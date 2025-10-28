@@ -1,10 +1,41 @@
 /* Admin Dashboard - Recent Activity Styles */
 .activity-item {
-    transition: background-color 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
 }
 
 .activity-item:hover {
     transform: translateX(2px);
+}
+
+/* Activity refresh animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.activity-item {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Recent activity loading state */
+#recent-activity-container.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Last updated timestamp subtle animation */
+#activity-last-updated {
+    transition: color 0.3s ease-in-out;
+}
+
+#activity-last-updated:hover {
+    color: rgb(99, 102, 241); /* indigo-500 */
 }
 
 /* Chart Container Responsive Sizing */

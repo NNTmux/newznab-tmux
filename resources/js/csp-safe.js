@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initAdminGroups();
     initTinyMCE();
     initAdminSpecificFeatures();
+    initRecentActivityRefresh();
 
     // Initialize page-specific functionality from inline scripts
     initMyMovies();
@@ -3263,7 +3264,8 @@ function startSystemMetricsAutoRefresh() {
                 const timestampElem = document.querySelector('[data-metric="last-updated"]');
                 if (timestampElem) {
                     const now = new Date();
-                    timestampElem.textContent = now.toLocaleTimeString();
+                    const timeString = now.toLocaleTimeString();
+                    timestampElem.textContent = 'Last updated: ' + timeString;
                 }
             })
             .catch(error => {
@@ -4255,419 +4257,102 @@ function initAddToCart() {
     };
 }
 
-// Note: Main DOMContentLoaded event listener is already defined at the top of the file
-// Just adding the new initializations to the existing initialization list above
-
-// Show validation error message for deleted users page
-window.showValidationError = function(message) {
-    const errorDiv = document.getElementById('validationError');
-    const errorMessage = document.getElementById('validationErrorMessage');
-    if (errorDiv && errorMessage) {
-        errorMessage.textContent = message;
-        errorDiv.classList.remove('hidden');
-
-        // Scroll to the error message
-        errorDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-        // Auto-hide after 5 seconds
-        setTimeout(() => {
-            errorDiv.classList.add('hidden');
-        }, 5000);
-    }
-};
-
-// Hide validation error
-window.hideValidationError = function() {
-    const errorDiv = document.getElementById('validationError');
-    if (errorDiv) {
-        errorDiv.classList.add('hidden');
-    }
-};
-
-// Confirm bulk action for deleted users
-window.confirmBulkAction = function(event) {
-    const action = document.getElementById('bulkAction')?.value;
-    const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
-
-    if (!action) {
-        event.preventDefault();
-        showValidationError('Please select an action from the dropdown.');
-        return false;
+// Recent Activity Auto-Refresh (20 minutes)
+function initRecentActivityRefresh() {
+    const activityContainer = document.getElementById('recent-activity-container');
+    if (!activityContainer) {
+        return; // Not on admin dashboard page
     }
 
-    if (checkedBoxes.length === 0) {
-        event.preventDefault();
-        showValidationError('Please select at least one user to perform this action.');
-        return false;
+    const refreshUrl = activityContainer.getAttribute('data-refresh-url');
+    if (!refreshUrl) {
+        return;
     }
 
-    // Show confirmation dialog with appropriate message
-    let confirmMessage = '';
-    if (action === 'delete') {
-        confirmMessage = `Are you sure you want to PERMANENTLY delete ${checkedBoxes.length} user(s)?\n\nThis action cannot be undone!`;
-    } else if (action === 'restore') {
-        confirmMessage = `Are you sure you want to restore ${checkedBoxes.length} user(s)?`;
-    }
-
-    if (!confirm(confirmMessage)) {
-        event.preventDefault();
-        return false;
-    }
-
-    return true;
-};
-
-// Movies Layout Toggle Functionality
-function initMoviesLayoutToggle() {
-    const layoutToggle = document.getElementById('layoutToggle');
-    const layoutToggleText = document.getElementById('layoutToggleText');
-    const moviesGrid = document.getElementById('moviesGrid');
-
-    if (!layoutToggle || !layoutToggleText || !moviesGrid) {
-        return; // Not on movies page
-    }
-
-    // Get saved layout preference from data attribute (from database)
-    // 1 = 1-column, 2 = 2-columns
-    let currentLayout = parseInt(moviesGrid.dataset.userLayout) || 2;
-
-    // Apply the saved layout on page load
-    applyLayout(currentLayout);
-
-    // Toggle layout on button click
-    layoutToggle.addEventListener('click', function() {
-        if (currentLayout === 2) {
-            currentLayout = 1;
-        } else {
-            currentLayout = 2;
-        }
-
-        // Save preference to database via AJAX
-        fetch('/movies/update-layout', {
-            method: 'POST',
+    // Function to refresh activity data
+    function refreshRecentActivity() {
+        fetch(refreshUrl, {
+            method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
             },
-            body: JSON.stringify({
-                layout: currentLayout
-            })
+            credentials: 'same-origin'
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
-            if (data.success) {
-                // Apply layout after successful save
-                applyLayout(currentLayout);
+            if (data.success && data.activities) {
+                updateActivityDisplay(data.activities);
+                updateLastRefreshTime();
             }
         })
         .catch(error => {
-            console.error('Error saving layout preference:', error);
-            // Still apply layout even if save failed
-            applyLayout(currentLayout);
+            console.error('Error refreshing recent activity:', error);
         });
-    });
-
-    function applyLayout(layout) {
-        // Get all movie poster images and placeholder divs
-        const posterImages = moviesGrid.querySelectorAll('img[alt], .bg-gray-200.dark\\:bg-gray-700');
-
-        // Get all release card containers
-        const releaseCardContainers = moviesGrid.querySelectorAll('.release-card-container');
-
-        if (layout === 1) {
-            // 1-column layout: larger images (w-48 h-72, original size)
-            moviesGrid.classList.remove('lg:grid-cols-2');
-            moviesGrid.classList.add('grid-cols-1');
-            layoutToggleText.textContent = '1 Column';
-            layoutToggle.querySelector('i').className = 'fas fa-th-list mr-2';
-
-            // Update image sizes to larger
-            posterImages.forEach(el => {
-                el.classList.remove('w-32', 'h-48');
-                el.classList.add('w-48', 'h-72');
-            });
-
-            // Update release card layout for 1-column view - side by side on all screens
-            releaseCardContainers.forEach(container => {
-                // Change container to flex-row with items on sides
-                container.classList.remove('space-y-2');
-                container.classList.add('flex', 'flex-row', 'items-start', 'justify-between', 'gap-3');
-
-                // Make info wrapper take available space
-                const infoWrapper = container.querySelector('.release-info-wrapper');
-                if (infoWrapper) {
-                    infoWrapper.classList.add('flex-1', 'min-w-0');
-                }
-
-                // Make actions wrapper stay on the right in a horizontal row
-                const actionsWrapper = container.querySelector('.release-actions');
-                if (actionsWrapper) {
-                    actionsWrapper.classList.remove('flex-wrap');
-                    actionsWrapper.classList.add('flex-shrink-0', 'flex-row', 'items-center');
-                }
-            });
-        } else {
-            // 2-column layout: smaller images (w-32 h-48)
-            moviesGrid.classList.remove('grid-cols-1');
-            moviesGrid.classList.add('lg:grid-cols-2');
-            layoutToggleText.textContent = '2 Columns';
-            layoutToggle.querySelector('i').className = 'fas fa-th-large mr-2';
-
-            // Update image sizes to smaller
-            posterImages.forEach(el => {
-                el.classList.remove('w-48', 'h-72');
-                el.classList.add('w-32', 'h-48');
-            });
-
-            // Update release card layout for 2-column view - stacked vertically
-            releaseCardContainers.forEach(container => {
-                // Change back to stacked layout
-                container.classList.add('space-y-2');
-                container.classList.remove('flex', 'flex-row', 'items-start', 'justify-between', 'gap-3');
-
-                // Remove special styling from info wrapper
-                const infoWrapper = container.querySelector('.release-info-wrapper');
-                if (infoWrapper) {
-                    infoWrapper.classList.remove('flex-1', 'min-w-0');
-                }
-
-                // Restore normal flex-wrap for actions wrapper
-                const actionsWrapper = container.querySelector('.release-actions');
-                if (actionsWrapper) {
-                    actionsWrapper.classList.add('flex-wrap', 'items-center');
-                    actionsWrapper.classList.remove('flex-shrink-0', 'flex-row');
-                }
-            });
-        }
-    }
-}
-
-/**
- * Profile Charts - User Download and API Request Charts
- * Initialize charts, progress bars, and tab switching for profile page
- */
-// Store chart instances globally to prevent recreation
-let profileDownloadsChartInstance = null;
-let profileApiRequestsChartInstance = null;
-
-function initProfileCharts() {
-    initProfileProgressBars();
-    // Note: initProfileChartsData() is called when the API tab is shown for the first time
-}
-
-/**
- * Initialize progress bar animations
- */
-function initProfileProgressBars() {
-    const progressBars = document.querySelectorAll('.progress-bar');
-    progressBars.forEach(bar => {
-        const width = bar.dataset.width;
-        if (width) {
-            // Small delay to trigger CSS transition
-            setTimeout(() => {
-                bar.style.width = width + '%';
-            }, 100);
-        }
-    });
-}
-
-/**
- * Initialize Chart.js charts for profile page
- */
-function initProfileChartsData() {
-    // Get data from data attributes
-    const chartContainer = document.getElementById('profile-charts-container');
-    if (!chartContainer) return;
-
-    const downloadsHourlyData = JSON.parse(chartContainer.dataset.downloadsHourly || '{}');
-    const apiRequestsHourlyData = JSON.parse(chartContainer.dataset.apiRequestsHourly || '{}');
-    const downloadLimit = parseInt(chartContainer.dataset.downloadLimit || '0');
-    const apiLimit = parseInt(chartContainer.dataset.apiLimit || '0');
-
-    const labels = Object.keys(downloadsHourlyData);
-    const downloadsValues = Object.values(downloadsHourlyData);
-    const apiValues = Object.values(apiRequestsHourlyData);
-
-    // Check if user is in dark mode
-    const isDarkMode = document.documentElement.classList.contains('dark');
-    const gridColor = isDarkMode ? 'rgba(75, 85, 99, 0.3)' : 'rgba(200, 200, 200, 0.3)';
-    const textColor = isDarkMode ? 'rgba(156, 163, 175, 1)' : 'rgba(75, 85, 99, 1)';
-
-    // Create Downloads Chart
-    createProfileDownloadsChart(labels, downloadsValues, downloadLimit, gridColor, textColor);
-
-    // Create API Requests Chart
-    createProfileApiRequestsChart(labels, apiValues, apiLimit, gridColor, textColor);
-}
-
-/**
- * Create Downloads Chart for profile page
- */
-function createProfileDownloadsChart(labels, data, limit, gridColor, textColor) {
-    const downloadsCtx = document.getElementById('downloadsChart');
-    if (!downloadsCtx) return;
-
-    // Destroy existing chart instance if it exists
-    if (profileDownloadsChartInstance) {
-        profileDownloadsChartInstance.destroy();
     }
 
-    profileDownloadsChartInstance = new Chart(downloadsCtx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Downloads',
-                data: data,
-                borderColor: 'rgb(59, 130, 246)',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: 'rgb(59, 130, 246)',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 3,
-                pointHoverRadius: 5
-            }, {
-                label: 'Limit',
-                data: Array(labels.length).fill(limit),
-                borderColor: 'rgba(239, 68, 68, 0.5)',
-                borderWidth: 2,
-                borderDash: [5, 5],
-                fill: false,
-                pointRadius: 0,
-                pointHoverRadius: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                    labels: {
-                        color: textColor
-                    }
-                },
-                tooltip: {
-                    mode: 'index',
-                    intersect: false,
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1,
-                        color: textColor
-                    },
-                    grid: {
-                        color: gridColor
-                    }
-                },
-                x: {
-                    ticks: {
-                        color: textColor,
-                        maxRotation: 45,
-                        minRotation: 45
-                    },
-                    grid: {
-                        color: gridColor
-                    }
-                }
-            },
-            interaction: {
-                mode: 'nearest',
-                axis: 'x',
-                intersect: false
-            }
+    // Function to update the activity display
+    function updateActivityDisplay(activities) {
+        const container = document.getElementById('recent-activity-container');
+        if (!container) return;
+
+        // Clear existing content
+        container.innerHTML = '';
+
+        if (activities.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-4" id="no-activity-message">No recent activity</p>';
+            return;
         }
-    });
-}
 
-/**
- * Create API Requests Chart for profile page
- */
-function createProfileApiRequestsChart(labels, data, limit, gridColor, textColor) {
-    const apiCtx = document.getElementById('apiRequestsChart');
-    if (!apiCtx) return;
+        // Add each activity item
+        activities.forEach(activity => {
+            const activityItem = document.createElement('div');
+            activityItem.className = 'flex items-start activity-item rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors';
 
-    // Destroy existing chart instance if it exists
-    if (profileApiRequestsChartInstance) {
-        profileApiRequestsChartInstance.destroy();
+            activityItem.innerHTML = `
+                <div class="w-8 h-8 ${activity.icon_bg} rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                    <i class="fas fa-${activity.icon} ${activity.icon_color} text-sm"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm text-gray-800 dark:text-gray-200">${escapeHtml(activity.message)}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">${escapeHtml(activity.created_at)}</p>
+                </div>
+            `;
+
+            container.appendChild(activityItem);
+        });
     }
 
-    profileApiRequestsChartInstance = new Chart(apiCtx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'API Requests',
-                data: data,
-                borderColor: 'rgb(168, 85, 247)',
-                backgroundColor: 'rgba(168, 85, 247, 0.1)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: 'rgb(168, 85, 247)',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 3,
-                pointHoverRadius: 5
-            }, {
-                label: 'Limit',
-                data: Array(labels.length).fill(limit),
-                borderColor: 'rgba(239, 68, 68, 0.5)',
-                borderWidth: 2,
-                borderDash: [5, 5],
-                fill: false,
-                pointRadius: 0,
-                pointHoverRadius: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                    labels: {
-                        color: textColor
-                    }
-                },
-                tooltip: {
-                    mode: 'index',
-                    intersect: false,
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1,
-                        color: textColor
-                    },
-                    grid: {
-                        color: gridColor
-                    }
-                },
-                x: {
-                    ticks: {
-                        color: textColor,
-                        maxRotation: 45,
-                        minRotation: 45
-                    },
-                    grid: {
-                        color: gridColor
-                    }
-                }
-            },
-            interaction: {
-                mode: 'nearest',
-                axis: 'x',
-                intersect: false
-            }
+    // Function to update last refresh time
+    function updateLastRefreshTime() {
+        const lastUpdatedElement = document.getElementById('activity-last-updated');
+        if (lastUpdatedElement) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            lastUpdatedElement.innerHTML = `<i class="fas fa-sync-alt"></i> Last updated: ${timeString}`;
+        }
+    }
+
+    // Helper function to escape HTML to prevent XSS
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Set up auto-refresh every 20 minutes (1200000 milliseconds)
+    const refreshInterval = 20 * 60 * 1000; // 20 minutes in milliseconds
+    setInterval(refreshRecentActivity, refreshInterval);
+
+    // Also refresh on page visibility change (when user comes back to tab)
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            refreshRecentActivity();
         }
     });
 }

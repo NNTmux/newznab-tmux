@@ -442,11 +442,16 @@
 
         <!-- Recent Activity -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                <i class="fas fa-history mr-2 text-indigo-600 dark:text-indigo-400"></i>
-                Recent User Activity
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center justify-between">
+                <span>
+                    <i class="fas fa-history mr-2 text-indigo-600 dark:text-indigo-400"></i>
+                    Recent User Activity
+                </span>
+                <span class="text-xs text-gray-500 dark:text-gray-400" id="activity-last-updated">
+                    <i class="fas fa-sync-alt"></i> Auto-refreshes every 20 minutes
+                </span>
             </h3>
-            <div class="space-y-3">
+            <div class="space-y-3" id="recent-activity-container" data-refresh-url="{{ route('admin.api.user-activity.recent') }}">
                 @if(isset($recent_activity) && count($recent_activity) > 0)
                     @foreach($recent_activity as $activity)
                         <div class="flex items-start activity-item rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
@@ -460,7 +465,7 @@
                         </div>
                     @endforeach
                 @else
-                    <p class="text-gray-500 dark:text-gray-400 text-center py-4">No recent activity</p>
+                    <p class="text-gray-500 dark:text-gray-400 text-center py-4" id="no-activity-message">No recent activity</p>
                 @endif
             </div>
         </div>

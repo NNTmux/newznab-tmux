@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Observers\UserActivityObserver;
 use App\Observers\UserServiceObserver;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,5 +23,6 @@ class UserServiceProvider extends ServiceProvider
     public function boot(): void
     {
         User::observe(UserServiceObserver::class);
+        User::observe(UserActivityObserver::class);
     }
 }

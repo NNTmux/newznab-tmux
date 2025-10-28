@@ -181,6 +181,7 @@ Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
 
     // User Activity API endpoints
     Route::get('api/user-activity/minutes', [AdminPageController::class, 'getUserActivityMinutes'])->name('admin.api.user-activity.minutes');
+    Route::get('api/user-activity/recent', [AdminPageController::class, 'getRecentActivity'])->name('admin.api.user-activity.recent');
 
     Route::post('anidb-delete/{id}', [AdminAnidbController::class, 'destroy'])->name('admin.anidb-delete');
     Route::match(['GET', 'POST'], 'anidb-edit/{id}', [AdminAnidbController::class, 'edit'])->name('admin.anidb-edit');
