@@ -61,6 +61,15 @@ class ProfileController extends BasePageController
             $this->userdata->style = 'Using the admin selected theme.';
         }
 
+        // Get 24-hour hourly data for downloads and API requests
+        $downloadsHourly = UserDownload::getHourlyDownloads($userID);
+        $apiRequestsHourly = UserRequest::getHourlyApiRequests($userID);
+
+        // Get role limits
+        $userRole = $this->userdata->roles->first();
+        $downloadLimit = $userRole->downloadrequests ?? 0;
+        $apiLimit = $userRole->apirequests ?? 0;
+
         $this->viewData = array_merge($this->viewData, [
             'downloadlist' => UserDownload::getDownloadRequestsForUser($userID),
             'apirequests' => UserRequest::getApiRequests($userID),
@@ -72,6 +81,10 @@ class ProfileController extends BasePageController
             'privileged' => $privileged,
             'isadmin' => $this->userdata->hasRole('Admin'),
             'commentslist' => ReleaseComment::getCommentsForUserRange($userID),
+            'downloadsHourly' => $downloadsHourly,
+            'apiRequestsHourly' => $apiRequestsHourly,
+            'downloadLimit' => $downloadLimit,
+            'apiLimit' => $apiLimit,
             'meta_title' => 'View User Profile',
             'meta_keywords' => 'view,profile,user,details',
             'meta_description' => 'View User Profile for '.$this->userdata->username,

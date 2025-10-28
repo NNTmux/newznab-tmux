@@ -71,6 +71,39 @@ class UserDownload extends Model
     }
 
     /**
+     * Get hourly download counts for the last 24 hours.
+     *
+     * @return array Array of hourly counts indexed by hour
+     *
+     * @throws \Exception
+     */
+    public static function getHourlyDownloads(int $userID): array
+    {
+        $hourlyData = [];
+        $now = now();
+
+        // Initialize all 24 hours with 0
+        for ($i = 23; $i >= 0; $i--) {
+            $hour = $now->copy()->subHours($i);
+            $hourlyData[$hour->format('H:00')] = 0;
+        }
+
+        // Get downloads from the last 24 hours grouped by hour
+        $downloads = self::whereUsersId($userID)
+            ->where('timestamp', '>', $now->subDay())
+            ->get();
+
+        foreach ($downloads as $download) {
+            $hourKey = \Carbon\Carbon::parse($download->timestamp)->format('H:00');
+            if (isset($hourlyData[$hourKey])) {
+                $hourlyData[$hourKey]++;
+            }
+        }
+
+        return $hourlyData;
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public static function getDownloadRequestsForUser($userID)

@@ -10,8 +10,18 @@
 /* Chart Container Responsive Sizing */
 .chart-container {
     position: relative;
-    height: 250px;
+    height: 16rem; /* 256px - updated for profile charts */
     width: 100%;
+}
+
+/* Ensure canvas fills container properly */
+.chart-container canvas {
+    max-height: 100%;
+}
+
+/* Admin dashboard specific chart height */
+#adminDashboard .chart-container {
+    height: 250px;
 }
 
 /* Smooth transitions for metric updates */
@@ -42,3 +52,67 @@
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
+/* Profile Charts - Progress Bars */
+.progress-bar {
+    transition: width 0.3s ease-in-out;
+    width: 0; /* Start at 0 for animation */
+}
+
+/* Profile Charts - API Token Scrollbar */
+code.api-token {
+    overflow-x: auto;
+    word-break: break-all;
+}
+
+code.api-token::-webkit-scrollbar {
+    height: 6px;
+}
+
+code.api-token::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+}
+
+code.api-token::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 3px;
+}
+
+code.api-token::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 0, 0.5);
+}
+/* Profile Page Styles */
+
+/* Tab content visibility */
+.tab-content.hidden-by-default {
+    display: none;
+}
+
+/* Progress bar animations */
+.progress-bar {
+    transition: width 0.3s ease-in-out;
+}
+
+/* Custom scrollbar for API token code blocks */
+code.api-token {
+    overflow-x: auto;
+    word-break: break-all;
+}
+
+code.api-token::-webkit-scrollbar {
+    height: 6px;
+}
+
+code.api-token::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+}
+
+code.api-token::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 3px;
+}
+
+code.api-token::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 0, 0.5);
+}

@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initDetailsPageImageModal();
     initAddToCart();
     initMoviesLayoutToggle();
+    initProfileCharts();
 });
 
 // Event delegation for dynamically added elements
@@ -4363,3 +4364,218 @@ function initMoviesLayoutToggle() {
     }
 }
 
+/**
+ * Profile Charts - User Download and API Request Charts
+ * Initialize charts, progress bars, and tab switching for profile page
+ */
+function initProfileCharts() {
+    initProfileProgressBars();
+    initProfileChartsData();
+}
+
+/**
+ * Initialize progress bar animations
+ */
+function initProfileProgressBars() {
+    const progressBars = document.querySelectorAll('.progress-bar');
+    progressBars.forEach(bar => {
+        const width = bar.dataset.width;
+        if (width) {
+            // Small delay to trigger CSS transition
+            setTimeout(() => {
+                bar.style.width = width + '%';
+            }, 100);
+        }
+    });
+}
+
+/**
+ * Initialize Chart.js charts for profile page
+ */
+function initProfileChartsData() {
+    // Get data from data attributes
+    const chartContainer = document.getElementById('profile-charts-container');
+    if (!chartContainer) return;
+
+    const downloadsHourlyData = JSON.parse(chartContainer.dataset.downloadsHourly || '{}');
+    const apiRequestsHourlyData = JSON.parse(chartContainer.dataset.apiRequestsHourly || '{}');
+    const downloadLimit = parseInt(chartContainer.dataset.downloadLimit || '0');
+    const apiLimit = parseInt(chartContainer.dataset.apiLimit || '0');
+
+    const labels = Object.keys(downloadsHourlyData);
+    const downloadsValues = Object.values(downloadsHourlyData);
+    const apiValues = Object.values(apiRequestsHourlyData);
+
+    // Check if user is in dark mode
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    const gridColor = isDarkMode ? 'rgba(75, 85, 99, 0.3)' : 'rgba(200, 200, 200, 0.3)';
+    const textColor = isDarkMode ? 'rgba(156, 163, 175, 1)' : 'rgba(75, 85, 99, 1)';
+
+    // Create Downloads Chart
+    createProfileDownloadsChart(labels, downloadsValues, downloadLimit, gridColor, textColor);
+
+    // Create API Requests Chart
+    createProfileApiRequestsChart(labels, apiValues, apiLimit, gridColor, textColor);
+}
+
+/**
+ * Create Downloads Chart for profile page
+ */
+function createProfileDownloadsChart(labels, data, limit, gridColor, textColor) {
+    const downloadsCtx = document.getElementById('downloadsChart');
+    if (!downloadsCtx) return;
+
+    new Chart(downloadsCtx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Downloads',
+                data: data,
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: 'rgb(59, 130, 246)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 3,
+                pointHoverRadius: 5
+            }, {
+                label: 'Limit',
+                data: Array(labels.length).fill(limit),
+                borderColor: 'rgba(239, 68, 68, 0.5)',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                fill: false,
+                pointRadius: 0,
+                pointHoverRadius: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        color: textColor
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        color: textColor
+                    },
+                    grid: {
+                        color: gridColor
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: textColor,
+                        maxRotation: 45,
+                        minRotation: 45
+                    },
+                    grid: {
+                        color: gridColor
+                    }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            }
+        }
+    });
+}
+
+/**
+ * Create API Requests Chart for profile page
+ */
+function createProfileApiRequestsChart(labels, data, limit, gridColor, textColor) {
+    const apiCtx = document.getElementById('apiRequestsChart');
+    if (!apiCtx) return;
+
+    new Chart(apiCtx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'API Requests',
+                data: data,
+                borderColor: 'rgb(168, 85, 247)',
+                backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: 'rgb(168, 85, 247)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 3,
+                pointHoverRadius: 5
+            }, {
+                label: 'Limit',
+                data: Array(labels.length).fill(limit),
+                borderColor: 'rgba(239, 68, 68, 0.5)',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                fill: false,
+                pointRadius: 0,
+                pointHoverRadius: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        color: textColor
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        color: textColor
+                    },
+                    grid: {
+                        color: gridColor
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: textColor,
+                        maxRotation: 45,
+                        minRotation: 45
+                    },
+                    grid: {
+                        color: gridColor
+                    }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            }
+        }
+    });
+}

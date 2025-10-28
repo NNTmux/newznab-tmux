@@ -239,7 +239,54 @@
                                 <h2 class="text-lg font-semibold">API & Downloads</h2>
                             </div>
 
-                            <!-- Stats -->
+                            <!-- Usage Limits -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <!-- Downloads Usage -->
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                            <i class="fa fa-download text-blue-600 mr-2"></i>Downloads (24h)
+                                        </h3>
+                                        <span class="text-sm font-bold {{ $grabstoday >= $downloadLimit ? 'text-red-600' : 'text-green-600' }}">
+                                            {{ $grabstoday ?? 0 }} / {{ $downloadLimit }}
+                                        </span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                                        @php
+                                            $downloadPercentage = $downloadLimit > 0 ? min(($grabstoday / $downloadLimit) * 100, 100) : 0;
+                                            $downloadColor = $downloadPercentage >= 90 ? 'bg-red-600' : ($downloadPercentage >= 70 ? 'bg-yellow-500' : 'bg-green-600');
+                                        @endphp
+                                        <div class="{{ $downloadColor }} h-3 rounded-full progress-bar" data-width="{{ $downloadPercentage }}"></div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        {{ number_format($downloadLimit - $grabstoday) }} downloads remaining
+                                    </p>
+                                </div>
+
+                                <!-- API Requests Usage -->
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                            <i class="fa fa-server text-purple-600 mr-2"></i>API Requests (24h)
+                                        </h3>
+                                        <span class="text-sm font-bold {{ $apirequests >= $apiLimit ? 'text-red-600' : 'text-green-600' }}">
+                                            {{ $apirequests ?? 0 }} / {{ $apiLimit }}
+                                        </span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                                        @php
+                                            $apiPercentage = $apiLimit > 0 ? min(($apirequests / $apiLimit) * 100, 100) : 0;
+                                            $apiColor = $apiPercentage >= 90 ? 'bg-red-600' : ($apiPercentage >= 70 ? 'bg-yellow-500' : 'bg-purple-600');
+                                        @endphp
+                                        <div class="{{ $apiColor }} h-3 rounded-full progress-bar" data-width="{{ $apiPercentage }}"></div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        {{ number_format($apiLimit - $apirequests) }} requests remaining
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Stats Cards -->
                             <div class="grid grid-cols-3 gap-4 mb-6">
                                 <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow">
                                     <div class="text-3xl font-bold text-blue-600">{{ $user->grabs ?? 0 }}</div>
@@ -255,12 +302,40 @@
                                 </div>
                             </div>
 
+                            <!-- 24-Hour Activity Charts -->
+                            <div id="profile-charts-container"
+                                 class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6"
+                                 data-downloads-hourly="{{ json_encode($downloadsHourly ?? []) }}"
+                                 data-api-requests-hourly="{{ json_encode($apiRequestsHourly ?? []) }}"
+                                 data-download-limit="{{ $downloadLimit ?? 0 }}"
+                                 data-api-limit="{{ $apiLimit ?? 0 }}">
+                                <!-- Downloads Chart -->
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
+                                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                        <i class="fa fa-chart-line text-blue-600 mr-2"></i>Downloads (Last 24 Hours)
+                                    </h3>
+                                    <div class="chart-container">
+                                        <canvas id="downloadsChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- API Requests Chart -->
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
+                                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                        <i class="fa fa-chart-line text-purple-600 mr-2"></i>API Requests (Last 24 Hours)
+                                    </h3>
+                                    <div class="chart-container">
+                                        <canvas id="apiRequestsChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
                             @if(($isadmin ?? false) || !$publicview)
                                 <!-- API Keys -->
                                 <div class="space-y-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">API Token</label>
-                                        <code class="block text-xs bg-gray-800 text-green-400 p-3 rounded break-all">{{ $user->api_token }}</code>
+                                        <code class="api-token block text-xs bg-gray-800 text-green-400 p-3 rounded break-all">{{ $user->api_token }}</code>
                                     </div>
                                 </div>
                             @endif
@@ -292,5 +367,10 @@
             </div>
     </div>
 </div>
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+@endpush
+
 @endsection
 
