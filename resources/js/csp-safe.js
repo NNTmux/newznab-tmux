@@ -1486,35 +1486,95 @@ function initSidebarToggle() {
 
 // Dropdown Menus for Header Navigation
 function initDropdownMenus() {
-    document.querySelectorAll('.dropdown-toggle').forEach(function(toggle) {
+    const dropdownContainers = document.querySelectorAll('.dropdown-container');
+
+    dropdownContainers.forEach(function(container) {
+        const toggle = container.querySelector('.dropdown-toggle');
+        const menu = container.querySelector('.dropdown-menu');
+
+        if (!toggle || !menu) return;
+
+        let closeTimeout;
+
+        // Ensure menu is hidden initially
+        menu.style.display = 'none';
+
+        // Toggle on click
         toggle.addEventListener('click', function(e) {
             e.preventDefault();
-            const menu = this.nextElementSibling;
-            if (menu && menu.classList.contains('dropdown-menu')) {
-                // Close all other dropdowns
-                document.querySelectorAll('.dropdown-menu').forEach(function(m) {
-                    if (m !== menu) {
-                        m.classList.remove('show');
-                        m.style.display = 'none';
-                    }
-                });
+            e.stopPropagation();
 
-                // Toggle this dropdown
-                menu.classList.toggle('show');
-                menu.style.display = menu.classList.contains('show') ? 'block' : 'none';
+            const isCurrentlyOpen = menu.style.display === 'block';
+
+            // Close all other dropdowns
+            dropdownContainers.forEach(function(otherContainer) {
+                if (otherContainer !== container) {
+                    const otherMenu = otherContainer.querySelector('.dropdown-menu');
+                    if (otherMenu) {
+                        otherMenu.style.display = 'none';
+                    }
+                }
+            });
+
+            // Toggle this dropdown
+            if (isCurrentlyOpen) {
+                menu.style.display = 'none';
+            } else {
+                menu.style.display = 'block';
             }
+        });
+
+        // Keep open on hover over the container
+        container.addEventListener('mouseenter', function() {
+            clearTimeout(closeTimeout);
+        });
+
+        // Close after delay when leaving the container
+        container.addEventListener('mouseleave', function() {
+            closeTimeout = setTimeout(function() {
+                menu.style.display = 'none';
+            }, 300);
+        });
+
+        // Prevent closing when hovering over the menu itself
+        menu.addEventListener('mouseenter', function() {
+            clearTimeout(closeTimeout);
         });
     });
 
     // Close dropdowns when clicking outside
     document.addEventListener('click', function(e) {
-        if (!e.target.closest('.dropdown-toggle') && !e.target.closest('.dropdown-menu')) {
-            document.querySelectorAll('.dropdown-menu').forEach(function(menu) {
-                menu.classList.remove('show');
-                menu.style.display = 'none';
+        if (!e.target.closest('.dropdown-container')) {
+            dropdownContainers.forEach(function(container) {
+                const menu = container.querySelector('.dropdown-menu');
+                if (menu) {
+                    menu.style.display = 'none';
+                }
             });
         }
     });
+
+    // Mobile menu toggle
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    if (mobileMenuToggle) {
+        mobileMenuToggle.addEventListener('click', function() {
+            const desktopNav = document.querySelector('.md\\:flex.md\\:items-center');
+            if (desktopNav) {
+                desktopNav.classList.toggle('hidden');
+                desktopNav.classList.toggle('flex');
+            }
+        });
+    }
+
+    // Mobile search toggle
+    const mobileSearchToggle = document.getElementById('mobile-search-toggle');
+    const mobileSearchForm = document.getElementById('mobile-search-form');
+    if (mobileSearchToggle && mobileSearchForm) {
+        mobileSearchToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            mobileSearchForm.classList.toggle('hidden');
+        });
+    }
 }
 
 // Image Fallbacks

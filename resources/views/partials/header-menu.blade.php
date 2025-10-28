@@ -83,7 +83,7 @@
                                     <span>{{ $parentcat['title'] }}</span>
                                     <i class="fas fa-chevron-down ml-1 text-xs"></i>
                                 </button>
-                                <div class="dropdown-menu absolute left-0 top-full w-48 bg-gray-900 dark:bg-gray-950 rounded-md shadow-lg z-50" style="display: none;">
+                                <div class="dropdown-menu absolute left-0 top-full w-48 bg-gray-900 dark:bg-gray-950 rounded-md shadow-lg z-50">
                                     <a href="{{ url('/browse/' . $parentcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">{{ $parentcat['title'] }}</a>
                                     <div class="border-t border-gray-700 dark:border-gray-600"></div>
                                     @foreach($parentcat['categories'] as $subcat)
@@ -223,94 +223,4 @@
     </div>
 </nav>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Header menu script loaded');
-
-    // Dropdown functionality
-    const dropdownContainers = document.querySelectorAll('.dropdown-container');
-    console.log('Found dropdown containers:', dropdownContainers.length);
-
-    dropdownContainers.forEach((container, index) => {
-        const toggle = container.querySelector('.dropdown-toggle');
-        const menu = container.querySelector('.dropdown-menu');
-
-        console.log(`Container ${index}:`, { toggle: !!toggle, menu: !!menu });
-
-        if (!toggle || !menu) return;
-
-        let closeTimeout;
-
-        // Toggle on click
-        toggle.addEventListener('click', function(e) {
-            console.log('Dropdown clicked!');
-            e.preventDefault();
-            e.stopPropagation();
-
-            const isCurrentlyOpen = menu.style.display === 'block';
-            console.log('Currently open:', isCurrentlyOpen, 'Display:', menu.style.display);
-
-            // Close all other dropdowns
-            dropdownContainers.forEach(otherContainer => {
-                if (otherContainer !== container) {
-                    const otherMenu = otherContainer.querySelector('.dropdown-menu');
-                    if (otherMenu) {
-                        otherMenu.style.display = 'none';
-                    }
-                }
-            });
-
-            // Toggle this dropdown
-            if (isCurrentlyOpen) {
-                console.log('Closing dropdown');
-                menu.style.display = 'none';
-            } else {
-                console.log('Opening dropdown');
-                menu.style.display = 'block';
-            }
-        });
-
-        // Keep open on hover over the container
-        container.addEventListener('mouseenter', function() {
-            clearTimeout(closeTimeout);
-        });
-
-        // Close after delay when leaving the container
-        container.addEventListener('mouseleave', function() {
-            closeTimeout = setTimeout(() => {
-                menu.style.display = 'none';
-            }, 300);
-        });
-
-        // Prevent closing when hovering over the menu itself
-        menu.addEventListener('mouseenter', function() {
-            clearTimeout(closeTimeout);
-        });
-    });
-
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.dropdown-container')) {
-            dropdownContainers.forEach(container => {
-                const menu = container.querySelector('.dropdown-menu');
-                if (menu) {
-                    menu.style.display = 'none';
-                }
-            });
-        }
-    });
-
-    // Mobile menu toggle
-    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-    if (mobileMenuToggle) {
-        mobileMenuToggle.addEventListener('click', function() {
-            const desktopNav = document.querySelector('.md\\:flex.md\\:items-center');
-            if (desktopNav) {
-                desktopNav.classList.toggle('hidden');
-                desktopNav.classList.toggle('flex');
-            }
-        });
-    }
-});
-</script>
 
