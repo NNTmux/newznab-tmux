@@ -302,33 +302,6 @@
                                 </div>
                             </div>
 
-                            <!-- 24-Hour Activity Charts -->
-                            <div id="profile-charts-container"
-                                 class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6"
-                                 data-downloads-hourly="{{ json_encode($downloadsHourly ?? []) }}"
-                                 data-api-requests-hourly="{{ json_encode($apiRequestsHourly ?? []) }}"
-                                 data-download-limit="{{ $downloadLimit ?? 0 }}"
-                                 data-api-limit="{{ $apiLimit ?? 0 }}">
-                                <!-- Downloads Chart -->
-                                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
-                                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                                        <i class="fa fa-chart-line text-blue-600 mr-2"></i>Downloads (Last 24 Hours)
-                                    </h3>
-                                    <div class="chart-container">
-                                        <canvas id="downloadsChart"></canvas>
-                                    </div>
-                                </div>
-
-                                <!-- API Requests Chart -->
-                                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
-                                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                                        <i class="fa fa-chart-line text-purple-600 mr-2"></i>API Requests (Last 24 Hours)
-                                    </h3>
-                                    <div class="chart-container">
-                                        <canvas id="apiRequestsChart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
 
                             @if(($isadmin ?? false) || !$publicview)
                                 <!-- API Keys -->
@@ -368,9 +341,6 @@
     </div>
 </div>
 
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-@endpush
 
 @endsection
 
