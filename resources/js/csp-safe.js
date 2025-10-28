@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initDetailsPageImageModal();
     initAddToCart();
     initMoviesLayoutToggle();
-    initProfileCharts(); // This only initializes progress bars now
+    initProfilePage(); // Initialize profile page (progress bars and charts)
 });
 
 // Event delegation for dynamically added elements
@@ -1631,7 +1631,19 @@ function initProfileTabs() {
                     chartsInitialized = true;
                     // Small delay to ensure the tab is fully visible before rendering charts
                     setTimeout(() => {
-                        initProfileChartsData();
+                        // Wait for Chart.js to be available
+                        let attempts = 0;
+                        const maxAttempts = 20; // Try for up to 2 seconds
+                        const checkChartJs = setInterval(() => {
+                            attempts++;
+                            if (typeof Chart !== 'undefined') {
+                                clearInterval(checkChartJs);
+                                initializeProfileCharts();
+                            } else if (attempts >= maxAttempts) {
+                                clearInterval(checkChartJs);
+                                console.error('Chart.js failed to load within timeout period');
+                            }
+                        }, 100);
                     }, 50);
                 }
             }
@@ -4074,6 +4086,115 @@ function initMyMovies() {
     }
 }
 
+// Movies page layout toggle functionality
+function initMoviesLayoutToggle() {
+    const toggleButton = document.getElementById('layoutToggle');
+    const toggleText = document.getElementById('layoutToggleText');
+    const moviesGrid = document.getElementById('moviesGrid');
+
+    if (!toggleButton || !toggleText || !moviesGrid) {
+        return; // Not on movies page
+    }
+
+    // Get current layout from data attribute
+    let currentLayout = parseInt(moviesGrid.dataset.userLayout) || 2;
+
+    // Apply current layout
+    applyLayout(currentLayout);
+
+    // Handle toggle button click
+    toggleButton.addEventListener('click', function() {
+        // Toggle between 1 and 2 column layouts
+        currentLayout = currentLayout === 2 ? 1 : 2;
+
+        // Save preference to server
+        fetch('/movies/update-layout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({ layout: currentLayout })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                applyLayout(currentLayout);
+            }
+        })
+        .catch(error => {
+            console.error('Error saving layout preference:', error);
+            // Apply layout anyway even if save fails
+            applyLayout(currentLayout);
+        });
+    });
+
+    function applyLayout(layout) {
+        const images = moviesGrid.querySelectorAll('img[alt], .bg-gray-200.dark\\:bg-gray-700');
+        const releaseContainers = moviesGrid.querySelectorAll('.release-card-container');
+
+        if (layout === 1) {
+            // 1 Column Layout
+            moviesGrid.classList.remove('lg:grid-cols-2');
+            moviesGrid.classList.add('grid-cols-1');
+            toggleText.textContent = '1 Column';
+            toggleButton.querySelector('i').className = 'fas fa-th-list mr-2';
+
+            // Make images larger
+            images.forEach(img => {
+                img.classList.remove('w-32', 'h-48');
+                img.classList.add('w-48', 'h-72');
+            });
+
+            // Adjust release card containers to horizontal layout
+            releaseContainers.forEach(container => {
+                container.classList.remove('space-y-2');
+                container.classList.add('flex', 'flex-row', 'items-start', 'justify-between', 'gap-3');
+
+                const infoWrapper = container.querySelector('.release-info-wrapper');
+                if (infoWrapper) {
+                    infoWrapper.classList.add('flex-1', 'min-w-0');
+                }
+
+                const actions = container.querySelector('.release-actions');
+                if (actions) {
+                    actions.classList.remove('flex-wrap');
+                    actions.classList.add('flex-shrink-0', 'flex-row', 'items-center');
+                }
+            });
+        } else {
+            // 2 Column Layout
+            moviesGrid.classList.remove('grid-cols-1');
+            moviesGrid.classList.add('lg:grid-cols-2');
+            toggleText.textContent = '2 Columns';
+            toggleButton.querySelector('i').className = 'fas fa-th-large mr-2';
+
+            // Make images smaller
+            images.forEach(img => {
+                img.classList.remove('w-48', 'h-72');
+                img.classList.add('w-32', 'h-48');
+            });
+
+            // Adjust release card containers to vertical layout
+            releaseContainers.forEach(container => {
+                container.classList.add('space-y-2');
+                container.classList.remove('flex', 'flex-row', 'items-start', 'justify-between', 'gap-3');
+
+                const infoWrapper = container.querySelector('.release-info-wrapper');
+                if (infoWrapper) {
+                    infoWrapper.classList.remove('flex-1', 'min-w-0');
+                }
+
+                const actions = container.querySelector('.release-actions');
+                if (actions) {
+                    actions.classList.add('flex-wrap', 'items-center');
+                    actions.classList.remove('flex-shrink-0', 'flex-row');
+                }
+            });
+        }
+    }
+}
+
 // Auth pages functionality
 function initAuthPages() {
     // Auto-hide success messages after 5 seconds on login page
@@ -4356,3 +4477,230 @@ function initRecentActivityRefresh() {
         }
     });
 }
+
+// Profile page functionality
+let downloadsChart = null;
+let apiRequestsChart = null;
+
+function initProfilePage() {
+    // Animate progress bars
+    animateProgressBars();
+}
+
+function animateProgressBars() {
+    document.querySelectorAll('.progress-bar').forEach(bar => {
+        const width = bar.dataset.width;
+        if (width) {
+            setTimeout(() => {
+                bar.style.width = width + '%';
+            }, 100);
+        }
+    });
+}
+
+function initializeProfileCharts() {
+    // Check if Chart.js is loaded
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js is not loaded. Cannot initialize profile charts.');
+        return;
+    }
+
+    const container = document.getElementById('profile-charts-container');
+    if (!container) {
+        return;
+    }
+
+    const downloadsHourly = JSON.parse(container.dataset.downloadsHourly || '{}');
+    const apiRequestsHourly = JSON.parse(container.dataset.apiRequestsHourly || '{}');
+    const downloadLimit = parseInt(container.dataset.downloadLimit || '0');
+    const apiLimit = parseInt(container.dataset.apiLimit || '0');
+
+    const labels = Object.keys(downloadsHourly);
+    const downloadsData = Object.values(downloadsHourly);
+    const apiData = Object.values(apiRequestsHourly);
+
+    // Get colors based on dark mode
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    const gridColor = isDarkMode ? 'rgba(75, 85, 99, 0.3)' : 'rgba(200, 200, 200, 0.3)';
+    const textColor = isDarkMode ? 'rgba(156, 163, 175, 1)' : 'rgba(75, 85, 99, 1)';
+
+    createDownloadsChart(labels, downloadsData, downloadLimit, gridColor, textColor);
+    createApiRequestsChart(labels, apiData, apiLimit, gridColor, textColor);
+}
+
+function createDownloadsChart(labels, data, limit, gridColor, textColor) {
+    const canvas = document.getElementById('downloadsChart');
+    if (!canvas) {
+        return;
+    }
+
+    // Destroy existing chart if it exists
+    if (downloadsChart) {
+        downloadsChart.destroy();
+    }
+
+    downloadsChart = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Downloads',
+                    data: data,
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: 'rgb(59, 130, 246)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 3,
+                    pointHoverRadius: 5
+                },
+                {
+                    label: 'Limit',
+                    data: Array(labels.length).fill(limit),
+                    borderColor: 'rgba(239, 68, 68, 0.5)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    pointRadius: 0,
+                    pointHoverRadius: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        color: textColor
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        color: textColor
+                    },
+                    grid: {
+                        color: gridColor
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: textColor,
+                        maxRotation: 45,
+                        minRotation: 45
+                    },
+                    grid: {
+                        color: gridColor
+                    }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            }
+        }
+    });
+}
+
+function createApiRequestsChart(labels, data, limit, gridColor, textColor) {
+    const canvas = document.getElementById('apiRequestsChart');
+    if (!canvas) {
+        return;
+    }
+
+    // Destroy existing chart if it exists
+    if (apiRequestsChart) {
+        apiRequestsChart.destroy();
+    }
+
+    apiRequestsChart = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'API Requests',
+                    data: data,
+                    borderColor: 'rgb(168, 85, 247)',
+                    backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: 'rgb(168, 85, 247)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 3,
+                    pointHoverRadius: 5
+                },
+                {
+                    label: 'Limit',
+                    data: Array(labels.length).fill(limit),
+                    borderColor: 'rgba(239, 68, 68, 0.5)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    pointRadius: 0,
+                    pointHoverRadius: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        color: textColor
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        color: textColor
+                    },
+                    grid: {
+                        color: gridColor
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: textColor,
+                        maxRotation: 45,
+                        minRotation: 45
+                    },
+                    grid: {
+                        color: gridColor
+                    }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            }
+        }
+    });
+}
+
