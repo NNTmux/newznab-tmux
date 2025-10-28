@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initDetailsPageImageModal();
     initAddToCart();
     initMoviesLayoutToggle();
-    initProfileCharts();
+    initProfileCharts(); // This only initializes progress bars now
 });
 
 // Event delegation for dynamically added elements
@@ -1599,6 +1599,8 @@ function initProfileTabs() {
         return; // Not on a page with tabs
     }
 
+    let chartsInitialized = false;
+
     tabLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
@@ -1622,6 +1624,15 @@ function initProfileTabs() {
             const targetContent = document.getElementById(targetId);
             if (targetContent) {
                 targetContent.style.display = 'block';
+
+                // Initialize charts when API tab is shown for the first time
+                if (targetId === 'api' && !chartsInitialized) {
+                    chartsInitialized = true;
+                    // Small delay to ensure the tab is fully visible before rendering charts
+                    setTimeout(() => {
+                        initProfileChartsData();
+                    }, 50);
+                }
             }
 
             // Update URL hash without scrolling
@@ -1636,6 +1647,13 @@ function initProfileTabs() {
         if (link) {
             link.click();
         }
+    } else if (hash === '' || hash === 'general') {
+        // If on general tab or no hash, ensure other tabs are hidden
+        tabContents.forEach((content, index) => {
+            if (index !== 0) {
+                content.style.display = 'none';
+            }
+        });
     }
 }
 
@@ -4428,9 +4446,13 @@ function initMoviesLayoutToggle() {
  * Profile Charts - User Download and API Request Charts
  * Initialize charts, progress bars, and tab switching for profile page
  */
+// Store chart instances globally to prevent recreation
+let profileDownloadsChartInstance = null;
+let profileApiRequestsChartInstance = null;
+
 function initProfileCharts() {
     initProfileProgressBars();
-    initProfileChartsData();
+    // Note: initProfileChartsData() is called when the API tab is shown for the first time
 }
 
 /**
@@ -4485,7 +4507,12 @@ function createProfileDownloadsChart(labels, data, limit, gridColor, textColor) 
     const downloadsCtx = document.getElementById('downloadsChart');
     if (!downloadsCtx) return;
 
-    new Chart(downloadsCtx, {
+    // Destroy existing chart instance if it exists
+    if (profileDownloadsChartInstance) {
+        profileDownloadsChartInstance.destroy();
+    }
+
+    profileDownloadsChartInstance = new Chart(downloadsCtx, {
         type: 'line',
         data: {
             labels: labels,
@@ -4566,7 +4593,12 @@ function createProfileApiRequestsChart(labels, data, limit, gridColor, textColor
     const apiCtx = document.getElementById('apiRequestsChart');
     if (!apiCtx) return;
 
-    new Chart(apiCtx, {
+    // Destroy existing chart instance if it exists
+    if (profileApiRequestsChartInstance) {
+        profileApiRequestsChartInstance.destroy();
+    }
+
+    profileApiRequestsChartInstance = new Chart(apiCtx, {
         type: 'line',
         data: {
             labels: labels,
