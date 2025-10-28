@@ -95,9 +95,9 @@
                             name="trust_device"
                             id="trust_device"
                             value="1"
-                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
+                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 checked:bg-blue-600 dark:checked:bg-blue-600"
                         >
-                        <label for="trust_device" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                        <label for="trust_device" class="ml-2 block text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
                             Trust this device for 30 days
                         </label>
                     </div>
