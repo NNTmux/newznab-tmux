@@ -6,7 +6,6 @@ use App\Http\Controllers\BasePageController;
 use App\Models\Category;
 use App\Models\Release;
 use Blacklight\Releases;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class AdminReleasesController extends BasePageController
@@ -96,7 +95,7 @@ class AdminReleasesController extends BasePageController
                 if (request()->wantsJson() || request()->ajax()) {
                     return response()->json([
                         'success' => true,
-                        'message' => 'Release deleted successfully'
+                        'message' => 'Release deleted successfully',
                     ]);
                 }
 
@@ -107,7 +106,7 @@ class AdminReleasesController extends BasePageController
             if (request()->wantsJson() || request()->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No release ID provided'
+                    'message' => 'No release ID provided',
                 ], 400);
             }
 
@@ -128,7 +127,7 @@ class AdminReleasesController extends BasePageController
             if (request()->wantsJson() || request()->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error deleting release: '.$e->getMessage()
+                    'message' => 'Error deleting release: '.$e->getMessage(),
                 ], 500);
             }
 
