@@ -38,6 +38,8 @@ class AdminUserController extends BasePageController
             'email' => $request->has('email') ? $request->input('email') : '',
             'host' => $request->has('host') ? $request->input('host') : '',
             'role' => $request->has('role') ? $request->input('role') : '',
+            'created_from' => $request->has('created_from') ? $request->input('created_from') : '',
+            'created_to' => $request->has('created_to') ? $request->input('created_to') : '',
         ];
 
         $result = User::getRange(
@@ -48,10 +50,12 @@ class AdminUserController extends BasePageController
             $variables['email'],
             $variables['host'],
             $variables['role'],
-            true
+            true,
+            $variables['created_from'],
+            $variables['created_to']
         );
 
-        $results = $this->paginate($result ?? [], User::getCount($variables['role'], $variables['username'], $variables['host'], $variables['email']) ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
+        $results = $this->paginate($result ?? [], User::getCount($variables['role'], $variables['username'], $variables['host'], $variables['email'], $variables['created_from'], $variables['created_to']) ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
         // Add country data to each user based on their host IP
         foreach ($results as $user) {
@@ -74,6 +78,8 @@ class AdminUserController extends BasePageController
             'email' => $variables['email'],
             'host' => $variables['host'],
             'role' => $variables['role'],
+            'created_from' => $variables['created_from'],
+            'created_to' => $variables['created_to'],
             'role_ids' => array_keys($roles),
             'role_names' => $roles,
             'userlist' => $results,

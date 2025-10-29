@@ -254,7 +254,7 @@ class User extends Authenticatable
         self::find($id)->delete();
     }
 
-    public static function getCount(?string $role = null, ?string $username = '', ?string $host = '', ?string $email = ''): int
+    public static function getCount(?string $role = null, ?string $username = '', ?string $host = '', ?string $email = '', ?string $createdFrom = '', ?string $createdTo = ''): int
     {
         $res = self::query()->withTrashed()->where('email', '<>', 'sharing@nZEDb.com');
 
@@ -272,6 +272,14 @@ class User extends Authenticatable
 
         if ($email !== '') {
             $res->where('email', 'like', '%'.$email.'%');
+        }
+
+        if ($createdFrom !== '') {
+            $res->where('created_at', '>=', $createdFrom.' 00:00:00');
+        }
+
+        if ($createdTo !== '') {
+            $res->where('created_at', '<=', $createdTo.' 23:59:59');
         }
 
         return $res->count(['id']);
@@ -382,7 +390,7 @@ class User extends Authenticatable
     /**
      * @throws \Throwable
      */
-    public static function getRange($start, $offset, $orderBy, ?string $userName = '', ?string $email = '', ?string $host = '', ?string $role = '', bool $apiRequests = false): Collection
+    public static function getRange($start, $offset, $orderBy, ?string $userName = '', ?string $email = '', ?string $host = '', ?string $role = '', bool $apiRequests = false, ?string $createdFrom = '', ?string $createdTo = ''): Collection
     {
         if ($apiRequests) {
             UserRequest::clearApiRequests(false);
@@ -391,7 +399,7 @@ class User extends Authenticatable
 				FROM users
 				INNER JOIN roles ON roles.id = users.roles_id
 				LEFT JOIN user_requests ON user_requests.users_id = users.id
-				WHERE users.id != 0 %s %s %s %s
+				WHERE users.id != 0 %s %s %s %s %s %s
 				AND email != 'sharing@nZEDb.com'
 				GROUP BY users.id
 				ORDER BY %s %s %s ";
@@ -400,7 +408,7 @@ class User extends Authenticatable
 				SELECT users.*, roles.name AS rolename
 				FROM users
 				INNER JOIN roles ON roles.id = users.roles_id
-				WHERE 1=1 %s %s %s %s
+				WHERE 1=1 %s %s %s %s %s %s
 				ORDER BY %s %s %s';
         }
         $order = self::getBrowseOrder($orderBy);
@@ -412,6 +420,8 @@ class User extends Authenticatable
                 ! empty($email) ? 'AND users.email '.'LIKE '.escapeString('%'.$email.'%') : '',
                 ! empty($host) ? 'AND users.host '.'LIKE '.escapeString('%'.$host.'%') : '',
                 (! empty($role) ? ('AND users.roles_id = '.$role) : ''),
+                ! empty($createdFrom) ? 'AND users.created_at >= '.escapeString($createdFrom.' 00:00:00') : '',
+                ! empty($createdTo) ? 'AND users.created_at <= '.escapeString($createdTo.' 23:59:59') : '',
                 $order[0],
                 $order[1],
                 ($start === false ? '' : ('LIMIT '.$offset.' OFFSET '.$start))

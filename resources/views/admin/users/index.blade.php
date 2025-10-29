@@ -18,7 +18,7 @@
         <!-- Search Filters -->
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
             <form method="get" action="{{ url('admin/user-list') }}">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div>
                         <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
                         <input type="text"
@@ -58,6 +58,22 @@
                                 </option>
                             @endforeach
                         </select>
+                    </div>
+                    <div>
+                        <label for="created_from" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Registered From</label>
+                        <input type="date"
+                               id="created_from"
+                               name="created_from"
+                               value="{{ $created_from ?? '' }}"
+                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400">
+                    </div>
+                    <div>
+                        <label for="created_to" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Registered To</label>
+                        <input type="date"
+                               id="created_to"
+                               name="created_to"
+                               value="{{ $created_to ?? '' }}"
+                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400">
                     </div>
                 </div>
                 <div class="mt-4 flex gap-2">
