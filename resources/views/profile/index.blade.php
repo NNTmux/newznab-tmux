@@ -61,11 +61,6 @@
                                 <i class="fa fa-envelope mr-3"></i>My Invitations
                             </a>
                         @endif
-                        @if(($isadmin ?? false) && isset($downloadlist) && count($downloadlist) > 0)
-                            <a href="#downloads" class="tab-link flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 rounded-lg">
-                                <i class="fa fa-download mr-3"></i>Recent Downloads
-                            </a>
-                        @endif
                     </div>
                 </div>
 
