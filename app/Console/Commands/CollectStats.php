@@ -43,7 +43,9 @@ class CollectStats extends Command
         RoleStat::insertUsersByRole();
         $this->info('Users by role collected.');
         UserActivityStat::collectDailyStats();
-        $this->info('User activity stats collected.');
+        $this->info('User activity daily stats collected.');
+        UserActivityStat::collectHourlyStats();
+        $this->info('User activity hourly stats collected.');
         $this->info('Site stats collected.');
     }
 }

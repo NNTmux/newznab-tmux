@@ -39,6 +39,10 @@ Schedule::command('metrics:collect --cleanup')->dailyAt('03:00');
 Schedule::call(function () {
     \App\Models\UserActivityStat::cleanupOldStats(90);
 })->weeklyOn(1, '04:00');
+// Cleanup old hourly stats daily (keep last 30 days)
+Schedule::call(function () {
+    \App\Models\UserActivityStat::cleanupOldHourlyStats(30);
+})->dailyAt('04:30');
 if (config('nntmux.purge_inactive_users') === true) {
     Schedule::job(new RemoveInactiveAccounts)->daily();
     Schedule::job(new PurgeDeletedAccounts)->daily();

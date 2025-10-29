@@ -96,49 +96,12 @@ class UserStatsService
 
     /**
      * Get downloads per hour for the last N hours
-     * Uses live data from user_downloads table
+     * Uses aggregated hourly stats from user_activity_stats_hourly table
      */
     public function getDownloadsPerHour(int $hours = 168): array
     {
-        $startTime = Carbon::now()->subHours($hours - 1)->startOfHour();
-
-        $downloads = UserDownload::query()
-            ->select(
-                DB::raw('DATE_FORMAT(timestamp, "%Y-%m-%d %H:00:00") as hour'),
-                DB::raw('COUNT(*) as count')
-            )
-            ->where('timestamp', '>=', $startTime)
-            ->groupBy(DB::raw('DATE_FORMAT(timestamp, "%Y-%m-%d %H:00:00")'))
-            ->orderBy('hour', 'asc')
-            ->get()
-            ->keyBy('hour');
-
-        // Fill in missing hours with zero counts
-        $result = [];
-        for ($i = $hours - 1; $i >= 0; $i--) {
-            $time = Carbon::now()->subHours($i)->startOfHour();
-            $hourKey = $time->format('Y-m-d H:00:00');
-            $found = $downloads->get($hourKey);
-
-            // Format label based on how recent the hour is
-            $now = Carbon::now();
-            if ($time->isToday()) {
-                $label = $time->format('H:i');
-            } elseif ($time->isYesterday()) {
-                $label = 'Yesterday '.$time->format('H:i');
-            } elseif ($time->diffInDays($now) < 7) {
-                $label = $time->format('D H:i');
-            } else {
-                $label = $time->format('M d H:i');
-            }
-
-            $result[] = [
-                'time' => $label,
-                'count' => $found ? $found->count : 0,
-            ];
-        }
-
-        return $result;
+        // Use the aggregated hourly stats from UserActivityStat model
+        return UserActivityStat::getDownloadsPerHour($hours);
     }
 
     /**
@@ -238,49 +201,12 @@ class UserStatsService
 
     /**
      * Get API hits per hour for the last N hours
-     * Uses live data from user_requests table
+     * Uses aggregated hourly stats from user_activity_stats_hourly table
      */
     public function getApiHitsPerHour(int $hours = 168): array
     {
-        $startTime = Carbon::now()->subHours($hours - 1)->startOfHour();
-
-        $apiHits = UserRequest::query()
-            ->select(
-                DB::raw('DATE_FORMAT(timestamp, "%Y-%m-%d %H:00:00") as hour'),
-                DB::raw('COUNT(*) as count')
-            )
-            ->where('timestamp', '>=', $startTime)
-            ->groupBy(DB::raw('DATE_FORMAT(timestamp, "%Y-%m-%d %H:00:00")'))
-            ->orderBy('hour', 'asc')
-            ->get()
-            ->keyBy('hour');
-
-        // Fill in missing hours with zero counts
-        $result = [];
-        for ($i = $hours - 1; $i >= 0; $i--) {
-            $time = Carbon::now()->subHours($i)->startOfHour();
-            $hourKey = $time->format('Y-m-d H:00:00');
-            $found = $apiHits->get($hourKey);
-
-            // Format label based on how recent the hour is
-            $now = Carbon::now();
-            if ($time->isToday()) {
-                $label = $time->format('H:i');
-            } elseif ($time->isYesterday()) {
-                $label = 'Yesterday '.$time->format('H:i');
-            } elseif ($time->diffInDays($now) < 7) {
-                $label = $time->format('D H:i');
-            } else {
-                $label = $time->format('M d H:i');
-            }
-
-            $result[] = [
-                'time' => $label,
-                'count' => $found ? $found->count : 0,
-            ];
-        }
-
-        return $result;
+        // Use the aggregated hourly stats from UserActivityStat model
+        return UserActivityStat::getApiHitsPerHour($hours);
     }
 
     /**
