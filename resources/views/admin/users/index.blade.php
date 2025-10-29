@@ -120,15 +120,59 @@
                     <thead class="bg-gray-50 dark:bg-gray-900">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Username</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <a href="{{ url('admin/user-list?' . http_build_query(array_merge(request()->except('ob'), ['ob' => request('ob') === 'username_asc' ? 'username_desc' : 'username_asc']))) }}" class="group inline-flex items-center hover:text-gray-700 dark:hover:text-gray-200">
+                                    Username
+                                    @if(request('ob') === 'username_asc')
+                                        <i class="fa fa-sort-up ml-1"></i>
+                                    @elseif(request('ob') === 'username_desc')
+                                        <i class="fa fa-sort-down ml-1"></i>
+                                    @else
+                                        <i class="fa fa-sort ml-1 opacity-50 group-hover:opacity-100"></i>
+                                    @endif
+                                </a>
+                            </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <a href="{{ url('admin/user-list?' . http_build_query(array_merge(request()->except('ob'), ['ob' => request('ob') === 'apiaccess_asc' ? 'apiaccess_desc' : 'apiaccess_asc']))) }}" class="group inline-flex items-center hover:text-gray-700 dark:hover:text-gray-200">
+                                    Status
+                                    @if(request('ob') === 'apiaccess_asc')
+                                        <i class="fa fa-sort-up ml-1"></i>
+                                    @elseif(request('ob') === 'apiaccess_desc')
+                                        <i class="fa fa-sort-down ml-1"></i>
+                                    @else
+                                        <i class="fa fa-sort ml-1 opacity-50 group-hover:opacity-100"></i>
+                                    @endif
+                                </a>
+                            </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role Expiry</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <a href="{{ url('admin/user-list?' . http_build_query(array_merge(request()->except('ob'), ['ob' => request('ob') === 'rolechangedate_asc' ? 'rolechangedate_desc' : 'rolechangedate_asc']))) }}" class="group inline-flex items-center hover:text-gray-700 dark:hover:text-gray-200">
+                                    Role Expiry
+                                    @if(request('ob') === 'rolechangedate_asc')
+                                        <i class="fa fa-sort-up ml-1"></i>
+                                    @elseif(request('ob') === 'rolechangedate_desc')
+                                        <i class="fa fa-sort-down ml-1"></i>
+                                    @else
+                                        <i class="fa fa-sort ml-1 opacity-50 group-hover:opacity-100"></i>
+                                    @endif
+                                </a>
+                            </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Host</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Country</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Verified</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Created</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <a href="{{ url('admin/user-list?' . http_build_query(array_merge(request()->except('ob'), ['ob' => request('ob') === 'createdat_asc' ? 'createdat_desc' : 'createdat_asc']))) }}" class="group inline-flex items-center hover:text-gray-700 dark:hover:text-gray-200">
+                                    Created
+                                    @if(request('ob') === 'createdat_asc')
+                                        <i class="fa fa-sort-up ml-1"></i>
+                                    @elseif(request('ob') === 'createdat_desc')
+                                        <i class="fa fa-sort-down ml-1"></i>
+                                    @else
+                                        <i class="fa fa-sort ml-1 opacity-50 group-hover:opacity-100"></i>
+                                    @endif
+                                </a>
+                            </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
