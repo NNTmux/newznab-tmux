@@ -143,10 +143,6 @@
         },
         {
             "type": "vcs",
-            "url": "https://github.com/DariusIII/Laravel.Smarty"
-        },
-        {
-            "type": "vcs",
             "url": "https://github.com/DariusIII/tmdbapi"
         }
     ],

@@ -36,10 +36,8 @@ use App\Http\Controllers\Admin\AdminSiteController;
 use App\Http\Controllers\Admin\AdminTmuxController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\DeletedUsersController;
-use App\Http\Controllers\Admin\SystemMetricsController;
 use App\Http\Controllers\AdultController;
 use App\Http\Controllers\AjaxController;
-use App\Http\Controllers\AnimeController;
 use App\Http\Controllers\ApiHelpController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -55,7 +53,6 @@ use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\DetailsController;
 use App\Http\Controllers\FailedReleasesController;
-use App\Http\Controllers\FileListController;
 use App\Http\Controllers\GamesController;
 use App\Http\Controllers\GetNzbController;
 use App\Http\Controllers\InvitationController;
@@ -137,8 +134,6 @@ Route::middleware('isVerified')->group(function () {
         Route::match(['GET', 'POST'], 'Audio/{id?}', [MusicController::class, 'show'])->name('Audio');
         Route::match(['GET', 'POST'], 'Console/{id?}', [ConsoleController::class, 'show'])->name('Console');
         Route::match(['GET', 'POST'], 'XXX/{id?}', [AdultController::class, 'show'])->name('XXX');
-        Route::match(['GET', 'POST'], 'anime', [AnimeController::class, 'showAnime'])->name('anime');
-        Route::match(['GET', 'POST'], 'animelist', [AnimeController::class, 'showList'])->name('animelist');
         Route::match(['GET', 'POST'], 'Books/{id?}', [BooksController::class, 'index'])->name('Books');
     });
 
@@ -153,7 +148,6 @@ Route::middleware('isVerified')->group(function () {
     Route::match(['GET', 'POST'], 'mymovies', [MyMoviesController::class, 'show'])->name('mymovies');
     Route::match(['GET', 'POST'], 'myshows', [MyShowsController::class, 'show'])->name('myshows');
     Route::match(['GET', 'POST'], 'myshows/browse', [MyShowsController::class, 'browse'])->name('myshows.browse');
-    Route::match(['GET', 'POST'], 'filelist/{guid}', [FileListController::class, 'show'])->name('filelist');
     Route::get('api/release/{guid}/filelist', [\App\Http\Controllers\Api\FileListApiController::class, 'getFileList'])->name('api.filelist');
     Route::match(['GET', 'POST'], 'series/{id?}', [SeriesController::class, 'index'])->name('series');
     Route::match(['GET', 'POST'], 'trending-tv', [SeriesController::class, 'showTrending'])->name('trending-tv');

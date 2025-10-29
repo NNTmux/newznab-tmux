@@ -21,7 +21,6 @@
                                     <a href="{{ url('/browse/' . $parentcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">All TV</a>
                                     <div class="border-t border-gray-700 dark:border-gray-600"></div>
                                     <a href="{{ route('series') }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">TV Series</a>
-                                    <a href="{{ route('animelist') }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">Anime Series</a>
                                     <div class="border-t border-gray-700 dark:border-gray-600"></div>
                                     @foreach($parentcat['categories'] as $subcat)
                                         <a href="{{ url('/browse/TV/' . $subcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">{{ $subcat['title'] }}</a>
