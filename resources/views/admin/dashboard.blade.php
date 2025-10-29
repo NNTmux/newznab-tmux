@@ -76,7 +76,7 @@
                 </div>
             </div>
             <div class="mt-4">
-                <a href="{{ url('/admin/failed-releases') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                <a href="{{ url('/admin/failrel-list') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
                     View failed releases <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
