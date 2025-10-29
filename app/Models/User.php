@@ -256,7 +256,7 @@ class User extends Authenticatable
 
     public static function getCount(?string $role = null, ?string $username = '', ?string $host = '', ?string $email = ''): int
     {
-        $res = self::query()->where('email', '<>', 'sharing@nZEDb.com');
+        $res = self::query()->withTrashed()->where('email', '<>', 'sharing@nZEDb.com');
 
         if (! empty($role)) {
             $res->where('roles_id', $role);

@@ -144,6 +144,9 @@
         <!-- Toast notifications will be dynamically inserted here -->
     </div>
 
+    <!-- Confirmation Modal -->
+    @include('partials.confirmation-modal')
+
     <!-- Scripts -->
     <!-- Toast Notifications (must load before other scripts) -->
     @include('partials.toast-notifications')

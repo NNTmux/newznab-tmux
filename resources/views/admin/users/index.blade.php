@@ -106,12 +106,12 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Username</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role Expiry</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Host</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Country</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Verified</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Bad User</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Created</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                         </tr>
@@ -124,6 +124,21 @@
                                     <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $user->username }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if($user->deleted_at)
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200" title="Soft Deleted on {{ \Carbon\Carbon::parse($user->deleted_at)->format('M j, Y g:i A') }}">
+                                            <i class="fa fa-trash mr-1"></i>Deleted
+                                        </span>
+                                    @elseif(isset($user->apiaccess) && $user->apiaccess == 0)
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200" title="API Access Disabled">
+                                            <i class="fa fa-ban mr-1"></i>Disabled
+                                        </span>
+                                    @else
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                            <i class="fa fa-check-circle mr-1"></i>Active
+                                        </span>
+                                    @endif
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                                         {{ $user->roles->first()->name ?? 'N/A' }}
@@ -235,28 +250,35 @@
 </div>
 
 <!-- Verify User Confirmation Modal -->
-<div id="verifyUserModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
-        <div class="mt-3 text-center">
-            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-900">
-                <i class="fa fa-check-circle text-green-600 dark:text-green-400 text-2xl"></i>
-            </div>
-            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 mt-4">Verify User</h3>
-            <div class="mt-2 px-7 py-3">
-                <p class="text-sm text-gray-500 dark:text-gray-400">
-                    Are you sure you want to manually verify this user? This will mark their email as verified.
-                </p>
-            </div>
-            <div class="flex gap-3 px-4 py-3">
-                <button onclick="hideVerifyModal()"
-                        class="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-base font-medium rounded-md shadow-sm hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
-                    Cancel
-                </button>
-                <button onclick="submitVerifyForm()"
-                        class="flex-1 px-4 py-2 bg-green-600 dark:bg-green-700 text-white text-base font-medium rounded-md shadow-sm hover:bg-green-700 dark:hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500">
-                    Verify
+<div id="verifyUserModal" class="fixed inset-0 bg-gray-900 dark:bg-black bg-opacity-50 dark:bg-opacity-70 hidden items-center justify-center z-50 transition-opacity">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
+                    <i class="fa fa-check-circle text-green-600 dark:text-green-400 mr-2"></i>
+                    Verify User
+                </h3>
+                <button type="button" onclick="hideVerifyModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
+        </div>
+        <div class="px-6 py-4">
+            <p class="text-gray-700 dark:text-gray-300">
+                Are you sure you want to manually verify this user? This will mark their email as verified.
+            </p>
+        </div>
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
+            <button type="button"
+                    onclick="hideVerifyModal()"
+                    class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition font-medium">
+                <i class="fas fa-times mr-2"></i>Cancel
+            </button>
+            <button type="button"
+                    onclick="submitVerifyForm()"
+                    class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition font-medium">
+                <i class="fa fa-check mr-2"></i>Verify
+            </button>
         </div>
     </div>
 </div>

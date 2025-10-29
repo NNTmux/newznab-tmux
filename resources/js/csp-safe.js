@@ -74,21 +74,49 @@ function initEventDelegation() {
             }
         }
 
-        // Handle confirm delete
+        // Handle confirm delete - using styled modal
         if (e.target.hasAttribute('data-confirm-delete') || e.target.closest('[data-confirm-delete]')) {
-            const confirmed = confirm('Are you sure you want to delete this item?');
-            if (!confirmed) {
-                e.preventDefault();
-            }
+            e.preventDefault();
+            e.stopPropagation();
+
+            const element = e.target.hasAttribute('data-confirm-delete') ? e.target : e.target.closest('[data-confirm-delete]');
+            const form = element.closest('form');
+
+            showConfirm({
+                message: 'Are you sure you want to delete this item?',
+                type: 'danger',
+                confirmText: 'Delete',
+                onConfirm: function() {
+                    if (form) {
+                        form.submit();
+                    } else if (element.href) {
+                        window.location.href = element.href;
+                    }
+                }
+            });
         }
 
-        // Handle confirm action
+        // Handle confirm action - using styled modal
         if (e.target.hasAttribute('data-confirm') || e.target.closest('[data-confirm]')) {
-            const message = e.target.getAttribute('data-confirm') || e.target.closest('[data-confirm]').getAttribute('data-confirm');
-            const confirmed = confirm(message);
-            if (!confirmed) {
-                e.preventDefault();
-            }
+            e.preventDefault();
+            e.stopPropagation();
+
+            const element = e.target.hasAttribute('data-confirm') ? e.target : e.target.closest('[data-confirm]');
+            const message = element.getAttribute('data-confirm');
+            const form = element.closest('form');
+
+            showConfirm({
+                message: message,
+                type: 'danger',
+                confirmText: 'Delete',
+                onConfirm: function() {
+                    if (form) {
+                        form.submit();
+                    } else if (element.href) {
+                        window.location.href = element.href;
+                    }
+                }
+            });
         }
 
         // Handle download NZB buttons
@@ -207,8 +235,141 @@ function initToastNotifications() {
                 toast.remove();
             }, 300);
         }, 5000);
+
+        // Add close button listener
+        const closeBtn = toast.querySelector('.toast-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                toast.classList.add('removing');
+                setTimeout(function() {
+                    toast.remove();
+                }, 300);
+            });
+        }
     };
 }
+
+// Styled Confirmation Modal (replaces native confirm dialogs)
+let confirmationCallback = null;
+
+window.showConfirm = function(options) {
+    // Options: { message, title, details, confirmText, cancelText, type, onConfirm }
+    const modal = document.getElementById('confirmationModal');
+    if (!modal) return Promise.reject('Modal not found');
+
+    const defaults = {
+        title: 'Confirm Action',
+        message: 'Are you sure you want to proceed?',
+        details: '',
+        confirmText: 'Confirm',
+        cancelText: 'Cancel',
+        type: 'info', // 'info', 'warning', 'danger', 'success'
+        onConfirm: null
+    };
+
+    const config = { ...defaults, ...options };
+
+    // Set modal content
+    document.getElementById('confirmationModalTitleText').textContent = config.title;
+    document.getElementById('confirmationModalMessage').textContent = config.message;
+    document.getElementById('confirmationModalConfirmText').textContent = config.confirmText;
+    document.getElementById('confirmationModalCancelText').textContent = config.cancelText;
+
+    // Set icon based on type
+    const icon = document.getElementById('confirmationModalIcon');
+    const confirmBtn = document.getElementById('confirmationModalConfirmBtn');
+
+    // Remove all existing classes from icon safely (works with SVG elements)
+    while (icon.classList.length > 0) {
+        icon.classList.remove(icon.classList.item(0));
+    }
+    icon.classList.add('fas', 'mr-2');
+
+    // Remove all existing classes from button
+    while (confirmBtn.classList.length > 0) {
+        confirmBtn.classList.remove(confirmBtn.classList.item(0));
+    }
+    confirmBtn.classList.add('px-4', 'py-2', 'text-white', 'rounded-lg', 'transition', 'font-medium');
+
+    if (config.type === 'danger') {
+        icon.classList.add('fa-exclamation-triangle', 'text-red-600', 'dark:text-red-400');
+        confirmBtn.classList.add('bg-red-600', 'dark:bg-red-700', 'hover:bg-red-700', 'dark:hover:bg-red-800');
+    } else if (config.type === 'warning') {
+        icon.classList.add('fa-exclamation-circle', 'text-yellow-600', 'dark:text-yellow-400');
+        confirmBtn.classList.add('bg-yellow-600', 'dark:bg-yellow-700', 'hover:bg-yellow-700', 'dark:hover:bg-yellow-800');
+    } else if (config.type === 'success') {
+        icon.classList.add('fa-check-circle', 'text-green-600', 'dark:text-green-400');
+        confirmBtn.classList.add('bg-green-600', 'dark:bg-green-700', 'hover:bg-green-700', 'dark:hover:bg-green-800');
+    } else { // info
+        icon.classList.add('fa-info-circle', 'text-blue-600', 'dark:text-blue-400');
+        confirmBtn.classList.add('bg-blue-600', 'dark:bg-blue-700', 'hover:bg-blue-700', 'dark:hover:bg-blue-800');
+    }
+
+    // Handle details
+    const detailsDiv = document.getElementById('confirmationModalDetails');
+    const detailsText = document.getElementById('confirmationModalDetailsText');
+    if (config.details) {
+        detailsText.textContent = config.details;
+        detailsDiv.classList.remove('hidden');
+    } else {
+        detailsDiv.classList.add('hidden');
+    }
+
+    // Store callback
+    confirmationCallback = config.onConfirm;
+
+    // Show modal
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+
+    // Return promise for async/await usage
+    return new Promise((resolve, reject) => {
+        confirmationCallback = function(confirmed) {
+            if (confirmed && config.onConfirm) {
+                config.onConfirm();
+            }
+            resolve(confirmed);
+        };
+    });
+};
+
+window.closeConfirmationModal = function() {
+    const modal = document.getElementById('confirmationModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+    if (confirmationCallback) {
+        confirmationCallback(false);
+        confirmationCallback = null;
+    }
+};
+
+window.confirmConfirmationModal = function() {
+    const modal = document.getElementById('confirmationModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+    if (confirmationCallback) {
+        confirmationCallback(true);
+        confirmationCallback = null;
+    }
+};
+
+// Enhanced confirm function (backward compatible but with styled modal)
+window.confirmStyled = function(message, title = 'Confirm', type = 'info') {
+    return new Promise((resolve) => {
+        showConfirm({
+            message: message,
+            title: title,
+            type: type,
+            onConfirm: () => resolve(true)
+        }).then(result => {
+            if (!result) resolve(false);
+        });
+    });
+};
 
 // NFO Modal
 function initNfoModal() {
@@ -989,63 +1150,6 @@ function initMediainfoAndFilelist() {
 
 // Cart and Multi-select functionality
 function initCartFunctionality() {
-    // Global showConfirmation function for cart page
-    window.showConfirmation = function(message, onConfirm) {
-        const modal = document.createElement('div');
-        modal.className = 'confirmation-modal';
-        modal.innerHTML = `
-            <div class="confirmation-modal-content">
-                <div class="confirmation-modal-header">
-                    <div class="confirmation-modal-icon">
-                        <i class="fa fa-exclamation-triangle"></i>
-                    </div>
-                    <h3 class="confirmation-modal-title">Confirm Deletion</h3>
-                </div>
-                <div class="confirmation-modal-body">
-                    ${message}
-                </div>
-                <div class="confirmation-modal-footer">
-                    <button class="btn-cancel">Cancel</button>
-                    <button class="btn-confirm">Delete</button>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(modal);
-
-        const cancelBtn = modal.querySelector('.btn-cancel');
-        const confirmBtn = modal.querySelector('.btn-confirm');
-
-        function closeModal() {
-            modal.style.animation = 'fadeOut 0.2s ease-out';
-            setTimeout(() => modal.remove(), 200);
-        }
-
-        cancelBtn.addEventListener('click', closeModal);
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                closeModal();
-            }
-        });
-
-        confirmBtn.addEventListener('click', function() {
-            closeModal();
-            onConfirm();
-        });
-
-        // Focus on cancel button by default
-        setTimeout(() => cancelBtn.focus(), 100);
-
-        // ESC key to close
-        const escHandler = function(e) {
-            if (e.key === 'Escape') {
-                closeModal();
-                document.removeEventListener('keydown', escHandler);
-            }
-        };
-        document.addEventListener('keydown', escHandler);
-    };
-
     // Cart page specific functionality
     const checkAll = document.getElementById('check-all');
     const checkboxes = document.querySelectorAll('.cart-checkbox');
@@ -1121,9 +1225,12 @@ function initCartFunctionality() {
                     return;
                 }
 
-                showConfirmation(
-                    `Are you sure you want to delete <strong>${selected.length}</strong> item(s) from your cart?`,
-                    function() {
+                showConfirm({
+                    title: 'Delete from Cart',
+                    message: `Are you sure you want to delete ${selected.length} item${selected.length > 1 ? 's' : ''} from your cart?`,
+                    type: 'danger',
+                    confirmText: 'Delete',
+                    onConfirm: function() {
                         // Delete via AJAX
                         fetch('/cart/delete/' + selected.join(','), {
                             method: 'POST',
@@ -1155,7 +1262,7 @@ function initCartFunctionality() {
                             }
                         });
                     }
-                );
+                });
             });
         });
 
@@ -1168,9 +1275,12 @@ function initCartFunctionality() {
                 const releaseName = this.getAttribute('data-release-name');
                 const deleteUrl = this.getAttribute('data-delete-url');
 
-                showConfirmation(
-                    `Are you sure you want to remove <strong>${releaseName}</strong> from your cart?`,
-                    function() {
+                showConfirm({
+                    title: 'Remove from Cart',
+                    message: `Are you sure you want to remove "${releaseName}" from your cart?`,
+                    type: 'warning',
+                    confirmText: 'Remove',
+                    onConfirm: function() {
                         if (typeof showToast === 'function') {
                             showToast('Removing item from cart...', 'info');
                         }
@@ -1179,7 +1289,7 @@ function initCartFunctionality() {
                             window.location.href = deleteUrl;
                         }, 500);
                     }
-                );
+                });
             });
         });
     }
@@ -1288,10 +1398,15 @@ function initCartFunctionality() {
                 return;
             }
 
-            const confirmMessage = `Are you sure you want to delete <strong>${selected.length}</strong> release${selected.length > 1 ? 's' : ''}? This action cannot be undone.`;
+            const confirmMessage = `Are you sure you want to delete ${selected.length} release${selected.length > 1 ? 's' : ''}? This action cannot be undone.`;
 
-            // Use the custom confirmation modal
-            showConfirmation(confirmMessage, function() {
+            // Use styled confirmation modal
+            showConfirm({
+                title: 'Delete Releases',
+                message: confirmMessage,
+                type: 'danger',
+                confirmText: 'Delete',
+                onConfirm: function() {
                 console.log('User confirmed deletion');
 
                 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
@@ -1385,7 +1500,8 @@ function initCartFunctionality() {
                         setTimeout(() => window.location.reload(), 1500);
                     }
                 });
-            });
+            }
+        });
         });
     } else {
         console.log('Delete button not found on page');
@@ -3691,97 +3807,110 @@ function ajax_backfill_status(id, status) {
 }
 
 function ajax_group_reset(id) {
-    if (!confirm('Are you sure you want to reset this group?')) {
-        return;
-    }
+    showConfirm({
+        title: 'Reset Group',
+        message: 'Are you sure you want to reset this group?',
+        type: 'warning',
+        confirmText: 'Reset',
+        onConfirm: function() {
+            const ajaxUrl = document.querySelector('[data-ajax-url]')?.dataset.ajaxUrl;
+            const csrfToken = document.querySelector('[data-csrf-token]')?.dataset.csrfToken;
 
-    const ajaxUrl = document.querySelector('[data-ajax-url]')?.dataset.ajaxUrl;
-    const csrfToken = document.querySelector('[data-csrf-token]')?.dataset.csrfToken;
+            if (!ajaxUrl || !csrfToken) return;
 
-    if (!ajaxUrl || !csrfToken) return;
-
-    fetch(ajaxUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
-        },
-        body: JSON.stringify({
-            action: 'reset_group',
-            group_id: id
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
+            fetch(ajaxUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    action: 'reset_group',
+                    group_id: id
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            })
+            .catch(error => console.error('Error resetting group:', error));
         }
-    })
-    .catch(error => console.error('Error resetting group:', error));
+    });
 }
 
 function confirmGroupDelete(id) {
-    if (!confirm('Are you sure you want to delete this group?')) {
-        return;
-    }
+    showConfirm({
+        title: 'Delete Group',
+        message: 'Are you sure you want to delete this group?',
+        type: 'danger',
+        confirmText: 'Delete',
+        onConfirm: function() {
+            const ajaxUrl = document.querySelector('[data-ajax-url]')?.dataset.ajaxUrl;
+            const csrfToken = document.querySelector('[data-csrf-token]')?.dataset.csrfToken;
 
-    const ajaxUrl = document.querySelector('[data-ajax-url]')?.dataset.ajaxUrl;
-    const csrfToken = document.querySelector('[data-csrf-token]')?.dataset.csrfToken;
+            if (!ajaxUrl || !csrfToken) return;
 
-    if (!ajaxUrl || !csrfToken) return;
-
-    fetch(ajaxUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
-        },
-        body: JSON.stringify({
-            action: 'delete_group',
-            group_id: id
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const row = document.getElementById('grouprow-' + id);
-            if (row) {
-                row.classList.add('fade-out');
-                setTimeout(() => row.remove(), 300);
-            }
+            fetch(ajaxUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    action: 'delete_group',
+                    group_id: id
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const row = document.getElementById('grouprow-' + id);
+                    if (row) {
+                        row.classList.add('fade-out');
+                        setTimeout(() => row.remove(), 300);
+                    }
+                }
+            })
+            .catch(error => console.error('Error deleting group:', error));
         }
-    })
-    .catch(error => console.error('Error deleting group:', error));
+    });
 }
 
 function confirmGroupPurge(id) {
-    if (!confirm('Are you sure you want to purge this group? This will delete all releases and binaries!')) {
-        return;
-    }
+    showConfirm({
+        title: 'Purge Group',
+        message: 'Are you sure you want to purge this group?',
+        details: 'This will delete all releases and binaries!',
+        type: 'danger',
+        confirmText: 'Purge',
+        onConfirm: function() {
+            const ajaxUrl = document.querySelector('[data-ajax-url]')?.dataset.ajaxUrl;
+            const csrfToken = document.querySelector('[data-csrf-token]')?.dataset.csrfToken;
 
-    const ajaxUrl = document.querySelector('[data-ajax-url]')?.dataset.ajaxUrl;
-    const csrfToken = document.querySelector('[data-csrf-token]')?.dataset.csrfToken;
+            if (!ajaxUrl || !csrfToken) return;
 
-    if (!ajaxUrl || !csrfToken) return;
-
-    fetch(ajaxUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
-        },
-        body: JSON.stringify({
-            action: 'purge_group',
-            group_id: id
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
+            fetch(ajaxUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    action: 'purge_group',
+                    group_id: id
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            })
+            .catch(error => console.error('Error purging group:', error));
         }
-    })
-    .catch(error => console.error('Error purging group:', error));
+    });
 }
 
 function ajax_group_reset_all() {
@@ -3886,6 +4015,7 @@ window.showVerifyModal = function(event, form) {
     const modal = document.getElementById('verifyUserModal');
     if (modal) {
         modal.classList.remove('hidden');
+        modal.classList.add('flex');
     }
 };
 
@@ -3893,6 +4023,7 @@ window.hideVerifyModal = function() {
     const modal = document.getElementById('verifyUserModal');
     if (modal) {
         modal.classList.add('hidden');
+        modal.classList.remove('flex');
     }
     window.currentVerifyForm = null;
 };
@@ -4139,7 +4270,9 @@ function initAdminDeletedUsers() {
     }
 
     // Bulk action confirmation
-    window.confirmBulkAction = function() {
+    window.confirmBulkAction = function(event) {
+        event?.preventDefault();
+
         const action = document.getElementById('bulkAction')?.value;
         const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
         const validationError = document.getElementById('validationError');
@@ -4168,20 +4301,58 @@ function initAdminDeletedUsers() {
 
         const count = checkedBoxes.length;
         const actionText = action === 'restore' ? 'restore' : 'permanently delete';
+        const type = action === 'restore' ? 'success' : 'danger';
+        const title = action === 'restore' ? 'Restore Users' : 'Delete Users';
 
-        return confirm(`Are you sure you want to ${actionText} ${count} user${count > 1 ? 's' : ''}?`);
-    };
-
-    // Individual action confirmations
-    document.querySelectorAll('.inline-form button[data-confirm]').forEach(button => {
-        button.addEventListener('click', function(e) {
-            const message = this.getAttribute('data-confirm');
-            if (!confirm(message)) {
-                e.preventDefault();
+        showConfirm({
+            title: title,
+            message: `Are you sure you want to ${actionText} ${count} user${count > 1 ? 's' : ''}?`,
+            type: type,
+            confirmText: action === 'restore' ? 'Restore' : 'Delete',
+            onConfirm: function() {
+                document.getElementById('bulkActionForm')?.submit();
             }
         });
-    });
+
+        return false;
+    };
 }
+
+// Individual user restore/delete actions for deleted users page
+window.restoreUser = function(userId, username) {
+    showConfirm({
+        title: 'Restore User',
+        message: `Are you sure you want to restore user '${username}'?`,
+        type: 'success',
+        confirmText: 'Restore',
+        onConfirm: function() {
+            const form = document.getElementById('individualActionForm');
+            if (form) {
+                const baseUrl = window.location.origin;
+                form.action = `${baseUrl}/admin/deleted-users/restore/${userId}`;
+                form.submit();
+            }
+        }
+    });
+};
+
+window.permanentDeleteUser = function(userId, username) {
+    showConfirm({
+        title: 'Permanently Delete User',
+        message: `Are you sure you want to PERMANENTLY delete user '${username}'?`,
+        details: 'This action cannot be undone!',
+        type: 'danger',
+        confirmText: 'Delete Permanently',
+        onConfirm: function() {
+            const form = document.getElementById('individualActionForm');
+            if (form) {
+                const baseUrl = window.location.origin;
+                form.action = `${baseUrl}/admin/deleted-users/permanent-delete/${userId}`;
+                form.submit();
+            }
+        }
+    });
+};
 
 // My Movies page functionality
 function initMyMovies() {

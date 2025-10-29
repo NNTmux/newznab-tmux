@@ -128,7 +128,7 @@
                         </select>
                         <button type="submit"
                                 class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700"
-                                onclick="return confirmBulkAction()">
+                                onclick="confirmBulkAction(event)">
                             <i class="fa fa-check mr-2"></i>Apply
                         </button>
                     </div>
@@ -202,24 +202,18 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex gap-2">
-                                            <form action="{{ url('admin/deleted-users/restore/' . $user->id) }}" method="POST" class="inline-form">
-                                                @csrf
-                                                <button type="submit"
-                                                        class="text-green-600 hover:text-green-900 bg-transparent border-0 p-0 cursor-pointer"
-                                                        title="Restore User"
-                                                        data-confirm="Are you sure you want to restore user '{{ $user->username }}'?">
-                                                    <i class="fa fa-undo"></i>
-                                                </button>
-                                            </form>
-                                            <form action="{{ url('admin/deleted-users/permanent-delete/' . $user->id) }}" method="POST" class="inline-form">
-                                                @csrf
-                                                <button type="submit"
-                                                        class="text-red-600 hover:text-red-900 bg-transparent border-0 p-0 cursor-pointer"
-                                                        title="Permanently Delete"
-                                                        data-confirm="Are you sure you want to PERMANENTLY delete user '{{ $user->username }}'? This action cannot be undone!">
-                                                    <i class="fa fa-trash-alt"></i>
-                                                </button>
-                                            </form>
+                                            <button type="button"
+                                                    class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 bg-transparent border-0 p-0 cursor-pointer"
+                                                    title="Restore User"
+                                                    onclick="restoreUser({{ $user->id }}, '{{ addslashes($user->username) }}')">
+                                                <i class="fa fa-undo"></i>
+                                            </button>
+                                            <button type="button"
+                                                    class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-transparent border-0 p-0 cursor-pointer"
+                                                    title="Permanently Delete"
+                                                    onclick="permanentDeleteUser({{ $user->id }}, '{{ addslashes($user->username) }}')">
+                                                <i class="fa fa-trash-alt"></i>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -243,6 +237,9 @@
     </div>
 </div>
 
-{{-- Scripts moved to resources/js/csp-safe.js --}}
+<!-- Hidden form for individual actions -->
+<form id="individualActionForm" method="POST" style="display: none;">
+    @csrf
+</form>
 @endsection
 

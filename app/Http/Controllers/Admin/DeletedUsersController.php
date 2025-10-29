@@ -108,13 +108,18 @@ class DeletedUsersController extends BasePageController
         $action = $request->input('action');
         $userIds = $request->input('user_ids', []);
 
-        if (! in_array($action, ['restore', 'delete'], true) || empty($userIds) || ! is_array($userIds)) {
-            return redirect()->route('admin.deleted.users.index')->with('error', 'Invalid bulk action request.');
+        // Better validation with specific error messages
+        if (empty($action) || ! in_array($action, ['restore', 'delete'], true)) {
+            return redirect()->route('admin.deleted.users.index')->with('error', 'Please select a valid action.');
+        }
+
+        if (! is_array($userIds)) {
+            return redirect()->route('admin.deleted.users.index')->with('error', 'Invalid user selection format.');
         }
 
         $userIds = array_filter(array_map('intval', $userIds));
         if (empty($userIds)) {
-            return redirect()->route('admin.deleted.users.index')->with('error', 'No valid users selected.');
+            return redirect()->route('admin.deleted.users.index')->with('error', 'Please select at least one user.');
         }
 
         if ($action === 'restore') {
