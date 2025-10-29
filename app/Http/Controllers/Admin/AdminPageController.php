@@ -399,4 +399,54 @@ class AdminPageController extends BasePageController
             'api_hits' => $apiHitsPerMinute,
         ]);
     }
+
+    /**
+     * Get current system metrics (API endpoint)
+     */
+    public function getCurrentMetrics()
+    {
+        $cpuUsage = $this->getCpuUsage();
+        $ramUsage = $this->getRamUsage();
+        $cpuInfo = $this->getCpuInfo();
+        $loadAverage = $this->getLoadAverage();
+
+        return response()->json([
+            'success' => true,
+            'cpu' => [
+                'current' => $cpuUsage,
+                'cores' => $cpuInfo['cores'],
+                'threads' => $cpuInfo['threads'],
+                'model' => $cpuInfo['model'],
+                'load_average' => $loadAverage,
+            ],
+            'ram' => [
+                'used' => $ramUsage['used'],
+                'total' => $ramUsage['total'],
+                'percentage' => $ramUsage['percentage'],
+            ],
+        ]);
+    }
+
+    /**
+     * Get historical system metrics (API endpoint)
+     */
+    public function getHistoricalMetrics()
+    {
+        $timeRange = request('range', '24h'); // 24h or 30d
+
+        if ($timeRange === '30d') {
+            $cpuHistory = $this->systemMetricsService->getDailyMetrics('cpu', 30);
+            $ramHistory = $this->systemMetricsService->getDailyMetrics('ram', 30);
+        } else {
+            $cpuHistory = $this->systemMetricsService->getHourlyMetrics('cpu', 24);
+            $ramHistory = $this->systemMetricsService->getHourlyMetrics('ram', 24);
+        }
+
+        return response()->json([
+            'success' => true,
+            'cpu_history' => $cpuHistory,
+            'ram_history' => $ramHistory,
+            'range' => $timeRange,
+        ]);
+    }
 }

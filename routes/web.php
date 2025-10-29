@@ -170,8 +170,8 @@ Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
     Route::get('index', [AdminPageController::class, 'index'])->name('admin.index');
 
     // System Metrics API endpoints
-    Route::get('api/system-metrics/current', [SystemMetricsController::class, 'getCurrentMetrics'])->name('admin.api.metrics.current');
-    Route::get('api/system-metrics/historical', [SystemMetricsController::class, 'getHistoricalMetrics'])->name('admin.api.metrics.historical');
+    Route::get('api/system-metrics/current', [AdminPageController::class, 'getCurrentMetrics'])->name('admin.api.metrics.current');
+    Route::get('api/system-metrics/historical', [AdminPageController::class, 'getHistoricalMetrics'])->name('admin.api.metrics.historical');
 
     // User Activity API endpoints
     Route::get('api/user-activity/minutes', [AdminPageController::class, 'getUserActivityMinutes'])->name('admin.api.user-activity.minutes');
