@@ -109,6 +109,41 @@
                                     </div>
                                 </div>
 
+                                @if($user->rolechangedate)
+                                    <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
+                                        <div class="w-1/3 text-gray-600">Role Expiry</div>
+                                        <div class="w-2/3">
+                                            @php
+                                                $roleExpiryDate = \Carbon\Carbon::parse($user->rolechangedate);
+                                                $now = \Carbon\Carbon::now();
+                                                $isExpired = $roleExpiryDate->isPast();
+                                                $daysUntilExpiry = $now->diffInDays($roleExpiryDate, false);
+                                            @endphp
+                                            <div class="flex items-center">
+                                                <i class="fa fa-calendar-times text-gray-400 mr-2"></i>
+                                                <span class="font-medium">{{ $roleExpiryDate->format('M d, Y') }}</span>
+                                                @if($isExpired)
+                                                    <span class="ml-2 px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs rounded">
+                                                        <i class="fa fa-exclamation-circle mr-1"></i>Expired {{ $roleExpiryDate->diffForHumans() }}
+                                                    </span>
+                                                @elseif($daysUntilExpiry <= 7)
+                                                    <span class="ml-2 px-2 py-1 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 text-xs rounded">
+                                                        <i class="fa fa-clock mr-1"></i>Expires {{ $roleExpiryDate->diffForHumans() }}
+                                                    </span>
+                                                @elseif($daysUntilExpiry <= 30)
+                                                    <span class="ml-2 px-2 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-xs rounded">
+                                                        <i class="fa fa-clock mr-1"></i>Expires {{ $roleExpiryDate->diffForHumans() }}
+                                                    </span>
+                                                @else
+                                                    <span class="ml-2 px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded">
+                                                        <i class="fa fa-check-circle mr-1"></i>Expires {{ $roleExpiryDate->diffForHumans() }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+
                                 <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
                                     <div class="w-1/3 text-gray-600">Last Login</div>
                                     <div class="w-2/3">{{ \Carbon\Carbon::parse($user->lastlogin)->diffForHumans() }}</div>
@@ -243,14 +278,6 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                 <!-- Downloads Usage -->
                                 <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                            <i class="fa fa-download text-blue-600 mr-2"></i>Downloads (24h)
-                                        </h3>
-                                        <span class="text-sm font-bold {{ $grabstoday >= $downloadLimit ? 'text-red-600' : 'text-green-600' }}">
-                                            {{ $grabstoday ?? 0 }} / {{ $downloadLimit }}
-                                        </span>
-                                    </div>
                                     <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                                         @php
                                             $downloadPercentage = $downloadLimit > 0 ? min(($grabstoday / $downloadLimit) * 100, 100) : 0;
@@ -314,28 +341,6 @@
                             @endif
                         </div>
                     </div>
-
-                    <!-- Recent Downloads Tab -->
-                    @if(($isadmin ?? false) && isset($downloadlist) && count($downloadlist) > 0)
-                        <div id="downloads" class="tab-content hidden-by-default">
-                            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
-                                <div class="flex items-center mb-4">
-                                    <i class="fa fa-download text-blue-600 dark:text-blue-400 mr-2"></i>
-                                    <h2 class="text-lg font-semibold">Recent Downloads</h2>
-                                </div>
-                                <div class="space-y-2">
-                                    @foreach($downloadlist->take(20) as $download)
-                                        <div class="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700 last:border-0">
-                                            <a href="{{ url('/details/' . $download->guid) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex-1 break-words break-all">
-                                                {{ $download->searchname }}
-                                            </a>
-                                            <span class="text-sm text-gray-500 ml-4">{{ \Carbon\Carbon::parse($download->created_at)->diffForHumans() }}</span>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    @endif
                 </div>
             </div>
     </div>
