@@ -12,9 +12,6 @@ class ContactUsController extends BasePageController
      */
     public function contact(ContactContactURequest $request)
     {
-        if (\App\Support\CaptchaHelper::isEnabled()) {
-            $this->validate($request, \App\Support\CaptchaHelper::getValidationRules());
-        }
 
         $msg = '';
 

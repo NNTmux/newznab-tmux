@@ -126,3 +126,9 @@
 </div>
 @endsection
 
+@push('scripts')
+    @if(\App\Support\CaptchaHelper::isEnabled())
+        {!! \App\Support\CaptchaHelper::renderJs() !!}
+    @endif
+@endpush
+
