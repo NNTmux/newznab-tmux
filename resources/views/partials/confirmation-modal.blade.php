@@ -7,7 +7,7 @@
                     <i class="fas fa-exclamation-circle text-blue-600 dark:text-blue-400 mr-2" id="confirmationModalIcon"></i>
                     <span id="confirmationModalTitleText">Confirm Action</span>
                 </h3>
-                <button type="button" onclick="closeConfirmationModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <button type="button" data-close-confirmation-modal class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -22,12 +22,12 @@
         </div>
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
             <button type="button"
-                    onclick="closeConfirmationModal()"
+                    data-close-confirmation-modal
                     class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition font-medium">
                 <i class="fas fa-times mr-2"></i><span id="confirmationModalCancelText">Cancel</span>
             </button>
             <button type="button"
-                    onclick="confirmConfirmationModal()"
+                    data-confirm-confirmation-modal
                     id="confirmationModalConfirmBtn"
                     class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition font-medium">
                 <i class="fas fa-check mr-2"></i><span id="confirmationModalConfirmText">Confirm</span>

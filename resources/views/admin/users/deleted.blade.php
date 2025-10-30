@@ -90,22 +90,6 @@
             </form>
         </div>
 
-        <!-- Success/Error Messages -->
-        @if(session('success'))
-            <div class="mx-6 mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                <p class="text-green-800 dark:text-green-300">
-                    <i class="fa fa-check-circle mr-2"></i>{{ session('success') }}
-                </p>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                <p class="text-red-800 dark:text-red-300">
-                    <i class="fa fa-exclamation-circle mr-2"></i>{{ session('error') }}
-                </p>
-            </div>
-        @endif
 
         <!-- Validation Error Messages (for bulk actions) -->
         <div id="validationError" class="mx-6 mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg hidden">

@@ -143,6 +143,18 @@ function initEventDelegation() {
             e.preventDefault();
         }
 
+        // Handle confirmation modal close button
+        if (e.target.hasAttribute('data-close-confirmation-modal') || e.target.closest('[data-close-confirmation-modal]')) {
+            e.preventDefault();
+            closeConfirmationModal();
+        }
+
+        // Handle confirmation modal confirm button
+        if (e.target.hasAttribute('data-confirm-confirmation-modal') || e.target.closest('[data-confirm-confirmation-modal]')) {
+            e.preventDefault();
+            confirmConfirmationModal();
+        }
+
         // Handle admin groups management actions
         const actionTarget = e.target.closest('[data-action]');
         if (actionTarget) {
