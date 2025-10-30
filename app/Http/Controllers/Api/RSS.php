@@ -182,24 +182,28 @@ class RSS extends ApiController
                 return collect([]);
             }
 
-            // Then get all releases for these top movies
+            // Then get only the latest 5 releases for each of these top movies
             $sql = sprintf(
-                "SELECT DISTINCT
-                    r.searchname, r.guid, r.postdate, r.categories_id, r.size,
-                    r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
-                    r.adddate, r.imdbid,
-                    m.title, m.year, m.rating, m.plot, m.genre, m.cover, m.tmdbid, m.traktid,
-                    g.name AS group_name,
-                    CONCAT(cp.title, ' > ', c.title) AS category_name,
-                    COALESCE(cp.id,0) AS parentid
-                FROM releases r
-                INNER JOIN movieinfo m ON m.imdbid = r.imdbid
-                LEFT JOIN categories c ON c.id = r.categories_id
-                INNER JOIN root_categories cp ON cp.id = c.root_categories_id
-                LEFT JOIN usenet_groups g ON g.id = r.groups_id
-                WHERE r.imdbid IN ('%s')
-                    AND r.passwordstatus %s
-                ORDER BY FIELD(r.imdbid, '%s'), r.postdate DESC",
+                "SELECT * FROM (
+                    SELECT
+                        r.searchname, r.guid, r.postdate, r.categories_id, r.size,
+                        r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
+                        r.adddate, r.imdbid,
+                        m.title, m.year, m.rating, m.plot, m.genre, m.cover, m.tmdbid, m.traktid,
+                        g.name AS group_name,
+                        CONCAT(cp.title, ' > ', c.title) AS category_name,
+                        COALESCE(cp.id,0) AS parentid,
+                        ROW_NUMBER() OVER (PARTITION BY r.imdbid ORDER BY r.postdate DESC) as rn
+                    FROM releases r
+                    INNER JOIN movieinfo m ON m.imdbid = r.imdbid
+                    LEFT JOIN categories c ON c.id = r.categories_id
+                    INNER JOIN root_categories cp ON cp.id = c.root_categories_id
+                    LEFT JOIN usenet_groups g ON g.id = r.groups_id
+                    WHERE r.imdbid IN ('%s')
+                        AND r.passwordstatus %s
+                ) AS ranked
+                WHERE rn <= 5
+                ORDER BY FIELD(imdbid, '%s'), postdate DESC",
                 implode("','", $topMovies->toArray()),
                 $this->releases->showPasswords(),
                 implode("','", $topMovies->toArray())
@@ -242,27 +246,31 @@ class RSS extends ApiController
                 return collect([]);
             }
 
-            // Then get all releases for these top shows
+            // Then get only the latest 5 releases for each of these top shows
             $sql = sprintf(
-                "SELECT DISTINCT
-                    r.searchname, r.guid, r.postdate, r.categories_id, r.size,
-                    r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
-                    r.adddate, r.videos_id, r.tv_episodes_id,
-                    v.title, v.started, v.tvdb, v.tvmaze, v.trakt, v.tmdb, v.countries_id,
-                    ti.summary, ti.image,
-                    g.name AS group_name,
-                    CONCAT(cp.title, ' > ', c.title) AS category_name,
-                    COALESCE(cp.id,0) AS parentid
-                FROM releases r
-                INNER JOIN videos v ON v.id = r.videos_id
-                INNER JOIN tv_info ti ON ti.videos_id = v.id
-                LEFT JOIN categories c ON c.id = r.categories_id
-                INNER JOIN root_categories cp ON cp.id = c.root_categories_id
-                LEFT JOIN usenet_groups g ON g.id = r.groups_id
-                WHERE r.videos_id IN (%s)
-                    AND v.type = 0
-                    AND r.passwordstatus %s
-                ORDER BY FIELD(r.videos_id, %s), r.postdate DESC",
+                "SELECT * FROM (
+                    SELECT
+                        r.searchname, r.guid, r.postdate, r.categories_id, r.size,
+                        r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
+                        r.adddate, r.videos_id, r.tv_episodes_id,
+                        v.title, v.started, v.tvdb, v.tvmaze, v.trakt, v.tmdb, v.countries_id,
+                        ti.summary, ti.image,
+                        g.name AS group_name,
+                        CONCAT(cp.title, ' > ', c.title) AS category_name,
+                        COALESCE(cp.id,0) AS parentid,
+                        ROW_NUMBER() OVER (PARTITION BY r.videos_id ORDER BY r.postdate DESC) as rn
+                    FROM releases r
+                    INNER JOIN videos v ON v.id = r.videos_id
+                    INNER JOIN tv_info ti ON ti.videos_id = v.id
+                    LEFT JOIN categories c ON c.id = r.categories_id
+                    INNER JOIN root_categories cp ON cp.id = c.root_categories_id
+                    LEFT JOIN usenet_groups g ON g.id = r.groups_id
+                    WHERE r.videos_id IN (%s)
+                        AND v.type = 0
+                        AND r.passwordstatus %s
+                ) AS ranked
+                WHERE rn <= 5
+                ORDER BY FIELD(videos_id, %s), postdate DESC",
                 implode(',', $topShows->toArray()),
                 $this->releases->showPasswords(),
                 implode(',', $topShows->toArray())
