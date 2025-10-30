@@ -4269,7 +4269,94 @@ function initAdminDeletedUsers() {
         });
     }
 
-    // Bulk action confirmation
+    // Update selectAll state when individual checkboxes change
+    const userCheckboxes = document.querySelectorAll('.user-checkbox');
+    userCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const allChecked = Array.from(userCheckboxes).every(cb => cb.checked);
+            const someChecked = Array.from(userCheckboxes).some(cb => cb.checked);
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = allChecked;
+                selectAllCheckbox.indeterminate = someChecked && !allChecked;
+            }
+        });
+    });
+
+    // Bulk action form submit handler
+    const bulkActionForm = document.getElementById('bulkActionForm');
+    if (bulkActionForm) {
+        bulkActionForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const action = document.getElementById('bulkAction')?.value;
+            const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
+            const validationError = document.getElementById('validationError');
+            const validationErrorMessage = document.getElementById('validationErrorMessage');
+
+            // Hide any previous validation errors
+            if (validationError) {
+                validationError.classList.add('hidden');
+            }
+
+            // Validate action selected
+            if (!action) {
+                if (validationError && validationErrorMessage) {
+                    validationErrorMessage.textContent = 'Please select an action from the dropdown.';
+                    validationError.classList.remove('hidden');
+                }
+                return false;
+            }
+
+            // Validate at least one user selected
+            if (checkedBoxes.length === 0) {
+                if (validationError && validationErrorMessage) {
+                    validationErrorMessage.textContent = 'Please select at least one user.';
+                    validationError.classList.remove('hidden');
+                }
+                return false;
+            }
+
+            const count = checkedBoxes.length;
+            const actionText = action === 'restore' ? 'restore' : 'permanently delete';
+            const type = action === 'restore' ? 'success' : 'danger';
+            const title = action === 'restore' ? 'Restore Users' : 'Delete Users';
+
+            showConfirm({
+                title: title,
+                message: `Are you sure you want to ${actionText} ${count} user${count > 1 ? 's' : ''}?`,
+                type: type,
+                confirmText: action === 'restore' ? 'Restore' : 'Delete',
+                onConfirm: function() {
+                    bulkActionForm.submit();
+                }
+            });
+        });
+    }
+
+    // Event delegation for restore buttons
+    document.addEventListener('click', function(e) {
+        const restoreBtn = e.target.closest('.restore-user-btn');
+        if (restoreBtn) {
+            e.preventDefault();
+            const userId = restoreBtn.dataset.userId;
+            const username = restoreBtn.dataset.username;
+            if (userId && username) {
+                restoreUser(userId, username);
+            }
+        }
+
+        const deleteBtn = e.target.closest('.delete-user-btn');
+        if (deleteBtn) {
+            e.preventDefault();
+            const userId = deleteBtn.dataset.userId;
+            const username = deleteBtn.dataset.username;
+            if (userId && username) {
+                permanentDeleteUser(userId, username);
+            }
+        }
+    });
+
+    // Bulk action confirmation (kept for backward compatibility)
     window.confirmBulkAction = function(event) {
         event?.preventDefault();
 
@@ -4347,6 +4434,7 @@ window.permanentDeleteUser = function(userId, username) {
             const form = document.getElementById('individualActionForm');
             if (form) {
                 const baseUrl = window.location.origin;
+                // Use the correct route: permanent-delete
                 form.action = `${baseUrl}/admin/deleted-users/permanent-delete/${userId}`;
                 form.submit();
             }

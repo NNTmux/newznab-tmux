@@ -127,8 +127,8 @@
                             <option value="delete">Permanently Delete Selected</option>
                         </select>
                         <button type="submit"
-                                class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700"
-                                onclick="confirmBulkAction(event)">
+                                id="bulkActionBtn"
+                                class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700">
                             <i class="fa fa-check mr-2"></i>Apply
                         </button>
                     </div>
@@ -215,15 +215,17 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex gap-2">
                                             <button type="button"
-                                                    class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 bg-transparent border-0 p-0 cursor-pointer"
+                                                    class="restore-user-btn text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 bg-transparent border-0 p-0 cursor-pointer"
                                                     title="Restore User"
-                                                    onclick="restoreUser({{ $user->id }}, '{{ addslashes($user->username) }}')">
+                                                    data-user-id="{{ $user->id }}"
+                                                    data-username="{{ $user->username }}">
                                                 <i class="fa fa-undo"></i>
                                             </button>
                                             <button type="button"
-                                                    class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-transparent border-0 p-0 cursor-pointer"
+                                                    class="delete-user-btn text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-transparent border-0 p-0 cursor-pointer"
                                                     title="Permanently Delete"
-                                                    onclick="permanentDeleteUser({{ $user->id }}, '{{ addslashes($user->username) }}')">
+                                                    data-user-id="{{ $user->id }}"
+                                                    data-username="{{ $user->username }}">
                                                 <i class="fa fa-trash-alt"></i>
                                             </button>
                                         </div>
@@ -250,7 +252,7 @@
 </div>
 
 <!-- Hidden form for individual actions -->
-<form id="individualActionForm" method="POST" style="display: none;">
+<form id="individualActionForm" method="POST" class="hidden">
     @csrf
 </form>
 @endsection
