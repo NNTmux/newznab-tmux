@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
 
 $tmuxPath = base_path().'/misc/update/tmux/';
+$import = Settings::settingValue('import') ?? 0;
 $tmux_session = Settings::settingValue('tmux_session') ?? 0;
 $seq = Settings::settingValue('sequential') ?? 0;
 $delaytime = Settings::settingValue('delaytime');

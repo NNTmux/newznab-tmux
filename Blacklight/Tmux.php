@@ -132,7 +132,10 @@ class Tmux
 
         $constants = Settings::query()
             ->whereIn('name', $settings)
-            ->pluck('value', 'name')
+            ->get()
+            ->mapWithKeys(function ($item) {
+                return [$item->name => Settings::convertValue($item->getRawOriginal('value'))];
+            })
             ->toArray();
 
         $constants['alternate_nntp'] = config('nntmux_nntp.use_alternate_nntp_server') ? '1' : '0';
@@ -197,7 +200,7 @@ class Tmux
             ->whereIn('name', array_keys($settingsMap))
             ->get()
             ->mapWithKeys(function ($item) use ($settingsMap) {
-                return [$settingsMap[$item->name] => $item->value];
+                return [$settingsMap[$item->name] => Settings::convertValue($item->getRawOriginal('value'))];
             })
             ->toArray();
     }
@@ -256,6 +259,11 @@ class Tmux
      */
     public function get_color($colors_start, $colors_end, $colors_exc): int
     {
+        // Handle null values with sensible defaults
+        $colors_start = $colors_start ?? 0;
+        $colors_end = $colors_end ?? 255;
+        $colors_exc = $colors_exc ?? '';
+
         $exception = str_replace('.', '.', $colors_exc);
         $exceptions = explode(',', $exception);
         sort($exceptions);
@@ -279,8 +287,12 @@ class Tmux
     /**
      * @throws \Exception
      */
-    public function proc_query($qry, $bookreqids, string $db_name, string $ppmax = '', string $ppmin = ''): bool|string
+    public function proc_query($qry, $bookreqids, string $db_name, ?string $ppmax = '', ?string $ppmin = ''): bool|string
     {
+        // Convert null to empty string for backward compatibility
+        $ppmax = $ppmax ?? '';
+        $ppmin = $ppmin ?? '';
+
         switch ((int) $qry) {
             case 1:
                 return sprintf(

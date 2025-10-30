@@ -308,17 +308,10 @@ while ($runVar['counts']['iterations'] > 0) {
     $tOut->updateMonitorPane($runVar);
 
     // begin pane run execution
-    if ($runVar['settings']['is_running'] === '1') {
+    if ((int) $runVar['settings']['is_running'] === 1) {
         // run main updating function(s)
         try {
             $tRun->runPane('main', $runVar);
-        } catch (Exception $e) {
-            echo $e;
-        }
-
-        // run nzb-import
-        try {
-            $tRun->runPane('import', $runVar);
         } catch (Exception $e) {
             echo $e;
         }

@@ -185,11 +185,11 @@ class TmuxRun extends Tmux
         switch (true) {
             case ((int) $runVar['settings']['post_amazon'] === 1) && (((int) $runVar['counts']['now']['processmusic'] > 0)
                     || ((int) $runVar['counts']['now']['processbooks'] > 0) || ((int) $runVar['counts']['now']['processconsole'] > 0)
-                        || ((int) $runVar['counts']['now']['processgames'] > 0) || ((int) $runVar['counts']['now']['processxxx'] > 0))
+                    || ((int) $runVar['counts']['now']['processgames'] > 0) || ((int) $runVar['counts']['now']['processxxx'] > 0))
             && (((int) $runVar['settings']['processbooks'] !== 0) || ((int) $runVar['settings']['processconsole'] !== 0)
                 || ((int) $runVar['settings']['processmusic'] !== 0) ||
-                    ((int) $runVar['settings']['processgames'] !== 0)
-                    || ((int) $runVar['settings']['processxxx'] !== 0)):
+                ((int) $runVar['settings']['processgames'] !== 0)
+                || ((int) $runVar['settings']['processxxx'] !== 0)):
 
                 $log = $this->writelog($runVar['panes']['one'][1]);
                 shell_exec(
@@ -286,8 +286,8 @@ class TmuxRun extends Tmux
         // run backfill
         $backsleep = (
             (int) $runVar['settings']['progressive'] === 1 && floor($runVar['counts']['now']['collections_table'] / 500) > $runVar['settings']['back_timer']
-            ? floor($runVar['counts']['now']['collections_table'] / 500)
-            : $runVar['settings']['back_timer']
+                ? floor($runVar['counts']['now']['collections_table'] / 500)
+                : $runVar['settings']['back_timer']
         );
 
         if (((int) $runVar['settings']['backfill'] !== 0) && ($runVar['killswitch']['coll'] === false) && ($runVar['killswitch']['pp'] === false)) {
@@ -529,7 +529,7 @@ class TmuxRun extends Tmux
         for ($g = 1; $g <= 2; $g++) {
             shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.$g 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['zero'][$g]} has been disabled/terminated by Running\"'");
         }
-        for ($g = 0; $g <= 3; $g++) {
+        for ($g = 0; $g <= 1; $g++) {
             shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:1.$g 'echo \"\033[38;5;{$color}m\n{$runVar['panes']['one'][$g]} has been disabled/terminated by Running\"'");
         }
         for ($g = 0; $g <= 2; $g++) {
