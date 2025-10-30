@@ -255,38 +255,50 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex gap-2">
-                                        <a href="{{ url('admin/user-edit?id=' . $user->id) }}"
-                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
-                                           title="Edit">
-                                            <i class="fa fa-edit"></i>
-                                        </a>
-                                        @if(!$user->verified)
-                                            <form method="POST" action="{{ route('admin.verify') }}" class="inline verify-user-form">
+                                        @if($user->deleted_at)
+                                            <!-- Show restore button for deleted users -->
+                                            <button type="button"
+                                                    class="restore-user-btn text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 bg-transparent border-0 p-0 cursor-pointer"
+                                                    title="Restore User"
+                                                    data-user-id="{{ $user->id }}"
+                                                    data-username="{{ $user->username }}">
+                                                <i class="fa fa-undo"></i>
+                                            </button>
+                                        @else
+                                            <!-- Show normal actions for active users -->
+                                            <a href="{{ url('admin/user-edit?id=' . $user->id) }}"
+                                               class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                               title="Edit">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            @if(!$user->verified)
+                                                <form method="POST" action="{{ route('admin.verify') }}" class="inline verify-user-form">
+                                                    @csrf
+                                                    <input type="hidden" name="id" value="{{ $user->id }}">
+                                                    <button type="button"
+                                                            class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 border-0 bg-transparent cursor-pointer p-0"
+                                                            title="Verify User"
+                                                            onclick="showVerifyModal(event, this.closest('form'))">
+                                                        <i class="fa fa-check-circle"></i>
+                                                    </button>
+                                                </form>
+                                                <a href="{{ url('admin/resendverification?id=' . $user->id) }}"
+                                                   class="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300"
+                                                   title="Resend Verification">
+                                                    <i class="fa fa-envelope"></i>
+                                                </a>
+                                            @endif
+                                            <form action="{{ url('admin/user-delete') }}" method="POST" class="inline-form">
                                                 @csrf
                                                 <input type="hidden" name="id" value="{{ $user->id }}">
-                                                <button type="button"
-                                                        class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 border-0 bg-transparent cursor-pointer p-0"
-                                                        title="Verify User"
-                                                        onclick="showVerifyModal(event, this.closest('form'))">
-                                                    <i class="fa fa-check-circle"></i>
+                                                <button type="submit"
+                                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-transparent border-0 p-0 cursor-pointer"
+                                                        title="Delete"
+                                                        data-confirm="Are you sure you want to delete user '{{ $user->username }}'?">
+                                                    <i class="fa fa-trash"></i>
                                                 </button>
                                             </form>
-                                            <a href="{{ url('admin/resendverification?id=' . $user->id) }}"
-                                               class="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300"
-                                               title="Resend Verification">
-                                                <i class="fa fa-envelope"></i>
-                                            </a>
                                         @endif
-                                        <form action="{{ url('admin/user-delete') }}" method="POST" class="inline-form">
-                                            @csrf
-                                            <input type="hidden" name="id" value="{{ $user->id }}">
-                                            <button type="submit"
-                                                    class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-transparent border-0 p-0 cursor-pointer"
-                                                    title="Delete"
-                                                    data-confirm="Are you sure you want to delete user '{{ $user->username }}'?">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
-                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -343,6 +355,10 @@
     </div>
 </div>
 
+<!-- Hidden form for individual actions (restore deleted users) -->
+<form id="individualActionForm" method="POST" class="hidden">
+    @csrf
+</form>
 @endsection
 
 {{-- Scripts moved to resources/js/csp-safe.js --}}
