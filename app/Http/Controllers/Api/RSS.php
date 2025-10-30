@@ -161,6 +161,28 @@ class RSS extends ApiController
         return Cache::remember($cacheKey, 3600, function () {
             $fortyEightHoursAgo = \Illuminate\Support\Carbon::now()->subHours(48);
 
+            // First get the top 15 movies by download count
+            $topMovies = DB::table('movieinfo as m')
+                ->join('releases as r', 'm.imdbid', '=', 'r.imdbid')
+                ->leftJoin('user_downloads as ud', 'r.id', '=', 'ud.releases_id')
+                ->select([
+                    'm.imdbid',
+                    DB::raw('COUNT(DISTINCT ud.id) as total_downloads'),
+                ])
+                ->where('m.title', '!=', '')
+                ->where('m.imdbid', '!=', '0000000')
+                ->where('ud.timestamp', '>=', $fortyEightHoursAgo)
+                ->groupBy('m.imdbid')
+                ->havingRaw('COUNT(DISTINCT ud.id) > 0')
+                ->orderByDesc('total_downloads')
+                ->limit(15)
+                ->pluck('imdbid');
+
+            if ($topMovies->isEmpty()) {
+                return collect([]);
+            }
+
+            // Then get all releases for these top movies
             $sql = sprintf(
                 "SELECT DISTINCT
                     r.searchname, r.guid, r.postdate, r.categories_id, r.size,
@@ -169,28 +191,18 @@ class RSS extends ApiController
                     m.title, m.year, m.rating, m.plot, m.genre, m.cover, m.tmdbid, m.traktid,
                     g.name AS group_name,
                     CONCAT(cp.title, ' > ', c.title) AS category_name,
-                    COALESCE(cp.id,0) AS parentid,
-                    COUNT(DISTINCT ud.id) as total_downloads,
-                    COUNT(DISTINCT r.id) as release_count
+                    COALESCE(cp.id,0) AS parentid
                 FROM releases r
                 INNER JOIN movieinfo m ON m.imdbid = r.imdbid
-                LEFT JOIN user_downloads ud ON r.id = ud.releases_id
                 LEFT JOIN categories c ON c.id = r.categories_id
                 INNER JOIN root_categories cp ON cp.id = c.root_categories_id
                 LEFT JOIN usenet_groups g ON g.id = r.groups_id
-                WHERE m.title != ''
-                    AND m.imdbid != '0000000'
-                    AND ud.timestamp >= '%s'
+                WHERE r.imdbid IN ('%s')
                     AND r.passwordstatus %s
-                GROUP BY r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size,
-                    r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
-                    r.adddate, r.imdbid, m.title, m.year, m.rating, m.plot, m.genre,
-                    m.cover, m.tmdbid, m.traktid, g.name, cp.title, c.title, cp.id
-                HAVING COUNT(DISTINCT ud.id) > 0
-                ORDER BY total_downloads DESC, r.postdate DESC
-                LIMIT 15",
-                $fortyEightHoursAgo->format('Y-m-d H:i:s'),
-                $this->releases->showPasswords()
+                ORDER BY FIELD(r.imdbid, '%s'), r.postdate DESC",
+                implode("','", $topMovies->toArray()),
+                $this->releases->showPasswords(),
+                implode("','", $topMovies->toArray())
             );
 
             return Release::fromQuery($sql);
@@ -209,6 +221,28 @@ class RSS extends ApiController
         return Cache::remember($cacheKey, 3600, function () {
             $fortyEightHoursAgo = \Illuminate\Support\Carbon::now()->subHours(48);
 
+            // First get the top 15 TV shows by download count
+            $topShows = DB::table('videos as v')
+                ->join('releases as r', 'v.id', '=', 'r.videos_id')
+                ->leftJoin('user_downloads as ud', 'r.id', '=', 'ud.releases_id')
+                ->select([
+                    'v.id',
+                    DB::raw('COUNT(DISTINCT ud.id) as total_downloads'),
+                ])
+                ->where('v.type', 0) // 0 = TV
+                ->where('v.title', '!=', '')
+                ->where('ud.timestamp', '>=', $fortyEightHoursAgo)
+                ->groupBy('v.id')
+                ->havingRaw('COUNT(DISTINCT ud.id) > 0')
+                ->orderByDesc('total_downloads')
+                ->limit(15)
+                ->pluck('id');
+
+            if ($topShows->isEmpty()) {
+                return collect([]);
+            }
+
+            // Then get all releases for these top shows
             $sql = sprintf(
                 "SELECT DISTINCT
                     r.searchname, r.guid, r.postdate, r.categories_id, r.size,
@@ -218,30 +252,20 @@ class RSS extends ApiController
                     ti.summary, ti.image,
                     g.name AS group_name,
                     CONCAT(cp.title, ' > ', c.title) AS category_name,
-                    COALESCE(cp.id,0) AS parentid,
-                    COUNT(DISTINCT ud.id) as total_downloads,
-                    COUNT(DISTINCT r.id) as release_count
+                    COALESCE(cp.id,0) AS parentid
                 FROM releases r
                 INNER JOIN videos v ON v.id = r.videos_id
                 INNER JOIN tv_info ti ON ti.videos_id = v.id
-                LEFT JOIN user_downloads ud ON r.id = ud.releases_id
                 LEFT JOIN categories c ON c.id = r.categories_id
                 INNER JOIN root_categories cp ON cp.id = c.root_categories_id
                 LEFT JOIN usenet_groups g ON g.id = r.groups_id
-                WHERE v.type = 0
-                    AND v.title != ''
-                    AND ud.timestamp >= '%s'
+                WHERE r.videos_id IN (%s)
+                    AND v.type = 0
                     AND r.passwordstatus %s
-                GROUP BY r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size,
-                    r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
-                    r.adddate, r.videos_id, r.tv_episodes_id, v.title, v.started, v.tvdb,
-                    v.tvmaze, v.trakt, v.tmdb, v.countries_id, ti.summary, ti.image,
-                    g.name, cp.title, c.title, cp.id
-                HAVING COUNT(DISTINCT ud.id) > 0
-                ORDER BY total_downloads DESC, r.postdate DESC
-                LIMIT 15",
-                $fortyEightHoursAgo->format('Y-m-d H:i:s'),
-                $this->releases->showPasswords()
+                ORDER BY FIELD(r.videos_id, %s), r.postdate DESC",
+                implode(',', $topShows->toArray()),
+                $this->releases->showPasswords(),
+                implode(',', $topShows->toArray())
             );
 
             return Release::fromQuery($sql);
