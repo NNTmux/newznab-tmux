@@ -36,7 +36,12 @@
                 </h1>
                 <p class="text-blue-100">Most downloaded movies in the last 48 hours - Updated every hour</p>
             </div>
-            <div class="text-right">
+            <div class="text-right flex gap-2">
+                @if(auth()->check())
+                    <a href="{{ url('/rss/trending-movies?dl=1&api_token=' . auth()->user()->api_token) }}" class="inline-flex items-center px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition shadow-md" title="RSS Feed">
+                        <i class="fas fa-rss mr-2"></i> RSS Feed
+                    </a>
+                @endif
                 <a href="{{ route('Movies') }}" class="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg transition">
                     <i class="fas fa-film mr-2"></i> Browse All Movies
                 </a>

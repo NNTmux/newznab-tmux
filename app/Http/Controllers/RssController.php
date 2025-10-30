@@ -175,6 +175,42 @@ class RssController extends BasePageController
     /**
      * @throws \Throwable
      */
+    public function trendingMoviesRss(Request $request)
+    {
+        $rss = new RSS;
+        $offset = 0;
+        $user = $this->userCheck($request);
+        if (is_object($user)) {
+            return $user;
+        }
+        $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
+
+        $relData = $rss->getTrendingMoviesRss();
+
+        $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    public function trendingShowsRss(Request $request)
+    {
+        $rss = new RSS;
+        $offset = 0;
+        $user = $this->userCheck($request);
+        if (is_object($user)) {
+            return $user;
+        }
+        $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
+
+        $relData = $rss->getTrendingShowsRss();
+
+        $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
+    }
+
+    /**
+     * @throws \Throwable
+     */
     private function userCheck(Request $request): JsonResponse|array
     {
         if ($request->missing('api_token')) {

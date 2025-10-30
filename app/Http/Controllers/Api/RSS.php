@@ -150,6 +150,105 @@ class RSS extends ApiController
     }
 
     /**
+     * Get trending movies RSS (top 15 most downloaded in last 48 hours)
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getTrendingMoviesRss()
+    {
+        $cacheKey = 'rss_trending_movies_48h';
+
+        return Cache::remember($cacheKey, 3600, function () {
+            $fortyEightHoursAgo = \Illuminate\Support\Carbon::now()->subHours(48);
+
+            $sql = sprintf(
+                "SELECT DISTINCT
+                    r.searchname, r.guid, r.postdate, r.categories_id, r.size,
+                    r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
+                    r.adddate, r.imdbid,
+                    m.title, m.year, m.rating, m.plot, m.genre, m.cover, m.tmdbid, m.traktid,
+                    g.name AS group_name,
+                    CONCAT(cp.title, ' > ', c.title) AS category_name,
+                    COALESCE(cp.id,0) AS parentid,
+                    COUNT(DISTINCT ud.id) as total_downloads,
+                    COUNT(DISTINCT r.id) as release_count
+                FROM releases r
+                INNER JOIN movieinfo m ON m.imdbid = r.imdbid
+                LEFT JOIN user_downloads ud ON r.id = ud.releases_id
+                LEFT JOIN categories c ON c.id = r.categories_id
+                INNER JOIN root_categories cp ON cp.id = c.root_categories_id
+                LEFT JOIN usenet_groups g ON g.id = r.groups_id
+                WHERE m.title != ''
+                    AND m.imdbid != '0000000'
+                    AND ud.timestamp >= '%s'
+                    AND r.passwordstatus %s
+                GROUP BY r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size,
+                    r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
+                    r.adddate, r.imdbid, m.title, m.year, m.rating, m.plot, m.genre,
+                    m.cover, m.tmdbid, m.traktid, g.name, cp.title, c.title, cp.id
+                HAVING COUNT(DISTINCT ud.id) > 0
+                ORDER BY total_downloads DESC, r.postdate DESC
+                LIMIT 15",
+                $fortyEightHoursAgo->format('Y-m-d H:i:s'),
+                $this->releases->showPasswords()
+            );
+
+            return Release::fromQuery($sql);
+        });
+    }
+
+    /**
+     * Get trending TV shows RSS (top 15 most downloaded in last 48 hours)
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getTrendingShowsRss()
+    {
+        $cacheKey = 'rss_trending_shows_48h';
+
+        return Cache::remember($cacheKey, 3600, function () {
+            $fortyEightHoursAgo = \Illuminate\Support\Carbon::now()->subHours(48);
+
+            $sql = sprintf(
+                "SELECT DISTINCT
+                    r.searchname, r.guid, r.postdate, r.categories_id, r.size,
+                    r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
+                    r.adddate, r.videos_id, r.tv_episodes_id,
+                    v.title, v.started, v.tvdb, v.tvmaze, v.trakt, v.tmdb, v.countries_id,
+                    ti.summary, ti.image,
+                    g.name AS group_name,
+                    CONCAT(cp.title, ' > ', c.title) AS category_name,
+                    COALESCE(cp.id,0) AS parentid,
+                    COUNT(DISTINCT ud.id) as total_downloads,
+                    COUNT(DISTINCT r.id) as release_count
+                FROM releases r
+                INNER JOIN videos v ON v.id = r.videos_id
+                INNER JOIN tv_info ti ON ti.videos_id = v.id
+                LEFT JOIN user_downloads ud ON r.id = ud.releases_id
+                LEFT JOIN categories c ON c.id = r.categories_id
+                INNER JOIN root_categories cp ON cp.id = c.root_categories_id
+                LEFT JOIN usenet_groups g ON g.id = r.groups_id
+                WHERE v.type = 0
+                    AND v.title != ''
+                    AND ud.timestamp >= '%s'
+                    AND r.passwordstatus %s
+                GROUP BY r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size,
+                    r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments,
+                    r.adddate, r.videos_id, r.tv_episodes_id, v.title, v.started, v.tvdb,
+                    v.tvmaze, v.trakt, v.tmdb, v.countries_id, ti.summary, ti.image,
+                    g.name, cp.title, c.title, cp.id
+                HAVING COUNT(DISTINCT ud.id) > 0
+                ORDER BY total_downloads DESC, r.postdate DESC
+                LIMIT 15",
+                $fortyEightHoursAgo->format('Y-m-d H:i:s'),
+                $this->releases->showPasswords()
+            );
+
+            return Release::fromQuery($sql);
+        });
+    }
+
+    /**
      * Get the first instance of a column from a table where the column is greater than 0, ordered by a specified column.
      *
      * @param  string  $column  The column to select and check

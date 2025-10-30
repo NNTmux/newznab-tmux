@@ -165,6 +165,50 @@
             </div>
         </div>
 
+        <!-- Trending Feeds -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm mb-6 dark:bg-gray-800 dark:border-gray-600">
+            <div class="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-700 dark:bg-gray-700 dark:border-gray-600">
+                <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
+                    <i class="fa fa-fire mr-2 text-orange-600 dark:text-orange-400"></i>Trending Feeds
+                </h5>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Most downloaded content in the last 48 hours (updated hourly)</p>
+            </div>
+            <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                <div class="p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <strong class="text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
+                            <i class="fa fa-film mr-2 text-blue-600 dark:text-blue-400"></i>Trending Movies
+                        </strong>
+                        <a href="{{ url('/rss/trending-movies?dl=1&api_token=' . ($userdata->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" target="_blank">
+                            <i class="fa fa-external-link mr-1"></i>Open Feed
+                        </a>
+                    </div>
+                    <div class="flex rounded-md shadow-sm">
+                        <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/trending-movies?dl=1&api_token=' . ($userdata->api_token ?? '')) }}" readonly id="trendingMoviesFeedUrl">
+                        <button class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500 copy-btn" type="button" data-copy-target="trendingMoviesFeedUrl">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <strong class="text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
+                            <i class="fa fa-tv mr-2 text-purple-600 dark:text-purple-400"></i>Trending TV Shows
+                        </strong>
+                        <a href="{{ url('/rss/trending-shows?dl=1&api_token=' . ($userdata->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" target="_blank">
+                            <i class="fa fa-external-link mr-1"></i>Open Feed
+                        </a>
+                    </div>
+                    <div class="flex rounded-md shadow-sm">
+                        <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/trending-shows?dl=1&api_token=' . ($userdata->api_token ?? '')) }}" readonly id="trendingShowsFeedUrl">
+                        <button class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500 copy-btn" type="button" data-copy-target="trendingShowsFeedUrl">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Category Feeds -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm dark:bg-gray-800 dark:border-gray-600">
