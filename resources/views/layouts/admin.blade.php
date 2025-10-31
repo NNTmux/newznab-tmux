@@ -93,7 +93,7 @@
 
     @stack('scripts')
 
-    <script>
+    <script nonce="{{ csp_nonce() }}">
         // Display flash messages as toast notifications
         @if(session('success'))
             window.showToast('{{ session('success') }}', 'success');
