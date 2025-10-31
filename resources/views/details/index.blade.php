@@ -38,7 +38,7 @@
                             @endif
                         </div>
                         <div class="flex flex-wrap gap-2">
-                            <a href="{{ url('/getnzb/' . $release->guid) }}" class="download-nzb px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition inline-flex items-center" onclick="showToast('Downloading NZB...', 'success')">
+                            <a href="{{ url('/getnzb/' . $release->guid) }}" class="download-nzb px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition inline-flex items-center">
                                 <i class="fas fa-download mr-2"></i> Download NZB
                             </a>
                             <a href="#" class="add-to-cart px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition inline-flex items-center" data-guid="{{ $release->guid }}">
@@ -83,7 +83,7 @@
                         @if($hasPreviewImage)
                             <!-- Preview image -->
                             <div>
-                                <div class="block cursor-pointer" onclick="openImageModal('{{ url('/covers/preview/' . $release->guid . '_thumb.jpg') }}', 'Preview Image')">
+                                <div class="block cursor-pointer image-modal-trigger" data-image-url="{{ url('/covers/preview/' . $release->guid . '_thumb.jpg') }}" data-image-title="Preview Image">
                                     <img src="{{ url('/covers/preview/' . $release->guid . '_thumb.jpg') }}"
                                          alt="Preview"
                                          class="w-full h-auto rounded-lg shadow-md hover:shadow-lg transition"
@@ -96,7 +96,7 @@
                         @if($hasSampleImage)
                             <!-- Sample image -->
                             <div>
-                                <div class="block cursor-pointer" onclick="openImageModal('{{ url('/covers/sample/' . $release->guid . '_thumb.jpg') }}', 'Sample Image')">
+                                <div class="block cursor-pointer image-modal-trigger" data-image-url="{{ url('/covers/sample/' . $release->guid . '_thumb.jpg') }}" data-image-title="Sample Image">
                                     <img src="{{ url('/covers/sample/' . $release->guid . '_thumb.jpg') }}"
                                          alt="Sample"
                                          class="w-full h-auto rounded-lg shadow-md hover:shadow-lg transition"
@@ -922,9 +922,9 @@
 @endsection
 
 <!-- Image Modal -->
-<div id="imageModal" class="fixed inset-0 bg-transparent hidden items-center justify-center p-4">
-    <div class="relative max-w-7xl w-full h-full flex items-center justify-center">
-        <button type="button" onclick="closeImageModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 text-4xl font-bold z-10 bg-black bg-opacity-70 rounded-full w-12 h-12 flex items-center justify-center shadow-lg">
+<div id="imageModal" class="image-modal-backdrop hidden">
+    <div class="image-modal-container">
+        <button type="button" class="image-modal-close" data-close-image-modal>
             <i class="fas fa-times"></i>
         </button>
         <div class="text-center">

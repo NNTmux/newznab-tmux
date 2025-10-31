@@ -17,8 +17,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 
-    <!-- Dark Mode Script (must be inline to prevent flash) -->
-    <script>
+    <!-- Dark Mode Script (must use nonce to prevent flash) -->
+    <script nonce="{{ csp_nonce() }}">
         // Initialize theme before page renders to prevent flash
         (function() {
             @auth
@@ -153,167 +153,24 @@
 
     @stack('scripts')
 
-    <script>
-        // Theme management with system preference support
-        (function() {
-            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    <!-- Theme Management Data (moved to csp-safe.js) -->
+    <div id="current-theme-data"
+         data-theme="{{ auth()->check() ? (auth()->user()->theme_preference ?? 'light') : 'light' }}"
+         data-authenticated="{{ auth()->check() ? 'true' : 'false' }}"
+         data-update-url="{{ route('profile.update-theme') }}"
+         style="display: none;">
+    </div>
 
-            function applyTheme(themePreference) {
-                const html = document.documentElement;
-
-                if (themePreference === 'system') {
-                    if (mediaQuery.matches) {
-                        html.classList.add('dark');
-                    } else {
-                        html.classList.remove('dark');
-                    }
-                } else if (themePreference === 'dark') {
-                    html.classList.add('dark');
-                } else {
-                    html.classList.remove('dark');
-                }
-            }
-
-            function updateThemeButton(theme) {
-                const themeIcon = document.getElementById('theme-icon');
-                const themeLabel = document.getElementById('theme-label');
-                const themeToggle = document.getElementById('theme-toggle');
-
-                const icons = {
-                    'light': 'fa-sun',
-                    'dark': 'fa-moon',
-                    'system': 'fa-desktop'
-                };
-                const labels = {
-                    'light': 'Light',
-                    'dark': 'Dark',
-                    'system': 'System'
-                };
-                const titles = {
-                    'light': 'Light Mode',
-                    'dark': 'Dark Mode',
-                    'system': 'System Mode'
-                };
-
-                if (themeIcon) {
-                    // Remove all possible icon classes first
-                    themeIcon.classList.remove('fa-sun', 'fa-moon', 'fa-desktop');
-                    // Add the correct icon class
-                    themeIcon.classList.add(icons[theme]);
-                }
-                if (themeLabel) {
-                    themeLabel.textContent = labels[theme];
-                }
-                if (themeToggle) {
-                    themeToggle.setAttribute('title', titles[theme]);
-                }
-            }
-
-            // Listen for OS theme changes
-            mediaQuery.addEventListener('change', () => {
-                @auth
-                    const userThemePreference = '{{ auth()->user()->theme_preference ?? 'light' }}';
-                    if (userThemePreference === 'system') {
-                        applyTheme('system');
-                    }
-                @else
-                    const theme = localStorage.getItem('theme') || 'light';
-                    if (theme === 'system') {
-                        applyTheme('system');
-                    }
-                @endauth
-            });
-
-            // Listen for custom theme change events from sidebar
-            document.addEventListener('themeChanged', function(e) {
-                if (e.detail && e.detail.theme) {
-                    updateThemeButton(e.detail.theme);
-                    applyTheme(e.detail.theme);
-                    @auth
-                        currentTheme = e.detail.theme;
-                    @else
-                        currentTheme = e.detail.theme;
-                    @endauth
-                }
-            });
-
-            // Dark mode toggle - cycles through light -> dark -> system
-            const themeToggle = document.getElementById('theme-toggle');
-            @auth
-                let currentTheme = '{{ auth()->user()->theme_preference ?? 'light' }}';
-            @else
-                let currentTheme = localStorage.getItem('theme') || 'light';
-            @endauth
-
-            themeToggle?.addEventListener('click', function() {
-                let nextTheme;
-
-                // Cycle through: light -> dark -> system -> light
-                if (currentTheme === 'light') {
-                    nextTheme = 'dark';
-                } else if (currentTheme === 'dark') {
-                    nextTheme = 'system';
-                } else {
-                    nextTheme = 'light';
-                }
-
-                applyTheme(nextTheme);
-                updateThemeButton(nextTheme);
-
-                @auth
-                    // Save to backend for authenticated users
-                    fetch('{{ route('profile.update-theme') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({ theme_preference: nextTheme })
-                    }).then(response => response.json())
-                      .then(data => {
-                          if (data.success) {
-                              currentTheme = nextTheme;
-                              // Dispatch event to update sidebar
-                              document.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: nextTheme } }));
-                          }
-                      });
-                @else
-                    localStorage.setItem('theme', nextTheme);
-                    currentTheme = nextTheme;
-                    // Dispatch event to update sidebar
-                    document.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: nextTheme } }));
-                @endauth
-            });
-
-            // Mobile sidebar toggle
-            document.getElementById('mobile-sidebar-toggle')?.addEventListener('click', function() {
-                document.getElementById('sidebar')?.classList.toggle('hidden');
-            });
-
-            // Display flash messages as toast notifications
-            @if(session('success'))
-                window.showToast('{{ session('success') }}', 'success');
-            @endif
-
-            @if(session('error'))
-                @if(is_array(session('error')))
-                    @foreach(session('error') as $error)
-                        window.showToast('{{ $error }}', 'error');
-                    @endforeach
-                @else
-                    window.showToast('{{ session('error') }}', 'error');
-                @endif
-            @endif
-
-            @if(session('warning'))
-                window.showToast('{{ session('warning') }}', 'warning');
-            @endif
-
-            @if(session('info'))
-                window.showToast('{{ session('info') }}', 'info');
-            @endif
-        })();
-    </script>
+    <!-- Flash Messages Data (moved to csp-safe.js) -->
+    <div id="flash-messages-data"
+         data-messages="{{ json_encode([
+             'success' => session('success'),
+             'error' => session('error'),
+             'warning' => session('warning'),
+             'info' => session('info')
+         ]) }}"
+         style="display: none;">
+    </div>
 </body>
 </html>
 

@@ -1,6 +1,18 @@
 // CSP-Safe JavaScript - All inline event handlers moved here
 // This file handles all onclick, onchange, and other inline event handlers
 
+// Utility function to escape HTML
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     initEventDelegation();
     initToastNotifications();
@@ -291,31 +303,49 @@ window.showConfirm = function(options) {
     const icon = document.getElementById('confirmationModalIcon');
     const confirmBtn = document.getElementById('confirmationModalConfirmBtn');
 
-    // Remove all existing classes from icon safely (works with SVG elements)
-    while (icon.classList.length > 0) {
-        icon.classList.remove(icon.classList.item(0));
+    // Helper function to set classes (works with both regular elements and SVG)
+    function setIconClasses(element, classes) {
+        if (!element) return;
+        if (element instanceof SVGElement) {
+            element.setAttribute('class', classes.join(' '));
+        } else {
+            element.className = classes.join(' ');
+        }
     }
-    icon.classList.add('fas', 'mr-2');
 
-    // Remove all existing classes from button
-    while (confirmBtn.classList.length > 0) {
-        confirmBtn.classList.remove(confirmBtn.classList.item(0));
+    // Set base icon classes
+    let iconClasses = ['fas', 'mr-2'];
+
+    // Remove all existing classes from button and set base classes
+    if (confirmBtn) {
+        confirmBtn.className = '';
+        confirmBtn.classList.add('px-4', 'py-2', 'text-white', 'rounded-lg', 'transition', 'font-medium');
     }
-    confirmBtn.classList.add('px-4', 'py-2', 'text-white', 'rounded-lg', 'transition', 'font-medium');
 
     if (config.type === 'danger') {
-        icon.classList.add('fa-exclamation-triangle', 'text-red-600', 'dark:text-red-400');
-        confirmBtn.classList.add('bg-red-600', 'dark:bg-red-700', 'hover:bg-red-700', 'dark:hover:bg-red-800');
+        iconClasses.push('fa-exclamation-triangle', 'text-red-600', 'dark:text-red-400');
+        if (confirmBtn) {
+            confirmBtn.classList.add('bg-red-600', 'dark:bg-red-700', 'hover:bg-red-700', 'dark:hover:bg-red-800');
+        }
     } else if (config.type === 'warning') {
-        icon.classList.add('fa-exclamation-circle', 'text-yellow-600', 'dark:text-yellow-400');
-        confirmBtn.classList.add('bg-yellow-600', 'dark:bg-yellow-700', 'hover:bg-yellow-700', 'dark:hover:bg-yellow-800');
+        iconClasses.push('fa-exclamation-circle', 'text-yellow-600', 'dark:text-yellow-400');
+        if (confirmBtn) {
+            confirmBtn.classList.add('bg-yellow-600', 'dark:bg-yellow-700', 'hover:bg-yellow-700', 'dark:hover:bg-yellow-800');
+        }
     } else if (config.type === 'success') {
-        icon.classList.add('fa-check-circle', 'text-green-600', 'dark:text-green-400');
-        confirmBtn.classList.add('bg-green-600', 'dark:bg-green-700', 'hover:bg-green-700', 'dark:hover:bg-green-800');
+        iconClasses.push('fa-check-circle', 'text-green-600', 'dark:text-green-400');
+        if (confirmBtn) {
+            confirmBtn.classList.add('bg-green-600', 'dark:bg-green-700', 'hover:bg-green-700', 'dark:hover:bg-green-800');
+        }
     } else { // info
-        icon.classList.add('fa-info-circle', 'text-blue-600', 'dark:text-blue-400');
-        confirmBtn.classList.add('bg-blue-600', 'dark:bg-blue-700', 'hover:bg-blue-700', 'dark:hover:bg-blue-800');
+        iconClasses.push('fa-info-circle', 'text-blue-600', 'dark:text-blue-400');
+        if (confirmBtn) {
+            confirmBtn.classList.add('bg-blue-600', 'dark:bg-blue-700', 'hover:bg-blue-700', 'dark:hover:bg-blue-800');
+        }
     }
+
+    // Apply icon classes
+    setIconClasses(icon, iconClasses);
 
     // Handle details
     const detailsDiv = document.getElementById('confirmationModalDetails');
@@ -1162,6 +1192,76 @@ function initMediainfoAndFilelist() {
 
 // Cart and Multi-select functionality
 function initCartFunctionality() {
+    // Handle individual add to cart button clicks (for details page, browse page, etc.)
+    document.addEventListener('click', function(e) {
+        const cartBtn = e.target.closest('.add-to-cart');
+
+        if (cartBtn) {
+            e.preventDefault();
+
+            const guid = cartBtn.dataset.guid;
+            const iconElement = cartBtn.querySelector('.icon_cart');
+
+            if (!guid) {
+                console.error('No GUID found for cart item');
+                return;
+            }
+
+            // Prevent double-clicking
+            if (iconElement && iconElement.classList.contains('icon_cart_clicked')) {
+                return;
+            }
+
+            // Send AJAX request to add item to cart
+            fetch('/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ id: guid })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Visual feedback
+                    if (iconElement) {
+                        iconElement.classList.remove('fa-shopping-basket');
+                        iconElement.classList.add('fa-check', 'icon_cart_clicked');
+
+                        // Reset icon after 2 seconds
+                        setTimeout(() => {
+                            iconElement.classList.remove('fa-check', 'icon_cart_clicked');
+                            iconElement.classList.add('fa-shopping-basket');
+                        }, 2000);
+                    }
+
+                    // Update cart count if element exists
+                    const cartCount = document.querySelector('.cart-count');
+                    if (cartCount && data.cartCount) {
+                        cartCount.textContent = data.cartCount;
+                    }
+
+                    // Show success notification
+                    if (typeof showToast === 'function') {
+                        showToast('Added to cart successfully!', 'success');
+                    }
+                } else {
+                    if (typeof showToast === 'function') {
+                        showToast('Failed to add item to cart', 'error');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error adding to cart:', error);
+                if (typeof showToast === 'function') {
+                    showToast('An error occurred', 'error');
+                }
+            });
+        }
+    });
+
     // Cart page specific functionality
     const checkAll = document.getElementById('check-all');
     const checkboxes = document.querySelectorAll('.cart-checkbox');
@@ -1512,78 +1612,10 @@ function initCartFunctionality() {
                         setTimeout(() => window.location.reload(), 1500);
                     }
                 });
-            }
-        });
-        });
-    } else {
-        console.log('Delete button not found on page');
-    }
-
-    // Individual add to cart buttons
-    document.addEventListener('click', function(e) {
-        const cartBtn = e.target.closest('.add-to-cart');
-
-        if (cartBtn) {
-            e.preventDefault();
-
-            const guid = cartBtn.dataset.guid;
-            const iconElement = cartBtn.querySelector('.icon_cart');
-
-            if (!guid) {
-                console.error('No GUID found for cart item');
-                return;
-            }
-
-            // Prevent double-clicking
-            if (iconElement && iconElement.classList.contains('icon_cart_clicked')) {
-                return;
-            }
-
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-
-            // Send AJAX request to add item to cart
-            fetch('/cart/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({ id: guid })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Visual feedback
-                    if (iconElement) {
-                        iconElement.classList.remove('fa-shopping-basket');
-                        iconElement.classList.add('fa-check', 'icon_cart_clicked');
-
-                        // Reset icon after 2 seconds
-                        setTimeout(() => {
-                            iconElement.classList.remove('fa-check', 'icon_cart_clicked');
-                            iconElement.classList.add('fa-shopping-basket');
-                        }, 2000);
-                    }
-
-                    // Show success notification
-                    if (typeof showToast === 'function') {
-                        showToast('Added to cart successfully!', 'success');
-                    }
-                } else {
-                    if (typeof showToast === 'function') {
-                        showToast('Failed to add item to cart', 'error');
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error adding to cart:', error);
-                if (typeof showToast === 'function') {
-                    showToast('An error occurred', 'error');
                 }
             });
-        }
-    });
+        });
+    }
 }
 
 // Admin Menu Toggle
@@ -2284,2819 +2316,175 @@ function showExpiryToast(message, type) {
     }, 3000);
 }
 
-// Utility function to escape HTML
-function escapeHtml(text) {
-    // Handle non-string values
-    if (text === null || text === undefined) {
-        return '';
-    }
-    // Convert to string if it's not already
-    if (typeof text !== 'string') {
-        text = String(text);
-    }
-
-    const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-    };
-    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
-}
-
-// TinyMCE Initialization for Admin Content Pages
-function initTinyMCE() {
-    // Only initialize if TinyMCE editor element exists (check for #body or .tinymce-editor)
-    if (!document.getElementById('body') && !document.querySelector('.tinymce-editor')) {
-        return;
-    }
-
-    // Function to dynamically load TinyMCE from CDN
-    function loadTinyMCEScript() {
-        return new Promise(function(resolve, reject) {
-            // Check if already loaded
-            if (typeof tinymce !== 'undefined') {
-                resolve();
-                return;
-            }
-
-            // Get API key from textarea data attribute or create meta tag
-            const bodyTextarea = document.getElementById('body');
-            const tinymceEditors = document.querySelectorAll('.tinymce-editor');
-            let apiKey = 'no-api-key';
-
-            // Try to get from existing meta tag first
-            let apiKeyMeta = document.querySelector('meta[name="tinymce-api-key"]');
-
-            if (!apiKeyMeta) {
-                // Create meta tag dynamically if it doesn't exist
-                // Get API key from window config or use default
-                if (window.NNTmuxConfig && window.NNTmuxConfig.tinymceApiKey) {
-                    apiKey = window.NNTmuxConfig.tinymceApiKey;
-                } else if (bodyTextarea && bodyTextarea.dataset.tinymceApiKey) {
-                    apiKey = bodyTextarea.dataset.tinymceApiKey;
-                } else if (tinymceEditors.length > 0) {
-                    // Check if any tinymce-editor has the API key
-                    for (let i = 0; i < tinymceEditors.length; i++) {
-                        if (tinymceEditors[i].dataset.tinymceApiKey) {
-                            apiKey = tinymceEditors[i].dataset.tinymceApiKey;
-                            break;
-                        }
-                    }
-                }
-
-                // Create and append meta tag
-                apiKeyMeta = document.createElement('meta');
-                apiKeyMeta.setAttribute('name', 'tinymce-api-key');
-                apiKeyMeta.setAttribute('content', apiKey);
-                document.head.appendChild(apiKeyMeta);
-            } else {
-                apiKey = apiKeyMeta.content;
-            }
-
-            // Create script element
-            const script = document.createElement('script');
-            script.src = 'https://cdn.tiny.cloud/1/' + apiKey + '/tinymce/8/tinymce.min.js';
-            script.referrerPolicy = 'origin';
-
-            script.onload = function() {
-                console.log('TinyMCE script loaded from CDN');
-                resolve();
-            };
-
-            script.onerror = function() {
-                console.error('Failed to load TinyMCE script from CDN');
-                reject(new Error('Failed to load TinyMCE'));
-            };
-
-            // Append to head
-            document.head.appendChild(script);
-        });
-    }
-
-    // Function to detect if dark mode is active
-    function isDarkMode() {
-        return document.documentElement.classList.contains('dark') ||
-               (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    }
-
-    // Function to get TinyMCE config
-    function getTinyMCEConfig() {
-        const darkMode = isDarkMode();
-        const apiKeyMeta = document.querySelector('meta[name="tinymce-api-key"]');
-        const apiKey = apiKeyMeta ? apiKeyMeta.content : 'no-api-key';
-
-        return {
-            selector: '#body, .tinymce-editor',
-            height: 500,
-            menubar: true,
-            skin: darkMode ? 'oxide-dark' : 'oxide',
-            content_css: darkMode ? 'dark' : 'default',
-            plugins: [
-                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons'
-            ],
-            toolbar: 'undo redo | blocks fontfamily fontsize | ' +
-                'bold italic underline strikethrough | forecolor backcolor | ' +
-                'alignleft aligncenter alignright alignjustify | ' +
-                'bullist numlist outdent indent | ' +
-                'link image media table emoticons | ' +
-                'removeformat code fullscreen | help',
-            toolbar_mode: 'sliding',
-            content_style: 'body { font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.6; }',
-            branding: false,
-            promotion: false,
-            resize: true,
-            statusbar: true,
-            elementpath: true,
-            automatic_uploads: false,
-            file_picker_types: 'image',
-            font_family_formats: 'Arial=arial,helvetica,sans-serif; Courier New=courier new,courier,monospace; Georgia=georgia,palatino,serif; Tahoma=tahoma,arial,helvetica,sans-serif; Times New Roman=times new roman,times,serif; Verdana=verdana,geneva,sans-serif',
-            font_size_formats: '8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt',
-            autolink_pattern: /^(https?:\/\/|www\.|(?!www\.)[a-z0-9\-]+\.[a-z]{2,13})/i,
-            link_default_protocol: 'https',
-            link_assume_external_targets: true,
-            link_target_list: [
-                {title: 'None', value: ''},
-                {title: 'New window', value: '_blank'},
-                {title: 'Same window', value: '_self'}
-            ],
-            block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6; Preformatted=pre; Blockquote=blockquote',
-            valid_elements: '*[*]',
-            extended_valid_elements: '*[*]',
-            valid_children: '+body[style]',
-            paste_as_text: false,
-            paste_block_drop: false,
-            paste_data_images: true,
-            image_advtab: true,
-            image_caption: true,
-            image_description: true,
-            image_dimensions: true,
-            image_title: true,
-            table_default_attributes: {
-                border: '1'
-            },
-            table_default_styles: {
-                'border-collapse': 'collapse',
-                'width': '100%'
-            },
-            emoticons_database: 'emojis',
-            setup: function(editor) {
-                // Auto-save on content change
-                editor.on('change', function() {
-                    editor.save();
-                });
-                // Auto-save on blur (when editor loses focus)
-                editor.on('blur', function() {
-                    editor.save();
-                });
-                // Auto-save on keyup (for continuous saving)
-                editor.on('keyup', function() {
-                    editor.save();
-                });
-                // Save before form submission
-                editor.on('submit', function() {
-                    editor.save();
-                });
-            }
-        };
-    }
-
-    // Function to actually initialize TinyMCE once it's loaded
-    function doInitTinyMCE() {
-        // Initialize TinyMCE
-        tinymce.init(getTinyMCEConfig()).then(function(editors) {
-            if (editors && editors.length > 0) {
-                console.log('TinyMCE initialized successfully for ' + editors.length + ' editor(s)');
-
-                // Add form submission handler to sync content for all editors
-                editors.forEach(function(editor) {
-                    const textarea = document.getElementById(editor.id);
-                    if (textarea && textarea.form) {
-                        // Remove any existing listeners to avoid duplicates
-                        const form = textarea.form;
-                        if (!form.hasAttribute('data-tinymce-handler')) {
-                            form.addEventListener('submit', function(e) {
-                                // Sync all TinyMCE editors before form submission
-                                tinymce.triggerSave();
-                                console.log('TinyMCE content synced to textareas before form submission');
-                            });
-                            form.setAttribute('data-tinymce-handler', 'true');
-                        }
-                    }
-                });
-            }
-        }).catch(function(error) {
-            console.error('TinyMCE initialization failed:', error);
-        });
-
-        // Watch for theme changes and reinitialize TinyMCE
-        const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.attributeName === 'class') {
-                    // Get all active TinyMCE editors
-                    const allEditors = tinymce.editors;
-                    if (allEditors && allEditors.length > 0) {
-                        // Save content from all editors
-                        const editorContents = {};
-                        allEditors.forEach(function(editor) {
-                            editorContents[editor.id] = editor.getContent();
-                        });
-
-                        // Remove all editors
-                        tinymce.remove();
-
-                        // Reinitialize with new theme
-                        tinymce.init(getTinyMCEConfig()).then(function(editors) {
-                            // Restore content to each editor
-                            if (editors && editors.length > 0) {
-                                editors.forEach(function(editor) {
-                                    if (editorContents[editor.id]) {
-                                        editor.setContent(editorContents[editor.id]);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                }
-            });
-        });
-
-        // Start observing theme changes on the html element
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['class']
-        });
-    }
-
-    // Load TinyMCE script dynamically, then initialize
-    loadTinyMCEScript()
-        .then(function() {
-            console.log('TinyMCE available, initializing editor...');
-            doInitTinyMCE();
-        })
-        .catch(function(error) {
-            console.error('Failed to load TinyMCE:', error);
-            // Show error message to user for all TinyMCE textareas
-            const textareas = document.querySelectorAll('#body, .tinymce-editor');
-            textareas.forEach(function(textarea) {
-                if (textarea && textarea.parentElement) {
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'mt-2 p-3 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-200 rounded';
-                    errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>TinyMCE editor failed to load. Please refresh the page or check your internet connection.';
-                    textarea.parentElement.insertBefore(errorDiv, textarea.nextSibling);
-                }
-            });
-        });
-}
-
-// Mobile Enhancements
-function initMobileEnhancements() {
-    // Create mobile sidebar overlay
-    createMobileSidebarOverlay();
-
-    // Enhanced mobile sidebar toggle
-    initMobileSidebarToggle();
-
-    // Mobile menu toggle in header
-    initMobileHeaderMenu();
-
-    // Touch-friendly improvements
-    initTouchEnhancements();
-
-    // Mobile table responsiveness
-    initMobileTableEnhancements();
-
-    // Prevent zoom on double tap for buttons
-    preventDoubleTapZoom();
-
-    // Optimize modals for mobile
-    optimizeModalsForMobile();
-}
-
-// Create overlay for mobile sidebar
-function createMobileSidebarOverlay() {
-    if (document.querySelector('.mobile-sidebar-overlay')) return;
-
-    const overlay = document.createElement('div');
-    overlay.className = 'mobile-sidebar-overlay';
-    overlay.addEventListener('click', function() {
-        closeMobileSidebar();
-    });
-    document.body.appendChild(overlay);
-}
-
-// Mobile sidebar toggle functionality
-function initMobileSidebarToggle() {
-    const mobileToggle = document.getElementById('mobile-sidebar-toggle');
-    const sidebar = document.getElementById('sidebar');
-
-    if (mobileToggle && sidebar) {
-        mobileToggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-            toggleMobileSidebar();
-        });
-    }
-}
-
-function toggleMobileSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.querySelector('.mobile-sidebar-overlay');
-
-    if (sidebar && overlay) {
-        sidebar.classList.toggle('mobile-open');
-        overlay.classList.toggle('active');
-
-        // Prevent body scroll when sidebar is open
-        if (sidebar.classList.contains('mobile-open')) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = '';
-        }
-    }
-}
-
-function closeMobileSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.querySelector('.mobile-sidebar-overlay');
-
-    if (sidebar && overlay) {
-        sidebar.classList.remove('mobile-open');
-        overlay.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-}
-
-// Mobile header menu toggle
-function initMobileHeaderMenu() {
-    // Mobile search toggle
-    const mobileSearchToggle = document.getElementById('mobile-search-toggle');
-    const mobileSearchForm = document.getElementById('mobile-search-form');
-
-    if (mobileSearchToggle && mobileSearchForm) {
-        mobileSearchToggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-
-            if (mobileSearchForm.classList.contains('hidden')) {
-                mobileSearchForm.classList.remove('hidden');
-                // Close mobile menu if open
-                const mobileMenu = document.getElementById('mobile-menu');
-                if (mobileMenu) {
-                    mobileMenu.style.display = 'none';
-                }
-            } else {
-                mobileSearchForm.classList.add('hidden');
-            }
-        });
-
-        // Close mobile search when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!mobileSearchForm.contains(e.target) &&
-                !mobileSearchToggle.contains(e.target) &&
-                !mobileSearchForm.classList.contains('hidden')) {
-                mobileSearchForm.classList.add('hidden');
-            }
-        });
-    }
-
-    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-
-    if (mobileMenuToggle) {
-        mobileMenuToggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-
-            // Close mobile search if open
-            if (mobileSearchForm && !mobileSearchForm.classList.contains('hidden')) {
-                mobileSearchForm.classList.add('hidden');
-            }
-
-            const desktopNav = document.querySelector('.hidden.md\\:flex');
-
-            if (desktopNav) {
-                // Create mobile menu if it doesn't exist
-                let mobileMenu = document.getElementById('mobile-menu');
-
-                if (!mobileMenu) {
-                    mobileMenu = document.createElement('div');
-                    mobileMenu.id = 'mobile-menu';
-                    mobileMenu.className = 'md:hidden absolute top-16 left-0 right-0 bg-gray-800 dark:bg-gray-950 shadow-lg z-50 max-h-[80vh] overflow-y-auto';
-                    mobileMenu.style.display = 'none';
-
-                    // Clone navigation content
-                    const navClone = desktopNav.cloneNode(true);
-                    navClone.classList.remove('hidden', 'md:flex', 'md:items-center', 'md:space-x-1', 'flex-1');
-                    navClone.classList.add('flex', 'flex-col', 'space-y-2', 'p-4');
-
-                    // Update dropdown styles for mobile
-                    navClone.querySelectorAll('.dropdown-container').forEach(dropdown => {
-                        dropdown.classList.remove('relative');
-                        dropdown.classList.add('w-full');
-
-                        const button = dropdown.querySelector('.dropdown-toggle');
-                        if (button) {
-                            button.classList.add('w-full', 'justify-between');
-                        }
-
-                        const menu = dropdown.querySelector('.dropdown-menu');
-                        if (menu) {
-                            menu.classList.remove('absolute', 'left-0', 'top-full', 'w-48');
-                            menu.classList.add('relative', 'w-full', 'mt-2');
-                        }
-                    });
-
-                    mobileMenu.appendChild(navClone);
-                    mobileMenuToggle.parentElement.parentElement.appendChild(mobileMenu);
-                }
-
-                // Toggle menu visibility
-                if (mobileMenu.style.display === 'none') {
-                    mobileMenu.style.display = 'block';
-                    mobileMenuToggle.querySelector('i').classList.replace('fa-bars', 'fa-times');
-                } else {
-                    mobileMenu.style.display = 'none';
-                    mobileMenuToggle.querySelector('i').classList.replace('fa-times', 'fa-bars');
-                }
-            }
-        });
-    }
-
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', function(e) {
-        const mobileMenu = document.getElementById('mobile-menu');
-        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-
-        if (mobileMenu && mobileMenuToggle &&
-            mobileMenu.style.display === 'block' &&
-            !mobileMenu.contains(e.target) &&
-            !mobileMenuToggle.contains(e.target)) {
-            mobileMenu.style.display = 'none';
-            mobileMenuToggle.querySelector('i').classList.replace('fa-times', 'fa-bars');
-        }
-    });
-}
-
-// Touch enhancements for better mobile interaction
-function initTouchEnhancements() {
-    // Add touch feedback to all buttons
-    document.addEventListener('touchstart', function(e) {
-        const btn = e.target.closest('.btn, button, a[class*="btn"]');
-        if (btn) {
-            btn.style.opacity = '0.7';
-        }
-    }, { passive: true });
-
-    document.addEventListener('touchend', function(e) {
-        const btn = e.target.closest('.btn, button, a[class*="btn"]');
-        if (btn) {
-            setTimeout(() => {
-                btn.style.opacity = '';
-            }, 100);
-        }
-    }, { passive: true });
-
-    // Improve dropdown touch handling
-    document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
-        let touchStartY = 0;
-
-        toggle.addEventListener('touchstart', function(e) {
-            touchStartY = e.touches[0].clientY;
-        }, { passive: true });
-
-        toggle.addEventListener('touchend', function(e) {
-            const touchEndY = e.changedTouches[0].clientY;
-            const touchDiff = Math.abs(touchEndY - touchStartY);
-
-            // Only trigger if it's a tap, not a scroll
-            if (touchDiff < 10) {
-                e.preventDefault();
-                this.click();
-            }
-        });
-    });
-}
-
-// Mobile table enhancements
-function initMobileTableEnhancements() {
-    // Add data labels to table cells for mobile view
-    const tables = document.querySelectorAll('table');
-
-    tables.forEach(table => {
-        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
-
-        table.querySelectorAll('tbody tr').forEach(row => {
-            Array.from(row.querySelectorAll('td')).forEach((cell, index) => {
-                if (headers[index] && !cell.hasAttribute('data-label')) {
-                    cell.setAttribute('data-label', headers[index]);
-                }
-            });
-        });
-
-        // Add responsive wrapper if not present
-        if (!table.parentElement.classList.contains('table-responsive')) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'table-responsive';
-            table.parentNode.insertBefore(wrapper, table);
-            wrapper.appendChild(table);
-        }
-    });
-}
-
-// Prevent double-tap zoom on buttons
-function preventDoubleTapZoom() {
-    let lastTouchEnd = 0;
-
-    document.addEventListener('touchend', function(e) {
-        const now = Date.now();
-        if (now - lastTouchEnd <= 300) {
-            const target = e.target.closest('button, a, .btn, input[type="submit"]');
-            if (target) {
-                e.preventDefault();
-            }
-        }
-        lastTouchEnd = now;
-    }, { passive: false });
-}
-
-// Optimize modals for mobile devices
-function optimizeModalsForMobile() {
-    // Ensure modals are properly sized on mobile
-    const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            mutation.addedNodes.forEach(function(node) {
-                if (node.nodeType === 1) {
-                    const modal = node.querySelector('.modal-content') ||
-                                 (node.classList && node.classList.contains('modal-content') ? node : null);
-
-                    if (modal && window.innerWidth < 768) {
-                        modal.style.maxHeight = '90vh';
-                        modal.style.overflowY = 'auto';
-                        modal.style.margin = '0.5rem';
-                        modal.style.width = 'calc(100% - 1rem)';
-                    }
-                }
-            });
-        });
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    // Handle existing modals
-    document.querySelectorAll('.modal-content').forEach(modal => {
-        if (window.innerWidth < 768) {
-            modal.style.maxHeight = '90vh';
-            modal.style.overflowY = 'auto';
-            modal.style.margin = '0.5rem';
-            modal.style.width = 'calc(100% - 1rem)';
-        }
-    });
-
-    // Close sidebar when opening modal
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('[data-open-nfo], [data-open-image-modal], .mediainfo-badge, .filelist-badge')) {
-            closeMobileSidebar();
-        }
-    });
-}
-
-// Admin Dashboard Charts Initialization
-function initAdminDashboardCharts() {
-    // Check if Chart.js is loaded and if we're on the admin dashboard
-    if (typeof Chart === 'undefined') {
-        return;
-    }
-
-    // Check for dark mode
-    const isDarkMode = document.documentElement.classList.contains('dark');
-    const textColor = isDarkMode ? '#e5e7eb' : '#374151';
-    const gridColor = isDarkMode ? '#374151' : '#e5e7eb';
-
-    // Store chart instances for updates
-    window.adminCharts = {
-        cpu24h: null,
-        ram24h: null,
-        cpu30d: null,
-        ram30d: null,
-        downloadsMinute: null,
-        apiHitsMinute: null
-    };
-
-    // Downloads Chart (Hourly)
-    const downloadsCtx = document.getElementById('downloadsChart');
-    if (downloadsCtx) {
-        const downloadsData = JSON.parse(downloadsCtx.getAttribute('data-chart-data') || '[]');
-        new Chart(downloadsCtx, {
-            type: 'bar',
-            data: {
-                labels: downloadsData.map(d => d.time || d.date),
-                datasets: [{
-                    label: 'Downloads',
-                    data: downloadsData.map(d => d.count),
-                    backgroundColor: 'rgba(34, 197, 94, 0.7)',
-                    borderColor: 'rgba(34, 197, 94, 1)',
-                    borderWidth: 2,
-                    borderRadius: 6,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                        titleColor: textColor,
-                        bodyColor: textColor,
-                        borderColor: gridColor,
-                        borderWidth: 1,
-                        padding: 12,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return 'Downloads: ' + context.parsed.y.toLocaleString();
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            color: textColor,
-                            precision: 0
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            color: textColor,
-                            maxRotation: 45,
-                            minRotation: 45,
-                            maxTicksLimit: 24
-                        },
-                        grid: {
-                            display: false
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // API Hits Chart (Hourly)
-    const apiHitsCtx = document.getElementById('apiHitsChart');
-    if (apiHitsCtx) {
-        const apiHitsData = JSON.parse(apiHitsCtx.getAttribute('data-chart-data') || '[]');
-        new Chart(apiHitsCtx, {
-            type: 'line',
-            data: {
-                labels: apiHitsData.map(d => d.time || d.date),
-                datasets: [{
-                    label: 'API Hits',
-                    data: apiHitsData.map(d => d.count),
-                    backgroundColor: 'rgba(147, 51, 234, 0.1)',
-                    borderColor: 'rgba(147, 51, 234, 1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    pointBackgroundColor: 'rgba(147, 51, 234, 1)',
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                        titleColor: textColor,
-                        bodyColor: textColor,
-                        borderColor: gridColor,
-                        borderWidth: 1,
-                        padding: 12,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return 'API Hits: ' + context.parsed.y.toLocaleString();
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            color: textColor,
-                            precision: 0
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            color: textColor,
-                            maxRotation: 45,
-                            minRotation: 45,
-                            maxTicksLimit: 24
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // Downloads Per Minute Chart
-    const downloadsMinuteCtx = document.getElementById('downloadsMinuteChart');
-    if (downloadsMinuteCtx) {
-        const downloadsMinuteData = JSON.parse(downloadsMinuteCtx.getAttribute('data-chart-data') || '[]');
-        window.adminCharts.downloadsMinute = new Chart(downloadsMinuteCtx, {
-            type: 'line',
-            data: {
-                labels: downloadsMinuteData.map(d => d.time),
-                datasets: [{
-                    label: 'Downloads',
-                    data: downloadsMinuteData.map(d => d.count),
-                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                    borderColor: 'rgba(34, 197, 94, 1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 2,
-                    pointHoverRadius: 4,
-                    pointBackgroundColor: 'rgba(34, 197, 94, 1)',
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 1,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                        titleColor: textColor,
-                        bodyColor: textColor,
-                        borderColor: gridColor,
-                        borderWidth: 1,
-                        padding: 12,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return 'Downloads: ' + context.parsed.y.toLocaleString();
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            color: textColor,
-                            precision: 0
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            color: textColor,
-                            maxRotation: 45,
-                            minRotation: 45,
-                            maxTicksLimit: 12
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // API Hits Per Minute Chart
-    const apiHitsMinuteCtx = document.getElementById('apiHitsMinuteChart');
-    if (apiHitsMinuteCtx) {
-        const apiHitsMinuteData = JSON.parse(apiHitsMinuteCtx.getAttribute('data-chart-data') || '[]');
-        window.adminCharts.apiHitsMinute = new Chart(apiHitsMinuteCtx, {
-            type: 'line',
-            data: {
-                labels: apiHitsMinuteData.map(d => d.time),
-                datasets: [{
-                    label: 'API Hits',
-                    data: apiHitsMinuteData.map(d => d.count),
-                    backgroundColor: 'rgba(147, 51, 234, 0.1)',
-                    borderColor: 'rgba(147, 51, 234, 1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 2,
-                    pointHoverRadius: 4,
-                    pointBackgroundColor: 'rgba(147, 51, 234, 1)',
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 1,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                        titleColor: textColor,
-                        bodyColor: textColor,
-                        borderColor: gridColor,
-                        borderWidth: 1,
-                        padding: 12,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return 'API Hits: ' + context.parsed.y.toLocaleString();
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            color: textColor,
-                            precision: 0
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            color: textColor,
-                            maxRotation: 45,
-                            minRotation: 45,
-                            maxTicksLimit: 12
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // CPU Usage 24 Hour Historical Chart (Line)
-    const cpuHistory24hCtx = document.getElementById('cpuHistory24hChart');
-    if (cpuHistory24hCtx) {
-        const cpuHistory = JSON.parse(cpuHistory24hCtx.getAttribute('data-history') || '[]');
-        const cpuLabel = cpuHistory24hCtx.getAttribute('data-chart-label') || 'CPU Usage %';
-
-        window.adminCharts.cpu24h = new Chart(cpuHistory24hCtx, {
-            type: 'line',
-            data: {
-                labels: cpuHistory.map(d => d.time),
-                datasets: [{
-                    label: cpuLabel,
-                    data: cpuHistory.map(d => d.value),
-                    backgroundColor: 'rgba(249, 115, 22, 0.1)',
-                    borderColor: 'rgba(249, 115, 22, 1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    pointBackgroundColor: 'rgba(249, 115, 22, 1)',
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                        titleColor: textColor,
-                        bodyColor: textColor,
-                        borderColor: gridColor,
-                        borderWidth: 1,
-                        padding: 12,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return 'CPU: ' + context.parsed.y.toFixed(1) + '%';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: {
-                            color: textColor,
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            color: textColor,
-                            maxRotation: 45,
-                            minRotation: 45
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // RAM Usage 24 Hour Historical Chart (Line)
-    const ramHistory24hCtx = document.getElementById('ramHistory24hChart');
-    if (ramHistory24hCtx) {
-        const ramHistory = JSON.parse(ramHistory24hCtx.getAttribute('data-history') || '[]');
-        const ramLabel = ramHistory24hCtx.getAttribute('data-chart-label') || 'RAM Usage %';
-
-        window.adminCharts.ram24h = new Chart(ramHistory24hCtx, {
-            type: 'line',
-            data: {
-                labels: ramHistory.map(d => d.time),
-                datasets: [{
-                    label: ramLabel,
-                    data: ramHistory.map(d => d.value),
-                    backgroundColor: 'rgba(6, 182, 212, 0.1)',
-                    borderColor: 'rgba(6, 182, 212, 1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    pointBackgroundColor: 'rgba(6, 182, 212, 1)',
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                        titleColor: textColor,
-                        bodyColor: textColor,
-                        borderColor: gridColor,
-                        borderWidth: 1,
-                        padding: 12,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return 'RAM: ' + context.parsed.y.toFixed(1) + '%';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: {
-                            color: textColor,
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            color: textColor,
-                            maxRotation: 45,
-                            minRotation: 45
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // CPU Usage 30 Day Historical Chart (Line)
-    const cpuHistory30dCtx = document.getElementById('cpuHistory30dChart');
-    if (cpuHistory30dCtx) {
-        const cpuHistory = JSON.parse(cpuHistory30dCtx.getAttribute('data-history') || '[]');
-        const cpuLabel = cpuHistory30dCtx.getAttribute('data-chart-label') || 'CPU Usage %';
-
-        window.adminCharts.cpu30d = new Chart(cpuHistory30dCtx, {
-            type: 'line',
-            data: {
-                labels: cpuHistory.map(d => d.time),
-                datasets: [{
-                    label: cpuLabel,
-                    data: cpuHistory.map(d => d.value),
-                    backgroundColor: 'rgba(249, 115, 22, 0.1)',
-                    borderColor: 'rgba(249, 115, 22, 1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 3,
-                    pointHoverRadius: 5,
-                    pointBackgroundColor: 'rgba(249, 115, 22, 1)',
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                        titleColor: textColor,
-                        bodyColor: textColor,
-                        borderColor: gridColor,
-                        borderWidth: 1,
-                        padding: 12,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return 'CPU: ' + context.parsed.y.toFixed(1) + '%';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: {
-                            color: textColor,
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            color: textColor,
-                            maxRotation: 45,
-                            minRotation: 45
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // RAM Usage 30 Day Historical Chart (Line)
-    const ramHistory30dCtx = document.getElementById('ramHistory30dChart');
-    if (ramHistory30dCtx) {
-        const ramHistory = JSON.parse(ramHistory30dCtx.getAttribute('data-history') || '[]');
-        const ramLabel = ramHistory30dCtx.getAttribute('data-chart-label') || 'RAM Usage %';
-
-        window.adminCharts.ram30d = new Chart(ramHistory30dCtx, {
-            type: 'line',
-            data: {
-                labels: ramHistory.map(d => d.time),
-                datasets: [{
-                    label: ramLabel,
-                    data: ramHistory.map(d => d.value),
-                    backgroundColor: 'rgba(6, 182, 212, 0.1)',
-                    borderColor: 'rgba(6, 182, 212, 1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 3,
-                    pointHoverRadius: 5,
-                    pointBackgroundColor: 'rgba(6, 182, 212, 1)',
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-                        titleColor: textColor,
-                        bodyColor: textColor,
-                        borderColor: gridColor,
-                        borderWidth: 1,
-                        padding: 12,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return 'RAM: ' + context.parsed.y.toFixed(1) + '%';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: {
-                            color: textColor,
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            color: textColor,
-                            maxRotation: 45,
-                            minRotation: 45
-                        },
-                        grid: {
-                            color: gridColor,
-                            drawBorder: false
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // Start auto-refresh for system metrics (every 60 seconds)
-    startSystemMetricsAutoRefresh();
-}
-
-// Auto-refresh system metrics every minute
-function startSystemMetricsAutoRefresh() {
-    // Check if we're on the admin dashboard with system metrics
-    if (!document.getElementById('cpuHistory24hChart')) {
-        return;
-    }
-
-    // Update current metrics display
-    function updateCurrentMetrics() {
-        fetch('/admin/api/system-metrics/current')
-            .then(response => response.json())
-            .then(data => {
-                // Update CPU current usage
-                const cpuCurrentElem = document.querySelector('[data-metric="cpu-current"]');
-                if (cpuCurrentElem) {
-                    cpuCurrentElem.textContent = data.cpu.current.toFixed(1) + '%';
-                }
-
-                // Update CPU load averages
-                const load1minElem = document.querySelector('[data-metric="cpu-load-1min"]');
-                const load5minElem = document.querySelector('[data-metric="cpu-load-5min"]');
-                const load15minElem = document.querySelector('[data-metric="cpu-load-15min"]');
-
-                if (load1minElem) load1minElem.textContent = data.cpu.load_average['1min'];
-                if (load5minElem) load5minElem.textContent = data.cpu.load_average['5min'];
-                if (load15minElem) load15minElem.textContent = data.cpu.load_average['15min'];
-
-                // Update RAM current usage
-                const ramCurrentElem = document.querySelector('[data-metric="ram-current"]');
-                if (ramCurrentElem) {
-                    ramCurrentElem.textContent = data.ram.percentage.toFixed(1) + '%';
-                }
-
-                const ramDetailsElem = document.querySelector('[data-metric="ram-details"]');
-                if (ramDetailsElem) {
-                    ramDetailsElem.textContent = `${data.ram.used.toFixed(2)} GB / ${data.ram.total.toFixed(2)} GB`;
-                }
-
-                // Update last updated timestamp
-                const timestampElem = document.querySelector('[data-metric="last-updated"]');
-                if (timestampElem) {
-                    const now = new Date();
-                    const timeString = now.toLocaleTimeString();
-                    timestampElem.textContent = 'Last updated: ' + timeString;
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching current metrics:', error);
-            });
-    }
-
-    // Update historical charts
-    function updateHistoricalCharts() {
-        fetch('/admin/api/system-metrics/historical')
-            .then(response => response.json())
-            .then(data => {
-                // Update CPU 24h chart
-                if (window.adminCharts && window.adminCharts.cpu24h) {
-                    window.adminCharts.cpu24h.data.labels = data.cpu.history_24h.map(d => d.time);
-                    window.adminCharts.cpu24h.data.datasets[0].data = data.cpu.history_24h.map(d => d.value);
-                    window.adminCharts.cpu24h.update('none'); // 'none' for no animation
-                }
-
-                // Update RAM 24h chart
-                if (window.adminCharts && window.adminCharts.ram24h) {
-                    window.adminCharts.ram24h.data.labels = data.ram.history_24h.map(d => d.time);
-                    window.adminCharts.ram24h.data.datasets[0].data = data.ram.history_24h.map(d => d.value);
-                    window.adminCharts.ram24h.update('none');
-                }
-
-                // Update CPU 30d chart
-                if (window.adminCharts && window.adminCharts.cpu30d) {
-                    window.adminCharts.cpu30d.data.labels = data.cpu.history_30d.map(d => d.time);
-                    window.adminCharts.cpu30d.data.datasets[0].data = data.cpu.history_30d.map(d => d.value);
-                    window.adminCharts.cpu30d.update('none');
-                }
-
-                // Update RAM 30d chart
-                if (window.adminCharts && window.adminCharts.ram30d) {
-                    window.adminCharts.ram30d.data.labels = data.ram.history_30d.map(d => d.time);
-                    window.adminCharts.ram30d.data.datasets[0].data = data.ram.history_30d.map(d => d.value);
-                    window.adminCharts.ram30d.update('none');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching historical metrics:', error);
-            });
-    }
-
-    // Update user activity minute charts
-    function updateUserActivityMinutes() {
-        fetch('/admin/api/user-activity/minutes')
-            .then(response => response.json())
-            .then(data => {
-                // Update Downloads Per Minute chart
-                if (window.adminCharts && window.adminCharts.downloadsMinute) {
-                    window.adminCharts.downloadsMinute.data.labels = data.downloads.map(d => d.time);
-                    window.adminCharts.downloadsMinute.data.datasets[0].data = data.downloads.map(d => d.count);
-                    window.adminCharts.downloadsMinute.update('none');
-                }
-
-                // Update API Hits Per Minute chart
-                if (window.adminCharts && window.adminCharts.apiHitsMinute) {
-                    window.adminCharts.apiHitsMinute.data.labels = data.api_hits.map(d => d.time);
-                    window.adminCharts.apiHitsMinute.data.datasets[0].data = data.api_hits.map(d => d.count);
-                    window.adminCharts.apiHitsMinute.update('none');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching user activity minutes:', error);
-            });
-    }
-
-    // Initial update
-    updateCurrentMetrics();
-
-    // Update current metrics every 60 seconds (1 minute)
-    setInterval(updateCurrentMetrics, 60000);
-
-    // Update historical charts every 5 minutes (to reduce load)
-    setInterval(updateHistoricalCharts, 300000);
-
-    // Update user activity minute charts every 60 seconds (1 minute)
-    if (window.adminCharts && (window.adminCharts.downloadsMinute || window.adminCharts.apiHitsMinute)) {
-        setInterval(updateUserActivityMinutes, 60000);
-    }
-}
-
-// Admin Groups Management
-function initAdminGroups() {
-    // Group Edit Form Validation
-    const groupEditForm = document.getElementById('groupForm');
-    if (groupEditForm) {
-        groupEditForm.addEventListener('submit', function(event) {
-            const firstRecord = document.getElementById('first_record');
-            const lastRecord = document.getElementById('last_record');
-
-            if (!firstRecord || !lastRecord) return;
-
-            const firstVal = parseInt(firstRecord.value);
-            const lastVal = parseInt(lastRecord.value);
-
-            if (firstVal > lastVal && lastVal > 0) {
-                event.preventDefault();
-                alert('First record ID cannot be greater than last record ID');
-                return false;
-            }
-        });
-    }
-
-    // Group Bulk Form Validation
-    const groupBulkForm = document.getElementById('groupBulkForm');
-    if (groupBulkForm) {
-        groupBulkForm.addEventListener('submit', function(event) {
-            const groupfilter = document.getElementById('groupfilter');
-            if (!groupfilter) return;
-
-            const filterValue = groupfilter.value.trim();
-
-            if (filterValue === '') {
-                event.preventDefault();
-                alert('Please enter a group pattern');
-                return false;
-            }
-
-            // Simple regex validation
-            try {
-                new RegExp(filterValue);
-            } catch(e) {
-                event.preventDefault();
-                alert('Invalid regex pattern: ' + e.message);
-                return false;
-            }
-        });
-    }
-}
-
-function showResetAllModal() {
-    const modal = document.getElementById('resetAllModal');
-    if (modal) {
-        modal.classList.remove('hidden');
-    }
-}
-
-function hideResetAllModal() {
-    const modal = document.getElementById('resetAllModal');
-    if (modal) {
-        modal.classList.add('hidden');
-    }
-}
-
-function showPurgeAllModal() {
-    const modal = document.getElementById('purgeAllModal');
-    if (modal) {
-        modal.classList.remove('hidden');
-    }
-}
-
-function hidePurgeAllModal() {
-    const modal = document.getElementById('purgeAllModal');
-    if (modal) {
-        modal.classList.add('hidden');
-    }
-}
-
-function ajax_group_status(id, status) {
-    const ajaxUrl = document.querySelector('[data-ajax-url]')?.dataset.ajaxUrl;
-    const csrfToken = document.querySelector('[data-csrf-token]')?.dataset.csrfToken;
-
-    if (!ajaxUrl || !csrfToken) return;
-
-    // Ensure status is an integer
-    const statusInt = parseInt(status);
-
-    fetch(ajaxUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
-        },
-        body: JSON.stringify({
-            action: 'toggle_group_active_status',
-            group_id: parseInt(id),
-            group_status: statusInt
-        })
-    })
-    .then(response => response.text())
-    .then(data => {
-        // Update succeeded, regenerate the button with the new status
-        const groupCell = document.getElementById('group-' + id);
-        if (groupCell) {
-            // The status parameter is what we're setting it TO (not toggling)
-            // status = 1 means we're activating, status = 0 means we're deactivating
-            const isActive = statusInt === 1;
-
-            // Generate new button HTML with proper data attributes
-            const buttonHTML = isActive
-                ? `<button type="button"
-                        data-action="toggle-group-status"
-                        data-group-id="${id}"
-                        data-status="0"
-                        class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 hover:bg-green-200">
-                        <i class="fa fa-check-circle mr-1"></i>Active
-                    </button>`
-                : `<button type="button"
-                        data-action="toggle-group-status"
-                        data-group-id="${id}"
-                        data-status="1"
-                        class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200">
-                        <i class="fa fa-times-circle mr-1"></i>Inactive
-                    </button>`;
-
-            groupCell.innerHTML = buttonHTML;
-
-            // Show success message
-            if (typeof showToast === 'function') {
-                showToast(isActive ? 'Group activated successfully' : 'Group deactivated successfully', 'success');
-            }
-        }
-    })
-    .catch(error => {
-        console.error('Error toggling group status:', error);
-        if (typeof showToast === 'function') {
-            showToast('Error updating group status', 'error');
-        }
-    });
-}
-
-function ajax_backfill_status(id, status) {
-    const ajaxUrl = document.querySelector('[data-ajax-url]')?.dataset.ajaxUrl;
-    const csrfToken = document.querySelector('[data-csrf-token]')?.dataset.csrfToken;
-
-    if (!ajaxUrl || !csrfToken) return;
-
-    // Ensure status is an integer
-    const statusInt = parseInt(status);
-
-    fetch(ajaxUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
-        },
-        body: JSON.stringify({
-            action: 'toggle_group_backfill',
-            group_id: parseInt(id),
-            backfill: statusInt
-        })
-    })
-    .then(response => response.text())
-    .then(data => {
-        // Update succeeded, regenerate the button with the new status
-        const backfillCell = document.getElementById('backfill-' + id);
-        if (backfillCell) {
-            // The status parameter is what we're setting it TO (not toggling)
-            // status = 1 means we're enabling, status = 0 means we're disabling
-            const isEnabled = statusInt === 1;
-
-            // Generate new button HTML with proper data attributes
-            const buttonHTML = isEnabled
-                ? `<button type="button"
-                        data-action="toggle-backfill"
-                        data-group-id="${id}"
-                        data-status="0"
-                        class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 hover:bg-blue-200">
-                        <i class="fa fa-check-circle mr-1"></i>Enabled
-                    </button>`
-                : `<button type="button"
-                        data-action="toggle-backfill"
-                        data-group-id="${id}"
-                        data-status="1"
-                        class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200">
-                        <i class="fa fa-times-circle mr-1"></i>Disabled
-                    </button>`;
-
-            backfillCell.innerHTML = buttonHTML;
-
-            // Show success message
-            if (typeof showToast === 'function') {
-                showToast(isEnabled ? 'Backfill enabled successfully' : 'Backfill disabled successfully', 'success');
-            }
-        }
-    })
-    .catch(error => {
-        console.error('Error toggling backfill status:', error);
-        if (typeof showToast === 'function') {
-            showToast('Error updating backfill status', 'error');
-        }
-    });
-}
-
-function ajax_group_reset(id) {
-    showConfirm({
-        title: 'Reset Group',
-        message: 'Are you sure you want to reset this group?',
-        type: 'warning',
-        confirmText: 'Reset',
-        onConfirm: function() {
-            const ajaxUrl = document.querySelector('[data-ajax-url]')?.dataset.ajaxUrl;
-            const csrfToken = document.querySelector('[data-csrf-token]')?.dataset.csrfToken;
-
-            if (!ajaxUrl || !csrfToken) return;
-
-            fetch(ajaxUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                body: JSON.stringify({
-                    action: 'reset_group',
-                    group_id: id
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                }
-            })
-            .catch(error => console.error('Error resetting group:', error));
-        }
-    });
-}
-
-function confirmGroupDelete(id) {
-    showConfirm({
-        title: 'Delete Group',
-        message: 'Are you sure you want to delete this group?',
-        type: 'danger',
-        confirmText: 'Delete',
-        onConfirm: function() {
-            const ajaxUrl = document.querySelector('[data-ajax-url]')?.dataset.ajaxUrl;
-            const csrfToken = document.querySelector('[data-csrf-token]')?.dataset.csrfToken;
-
-            if (!ajaxUrl || !csrfToken) return;
-
-            fetch(ajaxUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                body: JSON.stringify({
-                    action: 'delete_group',
-                    group_id: id
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const row = document.getElementById('grouprow-' + id);
-                    if (row) {
-                        row.classList.add('fade-out');
-                        setTimeout(() => row.remove(), 300);
-                    }
-                }
-            })
-            .catch(error => console.error('Error deleting group:', error));
-        }
-    });
-}
-
-function confirmGroupPurge(id) {
-    showConfirm({
-        title: 'Purge Group',
-        message: 'Are you sure you want to purge this group?',
-        details: 'This will delete all releases and binaries!',
-        type: 'danger',
-        confirmText: 'Purge',
-        onConfirm: function() {
-            const ajaxUrl = document.querySelector('[data-ajax-url]')?.dataset.ajaxUrl;
-            const csrfToken = document.querySelector('[data-csrf-token]')?.dataset.csrfToken;
-
-            if (!ajaxUrl || !csrfToken) return;
-
-            fetch(ajaxUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                body: JSON.stringify({
-                    action: 'purge_group',
-                    group_id: id
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                }
-            })
-            .catch(error => console.error('Error purging group:', error));
-        }
-    });
-}
-
-function ajax_group_reset_all() {
-    const ajaxUrl = document.querySelector('[data-ajax-url]')?.dataset.ajaxUrl;
-    const csrfToken = document.querySelector('[data-csrf-token]')?.dataset.csrfToken;
-
-    if (!ajaxUrl || !csrfToken) return;
-
-    fetch(ajaxUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
-        },
-        body: JSON.stringify({
-            action: 'reset_all_groups'
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            hideResetAllModal();
-            location.reload();
-        }
-    })
-    .catch(error => console.error('Error resetting all groups:', error));
-}
-
-function ajax_group_purge_all() {
-    const ajaxUrl = document.querySelector('[data-ajax-url]')?.dataset.ajaxUrl;
-    const csrfToken = document.querySelector('[data-csrf-token]')?.dataset.csrfToken;
-
-    if (!ajaxUrl || !csrfToken) return;
-
-    fetch(ajaxUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
-        },
-        body: JSON.stringify({
-            action: 'purge_all_groups'
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            hidePurgeAllModal();
-            location.reload();
-        }
-    })
-    .catch(error => console.error('Error purging all groups:', error));
-}
-
-// ========================================
-// Admin-specific functions
-// ========================================
-
-// Admin Categories - Delete confirmation
-window.confirmDelete = window.confirmDelete || function(id) {
-    const modal = document.getElementById('deleteModal');
-    const deleteLink = document.getElementById('confirmDeleteLink');
-    if (modal && deleteLink) {
-        deleteLink.href = window.location.origin + '/admin/category-delete?id=' + id;
-        modal.classList.remove('hidden');
-    }
-};
-
-window.closeDeleteModal = function() {
-    const modal = document.getElementById('deleteModal');
-    if (modal) {
-        modal.classList.add('hidden');
-    }
-};
-
-// Admin Console/Books - Image preview on file upload
-function initAdminImagePreview() {
-    // Console cover preview
-    const consoleCoverInput = document.getElementById('cover');
-    if (consoleCoverInput) {
-        consoleCoverInput.addEventListener('change', function(e) {
-            if (e.target.files && e.target.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const imgs = document.querySelectorAll('img[alt]');
-                    imgs.forEach(img => {
-                        if (img.closest('form')?.contains(consoleCoverInput)) {
-                            img.src = event.target.result;
-                        }
-                    });
-                };
-                reader.readAsDataURL(e.target.files[0]);
-            }
-        });
-    }
-}
-
-// Admin Users - Verify user modal
-window.showVerifyModal = function(event, form) {
-    event.preventDefault();
-    window.currentVerifyForm = form;
-    const modal = document.getElementById('verifyUserModal');
-    if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    }
-};
-
-window.hideVerifyModal = function() {
-    const modal = document.getElementById('verifyUserModal');
-    if (modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-    }
-    window.currentVerifyForm = null;
-};
-
-window.submitVerifyForm = function() {
-    if (window.currentVerifyForm) {
-        window.currentVerifyForm.submit();
-    }
-};
-
-// Admin Invitations - Select all checkboxes
-function initAdminInvitationsSelectAll() {
-    const selectAllCheckbox = document.getElementById('select_all');
-    if (selectAllCheckbox) {
-        selectAllCheckbox.addEventListener('change', function(e) {
-            document.querySelectorAll('.invitation-checkbox').forEach(cb => {
-                cb.checked = e.target.checked;
-            });
-        });
-    }
-}
-
-// Admin Invitations - Copy to clipboard
-window.copyToClipboard = function(text) {
-    navigator.clipboard.writeText(text).then(function() {
-        if (typeof showToast === 'function') {
-            showToast('Link copied to clipboard!', 'success');
-        } else {
-            alert('Link copied to clipboard!');
-        }
-    }, function(err) {
-        console.error('Could not copy text: ', err);
-        alert('Failed to copy to clipboard');
-    });
-};
-
-// Admin Blacklist - Delete via AJAX
-window.ajax_binaryblacklist_delete = function(id) {
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-
-    fetch(window.location.origin + '/admin/binaryblacklist-delete?id=' + id, {
-        method: 'GET',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': csrfToken
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const row = document.getElementById('row-' + id);
-            if (row) {
-                row.style.transition = 'opacity 0.3s';
-                row.style.opacity = '0';
-                setTimeout(() => row.remove(), 300);
-            }
-            if (typeof showToast === 'function') {
-                showToast('Blacklist entry deleted successfully', 'success');
-            }
-        } else {
-            if (typeof showToast === 'function') {
-                showToast('Error deleting blacklist entry', 'error');
-            }
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        if (typeof showToast === 'function') {
-            showToast('Error deleting blacklist entry', 'error');
-        }
-    });
-};
-
-// Admin Comments - Delete modal
-window.openDeleteModal = function(commentId, commentText) {
-    const modal = document.getElementById('deleteModal');
-    const form = document.getElementById('deleteForm');
-    const preview = document.getElementById('deleteCommentPreview');
-
-    if (modal && form && preview) {
-        // Set the form action
-        form.action = window.location.origin + '/admin/comments-delete/' + commentId;
-
-        // Set the comment preview
-        preview.textContent = '"' + commentText.substring(0, 100) + (commentText.length >= 100 ? '..."' : '"');
-
-        // Show the modal
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-
-        // Prevent body scroll
-        document.body.style.overflow = 'hidden';
-    }
-};
-
-window.closeDeleteModal = window.closeDeleteModal || function() {
-    const modal = document.getElementById('deleteModal');
-    if (modal) {
-        // Hide the modal
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-
-        // Restore body scroll
-        document.body.style.overflow = '';
-    }
-};
-
-// Admin Regex Forms - Validation
-function initAdminRegexFormValidation() {
-    // Release naming regex form
-    const releaseNamingForm = document.getElementById('regexForm');
-    if (releaseNamingForm && window.location.pathname.includes('release-naming')) {
-        releaseNamingForm.addEventListener('submit', function(event) {
-            const groupRegex = document.getElementById('group_regex');
-            const regex = document.getElementById('regex');
-            const ordinal = document.getElementById('ordinal');
-
-            if (!groupRegex?.value.trim() || !regex?.value.trim() || !ordinal?.value) {
-                event.preventDefault();
-                alert('Please fill in all required fields.');
-                return false;
-            }
-        });
-    }
-
-    // Category regex form
-    if (releaseNamingForm && window.location.pathname.includes('category')) {
-        releaseNamingForm.addEventListener('submit', function(event) {
-            const groupRegex = document.getElementById('group_regex');
-            const regex = document.getElementById('regex');
-            const ordinal = document.getElementById('ordinal');
-
-            if (!groupRegex?.value.trim() || !regex?.value.trim() || !ordinal?.value) {
-                event.preventDefault();
-                alert('Please fill in all required fields.');
-                return false;
-            }
-        });
-    }
-
-    // Collection regex form
-    if (releaseNamingForm && window.location.pathname.includes('collection')) {
-        releaseNamingForm.addEventListener('submit', function(event) {
-            const groupRegex = document.getElementById('group_regex');
-            const regex = document.getElementById('regex');
-            const ordinal = document.getElementById('ordinal');
-
-            if (!groupRegex?.value.trim() || !regex?.value.trim() || !ordinal?.value) {
-                event.preventDefault();
-                alert('Please fill in all required fields.');
-                return false;
-            }
-        });
-    }
-
-    // Blacklist form
-    const blacklistForm = document.getElementById('blacklistForm');
-    if (blacklistForm) {
-        blacklistForm.addEventListener('submit', function(event) {
-            const groupname = document.getElementById('groupname');
-            const regex = document.getElementById('regex');
-
-            if (!groupname?.value.trim() || !regex?.value.trim()) {
-                event.preventDefault();
-                alert('Please fill in all required fields.');
-                return false;
-            }
-        });
-    }
-}
-
-// Admin Tmux - Select color highlighting
-function initAdminTmuxSelectColors() {
-    const tmuxForm = document.getElementById('tmuxForm');
-    if (!tmuxForm) return;
-
-    // Function to update select colors based on value
-    function updateSelectColor(select) {
-        select.classList.remove('select-yes', 'select-no', 'select-other');
-
-        const value = select.value.toLowerCase();
-        if (value === '1' || value === 'true' || value === 'yes') {
-            select.classList.add('select-yes');
-        } else if (value === '0' || value === 'false' || value === 'no') {
-            select.classList.add('select-no');
-        } else {
-            select.classList.add('select-other');
-        }
-    }
-
-    // Apply to all select elements in the form
-    const selects = tmuxForm.querySelectorAll('select');
-    selects.forEach(select => {
-        // Initial color
-        updateSelectColor(select);
-
-        // Update on change
-        select.addEventListener('change', function() {
-            updateSelectColor(this);
-        });
-    });
-}
-
-// Initialize all admin-specific features
-function initAdminSpecificFeatures() {
-    initAdminImagePreview();
-    initAdminInvitationsSelectAll();
-    initAdminRegexFormValidation();
-    initAdminTmuxSelectColors();
-    initAdminDeletedUsers();
-
-    // Close delete modal when clicking outside
-    const deleteModal = document.getElementById('deleteModal');
-    if (deleteModal) {
-        deleteModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeDeleteModal();
-            }
-        });
-    }
-
-    // Close verify modal when clicking outside
-    const verifyUserModal = document.getElementById('verifyUserModal');
-    if (verifyUserModal) {
-        verifyUserModal.addEventListener('click', function(event) {
-            if (event.target === this) {
-                hideVerifyModal();
-            }
-        });
-    }
-}
-
-// Admin Deleted Users page functionality
-function initAdminDeletedUsers() {
-    // Select all checkbox
-    const selectAllCheckbox = document.getElementById('selectAll');
-    if (selectAllCheckbox) {
-        selectAllCheckbox.addEventListener('change', function() {
-            const checkboxes = document.querySelectorAll('.user-checkbox');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = this.checked;
-            });
-        });
-    }
-
-    // Update selectAll state when individual checkboxes change
-    const userCheckboxes = document.querySelectorAll('.user-checkbox');
-    userCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            const allChecked = Array.from(userCheckboxes).every(cb => cb.checked);
-            const someChecked = Array.from(userCheckboxes).some(cb => cb.checked);
-            if (selectAllCheckbox) {
-                selectAllCheckbox.checked = allChecked;
-                selectAllCheckbox.indeterminate = someChecked && !allChecked;
-            }
-        });
-    });
-
-    // Bulk action form submit handler
-    const bulkActionForm = document.getElementById('bulkActionForm');
-    if (bulkActionForm) {
-        bulkActionForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const action = document.getElementById('bulkAction')?.value;
-            const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
-            const validationError = document.getElementById('validationError');
-            const validationErrorMessage = document.getElementById('validationErrorMessage');
-
-            // Hide any previous validation errors
-            if (validationError) {
-                validationError.classList.add('hidden');
-            }
-
-            // Validate action selected
-            if (!action) {
-                if (validationError && validationErrorMessage) {
-                    validationErrorMessage.textContent = 'Please select an action from the dropdown.';
-                    validationError.classList.remove('hidden');
-                }
-                return false;
-            }
-
-            // Validate at least one user selected
-            if (checkedBoxes.length === 0) {
-                if (validationError && validationErrorMessage) {
-                    validationErrorMessage.textContent = 'Please select at least one user.';
-                    validationError.classList.remove('hidden');
-                }
-                return false;
-            }
-
-            const count = checkedBoxes.length;
-            const actionText = action === 'restore' ? 'restore' : 'permanently delete';
-            const type = action === 'restore' ? 'success' : 'danger';
-            const title = action === 'restore' ? 'Restore Users' : 'Delete Users';
-
-            showConfirm({
-                title: title,
-                message: `Are you sure you want to ${actionText} ${count} user${count > 1 ? 's' : ''}?`,
-                type: type,
-                confirmText: action === 'restore' ? 'Restore' : 'Delete',
-                onConfirm: function() {
-                    bulkActionForm.submit();
-                }
-            });
-        });
-    }
-
-    // Event delegation for restore buttons
-    document.addEventListener('click', function(e) {
-        const restoreBtn = e.target.closest('.restore-user-btn');
-        if (restoreBtn) {
-            e.preventDefault();
-            const userId = restoreBtn.dataset.userId;
-            const username = restoreBtn.dataset.username;
-            if (userId && username) {
-                restoreUser(userId, username);
-            }
-        }
-
-        const deleteBtn = e.target.closest('.delete-user-btn');
-        if (deleteBtn) {
-            e.preventDefault();
-            const userId = deleteBtn.dataset.userId;
-            const username = deleteBtn.dataset.username;
-            if (userId && username) {
-                permanentDeleteUser(userId, username);
-            }
-        }
-    });
-
-    // Bulk action confirmation (kept for backward compatibility)
-    window.confirmBulkAction = function(event) {
-        event?.preventDefault();
-
-        const action = document.getElementById('bulkAction')?.value;
-        const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
-        const validationError = document.getElementById('validationError');
-        const validationErrorMessage = document.getElementById('validationErrorMessage');
-
-        if (!action) {
-            if (validationError && validationErrorMessage) {
-                validationErrorMessage.textContent = 'Please select an action from the dropdown.';
-                validationError.classList.remove('hidden');
-            }
-            return false;
-        }
-
-        if (checkedBoxes.length === 0) {
-            if (validationError && validationErrorMessage) {
-                validationErrorMessage.textContent = 'Please select at least one user.';
-                validationError.classList.remove('hidden');
-            }
-            return false;
-        }
-
-        // Hide validation error if showing
-        if (validationError) {
-            validationError.classList.add('hidden');
-        }
-
-        const count = checkedBoxes.length;
-        const actionText = action === 'restore' ? 'restore' : 'permanently delete';
-        const type = action === 'restore' ? 'success' : 'danger';
-        const title = action === 'restore' ? 'Restore Users' : 'Delete Users';
-
-        showConfirm({
-            title: title,
-            message: `Are you sure you want to ${actionText} ${count} user${count > 1 ? 's' : ''}?`,
-            type: type,
-            confirmText: action === 'restore' ? 'Restore' : 'Delete',
-            onConfirm: function() {
-                document.getElementById('bulkActionForm')?.submit();
-            }
-        });
-
-        return false;
-    };
-}
-
-// Individual user restore/delete actions for deleted users page
-window.restoreUser = function(userId, username) {
-    showConfirm({
-        title: 'Restore User',
-        message: `Are you sure you want to restore user '${username}'?`,
-        type: 'success',
-        confirmText: 'Restore',
-        onConfirm: function() {
-            const form = document.getElementById('individualActionForm');
-            if (form) {
-                const baseUrl = window.location.origin;
-                form.action = `${baseUrl}/admin/deleted-users/restore/${userId}`;
-                form.submit();
-            }
-        }
-    });
-};
-
-window.permanentDeleteUser = function(userId, username) {
-    showConfirm({
-        title: 'Permanently Delete User',
-        message: `Are you sure you want to PERMANENTLY delete user '${username}'?`,
-        details: 'This action cannot be undone!',
-        type: 'danger',
-        confirmText: 'Delete Permanently',
-        onConfirm: function() {
-            const form = document.getElementById('individualActionForm');
-            if (form) {
-                const baseUrl = window.location.origin;
-                // Use the correct route: permanent-delete
-                form.action = `${baseUrl}/admin/deleted-users/permanent-delete/${userId}`;
-                form.submit();
-            }
-        }
-    });
-};
-
-// My Movies page functionality
-function initMyMovies() {
-    // Confirm before removing movies
-    document.querySelectorAll('.confirm_action').forEach(element => {
-        element.addEventListener('click', function(e) {
-            if (!confirm('Are you sure you want to remove this movie from your watchlist?')) {
-                e.preventDefault();
-            }
-        });
-    });
-
-    // Image fallback for movie covers
-    document.querySelectorAll('img[data-fallback-src]').forEach(img => {
-        img.addEventListener('error', function() {
-            const fallback = this.getAttribute('data-fallback-src');
-            if (fallback && this.src !== fallback) {
-                this.src = fallback;
-            }
-        });
-    });
-
-    // Initialize Bootstrap tooltips if they exist
-    if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-    }
-}
-
-// Movies page layout toggle functionality
-function initMoviesLayoutToggle() {
-    const toggleButton = document.getElementById('layoutToggle');
-    const toggleText = document.getElementById('layoutToggleText');
-    const moviesGrid = document.getElementById('moviesGrid');
-
-    if (!toggleButton || !toggleText || !moviesGrid) {
-        return; // Not on movies page
-    }
-
-    // Get current layout from data attribute
-    let currentLayout = parseInt(moviesGrid.dataset.userLayout) || 2;
-
-    // Apply current layout
-    applyLayout(currentLayout);
-
-    // Handle toggle button click
-    toggleButton.addEventListener('click', function() {
-        // Toggle between 1 and 2 column layouts
-        currentLayout = currentLayout === 2 ? 1 : 2;
-
-        // Save preference to server
-        fetch('/movies/update-layout', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            },
-            body: JSON.stringify({ layout: currentLayout })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                applyLayout(currentLayout);
-            }
-        })
-        .catch(error => {
-            console.error('Error saving layout preference:', error);
-            // Apply layout anyway even if save fails
-            applyLayout(currentLayout);
-        });
-    });
-
-    function applyLayout(layout) {
-        const images = moviesGrid.querySelectorAll('img[alt], .bg-gray-200.dark\\:bg-gray-700');
-        const releaseContainers = moviesGrid.querySelectorAll('.release-card-container');
-
-        if (layout === 1) {
-            // 1 Column Layout
-            moviesGrid.classList.remove('lg:grid-cols-2');
-            moviesGrid.classList.add('grid-cols-1');
-            toggleText.textContent = '1 Column';
-            toggleButton.querySelector('i').className = 'fas fa-th-list mr-2';
-
-            // Make images larger
-            images.forEach(img => {
-                img.classList.remove('w-32', 'h-48');
-                img.classList.add('w-48', 'h-72');
-            });
-
-            // Adjust release card containers to horizontal layout
-            releaseContainers.forEach(container => {
-                container.classList.remove('space-y-2');
-                container.classList.add('flex', 'flex-row', 'items-start', 'justify-between', 'gap-3');
-
-                const infoWrapper = container.querySelector('.release-info-wrapper');
-                if (infoWrapper) {
-                    infoWrapper.classList.add('flex-1', 'min-w-0');
-                }
-
-                const actions = container.querySelector('.release-actions');
-                if (actions) {
-                    actions.classList.remove('flex-wrap');
-                    actions.classList.add('flex-shrink-0', 'flex-row', 'items-center');
-                }
-            });
-        } else {
-            // 2 Column Layout
-            moviesGrid.classList.remove('grid-cols-1');
-            moviesGrid.classList.add('lg:grid-cols-2');
-            toggleText.textContent = '2 Columns';
-            toggleButton.querySelector('i').className = 'fas fa-th-large mr-2';
-
-            // Make images smaller
-            images.forEach(img => {
-                img.classList.remove('w-48', 'h-72');
-                img.classList.add('w-32', 'h-48');
-            });
-
-            // Adjust release card containers to vertical layout
-            releaseContainers.forEach(container => {
-                container.classList.add('space-y-2');
-                container.classList.remove('flex', 'flex-row', 'items-start', 'justify-between', 'gap-3');
-
-                const infoWrapper = container.querySelector('.release-info-wrapper');
-                if (infoWrapper) {
-                    infoWrapper.classList.remove('flex-1', 'min-w-0');
-                }
-
-                const actions = container.querySelector('.release-actions');
-                if (actions) {
-                    actions.classList.add('flex-wrap', 'items-center');
-                    actions.classList.remove('flex-shrink-0', 'flex-row');
-                }
-            });
-        }
-    }
-}
-
-// Auth pages functionality
-function initAuthPages() {
-    // Auto-hide success messages after 5 seconds on login page
-    if (window.location.pathname.includes('/login')) {
-        setTimeout(function() {
-            const alerts = document.querySelectorAll('.bg-green-50, .bg-blue-50');
-            alerts.forEach(function(alert) {
-                alert.style.transition = 'opacity 0.5s ease-out';
-                alert.style.opacity = '0';
-                setTimeout(() => alert.remove(), 500);
-            });
-        }, 5000);
-    }
-
-    // 2FA verification - Auto-submit when 6 digits are entered
-    const otpInput = document.getElementById('one_time_password');
-    if (otpInput) {
-        otpInput.addEventListener('input', function(e) {
-            // Remove non-numeric characters
-            this.value = this.value.replace(/[^0-9]/g, '');
-
-            // Auto-submit when 6 digits are entered
-            if (this.value.length === 6) {
-                // Small delay to show the complete code before submitting
-                setTimeout(() => {
-                    this.form.submit();
-                }, 300);
-            }
-        });
-
-        // Focus on input when page loads
-        otpInput.focus();
-    }
-}
-
-// Profile edit page functionality
-function initProfileEdit() {
-    // 2FA Disable Form Toggle
-    const toggleBtn = document.getElementById('toggle-disable-2fa-btn');
-    const cancelBtn = document.getElementById('cancel-disable-2fa-btn');
-    const formContainer = document.getElementById('disable-2fa-form-container');
-
-    if (toggleBtn && formContainer) {
-        toggleBtn.addEventListener('click', function() {
-            formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
-        });
-    }
-
-    if (cancelBtn && formContainer) {
-        cancelBtn.addEventListener('click', function() {
-            formContainer.style.display = 'none';
-            // Clear password field
-            const passwordInput = document.getElementById('disable_2fa_password');
-            if (passwordInput) {
-                passwordInput.value = '';
-            }
-        });
-    }
-
-    // Theme preference instant preview
-    const themeRadios = document.querySelectorAll('input[name="theme_preference"]');
+// Theme Management (moved from main.blade.php)
+function initThemeManagement() {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-    function applyTheme(themeValue) {
+    function applyTheme(themePreference) {
         const html = document.documentElement;
 
-        if (themeValue === 'system') {
-            // Use system preference
+        if (themePreference === 'system') {
             if (mediaQuery.matches) {
                 html.classList.add('dark');
             } else {
                 html.classList.remove('dark');
             }
-        } else if (themeValue === 'dark') {
+        } else if (themePreference === 'dark') {
             html.classList.add('dark');
         } else {
             html.classList.remove('dark');
         }
     }
 
-    themeRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            applyTheme(this.value);
-        });
-    });
+    function updateThemeButton(theme) {
+        const themeIcon = document.getElementById('theme-icon');
+        const themeLabel = document.getElementById('theme-label');
+        const themeToggle = document.getElementById('theme-toggle');
 
-    // Listen to system preference changes if 'system' is selected
-    mediaQuery.addEventListener('change', function(e) {
-        const selectedTheme = document.querySelector('input[name="theme_preference"]:checked')?.value;
-        if (selectedTheme === 'system') {
+        const icons = {
+            'light': 'fa-sun',
+            'dark': 'fa-moon',
+            'system': 'fa-desktop'
+        };
+        const labels = {
+            'light': 'Light',
+            'dark': 'Dark',
+            'system': 'System'
+        };
+        const titles = {
+            'light': 'Light Mode',
+            'dark': 'Dark Mode',
+            'system': 'System Mode'
+        };
+
+        if (themeIcon) {
+            themeIcon.classList.remove('fa-sun', 'fa-moon', 'fa-desktop');
+            themeIcon.classList.add(icons[theme]);
+        }
+        if (themeLabel) {
+            themeLabel.textContent = labels[theme];
+        }
+        if (themeToggle) {
+            themeToggle.setAttribute('title', titles[theme]);
+        }
+    }
+
+    // Get current theme from data attribute or localStorage
+    const currentThemeElement = document.getElementById('current-theme-data');
+    let currentTheme = currentThemeElement ? currentThemeElement.dataset.theme : 'light';
+    const isAuthenticated = currentThemeElement ? currentThemeElement.dataset.authenticated === 'true' : false;
+
+    if (!isAuthenticated) {
+        currentTheme = localStorage.getItem('theme') || 'light';
+    }
+
+    // Listen for OS theme changes
+    mediaQuery.addEventListener('change', () => {
+        if (currentTheme === 'system') {
             applyTheme('system');
         }
     });
-}
 
-// Details page image modal functionality
-function initDetailsPageImageModal() {
-    window.openImageModal = function(imageUrl, title) {
-        const modal = document.getElementById('imageModal');
-        const modalImage = document.getElementById('imageModalImage');
-        const modalTitle = document.getElementById('imageModalTitle');
-
-        if (modal && modalImage) {
-            modalImage.src = imageUrl;
-            if (modalTitle) {
-                modalTitle.textContent = title || '';
-            }
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-
-            // Prevent body scroll when modal is open
-            document.body.style.overflow = 'hidden';
+    // Listen for custom theme change events from sidebar
+    document.addEventListener('themeChanged', function(e) {
+        if (e.detail && e.detail.theme) {
+            updateThemeButton(e.detail.theme);
+            applyTheme(e.detail.theme);
+            currentTheme = e.detail.theme;
         }
-    };
+    });
 
-    window.closeImageModal = function() {
-        const modal = document.getElementById('imageModal');
-        if (modal) {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
+    // Dark mode toggle
+    const themeToggle = document.getElementById('theme-toggle');
 
-            // Restore body scroll
-            document.body.style.overflow = '';
+    themeToggle?.addEventListener('click', function() {
+        let nextTheme;
+
+        if (currentTheme === 'light') {
+            nextTheme = 'dark';
+        } else if (currentTheme === 'dark') {
+            nextTheme = 'system';
+        } else {
+            nextTheme = 'light';
         }
-    };
 
-    // Close modal when clicking outside the image
-    const imageModal = document.getElementById('imageModal');
-    if (imageModal) {
-        imageModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeImageModal();
-            }
-        });
-    }
+        applyTheme(nextTheme);
+        updateThemeButton(nextTheme);
 
-    // Close modal with Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            const modal = document.getElementById('imageModal');
-            if (modal && !modal.classList.contains('hidden')) {
-                closeImageModal();
-            }
+        if (isAuthenticated) {
+            const updateThemeUrl = currentThemeElement ? currentThemeElement.dataset.updateUrl : '/profile/update-theme';
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+            fetch(updateThemeUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ theme_preference: nextTheme })
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      currentTheme = nextTheme;
+                      document.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: nextTheme } }));
+                  }
+              });
+        } else {
+            localStorage.setItem('theme', nextTheme);
+            currentTheme = nextTheme;
+            document.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: nextTheme } }));
         }
+    });
+
+    // Mobile sidebar toggle
+    document.getElementById('mobile-sidebar-toggle')?.addEventListener('click', function() {
+        document.getElementById('sidebar')?.classList.toggle('hidden');
     });
 }
 
-// Add to cart functionality for movie/browse pages
-function initAddToCart() {
-    window.addToCart = function(guid) {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-        const baseUrl = document.querySelector('meta[name="app-url"]')?.content || '';
+// Flash Messages as Toast Notifications
+function initFlashMessages() {
+    const flashMessagesElement = document.getElementById('flash-messages-data');
+    if (!flashMessagesElement) {
+        return;
+    }
 
-        fetch(baseUrl + '/cart/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken,
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({ id: guid })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
+    const flashMessages = JSON.parse(flashMessagesElement.dataset.messages || '{}');
+
+    if (flashMessages.success && typeof showToast === 'function') {
+        showToast(flashMessages.success, 'success');
+    }
+
+    if (flashMessages.error) {
+        if (Array.isArray(flashMessages.error)) {
+            flashMessages.error.forEach(error => {
                 if (typeof showToast === 'function') {
-                    showToast('Added to cart successfully!', 'success');
+                    showToast(error, 'error');
                 }
-            } else {
-                if (typeof showToast === 'function') {
-                    showToast('Failed to add to cart', 'error');
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            if (typeof showToast === 'function') {
-                showToast('An error occurred', 'error');
-            }
+            });
+        } else if (typeof showToast === 'function') {
+            showToast(flashMessages.error, 'error');
+        }
+    }
+
+    if (flashMessages.warning && typeof showToast === 'function') {
+        showToast(flashMessages.warning, 'warning');
+    }
+
+    if (flashMessages.info && typeof showToast === 'function') {
+        showToast(flashMessages.info, 'info');
+    }
+}
+
+// Initialize on DOMContentLoaded
+(function() {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            initThemeManagement();
+            initFlashMessages();
         });
-    };
-}
-
-// Recent Activity Auto-Refresh (20 minutes)
-function initRecentActivityRefresh() {
-    const activityContainer = document.getElementById('recent-activity-container');
-    if (!activityContainer) {
-        return; // Not on admin dashboard page
+    } else {
+        initThemeManagement();
+        initFlashMessages();
     }
-
-    const refreshUrl = activityContainer.getAttribute('data-refresh-url');
-    if (!refreshUrl) {
-        return;
-    }
-
-    // Function to refresh activity data
-    function refreshRecentActivity() {
-        fetch(refreshUrl, {
-            method: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            },
-            credentials: 'same-origin'
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success && data.activities) {
-                updateActivityDisplay(data.activities);
-                updateLastRefreshTime();
-            }
-        })
-        .catch(error => {
-            console.error('Error refreshing recent activity:', error);
-        });
-    }
-
-    // Function to update the activity display
-    function updateActivityDisplay(activities) {
-        const container = document.getElementById('recent-activity-container');
-        if (!container) return;
-
-        // Clear existing content
-        container.innerHTML = '';
-
-        if (activities.length === 0) {
-            container.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-4" id="no-activity-message">No recent activity</p>';
-            return;
-        }
-
-        // Add each activity item
-        activities.forEach(activity => {
-            const activityItem = document.createElement('div');
-            activityItem.className = 'flex items-start activity-item rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors';
-
-            activityItem.innerHTML = `
-                <div class="w-8 h-8 ${activity.icon_bg} rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                    <i class="fas fa-${activity.icon} ${activity.icon_color} text-sm"></i>
-                </div>
-                <div class="flex-1">
-                    <p class="text-sm text-gray-800 dark:text-gray-200">${escapeHtml(activity.message)}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">${escapeHtml(activity.created_at)}</p>
-                </div>
-            `;
-
-            container.appendChild(activityItem);
-        });
-    }
-
-    // Function to update last refresh time
-    function updateLastRefreshTime() {
-        const lastUpdatedElement = document.getElementById('activity-last-updated');
-        if (lastUpdatedElement) {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            lastUpdatedElement.innerHTML = `<i class="fas fa-sync-alt"></i> Last updated: ${timeString}`;
-        }
-    }
-
-    // Helper function to escape HTML to prevent XSS
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    // Set up auto-refresh every 20 minutes (1200000 milliseconds)
-    const refreshInterval = 20 * 60 * 1000; // 20 minutes in milliseconds
-    setInterval(refreshRecentActivity, refreshInterval);
-
-    // Also refresh on page visibility change (when user comes back to tab)
-    document.addEventListener('visibilitychange', function() {
-        if (!document.hidden) {
-            refreshRecentActivity();
-        }
-    });
-}
-
-// Profile page functionality
-let downloadsChart = null;
-let apiRequestsChart = null;
-
-function initProfilePage() {
-    // Animate progress bars
-    animateProgressBars();
-}
-
-function animateProgressBars() {
-    document.querySelectorAll('.progress-bar').forEach(bar => {
-        const width = bar.dataset.width;
-        if (width) {
-            setTimeout(() => {
-                bar.style.width = width + '%';
-            }, 100);
-        }
-    });
-}
-
-function initializeProfileCharts() {
-    // Check if Chart.js is loaded
-    if (typeof Chart === 'undefined') {
-        console.error('Chart.js is not loaded. Cannot initialize profile charts.');
-        return;
-    }
-
-    const container = document.getElementById('profile-charts-container');
-    if (!container) {
-        return;
-    }
-
-    const downloadsHourly = JSON.parse(container.dataset.downloadsHourly || '{}');
-    const apiRequestsHourly = JSON.parse(container.dataset.apiRequestsHourly || '{}');
-    const downloadLimit = parseInt(container.dataset.downloadLimit || '0');
-    const apiLimit = parseInt(container.dataset.apiLimit || '0');
-
-    const labels = Object.keys(downloadsHourly);
-    const downloadsData = Object.values(downloadsHourly);
-    const apiData = Object.values(apiRequestsHourly);
-
-    // Get colors based on dark mode
-    const isDarkMode = document.documentElement.classList.contains('dark');
-    const gridColor = isDarkMode ? 'rgba(75, 85, 99, 0.3)' : 'rgba(200, 200, 200, 0.3)';
-    const textColor = isDarkMode ? 'rgba(156, 163, 175, 1)' : 'rgba(75, 85, 99, 1)';
-
-    createDownloadsChart(labels, downloadsData, downloadLimit, gridColor, textColor);
-    createApiRequestsChart(labels, apiData, apiLimit, gridColor, textColor);
-}
-
-function createDownloadsChart(labels, data, limit, gridColor, textColor) {
-    const canvas = document.getElementById('downloadsChart');
-    if (!canvas) {
-        return;
-    }
-
-    // Destroy existing chart if it exists
-    if (downloadsChart) {
-        downloadsChart.destroy();
-    }
-
-    downloadsChart = new Chart(canvas, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Downloads',
-                    data: data,
-                    borderColor: 'rgb(59, 130, 246)',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: 'rgb(59, 130, 246)',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 3,
-                    pointHoverRadius: 5
-                },
-                {
-                    label: 'Limit',
-                    data: Array(labels.length).fill(limit),
-                    borderColor: 'rgba(239, 68, 68, 0.5)',
-                    borderWidth: 2,
-                    borderDash: [5, 5],
-                    fill: false,
-                    pointRadius: 0,
-                    pointHoverRadius: 0
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                    labels: {
-                        color: textColor
-                    }
-                },
-                tooltip: {
-                    mode: 'index',
-                    intersect: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1,
-                        color: textColor
-                    },
-                    grid: {
-                        color: gridColor
-                    }
-                },
-                x: {
-                    ticks: {
-                        color: textColor,
-                        maxRotation: 45,
-                        minRotation: 45
-                    },
-                    grid: {
-                        color: gridColor
-                    }
-                }
-            },
-            interaction: {
-                mode: 'nearest',
-                axis: 'x',
-                intersect: false
-            }
-        }
-    });
-}
-
-function createApiRequestsChart(labels, data, limit, gridColor, textColor) {
-    const canvas = document.getElementById('apiRequestsChart');
-    if (!canvas) {
-        return;
-    }
-
-    // Destroy existing chart if it exists
-    if (apiRequestsChart) {
-        apiRequestsChart.destroy();
-    }
-
-    apiRequestsChart = new Chart(canvas, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'API Requests',
-                    data: data,
-                    borderColor: 'rgb(168, 85, 247)',
-                    backgroundColor: 'rgba(168, 85, 247, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: 'rgb(168, 85, 247)',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 3,
-                    pointHoverRadius: 5
-                },
-                {
-                    label: 'Limit',
-                    data: Array(labels.length).fill(limit),
-                    borderColor: 'rgba(239, 68, 68, 0.5)',
-                    borderWidth: 2,
-                    borderDash: [5, 5],
-                    fill: false,
-                    pointRadius: 0,
-                    pointHoverRadius: 0
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                    labels: {
-                        color: textColor
-                    }
-                },
-                tooltip: {
-                    mode: 'index',
-                    intersect: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1,
-                        color: textColor
-                    },
-                    grid: {
-                        color: gridColor
-                    }
-                },
-                x: {
-                    ticks: {
-                        color: textColor,
-                        maxRotation: 45,
-                        minRotation: 45
-                    },
-                    grid: {
-                        color: gridColor
-                    }
-                }
-            },
-            interaction: {
-                mode: 'nearest',
-                axis: 'x',
-                intersect: false
-            }
-        }
-    });
-}
-
+})();
