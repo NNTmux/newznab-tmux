@@ -423,6 +423,7 @@ function initNfoModal() {
 
         // Show modal
         modal.classList.remove('hidden');
+        modal.style.display = 'block';
 
         // Reset content with loading message
         content.innerHTML = '<div class="flex items-center justify-center py-8"><i class="fas fa-spinner fa-spin text-2xl mr-2"></i><span>Loading NFO...</span></div>';
@@ -453,6 +454,7 @@ function initNfoModal() {
         const modal = document.getElementById('nfoModal');
         if (modal) {
             modal.classList.add('hidden');
+            modal.style.display = 'none';
         }
     };
 
@@ -2314,6 +2316,131 @@ function showExpiryToast(message, type) {
         toast.style.opacity = '0';
         setTimeout(() => toast.remove(), 300);
     }, 3000);
+}
+
+// Page-specific initialization functions
+function initMyMovies() {
+    // Placeholder for MyMovies page specific functionality
+    // Currently no additional functionality needed
+}
+
+function initAuthPages() {
+    // Placeholder for auth pages specific functionality
+    // Currently no additional functionality needed
+}
+
+function initProfileEdit() {
+    // Placeholder for profile edit page specific functionality
+    // Currently no additional functionality needed
+}
+
+function initDetailsPageImageModal() {
+    // Handle image modal triggers on release details page
+    const imageModalTriggers = document.querySelectorAll('.image-modal-trigger');
+    const imageModal = document.getElementById('imageModal');
+    const imageModalImage = document.getElementById('imageModalImage');
+    const imageModalTitle = document.getElementById('imageModalTitle');
+    const closeButtons = document.querySelectorAll('[data-close-image-modal]');
+
+    if (!imageModal || !imageModalImage || !imageModalTitle) {
+        return; // Not on the details page
+    }
+
+    // Add click handlers to image triggers
+    imageModalTriggers.forEach(function(trigger) {
+        trigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            const imageUrl = this.getAttribute('data-image-url');
+            const imageTitle = this.getAttribute('data-image-title') || 'Image Preview';
+
+            // Update the full image URL (replace _thumb with the full image)
+            const fullImageUrl = imageUrl.replace('_thumb.jpg', '.jpg');
+
+            imageModalImage.src = fullImageUrl;
+            imageModalTitle.textContent = imageTitle;
+            imageModal.classList.remove('hidden');
+            imageModal.style.display = 'flex';
+        });
+    });
+
+    // Add click handler to close button
+    closeButtons.forEach(function(closeBtn) {
+        closeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            imageModal.classList.add('hidden');
+            imageModal.style.display = 'none';
+        });
+    });
+
+    // Close modal when clicking on backdrop
+    imageModal.addEventListener('click', function(e) {
+        if (e.target === imageModal) {
+            imageModal.classList.add('hidden');
+            imageModal.style.display = 'none';
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !imageModal.classList.contains('hidden')) {
+            imageModal.classList.add('hidden');
+            imageModal.style.display = 'none';
+        }
+    });
+}
+
+function initAddToCart() {
+    // Add to cart functionality is already handled in initCartFunctionality()
+    // This is just a placeholder for backward compatibility
+}
+
+function initMoviesLayoutToggle() {
+    // Placeholder for movies layout toggle functionality
+    // Currently no additional functionality needed
+}
+
+function initProfilePage() {
+    // Placeholder for profile page specific functionality
+    // Progress bars and charts are handled elsewhere
+}
+
+function initMobileEnhancements() {
+    // Handle mobile-specific enhancements
+    const mobileSidebarToggle = document.getElementById('mobile-sidebar-toggle');
+    if (mobileSidebarToggle) {
+        mobileSidebarToggle.addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                sidebar.classList.toggle('hidden');
+                sidebar.classList.toggle('flex');
+            }
+        });
+    }
+}
+
+function initAdminDashboardCharts() {
+    // Placeholder for admin dashboard charts
+    // Chart initialization happens when the admin dashboard loads
+}
+
+function initAdminGroups() {
+    // Placeholder for admin groups functionality
+    // Group management is handled in event delegation
+}
+
+function initTinyMCE() {
+    // Placeholder for TinyMCE initialization
+    // TinyMCE is loaded separately when needed
+}
+
+function initAdminSpecificFeatures() {
+    // Placeholder for admin-specific features
+    // Most admin features are handled in dedicated functions
+}
+
+function initRecentActivityRefresh() {
+    // Placeholder for recent activity auto-refresh
+    // Activity refresh is handled on the admin dashboard
 }
 
 // Theme Management (moved from main.blade.php)

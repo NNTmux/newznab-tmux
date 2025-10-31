@@ -922,7 +922,7 @@
 @endsection
 
 <!-- Image Modal -->
-<div id="imageModal" class="image-modal-backdrop hidden">
+<div id="imageModal" class="image-modal-backdrop hidden" style="display: none;">
     <div class="image-modal-container">
         <button type="button" class="image-modal-close" data-close-image-modal>
             <i class="fas fa-times"></i>

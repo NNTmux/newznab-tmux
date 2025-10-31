@@ -501,6 +501,77 @@ code.api-token::-webkit-scrollbar-thumb:hover {
     box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.5);
 }
 
+/* Image Modal Styles */
+.image-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 99999;
+    background-color: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.image-modal-backdrop.hidden {
+    display: none !important;
+}
+
+.image-modal-backdrop:not(.hidden) {
+    display: flex;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.image-modal-backdrop:not(.hidden) .image-modal-container {
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+.image-modal-container {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+}
+
+.image-modal-close {
+    position: absolute;
+    top: -3rem;
+    right: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    font-size: 1.25rem;
+}
+
+.image-modal-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+}
+
+/* NFO Modal Styles */
+#nfoModal {
+    display: none;
+}
+
+#nfoModal.hidden {
+    display: none !important;
+}
+
+#nfoModal:not(.hidden) {
+    display: block;
+}
+
 .confirmation-modal-footer .btn-confirm:active {
     transform: translateY(0);
 }
