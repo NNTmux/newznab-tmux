@@ -383,7 +383,7 @@
     <!-- Preview/Sample Image Modal -->
     <div id="previewModal" class="hidden fixed inset-0 bg-black bg-opacity-75 items-center justify-center p-4" style="display: none; z-index: 9999 !important;">
         <div class="relative max-w-4xl w-full">
-            <button type="button" onclick="closePreviewModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl font-bold z-10">
+            <button type="button" data-close-preview-modal class="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl font-bold z-10">
                 <i class="fas fa-times"></i>
             </button>
             <div class="text-center mb-2">

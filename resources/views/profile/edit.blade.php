@@ -236,7 +236,7 @@
                 <div class="flex space-x-2">
                     <a href="{{ route('profileedit', ['action' => 'newapikey']) }}"
                        class="px-6 py-2 text-blue-700 bg-blue-100 rounded-lg hover:bg-blue-200 transition"
-                       onclick="return confirm('Are you sure you want to generate a new API key?')">
+                       data-confirm="Are you sure you want to generate a new API key?">
                         <i class="fas fa-key mr-2"></i>New API Key
                     </a>
                     <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition">

@@ -3,6 +3,7 @@ config.php
 docker/.zsh_history
 docker/composer-auth.json
 docker/php-overrides.local.ini
+docker-compose.yml
 docker-compose.override.yml
 .env
 install.lock
@@ -20,7 +21,21 @@ test.php
 
 /.idea/
 /vendor/*
-/storage/covers/*
+# Ignore all files in covers directories but keep folder structure
+# This includes symlinks - Git treats symlinks as files, so they're automatically ignored
+/storage/covers/**/*
+!/storage/covers/**/
+!/storage/covers/**/.gitignore
+!/storage/covers/**/no-cover.jpg
+!/storage/covers/**/no-backdrop.jpg
+/public/covers/**/*
+!/public/covers/**/
+!/public/covers/**/.gitignore
+!/public/covers/**/no-cover.jpg
+!/public/covers/**/no-backdrop.jpg
+
+# Ignore symlinks in public/storage that point to storage/covers
+/public/storage/covers
 /storage/nzb/*
 /resources/tmp/*
 !/resources/tmp/unrar/
@@ -28,8 +43,8 @@ test.php
 !/resources/tmp/imdb_cache/
 !/public/assets/*
 
-# Ignore Vite build manifest (regenerated locally)
-/public/build/manifest.json
+# Ignore Vite build output (regenerated locally)
+/public/build/
 
 # Logs
 npm-debug.log*
@@ -44,3 +59,14 @@ node_modules/
 .vscode-test
 
 /.phpunit.cache
+phpunit.xml.back
+
+# IDE helper files (generated locally)
+_ide_helper.php
+
+# Lock files (generated locally, should not be committed)
+*-lock
+composer.lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

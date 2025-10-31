@@ -279,7 +279,7 @@
     <!-- Preview/Sample Image Modal -->
     <div id="previewModal" class="hidden fixed inset-0 bg-black bg-opacity-75 items-center justify-center p-4" style="display: none; z-index: 9999 !important;">
         <div class="relative max-w-4xl w-full">
-            <button type="button" onclick="closePreviewModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl font-bold z-10">
+            <button type="button" data-close-preview-modal class="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl font-bold z-10">
                 <i class="fas fa-times"></i>
             </button>
             <div class="text-center mb-2">
@@ -299,7 +299,7 @@
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 dark:text-gray-200 flex items-center">
                     <i class="fas fa-info-circle mr-2 text-blue-600 dark:text-blue-400 dark:text-blue-400"></i> Media Information
                 </h3>
-                <button type="button" onclick="closeMediainfoModal()" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 text-2xl font-bold">
+                <button type="button" data-close-mediainfo-modal class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 text-2xl font-bold">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -319,7 +319,7 @@
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 dark:text-gray-200 flex items-center">
                     <i class="fas fa-file-archive mr-2 text-green-600 dark:text-green-400"></i> File List
                 </h3>
-                <button type="button" onclick="closeFilelistModal()" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 text-2xl font-bold">
+                <button type="button" data-close-filelist-modal class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 text-2xl font-bold">
                     <i class="fas fa-times"></i>
                 </button>
             </div>

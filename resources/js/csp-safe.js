@@ -48,50 +48,71 @@ document.addEventListener('DOMContentLoaded', function() {
     initDetailsPageImageModal();
     initMoviesLayoutToggle();
     initProfilePage(); // Initialize profile page (progress bars and charts)
+    initCopyToClipboard(); // Copy functionality for RSS/Profile pages
+    initVerifyUserModal(); // Admin user verification modal
 });
 
-// Event delegation for dynamically added elements
+// Event delegation for dynamically added elements - optimized with early returns
 function initEventDelegation() {
+    // Helper function to find element with attribute, checking both target and closest
+    function findElementWithAttr(e, attr) {
+        if (!e || !e.target) return null;
+        if (e.target.hasAttribute(attr)) return e.target;
+        return e.target.closest(`[${attr}]`);
+    }
+
+    // Helper function to find element with class
+    function findElementWithClass(e, className) {
+        if (!e || !e.target) return null;
+        if (e.target.classList && e.target.classList.contains(className)) return e.target;
+        return e.target.closest(`.${className}`);
+    }
+
     document.addEventListener('click', function(e) {
         // Handle toast close buttons
-        if (e.target.classList.contains('toast-close') || e.target.closest('.toast-close')) {
-            const toast = e.target.closest('.toast-notification');
+        const toastClose = findElementWithClass(e, 'toast-close');
+        if (toastClose) {
+            const toast = toastClose.closest('.toast-notification');
             if (toast) {
                 toast.remove();
             }
+            return;
         }
 
         // Handle NFO modal close
-        if (e.target.hasAttribute('data-close-nfo-modal') || e.target.closest('[data-close-nfo-modal]')) {
+        if (findElementWithAttr(e, 'data-close-nfo-modal')) {
             e.preventDefault();
             closeNfoModal();
+            return;
         }
 
         // Handle NFO modal open
-        if (e.target.hasAttribute('data-open-nfo') || e.target.closest('[data-open-nfo]')) {
+        const nfoOpen = findElementWithAttr(e, 'data-open-nfo');
+        if (nfoOpen) {
             e.preventDefault();
-            const guid = e.target.getAttribute('data-open-nfo') || e.target.closest('[data-open-nfo]').getAttribute('data-open-nfo');
+            const guid = nfoOpen.getAttribute('data-open-nfo');
             if (guid) {
                 openNfoModal(guid);
             }
+            return;
         }
 
         // Handle logout
-        if (e.target.hasAttribute('data-logout') || e.target.closest('[data-logout]')) {
+        if (findElementWithAttr(e, 'data-logout')) {
             e.preventDefault();
             const logoutForm = document.getElementById('logout-form');
             if (logoutForm) {
                 logoutForm.submit();
             }
+            return;
         }
 
         // Handle confirm delete - using styled modal
-        if (e.target.hasAttribute('data-confirm-delete') || e.target.closest('[data-confirm-delete]')) {
+        const confirmDelete = findElementWithAttr(e, 'data-confirm-delete');
+        if (confirmDelete) {
             e.preventDefault();
             e.stopPropagation();
-
-            const element = e.target.hasAttribute('data-confirm-delete') ? e.target : e.target.closest('[data-confirm-delete]');
-            const form = element.closest('form');
+            const form = confirmDelete.closest('form');
 
             showConfirm({
                 message: 'Are you sure you want to delete this item?',
@@ -100,21 +121,21 @@ function initEventDelegation() {
                 onConfirm: function() {
                     if (form) {
                         form.submit();
-                    } else if (element.href) {
-                        window.location.href = element.href;
+                    } else if (confirmDelete.href) {
+                        window.location.href = confirmDelete.href;
                     }
                 }
             });
+            return;
         }
 
         // Handle confirm action - using styled modal
-        if (e.target.hasAttribute('data-confirm') || e.target.closest('[data-confirm]')) {
+        const confirmAction = findElementWithAttr(e, 'data-confirm');
+        if (confirmAction) {
             e.preventDefault();
             e.stopPropagation();
-
-            const element = e.target.hasAttribute('data-confirm') ? e.target : e.target.closest('[data-confirm]');
-            const message = element.getAttribute('data-confirm');
-            const form = element.closest('form');
+            const message = confirmAction.getAttribute('data-confirm');
+            const form = confirmAction.closest('form');
 
             showConfirm({
                 message: message,
@@ -123,11 +144,12 @@ function initEventDelegation() {
                 onConfirm: function() {
                     if (form) {
                         form.submit();
-                    } else if (element.href) {
-                        window.location.href = element.href;
+                    } else if (confirmAction.href) {
+                        window.location.href = confirmAction.href;
                     }
                 }
             });
+            return;
         }
 
         // Handle download NZB buttons
@@ -208,6 +230,70 @@ function initEventDelegation() {
                     ajax_group_purge_all();
                     break;
             }
+        }
+
+        // Handle restore user button (both admin/user-list and admin/deleted-users pages)
+        const restoreUserBtn = e.target.closest('.restore-user-btn');
+        if (restoreUserBtn) {
+            e.preventDefault();
+            const userId = restoreUserBtn.getAttribute('data-user-id');
+            const username = restoreUserBtn.getAttribute('data-username') || 'this user';
+
+            showConfirm({
+                title: 'Restore User',
+                message: `Are you sure you want to restore user "${username}"?`,
+                type: 'success',
+                confirmText: 'Restore',
+                cancelText: 'Cancel',
+                onConfirm: function() {
+                    const form = document.getElementById('individualActionForm');
+                    if (!form) {
+                        console.error('Individual action form not found');
+                        if (typeof showToast === 'function') {
+                            showToast('Error: Form not found', 'error');
+                        }
+                        return;
+                    }
+
+                    // Set form action and submit
+                    form.action = `/admin/deleted-users/restore/${userId}`;
+                    form.method = 'POST';
+                    form.submit();
+                }
+            });
+            return;
+        }
+
+        // Handle permanent delete user button (deleted users page only)
+        const deleteUserBtn = e.target.closest('.delete-user-btn');
+        if (deleteUserBtn) {
+            e.preventDefault();
+            const userId = deleteUserBtn.getAttribute('data-user-id');
+            const username = deleteUserBtn.getAttribute('data-username') || 'this user';
+
+            showConfirm({
+                title: 'Permanently Delete User',
+                message: `Are you sure you want to permanently delete user "${username}"? This action cannot be undone and will remove all user data.`,
+                type: 'danger',
+                confirmText: 'Delete Permanently',
+                cancelText: 'Cancel',
+                onConfirm: function() {
+                    const form = document.getElementById('individualActionForm');
+                    if (!form) {
+                        console.error('Individual action form not found');
+                        if (typeof showToast === 'function') {
+                            showToast('Error: Form not found', 'error');
+                        }
+                        return;
+                    }
+
+                    // Set form action and submit
+                    form.action = `/admin/deleted-users/permanent-delete/${userId}`;
+                    form.method = 'POST';
+                    form.submit();
+                }
+            });
+            return;
         }
     });
 
@@ -292,11 +378,16 @@ window.showConfirm = function(options) {
 
     const config = { ...defaults, ...options };
 
-    // Set modal content
-    document.getElementById('confirmationModalTitleText').textContent = config.title;
-    document.getElementById('confirmationModalMessage').textContent = config.message;
-    document.getElementById('confirmationModalConfirmText').textContent = config.confirmText;
-    document.getElementById('confirmationModalCancelText').textContent = config.cancelText;
+    // Set modal content - with null checks
+    const titleText = document.getElementById('confirmationModalTitleText');
+    const messageText = document.getElementById('confirmationModalMessage');
+    const confirmText = document.getElementById('confirmationModalConfirmText');
+    const cancelText = document.getElementById('confirmationModalCancelText');
+    
+    if (titleText) titleText.textContent = config.title;
+    if (messageText) messageText.textContent = config.message;
+    if (confirmText) confirmText.textContent = config.confirmText;
+    if (cancelText) cancelText.textContent = config.cancelText;
 
     // Set icon based on type
     const icon = document.getElementById('confirmationModalIcon');
@@ -349,10 +440,10 @@ window.showConfirm = function(options) {
     // Handle details
     const detailsDiv = document.getElementById('confirmationModalDetails');
     const detailsText = document.getElementById('confirmationModalDetailsText');
-    if (config.details) {
+    if (config.details && detailsText && detailsDiv) {
         detailsText.textContent = config.details;
         detailsDiv.classList.remove('hidden');
-    } else {
+    } else if (detailsDiv) {
         detailsDiv.classList.add('hidden');
     }
 
@@ -505,30 +596,45 @@ function initLogoutForms() {
     // Already handled in event delegation
 }
 
-// Season switcher for series
+// Season switcher for series - optimized
 function initSeasonSwitcher() {
     window.switchSeason = function(seasonNumber) {
-        // Hide all season containers
-        document.querySelectorAll('[data-season-container]').forEach(function(container) {
-            container.style.display = 'none';
+        // Hide all season content
+        document.querySelectorAll('.season-content').forEach(function(content) {
+            content.classList.add('hidden');
         });
 
-        // Show selected season
-        const selectedSeason = document.querySelector('[data-season-container="' + seasonNumber + '"]');
-        if (selectedSeason) {
-            selectedSeason.style.display = 'block';
+        // Remove active styling from all tabs
+        document.querySelectorAll('.season-tab').forEach(function(tab) {
+            tab.classList.remove('border-blue-500', 'text-blue-600');
+            tab.classList.add('border-transparent', 'text-gray-500');
+
+            // Update badge styling
+            const badge = tab.querySelector('span');
+            if (badge) {
+                badge.classList.remove('bg-blue-100', 'text-blue-800');
+                badge.classList.add('bg-gray-100', 'text-gray-600');
+            }
+        });
+
+        // Show selected season content
+        const selectedContent = document.querySelector('.season-content[data-season="' + seasonNumber + '"]');
+        if (selectedContent) {
+            selectedContent.classList.remove('hidden');
         }
 
-        // Update button states
-        document.querySelectorAll('[data-season]').forEach(function(btn) {
-            btn.classList.remove('active', 'bg-blue-600', 'text-white');
-            btn.classList.add('bg-gray-200', 'text-gray-700');
-        });
+        // Add active styling to selected tab
+        const selectedTab = document.querySelector('.season-tab[data-season="' + seasonNumber + '"]');
+        if (selectedTab) {
+            selectedTab.classList.remove('border-transparent', 'text-gray-500');
+            selectedTab.classList.add('border-blue-500', 'text-blue-600');
 
-        const activeBtn = document.querySelector('[data-season="' + seasonNumber + '"]');
-        if (activeBtn) {
-            activeBtn.classList.remove('bg-gray-200', 'text-gray-700');
-            activeBtn.classList.add('active', 'bg-blue-600', 'text-white');
+            // Update badge styling
+            const badge = selectedTab.querySelector('span');
+            if (badge) {
+                badge.classList.remove('bg-gray-100', 'text-gray-600');
+                badge.classList.add('bg-blue-100', 'text-blue-800');
+            }
         }
     };
 }
@@ -1149,6 +1255,28 @@ function initMediainfoAndFilelist() {
             const guid = filelistBadge.dataset.guid;
             showFilelist(guid);
         }
+
+        // Handle modal close buttons with data attributes
+        if (e.target.hasAttribute('data-close-preview-modal') || e.target.closest('[data-close-preview-modal]')) {
+            e.preventDefault();
+            if (typeof closePreviewModal === 'function') {
+                closePreviewModal();
+            }
+        }
+
+        if (e.target.hasAttribute('data-close-mediainfo-modal') || e.target.closest('[data-close-mediainfo-modal]')) {
+            e.preventDefault();
+            if (typeof closeMediainfoModal === 'function') {
+                closeMediainfoModal();
+            }
+        }
+
+        if (e.target.hasAttribute('data-close-filelist-modal') || e.target.closest('[data-close-filelist-modal]')) {
+            e.preventDefault();
+            if (typeof closeFilelistModal === 'function') {
+                closeFilelistModal();
+            }
+        }
     });
 
     // Close modals on background click
@@ -1165,7 +1293,7 @@ function initMediainfoAndFilelist() {
     if (mediainfoModal) {
         mediainfoModal.addEventListener('click', function(e) {
             // Close if clicking the backdrop OR the close button
-            if (e.target === this || e.target.closest('[onclick*="closeMediainfoModal"]')) {
+            if (e.target === this || e.target.closest('[data-close-mediainfo-modal]')) {
                 closeMediainfoModal();
             }
         });
@@ -1175,7 +1303,7 @@ function initMediainfoAndFilelist() {
     if (filelistModal) {
         filelistModal.addEventListener('click', function(e) {
             // Close if clicking the backdrop OR the close button
-            if (e.target === this || e.target.closest('[onclick*="closeFilelistModal"]')) {
+            if (e.target === this || e.target.closest('[data-close-filelist-modal]')) {
                 closeFilelistModal();
             }
         });
@@ -2515,11 +2643,18 @@ function initMoviesLayoutToggle() {
         currentLayout = currentLayout === 2 ? 1 : 2;
 
         // Save preference to server
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (!csrfToken || !csrfToken.content) {
+            console.error('CSRF token not found');
+            applyLayout(currentLayout); // Apply layout anyway
+            return;
+        }
+        
         fetch('/movies/update-layout', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                'X-CSRF-TOKEN': csrfToken.content
             },
             body: JSON.stringify({ layout: currentLayout })
         })
@@ -2544,8 +2679,9 @@ function initMoviesLayoutToggle() {
             // 1 Column Layout
             moviesGrid.classList.remove('lg:grid-cols-2');
             moviesGrid.classList.add('grid-cols-1');
-            toggleText.textContent = '1 Column';
-            toggleButton.querySelector('i').className = 'fas fa-th-list mr-2';
+            if (toggleText) toggleText.textContent = '1 Column';
+            const icon = toggleButton.querySelector('i');
+            if (icon) icon.className = 'fas fa-th-list mr-2';
 
             // Make images larger
             images.forEach(img => {
@@ -2573,8 +2709,9 @@ function initMoviesLayoutToggle() {
             // 2 Column Layout
             moviesGrid.classList.remove('grid-cols-1');
             moviesGrid.classList.add('lg:grid-cols-2');
-            toggleText.textContent = '2 Columns';
-            toggleButton.querySelector('i').className = 'fas fa-th-large mr-2';
+            if (toggleText) toggleText.textContent = '2 Columns';
+            const icon = toggleButton.querySelector('i');
+            if (icon) icon.className = 'fas fa-th-large mr-2';
 
             // Make images smaller
             images.forEach(img => {
@@ -2600,11 +2737,6 @@ function initMoviesLayoutToggle() {
             });
         }
     }
-}
-
-function initProfilePage() {
-    // Placeholder for profile page specific functionality
-    // Progress bars and charts are handled elsewhere
 }
 
 function initMobileEnhancements() {
@@ -2878,14 +3010,538 @@ function initTinyMCE() {
         });
 }
 
-function initAdminSpecificFeatures() {
-    // Placeholder for admin-specific features
-    // Most admin features are handled in dedicated functions
+// Admin Image Preview functionality
+function initAdminImagePreview() {
+    // Handle admin page image previews (for cover images, etc.)
+    // This uses the existing image modal functionality
+    document.addEventListener('click', function(e) {
+        const imageTrigger = e.target.closest('[data-admin-image-preview]');
+        if (imageTrigger) {
+            e.preventDefault();
+            const imageUrl = imageTrigger.getAttribute('data-admin-image-preview');
+            if (imageUrl && typeof openImageModal === 'function') {
+                openImageModal(imageUrl);
+            }
+        }
+    });
+
+    // Preview image on file input change (for admin edit pages)
+    document.querySelectorAll('input[type="file"][accept*="image"]').forEach(function(fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    // Find preview container
+                    const previewContainer = fileInput.closest('div').querySelector('.image-preview');
+                    if (previewContainer) {
+                        let previewImg = previewContainer.querySelector('img');
+                        if (!previewImg) {
+                            previewImg = document.createElement('img');
+                            previewImg.className = 'w-full h-auto rounded-lg';
+                            previewContainer.innerHTML = '';
+                            previewContainer.appendChild(previewImg);
+                        }
+                        previewImg.src = event.target.result;
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    });
 }
 
+// Admin Invitations Select All functionality
+function initAdminInvitationsSelectAll() {
+    const selectAllCheckbox = document.getElementById('select_all');
+    if (!selectAllCheckbox) {
+        return; // Not on invitations page
+    }
+
+    const invitationCheckboxes = document.querySelectorAll('.invitation-checkbox');
+
+    // Handle select all checkbox change
+    selectAllCheckbox.addEventListener('change', function() {
+        invitationCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+
+    // Handle individual checkbox changes to update select all state
+    invitationCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const allChecked = Array.from(invitationCheckboxes).every(cb => cb.checked);
+            const someChecked = Array.from(invitationCheckboxes).some(cb => cb.checked);
+            selectAllCheckbox.checked = allChecked;
+            selectAllCheckbox.indeterminate = someChecked && !allChecked;
+        });
+    });
+
+    // Initialize the select all state on page load
+    const allChecked = invitationCheckboxes.length > 0 && Array.from(invitationCheckboxes).every(cb => cb.checked);
+    selectAllCheckbox.checked = allChecked;
+}
+
+// Admin Regex Form Validation
+function initAdminRegexFormValidation() {
+    const regexForm = document.getElementById('regexForm');
+    if (!regexForm) {
+        return; // Not on a regex edit page
+    }
+
+    // Validate regex pattern on form submit
+    regexForm.addEventListener('submit', function(e) {
+        const regexInputs = regexForm.querySelectorAll('input[name*="regex"], textarea[name*="regex"]');
+        let isValid = true;
+        const errors = [];
+
+        regexInputs.forEach(input => {
+            const value = input.value.trim();
+            if (value && input.hasAttribute('required')) {
+                // Basic regex validation - check if it looks like a valid regex pattern
+                // Regex should typically start with a delimiter (/, #, ~, etc.)
+                // and have matching delimiters
+                if (value.length > 0) {
+                    const firstChar = value[0];
+                    const delimiters = ['/', '#', '~', '%', '@', '!'];
+                    
+                    if (delimiters.includes(firstChar)) {
+                        // Check if regex has matching closing delimiter
+                        let delimiterCount = 0;
+                        let flags = '';
+                        for (let i = 0; i < value.length; i++) {
+                            if (value[i] === firstChar && i > 0) {
+                                delimiterCount++;
+                                // Check if there are flags after this delimiter
+                                flags = value.substring(i + 1);
+                                break;
+                            }
+                        }
+
+                        if (delimiterCount === 0) {
+                            isValid = false;
+                            errors.push(`Regex pattern "${input.name}" is missing closing delimiter "${firstChar}"`);
+                            input.classList.add('border-red-500');
+                        } else {
+                            input.classList.remove('border-red-500');
+                            // Validate flags if present
+                            if (flags && !/^[gimsux]*$/.test(flags)) {
+                                isValid = false;
+                                errors.push(`Invalid regex flags in "${input.name}". Allowed: g, i, m, s, u, x`);
+                                input.classList.add('border-red-500');
+                            }
+                        }
+                    } else if (value.length > 0) {
+                        // Regex doesn't start with a delimiter, might still be valid but warn
+                        input.classList.add('border-yellow-500');
+                    }
+                }
+            }
+        });
+
+        if (!isValid && errors.length > 0) {
+            e.preventDefault();
+            const errorMsg = errors.join('\n');
+            if (typeof showToast === 'function') {
+                showToast('Please fix regex validation errors', 'error');
+            } else {
+                alert(errorMsg);
+            }
+        }
+    });
+
+    // Real-time validation feedback for regex inputs
+    const regexInputs = regexForm.querySelectorAll('input[name*="regex"], textarea[name*="regex"]');
+    regexInputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            const value = this.value.trim();
+            if (value) {
+                const firstChar = value[0];
+                const delimiters = ['/', '#', '~', '%', '@', '!'];
+                
+                if (delimiters.includes(firstChar)) {
+                    let delimiterCount = 0;
+                    for (let i = 1; i < value.length; i++) {
+                        if (value[i] === firstChar) {
+                            delimiterCount++;
+                            break;
+                        }
+                    }
+                    
+                    if (delimiterCount === 0) {
+                        this.classList.add('border-red-500');
+                        this.classList.remove('border-green-500');
+                    } else {
+                        this.classList.remove('border-red-500');
+                        this.classList.add('border-green-500');
+                    }
+                } else {
+                    this.classList.remove('border-red-500', 'border-green-500');
+                }
+            } else {
+                this.classList.remove('border-red-500', 'border-green-500');
+            }
+        });
+    });
+}
+
+// Admin Tmux Select Colors functionality
+function initAdminTmuxSelectColors() {
+    // This function is for future tmux color selection functionality
+    // Currently, no color selection is needed in tmux settings
+    // If color pickers are added to tmux-edit page in the future, add them here
+    
+    // Check if we're on a page that might have color inputs
+    const colorInputs = document.querySelectorAll('input[type="color"], select[data-color-select]');
+    if (colorInputs.length > 0) {
+        colorInputs.forEach(function(input) {
+            // Add color preview functionality if needed
+            if (input.type === 'color') {
+                input.addEventListener('change', function() {
+                    // Update preview or related elements if needed
+                    const preview = input.closest('.form-group')?.querySelector('.color-preview');
+                    if (preview) {
+                        preview.style.backgroundColor = input.value;
+                    }
+                });
+            }
+        });
+    }
+}
+
+// Initialize all admin-specific features
+function initAdminSpecificFeatures() {
+    initAdminImagePreview();
+    initAdminInvitationsSelectAll();
+    initAdminRegexFormValidation();
+    initAdminTmuxSelectColors();
+    initAdminDeletedUsers();
+
+    // Close delete modal when clicking outside
+    const deleteModal = document.getElementById('deleteModal');
+    if (deleteModal) {
+        deleteModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteModal();
+            }
+        });
+    }
+
+    // Close verify modal when clicking outside
+    const verifyUserModal = document.getElementById('verifyUserModal');
+    if (verifyUserModal) {
+        verifyUserModal.addEventListener('click', function(event) {
+            if (event.target === this) {
+                hideVerifyModal();
+            }
+        });
+    }
+}
+
+// Admin Deleted Users page functionality
+function initAdminDeletedUsers() {
+    // Select all checkbox
+    const selectAllCheckbox = document.getElementById('selectAll');
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.user-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+    }
+
+    // Update selectAll state when individual checkboxes change
+    const userCheckboxes = document.querySelectorAll('.user-checkbox');
+    userCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const allChecked = Array.from(userCheckboxes).every(cb => cb.checked);
+            const someChecked = Array.from(userCheckboxes).some(cb => cb.checked);
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = allChecked;
+                selectAllCheckbox.indeterminate = someChecked && !allChecked;
+            }
+        });
+    });
+
+    // Bulk action form submit handler
+    const bulkActionForm = document.getElementById('bulkActionForm');
+    if (bulkActionForm) {
+        bulkActionForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const action = document.getElementById('bulkAction')?.value;
+            const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
+            const validationError = document.getElementById('validationError');
+            const validationErrorMessage = document.getElementById('validationErrorMessage');
+
+            // Hide any previous validation errors
+            if (validationError) {
+                validationError.classList.add('hidden');
+            }
+
+            // Validate action selected
+            if (!action) {
+                if (validationError && validationErrorMessage) {
+                    validationErrorMessage.textContent = 'Please select an action from the dropdown.';
+                    validationError.classList.remove('hidden');
+                }
+                return false;
+            }
+
+            // Validate at least one user selected
+            if (checkedBoxes.length === 0) {
+                if (validationError && validationErrorMessage) {
+                    validationErrorMessage.textContent = 'Please select at least one user.';
+                    validationError.classList.remove('hidden');
+                }
+                return false;
+            }
+
+            const count = checkedBoxes.length;
+            const actionText = action === 'restore' ? 'restore' : 'permanently delete';
+            const type = action === 'restore' ? 'success' : 'danger';
+            const title = action === 'restore' ? 'Restore Users' : 'Delete Users';
+
+            showConfirm({
+                title: title,
+                message: `Are you sure you want to ${actionText} ${count} user${count > 1 ? 's' : ''}?`,
+                type: type,
+                confirmText: action === 'restore' ? 'Restore' : 'Delete',
+                onConfirm: function() {
+                    bulkActionForm.submit();
+                }
+            });
+        });
+    }
+
+    // Event delegation for restore buttons
+    document.addEventListener('click', function(e) {
+        const restoreBtn = e.target.closest('.restore-user-btn');
+        if (restoreBtn) {
+            e.preventDefault();
+            const userId = restoreBtn.dataset.userId;
+            const username = restoreBtn.dataset.username;
+            if (userId && username) {
+                restoreUser(userId, username);
+            }
+        }
+
+        const deleteBtn = e.target.closest('.delete-user-btn');
+        if (deleteBtn) {
+            e.preventDefault();
+            const userId = deleteBtn.dataset.userId;
+            const username = deleteBtn.dataset.username;
+            if (userId && username) {
+                permanentDeleteUser(userId, username);
+            }
+        }
+    });
+
+    // Bulk action confirmation (kept for backward compatibility)
+    window.confirmBulkAction = function(event) {
+        event?.preventDefault();
+
+        const action = document.getElementById('bulkAction')?.value;
+        const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
+        const validationError = document.getElementById('validationError');
+        const validationErrorMessage = document.getElementById('validationErrorMessage');
+
+        if (!action) {
+            if (validationError && validationErrorMessage) {
+                validationErrorMessage.textContent = 'Please select an action from the dropdown.';
+                validationError.classList.remove('hidden');
+            }
+            return false;
+        }
+
+        if (checkedBoxes.length === 0) {
+            if (validationError && validationErrorMessage) {
+                validationErrorMessage.textContent = 'Please select at least one user.';
+                validationError.classList.remove('hidden');
+            }
+            return false;
+        }
+
+        // Hide validation error if showing
+        if (validationError) {
+            validationError.classList.add('hidden');
+        }
+
+        const count = checkedBoxes.length;
+        const actionText = action === 'restore' ? 'restore' : 'permanently delete';
+        const type = action === 'restore' ? 'success' : 'danger';
+        const title = action === 'restore' ? 'Restore Users' : 'Delete Users';
+
+        showConfirm({
+            title: title,
+            message: `Are you sure you want to ${actionText} ${count} user${count > 1 ? 's' : ''}?`,
+            type: type,
+            confirmText: action === 'restore' ? 'Restore' : 'Delete',
+            onConfirm: function() {
+                document.getElementById('bulkActionForm')?.submit();
+            }
+        });
+
+        return false;
+    };
+}
+
+// Individual user restore/delete actions for deleted users page
+window.restoreUser = function(userId, username) {
+    showConfirm({
+        title: 'Restore User',
+        message: `Are you sure you want to restore user '${username}'?`,
+        type: 'success',
+        confirmText: 'Restore',
+        onConfirm: function() {
+            const form = document.getElementById('individualActionForm');
+            if (form) {
+                const baseUrl = window.location.origin;
+                form.action = `${baseUrl}/admin/deleted-users/restore/${userId}`;
+                form.submit();
+            }
+        }
+    });
+};
+
+window.permanentDeleteUser = function(userId, username) {
+    showConfirm({
+        title: 'Permanently Delete User',
+        message: `Are you sure you want to PERMANENTLY delete user '${username}'?`,
+        details: 'This action cannot be undone!',
+        type: 'danger',
+        confirmText: 'Delete Permanently',
+        onConfirm: function() {
+            const form = document.getElementById('individualActionForm');
+            if (form) {
+                const baseUrl = window.location.origin;
+                // Use the correct route: permanent-delete
+                form.action = `${baseUrl}/admin/deleted-users/permanent-delete/${userId}`;
+                form.submit();
+            }
+        }
+    });
+};
+
+// Recent Activity Auto-Refresh (20 minutes)
 function initRecentActivityRefresh() {
-    // Placeholder for recent activity auto-refresh
-    // Activity refresh is handled on the admin dashboard
+    const activityContainer = document.getElementById('recent-activity-container');
+    if (!activityContainer) {
+        return; // Not on admin dashboard page
+    }
+
+    const refreshUrl = activityContainer.getAttribute('data-refresh-url');
+    if (!refreshUrl) {
+        return;
+    }
+
+    // Function to refresh activity data
+    function refreshRecentActivity() {
+        fetch(refreshUrl, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success && data.activities) {
+                updateActivityDisplay(data.activities);
+                updateLastRefreshTime();
+            }
+        })
+        .catch(error => {
+            console.error('Error refreshing recent activity:', error);
+        });
+    }
+
+    // Function to update the activity display
+    function updateActivityDisplay(activities) {
+        const container = document.getElementById('recent-activity-container');
+        if (!container) return;
+
+        // Clear existing content
+        container.innerHTML = '';
+
+        if (activities.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-4" id="no-activity-message">No recent activity</p>';
+            return;
+        }
+
+        // Add each activity item
+        activities.forEach(activity => {
+            const activityItem = document.createElement('div');
+            activityItem.className = 'flex items-start activity-item rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors';
+
+            activityItem.innerHTML = `
+                <div class="w-8 h-8 ${activity.icon_bg} rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                    <i class="fas fa-${activity.icon} ${activity.icon_color} text-sm"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm text-gray-800 dark:text-gray-200">${escapeHtml(activity.message)}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">${escapeHtml(activity.created_at)}</p>
+                </div>
+            `;
+
+            container.appendChild(activityItem);
+        });
+    }
+
+    // Function to update last refresh time
+    function updateLastRefreshTime() {
+        const lastUpdatedElement = document.getElementById('activity-last-updated');
+        if (lastUpdatedElement) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            lastUpdatedElement.innerHTML = `<i class="fas fa-sync-alt"></i> Last updated: ${timeString}`;
+        }
+    }
+
+    // Helper function to escape HTML to prevent XSS
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Set up auto-refresh every 20 minutes (1200000 milliseconds)
+    const refreshInterval = 20 * 60 * 1000; // 20 minutes in milliseconds
+    setInterval(refreshRecentActivity, refreshInterval);
+
+    // Also refresh on page visibility change (when user comes back to tab)
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            refreshRecentActivity();
+        }
+    });
+}
+
+// Profile page functionality
+let downloadsChart = null;
+let apiRequestsChart = null;
+
+function initProfilePage() {
+    // Animate progress bars
+    animateProgressBars();
+}
+
+function animateProgressBars() {
+    document.querySelectorAll('.progress-bar').forEach(bar => {
+        const width = bar.dataset.width;
+        if (width) {
+            setTimeout(() => {
+                bar.style.width = width + '%';
+            }, 100);
+        }
+    });
 }
 
 // Theme Management (moved from main.blade.php)
@@ -3011,6 +3667,164 @@ function initThemeManagement() {
     // Mobile sidebar toggle
     document.getElementById('mobile-sidebar-toggle')?.addEventListener('click', function() {
         document.getElementById('sidebar')?.classList.toggle('hidden');
+    });
+}
+
+// Copy to Clipboard functionality - consolidated and optimized
+function initCopyToClipboard() {
+    // Unified copy function with visual feedback
+    function copyToClipboard(text, button) {
+        // Try modern Clipboard API first
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function() {
+                showCopyFeedback(button);
+            }).catch(function() {
+                // Fallback for older browsers
+                fallbackCopy(text, button);
+            });
+        } else {
+            fallbackCopy(text, button);
+        }
+    }
+
+    function fallbackCopy(text, button) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        textarea.setSelectionRange(0, 99999);
+        try {
+            document.execCommand('copy');
+            showCopyFeedback(button);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+        }
+        document.body.removeChild(textarea);
+    }
+
+    function showCopyFeedback(button) {
+        if (!button) return;
+        const icon = button.querySelector('i');
+        if (icon) {
+            icon.classList.remove('fa-copy');
+            icon.classList.add('fa-check');
+        }
+        if (button.classList) {
+            button.classList.add('text-green-600');
+        }
+        setTimeout(function() {
+            if (!button) return;
+            if (icon) {
+                icon.classList.remove('fa-check');
+                icon.classList.add('fa-copy');
+            }
+            if (button.classList) {
+                button.classList.remove('text-green-600');
+            }
+        }, 2000);
+    }
+
+    // Event delegation for copy buttons
+    document.addEventListener('click', function(e) {
+        const copyBtn = e.target.closest('.copy-btn');
+        if (copyBtn) {
+            const targetId = copyBtn.getAttribute('data-copy-target');
+            const input = document.getElementById(targetId);
+            if (input) {
+                e.preventDefault();
+                input.select();
+                input.setSelectionRange(0, 99999);
+                copyToClipboard(input.value, copyBtn);
+            }
+        }
+
+        // API Token copy button (specific ID)
+        const apiTokenBtn = e.target.id === 'copyApiToken' ? e.target : e.target.closest('#copyApiToken');
+        if (apiTokenBtn) {
+            const input = document.getElementById('apiTokenInput');
+            if (input) {
+                e.preventDefault();
+                input.select();
+                input.setSelectionRange(0, 99999);
+                copyToClipboard(input.value, apiTokenBtn);
+            }
+        }
+    });
+}
+
+// Verify User Modal functionality
+function initVerifyUserModal() {
+    let verifyForm = null;
+
+    // Show verify modal
+    window.showVerifyModal = function(event, form) {
+        event.preventDefault();
+        verifyForm = form;
+        const modal = document.getElementById('verifyUserModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    };
+
+    // Hide verify modal
+    window.hideVerifyModal = function() {
+        const modal = document.getElementById('verifyUserModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+        verifyForm = null;
+    };
+
+    // Submit verify form
+    window.submitVerifyForm = function() {
+        if (verifyForm) {
+            verifyForm.submit();
+        } else {
+            // Fallback: find form by data attribute
+            const formId = document.querySelector('[data-show-verify-modal]')?.getAttribute('data-form-id');
+            if (formId) {
+                const form = document.querySelector(`form[action*="admin.verify"] input[value="${formId}"]`)?.closest('form');
+                if (form) {
+                    form.submit();
+                }
+            }
+        }
+        hideVerifyModal();
+    };
+
+    // Event delegation for verify modal
+    document.addEventListener('click', function(e) {
+        if (e.target.hasAttribute('data-show-verify-modal') || e.target.closest('[data-show-verify-modal]')) {
+            const element = e.target.hasAttribute('data-show-verify-modal') ? e.target : e.target.closest('[data-show-verify-modal]');
+            const form = element.closest('form');
+            if (form) {
+                showVerifyModal(e, form);
+            }
+        }
+
+        if (e.target.hasAttribute('data-close-verify-modal') || e.target.closest('[data-close-verify-modal]')) {
+            e.preventDefault();
+            hideVerifyModal();
+        }
+
+        if (e.target.hasAttribute('data-submit-verify-form') || e.target.closest('[data-submit-verify-form]')) {
+            e.preventDefault();
+            submitVerifyForm();
+        }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('verifyUserModal');
+            if (modal && !modal.classList.contains('hidden')) {
+                hideVerifyModal();
+            }
+        }
     });
 }
 

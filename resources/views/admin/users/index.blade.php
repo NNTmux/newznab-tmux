@@ -278,7 +278,8 @@
                                                     <button type="button"
                                                             class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 border-0 bg-transparent cursor-pointer p-0"
                                                             title="Verify User"
-                                                            onclick="showVerifyModal(event, this.closest('form'))">
+                                                            data-show-verify-modal
+                                                            data-form-id="{{ $user->id }}">
                                                         <i class="fa fa-check-circle"></i>
                                                     </button>
                                                 </form>
@@ -330,7 +331,7 @@
                     <i class="fa fa-check-circle text-green-600 dark:text-green-400 mr-2"></i>
                     Verify User
                 </h3>
-                <button type="button" onclick="hideVerifyModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <button type="button" data-close-verify-modal class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -342,12 +343,12 @@
         </div>
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
             <button type="button"
-                    onclick="hideVerifyModal()"
+                    data-close-verify-modal
                     class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition font-medium">
                 <i class="fas fa-times mr-2"></i>Cancel
             </button>
             <button type="button"
-                    onclick="submitVerifyForm()"
+                    data-submit-verify-form
                     class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition font-medium">
                 <i class="fa fa-check mr-2"></i>Verify
             </button>
