@@ -3,6 +3,7 @@ config.php
 docker/.zsh_history
 docker/composer-auth.json
 docker/php-overrides.local.ini
+docker-compose.yml
 docker-compose.override.yml
 .env
 install.lock
@@ -58,3 +59,14 @@ node_modules/
 .vscode-test
 
 /.phpunit.cache
+phpunit.xml.back
+
+# IDE helper files (generated locally)
+_ide_helper.php
+
+# Lock files (generated locally, should not be committed)
+*-lock
+composer.lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
