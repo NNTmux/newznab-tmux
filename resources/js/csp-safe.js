@@ -2353,10 +2353,8 @@ function initDetailsPageImageModal() {
             const imageUrl = this.getAttribute('data-image-url');
             const imageTitle = this.getAttribute('data-image-title') || 'Image Preview';
 
-            // Update the full image URL (replace _thumb with the full image)
-            const fullImageUrl = imageUrl.replace('_thumb.jpg', '.jpg');
-
-            imageModalImage.src = fullImageUrl;
+            // Use the image URL as-is (keeping _thumb suffix)
+            imageModalImage.src = imageUrl;
             imageModalTitle.textContent = imageTitle;
             imageModal.classList.remove('hidden');
             imageModal.style.display = 'flex';
