@@ -572,6 +572,11 @@ code.api-token::-webkit-scrollbar-thumb:hover {
     display: block;
 }
 
+/* Header Dropdown Menu Styles - Prevent flash on page load */
+.dropdown-menu {
+    display: none;
+}
+
 .confirmation-modal-footer .btn-confirm:active {
     transform: translateY(0);
 }
