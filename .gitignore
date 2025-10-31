@@ -21,6 +21,7 @@ test.php
 /.idea/
 /vendor/*
 # Ignore all files in covers directories but keep folder structure
+# This includes symlinks - Git treats symlinks as files, so they're automatically ignored
 /storage/covers/**/*
 !/storage/covers/**/
 !/storage/covers/**/.gitignore
