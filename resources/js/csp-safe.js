@@ -46,7 +46,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initAuthPages();
     initProfileEdit();
     initDetailsPageImageModal();
-    initAddToCart();
     initMoviesLayoutToggle();
     initProfilePage(); // Initialize profile page (progress bars and charts)
 });
@@ -2318,20 +2317,127 @@ function showExpiryToast(message, type) {
     }, 3000);
 }
 
-// Page-specific initialization functions
+// My Movies page functionality
 function initMyMovies() {
-    // Placeholder for MyMovies page specific functionality
-    // Currently no additional functionality needed
+    // Confirm before removing movies
+    document.querySelectorAll('.confirm_action').forEach(element => {
+        element.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to remove this movie from your watchlist?')) {
+                e.preventDefault();
+            }
+        });
+    });
+
+    // Image fallback for movie covers
+    document.querySelectorAll('img[data-fallback-src]').forEach(img => {
+        img.addEventListener('error', function() {
+            const fallback = this.getAttribute('data-fallback-src');
+            if (fallback && this.src !== fallback) {
+                this.src = fallback;
+            }
+        });
+    });
+
+    // Initialize Bootstrap tooltips if they exist
+    if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    }
 }
 
+// Auth pages functionality
 function initAuthPages() {
-    // Placeholder for auth pages specific functionality
-    // Currently no additional functionality needed
+    // Auto-hide success messages after 5 seconds on login page
+    if (window.location.pathname.includes('/login')) {
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.bg-green-50, .bg-blue-50');
+            alerts.forEach(function(alert) {
+                alert.style.transition = 'opacity 0.5s ease-out';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
+    }
+
+    // 2FA verification - Auto-submit when 6 digits are entered
+    const otpInput = document.getElementById('one_time_password');
+    if (otpInput) {
+        otpInput.addEventListener('input', function(e) {
+            // Remove non-numeric characters
+            this.value = this.value.replace(/[^0-9]/g, '');
+
+            // Auto-submit when 6 digits are entered
+            if (this.value.length === 6) {
+                // Small delay to show the complete code before submitting
+                setTimeout(() => {
+                    this.form.submit();
+                }, 300);
+            }
+        });
+
+        // Focus on input when page loads
+        otpInput.focus();
+    }
 }
 
+// Profile edit page functionality
 function initProfileEdit() {
-    // Placeholder for profile edit page specific functionality
-    // Currently no additional functionality needed
+    // 2FA Disable Form Toggle
+    const toggleBtn = document.getElementById('toggle-disable-2fa-btn');
+    const cancelBtn = document.getElementById('cancel-disable-2fa-btn');
+    const formContainer = document.getElementById('disable-2fa-form-container');
+
+    if (toggleBtn && formContainer) {
+        toggleBtn.addEventListener('click', function() {
+            formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+        });
+    }
+
+    if (cancelBtn && formContainer) {
+        cancelBtn.addEventListener('click', function() {
+            formContainer.style.display = 'none';
+            // Clear password field
+            const passwordInput = document.getElementById('disable_2fa_password');
+            if (passwordInput) {
+                passwordInput.value = '';
+            }
+        });
+    }
+
+    // Theme preference instant preview
+    const themeRadios = document.querySelectorAll('input[name="theme_preference"]');
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    function applyTheme(themeValue) {
+        const html = document.documentElement;
+
+        if (themeValue === 'system') {
+            // Use system preference
+            if (mediaQuery.matches) {
+                html.classList.add('dark');
+            } else {
+                html.classList.remove('dark');
+            }
+        } else if (themeValue === 'dark') {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
+        }
+    }
+
+    themeRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            applyTheme(this.value);
+        });
+    });
+
+    // Listen to system preference changes if 'system' is selected
+    mediaQuery.addEventListener('change', function(e) {
+        const selectedTheme = document.querySelector('input[name="theme_preference"]:checked')?.value;
+        if (selectedTheme === 'system') {
+            applyTheme('system');
+        }
+    });
 }
 
 function initDetailsPageImageModal() {
@@ -2387,14 +2493,113 @@ function initDetailsPageImageModal() {
     });
 }
 
-function initAddToCart() {
-    // Add to cart functionality is already handled in initCartFunctionality()
-    // This is just a placeholder for backward compatibility
-}
-
+// Movies page layout toggle functionality
 function initMoviesLayoutToggle() {
-    // Placeholder for movies layout toggle functionality
-    // Currently no additional functionality needed
+    const toggleButton = document.getElementById('layoutToggle');
+    const toggleText = document.getElementById('layoutToggleText');
+    const moviesGrid = document.getElementById('moviesGrid');
+
+    if (!toggleButton || !toggleText || !moviesGrid) {
+        return; // Not on movies page
+    }
+
+    // Get current layout from data attribute
+    let currentLayout = parseInt(moviesGrid.dataset.userLayout) || 2;
+
+    // Apply current layout
+    applyLayout(currentLayout);
+
+    // Handle toggle button click
+    toggleButton.addEventListener('click', function() {
+        // Toggle between 1 and 2 column layouts
+        currentLayout = currentLayout === 2 ? 1 : 2;
+
+        // Save preference to server
+        fetch('/movies/update-layout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({ layout: currentLayout })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    applyLayout(currentLayout);
+                }
+            })
+            .catch(error => {
+                console.error('Error saving layout preference:', error);
+                // Apply layout anyway even if save fails
+                applyLayout(currentLayout);
+            });
+    });
+
+    function applyLayout(layout) {
+        const images = moviesGrid.querySelectorAll('img[alt], .bg-gray-200.dark\\:bg-gray-700');
+        const releaseContainers = moviesGrid.querySelectorAll('.release-card-container');
+
+        if (layout === 1) {
+            // 1 Column Layout
+            moviesGrid.classList.remove('lg:grid-cols-2');
+            moviesGrid.classList.add('grid-cols-1');
+            toggleText.textContent = '1 Column';
+            toggleButton.querySelector('i').className = 'fas fa-th-list mr-2';
+
+            // Make images larger
+            images.forEach(img => {
+                img.classList.remove('w-32', 'h-48');
+                img.classList.add('w-48', 'h-72');
+            });
+
+            // Adjust release card containers to horizontal layout
+            releaseContainers.forEach(container => {
+                container.classList.remove('space-y-2');
+                container.classList.add('flex', 'flex-row', 'items-start', 'justify-between', 'gap-3');
+
+                const infoWrapper = container.querySelector('.release-info-wrapper');
+                if (infoWrapper) {
+                    infoWrapper.classList.add('flex-1', 'min-w-0');
+                }
+
+                const actions = container.querySelector('.release-actions');
+                if (actions) {
+                    actions.classList.remove('flex-wrap');
+                    actions.classList.add('flex-shrink-0', 'flex-row', 'items-center');
+                }
+            });
+        } else {
+            // 2 Column Layout
+            moviesGrid.classList.remove('grid-cols-1');
+            moviesGrid.classList.add('lg:grid-cols-2');
+            toggleText.textContent = '2 Columns';
+            toggleButton.querySelector('i').className = 'fas fa-th-large mr-2';
+
+            // Make images smaller
+            images.forEach(img => {
+                img.classList.remove('w-48', 'h-72');
+                img.classList.add('w-32', 'h-48');
+            });
+
+            // Adjust release card containers to vertical layout
+            releaseContainers.forEach(container => {
+                container.classList.add('space-y-2');
+                container.classList.remove('flex', 'flex-row', 'items-start', 'justify-between', 'gap-3');
+
+                const infoWrapper = container.querySelector('.release-info-wrapper');
+                if (infoWrapper) {
+                    infoWrapper.classList.remove('flex-1', 'min-w-0');
+                }
+
+                const actions = container.querySelector('.release-actions');
+                if (actions) {
+                    actions.classList.add('flex-wrap', 'items-center');
+                    actions.classList.remove('flex-shrink-0', 'flex-row');
+                }
+            });
+        }
+    }
 }
 
 function initProfilePage() {
@@ -2426,9 +2631,251 @@ function initAdminGroups() {
     // Group management is handled in event delegation
 }
 
+// TinyMCE Initialization for Admin Content Pages
 function initTinyMCE() {
-    // Placeholder for TinyMCE initialization
-    // TinyMCE is loaded separately when needed
+    // Only initialize if TinyMCE editor element exists (check for #body or .tinymce-editor)
+    if (!document.getElementById('body') && !document.querySelector('.tinymce-editor')) {
+        return;
+    }
+
+    // Function to dynamically load TinyMCE from CDN
+    function loadTinyMCEScript() {
+        return new Promise(function(resolve, reject) {
+            // Check if already loaded
+            if (typeof tinymce !== 'undefined') {
+                resolve();
+                return;
+            }
+
+            // Get API key from textarea data attribute or create meta tag
+            const bodyTextarea = document.getElementById('body');
+            const tinymceEditors = document.querySelectorAll('.tinymce-editor');
+            let apiKey = 'no-api-key';
+
+            // Try to get from existing meta tag first
+            let apiKeyMeta = document.querySelector('meta[name="tinymce-api-key"]');
+
+            if (!apiKeyMeta) {
+                // Create meta tag dynamically if it doesn't exist
+                // Get API key from window config or use default
+                if (window.NNTmuxConfig && window.NNTmuxConfig.tinymceApiKey) {
+                    apiKey = window.NNTmuxConfig.tinymceApiKey;
+                } else if (bodyTextarea && bodyTextarea.dataset.tinymceApiKey) {
+                    apiKey = bodyTextarea.dataset.tinymceApiKey;
+                } else if (tinymceEditors.length > 0) {
+                    // Check if any tinymce-editor has the API key
+                    for (let i = 0; i < tinymceEditors.length; i++) {
+                        if (tinymceEditors[i].dataset.tinymceApiKey) {
+                            apiKey = tinymceEditors[i].dataset.tinymceApiKey;
+                            break;
+                        }
+                    }
+                }
+
+                // Create and append meta tag
+                apiKeyMeta = document.createElement('meta');
+                apiKeyMeta.setAttribute('name', 'tinymce-api-key');
+                apiKeyMeta.setAttribute('content', apiKey);
+                document.head.appendChild(apiKeyMeta);
+            } else {
+                apiKey = apiKeyMeta.content;
+            }
+
+            // Create script element
+            const script = document.createElement('script');
+            script.src = 'https://cdn.tiny.cloud/1/' + apiKey + '/tinymce/8/tinymce.min.js';
+            script.referrerPolicy = 'origin';
+
+            script.onload = function() {
+                console.log('TinyMCE script loaded from CDN');
+                resolve();
+            };
+
+            script.onerror = function() {
+                console.error('Failed to load TinyMCE script from CDN');
+                reject(new Error('Failed to load TinyMCE'));
+            };
+
+            // Append to head
+            document.head.appendChild(script);
+        });
+    }
+
+    // Function to detect if dark mode is active
+    function isDarkMode() {
+        return document.documentElement.classList.contains('dark') ||
+            (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    }
+
+    // Function to get TinyMCE config
+    function getTinyMCEConfig() {
+        const darkMode = isDarkMode();
+        const apiKeyMeta = document.querySelector('meta[name="tinymce-api-key"]');
+        const apiKey = apiKeyMeta ? apiKeyMeta.content : 'no-api-key';
+
+        return {
+            selector: '#body, .tinymce-editor',
+            height: 500,
+            menubar: true,
+            skin: darkMode ? 'oxide-dark' : 'oxide',
+            content_css: darkMode ? 'dark' : 'default',
+            plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons'
+            ],
+            toolbar: 'undo redo | blocks fontfamily fontsize | ' +
+                'bold italic underline strikethrough | forecolor backcolor | ' +
+                'alignleft aligncenter alignright alignjustify | ' +
+                'bullist numlist outdent indent | ' +
+                'link image media table emoticons | ' +
+                'removeformat code fullscreen | help',
+            toolbar_mode: 'sliding',
+            content_style: 'body { font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.6; }',
+            branding: false,
+            promotion: false,
+            resize: true,
+            statusbar: true,
+            elementpath: true,
+            automatic_uploads: false,
+            file_picker_types: 'image',
+            font_family_formats: 'Arial=arial,helvetica,sans-serif; Courier New=courier new,courier,monospace; Georgia=georgia,palatino,serif; Tahoma=tahoma,arial,helvetica,sans-serif; Times New Roman=times new roman,times,serif; Verdana=verdana,geneva,sans-serif',
+            font_size_formats: '8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt',
+            autolink_pattern: /^(https?:\/\/|www\.|(?!www\.)[a-z0-9\-]+\.[a-z]{2,13})/i,
+            link_default_protocol: 'https',
+            link_assume_external_targets: true,
+            link_target_list: [
+                {title: 'None', value: ''},
+                {title: 'New window', value: '_blank'},
+                {title: 'Same window', value: '_self'}
+            ],
+            block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6; Preformatted=pre; Blockquote=blockquote',
+            valid_elements: '*[*]',
+            extended_valid_elements: '*[*]',
+            valid_children: '+body[style]',
+            paste_as_text: false,
+            paste_block_drop: false,
+            paste_data_images: true,
+            image_advtab: true,
+            image_caption: true,
+            image_description: true,
+            image_dimensions: true,
+            image_title: true,
+            table_default_attributes: {
+                border: '1'
+            },
+            table_default_styles: {
+                'border-collapse': 'collapse',
+                'width': '100%'
+            },
+            emoticons_database: 'emojis',
+            setup: function(editor) {
+                // Auto-save on content change
+                editor.on('change', function() {
+                    editor.save();
+                });
+                // Auto-save on blur (when editor loses focus)
+                editor.on('blur', function() {
+                    editor.save();
+                });
+                // Auto-save on keyup (for continuous saving)
+                editor.on('keyup', function() {
+                    editor.save();
+                });
+                // Save before form submission
+                editor.on('submit', function() {
+                    editor.save();
+                });
+            }
+        };
+    }
+
+    // Function to actually initialize TinyMCE once it's loaded
+    function doInitTinyMCE() {
+        // Initialize TinyMCE
+        tinymce.init(getTinyMCEConfig()).then(function(editors) {
+            if (editors && editors.length > 0) {
+                console.log('TinyMCE initialized successfully for ' + editors.length + ' editor(s)');
+
+                // Add form submission handler to sync content for all editors
+                editors.forEach(function(editor) {
+                    const textarea = document.getElementById(editor.id);
+                    if (textarea && textarea.form) {
+                        // Remove any existing listeners to avoid duplicates
+                        const form = textarea.form;
+                        if (!form.hasAttribute('data-tinymce-handler')) {
+                            form.addEventListener('submit', function(e) {
+                                // Sync all TinyMCE editors before form submission
+                                tinymce.triggerSave();
+                                console.log('TinyMCE content synced to textareas before form submission');
+                            });
+                            form.setAttribute('data-tinymce-handler', 'true');
+                        }
+                    }
+                });
+            }
+        }).catch(function(error) {
+            console.error('TinyMCE initialization failed:', error);
+        });
+
+        // Watch for theme changes and reinitialize TinyMCE
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === 'class') {
+                    // Get all active TinyMCE editors
+                    const allEditors = tinymce.editors;
+                    if (allEditors && allEditors.length > 0) {
+                        // Save content from all editors
+                        const editorContents = {};
+                        allEditors.forEach(function(editor) {
+                            editorContents[editor.id] = editor.getContent();
+                        });
+
+                        // Remove all editors
+                        tinymce.remove();
+
+                        // Reinitialize with new theme
+                        tinymce.init(getTinyMCEConfig()).then(function(editors) {
+                            // Restore content to each editor
+                            if (editors && editors.length > 0) {
+                                editors.forEach(function(editor) {
+                                    if (editorContents[editor.id]) {
+                                        editor.setContent(editorContents[editor.id]);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            });
+        });
+
+        // Start observing theme changes on the html element
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+    }
+
+    // Load TinyMCE script dynamically, then initialize
+    loadTinyMCEScript()
+        .then(function() {
+            console.log('TinyMCE available, initializing editor...');
+            doInitTinyMCE();
+        })
+        .catch(function(error) {
+            console.error('Failed to load TinyMCE:', error);
+            // Show error message to user for all TinyMCE textareas
+            const textareas = document.querySelectorAll('#body, .tinymce-editor');
+            textareas.forEach(function(textarea) {
+                if (textarea && textarea.parentElement) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'mt-2 p-3 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-200 rounded';
+                    errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>TinyMCE editor failed to load. Please refresh the page or check your internet connection.';
+                    textarea.parentElement.insertBefore(errorDiv, textarea.nextSibling);
+                }
+            });
+        });
 }
 
 function initAdminSpecificFeatures() {
