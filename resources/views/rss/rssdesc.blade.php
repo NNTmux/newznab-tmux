@@ -283,6 +283,5 @@
 </div>
 
 {{-- Copy to clipboard functionality moved to csp-safe.js --}}
-@endpush
 @endsection
 
