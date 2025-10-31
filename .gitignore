@@ -28,8 +28,8 @@ test.php
 !/resources/tmp/imdb_cache/
 !/public/assets/*
 
-# Ignore Vite build manifest (regenerated locally)
-/public/build/manifest.json
+# Ignore Vite build output (regenerated locally)
+/public/build/
 
 # Logs
 npm-debug.log*
