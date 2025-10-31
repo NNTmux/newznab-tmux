@@ -32,6 +32,9 @@ test.php
 !/public/covers/**/.gitignore
 !/public/covers/**/no-cover.jpg
 !/public/covers/**/no-backdrop.jpg
+
+# Ignore symlinks in public/storage that point to storage/covers
+/public/storage/covers
 /storage/nzb/*
 /resources/tmp/*
 !/resources/tmp/unrar/
