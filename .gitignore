@@ -20,7 +20,17 @@ test.php
 
 /.idea/
 /vendor/*
-/storage/covers/*
+# Ignore all files in covers directories but keep folder structure
+/storage/covers/**/*
+!/storage/covers/**/
+!/storage/covers/**/.gitignore
+!/storage/covers/**/no-cover.jpg
+!/storage/covers/**/no-backdrop.jpg
+/public/covers/**/*
+!/public/covers/**/
+!/public/covers/**/.gitignore
+!/public/covers/**/no-cover.jpg
+!/public/covers/**/no-backdrop.jpg
 /storage/nzb/*
 /resources/tmp/*
 !/resources/tmp/unrar/
