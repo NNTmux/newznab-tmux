@@ -146,7 +146,7 @@
                                         <a href="{{ url('/admin/release-delete/' . $release->guid) }}"
                                            class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                                            title="Delete release"
-                                           onclick="return confirm('Are you sure you want to delete this release?')">
+                                           data-confirm="Are you sure you want to delete this release?">
                                             <i class="fa fa-trash"></i>
                                         </a>
                                     </div>

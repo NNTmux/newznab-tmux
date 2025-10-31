@@ -286,47 +286,7 @@
                                                     </div>
                                                 </div>
 
-<script>
-function switchSeason(seasonNumber) {
-    // Hide all season content
-    document.querySelectorAll('.season-content').forEach(content => {
-        content.classList.add('hidden');
-    });
-
-    // Remove active styling from all tabs
-    document.querySelectorAll('.season-tab').forEach(tab => {
-        tab.classList.remove('border-blue-500', 'text-blue-600');
-        tab.classList.add('border-transparent', 'text-gray-500');
-
-        // Update badge styling
-        const badge = tab.querySelector('span');
-        if (badge) {
-            badge.classList.remove('bg-blue-100', 'text-blue-800');
-            badge.classList.add('bg-gray-100', 'text-gray-600');
-        }
-    });
-
-    // Show selected season content
-    const selectedContent = document.querySelector(`.season-content[data-season="${seasonNumber}"]`);
-    if (selectedContent) {
-        selectedContent.classList.remove('hidden');
-    }
-
-    // Add active styling to selected tab
-    const selectedTab = document.querySelector(`.season-tab[data-season="${seasonNumber}"]`);
-    if (selectedTab) {
-        selectedTab.classList.remove('border-transparent', 'text-gray-500');
-        selectedTab.classList.add('border-blue-500', 'text-blue-600');
-
-        // Update badge styling
-        const badge = selectedTab.querySelector('span');
-        if (badge) {
-            badge.classList.remove('bg-gray-100', 'text-gray-600');
-            badge.classList.add('bg-blue-100', 'text-blue-800');
-        }
-    }
-}
-</script>
+{{-- Season switcher functionality moved to csp-safe.js --}}
                                             @endforeach
                                         </div>
                                     </div>

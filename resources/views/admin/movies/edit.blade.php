@@ -247,7 +247,7 @@
                         </a>
                         <a href="{{ url('admin/movie-edit?id=' . ($movie['imdbid'] ?? $movie->imdbid ?? '') . '&update=1') }}"
                            class="ml-auto px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                           onclick="return confirm('This will fetch and update movie data from TMDB. Continue?')">
+                           data-confirm="This will fetch and update movie data from TMDB. Continue?">
                             <i class="fa fa-refresh mr-2"></i>Update from TMDB
                         </a>
                     </div>
