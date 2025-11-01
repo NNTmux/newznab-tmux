@@ -26,9 +26,29 @@ return [
 
     'status_bar' => [
         'interval' => 5,
-        'bg_color' => 'black',
-        'fg_color' => 'white',
+        'bg_color' => 'colour235',  // Dark grey
+        'fg_color' => 'colour250',  // Light grey
+        'active_bg' => 'colour39',  // Bright blue
+        'active_fg' => 'colour234', // Almost black
         'show_system_info' => true,
+        'use_powerline' => env('TMUX_USE_POWERLINE', true),
+        'left_length' => 40,
+        'right_length' => 150,
+    ],
+
+    'fonts' => [
+        // Popular Nerd Fonts / Powerline fonts
+        // Install with: sudo apt-get install fonts-powerline
+        'use_nerd_fonts' => env('TMUX_USE_NERD_FONTS', true),
+        'symbols' => [
+            'separator_left' => '',   // Powerline arrow
+            'separator_right' => '',  // Powerline arrow
+            'branch' => '',           // Git branch
+            'lock' => '',             // Lock symbol
+            'cpu' => '',              // CPU symbol
+            'ram' => '',              // RAM symbol
+            'clock' => '',            // Clock symbol
+        ],
     ],
 
     'panes' => [
@@ -36,6 +56,24 @@ return [
         'remain_on_exit' => true,
         'aggressive_resize' => true,
         'monitor_activity' => true,
+        'border_style' => 'rounded',  // rounded, heavy, double, simple
+        'active_border_color' => 'colour39',  // Bright blue
+        'inactive_border_color' => 'colour238',  // Dark grey
+    ],
+
+    'colors' => [
+        // Modern color scheme (Dracula-inspired)
+        'background' => 'colour235',
+        'foreground' => 'colour250',
+        'selection' => 'colour238',
+        'comment' => 'colour244',
+        'cyan' => 'colour117',
+        'green' => 'colour114',
+        'orange' => 'colour215',
+        'pink' => 'colour212',
+        'purple' => 'colour141',
+        'red' => 'colour210',
+        'yellow' => 'colour228',
     ],
 
     'keys' => [
