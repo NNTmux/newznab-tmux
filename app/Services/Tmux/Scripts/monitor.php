@@ -49,10 +49,10 @@ try {
     $runVar['commands']['_phpn'] = "nice -n{$tmux_niceness} php";
     $runVar['commands']['_sleep'] = "{$runVar['commands']['_phpn']} ".base_path('app/Services/Tmux/Scripts/showsleep.php');
 
-    // Add scripts paths for TmuxRun - Using multiprocessing scripts WITH ARGUMENTS
-    $runVar['scripts']['binaries'] = "nice -n{$tmux_niceness} php ".base_path('misc/update/multiprocessing/binaries.php').' 0';
-    $runVar['scripts']['backfill'] = "nice -n{$tmux_niceness} php ".base_path('misc/update/multiprocessing/backfill.php').' 0';
-    $runVar['scripts']['releases'] = "nice -n{$tmux_niceness} php ".base_path('misc/update/multiprocessing/releases.php');
+    // Add scripts paths for TmuxRun - Using Artisan multiprocessing commands
+    $runVar['scripts']['binaries'] = "nice -n{$tmux_niceness} ".PHP_BINARY.' artisan multiprocessing:binaries 0';
+    $runVar['scripts']['backfill'] = "nice -n{$tmux_niceness} ".PHP_BINARY.' artisan multiprocessing:backfill 0';
+    $runVar['scripts']['releases'] = "nice -n{$tmux_niceness} ".PHP_BINARY.' artisan multiprocessing:releases';
 
     // Spawn IRC scraper immediately
     try {

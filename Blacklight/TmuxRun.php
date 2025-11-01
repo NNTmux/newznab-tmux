@@ -194,7 +194,7 @@ class TmuxRun extends Tmux
                 $log = $this->writelog($runVar['panes']['one'][1]);
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:1.1 ' \
-						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/multiprocessing/postprocess.php ama $log; \
+						{$runVar['commands']['_phpn']} artisan multiprocessing:postprocess ama 2>&1 | tee -a $log; \
 						date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer_amazon']}' 2>&1 1> /dev/null"
                 );
                 break;
@@ -237,8 +237,8 @@ class TmuxRun extends Tmux
                 $log = $this->writelog($runVar['panes']['two'][1]);
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:2.1 ' \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/postprocess.php tv $log; \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/postprocess.php mov $log; \
+						{$runVar['commands']['_php']} artisan multiprocessing:postprocess tv 2>&1 | tee -a $log; \
+						{$runVar['commands']['_php']} artisan multiprocessing:postprocess mov 2>&1 | tee -a $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/postprocess.php anime true $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/PostProc/check_covers.php true $log; \
 						date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer_non']}' 2>&1 1> /dev/null"
@@ -338,7 +338,7 @@ class TmuxRun extends Tmux
                 $color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:2.0 'echo \"\033[38;5;{$color}m\"; \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/postprocess.php add $log; date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer']}' 2>&1 1> /dev/null"
+						{$runVar['commands']['_php']} artisan multiprocessing:postprocess add 2>&1 | tee -a $log; date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer']}' 2>&1 1> /dev/null"
                 );
                 $runVar['timers']['timer3'] = time();
                 break;
@@ -346,7 +346,7 @@ class TmuxRun extends Tmux
                 $log = $this->writelog($runVar['panes']['two'][0]);
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:2.0 ' \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/postprocess.php nfo $log; date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer']}' 2>&1 1> /dev/null"
+						{$runVar['commands']['_php']} artisan multiprocessing:postprocess nfo 2>&1 | tee -a $log; date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer']}' 2>&1 1> /dev/null"
                 );
                 $runVar['timers']['timer3'] = time();
                 break;
@@ -355,8 +355,8 @@ class TmuxRun extends Tmux
                 $log = $this->writelog($runVar['panes']['two'][0]);
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:2.0 ' \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/postprocess.php add $log; \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/postprocess.php nfo $log; \
+						{$runVar['commands']['_php']} artisan multiprocessing:postprocess add 2>&1 | tee -a $log; \
+						{$runVar['commands']['_php']} artisan multiprocessing:postprocess nfo 2>&1 | tee -a $log; \
 						date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer']}' 2>&1 1> /dev/null"
                 );
                 $runVar['timers']['timer3'] = time();
@@ -482,7 +482,7 @@ class TmuxRun extends Tmux
             if ((int) $runVar['settings']['backfill'] !== 0) {
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:0.1 ' \
-					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/multiprocessing/backfill.php $log; \
+					{$runVar['commands']['_php']} artisan multiprocessing:backfill 2>&1 | tee -a $log; \
 					date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['seq_timer']}' 2>&1 1> /dev/null"
                 );
                 $runVar['timers']['timer5'] = time();

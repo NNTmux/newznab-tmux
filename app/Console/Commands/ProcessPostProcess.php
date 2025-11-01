@@ -1,0 +1,63 @@
+<?php
+
+namespace App\Console\Commands;
+
+use Blacklight\libraries\Forking;
+use Illuminate\Console\Command;
+
+class ProcessPostProcess extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'multiprocessing:postprocess
+                            {type : Type: ama, add, mov, nfo, sha, or tv}
+                            {renamed=false : For mov/tv: only post-process renamed releases (true/false)}';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Post-process releases using multiprocessing';
+
+    /**
+     * Execute the console command.
+     */
+    public function handle(): int
+    {
+        $type = $this->argument('type');
+        $renamed = $this->argument('renamed');
+
+        if (! \in_array($type, ['ama', 'add', 'mov', 'nfo', 'sha', 'tv'], true)) {
+            $this->error('Type must be one of: ama, add, mov, nfo, sha, tv');
+            $this->line('');
+            $this->line('ama => Do amazon processing (no multiprocessing due to API restrictions)');
+            $this->line('add => Do additional (rar|zip) processing');
+            $this->line('mov => Do movie processing');
+            $this->line('nfo => Do NFO processing');
+            $this->line('sha => Do sharing processing (no multiprocessing)');
+            $this->line('tv  => Do TV processing');
+
+            return self::FAILURE;
+        }
+
+        try {
+            $options = [];
+            if ($renamed === 'true' || $renamed === true) {
+                $options = [0 => true];
+            }
+
+            (new Forking)->processWorkType('postProcess_'.$type, $options);
+
+            return self::SUCCESS;
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+
+            return self::FAILURE;
+        }
+    }
+}
+

@@ -194,17 +194,17 @@ class TmuxTaskRunner
             return $this->disablePane($pane, 'Update Binaries', 'postprocess kill limit exceeded');
         }
 
-        $script = match ((int) $enabled) {
-            1 => base_path('misc/update/multiprocessing/safe.php binaries'),
+        $artisanCommand = match ((int) $enabled) {
+            1 => 'multiprocessing:safe binaries',
             default => null,
         };
 
-        if (! $script) {
+        if (! $artisanCommand) {
             return false;
         }
 
         $niceness = Settings::settingValue('niceness') ?? 2;
-        $command = "nice -n{$niceness} php {$script}";
+        $command = "nice -n{$niceness} ".PHP_BINARY." artisan {$artisanCommand}";
         $sleep = (int) ($config['settings']['bins_timer'] ?? 60);
         $command = $this->buildCommand($command, ['log_pane' => 'binaries', 'sleep' => $sleep]);
 
@@ -229,13 +229,13 @@ class TmuxTaskRunner
             return $this->disablePane($pane, 'Backfill', 'kill limit exceeded');
         }
 
-        $script = match ((int) $enabled) {
-            1 => base_path('misc/update/multiprocessing/backfill.php'),
-            4 => base_path('misc/update/multiprocessing/safe.php backfill'),
+        $artisanCommand = match ((int) $enabled) {
+            1 => 'multiprocessing:backfill',
+            4 => 'multiprocessing:safe backfill',
             default => null,
         };
 
-        if (! $script) {
+        if (! $artisanCommand) {
             return false;
         }
 
@@ -249,7 +249,7 @@ class TmuxTaskRunner
             : $baseSleep;
 
         $niceness = Settings::settingValue('niceness') ?? 2;
-        $command = "nice -n{$niceness} php {$script}";
+        $command = "nice -n{$niceness} ".PHP_BINARY." artisan {$artisanCommand}";
         $command = $this->buildCommand($command, ['log_pane' => 'backfill', 'sleep' => $sleep]);
 
         return $this->paneManager->respawnPane($pane, $command);
@@ -267,9 +267,8 @@ class TmuxTaskRunner
             return $this->disablePane($pane, 'Update Releases', 'disabled in settings');
         }
 
-        $script = base_path('misc/update/multiprocessing/releases.php');
         $niceness = Settings::settingValue('niceness') ?? 2;
-        $command = "nice -n{$niceness} php {$script}";
+        $command = "nice -n{$niceness} ".PHP_BINARY." artisan multiprocessing:releases";
         $sleep = (int) ($config['settings']['rel_timer'] ?? 60);
         $command = $this->buildCommand($command, ['log_pane' => 'releases', 'sleep' => $sleep]);
 
