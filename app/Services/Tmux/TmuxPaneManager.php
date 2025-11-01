@@ -69,6 +69,18 @@ class TmuxPaneManager
     }
 
     /**
+     * Select a specific window
+     */
+    public function selectWindow(int $window): bool
+    {
+        $result = Process::timeout(5)->run(
+            "tmux select-window -t {$this->sessionName}:{$window}"
+        );
+
+        return $result->successful();
+    }
+
+    /**
      * Respawn a pane with a new command
      */
     public function respawnPane(string $target, string $command, bool $kill = false): bool

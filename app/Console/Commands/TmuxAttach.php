@@ -44,6 +44,11 @@ class TmuxAttach extends Command
         $this->info("📎 Attaching to session '{$sessionName}'...");
         $this->info('💡 Press Ctrl+A then D to detach');
 
+        // Select monitor pane before attaching so user lands there
+        $paneManager = new \App\Services\Tmux\TmuxPaneManager($sessionName);
+        $paneManager->selectWindow(0);
+        $paneManager->selectPane('0.0');
+
         // Execute tmux attach
         passthru("tmux attach -t {$sessionName}");
 

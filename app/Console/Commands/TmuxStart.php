@@ -102,6 +102,11 @@ class TmuxStart extends Command
             $this->info('🚀 Starting monitor...');
             $this->startMonitor($sessionName);
 
+            // Select monitor pane (0.0) so attach lands there
+            $paneManager = new \App\Services\Tmux\TmuxPaneManager($sessionName);
+            $paneManager->selectWindow(0);
+            $paneManager->selectPane('0.0');
+
             $this->info("✅ Tmux session '{$sessionName}' started successfully");
 
             // Attach if requested

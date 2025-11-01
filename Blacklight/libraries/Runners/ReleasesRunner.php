@@ -149,7 +149,8 @@ class ReleasesRunner extends BaseRunner
         if ((bool) config('nntmux.stream_fork_output', false) === true) {
             $commands = [];
             foreach ($queues as $queue) {
-                $commands[] = PHP_BINARY.' misc/update/tmux/bin/groupfixrelnames.php "'.$queue.'" true';
+                // Updated to use new script location (modernized)
+                $commands[] = PHP_BINARY.' app/Services/Tmux/Scripts/groupfixrelnames.php "'.$queue.'" true';
             }
             $this->runStreamingCommands($commands, $maxThreads, 'fixRelNames_'.$mode);
 
@@ -163,7 +164,8 @@ class ReleasesRunner extends BaseRunner
         $taskNum = $count;
         foreach ($queues as $queue) {
             $pool->add(function () use ($queue) {
-                return $this->executeCommand(PHP_BINARY.' misc/update/tmux/bin/groupfixrelnames.php "'.$queue.'" true');
+                // Updated to use new script location (modernized)
+                return $this->executeCommand(PHP_BINARY.' app/Services/Tmux/Scripts/groupfixrelnames.php "'.$queue.'" true');
             }, self::ASYNC_BUFFER_SIZE)->then(function ($output) use (&$taskNum) {
                 echo $output;
                 $this->colorCli->primary('Task #'.$taskNum.' Finished fixing releases names');

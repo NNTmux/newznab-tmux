@@ -12,14 +12,14 @@ class PredbCheck extends Command
      *
      * @var string
      */
-    protected $signature = 'predb:check {limit?}';
+    protected $signature = 'predb:check {limit? : Maximum number of releases to check}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Check PreDB releases for matching';
+    protected $description = 'Check releases against PreDB for matches';
 
     /**
      * Execute the console command.
@@ -28,8 +28,25 @@ class PredbCheck extends Command
     {
         $limit = $this->argument('limit');
 
-        Predb::checkPre(is_numeric($limit) ? (int) $limit : false);
+        if ($limit !== null && ! is_numeric($limit)) {
+            $this->error('Limit must be a number');
 
-        return self::SUCCESS;
+            return Command::FAILURE;
+        }
+
+        $this->info('Checking releases against PreDB...');
+
+        try {
+            Predb::checkPre($limit ? (int) $limit : false);
+
+            $this->info('✅ PreDB check complete');
+
+            return Command::SUCCESS;
+
+        } catch (\Exception $e) {
+            $this->error('PreDB check failed: '.$e->getMessage());
+
+            return Command::FAILURE;
+        }
     }
 }

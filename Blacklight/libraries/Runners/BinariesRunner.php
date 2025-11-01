@@ -61,8 +61,8 @@ class BinariesRunner extends BaseRunner
 
     public function safeBinaries(): void
     {
-        // update group stats
-        $this->executeCommand(PHP_BINARY.' misc/update/tmux/bin/update_groups.php');
+        // update group stats - Updated to use new script location (modernized)
+        $this->executeCommand(PHP_BINARY.' app/Services/Tmux/Scripts/update_groups.php');
 
         $maxHeaders = (int) Settings::settingValue('max_headers_iteration') ?: 1000000;
         $maxMessages = (int) Settings::settingValue('maxmssgs');

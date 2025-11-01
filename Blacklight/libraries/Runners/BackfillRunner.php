@@ -62,8 +62,8 @@ class BackfillRunner extends BaseRunner
 
     public function safeBackfill(): void
     {
-        // make sure short_groups is up-to-date
-        $this->executeCommand(PHP_BINARY.' misc/update/tmux/bin/update_groups.php');
+        // make sure short_groups is up-to-date - Updated to use new script location (modernized)
+        $this->executeCommand(PHP_BINARY.' app/Services/Tmux/Scripts/update_groups.php');
 
         $backfill_qty = (int) Settings::settingValue('backfill_qty');
         $backfill_order = (int) Settings::settingValue('backfill_order');
