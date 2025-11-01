@@ -18,24 +18,18 @@ class TmuxUIRestart extends Command
      *
      * @var string
      */
-    protected $description = 'Restart processing of tmux scripts completely';
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    protected $description = 'Restart processing of tmux scripts (deprecated - use tmux:stop && tmux:start)';
 
     /**
      * Execute the console command.
      */
-    public function handle(): void
+    public function handle(): int
     {
-        $this->call('tmux-ui:stop', ['--kill' => true]);
-        $this->call('tmux-ui:start');
+        $this->warn('⚠️  This command is deprecated. Use "php artisan tmux:stop && php artisan tmux:start" instead.');
+
+        $this->call('tmux:stop', ['--force' => true]);
+        sleep(2);
+
+        return $this->call('tmux:start');
     }
 }

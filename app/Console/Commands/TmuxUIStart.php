@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Settings;
 use App\Support\UpdatePerformanceHelper;
 use Blacklight\Tmux;
 use Illuminate\Console\Command;
@@ -34,36 +33,13 @@ class TmuxUIStart extends Command
     {
         try {
             $this->info('🚀 Starting Tmux UI...');
+            $this->warn('⚠️  This command is deprecated. Use "php artisan tmux:start" instead.');
 
-            $tmux = new Tmux;
-            $tmuxSession = Settings::settingValue('tmux_session') ?? 0;
-            $timeout = (int) $this->option('timeout');
-
-            // Check system resources before starting
-            $this->checkSystemResources();
-
-            // Check if session already exists
-            if (! $this->option('force') && $this->isSessionRunning($tmuxSession)) {
-                $this->error("❌ Tmux session '$tmuxSession' is already running");
-
-                if (! $this->confirm('Would you like to restart the session?')) {
-                    return Command::FAILURE;
-                }
-
-                $this->call('tmux-ui:stop', ['--kill' => true]);
-                sleep(2); // Brief pause to ensure clean shutdown
-            }
-
-            // Set running state
-            $tmux->startRunning();
-            $this->line('  ✓ Tmux running state activated');
-
-            // Start tmux session
-            $this->startTmuxSession($tmuxSession, $timeout);
-
-            $this->info('✅ Tmux UI started successfully');
-
-            return Command::SUCCESS;
+            // Delegate to new command
+            return $this->call('tmux:start', [
+                '--force' => $this->option('force'),
+                '--attach' => $this->option('monitor'),
+            ]);
 
         } catch (\Exception $e) {
             $this->error('❌ Failed to start Tmux UI: '.$e->getMessage());

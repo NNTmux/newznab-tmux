@@ -2,10 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Settings;
-use Blacklight\Tmux;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Process;
 
 class TmuxUIStop extends Command
 {
@@ -21,24 +18,17 @@ class TmuxUIStop extends Command
      *
      * @var string
      */
-    protected $description = 'Stop the processing of tmux scripts.';
+    protected $description = 'Stop the processing of tmux scripts (deprecated - use tmux:stop)';
 
     /**
-     * @throws \Exception
+     * Execute the console command
      */
-    public function handle(): void
+    public function handle(): int
     {
-        $tmux = new Tmux;
-        $tmux->stopIfRunning();
-        if ($this->option('kill') === true) {
-            $sessionName = Settings::settingValue('tmux_session');
-            $tmuxSession = Process::run('tmux kill-session -t '.$sessionName);
-            $this->info('Killing active tmux session: '.$sessionName);
-            if ($tmuxSession->successful()) {
-                $this->info('Tmux session killed successfully');
-            } else {
-                $this->info('No valid tmux sessions found');
-            }
-        }
+        $this->warn('⚠️  This command is deprecated. Use "php artisan tmux:stop" instead.');
+
+        return $this->call('tmux:stop', [
+            '--force' => $this->option('kill'),
+        ]);
     }
 }
