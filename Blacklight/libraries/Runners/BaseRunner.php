@@ -28,9 +28,119 @@ abstract class BaseRunner
 
     protected function buildDnrCommand(string $args): string
     {
-        $dnr_path = PHP_BINARY.' misc/update/multiprocessing/.do_not_run/switch.php "php  ';
+        // Convert legacy command arguments to new artisan commands
+        return $this->convertSwitchToArtisan($args);
+    }
 
-        return $dnr_path.$args.'"';
+    /**
+     * Convert legacy command format to new artisan commands.
+     */
+    private function convertSwitchToArtisan(string $args): string
+    {
+        $parts = array_filter(explode('  ', trim($args)));
+
+        if (empty($parts)) {
+            return '';
+        }
+
+        $command = $parts[0] ?? '';
+
+        switch ($command) {
+            case 'backfill':
+                // backfill  {group}  {type}
+                $group = $parts[1] ?? '';
+                $type = $parts[2] ?? '1';
+
+                return PHP_BINARY.' artisan backfill:group "'.$group.'" '.$type;
+
+            case 'backfill_all_quantity':
+                // backfill_all_quantity  {group}  {quantity}
+                $group = $parts[1] ?? '';
+                $quantity = $parts[2] ?? '';
+
+                return PHP_BINARY.' artisan backfill:group "'.$group.'" 1 '.$quantity;
+
+            case 'backfill_all_quick':
+                // backfill_all_quick  {group}
+                $group = $parts[1] ?? '';
+
+                return PHP_BINARY.' artisan backfill:group "'.$group.'" 1 10000';
+
+            case 'get_range':
+                // get_range  {mode}  {group}  {first}  {last}  {threads}
+                $mode = $parts[1] ?? '';
+                $group = $parts[2] ?? '';
+                $first = $parts[3] ?? '0';
+                $last = $parts[4] ?? '0';
+
+                return PHP_BINARY.' artisan articles:get-range "'.$mode.'" "'.$group.'" '.$first.' '.$last;
+
+            case 'part_repair':
+                // part_repair  {group}
+                $group = $parts[1] ?? '';
+
+                return PHP_BINARY.' artisan binaries:part-repair "'.$group.'"';
+
+            case 'releases':
+                // releases  {groupId}
+                $groupId = $parts[1] ?? '';
+
+                return PHP_BINARY.' artisan releases:process '.($groupId !== '' ? $groupId : '');
+
+            case 'update_group_headers':
+                // update_group_headers  {group}
+                $group = $parts[1] ?? '';
+
+                return PHP_BINARY.' artisan group:update-headers "'.$group.'"';
+
+            case 'update_per_group':
+                // update_per_group  {groupId}
+                $groupId = $parts[1] ?? '';
+
+                return PHP_BINARY.' artisan group:update-all '.$groupId;
+
+            case 'pp_additional':
+                // pp_additional  {guid}
+                $guid = $parts[1] ?? '';
+
+                return PHP_BINARY.' artisan postprocess:guid additional '.$guid;
+
+            case 'pp_nfo':
+                // pp_nfo  {guid}
+                $guid = $parts[1] ?? '';
+
+                return PHP_BINARY.' artisan postprocess:guid nfo '.$guid;
+
+            case 'pp_movie':
+                // pp_movie  {guid}  {renamed}
+                $guid = $parts[1] ?? '';
+                $renamed = $parts[2] ?? '';
+
+                return PHP_BINARY.' artisan postprocess:guid movie '.$guid.($renamed !== '' ? ' '.$renamed : '');
+
+            case 'pp_tv':
+                // pp_tv  {guid}  {renamed}
+                $guid = $parts[1] ?? '';
+                $renamed = $parts[2] ?? '';
+
+                return PHP_BINARY.' artisan postprocess:guid tv '.$guid.($renamed !== '' ? ' '.$renamed : '');
+
+            default:
+                // Log unrecognized command and return empty string
+                if (config('app.debug')) {
+                    \Log::warning('Unrecognized multiprocessing command: '.$args);
+                }
+
+                return '';
+        }
+    }
+
+    /**
+     * Public wrapper for buildDnrCommand (used by Forking class).
+     */
+    public function buildDnrCommandPublic(string $args): string
+    {
+        return $this->buildDnrCommand($args);
     }
 
     protected function executeCommand(string $command): string

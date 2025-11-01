@@ -32,11 +32,6 @@ class Forking
     protected int $outputType;
 
     /**
-     * Path to do not run folder.
-     */
-    private string $dnr_path;
-
-    /**
      * Work to work on.
      */
     private array $work = [];
@@ -100,7 +95,7 @@ class Forking
     {
         $this->colorCli = new ColorCLI;
 
-        $this->dnr_path = PHP_BINARY.' misc/update/multiprocessing/.do_not_run/switch.php "php  ';
+        // Using artisan commands for all multiprocessing operations
 
         $this->maxSize = (int) Settings::settingValue('maxsizetoprocessnfo');
         $this->minSize = (int) Settings::settingValue('minsizetoprocessnfo');
@@ -164,11 +159,12 @@ class Forking
     }
 
     /**
-     * Helper to build a DNR switch command.
+     * Helper to build artisan command from legacy command format.
      */
     private function buildDnrCommand(string $args): string
     {
-        return $this->dnr_path.$args.'"';
+        // Use the same conversion logic as BaseRunner
+        return $this->backfillRunner->buildDnrCommandPublic($args);
     }
 
     /**
