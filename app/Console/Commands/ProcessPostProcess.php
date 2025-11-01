@@ -60,4 +60,3 @@ class ProcessPostProcess extends Command
         }
     }
 }
-

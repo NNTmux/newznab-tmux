@@ -49,4 +49,3 @@ class ProcessFixRelNames extends Command
         }
     }
 }
-

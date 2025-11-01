@@ -37,4 +37,3 @@ class ProcessUpdatePerGroup extends Command
         }
     }
 }
-

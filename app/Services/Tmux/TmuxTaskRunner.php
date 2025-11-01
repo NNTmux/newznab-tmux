@@ -268,7 +268,7 @@ class TmuxTaskRunner
         }
 
         $niceness = Settings::settingValue('niceness') ?? 2;
-        $command = "nice -n{$niceness} ".PHP_BINARY." artisan multiprocessing:releases";
+        $command = "nice -n{$niceness} ".PHP_BINARY.' artisan multiprocessing:releases';
         $sleep = (int) ($config['settings']['rel_timer'] ?? 60);
         $command = $this->buildCommand($command, ['log_pane' => 'releases', 'sleep' => $sleep]);
 

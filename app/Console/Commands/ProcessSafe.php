@@ -49,4 +49,3 @@ class ProcessSafe extends Command
         }
     }
 }
-
