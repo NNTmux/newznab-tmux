@@ -34,7 +34,6 @@ class TmuxMonitorService
     {
         $this->runVar['paths']['misc'] = base_path().'/misc/';
         $this->runVar['paths']['cli'] = base_path().'/cli/';
-        $this->runVar['paths']['scraper'] = base_path().'/misc/IRCScraper/scrape.php';
 
         $this->runVar['constants'] = $this->tmux->getConstantSettings();
         $this->runVar['settings'] = $this->tmux->getMonitorSettings();

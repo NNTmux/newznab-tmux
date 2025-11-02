@@ -164,14 +164,9 @@ class TmuxTaskRunner
             return $this->disablePane($pane, 'IRC Scraper', 'disabled in settings');
         }
 
-        $scraperScript = base_path('misc/IRCScraper/scrape.php');
-
-        if (! file_exists($scraperScript)) {
-            return $this->disablePane($pane, 'IRC Scraper', 'script not found');
-        }
-
         $niceness = Settings::settingValue('niceness') ?? 2;
-        $command = "nice -n{$niceness} php {$scraperScript} true";
+        $artisan = base_path('artisan');
+        $command = "nice -n{$niceness} php {$artisan} irc:scrape --quiet";
         $command = $this->buildCommand($command, ['log_pane' => 'scraper']);
 
         return $this->paneManager->respawnPane($pane, $command);
