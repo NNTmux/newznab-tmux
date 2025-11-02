@@ -166,7 +166,7 @@ class TmuxTaskRunner
 
         $niceness = Settings::settingValue('niceness') ?? 2;
         $artisan = base_path('artisan');
-        $command = "nice -n{$niceness} php {$artisan} irc:scrape --quiet";
+        $command = "nice -n{$niceness} php {$artisan} irc:scrape";
         $command = $this->buildCommand($command, ['log_pane' => 'scraper']);
 
         return $this->paneManager->respawnPane($pane, $command);
