@@ -171,7 +171,7 @@ class TmuxTaskRunner
         }
 
         $niceness = Settings::settingValue('niceness') ?? 2;
-        $command = "nice -n{$niceness} php {$scraperScript}";
+        $command = "nice -n{$niceness} php {$scraperScript} true";
         $command = $this->buildCommand($command, ['log_pane' => 'scraper']);
 
         return $this->paneManager->respawnPane($pane, $command);
