@@ -322,6 +322,124 @@
                     </div>
                 </div>
 
+                <!-- Console & Monitoring Tools -->
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Console & Monitoring Tools</h2>
+                    <div class="bg-blue-50 dark:bg-gray-700 border border-blue-200 dark:border-gray-600 rounded-lg p-4 mb-4">
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            <i class="fa fa-info-circle mr-2"></i>
+                            Enable monitoring tools to display system metrics in separate tmux windows. Each tool requires the corresponding package to be installed on your system.
+                        </p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Shell Console -->
+                        <x-form.group label="Shell Console" for="console" help="Enable an interactive bash shell window for manual commands.">
+                            <x-select id="console" name="console" class="w-full">
+                                @foreach($yesno_ids as $index => $val)
+                                    <option value="{{ $val }}" {{ ($site['console'] ?? '') == $val ? 'selected' : '' }}>
+                                        {{ $yesno_names[$index] }}
+                                    </option>
+                                @endforeach
+                            </x-select>
+                        </x-form.group>
+
+                        <!-- System Monitoring Tools -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <x-form.group label="htop" for="htop" help="Interactive process viewer (apt-get install htop).">
+                                <x-select id="htop" name="htop" class="w-full">
+                                    @foreach($yesno_ids as $index => $val)
+                                        <option value="{{ $val }}" {{ ($site['htop'] ?? '') == $val ? 'selected' : '' }}>
+                                            {{ $yesno_names[$index] }}
+                                        </option>
+                                    @endforeach
+                                </x-select>
+                            </x-form.group>
+
+                            <x-form.group label="mytop" for="mytop" help="MySQL/MariaDB performance monitor (apt-get install mytop).">
+                                <x-select id="mytop" name="mytop" class="w-full">
+                                    @foreach($yesno_ids as $index => $val)
+                                        <option value="{{ $val }}" {{ ($site['mytop'] ?? '') == $val ? 'selected' : '' }}>
+                                            {{ $yesno_names[$index] }}
+                                        </option>
+                                    @endforeach
+                                </x-select>
+                            </x-form.group>
+
+                            <x-form.group label="nmon" for="nmon" help="System performance monitor (apt-get install nmon).">
+                                <x-select id="nmon" name="nmon" class="w-full">
+                                    @foreach($yesno_ids as $index => $val)
+                                        <option value="{{ $val }}" {{ ($site['nmon'] ?? '') == $val ? 'selected' : '' }}>
+                                            {{ $yesno_names[$index] }}
+                                        </option>
+                                    @endforeach
+                                </x-select>
+                            </x-form.group>
+                        </div>
+
+                        <!-- Network Monitoring Tools -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <x-form.group label="vnstat" for="vnstat" help="Network traffic monitor (apt-get install vnstat).">
+                                <x-select id="vnstat" name="vnstat" class="w-full">
+                                    @foreach($yesno_ids as $index => $val)
+                                        <option value="{{ $val }}" {{ ($site['vnstat'] ?? '') == $val ? 'selected' : '' }}>
+                                            {{ $yesno_names[$index] }}
+                                        </option>
+                                    @endforeach
+                                </x-select>
+                            </x-form.group>
+
+                            <x-form.group label="vnstat Args" for="vnstat_args" help="Arguments for vnstat command (e.g., -i eth0).">
+                                <x-input id="vnstat_args" name="vnstat_args" type="text" value="{{ $site['vnstat_args'] ?? '' }}" class="w-full" />
+                            </x-form.group>
+
+                            <x-form.group label="tcptrack" for="tcptrack" help="TCP connection monitor (apt-get install tcptrack).">
+                                <x-select id="tcptrack" name="tcptrack" class="w-full">
+                                    @foreach($yesno_ids as $index => $val)
+                                        <option value="{{ $val }}" {{ ($site['tcptrack'] ?? '') == $val ? 'selected' : '' }}>
+                                            {{ $yesno_names[$index] }}
+                                        </option>
+                                    @endforeach
+                                </x-select>
+                            </x-form.group>
+                        </div>
+
+                        <x-form.group label="tcptrack Args" for="tcptrack_args" help="Arguments for tcptrack (e.g., -i eth0).">
+                            <x-input id="tcptrack_args" name="tcptrack_args" type="text" value="{{ $site['tcptrack_args'] ?? '' }}" class="w-full" />
+                        </x-form.group>
+
+                        <!-- Additional Tools -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <x-form.group label="bwm-ng" for="bwmng" help="Bandwidth monitor (apt-get install bwm-ng).">
+                                <x-select id="bwmng" name="bwmng" class="w-full">
+                                    @foreach($yesno_ids as $index => $val)
+                                        <option value="{{ $val }}" {{ ($site['bwmng'] ?? '') == $val ? 'selected' : '' }}>
+                                            {{ $yesno_names[$index] }}
+                                        </option>
+                                    @endforeach
+                                </x-select>
+                            </x-form.group>
+
+                            <x-form.group label="Redis Stats" for="redis" help="Redis statistics monitor (requires redis-stat gem).">
+                                <x-select id="redis" name="redis" class="w-full">
+                                    @foreach($yesno_ids as $index => $val)
+                                        <option value="{{ $val }}" {{ ($site['redis'] ?? '') == $val ? 'selected' : '' }}>
+                                            {{ $yesno_names[$index] }}
+                                        </option>
+                                    @endforeach
+                                </x-select>
+                            </x-form.group>
+                        </div>
+
+                        <div class="bg-yellow-50 dark:bg-gray-800 border border-yellow-300 dark:border-gray-600 rounded p-3">
+                            <p class="text-sm text-yellow-700 dark:text-gray-400">
+                                <i class="fa fa-exclamation-triangle mr-2"></i>
+                                Note: Enabling a monitoring tool without having it installed will cause the tmux window to fail. Install required packages before enabling them.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Submit Button -->
                 <div class="flex justify-end">
                     <x-button type="submit" class="px-6 py-2">

@@ -151,6 +151,16 @@ class TmuxLayoutBuilder
 
     /**
      * Create optional monitoring windows based on settings
+     *
+     * Creates separate tmux windows for enabled monitoring tools.
+     * Each tool gets its own dedicated window starting from index 4.
+     *
+     * Window layout:
+     * - Window 0: Monitor + Processing panes (binaries/backfill/releases)
+     * - Window 1: Utilities (fix names, remove crap)
+     * - Window 2: Postprocessing (additional, non-amazon, amazon)
+     * - Window 3: IRC Scraper
+     * - Window 4+: Monitoring tools (htop, nmon, vnstat, tcptrack, bwm-ng, mytop, redis, console)
      */
     protected function createOptionalWindows(): void
     {
