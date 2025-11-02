@@ -59,7 +59,7 @@ class UpdatePostProcess extends Command
 
         try {
             $nntp = $this->validTypes[$type] ? $this->getNntp() : null;
-            $postProcess = new PostProcess();
+            $postProcess = new PostProcess;
 
             match ($type) {
                 'all' => $postProcess->processAll($nntp),
