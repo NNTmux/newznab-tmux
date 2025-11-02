@@ -30,7 +30,7 @@ class BinariesRunner extends BaseRunner
         if ((bool) config('nntmux.stream_fork_output', false) === true) {
             $commands = [];
             foreach ($work as $group) {
-                $commands[] = PHP_BINARY.' misc/update/update_binaries.php '.$group->name.' '.$group->max;
+                $commands[] = PHP_BINARY.' artisan update:binaries '.$group->name.' '.$group->max;
             }
             $this->runStreamingCommands($commands, $maxProcesses, 'binaries');
 
@@ -44,7 +44,7 @@ class BinariesRunner extends BaseRunner
         $taskNum = $count;
         foreach ($work as $group) {
             $pool->add(function () use ($group) {
-                return $this->executeCommand(PHP_BINARY.' misc/update/update_binaries.php '.$group->name.' '.$group->max);
+                return $this->executeCommand(PHP_BINARY.' artisan update:binaries '.$group->name.' '.$group->max);
             }, self::ASYNC_BUFFER_SIZE)->then(function ($output) use ($group, &$taskNum) {
                 echo $output;
                 $this->colorCli->primary('Task #'.$taskNum.' Updated group '.$group->name);

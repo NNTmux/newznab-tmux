@@ -31,7 +31,7 @@ class BackfillRunner extends BaseRunner
         if ((bool) config('nntmux.stream_fork_output', false) === true) {
             $commands = [];
             foreach ($work as $group) {
-                $commands[] = PHP_BINARY.' misc/update/backfill.php '.$group->name.(isset($group->max) ? (' '.$group->max) : '');
+                $commands[] = PHP_BINARY.' artisan update:backfill '.$group->name.(isset($group->max) ? (' '.$group->max) : '');
             }
             $this->runStreamingCommands($commands, $maxProcesses, 'backfill');
 
@@ -45,7 +45,7 @@ class BackfillRunner extends BaseRunner
         $taskNum = $count;
         foreach ($work as $group) {
             $pool->add(function () use ($group) {
-                return $this->executeCommand(PHP_BINARY.' misc/update/backfill.php '.$group->name.(isset($group->max) ? (' '.$group->max) : ''));
+                return $this->executeCommand(PHP_BINARY.' artisan update:backfill '.$group->name.(isset($group->max) ? (' '.$group->max) : ''));
             }, self::ASYNC_BUFFER_SIZE)->then(function ($output) use ($group, &$taskNum) {
                 echo $output;
                 $this->colorCli->primary('Task #'.$taskNum.' Backfilled group '.$group->name);

@@ -22,7 +22,7 @@ class PostProcessRunner extends BaseRunner
             foreach ($releases as $release) {
                 // id may already be a single GUID bucket char; if not, take first char defensively
                 $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
-                $commands[] = PHP_BINARY.' misc/update/postprocess.php '.$type.$char;
+                $commands[] = PHP_BINARY.' artisan update:postprocess '.$type.$char;
             }
             $this->runStreamingCommands($commands, $maxProcesses, $desc);
 
@@ -36,7 +36,7 @@ class PostProcessRunner extends BaseRunner
         foreach ($releases as $release) {
             $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
             $pool->add(function () use ($char, $type) {
-                return $this->executeCommand(PHP_BINARY.' misc/update/postprocess.php '.$type.$char);
+                return $this->executeCommand(PHP_BINARY.' artisan update:postprocess '.$type.$char);
             }, self::ASYNC_BUFFER_SIZE)->then(function ($output) use (&$count, $desc) {
                 echo $output;
                 $this->colorCli->primary('Finished task #'.$count.' for '.$desc);

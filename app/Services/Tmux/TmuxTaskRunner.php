@@ -426,14 +426,8 @@ class TmuxTaskRunner
             return $this->disablePane($pane, 'Post-process Additional', 'disabled in settings');
         }
 
-        $script = base_path('misc/update/postprocess.php');
-
-        if (! file_exists($script)) {
-            return $this->disablePane($pane, 'Post-process Additional', 'script not found');
-        }
-
         $niceness = Settings::settingValue('niceness') ?? 2;
-        $command = "nice -n{$niceness} php {$script} additional true";
+        $command = "nice -n{$niceness} ".PHP_BINARY.' artisan update:postprocess additional true';
         $sleep = (int) ($runVar['settings']['post_timer'] ?? 300);
         $command = $this->buildCommand($command, ['log_pane' => 'post_additional', 'sleep' => $sleep]);
 
@@ -460,23 +454,18 @@ class TmuxTaskRunner
             return $this->disablePane($pane, 'Post-process Non-Amazon', 'no movies/tv/anime to process');
         }
 
-        $script = base_path('misc/update/postprocess.php');
-
-        if (! file_exists($script)) {
-            return $this->disablePane($pane, 'Post-process Non-Amazon', 'script not found');
-        }
-
         $niceness = Settings::settingValue('niceness') ?? 2;
         $log = $this->getLogFile('post_non');
 
+        $artisan = PHP_BINARY.' artisan';
         $commands = [
-            "php {$script} tv true 2>&1 | tee -a {$log}",
-            "php {$script} movie true 2>&1 | tee -a {$log}",
-            "php {$script} anime true 2>&1 | tee -a {$log}",
+            "{$artisan} update:postprocess tv true 2>&1 | tee -a {$log}",
+            "{$artisan} update:postprocess movies true 2>&1 | tee -a {$log}",
+            "{$artisan} update:postprocess anime true 2>&1 | tee -a {$log}",
         ];
 
         $sleep = (int) ($runVar['settings']['post_timer_non'] ?? 300);
-        $allCommands = "nice -n{$niceness} ".implode('; nice -n{$niceness} php ', $commands);
+        $allCommands = "nice -n{$niceness} ".implode('; nice -n{$niceness} ', $commands);
         $fullCommand = "{$allCommands}; date +'%Y-%m-%d %T'; sleep {$sleep}";
 
         return $this->paneManager->respawnPane($pane, $fullCommand);
@@ -504,14 +493,8 @@ class TmuxTaskRunner
             return $this->disablePane($pane, 'Post-process Amazon', 'no music/books/games to process');
         }
 
-        $script = base_path('misc/update/postprocess.php');
-
-        if (! file_exists($script)) {
-            return $this->disablePane($pane, 'Post-process Amazon', 'script not found');
-        }
-
         $niceness = Settings::settingValue('niceness') ?? 2;
-        $command = "nice -n{$niceness} php {$script} amazon true";
+        $command = "nice -n{$niceness} ".PHP_BINARY.' artisan update:postprocess amazon true';
         $sleep = (int) ($runVar['settings']['post_timer_amazon'] ?? 300);
         $command = $this->buildCommand($command, ['log_pane' => 'post_amazon', 'sleep' => $sleep]);
 
