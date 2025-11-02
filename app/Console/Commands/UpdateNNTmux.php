@@ -126,7 +126,7 @@ class UpdateNNTmux extends Command
         $tmux = new Tmux;
         $this->tmuxWasRunning = $tmux->isRunning();
         if ($this->tmuxWasRunning) {
-            $this->call('tmux-ui:stop', ['--kill' => true]);
+            $this->call('tmux:stop', ['--force' => true]);
         }
 
         $this->progressBar->advance();
@@ -381,7 +381,7 @@ class UpdateNNTmux extends Command
 
         // Restore tmux state
         if ($this->tmuxWasRunning) {
-            $this->call('tmux-ui:start');
+            $this->call('tmux:start');
         }
     }
 }

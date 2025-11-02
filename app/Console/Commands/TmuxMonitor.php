@@ -66,7 +66,7 @@ class TmuxMonitor extends Command
             // Verify session exists
             if (! $this->sessionManager->sessionExists()) {
                 $this->error("❌ Tmux session '{$sessionName}' does not exist.");
-                $this->info("💡 Run 'php artisan tmux-ui:start' to create the session first.");
+                $this->info("💡 Run 'php artisan tmux:start' to create the session first.");
 
                 return Command::FAILURE;
             }
