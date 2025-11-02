@@ -14,8 +14,8 @@ class UpdatePostProcess extends Command
      * @var string
      */
     protected $signature = 'update:postprocess
-                            {type : Type: all, nfo, movies, tv, music, console, games, book, anime, xxx, additional, amazon, pre, sharing, allinf, tvdb}
-                            {echo=true : Echo output (true/false)}';
+                            {type : Type (all, nfo, movies, tv, music, console, games, book, anime, xxx, additional)}
+                            {echo? : Echo output (true/false, default: true)}';
 
     /**
      * The console command description.
@@ -47,7 +47,8 @@ class UpdatePostProcess extends Command
     public function handle(): int
     {
         $type = $this->argument('type');
-        $echo = $this->argument('echo') === 'true';
+        $echoArg = $this->argument('echo');
+        $echo = ($echoArg === null || $echoArg === 'true');
 
         if (! array_key_exists($type, $this->validTypes)) {
             $this->error("Invalid type: {$type}");
@@ -58,7 +59,7 @@ class UpdatePostProcess extends Command
 
         try {
             $nntp = $this->validTypes[$type] ? $this->getNntp() : null;
-            $postProcess = new PostProcess(['Echo' => $echo, 'NNTP' => $nntp]);
+            $postProcess = new PostProcess();
 
             match ($type) {
                 'all' => $postProcess->processAll($nntp),

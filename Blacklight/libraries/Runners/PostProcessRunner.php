@@ -22,7 +22,8 @@ class PostProcessRunner extends BaseRunner
             foreach ($releases as $release) {
                 // id may already be a single GUID bucket char; if not, take first char defensively
                 $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
-                $commands[] = PHP_BINARY.' artisan update:postprocess '.$type.$char;
+                // Use postprocess:guid command which accepts the GUID character
+                $commands[] = PHP_BINARY.' artisan postprocess:guid '.$type.' '.$char;
             }
             $this->runStreamingCommands($commands, $maxProcesses, $desc);
 
@@ -36,7 +37,8 @@ class PostProcessRunner extends BaseRunner
         foreach ($releases as $release) {
             $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
             $pool->add(function () use ($char, $type) {
-                return $this->executeCommand(PHP_BINARY.' artisan update:postprocess '.$type.$char);
+                // Use postprocess:guid command which accepts the GUID character
+                return $this->executeCommand(PHP_BINARY.' artisan postprocess:guid '.$type.' '.$char);
             }, self::ASYNC_BUFFER_SIZE)->then(function ($output) use (&$count, $desc) {
                 echo $output;
                 $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
@@ -72,7 +74,7 @@ class PostProcessRunner extends BaseRunner
         $queue = DB::select($sql);
 
         $maxProcesses = (int) Settings::settingValue('postthreads');
-        $this->runPostProcess($queue, $maxProcesses, 'additional true ', 'additional postprocessing');
+        $this->runPostProcess($queue, $maxProcesses, 'additional', 'additional postprocessing');
     }
 
     public function processNfo(): void
@@ -100,7 +102,7 @@ class PostProcessRunner extends BaseRunner
         $queue = DB::select($sql);
 
         $maxProcesses = (int) Settings::settingValue('nfothreads');
-        $this->runPostProcess($queue, $maxProcesses, 'nfo true ', 'nfo postprocessing');
+        $this->runPostProcess($queue, $maxProcesses, 'nfo', 'nfo postprocessing');
     }
 
     public function processMovies(bool $renamedOnly): void
@@ -138,7 +140,7 @@ class PostProcessRunner extends BaseRunner
         $queue = DB::select($sql);
 
         $maxProcesses = (int) Settings::settingValue('postthreadsnon');
-        $this->runPostProcess($queue, $maxProcesses, 'movies true ', 'movies postprocessing');
+        $this->runPostProcess($queue, $maxProcesses, 'movie', 'movies postprocessing');
     }
 
     public function processTv(bool $renamedOnly): void
@@ -182,7 +184,7 @@ class PostProcessRunner extends BaseRunner
         $queue = DB::select($sql);
 
         $maxProcesses = (int) Settings::settingValue('postthreadsnon');
-        $this->runPostProcess($queue, $maxProcesses, 'tv true ', 'tv postprocessing');
+        $this->runPostProcess($queue, $maxProcesses, 'tv', 'tv postprocessing');
     }
 
     /**
