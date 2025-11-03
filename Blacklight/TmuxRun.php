@@ -244,7 +244,7 @@ class TmuxRun extends Tmux
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:2.1 ' \
 						{$runVar['commands']['_php']} artisan multiprocessing:postprocess tv 2>&1 | tee -a $log; \
 						{$runVar['commands']['_php']} artisan multiprocessing:postprocess mov 2>&1 | tee -a $log; \
-						{$runVar['commands']['_php']} artisan multiprocessing:postprocess anime 2>&1 | tee -a $log; \ $log; \
+						{$runVar['commands']['_php']} artisan multiprocessing:postprocess ani 2>&1 | tee -a $log; \ $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/PostProc/check_covers.php true $log; \
 						date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer_non']}' 2>&1 1> /dev/null"
                 );
