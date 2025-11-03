@@ -458,7 +458,7 @@ class TmuxTaskRunner
             $log = $this->getLogFile('removecrap');
             $commands = [];
             foreach ($types as $type) {
-                $commands[] = "echo \"\\nRunning removeCrapReleases for {$type}\"; nice -n{$niceness} php {$artisan} releases:remove-crap --type={$type} --time={$time} --delete 2>&1 | tee -a {$log}";
+                $commands[] = "echo \"\nRunning removeCrapReleases for {$type}\"; nice -n{$niceness} php {$artisan} releases:remove-crap --type={$type} --time={$time} --delete 2>&1 | tee -a {$log}";
             }
 
             // Join all commands with semicolons and add final timestamp and sleep
