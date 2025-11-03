@@ -56,7 +56,7 @@ class TmuxTaskRunner
     protected function disablePane(string $pane, string $taskName, string $reason): bool
     {
         $color = $this->getRandomColor();
-        $message = "echo \"\\033[38;5;{$color}m\\n{$taskName} has been disabled: {$reason}\"";
+        $message = "echo \"\033[38;5;{$color}m\\n{$taskName} has been disabled: {$reason}\"";
 
         return $this->paneManager->respawnPane($pane, $message, kill: true);
     }
