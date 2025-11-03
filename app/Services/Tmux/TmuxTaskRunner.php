@@ -24,6 +24,27 @@ class TmuxTaskRunner
     }
 
     /**
+     * Get niceness value from settings or config with sensible default
+     */
+    protected function getNiceness(): int
+    {
+        // Try to get from settings first
+        $niceness = Settings::settingValue('niceness');
+
+        // If empty string or null, try config
+        if (empty($niceness) && $niceness !== 0 && $niceness !== '0') {
+            $niceness = config('nntmux.niceness');
+        }
+
+        // If still empty, use system default
+        if (empty($niceness) && $niceness !== 0 && $niceness !== '0') {
+            $niceness = 10; // Standard nice default
+        }
+
+        return (int) $niceness;
+    }
+
+    /**
      * Run a task in a specific pane
      */
     public function runTask(string $taskName, array $config): bool
@@ -91,7 +112,7 @@ class TmuxTaskRunner
      */
     protected function buildSleepCommand(int $seconds): string
     {
-        $niceness = Settings::settingValue('niceness') ?? 2;
+        $niceness = $this->getNiceness();
         $sleepScript = base_path('app/Services/Tmux/Scripts/showsleep.php');
 
         if (file_exists($sleepScript)) {
@@ -164,7 +185,7 @@ class TmuxTaskRunner
             return $this->disablePane($pane, 'IRC Scraper', 'disabled in settings');
         }
 
-        $niceness = Settings::settingValue('niceness') ?? 2;
+        $niceness = $this->getNiceness();
         $artisan = base_path('artisan');
         $command = "nice -n{$niceness} php {$artisan} irc:scrape";
         $command = $this->buildCommand($command, ['log_pane' => 'scraper']);
@@ -198,7 +219,7 @@ class TmuxTaskRunner
             return false;
         }
 
-        $niceness = Settings::settingValue('niceness') ?? 2;
+        $niceness = $this->getNiceness();
         $command = "nice -n{$niceness} ".PHP_BINARY." artisan {$artisanCommand}";
         $sleep = (int) ($config['settings']['bins_timer'] ?? 60);
         $command = $this->buildCommand($command, ['log_pane' => 'binaries', 'sleep' => $sleep]);
@@ -243,7 +264,7 @@ class TmuxTaskRunner
             ? floor($collections / 500)
             : $baseSleep;
 
-        $niceness = Settings::settingValue('niceness') ?? 2;
+        $niceness = $this->getNiceness();
         $command = "nice -n{$niceness} ".PHP_BINARY." artisan {$artisanCommand}";
         $command = $this->buildCommand($command, ['log_pane' => 'backfill', 'sleep' => $sleep]);
 
@@ -262,7 +283,7 @@ class TmuxTaskRunner
             return $this->disablePane($pane, 'Update Releases', 'disabled in settings');
         }
 
-        $niceness = Settings::settingValue('niceness') ?? 2;
+        $niceness = $this->getNiceness();
         $command = "nice -n{$niceness} ".PHP_BINARY.' artisan multiprocessing:releases';
         $sleep = (int) ($config['settings']['rel_timer'] ?? 60);
         $command = $this->buildCommand($command, ['log_pane' => 'releases', 'sleep' => $sleep]);
@@ -337,7 +358,7 @@ class TmuxTaskRunner
         // Full sequential mode - runs group:update-all for each group
         $pane = '0.1';
 
-        $niceness = Settings::settingValue('niceness') ?? 2;
+        $niceness = $this->getNiceness();
         $artisan = base_path('artisan');
         $command = "nice -n{$niceness} php {$artisan} group:update-all";
         $command = $this->buildCommand($command, ['log_pane' => 'sequential']);
@@ -391,7 +412,7 @@ class TmuxTaskRunner
             return $this->disablePane($pane, 'Remove Crap', 'disabled in settings');
         }
 
-        $niceness = Settings::settingValue('niceness') ?? 2;
+        $niceness = $this->getNiceness();
         $artisan = base_path('artisan');
         $sleep = (int) ($runVar['settings']['crap_timer'] ?? 300);
 
