@@ -407,12 +407,19 @@ class TmuxTaskRunner
         if ($option === 'Custom') {
             $selectedTypes = $runVar['settings']['fix_crap'] ?? '';
 
-            if (empty($selectedTypes)) {
+            // Convert numeric 0 or empty values to empty string
+            if (empty($selectedTypes) || $selectedTypes === 0 || $selectedTypes === '0') {
                 return $this->disablePane($pane, 'Remove Crap', 'no crap types selected');
             }
 
             $types = is_array($selectedTypes) ? $selectedTypes : explode(',', $selectedTypes);
-            $types = array_filter($types); // Remove empty values
+
+            // Trim whitespace and filter out empty values and '0'
+            $types = array_map('trim', $types);
+            $types = array_filter($types, fn($type) => !empty($type) && $type !== '0');
+
+            // Re-index array to ensure sequential keys
+            $types = array_values($types);
 
             if (empty($types)) {
                 return $this->disablePane($pane, 'Remove Crap', 'no crap types selected');
