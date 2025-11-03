@@ -20,7 +20,6 @@ use App\Services\Tmux\TmuxMonitorService;
 use App\Services\Tmux\TmuxTaskRunner;
 use Blacklight\ColorCLI;
 use Blacklight\TmuxOutput;
-use Blacklight\TmuxRun;
 
 $colorCli = new ColorCLI;
 
@@ -33,26 +32,8 @@ try {
     $taskRunner = new TmuxTaskRunner($sessionName);
     $output = new TmuxOutput;
 
-    // For backwards compatibility, also initialize old classes
-    $tRun = new TmuxRun;
-
     // Initialize monitor
     $runVar = $monitor->initializeMonitor();
-
-    // Add paths that TmuxRun expects
-    $runVar['paths']['misc'] = base_path().'/misc/';
-    $runVar['paths']['cli'] = base_path().'/cli/';
-
-    // Also initialize old-style commands for compatibility
-    $tmux_niceness = Settings::settingValue('niceness') ?? 2;
-    $runVar['commands']['_php'] = " nice -n{$tmux_niceness} php";
-    $runVar['commands']['_phpn'] = "nice -n{$tmux_niceness} php";
-    $runVar['commands']['_sleep'] = "{$runVar['commands']['_phpn']} ".base_path('app/Services/Tmux/Scripts/showsleep.php');
-
-    // Add scripts paths for TmuxRun - Using Artisan multiprocessing commands
-    $runVar['scripts']['binaries'] = "nice -n{$tmux_niceness} ".PHP_BINARY.' artisan multiprocessing:binaries 0';
-    $runVar['scripts']['backfill'] = "nice -n{$tmux_niceness} ".PHP_BINARY.' artisan multiprocessing:backfill 0';
-    $runVar['scripts']['releases'] = "nice -n{$tmux_niceness} ".PHP_BINARY.' artisan multiprocessing:releases';
 
     // Spawn IRC scraper immediately
     try {
@@ -61,29 +42,14 @@ try {
         logger()->error('Failed to spawn IRC scraper: '.$e->getMessage());
     }
 
-    // Get list of panes for compatibility
-    $runVar['panes'] = $tRun->getListOfPanes($runVar['constants']);
-
     $colorCli->header('Tmux Monitor Started');
     echo "Session: {$sessionName}\n";
     echo "Press Ctrl+C to stop (or set exit flag in settings)\n\n";
 
     // Main monitoring loop
     while ($monitor->shouldContinue()) {
-        // Collect statistics (but preserve our custom settings)
-        $scriptsBackup = $runVar['scripts'] ?? [];
-        $commandsBackup = $runVar['commands'] ?? [];
-        $pathsBackup = $runVar['paths'] ?? [];
-
+        // Collect statistics
         $runVar = $monitor->collectStatistics();
-
-        // Restore our custom settings that collectStatistics doesn't know about
-        $runVar['scripts'] = $scriptsBackup;
-        $runVar['commands'] = $commandsBackup;
-        $runVar['paths'] = array_merge($runVar['paths'] ?? [], $pathsBackup);
-
-        // Refresh panes list periodically
-        $runVar['panes'] = $tRun->getListOfPanes($runVar['constants']);
 
         // Update display
         $output->updateMonitorPane($runVar);
@@ -100,11 +66,10 @@ try {
                 default => [],
             };
 
-            // Run each pane task
+            // Run each pane task using TmuxTaskRunner
             foreach ($panesToRun as $paneName) {
                 try {
-                    // Use old TmuxRun for compatibility during transition
-                    $tRun->runPane($paneName, $runVar);
+                    $taskRunner->runPaneTask($paneName, [], $runVar);
                 } catch (Exception $e) {
                     logger()->error("Failed to run pane {$paneName}: ".$e->getMessage());
                 }

@@ -490,19 +490,61 @@ class TmuxTaskRunner
      */
     protected function runPostProcessAdditional(array $runVar): bool
     {
-        $enabled = (int) ($runVar['settings']['post'] ?? 0);
+        $postSetting = (int) ($runVar['settings']['post'] ?? 0);
         $pane = '2.0';
 
-        if ($enabled !== 1) {
+        // Check if post processing is enabled (1 = additional, 2 = nfo, 3 = both)
+        if ($postSetting === 0) {
             return $this->disablePane($pane, 'Post-process Additional', 'disabled in settings');
         }
 
-        $niceness = Settings::settingValue('niceness') ?? 2;
-        $command = "nice -n{$niceness} ".PHP_BINARY.' artisan update:postprocess additional true';
-        $sleep = (int) ($runVar['settings']['post_timer'] ?? 300);
-        $command = $this->buildCommand($command, ['log_pane' => 'post_additional', 'sleep' => $sleep]);
+        $hasWork = (int) ($runVar['counts']['now']['work'] ?? 0) > 0;
+        $hasNfo = (int) ($runVar['counts']['now']['processnfo'] ?? 0) > 0;
 
-        return $this->paneManager->respawnPane($pane, $command);
+        $niceness = Settings::settingValue('niceness') ?? 2;
+        $log = $this->getLogFile('post_additional');
+        $sleep = (int) ($runVar['settings']['post_timer'] ?? 300);
+
+        $commands = [];
+
+        // Build commands based on post setting value
+        if ($postSetting === 1) {
+            // Post = 1: Additional processing only
+            if ($hasWork) {
+                $commands[] = "nice -n{$niceness} ".PHP_BINARY." artisan update:postprocess additional true 2>&1 | tee -a {$log}";
+            }
+        } elseif ($postSetting === 2) {
+            // Post = 2: NFO processing only
+            if ($hasNfo) {
+                $commands[] = "nice -n{$niceness} ".PHP_BINARY." artisan update:postprocess nfo true 2>&1 | tee -a {$log}";
+            }
+        } elseif ($postSetting === 3) {
+            // Post = 3: Both additional and NFO
+            if ($hasWork) {
+                $commands[] = "nice -n{$niceness} ".PHP_BINARY." artisan update:postprocess additional true 2>&1 | tee -a {$log}";
+            }
+            if ($hasNfo) {
+                $commands[] = "nice -n{$niceness} ".PHP_BINARY." artisan update:postprocess nfo true 2>&1 | tee -a {$log}";
+            }
+        }
+
+        // If no work available, disable the pane
+        if (empty($commands)) {
+            $reason = match ($postSetting) {
+                1 => 'no additional work to process',
+                2 => 'no NFOs to process',
+                3 => 'no additional work or NFOs to process',
+                default => 'invalid post setting value',
+            };
+
+            return $this->disablePane($pane, 'Post-process Additional', $reason);
+        }
+
+        // Build the full command with all parts
+        $allCommands = implode('; ', $commands);
+        $fullCommand = "{$allCommands}; date +'%Y-%m-%d %T'; sleep {$sleep}";
+
+        return $this->paneManager->respawnPane($pane, $fullCommand);
     }
 
     /**

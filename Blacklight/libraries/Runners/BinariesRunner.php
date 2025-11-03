@@ -66,6 +66,14 @@ class BinariesRunner extends BaseRunner
 
         $maxHeaders = (int) Settings::settingValue('max_headers_iteration') ?: 1000000;
         $maxMessages = (int) Settings::settingValue('maxmssgs');
+
+        // Prevent division by zero - ensure maxmssgs is at least 1
+        if ($maxMessages < 1) {
+            $defaultMaxMessages = 20000;
+            $this->colorCli->warning('maxmssgs setting is invalid or not set, using default of '.$defaultMaxMessages);
+            $maxMessages = $defaultMaxMessages;
+        }
+
         $maxProcesses = (int) Settings::settingValue('binarythreads');
 
         $groups = DB::select(
