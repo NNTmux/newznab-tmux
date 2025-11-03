@@ -51,6 +51,24 @@ class TmuxMonitorService
             'percent' => [],
         ];
 
+        // Initialize modsettings (for backward compatibility with old TmuxRun.php)
+        // Parse fix_crap setting into an array
+        $fixCrapSetting = $this->runVar['settings']['fix_crap'] ?? '';
+        $fixCrapTypes = ! empty($fixCrapSetting)
+            ? (is_array($fixCrapSetting) ? $fixCrapSetting : explode(',', $fixCrapSetting))
+            : [];
+        $fixCrapTypes = array_filter($fixCrapTypes);
+
+        $this->runVar['modsettings'] = [
+            'fix_crap' => $fixCrapTypes,
+            'fc' => [
+                'num' => 0,
+                'max' => count($fixCrapTypes),
+                'time' => 'full',
+                'firstrun' => true,
+            ],
+        ];
+
         return $this->runVar;
     }
 

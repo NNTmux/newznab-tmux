@@ -399,10 +399,8 @@ class TmuxTaskRunner
         if ($option === 'All') {
             $command = "nice -n{$niceness} php {$artisan} releases:remove-crap --time=2 --delete";
             $command = $this->buildCommand($command, ['log_pane' => 'removecrap', 'sleep' => $sleep]);
-            // Wrap in while loop to keep pane alive
-            $loopCommand = "while true; do {$command}; done";
 
-            return $this->paneManager->respawnPane($pane, $loopCommand);
+            return $this->paneManager->respawnPane($pane, $command);
         }
 
         // Handle 'Custom' mode - cycle through selected types
@@ -456,10 +454,7 @@ class TmuxTaskRunner
                 'types' => $types,
             ]);
 
-            // Wrap in while loop to keep pane alive
-            $loopCommand = "while true; do {$command}; done";
-
-            return $this->paneManager->respawnPane($pane, $loopCommand);
+            return $this->paneManager->respawnPane($pane, $command);
         }
 
         // Default fallback - disabled
