@@ -403,7 +403,7 @@ class TmuxTaskRunner
             return $this->paneManager->respawnPane($pane, $command);
         }
 
-        // Handle 'Custom' mode - cycle through selected types
+        // Handle 'Custom' mode - run all selected types sequentially
         if ($option === 'Custom') {
             $selectedTypes = $runVar['settings']['fix_crap'] ?? '';
 
@@ -418,43 +418,32 @@ class TmuxTaskRunner
                 return $this->disablePane($pane, 'Remove Crap', 'no crap types selected');
             }
 
-            // Get the next type to process
+            // Get state to determine if this is first run
             $stateFile = storage_path('tmux/removecrap_state.json');
             $state = $this->loadCrapState($stateFile);
-
-            // Determine current type index
-            $currentIndex = $state['current_index'] ?? 0;
             $isFirstRun = $state['first_run'] ?? true;
-
-            // Validate index
-            if ($currentIndex >= count($types)) {
-                $currentIndex = 0;
-                $isFirstRun = false;
-            }
-
-            $currentType = $types[$currentIndex];
 
             // Determine time limit: full on first run, 4 hours otherwise
             $time = $isFirstRun ? 'full' : '4';
 
-            // Build and run command
-            $command = "nice -n{$niceness} php {$artisan} releases:remove-crap --type={$currentType} --time={$time} --delete";
-            $command = $this->buildCommand($command, ['log_pane' => 'removecrap', 'sleep' => $sleep]);
-
-            // Update state for next run
-            $nextIndex = $currentIndex + 1;
-            if ($nextIndex >= count($types)) {
-                $nextIndex = 0;
-                $isFirstRun = false;
+            // Build commands for all enabled types to run sequentially
+            $log = $this->getLogFile('removecrap');
+            $commands = [];
+            foreach ($types as $type) {
+                $commands[] = "echo \"\\nRunning removeCrapReleases for {$type}\"; nice -n{$niceness} php {$artisan} releases:remove-crap --type={$type} --time={$time} --delete 2>&1 | tee -a {$log}";
             }
 
+            // Join all commands with semicolons and add final timestamp and sleep
+            $allCommands = implode('; ', $commands);
+            $fullCommand = "{$allCommands}; date +'%Y-%m-%d %T'; sleep {$sleep}";
+
+            // Mark that we're not on the first run anymore for next cycle
             $this->saveCrapState($stateFile, [
-                'current_index' => $nextIndex,
-                'first_run' => $isFirstRun,
+                'first_run' => false,
                 'types' => $types,
             ]);
 
-            return $this->paneManager->respawnPane($pane, $command);
+            return $this->paneManager->respawnPane($pane, $fullCommand);
         }
 
         // Default fallback - disabled
@@ -467,13 +456,13 @@ class TmuxTaskRunner
     protected function loadCrapState(string $file): array
     {
         if (! file_exists($file)) {
-            return ['current_index' => 0, 'first_run' => true];
+            return ['first_run' => true];
         }
 
         $content = file_get_contents($file);
         $state = json_decode($content, true);
 
-        return $state ?: ['current_index' => 0, 'first_run' => true];
+        return $state ?: ['first_run' => true];
     }
 
     /**

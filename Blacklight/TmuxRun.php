@@ -409,23 +409,25 @@ class TmuxRun extends Tmux
 
                     // Check to see if the pane is dead, if so respawn it.
                     if (shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:1 | grep ^1 | grep -c dead") == 1) {
-                        // Run remove crap releases.
+                        // Build command to run all enabled crap removal options sequentially
+                        $commands = [];
+                        foreach ($runVar['modsettings']['fix_crap'] as $crapType) {
+                            $commands[] = "echo \"\nRunning removeCrapReleases for {$crapType}\"; \
+							{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}testing/Releases/removeCrapReleases.php true  \
+							{$runVar['modsettings']['fc']['time']} {$crapType} $log";
+                        }
+
+                        // Join all commands with semicolons and add final timestamp and sleep
+                        $allCommands = implode('; ', $commands);
+
+                        // Run all crap removal options in sequence, then refresh pane when complete
                         shell_exec(
                             "tmux respawnp -t{$runVar['constants']['tmux_session']}:1.1 ' \
-							echo \"\nRunning removeCrapReleases for {$runVar['modsettings']['fix_crap'][$runVar['modsettings']['fc']['num']]}\"; \
-							{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}testing/Releases/removeCrapReleases.php true  \
-							{$runVar['modsettings']['fc']['time']} {$runVar['modsettings']['fix_crap'][$runVar['modsettings']['fc']['num']]} $log; \
+							{$allCommands}; \
 							date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['crap_timer']}' 2>&1 1> /dev/null"
                         );
 
-                        // Increment so we know which type to run next.
-                        $runVar['modsettings']['fc']['num']++;
-                    }
-
-                    // If we reached the end, reset the type.
-                    if ((int) $runVar['modsettings']['fc']['num'] === (int) $runVar['modsettings']['fc']['max']) {
-                        $runVar['modsettings']['fc']['num'] = 0;
-                        // And say we are not on the first run, so we run 2 hours the next times.
+                        // Mark that we're not on the first run anymore, so we run 4 hours the next times.
                         $runVar['modsettings']['fc']['firstrun'] = false;
                     }
                 }
