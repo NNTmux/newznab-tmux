@@ -394,7 +394,8 @@ class TmuxTaskRunner
 
         $sleep = (int) ($runVar['settings']['fix_timer'] ?? 300);
         $allCommands = implode('; ', $commands);
-        $fullCommand = "{$allCommands}; date +'%Y-%m-%d %T'; sleep {$sleep}";
+        $sleepCommand = $this->buildSleepCommand($sleep);
+        $fullCommand = "{$allCommands}; date +'%Y-%m-%d %T'; {$sleepCommand}";
 
         return $this->paneManager->respawnPane($pane, $fullCommand);
     }
@@ -463,7 +464,8 @@ class TmuxTaskRunner
 
             // Join all commands with semicolons and add final timestamp and sleep
             $allCommands = implode('; ', $commands);
-            $fullCommand = "{$allCommands}; date +'%Y-%m-%d %T'; sleep {$sleep}";
+            $sleepCommand = $this->buildSleepCommand($sleep);
+            $fullCommand = "{$allCommands}; date +'%Y-%m-%d %T'; {$sleepCommand}";
 
             // Mark that we're not on the first run anymore for next cycle
             $this->saveCrapState($stateFile, [
@@ -563,7 +565,8 @@ class TmuxTaskRunner
 
         // Build the full command with all parts
         $allCommands = implode('; ', $commands);
-        $fullCommand = "{$allCommands}; date +'%Y-%m-%d %T'; sleep {$sleep}";
+        $sleepCommand = $this->buildSleepCommand($sleep);
+        $fullCommand = "{$allCommands}; date +'%Y-%m-%d %T'; {$sleepCommand}";
 
         return $this->paneManager->respawnPane($pane, $fullCommand);
     }
@@ -630,7 +633,8 @@ class TmuxTaskRunner
 
         $sleep = (int) ($runVar['settings']['post_timer_non'] ?? 300);
         $allCommands = implode('; ', $commands);
-        $fullCommand = "{$allCommands}; date +'%Y-%m-%d %T'; sleep {$sleep}";
+        $sleepCommand = $this->buildSleepCommand($sleep);
+        $fullCommand = "{$allCommands}; date +'%Y-%m-%d %T'; {$sleepCommand}";
 
         return $this->paneManager->respawnPane($pane, $fullCommand);
     }
