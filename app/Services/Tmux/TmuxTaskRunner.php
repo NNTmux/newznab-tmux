@@ -580,23 +580,53 @@ class TmuxTaskRunner
             return $this->disablePane($pane, 'Post-process Non-Amazon', 'disabled in settings');
         }
 
-        $hasWork = (int) ($runVar['counts']['now']['processmovies'] ?? 0) > 0
-            || (int) ($runVar['counts']['now']['processtv'] ?? 0) > 0
-            || (int) ($runVar['counts']['now']['processanime'] ?? 0) > 0;
-
-        if (! $hasWork) {
-            return $this->disablePane($pane, 'Post-process Non-Amazon', 'no movies/tv/anime to process');
-        }
-
         $niceness = $this->getNiceness();
         $log = $this->getLogFile('post_non');
-
         $artisan = PHP_BINARY.' artisan';
-        $commands = [
-            "nice -n{$niceness} {$artisan} update:postprocess tv true 2>&1 | tee -a {$log}",
-            "nice -n{$niceness} {$artisan} update:postprocess movies true 2>&1 | tee -a {$log}",
-            "nice -n{$niceness} {$artisan} update:postprocess anime true 2>&1 | tee -a {$log}",
-        ];
+        $commands = [];
+
+        // Only add TV processing if enabled and has work
+        $processTv = (int) ($runVar['settings']['processtvrage'] ?? 0);
+        $hasTvWork = (int) ($runVar['counts']['now']['processtv'] ?? 0) > 0;
+        if ($processTv > 0 && $hasTvWork) {
+            $commands[] = "nice -n{$niceness} {$artisan} update:postprocess tv true 2>&1 | tee -a {$log}";
+        }
+
+        // Only add Movies processing if enabled and has work
+        $processMovies = (int) ($runVar['settings']['processmovies'] ?? 0);
+        $hasMoviesWork = (int) ($runVar['counts']['now']['processmovies'] ?? 0) > 0;
+        if ($processMovies > 0 && $hasMoviesWork) {
+            $commands[] = "nice -n{$niceness} {$artisan} update:postprocess movies true 2>&1 | tee -a {$log}";
+        }
+
+        // Only add Anime processing if enabled and has work
+        $processAnime = (int) ($runVar['settings']['processanime'] ?? 0);
+        $hasAnimeWork = (int) ($runVar['counts']['now']['processanime'] ?? 0) > 0;
+        if ($processAnime > 0 && $hasAnimeWork) {
+            $commands[] = "nice -n{$niceness} {$artisan} update:postprocess anime true 2>&1 | tee -a {$log}";
+        }
+
+        // If no work available for any enabled type, disable the pane
+        if (empty($commands)) {
+            $enabledTypes = [];
+            if ($processTv > 0) {
+                $enabledTypes[] = 'TV';
+            }
+            if ($processMovies > 0) {
+                $enabledTypes[] = 'Movies';
+            }
+            if ($processAnime > 0) {
+                $enabledTypes[] = 'Anime';
+            }
+
+            if (empty($enabledTypes)) {
+                return $this->disablePane($pane, 'Post-process Non-Amazon', 'no types enabled (TV/Movies/Anime)');
+            }
+
+            $typesList = implode(', ', $enabledTypes);
+
+            return $this->disablePane($pane, 'Post-process Non-Amazon', "no work for enabled types ({$typesList})");
+        }
 
         $sleep = (int) ($runVar['settings']['post_timer_non'] ?? 300);
         $allCommands = implode('; ', $commands);
