@@ -66,6 +66,10 @@
                         <x-form.group label="Tmux Session Name" for="tmux_session" help="Session name for tmux. No spaces allowed. Can't be changed after scripts start.">
                             <x-input id="tmux_session" name="tmux_session" type="text" value="{{ $site['tmux_session'] ?? 'nntmux' }}" class="w-full" />
                         </x-form.group>
+
+                        <x-form.group label="Process Niceness" for="niceness" help="Process priority. Lower values = higher priority. Range: -20 (highest) to 19 (lowest). Default: 10.">
+                            <x-input id="niceness" name="niceness" type="number" min="-20" max="19" value="{{ $site['niceness'] ?? 10 }}" class="w-full" />
+                        </x-form.group>
                     </div>
                 </div>
 
