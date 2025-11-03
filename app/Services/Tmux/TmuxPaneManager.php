@@ -87,8 +87,12 @@ class TmuxPaneManager
     {
         $killFlag = $kill ? '-k' : '';
 
+        // Escape the command for tmux by replacing double quotes with escaped quotes
+        $escapedCommand = str_replace('"', '\\"', $command);
+        $escapedCommand = str_replace('$', '\\$', $escapedCommand);
+
         $result = Process::timeout(10)->run(
-            "tmux respawnp {$killFlag} -t {$this->sessionName}:{$target} '{$command}'"
+            "tmux respawnp {$killFlag} -t {$this->sessionName}:{$target} \"{$escapedCommand}\""
         );
 
         return $result->successful();

@@ -13,7 +13,7 @@ class ProcessPostProcess extends Command
      * @var string
      */
     protected $signature = 'multiprocessing:postprocess
-                            {type : Type: ama, add, mov, nfo, sha, or tv}
+                            {type : Type: ama, add, ani, mov, nfo, sha, or tv}
                             {renamed=false : For mov/tv: only post-process renamed releases (true/false)}';
 
     /**
@@ -31,11 +31,12 @@ class ProcessPostProcess extends Command
         $type = $this->argument('type');
         $renamed = $this->argument('renamed');
 
-        if (! \in_array($type, ['ama', 'add', 'mov', 'nfo', 'sha', 'tv'], true)) {
-            $this->error('Type must be one of: ama, add, mov, nfo, sha, tv');
+        if (! \in_array($type, ['ama', 'add', 'ani', 'mov', 'nfo', 'sha', 'tv'], true)) {
+            $this->error('Type must be one of: ama, add, ani, mov, nfo, sha, tv');
             $this->line('');
-            $this->line('ama => Do amazon processing (no multiprocessing due to API restrictions)');
+            $this->line('ama => Do amazon/books processing');
             $this->line('add => Do additional (rar|zip) processing');
+            $this->line('ani => Do anime processing');
             $this->line('mov => Do movie processing');
             $this->line('nfo => Do NFO processing');
             $this->line('sha => Do sharing processing (no multiprocessing)');

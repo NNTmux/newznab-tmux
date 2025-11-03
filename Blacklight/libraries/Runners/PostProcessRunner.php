@@ -212,4 +212,68 @@ class PostProcessRunner extends BaseRunner
 
         return count(DB::select($checkSql)) > 0;
     }
+
+    public function processAnime(): void
+    {
+        if ((int) Settings::settingValue('lookupanidb') <= 0) {
+            $this->headerNone();
+
+            return;
+        }
+
+        $checkSql = '
+            SELECT id
+            FROM releases
+            WHERE categories_id = 5070
+            AND anidbid IS NULL
+            LIMIT 1';
+        if (count(DB::select($checkSql)) === 0) {
+            $this->headerNone();
+
+            return;
+        }
+
+        $sql = '
+            SELECT DISTINCT LEFT(leftguid, 1) AS id
+            FROM releases
+            WHERE categories_id = 5070
+            AND anidbid IS NULL
+            LIMIT 16';
+        $queue = DB::select($sql);
+
+        $maxProcesses = (int) Settings::settingValue('postthreadsnon');
+        $this->runPostProcess($queue, $maxProcesses, 'anime', 'anime postprocessing');
+    }
+
+    public function processBooks(): void
+    {
+        if ((int) Settings::settingValue('lookupbooks') <= 0) {
+            $this->headerNone();
+
+            return;
+        }
+
+        $checkSql = '
+            SELECT id
+            FROM releases
+            WHERE categories_id BETWEEN 7000 AND 7999
+            AND bookinfo_id IS NULL
+            LIMIT 1';
+        if (count(DB::select($checkSql)) === 0) {
+            $this->headerNone();
+
+            return;
+        }
+
+        $sql = '
+            SELECT DISTINCT LEFT(leftguid, 1) AS id
+            FROM releases
+            WHERE categories_id BETWEEN 7000 AND 7999
+            AND bookinfo_id IS NULL
+            LIMIT 16';
+        $queue = DB::select($sql);
+
+        $maxProcesses = (int) Settings::settingValue('postthreadsnon');
+        $this->runPostProcess($queue, $maxProcesses, 'books', 'books postprocessing');
+    }
 }

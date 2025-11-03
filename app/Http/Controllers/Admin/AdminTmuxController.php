@@ -20,7 +20,17 @@ class AdminTmuxController extends BasePageController
 
         switch ($action) {
             case 'submit':
-                Settings::settingsUpdate($request->all());
+                $data = $request->all();
+
+                // Handle fix_crap checkbox array - convert to comma-separated string
+                if (isset($data['fix_crap']) && is_array($data['fix_crap'])) {
+                    $data['fix_crap'] = implode(',', $data['fix_crap']);
+                } elseif (! isset($data['fix_crap'])) {
+                    // If no checkboxes selected, save empty string
+                    $data['fix_crap'] = '';
+                }
+
+                Settings::settingsUpdate($data);
 
                 return redirect()->to('admin/tmux-edit')->with('success', 'Tmux settings updated successfully');
 

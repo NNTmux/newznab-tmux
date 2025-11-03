@@ -14,10 +14,10 @@ class BooksProcessor
         $this->echooutput = $echooutput;
     }
 
-    public function process(): void
+    public function process(string $groupID = '', string $guidChar = ''): void
     {
         if ((int) Settings::settingValue('lookupbooks') !== 0) {
-            (new Books)->processBookReleases();
+            (new Books)->processBookReleases($groupID, $guidChar);
         }
     }
 }

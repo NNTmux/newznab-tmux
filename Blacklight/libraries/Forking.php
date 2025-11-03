@@ -199,11 +199,15 @@ class Forking
                 break;
 
             case 'postProcess_ama':
-                $this->processSingle();
+                $this->postProcessRunner->processBooks();
                 break;
 
             case 'postProcess_add':
                 $this->postProcessRunner->processAdditional();
+                break;
+
+            case 'postProcess_ani':
+                $this->postProcessRunner->processAnime();
                 break;
 
             case 'postProcess_mov':

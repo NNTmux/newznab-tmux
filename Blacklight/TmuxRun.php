@@ -153,7 +153,12 @@ class TmuxRun extends Tmux
                 $log = $this->writelog($runVar['panes']['two'][2]);
                 shell_exec(
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:2.2 ' \
-						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update/postprocess.php amazon true $log; date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer_amazon']}' 2>&1 1> /dev/null"
+						{$runVar['commands']['_phpn']} artisan update:postprocess music true 2>&1 | tee -a $log; \
+						{$runVar['commands']['_phpn']} artisan update:postprocess book true 2>&1 | tee -a $log; \
+						{$runVar['commands']['_phpn']} artisan update:postprocess console true 2>&1 | tee -a $log; \
+						{$runVar['commands']['_phpn']} artisan update:postprocess games true 2>&1 | tee -a $log; \
+						{$runVar['commands']['_phpn']} artisan update:postprocess xxx true 2>&1 | tee -a $log; \
+						date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer_amazon']}' 2>&1 1> /dev/null"
                 );
                 break;
             case (int) $runVar['settings']['post_amazon'] === 1 && (int) $runVar['settings']['processbooks'] === 0
@@ -239,7 +244,7 @@ class TmuxRun extends Tmux
                     "tmux respawnp -t{$runVar['constants']['tmux_session']}:2.1 ' \
 						{$runVar['commands']['_php']} artisan multiprocessing:postprocess tv 2>&1 | tee -a $log; \
 						{$runVar['commands']['_php']} artisan multiprocessing:postprocess mov 2>&1 | tee -a $log; \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update/postprocess.php anime true $log; \
+						{$runVar['commands']['_php']} artisan multiprocessing:postprocess anime 2>&1 | tee -a $log; \ $log; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/PostProc/check_covers.php true $log; \
 						date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['post_timer_non']}' 2>&1 1> /dev/null"
                 );

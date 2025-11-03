@@ -304,14 +304,40 @@
                     <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Remove Crap Releases</h2>
                     <div class="space-y-4">
                         <x-form.group label="Remove Crap Releases" for="fix_crap_opt" help="Remove passworded and other junk releases.">
-                            <x-select id="fix_crap_opt" name="fix_crap_opt" class="w-full">
-                                @foreach($yesno_ids as $index => $val)
-                                    <option value="{{ $val }}" {{ ($site['fix_crap_opt'] ?? '') == $val ? 'selected' : '' }}>
-                                        {{ $yesno_names[$index] }}
-                                    </option>
+                            <div class="space-y-2">
+                                @foreach($fix_crap_radio_ids as $index => $val)
+                                    <label class="flex items-center space-x-2 cursor-pointer">
+                                        <input type="radio"
+                                               id="fix_crap_opt_{{ $val }}"
+                                               name="fix_crap_opt"
+                                               value="{{ $val }}"
+                                               {{ ($site['fix_crap_opt'] ?? 'Disabled') == $val ? 'checked' : '' }}
+                                               class="form-radio h-4 w-4 text-blue-600 dark:bg-gray-700 dark:border-gray-600">
+                                        <span class="text-sm text-gray-700 dark:text-gray-300">{{ $fix_crap_radio_names[$index] }}</span>
+                                    </label>
                                 @endforeach
-                            </x-select>
+                            </div>
                         </x-form.group>
+
+                        <div id="crap_types_container">
+                            <x-form.group label="Select Crap Types" for="fix_crap_types" help="Choose which types of crap releases to remove.">
+                                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-blue-200 dark:border-blue-700">
+                                    @php
+                                        $selectedTypes = explode(',', $site['fix_crap'] ?? '');
+                                    @endphp
+                                    @foreach($fix_crap_check_ids as $index => $val)
+                                        <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded transition-colors">
+                                            <input type="checkbox"
+                                                   name="fix_crap[]"
+                                                   value="{{ $val }}"
+                                                   {{ in_array($val, $selectedTypes) ? 'checked' : '' }}
+                                                   class="form-checkbox h-4 w-4 text-blue-600 rounded dark:bg-gray-700 dark:border-gray-600">
+                                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ ucfirst($fix_crap_check_names[$index]) }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </x-form.group>
+                        </div>
 
                         <x-form.group label="Remove Crap Sleep Timer" for="crap_timer">
                             <div class="flex gap-2">
@@ -321,6 +347,7 @@
                         </x-form.group>
                     </div>
                 </div>
+
 
                 <!-- Console & Monitoring Tools -->
                 <div class="border-b border-gray-200 dark:border-gray-700 pb-6">

@@ -112,23 +112,27 @@ class PostProcess
     /**
      * Lookup anidb if enabled.
      *
+     * @param  string  $groupID  (Optional) ID of a group to work on.
+     * @param  string  $guidChar  (Optional) First letter of a release GUID to use to get work.
      *
      * @throws \Exception
      */
-    public function processAnime(): void
+    public function processAnime(string $groupID = '', string $guidChar = ''): void
     {
-        $this->animeProcessor->process();
+        $this->animeProcessor->process($groupID, $guidChar);
     }
 
     /**
      * Process books using amazon.com.
      *
+     * @param  string  $groupID  (Optional) ID of a group to work on.
+     * @param  string  $guidChar  (Optional) First letter of a release GUID to use to get work.
      *
      * @throws \Exception
      */
-    public function processBooks(): void
+    public function processBooks(string $groupID = '', string $guidChar = ''): void
     {
-        $this->booksProcessor->process();
+        $this->booksProcessor->process($groupID, $guidChar);
     }
 
     /**

@@ -14,10 +14,10 @@ class AnimeProcessor
         $this->echooutput = $echooutput;
     }
 
-    public function process(): void
+    public function process(string $groupID = '', string $guidChar = ''): void
     {
         if ((int) Settings::settingValue('lookupanidb') !== 0) {
-            (new AniDB)->processAnimeReleases();
+            (new AniDB)->processAnimeReleases($groupID, $guidChar);
         }
     }
 }

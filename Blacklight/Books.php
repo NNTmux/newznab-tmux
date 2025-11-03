@@ -251,7 +251,7 @@ class Books
      *
      * @throws \Exception
      */
-    public function processBookReleases(): void
+    public function processBookReleases(string $groupID = '', string $guidChar = ''): void
     {
         $bookids = [];
         if (ctype_digit((string) $this->bookreqids)) {
@@ -263,13 +263,22 @@ class Books
         $total = \count($bookids);
         if ($total > 0) {
             foreach ($bookids as $i => $iValue) {
+                $query = Release::query()
+                    ->whereNull('bookinfo_id')
+                    ->whereIn('categories_id', [$iValue])
+                    ->orderByDesc('postdate')
+                    ->limit($this->bookqty);
+
+                if ($guidChar !== '') {
+                    $query->where('leftguid', 'like', $guidChar.'%');
+                }
+
+                if ($groupID !== '') {
+                    $query->where('groups_id', $groupID);
+                }
+
                 $this->processBookReleasesHelper(
-                    Release::query()
-                        ->whereNull('bookinfo_id')
-                        ->whereIn('categories_id', [$iValue])
-                        ->orderByDesc('postdate')
-                        ->limit($this->bookqty)
-                        ->get(['searchname', 'id', 'categories_id']), $iValue
+                    $query->get(['searchname', 'id', 'categories_id']), $iValue
                 );
             }
         }

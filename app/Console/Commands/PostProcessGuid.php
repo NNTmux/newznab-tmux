@@ -18,7 +18,7 @@ class PostProcessGuid extends Command
      * @var string
      */
     protected $signature = 'postprocess:guid
-                            {type : Type: additional, nfo, movie, or tv}
+                            {type : Type: additional, nfo, movie, tv, anime, or books}
                             {guid : First character of release guid (a-f, 0-9)}
                             {renamed? : For movie/tv: process renamed only (optional)}';
 
@@ -70,8 +70,16 @@ class PostProcessGuid extends Command
                     (new PostProcess)->processTv('', $guid, $renamed);
                     break;
 
+                case 'anime':
+                    (new PostProcess)->processAnime('', $guid);
+                    break;
+
+                case 'books':
+                    (new PostProcess)->processBooks('', $guid);
+                    break;
+
                 default:
-                    $this->error('Invalid type. Must be: additional, nfo, movie, or tv.');
+                    $this->error('Invalid type. Must be: additional, nfo, movie, tv, anime, or books.');
 
                     return self::FAILURE;
             }

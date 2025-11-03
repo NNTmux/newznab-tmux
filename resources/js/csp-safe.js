@@ -383,7 +383,7 @@ window.showConfirm = function(options) {
     const messageText = document.getElementById('confirmationModalMessage');
     const confirmText = document.getElementById('confirmationModalConfirmText');
     const cancelText = document.getElementById('confirmationModalCancelText');
-    
+
     if (titleText) titleText.textContent = config.title;
     if (messageText) messageText.textContent = config.message;
     if (confirmText) confirmText.textContent = config.confirmText;
@@ -2649,7 +2649,7 @@ function initMoviesLayoutToggle() {
             applyLayout(currentLayout); // Apply layout anyway
             return;
         }
-        
+
         fetch('/movies/update-layout', {
             method: 'POST',
             headers: {
@@ -2771,29 +2771,29 @@ function initAdminDashboardCharts() {
         }, 100);
         return;
     }
-    
+
     initializeAllDashboardCharts();
 }
 
 function initializeAllDashboardCharts() {
     // Check if any chart canvas elements exist
-    const hasUserStatsCharts = document.getElementById('downloadsChart') || 
+    const hasUserStatsCharts = document.getElementById('downloadsChart') ||
                                  document.getElementById('apiHitsChart') ||
                                  document.getElementById('downloadsMinuteChart') ||
                                  document.getElementById('apiHitsMinuteChart');
-    
+
     const hasSystemCharts = document.getElementById('cpuHistory24hChart') ||
                             document.getElementById('ramHistory24hChart') ||
                             document.getElementById('cpuHistory30dChart') ||
                             document.getElementById('ramHistory30dChart');
-    
+
     if (!hasUserStatsCharts && !hasSystemCharts) {
         return; // Not on admin dashboard or charts not present
     }
 
     // Initialize user statistics charts
     initializeUserStatCharts();
-    
+
     // Initialize system metrics charts
     initializeSystemMetricsCharts();
 }
@@ -3477,8 +3477,8 @@ function initAdminRegexFormValidation() {
                 // and have matching delimiters
                 if (value.length > 0) {
                     const firstChar = value[0];
-                    const delimiters = ['/', '#', '~', '%', '@', '!'];
-                    
+                    const delimiters = ['/', '#', '~', '%', '@', '!',];
+
                     if (delimiters.includes(firstChar)) {
                         // Check if regex has matching closing delimiter
                         let delimiterCount = 0;
@@ -3531,8 +3531,8 @@ function initAdminRegexFormValidation() {
             const value = this.value.trim();
             if (value) {
                 const firstChar = value[0];
-                const delimiters = ['/', '#', '~', '%', '@', '!'];
-                
+                const delimiters = ['/', '#', '~', '%', '@', '!',];
+
                 if (delimiters.includes(firstChar)) {
                     let delimiterCount = 0;
                     for (let i = 1; i < value.length; i++) {
@@ -3541,7 +3541,7 @@ function initAdminRegexFormValidation() {
                             break;
                         }
                     }
-                    
+
                     if (delimiterCount === 0) {
                         this.classList.add('border-red-500');
                         this.classList.remove('border-green-500');
@@ -3564,7 +3564,7 @@ function initAdminTmuxSelectColors() {
     // This function is for future tmux color selection functionality
     // Currently, no color selection is needed in tmux settings
     // If color pickers are added to tmux-edit page in the future, add them here
-    
+
     // Check if we're on a page that might have color inputs
     const colorInputs = document.querySelectorAll('input[type="color"], select[data-color-select]');
     if (colorInputs.length > 0) {
@@ -4248,3 +4248,53 @@ function initFlashMessages() {
         initFlashMessages();
     }
 })();
+
+// Tmux Edit - Remove Crap Releases Toggle
+function toggleCrapTypes(value) {
+    const container = document.getElementById('crap_types_container');
+    if (container) {
+        if (value === 'Custom') {
+            container.style.display = 'block';
+            // Add a slight animation effect
+            setTimeout(() => {
+                container.style.opacity = '1';
+            }, 10);
+        } else {
+            container.style.opacity = '0.5';
+            setTimeout(() => {
+                container.style.display = 'none';
+                container.style.opacity = '1';
+            }, 200);
+        }
+    }
+}
+
+// Initialize tmux edit page functionality
+function initTmuxEdit() {
+    // Initialize crap types toggle on page load
+    const checkedRadio = document.querySelector('input[name="fix_crap_opt"]:checked');
+    if (checkedRadio) {
+        toggleCrapTypes(checkedRadio.value);
+    }
+
+    // Add event listeners to all radio buttons
+    document.querySelectorAll('input[name="fix_crap_opt"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            toggleCrapTypes(this.value);
+        });
+    });
+}
+
+// Initialize on DOMContentLoaded if on tmux-edit page
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        if (document.getElementById('crap_types_container')) {
+            initTmuxEdit();
+        }
+    });
+} else {
+    if (document.getElementById('crap_types_container')) {
+        initTmuxEdit();
+    }
+}
+

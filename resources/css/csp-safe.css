@@ -627,3 +627,22 @@ code.api-token::-webkit-scrollbar-thumb:hover {
     }
 }
 
+/* Tmux Edit - Remove Crap Types Container Styles */
+#crap_types_container {
+    transition: opacity 0.3s ease, display 0.3s ease;
+}
+
+/* Checkbox hover effects for crap types */
+.hover\:bg-gray-100:hover {
+    transition: background-color 0.2s ease;
+}
+
+.dark .hover\:bg-gray-700:hover {
+    transition: background-color 0.2s ease;
+}
+
+/* Form checkbox focus ring */
+.form-checkbox:focus-visible {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+}

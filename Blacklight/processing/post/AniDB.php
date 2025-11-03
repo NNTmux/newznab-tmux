@@ -56,14 +56,26 @@ class AniDB
     /**
      * Queues anime releases for processing.
      *
+     * @param  string  $groupID  (Optional) ID of a group to work on.
+     * @param  string  $guidChar  (Optional) First letter of a release GUID to use to get work.
+     *
      * @throws \Exception
      */
-    public function processAnimeReleases(): void
+    public function processAnimeReleases(string $groupID = '', string $guidChar = ''): void
     {
-        $results = Release::query()
+        $query = Release::query()
             ->whereNull('anidbid')
-            ->where('categories_id', Category::TV_ANIME)
-            ->orderByDesc('postdate')
+            ->where('categories_id', Category::TV_ANIME);
+
+        if ($guidChar !== '') {
+            $query->where('leftguid', 'like', $guidChar.'%');
+        }
+
+        if ($groupID !== '') {
+            $query->where('groups_id', $groupID);
+        }
+
+        $results = $query->orderByDesc('postdate')
             ->limit($this->aniqty)
             ->get();
 

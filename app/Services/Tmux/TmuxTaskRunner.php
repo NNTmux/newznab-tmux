@@ -71,7 +71,7 @@ class TmuxTaskRunner
         // Add sleep timer at the end if specified
         if (isset($options['sleep'])) {
             $sleepCommand = $this->buildSleepCommand($options['sleep']);
-            $parts[] = "date +'%Y-%m-%d %T'";
+            $parts[] = 'date +"%Y-%m-%d %T"';
             $parts[] = $sleepCommand;
         }
 
@@ -334,16 +334,12 @@ class TmuxTaskRunner
      */
     protected function runMainSequential(array $runVar): bool
     {
-        // Full sequential mode - runs sequential script
+        // Full sequential mode - runs group:update-all for each group
         $pane = '0.1';
-        $script = base_path('misc/update/nix/tmux/bin/sequential.php');
-
-        if (! file_exists($script)) {
-            return $this->disablePane($pane, 'Sequential', 'script not found');
-        }
 
         $niceness = Settings::settingValue('niceness') ?? 2;
-        $command = "nice -n{$niceness} php {$script}";
+        $artisan = base_path('artisan');
+        $command = "nice -n{$niceness} php {$artisan} group:update-all";
         $command = $this->buildCommand($command, ['log_pane' => 'sequential']);
 
         return $this->paneManager->respawnPane($pane, $command);
@@ -387,26 +383,115 @@ class TmuxTaskRunner
      */
     protected function runRemoveCrapTask(array $runVar): bool
     {
-        $enabled = (int) ($runVar['settings']['fix_crap'] ?? 0);
+        $option = $runVar['settings']['fix_crap_opt'] ?? 'Disabled';
         $pane = '1.1';
 
-        if ($enabled !== 1) {
+        // Handle disabled state
+        if ($option === 'Disabled' || $option === 0 || $option === '0') {
             return $this->disablePane($pane, 'Remove Crap', 'disabled in settings');
         }
 
-        $option = (int) ($runVar['settings']['fix_crap_opt'] ?? 1);
-        $script = base_path('misc/update/nix/tmux/bin/removecrap.php');
+        $niceness = Settings::settingValue('niceness') ?? 2;
+        $artisan = base_path('artisan');
+        $sleep = (int) ($runVar['settings']['crap_timer'] ?? 300);
 
-        if (! file_exists($script)) {
-            return $this->disablePane($pane, 'Remove Crap', 'script not found');
+        // Handle 'All' mode - run all types with 2 hour time limit
+        if ($option === 'All') {
+            $command = "nice -n{$niceness} php {$artisan} releases:remove-crap --time=2 --delete";
+            $command = $this->buildCommand($command, ['log_pane' => 'removecrap', 'sleep' => $sleep]);
+            // Wrap in while loop to keep pane alive
+            $loopCommand = "while true; do {$command}; done";
+
+            return $this->paneManager->respawnPane($pane, $loopCommand);
         }
 
-        $niceness = Settings::settingValue('niceness') ?? 2;
-        $command = "nice -n{$niceness} php {$script} {$option}";
-        $sleep = (int) ($runVar['settings']['crap_timer'] ?? 300);
-        $command = $this->buildCommand($command, ['log_pane' => 'removecrap', 'sleep' => $sleep]);
+        // Handle 'Custom' mode - cycle through selected types
+        if ($option === 'Custom') {
+            $selectedTypes = $runVar['settings']['fix_crap'] ?? '';
 
-        return $this->paneManager->respawnPane($pane, $command);
+            if (empty($selectedTypes)) {
+                return $this->disablePane($pane, 'Remove Crap', 'no crap types selected');
+            }
+
+            $types = is_array($selectedTypes) ? $selectedTypes : explode(',', $selectedTypes);
+            $types = array_filter($types); // Remove empty values
+
+            if (empty($types)) {
+                return $this->disablePane($pane, 'Remove Crap', 'no crap types selected');
+            }
+
+            // Get the next type to process
+            $stateFile = storage_path('tmux/removecrap_state.json');
+            $state = $this->loadCrapState($stateFile);
+
+            // Determine current type index
+            $currentIndex = $state['current_index'] ?? 0;
+            $isFirstRun = $state['first_run'] ?? true;
+
+            // Validate index
+            if ($currentIndex >= count($types)) {
+                $currentIndex = 0;
+                $isFirstRun = false;
+            }
+
+            $currentType = $types[$currentIndex];
+
+            // Determine time limit: full on first run, 4 hours otherwise
+            $time = $isFirstRun ? 'full' : '4';
+
+            // Build and run command
+            $command = "nice -n{$niceness} php {$artisan} releases:remove-crap --type={$currentType} --time={$time} --delete";
+            $command = $this->buildCommand($command, ['log_pane' => 'removecrap', 'sleep' => $sleep]);
+
+            // Update state for next run
+            $nextIndex = $currentIndex + 1;
+            if ($nextIndex >= count($types)) {
+                $nextIndex = 0;
+                $isFirstRun = false;
+            }
+
+            $this->saveCrapState($stateFile, [
+                'current_index' => $nextIndex,
+                'first_run' => $isFirstRun,
+                'types' => $types,
+            ]);
+
+            // Wrap in while loop to keep pane alive
+            $loopCommand = "while true; do {$command}; done";
+
+            return $this->paneManager->respawnPane($pane, $loopCommand);
+        }
+
+        // Default fallback - disabled
+        return $this->disablePane($pane, 'Remove Crap', 'invalid configuration');
+    }
+
+    /**
+     * Load crap removal state
+     */
+    protected function loadCrapState(string $file): array
+    {
+        if (! file_exists($file)) {
+            return ['current_index' => 0, 'first_run' => true];
+        }
+
+        $content = file_get_contents($file);
+        $state = json_decode($content, true);
+
+        return $state ?: ['current_index' => 0, 'first_run' => true];
+    }
+
+    /**
+     * Save crap removal state
+     */
+    protected function saveCrapState(string $file, array $state): void
+    {
+        $dir = dirname($file);
+        if (! is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        file_put_contents($file, json_encode($state, JSON_PRETTY_PRINT));
     }
 
     /**
