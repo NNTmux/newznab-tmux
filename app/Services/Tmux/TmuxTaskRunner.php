@@ -416,7 +416,7 @@ class TmuxTaskRunner
 
             // Trim whitespace and filter out empty values and '0'
             $types = array_map('trim', $types);
-            $types = array_filter($types, fn($type) => !empty($type) && $type !== '0');
+            $types = array_filter($types, fn ($type) => ! empty($type) && $type !== '0');
 
             // Re-index array to ensure sequential keys
             $types = array_values($types);
