@@ -14,7 +14,7 @@ class UpdatePostProcess extends Command
      * @var string
      */
     protected $signature = 'update:postprocess
-                            {type : Type (all, nfo, movies, tv, music, console, games, book, anime, xxx, additional)}
+                            {type : Type (all, nfo, movies, tv, music, console, games, book, anime, xxx, additional, amazon)}
                             {echo? : Echo output (true/false, default: true)}';
 
     /**
@@ -30,6 +30,7 @@ class UpdatePostProcess extends Command
     private array $validTypes = [
         'additional' => false,
         'all' => true,
+        'amazon' => false, // Alias for book, music, console, games, xxx
         'anime' => false,
         'book' => false,
         'console' => false,
@@ -63,6 +64,7 @@ class UpdatePostProcess extends Command
 
             match ($type) {
                 'all' => $postProcess->processAll($nntp),
+                'amazon' => $this->processAmazon($postProcess),
                 'nfo' => $postProcess->processNfos($nntp),
                 'movies' => $postProcess->processMovies(),
                 'music' => $postProcess->processMusic(),
@@ -102,6 +104,19 @@ class UpdatePostProcess extends Command
         $this->line('  tv          - Processes tv');
         $this->line('  xxx         - Processes xxx');
         $this->line('  additional  - Processes previews/mediainfo/etc...');
+        $this->line('  amazon      - Processes books, music, console, games, and xxx');
+    }
+
+    /**
+     * Process amazon types (books, music, console, games, xxx).
+     */
+    private function processAmazon(PostProcess $postProcess): void
+    {
+        $postProcess->processBooks();
+        $postProcess->processMusic();
+        $postProcess->processConsoles();
+        $postProcess->processGames();
+        $postProcess->processXXX();
     }
 
     /**

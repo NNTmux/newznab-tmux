@@ -21,13 +21,17 @@ class ProcessPostProcess extends Command
      *
      * @var string
      */
-    protected $description = 'Post-process releases using multiprocessing';
+    protected $description = '[DEPRECATED] Use update:postprocess instead. Post-process releases using multiprocessing';
 
     /**
      * Execute the console command.
      */
     public function handle(): int
     {
+        $this->warn('⚠️  WARNING: This command is DEPRECATED and will be removed in a future version.');
+        $this->warn('    Please use "update:postprocess" instead.');
+        $this->line('');
+
         $type = $this->argument('type');
         $renamed = $this->argument('renamed');
 
