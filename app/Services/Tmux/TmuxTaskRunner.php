@@ -77,7 +77,7 @@ class TmuxTaskRunner
     protected function disablePane(string $pane, string $taskName, string $reason): bool
     {
         $color = $this->getRandomColor();
-        $message = "echo \"\033[38;5;{$color}m\\n{$taskName} has been disabled: {$reason}\"";
+        $message = "echo -e \"\033[38;5;{$color}m\n{$taskName} has been disabled: {$reason}\"";
 
         return $this->paneManager->respawnPane($pane, $message, kill: true);
     }
@@ -588,18 +588,18 @@ class TmuxTaskRunner
             return $this->disablePane($pane, 'Post-process Non-Amazon', 'no movies/tv/anime to process');
         }
 
-        $niceness = Settings::settingValue('niceness') ?? 2;
+        $niceness = $this->getNiceness();
         $log = $this->getLogFile('post_non');
 
         $artisan = PHP_BINARY.' artisan';
         $commands = [
-            "{$artisan} update:postprocess tv true 2>&1 | tee -a {$log}",
-            "{$artisan} update:postprocess movies true 2>&1 | tee -a {$log}",
-            "{$artisan} update:postprocess anime true 2>&1 | tee -a {$log}",
+            "nice -n{$niceness} {$artisan} update:postprocess tv true 2>&1 | tee -a {$log}",
+            "nice -n{$niceness} {$artisan} update:postprocess movies true 2>&1 | tee -a {$log}",
+            "nice -n{$niceness} {$artisan} update:postprocess anime true 2>&1 | tee -a {$log}",
         ];
 
         $sleep = (int) ($runVar['settings']['post_timer_non'] ?? 300);
-        $allCommands = "nice -n{$niceness} ".implode('; nice -n{$niceness} ', $commands);
+        $allCommands = implode('; ', $commands);
         $fullCommand = "{$allCommands}; date +'%Y-%m-%d %T'; sleep {$sleep}";
 
         return $this->paneManager->respawnPane($pane, $fullCommand);
