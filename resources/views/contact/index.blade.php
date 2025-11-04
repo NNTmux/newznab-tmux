@@ -44,7 +44,7 @@
                 <p class="text-gray-600 dark:text-gray-400">Don't hesitate to send us a message. Our team will be happy to help you.</p>
             </div>
 
-            {{ html()->form('POST', route('contact-us'))->open() }}
+            {{ html()->form()->method('POST')->action(route('contact-us'))->open() }}
                 <div class="mb-6">
                     <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Name <span class="text-red-500">*</span>

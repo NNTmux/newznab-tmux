@@ -49,7 +49,7 @@
                 </div>
             </div>
 
-            {{ html()->form('POST', url("mymovies?id=do{$type}"))->id('mymovies')->class('space-y-6')->open() }}
+            {{ html()->form()->method('POST')->action(url("mymovies?id=do{$type}"))->id('mymovies')->class('space-y-6')->open() }}
                 <input type="hidden" name="imdb" value="{{ $imdbid }}"/>
                 @if(!empty($from))
                     <input type="hidden" name="from" value="{{ $from }}" />
