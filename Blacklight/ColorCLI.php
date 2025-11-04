@@ -153,8 +153,8 @@ class ColorCLI
     /**
      * Apply ANSI color code to a string and return it (does not render)
      *
-     * @param string $string The string to colorize
-     * @param string $color The color name
+     * @param  string  $string  The string to colorize
+     * @param  string  $color  The color name
      * @return string The colored string with ANSI codes
      */
     public function ansiString(string $string, string $color): string
@@ -171,6 +171,7 @@ class ColorCLI
         ];
 
         $code = $colors[$color] ?? '0;37';
+
         return "\033[{$code}m{$string}\033[0m";
     }
 }
