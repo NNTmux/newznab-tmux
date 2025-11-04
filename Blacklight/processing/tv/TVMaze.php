@@ -105,10 +105,11 @@ class TVMaze extends TV
                         // Get the show from TVMaze
                         $tvMazeShow = $this->getShowInfo((string) $release['cleanname']);
 
+                        $dupeCheck = false;
+
                         if (\is_array($tvMazeShow)) {
                             $siteId = (int) $tvMazeShow['tvmaze'];
                             // Check if we have the TVDB ID already, if we do use that Video ID, unless it is 0
-                            $dupeCheck = false;
                             if ((int) $tvMazeShow['tvdb'] !== 0) {
                                 $dupeCheck = $this->getVideoIDFromSiteID('tvdb', $tvMazeShow['tvdb']);
                             }

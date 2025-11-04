@@ -182,7 +182,7 @@ class NameFixer
 
         if ($total > 0) {
             $this->_totalReleases = $total;
-            $this->colorCLI->climate()->info(number_format($total).' releases to process.');
+            $this->colorCLI->info(number_format($total).' releases to process.');
 
             foreach ($releases as $rel) {
                 $releaseRow = Release::fromQuery(
@@ -212,7 +212,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' NFO\'s');
         } else {
-            $this->colorCLI->climate()->info('Nothing to fix.');
+            $this->colorCLI->info('Nothing to fix.');
         }
     }
 
@@ -261,7 +261,7 @@ class NameFixer
         $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
-            $this->colorCLI->climate()->info(number_format($total).' file names to process.');
+            $this->colorCLI->info(number_format($total).' file names to process.');
 
             foreach ($releases as $release) {
                 $this->reset();
@@ -272,7 +272,7 @@ class NameFixer
 
             $this->_echoFoundCount($echo, ' files');
         } else {
-            $this->colorCLI->climate()->info('Nothing to fix.');
+            $this->colorCLI->info('Nothing to fix.');
         }
     }
 
@@ -321,7 +321,7 @@ class NameFixer
         $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
-            $this->colorCLI->climate()->info(number_format($total).' CRC32\'s to process.');
+            $this->colorCLI->info(number_format($total).' CRC32\'s to process.');
 
             foreach ($releases as $release) {
                 $this->reset();
@@ -332,7 +332,7 @@ class NameFixer
 
             $this->_echoFoundCount($echo, ' crc32\'s');
         } else {
-            $this->colorCLI->climate()->info('Nothing to fix.');
+            $this->colorCLI->info('Nothing to fix.');
         }
     }
 
@@ -379,7 +379,7 @@ class NameFixer
         $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
-            $this->colorCLI->climate()->info(number_format($total).' xxx file names to process.');
+            $this->colorCLI->info(number_format($total).' xxx file names to process.');
 
             foreach ($releases as $release) {
                 $this->reset();
@@ -389,7 +389,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' files');
         } else {
-            $this->colorCLI->climate()->info('Nothing to fix.');
+            $this->colorCLI->info('Nothing to fix.');
         }
     }
 
@@ -438,7 +438,7 @@ class NameFixer
         $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
-            $this->colorCLI->climate()->info(number_format($total).' srr file extensions to process.');
+            $this->colorCLI->info(number_format($total).' srr file extensions to process.');
 
             foreach ($releases as $release) {
                 $this->reset();
@@ -448,7 +448,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' files');
         } else {
-            $this->colorCLI->climate()->info('Nothing to fix.');
+            $this->colorCLI->info('Nothing to fix.');
         }
     }
 
@@ -494,7 +494,7 @@ class NameFixer
         if ($total > 0) {
             $this->_totalReleases = $total;
 
-            $this->colorCLI->climate()->info(number_format($total).' releases to process.');
+            $this->colorCLI->info(number_format($total).' releases to process.');
             $Nfo = new Nfo;
             $nzbContents = new NZBContents;
 
@@ -508,7 +508,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' files');
         } else {
-            $this->colorCLI->climate()->info('Nothing to fix.');
+            $this->colorCLI->info('Nothing to fix.');
         }
     }
 
@@ -560,7 +560,7 @@ class NameFixer
         $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
-            $this->colorCLI->climate()->info(number_format($total).' unique ids to process.');
+            $this->colorCLI->info(number_format($total).' unique ids to process.');
             foreach ($releases as $rel) {
                 $this->checked++;
                 $this->reset();
@@ -569,7 +569,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' UID\'s');
         } else {
-            $this->colorCLI->climate()->info('Nothing to fix.');
+            $this->colorCLI->info('Nothing to fix.');
         }
     }
 
@@ -612,7 +612,7 @@ class NameFixer
         $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
-            $this->colorCLI->climate()->info(number_format($total).' mediainfo movie names to process.');
+            $this->colorCLI->info(number_format($total).' mediainfo movie names to process.');
             foreach ($releases as $rel) {
                 $this->checked++;
                 $this->reset();
@@ -621,7 +621,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' MediaInfo\'s');
         } else {
-            $this->colorCLI->climate()->info('Nothing to fix.');
+            $this->colorCLI->info('Nothing to fix.');
         }
     }
 
@@ -678,7 +678,7 @@ class NameFixer
         $total = $releases->count();
         if ($total > 0) {
             $this->_totalReleases = $total;
-            $this->colorCLI->climate()->info(number_format($total).' hash_16K to process.');
+            $this->colorCLI->info(number_format($total).' hash_16K to process.');
             foreach ($releases as $rel) {
                 $this->checked++;
                 $this->reset();
@@ -687,7 +687,7 @@ class NameFixer
             }
             $this->_echoFoundCount($echo, ' hashes');
         } else {
-            $this->colorCLI->climate()->info('Nothing to fix.');
+            $this->colorCLI->info('Nothing to fix.');
         }
     }
 
@@ -724,7 +724,7 @@ class NameFixer
     protected function _echoFoundCount(bool|int $echo, string $type): void
     {
         if ($echo === true) {
-            $this->colorCLI->climate()->info(
+            $this->colorCLI->info(
                 PHP_EOL.
                 number_format($this->fixed).
                 ' releases have had their names changed out of: '.
@@ -732,7 +732,7 @@ class NameFixer
                 $type.'.'
             );
         } else {
-            $this->colorCLI->climate()->info(
+            $this->colorCLI->info(
                 PHP_EOL.
                 number_format($this->fixed).
                 ' releases could have their names changed. '.
@@ -748,7 +748,7 @@ class NameFixer
      */
     protected function _echoStartMessage(int $time, string $type): void
     {
-        $this->colorCLI->climate()->info(
+        $this->colorCLI->info(
             sprintf(
                 'Fixing search names %s using %s.',
                 ($time === 1 ? 'in the past 6 hours' : 'since the beginning'),
@@ -764,7 +764,7 @@ class NameFixer
         }
 
         if ($show === 2) {
-            $this->colorCLI->climate()->info(
+            $this->colorCLI->info(
                 'Renamed Releases: ['.
                 number_format($this->fixed).
                 '] '.
@@ -1084,8 +1084,8 @@ class NameFixer
             $limit = 'LIMIT 1000000';
         }
 
-        $this->colorCLI->climate()->info(PHP_EOL.'Match PreFiles '.$args[1].' Started at '.now());
-        $this->colorCLI->climate()->info('Matching predb filename to cleaned release_files.name.');
+        $this->colorCLI->info(PHP_EOL.'Match PreFiles '.$args[1].' Started at '.now());
+        $this->colorCLI->info('Matching predb filename to cleaned release_files.name.');
 
         $counter = $counted = 0;
         $timeStart = now();
@@ -1114,7 +1114,7 @@ class NameFixer
             $total = $query->count();
 
             if ($total > 0) {
-                $this->colorCLI->climate()->info(PHP_EOL.number_format($total).' releases to process.');
+                $this->colorCLI->info(PHP_EOL.number_format($total).' releases to process.');
 
                 foreach ($query as $row) {
                     $success = $this->matchPreDbFiles($row, true, 1, $show);
@@ -1122,12 +1122,12 @@ class NameFixer
                         $counted++;
                     }
                     if ($show === 0) {
-                        $this->colorCLI->climate()->info('Renamed Releases: ['.number_format($counted).'] '.(new ConsoleTools)->percentString(++$counter, $total));
+                        $this->colorCLI->info('Renamed Releases: ['.number_format($counted).'] '.(new ConsoleTools)->percentString(++$counter, $total));
                     }
                 }
-                $this->colorCLI->climate()->info(PHP_EOL.'Renamed '.number_format($counted).' releases in '.now()->diffInSeconds($timeStart, true).' seconds'.'.');
+                $this->colorCLI->info(PHP_EOL.'Renamed '.number_format($counted).' releases in '.now()->diffInSeconds($timeStart, true).' seconds'.'.');
             } else {
-                $this->colorCLI->climate()->info('Nothing to do.');
+                $this->colorCLI->info('Nothing to do.');
             }
         }
     }

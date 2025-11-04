@@ -291,12 +291,12 @@ class TVDB extends TV
             $response = $this->client->search()->search($name, ['type' => 'series']);
         } catch (ResourceNotFoundException $e) {
             $response = false;
-            $this->colorCli->climate()->error('Show not found on TVDB');
+            $this->colorCli->error('Show not found on TVDB');
         } catch (UnauthorizedException $e) {
             try {
                 $this->authorizeTvdb();
             } catch (UnauthorizedException $error) {
-                $this->colorCli->climate()->error('Not authorized to access TVDB');
+                $this->colorCli->error('Not authorized to access TVDB');
             }
         }
 
@@ -383,7 +383,7 @@ class TVDB extends TV
                     try {
                         $this->authorizeTvdb();
                     } catch (UnauthorizedException $error) {
-                        $this->colorCli->climate()->error('Not authorized to access TVDB');
+                        $this->colorCli->error('Not authorized to access TVDB');
                     }
                 }
             } else {
@@ -431,13 +431,13 @@ class TVDB extends TV
             $poster = collect($poster)->where('type', 2)->sortByDesc('score')->first();
             $this->posterUrl = ! empty($poster->image) ? $poster->image : '';
         } catch (ResourceNotFoundException $e) {
-            $this->colorCli->climate()->error('Poster image not found on TVDB');
+            $this->colorCli->error('Poster image not found on TVDB');
         } catch (UnauthorizedException $error) {
 
             try {
                 $this->authorizeTvdb();
             } catch (UnauthorizedException $error) {
-                $this->colorCli->climate()->error('Not authorized to access TVDB');
+                $this->colorCli->error('Not authorized to access TVDB');
             }
         }
 
@@ -445,9 +445,9 @@ class TVDB extends TV
             $imdbId = $this->client->series()->extended($show->tvdb_id);
             preg_match('/tt(?P<imdbid>\d{6,9})$/i', $imdbId->getIMDBId(), $imdb);
         } catch (ResourceNotFoundException $e) {
-            $this->colorCli->climate()->error('Show ImdbId not found on TVDB');
+            $this->colorCli->error('Show ImdbId not found on TVDB');
         } catch (\Exception) {
-            $this->colorCli->climate()->error('Error on TVDB, aborting');
+            $this->colorCli->error('Error on TVDB, aborting');
         }
 
         return [

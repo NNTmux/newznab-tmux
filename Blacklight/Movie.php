@@ -661,7 +661,7 @@ class Movie
                         $ret['title'] = $art['name'];
                     }
                     if ($this->echooutput) {
-                        $this->colorCli->climate()->info('Fanart found '.$ret['title']);
+                        $this->colorCli->info('Fanart found '.$ret['title']);
                     }
 
                     return $ret;
@@ -794,7 +794,7 @@ class Movie
 
             // Log success
             if ($this->echooutput) {
-                $this->colorCli->climate()->info('TMDb found '.$ret['title']);
+                $this->colorCli->info('TMDb found '.$ret['title']);
             }
 
             // Cache the result
@@ -878,7 +878,7 @@ class Movie
 
             // Log success
             if ($this->echooutput) {
-                $this->colorCli->climate()->info('IMDb found '.$title);
+                $this->colorCli->info('IMDb found '.$title);
             }
 
             // Cache the successful result
@@ -969,7 +969,7 @@ class Movie
 
             // Log success
             if ($this->echooutput) {
-                $this->colorCli->climate()->info('Trakt found '.$movieData['title']);
+                $this->colorCli->info('Trakt found '.$movieData['title']);
             }
 
             // Cache the successful result
@@ -1069,7 +1069,7 @@ class Movie
 
             // Log success
             if ($this->echooutput) {
-                $this->colorCli->climate()->info('OMDbAPI Found '.$movieData['title']);
+                $this->colorCli->info('OMDbAPI Found '.$movieData['title']);
             }
 
             // Cache the successful result
@@ -1139,7 +1139,7 @@ class Movie
 
             // Log success
             if ($this->echooutput) {
-                $this->colorCli->climate()->info('iTunes found '.$movieData['title']);
+                $this->colorCli->info('iTunes found '.$movieData['title']);
             }
 
             // Cache the successful result
@@ -1193,7 +1193,7 @@ class Movie
             try {
                 $this->service = $service;
                 if ($this->echooutput && $this->service !== '') {
-                    $this->colorCli->climate()->info($this->service.' found IMDBid: tt'.$imdbId);
+                    $this->colorCli->info($this->service.' found IMDBid: tt'.$imdbId);
                 }
 
                 // Get movie info ID
@@ -1334,7 +1334,7 @@ class Movie
 
                 // Log current lookup if output is enabled
                 if ($this->echooutput) {
-                    $this->colorCli->climate()->info('Looking up: '.$movieName);
+                    $this->colorCli->info('Looking up: '.$movieName);
                 }
 
                 // Try all available sources to find IMDB ID
@@ -1348,7 +1348,7 @@ class Movie
                 if ($foundIMDB) {
                     // Movie was successfully updated by one of the services
                     if ($this->echooutput) {
-                        $this->colorCli->climate()->success('Successfully updated release with IMDB ID');
+                        $this->colorCli->primary('Successfully updated release with IMDB ID');
                     }
 
                     continue;
@@ -1357,7 +1357,7 @@ class Movie
                     $releaseCheck = Release::query()->where('id', $arr['id'])->whereNotNull('imdbid')->exists();
                     if ($releaseCheck) {
                         if ($this->echooutput) {
-                            $this->colorCli->climate()->info('Release already has IMDB ID, skipping');
+                            $this->colorCli->info('Release already has IMDB ID, skipping');
                         }
 
                         continue;
@@ -1379,7 +1379,7 @@ class Movie
 
                     $this->colorCli->header('Failed to find IMDB IDs for '.count($failedIDs).' releases:');
                     foreach ($failedReleases as $release) {
-                        $this->colorCli->climate()->error("ID: {$release->id} - {$release->searchname}");
+                        $this->colorCli->error("ID: {$release->id} - {$release->searchname}");
                     }
                 }
 
@@ -1621,7 +1621,7 @@ class Movie
                 Cache::put($cacheKey, $match['imdbid'], now()->addDays(7));
 
                 if ($this->echooutput) {
-                    $this->colorCli->climate()->info("Found local match: {$match['title']} ({$match['imdbid']})");
+                    $this->colorCli->info("Found local match: {$match['title']} ({$match['imdbid']})");
                 }
 
                 return $match['imdbid'];

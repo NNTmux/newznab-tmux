@@ -73,7 +73,6 @@
         "laravel/tinker": "^2.10.1",
         "laravel/ui": "^4.6",
         "laravelcollective/html": "^6.4",
-        "league/climate": "^3.10",
         "leventcz/laravel-top": "^1.2",
         "livewire/livewire": "^3.6",
         "livewire/volt": "^1.6",
