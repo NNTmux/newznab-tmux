@@ -588,21 +588,20 @@ class TmuxTaskRunner
         $artisan = PHP_BINARY.' artisan';
         $commands = [];
 
-        // Only add TV processing if enabled and has work
+        // TV processing - Uses update:postprocess which now spawns parallel processes with pipelined providers
         $processTv = (int) ($runVar['settings']['processtvrage'] ?? 0);
         $hasTvWork = (int) ($runVar['counts']['now']['processtv'] ?? 0) > 0;
         if ($processTv > 0 && $hasTvWork) {
-            $commands[] = "nice -n{$niceness} {$artisan} update:postprocess tv true 2>&1 | tee -a {$log}";
+            $commands[] = "nice -n{$niceness} {$artisan} update:postprocess tv 2>&1 | tee -a {$log}";
         }
 
-        // Only add Movies processing if enabled and has work
+        // Movies processing - Uses single-process command
         $processMovies = (int) ($runVar['settings']['processmovies'] ?? 0);
         $hasMoviesWork = (int) ($runVar['counts']['now']['processmovies'] ?? 0) > 0;
         if ($processMovies > 0 && $hasMoviesWork) {
             $commands[] = "nice -n{$niceness} {$artisan} update:postprocess movies true 2>&1 | tee -a {$log}";
         }
 
-        // Only add Anime processing if enabled and has work
         $processAnime = (int) ($runVar['settings']['processanime'] ?? 0);
         $hasAnimeWork = (int) ($runVar['counts']['now']['processanime'] ?? 0) > 0;
         if ($processAnime > 0 && $hasAnimeWork) {

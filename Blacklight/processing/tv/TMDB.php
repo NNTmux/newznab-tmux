@@ -48,14 +48,19 @@ class TMDB extends TV
         $tvcount = \count($res);
         $lookupSetting = true;
 
-        if ($this->echooutput && $tvcount > 0) {
-            $this->colorCli->header('Processing TMDB lookup for '.number_format($tvcount).' release(s).', true);
+        if ($tvcount === 0) {
+
+            return;
         }
 
         if ($res instanceof \Traversable) {
             $this->titleCache = [];
+            $processed = 0;
+            $matched = 0;
+            $skipped = 0;
 
             foreach ($res as $row) {
+                $processed++;
                 $siteId = false;
                 $this->posterUrl = '';
 
@@ -65,11 +70,13 @@ class TMDB extends TV
                 if (\is_array($release) && $release['name'] !== '') {
                     if (\in_array($release['cleanname'], $this->titleCache, false)) {
                         if ($this->echooutput) {
-                            $this->colorCli->headerOver('Title: ').
-                                    $this->colorCli->warningOver($release['cleanname']).
-                                    $this->colorCli->header(' already failed lookup for this site.  Skipping.', true);
+                            $this->colorCli->primaryOver('    → ');
+                            $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
+                            $this->colorCli->primaryOver(' → ');
+                            $this->colorCli->alternate('Skipped (previously failed)');
                         }
                         $this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
+                        $skipped++;
 
                         continue;
                     }
@@ -85,9 +92,10 @@ class TMDB extends TV
                     // If lookups are allowed lets try to get it.
                     if ($videoId === 0 && $lookupSetting) {
                         if ($this->echooutput) {
-                            $this->colorCli->primaryOver('Checking TMDB for previously failed title: ').
-                                    $this->colorCli->headerOver($release['cleanname']).
-                                    $this->colorCli->primary('.', true);
+                            $this->colorCli->primaryOver('    → ');
+                            $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
+                            $this->colorCli->primaryOver(' → ');
+                            $this->colorCli->info('Searching TMDB...');
                         }
 
                         // Get the show from TMDB
@@ -107,9 +115,11 @@ class TMDB extends TV
                             }
                         }
                     } else {
-                        if ($this->echooutput) {
-                            $this->colorCli->climate()->info('Found local TMDB match for: '.$release['cleanname']);
-                            $this->colorCli->climate()->info('.  Attempting episode lookup!');
+                        if ($this->echooutput && $videoId > 0) {
+                            $this->colorCli->primaryOver('    → ');
+                            $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
+                            $this->colorCli->primaryOver(' → ');
+                            $this->colorCli->info('Found in DB');
                         }
                         $siteId = $this->getSiteIDFromVideoID('tmdb', $videoId);
                     }
@@ -124,7 +134,13 @@ class TMDB extends TV
                         if ($episodeNo === 'all') {
                             // Set the video ID and leave episode 0
                             $this->setVideoIdFound($videoId, $row['id'], 0);
-                            $this->colorCli->climate()->info('Found TMDB Match for Full Season!');
+                            if ($this->echooutput) {
+                                $this->colorCli->primaryOver('    → ');
+                                $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
+                                $this->colorCli->primaryOver(' → ');
+                                $this->colorCli->primary('Full Season matched');
+                            }
+                            $matched++;
 
                             continue;
                         }
@@ -155,25 +171,70 @@ class TMDB extends TV
                             // Mark the releases video and episode IDs
                             $this->setVideoIdFound($videoId, $row['id'], $episode);
                             if ($this->echooutput) {
-                                $this->colorCli->climate()->info('Found TMDB Match!');
+                                $this->colorCli->primaryOver('    → ');
+                                $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
+                                $this->colorCli->primaryOver(' S');
+                                $this->colorCli->warningOver(sprintf('%02d', $seriesNo));
+                                $this->colorCli->primaryOver('E');
+                                $this->colorCli->warningOver(sprintf('%02d', $episodeNo));
+                                $this->colorCli->primaryOver(' ✓ ');
+                                $this->colorCli->primary('MATCHED (TMDB)');
                             }
+                            $matched++;
                         } else {
                             // Processing failed, set the episode ID to the next processing group
                             $this->setVideoIdFound($videoId, $row['id'], 0);
                             $this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
+                            if ($this->echooutput) {
+                                $this->colorCli->primaryOver('    → ');
+                                $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
+                                $this->colorCli->primaryOver(' → ');
+                                $this->colorCli->warning('Episode not found');
+                            }
                         }
                     } else {
                         // Processing failed, set the episode ID to the next processing group
                         $this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
                         $this->titleCache[] = $release['cleanname'] ?? null;
+                        if ($this->echooutput) {
+                            $this->colorCli->primaryOver('    → ');
+                            $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
+                            $this->colorCli->primaryOver(' → ');
+                            $this->colorCli->warning('Not found');
+                        }
                     }
                 } else {
                     // Processing failed, set the episode ID to the next processing group
                     $this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
                     $this->titleCache[] = $release['cleanname'] ?? null;
+                    if ($this->echooutput) {
+                        $this->colorCli->primaryOver('    → ');
+                        $this->colorCli->alternateOver(mb_substr($row['searchname'], 0, 50));
+                        $this->colorCli->primaryOver(' → ');
+                        $this->colorCli->error('Parse failed');
+                    }
                 }
             }
+
+            // Display summary
+            if ($this->echooutput && $matched > 0) {
+                echo "\n";
+                $this->colorCli->primaryOver('  ✓ TMDB: ');
+                $this->colorCli->primary(sprintf('%d matched, %d skipped', $matched, $skipped));
+            }
         }
+    }
+
+    /**
+     * Truncate title for display purposes.
+     */
+    private function truncateTitle(string $title, int $maxLength = 45): string
+    {
+        if (mb_strlen($title) <= $maxLength) {
+            return $title;
+        }
+
+        return mb_substr($title, 0, $maxLength - 3).'...';
     }
 
     /**

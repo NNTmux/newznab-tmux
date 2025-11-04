@@ -67,12 +67,18 @@ class TVDB extends TV
 
         $tvCount = \count($res);
 
-        if ($this->echooutput && $tvCount > 0) {
-            $this->colorCli->header('Processing TVDB lookup for '.number_format($tvCount).' release(s).', true);
+        if ($tvCount === 0) {
+
+            return;
         }
+
         $this->titleCache = [];
+        $processed = 0;
+        $matched = 0;
+        $skipped = 0;
 
         foreach ($res as $row) {
+            $processed++;
             $siteId = false;
             $this->posterUrl = '';
 
@@ -81,11 +87,13 @@ class TVDB extends TV
             if (\is_array($release) && $release['name'] !== '') {
                 if (\in_array($release['cleanname'], $this->titleCache, false)) {
                     if ($this->echooutput) {
-                        $this->colorCli->headerOver('Title: ').
-                        $this->colorCli->warningOver($release['cleanname']).
-                        $this->colorCli->header(' already failed lookup for this site.  Skipping.', true);
+                        $this->colorCli->primaryOver('    → ');
+                        $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
+                        $this->colorCli->primaryOver(' → ');
+                        $this->colorCli->alternate('Skipped (previously failed)');
                     }
                     $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
+                    $skipped++;
 
                     continue;
                 }
@@ -106,7 +114,10 @@ class TVDB extends TV
                 if ($siteId === false && $lookupSetting) {
                     // If it doesn't exist locally and lookups are allowed lets try to get it.
                     if ($this->echooutput) {
-                        $this->colorCli->climate()->error('Video ID for '.$release['cleanname'].' not found in local db, checking web.');
+                        $this->colorCli->primaryOver('    → ');
+                        $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
+                        $this->colorCli->primaryOver(' → ');
+                        $this->colorCli->info('Searching TVDB...');
                     }
 
                     // Check if we have a valid country and set it in the array
@@ -125,7 +136,10 @@ class TVDB extends TV
                         $siteId = (int) $tvdbShow['tvdb'];
                     }
                 } elseif ($this->echooutput && $siteId !== false) {
-                    $this->colorCli->climate()->info('Video ID for '.$release['cleanname'].' found in local db, attempting episode match.');
+                    $this->colorCli->primaryOver('    → ');
+                    $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
+                    $this->colorCli->primaryOver(' → ');
+                    $this->colorCli->info('Found in DB');
                 }
 
                 if ((int) $videoId > 0 && (int) $siteId > 0) {
@@ -148,7 +162,13 @@ class TVDB extends TV
                     if ($episodeNo === 'all') {
                         // Set the video ID and leave episode 0
                         $this->setVideoIdFound($videoId, $row['id'], 0);
-                        $this->colorCli->climate()->info('Found TVDB Match for Full Season!');
+                        if ($this->echooutput) {
+                            $this->colorCli->primaryOver('    → ');
+                            $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
+                            $this->colorCli->primaryOver(' → ');
+                            $this->colorCli->primary('Full Season matched');
+                        }
+                        $matched++;
 
                         continue;
                     }
@@ -179,24 +199,71 @@ class TVDB extends TV
                         // Mark the releases video and episode IDs
                         $this->setVideoIdFound($videoId, $row['id'], $episode);
                         if ($this->echooutput) {
-                            $this->colorCli->climate()->info('Found TVDB Match!');
+                            $this->colorCli->primaryOver('    → ');
+                            $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
+                            $this->colorCli->primaryOver(' S');
+                            $this->colorCli->warningOver(sprintf('%02d', $seriesNo));
+                            $this->colorCli->primaryOver('E');
+                            $this->colorCli->warningOver(sprintf('%02d', $episodeNo));
+                            $this->colorCli->primaryOver(' ✓ ');
+                            $this->colorCli->primary('MATCHED (TVDB)');
                         }
+                        $matched++;
                     } else {
                         // Processing failed, set the episode ID to the next processing group
                         $this->setVideoIdFound($videoId, $row['id'], 0);
                         $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
+                        if ($this->echooutput) {
+                            $this->colorCli->primaryOver('    → ');
+                            $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
+                            $this->colorCli->primaryOver(' → ');
+                            $this->colorCli->warning('Episode not found');
+                        }
                     }
                 } else {
                     // Processing failed, set the episode ID to the next processing group
                     $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
                     $this->titleCache[] = $release['cleanname'] ?? null;
+                    if ($this->echooutput) {
+                        $this->colorCli->primaryOver('    → ');
+                        $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
+                        $this->colorCli->primaryOver(' → ');
+                        $this->colorCli->warning('Not found');
+                    }
                 }
             } else {
                 // Parsing failed, take it out of the queue for examination
                 $this->setVideoNotFound(parent::FAILED_PARSE, $row['id']);
                 $this->titleCache[] = $release['cleanname'] ?? null;
+                if ($this->echooutput) {
+                    $this->colorCli->error(sprintf(
+                        '  ✗ [%d/%d] Parse failed: %s',
+                        $processed,
+                        $tvCount,
+                        mb_substr($row['searchname'], 0, 50)
+                    ));
+                }
             }
         }
+
+        // Display summary
+        if ($this->echooutput && $matched > 0) {
+            echo "\n";
+            $this->colorCli->primaryOver('  ✓ TVDB: ');
+            $this->colorCli->primary(sprintf('%d matched, %d skipped', $matched, $skipped));
+        }
+    }
+
+    /**
+     * Truncate title for display purposes.
+     */
+    private function truncateTitle(string $title, int $maxLength = 45): string
+    {
+        if (mb_strlen($title) <= $maxLength) {
+            return $title;
+        }
+
+        return mb_substr($title, 0, $maxLength - 3).'...';
     }
 
     /**
