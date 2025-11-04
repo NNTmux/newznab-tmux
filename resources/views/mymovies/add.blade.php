@@ -49,7 +49,7 @@
                 </div>
             </div>
 
-            {!! Form::open(['id' => 'mymovies', 'class' => 'space-y-6', 'url' => "mymovies?id=do{$type}"]) !!}
+            {{ html()->form()->method('POST')->action(url("mymovies?id=do{$type}"))->id('mymovies')->class('space-y-6')->open() }}
                 <input type="hidden" name="imdb" value="{{ $imdbid }}"/>
                 @if(!empty($from))
                     <input type="hidden" name="from" value="{{ $from }}" />
@@ -82,7 +82,7 @@
                         <i class="fa fa-arrow-left mr-2"></i>Back to My Movies
                     </a>
                 </div>
-            {!! Form::close() !!}
+            {{ html()->form()->close() }}
         </div>
     </div>
 </div>

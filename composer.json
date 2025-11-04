@@ -72,7 +72,6 @@
         "laravel/telescope": "^5.5",
         "laravel/tinker": "^2.10.1",
         "laravel/ui": "^4.6",
-        "laravelcollective/html": "^6.4",
         "leventcz/laravel-top": "^1.2",
         "livewire/livewire": "^3.6",
         "livewire/volt": "^1.6",
@@ -106,7 +105,8 @@
         "symfony/postmark-mailer": "^7.0",
         "symfony/process": "^7.0",
         "vlucas/phpdotenv": "^5.6",
-        "voku/simple_html_dom": "^4.8"
+        "voku/simple_html_dom": "^4.8",
+        "spatie/laravel-html": "^3.11"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.5",
