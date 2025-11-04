@@ -2,7 +2,7 @@
 
 namespace Blacklight;
 
-use function Termwind\{render};
+use function Termwind\render;
 
 /**
  * Class ColorCLI.
@@ -103,14 +103,18 @@ class ColorCLI
 
     public function progress(): object
     {
-        return new class {
+        return new class
+        {
             private int $total = 0;
+
             private int $current = 0;
+
             private string $label = '';
 
             public function total(int $total): self
             {
                 $this->total = $total;
+
                 return $this;
             }
 
