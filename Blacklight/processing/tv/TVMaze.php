@@ -54,14 +54,19 @@ class TVMaze extends TV
 
         $tvCount = \count($res);
 
-        if ($this->echooutput && $tvCount > 0) {
-            $this->colorCli->header('Processing TVMaze lookup for '.number_format($tvCount).' release(s).', true);
+        if ($tvCount === 0) {
+
+            return;
         }
 
         if ($res instanceof \Traversable) {
             $this->titleCache = [];
+            $processed = 0;
+            $matched = 0;
+            $skipped = 0;
 
             foreach ($res as $row) {
+                $processed++;
                 $siteId = false;
                 $this->posterUrl = '';
 
@@ -70,11 +75,13 @@ class TVMaze extends TV
                 if (\is_array($release) && $release['name'] !== '') {
                     if (\in_array($release['cleanname'], $this->titleCache, false)) {
                         if ($this->echooutput) {
-                            $this->colorCli->headerOver('Title: ').
-                                    $this->colorCli->warningOver($release['cleanname']).
-                                    $this->colorCli->header(' already failed lookup for this site.  Skipping.', true);
+                            $this->colorCli->primaryOver('    → ');
+                            $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
+                            $this->colorCli->primaryOver(' → ');
+                            $this->colorCli->alternate('Skipped (previously failed)');
                         }
                         $this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
+                        $skipped++;
 
                         continue;
                     }
@@ -89,18 +96,20 @@ class TVMaze extends TV
                     if ($videoId === 0 && $lookupSetting) {
                         // If lookups are allowed lets try to get it.
                         if ($this->echooutput) {
-                            $this->colorCli->primaryOver('Checking TVMaze for previously failed title: ').
-                                    $this->colorCli->headerOver($release['cleanname']).
-                                    $this->colorCli->primary('.', true);
+                            $this->colorCli->primaryOver('    → ');
+                            $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
+                            $this->colorCli->primaryOver(' → ');
+                            $this->colorCli->info('Searching TVMaze...');
                         }
 
                         // Get the show from TVMaze
                         $tvMazeShow = $this->getShowInfo((string) $release['cleanname']);
 
+                        $dupeCheck = false;
+
                         if (\is_array($tvMazeShow)) {
                             $siteId = (int) $tvMazeShow['tvmaze'];
                             // Check if we have the TVDB ID already, if we do use that Video ID, unless it is 0
-                            $dupeCheck = false;
                             if ((int) $tvMazeShow['tvdb'] !== 0) {
                                 $dupeCheck = $this->getVideoIDFromSiteID('tvdb', $tvMazeShow['tvdb']);
                             }
@@ -110,12 +119,16 @@ class TVMaze extends TV
                                 $videoId = $dupeCheck;
                                 // Update any missing fields and add site IDs
                                 $this->update($videoId, $tvMazeShow);
-                                $siteId = $this->getSiteIDFromVideoID('tvmaze', $videoId);
                             }
+                        } else {
+                            $videoId = $dupeCheck;
                         }
                     } else {
-                        if ($this->echooutput) {
-                            $this->colorCli->climate()->info('Found local TVMaze match for: '.$release['cleanname'].'. Attempting episode lookup!');
+                        if ($this->echooutput && $videoId > 0) {
+                            $this->colorCli->primaryOver('    → ');
+                            $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
+                            $this->colorCli->primaryOver(' → ');
+                            $this->colorCli->info('Found in DB');
                         }
                         $siteId = $this->getSiteIDFromVideoID('tvmaze', $videoId);
                     }
@@ -130,7 +143,13 @@ class TVMaze extends TV
                         if ($episodeNo === 'all') {
                             // Set the video ID and leave episode 0
                             $this->setVideoIdFound($videoId, $row['id'], 0);
-                            $this->colorCli->climate()->info('Found TVMaze Match for Full Season!', true);
+                            if ($this->echooutput) {
+                                $this->colorCli->primaryOver('    → ');
+                                $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
+                                $this->colorCli->primaryOver(' → ');
+                                $this->colorCli->primary('Full Season matched');
+                            }
+                            $matched++;
 
                             continue;
                         }
@@ -161,25 +180,70 @@ class TVMaze extends TV
                             // Mark the releases video and episode IDs
                             $this->setVideoIdFound($videoId, $row['id'], $episode);
                             if ($this->echooutput) {
-                                $this->colorCli->climate()->info('Found TVMaze Match!', true);
+                                $this->colorCli->primaryOver('    → ');
+                                $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
+                                $this->colorCli->primaryOver(' S');
+                                $this->colorCli->warningOver(sprintf('%02d', $seriesNo));
+                                $this->colorCli->primaryOver('E');
+                                $this->colorCli->warningOver(sprintf('%02d', $episodeNo));
+                                $this->colorCli->primaryOver(' ✓ ');
+                                $this->colorCli->primary('MATCHED (TVMaze)');
                             }
+                            $matched++;
                         } else {
                             // Processing failed, set the episode ID to the next processing group
                             $this->setVideoIdFound($videoId, $row['id'], 0);
                             $this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
+                            if ($this->echooutput) {
+                                $this->colorCli->primaryOver('    → ');
+                                $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
+                                $this->colorCli->primaryOver(' → ');
+                                $this->colorCli->warning('Episode not found');
+                            }
                         }
                     } else {
                         // Processing failed, set the episode ID to the next processing group
                         $this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
                         $this->titleCache[] = $release['cleanname'] ?? null;
+                        if ($this->echooutput) {
+                            $this->colorCli->primaryOver('    → ');
+                            $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
+                            $this->colorCli->primaryOver(' → ');
+                            $this->colorCli->warning('Not found');
+                        }
                     }
                 } else {
                     // Processing failed, set the episode ID to the next processing group
                     $this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
                     $this->titleCache[] = $release['cleanname'] ?? null;
+                    if ($this->echooutput) {
+                        $this->colorCli->primaryOver('    → ');
+                        $this->colorCli->alternateOver(mb_substr($row['searchname'], 0, 50));
+                        $this->colorCli->primaryOver(' → ');
+                        $this->colorCli->error('Parse failed');
+                    }
                 }
             }
+
+            // Display summary
+            if ($this->echooutput && $matched > 0) {
+                echo "\n";
+                $this->colorCli->primaryOver('  ✓ TVMaze: ');
+                $this->colorCli->primary(sprintf('%d matched, %d skipped', $matched, $skipped));
+            }
         }
+    }
+
+    /**
+     * Truncate title for display purposes.
+     */
+    private function truncateTitle(string $title, int $maxLength = 45): string
+    {
+        if (mb_strlen($title) <= $maxLength) {
+            return $title;
+        }
+
+        return mb_substr($title, 0, $maxLength - 3).'...';
     }
 
     /**

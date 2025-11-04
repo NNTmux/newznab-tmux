@@ -184,7 +184,61 @@ class PostProcessRunner extends BaseRunner
         $queue = DB::select($sql);
 
         $maxProcesses = (int) Settings::settingValue('postthreadsnon');
-        $this->runPostProcess($queue, $maxProcesses, 'tv', 'tv postprocessing');
+
+        // Use pipelined TV processing for better efficiency
+        $this->runPostProcessTvPipeline($queue, $maxProcesses, 'tv postprocessing (pipelined)', $renamedOnly);
+    }
+
+    /**
+     * Run pipelined TV post-processing across multiple GUID buckets in parallel.
+     * Each parallel process runs the full provider pipeline sequentially.
+     */
+    private function runPostProcessTvPipeline(array $releases, int $maxProcesses, string $desc, bool $renamedOnly): void
+    {
+        if (empty($releases)) {
+            $this->headerNone();
+
+            return;
+        }
+
+        // If streaming is enabled, run commands with real-time output
+        if ((bool) config('nntmux.stream_fork_output', false) === true) {
+            $commands = [];
+            foreach ($releases as $release) {
+                $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
+                $renamed = isset($release->renamed) ? $release->renamed : '';
+                // Use the pipelined TV command
+                $commands[] = PHP_BINARY.' artisan postprocess:tv-pipeline '.$char.($renamed ? ' '.$renamed : '').' --mode=pipeline';
+            }
+            $this->runStreamingCommands($commands, $maxProcesses, $desc);
+
+            return;
+        }
+
+        $pool = $this->createPool($maxProcesses);
+        $count = count($releases);
+        $this->headerStart('postprocess: '.$desc, $count, $maxProcesses);
+
+        foreach ($releases as $release) {
+            $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
+            $renamed = isset($release->renamed) ? $release->renamed : '';
+            $pool->add(function () use ($char, $renamed) {
+                // Use the pipelined TV command for each GUID bucket
+                return $this->executeCommand(PHP_BINARY.' artisan postprocess:tv-pipeline '.$char.($renamed ? ' '.$renamed : '').' --mode=pipeline');
+            }, self::ASYNC_BUFFER_SIZE)->then(function ($output) use (&$count, $desc) {
+                echo $output;
+                $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
+                $count--;
+            })->catch(function (\Throwable $exception) {
+                echo $exception->getMessage();
+            })->catch(static function (SerializableException $serializableException) {
+                // swallow
+            })->timeout(function () use ($desc, &$count) {
+                $this->colorCli->notice('Task #'.$count.' ('.$desc.'): Timeout occurred.');
+            });
+        }
+
+        $pool->wait();
     }
 
     /**

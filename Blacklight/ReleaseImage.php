@@ -72,7 +72,7 @@ class ReleaseImage
 
             $img = false;
         } catch (\Error $e) {
-            $this->colorCli->climate()->info($e->getMessage());
+            $this->colorCli->info($e->getMessage());
             $img = false;
         }
 

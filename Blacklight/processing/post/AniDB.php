@@ -245,7 +245,7 @@ class AniDB
 
         // We ignore episode number 0 (Complete Series) for matching episodes but still link the title.
         if ($this->echooutput) {
-            $this->colorCli->climate()->info('Looking Up: Title: '.$title.' Episode: '.$epno);
+            $this->colorCli->info('Looking Up: Title: '.$title.' Episode: '.$epno);
         }
 
         $anidbTitle = $this->getAnidbByName($title);

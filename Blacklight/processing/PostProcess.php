@@ -194,12 +194,28 @@ class PostProcess
      * @param  string  $guidChar  (Optional) First letter of a release GUID to use to get work.
      * @param  int|string|null  $processTV  (Optional) 0 Don't process, 1 process all releases,
      *                                      2 process renamed releases only, '' check site setting
+     * @param  string  $mode  (Optional) Processing mode: 'pipeline' (default) or 'parallel'
      *
      * @throws \Exception
      */
-    public function processTv(string $groupID = '', string $guidChar = '', int|string|null $processTV = ''): void
+    public function processTv(string $groupID = '', string $guidChar = '', int|string|null $processTV = '', string $mode = 'pipeline'): void
     {
-        $this->tvProcessor->process($groupID, $guidChar, $processTV);
+        // If no GUID character specified, use parallel-pipeline processing via Forking
+        if ($guidChar === '') {
+            $forking = new \Blacklight\libraries\Forking;
+            $options = [];
+
+            // Convert processTV setting to renamed-only flag
+            $processTV = (is_numeric($processTV) ? $processTV : \App\Models\Settings::settingValue('lookuptv'));
+            if ($processTV == 2) {
+                $options = [0 => true]; // renamed only
+            }
+
+            $forking->processWorkType('postProcess_tv', $options);
+        } else {
+            // Process single GUID bucket with pipeline
+            $this->tvProcessor->process($groupID, $guidChar, $processTV, $mode);
+        }
     }
 
     /**
