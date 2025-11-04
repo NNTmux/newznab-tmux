@@ -481,8 +481,8 @@ class TmuxOutput extends Tmux
             ['Slow', '/.*\bSlow[^:]*?: (\d+)\b.*/'],
             ['QPS', '/.*\bQueries[^:]*?: (\d+)\b.*/'],
         ] as $v) {
-            $pieces[] = color($v[0].' = ')->green.
-                color(preg_replace($v[1], '$1', $info))->yellow;
+            $pieces[] = $this->colorCli->ansiString($v[0].' = ', 'green').
+                $this->colorCli->ansiString(preg_replace($v[1], '$1', $info), 'yellow');
         }
         $buffer .= PHP_EOL.implode(', ', $pieces).PHP_EOL;
 
@@ -515,11 +515,11 @@ class TmuxOutput extends Tmux
 
     protected function _setColourMasks(): void
     {
-        $this->_colourMasks[1] = color('%-18s')->yellow.' '.color('%-60.60s')->yellow->dark.PHP_EOL;
-        $this->_colourMasks['2.0'] = color('%-20s')->magenta->dark.' '.color('%-33.33s')->yellow->dark.PHP_EOL;
-        $this->_colourMasks['2.1'] = color('%-20s')->yellow.' '.color('%-33.33s')->yellow->dark.PHP_EOL;
-        $this->_colourMasks[3] = color('%-16.16s %25.25s %25.25s')->yellow.PHP_EOL;
-        $this->_colourMasks[4] = color('%-16.16s')->green.' '.color('%25.25s %25.25s')->yellow->dark.PHP_EOL;
-        $this->_colourMasks[5] = color('%-16.16s %25.25s %25.25s')->yellow->dark.PHP_EOL;
+        $this->_colourMasks[1] = $this->colorCli->ansiString('%-18s', 'yellow').' '.$this->colorCli->ansiString('%-60.60s', 'yellow').PHP_EOL;
+        $this->_colourMasks['2.0'] = $this->colorCli->ansiString('%-20s', 'magenta').' '.$this->colorCli->ansiString('%-33.33s', 'yellow').PHP_EOL;
+        $this->_colourMasks['2.1'] = $this->colorCli->ansiString('%-20s', 'yellow').' '.$this->colorCli->ansiString('%-33.33s', 'yellow').PHP_EOL;
+        $this->_colourMasks[3] = $this->colorCli->ansiString('%-16.16s %25.25s %25.25s', 'yellow').PHP_EOL;
+        $this->_colourMasks[4] = $this->colorCli->ansiString('%-16.16s', 'green').' '.$this->colorCli->ansiString('%25.25s %25.25s', 'yellow').PHP_EOL;
+        $this->_colourMasks[5] = $this->colorCli->ansiString('%-16.16s %25.25s %25.25s', 'yellow').PHP_EOL;
     }
 }

@@ -149,4 +149,28 @@ class ColorCLI
             }
         };
     }
+
+    /**
+     * Apply ANSI color code to a string and return it (does not render)
+     *
+     * @param string $string The string to colorize
+     * @param string $color The color name
+     * @return string The colored string with ANSI codes
+     */
+    public function ansiString(string $string, string $color): string
+    {
+        $colors = [
+            'black' => '0;30',
+            'red' => '0;31',
+            'green' => '0;32',
+            'yellow' => '0;33',
+            'blue' => '0;34',
+            'magenta' => '0;35',
+            'cyan' => '0;36',
+            'white' => '0;37',
+        ];
+
+        $code = $colors[$color] ?? '0;37';
+        return "\033[{$code}m{$string}\033[0m";
+    }
 }

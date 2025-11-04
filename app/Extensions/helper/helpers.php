@@ -4,7 +4,6 @@ use App\Models\Release;
 use Blacklight\NZB;
 use Blacklight\utility\Utility;
 use Blacklight\XXX;
-use Colors\Color;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
@@ -144,13 +143,6 @@ if (! function_exists('getSimilarName')) {
     function getSimilarName($name): string
     {
         return implode(' ', \array_slice(str_word_count(str_replace(['.', '_', '-'], ' ', $name), 2), 0, 2));
-    }
-}
-
-if (! function_exists('color')) {
-    function color(string $string = ''): Color
-    {
-        return new Color($string);
     }
 }
 
