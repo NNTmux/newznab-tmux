@@ -49,7 +49,7 @@
                 </div>
             </div>
 
-            {!! Form::open(['id' => 'myshows', 'class' => 'space-y-6', 'url' => "myshows?action=do{$type}"]) !!}
+            {{ html()->form('POST', url("myshows?action=do{$type}"))->id('myshows')->class('space-y-6')->open() }}
                 <input type="hidden" name="id" value="{{ $video }}"/>
                 @if(!empty($from))
                     <input type="hidden" name="from" value="{{ $from }}" />
@@ -82,7 +82,7 @@
                         <i class="fa fa-arrow-left mr-2"></i>Back to My Shows
                     </a>
                 </div>
-            {!! Form::close() !!}
+            {{ html()->form()->close() }}
         </div>
     </div>
 </div>
