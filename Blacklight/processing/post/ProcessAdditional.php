@@ -1423,10 +1423,11 @@ class ProcessAdditional
             $fileData = $dataSummary['file_list'] ?? [];
             if (! empty($fileData)) {
                 $rarFileName = Arr::pluck($fileData, 'name');
-                if (preg_match(NameFixer::PREDB_REGEX, $rarFileName[0], $hit)) {
-                    $preCheck = Predb::whereTitle($hit[0])->first();
+                $extractedName = $this->extractReleaseNameFromFile($rarFileName[0]);
+                if ($extractedName !== null) {
+                    $preCheck = Predb::whereTitle($extractedName)->first();
                     $this->_release->preid = $preCheck !== null ? $preCheck->value('id') : 0;
-                    $candidate = $preCheck->title ?? ucwords($hit[0], '.');
+                    $candidate = $preCheck->title ?? $extractedName;
                     $candidate = $this->normalizeCandidateTitle($candidate);
                     if ($this->isPlausibleReleaseTitle($candidate)) {
                         (new NameFixer)->updateRelease($this->_release, $candidate, 'RarInfo FileName Match', true, 'Filenames, ', true, true, $this->_release->preid);
@@ -1436,10 +1437,11 @@ class ProcessAdditional
                 } elseif (! empty($dataSummary['archives']) && ! empty($dataSummary['archives'][$rarFileName[0]]['file_list'])) {
                     $archiveData = $dataSummary['archives'][$rarFileName[0]]['file_list'];
                     $archiveFileName = Arr::pluck($archiveData, 'name');
-                    if (preg_match(NameFixer::PREDB_REGEX, $archiveFileName[0], $match2)) {
-                        $preCheck = Predb::whereTitle($match2[0])->first();
+                    $extractedName = $this->extractReleaseNameFromFile($archiveFileName[0]);
+                    if ($extractedName !== null) {
+                        $preCheck = Predb::whereTitle($extractedName)->first();
                         $this->_release->preid = $preCheck !== null ? $preCheck->value('id') : 0;
-                        $candidate = $preCheck->title ?? ucwords($match2[0], '.');
+                        $candidate = $preCheck->title ?? $extractedName;
                         $candidate = $this->normalizeCandidateTitle($candidate);
                         if ($this->isPlausibleReleaseTitle($candidate)) {
                             (new NameFixer)->updateRelease($this->_release, $candidate, 'RarInfo FileName Match', true, 'Filenames, ', true, true, $this->_release->preid);
@@ -3080,6 +3082,36 @@ class ProcessAdditional
     }
 
     /**
+     * Extract release name from a filename, handling file extensions and using an improved pattern.
+     * Returns null if no valid release name found.
+     */
+    private function extractReleaseNameFromFile(string $filename): ?string
+    {
+        // Strip directory path if present (e.g., "Sample/file.mkv" -> "file.mkv")
+        $basename = basename($filename);
+
+        // First, strip common file extensions (video, archive, metadata, package, and executable files)
+        $cleaned = preg_replace('/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx|par2?|nfo|sfv|nzb|rar|zip|r\d{2,3}|pkg|exe|msi)$/i', '', $basename);
+
+        // Try improved regex that better handles audio/video codecs with dots (DD.5.1, H.264, etc.)
+        // Match from start to a separator (hyphen or dot) followed by a group name (2+ word chars)
+        // This preserves everything including complex codec patterns like DD.5.1 and H.264
+        if (preg_match('/^(.+[-.][A-Za-z0-9_]{2,})$/i', $cleaned, $match)) {
+            // Matched: full string ending with -GROUP or .GROUP
+            // Capitalize first letter of each word (using . as delimiter for release names)
+            return ucwords($match[1], '.-_ ');
+        }
+
+        // Fallback to standard PREDB_REGEX
+        if (preg_match(NameFixer::PREDB_REGEX, $cleaned, $hit)) {
+            return ucwords($hit[0], '.');
+        }
+
+        // If neither pattern matched, return null
+        return null;
+    }
+
+    /**
      * Normalize a candidate title by stripping trailing part/vol/rNN tokens and trivial suffixes.
      */
     private function normalizeCandidateTitle(string $title): string
@@ -3087,6 +3119,8 @@ class ProcessAdditional
         $t = trim($title);
         // Remove common video file extensions
         $t = preg_replace('/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx)$/i', '', $t) ?? $t;
+        // Remove archive and metadata file extensions
+        $t = preg_replace('/\.(par2?|nfo|sfv|nzb|rar|zip|r\d{2,3}|pkg|exe|msi)$/i', '', $t) ?? $t;
         // Remove common trailing segment markers like .part01, .vol12+3, -r12, r12
         $t = preg_replace('/[.\-_ ](?:part|vol|r)\d+(?:\+\d+)?$/i', '', $t) ?? $t;
         // Collapse multiple spaces/underscores
@@ -3117,14 +3151,23 @@ class ProcessAdditional
         if (preg_match('/(?:^|[.\-_ ])(?:part|vol|r)\d+(?:\+\d+)?$/i', $t)) {
             return false;
         }
+        // Reject generic installer/setup filenames
+        if (preg_match('/^(setup|install|installer|patch|update|crack|keygen)\d*[\s._-]/i', $t)) {
+            return false;
+        }
         // Acceptance criteria
-        $hasGroupSuffix = (bool) preg_match('/-[A-Za-z0-9]{2,}$/', $t);
+        $hasGroupSuffix = (bool) preg_match('/[-.][A-Za-z0-9]{2,}$/', $t);
         $hasYear = (bool) preg_match('/\b(19|20)\d{2}\b/', $t);
         $hasQuality = (bool) preg_match('/\b(480p|720p|1080p|2160p|4k|webrip|web[ .-]?dl|bluray|bdrip|dvdrip|hdtv|hdrip|xvid|x264|x265|hevc|h\.?264|ts|cam|r5|proper|repack)\b/i', $t);
         $hasTV = (bool) preg_match('/\bS\d{1,2}[Eex]\d{1,3}\b/i', $t);
         $hasXXX = (bool) preg_match('/\bXXX\b/i', $t);
 
-        if ($hasGroupSuffix || ($hasYear && ($hasQuality || $hasTV)) || $hasXXX) {
+        // Accept if:
+        // - Has a group suffix (e.g., -ETHEL or .NBQ)
+        // - Has TV episode identifier with quality indicator (e.g., S03E14 + 720p)
+        // - Has year with quality or TV identifier
+        // - Has XXX tag
+        if ($hasGroupSuffix || ($hasTV && $hasQuality) || ($hasYear && ($hasQuality || $hasTV)) || $hasXXX) {
             return true;
         }
 

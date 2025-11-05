@@ -433,15 +433,26 @@ class ReleaseCleaning
      */
     public function fixerCleaner($name)
     {
-        // Extensions.
-        // Remove stuff from the start.
-        // Replace multiple spaces with 1 space
-        $cleanerName = preg_replace([
-            '/([\-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar)?(\d{1,3}\.rev"|\.vol.+?"|\.[A-Za-z0-9]{2,4}$|$)/i',
-            '/^(Release Name|sample-)/i', '/\s\s+/i',
-        ], ' ', $name);
+        $cleanerName = $name;
 
-        // Remove invalid characters.
+        // Remove sample/proof/thumbs markers from the end
+        $cleanerName = preg_replace('/[.\-_](sample|proof|thumbs?)$/i', '', $cleanerName);
+
+        // Remove archive extensions from the end
+        $cleanerName = preg_replace('/\.(par2?|nfo|sfv|nzb|rar|r\d{2,3}|zip)$/i', '', $cleanerName);
+
+        // Remove part/volume markers from the end
+        $cleanerName = preg_replace('/\.part\d+(\.rar)?$/i', '', $cleanerName);
+        $cleanerName = preg_replace('/\.vol\d+\+\d+\.par2$/i', '', $cleanerName);
+        $cleanerName = preg_replace('/\d{1,3}\.rev"?$/i', '', $cleanerName);
+
+        // Remove "Release Name" or "sample-" from the start
+        $cleanerName = preg_replace('/^(Release Name|sample[-_])/i', '', $cleanerName);
+
+        // Collapse multiple spaces
+        $cleanerName = preg_replace('/\s\s+/', ' ', $cleanerName);
+
+        // Remove invalid characters
         return trim(mb_convert_encoding(preg_replace('/[^(\x20-\x7F)]*/', '', $cleanerName), 'UTF-8', mb_list_encodings()));
     }
 }

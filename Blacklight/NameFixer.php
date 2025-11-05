@@ -2203,6 +2203,10 @@ class NameFixer
     private function normalizeCandidateTitle(string $title): string
     {
         $t = trim($title);
+        // Remove common video file extensions
+        $t = preg_replace('/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx)$/i', '', $t) ?? $t;
+        // Remove archive and metadata file extensions
+        $t = preg_replace('/\.(par2?|nfo|sfv|nzb|rar|zip|r\d{2,3}|pkg|exe|msi)$/i', '', $t) ?? $t;
         // Remove common trailing segment markers like .part01, .vol12+3, -r12, r12
         $t = preg_replace('/[.\-_ ](?:part|vol|r)\d+(?:\+\d+)?$/i', '', $t) ?? $t;
         // Collapse multiple spaces/underscores
@@ -2233,14 +2237,25 @@ class NameFixer
         if (preg_match('/(?:^|[.\-_ ])(?:part|vol|r)\d+(?:\+\d+)?$/i', $t)) {
             return false;
         }
+        // Reject generic installer/setup filenames
+        if (preg_match('/^(setup|install|installer|patch|update|crack|keygen)\d*[\s._-]/i', $t)) {
+            return false;
+        }
         // Acceptance criteria
-        $hasGroupSuffix = (bool) preg_match('/-[A-Za-z0-9]{2,}$/', $t);
+        $hasGroupSuffix = (bool) preg_match('/[-.][A-Za-z0-9]{2,}$/', $t);
         $hasYear = (bool) preg_match('/\b(19|20)\d{2}\b/', $t);
         $hasQuality = (bool) preg_match('/\b(480p|720p|1080p|2160p|4k|webrip|web[ .-]?dl|bluray|bdrip|dvdrip|hdtv|hdrip|xvid|x264|x265|hevc|h\.?264|ts|cam|r5|proper|repack)\b/i', $t);
         $hasTV = (bool) preg_match('/\bS\d{1,2}[Eex]\d{1,3}\b/i', $t);
         $hasXXX = (bool) preg_match('/\bXXX\b/i', $t);
 
-        if ($hasGroupSuffix || $hasXXX || $hasTV || ($hasYear && ($hasQuality || $hasTV)) || $hasQuality) {
+        // Accept if:
+        // - Has a group suffix (e.g., -ETHEL or .NBQ)
+        // - Has TV episode identifier with quality indicator (e.g., S03E14 + 720p)
+        // - Has year with quality or TV identifier
+        // - Has XXX tag
+        // - Has quality indicator (standalone)
+        // - Has TV episode identifier (standalone)
+        if ($hasGroupSuffix || ($hasTV && $hasQuality) || ($hasYear && ($hasQuality || $hasTV)) || $hasXXX || $hasQuality || $hasTV) {
             return true;
         }
 
