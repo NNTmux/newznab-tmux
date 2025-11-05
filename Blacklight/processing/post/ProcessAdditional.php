@@ -3085,6 +3085,8 @@ class ProcessAdditional
     private function normalizeCandidateTitle(string $title): string
     {
         $t = trim($title);
+        // Remove common video file extensions
+        $t = preg_replace('/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx)$/i', '', $t) ?? $t;
         // Remove common trailing segment markers like .part01, .vol12+3, -r12, r12
         $t = preg_replace('/[.\-_ ](?:part|vol|r)\d+(?:\+\d+)?$/i', '', $t) ?? $t;
         // Collapse multiple spaces/underscores
