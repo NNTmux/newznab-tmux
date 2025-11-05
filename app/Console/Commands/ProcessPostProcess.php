@@ -13,7 +13,7 @@ class ProcessPostProcess extends Command
      * @var string
      */
     protected $signature = 'multiprocessing:postprocess
-                            {type : Type: ama, add, ani, mov, nfo, sha, or tv}
+                            {type : Type: ama, add, ani, mov, nfo or tv}
                             {renamed=false : For mov/tv: only post-process renamed releases (true/false)}';
 
     /**
@@ -21,21 +21,20 @@ class ProcessPostProcess extends Command
      *
      * @var string
      */
-    protected $description = '[DEPRECATED] Use update:postprocess instead. Post-process releases using multiprocessing';
+    protected $description = 'Post-process releases using multiprocessing';
 
     /**
      * Execute the console command.
      */
     public function handle(): int
     {
-        $this->warn('⚠️  WARNING: This command is DEPRECATED and will be removed in a future version.');
-        $this->warn('    Please use "update:postprocess" instead.');
+        $this->warn('⚠️  WARNING: This command is to be used from cli.');
         $this->line('');
 
         $type = $this->argument('type');
         $renamed = $this->argument('renamed');
 
-        if (! \in_array($type, ['ama', 'add', 'ani', 'mov', 'nfo', 'sha', 'tv'], true)) {
+        if (! \in_array($type, ['ama', 'add', 'ani', 'mov', 'nfo', 'tv'], true)) {
             $this->error('Type must be one of: ama, add, ani, mov, nfo, sha, tv');
             $this->line('');
             $this->line('ama => Do amazon/books processing');
@@ -43,7 +42,6 @@ class ProcessPostProcess extends Command
             $this->line('ani => Do anime processing');
             $this->line('mov => Do movie processing');
             $this->line('nfo => Do NFO processing');
-            $this->line('sha => Do sharing processing (no multiprocessing)');
             $this->line('tv  => Do TV processing');
 
             return self::FAILURE;
