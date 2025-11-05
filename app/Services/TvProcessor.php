@@ -76,6 +76,22 @@ class TvProcessor
         $totalTime = 0;
 
         foreach ($providers as $index => $provider) {
+            // Check if there's any work remaining for this provider
+            if (! $this->hasWorkForProvider($provider['name'], $groupID, $guidChar, $processTV)) {
+                if ($this->echooutput) {
+                    $this->colorCli->primaryOver('  [');
+                    $this->colorCli->warningOver($index + 1);
+                    $this->colorCli->primaryOver('/');
+                    $this->colorCli->warningOver(count($providers));
+                    $this->colorCli->primaryOver('] ');
+                    $this->colorCli->alternateOver('→ ');
+                    $this->colorCli->alternate($provider['name'].' → No work remaining, skipping');
+                    echo "\n";
+                }
+
+                continue;
+            }
+
             $this->displayProviderHeader($provider['name'], $index + 1, count($providers));
 
             $startTime = microtime(true);
@@ -102,6 +118,22 @@ class TvProcessor
         $providers = $this->getProviderPipeline();
 
         foreach ($providers as $index => $provider) {
+            // Check if there's any work remaining for this stage of the pipeline
+            if (! $this->hasWorkForProvider($provider['name'], $groupID, $guidChar, $processTV)) {
+                if ($this->echooutput) {
+                    $this->colorCli->primaryOver('  [');
+                    $this->colorCli->warningOver($index + 1);
+                    $this->colorCli->primaryOver('/');
+                    $this->colorCli->warningOver(count($providers));
+                    $this->colorCli->primaryOver('] ');
+                    $this->colorCli->alternateOver('→ ');
+                    $this->colorCli->alternate($provider['name'].' → No work remaining, skipping');
+                    echo "\n";
+                }
+
+                continue;
+            }
+
             $this->displayProviderHeader($provider['name'], $index + 1, count($providers));
 
             $startTime = microtime(true);
@@ -120,12 +152,50 @@ class TvProcessor
     private function getProviderPipeline(): array
     {
         return [
-            ['name' => 'Local DB', 'instance' => new LocalDB],
-            ['name' => 'TVDB', 'instance' => new TVDB],
-            ['name' => 'TVMaze', 'instance' => new TVMaze],
-            ['name' => 'TMDB', 'instance' => new TMDB],
-            ['name' => 'Trakt', 'instance' => new TraktTv],
+            ['name' => 'Local DB', 'instance' => new LocalDB, 'status' => 0],
+            ['name' => 'TVDB', 'instance' => new TVDB, 'status' => 0],
+            ['name' => 'TVMaze', 'instance' => new TVMaze, 'status' => -1],
+            ['name' => 'TMDB', 'instance' => new TMDB, 'status' => -2],
+            ['name' => 'Trakt', 'instance' => new TraktTv, 'status' => -3],
         ];
+    }
+
+    /**
+     * Check if there's work remaining for a specific provider in the pipeline.
+     */
+    private function hasWorkForProvider(string $providerName, string $groupID, string $guidChar, int|string $processTV): bool
+    {
+        $statusMap = [
+            'Local DB' => 0,   // Process unprocessed releases
+            'TVDB' => 0,       // Process unprocessed releases (runs in parallel with LocalDB conceptually)
+            'TVMaze' => -1,    // Process releases not found by TVDB
+            'TMDB' => -2,      // Process releases not found by TVMaze
+            'Trakt' => -3,     // Process releases not found by TMDB
+        ];
+
+        $status = $statusMap[$providerName] ?? 0;
+
+        // Build the same query logic as getTvReleases but just check for existence
+        $query = \App\Models\Release::query()
+            ->where(['videos_id' => 0, 'tv_episodes_id' => $status])
+            ->where('size', '>', 1048576)
+            ->whereBetween('categories_id', [5000, 5999])
+            ->where('categories_id', '<>', 5070)
+            ->limit(1);
+
+        if ($groupID !== '') {
+            $query->where('groups_id', $groupID);
+        }
+
+        if ($guidChar !== '') {
+            $query->where('leftguid', $guidChar);
+        }
+
+        if ($processTV == 2) {
+            $query->where('isrenamed', '=', 1);
+        }
+
+        return $query->exists();
     }
 
     /**
