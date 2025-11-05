@@ -3120,7 +3120,7 @@ class ProcessAdditional
         // Remove common video file extensions
         $t = preg_replace('/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx)$/i', '', $t) ?? $t;
         // Remove archive and metadata file extensions
-        $t = preg_replace('/\.(par2?|nfo|sfv|nzb|rar|zip|r\d{2,3}|pkg|exe|msi)$/i', '', $t) ?? $t;
+        $t = preg_replace('/\.(par2?|nfo|sfv|nzb|rar|zip|r\d{2,3}|pkg|exe|msi|jpe?g|png|gif|bmp)$/i', '', $t) ?? $t;
         // Remove common trailing segment markers like .part01, .vol12+3, -r12, r12
         $t = preg_replace('/[.\-_ ](?:part|vol|r)\d+(?:\+\d+)?$/i', '', $t) ?? $t;
         // Collapse multiple spaces/underscores
