@@ -264,13 +264,13 @@ class GetNzbController extends BasePageController
         }
 
         // Update statistics
-        $this->updateDownloadStatistics($request, $uid, $releaseId, $releaseData['id']);
+        $this->updateDownloadStatistics($request, $uid, $releaseId, $releaseData->id);
 
         // Build response headers
         $headers = $this->buildNzbHeaders($releaseId, $uid, $rssToken, $releaseData);
 
         // Stream modified NZB content
-        $cleanName = $this->sanitizeFilename($releaseData['searchname']);
+        $cleanName = $this->sanitizeFilename($releaseData->searchname);
 
         return response()->streamDownload(
             fn () => $this->streamModifiedNzbContent($nzbPath, $uid),
@@ -296,27 +296,26 @@ class GetNzbController extends BasePageController
     /**
      * Build headers for NZB download response
      *
-     * @param  array<string, mixed>  $releaseData
      * @return array<string, string>
      */
-    private function buildNzbHeaders(string $releaseId, int $uid, string $rssToken, array $releaseData): array
+    private function buildNzbHeaders(string $releaseId, int $uid, string $rssToken, Release $releaseData): array
     {
         $headers = [
             'Content-Type' => 'application/x-nzb',
             'Expires' => now()->addYear()->toRfc7231String(),
             'X-DNZB-Failure' => url('/failed')."?guid={$releaseId}&userid={$uid}&api_token={$rssToken}",
-            'X-DNZB-Category' => e($releaseData['category_name']),
+            'X-DNZB-Category' => e($releaseData->category_name),
             'X-DNZB-Details' => url("/details/{$releaseId}"),
         ];
 
         // Add optional metadata headers
-        if (! empty($releaseData['imdbid']) && $releaseData['imdbid'] > 0) {
-            $headers['X-DNZB-MoreInfo'] = "http://www.imdb.com/title/tt{$releaseData['imdbid']}";
-        } elseif (! empty($releaseData['tvdb']) && $releaseData['tvdb'] > 0) {
-            $headers['X-DNZB-MoreInfo'] = "http://www.thetvdb.com/?tab=series&id={$releaseData['tvdb']}";
+        if (! empty($releaseData->imdbid) && $releaseData->imdbid > 0) {
+            $headers['X-DNZB-MoreInfo'] = "http://www.imdb.com/title/tt{$releaseData->imdbid}";
+        } elseif (! empty($releaseData->tvdb) && $releaseData->tvdb > 0) {
+            $headers['X-DNZB-MoreInfo'] = "http://www.thetvdb.com/?tab=series&id={$releaseData->tvdb}";
         }
 
-        if ((int) $releaseData['nfostatus'] === 1) {
+        if ((int) $releaseData->nfostatus === 1) {
             $headers['X-DNZB-NFO'] = url("/nfo/{$releaseId}");
         }
 
