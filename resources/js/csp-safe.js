@@ -159,11 +159,15 @@ function initEventDelegation() {
             }
         }
 
-        // Handle season switcher
-        if (e.target.hasAttribute('data-season') || e.target.closest('[data-season]')) {
+        // Handle season switcher - only for season-tab buttons, not content
+        const seasonTab = e.target.classList.contains('season-tab') ? e.target : e.target.closest('.season-tab');
+        if (seasonTab) {
             e.preventDefault();
-            const seasonNumber = e.target.getAttribute('data-season') || e.target.closest('[data-season]').getAttribute('data-season');
-            switchSeason(seasonNumber);
+            const seasonNumber = seasonTab.getAttribute('data-season');
+            if (seasonNumber && typeof switchSeason === 'function') {
+                switchSeason(seasonNumber);
+            }
+            return;
         }
 
         // Handle binary blacklist delete
