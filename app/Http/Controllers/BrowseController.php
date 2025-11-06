@@ -85,8 +85,6 @@ class BrowseController extends BasePageController
                     $covgroup = 'console';
                 } elseif ($cdata->root_categories_id === Category::MOVIE_ROOT) {
                     $covgroup = 'movies';
-                } elseif ($cdata->root_categories_id === Category::XXX_ROOT) {
-                    $covgroup = 'xxx';
                 } elseif ($cdata->root_categories_id === Category::PC_ROOT) {
                     $covgroup = 'games';
                 } elseif ($cdata->root_categories_id === Category::MUSIC_ROOT) {

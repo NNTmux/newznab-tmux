@@ -85,76 +85,100 @@
         <!-- Results -->
         @if(count($results) > 0)
             <div class="mb-4 flex justify-between items-center">
-                <h2 class="text-xl font-semibold text-gray-800">
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
                     <i class="fa fa-film mr-2 text-blue-600"></i>
                     {{ $catname ?? 'All' }} XXX
                 </h2>
-                <span class="text-sm text-gray-600">
+                <span class="text-sm text-gray-600 dark:text-gray-400">
                     {{ $results->total() }} results found
                 </span>
             </div>
 
-            <!-- XXX Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 mb-6">
-                @foreach($resultsadd as $result)
-                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200">
-                        <a href="{{ url('/details/' . $result->guid) }}" class="block relative">
-                            @if(!empty($result->cover))
-                                <img src="{{ url('/covers/xxx/' . $result->cover) }}"
-                                     alt="{{ $result->title ?? $result->searchname }}"
-                                     class="w-full h-48 object-cover"
-                                     data-fallback-src="{{ url('/images/no-cover.png') }}">
-                            @else
-                                <div class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                    <i class="fa fa-film text-4xl text-gray-400"></i>
-                                </div>
-                            @endif
-                            @if(!empty($result->failed) && $result->failed > 0)
-                                <div class="absolute top-2 right-2">
-                                    <span class="px-2 py-1 bg-red-600 dark:bg-red-700 text-white text-xs rounded-full shadow-lg" title="{{ $result->failed }} user(s) reported download failure">
-                                        <i class="fa fa-exclamation-triangle mr-1"></i>Failed
-                                    </span>
-                                </div>
-                            @endif
-                            <div class="p-3">
-                                <h3 class="font-semibold text-sm text-gray-800 dark:text-gray-200 line-clamp-2 mb-1 break-words break-all" title="{{ $result->title ?? $result->searchname }}">
-                                    {{ $result->title ?? $result->searchname }}
-                                </h3>
-                                @if(!empty($result->releasedate))
-                                    <p class="text-xs text-gray-500">{{ date('Y', strtotime($result->releasedate)) }}</p>
-                                @elseif(!empty($result->year))
-                                    <p class="text-xs text-gray-500">{{ $result->year }}</p>
-                                @endif
-                                @if(!empty($result->genre))
-                                    <div class="text-xs text-blue-600 dark:text-blue-400 mt-1 line-clamp-1">
-                                        {!! $result->genre !!}
+            <!-- XXX List Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">Category</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider hidden lg:table-cell">Posted</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider hidden xl:table-cell">Size</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        @foreach($results as $result)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                <td class="px-4 py-3">
+                                    <div class="flex items-start">
+                                        <div class="flex-1 min-w-0">
+                                            <a href="{{ url('/details/' . $result->guid) }}"
+                                               class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium break-words">
+                                                {{ $result->searchname }}
+                                            </a>
+                                            @if(!empty($result->failed) && $result->failed > 0)
+                                                <span class="ml-2 px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs rounded"
+                                                      title="{{ $result->failed }} user(s) reported download failure">
+                                                    <i class="fa fa-exclamation-triangle mr-1"></i>Failed
+                                                </span>
+                                            @endif
+                                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                @if(!empty($result->genre))
+                                                    <span class="mr-3">
+                                                        <i class="fa fa-tag mr-1"></i>
+                                                        {!! makeFieldLinks((array) $result, 'genre', 'xxx') !!}
+                                                    </span>
+                                                @endif
+                                                @if(!empty($result->actors))
+                                                    <span class="mr-3">
+                                                        <i class="fa fa-users mr-1"></i>
+                                                        {!! makeFieldLinks((array) $result, 'actors', 'xxx') !!}
+                                                    </span>
+                                                @endif
+                                                @if(!empty($result->director))
+                                                    <span>
+                                                        <i class="fa fa-user-circle mr-1"></i>
+                                                        {!! makeFieldLinks((array) $result, 'director', 'xxx') !!}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
-                                @endif
-                                @if(!empty($result->director))
-                                    <div class="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-1" title="Director">
-                                        <i class="fa fa-user-circle mr-1"></i>{!! $result->director !!}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 hidden md:table-cell">
+                                    {{ $result->category_name ?? 'XXX' }}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 hidden lg:table-cell whitespace-nowrap">
+                                    {{ date('M d, Y', strtotime($result->postdate)) }}
+                                    <div class="text-xs text-gray-500">{{ date('H:i', strtotime($result->postdate)) }}</div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 hidden xl:table-cell whitespace-nowrap">
+                                    {{ $result->size_formatted ?? number_format($result->size / 1073741824, 2) . ' GB' }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <a href="{{ url('/getnzb?id=' . $result->guid) }}"
+                                           class="inline-flex items-center px-3 py-1.5 bg-green-600 dark:bg-green-700 text-white text-xs rounded hover:bg-green-700 dark:hover:bg-green-800"
+                                           title="Download NZB">
+                                            <i class="fa fa-download mr-1"></i>
+                                            <span class="hidden sm:inline">Download</span>
+                                        </a>
+                                        <a href="{{ url('/details/' . $result->guid) }}"
+                                           class="inline-flex items-center px-3 py-1.5 bg-blue-600 dark:bg-blue-700 text-white text-xs rounded hover:bg-blue-700 dark:hover:bg-blue-800"
+                                           title="View Details">
+                                            <i class="fa fa-info-circle mr-1"></i>
+                                            <span class="hidden sm:inline">Details</span>
+                                        </a>
                                     </div>
-                                @endif
-                            </div>
-                        </a>
-                        <div class="px-3 pb-3 flex gap-1">
-                            <a href="{{ url('/getnzb?id=' . $result->guid) }}"
-                               class="flex-1 px-2 py-1 bg-green-600 dark:bg-green-700 text-white text-xs rounded hover:bg-green-700 dark:hover:bg-green-800 text-center"
-                               title="Download NZB">
-                                <i class="fa fa-download"></i>
-                            </a>
-                            <a href="{{ url('/details/' . $result->guid) }}"
-                               class="flex-1 px-2 py-1 bg-blue-600 dark:bg-blue-700 text-white text-xs rounded hover:bg-blue-700 dark:hover:bg-blue-800 text-center"
-                               title="View Details">
-                                <i class="fa fa-info-circle"></i>
-                            </a>
-                        </div>
-                    </div>
-                @endforeach
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
 
             <!-- Pagination -->
-            <div class="flex justify-center">
+            <div class="flex justify-center mt-6">
                 {{ $results->links() }}
             </div>
         @else

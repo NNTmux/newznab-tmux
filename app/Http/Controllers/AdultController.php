@@ -39,18 +39,10 @@ class AdultController extends BasePageController
         $ordering = $adult->getXXXOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
 
-        $movies = [];
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
-        $offset = ($page - 1) * config('nntmux.items_per_cover_page');
-        $rslt = $adult->getXXXRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, $this->userdata['categoryexclusions']);
-        $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
-        foreach ($results as $result) {
-            $result->genre = makeFieldLinks((array) $result, 'genre', 'xxx');
-            $result->actors = makeFieldLinks((array) $result, 'actors', 'xxx');
-            $result->director = makeFieldLinks((array) $result, 'director', 'xxx');
-
-            $movies[] = $result;
-        }
+        $offset = ($page - 1) * config('nntmux.items_per_page');
+        $rslt = $adult->getXXXRange($page, $catarray, $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata['categoryexclusions']);
+        $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
 
@@ -90,9 +82,8 @@ class AdultController extends BasePageController
             'director' => $director,
             'genres' => $genres,
             'genre' => $genre,
-            'resultsadd' => $movies,
             'results' => $results,
-            'covgroup' => 'xxx',
+            'lastvisit' => $this->userdata['lastlogin'] ?? null,
             'meta_title' => 'Browse XXX',
             'meta_keywords' => 'browse,xxx,nzb,description,details',
             'meta_description' => 'Browse for XXX Movies',
