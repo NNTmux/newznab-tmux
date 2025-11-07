@@ -187,21 +187,41 @@ class IRCScraper extends IRCClient
      */
     protected function processChannelMessages(): void
     {
+        if ($this->_debug && ! $this->_silent) {
+            echo '[DEBUG] Processing message: '.$this->_channelData['message'].PHP_EOL;
+        }
+
         if (preg_match(
             '/^(NEW|UPD|NUK): \[DT: (?P<time>.+?)\]\s?\[TT: (?P<title>.+?)\]\s?\[SC: (?P<source>.+?)\]\s?\[CT: (?P<category>.+?)\]\s?\[RQ: (?P<req>.+?)\]'.
             '\s?\[SZ: (?P<size>.+?)\]\s?\[FL: (?P<files>.+?)\]\s?(\[FN: (?P<filename>.+?)\]\s?)?(\[(?P<nuked>(UN|MOD|RE|OLD)?NUKED?): (?P<reason>.+?)\])?$/i',
             $this->_channelData['message'],
             $hits
         )) {
+            if ($this->_debug && ! $this->_silent) {
+                echo '[DEBUG] Regex matched! Title: '.$hits['title'].' | Source: '.$hits['source'].' | Category: '.$hits['category'].PHP_EOL;
+            }
+
             if (isset($this->_ignoredChannels[$hits['source']]) && $this->_ignoredChannels[$hits['source']] === true) {
+                if ($this->_debug && ! $this->_silent) {
+                    echo '[DEBUG] Source '.$hits['source'].' is ignored, skipping...'.PHP_EOL;
+                }
+
                 return;
             }
 
             if ($this->_categoryIgnoreRegex !== false && preg_match((string) $this->_categoryIgnoreRegex, $hits['category'])) {
+                if ($this->_debug && ! $this->_silent) {
+                    echo '[DEBUG] Category '.$hits['category'].' is ignored by regex, skipping...'.PHP_EOL;
+                }
+
                 return;
             }
 
             if ($this->_titleIgnoreRegex !== false && preg_match((string) $this->_titleIgnoreRegex, $hits['title'])) {
+                if ($this->_debug && ! $this->_silent) {
+                    echo '[DEBUG] Title '.$hits['title'].' is ignored by regex, skipping...'.PHP_EOL;
+                }
+
                 return;
             }
 
@@ -250,6 +270,10 @@ class IRCScraper extends IRCClient
                 $this->_nuked = true; // flag for output
             }
             $this->_checkForDupe();
+        } else {
+            if ($this->_debug && ! $this->_silent) {
+                echo '[DEBUG] Message did not match PRE regex pattern'.PHP_EOL;
+            }
         }
     }
 
@@ -262,8 +286,14 @@ class IRCScraper extends IRCClient
     {
         $this->_oldPre = Predb::query()->where('title', $this->_curPre['title'])->select(['category', 'size'])->first();
         if ($this->_oldPre === null) {
+            if ($this->_debug && ! $this->_silent) {
+                echo '[DEBUG] New PRE found, inserting: '.$this->_curPre['title'].PHP_EOL;
+            }
             $this->_insertNewPre();
         } else {
+            if ($this->_debug && ! $this->_silent) {
+                echo '[DEBUG] PRE already exists, updating: '.$this->_curPre['title'].PHP_EOL;
+            }
             $this->_updatePre();
         }
         $this->_resetPreVariables();
@@ -277,13 +307,27 @@ class IRCScraper extends IRCClient
      */
     protected function _insertNewPre(): void
     {
-        if (config('nntmux.elasticsearch_enabled') === true) {
-            $indexData = (new ElasticSearchSiteSearch)->predbIndexSearch($this->_curPre['title']);
-        } else {
-            $indexData = $this->manticoreSearch->searchIndexes('predb_rt', $this->_curPre['title'], ['title']);
-        }
-        if (! empty($indexData) || empty($this->_curPre['title'])) {
+        // Check if title is empty first
+        if (empty($this->_curPre['title'])) {
+            if ($this->_debug && ! $this->_silent) {
+                echo '[DEBUG] PRE title is empty, skipping insert'.PHP_EOL;
+            }
+
             return;
+        }
+
+        // Double-check database to ensure we don't have stale search index data
+        $existingPre = Predb::query()->where('title', $this->_curPre['title'])->first();
+        if ($existingPre !== null) {
+            if ($this->_debug && ! $this->_silent) {
+                echo '[DEBUG] PRE already exists in database (ID: '.$existingPre->id.'), skipping insert'.PHP_EOL;
+            }
+
+            return;
+        }
+
+        if ($this->_debug && ! $this->_silent) {
+            echo '[DEBUG] PRE not in database, proceeding with insert...'.PHP_EOL;
         }
 
         $query = 'INSERT INTO predb (';
@@ -313,27 +357,43 @@ class IRCScraper extends IRCClient
 
         $query .= '%s)';
 
-        DB::insert(
-            sprintf(
-                $query,
-                escapeString($this->_curPre['title'])
-            )
-        );
-
-        $parameters = [
-            'id' => DB::connection()->getPdo()->lastInsertId(),
-            'title' => $this->_curPre['title'],
-            'filename' => $this->_curPre['filename'] ?? null,
-            'source' => $this->_curPre['source'] ?? null,
-        ];
-
-        if (config('nntmux.elasticsearch_enabled') === true) {
-            $this->elasticsearch->insertPreDb($parameters);
-        } else {
-            $this->manticoreSearch->insertPredb($parameters);
+        if ($this->_debug && ! $this->_silent) {
+            echo '[DEBUG] Executing SQL: '.substr($query, 0, 100).'...'.PHP_EOL;
         }
 
-        $this->_doEcho(true);
+        try {
+            DB::insert(
+                sprintf(
+                    $query,
+                    escapeString($this->_curPre['title'])
+                )
+            );
+
+            $lastId = DB::connection()->getPdo()->lastInsertId();
+
+            if ($this->_debug && ! $this->_silent) {
+                echo '[DEBUG] Successfully inserted PRE with ID: '.$lastId.PHP_EOL;
+            }
+
+            $parameters = [
+                'id' => $lastId,
+                'title' => $this->_curPre['title'],
+                'filename' => $this->_curPre['filename'] ?? null,
+                'source' => $this->_curPre['source'] ?? null,
+            ];
+
+            if (config('nntmux.elasticsearch_enabled') === true) {
+                $this->elasticsearch->insertPreDb($parameters);
+            } else {
+                $this->manticoreSearch->insertPredb($parameters);
+            }
+
+            $this->_doEcho(true);
+        } catch (\Exception $e) {
+            if ($this->_debug && ! $this->_silent) {
+                echo '[DEBUG] ERROR inserting PRE: '.$e->getMessage().PHP_EOL;
+            }
+        }
     }
 
     /**

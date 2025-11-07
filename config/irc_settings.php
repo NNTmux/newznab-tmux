@@ -76,7 +76,6 @@ return [
         [
             // '#Channel'                => 'Password',
             '#PreNNTmux' => null,
-            '#nZEDbPRE' => null,
         ]
     ),
 

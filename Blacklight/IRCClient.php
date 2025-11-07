@@ -358,6 +358,12 @@ class IRCClient
             if ((time() - $this->_lastPing) > ($this->_socket_timeout / 2)) {
                 $this->_ping($this->_remote_host_received);
             }
+
+            // Small sleep to prevent CPU spinning when no data is available
+            // Only sleep if buffer was empty
+            if (empty($this->_buffer)) {
+                usleep(100000); // 100ms
+            }
         }
     }
 
@@ -464,9 +470,32 @@ class IRCClient
     {
         $buffer = '';
         do {
-            stream_set_timeout($this->_socket, $this->_socket_timeout);
+            // Use a shorter timeout for reading to be more responsive
+            stream_set_timeout($this->_socket, 5);
             $line = fgets($this->_socket, 1024);
+
+            // Check if connection is still alive and handle timeout/errors
             if ($line === false) {
+                $meta = stream_get_meta_data($this->_socket);
+
+                // If stream timed out, it's OK - just no data available
+                if ($meta['timed_out']) {
+                    // Check if connection is still valid
+                    if (! $this->_connected()) {
+                        echo 'Connection lost (timeout), attempting to reconnect...'.PHP_EOL;
+                        $this->_reconnect();
+                    }
+                    break;
+                }
+
+                // If EOF or other error, connection is dead
+                if ($meta['eof'] || ! $this->_connected()) {
+                    echo 'Connection lost, attempting to reconnect...'.PHP_EOL;
+                    $this->_reconnect();
+                    break;
+                }
+
+                // No data available but connection is fine
                 break;
             }
             $buffer .= $line;
@@ -542,6 +571,9 @@ class IRCClient
             echo 'ERROR: '.$error_string.' ('.$error_number.')'.PHP_EOL;
         } else {
             $this->_socket = $socket;
+            // Set blocking mode with timeout for proper connection handling
+            stream_set_blocking($this->_socket, true);
+            stream_set_timeout($this->_socket, $this->_socket_timeout);
         }
     }
 
@@ -573,12 +605,14 @@ class IRCClient
     {
         $result = preg_replace(
             [
-                '/(\x03(?:\d{1,2}(?:,\d{1,2})?)?)/', // Color code
+                '/\x03\d{1,2}(?:,\d{1,2})?/', // Color code with foreground and optional background
+                '/\x03/', // Color code without parameters (reset)
                 '/\x02/', // Bold
-                '/\x0F/', // Escaped
-                '/\x16/', // Italic
+                '/\x0F/', // Reset/Normal
+                '/\x16/', // Reverse/Italic
                 '/\x1F/', // Underline
-                '/\x12/', // Device control 2
+                '/\x1D/', // Italic
+                '/\x11/', // Monospace
             ],
             '',
             $text
