@@ -4309,56 +4309,109 @@ if (document.readyState === 'loading') {
     }
 }
 
-// Initialize quality filter for movie releases
+// Initialize quality filter for movie releases (resolution + source)
 function initQualityFilter() {
-    const filterButtons = document.querySelectorAll('.quality-filter-btn');
+    const resolutionButtons = document.querySelectorAll('.resolution-filter-btn');
+    const sourceButtons = document.querySelectorAll('.source-filter-btn');
     const releaseItems = document.querySelectorAll('.release-item');
     const releaseCount = document.getElementById('release-count');
 
-    if (!filterButtons.length || !releaseItems.length || !releaseCount) {
+    if (!releaseItems.length || !releaseCount) {
         return; // Exit if elements don't exist on the page
     }
 
     const totalReleases = releaseItems.length;
+    let activeResolution = 'all';
+    let activeSource = 'all';
 
-    filterButtons.forEach(button => {
+    // Function to apply filters
+    function applyFilters() {
+        let visibleCount = 0;
+
+        releaseItems.forEach(item => {
+            const releaseName = item.getAttribute('data-release-name');
+            if (!releaseName) return;
+
+            let matchesResolution = true;
+            let matchesSource = true;
+
+            // Check resolution filter
+            if (activeResolution !== 'all') {
+                matchesResolution = releaseName.includes(activeResolution.toLowerCase());
+            }
+
+            // Check source filter
+            if (activeSource !== 'all') {
+                const sourceLower = activeSource.toLowerCase();
+                // Handle different naming variations
+                if (sourceLower === 'bluray') {
+                    matchesSource = releaseName.includes('bluray') ||
+                                   releaseName.includes('blu-ray') ||
+                                   releaseName.includes('bdrip') ||
+                                   releaseName.includes('brrip');
+                } else if (sourceLower === 'web-dl') {
+                    matchesSource = releaseName.includes('web-dl') ||
+                                   releaseName.includes('webdl') ||
+                                   releaseName.includes('web.dl');
+                } else if (sourceLower === 'webrip') {
+                    matchesSource = releaseName.includes('webrip') ||
+                                   releaseName.includes('web-rip') ||
+                                   releaseName.includes('web.rip');
+                } else {
+                    matchesSource = releaseName.includes(sourceLower);
+                }
+            }
+
+            // Show/hide based on both filters
+            if (matchesResolution && matchesSource) {
+                item.style.display = '';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        // Update count display
+        if (activeResolution === 'all' && activeSource === 'all') {
+            releaseCount.textContent = `(${totalReleases} total)`;
+        } else {
+            releaseCount.textContent = `(${visibleCount} of ${totalReleases})`;
+        }
+    }
+
+    // Resolution filter buttons
+    resolutionButtons.forEach(button => {
         button.addEventListener('click', function() {
-            const quality = this.getAttribute('data-quality');
+            const filter = this.getAttribute('data-filter');
+            activeResolution = filter;
 
             // Update active button styling
-            filterButtons.forEach(btn => {
+            resolutionButtons.forEach(btn => {
                 btn.classList.remove('active', 'bg-blue-600', 'text-white');
                 btn.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
             });
             this.classList.add('active', 'bg-blue-600', 'text-white');
             this.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
 
-            let visibleCount = 0;
+            applyFilters();
+        });
+    });
 
-            // Filter releases
-            releaseItems.forEach(item => {
-                const releaseName = item.getAttribute('data-release-name');
+    // Source filter buttons
+    sourceButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const filter = this.getAttribute('data-filter');
+            activeSource = filter;
 
-                if (quality === 'all') {
-                    item.style.display = '';
-                    visibleCount++;
-                } else {
-                    // Check if release name contains the quality indicator
-                    if (releaseName && releaseName.includes(quality.toLowerCase())) {
-                        item.style.display = '';
-                        visibleCount++;
-                    } else {
-                        item.style.display = 'none';
-                    }
-                }
+            // Update active button styling
+            sourceButtons.forEach(btn => {
+                btn.classList.remove('active', 'bg-purple-600', 'text-white');
+                btn.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
             });
+            this.classList.add('active', 'bg-purple-600', 'text-white');
+            this.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
 
-            // Update count
-            if (quality === 'all') {
-                releaseCount.textContent = `(${totalReleases} total)`;
-            } else {
-                releaseCount.textContent = `(${visibleCount} of ${totalReleases})`;
-            }
+            applyFilters();
         });
     });
 }
