@@ -40,6 +40,11 @@ class RenameOtherMiscReleases extends Command
     protected int $matched = 0;
 
     /**
+     * Cache for category lookups to avoid repeated DB queries.
+     */
+    protected array $categoryCache = [];
+
+    /**
      * Execute the console command.
      */
     public function handle(): int
@@ -67,13 +72,9 @@ class RenameOtherMiscReleases extends Command
         $startTime = now();
 
         try {
-            // Process releases with exact PreDB matches (title, filename, and size)
-            $this->info('Step 1: Attempting exact PreDB matches (title/filename + size)...');
-            $this->processExactMatches($limit, $dryRun, $show, $sizeTolerance, $categorize);
-
-            // Process releases with title matches only
-            $this->info('Step 2: Attempting fuzzy title matches...');
-            $this->processTitleMatches($limit, $dryRun, $show, $categorize);
+            // Process releases in a single pass with cascading match attempts
+            $this->info('Processing releases with PreDB matching...');
+            $this->processReleases($limit, $dryRun, $show, $sizeTolerance, $categorize);
 
             $duration = now()->diffInSeconds($startTime, true);
 
@@ -94,7 +95,145 @@ class RenameOtherMiscReleases extends Command
     }
 
     /**
+     * Process releases with PreDB matching in a single pass.
+     */
+    protected function processReleases($limit, bool $dryRun, bool $show, float $sizeTolerance, Categorize $categorize): void
+    {
+        $query = Release::query()
+            ->whereIn('categories_id', [Category::OTHER_MISC, Category::OTHER_HASHED])
+            ->where('predb_id', 0)
+            ->select(['id', 'guid', 'name', 'searchname', 'size', 'fromname', 'categories_id', 'groups_id'])
+            ->orderBy('id', 'DESC'); // Process newest first
+
+        if ($limit) {
+            $query->limit((int) $limit);
+        }
+
+        $releases = $query->get();
+        $total = $releases->count();
+
+        if ($total === 0) {
+            $this->info('No releases found to process.');
+
+            return;
+        }
+
+        $this->info("Processing {$total} releases...");
+
+        foreach ($releases as $release) {
+            $this->checked++;
+
+            // Clean the release name for matching
+            $cleanName = $this->cleanReleaseName($release->searchname);
+
+            if (empty($cleanName)) {
+                continue;
+            }
+
+            // Try matching in order of confidence (most strict to least strict)
+            $matched = false;
+
+            // 1. Title + Size Match (most reliable)
+            if (! $matched) {
+                $matched = $this->matchByTitleAndSize($release, $cleanName, $dryRun, $show, $sizeTolerance, $categorize);
+            }
+
+            // 2. Filename + Size Match
+            if (! $matched) {
+                $matched = $this->matchByFilenameAndSize($release, $cleanName, $dryRun, $show, $sizeTolerance, $categorize);
+            }
+
+            // 3. Direct Title Match (no size check)
+            if (! $matched) {
+                $matched = $this->matchByDirectTitle($release, $cleanName, $dryRun, $show, $categorize);
+            }
+
+            // 4. Direct Filename Match (no size check)
+            if (! $matched) {
+                $matched = $this->matchByDirectFilename($release, $cleanName, $dryRun, $show, $categorize);
+            }
+
+            // 5. Partial Title Match (least strict, last resort)
+            if (! $matched) {
+                $matched = $this->matchByPartialTitle($release, $cleanName, $dryRun, $show, $categorize);
+            }
+
+            if ($matched) {
+                $this->matched++;
+            }
+
+            if (! $show && $this->checked % 10 === 0) {
+                $percent = round(($this->checked / $total) * 100, 1);
+                $this->info(
+                    "Progress: {$percent}% ({$this->checked}/{$total}) | ".
+                    "Matched: {$this->matched} | Renamed: {$this->renamed}"
+                );
+            }
+        }
+
+        if (! $show) {
+            echo PHP_EOL;
+        }
+    }
+
+    /**
+     * Match release by direct title (no size check).
+     */
+    protected function matchByDirectTitle($release, string $cleanName, bool $dryRun, bool $show, Categorize $categorize): bool
+    {
+        $predb = Predb::query()
+            ->where('title', $cleanName)
+            ->first(['id', 'title', 'size', 'source']);
+
+        if ($predb) {
+            return $this->updateReleaseFromPredb($release, $predb, 'Direct Title Match', $dryRun, $show, $categorize);
+        }
+
+        return false;
+    }
+
+    /**
+     * Match release by direct filename (no size check).
+     */
+    protected function matchByDirectFilename($release, string $cleanName, bool $dryRun, bool $show, Categorize $categorize): bool
+    {
+        $predb = Predb::query()
+            ->where('filename', $cleanName)
+            ->first(['id', 'title', 'size', 'source']);
+
+        if ($predb) {
+            return $this->updateReleaseFromPredb($release, $predb, 'Direct Filename Match', $dryRun, $show, $categorize);
+        }
+
+        return false;
+    }
+
+    /**
+     * Match release by partial title using LIKE.
+     */
+    protected function matchByPartialTitle($release, string $cleanName, bool $dryRun, bool $show, Categorize $categorize): bool
+    {
+        // Only try partial match if clean name is reasonably long to avoid too many false positives
+        if (strlen($cleanName) < 15) {
+            return false;
+        }
+
+        $searchPattern = '%'.str_replace(['%', '_'], ['\\%', '\\_'], $cleanName).'%';
+        $predb = Predb::query()
+            ->where('title', 'LIKE', $searchPattern)
+            ->first(['id', 'title', 'size', 'source']);
+
+        if ($predb) {
+            return $this->updateReleaseFromPredb($release, $predb, 'Partial Title Match', $dryRun, $show, $categorize);
+        }
+
+        return false;
+    }
+
+    /**
      * Process releases with exact PreDB matches (title/filename + size).
+     *
+     * @deprecated Use processReleases() instead for better performance
      */
     protected function processExactMatches($limit, bool $dryRun, bool $show, float $sizeTolerance, Categorize $categorize): void
     {
@@ -262,42 +401,23 @@ class RenameOtherMiscReleases extends Command
 
     /**
      * Match release by fuzzy title matching using search.
+     *
+     * @deprecated Split into separate methods for better performance
      */
     protected function matchByFuzzyTitle($release, string $cleanName, bool $dryRun, bool $show, Categorize $categorize): bool
     {
-        if (empty($cleanName)) {
-            return false;
-        }
-
         // Try direct title match first
-        $predb = Predb::query()
-            ->where('title', $cleanName)
-            ->first(['id', 'title', 'size', 'source']);
-
-        if ($predb) {
-            return $this->updateReleaseFromPredb($release, $predb, 'Title Match', $dryRun, $show, $categorize);
+        if ($this->matchByDirectTitle($release, $cleanName, $dryRun, $show, $categorize)) {
+            return true;
         }
 
         // Try filename match
-        $predb = Predb::query()
-            ->where('filename', $cleanName)
-            ->first(['id', 'title', 'size', 'source']);
-
-        if ($predb) {
-            return $this->updateReleaseFromPredb($release, $predb, 'Filename Match', $dryRun, $show, $categorize);
+        if ($this->matchByDirectFilename($release, $cleanName, $dryRun, $show, $categorize)) {
+            return true;
         }
 
-        // Try partial title match with LIKE
-        $searchPattern = '%'.str_replace(['%', '_'], ['\\%', '\\_'], $cleanName).'%';
-        $predb = Predb::query()
-            ->where('title', 'LIKE', $searchPattern)
-            ->first(['id', 'title', 'size', 'source']);
-
-        if ($predb) {
-            return $this->updateReleaseFromPredb($release, $predb, 'Partial Title Match', $dryRun, $show, $categorize);
-        }
-
-        return false;
+        // Try partial title match
+        return $this->matchByPartialTitle($release, $cleanName, $dryRun, $show, $categorize);
     }
 
     /**
@@ -305,9 +425,8 @@ class RenameOtherMiscReleases extends Command
      */
     protected function updateReleaseFromPredb($release, $predb, string $matchType, bool $dryRun, bool $show, Categorize $categorize): bool
     {
-        // Get old category name
-        $oldCategory = Category::query()->where('id', $release->categories_id)->first();
-        $oldCategoryName = $oldCategory ? $oldCategory->title : "Unknown (ID: {$release->categories_id})";
+        // Get old category name using cache
+        $oldCategoryName = $this->getCategoryName($release->categories_id);
 
         if ($release->searchname === $predb->title) {
             // Names already match, just update predb_id
@@ -353,14 +472,9 @@ class RenameOtherMiscReleases extends Command
 
             // Recategorize if needed
             $newCategory = $categorize->determineCategory($release->groups_id, $newName);
-            if ($newCategory !== null && $newCategory !== $release->categories_id) {
+            if ($newCategory !== null && is_int($newCategory) && $newCategory !== $release->categories_id) {
                 Release::where('id', $release->id)->update(['categories_id' => $newCategory]);
-                $newCategoryObj = Category::query()->where('id', $newCategory)->first();
-                if ($newCategoryObj && isset($newCategoryObj->title)) {
-                    $newCategoryName = $newCategoryObj->title;
-                } else {
-                    $newCategoryName = "Unknown (ID: {$newCategory})";
-                }
+                $newCategoryName = $this->getCategoryName($newCategory);
             }
 
             // Update search indexes
@@ -372,13 +486,8 @@ class RenameOtherMiscReleases extends Command
         } else {
             // Dry run: calculate what the new category would be
             $newCategory = $categorize->determineCategory($release->groups_id, $newName);
-            if ($newCategory !== null && $newCategory !== $release->categories_id) {
-                $newCategoryObj = Category::query()->where('id', $newCategory)->first();
-                if ($newCategoryObj && isset($newCategoryObj->title)) {
-                    $newCategoryName = $newCategoryObj->title;
-                } else {
-                    $newCategoryName = "Unknown (ID: {$newCategory})";
-                }
+            if ($newCategory !== null && is_int($newCategory) && $newCategory !== $release->categories_id) {
+                $newCategoryName = $this->getCategoryName($newCategory);
             }
         }
 
@@ -426,5 +535,18 @@ class RenameOtherMiscReleases extends Command
         $cleaned = preg_replace('/\s+/', ' ', $cleaned);
 
         return $cleaned;
+    }
+
+    /**
+     * Get category name with caching to avoid repeated DB lookups.
+     */
+    protected function getCategoryName(int $categoryId): string
+    {
+        if (! isset($this->categoryCache[$categoryId])) {
+            $category = Category::query()->where('id', $categoryId)->first(['title']);
+            $this->categoryCache[$categoryId] = $category ? $category->title : "Unknown (ID: {$categoryId})";
+        }
+
+        return $this->categoryCache[$categoryId];
     }
 }
