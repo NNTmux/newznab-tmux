@@ -1441,13 +1441,19 @@ function initCartFunctionality() {
                     return;
                 }
 
-                // Download all selected NZBs
-                selected.forEach(guid => {
-                    window.open('/getnzb?id=' + guid, '_blank');
-                });
-
-                if (typeof showToast === 'function') {
-                    showToast('Downloading ' + selected.length + ' item(s)', 'success');
+                // If only one release is selected, download it directly
+                if (selected.length === 1) {
+                    window.location.href = '/getnzb/' + selected[0];
+                    if (typeof showToast === 'function') {
+                        showToast('Downloading NZB...', 'success');
+                    }
+                } else {
+                    // For multiple releases, download as zip
+                    const guids = selected.join(',');
+                    window.location.href = '/getnzb?id=' + encodeURIComponent(guids) + '&zip=1';
+                    if (typeof showToast === 'function') {
+                        showToast(`Downloading ${selected.length} NZBs as zip file...`, 'success');
+                    }
                 }
             });
         });
