@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initProfilePage(); // Initialize profile page (progress bars and charts)
     initCopyToClipboard(); // Copy functionality for RSS/Profile pages
     initVerifyUserModal(); // Admin user verification modal
+    initQualityFilter(); // Quality filter for movie releases
 });
 
 // Event delegation for dynamically added elements - optimized with early returns
@@ -4306,5 +4307,59 @@ if (document.readyState === 'loading') {
     if (document.getElementById('crap_types_container')) {
         initTmuxEdit();
     }
+}
+
+// Initialize quality filter for movie releases
+function initQualityFilter() {
+    const filterButtons = document.querySelectorAll('.quality-filter-btn');
+    const releaseItems = document.querySelectorAll('.release-item');
+    const releaseCount = document.getElementById('release-count');
+
+    if (!filterButtons.length || !releaseItems.length || !releaseCount) {
+        return; // Exit if elements don't exist on the page
+    }
+
+    const totalReleases = releaseItems.length;
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const quality = this.getAttribute('data-quality');
+
+            // Update active button styling
+            filterButtons.forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-600', 'text-white');
+                btn.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
+            });
+            this.classList.add('active', 'bg-blue-600', 'text-white');
+            this.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
+
+            let visibleCount = 0;
+
+            // Filter releases
+            releaseItems.forEach(item => {
+                const releaseName = item.getAttribute('data-release-name');
+
+                if (quality === 'all') {
+                    item.style.display = '';
+                    visibleCount++;
+                } else {
+                    // Check if release name contains the quality indicator
+                    if (releaseName && releaseName.includes(quality.toLowerCase())) {
+                        item.style.display = '';
+                        visibleCount++;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                }
+            });
+
+            // Update count
+            if (quality === 'all') {
+                releaseCount.textContent = `(${totalReleases} total)`;
+            } else {
+                releaseCount.textContent = `(${visibleCount} of ${totalReleases})`;
+            }
+        });
+    });
 }
 

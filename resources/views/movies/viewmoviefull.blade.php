@@ -145,14 +145,32 @@
             <!-- All Available Releases -->
             @if(isset($releases) && count($releases) > 0)
                 <div class="mt-8 pt-8 border-t border-gray-200">
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-                        Available Releases
-                        <span class="text-lg font-normal text-gray-500">({{ count($releases) }} total)</span>
-                    </h2>
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4 md:mb-0">
+                            Available Releases
+                            <span class="text-lg font-normal text-gray-500" id="release-count">({{ count($releases) }} total)</span>
+                        </h2>
 
-                    <div class="space-y-3">
+                        <!-- Quality Filter Buttons -->
+                        <div class="flex flex-wrap gap-2">
+                            <button class="quality-filter-btn active px-4 py-2 rounded-lg text-sm font-medium transition bg-blue-600 text-white hover:bg-blue-700" data-quality="all">
+                                <i class="fas fa-list mr-1"></i> All
+                            </button>
+                            <button class="quality-filter-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-quality="720p">
+                                <i class="fas fa-tv mr-1"></i> 720p
+                            </button>
+                            <button class="quality-filter-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-quality="1080p">
+                                <i class="fas fa-desktop mr-1"></i> 1080p
+                            </button>
+                            <button class="quality-filter-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-quality="2160p">
+                                <i class="fas fa-film mr-1"></i> 2160p / 4K
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3" id="releases-container">
                         @foreach($releases as $release)
-                            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition">
+                            <div class="release-item bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition" data-release-name="{{ strtolower($release['name']) }}">
                                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                                     <div class="flex-1 min-w-0">
                                         <a href="{{ url('/details/' . $release['guid']) }}" class="text-base text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:text-blue-400 font-medium block truncate" title="{{ $release['name'] }}">
@@ -218,5 +236,6 @@
         </div>
     @endif
 </div>
+
 @endsection
 
