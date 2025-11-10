@@ -14,7 +14,6 @@ class ConsoleTools extends ColorCLI
      */
     public function __construct()
     {
-        parent::__construct();
         $this->lastMessageLength = 0;
     }
 
