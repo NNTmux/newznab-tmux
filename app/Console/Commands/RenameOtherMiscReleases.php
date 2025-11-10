@@ -181,6 +181,28 @@ class RenameOtherMiscReleases extends Command
      */
     protected function matchByDirectTitle($release, string $cleanName, bool $dryRun, bool $show, Categorize $categorize): bool
     {
+        // Try ManticoreSearch first if available
+        if (config('nntmux.manticore.enabled') === true || config('sphinxsearch.host')) {
+            try {
+                $manticore = new ManticoreSearch;
+                $results = $manticore->searchIndexes('predb_rt', $cleanName, ['title']);
+
+                if (! empty($results['data'])) {
+                    // Get the first matching PreDB entry from database
+                    $predbId = $results['data'][0]['id'] ?? null;
+                    if ($predbId) {
+                        $predb = Predb::query()->where('id', $predbId)->first(['id', 'title', 'size', 'source']);
+                        if ($predb && $predb->title === $cleanName) {
+                            return $this->updateReleaseFromPredb($release, $predb, 'Direct Title Match', $dryRun, $show, $categorize);
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                // Fall through to direct query
+            }
+        }
+
+        // Fallback to direct query
         $predb = Predb::query()
             ->where('title', $cleanName)
             ->first(['id', 'title', 'size', 'source']);
@@ -197,6 +219,28 @@ class RenameOtherMiscReleases extends Command
      */
     protected function matchByDirectFilename($release, string $cleanName, bool $dryRun, bool $show, Categorize $categorize): bool
     {
+        // Try ManticoreSearch first if available
+        if (config('nntmux.manticore.enabled') === true || config('sphinxsearch.host')) {
+            try {
+                $manticore = new ManticoreSearch;
+                $results = $manticore->searchIndexes('predb_rt', $cleanName, ['filename']);
+
+                if (! empty($results['data'])) {
+                    // Get the first matching PreDB entry from database
+                    $predbId = $results['data'][0]['id'] ?? null;
+                    if ($predbId) {
+                        $predb = Predb::query()->where('id', $predbId)->first(['id', 'title', 'size', 'source']);
+                        if ($predb && $predb->filename === $cleanName) {
+                            return $this->updateReleaseFromPredb($release, $predb, 'Direct Filename Match', $dryRun, $show, $categorize);
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                // Fall through to direct query
+            }
+        }
+
+        // Fallback to direct query
         $predb = Predb::query()
             ->where('filename', $cleanName)
             ->first(['id', 'title', 'size', 'source']);
@@ -209,7 +253,7 @@ class RenameOtherMiscReleases extends Command
     }
 
     /**
-     * Match release by partial title using LIKE.
+     * Match release by partial title using ManticoreSearch or LIKE.
      */
     protected function matchByPartialTitle($release, string $cleanName, bool $dryRun, bool $show, Categorize $categorize): bool
     {
@@ -218,6 +262,30 @@ class RenameOtherMiscReleases extends Command
             return false;
         }
 
+        // Try ManticoreSearch first if available - it's much faster for fuzzy matching
+        if (config('nntmux.manticore.enabled') === true || config('sphinxsearch.host')) {
+            try {
+                $manticore = new ManticoreSearch;
+                $results = $manticore->searchIndexes('predb_rt', $cleanName, ['title', 'filename']);
+
+                if (! empty($results['data'])) {
+                    // Get the best matching PreDB entry from database
+                    foreach ($results['data'] as $result) {
+                        $predbId = $result['id'] ?? null;
+                        if ($predbId) {
+                            $predb = Predb::query()->where('id', $predbId)->first(['id', 'title', 'size', 'source']);
+                            if ($predb) {
+                                return $this->updateReleaseFromPredb($release, $predb, 'Partial Title Match (ManticoreSearch)', $dryRun, $show, $categorize);
+                            }
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                // Fall through to direct query
+            }
+        }
+
+        // Fallback to LIKE query (slower)
         $searchPattern = '%'.str_replace(['%', '_'], ['\\%', '\\_'], $cleanName).'%';
         $predb = Predb::query()
             ->where('title', 'LIKE', $searchPattern)
@@ -356,6 +424,33 @@ class RenameOtherMiscReleases extends Command
         $sizeMin = $release->size * (1 - ($sizeTolerance / 100));
         $sizeMax = $release->size * (1 + ($sizeTolerance / 100));
 
+        // Try ManticoreSearch first if available
+        if (config('nntmux.manticore.enabled') === true || config('sphinxsearch.host')) {
+            try {
+                $manticore = new ManticoreSearch;
+                $results = $manticore->searchIndexes('predb_rt', $cleanName, ['title']);
+
+                if (! empty($results['data'])) {
+                    // Filter results by size in PHP and get from database
+                    foreach ($results['data'] as $result) {
+                        $predbId = $result['id'] ?? null;
+                        if ($predbId) {
+                            $predb = Predb::query()->where('id', $predbId)->first(['id', 'title', 'size', 'source']);
+                            if ($predb && $predb->title === $cleanName) {
+                                // Check size if available
+                                if ($predb->size === null || ($predb->size >= $sizeMin && $predb->size <= $sizeMax)) {
+                                    return $this->updateReleaseFromPredb($release, $predb, 'Title + Size Match', $dryRun, $show, $categorize);
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                // Fall through to direct query
+            }
+        }
+
+        // Fallback to direct query
         $predb = Predb::query()
             ->where('title', $cleanName)
             ->where(function ($query) use ($sizeMin, $sizeMax) {
@@ -384,6 +479,33 @@ class RenameOtherMiscReleases extends Command
         $sizeMin = $release->size * (1 - ($sizeTolerance / 100));
         $sizeMax = $release->size * (1 + ($sizeTolerance / 100));
 
+        // Try ManticoreSearch first if available
+        if (config('nntmux.manticore.enabled') === true || config('sphinxsearch.host')) {
+            try {
+                $manticore = new ManticoreSearch;
+                $results = $manticore->searchIndexes('predb_rt', $cleanName, ['filename']);
+
+                if (! empty($results['data'])) {
+                    // Filter results by size in PHP and get from database
+                    foreach ($results['data'] as $result) {
+                        $predbId = $result['id'] ?? null;
+                        if ($predbId) {
+                            $predb = Predb::query()->where('id', $predbId)->first(['id', 'title', 'size', 'source', 'filename']);
+                            if ($predb && $predb->filename === $cleanName) {
+                                // Check size if available
+                                if ($predb->size === null || ($predb->size >= $sizeMin && $predb->size <= $sizeMax)) {
+                                    return $this->updateReleaseFromPredb($release, $predb, 'Filename + Size Match', $dryRun, $show, $categorize);
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                // Fall through to direct query
+            }
+        }
+
+        // Fallback to direct query
         $predb = Predb::query()
             ->where('filename', $cleanName)
             ->where(function ($query) use ($sizeMin, $sizeMax) {
