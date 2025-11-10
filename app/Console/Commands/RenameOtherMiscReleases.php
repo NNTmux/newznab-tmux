@@ -1,0 +1,430 @@
+<?php
+
+namespace App\Console\Commands;
+
+use App\Models\Category;
+use App\Models\Predb;
+use App\Models\Release;
+use Blacklight\Categorize;
+use Blacklight\ColorCLI;
+use Blacklight\ElasticSearchSiteSearch;
+use Blacklight\ManticoreSearch;
+use Illuminate\Console\Command;
+
+class RenameOtherMiscReleases extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'releases:rename-other-misc
+                                 {--limit= : Maximum number of releases to process}
+                                 {--dry-run : Show what would be renamed without actually updating}
+                                 {--show : Display detailed release changes}
+                                 {--size-tolerance=5 : Size tolerance percentage for matching (default: 5%)}';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Rename releases in other->misc and other-hashed categories using PreDB entries';
+
+    protected ?ColorCLI $colorCLI = null;
+
+    protected int $renamed = 0;
+
+    protected int $checked = 0;
+
+    protected int $matched = 0;
+
+    /**
+     * Execute the console command.
+     */
+    public function handle(): int
+    {
+        $this->colorCLI = new ColorCLI;
+        $categorize = new Categorize;
+
+        $limit = $this->option('limit');
+        $dryRun = $this->option('dry-run');
+        $show = $this->option('show');
+        $sizeTolerance = (float) $this->option('size-tolerance');
+
+        if ($limit && ! is_numeric($limit)) {
+            $this->error('Limit must be a numeric value.');
+
+            return Command::FAILURE;
+        }
+
+        $this->colorCLI->header('Starting rename of releases in other->misc and other-hashed categories');
+
+        if ($dryRun) {
+            $this->colorCLI->info('DRY RUN MODE - No changes will be made');
+        }
+
+        $startTime = now();
+
+        try {
+            // Process releases with exact PreDB matches (title, filename, and size)
+            $this->info('Step 1: Attempting exact PreDB matches (title/filename + size)...');
+            $this->processExactMatches($limit, $dryRun, $show, $sizeTolerance, $categorize);
+
+            // Process releases with title matches only
+            $this->info('Step 2: Attempting fuzzy title matches...');
+            $this->processTitleMatches($limit, $dryRun, $show, $categorize);
+
+            $duration = now()->diffInSeconds($startTime, true);
+
+            $this->colorCLI->header('Processing Complete');
+            $this->colorCLI->primary("Checked: {$this->checked} releases");
+            $this->colorCLI->primary("Matched: {$this->matched} releases");
+            $this->colorCLI->primary("Renamed: {$this->renamed} releases");
+            $this->colorCLI->primary("Duration: {$duration} seconds");
+
+            return Command::SUCCESS;
+
+        } catch (\Exception $e) {
+            $this->error('Error: '.$e->getMessage());
+            $this->error($e->getTraceAsString());
+
+            return Command::FAILURE;
+        }
+    }
+
+    /**
+     * Process releases with exact PreDB matches (title/filename + size).
+     */
+    protected function processExactMatches($limit, bool $dryRun, bool $show, float $sizeTolerance, Categorize $categorize): void
+    {
+        $query = Release::query()
+            ->whereIn('categories_id', [Category::OTHER_MISC, Category::OTHER_HASHED])
+            ->where('predb_id', 0)
+            ->select(['id', 'guid', 'name', 'searchname', 'size', 'fromname', 'categories_id', 'groups_id']);
+
+        if ($limit) {
+            $query->limit((int) $limit);
+        }
+
+        $releases = $query->get();
+        $total = $releases->count();
+
+        if ($total === 0) {
+            $this->info('No releases found for exact matching.');
+
+            return;
+        }
+
+        $this->info("Processing {$total} releases for exact matching...");
+
+        foreach ($releases as $release) {
+            $this->checked++;
+
+            // Clean the release name for matching
+            $cleanName = $this->cleanReleaseName($release->searchname);
+
+            // Try to match by title and size
+            $matched = $this->matchByTitleAndSize($release, $cleanName, $dryRun, $show, $sizeTolerance, $categorize);
+
+            if (! $matched) {
+                // Try to match by filename and size
+                $matched = $this->matchByFilenameAndSize($release, $cleanName, $dryRun, $show, $sizeTolerance, $categorize);
+            }
+
+            if ($matched) {
+                $this->matched++;
+            }
+
+            if (! $show && $this->checked % 10 === 0) {
+                $percent = round(($this->checked / $total) * 100, 1);
+                $this->info(
+                    "Progress: {$percent}% ({$this->checked}/{$total}) | ".
+                    "Matched: {$this->matched} | Renamed: {$this->renamed}"
+                );
+            }
+        }
+
+        if (! $show) {
+            echo PHP_EOL;
+        }
+    }
+
+    /**
+     * Process releases with title matches only.
+     */
+    protected function processTitleMatches($limit, bool $dryRun, bool $show, Categorize $categorize): void
+    {
+        $query = Release::query()
+            ->whereIn('categories_id', [Category::OTHER_MISC, Category::OTHER_HASHED])
+            ->where('predb_id', 0)
+            ->select(['id', 'guid', 'name', 'searchname', 'size', 'fromname', 'categories_id', 'groups_id']);
+
+        if ($limit) {
+            $query->limit((int) $limit);
+        }
+
+        $releases = $query->get();
+        $total = $releases->count();
+
+        if ($total === 0) {
+            $this->info('No releases found for title matching.');
+
+            return;
+        }
+
+        $this->info("Processing {$total} releases for title matching...");
+
+        $initialChecked = $this->checked;
+
+        foreach ($releases as $release) {
+            $this->checked++;
+
+            // Clean the release name for matching
+            $cleanName = $this->cleanReleaseName($release->searchname);
+
+            // Try fuzzy title matching
+            $matched = $this->matchByFuzzyTitle($release, $cleanName, $dryRun, $show, $categorize);
+
+            if ($matched) {
+                $this->matched++;
+            }
+
+            if (! $show && ($this->checked - $initialChecked) % 10 === 0) {
+                $percent = round((($this->checked - $initialChecked) / $total) * 100, 1);
+                $this->info(
+                    "Progress: {$percent}% ({$this->checked}/{$total}) | ".
+                    "Matched: {$this->matched} | Renamed: {$this->renamed}"
+                );
+            }
+        }
+
+        if (! $show) {
+            echo PHP_EOL;
+        }
+    }
+
+    /**
+     * Match release by title and size in PreDB.
+     */
+    protected function matchByTitleAndSize($release, string $cleanName, bool $dryRun, bool $show, float $sizeTolerance, Categorize $categorize): bool
+    {
+        if (empty($cleanName)) {
+            return false;
+        }
+
+        // Calculate size range for matching
+        $sizeMin = $release->size * (1 - ($sizeTolerance / 100));
+        $sizeMax = $release->size * (1 + ($sizeTolerance / 100));
+
+        $predb = Predb::query()
+            ->where('title', $cleanName)
+            ->where(function ($query) use ($sizeMin, $sizeMax) {
+                $query->whereNull('size')
+                    ->orWhereBetween('size', [$sizeMin, $sizeMax]);
+            })
+            ->first(['id', 'title', 'size', 'source']);
+
+        if ($predb) {
+            return $this->updateReleaseFromPredb($release, $predb, 'Title + Size Match', $dryRun, $show, $categorize);
+        }
+
+        return false;
+    }
+
+    /**
+     * Match release by filename and size in PreDB.
+     */
+    protected function matchByFilenameAndSize($release, string $cleanName, bool $dryRun, bool $show, float $sizeTolerance, Categorize $categorize): bool
+    {
+        if (empty($cleanName)) {
+            return false;
+        }
+
+        // Calculate size range for matching
+        $sizeMin = $release->size * (1 - ($sizeTolerance / 100));
+        $sizeMax = $release->size * (1 + ($sizeTolerance / 100));
+
+        $predb = Predb::query()
+            ->where('filename', $cleanName)
+            ->where(function ($query) use ($sizeMin, $sizeMax) {
+                $query->whereNull('size')
+                    ->orWhereBetween('size', [$sizeMin, $sizeMax]);
+            })
+            ->first(['id', 'title', 'size', 'source']);
+
+        if ($predb) {
+            return $this->updateReleaseFromPredb($release, $predb, 'Filename + Size Match', $dryRun, $show, $categorize);
+        }
+
+        return false;
+    }
+
+    /**
+     * Match release by fuzzy title matching using search.
+     */
+    protected function matchByFuzzyTitle($release, string $cleanName, bool $dryRun, bool $show, Categorize $categorize): bool
+    {
+        if (empty($cleanName)) {
+            return false;
+        }
+
+        // Try direct title match first
+        $predb = Predb::query()
+            ->where('title', $cleanName)
+            ->first(['id', 'title', 'size', 'source']);
+
+        if ($predb) {
+            return $this->updateReleaseFromPredb($release, $predb, 'Title Match', $dryRun, $show, $categorize);
+        }
+
+        // Try filename match
+        $predb = Predb::query()
+            ->where('filename', $cleanName)
+            ->first(['id', 'title', 'size', 'source']);
+
+        if ($predb) {
+            return $this->updateReleaseFromPredb($release, $predb, 'Filename Match', $dryRun, $show, $categorize);
+        }
+
+        // Try partial title match with LIKE
+        $searchPattern = '%'.str_replace(['%', '_'], ['\\%', '\\_'], $cleanName).'%';
+        $predb = Predb::query()
+            ->where('title', 'LIKE', $searchPattern)
+            ->first(['id', 'title', 'size', 'source']);
+
+        if ($predb) {
+            return $this->updateReleaseFromPredb($release, $predb, 'Partial Title Match', $dryRun, $show, $categorize);
+        }
+
+        return false;
+    }
+
+    /**
+     * Update release from PreDB entry.
+     */
+    protected function updateReleaseFromPredb($release, $predb, string $matchType, bool $dryRun, bool $show, Categorize $categorize): bool
+    {
+        // Get old category name
+        $oldCategory = Category::query()->where('id', $release->categories_id)->first();
+        $oldCategoryName = $oldCategory ? $oldCategory->title : "Unknown (ID: {$release->categories_id})";
+
+        if ($release->searchname === $predb->title) {
+            // Names already match, just update predb_id
+            if (! $dryRun) {
+                Release::where('id', $release->id)->update(['predb_id' => $predb->id]);
+            }
+
+            if ($show) {
+                $this->colorCLI->primary('═══════════════════════════════════════════════════════════');
+                $this->colorCLI->header("Release ID: {$release->id}");
+                $this->colorCLI->primary("GUID: {$release->guid}");
+                $this->colorCLI->info("Match Type: {$matchType}");
+                $this->colorCLI->info("Searchname: {$release->searchname}");
+                $this->colorCLI->info("Category: {$oldCategoryName}");
+                $this->colorCLI->info("PreDB Title: {$predb->title}");
+                $this->colorCLI->info("PreDB Source: {$predb->source}");
+                $this->colorCLI->warning('Action: Same name, only updating predb_id');
+                if ($dryRun) {
+                    $this->colorCLI->info('[DRY RUN - Not actually updated]');
+                }
+                $this->colorCLI->primary('═══════════════════════════════════════════════════════════');
+                echo PHP_EOL;
+            }
+
+            return true;
+        }
+
+        // Names differ, perform full rename
+        $oldName = $release->name;
+        $oldSearchName = $release->searchname;
+        $newName = $predb->title;
+        $newCategory = null;
+        $newCategoryName = $oldCategoryName;
+
+        if (! $dryRun) {
+            // Update release
+            Release::where('id', $release->id)->update([
+                'name' => $newName,
+                'searchname' => $newName,
+                'isrenamed' => 1,
+                'predb_id' => $predb->id,
+            ]);
+
+            // Recategorize if needed
+            $newCategory = $categorize->determineCategory($release->groups_id, $newName);
+            if ($newCategory !== null && $newCategory !== $release->categories_id) {
+                Release::where('id', $release->id)->update(['categories_id' => $newCategory]);
+                $newCategoryObj = Category::query()->where('id', $newCategory)->first();
+                if ($newCategoryObj && isset($newCategoryObj->title)) {
+                    $newCategoryName = $newCategoryObj->title;
+                } else {
+                    $newCategoryName = "Unknown (ID: {$newCategory})";
+                }
+            }
+
+            // Update search indexes
+            if (config('nntmux.elasticsearch_enabled') === true) {
+                (new ElasticSearchSiteSearch)->updateRelease($release->id);
+            } else {
+                (new ManticoreSearch)->updateRelease($release->id);
+            }
+        } else {
+            // Dry run: calculate what the new category would be
+            $newCategory = $categorize->determineCategory($release->groups_id, $newName);
+            if ($newCategory !== null && $newCategory !== $release->categories_id) {
+                $newCategoryObj = Category::query()->where('id', $newCategory)->first();
+                if ($newCategoryObj && isset($newCategoryObj->title)) {
+                    $newCategoryName = $newCategoryObj->title;
+                } else {
+                    $newCategoryName = "Unknown (ID: {$newCategory})";
+                }
+            }
+        }
+
+        $this->renamed++;
+
+        if ($show) {
+            $this->colorCLI->primary('═══════════════════════════════════════════════════════════');
+            $this->colorCLI->header("Release ID: {$release->id}");
+            $this->colorCLI->primary("GUID: {$release->guid}");
+            $this->colorCLI->info("Match Type: {$matchType}");
+            echo PHP_EOL;
+            $this->colorCLI->warning("OLD Searchname: {$oldSearchName}");
+            $this->colorCLI->warning("OLD Category:   {$oldCategoryName}");
+            echo PHP_EOL;
+            $this->colorCLI->header("NEW Searchname: {$newName}");
+            if ($newCategory !== null && $newCategory !== $release->categories_id) {
+                $this->colorCLI->header("NEW Category:   {$newCategoryName}");
+            } else {
+                $this->colorCLI->info("NEW Category:   {$newCategoryName} (unchanged)");
+            }
+            echo PHP_EOL;
+            $this->colorCLI->info("PreDB Source: {$predb->source}");
+            if ($dryRun) {
+                $this->colorCLI->info('[DRY RUN - Not actually updated]');
+            }
+            $this->colorCLI->primary('═══════════════════════════════════════════════════════════');
+            echo PHP_EOL;
+        }
+
+        return true;
+    }
+
+    /**
+     * Clean release name for matching.
+     */
+    protected function cleanReleaseName(string $name): string
+    {
+        // Remove common release group tags and clean up
+        $cleaned = trim($name);
+
+        // Remove leading/trailing dots, dashes, underscores
+        $cleaned = trim($cleaned, '._- ');
+
+        // Replace multiple spaces with single space
+        $cleaned = preg_replace('/\s+/', ' ', $cleaned);
+
+        return $cleaned;
+    }
+}
