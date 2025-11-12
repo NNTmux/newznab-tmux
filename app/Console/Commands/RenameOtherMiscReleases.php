@@ -207,34 +207,22 @@ class RenameOtherMiscReleases extends Command
      */
     protected function matchByDirectTitle($release, string $cleanName, bool $dryRun, bool $show, Categorize $categorize): bool
     {
-        // Try ManticoreSearch first if available
+        // Use ManticoreSearch for fast exact matching
         $manticore = $this->getManticore();
 
         if ($manticore) {
             try {
-                $results = $manticore->searchIndexes('predb_rt', $cleanName, ['title']);
+                // Get exact match ID from Manticore (extremely fast)
+                $predbId = $manticore->exactMatch('predb_rt', $cleanName, 'title');
 
-                if (! empty($results['data'])) {
-                    // Batch load PreDB rows to avoid one DB query per result
-                    $ids = array_map(function ($r) {
-                        return $r['id'] ?? null;
-                    }, $results['data']);
-                    $ids = array_filter($ids);
+                if ($predbId) {
+                    // Load single PreDB record from database
+                    $predb = Predb::query()
+                        ->where('id', $predbId)
+                        ->first(['id', 'title', 'size', 'source']);
 
-                    if (! empty($ids)) {
-                        $predbs = Predb::query()->whereIn('id', $ids)->get(['id', 'title', 'size', 'source'])->keyBy('id');
-
-                        foreach ($results['data'] as $result) {
-                            $predbId = $result['id'] ?? null;
-                            if (! $predbId || ! isset($predbs[$predbId])) {
-                                continue;
-                            }
-
-                            $predb = $predbs[$predbId];
-                            if ($predb && $predb->title === $cleanName) {
-                                return $this->updateReleaseFromPredb($release, $predb, 'Direct Title Match', $dryRun, $show, $categorize);
-                            }
-                        }
+                    if ($predb) {
+                        return $this->updateReleaseFromPredb($release, $predb, 'Direct Title Match', $dryRun, $show, $categorize);
                     }
                 }
             } catch (\Exception $e) {
@@ -242,7 +230,7 @@ class RenameOtherMiscReleases extends Command
             }
         }
 
-        // Fallback to direct query
+        // Fallback to direct database query if Manticore unavailable
         $predb = Predb::query()
             ->where('title', $cleanName)
             ->first(['id', 'title', 'size', 'source']);
@@ -259,34 +247,22 @@ class RenameOtherMiscReleases extends Command
      */
     protected function matchByDirectFilename($release, string $cleanName, bool $dryRun, bool $show, Categorize $categorize): bool
     {
-        // Try ManticoreSearch first if available
+        // Use ManticoreSearch for fast exact matching
         $manticore = $this->getManticore();
 
         if ($manticore) {
             try {
-                $results = $manticore->searchIndexes('predb_rt', $cleanName, ['filename']);
+                // Get exact match ID from Manticore (extremely fast)
+                $predbId = $manticore->exactMatch('predb_rt', $cleanName, 'filename');
 
-                if (! empty($results['data'])) {
-                    // Batch load PreDB rows to avoid one DB query per result
-                    $ids = array_map(function ($r) {
-                        return $r['id'] ?? null;
-                    }, $results['data']);
-                    $ids = array_filter($ids);
+                if ($predbId) {
+                    // Load single PreDB record from database
+                    $predb = Predb::query()
+                        ->where('id', $predbId)
+                        ->first(['id', 'title', 'size', 'source']);
 
-                    if (! empty($ids)) {
-                        $predbs = Predb::query()->whereIn('id', $ids)->get(['id', 'title', 'size', 'source', 'filename'])->keyBy('id');
-
-                        foreach ($results['data'] as $result) {
-                            $predbId = $result['id'] ?? null;
-                            if (! $predbId || ! isset($predbs[$predbId])) {
-                                continue;
-                            }
-
-                            $predb = $predbs[$predbId];
-                            if ($predb && isset($predb->filename) && $predb->filename === $cleanName) {
-                                return $this->updateReleaseFromPredb($release, $predb, 'Direct Filename Match', $dryRun, $show, $categorize);
-                            }
-                        }
+                    if ($predb) {
+                        return $this->updateReleaseFromPredb($release, $predb, 'Direct Filename Match', $dryRun, $show, $categorize);
                     }
                 }
             } catch (\Exception $e) {
@@ -294,7 +270,7 @@ class RenameOtherMiscReleases extends Command
             }
         }
 
-        // Fallback to direct query
+        // Fallback to direct database query if Manticore unavailable
         $predb = Predb::query()
             ->where('filename', $cleanName)
             ->first(['id', 'title', 'size', 'source']);
@@ -321,27 +297,18 @@ class RenameOtherMiscReleases extends Command
 
         if ($manticore) {
             try {
-                $results = $manticore->searchIndexes('predb_rt', $cleanName, ['title', 'filename']);
+                // Use a custom limited search for partial matching
+                $results = $this->limitedSearch('predb_rt', $cleanName, ['title', 'filename'], 10);
 
-                if (! empty($results['data'])) {
-                    $ids = array_map(function ($r) {
-                        return $r['id'] ?? null;
-                    }, $results['data']);
-                    $ids = array_filter($ids);
+                if (! empty($results)) {
+                    // Batch load just the limited PreDB rows
+                    $predbs = Predb::query()->whereIn('id', $results)->get(['id', 'title', 'size', 'source'])->keyBy('id');
 
-                    if (! empty($ids)) {
-                        $predbs = Predb::query()->whereIn('id', $ids)->get(['id', 'title', 'size', 'source'])->keyBy('id');
-
-                        foreach ($results['data'] as $result) {
-                            $predbId = $result['id'] ?? null;
-                            if (! $predbId || ! isset($predbs[$predbId])) {
-                                continue;
-                            }
-
+                    foreach ($results as $predbId) {
+                        if (isset($predbs[$predbId])) {
                             $predb = $predbs[$predbId];
-                            if ($predb) {
-                                return $this->updateReleaseFromPredb($release, $predb, 'Partial Title Match (ManticoreSearch)', $dryRun, $show, $categorize);
-                            }
+
+                            return $this->updateReleaseFromPredb($release, $predb, 'Partial Title Match (ManticoreSearch)', $dryRun, $show, $categorize);
                         }
                     }
                 }
@@ -361,6 +328,53 @@ class RenameOtherMiscReleases extends Command
         }
 
         return false;
+    }
+
+    /**
+     * Perform a limited Manticore search returning only IDs up to specified limit.
+     */
+    protected function limitedSearch(string $index, string $searchString, array $fields, int $limit = 10): array
+    {
+        $manticore = $this->getManticore();
+        if (! $manticore) {
+            return [];
+        }
+
+        try {
+            $escapedSearch = ManticoreSearch::escapeString($searchString);
+            if (empty($escapedSearch)) {
+                return [];
+            }
+
+            $searchColumns = '';
+            if (! empty($fields)) {
+                if (count($fields) > 1) {
+                    $searchColumns = '@('.implode(',', $fields).')';
+                } else {
+                    $searchColumns = '@'.$fields[0];
+                }
+            }
+
+            $searchExpr = '@@relaxed '.$searchColumns.' '.$escapedSearch;
+
+            $query = (new \Manticoresearch\Search($manticore->manticoreSearch))
+                ->setTable($index)
+                ->option('ranker', 'sph04')
+                ->limit($limit)
+                ->stripBadUtf8(true)
+                ->search($searchExpr);
+
+            $results = $query->get();
+
+            $ids = [];
+            foreach ($results as $doc) {
+                $ids[] = $doc->getId();
+            }
+
+            return $ids;
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 
     /**
@@ -489,37 +503,26 @@ class RenameOtherMiscReleases extends Command
         $sizeMin = $release->size * (1 - ($sizeTolerance / 100));
         $sizeMax = $release->size * (1 + ($sizeTolerance / 100));
 
-        // Try ManticoreSearch first if available
+        // Use ManticoreSearch for fast exact title matching, then verify size
         $manticore = $this->getManticore();
 
         if ($manticore) {
             try {
-                $results = $manticore->searchIndexes('predb_rt', $cleanName, ['title']);
+                // Get exact match ID from Manticore (extremely fast)
+                $predbId = $manticore->exactMatch('predb_rt', $cleanName, 'title');
 
-                if (! empty($results['data'])) {
-                    // Batch load PreDB rows to avoid one DB query per result
-                    $ids = array_map(function ($r) {
-                        return $r['id'] ?? null;
-                    }, $results['data']);
-                    $ids = array_filter($ids);
+                if ($predbId) {
+                    // Load and verify size
+                    $predb = Predb::query()
+                        ->where('id', $predbId)
+                        ->where(function ($query) use ($sizeMin, $sizeMax) {
+                            $query->whereNull('size')
+                                ->orWhereBetween('size', [$sizeMin, $sizeMax]);
+                        })
+                        ->first(['id', 'title', 'size', 'source']);
 
-                    if (! empty($ids)) {
-                        $predbs = Predb::query()->whereIn('id', $ids)->get(['id', 'title', 'size', 'source'])->keyBy('id');
-
-                        foreach ($results['data'] as $result) {
-                            $predbId = $result['id'] ?? null;
-                            if (! $predbId || ! isset($predbs[$predbId])) {
-                                continue;
-                            }
-
-                            $predb = $predbs[$predbId];
-                            if ($predb && $predb->title === $cleanName) {
-                                // Check size if available
-                                if ($predb->size === null || ($predb->size >= $sizeMin && $predb->size <= $sizeMax)) {
-                                    return $this->updateReleaseFromPredb($release, $predb, 'Title + Size Match', $dryRun, $show, $categorize);
-                                }
-                            }
-                        }
+                    if ($predb) {
+                        return $this->updateReleaseFromPredb($release, $predb, 'Title + Size Match', $dryRun, $show, $categorize);
                     }
                 }
             } catch (\Exception $e) {
@@ -527,7 +530,7 @@ class RenameOtherMiscReleases extends Command
             }
         }
 
-        // Fallback to direct query
+        // Fallback to direct database query
         $predb = Predb::query()
             ->where('title', $cleanName)
             ->where(function ($query) use ($sizeMin, $sizeMax) {
@@ -556,37 +559,26 @@ class RenameOtherMiscReleases extends Command
         $sizeMin = $release->size * (1 - ($sizeTolerance / 100));
         $sizeMax = $release->size * (1 + ($sizeTolerance / 100));
 
-        // Try ManticoreSearch first if available
+        // Use ManticoreSearch for fast exact filename matching, then verify size
         $manticore = $this->getManticore();
 
         if ($manticore) {
             try {
-                $results = $manticore->searchIndexes('predb_rt', $cleanName, ['filename']);
+                // Get exact match ID from Manticore (extremely fast)
+                $predbId = $manticore->exactMatch('predb_rt', $cleanName, 'filename');
 
-                if (! empty($results['data'])) {
-                    // Batch load PreDB rows to avoid one DB query per result
-                    $ids = array_map(function ($r) {
-                        return $r['id'] ?? null;
-                    }, $results['data']);
-                    $ids = array_filter($ids);
+                if ($predbId) {
+                    // Load and verify size
+                    $predb = Predb::query()
+                        ->where('id', $predbId)
+                        ->where(function ($query) use ($sizeMin, $sizeMax) {
+                            $query->whereNull('size')
+                                ->orWhereBetween('size', [$sizeMin, $sizeMax]);
+                        })
+                        ->first(['id', 'title', 'size', 'source']);
 
-                    if (! empty($ids)) {
-                        $predbs = Predb::query()->whereIn('id', $ids)->get(['id', 'title', 'size', 'source', 'filename'])->keyBy('id');
-
-                        foreach ($results['data'] as $result) {
-                            $predbId = $result['id'] ?? null;
-                            if (! $predbId || ! isset($predbs[$predbId])) {
-                                continue;
-                            }
-
-                            $predb = $predbs[$predbId];
-                            if ($predb && isset($predb->filename) && $predb->filename === $cleanName) {
-                                // Check size if available
-                                if ($predb->size === null || ($predb->size >= $sizeMin && $predb->size <= $sizeMax)) {
-                                    return $this->updateReleaseFromPredb($release, $predb, 'Filename + Size Match', $dryRun, $show, $categorize);
-                                }
-                            }
-                        }
+                    if ($predb) {
+                        return $this->updateReleaseFromPredb($release, $predb, 'Filename + Size Match', $dryRun, $show, $categorize);
                     }
                 }
             } catch (\Exception $e) {
@@ -594,7 +586,7 @@ class RenameOtherMiscReleases extends Command
             }
         }
 
-        // Fallback to direct query
+        // Fallback to direct database query
         $predb = Predb::query()
             ->where('filename', $cleanName)
             ->where(function ($query) use ($sizeMin, $sizeMax) {
