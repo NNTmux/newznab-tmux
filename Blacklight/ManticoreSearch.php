@@ -449,49 +449,4 @@ class ManticoreSearch
 
         return $result;
     }
-
-    /**
-     * Fast exact match search - returns only first matching ID or null.
-     * Much faster than searchIndexes for exact matches.
-     */
-    public function exactMatch(string $rt_index, string $searchString, string $field): ?int
-    {
-        if (empty($rt_index) || empty($searchString) || empty($field)) {
-            return null;
-        }
-
-        try {
-            // Use exact phrase matching with field filter
-            // The @field syntax with quotes ensures exact matching
-            $escapedSearch = self::escapeString($searchString);
-            if (empty($escapedSearch)) {
-                return null;
-            }
-
-            $searchExpr = '@'.$field.' "'.str_replace('"', '\\"', $searchString).'"';
-
-            $query = (new Search($this->manticoreSearch))
-                ->setTable($rt_index)
-                ->option('ranker', 'none') // Faster - we don't need ranking for exact match
-                ->limit(1) // Only need first match
-                ->stripBadUtf8(true)
-                ->search($searchExpr);
-
-            $results = $query->get();
-
-            if (! empty($results)) {
-                foreach ($results as $doc) {
-                    return $doc->getId();
-                }
-            }
-        } catch (\Throwable $e) {
-            Log::error('ManticoreSearch exactMatch error: '.$e->getMessage(), [
-                'index' => $rt_index,
-                'field' => $field,
-                'search' => $searchString,
-            ]);
-        }
-
-        return null;
-    }
 }
