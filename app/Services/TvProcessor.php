@@ -135,6 +135,7 @@ class TvProcessor
                     'status' => 'skipped',
                     'duration' => 0.0,
                 ];
+
                 continue;
             }
 
