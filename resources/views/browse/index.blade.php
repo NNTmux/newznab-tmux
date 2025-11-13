@@ -164,7 +164,7 @@
                                                         <i class="fas fa-images mr-1"></i> Sample
                                                     </button>
                                                 @endif
-                                                @if(isset($result->videos_id) && $result->videos_id > 0)
+                                                @if(!empty($result->videos_id) && (int)$result->videos_id > 0)
                                                     <a href="{{ url('/series/' . $result->videos_id) }}"
                                                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 hover:bg-indigo-200 dark:hover:bg-indigo-800 transition"
                                                        title="View full series">
