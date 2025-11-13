@@ -388,6 +388,7 @@ abstract class TV extends Videos
 
             // Clean show name.
             $showInfo['cleanname'] = preg_replace('/ - \d+$/i', '', $this->cleanName($showInfo['name']));
+            $showInfo['cleanname'] = $this->normalizeShowTitle($showInfo['cleanname']);
 
             // Get the Season/Episode/Airdate
             $showInfo += $this->parseSeasonEp($relname);
@@ -441,6 +442,33 @@ abstract class TV extends Videos
     }
 
     /**
+     * Normalize well-known daily/talk show titles to their canonical names.
+     */
+    protected function normalizeShowTitle(string $cleanName): string
+    {
+        $normalized = strtolower(trim($cleanName));
+        $aliases = [
+            'stephen colbert' => 'The Late Show with Stephen Colbert',
+            'late show with stephen colbert' => 'The Late Show with Stephen Colbert',
+            'late show stephen colbert' => 'The Late Show with Stephen Colbert',
+            'the late show stephen colbert' => 'The Late Show with Stephen Colbert',
+            'colbert' => 'The Late Show with Stephen Colbert',
+            'daily show' => 'The Daily Show',
+            'the daily show' => 'The Daily Show',
+            'daily show with jon stewart' => 'The Daily Show',
+            'daily show with trevor noah' => 'The Daily Show',
+            'the daily show with jon stewart' => 'The Daily Show',
+            'the daily show with trevor noah' => 'The Daily Show',
+        ];
+
+        if (isset($aliases[$normalized])) {
+            return $aliases[$normalized];
+        }
+
+        return $cleanName;
+    }
+
+    /**
      * Parses the release searchname for the season/episode/airdate information.
      */
     private function parseSeasonEp(string $relname): array
@@ -479,23 +507,24 @@ abstract class TV extends Videos
         }
         // 2009.01.01 and 2009-01-01
         elseif (preg_match('/^(.*?)[^a-z0-9](?P<airdate>(19|20)(\d{2})[.\/-](\d{2})[.\/-](\d{2}))[^a-z0-9]?/i', $relname, $hits)) {
-            $episodeArr['season'] = $hits[4].$hits[5];
-            $episodeArr['episode'] = $hits[5].'/'.$hits[6];
+            $episodeArr['season'] = 0;
+            $episodeArr['episode'] = 0;
             $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $hits['airdate']))); // yyyy-mm-dd
         }
         // 01.01.2009
         elseif (preg_match('/^(.*?)[^a-z0-9](?P<airdate>(\d{2})[^a-z0-9](\d{2})[^a-z0-9](19|20)(\d{2}))[^a-z0-9]?/i', $relname, $hits)) {
-            $episodeArr['season'] = $hits[5].$hits[6];
-            $episodeArr['episode'] = $hits[3].'/'.$hits[4];
+            $episodeArr['season'] = 0;
+            $episodeArr['episode'] = 0;
             $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $hits['airdate']))); // yyyy-mm-dd
         }
         // 01.01.09
         elseif (preg_match('/^(.*?)[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9]?/i', $relname, $hits)) {
             // Add extra logic to capture the proper YYYY year
-            $episodeArr['season'] = $hits[4] = ($hits[4] <= 99 && $hits[4] > 15) ? '19'.$hits[4] : '20'.$hits[4];
-            $episodeArr['episode'] = $hits[2].'/'.$hits[3];
-            $tmpAirdate = $episodeArr['season'].'/'.$episodeArr['episode'];
-            $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $tmpAirdate))); // yyyy-mm-dd
+            $year = ($hits[4] <= 99 && $hits[4] > 15) ? '19'.$hits[4] : '20'.$hits[4];
+            $airdate = $year.'/'.$hits[2].'/'.$hits[3];
+            $episodeArr['season'] = 0;
+            $episodeArr['episode'] = 0;
+            $episodeArr['airdate'] = date('Y-m-d', strtotime($airdate)); // yyyy-mm-dd
         }
         // 2009.E01
         elseif (preg_match('/^(.*?)[^a-z0-9]20(\d{2})[^a-z0-9](\d{1,3})[^a-z0-9]?/i', $relname, $hits)) {

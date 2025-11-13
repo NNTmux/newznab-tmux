@@ -130,6 +130,7 @@ class TMDB extends TV
 
                         $seriesNo = preg_replace('/^S0*/i', '', $release['season']);
                         $episodeNo = preg_replace('/^E0*/i', '', $release['episode']);
+                        $hasAirdate = ! empty($release['airdate']);
 
                         if ($episodeNo === 'all') {
                             // Set the video ID and leave episode 0
@@ -154,16 +155,24 @@ class TMDB extends TV
                         $episode = $this->getBySeasonEp($videoId, $seriesNo, $episodeNo, $release['airdate']);
 
                         if ($episode === false) {
-                            // Send the request for the episode to TMDB
-                            $tmdbEpisode = $this->getEpisodeInfo(
-                                $siteId,
-                                $seriesNo,
-                                $episodeNo,
-                                $release['airdate']
-                            );
+                            if ($seriesNo !== '' && $episodeNo !== '') {
+                                // Send the request for the episode to TMDB using season/episode numbers
+                                $tmdbEpisode = $this->getEpisodeInfo(
+                                    $siteId,
+                                    $seriesNo,
+                                    $episodeNo,
+                                    $release['airdate']
+                                );
 
-                            if ($tmdbEpisode) {
-                                $episode = $this->addEpisode($videoId, $tmdbEpisode);
+                                if ($tmdbEpisode) {
+                                    $episode = $this->addEpisode($videoId, $tmdbEpisode);
+                                }
+                            }
+
+                            if ($episode === false && $hasAirdate) {
+                                // Refresh episode cache and attempt airdate match
+                                $this->getEpisodeInfo($siteId, -1, -1, '', $videoId);
+                                $episode = $this->getBySeasonEp($videoId, 0, 0, $release['airdate']);
                             }
                         }
 
@@ -173,10 +182,15 @@ class TMDB extends TV
                             if ($this->echooutput) {
                                 $this->colorCli->primaryOver('    → ');
                                 $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
-                                $this->colorCli->primaryOver(' S');
-                                $this->colorCli->warningOver(sprintf('%02d', $seriesNo));
-                                $this->colorCli->primaryOver('E');
-                                $this->colorCli->warningOver(sprintf('%02d', $episodeNo));
+                                if ($seriesNo !== '' && $episodeNo !== '') {
+                                    $this->colorCli->primaryOver(' S');
+                                    $this->colorCli->warningOver(sprintf('%02d', $seriesNo));
+                                    $this->colorCli->primaryOver('E');
+                                    $this->colorCli->warningOver(sprintf('%02d', $episodeNo));
+                                } elseif ($hasAirdate) {
+                                    $this->colorCli->primaryOver(' | ');
+                                    $this->colorCli->warningOver($release['airdate']);
+                                }
                                 $this->colorCli->primaryOver(' ✓ ');
                                 $this->colorCli->primary('MATCHED (TMDB)');
                             }
@@ -188,6 +202,10 @@ class TMDB extends TV
                             if ($this->echooutput) {
                                 $this->colorCli->primaryOver('    → ');
                                 $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
+                                if ($hasAirdate) {
+                                    $this->colorCli->primaryOver(' | ');
+                                    $this->colorCli->warningOver($release['airdate']);
+                                }
                                 $this->colorCli->primaryOver(' → ');
                                 $this->colorCli->warning('Episode not found');
                             }

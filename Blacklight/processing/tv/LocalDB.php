@@ -21,8 +21,9 @@ class LocalDB extends TV
 
         $tvCount = \count($res);
         $matchedCount = 0;
-        $notFoundCount = 0;
+        $seriesMatchedCount = 0;
         $episodeMissingCount = 0;
+        $notFoundCount = 0;
 
         if ($tvCount === 0) {
             return;
@@ -44,13 +45,15 @@ class LocalDB extends TV
             if ($videoId !== 0 && $videoId !== false) {
                 // Found a matching show in local DB
                 $episodeId = false;
+                $hasEpisodeNumbers = isset($showInfo['season'], $showInfo['episode']) && $showInfo['episode'] !== 'all' && (int) $showInfo['season'] > 0 && (int) $showInfo['episode'] > 0;
+                $hasAirdate = ! empty($showInfo['airdate']);
 
-                if (isset($showInfo['season'], $showInfo['episode']) && $showInfo['episode'] !== 'all') {
+                if ($hasEpisodeNumbers || $hasAirdate) {
                     // Try to find the specific episode
                     $episodeId = $this->getBySeasonEp(
                         $videoId,
-                        $showInfo['season'],
-                        $showInfo['episode'],
+                        (int) ($showInfo['season'] ?? 0),
+                        (int) ($showInfo['episode'] ?? 0),
                         $showInfo['airdate'] ?? ''
                     );
                 }
@@ -64,25 +67,46 @@ class LocalDB extends TV
                     if ($this->echooutput) {
                         $this->colorCli->primaryOver('    → ');
                         $this->colorCli->headerOver($showInfo['cleanname']);
-                        $this->colorCli->primaryOver(' S');
-                        $this->colorCli->warningOver(sprintf('%02d', $showInfo['season'] ?? 0));
-                        $this->colorCli->primaryOver('E');
-                        $this->colorCli->warningOver(sprintf('%02d', $showInfo['episode'] ?? 0));
+                        if ($hasAirdate) {
+                            $this->colorCli->primaryOver(' | ');
+                            $this->colorCli->warningOver($showInfo['airdate']);
+                        } else {
+                            $this->colorCli->primaryOver(' S');
+                            $this->colorCli->warningOver(sprintf('%02d', (int) ($showInfo['season'] ?? 0)));
+                            $this->colorCli->primaryOver('E');
+                            $this->colorCli->warningOver(sprintf('%02d', (int) ($showInfo['episode'] ?? 0)));
+                        }
                         $this->colorCli->primaryOver(' ✓ ');
                         $this->colorCli->primary('MATCHED (Local DB)');
                     }
-                } elseif ($videoId > 0 && isset($showInfo['season'], $showInfo['episode']) && $showInfo['episode'] !== 'all') {
-                    // Show found but episode not in database yet
-                    $episodeMissingCount++;
-                    if ($this->echooutput) {
+                } else {
+                    // Series matched but no specific episode located
+                    $this->setVideoIdFound($videoId, $release->id, 0);
+                    $matched = true;
+                    $seriesMatchedCount++;
+
+                    if ($hasEpisodeNumbers || $hasAirdate) {
+                        $episodeMissingCount++;
+                        if ($this->echooutput) {
+                            $this->colorCli->primaryOver('    → ');
+                            $this->colorCli->headerOver($showInfo['cleanname']);
+                            if ($hasAirdate) {
+                                $this->colorCli->primaryOver(' | ');
+                                $this->colorCli->warningOver($showInfo['airdate']);
+                            } else {
+                                $this->colorCli->primaryOver(' S');
+                                $this->colorCli->warningOver(sprintf('%02d', (int) ($showInfo['season'] ?? 0)));
+                                $this->colorCli->primaryOver('E');
+                                $this->colorCli->warningOver(sprintf('%02d', (int) ($showInfo['episode'] ?? 0)));
+                            }
+                            $this->colorCli->headerOver(' → ');
+                            $this->colorCli->notice($hasAirdate ? 'Series matched, airdate not in local DB' : 'Series matched, episode not in local DB');
+                        }
+                    } elseif ($this->echooutput) {
                         $this->colorCli->primaryOver('    → ');
                         $this->colorCli->headerOver($showInfo['cleanname']);
-                        $this->colorCli->primaryOver(' S');
-                        $this->colorCli->warningOver(sprintf('%02d', $showInfo['season'] ?? 0));
-                        $this->colorCli->primaryOver('E');
-                        $this->colorCli->warningOver(sprintf('%02d', $showInfo['episode'] ?? 0));
-                        $this->colorCli->headerOver(' → ');
-                        $this->colorCli->notice('Show found, episode missing');
+                        $this->colorCli->primaryOver(' → ');
+                        $this->colorCli->notice('Series matched (no episode info)');
                     }
                 }
             }
@@ -92,7 +116,10 @@ class LocalDB extends TV
                 if ($this->echooutput) {
                     $this->colorCli->primaryOver('    → ');
                     $this->colorCli->alternateOver($showInfo['cleanname']);
-                    if (isset($showInfo['season'], $showInfo['episode'])) {
+                    if (! empty($showInfo['airdate'])) {
+                        $this->colorCli->primaryOver(' | ');
+                        $this->colorCli->warningOver($showInfo['airdate']);
+                    } elseif (isset($showInfo['season'], $showInfo['episode'])) {
                         $this->colorCli->primaryOver(' S');
                         $this->colorCli->warningOver(sprintf('%02d', $showInfo['season'] ?? 0));
                         $this->colorCli->primaryOver('E');
@@ -104,10 +131,16 @@ class LocalDB extends TV
             }
         }
 
-        if ($this->echooutput && $matchedCount > 0) {
+        if ($this->echooutput && ($matchedCount > 0 || $seriesMatchedCount > 0)) {
             echo "\n";
             $this->colorCli->primaryOver('  ✓ Local DB: ');
-            $this->colorCli->primary(sprintf('%d matched, %d missing episodes, %d not found', $matchedCount, $episodeMissingCount, $notFoundCount));
+            $this->colorCli->primary(sprintf(
+                '%d episode matches, %d series matches, %d missing episodes, %d not found',
+                $matchedCount,
+                $seriesMatchedCount,
+                $episodeMissingCount,
+                $notFoundCount
+            ));
         }
     }
 
