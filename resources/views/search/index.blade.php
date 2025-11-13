@@ -222,6 +222,13 @@
                                                     <i class="fas fa-file-alt mr-1"></i> NFO
                                                 </button>
                                             @endif
+                                            @if(!empty($result->videos_id) && (int)$result->videos_id > 0)
+                                                <a href="{{ url('/series/' . $result->videos_id) }}"
+                                                   class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 hover:bg-indigo-200 dark:hover:bg-indigo-800 transition"
+                                                   title="View full series">
+                                                    <i class="fas fa-tv mr-1"></i> View Series
+                                                </a>
+                                            @endif
                                         </div>
                                         <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 flex flex-wrap gap-2">
                                             @if($result->group_name)
@@ -315,6 +322,13 @@
                                                 title="View NFO file">
                                             <i class="fas fa-file-alt mr-1"></i> NFO
                                         </button>
+                                    @endif
+                                    @if(!empty($result->videos_id) && (int)$result->videos_id > 0)
+                                        <a href="{{ url('/series/' . $result->videos_id) }}"
+                                           class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 hover:bg-indigo-200 dark:hover:bg-indigo-800 transition"
+                                           title="View full series">
+                                            <i class="fas fa-tv mr-1"></i> View Series
+                                        </a>
                                     @endif
                                 </div>
                                 <div class="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-600 dark:text-gray-400">
