@@ -250,15 +250,17 @@ class ProcessAdditional
      */
     protected bool $_reverse;
 
-    protected ManticoreSearch $manticore;
+    protected ?ManticoreSearch $manticore = null;
 
-    private FFMpeg $ffmpeg;
+    private ?FFMpeg $ffmpeg = null;
 
-    private FFProbe $ffprobe;
+    private ?FFProbe $ffprobe = null;
 
-    private MediaInfo $mediaInfo;
+    private ?MediaInfo $mediaInfo = null;
 
-    private ElasticSearchSiteSearch $elasticsearch;
+    private ?ElasticSearchSiteSearch $elasticsearch = null;
+
+    private bool $elasticsearchEnabled;
 
     /**
      * ProcessAdditional constructor.
@@ -280,13 +282,6 @@ class ProcessAdditional
         $this->_releaseImage = new ReleaseImage;
         $this->_par2Info = new Par2Info;
         $this->_nfo = new Nfo;
-        $this->manticore = new ManticoreSearch;
-        $this->elasticsearch = new ElasticSearchSiteSearch;
-        $this->ffmpeg = FFMpeg::create(['timeout' => Settings::settingValue('timeoutseconds')]);
-        $this->ffprobe = FFProbe::create();
-        $this->mediaInfo = new MediaInfo;
-        $this->mediaInfo->setConfig('use_oldxml_mediainfo_output_format', true);
-        $this->mediaInfo->setConfig('command', config('nntmux_settings.mediainfo_path'));
 
         $this->_innerFileBlacklist = Settings::settingValue('innerfileblacklist') === '' ? false : Settings::settingValue('innerfileblacklist');
         $this->_maxNestedLevels = (int) Settings::settingValue('maxnestedlevels') === 0 ? 3 : (int) Settings::settingValue('maxnestedlevels');
@@ -364,6 +359,7 @@ class ProcessAdditional
         $this->_videoFileRegex = '\\.(AVI|F4V|IFO|M1V|M2V|M4V|MKV|MOV|MP4|MPEG|MPG|MPGV|MPV|OGV|QT|RM|RMVB|TS|VOB|WMV)';
         $this->_debugDownloadFailures = (bool) config('app.debug');
         $this->_groupUnavailable = false; // flag when NNTP group is missing
+        $this->elasticsearchEnabled = config('nntmux.elasticsearch_enabled') === true;
     }
 
     /**
@@ -372,6 +368,53 @@ class ProcessAdditional
     public function __destruct()
     {
         $this->_clearMainTmpPath();
+    }
+
+    private function ffmpeg(): FFMpeg
+    {
+        if ($this->ffmpeg === null) {
+            $this->ffmpeg = FFMpeg::create(['timeout' => Settings::settingValue('timeoutseconds')]);
+        }
+
+        return $this->ffmpeg;
+    }
+
+    private function ffprobe(): FFProbe
+    {
+        if ($this->ffprobe === null) {
+            $this->ffprobe = FFProbe::create();
+        }
+
+        return $this->ffprobe;
+    }
+
+    private function mediaInfo(): MediaInfo
+    {
+        if ($this->mediaInfo === null) {
+            $this->mediaInfo = new MediaInfo;
+            $this->mediaInfo->setConfig('use_oldxml_mediainfo_output_format', true);
+            $this->mediaInfo->setConfig('command', config('nntmux_settings.mediainfo_path'));
+        }
+
+        return $this->mediaInfo;
+    }
+
+    private function manticore(): ManticoreSearch
+    {
+        if ($this->manticore === null) {
+            $this->manticore = new ManticoreSearch;
+        }
+
+        return $this->manticore;
+    }
+
+    private function elasticsearch(): ElasticSearchSiteSearch
+    {
+        if ($this->elasticsearch === null) {
+            $this->elasticsearch = new ElasticSearchSiteSearch;
+        }
+
+        return $this->elasticsearch;
     }
 
     /**
@@ -1547,10 +1590,10 @@ class ProcessAdditional
             $this->_addFileInfo($file);
         }
         if ($this->_addedFileInfo > 0) {
-            if (config('nntmux.elasticsearch_enabled') === true) {
-                $this->elasticsearch->updateRelease($this->_release->id);
+            if ($this->elasticsearchEnabled) {
+                $this->elasticsearch()->updateRelease($this->_release->id);
             } else {
-                $this->manticore->updateRelease($this->_release->id);
+                $this->manticore()->updateRelease($this->_release->id);
             }
         }
 
@@ -2104,7 +2147,7 @@ class ProcessAdditional
             if (! $retVal) {
                 // Get the media info for the file.
                 try {
-                    $xmlArray = $this->mediaInfo->getInfo($fileLocation, false);
+                    $xmlArray = $this->mediaInfo()->getInfo($fileLocation, false);
 
                     if ($xmlArray !== null) {
                         foreach ($xmlArray->getAudios() as $track) {
@@ -2134,10 +2177,10 @@ class ProcessAdditional
                                     $release = Release::whereId($this->_release->id);
                                     $release->update(['searchname' => $newTitle, 'categories_id' => $newCat['categories_id'], 'iscategorized' => 1, 'isrenamed' => 1, 'proc_pp' => 1]);
 
-                                    if (config('nntmux.elasticsearch_enabled') === true) {
-                                        $this->elasticsearch->updateRelease($this->_release->id);
+                                    if ($this->elasticsearchEnabled) {
+                                        $this->elasticsearch()->updateRelease($this->_release->id);
                                     } else {
-                                        $this->manticore->updateRelease($this->_release->id);
+                                        $this->manticore()->updateRelease($this->_release->id);
                                     }
 
                                     // Echo the changed name.
@@ -2181,9 +2224,9 @@ class ProcessAdditional
                 $audioFileName = ($this->_release->guid.'.ogg');
 
                 // Create an audio sample.
-                if ($this->ffprobe->isValid($fileLocation)) {
+                if ($this->ffprobe()->isValid($fileLocation)) {
                     try {
-                        $audioSample = $this->ffmpeg->open($fileLocation);
+                        $audioSample = $this->ffmpeg()->open($fileLocation);
                         $format = new Vorbis;
                         $audioSample->clip(TimeCode::fromSeconds(30), TimeCode::fromSeconds(30));
                         $audioSample->save($format, $this->tmpPath.$audioFileName);
@@ -2256,8 +2299,8 @@ class ProcessAdditional
     private function getVideoTime(string $videoLocation): string
     {
         // Get the real duration of the file.
-        if ($this->ffprobe->isValid($videoLocation)) {
-            $time = $this->ffprobe->format($videoLocation)->get('duration');
+        if ($this->ffprobe()->isValid($videoLocation)) {
+            $time = $this->ffprobe()->format($videoLocation)->get('duration');
         }
 
         if (empty($time) || ! preg_match('/time=(\d{1,2}:\d{1,2}:)?(\d{1,2})\.(\d{1,2})\s*bitrate=/i', $time, $numbers)) {
@@ -2292,9 +2335,9 @@ class ProcessAdditional
             $time = $this->getVideoTime($fileLocation);
 
             // Create the image.
-            if ($this->ffprobe->isValid($fileLocation)) {
+            if ($this->ffprobe()->isValid($fileLocation)) {
                 try {
-                    $this->ffmpeg->open($fileLocation)->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time))->save($fileName);
+                    $this->ffmpeg()->open($fileLocation)->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time))->save($fileName);
                 } catch (\RuntimeException $runtimeException) {
                     if (config('app.debug') === true) {
                         Log::error($runtimeException->getTraceAsString());
@@ -2382,9 +2425,9 @@ class ProcessAdditional
                     }
 
                     // Try to get the sample (from the end instead of the start).
-                    if ($this->ffprobe->isValid($fileLocation)) {
+                    if ($this->ffprobe()->isValid($fileLocation)) {
                         try {
-                            $video = $this->ffmpeg->open($fileLocation);
+                            $video = $this->ffmpeg()->open($fileLocation);
                             $videoSample = $video->clip(TimeCode::fromString($lowestLength), TimeCode::fromSeconds($this->_ffMPEGDuration));
                             $format = new Ogg;
                             $format->setAudioCodec('libvorbis');
@@ -2401,9 +2444,9 @@ class ProcessAdditional
             }
 
             // If longer than 60 or we could not get the video length, run the old way.
-            if (! $newMethod && $this->ffprobe->isValid($fileLocation)) {
+            if (! $newMethod && $this->ffprobe()->isValid($fileLocation)) {
                 try {
-                    $video = $this->ffmpeg->open($fileLocation);
+                    $video = $this->ffmpeg()->open($fileLocation);
                     $videoSample = $video->clip(TimeCode::fromSeconds(0), TimeCode::fromSeconds($this->_ffMPEGDuration));
                     $format = new Ogg;
                     $format->setAudioCodec('libvorbis');
@@ -2464,7 +2507,7 @@ class ProcessAdditional
         // Look for the video file.
         if (File::isFile($fileLocation)) {
             try {
-                $xmlArray = $this->mediaInfo->getInfo($fileLocation, true);
+                $xmlArray = $this->mediaInfo()->getInfo($fileLocation, true);
 
                 // Insert it into the DB.
                 \App\Models\MediaInfo::addData($this->_release->id, $xmlArray);
@@ -2760,10 +2803,10 @@ class ProcessAdditional
 
             // Delete search index document.
             try {
-                if (config('nntmux.elasticsearch_enabled') === true) {
-                    $this->elasticsearch->deleteRelease($id);
+                if ($this->elasticsearchEnabled) {
+                    $this->elasticsearch()->deleteRelease($id);
                 } else {
-                    $this->manticore->deleteRelease(['i' => $id, 'g' => $guid]);
+                    $this->manticore()->deleteRelease(['i' => $id, 'g' => $guid]);
                 }
             } catch (\Throwable $e) {
                 // ignore index delete failures
