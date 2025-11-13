@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Release;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
 use Blacklight\processing\tv\LocalDB;
@@ -21,25 +22,22 @@ class TvProcessor
 
     private ColorCLI $colorCli;
 
+    /**
+     * @var array<int, array{name: string, factory: callable, status: int}>
+     */
+    private array $providers;
+
     private array $stats = [
-        'total' => 0,
-        'processed' => 0,
-        'matched' => 0,
-        'failed' => 0,
-        'skipped' => 0,
-        'byProvider' => [
-            'Local DB' => ['processed' => 0, 'matched' => 0, 'failed' => 0],
-            'TVDB' => ['processed' => 0, 'matched' => 0, 'failed' => 0],
-            'TVMaze' => ['processed' => 0, 'matched' => 0, 'failed' => 0],
-            'TMDB' => ['processed' => 0, 'matched' => 0, 'failed' => 0],
-            'Trakt' => ['processed' => 0, 'matched' => 0, 'failed' => 0],
-        ],
+        'mode' => self::MODE_PIPELINE,
+        'totalDuration' => 0.0,
+        'providers' => [],
     ];
 
     public function __construct(bool $echooutput)
     {
         $this->echooutput = $echooutput;
         $this->colorCli = new ColorCLI;
+        $this->providers = $this->buildProviderPipeline();
     }
 
     /**
@@ -52,7 +50,7 @@ class TvProcessor
      */
     public function process(string $groupID = '', string $guidChar = '', int|string|null $processTV = '', string $mode = self::MODE_PIPELINE): void
     {
-        $processTV = (is_numeric($processTV) ? $processTV : Settings::settingValue('lookuptv'));
+        $processTV = (int) (is_numeric($processTV) ? $processTV : Settings::settingValue('lookuptv'));
         if ($processTV <= 0) {
             return;
         }
@@ -65,137 +63,194 @@ class TvProcessor
     }
 
     /**
+     * Retrieve statistics from the most recent run.
+     */
+    public function getStats(): array
+    {
+        return $this->stats;
+    }
+
+    /**
      * Process releases through providers in parallel (all providers process all releases).
      * This is faster but uses more API calls. Compatible with Forking class.
      */
-    private function processParallel(string $groupID, string $guidChar, int|string $processTV): void
+    private function processParallel(string $groupID, string $guidChar, int $processTV): void
     {
-        // $this->displayHeaderParallel($guidChar);
+        $this->resetStats(self::MODE_PARALLEL);
+        $this->displayModeHeader(self::MODE_PARALLEL, $guidChar);
+        [$totalTime, $processedAny] = $this->runProviders(self::MODE_PARALLEL, $groupID, $guidChar, $processTV);
 
-        $providers = $this->getProviderPipeline();
-        $totalTime = 0;
-
-        foreach ($providers as $index => $provider) {
-            // Check if there's any work remaining for this provider
-            if (! $this->hasWorkForProvider($provider['name'], $groupID, $guidChar, $processTV)) {
-                if ($this->echooutput) {
-                    $this->colorCli->primaryOver('  [');
-                    $this->colorCli->warningOver($index + 1);
-                    $this->colorCli->primaryOver('/');
-                    $this->colorCli->warningOver(count($providers));
-                    $this->colorCli->primaryOver('] ');
-                    $this->colorCli->alternateOver('→ ');
-                    $this->colorCli->alternate($provider['name'].' → No work remaining, skipping');
-                    echo "\n";
-                }
-
-                continue;
-            }
-
-            $this->displayProviderHeader($provider['name'], $index + 1, count($providers));
-
-            $startTime = microtime(true);
-            $provider['instance']->processSite($groupID, $guidChar, $processTV);
-            $elapsedTime = microtime(true) - $startTime;
-            $totalTime += $elapsedTime;
-
-            $this->displayProviderComplete($provider['name'], $elapsedTime);
+        if ($processedAny) {
+            $this->displaySummaryParallel($totalTime);
         }
-
-        // $this->displaySummaryParallel($totalTime);
     }
 
     /**
      * Process releases through providers in pipeline (sequential, each processes failures from previous).
      * This is more efficient and reduces API calls significantly.
      */
-    private function processPipeline(string $groupID, string $guidChar, int|string $processTV): void
+    private function processPipeline(string $groupID, string $guidChar, int $processTV): void
     {
-        // $this->displayHeader($guidChar);
+        $this->resetStats(self::MODE_PIPELINE);
+        $this->displayModeHeader(self::MODE_PIPELINE, $guidChar);
+        [, $processedAny] = $this->runProviders(self::MODE_PIPELINE, $groupID, $guidChar, $processTV);
 
-        // Pipeline: Process releases through each provider in sequence
-        // Each provider only processes releases that failed in previous steps
-        $providers = $this->getProviderPipeline();
+        if ($processedAny) {
+            $this->displaySummary();
+        }
+    }
 
-        foreach ($providers as $index => $provider) {
-            // Check if there's any work remaining for this stage of the pipeline
-            if (! $this->hasWorkForProvider($provider['name'], $groupID, $guidChar, $processTV)) {
-                if ($this->echooutput) {
-                    $this->colorCli->primaryOver('  [');
-                    $this->colorCli->warningOver($index + 1);
-                    $this->colorCli->primaryOver('/');
-                    $this->colorCli->warningOver(count($providers));
-                    $this->colorCli->primaryOver('] ');
-                    $this->colorCli->alternateOver('→ ');
-                    $this->colorCli->alternate($provider['name'].' → No work remaining, skipping');
-                    echo "\n";
-                }
+    private function resetStats(string $mode): void
+    {
+        $this->stats = [
+            'mode' => $mode,
+            'totalDuration' => 0.0,
+            'providers' => [],
+        ];
 
+        foreach ($this->providers as $provider) {
+            $this->stats['providers'][$provider['name']] = [
+                'status' => 'pending',
+                'duration' => 0.0,
+            ];
+        }
+    }
+
+    /**
+     * Execute providers in the configured order and track timing.
+     *
+     * @return array{0: float, 1: bool} [total elapsed time, processed flag]
+     */
+    private function runProviders(string $mode, string $groupID, string $guidChar, int $processTV): array
+    {
+        $totalTime = 0.0;
+        $providerCount = count($this->providers);
+        $processedAny = false;
+
+        foreach ($this->providers as $index => $provider) {
+            $pendingWork = $this->getPendingWorkForProvider($provider, $groupID, $guidChar, $processTV);
+            if ($pendingWork === null) {
+                $this->displayProviderSkip($provider['name'], $index + 1, $providerCount);
+                $this->stats['providers'][$provider['name']] = [
+                    'status' => 'skipped',
+                    'duration' => 0.0,
+                ];
                 continue;
             }
 
-            $this->displayProviderHeader($provider['name'], $index + 1, count($providers));
+            $this->displayProviderHeader($provider['name'], $index + 1, $providerCount);
+            $this->displayProviderPreview(
+                $provider['name'],
+                $pendingWork['release'],
+                $pendingWork['total'],
+                $provider['status'] ?? 0
+            );
+
+            /** @var object $processor */
+            $processor = ($provider['factory'])();
+            if (property_exists($processor, 'echooutput')) {
+                $processor->echooutput = $this->echooutput;
+            }
 
             $startTime = microtime(true);
-            $provider['instance']->processSite($groupID, $guidChar, $processTV);
+            $processor->processSite($groupID, $guidChar, $processTV);
             $elapsedTime = microtime(true) - $startTime;
+            $processedAny = true;
+            $this->stats['providers'][$provider['name']] = [
+                'status' => 'processed',
+                'duration' => $elapsedTime,
+            ];
+            $this->stats['totalDuration'] += $elapsedTime;
+
+            if ($mode === self::MODE_PARALLEL) {
+                $totalTime += $elapsedTime;
+            }
 
             $this->displayProviderComplete($provider['name'], $elapsedTime);
         }
 
-        // $this->displaySummary();
+        return [$totalTime, $processedAny];
     }
 
     /**
      * Get the provider pipeline in order of preference.
      */
-    private function getProviderPipeline(): array
+    private function buildProviderPipeline(): array
     {
         return [
-            ['name' => 'Local DB', 'instance' => new LocalDB, 'status' => 0],
-            ['name' => 'TVDB', 'instance' => new TVDB, 'status' => 0],
-            ['name' => 'TVMaze', 'instance' => new TVMaze, 'status' => -1],
-            ['name' => 'TMDB', 'instance' => new TMDB, 'status' => -2],
-            ['name' => 'Trakt', 'instance' => new TraktTv, 'status' => -3],
+            ['name' => 'Local DB', 'factory' => static fn () => new LocalDB, 'status' => 0],
+            ['name' => 'TVDB', 'factory' => static fn () => new TVDB, 'status' => 0],
+            ['name' => 'TVMaze', 'factory' => static fn () => new TVMaze, 'status' => -1],
+            ['name' => 'TMDB', 'factory' => static fn () => new TMDB, 'status' => -2],
+            ['name' => 'Trakt', 'factory' => static fn () => new TraktTv, 'status' => -3],
         ];
     }
 
     /**
-     * Check if there's work remaining for a specific provider in the pipeline.
+     * Determine whether a provider has pending work and return a preview release.
+     *
+     * @return array{release: Release, total: int}|null
      */
-    private function hasWorkForProvider(string $providerName, string $groupID, string $guidChar, int|string $processTV): bool
+    private function getPendingWorkForProvider(array $provider, string $groupID, string $guidChar, int $processTV): ?array
     {
-        $statusMap = [
-            'Local DB' => 0,   // Process unprocessed releases
-            'TVDB' => 0,       // Process unprocessed releases (runs in parallel with LocalDB conceptually)
-            'TVMaze' => -1,    // Process releases not found by TVDB
-            'TMDB' => -2,      // Process releases not found by TVMaze
-            'Trakt' => -3,     // Process releases not found by TMDB
-        ];
+        $status = $provider['status'] ?? 0;
 
-        $status = $statusMap[$providerName] ?? 0;
-
-        // Build the same query logic as getTvReleases but just check for existence
-        $query = \App\Models\Release::query()
+        $baseQuery = Release::query()
+            ->select([
+                'id',
+                'guid',
+                'leftguid',
+                'groups_id',
+                'searchname',
+                'size',
+                'categories_id',
+                'videos_id',
+                'tv_episodes_id',
+                'postdate',
+            ])
             ->where(['videos_id' => 0, 'tv_episodes_id' => $status])
             ->where('size', '>', 1048576)
             ->whereBetween('categories_id', [5000, 5999])
-            ->where('categories_id', '<>', 5070)
-            ->limit(1);
+            ->where('categories_id', '<>', 5070);
 
         if ($groupID !== '') {
-            $query->where('groups_id', $groupID);
+            $baseQuery->where('groups_id', $groupID);
         }
 
         if ($guidChar !== '') {
-            $query->where('leftguid', $guidChar);
+            $baseQuery->where('leftguid', $guidChar);
         }
 
-        if ($processTV == 2) {
-            $query->where('isrenamed', '=', 1);
+        if ($processTV === 2) {
+            $baseQuery->where('isrenamed', '=', 1);
         }
 
-        return $query->exists();
+        $total = (clone $baseQuery)->count();
+        if ($total === 0) {
+            return null;
+        }
+
+        $release = (clone $baseQuery)
+            ->orderByDesc('postdate')
+            ->first();
+
+        if ($release === null) {
+            return null;
+        }
+
+        return [
+            'release' => $release,
+            'total' => $total,
+        ];
+    }
+
+    private function displayModeHeader(string $mode, string $guidChar = ''): void
+    {
+        if ($mode === self::MODE_PARALLEL) {
+            $this->displayHeaderParallel($guidChar);
+        } else {
+            $this->displayHeader($guidChar);
+        }
     }
 
     /**
@@ -266,6 +321,52 @@ class TvProcessor
     }
 
     /**
+     * Display details about the next release the provider will work on.
+     */
+    private function displayProviderPreview(string $providerName, Release $release, int $total, int $status): void
+    {
+        if (! $this->echooutput) {
+            return;
+        }
+
+        echo "\n";
+        $this->colorCli->primaryOver('       ↳ ');
+        $this->colorCli->warningOver($total);
+        $this->colorCli->primaryOver(' pending release(s)');
+        $this->colorCli->primaryOver(' | Filter: ');
+        $this->colorCli->alternate($this->formatStatusLabel($status));
+
+        echo "\n";
+        $this->colorCli->primaryOver('         · Next: ');
+        $this->colorCli->headerOver($release->searchname ?? 'n/a');
+        $this->colorCli->primaryOver(' | ID ');
+        $this->colorCli->warningOver((string) $release->id);
+        $this->colorCli->primaryOver(' | GUID ');
+        $this->colorCli->warningOver((string) $release->guid);
+        echo "\n";
+    }
+
+    /**
+     * Display provider skip message.
+     */
+    private function displayProviderSkip(string $providerName, int $step, int $total): void
+    {
+        if (! $this->echooutput) {
+            return;
+        }
+
+        echo "\n";
+        $this->colorCli->primaryOver('  [');
+        $this->colorCli->warningOver($step);
+        $this->colorCli->primaryOver('/');
+        $this->colorCli->warningOver($total);
+        $this->colorCli->primaryOver('] ');
+        $this->colorCli->alternateOver('→ ');
+        $this->colorCli->alternate($providerName.' → No work remaining, skipping');
+        echo "\n";
+    }
+
+    /**
      * Display provider completion message.
      */
     private function displayProviderComplete(string $providerName, float $elapsedTime): void
@@ -314,5 +415,16 @@ class TvProcessor
         $this->colorCli->warningOver('Total: ');
         $this->colorCli->warning(sprintf('%.2fs', $totalTime));
         echo "\n";
+    }
+
+    private function formatStatusLabel(int $status): string
+    {
+        return match ($status) {
+            0 => 'tv_episodes_id = 0 (Unmatched)',
+            -1 => 'tv_episodes_id = -1 (Awaiting TVMaze)',
+            -2 => 'tv_episodes_id = -2 (Awaiting TMDB)',
+            -3 => 'tv_episodes_id = -3 (Awaiting Trakt)',
+            default => 'tv_episodes_id = '.$status,
+        };
     }
 }
