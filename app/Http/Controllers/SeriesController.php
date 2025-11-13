@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TvEpisode;
 use App\Models\UserSerie;
 use App\Models\Video;
 use Blacklight\Releases;
@@ -46,6 +47,113 @@ class SeriesController extends BasePageController
                 $nodata = 'No releases for this series.';
             } else {
                 $myshows = UserSerie::getShow($this->userdata->id, $show['id']);
+
+                // Hydrate missing season/episode numbers if tv_episodes_id is set but series/episode missing or zero.
+                $needsHydration = false;
+                foreach ($rel as $r) {
+                    if ($r->tv_episodes_id > 0 && ((empty($r->series) || (int) $r->series === 0) || (empty($r->episode) || (int) $r->episode === 0))) {
+                        $needsHydration = true;
+                        break;
+                    }
+                }
+
+                if ($needsHydration) {
+                    $episodeIds = collect($rel)->pluck('tv_episodes_id')->filter(fn ($v) => $v > 0)->unique()->values();
+                    if ($episodeIds->isNotEmpty()) {
+                        $episodeMeta = TvEpisode::whereIn('id', $episodeIds)->get()->keyBy('id');
+                        foreach ($rel as $r) {
+                            if ($r->tv_episodes_id > 0 && isset($episodeMeta[$r->tv_episodes_id])) {
+                                $meta = $episodeMeta[$r->tv_episodes_id];
+                                if (empty($r->series) || (int) $r->series === 0) {
+                                    $r->series = (int) $meta->series;
+                                }
+                                if (empty($r->episode) || (int) $r->episode === 0) {
+                                    $r->episode = (int) $meta->episode;
+                                }
+                            }
+
+                            // Enhanced regex fallback if still missing - covers specials and alternative patterns
+                            if (($r->tv_episodes_id > 0) && ((empty($r->series) || (int) $r->series === 0) || (empty($r->episode) || (int) $r->episode === 0)) && ! empty($r->searchname)) {
+                                $matched = false;
+
+                                // Pattern 1: Standard S##E## or S##E### (including specials like S00E01)
+                                if (! $matched && preg_match('/\bS(\d{1,2})E(\d{1,3})\b/i', $r->searchname, $m)) {
+                                    if (empty($r->series) || (int) $r->series === 0) {
+                                        $r->series = (int) $m[1];
+                                    }
+                                    if (empty($r->episode) || (int) $r->episode === 0) {
+                                        $r->episode = (int) $m[2];
+                                    }
+                                    $matched = true;
+                                }
+
+                                // Pattern 2: ##x## or ##x### format
+                                if (! $matched && preg_match('/\b(\d{1,2})x(\d{1,3})\b/i', $r->searchname, $m)) {
+                                    if (empty($r->series) || (int) $r->series === 0) {
+                                        $r->series = (int) $m[1];
+                                    }
+                                    if (empty($r->episode) || (int) $r->episode === 0) {
+                                        $r->episode = (int) $m[2];
+                                    }
+                                    $matched = true;
+                                }
+
+                                // Pattern 3: Season.#.Episode.# format
+                                if (! $matched && preg_match('/\bSeason[\s._-]*(\d{1,2})[\s._-]*Episode[\s._-]*(\d{1,3})\b/i', $r->searchname, $m)) {
+                                    if (empty($r->series) || (int) $r->series === 0) {
+                                        $r->series = (int) $m[1];
+                                    }
+                                    if (empty($r->episode) || (int) $r->episode === 0) {
+                                        $r->episode = (int) $m[2];
+                                    }
+                                    $matched = true;
+                                }
+
+                                // Pattern 4: Compact format like 101, 1201 (season + episode as concatenated digits)
+                                // Only match if we have NO season/episode and pattern is clear (e.g., 101-999 or 1001-9999)
+                                if (! $matched && preg_match('/\b(\d)(0[1-9]|[1-9]\d)\b/', $r->searchname, $m)) {
+                                    if ((empty($r->series) || (int) $r->series === 0) && (empty($r->episode) || (int) $r->episode === 0)) {
+                                        $r->series = (int) $m[1];
+                                        $r->episode = (int) $m[2];
+                                        $matched = true;
+                                    }
+                                }
+
+                                // Pattern 5: Date-based episodes YYYY.MM.DD or YYYY-MM-DD (for daily shows)
+                                if (! $matched && preg_match('/\b(\d{4})[._-](\d{2})[._-](\d{2})\b/', $r->searchname, $m)) {
+                                    // For daily shows, use year as season, encode month+day as episode (MMDD)
+                                    if (empty($r->series) || (int) $r->series === 0) {
+                                        $r->series = (int) $m[1]; // Year as season
+                                    }
+                                    if (empty($r->episode) || (int) $r->episode === 0) {
+                                        $r->episode = (int) ($m[2].$m[3]); // MMDD as episode
+                                    }
+                                    $matched = true;
+                                }
+
+                                // Pattern 6: Part/Pt format (e.g., "Part 1", "Pt.2")
+                                if (! $matched && preg_match('/\b(?:Part|Pt)[\s._-]*(\d{1,3})\b/i', $r->searchname, $m)) {
+                                    if (empty($r->episode) || (int) $r->episode === 0) {
+                                        $r->episode = (int) $m[1];
+                                        if (empty($r->series) || (int) $r->series === 0) {
+                                            $r->series = 1; // Default to season 1 for part-based episodes
+                                        }
+                                        $matched = true;
+                                    }
+                                }
+
+                                // Pattern 7: Episode only format "E##" or "Ep##" (when season might be in title/elsewhere)
+                                if (! $matched && (empty($r->episode) || (int) $r->episode === 0) && preg_match('/\bEp?[\s._-]*(\d{1,3})\b/i', $r->searchname, $m)) {
+                                    $r->episode = (int) $m[1];
+                                    if (empty($r->series) || (int) $r->series === 0) {
+                                        $r->series = 1; // Default to season 1
+                                    }
+                                    $matched = true;
+                                }
+                            }
+                        }
+                    }
+                }
 
                 // Sort releases by season, episode, date posted.
                 $series = $episode = $posted = [];
@@ -140,7 +248,7 @@ class SeriesController extends BasePageController
 
             return view('series.viewseries', $this->viewData);
         } else {
-            $letter = ($id && preg_match('/^(0\-9|[A-Z])$/i', $id)) ? $id : '0-9';
+            $letter = ($id && preg_match('/^(0-9|[A-Z])$/i', $id)) ? $id : '0-9';
 
             $showname = ($request->has('title') && ! empty($request->input('title'))) ? $request->input('title') : '';
 
