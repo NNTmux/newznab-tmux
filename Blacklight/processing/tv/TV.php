@@ -396,6 +396,28 @@ abstract class TV extends Videos
             // Get the Season/Episode/Airdate
             $showInfo += $this->parseSeasonEp($relname);
 
+            // --- Post-parse correction for daily talk shows misclassified as Season = Year ---
+            // Some date-based releases like Show.2025.11.03.* wrongly match the 2009.E01 pattern and set season=2025, episode=11.
+            // If we detect a full YYYY.MM.DD (or YYYY-MM-DD / YYYY/MM/DD) date in the original release name and season is a 4-digit year
+            // we convert it to an airdate form (season=0, episode=0, airdate=YYYY-MM-DD) to allow later API season/episode resolution.
+            if (isset($showInfo['season'], $showInfo['episode']) && ! isset($showInfo['airdate'])) {
+                if (is_numeric($showInfo['season']) && (int) $showInfo['season'] >= 1900 && (int) $showInfo['season'] <= (int) date('Y') + 1) {
+                    // Look for full date pattern.
+                    if (preg_match('/(?P<year>(19|20)\d{2})[.\-\/](?P<month>\d{2})[.\-\/](?P<day>\d{2})/i', $relname, $dateHits)) {
+                        $year = (int) $dateHits['year'];
+                        $month = (int) $dateHits['month'];
+                        $day = (int) $dateHits['day'];
+                        // Basic sanity checks for month/day ranges.
+                        if ($month >= 1 && $month <= 12 && $day >= 1 && $day <= 31) {
+                            $showInfo['airdate'] = sprintf('%04d-%02d-%02d', $year, $month, $day);
+                            $showInfo['season'] = 0;
+                            $showInfo['episode'] = 0;
+                        }
+                    }
+                }
+            }
+            // --- End correction ---
+
             if (isset($showInfo['season'], $showInfo['episode'])) {
                 if (! isset($showInfo['airdate'])) {
                     // If year is present in the release name, add it to the cleaned name for title search
@@ -428,7 +450,7 @@ abstract class TV extends Videos
         // For names that don't start with the title.
         if (preg_match('/^([^a-z0-9]{2,}|(sample|proof|repost)-)(?P<name>[\w .-]*?)'.$following.'/i', $relname, $hits)) {
             $showName = $hits['name'];
-        } elseif (preg_match('/^(?P<name>[\w+][\s\w\'\.\-]*?)'.$following.'/i', $relname, $hits)) {
+        } elseif (preg_match('/^(?P<name>[\w+][\s\w\'._-]*?)'.$following.'/i', $relname, $hits)) {
             // For names that start with the title.
             $showName = $hits['name'];
         }
@@ -493,7 +515,7 @@ abstract class TV extends Videos
         $episodeArr = [];
 
         // S01E01-E02 and S01E01-02
-        if (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?e(\d{1,3})(?:[e-])(\d{1,3})[^a-z0-9]?/i', $relname, $hits)) {
+        if (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?e(\d{1,3})[e-](\d{1,3})[^a-z0-9]?/i', $relname, $hits)) {
             $episodeArr['season'] = (int) $hits[2];
             $episodeArr['episode'] = [(int) $hits[3], (int) $hits[4]];
         }
