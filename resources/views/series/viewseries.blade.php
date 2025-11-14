@@ -199,16 +199,39 @@
 
             <!-- Episodes by Season - Tabbed Interface -->
             @if(!empty($seasons))
+                <form id="nzb_multi_operations_form" method="get">
                 <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
                     <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-                        <h5 class="text-lg font-semibold text-gray-800 dark:text-white">
-                            <i class="fa fa-list mr-2 text-blue-600 dark:text-blue-400"></i>
-                            Episodes & Releases
-                        </h5>
+                        <div class="flex items-center justify-between">
+                            <h5 class="text-lg font-semibold text-gray-800 dark:text-white">
+                                <i class="fa fa-list mr-2 text-blue-600 dark:text-blue-400"></i>
+                                Episodes & Releases
+                            </h5>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <small class="text-gray-600 dark:text-gray-400">With Selected:</small>
+                                <div class="flex gap-1">
+                                    <button type="button" class="nzb_multi_operations_download px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 transition text-sm" title="Download NZBs">
+                                        <i class="fa fa-cloud-download"></i>
+                                    </button>
+                                    <button type="button" class="nzb_multi_operations_cart px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800 transition text-sm" title="Send to Download Basket">
+                                        <i class="fa fa-shopping-basket"></i>
+                                    </button>
+                                    @if(auth()->check() && auth()->user()->hasRole('Admin'))
+                                        <button type="button" class="nzb_multi_operations_delete px-3 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 transition text-sm" title="Delete">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Season Tabs -->
                     <div class="border-b border-gray-200">
+                        <div class="flex items-center px-4 py-2 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+                            <input type="checkbox" class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700 mr-2" id="chkSelectAll">
+                            <label for="chkSelectAll" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">Select All</label>
+                        </div>
                         <nav class="flex flex-wrap -mb-px px-4" aria-label="Tabs">
                             @foreach($seasons as $seasonNumber => $episodes)
                                 <button type="button"
@@ -234,7 +257,10 @@
                                         </h6>
                                         <div class="space-y-2">
                                             @foreach($releases as $release)
-                                                <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-900 rounded p-3 hover:bg-gray-100">
+                                                <div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-900 rounded p-3 hover:bg-gray-100">
+                                                    <div class="flex-shrink-0">
+                                                        <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" name="release[]" value="{{ $release->guid }}">
+                                                    </div>
                                                     <div class="flex-1">
                                                         <div class="flex items-center gap-2 flex-wrap">
                                                             <a href="{{ url('/details/' . $release->guid) }}"
@@ -295,6 +321,7 @@
                         @endforeach
                     </div>
                 </div>
+                </form>
             @else
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-blue-800">
                     <i class="fa fa-info-circle mr-2"></i>
