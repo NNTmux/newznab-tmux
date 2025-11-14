@@ -27,7 +27,7 @@ class SeriesController extends BasePageController
             $catarray = [];
             $catarray[] = $category;
 
-        $seriesLimit = (int) config('nntmux.series_view_limit', 200);
+            $seriesLimit = (int) config('nntmux.series_view_limit', 200);
             $page = $request->has('page') && is_numeric($request->input('page')) ? (int) $request->input('page') : 1;
             $page = max($page, 1);
             $offset = $seriesLimit > 0 ? ($page - 1) * $seriesLimit : 0;
