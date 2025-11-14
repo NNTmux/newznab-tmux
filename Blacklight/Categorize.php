@@ -836,6 +836,11 @@ class Categorize
             return false;
         }
 
+        // Exclude known talk shows and late-night shows
+        if (preg_match('/\b(Seth\.Meyers|Jimmy\.Fallon|Jimmy\.Kimmel|Stephen\.Colbert|James\.Corden|Conan|Tonight\.Show|Late\.Show|Late\.Night|Daily\.Show|Last\.Week\.Tonight|Real\.Time|The\.View|Ellen|Oprah|Graham\.Norton|Jonathan\.Ross|Chelsea\.Lately|Craig\.Ferguson|David\.Letterman|Jay\.Leno)\b/i', $this->releaseName)) {
+            return false;
+        }
+
         // Adult keywords commonly found in titles
         $adultKeywords = 'Anal|Ass|BBW|BDSM|Blow|Boob|Bukkake|Casting|Couch|Cock|Compilation|Creampie|Cum|Dick|Dildo|Facial|Fetish|Fuck|Gang|Hardcore|Homemade|Horny|Interracial|Lesbian|MILF|Masturbat|Nympho|Oral|Orgasm|Penetrat|Pornstar|POV|Pussy|Riding|Seduct|Sex|Shaved|Slut|Squirt|Suck|Swallow|Threesome|Tits|Titty|Toy|Virgin|Whore';
 
