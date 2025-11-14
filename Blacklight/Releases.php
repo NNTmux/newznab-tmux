@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Log;
  */
 class Releases extends Release
 {
+    private const CACHE_VERSION_KEY = 'releases:cache_version';
+
     // RAR/ZIP Password indicator.
     public const PASSWD_NONE = 0; // No password.
 
@@ -51,6 +53,7 @@ class Releases extends Release
      */
     public function getBrowseRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [], int|string $groupName = -1, int $minSize = 0): mixed
     {
+        $cacheVersion = $this->getCacheVersion();
         $page = max(1, $page);
         $start = max(0, $start);
 
@@ -96,7 +99,8 @@ class Releases extends Release
             ($start === 0 ? ' LIMIT '.$num : ' LIMIT '.$num.' OFFSET '.$start)
         );
 
-        $releases = Cache::get(md5($qry.$page));
+        $cacheKey = md5($cacheVersion.$qry.$page);
+        $releases = Cache::get($cacheKey);
         if ($releases !== null) {
             return $releases;
         }
@@ -106,7 +110,7 @@ class Releases extends Release
             $sql[0]->_totalcount = $sql[0]->_totalrows = $possibleRows;
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($qry.$page), $sql, $expiresAt);
+        Cache::put($cacheKey, $sql, $expiresAt);
 
         return $sql;
     }
@@ -480,7 +484,7 @@ class Releases extends Release
         );
 
         // Check cache
-        $cacheKey = md5($sql);
+        $cacheKey = md5($this->getCacheVersion().$sql);
         $releases = Cache::get($cacheKey);
         if ($releases !== null) {
             return $releases;
@@ -787,10 +791,15 @@ class Releases extends Release
      */
     public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
-        $cacheKey = md5(serialize(func_get_args()).'tvSearch');
-        $cached = Cache::get($cacheKey);
-        if ($cached !== null) {
-            return $cached;
+        $shouldCache = ! (isset($siteIdArr['id']) && (int) $siteIdArr['id'] > 0);
+        $rawCacheKey = md5(serialize(func_get_args()).'tvSearch');
+        $cacheKey = null;
+        if ($shouldCache) {
+            $cacheKey = md5($this->getCacheVersion().$rawCacheKey);
+            $cached = Cache::get($cacheKey);
+            if ($cached !== null) {
+                return $cached;
+            }
         }
 
         $conditions = [
@@ -810,6 +819,8 @@ class Releases extends Release
             }
 
             if (! empty($siteConditions)) {
+                $siteUsesVideoIdOnly = count($siteConditions) === 1 && isset($siteIdArr['id']) && (int) $siteIdArr['id'] > 0;
+
                 $seriesFilter = ($series !== '') ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : '';
                 $episodeFilter = ($episode !== '') ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : '';
                 $airDateFilter = ($airDate !== '') ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : '';
@@ -836,10 +847,14 @@ class Releases extends Release
                     $videoJoinCondition = sprintf('AND v.id IN (%s)', implode(',', array_map('intval', $videoIds)));
                 }
 
-                if (! empty($episodeIds)) {
+                if (! empty($episodeIds) && ! $siteUsesVideoIdOnly) {
                     $conditions[] = sprintf('r.tv_episodes_id IN (%s)', implode(',', array_map('intval', $episodeIds)));
                     $episodeJoinCondition = sprintf('AND tve.id IN (%s)', implode(',', array_map('intval', $episodeIds)));
                     $needsEpisodeJoin = true;
+                }
+
+                if ($siteUsesVideoIdOnly) {
+                    $needsEpisodeJoin = false;
                 }
             }
         }
@@ -932,7 +947,12 @@ class Releases extends Release
             $whereSql
         );
 
-        $sql = sprintf('%s ORDER BY r.postdate DESC LIMIT %d OFFSET %d', $baseSql, $limit, $offset);
+        $limitClause = '';
+        if ($limit > 0) {
+            $limitClause = sprintf(' LIMIT %d OFFSET %d', $limit, $offset);
+        }
+
+        $sql = sprintf('%s ORDER BY r.postdate DESC%s', $baseSql, $limitClause);
         $releases = $this->fromQuery($sql);
 
         if ($releases->isNotEmpty()) {
@@ -946,10 +966,23 @@ class Releases extends Release
             $releases[0]->_totalrows = $countResult[0]->count ?? 0;
         }
 
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put($cacheKey, $releases, $expiresAt);
+        if ($shouldCache && $cacheKey !== null) {
+            $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+            Cache::put($cacheKey, $releases, $expiresAt);
+        }
 
         return $releases;
+    }
+
+    public static function bumpCacheVersion(): void
+    {
+        $current = Cache::get(self::CACHE_VERSION_KEY, 1);
+        Cache::forever(self::CACHE_VERSION_KEY, $current + 1);
+    }
+
+    private function getCacheVersion(): int
+    {
+        return Cache::get(self::CACHE_VERSION_KEY, 1);
     }
 
     /**

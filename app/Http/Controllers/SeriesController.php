@@ -27,10 +27,12 @@ class SeriesController extends BasePageController
             $catarray = [];
             $catarray[] = $category;
 
-            $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
-            $offset = ($page - 1) * config('nntmux.items_per_page');
+            $seriesLimit = (int) config('nntmux.series_view_limit', 0);
+            $page = $request->has('page') && is_numeric($request->input('page')) ? (int) $request->input('page') : 1;
+            $page = max($page, 1);
+            $offset = $seriesLimit > 0 ? ($page - 1) * $seriesLimit : 0;
 
-            $rel = $releases->tvSearch(['id' => $id], '', '', '', $offset, 1000, '', $catarray, -1);
+            $rel = $releases->tvSearch(['id' => $id], '', '', '', $offset, $seriesLimit, '', $catarray, -1);
 
             $show = Video::getByVideoID($id);
 
@@ -224,6 +226,8 @@ class SeriesController extends BasePageController
             }
 
             $catid = $category !== -1 ? $category : '';
+            $totalRows = ($rel && $rel->count() > 0) ? ($rel[0]->_totalrows ?? $rel->count()) : 0;
+            $totalPages = $seriesLimit > 0 ? (int) ceil(max($totalRows, 1) / $seriesLimit) : 1;
 
             $this->viewData = array_merge($this->viewData, [
                 'seasons' => $seasons,
@@ -241,6 +245,12 @@ class SeriesController extends BasePageController
                 'totalSeasonsAvailable' => $totalSeasonsAvailable,
                 'totalSeasonsAired' => $totalSeasonsAired,
                 'totalEpisodesAired' => $totalEpisodesAired,
+                'pagination' => [
+                    'per_page' => $seriesLimit,
+                    'current_page' => $page,
+                    'total_pages' => $totalPages,
+                    'total_rows' => $totalRows,
+                ],
                 'meta_title' => 'View TV Series',
                 'meta_keywords' => 'view,series,tv,show,description,details',
                 'meta_description' => 'View TV Series',

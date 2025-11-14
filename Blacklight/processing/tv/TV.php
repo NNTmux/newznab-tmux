@@ -10,6 +10,7 @@ use App\Models\TvInfo;
 use App\Models\Video;
 use Blacklight\ColorCLI;
 use Blacklight\processing\Videos;
+use Blacklight\Releases;
 use Blacklight\utility\Country;
 use Illuminate\Support\Facades\DB;
 
@@ -159,6 +160,8 @@ abstract class TV extends Videos
         Release::query()
             ->where('id', $releaseId)
             ->update(['videos_id' => $videoId, 'tv_episodes_id' => $episodeId]);
+
+        Releases::bumpCacheVersion();
     }
 
     /**
