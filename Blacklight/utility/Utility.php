@@ -12,22 +12,6 @@ use Illuminate\Support\Facades\Process;
  */
 class Utility
 {
-    public static function getThemesList(): array
-    {
-        $ignoredThemes = ['admin', 'shared'];
-        $themes = scandir(base_path().'/resources/views/themes', SCANDIR_SORT_ASCENDING);
-        $themeList[] = 'None';
-        foreach ($themes as $theme) {
-            if (! str_contains($theme, '.') && ! \in_array($theme, $ignoredThemes, false) && File::isDirectory(base_path().'/resources/views/themes/'.$theme)) {
-                $themeList[] = $theme;
-            }
-        }
-
-        sort($themeList);
-
-        return $themeList;
-    }
-
     /**
      * Unzip a gzip file, return the output. Return false on error / empty.
      *
@@ -58,31 +42,38 @@ class Utility
      * Creates an array to be used with stream_context_create() to verify openssl certificates
      * when connecting to a tls or ssl connection when using stream functions (fopen/file_get_contents/etc).
      *
-     * @param  bool  $forceIgnore  Force ignoring of verification.
+     * @param  bool  $forceIgnore  Force ignoring of verification (useful for self-signed certs in development).
+     * @return array Stream context options for SSL/TLS connections
      *
      * @static
      */
     public static function streamSslContextOptions(bool $forceIgnore = false): array
     {
-        if (config('nntmux_ssl.ssl_cafile') === '' && config('nntmux_ssl.ssl_capath') === '') {
-            $options = [
-                'verify_peer' => false,
-                'verify_peer_name' => false,
-                'allow_self_signed' => true,
-            ];
-        } else {
-            $options = [
-                'verify_peer' => $forceIgnore ? false : config('nntmux_ssl.ssl_verify_peer'),
-                'verify_peer_name' => $forceIgnore ? false : config('nntmux_ssl.ssl_verify_host'),
-                'allow_self_signed' => $forceIgnore ? true : config('nntmux_ssl.ssl_allow_self_signed'),
-            ];
-            if (config('nntmux_ssl.ssl_cafile') !== '') {
-                $options['cafile'] = config('nntmux_ssl.ssl_cafile');
+        $cafile = config('nntmux_ssl.ssl_cafile', '');
+        $capath = config('nntmux_ssl.ssl_capath', '');
+        $hasCustomCerts = $cafile !== '' || $capath !== '';
+
+        // Base options - either insecure (no certs configured) or configured
+        $options = [
+            'verify_peer' => ! $forceIgnore && $hasCustomCerts && config('nntmux_ssl.ssl_verify_peer', false),
+            'verify_peer_name' => ! $forceIgnore && $hasCustomCerts && config('nntmux_ssl.ssl_verify_host', false),
+            'allow_self_signed' => $forceIgnore ? true : config('nntmux_ssl.ssl_allow_self_signed', true),
+        ];
+
+        // Add certificate paths if configured
+        if ($hasCustomCerts && ! $forceIgnore) {
+            if ($cafile !== '') {
+                $options['cafile'] = $cafile;
             }
-            if (config('nntmux_ssl.ssl_capath') !== '') {
-                $options['capath'] = config('nntmux_ssl.ssl_capath');
+            if ($capath !== '') {
+                $options['capath'] = $capath;
             }
         }
+
+        // Additional security options for modern TLS
+        $options['crypto_method'] = STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT;
+        $options['disable_compression'] = true; // Prevent CRIME attacks
+        $options['SNI_enabled'] = true; // Enable Server Name Indication
 
         // If we set the transport to tls and the server falls back to ssl,
         // the context options would be for tls and would not apply to ssl,

@@ -554,6 +554,7 @@ class IRCClient
     {
         $this->_closeStream();
 
+        // Create SSL/TLS context if using secure connection
         $context = $this->_remote_tls
             ? stream_context_create(Utility::streamSslContextOptions(true))
             : null;
@@ -568,7 +569,8 @@ class IRCClient
         );
 
         if ($socket === false) {
-            echo 'ERROR: '.$error_string.' ('.$error_number.')'.PHP_EOL;
+            $protocol = $this->_remote_tls ? 'TLS/SSL' : 'TCP';
+            echo "ERROR: Failed to connect to IRC server via {$protocol}: {$error_string} ({$error_number})".PHP_EOL;
         } else {
             $this->_socket = $socket;
             // Set blocking mode with timeout for proper connection handling

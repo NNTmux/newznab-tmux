@@ -1230,13 +1230,18 @@ class NNTP extends \Net_NNTP_Client
                 trigger_error($message, E_USER_ERROR);
         }
         // Attempt to connect to usenet.
+        // Only create SSL context if using TLS/SSL transport
+        $context = preg_match('/tls|ssl/', $transport)
+            ? stream_context_create(Utility::streamSslContextOptions())
+            : null;
+
         $socket = stream_socket_client(
             $transport.'://'.$host.':'.$port,
             $errorNumber,
             $errorString,
             $timeout,
             STREAM_CLIENT_CONNECT,
-            stream_context_create(Utility::streamSslContextOptions())
+            $context
         );
         if ($socket === false) {
             $message = "Connection to $transport://$host:$port failed.";
