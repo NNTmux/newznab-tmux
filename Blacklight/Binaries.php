@@ -109,23 +109,23 @@ class Binaries
     protected \DateTime $startLoop;
 
     /**
-     * @var int How long it took in seconds to download headers
+     * @var float How long it took in seconds to download headers
      */
-    protected int $timeHeaders;
+    protected float $timeHeaders;
 
     /**
-     * @var int How long it took in seconds to clean/parse headers
+     * @var float How long it took in seconds to clean/parse headers
      */
-    protected int $timeCleaning;
+    protected float $timeCleaning;
 
     protected \DateTime $startPR;
 
     protected \DateTime $startUpdate;
 
     /**
-     * @var int The time it took to insert the headers
+     * @var float The time it took to insert the headers
      */
-    protected int $timeInsert;
+    protected float $timeInsert;
 
     /**
      * @var array the header currently being scanned
@@ -1212,15 +1212,15 @@ class Binaries
     {
         $currentMicroTime = now();
         if ($this->_echoCLI) {
-            $this->colorCli->alternateOver($this->timeHeaders.'s').
+            $this->colorCli->alternateOver(number_format($this->timeHeaders, 2).'s').
             $this->colorCli->primaryOver(' to download articles, ').
-            $this->colorCli->alternateOver($this->timeCleaning.'s').
+            $this->colorCli->alternateOver(number_format($this->timeCleaning, 2).'s').
             $this->colorCli->primaryOver(' to process collections, ').
-            $this->colorCli->alternateOver($this->timeInsert.'s').
+            $this->colorCli->alternateOver(number_format($this->timeInsert, 2).'s').
             $this->colorCli->primaryOver(' to insert binaries/parts, ').
-            $this->colorCli->alternateOver($currentMicroTime->diffInSeconds($this->startPR, true).'s').
+            $this->colorCli->alternateOver(number_format($currentMicroTime->diffInSeconds($this->startPR, true), 2).'s').
             $this->colorCli->primaryOver(' for part repair, ').
-            $this->colorCli->alternateOver($currentMicroTime->diffInSeconds($this->startLoop, true).'s').
+            $this->colorCli->alternateOver(number_format($currentMicroTime->diffInSeconds($this->startLoop, true), 2).'s').
             $this->colorCli->primary(' total.');
         }
     }
