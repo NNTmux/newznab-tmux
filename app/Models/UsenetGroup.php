@@ -348,8 +348,18 @@ class UsenetGroup extends Model
      */
     public static function resetall(): bool
     {
-        foreach (self::$cbpm as $tablePrefix) {
-            DB::statement("TRUNCATE TABLE {$tablePrefix}");
+        // Disable foreign key checks to allow truncating tables with foreign key constraints
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+
+        try {
+            // Truncate tables in reverse order to respect foreign key relationships
+            // (child tables first: missed_parts, parts, binaries, then parent: collections)
+            foreach (array_reverse(self::$cbpm) as $tablePrefix) {
+                DB::statement("TRUNCATE TABLE {$tablePrefix}");
+            }
+        } finally {
+            // Always re-enable foreign key checks, even if truncate fails
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
         }
 
         // Reset the group stats.

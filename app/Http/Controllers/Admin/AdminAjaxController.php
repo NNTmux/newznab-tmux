@@ -83,6 +83,7 @@ class AdminAjaxController extends BasePageController
                 case 'toggle_group_active_status':
                     $groupId = (int) $request->input('group_id');
                     $status = $request->has('group_status') ? (int) $request->input('group_status') : 0;
+
                     $message = UsenetGroup::updateGroupStatus($groupId, 'active', $status);
 
                     return response()->json([
