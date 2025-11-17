@@ -50,39 +50,45 @@ class AdminAjaxController extends BasePageController
                 case 'group_edit_purge_all':
                 case 'purge_all_groups':
                     UsenetGroup::purge();
+
                     return response()->json(['success' => true, 'message' => 'All groups purged successfully']);
 
                 case 'group_edit_reset_all':
                 case 'reset_all_groups':
                     UsenetGroup::resetall();
+
                     return response()->json(['success' => true, 'message' => 'All groups reset successfully']);
 
                 case 'group_edit_purge_single':
                 case 'purge_group':
                     $id = (int) $request->input('group_id');
                     UsenetGroup::purge($id);
+
                     return response()->json(['success' => true, 'message' => "Group $id purged successfully"]);
 
                 case 'group_edit_reset_single':
                 case 'reset_group':
                     $id = (int) $request->input('group_id');
                     UsenetGroup::reset($id);
+
                     return response()->json(['success' => true, 'message' => "Group $id reset successfully"]);
 
                 case 'group_edit_delete_single':
                 case 'delete_group':
                     $id = (int) $request->input('group_id');
                     UsenetGroup::deleteGroup($id);
+
                     return response()->json(['success' => true, 'message' => "Group $id deleted successfully"]);
 
                 case 'toggle_group_active_status':
                     $groupId = (int) $request->input('group_id');
                     $status = $request->has('group_status') ? (int) $request->input('group_status') : 0;
                     $message = UsenetGroup::updateGroupStatus($groupId, 'active', $status);
+
                     return response()->json([
                         'success' => true,
                         'message' => $message,
-                        'newStatus' => $status
+                        'newStatus' => $status,
                     ]);
 
                 case 'toggle_group_backfill_status':
@@ -92,10 +98,11 @@ class AdminAjaxController extends BasePageController
                         ? (int) $request->input('backfill_status')
                         : ($request->has('backfill') ? (int) $request->input('backfill') : 0);
                     $message = UsenetGroup::updateGroupStatus($groupId, 'backfill', $status);
+
                     return response()->json([
                         'success' => true,
                         'message' => $message,
-                        'newStatus' => $status
+                        'newStatus' => $status,
                     ]);
 
                 default:
