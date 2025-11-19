@@ -9,6 +9,8 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/forum/livewire-tailwind/css/forum.css',
                 'resources/forum/livewire-tailwind/js/forum.js',
+                'resources/forum/blade-tailwind/css/forum.css',
+                'resources/forum/blade-tailwind/js/forum.js',
             ],
             refresh: true,
         }),
