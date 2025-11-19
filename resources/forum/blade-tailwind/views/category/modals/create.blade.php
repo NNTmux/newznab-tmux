@@ -13,14 +13,14 @@
     </div>
     <div class="mb-3">
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="accepts_threads" id="accepts-threads" value="1" {{ old('accepts_threads') ? 'checked' : '' }}>
-            <label class="form-check-label" for="accepts-threads">{{ trans('forum::categories.enable_threads') }}</label>
+            <input class="form-check-input rounded border-gray-300 dark:border-gray-600 text-blue-500 dark:text-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" type="checkbox" name="accepts_threads" id="accepts-threads" value="1" {{ old('accepts_threads') ? 'checked' : '' }}>
+            <label class="form-check-label text-gray-700 dark:text-gray-300" for="accepts-threads">{{ trans('forum::categories.enable_threads') }}</label>
         </div>
     </div>
     <div class="mb-3">
         <div>
-            <input type="checkbox" name="is_private" id="is-private" value="1" {{ old('is_private') ? 'checked' : '' }}>
-            <label for="is-private">{{ trans('forum::categories.make_private') }}</label>
+            <input type="checkbox" name="is_private" id="is-private" value="1" class="rounded border-gray-300 dark:border-gray-600 text-blue-500 dark:text-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" {{ old('is_private') ? 'checked' : '' }}>
+            <label for="is-private" class="text-gray-700 dark:text-gray-300">{{ trans('forum::categories.make_private') }}</label>
         </div>
     </div>
     @include ('forum::category.partials.inputs.color')

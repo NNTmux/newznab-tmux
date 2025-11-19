@@ -2,7 +2,7 @@
 
 @section ('content')
     <div id="new-posts">
-        <h2 class="text-3xl text-medium my-4">{{ trans('forum::threads.unread_updated') }}</h2>
+        <h2 class="text-3xl text-medium my-4 text-gray-900 dark:text-gray-100">{{ trans('forum::threads.unread_updated') }}</h2>
 
         @if (!$threads->isEmpty())
             <div class="">
@@ -11,7 +11,7 @@
                 @endforeach
             </div>
         @else
-            <div class="bg-white shadow rounded text-gray-500 text-center py-4">
+            <div class="bg-white dark:bg-gray-800 shadow rounded text-gray-500 dark:text-gray-400 text-center py-4 transition-colors">
                 {{ trans('forum::threads.none_found') }}
             </div>
         @endif

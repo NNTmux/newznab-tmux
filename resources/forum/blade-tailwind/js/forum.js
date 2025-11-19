@@ -10,6 +10,44 @@ window.axios = axios;
 window.Vue = { createApp, ref, reactive, watch };
 window.VueDraggable = draggable;
 
+// Initialize dark mode theme from main app settings
+// This runs immediately to prevent flash of wrong theme
+(function() {
+    const metaTheme = document.querySelector('meta[name="theme-preference"]');
+    const isAuthenticated = document.querySelector('meta[name="user-authenticated"]');
+
+    let theme = 'light';
+
+    if (isAuthenticated && isAuthenticated.content === 'true' && metaTheme) {
+        // Use authenticated user's preference from database
+        theme = metaTheme.content;
+    } else {
+        // Use localStorage for guests (same key as main app)
+        theme = localStorage.getItem('theme') || 'light';
+    }
+
+    // Apply the theme
+    if (theme === 'system') {
+        // Use OS preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+    } else if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+    }
+
+    // Listen for OS theme changes when in system mode
+    if (theme === 'system') {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (e.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+    }
+})();
+
 document.addEventListener('DOMContentLoaded', function () {
     createApp({
         setup() {
@@ -84,6 +122,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     feather.replace();
+
+    // Get default category color from meta tag if available
+    const defaultColorMeta = document.querySelector('meta[name="default-category-color"]');
+    window.defaultCategoryColor = defaultColorMeta ? defaultColorMeta.content : '#3490dc';
 
     const input = document.querySelector('input[name=color_light_mode]');
 

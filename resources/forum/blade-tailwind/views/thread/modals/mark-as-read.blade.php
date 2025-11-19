@@ -4,7 +4,7 @@
     @slot('route', Forum::route('unread.mark-as-read'))
     @slot('method', 'PATCH')
 
-    <p>{{ trans('forum::general.generic_confirm') }}</p>
+    <p class="text-gray-900 dark:text-gray-100">{{ trans('forum::general.generic_confirm') }}</p>
 
     @slot('actions')
         <x-forum::button type="submit">

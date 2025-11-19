@@ -3,7 +3,7 @@
 @section ('content')
     <div id="thread">
         <div class="flex flex-col md:flex-row justify-between my-4">
-            <h2 class="grow text-3xl font-semibold">{{ $thread->title }}</h2>
+            <h2 class="grow text-3xl font-semibold text-gray-900 dark:text-gray-100">{{ $thread->title }}</h2>
 
             <div class="flex flex-col md:flex-row items-center gap-2">
                 @if (Gate::allows('deleteThreads', $thread->category) && Gate::allows('delete', $thread))
@@ -108,10 +108,10 @@
         @if ((count($posts) > 1 || $posts->currentPage() > 1) && (Gate::allows('deletePosts', $thread) || Gate::allows('restorePosts', $thread)) && count($selectablePosts) > 0)
             <div class="text-end mb-2">
                 <div class="form-check">
-                    <label for="selectAllPosts">
+                    <label for="selectAllPosts" class="text-gray-700 dark:text-gray-300">
                         {{ trans('forum::posts.select_all') }}
                     </label>
-                    <input type="checkbox" value="" id="selectAllPosts" class="align-middle" @click="toggleAll" :checked="state.selectedPosts.length == posts.data.length">
+                    <input type="checkbox" value="" id="selectAllPosts" class="align-middle rounded border-gray-300 dark:border-gray-600 text-blue-500 dark:text-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" @click="toggleAll" :checked="state.selectedPosts.length == posts.data.length">
                 </div>
             </div>
         @endif
@@ -181,11 +181,13 @@
     @if ($thread->trashed() && Gate::allows('restoreThreads', $thread->category) && Gate::allows('restore', $thread))
         @component('forum::modal-form')
             @slot('key', 'restore-thread')
-            @slot('title', '<i data-feather="refresh-cw" class="text-gray-500"></i>' . trans('forum::general.restore'))
+            @slot('title', '<i data-feather="refresh-cw" class="text-gray-500 dark:text-gray-400"></i>' . trans('forum::general.restore'))
             @slot('route', Forum::route('thread.restore', $thread))
             @slot('method', 'POST')
 
-            {{ trans('forum::general.generic_confirm') }}
+            <div class="text-gray-900 dark:text-gray-100">
+                {{ trans('forum::general.generic_confirm') }}
+            </div>
 
             @slot('actions')
                 <x-forum::button type="submit">{{ trans('forum::general.proceed') }}</x-forum::button>
@@ -196,20 +198,22 @@
     @if (Gate::allows('deleteThreads', $thread->category) && Gate::allows('delete', $thread))
         @component('forum::modal-form')
             @slot('key', 'delete-thread')
-            @slot('title', '<i data-feather="trash" class="text-gray-500"></i>' . trans('forum::threads.delete'))
+            @slot('title', '<i data-feather="trash" class="text-gray-500 dark:text-gray-400"></i>' . trans('forum::threads.delete'))
             @slot('route', Forum::route('thread.delete', $thread))
             @slot('method', 'DELETE')
 
-            @if (config('forum.general.soft_deletes'))
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="permadelete" value="1" id="permadelete">
-                    <label class="form-check-label" for="permadelete">
-                        {{ trans('forum::general.perma_delete') }}
-                    </label>
-                </div>
-            @else
-                {{ trans('forum::general.generic_confirm') }}
-            @endif
+            <div class="text-gray-900 dark:text-gray-100">
+                @if (config('forum.general.soft_deletes'))
+                    <div class="form-check">
+                        <input class="form-check-input rounded border-gray-300 dark:border-gray-600 text-blue-500 dark:text-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" type="checkbox" name="permadelete" value="1" id="permadelete">
+                        <label class="form-check-label text-gray-700 dark:text-gray-300" for="permadelete">
+                            {{ trans('forum::general.perma_delete') }}
+                        </label>
+                    </div>
+                @else
+                    {{ trans('forum::general.generic_confirm') }}
+                @endif
+            </div>
 
             @slot('actions')
                 <x-forum::button type="submit">{{ trans('forum::general.proceed') }}</x-forum::button>
@@ -219,13 +223,15 @@
         @if (config('forum.general.soft_deletes'))
             @component('forum::modal-form')
                 @slot('key', 'perma-delete-thread')
-                @slot('title', '<i data-feather="trash" class="text-gray-500"></i>' . trans_choice('forum::threads.perma_delete', 1))
+                @slot('title', '<i data-feather="trash" class="text-gray-500 dark:text-gray-400"></i>' . trans_choice('forum::threads.perma_delete', 1))
                 @slot('route', Forum::route('thread.delete', $thread))
                 @slot('method', 'DELETE')
 
                 <input type="hidden" name="permadelete" value="1" />
 
-                {{ trans('forum::general.generic_confirm') }}
+                <div class="text-gray-900 dark:text-gray-100">
+                    {{ trans('forum::general.generic_confirm') }}
+                </div>
 
                 @slot('actions')
                     <x-forum::button type="submit">{{ trans('forum::general.proceed') }}</x-forum::button>
@@ -239,11 +245,13 @@
             @if ($thread->locked)
                 @component('forum::modal-form')
                     @slot('key', 'unlock-thread')
-                    @slot('title', '<i data-feather="unlock" class="text-gray-500"></i> ' . trans('forum::threads.unlock'))
+                    @slot('title', '<i data-feather="unlock" class="text-gray-500 dark:text-gray-400"></i> ' . trans('forum::threads.unlock'))
                     @slot('route', Forum::route('thread.unlock', $thread))
                     @slot('method', 'POST')
 
-                    {{ trans('forum::general.generic_confirm') }}
+                    <div class="text-gray-900 dark:text-gray-100">
+                        {{ trans('forum::general.generic_confirm') }}
+                    </div>
 
                     @slot('actions')
                         <x-forum::button type="submit">{{ trans('forum::general.proceed') }}</x-forum::button>
@@ -252,11 +260,13 @@
             @else
                 @component('forum::modal-form')
                     @slot('key', 'lock-thread')
-                    @slot('title', '<i data-feather="lock" class="text-gray-500"></i> ' . trans('forum::threads.lock'))
+                    @slot('title', '<i data-feather="lock" class="text-gray-500 dark:text-gray-400"></i> ' . trans('forum::threads.lock'))
                     @slot('route', Forum::route('thread.lock', $thread))
                     @slot('method', 'POST')
 
-                    {{ trans('forum::general.generic_confirm') }}
+                    <div class="text-gray-900 dark:text-gray-100">
+                        {{ trans('forum::general.generic_confirm') }}
+                    </div>
 
                     @slot('actions')
                         <x-forum::button type="submit">{{ trans('forum::general.proceed') }}</x-forum::button>
@@ -269,11 +279,13 @@
             @if ($thread->pinned)
                 @component('forum::modal-form')
                     @slot('key', 'unpin-thread')
-                    @slot('title', '<i data-feather="arrow-down" class="text-gray-500"></i> ' . trans('forum::threads.unpin'))
+                    @slot('title', '<i data-feather="arrow-down" class="text-gray-500 dark:text-gray-400"></i> ' . trans('forum::threads.unpin'))
                     @slot('route', Forum::route('thread.unpin', $thread))
                     @slot('method', 'POST')
 
-                    {{ trans('forum::general.generic_confirm') }}
+                    <div class="text-gray-900 dark:text-gray-100">
+                        {{ trans('forum::general.generic_confirm') }}
+                    </div>
 
                     @slot('actions')
                         <x-forum::button type="submit">{{ trans('forum::general.proceed') }}</x-forum::button>
@@ -282,11 +294,13 @@
             @else
                 @component('forum::modal-form')
                     @slot('key', 'pin-thread')
-                    @slot('title', '<i data-feather="arrow-up" class="text-gray-500"></i> ' . trans('forum::threads.pin'))
+                    @slot('title', '<i data-feather="arrow-up" class="text-gray-500 dark:text-gray-400"></i> ' . trans('forum::threads.pin'))
                     @slot('route', Forum::route('thread.pin', $thread))
                     @slot('method', 'POST')
 
-                    {{ trans('forum::general.generic_confirm') }}
+                    <div class="text-gray-900 dark:text-gray-100">
+                        {{ trans('forum::general.generic_confirm') }}
+                    </div>
 
                     @slot('actions')
                         <x-forum::button type="submit">{{ trans('forum::general.proceed') }}</x-forum::button>
@@ -298,7 +312,7 @@
         @can ('rename', $thread)
             @component('forum::modal-form')
                 @slot('key', 'rename-thread')
-                @slot('title', '<i data-feather="edit-2" class="text-gray-500"></i> ' . trans('forum::general.rename'))
+                @slot('title', '<i data-feather="edit-2" class="text-gray-500 dark:text-gray-400"></i> ' . trans('forum::general.rename'))
                 @slot('route', Forum::route('thread.rename', $thread))
                 @slot('method', 'POST')
 
@@ -316,15 +330,15 @@
         @can ('moveThreadsFrom', $category)
             @component('forum::modal-form')
                 @slot('key', 'move-thread')
-                @slot('title', '<i data-feather="corner-up-right" class="text-gray-500"></i> ' . trans('forum::general.move'))
+                @slot('title', '<i data-feather="corner-up-right" class="text-gray-500 dark:text-gray-400"></i> ' . trans('forum::general.move'))
                 @slot('route', Forum::route('thread.move', $thread))
                 @slot('method', 'POST')
 
                 <div class="input-group">
                     <div class="input-group-prepend">
-                        <label class="input-group-text" for="category-id">{{ trans_choice('forum::categories.category', 1) }}</label>
+                        <label class="input-group-text text-gray-700 dark:text-gray-300" for="category-id">{{ trans_choice('forum::categories.category', 1) }}</label>
                     </div>
-                    <select name="category_id" id="category-id" class="form-select">
+                    <select name="category_id" id="category-id" class="form-select bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600">
                         @include ('forum::category.partials.options', ['hide' => $thread->category])
                     </select>
                 </div>

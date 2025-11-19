@@ -6,7 +6,7 @@
 
     <input type="hidden" name="category_id" value="{{ $category->id }}" />
 
-    <p>{{ trans('forum::general.generic_confirm') }}</p>
+    <p class="text-gray-900 dark:text-gray-100">{{ trans('forum::general.generic_confirm') }}</p>
 
     @slot('actions')
         <x-forum::button type="submit">

@@ -3,10 +3,10 @@
 
 @section('content')
     <div class="flex flex-row justify-between mb-2">
-        <h2 class="text-3xl" style="color: {{ $category->color_light_mode }};">
+        <h2 class="text-3xl text-gray-900 dark:text-gray-100" style="color: {{ $category->color_light_mode }};">
             {{ $category->title }} &nbsp;
             @if ($category->description)
-                <small>{{ $category->description }}</small>
+                <small class="text-gray-600 dark:text-gray-400">{{ $category->description }}</small>
             @endif
         </h2>
     </div>
@@ -50,10 +50,10 @@
 
                             <div class="text-end mt-2">
                                 <div class="form-check">
-                                    <label for="selectAllThreads">
+                                    <label for="selectAllThreads" class="text-gray-700 dark:text-gray-300">
                                         {{ trans('forum::threads.select_all') }}
                                     </label>
-                                    <input type="checkbox" value="" id="selectAllThreads" class="align-middle" @click="toggleAll" :checked="state.selectedThreads.length == selectableThreadIds.length">
+                                    <input type="checkbox" value="" id="selectAllThreads" class="align-middle rounded border-gray-300 dark:border-gray-600 text-blue-500 dark:text-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" @click="toggleAll" :checked="state.selectedThreads.length == selectableThreadIds.length">
                                 </div>
                             </div>
                     @endcan

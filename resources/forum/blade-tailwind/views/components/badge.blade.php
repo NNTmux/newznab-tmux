@@ -5,19 +5,19 @@
 @php
 switch($type) {
     case('info'):
-        $color = 'bg-blue-500';
+        $color = 'bg-blue-500 dark:bg-blue-600';
         break;
 
     case('danger'):
-        $color = 'bg-red-500';
+        $color = 'bg-red-500 dark:bg-red-600';
         break;
 
     case('warning'):
-        $color = 'bg-orange-500';
+        $color = 'bg-orange-500 dark:bg-orange-600';
         break;
 
     default:
-        $color = 'bg-gray-400';
+        $color = 'bg-gray-400 dark:bg-gray-500';
         break;
 }
 @endphp

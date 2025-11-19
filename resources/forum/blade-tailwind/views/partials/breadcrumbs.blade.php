@@ -1,11 +1,11 @@
 <nav aria-label="breadcrumb" class="mb-4">
-    <ol class="flex flex-wrap [&_li]:after:content-['/'] [&_li]:after:px-2 [&_li]:after:text-gray-500 [&_li:last-child]:after:content-['']">
-        <li class=""><a href="{{ url(config('forum.frontend.router.prefix')) }}" class="text-blue-500">{{ trans('forum::general.index') }}</a></li>
+    <ol class="flex flex-wrap [&_li]:after:content-['/'] [&_li]:after:px-2 [&_li]:after:text-gray-500 dark:[&_li]:after:text-gray-400 [&_li:last-child]:after:content-[''] text-gray-700 dark:text-gray-300">
+        <li class=""><a href="{{ url(config('forum.frontend.router.prefix')) }}" class="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">{{ trans('forum::general.index') }}</a></li>
         @if (isset($category) && $category)
             @include ('forum::partials.breadcrumb-categories', ['category' => $category])
         @endif
         @if (isset($thread) && $thread)
-            <li class=""><a href="{{ Forum::route('thread.show', $thread) }}" class="text-blue-500">{{ $thread->title }}</a></li>
+            <li class=""><a href="{{ Forum::route('thread.show', $thread) }}" class="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">{{ $thread->title }}</a></li>
         @endif
         @if (isset($breadcrumbs_append) && count($breadcrumbs_append) > 0)
             @foreach ($breadcrumbs_append as $breadcrumb)
