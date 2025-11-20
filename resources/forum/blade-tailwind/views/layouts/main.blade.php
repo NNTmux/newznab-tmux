@@ -28,7 +28,7 @@
     <nav class="v-navbar bg-white dark:bg-gray-800 shadow py-4 transition-colors duration-200">
         <div class="container mx-auto px-4 md:flex md:items-center md:gap-4">
             <div class="flex justify-between items-center">
-                <a class="text-lg font-semibold text-gray-900 dark:text-white" href="{{ url(config('forum.frontend.router.prefix')) }}">Laravel Forum</a>
+                <a class="text-lg font-semibold text-gray-900 dark:text-white" href="{{ url(config('forum.frontend.router.prefix')) }}">{{ config('app.name') }} Forum</a>
                 <button class="navbar-toggler block md:hidden border rounded-md px-2 py-1 text-gray-700 dark:text-gray-300 dark:border-gray-600" type="button" :class="{ collapsed: isCollapsed }" @click="isCollapsed = !isCollapsed">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="navbar-toggler-icon w-6 h-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
