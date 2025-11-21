@@ -10,9 +10,6 @@ use League\Fractal\TransformerAbstract;
 
 class ApiTransformer extends TransformerAbstract
 {
-    /**
-     * @var User
-     */
     protected User $user;
 
     /**
@@ -48,9 +45,6 @@ class ApiTransformer extends TransformerAbstract
 
     /**
      * Get base data common to all releases.
-     *
-     * @param  Release  $release
-     * @return array
      */
     protected function getBaseData(Release $release): array
     {
@@ -72,9 +66,6 @@ class ApiTransformer extends TransformerAbstract
 
     /**
      * Get movie-specific data fields.
-     *
-     * @param  Release  $release
-     * @return array
      */
     protected function getMovieSpecificData(Release $release): array
     {
@@ -87,9 +78,6 @@ class ApiTransformer extends TransformerAbstract
 
     /**
      * Get TV-specific data fields.
-     *
-     * @param  Release  $release
-     * @return array
      */
     protected function getTvSpecificData(Release $release): array
     {
@@ -109,9 +97,6 @@ class ApiTransformer extends TransformerAbstract
 
     /**
      * Generate the details URL for a release.
-     *
-     * @param  string  $guid
-     * @return string
      */
     protected function getDetailsUrl(string $guid): string
     {
@@ -120,9 +105,6 @@ class ApiTransformer extends TransformerAbstract
 
     /**
      * Generate the download URL for a release.
-     *
-     * @param  string  $guid
-     * @return string
      */
     protected function getDownloadUrl(string $guid): string
     {
