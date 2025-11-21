@@ -12,7 +12,7 @@ class DetailsTransformer extends TransformerAbstract
     protected $user;
 
     /**
-     * ApiTransformer constructor.
+     * DetailsTransformer constructor.
      */
     public function __construct($user)
     {
@@ -20,65 +20,42 @@ class DetailsTransformer extends TransformerAbstract
     }
 
     /**
-     * A Fractal transformer.
+     * Transform a release into a details array.
      */
-    public function transform(Release $releases): array
+    public function transform(Release $release): array
     {
-        if (\in_array($releases->categories_id, Category::MOVIES_GROUP, false)) {
-            return [
-                'title' => $releases->searchname,
-                'details' => url('/').'/details/'.$releases->guid,
-                'url' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&r='.$this->user->api_token,
-                'category' => $releases->categories_id,
-                'category_name' => $releases->category_name,
-                'added' => Carbon::parse($releases->adddate)->toRssString(),
-                'size' => $releases->size,
-                'files' => $releases->totalpart,
-                'imdbid' => $releases->imdbid,
-                'grabs' => $releases->grabs,
-                'comments' => $releases->comments,
-                'password' => $releases->passwordstatus,
-                'usenetdate' => Carbon::parse($releases->postdate)->toRssString(),
-            ];
-        }
-
-        if (\in_array($releases->categories_id, Category::TV_GROUP, false)) {
-            return [
-                'title' => $releases->searchname,
-                'details' => url('/').'/details/'.$releases->guid,
-                'link' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&i='.'&r='.$this->user->api_token,
-                'category' => $releases->categories_id,
-                'category_name' => $releases->category_name,
-                'added' => Carbon::parse($releases->adddate)->toRssString(),
-                'size' => $releases->size,
-                'files' => $releases->totalpart,
-                'tvairdate' => $releases->firstaired,
-                'tvdbid' => $releases->tvdb,
-                'traktid' => $releases->trakt,
-                'tvrageid' => $releases->tvrage,
-                'tvmazeid' => $releases->tvmaze,
-                'imdbid' => $releases->imdb,
-                'tmdbid' => $releases->tmdb,
-                'grabs' => $releases->grabs,
-                'comments' => $releases->comments,
-                'password' => $releases->passwordstatus,
-                'usenetdate' => Carbon::parse($releases->postdate)->toRssString(),
-            ];
-        }
-
-        return [
-            'title' => $releases->searchname,
-            'details' => url('/').'/details/'.$releases->guid,
-            'link' => url('/').'/getnzb?id='.$releases->guid.'.nzb'.'&i='.'&r='.$this->user->api_token,
-            'category' => $releases->categories_id,
-            'category_name' => $releases->category_name,
-            'added' => Carbon::parse($releases->adddate)->toRssString(),
-            'size' => $releases->size,
-            'files' => $releases->totalpart,
-            'grabs' => $releases->grabs,
-            'comments' => $releases->comments,
-            'password' => $releases->passwordstatus,
-            'usenetdate' => Carbon::parse($releases->postdate)->toRssString(),
+        // Base data common to all releases
+        $data = [
+            'title' => $release->searchname,
+            'details' => url('/').'/details/'.$release->guid,
+            'link' => url('/').'/getnzb?id='.$release->guid.'.nzb&r='.$this->user->api_token,
+            'category' => $release->categories_id,
+            'category_name' => $release->category_name,
+            'added' => Carbon::parse($release->adddate)->toRssString(),
+            'size' => $release->size,
+            'files' => $release->totalpart,
+            'grabs' => $release->grabs,
+            'comments' => $release->comments,
+            'password' => $release->passwordstatus,
+            'usenetdate' => Carbon::parse($release->postdate)->toRssString(),
         ];
+
+        // Add movie-specific data
+        if (\in_array($release->categories_id, Category::MOVIES_GROUP, false)) {
+            $data['imdbid'] = $release->imdbid;
+        }
+
+        // Add TV-specific data
+        if (\in_array($release->categories_id, Category::TV_GROUP, false)) {
+            $data['tvairdate'] = $release->firstaired;
+            $data['tvdbid'] = $release->tvdb;
+            $data['traktid'] = $release->trakt;
+            $data['tvrageid'] = $release->tvrage;
+            $data['tvmazeid'] = $release->tvmaze;
+            $data['imdbid'] = $release->imdb;
+            $data['tmdbid'] = $release->tmdb;
+        }
+
+        return $data;
     }
 }
