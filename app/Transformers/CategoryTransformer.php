@@ -8,14 +8,14 @@ use League\Fractal\TransformerAbstract;
 class CategoryTransformer extends TransformerAbstract
 {
     /**
-     * A Fractal transformer.
+     * Transform a root category into an array.
      */
     public function transform(RootCategory $category): array
     {
         return [
             'id' => $category->id,
             'name' => $category->title,
-            'subcategories' => $category->categories()->pluck('id', 'title'),
+            'subcategories' => $category->categories()->pluck('title', 'id'),
         ];
     }
 }
