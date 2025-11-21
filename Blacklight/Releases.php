@@ -1194,18 +1194,40 @@ class Releases extends Release
             $conditions[] = sprintf('r.id IN (%s)', implode(',', array_map('intval', $searchResult)));
         }
 
+        // Optimize: Join on imdbid directly (both tables have indexed imdbid columns)
+        // This is more efficient than joining through movieinfo_id
         $needsMovieInfoJoin = false;
+        $needsMovieInfoFields = false;
+
         if ($imDbId !== -1 && $imDbId) {
-            $conditions[] = sprintf('m.imdbid = %d', $imDbId);
-            $needsMovieInfoJoin = true;
+            // When searching by imdbid only, use direct filter on r.imdbid (uses index ix_releases_imdbid)
+            // Only join movieinfo if we also need tmdbid/traktid fields or are searching by those
+            if (($tmDbId === -1 || ! $tmDbId) && ($traktId === -1 || ! $traktId)) {
+                // Direct filter on releases.imdbid - no join needed
+                $conditions[] = sprintf('r.imdbid = %d', $imDbId);
+            } else {
+                // Need movieinfo join for tmdbid/traktid search - join on imdbid (both indexed)
+                $conditions[] = sprintf('r.imdbid = %d', $imDbId);
+                $needsMovieInfoJoin = true;
+                $needsMovieInfoFields = true;
+            }
         }
+
         if ($tmDbId !== -1 && $tmDbId) {
             $conditions[] = sprintf('m.tmdbid = %d', $tmDbId);
             $needsMovieInfoJoin = true;
+            $needsMovieInfoFields = true;
         }
+
         if ($traktId !== -1 && $traktId) {
             $conditions[] = sprintf('m.traktid = %d', $traktId);
             $needsMovieInfoJoin = true;
+            $needsMovieInfoFields = true;
+        }
+
+        // Always get movieinfo fields when joining (for consistency)
+        if ($needsMovieInfoJoin) {
+            $needsMovieInfoFields = true;
         }
 
         if (! empty($excludedCategories)) {
@@ -1225,6 +1247,14 @@ class Releases extends Release
         }
 
         $whereSql = 'WHERE '.implode(' AND ', $conditions);
+        // Join on imdbid directly (both tables have indexed imdbid) - more efficient than movieinfo_id
+        // Both ix_releases_imdbid and ix_movieinfo_imdbid are indexed, making this join very fast
+        if ($needsMovieInfoJoin) {
+            // Join on imdbid - both columns are indexed for optimal performance
+            $joinSql = 'INNER JOIN movieinfo m ON m.imdbid = r.imdbid';
+        } else {
+            $joinSql = '';
+        }
 
         // Select only fields required by XML/API transformers
         $baseSql = sprintf(
@@ -1241,8 +1271,8 @@ class Releases extends Release
              %s
              LEFT JOIN usenet_groups g ON g.id = r.groups_id
              %s",
-            $needsMovieInfoJoin ? 'm.imdbid, m.tmdbid, m.traktid,' : 'r.imdbid, NULL AS tmdbid, NULL AS traktid,',
-            $needsMovieInfoJoin ? 'INNER JOIN movieinfo m ON m.id = r.movieinfo_id' : '',
+            $needsMovieInfoFields ? 'm.imdbid, m.tmdbid, m.traktid,' : 'r.imdbid, NULL AS tmdbid, NULL AS traktid,',
+            $joinSql,
             $whereSql
         );
 
@@ -1253,11 +1283,20 @@ class Releases extends Release
         }
 
         $releases = $this->fromQuery($sql);
+
         if ($releases->isNotEmpty()) {
-            $countSql = sprintf('SELECT COUNT(*) as count FROM releases r %s %s', $needsMovieInfoJoin ? 'INNER JOIN movieinfo m ON m.id = r.movieinfo_id' : '', $whereSql);
-            $countResult = $this->fromQuery($countSql);
-            $releases[0]->_totalrows = $countResult[0]->count ?? 0;
+            // Optimize: Execute count query using same WHERE clause (uses same indexes)
+            // The count query is lightweight and can use index-only scans when possible
+            // Use same join logic as main query (join on imdbid when needed)
+            $countSql = sprintf(
+                'SELECT COUNT(*) as count FROM releases r %s %s',
+                $joinSql,
+                $whereSql
+            );
+            $countResult = DB::selectOne($countSql);
+            $releases[0]->_totalrows = $countResult->count ?? 0;
         }
+
         Cache::put($cacheKey, $releases, now()->addMinutes(config('nntmux.cache_expiry_medium')));
 
         return $releases;
