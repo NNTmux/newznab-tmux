@@ -1196,38 +1196,20 @@ class Releases extends Release
 
         // Optimize: Join on imdbid directly (both tables have indexed imdbid columns)
         // This is more efficient than joining through movieinfo_id
-        $needsMovieInfoJoin = false;
-        $needsMovieInfoFields = false;
+        // Always join movieinfo to get imdbid, tmdbid, and traktid fields consistently
 
         if ($imDbId !== -1 && $imDbId) {
-            // When searching by imdbid only, use direct filter on r.imdbid (uses index ix_releases_imdbid)
-            // Only join movieinfo if we also need tmdbid/traktid fields or are searching by those
-            if (($tmDbId === -1 || ! $tmDbId) && ($traktId === -1 || ! $traktId)) {
-                // Direct filter on releases.imdbid - no join needed
-                $conditions[] = sprintf('r.imdbid = %d', $imDbId);
-            } else {
-                // Need movieinfo join for tmdbid/traktid search - join on imdbid (both indexed)
-                $conditions[] = sprintf('r.imdbid = %d', $imDbId);
-                $needsMovieInfoJoin = true;
-                $needsMovieInfoFields = true;
-            }
+            // Filter on r.imdbid (uses index ix_releases_imdbid)
+            // The join on m.imdbid = r.imdbid will also use the index
+            $conditions[] = sprintf('r.imdbid = %d', $imDbId);
         }
 
         if ($tmDbId !== -1 && $tmDbId) {
             $conditions[] = sprintf('m.tmdbid = %d', $tmDbId);
-            $needsMovieInfoJoin = true;
-            $needsMovieInfoFields = true;
         }
 
         if ($traktId !== -1 && $traktId) {
             $conditions[] = sprintf('m.traktid = %d', $traktId);
-            $needsMovieInfoJoin = true;
-            $needsMovieInfoFields = true;
-        }
-
-        // Always get movieinfo fields when joining (for consistency)
-        if ($needsMovieInfoJoin) {
-            $needsMovieInfoFields = true;
         }
 
         if (! empty($excludedCategories)) {
@@ -1247,14 +1229,10 @@ class Releases extends Release
         }
 
         $whereSql = 'WHERE '.implode(' AND ', $conditions);
-        // Join on imdbid directly (both tables have indexed imdbid) - more efficient than movieinfo_id
+        // Always join on imdbid directly (both tables have indexed imdbid) - more efficient than movieinfo_id
         // Both ix_releases_imdbid and ix_movieinfo_imdbid are indexed, making this join very fast
-        if ($needsMovieInfoJoin) {
-            // Join on imdbid - both columns are indexed for optimal performance
-            $joinSql = 'INNER JOIN movieinfo m ON m.imdbid = r.imdbid';
-        } else {
-            $joinSql = '';
-        }
+        // This ensures we always get imdbid, tmdbid, and traktid fields in results
+        $joinSql = 'INNER JOIN movieinfo m ON m.imdbid = r.imdbid';
 
         // Select only fields required by XML/API transformers
         $baseSql = sprintf(
@@ -1271,7 +1249,7 @@ class Releases extends Release
              %s
              LEFT JOIN usenet_groups g ON g.id = r.groups_id
              %s",
-            $needsMovieInfoFields ? 'm.imdbid, m.tmdbid, m.traktid,' : 'r.imdbid, NULL AS tmdbid, NULL AS traktid,',
+            'm.imdbid, m.tmdbid, m.traktid,',
             $joinSql,
             $whereSql
         );
