@@ -368,7 +368,8 @@ class Movie
         }
         $imdbId = (str_starts_with($data['ids']['imdb'], 'tt')) ? substr($data['ids']['imdb'], 2) : $data['ids']['imdb'];
         $cover = 0;
-        if (File::isFile($this->imgSavePath.$imdbId).'-cover.jpg') {
+        // Fix incorrect file existence check (parentheses and concatenation)
+        if (File::isFile($this->imgSavePath.$imdbId.'-cover.jpg')) {
             $cover = 1;
         }
 
@@ -418,6 +419,32 @@ class Movie
     }
 
     /**
+     * Choose the first non-empty variable from up to five inputs.
+     *
+     * @return array|string
+     */
+    protected function setVariables(string|array $variable1, string|array $variable2, string|array $variable3, string|array $variable4, string|array $variable5)
+    {
+        if (! empty($variable1)) {
+            return $variable1;
+        }
+        if (! empty($variable2)) {
+            return $variable2;
+        }
+        if (! empty($variable3)) {
+            return $variable3;
+        }
+        if (! empty($variable4)) {
+            return $variable4;
+        }
+        if (! empty($variable5)) {
+            return $variable5;
+        }
+
+        return '';
+    }
+
+    /**
      * Update movie on movie-edit page.
      *
      * @param  array  $values  Array of keys/values to update. See $validKeys
@@ -450,31 +477,18 @@ class Movie
 
         MovieInfo::upsert($query, ['imdbid'], $onDuplicateKey);
 
+        // Always attempt to fetch a missing cover if imdbid present and cover not provided.
+        if (! empty($query['imdbid'])) {
+            $imdbIdForCover = $query['imdbid'];
+            $coverProvided = array_key_exists('cover', $values) && ! empty($values['cover']);
+            if (! $coverProvided && ! $this->hasCover($imdbIdForCover)) {
+                if ($this->fetchAndSaveCoverOnly($imdbIdForCover)) {
+                    MovieInfo::query()->where('imdbid', $imdbIdForCover)->update(['cover' => 1]);
+                }
+            }
+        }
+
         return true;
-    }
-
-    /**
-     * @return array|string
-     */
-    protected function setVariables(string|array $variable1, string|array $variable2, string|array $variable3, string|array $variable4, string|array $variable5)
-    {
-        if (! empty($variable1)) {
-            return $variable1;
-        }
-        if (! empty($variable2)) {
-            return $variable2;
-        }
-        if (! empty($variable3)) {
-            return $variable3;
-        }
-        if (! empty($variable4)) {
-            return $variable4;
-        }
-        if (! empty($variable5)) {
-            return $variable5;
-        }
-
-        return '';
     }
 
     /**
@@ -614,6 +628,11 @@ class Movie
             'year' => $mov['year'],
         ]);
 
+        // After updating, if cover flag is still 0 but file now exists (race condition), update DB.
+        if ($mov['cover'] === 0 && $this->hasCover($imdbId)) {
+            MovieInfo::query()->where('imdbid', $imdbId)->update(['cover' => 1]);
+        }
+
         if ($this->echooutput && $this->service !== '') {
             PHP_EOL.$this->colorCli->headerOver('Added/updated movie: ').
             $this->colorCli->primary(
@@ -630,10 +649,8 @@ class Movie
 
     /**
      * Fetch FanArt.tv backdrop / cover / title.
-     *
-     * @return array|false
      */
-    protected function fetchFanartTVProperties($imdbId)
+    protected function fetchFanartTVProperties($imdbId): false|array
     {
         if ($this->fanartapikey !== null) {
             $art = $this->fanart->getMovieFanArt('tt'.$imdbId);
@@ -1760,5 +1777,86 @@ class Movie
             'War',
             'Western',
         ];
+    }
+
+    protected function hasCover(string $imdbId): bool
+    {
+        // Checks both DB flag and physical file existence.
+        $record = MovieInfo::query()->select('cover')->where('imdbid', $imdbId)->first();
+        $dbHas = $record !== null && (int) $record->cover === 1;
+        $filePath = $this->imgSavePath.$imdbId.'-cover.jpg';
+        $fileHas = File::isFile($filePath);
+
+        return $dbHas || $fileHas;
+    }
+
+    protected function fetchAndSaveCoverOnly(string $imdbId): bool
+    {
+        // Attempt sources in priority order without pulling full metadata again if possible.
+        // Fanart
+        try {
+            $fanart = $this->fetchFanartTVProperties($imdbId);
+            if (! empty($fanart['cover'])) {
+                if ($this->releaseImage->saveImage($imdbId.'-cover', $fanart['cover'], $this->imgSavePath)) {
+                    return true;
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::debug('Fanart cover fetch failed for '.$imdbId.': '.$e->getMessage());
+        }
+        // TMDB
+        try {
+            $tmdb = $this->fetchTMDBProperties($imdbId);
+            if (! empty($tmdb['cover'])) {
+                if ($this->releaseImage->saveImage($imdbId.'-cover', $tmdb['cover'], $this->imgSavePath)) {
+                    return true;
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::debug('TMDB cover fetch failed for '.$imdbId.': '.$e->getMessage());
+        }
+        // IMDB
+        try {
+            $imdb = $this->fetchIMDBProperties($imdbId);
+            if (! empty($imdb['cover'])) {
+                if ($this->releaseImage->saveImage($imdbId.'-cover', $imdb['cover'], $this->imgSavePath)) {
+                    return true;
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::debug('IMDB cover fetch failed for '.$imdbId.': '.$e->getMessage());
+        }
+        // OMDB
+        try {
+            $omdb = $this->fetchOmdbAPIProperties($imdbId);
+            if (! empty($omdb['cover'])) {
+                if ($this->releaseImage->saveImage($imdbId.'-cover', $omdb['cover'], $this->imgSavePath)) {
+                    return true;
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::debug('OMDB cover fetch failed for '.$imdbId.': '.$e->getMessage());
+        }
+        // iTunes (requires currentTitle; attempt fallback if title known in DB)
+        try {
+            if (empty($this->currentTitle)) {
+                $info = MovieInfo::query()->select('title')->where('imdbid', $imdbId)->first();
+                if ($info !== null && ! empty($info->title)) {
+                    $this->currentTitle = $info->title;
+                }
+            }
+            if (! empty($this->currentTitle)) {
+                $itunes = $this->fetchItunesMovieProperties($this->currentTitle);
+                if (! empty($itunes['cover'])) {
+                    if ($this->releaseImage->saveImage($imdbId.'-cover', $itunes['cover'], $this->imgSavePath)) {
+                        return true;
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::debug('iTunes cover fetch failed for '.$imdbId.': '.$e->getMessage());
+        }
+
+        return false;
     }
 }
