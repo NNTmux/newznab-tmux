@@ -33,9 +33,24 @@ class FetchMovieByImdb extends Command
         }
 
         $movie = app(Movie::class);
+        $movie->echooutput = true;
+        $movie->service = 'console';
 
         $this->info('Force fetching movie data for IMDb id: tt'.$imdbId.' ...');
+
+        // Clear all caches for this movie to force fresh data retrieval
+        $this->line('Clearing cached data for this movie...');
+        \Cache::forget('tmdb_movie_'.md5('tt'.$imdbId));
+        \Cache::forget('trakt_movie_'.md5($imdbId));
+        \Cache::forget('imdb_movie_'.md5($imdbId));
+        \Cache::forget('omdb_movie_'.md5($imdbId));
+
+        $this->line('Debug: Calling updateMovieInfo()...');
+
         $ok = $movie->updateMovieInfo($imdbId);
+
+        $this->line('Debug: updateMovieInfo returned: '.($ok ? 'true' : 'false'));
+
         if (! $ok) {
             $this->error('Failed to fetch/update movie data for tt'.$imdbId.'.');
 
@@ -52,9 +67,16 @@ class FetchMovieByImdb extends Command
         $this->line('');
         $this->info('Updated movie: '.($updated->title ?? 'Unknown Title').' ('.$updated->year.')');
         $this->line('IMDb: tt'.$imdbId);
+        $this->line('TMDB ID: '.($updated->tmdbid ?? 'N/A'));
+        $this->line('Trakt ID: '.($updated->traktid ?? 'N/A'));
         $this->line('Rating: '.($updated->rating ?? 'N/A'));
         $this->line('Genre: '.($updated->genre ?? 'N/A'));
         $this->line('Cover: '.(($updated->cover ?? 0) == 1 ? 'Yes' : 'No'));
+
+        // Check if cover file exists
+        $coverPath = storage_path('covers/movies/'.$imdbId.'-cover.jpg');
+        $this->line('Debug: Cover file path: '.$coverPath);
+        $this->line('Debug: Cover file exists: '.(file_exists($coverPath) ? 'Yes' : 'No'));
 
         return self::SUCCESS;
     }
