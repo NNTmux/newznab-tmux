@@ -146,12 +146,12 @@ class ProfileController extends BasePageController
                         $this->userdata->roles_id,
                         $this->userdata->notes,
                         $this->userdata->invites,
-                        $request->has('viewmovies') ? 1 : 0,
-                        $request->has('viewaudio') ? 1 : 0,
-                        $request->has('viewpc') ? 1 : 0,
-                        $request->has('viewadult') ? 1 : 0,
-                        $request->has('viewconsole') ? 1 : 0,
-                        $request->has('viewbooks') ? 1 : 0,
+                        $request->has('movieview') ? 1 : 0,
+                        $request->has('musicview') ? 1 : 0,
+                        $request->has('gameview') ? 1 : 0,
+                        $request->has('xxxview') ? 1 : 0,
+                        $request->has('consoleview') ? 1 : 0,
+                        $request->has('bookview') ? 1 : 0,
                         'None',
                     );
 

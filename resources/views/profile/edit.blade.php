@@ -151,32 +151,32 @@
                     <label class="flex items-center">
                         <input type="checkbox" name="movieview" value="1" {{ $user->movieview ? 'checked' : '' }}
                             class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
-                        <span class="text-sm text-gray-700">Movie Covers</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Movie Covers</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="musicview" value="1" {{ $user->musicview ? 'checked' : '' }}
                             class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
-                        <span class="text-sm text-gray-700">Music Covers</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Music Covers</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="consoleview" value="1" {{ $user->consoleview ? 'checked' : '' }}
                             class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
-                        <span class="text-sm text-gray-700">Console Covers</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Console Covers</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="gameview" value="1" {{ $user->gameview ? 'checked' : '' }}
                             class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
-                        <span class="text-sm text-gray-700">Game Covers</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Game Covers</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="bookview" value="1" {{ $user->bookview ? 'checked' : '' }}
                             class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
-                        <span class="text-sm text-gray-700">Book Covers</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Book Covers</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="xxxview" value="1" {{ $user->xxxview ? 'checked' : '' }}
                             class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
-                        <span class="text-sm text-gray-700">XXX Covers</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">XXX Covers</span>
                     </label>
                 </div>
             </div>
@@ -186,44 +186,44 @@
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Category Permissions</h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <label class="flex items-center">
-                        <input type="checkbox" name="viewmovies" value="1" {{ $user->movieview ? 'checked' : '' }}
+                        <input type="checkbox" name="viewmovies" value="1" {{ $user->hasDirectPermission('view movies') ? 'checked' : '' }}
                             class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
-                        <span class="text-sm text-gray-700">Movies</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Movies</span>
                     </label>
                     <label class="flex items-center">
-                        <input type="checkbox" name="viewtv" value="1" {{ $user->can('view tv') ? 'checked' : '' }}
+                        <input type="checkbox" name="viewtv" value="1" {{ $user->hasDirectPermission('view tv') ? 'checked' : '' }}
                             class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
-                        <span class="text-sm text-gray-700">TV</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">TV</span>
                     </label>
                     <label class="flex items-center">
-                        <input type="checkbox" name="viewaudio" value="1" {{ $user->musicview ? 'checked' : '' }}
+                        <input type="checkbox" name="viewaudio" value="1" {{ $user->hasDirectPermission('view audio') ? 'checked' : '' }}
                             class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
-                        <span class="text-sm text-gray-700">Audio</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Audio</span>
                     </label>
                     <label class="flex items-center">
-                        <input type="checkbox" name="viewpc" value="1" {{ $user->gameview ? 'checked' : '' }}
+                        <input type="checkbox" name="viewpc" value="1" {{ $user->hasDirectPermission('view pc') ? 'checked' : '' }}
                             class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
-                        <span class="text-sm text-gray-700">PC</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">PC</span>
                     </label>
                     <label class="flex items-center">
-                        <input type="checkbox" name="viewconsole" value="1" {{ $user->consoleview ? 'checked' : '' }}
+                        <input type="checkbox" name="viewconsole" value="1" {{ $user->hasDirectPermission('view console') ? 'checked' : '' }}
                             class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
-                        <span class="text-sm text-gray-700">Console</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Console</span>
                     </label>
                     <label class="flex items-center">
-                        <input type="checkbox" name="viewbooks" value="1" {{ $user->bookview ? 'checked' : '' }}
+                        <input type="checkbox" name="viewbooks" value="1" {{ $user->hasDirectPermission('view books') ? 'checked' : '' }}
                             class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
-                        <span class="text-sm text-gray-700">Books</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Books</span>
                     </label>
                     <label class="flex items-center">
-                        <input type="checkbox" name="viewadult" value="1" {{ $user->xxxview ? 'checked' : '' }}
+                        <input type="checkbox" name="viewadult" value="1" {{ $user->hasDirectPermission('view adult') ? 'checked' : '' }}
                             class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
-                        <span class="text-sm text-gray-700">Adult</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Adult</span>
                     </label>
                     <label class="flex items-center">
-                        <input type="checkbox" name="viewother" value="1" {{ $user->can('view other') ? 'checked' : '' }}
+                        <input type="checkbox" name="viewother" value="1" {{ $user->hasDirectPermission('view other') ? 'checked' : '' }}
                             class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
-                        <span class="text-sm text-gray-700">Other</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Other</span>
                     </label>
                 </div>
             </div>
