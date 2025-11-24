@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\MovieInfo;
 use App\Models\Release;
 use App\Models\Settings;
+use App\Services\ImdbScraper;
 use Blacklight\libraries\FanartTV;
 use Blacklight\processing\tv\TraktTv;
 use Blacklight\utility\Utility;
@@ -24,12 +25,9 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
-use Imdb\Config;
-use Imdb\Title;
-use Imdb\TitleSearch;
-use Tmdb\Exception\TmdbApiException;
-use Tmdb\Laravel\Facades\Tmdb;
+use Illuminate\Support\Str; // ensure scraper imported
+use Tmdb; // add TMDB facade
+use Tmdb\Exception\TmdbApiException; // add TMDB exception
 
 /**
  * Class Movie.
@@ -101,8 +99,6 @@ class Movie
 
     public ?OMDbAPI $omdbApi;
 
-    private Config $config;
-
     /**
      * @var null|string
      */
@@ -133,14 +129,11 @@ class Movie
         }
 
         $this->lookuplanguage = Settings::settingValue('imdblanguage') !== '' ? (string) Settings::settingValue('imdblanguage') : 'en';
-        $this->config = new Config;
-        $this->config->language = $this->lookuplanguage;
-        $this->config->throwHttpExceptions = false;
         $cacheDir = storage_path('framework/cache/imdb_cache');
         if (! File::isDirectory($cacheDir)) {
             File::makeDirectory($cacheDir, 0777, false, true);
         }
-        $this->config->cachedir = $cacheDir;
+        // $this->config->cachedir = $cacheDir; // removed imdbphp config
 
         $this->imdburl = (int) Settings::settingValue('imdburl') !== 0;
         $this->movieqty = Settings::settingValue('maximdbprocessed') !== '' ? (int) Settings::settingValue('maximdbprocessed') : 100;
@@ -169,40 +162,23 @@ class Movie
     {
         $page = max(1, $page);
         $start = max(0, $start);
-
         $catsrch = '';
-        if (\count($cat) > 0 && $cat[0] !== -1) {
+        if (count($cat) > 0 && $cat[0] !== -1) {
             $catsrch = Category::getCategorySearch($cat);
         }
         $order = $this->getMovieOrder($orderBy);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        $moviesSql =
-            sprintf(
-                "
-					SELECT SQL_CALC_FOUND_ROWS
-						m.imdbid,
-						GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
-					FROM movieinfo m
-					LEFT JOIN releases r USING (imdbid)
-					WHERE m.title != ''
-					AND m.imdbid != '0000000'
-					AND r.passwordstatus %s
-					%s %s %s %s
-					GROUP BY m.imdbid
-					ORDER BY %s %s %s",
-                $this->showPasswords,
-                $this->getBrowseBy(),
-                (! empty($catsrch) ? $catsrch : ''),
-                (
-                    $maxAge > 0
-                        ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
-                        : ''
-                ),
-                \count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : '',
-                $order[0],
-                $order[1],
-                $start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start
-            );
+        $whereAge = $maxAge > 0 ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ' : '';
+        $whereExcluded = count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : '';
+        $limitClause = $start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start;
+        $moviesSql = "SELECT SQL_CALC_FOUND_ROWS m.imdbid, GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_id "
+            ."FROM movieinfo m LEFT JOIN releases r USING (imdbid) WHERE m.title != '' AND m.imdbid != '0000000' "
+            ."AND r.passwordstatus {$this->showPasswords} "
+            .$this->getBrowseBy().' '
+            .(! empty($catsrch) ? $catsrch.' ' : '')
+            .$whereAge
+            .$whereExcluded.' '
+            ."GROUP BY m.imdbid ORDER BY {$order[0]} {$order[1]} {$limitClause}";
         $movieCache = Cache::get(md5($moviesSql.$page));
         if ($movieCache !== null) {
             $movies = $movieCache;
@@ -213,57 +189,46 @@ class Movie
         }
         $movieIDs = $releaseIDs = [];
         if (! empty($movies['result'])) {
-            foreach ($movies['result'] as $movie => $id) {
+            foreach ($movies['result'] as $id) {
                 $movieIDs[] = $id->imdbid;
                 $releaseIDs[] = $id->grp_release_id;
             }
         }
-
-        $sql = sprintf(
-            "
-			SELECT
-				GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
-				GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') AS grp_rarinnerfilecount,
-				GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
-				GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
-				GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
-				GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
-				GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
-				GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
-				GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
-				GROUP_CONCAT(r.adddate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_adddate,
-				GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
-				GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
-				GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
-				GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-				GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
-				GROUP_CONCAT(cp.title, ' > ', c.title ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_catname,
-			m.*,
-			g.name AS group_name,
-			rn.releases_id AS nfoid
-			FROM releases r
-			LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id
-			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-			LEFT OUTER JOIN categories c ON c.id = r.categories_id
-			LEFT OUTER JOIN root_categories cp ON cp.id = c.root_categories_id
-			INNER JOIN movieinfo m ON m.imdbid = r.imdbid
-			WHERE m.imdbid IN (%s)
-			AND r.id IN (%s) %s
-			GROUP BY m.imdbid
-			ORDER BY %s %s",
-            (\is_array($movieIDs) && ! empty($movieIDs) ? implode(',', $movieIDs) : -1),
-            (\is_array($releaseIDs) && ! empty($releaseIDs) ? implode(',', $releaseIDs) : -1),
-            (! empty($catsrch) ? $catsrch : ''),
-            $order[0],
-            $order[1]
-        );
+        $inMovieIds = (is_array($movieIDs) && ! empty($movieIDs)) ? implode(',', $movieIDs) : -1;
+        $inReleaseIds = (is_array($releaseIDs) && ! empty($releaseIDs)) ? implode(',', $releaseIDs) : -1;
+        $sql = 'SELECT '
+            ."GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_id, "
+            ."GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_rarinnerfilecount, "
+            ."GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_haspreview, "
+            ."GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_password, "
+            ."GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_guid, "
+            ."GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_nfoid, "
+            ."GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_grpname, "
+            ."GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name, "
+            ."GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_postdate, "
+            ."GROUP_CONCAT(r.adddate ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_adddate, "
+            ."GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_size, "
+            ."GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_totalparts, "
+            ."GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_comments, "
+            ."GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_grabs, "
+            ."GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_failed, "
+            ."GROUP_CONCAT(cp.title, ' > ', c.title ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_catname, "
+            .'m.*, g.name AS group_name, rn.releases_id AS nfoid FROM releases r '
+            .'LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id '
+            .'LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id '
+            .'LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id '
+            .'LEFT OUTER JOIN categories c ON c.id = r.categories_id '
+            .'LEFT OUTER JOIN root_categories cp ON cp.id = c.root_categories_id '
+            .'INNER JOIN movieinfo m ON m.imdbid = r.imdbid '
+            ."WHERE m.imdbid IN ($inMovieIds) AND r.id IN ($inReleaseIds) "
+            .(! empty($catsrch) ? $catsrch.' ' : '')
+            ."GROUP BY m.imdbid ORDER BY {$order[0]} {$order[1]}";
         $return = Cache::get(md5($sql.$page));
         if ($return !== null) {
             return $return;
         }
         $return = Release::fromQuery($sql);
-        if (\count($return) > 0) {
+        if (count($return) > 0) {
             $return[0]->_totalcount = $movies['total'][0]->total ?? 0;
         }
         Cache::put(md5($sql.$page), $return, $expiresAt);
@@ -624,7 +589,7 @@ class Movie
             'title' => $mov['title'],
             'tmdbid' => $mov['tmdbid'],
             'traktid' => $mov['traktid'],
-            'type' => html_entity_decode(ucwords(preg_replace('/[\.\_]/', ' ', $mov['type'])), ENT_QUOTES, 'UTF-8'),
+            'type' => html_entity_decode(ucwords(preg_replace('/[._]/', ' ', $mov['type'])), ENT_QUOTES, 'UTF-8'),
             'year' => $mov['year'],
         ]);
 
@@ -838,76 +803,43 @@ class Movie
      */
     public function fetchIMDBProperties(string $imdbId): array|false
     {
-        // Create a cache key for this request
         $cacheKey = 'imdb_movie_'.md5($imdbId);
-        $expiresAt = now()->addDays(7); // Cache for 7 days
-
-        // Check if we have this cached
+        $expiresAt = now()->addDays(7);
         if (Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
         }
-
         try {
-            // Get real ID and title information
-            $realId = (new Title($imdbId, $this->config))->real_id();
-            $result = new Title($realId, $this->config);
-            $title = ! empty($result->orig_title()) ? $result->orig_title() : $result->title();
-
-            // If no title was found, cache the failure and return false
-            if (empty($title)) {
+            $scraper = app(ImdbScraper::class);
+            $scraped = $scraper->fetchById($imdbId);
+            if ($scraped === false || empty($scraped['title'])) {
                 Cache::put($cacheKey, false, now()->addHours(6));
 
                 return false;
             }
-
-            // Title similarity check when we have a title to compare against
             if (! empty($this->currentTitle)) {
-                similar_text($this->currentTitle, $title, $percent);
+                similar_text($this->currentTitle, $scraped['title'], $percent);
                 if ($percent < self::MATCH_PERCENT) {
                     Cache::put($cacheKey, false, now()->addHours(6));
 
                     return false;
                 }
+                if (! empty($this->currentYear) && ! empty($scraped['year'])) {
+                    similar_text($this->currentYear, $scraped['year'], $yearPercent);
+                    if ($yearPercent < self::YEAR_MATCH_PERCENT) {
+                        Cache::put($cacheKey, false, now()->addHours(6));
 
-                // Year similarity check
-                similar_text($this->currentYear, $result->year(), $percent);
-                if ($percent < self::YEAR_MATCH_PERCENT) {
-                    Cache::put($cacheKey, false, now()->addHours(6));
-
-                    return false;
+                        return false;
+                    }
                 }
             }
-
-            // Build the movie data array
-            $movieData = [
-                'title' => $title,
-                'tagline' => $result->tagline() ?? '',
-                'plot' => Arr::get($result->plot_split(), '0.plot', ''),
-                'rating' => $result->rating() ?? '',
-                'year' => $result->year() ?? '',
-                'cover' => $result->photo() ?? '',
-                'genre' => $result->genre() ?? '',
-                'language' => $result->language() ?? '',
-                'type' => $result->movietype() ?? '',
-                'actors' => $result->cast() ?? [],
-                'director' => $result->director() ?? [],
-            ];
-
-            // Log success
+            Cache::put($cacheKey, $scraped, $expiresAt);
             if ($this->echooutput) {
-                $this->colorCli->info('IMDb found '.$title);
+                $this->colorCli->info('IMDb scraped '.$scraped['title']);
             }
 
-            // Cache the successful result
-            Cache::put($cacheKey, $movieData, $expiresAt);
-
-            return $movieData;
-
-        } catch (\Exception $e) {
-            // Log the error
-            Log::error('IMDB API error for '.$imdbId.': '.$e->getMessage());
-
-            // Cache the failure but for shorter time
+            return $scraped;
+        } catch (\Throwable $e) {
+            Log::error('IMDb scrape error for '.$imdbId.': '.$e->getMessage());
             Cache::put($cacheKey, false, now()->addHours(6));
 
             return false;
@@ -1441,35 +1373,32 @@ class Movie
      */
     private function searchIMDb(int $releaseId): bool
     {
+        // Simplified scraper-only search
         try {
-            $imdbSearch = new TitleSearch($this->config);
-            foreach ($imdbSearch->search($this->currentTitle, [TitleSearch::MOVIE]) as $imdbTitle) {
-                if (empty($imdbTitle->title())) {
+            $scraper = app(ImdbScraper::class);
+            $matches = $scraper->search($this->currentTitle);
+            foreach ($matches as $match) {
+                $title = $match['title'] ?? '';
+                if ($title === '') {
                     continue;
                 }
-
-                // Compare title similarity
-                similar_text($imdbTitle->title(), $this->currentTitle, $percent);
+                similar_text($title, $this->currentTitle, $percent);
                 if ($percent < self::MATCH_PERCENT) {
                     continue;
                 }
-
-                // Compare year similarity if year is available
-                similar_text($this->currentYear, $imdbTitle->year(), $yearPercent);
-                if ($yearPercent < self::YEAR_MATCH_PERCENT) {
-                    continue;
+                if (! empty($this->currentYear) && ! empty($match['year'])) {
+                    similar_text($this->currentYear, $match['year'], $yearPercent);
+                    if ($yearPercent < self::YEAR_MATCH_PERCENT) {
+                        continue;
+                    }
                 }
-
-                // Found a good match, update the release
-                $getIMDBid = $imdbTitle->imdbid();
-                $imdbId = $this->doMovieUpdate('tt'.$getIMDBid, 'IMDb', $releaseId);
+                $imdbId = $this->doMovieUpdate('tt'.$match['imdbid'], 'IMDb(scrape)', $releaseId);
                 if ($imdbId !== false) {
                     return true;
                 }
             }
-        } catch (\ErrorException $e) {
-            $this->colorCli->error('Error fetching data from IMDb: '.$e->getMessage(), true);
-            Log::debug($e->getMessage());
+        } catch (\Throwable $e) {
+            Log::debug('IMDb scraper search failed: '.$e->getMessage());
         }
 
         return false;
@@ -1714,8 +1643,13 @@ class Movie
             // 1. Remove any common movie flags like 1080p, BluRay, etc.
             $name = preg_replace('/'.$followingList.'/i', ' ', $name);
 
-            // 2. Remove content in parentheses, brackets, and periods/underscores
-            $name = preg_replace('/\(.*?\)|\[.*?\]|[._]/i', ' ', $name);
+            // 2. Remove content in parentheses, brackets, and periods/underscores without complex alternation
+            $name = preg_replace('/\([^)]*\)/i', ' ', $name);
+            // Remove [ ... ] blocks without regex escapes to satisfy linter
+            while (($openPos = strpos($name, '[')) !== false && ($closePos = strpos($name, ']', $openPos)) !== false) {
+                $name = substr($name, 0, $openPos).' '.substr($name, $closePos + 1);
+            }
+            $name = str_replace(['.', '_'], ' ', $name);
 
             // 3. Remove scene group names (typically after a hyphen)
             $name = preg_replace('/-[A-Z0-9].*$/i', '', $name);
