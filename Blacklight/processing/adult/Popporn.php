@@ -17,7 +17,7 @@ class Popporn extends AdultMovies
     /**
      * Search endpoint
      */
-    private const SEARCH_ENDPOINT = '/search&q=';
+    private const SEARCH_ENDPOINT = '/search?q=';
 
     /**
      * Age verification URL
@@ -172,48 +172,59 @@ class Popporn extends AdultMovies
     {
         // Method 1: Try structured data
         if (preg_match('/"contentUrl":\s*"(.*?)"/is', $this->_response, $match)) {
-            $this->_res['trailers']['url'] = trim($match[1]);
+            $url = trim($match[1]);
+            if (! empty($url)) {
+                $this->_res['trailers']['url'] = $url;
 
-            return $this->_res;
+                return $this->_res;
+            }
         }
 
         // Method 2: Modern video embeds
         $videoSelectors = [
             'video source',
             'iframe[src*="trailer"]',
+            'video[src]',
         ];
 
         foreach ($videoSelectors as $selector) {
-            if ($ret = $this->_html->findOne($selector)) {
-                $this->_res['trailers']['url'] = $ret->src;
+            $ret = $this->_html->findOne($selector);
+            if ($ret && isset($ret->src) && ! empty(trim($ret->src))) {
+                $this->_res['trailers']['url'] = trim($ret->src);
 
                 return $this->_res;
             }
         }
 
         // Method 3: Original flash-based trailer extraction
-        if ($ret = $this->_html->findOne('input#thickbox-trailer-link')) {
-            $val = \property_exists($ret, 'value') ? (string) $ret->value : '';
-            $val = trim($val);
-            $val = str_replace('..', '', $val);
-            $tmprsp = $this->_response;
-            $this->_trailUrl = $val;
-            if (preg_match_all('/productID="\+(?<id>\d+),/', $this->_response, $hits)) {
-                $productid = $hits['id'][0];
-                $random = ((float) mt_rand() / (float) mt_getrandmax()) * 5400000000000000;
-                $this->_trailUrl = '/com/tlavideo/vod/FlvAjaxSupportService.cfc?random='.$random;
-                $this->_postParams = 'method=pipeStreamLoc&productID='.$productid;
-                $response = getRawHtml(self::BASE_URL.$this->_trailUrl, $this->cookie, $this->_postParams);
-                if (! empty($response)) {
-                    $retJson = json_decode(json_decode($response, true), true);
-                    if ($retJson && isset($retJson['LOC'])) {
-                        $this->_res['trailers']['baseurl'] = self::BASE_URL.'/flashmediaserver/trailerPlayer.swf';
-                        $this->_res['trailers']['flashvars'] = 'subscribe=false&image=&file='.self::BASE_URL.'/'.$retJson['LOC'].'&autostart=false';
-                        // Also provide a modern URL if possible
-                        $this->_res['trailers']['url'] = self::BASE_URL.'/'.$retJson['LOC'];
+        $ret = $this->_html->findOne('input#thickbox-trailer-link');
+        if ($ret && \property_exists($ret, 'value')) {
+            $val = trim((string) $ret->value);
+            if (! empty($val)) {
+                $val = str_replace('..', '', $val);
+                $tmprsp = $this->_response;
+                $this->_trailUrl = $val;
+
+                if (preg_match_all('/productID="\+(?<id>\d+),/', $this->_response, $hits)) {
+                    $productid = $hits['id'][0];
+                    $random = ((float) mt_rand() / (float) mt_getrandmax()) * 5400000000000000;
+                    $this->_trailUrl = '/com/tlavideo/vod/FlvAjaxSupportService.cfc?random='.$random;
+                    $this->_postParams = 'method=pipeStreamLoc&productID='.$productid;
+
+                    $response = getRawHtml(self::BASE_URL.$this->_trailUrl, $this->cookie, $this->_postParams);
+
+                    if (! empty($response)) {
+                        $retJson = json_decode(json_decode($response, true), true);
+                        if ($retJson && isset($retJson['LOC']) && ! empty($retJson['LOC'])) {
+                            $this->_res['trailers']['baseurl'] = self::BASE_URL.'/flashmediaserver/trailerPlayer.swf';
+                            $this->_res['trailers']['flashvars'] = 'subscribe=false&image=&file='.self::BASE_URL.'/'.$retJson['LOC'].'&autostart=false';
+                            // Also provide a modern URL if possible
+                            $this->_res['trailers']['url'] = self::BASE_URL.'/'.$retJson['LOC'];
+                        }
                     }
+
+                    $this->_response = $tmprsp;
                 }
-                $this->_response = $tmprsp;
             }
         }
 

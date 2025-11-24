@@ -20,11 +20,67 @@ if (! function_exists('getRawHtml')) {
      * @param  bool  $cookie
      * @return bool|mixed|string
      */
-    function getRawHtml($url, $cookie = false)
+    function getRawHtml($url, $cookie = false, $postData = null)
     {
+        // Check if this is an adult site that needs age verification
+        $adultSites = [
+            'adultdvdempire.com',
+            'adultdvdmarketplace.com',
+            'aebn.net',
+            'hotmovies.com',
+            'popporn.com',
+        ];
+
+        $isAdultSite = false;
+        foreach ($adultSites as $site) {
+            if (stripos($url, $site) !== false) {
+                $isAdultSite = true;
+                break;
+            }
+        }
+
+        // For adult sites, use age verification manager if available
+        if ($isAdultSite && class_exists('\Blacklight\processing\adult\AgeVerificationManager')) {
+            try {
+                static $ageVerificationManager = null;
+                if ($ageVerificationManager === null) {
+                    $ageVerificationManager = new \Blacklight\processing\adult\AgeVerificationManager;
+                }
+
+                if ($postData !== null) {
+                    // Handle POST requests
+                    $cookieJar = $ageVerificationManager->getCookieJar($url);
+                    $client = new Client([
+                        'cookies' => $cookieJar,
+                        'headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'],
+                    ]);
+
+                    $response = $client->post($url, ['form_params' => $postData]);
+                    $response = $response->getBody()->getContents();
+                } else {
+                    $response = $ageVerificationManager->makeRequest($url);
+                }
+
+                if ($response !== false) {
+                    $jsonResponse = json_decode($response, true);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        return $jsonResponse;
+                    }
+
+                    return $response;
+                }
+            } catch (\Exception $e) {
+                // Fall through to standard method
+                if (function_exists('config') && config('app.debug') === true) {
+                    Log::error('Age verification failed, falling back to standard method: '.$e->getMessage());
+                }
+            }
+        }
+
+        // Standard method for non-adult sites or if age verification fails
         $cookieJar = new CookieJar;
         $client = new Client(['headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246']]);
-        if ($cookie !== false) {
+        if ($cookie !== false && $cookie !== null && $cookie !== '') {
             $cookie = $cookieJar->setCookie(SetCookie::fromString($cookie));
             $client = new Client(['cookies' => $cookie, 'headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246']]);
         }
@@ -35,12 +91,12 @@ if (! function_exists('getRawHtml')) {
                 $response = $jsonResponse;
             }
         } catch (RequestException $e) {
-            if (config('app.debug') === true) {
+            if (function_exists('config') && config('app.debug') === true) {
                 Log::error($e->getMessage());
             }
             $response = false;
         } catch (RuntimeException $e) {
-            if (config('app.debug') === true) {
+            if (function_exists('config') && config('app.debug') === true) {
                 Log::error($e->getMessage());
             }
             $response = false;

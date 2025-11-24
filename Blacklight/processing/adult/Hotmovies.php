@@ -2,6 +2,10 @@
 
 namespace Blacklight\processing\adult;
 
+/**
+ * Class Hotmovies - HotMovies.com scraper
+ * Handles movie information extraction from hotmovies.com
+ */
 class Hotmovies extends AdultMovies
 {
     /**
@@ -59,6 +63,11 @@ class Hotmovies extends AdultMovies
      */
     protected string $_title = '';
 
+    /**
+     * Minimum similarity threshold for matching
+     */
+    protected float $minimumSimilarity = 90.0;
+
     protected function trailers(): false
     {
         // TODO: Implement trailers() method.
@@ -72,10 +81,24 @@ class Hotmovies extends AdultMovies
     protected function synopsis(): array
     {
         $this->_res['synopsis'] = 'N/A';
-        if ($this->_html->findOne('.desc_link')) {
-            $ret = $this->_html->findOne('.video_description');
-            if ($ret !== false) {
-                $this->_res['synopsis'] = trim($ret->innerText);
+
+        // Try multiple selectors
+        $selectors = [
+            '.video_description',
+            'div.description',
+            'div.synopsis',
+            'meta[name="description"]',
+        ];
+
+        foreach ($selectors as $selector) {
+            $ret = $this->_html->findOne($selector);
+            if ($ret) {
+                $text = $ret->innerText ?? $ret->plaintext ?? $ret->content ?? '';
+                if (! empty(trim($text))) {
+                    $this->_res['synopsis'] = trim($text);
+
+                    return $this->_res;
+                }
             }
         }
 
@@ -184,14 +207,25 @@ class Hotmovies extends AdultMovies
      */
     protected function covers(): array|false
     {
-        if ($ret = $this->_html->find('div#large_cover, img#cover', 1)) {
-            $this->_res['boxcover'] = trim($ret->src);
-            $this->_res['backcover'] = str_ireplace('.cover', '.back', trim($ret->src));
-        } else {
-            return false;
+        // Try multiple selectors
+        $selectors = [
+            'img#cover',
+            'div#large_cover img',
+            'img.boxcover',
+            'div.product-image img',
+        ];
+
+        foreach ($selectors as $selector) {
+            $ret = $this->_html->findOne($selector);
+            if ($ret && isset($ret->src)) {
+                $this->_res['boxcover'] = trim($ret->src);
+                $this->_res['backcover'] = str_ireplace(['.cover', 'front'], ['.back', 'back'], trim($ret->src));
+
+                return $this->_res;
+            }
         }
 
-        return $this->_res;
+        return false;
     }
 
     /**
@@ -204,37 +238,76 @@ class Hotmovies extends AdultMovies
         if (empty($movie)) {
             return false;
         }
-        $this->_response = false;
+
         $this->_getLink = self::HMURL.self::TRAILINGSEARCH.urlencode($movie).self::EXTRASEARCH;
         $this->_response = getRawHtml($this->_getLink, $this->cookie);
-        if ($this->_response !== false) {
-            if ($ret = $this->_html->loadHtml($this->_response)->findOne('h3[class=title]')) {
-                if ($ret->findOne('a[title]')) {
-                    $ret = $ret->findOne('a[title]');
-                    $title = trim($ret->title);
-                    $title = str_replace('/XXX/', '', $title);
-                    $title = preg_replace('/\(.*?\)|[._-]/', ' ', $title);
-                    if (! empty($title)) {
-                        similar_text($movie, $title, $p);
-                        if ($p >= 90) {
-                            $this->_title = $title;
-                            $this->_getLink = trim($ret->href);
-                            $this->_directUrl = trim($ret->href);
-                            unset($this->_response);
-                            if ($this->_getLink !== false) {
-                                $this->_response = getRawHtml($this->_getLink, $this->cookie);
-                            } else {
-                                $this->_response = getRawHtml($this->_directUrl, $this->cookie);
-                            }
-                            $this->_html->loadHtml($this->_response);
 
-                            return true;
-                        }
+        if ($this->_response === false) {
+            return false;
+        }
+
+        $this->_html->loadHtml($this->_response);
+
+        // Try multiple result selectors
+        $resultSelectors = [
+            'h3[class=title] a[title]',
+            'h3.title a',
+            'div.movie-title a',
+        ];
+
+        $bestMatch = null;
+        $highestSimilarity = 0;
+
+        foreach ($resultSelectors as $selector) {
+            $elements = $this->_html->find($selector);
+            if (! empty($elements)) {
+                foreach ($elements as $ret) {
+                    $title = $ret->title ?? $ret->plaintext ?? '';
+                    $url = $ret->href ?? '';
+
+                    if (empty($title) || empty($url)) {
+                        continue;
+                    }
+
+                    // Clean title for better matching
+                    $cleanTitle = str_replace('/XXX/', '', $title);
+                    $cleanTitle = preg_replace('/\(.*?\)|[._-]/', ' ', $cleanTitle);
+                    $cleanTitle = preg_replace('/\s+/', ' ', trim($cleanTitle));
+
+                    similar_text(strtolower($movie), strtolower($cleanTitle), $p);
+
+                    if ($p > $highestSimilarity) {
+                        $highestSimilarity = $p;
+                        $bestMatch = [
+                            'title' => trim($title),
+                            'url' => trim($url),
+                        ];
                     }
                 }
+
+                // If we found results with this selector, don't try others
+                if ($bestMatch !== null) {
+                    break;
+                }
             }
-        } else {
-            return false;
+        }
+
+        // Check if best match meets threshold
+        if ($bestMatch !== null && $highestSimilarity >= $this->minimumSimilarity) {
+            $this->_title = $bestMatch['title'];
+            $this->_getLink = $bestMatch['url'];
+            $this->_directUrl = str_starts_with($bestMatch['url'], 'http')
+                ? $bestMatch['url']
+                : self::HMURL.$bestMatch['url'];
+
+            unset($this->_response);
+            $this->_response = getRawHtml($this->_directUrl, $this->cookie);
+
+            if ($this->_response !== false) {
+                $this->_html->loadHtml($this->_response);
+
+                return true;
+            }
         }
 
         return false;

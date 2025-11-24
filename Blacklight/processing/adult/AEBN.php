@@ -4,6 +4,10 @@ namespace Blacklight\processing\adult;
 
 use voku\helper\SimpleHtmlDomNodeBlank;
 
+/**
+ * Class AEBN - AEBN Theater scraper
+ * Handles movie information extraction from straight.theater.aebn.net
+ */
 class AEBN extends AdultMovies
 {
     /**
@@ -53,7 +57,12 @@ class AEBN extends AdultMovies
      */
     protected string $_title = '';
 
-    public $cookie;
+    /**
+     * Minimum similarity threshold for matching
+     */
+    protected float $minimumSimilarity = 90.0;
+
+    public string $cookie = '';
 
     /**
      * Gets Trailer URL . will be processed in XXX insertswf.
@@ -74,14 +83,29 @@ class AEBN extends AdultMovies
      */
     protected function covers(): array
     {
-        $ret = $this->_html->find('div#md-boxCover, img[itemprop=thumbnailUrl]', 1);
-        if ($ret !== false) {
-            $ret = trim($ret->src);
-            if (str_starts_with($ret, '//')) {
-                $ret = 'https:'.$ret;
+        // Try multiple selectors
+        $selectors = [
+            'img[itemprop=thumbnailUrl]',
+            'div#md-boxCover img',
+            'img.boxcover',
+        ];
+
+        foreach ($selectors as $selector) {
+            $ret = $this->_html->findOne($selector);
+            if ($ret && isset($ret->src)) {
+                $coverUrl = trim($ret->src);
+
+                // Ensure URL has protocol
+                if (str_starts_with($coverUrl, '//')) {
+                    $coverUrl = 'https:'.$coverUrl;
+                }
+
+                // Get high-resolution versions
+                $this->_res['boxcover'] = str_ireplace(['160w.jpg', '120w.jpg'], 'xlf.jpg', $coverUrl);
+                $this->_res['backcover'] = str_ireplace(['160w.jpg', '120w.jpg'], 'xlb.jpg', $coverUrl);
+
+                return $this->_res;
             }
-            $this->_res['boxcover'] = str_ireplace('160w.jpg', 'xlf.jpg', $ret);
-            $this->_res['backcover'] = str_ireplace('160w.jpg', 'xlb.jpg', $ret);
         }
 
         return $this->_res;
@@ -190,30 +214,72 @@ class AEBN extends AdultMovies
         if (empty($movie)) {
             return false;
         }
+
         $this->_trailerUrl = self::TRAILINGSEARCH.urlencode($movie);
         $this->_response = getRawHtml(self::AEBNSURL.$this->_trailerUrl, $this->cookie);
-        if ($this->_response !== false) {
-            $i = 1;
-            foreach ($this->_html->loadHtml($this->_response)->find('div.movie') as $mov) {
-                $string = 'a#FTSMovieSearch_link_title_detail_'.$i;
-                if ($ret = $mov->findOne($string)) {
-                    $title = str_replace('/XXX/', '', $ret->title);
-                    $title = trim(preg_replace('/\(.*?\)|[._-]/', ' ', $title));
-                    similar_text(strtolower($movie), strtolower($title), $p);
-                    if ($p >= 90) {
-                        $this->_title = trim($ret->title);
-                        $this->_trailerUrl = html_entity_decode($ret->href);
-                        $this->_directUrl = self::AEBNSURL.$this->_trailerUrl;
-                        unset($this->_response);
-                        $this->_response = getRawHtml(self::AEBNSURL.$this->_trailerUrl, $this->cookie);
-                        $this->_html->loadHtml($this->_response);
 
-                        return true;
-                    }
+        if ($this->_response === false) {
+            return false;
+        }
 
-                    continue;
+        $this->_html->loadHtml($this->_response);
+
+        $bestMatch = null;
+        $highestSimilarity = 0;
+        $i = 1;
+
+        foreach ($this->_html->find('div.movie') as $mov) {
+            // Try multiple selector patterns
+            $selectors = [
+                'a#FTSMovieSearch_link_title_detail_'.$i,
+                'a.title-link',
+                'a[href*="/movie/"]',
+            ];
+
+            $ret = null;
+            foreach ($selectors as $selector) {
+                $ret = $mov->findOne($selector);
+                if ($ret) {
+                    break;
                 }
-                $i++;
+            }
+
+            if ($ret && isset($ret->href)) {
+                $title = $ret->title ?? trim($ret->plaintext);
+
+                if (! empty($title)) {
+                    // Clean title for better matching
+                    $cleanTitle = str_replace('/XXX/', '', $title);
+                    $cleanTitle = preg_replace('/\(.*?\)|[._-]/', ' ', $cleanTitle);
+                    $cleanTitle = preg_replace('/\s+/', ' ', trim($cleanTitle));
+
+                    similar_text(strtolower($movie), strtolower($cleanTitle), $p);
+
+                    if ($p > $highestSimilarity) {
+                        $highestSimilarity = $p;
+                        $bestMatch = [
+                            'title' => trim($title),
+                            'url' => html_entity_decode($ret->href),
+                        ];
+                    }
+                }
+            }
+            $i++;
+        }
+
+        // Check if best match meets threshold
+        if ($bestMatch !== null && $highestSimilarity >= $this->minimumSimilarity) {
+            $this->_title = $bestMatch['title'];
+            $this->_trailerUrl = $bestMatch['url'];
+            $this->_directUrl = self::AEBNSURL.$this->_trailerUrl;
+
+            unset($this->_response);
+            $this->_response = getRawHtml(self::AEBNSURL.$this->_trailerUrl, $this->cookie);
+
+            if ($this->_response !== false) {
+                $this->_html->loadHtml($this->_response);
+
+                return true;
             }
         }
 

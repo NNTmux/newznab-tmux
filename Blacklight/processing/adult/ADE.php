@@ -3,7 +3,8 @@
 namespace Blacklight\processing\adult;
 
 /**
- * Class ADE.
+ * Class ADE - Adult DVD Empire scraper
+ * Handles movie information extraction from adultdvdempire.com
  */
 class ADE extends AdultMovies
 {
@@ -47,9 +48,14 @@ class ADE extends AdultMovies
 
     protected $_response;
 
-    protected $_res = [];
+    protected array $_res = [];
 
     protected $_tmpResponse;
+
+    /**
+     * Minimum similarity threshold for matching
+     */
+    protected float $minimumSimilarity = 90.0;
 
     /**
      * Gets Trailer Movies.
@@ -88,9 +94,23 @@ class ADE extends AdultMovies
      */
     protected function covers(): array
     {
-        if ($ret = $this->_html->find('div#Boxcover, img[itemprop=image]', 1)) {
-            $this->_res['boxcover'] = preg_replace('/m\.jpg/', 'h.jpg', $ret->src);
-            $this->_res['backcover'] = preg_replace('/m\.jpg/', 'bh.jpg', $ret->src);
+        // Try multiple selectors for better reliability
+        $selectors = [
+            'div#Boxcover img[itemprop=image]',
+            'img[itemprop=image]',
+            'div#Boxcover img',
+            'div.boxcover img',
+        ];
+
+        foreach ($selectors as $selector) {
+            $ret = $this->_html->findOne($selector);
+            if ($ret && isset($ret->src)) {
+                // Get high-resolution covers
+                $this->_res['boxcover'] = preg_replace('/[ms]\.jpg$/', 'h.jpg', $ret->src);
+                $this->_res['backcover'] = preg_replace('/[ms]\.jpg$/', 'bh.jpg', $ret->src);
+
+                return $this->_res;
+            }
         }
 
         return $this->_res;
@@ -103,13 +123,21 @@ class ADE extends AdultMovies
      */
     protected function synopsis(): array
     {
-        // Prefer OpenGraph description, fall back to standard meta description
-        $meta = $this->_html->findOne('meta[property=og:description]');
-        if (! $meta) {
-            $meta = $this->_html->findOne('meta[name=description]');
-        }
-        if ($meta && isset($meta->content) && $meta->content !== false) {
-            $this->_res['synopsis'] = trim($meta->content);
+        // Try multiple selectors in priority order
+        $selectors = [
+            'meta[property="og:description"]' => 'content',
+            'meta[name="description"]' => 'content',
+            'div[itemprop="description"]' => 'plaintext',
+            'p.synopsis' => 'plaintext',
+        ];
+
+        foreach ($selectors as $selector => $property) {
+            $meta = $this->_html->findOne($selector);
+            if ($meta && isset($meta->$property) && $meta->$property !== false && ! empty(trim($meta->$property))) {
+                $this->_res['synopsis'] = trim($meta->$property);
+
+                return $this->_res;
+            }
         }
 
         return $this->_res;
@@ -118,18 +146,36 @@ class ADE extends AdultMovies
     /**
      * Gets the cast members and/or awards.
      *
-     *
      * @return array - cast, awards
      */
     protected function cast(): array
     {
         $cast = [];
-        foreach ($this->_html->find('h3') as $a) {
-            if ($a->plaintext !== false) {
-                $cast[] = trim($a->plaintext);
+
+        // Try multiple selector strategies
+        $selectors = [
+            'div[itemprop="actor"] span[itemprop="name"]',
+            'div.performer-list a',
+            'a[href*="/performer/"]',
+            'h3',
+        ];
+
+        foreach ($selectors as $selector) {
+            $elements = $this->_html->find($selector);
+            if (! empty($elements)) {
+                foreach ($elements as $a) {
+                    if ($a->plaintext !== false && ! empty(trim($a->plaintext))) {
+                        $cast[] = trim($a->plaintext);
+                    }
+                }
+
+                if (! empty($cast)) {
+                    break;
+                }
             }
         }
-        $this->_res['cast'] = $cast;
+
+        $this->_res['cast'] = array_values(array_unique($cast));
 
         return $this->_res;
     }
@@ -142,12 +188,31 @@ class ADE extends AdultMovies
     protected function genres(): mixed
     {
         $genres = [];
-        foreach ($this->_html->find('[Label="Category"]') as $a) {
-            if ($a->plaintext !== false) {
-                $genres[] = trim($a->plaintext);
+
+        // Try multiple selector strategies
+        $selectors = [
+            'a[Label="Category"]',
+            'div.categories a',
+            'a[href*="/category/"]',
+            'span[itemprop="genre"]',
+        ];
+
+        foreach ($selectors as $selector) {
+            $elements = $this->_html->find($selector);
+            if (! empty($elements)) {
+                foreach ($elements as $a) {
+                    if ($a->plaintext !== false && ! empty(trim($a->plaintext))) {
+                        $genres[] = trim($a->plaintext);
+                    }
+                }
+
+                if (! empty($genres)) {
+                    break;
+                }
             }
         }
-        $this->_res['genres'] = $genres;
+
+        $this->_res['genres'] = array_values(array_unique($genres));
 
         return $this->_res;
     }
@@ -193,30 +258,74 @@ class ADE extends AdultMovies
         if (empty($movie)) {
             return false;
         }
-        $this->_response = getRawHtml(self::ADE.$this->_dvdQuery.rawurlencode($movie));
-        if ($this->_response !== false) {
-            if ($res = $this->_html->loadHtml($this->_response)->find('a[class=fancybox-button]')) {
-                foreach ($res as $ret) {
-                    $title = $ret->title;
-                    $title = str_replace('/XXX/', '', $title);
-                    $title = preg_replace('/\(.*?\)|[._-]/', ' ', $title);
-                    $url = trim($ret->href);
-                    similar_text(strtolower($movie), strtolower($title), $p);
-                    if ($p >= 90) {
-                        $this->_directUrl = self::ADE.$url;
-                        $this->_title = trim($title);
-                        unset($this->_response);
-                        $this->_response = getRawHtml($this->_directUrl);
-                        $this->_html->loadHtml($this->_response);
 
-                        return true;
+        $this->_response = getRawHtml(self::ADE.$this->_dvdQuery.rawurlencode($movie));
+
+        if ($this->_response === false) {
+            return false;
+        }
+
+        $this->_html->loadHtml($this->_response);
+
+        // Try multiple search result selectors
+        $resultSelectors = [
+            'a[class=fancybox-button]',
+            'div.card a.boxcover-link',
+            'a[href*="/item/"]',
+        ];
+
+        $bestMatch = null;
+        $highestSimilarity = 0;
+
+        foreach ($resultSelectors as $selector) {
+            $res = $this->_html->find($selector);
+            if (! empty($res)) {
+                foreach ($res as $ret) {
+                    $title = $ret->title ?? $ret->getAttribute('title') ?? trim($ret->plaintext);
+                    $url = trim($ret->href ?? '');
+
+                    if (empty($title) || empty($url)) {
+                        continue;
+                    }
+
+                    // Clean title for better matching
+                    $cleanTitle = str_replace('/XXX/', '', $title);
+                    $cleanTitle = preg_replace('/\(.*?\)|[._-]/', ' ', $cleanTitle);
+                    $cleanTitle = preg_replace('/\s+/', ' ', trim($cleanTitle));
+
+                    similar_text(strtolower($movie), strtolower($cleanTitle), $p);
+
+                    if ($p > $highestSimilarity) {
+                        $highestSimilarity = $p;
+                        $bestMatch = [
+                            'title' => trim($title),
+                            'url' => $url,
+                        ];
                     }
                 }
 
-                return false;
+                // If we found results with this selector, don't try others
+                if ($bestMatch !== null) {
+                    break;
+                }
             }
+        }
 
-            return false;
+        // Check if best match meets threshold
+        if ($bestMatch !== null && $highestSimilarity >= $this->minimumSimilarity) {
+            $this->_directUrl = str_starts_with($bestMatch['url'], 'http')
+                ? $bestMatch['url']
+                : self::ADE.$bestMatch['url'];
+            $this->_title = $bestMatch['title'];
+
+            unset($this->_response);
+            $this->_response = getRawHtml($this->_directUrl);
+
+            if ($this->_response !== false) {
+                $this->_html->loadHtml($this->_response);
+
+                return true;
+            }
         }
 
         return false;
