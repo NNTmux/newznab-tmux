@@ -16,6 +16,9 @@ class GlobalDataComposer
      */
     public function compose(View $view): void
     {
+        $viewName = $view->getName() ?? '';
+        $isEmailView = str_starts_with($viewName, 'emails.');
+
         // Load settings as array with type conversions (empty strings -> null, numeric strings -> numbers)
         $siteArray = Settings::query()
             ->pluck('value', 'name')
@@ -24,9 +27,13 @@ class GlobalDataComposer
 
         $viewData = [
             'serverroot' => url('/'),
-            'site' => $siteArray,  // Now it's a proper array, not a Settings model
             'theme' => 'Gentele',
         ];
+
+        // Email views expect $site to be the string provided by the mailable
+        if (! $isEmailView) {
+            $viewData['site'] = $siteArray;  // Now it's a proper array, not a Settings model
+        }
 
         if (Auth::check()) {
             $userdata = User::find(Auth::id());

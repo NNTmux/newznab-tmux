@@ -31,7 +31,8 @@ class ForgottenPassword extends Mailable
     {
         $this->resetLink = $resetLink;
         $this->siteEmail = config('mail.from.address');
-        $this->siteTitle = config('app.name');
+        $siteName = config('app.name');
+        $this->siteTitle = is_array($siteName) ? (string) ($siteName[0] ?? '') : (string) ($siteName ?? '');
     }
 
     /**
