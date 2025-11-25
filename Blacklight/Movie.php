@@ -27,7 +27,6 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str; // ensure scraper imported
 use Tmdb; // add TMDB facade
-use Tmdb\Exception\TmdbApiException; // add TMDB exception
 
 /**
  * Class Movie.
@@ -502,27 +501,92 @@ class Movie
 
         // Prefer Fanart.tv cover over TMDB,TMDB over IMDB,IMDB over OMDB and OMDB over iTunes.
         if (! empty($fanart['cover'])) {
-            $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $fanart['cover'], $this->imgSavePath);
-        } elseif (! empty($tmdb['cover'])) {
-            $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $tmdb['cover'], $this->imgSavePath);
-        } elseif (! empty($imdb['cover'])) {
-            $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $imdb['cover'], $this->imgSavePath);
-        } elseif (! empty($omdb['cover'])) {
-            $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $omdb['cover'], $this->imgSavePath);
-        } elseif (! empty($iTunes['cover'])) {
-            $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $iTunes['cover'], $this->imgSavePath);
+            try {
+                $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $fanart['cover'], $this->imgSavePath);
+                if ($mov['cover'] === 0) {
+                    Log::warning('Failed to save FanartTV cover for '.$imdbId.' from URL: '.$fanart['cover']);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Error saving FanartTV cover for '.$imdbId.': '.$e->getMessage());
+                $mov['cover'] = 0;
+            }
+        }
+
+        if ($mov['cover'] === 0 && ! empty($tmdb['cover'])) {
+            try {
+                $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $tmdb['cover'], $this->imgSavePath);
+                if ($mov['cover'] === 0) {
+                    Log::warning('Failed to save TMDB cover for '.$imdbId.' from URL: '.$tmdb['cover']);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Error saving TMDB cover for '.$imdbId.': '.$e->getMessage());
+                $mov['cover'] = 0;
+            }
+        }
+
+        if ($mov['cover'] === 0 && ! empty($imdb['cover'])) {
+            try {
+                $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $imdb['cover'], $this->imgSavePath);
+                if ($mov['cover'] === 0) {
+                    Log::warning('Failed to save IMDB cover for '.$imdbId.' from URL: '.$imdb['cover']);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Error saving IMDB cover for '.$imdbId.': '.$e->getMessage());
+                $mov['cover'] = 0;
+            }
+        }
+
+        if ($mov['cover'] === 0 && ! empty($omdb['cover'])) {
+            try {
+                $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $omdb['cover'], $this->imgSavePath);
+                if ($mov['cover'] === 0) {
+                    Log::warning('Failed to save OMDB cover for '.$imdbId.' from URL: '.$omdb['cover']);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Error saving OMDB cover for '.$imdbId.': '.$e->getMessage());
+                $mov['cover'] = 0;
+            }
+        }
+
+        if ($mov['cover'] === 0 && ! empty($iTunes['cover'])) {
+            try {
+                $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $iTunes['cover'], $this->imgSavePath);
+                if ($mov['cover'] === 0) {
+                    Log::warning('Failed to save iTunes cover for '.$imdbId.' from URL: '.$iTunes['cover']);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Error saving iTunes cover for '.$imdbId.': '.$e->getMessage());
+                $mov['cover'] = 0;
+            }
         }
 
         // Backdrops.
         if (! empty($fanart['backdrop'])) {
-            $mov['backdrop'] = $this->releaseImage->saveImage($imdbId.'-backdrop', $fanart['backdrop'], $this->imgSavePath, 1920, 1024);
-        } elseif (! empty($tmdb['backdrop'])) {
-            $mov['backdrop'] = $this->releaseImage->saveImage($imdbId.'-backdrop', $tmdb['backdrop'], $this->imgSavePath, 1920, 1024);
+            try {
+                $mov['backdrop'] = $this->releaseImage->saveImage($imdbId.'-backdrop', $fanart['backdrop'], $this->imgSavePath, 1920, 1024);
+            } catch (\Throwable $e) {
+                Log::warning('Error saving FanartTV backdrop for '.$imdbId.': '.$e->getMessage());
+                $mov['backdrop'] = 0;
+            }
+        }
+
+        if ($mov['backdrop'] === 0 && ! empty($tmdb['backdrop'])) {
+            try {
+                $mov['backdrop'] = $this->releaseImage->saveImage($imdbId.'-backdrop', $tmdb['backdrop'], $this->imgSavePath, 1920, 1024);
+            } catch (\Throwable $e) {
+                Log::warning('Error saving TMDB backdrop for '.$imdbId.': '.$e->getMessage());
+                $mov['backdrop'] = 0;
+            }
         }
 
         // Banner
         if (! empty($fanart['banner'])) {
-            $mov['banner'] = $this->releaseImage->saveImage($imdbId.'-banner', $fanart['banner'], $this->imgSavePath);
+            try {
+                $mov['banner'] = $this->releaseImage->saveImage($imdbId.'-banner', $fanart['banner'], $this->imgSavePath);
+            } catch (\Throwable $e) {
+                Log::warning('Error saving FanartTV banner for '.$imdbId.': '.$e->getMessage());
+                $mov['banner'] = 0;
+            }
         }
 
         // RottenTomatoes rating from OmdbAPI
@@ -618,36 +682,40 @@ class Movie
     protected function fetchFanartTVProperties($imdbId): false|array
     {
         if ($this->fanartapikey !== null) {
-            $art = $this->fanart->getMovieFanArt('tt'.$imdbId);
+            try {
+                $art = $this->fanart->getMovieFanArt('tt'.$imdbId);
 
-            if (! empty($art)) {
-                if (isset($art['status']) && $art['status'] === 'error') {
-                    return false;
-                }
-                $ret = [];
-                if (! empty($art['moviebackground'][0]['url'])) {
-                    $ret['backdrop'] = $art['moviebackground'][0]['url'];
-                } elseif (! empty($art['moviethumb'][0]['url'])) {
-                    $ret['backdrop'] = $art['moviethumb'][0]['url'];
-                }
-                if (! empty($art['movieposter'][0]['url'])) {
-                    $ret['cover'] = $art['movieposter'][0]['url'];
-                }
-                if (! empty($art['moviebanner'][0]['url'])) {
-                    $ret['banner'] = $art['moviebanner'][0]['url'];
-                }
-
-                if (isset($ret['backdrop'], $ret['cover'])) {
-                    $ret['title'] = $imdbId;
-                    if (isset($art['name'])) {
-                        $ret['title'] = $art['name'];
+                if (! empty($art)) {
+                    if (isset($art['status']) && $art['status'] === 'error') {
+                        return false;
                     }
-                    if ($this->echooutput) {
-                        $this->colorCli->info('Fanart found '.$ret['title']);
+                    $ret = [];
+                    if (! empty($art['moviebackground'][0]['url'])) {
+                        $ret['backdrop'] = $art['moviebackground'][0]['url'];
+                    } elseif (! empty($art['moviethumb'][0]['url'])) {
+                        $ret['backdrop'] = $art['moviethumb'][0]['url'];
+                    }
+                    if (! empty($art['movieposter'][0]['url'])) {
+                        $ret['cover'] = $art['movieposter'][0]['url'];
+                    }
+                    if (! empty($art['moviebanner'][0]['url'])) {
+                        $ret['banner'] = $art['moviebanner'][0]['url'];
                     }
 
-                    return $ret;
+                    if (isset($ret['backdrop'], $ret['cover'])) {
+                        $ret['title'] = $imdbId;
+                        if (isset($art['name'])) {
+                            $ret['title'] = $art['name'];
+                        }
+                        if ($this->echooutput) {
+                            $this->colorCli->info('Fanart found '.$ret['title']);
+                        }
+
+                        return $ret;
+                    }
                 }
+            } catch (\Throwable $e) {
+                Log::warning('FanartTV API error for '.$imdbId.': '.$e->getMessage());
             }
         }
 
@@ -784,9 +852,9 @@ class Movie
 
             return $ret;
 
-        } catch (TmdbApiException|\ErrorException $error) {
+        } catch (\Throwable $e) {
             // Log the error
-            Log::error('TMDB API error for '.$lookupId.': '.$error->getMessage());
+            Log::warning('TMDB API error for '.$lookupId.': '.$e->getMessage());
 
             // Cache the failure but for shorter time
             Cache::put($cacheKey, false, now()->addHours(6));
@@ -839,7 +907,7 @@ class Movie
 
             return $scraped;
         } catch (\Throwable $e) {
-            Log::error('IMDb scrape error for '.$imdbId.': '.$e->getMessage());
+            Log::warning('IMDb scrape error for '.$imdbId.': '.$e->getMessage());
             Cache::put($cacheKey, false, now()->addHours(6));
 
             return false;
@@ -926,9 +994,9 @@ class Movie
 
             return $movieData;
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Log the error
-            Log::error('Trakt API error for '.$imdbId.': '.$e->getMessage());
+            Log::warning('Trakt API error for '.$imdbId.': '.$e->getMessage());
 
             // Cache the failure but for shorter time
             Cache::put($cacheKey, false, now()->addHours(6));
@@ -1026,9 +1094,9 @@ class Movie
 
             return $movieData;
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Log the error
-            Log::error('OMDB API error for '.$imdbId.': '.$e->getMessage());
+            Log::warning('OMDB API error for '.$imdbId.': '.$e->getMessage());
 
             // Cache the failure but for shorter time
             Cache::put($cacheKey, false, now()->addHours(6));
@@ -1102,9 +1170,9 @@ class Movie
             Cache::put($cacheKey, false, now()->addHours(6));
 
             return false;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // General error
-            Log::error('iTunes API error for "'.$title.'": '.$e->getMessage());
+            Log::warning('iTunes API error for "'.$title.'": '.$e->getMessage());
             Cache::put($cacheKey, false, now()->addHours(6));
 
             return false;
@@ -1509,8 +1577,8 @@ class Movie
                 }
             }
 
-        } catch (TmdbApiException|\ErrorException $error) {
-            Log::error('TMDB API error: '.$error->getMessage());
+        } catch (\Throwable $e) {
+            Log::warning('TMDB API error: '.$e->getMessage());
         }
 
         return false;

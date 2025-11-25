@@ -59,8 +59,39 @@ class ReleaseImage
     protected function fetchImage(string $imgLoc): bool|\Intervention\Image\Interfaces\ImageInterface
     {
         try {
+            // Create context with timeout settings for file_get_contents
+            $context = stream_context_create([
+                'http' => [
+                    'timeout' => 30,
+                    'user_agent' => 'Mozilla/5.0 (compatible; NNTmux/1.0)',
+                    'follow_location' => true,
+                    'max_redirects' => 5,
+                ],
+                'ssl' => [
+                    'verify_peer' => true,
+                    'verify_peer_name' => true,
+                    'allow_self_signed' => false,
+                ],
+            ]);
+
+            $imageData = @file_get_contents($imgLoc, false, $context);
+
+            if ($imageData === false) {
+                $error = error_get_last();
+                $errorMsg = $error !== null && isset($error['message']) ? $error['message'] : 'Unknown error fetching image';
+                $this->colorCli->notice('Failed to fetch image from '.$imgLoc.': '.$errorMsg);
+
+                return false;
+            }
+
+            if (empty($imageData)) {
+                $this->colorCli->notice('Empty image data received from '.$imgLoc);
+
+                return false;
+            }
+
             $manager = new ImageManager(Driver::class);
-            $img = $manager->read(file_get_contents($imgLoc));
+            $img = $manager->read($imageData);
         } catch (\Exception $e) {
             if ($e->getCode() === 404) {
                 $this->colorCli->notice('Data not available on server');
