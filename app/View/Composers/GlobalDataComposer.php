@@ -27,7 +27,6 @@ class GlobalDataComposer
 
         $viewData = [
             'serverroot' => url('/'),
-            'theme' => 'Gentele',
         ];
 
         // Email views expect $site to be the string provided by the mailable
