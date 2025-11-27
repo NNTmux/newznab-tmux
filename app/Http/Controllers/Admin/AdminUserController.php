@@ -65,6 +65,15 @@ class AdminUserController extends BasePageController
             }
             $user->country_name = $position ? $position->countryName : null;
             $user->country_code = $position ? $position->countryCode : null;
+
+            // Add daily API and download counts
+            try {
+                $user->daily_api_count = \App\Models\UserRequest::getApiRequests($user->id);
+                $user->daily_download_count = \App\Models\UserDownload::getDownloadRequests($user->id);
+            } catch (\Exception $e) {
+                $user->daily_api_count = 0;
+                $user->daily_download_count = 0;
+            }
         }
 
         // Build order by URLs
@@ -154,7 +163,8 @@ class AdminUserController extends BasePageController
                     $ret = User::signUp($request->input('username'), $request->input('password'), $request->input('email'), '', $request->input('notes'), $invites, '', true, $request->input('role'), false);
                 } else {
                     $editedUser = User::find($request->input('id'));
-                    $ret = User::updateUser($editedUser->id, $request->input('username'), $request->input('email'), $request->input('grabs'), $request->input('role'), $request->input('notes'), $request->input('invites'), ($request->has('movieview') ? 1 : 0), ($request->has('musicview') ? 1 : 0), ($request->has('gameview') ? 1 : 0), ($request->has('xxxview') ? 1 : 0), ($request->has('consoleview') ? 1 : 0), ($request->has('bookview') ? 1 : 0));
+                    // Use the current grabs value since it's read-only
+                    $ret = User::updateUser($editedUser->id, $request->input('username'), $request->input('email'), $editedUser->grabs, $request->input('role'), $request->input('notes'), $request->input('invites'), ($request->has('movieview') ? 1 : 0), ($request->has('musicview') ? 1 : 0), ($request->has('gameview') ? 1 : 0), ($request->has('xxxview') ? 1 : 0), ($request->has('consoleview') ? 1 : 0), ($request->has('bookview') ? 1 : 0));
                     if ($request->input('password') !== null) {
                         User::updatePassword($editedUser->id, $request->input('password'));
                     }
@@ -211,6 +221,17 @@ class AdminUserController extends BasePageController
                     $title = 'User Edit';
                     $id = $request->input('id');
                     $user = User::find($id);
+
+                    // Add daily API and download counts
+                    if ($user) {
+                        try {
+                            $user->daily_api_count = \App\Models\UserRequest::getApiRequests($user->id);
+                            $user->daily_download_count = \App\Models\UserDownload::getDownloadRequests($user->id);
+                        } catch (\Exception $e) {
+                            $user->daily_api_count = 0;
+                            $user->daily_download_count = 0;
+                        }
+                    }
                 }
 
                 break;
