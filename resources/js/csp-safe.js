@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initAdminSpecificFeatures();
     initRecentActivityRefresh();
     initContentToggle();
+    initContentDelete();
 
     // Initialize page-specific functionality from inline scripts
     initMyMovies();
@@ -4820,6 +4821,89 @@ function initContentToggle() {
             }
             toggleBtn.disabled = false;
             toggleBtn.style.opacity = '1';
+        });
+    });
+}
+
+// Admin Content List - Delete Content
+function initContentDelete() {
+    document.addEventListener('click', function(e) {
+        const deleteBtn = e.target.closest('.content-delete');
+        if (!deleteBtn) return;
+
+        e.preventDefault();
+        const contentId = deleteBtn.getAttribute('data-content-id');
+        const contentTitle = deleteBtn.getAttribute('data-content-title');
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+        if (!contentId || !csrfToken) {
+            if (typeof showToast === 'function') {
+                showToast('Error: Missing required data', 'error');
+            }
+            return;
+        }
+
+        // Show styled confirmation modal
+        showConfirm({
+            title: 'Delete Content',
+            message: `Are you sure you want to delete "${contentTitle}"?`,
+            details: 'This action cannot be undone.',
+            type: 'danger',
+            confirmText: 'Delete',
+            cancelText: 'Cancel',
+            onConfirm: function() {
+                // Disable button during request
+                deleteBtn.disabled = true;
+                deleteBtn.style.opacity = '0.6';
+
+                fetch('/admin/content-delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ id: contentId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove the row from the table
+                        const row = deleteBtn.closest('tr');
+                        if (row) {
+                            row.style.transition = 'opacity 0.3s';
+                            row.style.opacity = '0';
+                            setTimeout(() => {
+                                row.remove();
+
+                                // Check if table is empty now
+                                const tbody = document.querySelector('tbody');
+                                if (tbody && tbody.children.length === 0) {
+                                    location.reload(); // Reload to show "no content found" message
+                                }
+                            }, 300);
+                        }
+
+                        if (typeof showToast === 'function') {
+                            showToast(data.message, 'success');
+                        }
+                    } else {
+                        if (typeof showToast === 'function') {
+                            showToast(data.message || 'Failed to delete content', 'error');
+                        }
+                        deleteBtn.disabled = false;
+                        deleteBtn.style.opacity = '1';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting content:', error);
+                    if (typeof showToast === 'function') {
+                        showToast('An error occurred while deleting content', 'error');
+                    }
+                    deleteBtn.disabled = false;
+                    deleteBtn.style.opacity = '1';
+                });
+            }
         });
     });
 }

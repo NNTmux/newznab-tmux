@@ -146,15 +146,36 @@ class AdminContentController extends BasePageController
     /**
      * Delete content by ID.
      */
-    public function destroy(Request $request): \Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
+    public function destroy(Request $request)
     {
         if ($request->has('id')) {
-            Content::query()->where('id', $request->input('id'))->delete();
+            $content = Content::query()->find($request->input('id'));
+
+            if ($content) {
+                $content->delete();
+
+                // If AJAX request, return JSON
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Content deleted successfully'
+                    ]);
+                }
+
+                return redirect()->route('admin.content-list')->with('success', 'Content deleted successfully');
+            }
+
+            // If AJAX request, return error JSON
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Content not found'
+                ], 404);
+            }
         }
 
         $referrer = $request->server('HTTP_REFERER');
-
-        return redirect()->to($referrer);
+        return redirect()->to($referrer)->with('error', 'Invalid request');
     }
 
     /**

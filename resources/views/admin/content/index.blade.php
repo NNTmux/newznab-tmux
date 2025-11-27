@@ -101,10 +101,18 @@
                                                 title="{{ $item->status == 1 ? 'Disable' : 'Enable' }}">
                                             <i class="fa fa-toggle-{{ $item->status == 1 ? 'on' : 'off' }}"></i>
                                         </button>
+                                        <button type="button"
+                                                class="content-delete text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                                data-content-id="{{ $item->id }}"
+                                                data-content-title="{{ $item->title }}"
+                                                title="Delete">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach
-                                           data-confirm-delete>
+                    </tbody>
                 </table>
             </div>
         @else
