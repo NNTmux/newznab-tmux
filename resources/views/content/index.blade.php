@@ -5,7 +5,7 @@
     @if($front)
         <!-- Front Page Content -->
         <div class="px-6 py-8">
-            @if(is_array($content) && count($content) > 0)
+            @if(!empty($content) && count($content) > 0)
                 <div class="space-y-6">
                     @foreach($content as $item)
                         <article class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow duration-200">
@@ -43,7 +43,7 @@
                 <p class="text-gray-600">Browse our content pages</p>
             </div>
 
-            @if(is_array($content) && count($content) > 0)
+            @if(!empty($content) && count($content) > 0)
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($content as $item)
                         @if($item)

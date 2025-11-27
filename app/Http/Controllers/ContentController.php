@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Blacklight\Contents;
+use App\Models\Content;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ContentController extends BasePageController
 {
     /**
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\View\View
+     * Display content page(s).
      *
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\View\View
      * @throws \Exception
      */
     public function show(Request $request)
     {
-        $contents = new Contents;
-
         $role = $this->userdata->role ?? 0;
 
-        /* The role column in the content table values are :
+        /* The role column in the content table values are:
          * 1 = logged in users
          * 2 = admins
          *
@@ -30,37 +30,34 @@ class ContentController extends BasePageController
          *
          * Admins and mods should be the only ones to see admin content.
          */
-        $isAdmin = ($role === 2 || $role === 4);
+        $isAdmin = \in_array($role, [User::ROLE_ADMIN, User::ROLE_MODERATOR], true);
 
-        $contentId = 0;
-        if ($request->has('id')) {
-            $contentId = $request->input('id');
-        }
-
-        $contentPage = false;
-        if ($request->has('page')) {
-            $contentPage = $request->input('page');
-        }
+        $contentId = $request->input('id', 0);
+        $contentPage = $request->input('page', false);
 
         if ($contentId === 0 && $contentPage === 'content') {
-            $content = $contents->getAllButFront();
+            // Show all content except front page
+            $content = $this->getAllButFront()->all();
             $isFront = false;
             $meta_title = 'Contents page';
             $meta_keywords = 'contents';
             $meta_description = 'This is the contents page.';
         } elseif ($contentId !== 0 && $contentPage !== false) {
-            $content = [$contents->getByID($contentId, $role)];
+            // Show specific content by ID
+            $contentItem = $this->getContentById($contentId, $role);
+            $content = $contentItem ? [$contentItem] : [];
             $isFront = false;
             $meta_title = 'Contents page';
             $meta_keywords = 'contents';
             $meta_description = 'This is the contents page.';
         } else {
-            $content = $contents->getFrontPage();
-            $index = $contents->getIndex();
+            // Show front page content
+            $content = $this->getFrontPageContent()->all();
+            $index = $this->getIndexContent();
             $isFront = true;
-            $meta_title = $index->title ?? 'Contents page';
-            $meta_keywords = $index->metakeyword ?? 'contents';
-            $meta_description = $index->metadescription ?? 'This is the contents page.';
+            $meta_title = $index?->title ?? 'Contents page';
+            $meta_keywords = $index?->metakeywords ?? 'contents';
+            $meta_description = $index?->metadescription ?? 'This is the contents page.';
         }
 
         if (empty($content)) {
@@ -77,5 +74,53 @@ class ContentController extends BasePageController
         ]);
 
         return view('content.index', $this->viewData);
+    }
+
+    /**
+     * Get all active content ordered by type and ordinal.
+     */
+    protected function getActiveContent(): \Illuminate\Database\Eloquent\Collection
+    {
+        return Content::active()
+            ->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')
+            ->get();
+    }
+
+    /**
+     * Get all content except the front page.
+     */
+    protected function getAllButFront(): \Illuminate\Database\Eloquent\Collection
+    {
+        return Content::query()
+            ->where('id', '<>', 1)
+            ->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')
+            ->get();
+    }
+
+    /**
+     * Get content by ID with role-based access control.
+     */
+    protected function getContentById(int $id, int $role): ?Content
+    {
+        return Content::query()
+            ->where('id', $id)
+            ->forRole($role)
+            ->first();
+    }
+
+    /**
+     * Get front page content.
+     */
+    protected function getFrontPageContent(): \Illuminate\Database\Eloquent\Collection
+    {
+        return Content::frontPage()->get();
+    }
+
+    /**
+     * Get index content metadata.
+     */
+    protected function getIndexContent(): ?Content
+    {
+        return Content::active()->ofType(Content::TYPE_INDEX)->first();
     }
 }
