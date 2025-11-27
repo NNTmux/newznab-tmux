@@ -4,6 +4,7 @@ namespace App\View\Composers;
 
 use App\Events\UserLoggedIn;
 use App\Models\Category;
+use App\Models\Content;
 use App\Models\Settings;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -33,6 +34,13 @@ class GlobalDataComposer
         if (! $isEmailView) {
             $viewData['site'] = $siteArray;  // Now it's a proper array, not a Settings model
         }
+
+        // Load useful links for sidebar
+        $usefulLinks = Content::active()
+            ->ofType(Content::TYPE_USEFUL)
+            ->orderBy('ordinal')
+            ->get();
+        $viewData['usefulLinks'] = $usefulLinks;
 
         if (Auth::check()) {
             $userdata = User::find(Auth::id());

@@ -193,16 +193,26 @@ class AdminContentController extends BasePageController
      */
     protected function normalizeContentUrl(array $data): array
     {
-        if (isset($data['url'])) {
-            // Ensure URL starts with /
-            if ($data['url'] !== '/' && !str_starts_with($data['url'], '/')) {
-                $data['url'] = '/'.$data['url'];
-            }
+        if (isset($data['url']) && $data['url'] !== '') {
+            $url = $data['url'];
 
-            // Ensure URL ends with /
-            if (!str_ends_with($data['url'], '/')) {
-                $data['url'] .= '/';
+            // Check if URL is external (has protocol or is a domain pattern)
+            $hasProtocol = str_starts_with($url, 'http://') || str_starts_with($url, 'https://');
+            $isDomain = !str_starts_with($url, '/') && preg_match('/^[a-zA-Z0-9][a-zA-Z0-9-]*\.[a-zA-Z]{2,}/', $url);
+
+            // Only normalize internal URLs (those starting with / or root)
+            if (!$hasProtocol && !$isDomain) {
+                // Ensure internal URL starts with /
+                if ($url !== '/' && !str_starts_with($url, '/')) {
+                    $data['url'] = '/' . $url;
+                }
+
+                // Ensure internal URL ends with /
+                if (!str_ends_with($data['url'], '/')) {
+                    $data['url'] .= '/';
+                }
             }
+            // External URLs are left as-is
         }
 
         return $data;
