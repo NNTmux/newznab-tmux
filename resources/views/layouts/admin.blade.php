@@ -73,10 +73,29 @@
         </div>
     </div>
 
-    <!-- Dark Mode Toggle -->
-    <button id="theme-toggle" class="fixed bottom-4 left-4 z-50 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-3 rounded-full shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200" title="Toggle theme">
-        <i class="fas fa-moon theme-icon-dark hidden dark:inline"></i>
-        <i class="fas fa-sun theme-icon-light inline dark:hidden"></i>
+    <!-- Theme Toggle -->
+    <button id="theme-toggle" class="fixed bottom-4 left-4 z-50 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-full shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-200 flex items-center gap-2 touch-target"
+            title="{{ ucfirst(auth()->check() ? (auth()->user()->theme_preference ?? 'light') : 'light') }} Mode">
+        <i id="theme-icon" class="fas
+            @if(auth()->check())
+                @if((auth()->user()->theme_preference ?? 'light') === 'dark')
+                    fa-moon
+                @elseif((auth()->user()->theme_preference ?? 'light') === 'system')
+                    fa-desktop
+                @else
+                    fa-sun
+                @endif
+            @else
+                fa-sun
+            @endif
+        "></i>
+        <span id="theme-label" class="text-xs font-medium hidden sm:inline">
+            @if(auth()->check())
+                {{ ucfirst(auth()->user()->theme_preference ?? 'light') }}
+            @else
+                Light
+            @endif
+        </span>
     </button>
 
     <!-- Toast Notification Container -->

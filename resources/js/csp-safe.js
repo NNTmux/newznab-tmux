@@ -13,7 +13,202 @@ function escapeHtml(text) {
     return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 
+// Shared theme management utilities
+const themeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+/**
+ * Apply theme preference to the document
+ * @param {string} themePreference - 'light', 'dark', or 'system'
+ */
+function applyTheme(themePreference) {
+    const html = document.documentElement;
+
+    if (themePreference === 'system') {
+        if (themeMediaQuery.matches) {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
+        }
+    } else if (themePreference === 'dark') {
+        html.classList.add('dark');
+    } else {
+        html.classList.remove('dark');
+    }
+}
+
+/**
+ * Update all theme UI elements to reflect the current theme
+ * @param {string} themePreference - 'light', 'dark', or 'system'
+ */
+function updateAllThemeUI(themePreference) {
+    // Update ALL theme selector radio buttons (user area profile edit page)
+    // Use a flag to prevent event loops when programmatically updating
+    window._updatingThemeUI = true;
+    
+    const allThemeRadios = document.querySelectorAll('input[name="theme_preference"]');
+    let updatedCount = 0;
+    allThemeRadios.forEach(radio => {
+        const wasChecked = radio.checked;
+        if (radio.value === themePreference) {
+            radio.checked = true;
+            if (!wasChecked) updatedCount++;
+        } else {
+            radio.checked = false;
+        }
+    });
+    
+    if (updatedCount > 0) {
+        console.log(`Updated ${updatedCount} theme radio button(s) to ${themePreference}`);
+    }
+
+    // Update theme toggle button title and icon
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        const titles = {
+            'light': 'Theme: Light',
+            'dark': 'Theme: Dark',
+            'system': 'Theme: System (Auto)'
+        };
+        themeToggle.setAttribute('title', titles[themePreference] || 'Toggle theme');
+
+        // Update icon if it exists
+        const themeIcon = document.getElementById('theme-icon');
+        if (themeIcon) {
+            const icons = {
+                'light': 'fa-sun',
+                'dark': 'fa-moon',
+                'system': 'fa-desktop'
+            };
+            themeIcon.classList.remove('fa-sun', 'fa-moon', 'fa-desktop');
+            themeIcon.classList.add(icons[themePreference] || 'fa-sun');
+        }
+
+        // Update label if it exists
+        const themeLabel = document.getElementById('theme-label');
+        if (themeLabel) {
+            const labels = {
+                'light': 'Light',
+                'dark': 'Dark',
+                'system': 'System'
+            };
+            themeLabel.textContent = labels[themePreference] || 'Light';
+        }
+    }
+
+    // Update visual state of theme options
+    const themeOptions = document.querySelectorAll('.theme-option');
+    themeOptions.forEach(option => {
+        const radio = option.querySelector('.theme-radio') || option.querySelector('input[type="radio"]');
+        if (radio && radio.checked) {
+            option.classList.add('theme-option-active');
+        } else {
+            option.classList.remove('theme-option-active');
+        }
+    });
+
+    // Update meta tag
+    const metaTheme = document.querySelector('meta[name="theme-preference"]');
+    if (metaTheme) {
+        metaTheme.content = themePreference;
+    }
+    
+    // Clear the flag after a short delay to allow all updates to complete
+    setTimeout(() => {
+        window._updatingThemeUI = false;
+    }, 100);
+}
+
+/**
+ * Save theme preference to backend or localStorage
+ * @param {string} themePreference - 'light', 'dark', or 'system'
+ * @returns {Promise} Promise that resolves when theme is saved
+ */
+function saveThemePreference(themePreference) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    const updateThemeUrl = document.querySelector('meta[name="update-theme-url"]')?.content;
+    const isAuthenticated = document.querySelector('meta[name="user-authenticated"]');
+
+    if (isAuthenticated && isAuthenticated.content === 'true' && updateThemeUrl && csrfToken) {
+        return fetch(updateThemeUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({ theme_preference: themePreference })
+        }).then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  console.log('Theme saved successfully:', themePreference);
+                  // Update meta tag immediately
+                  const metaTheme = document.querySelector('meta[name="theme-preference"]');
+                  if (metaTheme) {
+                      metaTheme.content = themePreference;
+                      console.log('Meta tag updated to:', themePreference);
+                  }
+                  updateAllThemeUI(themePreference);
+                  // Dispatch custom event for theme change
+                  document.dispatchEvent(new CustomEvent('themeChanged', { 
+                      detail: { theme: themePreference } 
+                  }));
+                  return data;
+              } else {
+                  console.error('Theme save failed:', data);
+              }
+          })
+          .catch(error => {
+              console.error('Error updating theme:', error);
+              throw error;
+          });
+    } else {
+        // Save to localStorage for guests
+        localStorage.setItem('theme', themePreference);
+        updateAllThemeUI(themePreference);
+        document.dispatchEvent(new CustomEvent('themeChanged', { 
+            detail: { theme: themePreference } 
+        }));
+        return Promise.resolve({ success: true });
+    }
+}
+
+/**
+ * Initialize theme system - runs once on page load
+ */
+function initThemeSystem() {
+    // Get initial theme preference
+    const metaTheme = document.querySelector('meta[name="theme-preference"]');
+    const isAuthenticated = document.querySelector('meta[name="user-authenticated"]');
+    let currentTheme = metaTheme ? metaTheme.content : 'light';
+
+    if (!isAuthenticated || isAuthenticated.content !== 'true') {
+        currentTheme = localStorage.getItem('theme') || 'light';
+    }
+
+    // Apply initial theme
+    applyTheme(currentTheme);
+    updateAllThemeUI(currentTheme);
+
+    // Listen for OS theme changes if 'system' is selected
+    themeMediaQuery.addEventListener('change', () => {
+        const selectedTheme = metaTheme ? metaTheme.content : localStorage.getItem('theme') || 'light';
+        if (selectedTheme === 'system') {
+            applyTheme('system');
+        }
+    });
+
+    // Listen for theme changes from any source
+    document.addEventListener('themeChanged', function(e) {
+        if (e.detail && e.detail.theme) {
+            applyTheme(e.detail.theme);
+            updateAllThemeUI(e.detail.theme);
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize theme system first
+    initThemeSystem();
+    
     initEventDelegation();
     initToastNotifications();
     initNfoModal();
@@ -1784,50 +1979,12 @@ function initAdminMenu() {
         }
     });
 
-    // Theme management with system preference support for admin panel
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    // Theme toggle button handler - cycles through light -> dark -> system
     const themeToggle = document.getElementById('theme-toggle');
-
     if (themeToggle) {
-        // Get initial theme preference
-        const metaTheme = document.querySelector('meta[name="theme-preference"]');
-        const isAuthenticated = document.querySelector('meta[name="user-authenticated"]');
-        let currentTheme = metaTheme ? metaTheme.content : 'light';
-
-        if (!isAuthenticated || isAuthenticated.content !== 'true') {
-            currentTheme = localStorage.getItem('theme') || 'light';
-        }
-
-        // Function to apply theme
-        function applyTheme(themePreference) {
-            const html = document.documentElement;
-
-            if (themePreference === 'system') {
-                if (mediaQuery.matches) {
-                    html.classList.add('dark');
-                } else {
-                    html.classList.remove('dark');
-                }
-            } else if (themePreference === 'dark') {
-                html.classList.add('dark');
-            } else {
-                html.classList.remove('dark');
-            }
-        }
-
-        // Apply initial theme
-        applyTheme(currentTheme);
-
-        // Listen for OS theme changes
-        mediaQuery.addEventListener('change', () => {
-            const userThemePreference = metaTheme ? metaTheme.content : localStorage.getItem('theme') || 'light';
-            if (userThemePreference === 'system') {
-                applyTheme('system');
-            }
-        });
-
-        // Theme toggle click handler - cycles through light -> dark -> system
         themeToggle.addEventListener('click', function() {
+            const metaTheme = document.querySelector('meta[name="theme-preference"]');
+            const currentTheme = metaTheme ? metaTheme.content : localStorage.getItem('theme') || 'light';
             let nextTheme;
 
             // Cycle through: light -> dark -> system -> light
@@ -1840,45 +1997,10 @@ function initAdminMenu() {
             }
 
             applyTheme(nextTheme);
-
-            // Update button title
-            const titles = {
-                'light': 'Theme: Light',
-                'dark': 'Theme: Dark',
-                'system': 'Theme: System (Auto)'
-            };
-            this.setAttribute('title', titles[nextTheme]);
-
-            // Save theme preference
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-            const updateThemeUrl = document.querySelector('meta[name="update-theme-url"]')?.content;
-
-            if (isAuthenticated && isAuthenticated.content === 'true' && updateThemeUrl && csrfToken) {
-                // Save to backend for authenticated users
-                fetch(updateThemeUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    body: JSON.stringify({ theme_preference: nextTheme })
-                }).then(response => response.json())
-                  .then(data => {
-                      if (data.success) {
-                          currentTheme = nextTheme;
-                          if (metaTheme) {
-                              metaTheme.content = nextTheme;
-                          }
-                      }
-                  })
-                  .catch(error => console.error('Error updating theme:', error));
-            } else {
-                // Save to localStorage for guests
-                localStorage.setItem('theme', nextTheme);
-                currentTheme = nextTheme;
-            }
+            saveThemePreference(nextTheme);
         });
     }
+
 }
 
 // Sidebar Toggle functionality for regular user sidebar
@@ -2545,39 +2667,25 @@ function initProfileEdit() {
         });
     }
 
-    // Theme preference instant preview
-    const themeRadios = document.querySelectorAll('input[name="theme_preference"]');
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-    function applyTheme(themeValue) {
-        const html = document.documentElement;
-
-        if (themeValue === 'system') {
-            // Use system preference
-            if (mediaQuery.matches) {
-                html.classList.add('dark');
-            } else {
-                html.classList.remove('dark');
-            }
-        } else if (themeValue === 'dark') {
-            html.classList.add('dark');
-        } else {
-            html.classList.remove('dark');
+    // Theme preference instant preview (user area - profile edit page)
+    const allThemeRadios = document.querySelectorAll('input[name="theme_preference"]');
+    
+    allThemeRadios.forEach(radio => {
+        // Skip if event listener already attached (prevent duplicates)
+        if (radio.dataset.themeListenerAttached === 'true') {
+            return;
         }
-    }
-
-    themeRadios.forEach(radio => {
+        radio.dataset.themeListenerAttached = 'true';
+        
         radio.addEventListener('change', function() {
-            applyTheme(this.value);
+            // Prevent event loop if we're programmatically updating
+            if (window._updatingThemeUI) {
+                return;
+            }
+            const selectedTheme = this.value;
+            applyTheme(selectedTheme);
+            saveThemePreference(selectedTheme);
         });
-    });
-
-    // Listen to system preference changes if 'system' is selected
-    mediaQuery.addEventListener('change', function(e) {
-        const selectedTheme = document.querySelector('input[name="theme_preference"]:checked')?.value;
-        if (selectedTheme === 'system') {
-            applyTheme('system');
-        }
     });
 }
 
@@ -4246,23 +4354,6 @@ function animateProgressBars() {
 
 // Theme Management (moved from main.blade.php)
 function initThemeManagement() {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-    function applyTheme(themePreference) {
-        const html = document.documentElement;
-
-        if (themePreference === 'system') {
-            if (mediaQuery.matches) {
-                html.classList.add('dark');
-            } else {
-                html.classList.remove('dark');
-            }
-        } else if (themePreference === 'dark') {
-            html.classList.add('dark');
-        } else {
-            html.classList.remove('dark');
-        }
-    }
 
     function updateThemeButton(theme) {
         const themeIcon = document.getElementById('theme-icon');
@@ -4307,62 +4398,44 @@ function initThemeManagement() {
     }
 
     // Listen for OS theme changes
-    mediaQuery.addEventListener('change', () => {
+    themeMediaQuery.addEventListener('change', () => {
         if (currentTheme === 'system') {
             applyTheme('system');
         }
     });
 
-    // Listen for custom theme change events from sidebar
+    // Listen for custom theme change events
     document.addEventListener('themeChanged', function(e) {
         if (e.detail && e.detail.theme) {
             updateThemeButton(e.detail.theme);
-            applyTheme(e.detail.theme);
-            currentTheme = e.detail.theme;
         }
     });
 
-    // Dark mode toggle
+    // Dark mode toggle (user area - only if not already handled by admin)
     const themeToggle = document.getElementById('theme-toggle');
+    // Check if this is admin area by looking for admin-specific elements
+    const isAdminArea = document.querySelector('aside.bg-gray-900.dark\\:bg-gray-950') && 
+                        document.querySelector('a[href*="admin"]');
+    
+    if (themeToggle && !isAdminArea) {
+        // Only handle if not in admin area (admin has its own handler in initAdminMenu)
+        themeToggle.addEventListener('click', function() {
+            const metaTheme = document.querySelector('meta[name="theme-preference"]');
+            const currentTheme = metaTheme ? metaTheme.content : localStorage.getItem('theme') || 'light';
+            let nextTheme;
 
-    themeToggle?.addEventListener('click', function() {
-        let nextTheme;
+            if (currentTheme === 'light') {
+                nextTheme = 'dark';
+            } else if (currentTheme === 'dark') {
+                nextTheme = 'system';
+            } else {
+                nextTheme = 'light';
+            }
 
-        if (currentTheme === 'light') {
-            nextTheme = 'dark';
-        } else if (currentTheme === 'dark') {
-            nextTheme = 'system';
-        } else {
-            nextTheme = 'light';
-        }
-
-        applyTheme(nextTheme);
-        updateThemeButton(nextTheme);
-
-        if (isAuthenticated) {
-            const updateThemeUrl = currentThemeElement ? currentThemeElement.dataset.updateUrl : '/profile/update-theme';
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-
-            fetch(updateThemeUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                body: JSON.stringify({ theme_preference: nextTheme })
-            }).then(response => response.json())
-              .then(data => {
-                  if (data.success) {
-                      currentTheme = nextTheme;
-                      document.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: nextTheme } }));
-                  }
-              });
-        } else {
-            localStorage.setItem('theme', nextTheme);
-            currentTheme = nextTheme;
-            document.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: nextTheme } }));
-        }
-    });
+            applyTheme(nextTheme);
+            saveThemePreference(nextTheme);
+        });
+    }
 
     // Mobile sidebar toggle
     document.getElementById('mobile-sidebar-toggle')?.addEventListener('click', function() {

@@ -673,3 +673,62 @@ code.api-token::-webkit-scrollbar-thumb:hover {
     font-size: 1.125rem; /* 18px */
 }
 
+/* Admin Theme Selector Styles */
+.admin-theme-selector .theme-option {
+    border-color: rgb(55, 65, 81); /* gray-700 */
+    background-color: rgba(31, 41, 55, 0.5); /* gray-800/50 */
+}
+
+.admin-theme-selector .theme-option:hover {
+    background-color: rgb(31, 41, 55); /* gray-800 */
+}
+
+.admin-theme-selector .theme-option.theme-option-active {
+    border-color: rgb(59, 130, 246); /* blue-500 */
+    background-color: rgba(30, 64, 175, 0.3); /* blue-900/30 */
+}
+
+/* Fallback for browsers that support :has() */
+.admin-theme-selector .theme-option:has(.theme-radio:checked) {
+    border-color: rgb(59, 130, 246); /* blue-500 */
+    background-color: rgba(30, 64, 175, 0.3); /* blue-900/30 */
+}
+
+/* User Area Theme Selector Styles (for consistency) */
+.theme-option {
+    border-color: rgb(209, 213, 219); /* gray-300 */
+    background-color: rgb(249, 250, 251); /* gray-50 */
+}
+
+.dark .theme-option {
+    border-color: rgb(75, 85, 99); /* gray-600 */
+    background-color: rgb(55, 65, 81); /* gray-700 */
+}
+
+.theme-option:hover {
+    background-color: rgb(243, 244, 246); /* gray-100 */
+}
+
+.dark .theme-option:hover {
+    background-color: rgb(31, 41, 55); /* gray-800 */
+}
+
+.theme-option.theme-option-active {
+    border-color: rgb(59, 130, 246); /* blue-500 */
+    background-color: rgb(239, 246, 255); /* blue-50 */
+}
+
+.dark .theme-option.theme-option-active {
+    background-color: rgba(30, 64, 175, 0.2); /* blue-900/20 */
+}
+
+/* Fallback for browsers that support :has() */
+.theme-option:has(.theme-radio:checked) {
+    border-color: rgb(59, 130, 246); /* blue-500 */
+    background-color: rgb(239, 246, 255); /* blue-50 */
+}
+
+.dark .theme-option:has(.theme-radio:checked) {
+    background-color: rgba(30, 64, 175, 0.2); /* blue-900/20 */
+}
+
