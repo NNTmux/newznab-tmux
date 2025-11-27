@@ -64,7 +64,7 @@ class AdminContentController extends BasePageController
             case 'add':
                 $meta_title = 'Content Add';
                 $content['status'] = Content::STATUS_ENABLED;
-                $content['contenttype'] = Content::TYPE_ARTICLE;
+                $content['contenttype'] = Content::TYPE_USEFUL;
                 break;
 
             case 'submit':
@@ -90,7 +90,6 @@ class AdminContentController extends BasePageController
 
         $contenttypelist = [
             Content::TYPE_USEFUL => 'Useful Link',
-            Content::TYPE_ARTICLE => 'Article',
             Content::TYPE_INDEX => 'Homepage'
         ];
 
@@ -149,7 +148,7 @@ class AdminContentController extends BasePageController
             'body' => $data['body'] ?? '',
             'metadescription' => $data['metadescription'] ?? '',
             'metakeywords' => $data['metakeywords'] ?? '',
-            'contenttype' => $data['contenttype'] ?? Content::TYPE_ARTICLE,
+            'contenttype' => $data['contenttype'] ?? Content::TYPE_USEFUL,
             'status' => $data['status'] ?? Content::STATUS_ENABLED,
             'ordinal' => $data['ordinal'] ?? 0,
             'created_at' => now(),
@@ -174,7 +173,7 @@ class AdminContentController extends BasePageController
                 'body' => $data['body'] ?? '',
                 'metadescription' => $data['metadescription'] ?? '',
                 'metakeywords' => $data['metakeywords'] ?? '',
-                'contenttype' => $data['contenttype'] ?? Content::TYPE_ARTICLE,
+                'contenttype' => $data['contenttype'] ?? Content::TYPE_USEFUL,
                 'status' => $data['status'] ?? Content::STATUS_ENABLED,
                 'ordinal' => $data['ordinal'] ?? 0,
                 'updated_at' => now(),

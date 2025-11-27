@@ -44,7 +44,6 @@ class Content extends Model
 {
     // Content type constants
     public const TYPE_USEFUL = 1;
-    public const TYPE_ARTICLE = 2;
     public const TYPE_INDEX = 3;
 
     // Status constants
@@ -136,7 +135,6 @@ class Content extends Model
     {
         return match ($this->contenttype) {
             self::TYPE_USEFUL => 'Useful Link',
-            self::TYPE_ARTICLE => 'Article',
             self::TYPE_INDEX => 'Homepage',
             default => 'Unknown',
         };
