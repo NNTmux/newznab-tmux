@@ -200,6 +200,7 @@ Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
     Route::post('role-delete', [AdminRoleController::class, 'destroy'])->name('admin.role-delete');
     Route::get('content-list', [AdminContentController::class, 'index'])->name('admin.content-list');
     Route::match(['GET', 'POST'], 'content-add', [AdminContentController::class, 'create'])->name('admin.content-add');
+    Route::post('content-toggle-status', [AdminContentController::class, 'toggleStatus'])->name('admin.content-toggle-status');
     Route::post('content-delete', [AdminContentController::class, 'destroy'])->name('admin.content-delete');
     Route::get('category_regexes-list', [AdminCategoryRegexesController::class, 'index'])->name('admin.category-regexes-list');
     Route::match(['GET', 'POST'], 'category_regexes-edit', [AdminCategoryRegexesController::class, 'edit'])->name('admin.category-regexes-edit');

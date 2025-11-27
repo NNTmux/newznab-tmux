@@ -115,6 +115,35 @@ class AdminContentController extends BasePageController
     }
 
     /**
+     * Toggle content status (enable/disable).
+     */
+    public function toggleStatus(Request $request)
+    {
+        if ($request->has('id')) {
+            $content = Content::query()->find($request->input('id'));
+
+            if ($content) {
+                $newStatus = $content->status === Content::STATUS_ENABLED
+                    ? Content::STATUS_DISABLED
+                    : Content::STATUS_ENABLED;
+
+                $content->update(['status' => $newStatus, 'updated_at' => now()]);
+
+                return response()->json([
+                    'success' => true,
+                    'status' => $newStatus,
+                    'message' => $newStatus === Content::STATUS_ENABLED ? 'Content enabled' : 'Content disabled'
+                ]);
+            }
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Content not found'
+        ], 404);
+    }
+
+    /**
      * Delete content by ID.
      */
     public function destroy(Request $request): \Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application

@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initTinyMCE();
     initAdminSpecificFeatures();
     initRecentActivityRefresh();
+    initContentToggle();
 
     // Initialize page-specific functionality from inline scripts
     initMyMovies();
@@ -4725,6 +4726,100 @@ function initQualityFilter() {
             this.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
 
             applyFilters();
+        });
+    });
+}
+
+// Admin Content List - Toggle Enable/Disable
+function initContentToggle() {
+    document.addEventListener('click', function(e) {
+        const toggleBtn = e.target.closest('.content-toggle-status');
+        if (!toggleBtn) return;
+
+        e.preventDefault();
+        const contentId = toggleBtn.getAttribute('data-content-id');
+        const currentStatus = parseInt(toggleBtn.getAttribute('data-current-status'));
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+        if (!contentId || !csrfToken) {
+            if (typeof showToast === 'function') {
+                showToast('Error: Missing required data', 'error');
+            }
+            return;
+        }
+
+        // Disable button during request
+        toggleBtn.disabled = true;
+        toggleBtn.style.opacity = '0.6';
+
+        fetch('/admin/content-toggle-status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ id: contentId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const newStatus = data.status;
+                const row = toggleBtn.closest('tr');
+
+                // Find the status cell (6th td in the row - 0-indexed = 5)
+                const statusCell = row.cells[5];
+
+                // Update the status badge
+                if (newStatus === 1) {
+                    statusCell.innerHTML = `
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100">
+                            <i class="fa fa-check mr-1"></i>Enabled
+                        </span>
+                    `;
+                } else {
+                    statusCell.innerHTML = `
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100">
+                            <i class="fa fa-times mr-1"></i>Disabled
+                        </span>
+                    `;
+                }
+
+                // Update the toggle button itself
+                toggleBtn.setAttribute('data-current-status', newStatus);
+                toggleBtn.title = newStatus === 1 ? 'Disable' : 'Enable';
+
+                // Update button color classes
+                if (newStatus === 1) {
+                    toggleBtn.className = 'content-toggle-status text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300';
+                    toggleBtn.innerHTML = '<i class="fa fa-toggle-on"></i>';
+                } else {
+                    toggleBtn.className = 'content-toggle-status text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300';
+                    toggleBtn.innerHTML = '<i class="fa fa-toggle-off"></i>';
+                }
+
+                // Re-enable button
+                toggleBtn.disabled = false;
+                toggleBtn.style.opacity = '1';
+
+                if (typeof showToast === 'function') {
+                    showToast(data.message, 'success');
+                }
+            } else {
+                if (typeof showToast === 'function') {
+                    showToast(data.message || 'Failed to toggle content status', 'error');
+                }
+                toggleBtn.disabled = false;
+                toggleBtn.style.opacity = '1';
+            }
+        })
+        .catch(error => {
+            console.error('Error toggling content status:', error);
+            if (typeof showToast === 'function') {
+                showToast('An error occurred while toggling content status', 'error');
+            }
+            toggleBtn.disabled = false;
+            toggleBtn.style.opacity = '1';
         });
     });
 }

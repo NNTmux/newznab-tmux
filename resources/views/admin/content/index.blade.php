@@ -94,10 +94,17 @@
                                            title="Edit">
                                             <i class="fa fa-edit"></i>
                                         </a>
+                                        <button type="button"
+                                                class="content-toggle-status text-{{ $item->status == 1 ? 'green' : 'gray' }}-600 dark:text-{{ $item->status == 1 ? 'green' : 'gray' }}-400 hover:text-{{ $item->status == 1 ? 'green' : 'gray' }}-900 dark:hover:text-{{ $item->status == 1 ? 'green' : 'gray' }}-300"
+                                                data-content-id="{{ $item->id }}"
+                                                data-current-status="{{ $item->status }}"
+                                                title="{{ $item->status == 1 ? 'Disable' : 'Enable' }}">
+                                            <i class="fa fa-toggle-{{ $item->status == 1 ? 'on' : 'off' }}"></i>
+                                        </button>
                                         <a href="{{ url('admin/content-delete?id=' . $item->id) }}"
                                            class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                                            title="Delete"
-                                           onclick="return confirm('Are you sure you want to delete \'{{ $item->title }}\'?')">
+                                           data-confirm-delete>
                                             <i class="fa fa-trash"></i>
                                         </a>
                                     </div>
