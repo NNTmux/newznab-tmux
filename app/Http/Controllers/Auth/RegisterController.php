@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\RegisterRegisterRequest;
 use App\Models\Invitation;
 use App\Models\Settings;
 use App\Models\User;
+use App\Rules\ValidEmailDomain;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -127,7 +128,7 @@ class RegisterController extends Controller
 
         $validator = Validator::make($request->all(), [
             'username' => ['required', 'string', 'min:5', 'max:255', 'unique:users'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'indisposable'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'indisposable', new ValidEmailDomain()],
             'password' => ['required', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
         ], [
             'password.min' => 'The password must be at least 8 characters.',

@@ -10,12 +10,12 @@ return [
     | The source URL yielding a list of disposable email domains. Change this
     | to whatever source you like. Just make sure it returns a JSON array.
     |
-    | A sensible default is provided using Rawgit's services. Rawgit is
-    | a free service, so there are no uptime or support guarantees.
+    | Updated to use the actively maintained disposable-email-domains repository
+    | from GitHub's raw content URL.
     |
     */
 
-    'source' => 'https://rawgit.com/andreis/disposable-email-domains/master/domains.json',
+    'source' => 'https://raw.githubusercontent.com/disposable-email-domains/disposable-email-domains/master/disposable_email_blocklist.conf',
 
     /*
     |--------------------------------------------------------------------------

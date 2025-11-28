@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Jobs\SendAccountExpiredEmail;
 use App\Jobs\SendAccountWillExpireEmail;
+use App\Rules\ValidEmailDomain;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -562,7 +563,7 @@ class User extends Authenticatable
         if ($validate) {
             $validator = Validator::make($user, [
                 'username' => ['required', 'string', 'min:5', 'max:255', 'unique:users'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'indisposable'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'indisposable', new ValidEmailDomain()],
                 'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],
             ]);
 
