@@ -563,7 +563,7 @@ class User extends Authenticatable
         if ($validate) {
             $validator = Validator::make($user, [
                 'username' => ['required', 'string', 'min:5', 'max:255', 'unique:users'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'indisposable', new ValidEmailDomain()],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users', new ValidEmailDomain()],
                 'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],
             ]);
 

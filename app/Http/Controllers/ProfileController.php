@@ -132,7 +132,7 @@ class ProfileController extends BasePageController
                 return redirect()->to('profileedit');
             case 'submit':
                 $validator = Validator::make($request->all(), [
-                    'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users,email,'.$userid, 'indisposable', new ValidEmailDomain()],
+                    'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users,email,'.$userid, new ValidEmailDomain()],
                     'password' => ['nullable', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],
                 ]);
 

@@ -128,7 +128,7 @@ class RegisterController extends Controller
 
         $validator = Validator::make($request->all(), [
             'username' => ['required', 'string', 'min:5', 'max:255', 'unique:users'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users', 'indisposable', new ValidEmailDomain()],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users', new ValidEmailDomain()],
             'password' => ['required', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
         ], [
             'password.min' => 'The password must be at least 8 characters.',
