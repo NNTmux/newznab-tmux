@@ -28,7 +28,7 @@ use App\Http\Controllers\Admin\AdminMovieController;
 use App\Http\Controllers\Admin\AdminMusicController;
 use App\Http\Controllers\Admin\AdminPageController;
 use App\Http\Controllers\Admin\AdminPredbController;
-use App\Http\Controllers\Admin\AdminReleaseNamingRegexesController;
+use App\Http\Controllers\Admin\AdminPromotionController;
 use App\Http\Controllers\Admin\AdminReleasesController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\AdminShowsController;
@@ -199,16 +199,18 @@ Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
     Route::match(['GET', 'POST'], 'role-edit', [AdminRoleController::class, 'edit'])->name('admin.role-edit');
     Route::post('role-delete', [AdminRoleController::class, 'destroy'])->name('admin.role-delete');
     Route::get('content-list', [AdminContentController::class, 'index'])->name('admin.content-list');
-    Route::match(['GET', 'POST'], 'content-add', [AdminContentController::class, 'create'])->name('admin.content-add');
-    Route::post('content-toggle-status', [AdminContentController::class, 'toggleStatus'])->name('admin.content-toggle-status');
-    Route::post('content-delete', [AdminContentController::class, 'destroy'])->name('admin.content-delete');
-    Route::get('category_regexes-list', [AdminCategoryRegexesController::class, 'index'])->name('admin.category-regexes-list');
-    Route::match(['GET', 'POST'], 'category_regexes-edit', [AdminCategoryRegexesController::class, 'edit'])->name('admin.category-regexes-edit');
-    Route::get('collection_regexes-list', [AdminCollectionRegexesController::class, 'index'])->name('admin.collection-regexes-list');
-    Route::match(['GET', 'POST'], 'collection_regexes-edit', [AdminCollectionRegexesController::class, 'edit'])->name('admin.collection-regexes-edit');
-    Route::post('collection_regexes-test', [AdminCollectionRegexesController::class, 'testRegex'])->name('admin.collection-regexes-test');
-    Route::get('release_naming_regexes-list', [AdminReleaseNamingRegexesController::class, 'index'])->name('admin.release-naming-regexes-list');
-    Route::match(['GET', 'POST'], 'release_naming_regexes-edit', [AdminReleaseNamingRegexesController::class, 'edit'])->name('admin.release-naming-regexes-edit');
+
+    // Promotion routes
+    Route::get('promotions', [AdminPromotionController::class, 'index'])->name('admin.promotions.index');
+    Route::get('promotions/statistics', [AdminPromotionController::class, 'statistics'])->name('admin.promotions.statistics');
+    Route::get('promotions/create', [AdminPromotionController::class, 'create'])->name('admin.promotions.create');
+    Route::post('promotions', [AdminPromotionController::class, 'store'])->name('admin.promotions.store');
+    Route::get('promotions/{id}/edit', [AdminPromotionController::class, 'edit'])->name('admin.promotions.edit');
+    Route::get('promotions/{id}/statistics', [AdminPromotionController::class, 'showStatistics'])->name('admin.promotions.show-statistics');
+    Route::put('promotions/{id}', [AdminPromotionController::class, 'update'])->name('admin.promotions.update');
+    Route::delete('promotions/{id}', [AdminPromotionController::class, 'destroy'])->name('admin.promotions.destroy');
+    Route::get('promotions/{id}/toggle', [AdminPromotionController::class, 'toggle'])->name('admin.promotions.toggle');
+
     Route::post('release_naming_regexes-test', [AdminReleaseNamingRegexesController::class, 'testRegex'])->name('admin.release-naming-regexes-test');
     Route::post('ajax', [AdminAjaxController::class, 'ajaxAction'])->name('admin.ajax');
     Route::match(['GET', 'POST'], 'tmux-edit', [AdminTmuxController::class, 'edit'])->name('admin.tmux-edit');

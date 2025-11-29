@@ -24,6 +24,8 @@ Schedule::command('disposable:update')->weekly();
 Schedule::command('clean:directories')->hourly()->withoutOverlapping();
 Schedule::command('nntmux:delete-unverified-users')->twiceDaily(1, 13);
 Schedule::command('nntmux:update-expired-roles')->daily();
+// Automatically disable promotions that have passed their end_date
+Schedule::command('nntmux:disable-expired-promotions')->daily();
 Schedule::command('nntmux:remove-bad')->hourly()->withoutOverlapping();
 Schedule::command('telescope:prune')->daily();
 Schedule::command('horizon:snapshot')->everyFiveMinutes()->withoutOverlapping();

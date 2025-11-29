@@ -44,7 +44,7 @@ function updateAllThemeUI(themePreference) {
     // Update ALL theme selector radio buttons (user area profile edit page)
     // Use a flag to prevent event loops when programmatically updating
     window._updatingThemeUI = true;
-    
+
     const allThemeRadios = document.querySelectorAll('input[name="theme_preference"]');
     let updatedCount = 0;
     allThemeRadios.forEach(radio => {
@@ -56,7 +56,7 @@ function updateAllThemeUI(themePreference) {
             radio.checked = false;
         }
     });
-    
+
     if (updatedCount > 0) {
         console.log(`Updated ${updatedCount} theme radio button(s) to ${themePreference}`);
     }
@@ -111,7 +111,7 @@ function updateAllThemeUI(themePreference) {
     if (metaTheme) {
         metaTheme.content = themePreference;
     }
-    
+
     // Clear the flag after a short delay to allow all updates to complete
     setTimeout(() => {
         window._updatingThemeUI = false;
@@ -148,8 +148,8 @@ function saveThemePreference(themePreference) {
                   }
                   updateAllThemeUI(themePreference);
                   // Dispatch custom event for theme change
-                  document.dispatchEvent(new CustomEvent('themeChanged', { 
-                      detail: { theme: themePreference } 
+                  document.dispatchEvent(new CustomEvent('themeChanged', {
+                      detail: { theme: themePreference }
                   }));
                   return data;
               } else {
@@ -164,8 +164,8 @@ function saveThemePreference(themePreference) {
         // Save to localStorage for guests
         localStorage.setItem('theme', themePreference);
         updateAllThemeUI(themePreference);
-        document.dispatchEvent(new CustomEvent('themeChanged', { 
-            detail: { theme: themePreference } 
+        document.dispatchEvent(new CustomEvent('themeChanged', {
+            detail: { theme: themePreference }
         }));
         return Promise.resolve({ success: true });
     }
@@ -208,7 +208,7 @@ function initThemeSystem() {
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize theme system first
     initThemeSystem();
-    
+
     initEventDelegation();
     initToastNotifications();
     initNfoModal();
@@ -493,6 +493,50 @@ function initEventDelegation() {
                     form.action = `/admin/deleted-users/permanent-delete/${userId}`;
                     form.method = 'POST';
                     form.submit();
+                }
+            });
+            return;
+        }
+
+        // Handle promotion toggle (activate/deactivate)
+        const promotionToggleBtn = e.target.closest('.promotion-toggle-btn');
+        if (promotionToggleBtn) {
+            e.preventDefault();
+            const promotionName = promotionToggleBtn.getAttribute('data-promotion-name');
+            const isActive = promotionToggleBtn.getAttribute('data-promotion-active') === '1';
+            const action = isActive ? 'deactivate' : 'activate';
+
+            showConfirm({
+                title: `${action.charAt(0).toUpperCase() + action.slice(1)} Promotion`,
+                message: `Are you sure you want to ${action} the promotion "${promotionName}"?`,
+                type: isActive ? 'warning' : 'success',
+                confirmText: action.charAt(0).toUpperCase() + action.slice(1),
+                cancelText: 'Cancel',
+                onConfirm: function() {
+                    window.location.href = promotionToggleBtn.href;
+                }
+            });
+            return;
+        }
+
+        // Handle promotion delete
+        const promotionDeleteBtn = e.target.closest('.promotion-delete-btn');
+        if (promotionDeleteBtn) {
+            e.preventDefault();
+            const promotionName = promotionDeleteBtn.getAttribute('data-promotion-name');
+            const form = promotionDeleteBtn.closest('form');
+
+            showConfirm({
+                title: 'Delete Promotion',
+                message: `Are you sure you want to delete the promotion "${promotionName}"?`,
+                details: 'This action cannot be undone.',
+                type: 'danger',
+                confirmText: 'Delete',
+                cancelText: 'Cancel',
+                onConfirm: function() {
+                    if (form) {
+                        form.submit();
+                    }
                 }
             });
             return;
@@ -2669,14 +2713,14 @@ function initProfileEdit() {
 
     // Theme preference instant preview (user area - profile edit page)
     const allThemeRadios = document.querySelectorAll('input[name="theme_preference"]');
-    
+
     allThemeRadios.forEach(radio => {
         // Skip if event listener already attached (prevent duplicates)
         if (radio.dataset.themeListenerAttached === 'true') {
             return;
         }
         radio.dataset.themeListenerAttached = 'true';
-        
+
         radio.addEventListener('change', function() {
             // Prevent event loop if we're programmatically updating
             if (window._updatingThemeUI) {
@@ -4414,9 +4458,9 @@ function initThemeManagement() {
     // Dark mode toggle (user area - only if not already handled by admin)
     const themeToggle = document.getElementById('theme-toggle');
     // Check if this is admin area by looking for admin-specific elements
-    const isAdminArea = document.querySelector('aside.bg-gray-900.dark\\:bg-gray-950') && 
+    const isAdminArea = document.querySelector('aside.bg-gray-900.dark\\:bg-gray-950') &&
                         document.querySelector('a[href*="admin"]');
-    
+
     if (themeToggle && !isAdminArea) {
         // Only handle if not in admin area (admin has its own handler in initAdminMenu)
         themeToggle.addEventListener('click', function() {

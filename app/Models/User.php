@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Jobs\SendAccountExpiredEmail;
 use App\Jobs\SendAccountWillExpireEmail;
 use App\Rules\ValidEmailDomain;
+use App\Services\InvitationService;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -243,6 +244,11 @@ class User extends Authenticatable
         return $this->hasMany(ReleaseComment::class, 'users_id');
     }
 
+    public function promotionStats(): HasMany
+    {
+        return $this->hasMany(RolePromotionStat::class);
+    }
+
     /**
      * Get the user's timezone or default to UTC
      */
@@ -342,7 +348,7 @@ class User extends Authenticatable
         return self::whereEmail($email)->first();
     }
 
-    public static function updateUserRole(int $uid, int|string $role): bool
+    public static function updateUserRole(int $uid, int|string $role, bool $applyPromotions = true): bool
     {
         if (is_int($role)) {
             $roleQuery = Role::query()->where('id', $role)->first();
@@ -352,23 +358,23 @@ class User extends Authenticatable
         $roleName = $roleQuery->name;
 
         $user = self::find($uid);
-        $user->syncRoles([$roleName]);
+        $currentRoleId = $user->roles_id;
 
-        return self::find($uid)->update(['roles_id' => $roleQuery->id]);
-    }
+        $updated = self::find($uid)->update(['roles_id' => $roleQuery->id]);
 
-    public static function updateUserRoleChangeDate(int $uid, $date = '', int $addYear = 0): void
-    {
-        $user = self::find($uid);
-        $currRoleExp = $user->rolechangedate ?? now()->toDateTimeString();
-        if (! empty($date)) {
-            $user->update(['rolechangedate' => $date]);
+        // Apply promotions if enabled and role is being upgraded
+        if ($applyPromotions && $updated && $currentRoleId !== $roleQuery->id) {
+            $additionalDays = RolePromotion::calculateAdditionalDays($currentRoleId, $roleQuery->id);
+
+            if ($additionalDays > 0) {
+                $currentExpiry = $user->rolechangedate ? Carbon::parse($user->rolechangedate) : Carbon::now();
+                $newExpiry = $currentExpiry->addDays($additionalDays);
+                $user->update(['rolechangedate' => $newExpiry]);
+            }
         }
-        if (empty($date) && ! empty($addYear)) {
-            $user->update(['rolechangedate' => Carbon::createFromDate($currRoleExp)->addYears($addYear)]);
-        }
-    }
 
+        return $updated;
+    }
     public static function updateExpiredRoles(): void
     {
         $now = CarbonImmutable::now();

@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\RolePromotion;
 use App\Models\User;
+use App\Observers\RolePromotionObserver;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Event;
@@ -26,6 +28,9 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole('Admin');
         });
         Event::listen(Login::class, LoginViaRemember::class);
+
+        // Register observers
+        RolePromotion::observe(RolePromotionObserver::class);
     }
 
     /**
