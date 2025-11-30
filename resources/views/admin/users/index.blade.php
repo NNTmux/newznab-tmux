@@ -147,6 +147,9 @@
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <i class="fa fa-layer-group mr-1"></i>Pending Role
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 <a href="{{ url('admin/user-list?' . http_build_query(array_merge(request()->except('ob'), ['ob' => request('ob') === 'rolechangedate_asc' ? 'rolechangedate_desc' : 'rolechangedate_asc']))) }}" class="group inline-flex items-center hover:text-gray-700 dark:hover:text-gray-200">
                                     Role Expiry
                                     @if(request('ob') === 'rolechangedate_asc')
@@ -209,6 +212,24 @@
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                                         {{ $user->roles->first()->name ?? 'N/A' }}
                                     </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if(!empty($user->pending_roles_id) && !empty($user->pending_role_start_date))
+                                        @php
+                                            $pendingRole = \Spatie\Permission\Models\Role::find($user->pending_roles_id);
+                                            $pendingStartDate = \Carbon\Carbon::parse($user->pending_role_start_date);
+                                        @endphp
+                                        <div class="flex flex-col gap-1">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 w-fit">
+                                                <i class="fa fa-layer-group mr-1"></i>{{ $pendingRole->name ?? 'Unknown' }}
+                                            </span>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                <i class="fa fa-clock mr-1"></i>{{ $pendingStartDate->diffForHumans() }}
+                                            </span>
+                                        </div>
+                                    @else
+                                        <span class="text-gray-400 dark:text-gray-500 text-xs">—</span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                                     @if($user->rolechangedate)

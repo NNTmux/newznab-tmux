@@ -163,23 +163,62 @@ class AdminUserController extends BasePageController
                     $ret = User::signUp($request->input('username'), $request->input('password'), $request->input('email'), '', $request->input('notes'), $invites, '', true, $request->input('role'), false);
                 } else {
                     $editedUser = User::find($request->input('id'));
-                    // Use the current grabs value since it's read-only
-                    $ret = User::updateUser($editedUser->id, $request->input('username'), $request->input('email'), $editedUser->grabs, $request->input('role'), $request->input('notes'), $request->input('invites'), ($request->has('movieview') ? 1 : 0), ($request->has('musicview') ? 1 : 0), ($request->has('gameview') ? 1 : 0), ($request->has('xxxview') ? 1 : 0), ($request->has('consoleview') ? 1 : 0), ($request->has('bookview') ? 1 : 0));
-                    if ($request->input('password') !== null) {
-                        User::updatePassword($editedUser->id, $request->input('password'));
+
+                    // Check if role is changing and get stack preference
+                    $roleChanged = $editedUser->roles_id != $request->input('role');
+                    $stackRole = $request->input('stack_role') ? true : false; // Check if checkbox is checked
+                    $changedBy = auth()->check() ? auth()->id() : null;
+
+                    // Handle pending role cancellation
+                    if ($request->has('cancel_pending_role') && $request->input('cancel_pending_role')) {
+                        $editedUser->cancelPendingRole();
                     }
-                    // Handle rolechangedate - update if has value, clear if empty
+
+                    // Handle rolechangedate - BEFORE role change to ensure expiry is cleared if needed
                     if ($request->has('rolechangedate')) {
                         $roleChangeDate = $request->input('rolechangedate');
                         if (! empty($roleChangeDate)) {
                             User::updateUserRoleChangeDate($editedUser->id, $roleChangeDate);
+                            $editedUser->refresh();
                         } else {
                             // Clear the rolechangedate if empty string is provided
                             $editedUser->update(['rolechangedate' => null]);
+                            $editedUser->refresh();
                         }
                     }
-                    if ($request->input('role') !== null) {
+
+                    // If role is changing, handle it with stacking logic
+                    if ($roleChanged && $request->input('role') !== null) {
+                        User::updateUserRole(
+                            $editedUser->id,
+                            (int) $request->input('role'), // Cast to integer
+                            true, // Apply promotions
+                            $stackRole, // Stack role if requested
+                            $changedBy
+                        );
                         $editedUser->refresh();
+                    }
+
+                    // Update user basic information (but NOT the role - it's handled above)
+                    // Use current role to avoid overwriting
+                    $ret = User::updateUser(
+                        $editedUser->id,
+                        $request->input('username'),
+                        $request->input('email'),
+                        $editedUser->grabs,
+                        $editedUser->roles_id, // Use current role, not the request role
+                        $request->input('notes'),
+                        $request->input('invites'),
+                        ($request->has('movieview') ? 1 : 0),
+                        ($request->has('musicview') ? 1 : 0),
+                        ($request->has('gameview') ? 1 : 0),
+                        ($request->has('xxxview') ? 1 : 0),
+                        ($request->has('consoleview') ? 1 : 0),
+                        ($request->has('bookview') ? 1 : 0)
+                    );
+
+                    if ($request->input('password') !== null) {
+                        User::updatePassword($editedUser->id, $request->input('password'));
                     }
                 }
 

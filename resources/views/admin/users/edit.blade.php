@@ -75,6 +75,15 @@
                     <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Role <span class="text-red-500">*</span>
                     </label>
+                    @if(!is_array($user) && !empty($user->pending_roles_id))
+                        @php
+                            $pendingRole = \Spatie\Permission\Models\Role::find($user->pending_roles_id);
+                        @endphp
+                        <div class="mb-2 p-2 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 rounded text-sm text-blue-800 dark:text-blue-200 flex items-center">
+                            <i class="fa fa-info-circle mr-2"></i>
+                            <span><strong>Note:</strong> This user has a pending role change to <strong>{{ $pendingRole->name ?? 'Unknown' }}</strong></span>
+                        </div>
+                    @endif
                     <select id="role"
                             name="role"
                             required
@@ -134,7 +143,7 @@
                             <select id="expiry_year"
                                     class="w-full px-2 py-3 text-lg font-semibold bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500">
                                 <option value="">--</option>
-                                @for($y = date('Y'); $y <= date('Y') + 5; $y++)
+                                @for($y = date('Y'); $y <= date('Y') + 20; $y++)
                                     <option value="{{ $y }}">{{ $y }}</option>
                                 @endfor
                             </select>
@@ -290,6 +299,73 @@
                         </p>
                     @endif
                 </div>
+
+                <!-- Pending Role Information -->
+                @if(!is_array($user) && !empty($user->pending_roles_id) && !empty($user->pending_role_start_date))
+                    <div class="border-2 border-blue-300 dark:border-blue-600 rounded-lg p-4 bg-gradient-to-br from-blue-50 via-blue-50 to-white dark:from-blue-900/30 dark:via-blue-900/20 dark:to-gray-800 shadow-md">
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="text-sm font-semibold text-blue-700 dark:text-blue-300 flex items-center">
+                                <i class="fa fa-layer-group mr-2 text-lg"></i>
+                                Pending Stacked Role
+                            </label>
+                            <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-bold rounded-full bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-100 animate-pulse">
+                                <i class="fa fa-clock mr-1"></i> SCHEDULED
+                            </span>
+                        </div>
+
+                        @php
+                            $pendingRole = \Spatie\Permission\Models\Role::find($user->pending_roles_id);
+                            $pendingStartDate = \Carbon\Carbon::parse($user->pending_role_start_date);
+                            $daysUntilActivation = $pendingStartDate->diffInDays(now());
+                        @endphp
+
+                        <div class="bg-white dark:bg-gray-700 rounded-md p-3 mb-3 border border-blue-200 dark:border-blue-700">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-medium text-gray-600 dark:text-gray-300">Will change to:</span>
+                                <span class="text-sm font-bold text-blue-700 dark:text-blue-300">{{ $pendingRole->name ?? 'Unknown' }}</span>
+                            </div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-medium text-gray-600 dark:text-gray-300">Activation date:</span>
+                                <span class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ $pendingStartDate->format('M j, Y g:i A') }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-600 dark:text-gray-400">Time until activation:</span>
+                                <span class="text-sm font-semibold text-blue-600 dark:text-blue-400">{{ $pendingStartDate->diffForHumans() }}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <p class="text-xs text-blue-700 dark:text-blue-300">
+                                <i class="fa fa-info-circle mr-1"></i>
+                                This role will automatically activate when the current role expires
+                            </p>
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" name="cancel_pending_role" value="1"
+                                       class="rounded border-gray-300 dark:border-gray-600 text-red-600 shadow-sm focus:ring-red-500 dark:focus:ring-red-400">
+                                <span class="ml-2 text-xs text-red-600 dark:text-red-400 font-medium">Cancel pending role</span>
+                            </label>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Role Stacking Option -->
+                @if(!is_array($user) && !empty($user->rolechangedate) && \Carbon\Carbon::parse($user->rolechangedate)->isFuture())
+                    <div class="border border-purple-300 dark:border-purple-600 rounded-lg p-4 bg-gradient-to-br from-purple-50 via-purple-50 to-white dark:from-gray-800 dark:via-gray-800 dark:to-gray-700 shadow-sm">
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="checkbox" name="stack_role" value="1" checked
+                                   class="rounded border-gray-300 dark:border-gray-500 text-purple-600 dark:text-purple-500 shadow-sm focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-purple-500 dark:focus:border-purple-400 bg-white dark:bg-gray-700">
+                            <div class="ml-3 flex-1">
+                                <span class="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors">
+                                    <i class="fa fa-layer-group mr-1 text-purple-600 dark:text-purple-400"></i>
+                                    Stack role changes
+                                </span>
+                                <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                                    When enabled, role changes will be queued to start after the current role expires. Uncheck to apply immediately.
+                                </p>
+                            </div>
+                        </label>
+                    </div>
+                @endif
 
                 @if(!empty($user['id']))
                     <!-- Grabs -->

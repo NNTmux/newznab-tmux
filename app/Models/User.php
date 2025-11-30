@@ -70,12 +70,14 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $cp_api
  * @property string|null $style
  * @property string|null $rolechangedate When does the role expire
+ * @property string|null $pending_role_start_date When the pending role change takes effect
+ * @property int|null $pending_roles_id The role that will be applied after current role expires
  * @property string|null $remember_token
  * @property-read Collection|\App\Models\ReleaseComment[] $comment
  * @property-read Collection|\App\Models\UserDownload[] $download
  * @property-read Collection|\App\Models\DnzbFailure[] $failedRelease
  * @property-read Collection|\App\Models\Invitation[] $invitation
- * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\NotififupdateUsertcations\DatabaseNotification[] $notifications
  * @property-read Collection|\App\Models\UsersRelease[] $release
  * @property-read Collection|\App\Models\UserRequest[] $request
  * @property-read Collection|\App\Models\UserSerie[] $series
@@ -249,6 +251,68 @@ class User extends Authenticatable
         return $this->hasMany(RolePromotionStat::class);
     }
 
+    public function roleHistory(): HasMany
+    {
+        return $this->hasMany(UserRoleHistory::class);
+    }
+
+    /**
+     * Check if user has a pending stacked role
+     */
+    public function hasPendingRole(): bool
+    {
+        return $this->pending_roles_id !== null && $this->pending_role_start_date !== null;
+    }
+
+    /**
+     * Get the pending role details
+     */
+    public function getPendingRole(): ?Role
+    {
+        if (!$this->hasPendingRole()) {
+            return null;
+        }
+
+        return Role::find($this->pending_roles_id);
+    }
+
+    /**
+     * Cancel a pending stacked role
+     */
+    public function cancelPendingRole(): bool
+    {
+        if (!$this->hasPendingRole()) {
+            return false;
+        }
+
+        return $this->update([
+            'pending_roles_id' => null,
+            'pending_role_start_date' => null,
+        ]);
+    }
+
+    /**
+     * Get role expiry information including pending roles
+     */
+    public function getRoleExpiryInfo(): array
+    {
+        $currentRole = $this->role;
+        $currentExpiry = $this->rolechangedate ? Carbon::parse($this->rolechangedate) : null;
+        $pendingRole = $this->getPendingRole();
+        $pendingStart = $this->pending_role_start_date ? Carbon::parse($this->pending_role_start_date) : null;
+
+        return [
+            'current_role' => $currentRole,
+            'current_expiry' => $currentExpiry,
+            'has_expiry' => $currentExpiry !== null,
+            'is_expired' => $currentExpiry ? $currentExpiry->isPast() : false,
+            'days_until_expiry' => $currentExpiry ? Carbon::now()->diffInDays($currentExpiry, false) : null,
+            'pending_role' => $pendingRole,
+            'pending_start' => $pendingStart,
+            'has_pending_role' => $this->hasPendingRole(),
+        ];
+    }
+
     /**
      * Get the user's timezone or default to UTC
      */
@@ -348,28 +412,152 @@ class User extends Authenticatable
         return self::whereEmail($email)->first();
     }
 
-    public static function updateUserRole(int $uid, int|string $role, bool $applyPromotions = true): bool
+    public static function updateUserRole(int $uid, int|string $role, bool $applyPromotions = true, bool $stackRole = true, ?int $changedBy = null): bool
     {
-        if (is_int($role)) {
-            $roleQuery = Role::query()->where('id', $role)->first();
+        \Log::info('updateUserRole called', [
+            'uid' => $uid,
+            'role' => $role,
+            'role_type' => gettype($role),
+            'applyPromotions' => $applyPromotions,
+            'stackRole' => $stackRole,
+            'changedBy' => $changedBy
+        ]);
+
+        // Handle role parameter - can be int, numeric string, or role name
+        if (is_numeric($role)) {
+            // It's a number (either int or numeric string)
+            $roleQuery = Role::query()->where('id', (int) $role)->first();
         } else {
+            // It's a role name
             $roleQuery = Role::query()->where('name', $role)->first();
         }
+
+        if (!$roleQuery) {
+            \Log::error('Role not found', ['role' => $role, 'role_type' => gettype($role)]);
+            return false;
+        }
+
+        \Log::info('Role found', ['role_id' => $roleQuery->id, 'role_name' => $roleQuery->name]);
+
         $roleName = $roleQuery->name;
-
         $user = self::find($uid);
+
+        if (!$user) {
+            \Log::error('User not found', ['uid' => $uid]);
+            return false;
+        }
+
         $currentRoleId = $user->roles_id;
+        $oldExpiryDate = $user->rolechangedate ? Carbon::parse($user->rolechangedate) : null;
 
-        $updated = self::find($uid)->update(['roles_id' => $roleQuery->id]);
+        \Log::info('User current state', [
+            'currentRoleId' => $currentRoleId,
+            'oldExpiryDate' => $oldExpiryDate?->toDateTimeString(),
+            'oldExpiryIsFuture' => $oldExpiryDate?->isFuture()
+        ]);
 
-        // Apply promotions if enabled and role is being upgraded
-        if ($applyPromotions && $updated && $currentRoleId !== $roleQuery->id) {
-            $additionalDays = RolePromotion::calculateAdditionalDays($currentRoleId, $roleQuery->id);
+        // Check if role is actually changing
+        if ($currentRoleId === $roleQuery->id) {
+            \Log::info('Role not changing, returning');
+            return true; // No change needed
+        }
 
-            if ($additionalDays > 0) {
-                $currentExpiry = $user->rolechangedate ? Carbon::parse($user->rolechangedate) : Carbon::now();
-                $newExpiry = $currentExpiry->addDays($additionalDays);
-                $user->update(['rolechangedate' => $newExpiry]);
+        // Determine if we should stack this role change
+        $shouldStack = $stackRole && $oldExpiryDate && $oldExpiryDate->isFuture();
+
+        \Log::info('Stack decision', [
+            'shouldStack' => $shouldStack,
+            'stackRole' => $stackRole,
+            'hasOldExpiry' => $oldExpiryDate !== null,
+            'isFuture' => $oldExpiryDate?->isFuture()
+        ]);
+
+        if ($shouldStack) {
+            \Log::info('Stacking role change');
+
+            // Stack the role change - set it as pending
+            $user->update([
+                'pending_roles_id' => $roleQuery->id,
+                'pending_role_start_date' => $oldExpiryDate,
+            ]);
+
+            \Log::info('Pending role updated', [
+                'pending_roles_id' => $roleQuery->id,
+                'pending_role_start_date' => $oldExpiryDate->toDateTimeString()
+            ]);
+
+            // Record in history as a stacked change
+            try {
+                $history = UserRoleHistory::recordRoleChange(
+                    userId: $user->id,
+                    oldRoleId: $currentRoleId,
+                    newRoleId: $roleQuery->id,
+                    oldExpiryDate: $oldExpiryDate,
+                    newExpiryDate: null, // Will be determined when activated
+                    effectiveDate: $oldExpiryDate,
+                    isStacked: true,
+                    changeReason: 'stacked_role_change',
+                    changedBy: $changedBy
+                );
+
+                \Log::info('Role history recorded', ['history_id' => $history->id]);
+            } catch (\Exception $e) {
+                \Log::error('Failed to record role history', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+            }
+
+            return true;
+        }
+
+        // Apply the role change immediately
+        $additionalDays = 0;
+        if ($applyPromotions) {
+            $additionalDays = RolePromotion::calculateAdditionalDays($roleQuery->id);
+        }
+
+        // Calculate new expiry date
+        $newExpiryDate = null;
+        if ($additionalDays > 0) {
+            $baseDate = $oldExpiryDate && $oldExpiryDate->isFuture() ? $oldExpiryDate : Carbon::now();
+            $newExpiryDate = $baseDate->addDays($additionalDays);
+        }
+
+        // Update the user's role
+        $updated = $user->update([
+            'roles_id' => $roleQuery->id,
+            'rolechangedate' => $newExpiryDate,
+        ]);
+
+        // Sync Spatie roles
+        $user->syncRoles([$roleName]);
+
+        // Record in history
+        if ($updated) {
+            UserRoleHistory::recordRoleChange(
+                userId: $user->id,
+                oldRoleId: $currentRoleId,
+                newRoleId: $roleQuery->id,
+                oldExpiryDate: $oldExpiryDate,
+                newExpiryDate: $newExpiryDate,
+                effectiveDate: Carbon::now(),
+                isStacked: false,
+                changeReason: 'immediate_role_change',
+                changedBy: $changedBy
+            );
+
+            // Track promotion statistics if applicable
+            if ($applyPromotions && $additionalDays > 0) {
+                $promotions = RolePromotion::getActivePromotions($roleQuery->id);
+                foreach ($promotions as $promotion) {
+                    $promotion->trackApplication(
+                        $user->id,
+                        $roleQuery->id,
+                        $oldExpiryDate,
+                        $newExpiryDate
+                    );
+                }
             }
         }
 
@@ -391,9 +579,76 @@ class User extends Authenticatable
                 SendAccountWillExpireEmail::dispatch($user, $days)->onQueue('emails');
             }
         }
+
+        // Process expired roles
         foreach (self::query()->whereDate('rolechangedate', '<', $now)->get() as $expired) {
-            $expired->update(['roles_id' => self::ROLE_USER, 'rolechangedate' => null]);
+            $oldRoleId = $expired->roles_id;
+            $oldExpiryDate = $expired->rolechangedate ? Carbon::parse($expired->rolechangedate) : null;
+
+            // Check if there's a pending stacked role
+            if ($expired->pending_roles_id && $expired->pending_role_start_date) {
+                $pendingStartDate = Carbon::parse($expired->pending_role_start_date);
+
+                // If the pending role should start now or earlier
+                if ($pendingStartDate->lte($now)) {
+                    // Apply the pending role
+                    $newRoleId = $expired->pending_roles_id;
+                    $roleQuery = Role::query()->where('id', $newRoleId)->first();
+
+                    if ($roleQuery) {
+                        // Calculate additional days from promotions
+                        $additionalDays = RolePromotion::calculateAdditionalDays($newRoleId);
+                        $newExpiryDate = $additionalDays > 0 ? $now->addDays($additionalDays) : null;
+
+                        // Update user with pending role
+                        $expired->update([
+                            'roles_id' => $newRoleId,
+                            'rolechangedate' => $newExpiryDate,
+                            'pending_roles_id' => null,
+                            'pending_role_start_date' => null,
+                        ]);
+                        $expired->syncRoles([$roleQuery->name]);
+
+                        // Record in history
+                        UserRoleHistory::recordRoleChange(
+                            userId: $expired->id,
+                            oldRoleId: $oldRoleId,
+                            newRoleId: $newRoleId,
+                            oldExpiryDate: $oldExpiryDate,
+                            newExpiryDate: $newExpiryDate,
+                            effectiveDate: Carbon::instance($now),
+                            isStacked: true,
+                            changeReason: 'stacked_role_activated',
+                            changedBy: null
+                        );
+
+                        continue; // Skip the default expiry handling
+                    }
+                }
+            }
+
+            // Default behavior: downgrade to User role
+            $expired->update([
+                'roles_id' => self::ROLE_USER,
+                'rolechangedate' => null,
+                'pending_roles_id' => null,
+                'pending_role_start_date' => null,
+            ]);
             $expired->syncRoles(['User']);
+
+            // Record in history
+            UserRoleHistory::recordRoleChange(
+                userId: $expired->id,
+                oldRoleId: $oldRoleId,
+                newRoleId: self::ROLE_USER,
+                oldExpiryDate: $oldExpiryDate,
+                newExpiryDate: null,
+                effectiveDate: Carbon::instance($now),
+                isStacked: false,
+                changeReason: 'role_expired',
+                changedBy: null
+            );
+
             SendAccountExpiredEmail::dispatch($expired)->onQueue('emails');
         }
     }
@@ -510,6 +765,13 @@ class User extends Authenticatable
     public static function updatePassword(int $id, string $password): int
     {
         self::find($id)->update(['password' => self::hashPassword($password)]);
+
+        return self::SUCCESS;
+    }
+
+    public static function updateUserRoleChangeDate(int $id, string $roleChangeDate): int
+    {
+        self::find($id)->update(['rolechangedate' => $roleChangeDate]);
 
         return self::SUCCESS;
     }

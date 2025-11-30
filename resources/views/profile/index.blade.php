@@ -139,6 +139,35 @@
                                     </div>
                                 @endif
 
+                                @if($user->hasPendingRole())
+                                    <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
+                                        <div class="w-1/3 text-gray-600">Pending Role</div>
+                                        <div class="w-2/3">
+                                            @php
+                                                $pendingRole = $user->getPendingRole();
+                                                $pendingStartDate = \Carbon\Carbon::parse($user->pending_role_start_date);
+                                            @endphp
+                                            <div class="space-y-2">
+                                                <div class="flex items-center">
+                                                    <i class="fa fa-layer-group text-blue-400 mr-2"></i>
+                                                    <span class="font-medium text-blue-600 dark:text-blue-400">{{ $pendingRole->name ?? 'Unknown' }}</span>
+                                                    <span class="ml-2 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded">
+                                                        <i class="fa fa-clock mr-1"></i>Scheduled
+                                                    </span>
+                                                </div>
+                                                <div class="text-sm text-gray-600 dark:text-gray-400">
+                                                    <i class="fa fa-calendar-alt mr-1"></i>
+                                                    Will activate {{ $pendingStartDate->diffForHumans() }} on {{ $pendingStartDate->format('M d, Y g:i A') }}
+                                                </div>
+                                                <div class="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
+                                                    <i class="fa fa-info-circle mr-1"></i>
+                                                    This role will automatically activate when your current role expires
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+
                                 <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
                                     <div class="w-1/3 text-gray-600">Last Login</div>
                                     <div class="w-2/3">{{ \Carbon\Carbon::parse($user->lastlogin)->diffForHumans() }}</div>

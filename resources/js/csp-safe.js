@@ -2323,6 +2323,12 @@ function initializeDateTimePicker() {
         if (!isNaN(date.getTime())) {
             document.getElementById('expiry_year').value = date.getFullYear().toString();
             document.getElementById('expiry_month').value = String(date.getMonth() + 1).padStart(2, '0');
+
+            // Update valid days before setting the day value
+            if (typeof updateValidDays === 'function') {
+                updateValidDays();
+            }
+
             document.getElementById('expiry_day').value = String(date.getDate()).padStart(2, '0');
             document.getElementById('expiry_hour').value = String(date.getHours()).padStart(2, '0');
             document.getElementById('expiry_minute').value = String(date.getMinutes()).padStart(2, '0');
@@ -2337,6 +2343,58 @@ function initializeDateTimePicker() {
             element.addEventListener('change', updateDateTime);
         }
     });
+
+    // Add listeners for year and month changes to update valid days
+    const yearSelect = document.getElementById('expiry_year');
+    const monthSelect = document.getElementById('expiry_month');
+    if (yearSelect && monthSelect) {
+        yearSelect.addEventListener('change', updateValidDays);
+        monthSelect.addEventListener('change', updateValidDays);
+    }
+}
+
+// Update valid days based on selected month and year
+function updateValidDays() {
+    const yearSelect = document.getElementById('expiry_year');
+    const monthSelect = document.getElementById('expiry_month');
+    const daySelect = document.getElementById('expiry_day');
+
+    if (!yearSelect || !monthSelect || !daySelect) return;
+
+    const year = parseInt(yearSelect.value);
+    const month = parseInt(monthSelect.value);
+
+    if (!year || !month) return;
+
+    // Get number of days in the selected month
+    const daysInMonth = new Date(year, month, 0).getDate();
+
+    // Store current selection
+    const currentDay = parseInt(daySelect.value);
+
+    // Clear and rebuild day options
+    daySelect.innerHTML = '<option value="">--</option>';
+
+    for (let d = 1; d <= daysInMonth; d++) {
+        const option = document.createElement('option');
+        option.value = String(d).padStart(2, '0');
+        option.textContent = d;
+        daySelect.appendChild(option);
+    }
+
+    // Restore selection if still valid
+    if (currentDay && currentDay <= daysInMonth) {
+        daySelect.value = String(currentDay).padStart(2, '0');
+    } else if (currentDay > daysInMonth) {
+        // If previously selected day is now invalid, clear it and show warning
+        daySelect.value = '';
+
+        // Flash the day selector to indicate it needs attention
+        daySelect.classList.add('border-yellow-500', 'dark:border-yellow-400', 'bg-yellow-50', 'dark:bg-yellow-900/20');
+        setTimeout(() => {
+            daySelect.classList.remove('border-yellow-500', 'dark:border-yellow-400', 'bg-yellow-50', 'dark:bg-yellow-900/20');
+        }, 1500);
+    }
 }
 
 // Setup type-to-select functionality for all dropdowns
