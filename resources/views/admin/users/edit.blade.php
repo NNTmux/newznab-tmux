@@ -108,7 +108,9 @@
                             @php
                                 $expiryDate = \Carbon\Carbon::parse($user->rolechangedate);
                                 $isExpired = $expiryDate->isPast();
-                                $daysUntilExpiry = $expiryDate->diffInDays(now());
+                                $daysUntilExpiry = abs($expiryDate->diffInDays(now()));
+                                $totalHours = abs($expiryDate->diffInHours(now()));
+                                $hoursUntilExpiry = abs($totalHours % 24);
                             @endphp
                             @if($isExpired)
                                 <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 animate-pulse">
@@ -117,6 +119,10 @@
                             @elseif($daysUntilExpiry <= 7)
                                 <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
                                     <i class="fa fa-exclamation-circle mr-1"></i> Expiring Soon
+                                </span>
+                            @elseif($daysUntilExpiry <= 30)
+                                <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                    <i class="fa fa-check-circle mr-1"></i> Active
                                 </span>
                             @else
                                 <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
@@ -289,7 +295,7 @@
                                     </p>
                                     @if($daysUntilExpiry <= 7 && !$isExpired)
                                         <p class="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
-                                            <i class="fa fa-hourglass-half mr-1"></i>{{ $daysUntilExpiry }} day{{ $daysUntilExpiry != 1 ? 's' : '' }} and {{ $expiryDate->diffInHours(now()) % 24 }} hour{{ ($expiryDate->diffInHours(now()) % 24) != 1 ? 's' : '' }} remaining
+                                            <i class="fa fa-hourglass-half mr-1"></i>{{ $daysUntilExpiry }} day{{ $daysUntilExpiry != 1 ? 's' : '' }} and {{ $hoursUntilExpiry }} hour{{ $hoursUntilExpiry != 1 ? 's' : '' }} remaining
                                         </p>
                                     @endif
                                 </div>
