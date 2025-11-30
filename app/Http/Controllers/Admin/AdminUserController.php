@@ -169,12 +169,17 @@ class AdminUserController extends BasePageController
                     $stackRole = $request->input('stack_role') ? true : false; // Check if checkbox is checked
                     $changedBy = auth()->check() ? auth()->id() : null;
 
+                    // CRITICAL: Capture the ORIGINAL rolechangedate BEFORE any updates
+                    // This is needed for accurate role history tracking
+                    $originalRoleChangeDate = $editedUser->rolechangedate;
+
                     // Handle pending role cancellation
                     if ($request->has('cancel_pending_role') && $request->input('cancel_pending_role')) {
                         $editedUser->cancelPendingRole();
                     }
 
-                    // Handle rolechangedate - BEFORE role change to ensure expiry is cleared if needed
+                    // Handle rolechangedate - Update the expiry for the CURRENT role FIRST
+                    // This must happen BEFORE role change so the new expiry applies to the old role
                     if ($request->has('rolechangedate')) {
                         $roleChangeDate = $request->input('rolechangedate');
                         if (! empty($roleChangeDate)) {
@@ -188,13 +193,15 @@ class AdminUserController extends BasePageController
                     }
 
                     // If role is changing, handle it with stacking logic
+                    // Pass the original expiry so history records the correct old_expiry_date
                     if ($roleChanged && $request->input('role') !== null) {
                         User::updateUserRole(
                             $editedUser->id,
                             (int) $request->input('role'), // Cast to integer
                             true, // Apply promotions
                             $stackRole, // Stack role if requested
-                            $changedBy
+                            $changedBy,
+                            $originalRoleChangeDate // Pass original expiry for history
                         );
                         $editedUser->refresh();
                     }

@@ -2535,8 +2535,12 @@ function setupExpiryDateHandlers() {
 // Function to set expiry date and time by adding days and hours (stackable)
 function setExpiryDateTime(days, hours) {
     let baseDate;
+    let isAddingTime = false;
 
-    // Check if there's already a selected datetime
+    // First, check if user has an existing expiry date (from the original user data)
+    const originalUserExpiry = document.getElementById('original_user_expiry')?.value;
+
+    // Check if there's already a selected datetime in the form
     const year = document.getElementById('expiry_year')?.value;
     const month = document.getElementById('expiry_month')?.value;
     const day = document.getElementById('expiry_day')?.value;
@@ -2544,13 +2548,20 @@ function setExpiryDateTime(days, hours) {
     const minute = document.getElementById('expiry_minute')?.value;
 
     if (year && month && day && hour && minute) {
-        // Use existing selected datetime as base
+        // Use existing selected datetime as base (user is modifying an already set date)
         baseDate = new Date(year, parseInt(month) - 1, day, hour, minute);
+        isAddingTime = true;
         showExpiryToast('Added ' + (days > 0 ? days + ' day' + (days !== 1 ? 's' : '') : '') + (days > 0 && hours > 0 ? ' and ' : '') + (hours > 0 ? hours + ' hour' + (hours !== 1 ? 's' : '') : ''), 'info');
+    } else if (originalUserExpiry && originalUserExpiry !== '') {
+        // User has an existing expiry date - add time from that date (proper stacking)
+        baseDate = new Date(originalUserExpiry);
+        isAddingTime = true;
+        const originalDate = formatDateTimeForDisplay(new Date(originalUserExpiry));
+        showExpiryToast('Adding time from current expiry: ' + originalDate, 'info');
     } else {
-        // Start from current time
+        // No existing date - start from current time
         baseDate = new Date();
-        showExpiryToast('Expiry date set to ' + formatDateTimeForDisplay(baseDate), 'success');
+        showExpiryToast('Setting expiry date from now', 'success');
     }
 
     // Add the days and hours
@@ -2560,6 +2571,12 @@ function setExpiryDateTime(days, hours) {
     // Update all selectors
     document.getElementById('expiry_year').value = baseDate.getFullYear().toString();
     document.getElementById('expiry_month').value = String(baseDate.getMonth() + 1).padStart(2, '0');
+
+    // Update valid days before setting the day value
+    if (typeof updateValidDays === 'function') {
+        updateValidDays();
+    }
+
     document.getElementById('expiry_day').value = String(baseDate.getDate()).padStart(2, '0');
     document.getElementById('expiry_hour').value = String(baseDate.getHours()).padStart(2, '0');
     document.getElementById('expiry_minute').value = String(baseDate.getMinutes()).padStart(2, '0');
@@ -2585,9 +2602,15 @@ function setEndOfDay() {
 
     document.getElementById('expiry_year').value = endOfDay.getFullYear().toString();
     document.getElementById('expiry_month').value = String(endOfDay.getMonth() + 1).padStart(2, '0');
+
+    // Update valid days before setting the day value
+    if (typeof updateValidDays === 'function') {
+        updateValidDays();
+    }
+
     document.getElementById('expiry_day').value = String(endOfDay.getDate()).padStart(2, '0');
     document.getElementById('expiry_hour').value = '23';
-    document.getElementById('expiry_minute').value = '55';
+    document.getElementById('expiry_minute').value = '59';
 
     updateDateTime();
 

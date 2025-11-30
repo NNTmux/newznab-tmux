@@ -412,7 +412,7 @@ class User extends Authenticatable
         return self::whereEmail($email)->first();
     }
 
-    public static function updateUserRole(int $uid, int|string $role, bool $applyPromotions = true, bool $stackRole = true, ?int $changedBy = null): bool
+    public static function updateUserRole(int $uid, int|string $role, bool $applyPromotions = true, bool $stackRole = true, ?int $changedBy = null, ?string $originalExpiryBeforeEdits = null): bool
     {
         \Log::info('updateUserRole called', [
             'uid' => $uid,
@@ -420,7 +420,8 @@ class User extends Authenticatable
             'role_type' => gettype($role),
             'applyPromotions' => $applyPromotions,
             'stackRole' => $stackRole,
-            'changedBy' => $changedBy
+            'changedBy' => $changedBy,
+            'originalExpiryBeforeEdits' => $originalExpiryBeforeEdits
         ]);
 
         // Handle role parameter - can be int, numeric string, or role name
@@ -448,12 +449,20 @@ class User extends Authenticatable
         }
 
         $currentRoleId = $user->roles_id;
-        $oldExpiryDate = $user->rolechangedate ? Carbon::parse($user->rolechangedate) : null;
+        // Use the original expiry from before any edits if provided, otherwise use current
+        $oldExpiryDate = $originalExpiryBeforeEdits
+            ? Carbon::parse($originalExpiryBeforeEdits)
+            : ($user->rolechangedate ? Carbon::parse($user->rolechangedate) : null);
+
+        // The current expiry (after any updates in controller) is what we use for stacking logic
+        $currentExpiryDate = $user->rolechangedate ? Carbon::parse($user->rolechangedate) : null;
 
         \Log::info('User current state', [
             'currentRoleId' => $currentRoleId,
             'oldExpiryDate' => $oldExpiryDate?->toDateTimeString(),
-            'oldExpiryIsFuture' => $oldExpiryDate?->isFuture()
+            'currentExpiryDate' => $currentExpiryDate?->toDateTimeString(),
+            'oldExpiryIsFuture' => $oldExpiryDate?->isFuture(),
+            'currentExpiryIsFuture' => $currentExpiryDate?->isFuture()
         ]);
 
         // Check if role is actually changing
@@ -462,20 +471,48 @@ class User extends Authenticatable
             return true; // No change needed
         }
 
-        // Determine if we should stack this role change
-        $shouldStack = $stackRole && $oldExpiryDate && $oldExpiryDate->isFuture();
+        // Determine if we should stack this role change (based on CURRENT expiry, not old)
+        $shouldStack = $stackRole && $currentExpiryDate && $currentExpiryDate->isFuture();
 
         \Log::info('Stack decision', [
             'shouldStack' => $shouldStack,
             'stackRole' => $stackRole,
-            'hasOldExpiry' => $oldExpiryDate !== null,
-            'isFuture' => $oldExpiryDate?->isFuture()
+            'hasCurrentExpiry' => $currentExpiryDate !== null,
+            'isFuture' => $currentExpiryDate?->isFuture()
         ]);
 
         if ($shouldStack) {
-            \Log::info('Stacking role change');
+            \Log::info('Stacking role change', [
+                'oldExpiryDate' => $oldExpiryDate->toDateTimeString(),
+                'currentExpiryDate' => $currentExpiryDate->toDateTimeString(),
+                'pendingRoleStartDate' => $oldExpiryDate->toDateTimeString()
+            ]);
+
+            // Calculate new expiry date for the pending role
+            // Start with the role's base duration (addyears field converted to days)
+            $baseDays = $roleQuery->addyears * 365;
+            $promotionDays = 0;
+
+            if ($applyPromotions) {
+                $promotionDays = RolePromotion::calculateAdditionalDays($roleQuery->id);
+            }
+
+            $totalDays = $baseDays + $promotionDays;
+
+            // New role will start at oldExpiryDate (original expiry date before any admin edits)
+            // Then add the total days (base + promotion) to calculate when it will expire
+            $newExpiryDate = $oldExpiryDate->copy()->addDays($totalDays);
+
+            \Log::info('Calculated new expiry for pending role', [
+                'pendingRoleStartDate' => $oldExpiryDate->toDateTimeString(),
+                'baseDays' => $baseDays,
+                'promotionDays' => $promotionDays,
+                'totalDays' => $totalDays,
+                'newExpiryDate' => $newExpiryDate->toDateTimeString()
+            ]);
 
             // Stack the role change - set it as pending
+            // Use oldExpiryDate (original expiry) for when the role will start
             $user->update([
                 'pending_roles_id' => $roleQuery->id,
                 'pending_role_start_date' => $oldExpiryDate,
@@ -483,24 +520,32 @@ class User extends Authenticatable
 
             \Log::info('Pending role updated', [
                 'pending_roles_id' => $roleQuery->id,
-                'pending_role_start_date' => $oldExpiryDate->toDateTimeString()
+                'pending_role_start_date' => $oldExpiryDate->toDateTimeString(),
+                'pending_role_start_date_formatted' => $oldExpiryDate->format('Y-m-d H:i:s')
             ]);
 
             // Record in history as a stacked change
+            // effective_date should match old_expiry_date (when the stacked role will start)
             try {
                 $history = UserRoleHistory::recordRoleChange(
                     userId: $user->id,
                     oldRoleId: $currentRoleId,
                     newRoleId: $roleQuery->id,
-                    oldExpiryDate: $oldExpiryDate,
-                    newExpiryDate: null, // Will be determined when activated
-                    effectiveDate: $oldExpiryDate,
+                    oldExpiryDate: $oldExpiryDate, // When current role expires
+                    newExpiryDate: $newExpiryDate, // When the NEW role will expire (calculated from oldExpiryDate)
+                    effectiveDate: $oldExpiryDate, // Same as old_expiry_date - when the new role starts
                     isStacked: true,
                     changeReason: 'stacked_role_change',
                     changedBy: $changedBy
                 );
 
-                \Log::info('Role history recorded', ['history_id' => $history->id]);
+                \Log::info('Role history recorded for stacked change', [
+                    'history_id' => $history->id,
+                    'effective_date' => $history->effective_date->toDateTimeString(),
+                    'old_expiry_date' => $history->old_expiry_date?->toDateTimeString(),
+                    'new_expiry_date' => $history->new_expiry_date?->toDateTimeString(),
+                    'note' => 'effective_date equals old_expiry_date (when stacked role starts)'
+                ]);
             } catch (\Exception $e) {
                 \Log::error('Failed to record role history', [
                     'error' => $e->getMessage(),
@@ -512,16 +557,35 @@ class User extends Authenticatable
         }
 
         // Apply the role change immediately
-        $additionalDays = 0;
+        // Calculate base days from role's addyears field
+        $baseDays = $roleQuery->addyears * 365;
+        $promotionDays = 0;
+
         if ($applyPromotions) {
-            $additionalDays = RolePromotion::calculateAdditionalDays($roleQuery->id);
+            $promotionDays = RolePromotion::calculateAdditionalDays($roleQuery->id);
         }
+
+        $totalDays = $baseDays + $promotionDays;
+
+        \Log::info('Applying immediate role change', [
+            'baseDays' => $baseDays,
+            'promotionDays' => $promotionDays,
+            'totalDays' => $totalDays,
+            'applyPromotions' => $applyPromotions
+        ]);
 
         // Calculate new expiry date
         $newExpiryDate = null;
-        if ($additionalDays > 0) {
-            $baseDate = $oldExpiryDate && $oldExpiryDate->isFuture() ? $oldExpiryDate : Carbon::now();
-            $newExpiryDate = $baseDate->addDays($additionalDays);
+        if ($totalDays > 0) {
+            // For immediate changes, start from now (not from old expiry)
+            $baseDate = Carbon::now();
+            $newExpiryDate = $baseDate->copy()->addDays($totalDays);
+
+            \Log::info('Calculated new expiry date', [
+                'baseDate' => $baseDate->toDateTimeString(),
+                'totalDays' => $totalDays,
+                'newExpiryDate' => $newExpiryDate->toDateTimeString()
+            ]);
         }
 
         // Update the user's role
@@ -530,25 +594,45 @@ class User extends Authenticatable
             'rolechangedate' => $newExpiryDate,
         ]);
 
+        \Log::info('User role updated', [
+            'updated' => $updated,
+            'new_roles_id' => $roleQuery->id,
+            'new_rolechangedate' => $newExpiryDate?->toDateTimeString()
+        ]);
+
         // Sync Spatie roles
         $user->syncRoles([$roleName]);
 
         // Record in history
         if ($updated) {
-            UserRoleHistory::recordRoleChange(
-                userId: $user->id,
-                oldRoleId: $currentRoleId,
-                newRoleId: $roleQuery->id,
-                oldExpiryDate: $oldExpiryDate,
-                newExpiryDate: $newExpiryDate,
-                effectiveDate: Carbon::now(),
-                isStacked: false,
-                changeReason: 'immediate_role_change',
-                changedBy: $changedBy
-            );
+            try {
+                $history = UserRoleHistory::recordRoleChange(
+                    userId: $user->id,
+                    oldRoleId: $currentRoleId,
+                    newRoleId: $roleQuery->id,
+                    oldExpiryDate: $oldExpiryDate,
+                    newExpiryDate: $newExpiryDate,
+                    effectiveDate: Carbon::now(),
+                    isStacked: false,
+                    changeReason: 'immediate_role_change',
+                    changedBy: $changedBy
+                );
+
+                \Log::info('Role history recorded for immediate change', [
+                    'history_id' => $history->id,
+                    'effective_date' => $history->effective_date->toDateTimeString(),
+                    'old_expiry_date' => $history->old_expiry_date?->toDateTimeString(),
+                    'new_expiry_date' => $history->new_expiry_date?->toDateTimeString()
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Failed to record role history for immediate change', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+            }
 
             // Track promotion statistics if applicable
-            if ($applyPromotions && $additionalDays > 0) {
+            if ($applyPromotions && $promotionDays > 0) {
                 $promotions = RolePromotion::getActivePromotions($roleQuery->id);
                 foreach ($promotions as $promotion) {
                     $promotion->trackApplication(
@@ -596,9 +680,13 @@ class User extends Authenticatable
                     $roleQuery = Role::query()->where('id', $newRoleId)->first();
 
                     if ($roleQuery) {
-                        // Calculate additional days from promotions
-                        $additionalDays = RolePromotion::calculateAdditionalDays($newRoleId);
-                        $newExpiryDate = $additionalDays > 0 ? $now->addDays($additionalDays) : null;
+                        // Calculate base days from role's addyears field
+                        $baseDays = $roleQuery->addyears * 365;
+                        $promotionDays = RolePromotion::calculateAdditionalDays($newRoleId);
+                        $totalDays = $baseDays + $promotionDays;
+
+                        // Calculate new expiry date from now (when the role is being activated)
+                        $newExpiryDate = $totalDays > 0 ? $now->addDays($totalDays) : null;
 
                         // Update user with pending role
                         $expired->update([

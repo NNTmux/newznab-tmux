@@ -133,6 +133,9 @@
                     <!-- Hidden input for form submission -->
                     <input type="hidden" id="rolechangedate" name="rolechangedate" value="{{ is_array($user) ? ($user['rolechangedate'] ?? '') : (isset($user->rolechangedate) ? \Carbon\Carbon::parse($user->rolechangedate)->format('Y-m-d\TH:i:s') : '') }}">
 
+                    <!-- Hidden field to store the ORIGINAL user expiry date for proper stacking calculations -->
+                    <input type="hidden" id="original_user_expiry" value="{{ is_array($user) ? ($user['rolechangedate'] ?? '') : (isset($user->rolechangedate) ? \Carbon\Carbon::parse($user->rolechangedate)->format('Y-m-d\TH:i:s') : '') }}">
+
                     <!-- Custom DateTime Picker -->
                     <div class="grid grid-cols-5 gap-3">
                         <!-- Year Selector -->
@@ -143,7 +146,7 @@
                             <select id="expiry_year"
                                     class="w-full px-2 py-3 text-lg font-semibold bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500">
                                 <option value="">--</option>
-                                @for($y = date('Y'); $y <= date('Y') + 20; $y++)
+                                @for($y = date('Y'); $y <= date('Y') + 50; $y++)
                                     <option value="{{ $y }}">{{ $y }}</option>
                                 @endfor
                             </select>
@@ -339,10 +342,10 @@
                                 <i class="fa fa-info-circle mr-1"></i>
                                 This role will automatically activate when the current role expires
                             </p>
-                            <label class="inline-flex items-center">
+                            <label class="inline-flex items-center px-3 py-2 rounded-md bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 hover:bg-red-100 dark:hover:bg-red-900/50 cursor-pointer transition-all">
                                 <input type="checkbox" name="cancel_pending_role" value="1"
-                                       class="rounded border-gray-300 dark:border-gray-600 text-red-600 shadow-sm focus:ring-red-500 dark:focus:ring-red-400">
-                                <span class="ml-2 text-xs text-red-600 dark:text-red-400 font-medium">Cancel pending role</span>
+                                       class="rounded border-red-300 dark:border-red-600 bg-white dark:bg-gray-700 text-red-600 dark:text-red-500 shadow-sm focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400 focus:border-red-500 dark:focus:border-red-400 cursor-pointer">
+                                <span class="ml-2 text-xs text-red-700 dark:text-red-300 font-semibold">Cancel pending role</span>
                             </label>
                         </div>
                     </div>
