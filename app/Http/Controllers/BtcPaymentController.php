@@ -63,10 +63,13 @@ class BtcPaymentController extends BasePageController
             if ($checkOrder !== null) {
                 $user = User::query()->where('email', '=', $checkOrder->email)->first();
                 if ($user) {
-                    preg_match('/(?P<role>\w+(\s\+\+)?)[\s](?P<addYears>\d+)/i', $checkOrder->item_description, $matches);
-                    User::updateUserRole($user->id, $matches['role']);
+                    // Use the full item description as the role name
+                    // This allows matching roles like "Supporter 2 years" instead of just "Supporter"
+                    $roleName = trim($checkOrder->item_description);
+
+                    User::updateUserRole($user->id, $roleName);
                     $checkOrder->update(['invoice_status' => 'Settled']);
-                    Log::channel('btc_payment')->info('User: '.$user->username.' upgraded to '.$matches['role'].' for BTCPay webhook: '.$checkOrder->webhook_id);
+                    Log::channel('btc_payment')->info('User: '.$user->username.' upgraded to '.$roleName.' for BTCPay webhook: '.$checkOrder->webhook_id);
 
                     return response('OK', 200);
                 }
