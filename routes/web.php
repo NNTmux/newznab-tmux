@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\AdminMusicController;
 use App\Http\Controllers\Admin\AdminPageController;
 use App\Http\Controllers\Admin\AdminPredbController;
 use App\Http\Controllers\Admin\AdminPromotionController;
+use App\Http\Controllers\Admin\AdminReleaseNamingRegexesController;
 use App\Http\Controllers\Admin\AdminReleasesController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\AdminShowsController;
@@ -84,6 +85,7 @@ Route::get('register', [RegisterController::class, 'showRegistrationForm'])->nam
 Route::post('register', [RegisterController::class, 'register'])->name('register.post');
 
 Route::match(['GET', 'POST'], 'forgottenpassword', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('forgottenpassword')->withoutMiddleware(['auth']);
+Route::match(['GET', 'POST'], 'password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request')->withoutMiddleware(['auth']);
 Route::match(['GET', 'POST'], 'terms-and-conditions', [TermsController::class, 'terms'])->name('terms-and-conditions');
 Route::match(['GET', 'POST'], 'privacy-policy', [PrivacyPolicyController::class, 'privacyPolicy'])->name('privacy-policy');
 
