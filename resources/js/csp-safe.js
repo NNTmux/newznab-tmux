@@ -248,6 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initCopyToClipboard(); // Copy functionality for RSS/Profile pages
     initVerifyUserModal(); // Admin user verification modal
     initQualityFilter(); // Quality filter for movie releases
+    initUserListScrollSync(); // Synchronized scrollbars for user list table
 });
 
 // Event delegation for dynamically added elements - optimized with early returns
@@ -5106,3 +5107,43 @@ function initContentDelete() {
     });
 }
 
+// Initialize synchronized horizontal scrollbars for user list table
+function initUserListScrollSync() {
+    const topScroll = document.getElementById('topScroll');
+    const bottomScroll = document.getElementById('bottomScroll');
+    const topScrollContent = document.getElementById('topScrollContent');
+    const table = bottomScroll ? bottomScroll.querySelector('table') : null;
+
+    if (!topScroll || !bottomScroll || !topScrollContent || !table) {
+        return; // Elements not found, likely not on user list page
+    }
+
+    // Set the width of the top scroll content to match the table width
+    function updateTopScrollWidth() {
+        topScrollContent.style.width = table.scrollWidth + 'px';
+    }
+
+    // Initial width setup
+    updateTopScrollWidth();
+
+    // Update on window resize
+    window.addEventListener('resize', updateTopScrollWidth);
+
+    // Synchronize scrolling from top to bottom
+    topScroll.addEventListener('scroll', function() {
+        if (!topScroll.isSyncing) {
+            bottomScroll.isSyncing = true;
+            bottomScroll.scrollLeft = topScroll.scrollLeft;
+            bottomScroll.isSyncing = false;
+        }
+    });
+
+    // Synchronize scrolling from bottom to top
+    bottomScroll.addEventListener('scroll', function() {
+        if (!bottomScroll.isSyncing) {
+            topScroll.isSyncing = true;
+            topScroll.scrollLeft = bottomScroll.scrollLeft;
+            topScroll.isSyncing = false;
+        }
+    });
+}

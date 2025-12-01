@@ -115,7 +115,12 @@
 
         <!-- User Table -->
         @if(count($userlist) > 0)
-            <div class="overflow-x-auto">
+            <!-- Top Scrollbar -->
+            <div class="overflow-x-auto border-b border-gray-200 dark:border-gray-700" id="topScroll">
+                <div style="height: 1px;" id="topScrollContent"></div>
+            </div>
+
+            <div class="overflow-x-auto" id="bottomScroll">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead class="bg-gray-50 dark:bg-gray-900">
                         <tr>
