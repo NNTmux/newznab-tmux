@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedInteger('user_id');
             $table->unsignedBigInteger('role_promotion_id');
-            $table->unsignedBigInteger('role_id');
+            $table->unsignedInteger('role_id');
             $table->integer('days_added')->comment('Number of days added to role expiry');
             $table->dateTime('previous_expiry_date')->nullable()->comment('Previous role expiry date before promotion');
             $table->dateTime('new_expiry_date')->nullable()->comment('New role expiry date after promotion');
