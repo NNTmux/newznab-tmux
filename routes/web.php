@@ -199,6 +199,9 @@ Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
     Route::match(['GET', 'POST'], 'role-edit', [AdminRoleController::class, 'edit'])->name('admin.role-edit');
     Route::post('role-delete', [AdminRoleController::class, 'destroy'])->name('admin.role-delete');
     Route::get('content-list', [AdminContentController::class, 'index'])->name('admin.content-list');
+    Route::match(['GET', 'POST'], 'content-add', [AdminContentController::class, 'create'])->name('admin.content-add');
+    Route::post('content-toggle-status', [AdminContentController::class, 'toggleStatus'])->name('admin.content-toggle');
+    Route::post('content-delete', [AdminContentController::class, 'destroy'])->name('admin.content-delete');
 
     // Promotion routes
     Route::get('promotions', [AdminPromotionController::class, 'index'])->name('admin.promotions.index');
