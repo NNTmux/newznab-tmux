@@ -21,6 +21,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -403,48 +404,34 @@ class User extends Authenticatable
     }
 
     /**
+     * @param  string  $email
      * @return Model|static
      *
-     * @throws ModelNotFoundException
      */
-    public static function getByEmail(string $email)
+    public static function getByEmail(string $email): Model|static
     {
         return self::whereEmail($email)->first();
     }
 
     public static function updateUserRole(int $uid, int|string $role, bool $applyPromotions = true, bool $stackRole = true, ?int $changedBy = null, ?string $originalExpiryBeforeEdits = null): bool
     {
-        \Log::info('updateUserRole called', [
-            'uid' => $uid,
-            'role' => $role,
-            'role_type' => gettype($role),
-            'applyPromotions' => $applyPromotions,
-            'stackRole' => $stackRole,
-            'changedBy' => $changedBy,
-            'originalExpiryBeforeEdits' => $originalExpiryBeforeEdits
-        ]);
-
         // Handle role parameter - can be int, numeric string, or role name
         if (is_numeric($role)) {
-            // It's a number (either int or numeric string)
             $roleQuery = Role::query()->where('id', (int) $role)->first();
         } else {
-            // It's a role name
             $roleQuery = Role::query()->where('name', $role)->first();
         }
 
         if (!$roleQuery) {
-            \Log::error('Role not found', ['role' => $role, 'role_type' => gettype($role)]);
+            Log::error('Role not found', ['role' => $role, 'role_type' => gettype($role)]);
             return false;
         }
-
-        \Log::info('Role found', ['role_id' => $roleQuery->id, 'role_name' => $roleQuery->name]);
 
         $roleName = $roleQuery->name;
         $user = self::find($uid);
 
         if (!$user) {
-            \Log::error('User not found', ['uid' => $uid]);
+            Log::error('User not found', ['uid' => $uid]);
             return false;
         }
 
@@ -457,7 +444,7 @@ class User extends Authenticatable
         // The current expiry (after any updates in controller) is what we use for stacking logic
         $currentExpiryDate = $user->rolechangedate ? Carbon::parse($user->rolechangedate) : null;
 
-        \Log::info('User current state', [
+        Log::info('User current state', [
             'currentRoleId' => $currentRoleId,
             'oldExpiryDate' => $oldExpiryDate?->toDateTimeString(),
             'currentExpiryDate' => $currentExpiryDate?->toDateTimeString(),
@@ -467,7 +454,7 @@ class User extends Authenticatable
 
         // Check if role is actually changing
         if ($currentRoleId === $roleQuery->id) {
-            \Log::info('Role not changing, but checking for promotions', [
+            Log::info('Role not changing, but checking for promotions', [
                 'applyPromotions' => $applyPromotions,
                 'currentRoleId' => $currentRoleId
             ]);
@@ -477,7 +464,7 @@ class User extends Authenticatable
                 $promotionDays = RolePromotion::calculateAdditionalDays($roleQuery->id);
 
                 if ($promotionDays > 0) {
-                    \Log::info('Applying promotion days to existing role', [
+                    Log::info('Applying promotion days to existing role', [
                         'promotionDays' => $promotionDays,
                         'currentExpiryDate' => $currentExpiryDate?->toDateTimeString()
                     ]);
@@ -485,7 +472,7 @@ class User extends Authenticatable
                     // Calculate new expiry date by adding promotion days
                     $newExpiryDate = null;
                     if ($currentExpiryDate) {
-                        // Extend from current expiry date
+                        // Extend from the current expiry date
                         $newExpiryDate = $currentExpiryDate->copy()->addDays($promotionDays);
                     } else {
                         // No expiry date, create one from now
@@ -497,7 +484,7 @@ class User extends Authenticatable
                         'rolechangedate' => $newExpiryDate,
                     ]);
 
-                    \Log::info('Updated expiry date with promotions', [
+                    Log::info('Updated expiry date with promotions', [
                         'updated' => $updated,
                         'new_expiry_date' => $newExpiryDate?->toDateTimeString()
                     ]);
@@ -514,7 +501,7 @@ class User extends Authenticatable
                             );
                         }
 
-                        \Log::info('Tracked promotion application for existing role', [
+                        Log::info('Tracked promotion application for existing role', [
                             'promotions_count' => $promotions->count()
                         ]);
                     }
@@ -523,14 +510,14 @@ class User extends Authenticatable
                 }
             }
 
-            \Log::info('No promotions to apply, returning');
+            Log::info('No promotions to apply, returning');
             return true; // No change needed
         }
 
         // Determine if we should stack this role change (based on CURRENT expiry, not old)
         $shouldStack = $stackRole && $currentExpiryDate && $currentExpiryDate->isFuture();
 
-        \Log::info('Stack decision', [
+        Log::info('Stack decision', [
             'shouldStack' => $shouldStack,
             'stackRole' => $stackRole,
             'hasCurrentExpiry' => $currentExpiryDate !== null,
@@ -538,13 +525,13 @@ class User extends Authenticatable
         ]);
 
         if ($shouldStack) {
-            \Log::info('Stacking role change', [
+            Log::info('Stacking role change', [
                 'oldExpiryDate' => $oldExpiryDate->toDateTimeString(),
                 'currentExpiryDate' => $currentExpiryDate->toDateTimeString(),
                 'pendingRoleStartDate' => $oldExpiryDate->toDateTimeString()
             ]);
 
-            // Calculate new expiry date for the pending role
+            // Calculate a new expiry date for the pending role
             // Start with the role's base duration (addyears field converted to days)
             $baseDays = $roleQuery->addyears * 365;
             $promotionDays = 0;
@@ -559,7 +546,7 @@ class User extends Authenticatable
             // Then add the total days (base + promotion) to calculate when it will expire
             $newExpiryDate = $oldExpiryDate->copy()->addDays($totalDays);
 
-            \Log::info('Calculated new expiry for pending role', [
+            Log::info('Calculated new expiry for pending role', [
                 'pendingRoleStartDate' => $oldExpiryDate->toDateTimeString(),
                 'baseDays' => $baseDays,
                 'promotionDays' => $promotionDays,
@@ -574,7 +561,7 @@ class User extends Authenticatable
                 'pending_role_start_date' => $oldExpiryDate,
             ]);
 
-            \Log::info('Pending role updated', [
+            Log::info('Pending role updated', [
                 'pending_roles_id' => $roleQuery->id,
                 'pending_role_start_date' => $oldExpiryDate->toDateTimeString(),
                 'pending_role_start_date_formatted' => $oldExpiryDate->format('Y-m-d H:i:s')
@@ -595,7 +582,7 @@ class User extends Authenticatable
                     changedBy: $changedBy
                 );
 
-                \Log::info('Role history recorded for stacked change', [
+                Log::info('Role history recorded for stacked change', [
                     'history_id' => $history->id,
                     'effective_date' => $history->effective_date->toDateTimeString(),
                     'old_expiry_date' => $history->old_expiry_date?->toDateTimeString(),
@@ -603,7 +590,7 @@ class User extends Authenticatable
                     'note' => 'effective_date equals old_expiry_date (when stacked role starts)'
                 ]);
             } catch (\Exception $e) {
-                \Log::error('Failed to record role history', [
+                Log::error('Failed to record role history', [
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ]);
@@ -623,7 +610,7 @@ class User extends Authenticatable
 
         $totalDays = $baseDays + $promotionDays;
 
-        \Log::info('Applying immediate role change', [
+        Log::info('Applying immediate role change', [
             'baseDays' => $baseDays,
             'promotionDays' => $promotionDays,
             'totalDays' => $totalDays,
@@ -637,7 +624,7 @@ class User extends Authenticatable
             $baseDate = Carbon::now();
             $newExpiryDate = $baseDate->copy()->addDays($totalDays);
 
-            \Log::info('Calculated new expiry date', [
+            Log::info('Calculated new expiry date', [
                 'baseDate' => $baseDate->toDateTimeString(),
                 'totalDays' => $totalDays,
                 'newExpiryDate' => $newExpiryDate->toDateTimeString()
@@ -650,7 +637,7 @@ class User extends Authenticatable
             'rolechangedate' => $newExpiryDate,
         ]);
 
-        \Log::info('User role updated', [
+        Log::info('User role updated', [
             'updated' => $updated,
             'new_roles_id' => $roleQuery->id,
             'new_rolechangedate' => $newExpiryDate?->toDateTimeString()
@@ -681,7 +668,7 @@ class User extends Authenticatable
                     'new_expiry_date' => $history->new_expiry_date?->toDateTimeString()
                 ]);
             } catch (\Exception $e) {
-                \Log::error('Failed to record role history for immediate change', [
+                Log::error('Failed to record role history for immediate change', [
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ]);

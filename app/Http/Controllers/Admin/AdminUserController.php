@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BasePageController;
 use App\Models\Invitation;
 use App\Models\User;
+use App\Models\UserDownload;
+use App\Models\UserRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Jrean\UserVerification\Facades\UserVerification;
@@ -68,8 +70,8 @@ class AdminUserController extends BasePageController
 
             // Add daily API and download counts
             try {
-                $user->daily_api_count = \App\Models\UserRequest::getApiRequests($user->id);
-                $user->daily_download_count = \App\Models\UserDownload::getDownloadRequests($user->id);
+                $user->daily_api_count = UserRequest::getApiRequests($user->id);
+                $user->daily_download_count = UserDownload::getDownloadRequests($user->id);
             } catch (\Exception $e) {
                 $user->daily_api_count = 0;
                 $user->daily_download_count = 0;
@@ -102,7 +104,7 @@ class AdminUserController extends BasePageController
     /**
      * @return RedirectResponse|\Illuminate\View\View
      *
-     * @throws \Exception
+     * @throws \Exception|\Throwable
      */
     public function edit(Request $request)
     {
@@ -184,12 +186,11 @@ class AdminUserController extends BasePageController
                         $roleChangeDate = $request->input('rolechangedate');
                         if (! empty($roleChangeDate)) {
                             User::updateUserRoleChangeDate($editedUser->id, $roleChangeDate);
-                            $editedUser->refresh();
                         } else {
                             // Clear the rolechangedate if empty string is provided
                             $editedUser->update(['rolechangedate' => null]);
-                            $editedUser->refresh();
                         }
+                        $editedUser->refresh();
                     }
 
                     // If role is changing, handle it with stacking logic
@@ -245,26 +246,14 @@ class AdminUserController extends BasePageController
                     return redirect()->to('admin/user-list');
                 }
 
-                switch ($ret) {
-                    case User::ERR_SIGNUP_BADUNAME:
-                        $error = 'Bad username. Try a better one.';
-                        break;
-                    case User::ERR_SIGNUP_BADPASS:
-                        $error = 'Bad password. Try a longer one.';
-                        break;
-                    case User::ERR_SIGNUP_BADEMAIL:
-                        $error = 'Bad email.';
-                        break;
-                    case User::ERR_SIGNUP_UNAMEINUSE:
-                        $error = 'Username in use.';
-                        break;
-                    case User::ERR_SIGNUP_EMAILINUSE:
-                        $error = 'Email in use.';
-                        break;
-                    default:
-                        $error = 'Unknown save error.';
-                        break;
-                }
+                $error = match ($ret) {
+                    User::ERR_SIGNUP_BADUNAME => 'Bad username. Try a better one.',
+                    User::ERR_SIGNUP_BADPASS => 'Bad password. Try a longer one.',
+                    User::ERR_SIGNUP_BADEMAIL => 'Bad email.',
+                    User::ERR_SIGNUP_UNAMEINUSE => 'Username in use.',
+                    User::ERR_SIGNUP_EMAILINUSE => 'Email in use.',
+                    default => 'Unknown save error.',
+                };
                 $user += [
                     'id' => $request->input('id'),
                     'username' => $request->input('username'),
@@ -283,8 +272,8 @@ class AdminUserController extends BasePageController
                     // Add daily API and download counts
                     if ($user) {
                         try {
-                            $user->daily_api_count = \App\Models\UserRequest::getApiRequests($user->id);
-                            $user->daily_download_count = \App\Models\UserDownload::getDownloadRequests($user->id);
+                            $user->daily_api_count = UserRequest::getApiRequests($user->id);
+                            $user->daily_download_count = UserDownload::getDownloadRequests($user->id);
                         } catch (\Exception $e) {
                             $user->daily_api_count = 0;
                             $user->daily_download_count = 0;
