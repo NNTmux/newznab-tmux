@@ -47,23 +47,22 @@ class ResetPasswordController extends Controller
             return redirect()->route('password.request')->withErrors(['error' => 'No reset code provided.']);
         }
 
-        $ret = User::getByPassResetGuid($request->input('guid'));
-        if ($ret === null) {
+        $user = User::getByPassResetGuid($request->input('guid'));
+        if ($user === null) {
             return redirect()->route('password.request')->withErrors(['error' => 'Bad reset code provided.']);
         }
 
         // Check if user is soft deleted
-        $user = User::withTrashed()->find($ret['id']);
-        if ($user && $user->trashed()) {
+        if ($user->trashed()) {
             return redirect()->route('password.request')->withErrors(['error' => 'This account has been deactivated.']);
         }
 
         // Reset the password, inform the user, send out the email
-        User::updatePassResetGuid($ret['id'], '');
+        User::updatePassResetGuid($user->id, '');
         $newpass = User::generatePassword();
-        User::updatePassword($ret['id'], $newpass);
+        User::updatePassword($user->id, $newpass);
 
-        SendPasswordResetEmail::dispatch($ret, $newpass);
+        SendPasswordResetEmail::dispatch($user, $newpass);
 
         return redirect()->route('login')
             ->with('message', 'Your password has been reset to <strong>'.$newpass.'</strong> and sent to your e-mail address.')

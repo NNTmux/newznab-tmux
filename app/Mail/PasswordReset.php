@@ -14,12 +14,12 @@ class PasswordReset extends Mailable
     /**
      * @var User
      */
-    private $user;
+    public $user;
 
     /**
      * @var string
      */
-    private $newPass;
+    public $newPass;
 
     /**
      * @var mixed
