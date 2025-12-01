@@ -467,7 +467,63 @@ class User extends Authenticatable
 
         // Check if role is actually changing
         if ($currentRoleId === $roleQuery->id) {
-            \Log::info('Role not changing, returning');
+            \Log::info('Role not changing, but checking for promotions', [
+                'applyPromotions' => $applyPromotions,
+                'currentRoleId' => $currentRoleId
+            ]);
+
+            // Even if role isn't changing, apply promotions if requested
+            if ($applyPromotions) {
+                $promotionDays = RolePromotion::calculateAdditionalDays($roleQuery->id);
+
+                if ($promotionDays > 0) {
+                    \Log::info('Applying promotion days to existing role', [
+                        'promotionDays' => $promotionDays,
+                        'currentExpiryDate' => $currentExpiryDate?->toDateTimeString()
+                    ]);
+
+                    // Calculate new expiry date by adding promotion days
+                    $newExpiryDate = null;
+                    if ($currentExpiryDate) {
+                        // Extend from current expiry date
+                        $newExpiryDate = $currentExpiryDate->copy()->addDays($promotionDays);
+                    } else {
+                        // No expiry date, create one from now
+                        $newExpiryDate = Carbon::now()->addDays($promotionDays);
+                    }
+
+                    // Update the user's expiry date
+                    $updated = $user->update([
+                        'rolechangedate' => $newExpiryDate,
+                    ]);
+
+                    \Log::info('Updated expiry date with promotions', [
+                        'updated' => $updated,
+                        'new_expiry_date' => $newExpiryDate?->toDateTimeString()
+                    ]);
+
+                    // Track promotion statistics
+                    if ($updated) {
+                        $promotions = RolePromotion::getActivePromotions($roleQuery->id);
+                        foreach ($promotions as $promotion) {
+                            $promotion->trackApplication(
+                                $user->id,
+                                $roleQuery->id,
+                                $currentExpiryDate,
+                                $newExpiryDate
+                            );
+                        }
+
+                        \Log::info('Tracked promotion application for existing role', [
+                            'promotions_count' => $promotions->count()
+                        ]);
+                    }
+
+                    return $updated;
+                }
+            }
+
+            \Log::info('No promotions to apply, returning');
             return true; // No change needed
         }
 

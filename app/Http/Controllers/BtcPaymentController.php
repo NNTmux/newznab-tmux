@@ -65,7 +65,6 @@ class BtcPaymentController extends BasePageController
                 if ($user) {
                     preg_match('/(?P<role>\w+(\s\+\+)?)[\s](?P<addYears>\d+)/i', $checkOrder->item_description, $matches);
                     User::updateUserRole($user->id, $matches['role']);
-                    User::updateUserRoleChangeDate($user->id, null, $matches['addYears']);
                     $checkOrder->update(['invoice_status' => 'Settled']);
                     Log::channel('btc_payment')->info('User: '.$user->username.' upgraded to '.$matches['role'].' for BTCPay webhook: '.$checkOrder->webhook_id);
 
