@@ -46,8 +46,13 @@
             <!-- Password -->
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">New Password (leave blank to keep current)</label>
-                <input type="password" name="password" id="password"
-                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 @error('password') border-red-500 dark:border-red-600 @enderror">
+                <div class="relative">
+                    <input type="password" name="password" id="password"
+                        class="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 @error('password') border-red-500 dark:border-red-600 @enderror">
+                    <button type="button" class="password-toggle-btn absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-field-id="password">
+                        <i class="fas fa-eye" id="password-eye"></i>
+                    </button>
+                </div>
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Must contain at least 8 characters, including uppercase, lowercase, numbers and special characters</p>
                 @error('password')
                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -57,8 +62,13 @@
             <!-- Confirm Password -->
             <div>
                 <label for="password_confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Confirm Password</label>
-                <input type="password" name="password_confirmation" id="password_confirmation"
-                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500">
+                <div class="relative">
+                    <input type="password" name="password_confirmation" id="password_confirmation"
+                        class="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500">
+                    <button type="button" class="password-toggle-btn absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-field-id="password_confirmation">
+                        <i class="fas fa-eye" id="password_confirmation-eye"></i>
+                    </button>
+                </div>
             </div>
 
             <!-- Theme Preference -->
@@ -287,12 +297,17 @@
                                             <label for="disable_2fa_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                                 Current Password
                                             </label>
-                                            <input type="password"
-                                                   id="disable_2fa_password"
-                                                   name="current-password"
-                                                   required
-                                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
-                                                   placeholder="Enter your password">
+                                            <div class="relative">
+                                                <input type="password"
+                                                       id="disable_2fa_password"
+                                                       name="current-password"
+                                                       required
+                                                       class="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                                                       placeholder="Enter your password">
+                                                <button type="button" class="password-toggle-btn absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-field-id="disable_2fa_password">
+                                                    <i class="fas fa-eye" id="disable_2fa_password-eye"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                         <div class="flex gap-2">
                                             <button type="submit"
@@ -397,3 +412,28 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    // 2FA disable form toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('toggle-disable-2fa-btn');
+        const cancelBtn = document.getElementById('cancel-disable-2fa-btn');
+        const formContainer = document.getElementById('disable-2fa-form-container');
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function() {
+                formContainer.style.display = 'block';
+                toggleBtn.style.display = 'none';
+            });
+        }
+
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', function() {
+                formContainer.style.display = 'none';
+                toggleBtn.style.display = 'inline-block';
+            });
+        }
+    });
+</script>
+@endpush

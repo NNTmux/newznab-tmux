@@ -59,12 +59,17 @@
                     <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Password @if(empty($user['id']))<span class="text-red-500">*</span>@endif
                     </label>
-                    <input type="password"
-                           id="password"
-                           name="password"
-                           placeholder="{{ !empty($user['id']) ? 'Leave blank to keep current password' : '' }}"
-                           @if(empty($user['id'])) required @endif
-                           class="w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500">
+                    <div class="relative">
+                        <input type="password"
+                               id="password"
+                               name="password"
+                               placeholder="{{ !empty($user['id']) ? 'Leave blank to keep current password' : '' }}"
+                               @if(empty($user['id'])) required @endif
+                               class="w-full px-3 py-2 pr-12 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500">
+                        <button type="button" class="password-toggle-btn absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-field-id="password">
+                            <i class="fa fa-eye" id="password-eye"></i>
+                        </button>
+                    </div>
                     @if(!empty($user['id']))
                         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Leave blank to keep the current password</p>
                     @endif

@@ -205,6 +205,43 @@ function initThemeSystem() {
     });
 }
 
+/**
+ * Toggle password visibility for password input fields
+ * @param {string} fieldId - The ID of the password field to toggle
+ */
+window.togglePasswordVisibility = function(fieldId) {
+    const field = document.getElementById(fieldId);
+    const icon = document.getElementById(fieldId + '-eye');
+
+    if (!field || !icon) return;
+
+    if (field.type === 'password') {
+        field.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        field.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+};
+
+/**
+ * Initialize password visibility toggles for all password fields with toggle buttons
+ */
+function initPasswordVisibilityToggles() {
+    // Add click event listeners to all password toggle buttons
+    document.querySelectorAll('.password-toggle-btn').forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const fieldId = this.getAttribute('data-field-id');
+            if (fieldId) {
+                window.togglePasswordVisibility(fieldId);
+            }
+        });
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize theme system first
     initThemeSystem();
@@ -237,6 +274,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initRecentActivityRefresh();
     initContentToggle();
     initContentDelete();
+    initPasswordVisibilityToggles();
 
     // Initialize page-specific functionality from inline scripts
     initMyMovies();
