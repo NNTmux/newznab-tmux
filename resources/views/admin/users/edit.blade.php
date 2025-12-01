@@ -5,9 +5,16 @@
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                <i class="fa fa-user mr-2"></i>{{ $title }}
-            </h1>
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                    <i class="fa fa-user mr-2"></i>{{ $title }}
+                </h1>
+                @if(!empty($user['id']))
+                    <a href="{{ url('admin/user-role-history/' . $user['id']) }}" class="px-4 py-2 bg-purple-600 dark:bg-purple-700 text-white rounded-lg hover:bg-purple-700 dark:hover:bg-purple-800">
+                        <i class="fa fa-history mr-2"></i>View Role History
+                    </a>
+                @endif
+            </div>
         </div>
 
         <!-- Error Messages -->

@@ -36,6 +36,7 @@ use App\Http\Controllers\Admin\AdminShowsController;
 use App\Http\Controllers\Admin\AdminSiteController;
 use App\Http\Controllers\Admin\AdminTmuxController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminUserRoleHistoryController;
 use App\Http\Controllers\Admin\DeletedUsersController;
 use App\Http\Controllers\AdultController;
 use App\Http\Controllers\AjaxController;
@@ -194,6 +195,8 @@ Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
     Route::post('user-delete', [AdminUserController::class, 'destroy'])->name('admin.user-delete');
     Route::post('verify', [AdminUserController::class, 'verify'])->name('admin.verify');
     Route::post('resendverification', [AdminUserController::class, 'resendVerification'])->name('admin.resend-verification');
+    Route::get('user-role-history', [AdminUserRoleHistoryController::class, 'index'])->name('admin.user-role-history');
+    Route::get('user-role-history/{userId}', [AdminUserRoleHistoryController::class, 'show'])->name('admin.user-role-history.show');
     Route::match(['GET', 'POST'], 'site-edit', [AdminSiteController::class, 'edit'])->name('admin.site-edit');
     Route::get('site-stats', [AdminSiteController::class, 'stats'])->name('admin.site-stats');
     Route::get('role-list', [AdminRoleController::class, 'index'])->name('admin.role-list');

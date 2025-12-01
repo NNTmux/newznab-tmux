@@ -315,6 +315,11 @@
                                                title="Edit">
                                                 <i class="fa fa-edit"></i>
                                             </a>
+                                            <a href="{{ url('admin/user-role-history/' . $user->id) }}"
+                                               class="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300"
+                                               title="Role History">
+                                                <i class="fa fa-history"></i>
+                                            </a>
                                             @if(!$user->verified)
                                                 <form method="POST" action="{{ route('admin.verify') }}" class="inline verify-user-form">
                                                     @csrf

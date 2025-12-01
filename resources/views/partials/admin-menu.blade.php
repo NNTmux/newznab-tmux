@@ -19,6 +19,7 @@
         <div id="users-menu" class="hidden mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/user-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">User List</a>
             <a href="{{ url('/admin/role-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">Roles</a>
+            <a href="{{ url('/admin/user-role-history') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">Role History</a>
             <a href="{{ url('/admin/promotions') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">Promotions</a>
             <a href="{{ url('/admin/deleted-users') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">Deleted Users</a>
         </div>
