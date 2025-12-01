@@ -204,6 +204,18 @@ class AdminUserController extends BasePageController
                             $originalRoleChangeDate // Pass original expiry for history
                         );
                         $editedUser->refresh();
+                    } elseif (!$roleChanged && $request->input('role') !== null) {
+                        // Role isn't changing, but we should still apply promotions if there are any
+                        // This handles the case where admin extends expiry date for existing role
+                        User::updateUserRole(
+                            $editedUser->id,
+                            (int) $request->input('role'), // Same role
+                            true, // Apply promotions
+                            false, // Don't stack (not changing role)
+                            $changedBy,
+                            $originalRoleChangeDate
+                        );
+                        $editedUser->refresh();
                     }
 
                     // Update user basic information (but NOT the role - it's handled above)
