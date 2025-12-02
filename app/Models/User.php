@@ -413,7 +413,7 @@ class User extends Authenticatable
         return self::whereEmail($email)->first();
     }
 
-    public static function updateUserRole(int $uid, int|string $role, bool $applyPromotions = true, bool $stackRole = true, ?int $changedBy = null, ?string $originalExpiryBeforeEdits = null): bool
+    public static function updateUserRole(int $uid, int|string $role, bool $applyPromotions = true, bool $stackRole = true, ?int $changedBy = null, ?string $originalExpiryBeforeEdits = null, bool $preserveCurrentExpiry = false): bool
     {
         // Handle role parameter - can be int, numeric string, or role name
         if (is_numeric($role)) {
@@ -628,7 +628,13 @@ class User extends Authenticatable
 
         // Calculate new expiry date
         $newExpiryDate = null;
-        if ($totalDays > 0) {
+        if ($preserveCurrentExpiry && $currentExpiryDate) {
+            // Admin manually set an expiry date - preserve it as-is
+            $newExpiryDate = $currentExpiryDate;
+            Log::info('Preserving admin-set expiry date', [
+                'preservedDate' => $newExpiryDate->toDateTimeString()
+            ]);
+        } elseif ($totalDays > 0) {
             // For immediate changes, start from now (not from old expiry)
             $baseDate = Carbon::now();
             $newExpiryDate = $baseDate->copy()->addDays($totalDays);

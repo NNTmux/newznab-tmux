@@ -182,10 +182,12 @@ class AdminUserController extends BasePageController
 
                     // Handle rolechangedate - Update the expiry for the CURRENT role FIRST
                     // This must happen BEFORE role change so the new expiry applies to the old role
+                    $adminManuallySetExpiry = false;
                     if ($request->has('rolechangedate')) {
                         $roleChangeDate = $request->input('rolechangedate');
                         if (! empty($roleChangeDate)) {
                             User::updateUserRoleChangeDate($editedUser->id, $roleChangeDate);
+                            $adminManuallySetExpiry = true; // Flag that admin set custom expiry
                         } else {
                             // Clear the rolechangedate if empty string is provided
                             $editedUser->update(['rolechangedate' => null]);
@@ -199,25 +201,16 @@ class AdminUserController extends BasePageController
                         User::updateUserRole(
                             $editedUser->id,
                             (int) $request->input('role'), // Cast to integer
-                            true, // Apply promotions
+                            !$adminManuallySetExpiry, // Only apply promotions if admin didn't set custom expiry
                             $stackRole, // Stack role if requested
                             $changedBy,
-                            $originalRoleChangeDate // Pass original expiry for history
-                        );
-                        $editedUser->refresh();
-                    } elseif (!$roleChanged && $request->input('role') !== null) {
-                        // Role isn't changing, but we should still apply promotions if there are any
-                        // This handles the case where admin extends expiry date for existing role
-                        User::updateUserRole(
-                            $editedUser->id,
-                            (int) $request->input('role'), // Same role
-                            true, // Apply promotions
-                            false, // Don't stack (not changing role)
-                            $changedBy,
-                            $originalRoleChangeDate
+                            $originalRoleChangeDate, // Pass original expiry for history
+                            $adminManuallySetExpiry // Preserve admin's manually set expiry date
                         );
                         $editedUser->refresh();
                     }
+                    // Note: We don't call updateUserRole when role hasn't changed
+                    // If admin manually set a rolechangedate, that's already applied above
 
                     // Update user basic information (but NOT the role - it's handled above)
                     // Use current role to avoid overwriting
