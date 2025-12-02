@@ -63,21 +63,12 @@ class BtcPaymentController extends BasePageController
             if ($checkOrder !== null) {
                 $user = User::query()->where('email', '=', $checkOrder->email)->first();
                 if ($user) {
-                    if (preg_match('/(?P<role>\w+(\s\+\+)?)[\s]+(?P<addYears>\d+)/i', $checkOrder->item_description, $matches)) {
-                        $roleName = $matches['role'];
-                        User::updateUserRole($user->id, $roleName);
-                        $checkOrder->update(['invoice_status' => 'Settled']);
-                        Log::channel('btc_payment')->info('User: '.$user->username.' upgraded to '.$matches['role'].' for BTCPay webhook: '.$checkOrder->webhook_id);
+                    $roleName = $checkOrder->item_description;
+                    User::updateUserRole($user->id, $roleName);
+                    $checkOrder->update(['invoice_status' => 'Settled']);
+                    Log::channel('btc_payment')->info('User: '.$user->username.' upgraded to '.$roleName.' for BTCPay webhook: '.$checkOrder->webhook_id);
 
-                        return response('OK', 200);
-                    } else {
-                        Log::channel('btc_payment')->error('Failed to parse item description', [
-                            'item_description' => $checkOrder->item_description,
-                            'webhook_id' => $checkOrder->webhook_id
-                        ]);
-
-                        return response('Bad Request', 400);
-                    }
+                    return response('OK', 200);
                 }
 
                 Log::channel('btc_payment')->error('User not found for BTCPay webhook: '.$checkOrder->webhook_id);
