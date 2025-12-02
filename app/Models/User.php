@@ -459,8 +459,11 @@ class User extends Authenticatable
                 'currentRoleId' => $currentRoleId
             ]);
 
-            // Even if role isn't changing, apply promotions if requested
-            if ($applyPromotions) {
+            // Define roles that should not receive promotions
+            $excludedRoles = ['User', 'Admin', 'Moderator', 'Disabled', 'Friend'];
+
+            // Even if a role isn't changing, apply promotions if requested
+            if ($applyPromotions && !in_array($roleName, $excludedRoles, true)) {
                 $promotionDays = RolePromotion::calculateAdditionalDays($roleQuery->id);
 
                 if ($promotionDays > 0) {
@@ -469,7 +472,7 @@ class User extends Authenticatable
                         'currentExpiryDate' => $currentExpiryDate?->toDateTimeString()
                     ]);
 
-                    // Calculate new expiry date by adding promotion days
+                    // Calculate a new expiry date by adding promotion days
                     $newExpiryDate = null;
                     if ($currentExpiryDate) {
                         // Extend from the current expiry date
@@ -536,7 +539,10 @@ class User extends Authenticatable
             $baseDays = $roleQuery->addyears * 365;
             $promotionDays = 0;
 
-            if ($applyPromotions) {
+            // Define roles that should not receive promotions
+            $excludedRoles = ['User', 'Admin', 'Moderator', 'Disabled', 'Friend'];
+
+            if ($applyPromotions && !in_array($roleName, $excludedRoles, true)) {
                 $promotionDays = RolePromotion::calculateAdditionalDays($roleQuery->id);
             }
 
@@ -604,7 +610,10 @@ class User extends Authenticatable
         $baseDays = $roleQuery->addyears * 365;
         $promotionDays = 0;
 
-        if ($applyPromotions) {
+        // Define roles that should not receive promotions
+        $excludedRoles = ['User', 'Admin', 'Moderator', 'Disabled', 'Friend'];
+
+        if ($applyPromotions && !in_array($roleName, $excludedRoles, true)) {
             $promotionDays = RolePromotion::calculateAdditionalDays($roleQuery->id);
         }
 
