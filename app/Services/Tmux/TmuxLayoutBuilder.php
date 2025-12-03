@@ -61,12 +61,21 @@ class TmuxLayoutBuilder
         $this->paneManager->selectPane('1.0');
         $this->paneManager->splitHorizontal('1', '50%', 'removeCrapReleases');
 
-        // Window 2: Postprocessing (Additional + TV/Anime + Movies + Amazon + XXX)
+        // Window 2: Postprocessing (Left: Additional + TV + Amazon, Right: Movies + XXX)
         $this->paneManager->createWindow(2, 'post');
         $this->paneManager->setPaneTitle('2.0', 'postprocessing_additional');
-        $this->paneManager->splitVertical('2', '80%', 'postprocessing_tv');
-        $this->paneManager->splitVertical('2', '75%', 'postprocessing_movies');
-        $this->paneManager->splitVertical('2', '67%', 'postprocessing_amazon');
+
+        // Split horizontally to create left and right halves (don't set title yet)
+        $this->paneManager->splitHorizontal('2', '50%', '');
+
+        // Left side (2.0): split vertically for TV and Amazon
+        $this->paneManager->selectPane('2.0');
+        $this->paneManager->splitVertical('2', '67%', 'postprocessing_tv');
+        $this->paneManager->splitVertical('2', '50%', 'postprocessing_amazon');
+
+        // Right side: After left splits, right side is now 2.3
+        $this->paneManager->selectPane('2.3');
+        $this->paneManager->setPaneTitle('2.3', 'postprocessing_movies');
         $this->paneManager->splitVertical('2', '50%', 'postprocessing_xxx');
 
         // Window 3: IRC Scraper
@@ -98,12 +107,21 @@ class TmuxLayoutBuilder
         $this->paneManager->selectPane('1.0');
         $this->paneManager->splitHorizontal('1', '50%', 'removeCrapReleases');
 
-        // Window 2: Postprocessing
+        // Window 2: Postprocessing (Left: Additional + TV + Amazon, Right: Movies + XXX)
         $this->paneManager->createWindow(2, 'post');
         $this->paneManager->setPaneTitle('2.0', 'postprocessing_additional');
-        $this->paneManager->splitVertical('2', '80%', 'postprocessing_tv');
-        $this->paneManager->splitVertical('2', '75%', 'postprocessing_movies');
-        $this->paneManager->splitVertical('2', '67%', 'postprocessing_amazon');
+
+        // Split horizontally to create left and right halves (don't set title yet)
+        $this->paneManager->splitHorizontal('2', '50%', '');
+
+        // Left side (2.0): split vertically for TV and Amazon
+        $this->paneManager->selectPane('2.0');
+        $this->paneManager->splitVertical('2', '67%', 'postprocessing_tv');
+        $this->paneManager->splitVertical('2', '50%', 'postprocessing_amazon');
+
+        // Right side: After left splits, right side is now 2.3
+        $this->paneManager->selectPane('2.3');
+        $this->paneManager->setPaneTitle('2.3', 'postprocessing_movies');
         $this->paneManager->splitVertical('2', '50%', 'postprocessing_xxx');
 
         // Window 3: IRC Scraper

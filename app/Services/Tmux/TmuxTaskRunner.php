@@ -646,7 +646,7 @@ class TmuxTaskRunner
     protected function runMoviesTask(array $runVar): bool
     {
         $enabled = (int) ($runVar['settings']['post_non'] ?? 0);
-        $pane = '2.2';
+        $pane = '2.3';
 
         if ($enabled !== 1) {
             return $this->disablePane($pane, 'Post-process Movies', 'disabled in settings');
@@ -691,7 +691,7 @@ class TmuxTaskRunner
     protected function runAmazonTask(array $runVar): bool
     {
         $enabled = (int) ($runVar['settings']['post_amazon'] ?? 0);
-        $pane = '2.3';
+        $pane = '2.2';
 
         if ($enabled !== 1) {
             return $this->disablePane($pane, 'Post-process Amazon', 'disabled in settings');
