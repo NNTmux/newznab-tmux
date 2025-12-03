@@ -1,7 +1,5 @@
 <?php
 
-umask(0002);
-
 use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
