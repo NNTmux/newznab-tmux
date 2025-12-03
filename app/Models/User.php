@@ -413,7 +413,7 @@ class User extends Authenticatable
         return self::whereEmail($email)->first();
     }
 
-    public static function updateUserRole(int $uid, int|string $role, bool $applyPromotions = true, bool $stackRole = true, ?int $changedBy = null, ?string $originalExpiryBeforeEdits = null, bool $preserveCurrentExpiry = false): bool
+    public static function updateUserRole(int $uid, int|string $role, bool $applyPromotions = true, bool $stackRole = true, ?int $changedBy = null, ?string $originalExpiryBeforeEdits = null, bool $preserveCurrentExpiry = false, ?int $addYears = null): bool
     {
         // Handle role parameter - can be int, numeric string, or role name
         if (is_numeric($role)) {
@@ -536,7 +536,8 @@ class User extends Authenticatable
 
             // Calculate a new expiry date for the pending role
             // Start with the role's base duration (addyears field converted to days)
-            $baseDays = $roleQuery->addyears * 365;
+            // Use the provided addYears parameter if available, otherwise use role's default
+            $baseDays = ($addYears !== null ? $addYears : $roleQuery->addyears) * 365;
             $promotionDays = 0;
 
             // Define roles that should not receive promotions
@@ -607,7 +608,8 @@ class User extends Authenticatable
 
         // Apply the role change immediately
         // Calculate base days from role's addyears field
-        $baseDays = $roleQuery->addyears * 365;
+        // Use the provided addYears parameter if available, otherwise use role's default
+        $baseDays = ($addYears !== null ? $addYears : $roleQuery->addyears) * 365;
         $promotionDays = 0;
 
         // Define roles that should not receive promotions
