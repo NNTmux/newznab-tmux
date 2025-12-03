@@ -60,8 +60,8 @@ try {
 
             // Determine which panes to run based on sequential mode
             $panesToRun = match ($sequential) {
-                0 => ['main', 'fixnames', 'removecrap', 'ppadditional', 'tv', 'movies', 'amazon'],
-                1 => ['main', 'fixnames', 'removecrap', 'ppadditional', 'tv', 'movies', 'amazon'],
+                0 => ['main', 'fixnames', 'removecrap', 'ppadditional', 'tv', 'movies', 'amazon', 'xxx'],
+                1 => ['main', 'fixnames', 'removecrap', 'ppadditional', 'tv', 'movies', 'amazon', 'xxx'],
                 2 => ['main', 'fixnames', 'amazon'],
                 default => [],
             };

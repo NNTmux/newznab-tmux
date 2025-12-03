@@ -311,6 +311,7 @@ class TmuxTaskRunner
             'tv' => $this->runTvTask($runVar),
             'movies' => $this->runMoviesTask($runVar),
             'amazon' => $this->runAmazonTask($runVar),
+            'xxx' => $this->runXXXTask($runVar),
             'scraper' => $this->runIRCScraper($runVar),
             // Legacy mapping for backward compatibility
             'nonamazon' => $this->runTvTask($runVar),
@@ -685,7 +686,7 @@ class TmuxTaskRunner
     }
 
     /**
-     * Run Amazon post-processing (Books, Music, Games, Console, XXX)
+     * Run Amazon post-processing (Books, Music, Games, Console)
      */
     protected function runAmazonTask(array $runVar): bool
     {
@@ -699,17 +700,80 @@ class TmuxTaskRunner
         $hasWork = (int) ($runVar['counts']['now']['processmusic'] ?? 0) > 0
             || (int) ($runVar['counts']['now']['processbooks'] ?? 0) > 0
             || (int) ($runVar['counts']['now']['processconsole'] ?? 0) > 0
-            || (int) ($runVar['counts']['now']['processgames'] ?? 0) > 0
-            || (int) ($runVar['counts']['now']['processxxx'] ?? 0) > 0;
+            || (int) ($runVar['counts']['now']['processgames'] ?? 0) > 0;
 
         if (! $hasWork) {
             return $this->disablePane($pane, 'Post-process Amazon', 'no music/books/games to process');
         }
 
         $niceness = Settings::settingValue('niceness') ?? 2;
-        $command = "nice -n{$niceness} ".PHP_BINARY.' artisan update:postprocess amazon true';
+        $log = $this->getLogFile('post_amazon');
+        $artisan = PHP_BINARY.' artisan';
+        $commands = [];
+
+        // Books processing
+        $processBooks = (int) ($runVar['settings']['processbooks'] ?? 0);
+        $hasBooksWork = (int) ($runVar['counts']['now']['processbooks'] ?? 0) > 0;
+        if ($processBooks > 0 && $hasBooksWork) {
+            $commands[] = "nice -n{$niceness} {$artisan} update:postprocess book 2>&1 | tee -a {$log}";
+        }
+
+        // Music processing
+        $processMusic = (int) ($runVar['settings']['processmusic'] ?? 0);
+        $hasMusicWork = (int) ($runVar['counts']['now']['processmusic'] ?? 0) > 0;
+        if ($processMusic > 0 && $hasMusicWork) {
+            $commands[] = "nice -n{$niceness} {$artisan} update:postprocess music 2>&1 | tee -a {$log}";
+        }
+
+        // Console processing
+        $processConsole = (int) ($runVar['settings']['processconsole'] ?? 0);
+        $hasConsoleWork = (int) ($runVar['counts']['now']['processconsole'] ?? 0) > 0;
+        if ($processConsole > 0 && $hasConsoleWork) {
+            $commands[] = "nice -n{$niceness} {$artisan} update:postprocess console 2>&1 | tee -a {$log}";
+        }
+
+        // Games processing
+        $processGames = (int) ($runVar['settings']['processgames'] ?? 0);
+        $hasGamesWork = (int) ($runVar['counts']['now']['processgames'] ?? 0) > 0;
+        if ($processGames > 0 && $hasGamesWork) {
+            $commands[] = "nice -n{$niceness} {$artisan} update:postprocess games 2>&1 | tee -a {$log}";
+        }
+
+        // If no commands were added (no work available), disable the pane
+        if (empty($commands)) {
+            return $this->disablePane($pane, 'Post-process Amazon', 'no work available for any enabled type');
+        }
+
         $sleep = (int) ($runVar['settings']['post_timer_amazon'] ?? 300);
-        $command = $this->buildCommand($command, ['log_pane' => 'post_amazon', 'sleep' => $sleep]);
+        $allCommands = implode('; ', $commands);
+        $sleepCommand = $this->buildSleepCommand($sleep);
+        $fullCommand = "{$allCommands}; date +'%Y-%m-%d %T'; {$sleepCommand}";
+
+        return $this->paneManager->respawnPane($pane, $fullCommand);
+    }
+
+    /**
+     * Run XXX post-processing
+     */
+    protected function runXXXTask(array $runVar): bool
+    {
+        $enabled = (int) ($runVar['settings']['processxxx'] ?? 0);
+        $pane = '2.4';
+
+        if ($enabled !== 1) {
+            return $this->disablePane($pane, 'Post-process XXX', 'disabled in settings');
+        }
+
+        $hasWork = (int) ($runVar['counts']['now']['processxxx'] ?? 0) > 0;
+
+        if (! $hasWork) {
+            return $this->disablePane($pane, 'Post-process XXX', 'no XXX releases to process');
+        }
+
+        $niceness = Settings::settingValue('niceness') ?? 2;
+        $command = "nice -n{$niceness} ".PHP_BINARY.' artisan update:postprocess xxx true';
+        $sleep = (int) ($runVar['settings']['post_timer_amazon'] ?? 300);
+        $command = $this->buildCommand($command, ['log_pane' => 'post_xxx', 'sleep' => $sleep]);
 
         return $this->paneManager->respawnPane($pane, $command);
     }

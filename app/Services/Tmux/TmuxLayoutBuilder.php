@@ -61,12 +61,13 @@ class TmuxLayoutBuilder
         $this->paneManager->selectPane('1.0');
         $this->paneManager->splitHorizontal('1', '50%', 'removeCrapReleases');
 
-        // Window 2: Postprocessing (Additional + TV/Anime + Movies + Amazon)
+        // Window 2: Postprocessing (Additional + TV/Anime + Movies + Amazon + XXX)
         $this->paneManager->createWindow(2, 'post');
         $this->paneManager->setPaneTitle('2.0', 'postprocessing_additional');
-        $this->paneManager->splitVertical('2', '75%', 'postprocessing_tv');
-        $this->paneManager->splitVertical('2', '67%', 'postprocessing_movies');
-        $this->paneManager->splitVertical('2', '50%', 'postprocessing_amazon');
+        $this->paneManager->splitVertical('2', '80%', 'postprocessing_tv');
+        $this->paneManager->splitVertical('2', '75%', 'postprocessing_movies');
+        $this->paneManager->splitVertical('2', '67%', 'postprocessing_amazon');
+        $this->paneManager->splitVertical('2', '50%', 'postprocessing_xxx');
 
         // Window 3: IRC Scraper
         $this->createIRCScraperWindow();
@@ -100,9 +101,10 @@ class TmuxLayoutBuilder
         // Window 2: Postprocessing
         $this->paneManager->createWindow(2, 'post');
         $this->paneManager->setPaneTitle('2.0', 'postprocessing_additional');
-        $this->paneManager->splitVertical('2', '75%', 'postprocessing_tv');
-        $this->paneManager->splitVertical('2', '67%', 'postprocessing_movies');
-        $this->paneManager->splitVertical('2', '50%', 'postprocessing_amazon');
+        $this->paneManager->splitVertical('2', '80%', 'postprocessing_tv');
+        $this->paneManager->splitVertical('2', '75%', 'postprocessing_movies');
+        $this->paneManager->splitVertical('2', '67%', 'postprocessing_amazon');
+        $this->paneManager->splitVertical('2', '50%', 'postprocessing_xxx');
 
         // Window 3: IRC Scraper
         $this->createIRCScraperWindow();
