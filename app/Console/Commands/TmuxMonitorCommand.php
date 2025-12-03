@@ -150,8 +150,9 @@ class TmuxMonitorCommand extends Command
             'fixnames' => ['target' => '1.0'],
             'removecrap' => ['target' => '1.1'],
             'ppadditional' => ['target' => '2.0'],
-            'nonamazon' => ['target' => '2.1'],
-            'amazon' => ['target' => '2.2'],
+            'tv' => ['target' => '2.1'],
+            'movies' => ['target' => '2.2'],
+            'amazon' => ['target' => '2.3'],
             'scraper' => ['target' => '3.0'],
         ];
     }
@@ -163,12 +164,13 @@ class TmuxMonitorCommand extends Command
     {
         return [
             'main' => ['target' => '0.1'],
-            'amazon' => ['target' => '2.2'],
+            'amazon' => ['target' => '2.3'],
             'scraper' => ['target' => '3.0'],
             'fixnames' => ['target' => '1.0'],
             'removecrap' => ['target' => '1.1'],
             'ppadditional' => ['target' => '2.0'],
-            'nonamazon' => ['target' => '2.1'],
+            'tv' => ['target' => '2.1'],
+            'movies' => ['target' => '2.2'],
         ];
     }
 

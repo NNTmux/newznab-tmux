@@ -61,10 +61,11 @@ class TmuxLayoutBuilder
         $this->paneManager->selectPane('1.0');
         $this->paneManager->splitHorizontal('1', '50%', 'removeCrapReleases');
 
-        // Window 2: Postprocessing (Additional + Non-Amazon + Amazon)
+        // Window 2: Postprocessing (Additional + TV/Anime + Movies + Amazon)
         $this->paneManager->createWindow(2, 'post');
         $this->paneManager->setPaneTitle('2.0', 'postprocessing_additional');
-        $this->paneManager->splitVertical('2', '67%', 'postprocessing_non_amazon');
+        $this->paneManager->splitVertical('2', '75%', 'postprocessing_tv');
+        $this->paneManager->splitVertical('2', '67%', 'postprocessing_movies');
         $this->paneManager->splitVertical('2', '50%', 'postprocessing_amazon');
 
         // Window 3: IRC Scraper
@@ -99,7 +100,8 @@ class TmuxLayoutBuilder
         // Window 2: Postprocessing
         $this->paneManager->createWindow(2, 'post');
         $this->paneManager->setPaneTitle('2.0', 'postprocessing_additional');
-        $this->paneManager->splitVertical('2', '67%', 'postprocessing_non_amazon');
+        $this->paneManager->splitVertical('2', '75%', 'postprocessing_tv');
+        $this->paneManager->splitVertical('2', '67%', 'postprocessing_movies');
         $this->paneManager->splitVertical('2', '50%', 'postprocessing_amazon');
 
         // Window 3: IRC Scraper
@@ -158,7 +160,7 @@ class TmuxLayoutBuilder
      * Window layout:
      * - Window 0: Monitor + Processing panes (binaries/backfill/releases)
      * - Window 1: Utilities (fix names, remove crap)
-     * - Window 2: Postprocessing (additional, non-amazon, amazon)
+     * - Window 2: Postprocessing (additional, tv/anime, movies, amazon)
      * - Window 3: IRC Scraper
      * - Window 4+: Monitoring tools (htop, nmon, vnstat, tcptrack, bwm-ng, mytop, redis, console)
      */

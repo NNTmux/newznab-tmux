@@ -308,9 +308,12 @@ class TmuxTaskRunner
             'fixnames' => $this->runFixNamesTask($runVar),
             'removecrap' => $this->runRemoveCrapTask($runVar),
             'ppadditional' => $this->runPostProcessAdditional($runVar),
-            'nonamazon' => $this->runNonAmazonTask($runVar),
+            'tv' => $this->runTvTask($runVar),
+            'movies' => $this->runMoviesTask($runVar),
             'amazon' => $this->runAmazonTask($runVar),
             'scraper' => $this->runIRCScraper($runVar),
+            // Legacy mapping for backward compatibility
+            'nonamazon' => $this->runTvTask($runVar),
             default => false,
         };
     }
@@ -572,19 +575,19 @@ class TmuxTaskRunner
     }
 
     /**
-     * Run non-Amazon post-processing (TV, Movies, Anime)
+     * Run TV/Anime post-processing
      */
-    protected function runNonAmazonTask(array $runVar): bool
+    protected function runTvTask(array $runVar): bool
     {
         $enabled = (int) ($runVar['settings']['post_non'] ?? 0);
         $pane = '2.1';
 
         if ($enabled !== 1) {
-            return $this->disablePane($pane, 'Post-process Non-Amazon', 'disabled in settings');
+            return $this->disablePane($pane, 'Post-process TV/Anime', 'disabled in settings');
         }
 
         $niceness = $this->getNiceness();
-        $log = $this->getLogFile('post_non');
+        $log = $this->getLogFile('post_tv');
         $artisan = PHP_BINARY.' artisan';
         $commands = [];
 
@@ -602,13 +605,7 @@ class TmuxTaskRunner
             }
         }
 
-        // Movies processing - Uses single-process command
-        $processMovies = (int) ($runVar['settings']['processmovies'] ?? 0);
-        $hasMoviesWork = (int) ($runVar['counts']['now']['processmovies'] ?? 0) > 0;
-        if ($processMovies > 0 && $hasMoviesWork) {
-            $commands[] = "nice -n{$niceness} {$artisan} update:postprocess movies true 2>&1 | tee -a {$log}";
-        }
-
+        // Anime processing
         $processAnime = (int) ($runVar['settings']['processanime'] ?? 0);
         $hasAnimeWork = (int) ($runVar['counts']['now']['processanime'] ?? 0) > 0;
         if ($processAnime > 0 && $hasAnimeWork) {
@@ -621,20 +618,17 @@ class TmuxTaskRunner
             if ($processTv > 0) {
                 $enabledTypes[] = 'TV';
             }
-            if ($processMovies > 0) {
-                $enabledTypes[] = 'Movies';
-            }
             if ($processAnime > 0) {
                 $enabledTypes[] = 'Anime';
             }
 
             if (empty($enabledTypes)) {
-                return $this->disablePane($pane, 'Post-process Non-Amazon', 'no types enabled (TV/Movies/Anime)');
+                return $this->disablePane($pane, 'Post-process TV/Anime', 'no types enabled (TV/Anime)');
             }
 
             $typesList = implode(', ', $enabledTypes);
 
-            return $this->disablePane($pane, 'Post-process Non-Amazon', "no work for enabled types ({$typesList})");
+            return $this->disablePane($pane, 'Post-process TV/Anime', "no work for enabled types ({$typesList})");
         }
 
         $sleep = (int) ($runVar['settings']['post_timer_non'] ?? 300);
@@ -646,12 +640,57 @@ class TmuxTaskRunner
     }
 
     /**
+     * Run Movies post-processing
+     */
+    protected function runMoviesTask(array $runVar): bool
+    {
+        $enabled = (int) ($runVar['settings']['post_non'] ?? 0);
+        $pane = '2.2';
+
+        if ($enabled !== 1) {
+            return $this->disablePane($pane, 'Post-process Movies', 'disabled in settings');
+        }
+
+        $niceness = $this->getNiceness();
+        $log = $this->getLogFile('post_movies');
+        $artisan = PHP_BINARY.' artisan';
+
+        // Movies processing - Uses single-process command
+        $processMovies = (int) ($runVar['settings']['processmovies'] ?? 0);
+        $hasMoviesWork = (int) ($runVar['counts']['now']['processmovies'] ?? 0) > 0;
+
+        if ($processMovies === 0) {
+            return $this->disablePane($pane, 'Post-process Movies', 'disabled in settings');
+        }
+
+        if (! $hasMoviesWork) {
+            return $this->disablePane($pane, 'Post-process Movies', 'no work available');
+        }
+
+        $sleep = (int) ($runVar['settings']['post_timer_non'] ?? 300);
+        $command = "nice -n{$niceness} {$artisan} update:postprocess movies true 2>&1 | tee -a {$log}";
+        $sleepCommand = $this->buildSleepCommand($sleep);
+        $fullCommand = "{$command}; date +'%Y-%m-%d %T'; {$sleepCommand}";
+
+        return $this->paneManager->respawnPane($pane, $fullCommand);
+    }
+
+    /**
+     * Legacy method for backward compatibility - now just calls runTvTask
+     * @deprecated Use runTvTask() instead
+     */
+    protected function runNonAmazonTask(array $runVar): bool
+    {
+        return $this->runTvTask($runVar);
+    }
+
+    /**
      * Run Amazon post-processing (Books, Music, Games, Console, XXX)
      */
     protected function runAmazonTask(array $runVar): bool
     {
         $enabled = (int) ($runVar['settings']['post_amazon'] ?? 0);
-        $pane = '2.2';
+        $pane = '2.3';
 
         if ($enabled !== 1) {
             return $this->disablePane($pane, 'Post-process Amazon', 'disabled in settings');
