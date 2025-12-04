@@ -572,6 +572,10 @@ class SettingsTableSeeder extends Seeder
                 'name' => 'redis',
                 'value' => '0',
             ],
+            237 => [
+                'name' => 'redis_args',
+                'value' => 'NULL',
+            ],
             212 => [
                 'name' => 'rel_timer',
                 'value' => '30',

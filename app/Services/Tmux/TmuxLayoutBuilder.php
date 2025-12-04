@@ -232,10 +232,28 @@ class TmuxLayoutBuilder
             $windowIndex++;
         }
 
-        // redis-stat
+        // redis monitoring
         if ((int) Settings::settingValue('redis') === 1 && $this->commandExists('redis-cli')) {
-            $this->paneManager->createWindow($windowIndex, 'redis-stat');
-            $this->paneManager->respawnPane("{$windowIndex}.0", 'redis-stat --verbose --server=63790');
+            $redisHost = config('database.redis.default.host', '127.0.0.1');
+            $redisPort = config('database.redis.default.port', 6379);
+            $redisArgs = Settings::settingValue('redis_args') ?? '';
+            $refreshInterval = 2;
+
+            $this->paneManager->createWindow($windowIndex, 'redis');
+
+            // Check if custom args provided for simple redis-cli output
+            if (! empty($redisArgs) && $redisArgs !== 'NULL') {
+                $this->paneManager->respawnPane("{$windowIndex}.0", "watch -n{$refreshInterval} -c 'redis-cli -h {$redisHost} -p {$redisPort} {$redisArgs}'");
+            } else {
+                // Use modern visual monitoring script
+                $monitorScript = base_path('misc/redis-monitor.sh');
+                if (file_exists($monitorScript)) {
+                    $this->paneManager->respawnPane("{$windowIndex}.0", "bash {$monitorScript} {$redisHost} {$redisPort} {$refreshInterval}");
+                } else {
+                    // Fallback to basic redis-cli info with color
+                    $this->paneManager->respawnPane("{$windowIndex}.0", "watch -n{$refreshInterval} -c 'redis-cli -h {$redisHost} -p {$redisPort} info'");
+                }
+            }
             $windowIndex++;
         }
 

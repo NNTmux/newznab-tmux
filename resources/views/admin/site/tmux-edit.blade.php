@@ -451,7 +451,7 @@
                                 </x-select>
                             </x-form.group>
 
-                            <x-form.group label="Redis Stats" for="redis" help="Redis statistics monitor (requires redis-stat gem).">
+                            <x-form.group label="Redis Monitor" for="redis" help="Redis server monitor (requires redis-cli). Uses Redis config from .env.">
                                 <x-select id="redis" name="redis" class="w-full">
                                     @foreach($yesno_ids as $index => $val)
                                         <option value="{{ $val }}" {{ ($site['redis'] ?? '') == $val ? 'selected' : '' }}>
@@ -461,6 +461,10 @@
                                 </x-select>
                             </x-form.group>
                         </div>
+
+                        <x-form.group label="Redis Args" for="redis_args" help="Custom redis-cli arguments (e.g., 'info' or 'info clients'). Leave empty for default stats+memory display.">
+                            <x-input id="redis_args" name="redis_args" type="text" value="{{ $site['redis_args'] ?? '' }}" class="w-full" placeholder="e.g., info clients" />
+                        </x-form.group>
 
                         <div class="bg-yellow-50 dark:bg-gray-800 border border-yellow-300 dark:border-gray-600 rounded p-3">
                             <p class="text-sm text-yellow-700 dark:text-gray-400">
