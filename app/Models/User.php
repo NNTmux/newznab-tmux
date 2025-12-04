@@ -454,15 +454,75 @@ class User extends Authenticatable
 
         // Check if role is actually changing
         if ($currentRoleId === $roleQuery->id) {
-            Log::info('Role not changing, but checking for promotions', [
+            Log::info('Role not changing, but checking for promotions and addYears', [
                 'applyPromotions' => $applyPromotions,
-                'currentRoleId' => $currentRoleId
+                'currentRoleId' => $currentRoleId,
+                'addYears' => $addYears
             ]);
 
             // Define roles that should not receive promotions
             $excludedRoles = ['User', 'Admin', 'Moderator', 'Disabled', 'Friend'];
 
-            // Even if a role isn't changing, apply promotions if requested
+            // If addYears is provided, extend the subscription from current expiry
+            if ($addYears !== null && $addYears > 0) {
+                $additionalDays = $addYears * 365;
+                $promotionDays = 0;
+
+                if ($applyPromotions && !in_array($roleName, $excludedRoles, true)) {
+                    $promotionDays = RolePromotion::calculateAdditionalDays($roleQuery->id);
+                }
+
+                $totalDays = $additionalDays + $promotionDays;
+
+                Log::info('Applying addYears to existing role', [
+                    'addYears' => $addYears,
+                    'additionalDays' => $additionalDays,
+                    'promotionDays' => $promotionDays,
+                    'totalDays' => $totalDays,
+                    'currentExpiryDate' => $currentExpiryDate?->toDateTimeString()
+                ]);
+
+                // Calculate new expiry date - extend from current expiry if it exists and is in future
+                $newExpiryDate = null;
+                if ($currentExpiryDate && $currentExpiryDate->isFuture()) {
+                    // Extend from the current expiry date
+                    $newExpiryDate = $currentExpiryDate->copy()->addDays($totalDays);
+                } else {
+                    // No expiry date or expired, create one from now
+                    $newExpiryDate = Carbon::now()->addDays($totalDays);
+                }
+
+                // Update the user's expiry date
+                $updated = $user->update([
+                    'rolechangedate' => $newExpiryDate,
+                ]);
+
+                Log::info('Updated expiry date with addYears', [
+                    'updated' => $updated,
+                    'new_expiry_date' => $newExpiryDate?->toDateTimeString()
+                ]);
+
+                // Track promotion statistics if applicable
+                if ($updated && $promotionDays > 0) {
+                    $promotions = RolePromotion::getActivePromotions($roleQuery->id);
+                    foreach ($promotions as $promotion) {
+                        $promotion->trackApplication(
+                            $user->id,
+                            $roleQuery->id,
+                            $currentExpiryDate,
+                            $newExpiryDate
+                        );
+                    }
+
+                    Log::info('Tracked promotion application for existing role with addYears', [
+                        'promotions_count' => $promotions->count()
+                    ]);
+                }
+
+                return $updated;
+            }
+
+            // Even if a role isn't changing, apply promotions if requested (and no addYears provided)
             if ($applyPromotions && !in_array($roleName, $excludedRoles, true)) {
                 $promotionDays = RolePromotion::calculateAdditionalDays($roleQuery->id);
 
