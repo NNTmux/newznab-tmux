@@ -350,8 +350,11 @@ class RefreshAnimeData extends Command
             return [];
         }
 
+        // Fix UTF-8 encoding issues (double-encoding, corrupted sequences)
+        $s = $this->fixEncoding($searchname);
+
         // Normalize common separators
-        $s = str_replace(['_', '.'], ' ', $searchname);
+        $s = str_replace(['_', '.'], ' ', $s);
         $s = preg_replace('/\s+/', ' ', $s);
         $s = trim($s);
 
@@ -405,10 +408,54 @@ class RefreshAnimeData extends Command
     }
 
     /**
+     * Fix UTF-8 encoding issues in strings (double-encoding, corrupted sequences).
+     */
+    private function fixEncoding(string $text): string
+    {
+        // Remove common corrupted character sequences (encoding artifacts)
+        // Pattern: Ã¢Â_Â, Ã¢Â Â, Ã¢Â, etc.
+        $text = preg_replace('/Ã¢Â[_\sÂ]*/u', '', $text);
+        $text = preg_replace('/Ã[¢Â©€£]/u', '', $text);
+        
+        // Remove standalone Â characters (common encoding artifact)
+        $text = preg_replace('/Â+/u', '', $text);
+        
+        // Remove any remaining Ã sequences (encoding artifacts)
+        $text = preg_replace('/Ã[^\s]*/u', '', $text);
+        
+        // Try to detect and fix double-encoding issues
+        // Common patterns: Ã©, Ã, etc. (UTF-8 interpreted as ISO-8859-1)
+        if (preg_match('/Ã[^\s]/u', $text)) {
+            // Try ISO-8859-1 -> UTF-8 conversion (common double-encoding fix)
+            $converted = @mb_convert_encoding($text, 'UTF-8', 'ISO-8859-1');
+            if ($converted !== false && !preg_match('/Ã[^\s]/u', $converted)) {
+                $text = $converted;
+            }
+        }
+        
+        // Remove any remaining non-printable or control characters except spaces
+        $text = preg_replace('/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/u', '', $text);
+        
+        // Normalize Unicode (NFD -> NFC) if available
+        if (function_exists('normalizer_normalize')) {
+            $text = normalizer_normalize($text, \Normalizer::FORM_C);
+        }
+        
+        // Final cleanup: remove any remaining isolated non-ASCII control-like characters
+        // This catches any remaining encoding artifacts
+        $text = preg_replace('/[\xC0-\xC1\xC2-\xC5]/u', '', $text);
+        
+        return $text;
+    }
+
+    /**
      * Strip stray separators, language codes, episode numbers, and other release tags from title.
      */
     private function cleanTitle(string $title): string
     {
+        // Fix encoding issues first
+        $title = $this->fixEncoding($title);
+        
         // Remove all bracketed tags (language, quality, etc.)
         $title = preg_replace('/\[[^\]]+\]/', ' ', $title);
         

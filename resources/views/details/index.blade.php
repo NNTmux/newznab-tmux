@@ -457,6 +457,7 @@
                     $anidbEnglishTitle = $anidbData['english_title'] ?? ($anidb->english_title ?? null);
                     $anidbOriginalTitle = $anidbData['original_title'] ?? ($anidb->original_title ?? null);
                     $anidbOriginalLang = $anidbData['original_lang'] ?? ($anidb->original_lang ?? null);
+                    $anidbRomajiTitle = $anidbData['romaji_title'] ?? ($anidb->romaji_title ?? null);
                     $anidbHashtag = $anidbData['hashtag'] ?? ($anidb->hashtag ?? null);
                     $anidbType = $anidbData['type'] ?? ($anidb->type ?? null);
                     $anidbMediaType = $anidbData['media_type'] ?? ($anidb->media_type ?? null);
@@ -516,7 +517,7 @@
                         @endif
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        @if(!empty($anidbEnglishTitle) || !empty($anidbOriginalTitle) || !empty($anidbHashtag))
+                        @if(!empty($anidbEnglishTitle) || !empty($anidbOriginalTitle) || !empty($anidbRomajiTitle) || !empty($anidbHashtag))
                             <div class="md:col-span-2">
                                 <dt class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Titles</dt>
                                 <dd class="mt-1 space-y-2">
@@ -526,17 +527,25 @@
                                             {{ $anidbEnglishTitle }}
                                         </div>
                                     @endif
-                                    @if(!empty($anidbOriginalTitle))
+                                    @if(!empty($anidbOriginalTitle) && $anidbOriginalLang === 'ja')
                                         <div class="text-sm text-gray-900 dark:text-gray-100 font-semibold">
-                                            <span class="text-xs text-gray-500 dark:text-gray-400 font-normal mr-2">
-                                                @if($anidbOriginalLang === 'ja')
-                                                    Native:
-                                                @elseif($anidbOriginalLang === 'x-jat')
-                                                    Romaji:
-                                                @else
-                                                    Original:
-                                                @endif
-                                            </span>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400 font-normal mr-2">Native:</span>
+                                            {{ $anidbOriginalTitle }}
+                                        </div>
+                                    @endif
+                                    @if(!empty($anidbRomajiTitle))
+                                        <div class="text-sm text-gray-900 dark:text-gray-100 font-semibold">
+                                            <span class="text-xs text-gray-500 dark:text-gray-400 font-normal mr-2">Romaji:</span>
+                                            {{ $anidbRomajiTitle }}
+                                        </div>
+                                    @elseif(!empty($anidbOriginalTitle) && $anidbOriginalLang === 'x-jat')
+                                        <div class="text-sm text-gray-900 dark:text-gray-100 font-semibold">
+                                            <span class="text-xs text-gray-500 dark:text-gray-400 font-normal mr-2">Romaji:</span>
+                                            {{ $anidbOriginalTitle }}
+                                        </div>
+                                    @elseif(!empty($anidbOriginalTitle) && $anidbOriginalLang !== 'ja')
+                                        <div class="text-sm text-gray-900 dark:text-gray-100 font-semibold">
+                                            <span class="text-xs text-gray-500 dark:text-gray-400 font-normal mr-2">Original:</span>
                                             {{ $anidbOriginalTitle }}
                                         </div>
                                     @endif
@@ -546,7 +555,7 @@
                                             <span class="font-mono text-blue-600 dark:text-blue-400">{{ $anidbHashtag }}</span>
                                         </div>
                                     @endif
-                                    @if(empty($anidbEnglishTitle) && empty($anidbOriginalTitle) && !empty($anidbTitle))
+                                    @if(empty($anidbEnglishTitle) && empty($anidbOriginalTitle) && empty($anidbRomajiTitle) && !empty($anidbTitle))
                                         <div class="text-sm text-gray-900 dark:text-gray-100 font-semibold">
                                             {{ $anidbTitle }}
                                         </div>

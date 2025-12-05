@@ -546,60 +546,64 @@ class PopulateAniList
         $source = $anilistData['source'] ?? null;
         $hashtag = $anilistData['hashtag'] ?? null;
 
+        // Use updateOrInsert to handle race conditions atomically
+        // This prevents duplicate key errors when multiple processes try to insert the same record
         $check = AnidbInfo::query()->where('anidbid', $anidbid)->first();
+        
+        $data = [
+            'anidbid' => $anidbid,
+            'anilist_id' => $anilistId,
+            'mal_id' => $malId,
+            'country' => $country,
+            'media_type' => $mediaType,
+            'type' => $anilistData['format'] ?? null,
+            'episodes' => $episodes,
+            'duration' => $duration,
+            'status' => $status,
+            'source' => $source,
+            'hashtag' => $hashtag,
+            'startdate' => $startDate,
+            'enddate' => $endDate,
+            'description' => $description,
+            'rating' => $rating,
+            'picture' => $picture,
+            'categories' => $genres,
+            'characters' => $characters,
+            'creators' => $creators,
+            'related' => $related,
+            'similar' => $similar,
+            'updated' => now(),
+        ];
 
-        if ($check === null) {
-            AnidbInfo::insert([
-                'anidbid' => $anidbid,
-                'anilist_id' => $anilistId,
-                'mal_id' => $malId,
-                'country' => $country,
-                'media_type' => $mediaType,
-                'type' => $anilistData['format'] ?? null,
-                'episodes' => $episodes,
-                'duration' => $duration,
-                'status' => $status,
-                'source' => $source,
-                'hashtag' => $hashtag,
-                'startdate' => $startDate,
-                'enddate' => $endDate,
-                'description' => $description,
-                'rating' => $rating,
-                'picture' => $picture,
-                'categories' => $genres,
-                'characters' => $characters,
-                'creators' => $creators,
-                'related' => $related,
-                'similar' => $similar,
-                'updated' => now(),
-            ]);
-        } else {
-            AnidbInfo::query()
-                ->where('anidbid', $anidbid)
-                ->update([
-                    'anilist_id' => $anilistId ?? $check->anilist_id,
-                    'mal_id' => $malId ?? $check->mal_id,
-                    'country' => $country ?? $check->country,
-                    'media_type' => $mediaType ?? $check->media_type,
-                    'type' => $anilistData['format'] ?? $anilistData['type'] ?? $check->type,
-                    'episodes' => $episodes ?? $check->episodes,
-                    'duration' => $duration ?? $check->duration,
-                    'status' => $status ?? $check->status,
-                    'source' => $source ?? $check->source,
-                    'hashtag' => $hashtag ?? $check->hashtag,
-                    'startdate' => $startDate ?? $check->startdate,
-                    'enddate' => $endDate ?? $check->enddate,
-                    'description' => $description ?: $check->description,
-                    'rating' => $rating ?? $check->rating,
-                    'picture' => $picture ?? $check->picture,
-                    'categories' => $genres ?: $check->categories,
-                    'characters' => $characters ?: $check->characters,
-                    'creators' => $creators ?: $check->creators,
-                    'related' => $related ?: $check->related,
-                    'similar' => $similar ?: $check->similar,
-                    'updated' => now(),
-                ]);
+        // If record exists, preserve existing values for null fields
+        if ($check !== null) {
+            $data['anilist_id'] = $anilistId ?? $check->anilist_id;
+            $data['mal_id'] = $malId ?? $check->mal_id;
+            $data['country'] = $country ?? $check->country;
+            $data['media_type'] = $mediaType ?? $check->media_type;
+            $data['type'] = $anilistData['format'] ?? $anilistData['type'] ?? $check->type;
+            $data['episodes'] = $episodes ?? $check->episodes;
+            $data['duration'] = $duration ?? $check->duration;
+            $data['status'] = $status ?? $check->status;
+            $data['source'] = $source ?? $check->source;
+            $data['hashtag'] = $hashtag ?? $check->hashtag;
+            $data['startdate'] = $startDate ?? $check->startdate;
+            $data['enddate'] = $endDate ?? $check->enddate;
+            $data['description'] = $description ?: $check->description;
+            $data['rating'] = $rating ?? $check->rating;
+            $data['picture'] = $picture ?? $check->picture;
+            $data['categories'] = $genres ?: $check->categories;
+            $data['characters'] = $characters ?: $check->characters;
+            $data['creators'] = $creators ?: $check->creators;
+            $data['related'] = $related ?: $check->related;
+            $data['similar'] = $similar ?: $check->similar;
         }
+
+        // Use updateOrInsert to atomically handle insert/update (prevents race conditions)
+        AnidbInfo::query()->updateOrInsert(
+            ['anidbid' => $anidbid],
+            $data
+        );
 
         // Insert titles
         if (isset($anilistData['title']['romaji']) && ! empty($anilistData['title']['romaji'])) {

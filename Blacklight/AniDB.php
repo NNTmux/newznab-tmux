@@ -178,19 +178,22 @@ class AniDB
                 )
             );
             
-            // If we found a native title, use it; otherwise try to get romaji
+            // Get romaji title separately
+            $romajiTitle = DB::selectOne(
+                sprintf(
+                    '
+					SELECT title, lang
+					FROM anidb_titles
+					WHERE anidbid = %d AND lang = "x-jat"
+					LIMIT 1',
+                    $anidbID
+                )
+            );
+            
+            // If we found a native title, use it; otherwise use romaji as original
             $originalTitle = $nativeTitle;
-            if (!$originalTitle) {
-                $originalTitle = DB::selectOne(
-                    sprintf(
-                        '
-						SELECT title, lang
-						FROM anidb_titles
-						WHERE anidbid = %d AND lang = "x-jat"
-						LIMIT 1',
-                        $anidbID
-                    )
-                );
+            if (!$originalTitle && $romajiTitle) {
+                $originalTitle = $romajiTitle;
             }
             
             // Add titles to result
@@ -206,6 +209,13 @@ class AniDB
             } else {
                 $result->original_title = null;
                 $result->original_lang = null;
+            }
+            
+            // Add romaji title separately (even if it's also the original)
+            if ($romajiTitle && isset($romajiTitle->title)) {
+                $result->romaji_title = $romajiTitle->title;
+            } else {
+                $result->romaji_title = null;
             }
         }
 
