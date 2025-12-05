@@ -29,7 +29,6 @@ if (isset($argv[1]) && $argv[1] === 'all' && isset($argv[2]) && $argv[2] === 'tr
         DB::select('TRUNCATE TABLE tv_info');
         DB::select('TRUNCATE TABLE tv_episodes');
         DB::select('TRUNCATE TABLE anidb_info');
-        DB::select('TRUNCATE TABLE anidb_episodes');
     }
     $colorCli->header('Resetting all postprocessing');
     $qry = DB::select('SELECT id FROM releases');
@@ -209,7 +208,6 @@ if (isset($argv[1]) && ($argv[1] === 'anime' || $argv[1] === 'all')) {
     $ran = true;
     if (isset($argv[3]) && $argv[3] === 'truncate') {
         DB::select('TRUNCATE TABLE anidb_info');
-        DB::select('TRUNCATE TABLE anidb_episodes');
     }
     if (isset($argv[2]) && $argv[2] === 'true') {
         $colorCli->header('Resetting all Anime postprocessing');

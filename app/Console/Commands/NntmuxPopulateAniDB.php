@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\PopulateAniDB;
+use Blacklight\PopulateAniList;
 use Illuminate\Console\Command;
 
 class NntmuxPopulateAniDB extends Command
@@ -13,29 +13,32 @@ class NntmuxPopulateAniDB extends Command
      * @var string
      */
     protected $signature = 'nntmux:populate-anidb
-    {--full : Populate full data}
     {--info : Populate info only}
-    {--anidbid : Populate tables for specific anidbid}';
+    {--anilistid : Populate tables for specific AniList ID}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Populate AniDB table';
+    protected $description = 'Populate AniList table (replaces AniDB)';
 
     /**
      * Execute the console command.
      */
     public function handle(): void
     {
-        if ($this->option('full')) {
-            (new PopulateAniDB(['Echo' => true]))->populateTable('full');
-        } elseif ($this->option('info') && is_numeric($this->option('anidbid'))) {
-            (new PopulateAniDB(['Echo' => true]))->populateTable('info', $this->option('anidbid'));
+        $palist = new PopulateAniList;
+        
+        if ($this->option('info') && is_numeric($this->option('anilistid'))) {
+            $palist->populateTable('info', $this->option('anilistid'));
         } elseif ($this->option('info')) {
-            (new PopulateAniDB(['Echo' => true]))->populateTable('info');
+            $palist->populateTable('info');
+        } else {
+            $this->error('Please specify --info option');
+            return;
         }
-        $this->info('AniDB tables populated with requested data');
+        
+        $this->info('AniList tables populated with requested data');
     }
 }

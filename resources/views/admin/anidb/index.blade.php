@@ -61,11 +61,11 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @php
-                                    $coverPath = public_path('covers/anime/' . $anime->anidbid . '.jpg');
+                                    $coverPath = storage_path('covers/anime/' . $anime->anidbid . '-cover.jpg');
                                     $hasCover = file_exists($coverPath);
                                 @endphp
                                 @if($hasCover)
-                                    <img src="{{ asset('covers/anime/' . $anime->anidbid . '.jpg') }}"
+                                    <img src="{{ url('/covers/anime/' . $anime->anidbid . '-cover.jpg') }}"
                                          alt="{{ $anime->title }}"
                                          class="h-16 w-12 object-cover rounded shadow"
                                          loading="lazy">

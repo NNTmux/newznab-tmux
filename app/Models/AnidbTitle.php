@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $type type of title.
  * @property string $lang
  * @property string $title
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\AnidbEpisode[] $episode
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\AnidbInfo[] $info
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbTitle whereAnidbid($value)
@@ -52,11 +51,6 @@ class AnidbTitle extends Model
      * @var array
      */
     protected $guarded = [];
-
-    public function episode(): HasMany
-    {
-        return $this->hasMany(AnidbEpisode::class, 'anidbid');
-    }
 
     public function info(): HasMany
     {

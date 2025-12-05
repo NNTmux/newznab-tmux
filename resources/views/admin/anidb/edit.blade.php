@@ -125,11 +125,11 @@
                             </label>
                             <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
                                 @php
-                                    $coverPath = public_path('covers/anime/' . $anime['anidbid'] . '.jpg');
+                                    $coverPath = storage_path('covers/anime/' . $anime['anidbid'] . '-cover.jpg');
                                     $hasCover = file_exists($coverPath);
                                 @endphp
                                 @if($hasCover)
-                                    <img src="{{ asset('covers/anime/' . $anime['anidbid'] . '.jpg') }}"
+                                    <img src="{{ url('/covers/anime/' . $anime['anidbid'] . '-cover.jpg') }}"
                                          alt="{{ $anime['title'] }}"
                                          class="max-w-full h-auto mx-auto rounded shadow-lg"
                                          style="max-height: 400px;">
@@ -137,10 +137,36 @@
                                     <div class="flex flex-col items-center justify-center py-12 text-gray-400 dark:text-gray-500">
                                         <i class="fas fa-dragon text-6xl mb-3"></i>
                                         <p>No cover image available</p>
+                                        <p class="text-xs mt-2">Cover will be downloaded from AniList when data is populated</p>
                                     </div>
                                 @endif
                             </div>
                         </div>
+                        
+                        <!-- External Links -->
+                        @php
+                            $anilistId = $anime['anilist_id'] ?? null;
+                            $malId = $anime['mal_id'] ?? null;
+                        @endphp
+                        @if(!empty($anilistId) || !empty($malId))
+                            <div class="mt-4">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    External Links
+                                </label>
+                                <div class="flex flex-wrap gap-2">
+                                    @if(!empty($anilistId))
+                                        <a href="{{ $site['dereferrer_link'] ?? '' }}https://anilist.co/anime/{{ $anilistId }}" target="_blank" class="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition text-sm">
+                                            <i class="fas fa-external-link-alt mr-2"></i> AniList
+                                        </a>
+                                    @endif
+                                    @if(!empty($malId))
+                                        <a href="{{ $site['dereferrer_link'] ?? '' }}https://myanimelist.net/anime/{{ $malId }}" target="_blank" class="inline-flex items-center px-3 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition text-sm">
+                                            <i class="fas fa-external-link-alt mr-2"></i> MyAnimeList
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
 
                         <!-- Description -->
                         <div>

@@ -316,6 +316,7 @@ class Categorize
 
     public function isAnimeTV(): bool
     {
+
         if ($this->hasAdultMarkers()) {
             return false;
         }
@@ -325,7 +326,12 @@ class Categorize
 
             return true;
         }
-        if (preg_match('/(ANiHLS|HaiKU|ANiURL)/i', $this->releaseName)) {
+        if (preg_match('/((\[[a-fA-F0-9]{8}\])|(\[[a-z0-9]{8}\])|ANiHLS|HaiKU|ANiURL|SkyAnime|2jzgte|^shiteater|(Erai|New)\-raws)|(LostYears|Vodes)$/i', $this->releaseName)) {
+            $this->tmpCat = Category::TV_ANIME;
+
+            return true;
+        }
+        if (preg_match('/Sokudo|Ninja Kamui|Synduality Noir|Komyo|Yoohoo/i', $this->releaseName)) {
             $this->tmpCat = Category::TV_ANIME;
 
             return true;

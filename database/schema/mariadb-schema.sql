@@ -1,20 +1,19 @@
 SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE IF EXISTS `anidb_episodes`;
-
-CREATE TABLE `anidb_episodes` (
-  `anidbid` int(10) unsigned NOT NULL COMMENT 'ID of title from AniDB',
-  `episodeid` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'anidb id for this episode',
-  `episode_no` smallint(5) unsigned NOT NULL COMMENT 'Numeric version of episode (leave 0 for combined episodes).',
-  `episode_title` varchar(255) NOT NULL COMMENT 'Title of the episode (en, x-jat)',
-  `airdate` date NOT NULL,
-  PRIMARY KEY (`anidbid`,`episodeid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 
 DROP TABLE IF EXISTS `anidb_info`;
 
 CREATE TABLE `anidb_info` (
   `anidbid` int(10) unsigned NOT NULL COMMENT 'ID of title from AniDB',
+  `anilist_id` int(10) unsigned DEFAULT NULL COMMENT 'ID from AniList',
+  `mal_id` int(10) unsigned DEFAULT NULL COMMENT 'ID from MyAnimeList',
+  `country` char(2) DEFAULT NULL COMMENT 'ISO 3166-1 alpha-2 country code',
+  `media_type` varchar(10) DEFAULT NULL COMMENT 'ANIME or MANGA',
   `type` varchar(32) DEFAULT NULL,
+  `episodes` int(10) unsigned DEFAULT NULL,
+  `duration` int(10) unsigned DEFAULT NULL COMMENT 'Duration in minutes',
+  `status` varchar(20) DEFAULT NULL COMMENT 'Media status (FINISHED, RELEASING, etc.)',
+  `source` varchar(20) DEFAULT NULL COMMENT 'Original source (MANGA, ORIGINAL, etc.)',
+  `hashtag` varchar(255) DEFAULT NULL COMMENT 'AniList hashtag',
   `startdate` date DEFAULT NULL,
   `enddate` date DEFAULT NULL,
   `updated` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -27,7 +26,10 @@ CREATE TABLE `anidb_info` (
   `categories` varchar(1024) DEFAULT NULL,
   `characters` varchar(1024) DEFAULT NULL,
   PRIMARY KEY (`anidbid`),
-  KEY `ix_anidb_info_datetime` (`startdate`,`enddate`,`updated`)
+  KEY `ix_anidb_info_datetime` (`startdate`,`enddate`,`updated`),
+  KEY `ix_anidb_info_anilist_id` (`anilist_id`),
+  KEY `ix_anidb_info_mal_id` (`mal_id`),
+  KEY `ix_anidb_info_country` (`country`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 
 DROP TABLE IF EXISTS `anidb_titles`;

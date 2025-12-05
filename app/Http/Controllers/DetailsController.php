@@ -121,6 +121,22 @@ class DetailsController extends BasePageController
             $AniDBAPIArray = '';
             if ($data['anidbid'] > 0) {
                 $AniDBAPIArray = (new AniDB)->getAnimeInfo($data['anidbid']);
+                
+                // If we have anilist_id but missing details, fetch from AniList
+                if ($AniDBAPIArray && !empty($AniDBAPIArray->anilist_id)) {
+                    $anilistId = is_object($AniDBAPIArray) ? $AniDBAPIArray->anilist_id : ($AniDBAPIArray['anilist_id'] ?? null);
+                    if ($anilistId && (empty($AniDBAPIArray->country) && empty($AniDBAPIArray->media_type))) {
+                        // Fetch fresh data from AniList if country/media_type is missing
+                        try {
+                            $palist = new \Blacklight\PopulateAniList;
+                            $palist->populateTable('info', $anilistId);
+                            // Refresh the data
+                            $AniDBAPIArray = (new AniDB)->getAnimeInfo($data['anidbid']);
+                        } catch (\Exception $e) {
+                            // Silently fail, use existing data
+                        }
+                    }
+                }
             }
 
             $pre = Predb::getForRelease($data['predb_id']);

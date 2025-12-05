@@ -15,20 +15,19 @@ class AniDB
     public function __construct() {}
 
     /**
-     * Updates stored AniDB entries in the database.
+     * Updates stored AniList entries in the database.
+     * Note: AniList doesn't support episodes, so episode-related parameters are ignored.
      */
-    public function updateTitle(int $anidbID, string $title, string $type, string $startdate, string $enddate, string $related, string $similar, string $creators, string $description, string $rating, string $categories, string $characters, string $epnos, string $airdates, string $episodetitles): void
+    public function updateTitle(int $anidbID, string $title, string $type, string $startdate, string $enddate, string $related, string $similar, string $creators, string $description, string $rating, string $categories, string $characters, string $epnos = '', string $airdates = '', string $episodetitles = ''): void
     {
         DB::update(
             sprintf(
                 '
 				UPDATE anidb_titles at
 				INNER JOIN anidb_info ai ON ai.anidbid = at.anidbid
-				INNER JOIN anidb_episodes ae ON ae.anidbid = at.anidbid
 				SET title = %s, type = %s, startdate = %s, enddate = %s,
 					related = %s, similar = %s, creators = %s, description = %s, rating = %s,
-					categories = %s, characters = %s, epnos = %s, airdates = %s,
-					episodetitles = %s WHERE anidbid = %d',
+					categories = %s, characters = %s WHERE anidbid = %d',
                 escapeString($title),
                 escapeString($type),
                 escapeString($startdate),
@@ -40,9 +39,6 @@ class AniDB
                 escapeString($rating),
                 escapeString($categories),
                 escapeString($characters),
-                escapeString($epnos),
-                escapeString($airdates),
-                escapeString($episodetitles),
                 $anidbID
             )
         );
@@ -57,10 +53,9 @@ class AniDB
             DB::delete(
                 sprintf(
                     '
-				DELETE at, ai, ae
+				DELETE at, ai
 				FROM anidb_titles AS at
 				LEFT OUTER JOIN anidb_info ai USING (anidbid)
-				LEFT OUTER JOIN anidb_episodes ae USING (anidbid)
 				WHERE anidbid = %d',
                     $anidbID
                 )
@@ -125,25 +120,95 @@ class AniDB
     }
 
     /**
-     * Retrieves all info for a specific AniDB ID.
+     * Retrieves all info for a specific AniList ID.
+     * Note: AniList doesn't support episodes, so episode data is not included.
      */
     public function getAnimeInfo(int $anidbID): mixed
     {
+        // Get main info with primary title (prefer English, fallback to any)
         $animeInfo = DB::select(
             sprintf(
                 '
 				SELECT at.anidbid, at.lang, at.title,
+					ai.anilist_id, ai.mal_id, ai.country, ai.media_type, ai.episodes, ai.duration, ai.status, ai.source, ai.hashtag,
 					ai.startdate, ai.enddate, ai.updated, ai.related, ai.creators, ai.description,
-					ai.rating, ai.picture, ai.categories, ai.characters, ai.type, ai.similar, ae.episodeid, ae
-					.episode_title, ae.episode_no, ae.airdate
+					ai.rating, ai.picture, ai.categories, ai.characters, ai.type, ai.similar
 				FROM anidb_titles AS at
 				LEFT JOIN anidb_info AS ai USING (anidbid)
-				LEFT JOIN anidb_episodes ae USING (anidbid)
-				WHERE at.anidbid = %d',
+				WHERE at.anidbid = %d
+				ORDER BY CASE 
+					WHEN at.lang = "en" THEN 1
+					WHEN at.lang = "x-jat" THEN 2
+					ELSE 3
+				END
+				LIMIT 1',
                 $anidbID
             )
         );
 
-        return $animeInfo[0] ?? false;
+        $result = $animeInfo[0] ?? false;
+        
+        if ($result) {
+            // Get English title separately
+            $englishTitle = DB::selectOne(
+                sprintf(
+                    '
+					SELECT title
+					FROM anidb_titles
+					WHERE anidbid = %d AND lang = "en"
+					LIMIT 1',
+                    $anidbID
+                )
+            );
+            
+            // Get native title (prefer ja, then x-jat, then any non-English title)
+            $nativeTitle = DB::selectOne(
+                sprintf(
+                    '
+					SELECT title, lang
+					FROM anidb_titles
+					WHERE anidbid = %d AND lang NOT IN ("en")
+					ORDER BY CASE 
+						WHEN lang = "ja" THEN 1
+						WHEN lang = "x-jat" THEN 2
+						ELSE 3
+					END
+					LIMIT 1',
+                    $anidbID
+                )
+            );
+            
+            // If we found a native title, use it; otherwise try to get romaji
+            $originalTitle = $nativeTitle;
+            if (!$originalTitle) {
+                $originalTitle = DB::selectOne(
+                    sprintf(
+                        '
+						SELECT title, lang
+						FROM anidb_titles
+						WHERE anidbid = %d AND lang = "x-jat"
+						LIMIT 1',
+                        $anidbID
+                    )
+                );
+            }
+            
+            // Add titles to result
+            if ($englishTitle && isset($englishTitle->title)) {
+                $result->english_title = $englishTitle->title;
+            } else {
+                $result->english_title = null;
+            }
+            
+            if ($originalTitle && isset($originalTitle->title)) {
+                $result->original_title = $originalTitle->title;
+                $result->original_lang = $originalTitle->lang;
+            } else {
+                $result->original_title = null;
+                $result->original_lang = null;
+            }
+        }
+
+        return $result;
     }
 }

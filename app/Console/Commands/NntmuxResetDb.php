@@ -82,7 +82,6 @@ class NntmuxResetDb extends Command
                 'releases',
                 'anidb_titles',
                 'anidb_info',
-                'anidb_episodes',
                 'releases_groups',
             ];
             foreach ($arr as &$value) {

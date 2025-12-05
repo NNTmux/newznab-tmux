@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * App\Models\AnidbInfo.
  *
- * @property-read AnidbEpisode $episode
  * @property-read AnidbTitle $title
  *
  * @mixin \Eloquent
@@ -26,6 +25,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $picture
  * @property string|null $categories
  * @property string|null $characters
+ * @property int|null $anilist_id ID from AniList
+ * @property int|null $mal_id ID from MyAnimeList
+ * @property string|null $country ISO 3166-1 alpha-2 country code
+ * @property string|null $media_type ANIME or MANGA
+ * @property int|null $episodes Number of episodes
+ * @property int|null $duration Duration in minutes
+ * @property string|null $status Media status (FINISHED, RELEASING, etc.)
+ * @property string|null $source Original source (MANGA, ORIGINAL, etc.)
+ * @property string|null $hashtag AniList hashtag
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbInfo newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbInfo newQuery()
@@ -81,8 +89,4 @@ class AnidbInfo extends Model
         return $this->belongsTo(AnidbTitle::class, 'anidbid');
     }
 
-    public function episode(): BelongsTo
-    {
-        return $this->belongsTo(AnidbEpisode::class, 'anidbid');
-    }
 }
