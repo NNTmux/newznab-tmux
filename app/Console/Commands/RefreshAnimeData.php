@@ -33,6 +33,7 @@ class RefreshAnimeData extends Command
                             {--limit=0 : Maximum number of releases to process (0 = all)}
                             {--chunk=100 : Process releases in chunks of this size}
                             {--missing-only : Only refresh releases missing AniList data (no anilist_id)}
+                            {--retry-failed : Only refresh releases with anidbid <= 0 (failed processing: -1, -2, etc.)}
                             {--force : Force refresh even if data exists}';
 
     /**
@@ -50,9 +51,17 @@ class RefreshAnimeData extends Command
         $limit = (int) $this->option('limit');
         $chunkSize = (int) $this->option('chunk');
         $missingOnly = $this->option('missing-only');
+        $retryFailed = $this->option('retry-failed');
         $force = $this->option('force');
 
         $this->info('Starting AniList data refresh for anime releases...');
+        if ($retryFailed) {
+            $this->info('Mode: Retrying failed releases (anidbid <= 0)...');
+        } elseif ($missingOnly) {
+            $this->info('Mode: Missing AniList data only...');
+        } else {
+            $this->info('Mode: All releases...');
+        }
         $this->info('Matching releases by searchname to AniList API...');
         $this->newLine();
 
@@ -60,6 +69,11 @@ class RefreshAnimeData extends Command
         $query = Release::query()
             ->select(['releases.id', 'releases.anidbid', 'releases.searchname'])
             ->where('categories_id', Category::TV_ANIME);
+
+        // If retry-failed, only get releases with anidbid <= 0 (failed processing)
+        if ($retryFailed) {
+            $query->where('releases.anidbid', '<=', 0);
+        }
 
         // If missing-only, only get releases without anilist_id
         if ($missingOnly) {
@@ -94,6 +108,7 @@ class RefreshAnimeData extends Command
         $failed = 0;
         $skipped = 0;
         $notFound = 0;
+        $failedSearchnames = []; // Track failed searchnames for summary
 
         // Process in chunks
         $chunks = $releases->chunk($chunkSize);
@@ -113,6 +128,15 @@ class RefreshAnimeData extends Command
                     
                     if (empty($titleData) || empty($titleData['title'])) {
                         $notFound++;
+                        $failedSearchnames[] = [
+                            'searchname' => $searchname,
+                            'reason' => 'Failed to extract title',
+                            'cleaned_title' => null,
+                        ];
+                        if ($this->getOutput()->isVerbose()) {
+                            $this->newLine();
+                            $this->warn("Failed to extract title from searchname: {$searchname}");
+                        }
                         $processed++;
                         $progressBar->advance();
                         continue;
@@ -121,7 +145,8 @@ class RefreshAnimeData extends Command
                     $cleanTitle = $titleData['title'];
 
                     // Check if we should skip (if not forcing and data exists)
-                    if (! $force && ! $missingOnly) {
+                    // Don't skip if we're retrying failed releases (anidbid <= 0)
+                    if (! $force && ! $missingOnly && ! $retryFailed) {
                         // Check if release already has complete AniList data
                         if ($release->anidbid > 0) {
                             $anidbInfo = DB::table('anidb_info')
@@ -155,6 +180,17 @@ class RefreshAnimeData extends Command
 
                     if (! $searchResults || empty($searchResults)) {
                         $notFound++;
+                        $failedSearchnames[] = [
+                            'searchname' => $searchname,
+                            'reason' => 'No AniList match found',
+                            'cleaned_title' => $cleanTitle,
+                        ];
+                        if ($this->getOutput()->isVerbose()) {
+                            $this->newLine();
+                            $this->warn("No AniList match found for:");
+                            $this->line("  Searchname: {$searchname}");
+                            $this->line("  Cleaned title: {$cleanTitle}");
+                        }
                         $processed++;
                         $progressBar->advance();
                         continue;
@@ -165,6 +201,17 @@ class RefreshAnimeData extends Command
 
                     if (! $anilistId) {
                         $notFound++;
+                        $failedSearchnames[] = [
+                            'searchname' => $searchname,
+                            'reason' => 'AniList result missing ID',
+                            'cleaned_title' => $cleanTitle,
+                        ];
+                        if ($this->getOutput()->isVerbose()) {
+                            $this->newLine();
+                            $this->warn("AniList search returned result but no ID for:");
+                            $this->line("  Searchname: {$searchname}");
+                            $this->line("  Cleaned title: {$cleanTitle}");
+                        }
                         $processed++;
                         $progressBar->advance();
                         continue;
@@ -213,6 +260,21 @@ class RefreshAnimeData extends Command
                             ]
                         );
                         
+                        // Show failed searchnames if any
+                        if (!empty($failedSearchnames)) {
+                            $this->newLine();
+                            $this->warn("Failed searchnames (before rate limit error):");
+                            $this->line("Showing up to 10 examples:");
+                            $examples = array_slice($failedSearchnames, 0, 10);
+                            foreach ($examples as $item) {
+                                $cleanedTitle = $item['cleaned_title'] ?? '(extraction failed)';
+                                $this->line("  - {$item['searchname']} -> {$cleanedTitle} ({$item['reason']})");
+                            }
+                            if (count($failedSearchnames) > 10) {
+                                $this->line("  ... and " . (count($failedSearchnames) - 10) . " more.");
+                            }
+                        }
+                        
                         return self::FAILURE;
                     }
                     
@@ -244,6 +306,34 @@ class RefreshAnimeData extends Command
                 ['Skipped', $skipped],
             ]
         );
+
+        // Show failed searchnames if any
+        if (!empty($failedSearchnames) && $notFound > 0) {
+            $this->newLine();
+            $this->warn("Failed to fetch data for {$notFound} release(s):");
+            $this->newLine();
+            
+            // Show up to 20 examples
+            $examples = array_slice($failedSearchnames, 0, 20);
+            $rows = [];
+            foreach ($examples as $item) {
+                $cleanedTitle = $item['cleaned_title'] ?? '(extraction failed)';
+                $rows[] = [
+                    substr($item['searchname'], 0, 60) . (strlen($item['searchname']) > 60 ? '...' : ''),
+                    substr($cleanedTitle, 0, 40) . (strlen($cleanedTitle) > 40 ? '...' : ''),
+                    $item['reason'],
+                ];
+            }
+            
+            $this->table(
+                ['Searchname', 'Cleaned Title', 'Reason'],
+                $rows
+            );
+            
+            if (count($failedSearchnames) > 20) {
+                $this->line("... and " . (count($failedSearchnames) - 20) . " more. Use --verbose to see all.");
+            }
+        }
 
         return self::SUCCESS;
     }
@@ -277,16 +367,20 @@ class RefreshAnimeData extends Command
         $title = '';
 
         // Try to extract title by removing episode patterns
-        // 1) Look for " - NNN" and extract title before it
-        if (preg_match('/\s-\s*(\d{1,3})\b/', $s, $m, PREG_OFFSET_CAPTURE)) {
+        // 1) Look for " S01E01" or " S1E1" pattern
+        if (preg_match('/\sS\d+E\d+/i', $s, $m, PREG_OFFSET_CAPTURE)) {
             $title = substr($s, 0, (int) $m[0][1]);
         }
-        // 2) If not found, look for " E0*NNN" or " Ep NNN"
+        // 2) Look for " 1x18" or " 2x05" pattern (season x episode)
+        elseif (preg_match('/\s\d+x\d+/i', $s, $m, PREG_OFFSET_CAPTURE)) {
+            $title = substr($s, 0, (int) $m[0][1]);
+        }
+        // 3) Look for " - NNN" and extract title before it
+        elseif (preg_match('/\s-\s*(\d{1,3})\b/', $s, $m, PREG_OFFSET_CAPTURE)) {
+            $title = substr($s, 0, (int) $m[0][1]);
+        }
+        // 4) If not found, look for " E0*NNN" or " Ep NNN"
         elseif (preg_match('/\sE(?:p(?:isode)?)?\s*0*(\d{1,3})\b/i', $s, $m, PREG_OFFSET_CAPTURE)) {
-            $title = substr($s, 0, (int) $m[0][1]);
-        }
-        // 3) Look for " S01E01" or " S1E1" pattern
-        elseif (preg_match('/\sS\d+E\d+/i', $s, $m, PREG_OFFSET_CAPTURE)) {
             $title = substr($s, 0, (int) $m[0][1]);
         }
         // 4) Keywords Movie/OVA/Complete Series
@@ -334,11 +428,16 @@ class RefreshAnimeData extends Command
         $title = preg_replace('/[-_]\s*\d{1,4}\s*$/i', '', $title);
         $title = preg_replace('/\s+\d{1,4}\s*$/i', '', $title);
         
-        // Remove episode patterns
-        $title = preg_replace('/\s*-\s*\d{1,4}\s*$/i', '', $title);
+        // Remove episode patterns (including episode titles that follow)
+        // Remove " - 1x18 - Episode Title" or " - 1x18" patterns
+        $title = preg_replace('/\s*-\s*\d+x\d+.*$/i', '', $title);
+        // Remove " S01E01" or " S1E1" pattern
+        $title = preg_replace('/\s+S\d+E\d+.*$/i', '', $title);
+        // Remove " - NNN" or " - NNN - Episode Title" patterns
+        $title = preg_replace('/\s*-\s*\d{1,4}(?:\s*-\s*.*)?\s*$/i', '', $title);
         $title = preg_replace('/\s*-\s*$/i', '', $title);
+        // Remove " E0*NNN" or " Ep NNN" patterns
         $title = preg_replace('/\s+E(?:p(?:isode)?)?\s*0*\d{1,4}\s*$/i', '', $title);
-        $title = preg_replace('/\s+S\d+E\d+\s*$/i', '', $title);
         
         // Remove quality/resolution tags
         $title = preg_replace('/\b(480p|720p|1080p|2160p|4K|BD|BDRip|BluRay|Blu-Ray|HEVC|x264|x265|H264|H265|WEB|WEBRip|DVDRip|TVRip)\b/i', ' ', $title);

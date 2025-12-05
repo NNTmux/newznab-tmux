@@ -135,16 +135,20 @@ class AniDB
         $title = '';
 
         // Try to extract title by removing episode patterns
-        // 1) Look for " - NNN" and extract title before it
-        if (preg_match('/\s-\s*(\d{1,3})\b/', $s, $m, PREG_OFFSET_CAPTURE)) {
+        // 1) Look for " S01E01" or " S1E1" pattern
+        if (preg_match('/\sS\d+E\d+/i', $s, $m, PREG_OFFSET_CAPTURE)) {
             $title = substr($s, 0, (int) $m[0][1]);
         }
-        // 2) If not found, look for " E0*NNN" or " Ep NNN"
+        // 2) Look for " 1x18" or " 2x05" pattern (season x episode)
+        elseif (preg_match('/\s\d+x\d+/i', $s, $m, PREG_OFFSET_CAPTURE)) {
+            $title = substr($s, 0, (int) $m[0][1]);
+        }
+        // 3) Look for " - NNN" and extract title before it
+        elseif (preg_match('/\s-\s*(\d{1,3})\b/', $s, $m, PREG_OFFSET_CAPTURE)) {
+            $title = substr($s, 0, (int) $m[0][1]);
+        }
+        // 4) If not found, look for " E0*NNN" or " Ep NNN"
         elseif (preg_match('/\sE(?:p(?:isode)?)?\s*0*(\d{1,3})\b/i', $s, $m, PREG_OFFSET_CAPTURE)) {
-            $title = substr($s, 0, (int) $m[0][1]);
-        }
-        // 3) Look for " S01E01" or " S1E1" pattern
-        elseif (preg_match('/\sS\d+E\d+/i', $s, $m, PREG_OFFSET_CAPTURE)) {
             $title = substr($s, 0, (int) $m[0][1]);
         }
         // 4) Keywords Movie/OVA/Complete Series
@@ -194,11 +198,16 @@ class AniDB
         $title = preg_replace('/[-_]\s*\d{1,4}\s*$/i', '', $title);
         $title = preg_replace('/\s+\d{1,4}\s*$/i', '', $title);
         
-        // Remove episode patterns
-        $title = preg_replace('/\s*-\s*\d{1,4}\s*$/i', '', $title);
+        // Remove episode patterns (including episode titles that follow)
+        // Remove " - 1x18 - Episode Title" or " - 1x18" patterns
+        $title = preg_replace('/\s*-\s*\d+x\d+.*$/i', '', $title);
+        // Remove " S01E01" or " S1E1" pattern
+        $title = preg_replace('/\s+S\d+E\d+.*$/i', '', $title);
+        // Remove " - NNN" or " - NNN - Episode Title" patterns
+        $title = preg_replace('/\s*-\s*\d{1,4}(?:\s*-\s*.*)?\s*$/i', '', $title);
         $title = preg_replace('/\s*-\s*$/i', '', $title);
+        // Remove " E0*NNN" or " Ep NNN" patterns
         $title = preg_replace('/\s+E(?:p(?:isode)?)?\s*0*\d{1,4}\s*$/i', '', $title);
-        $title = preg_replace('/\s+S\d+E\d+\s*$/i', '', $title);
         
         // Remove quality/resolution tags
         $title = preg_replace('/\b(480p|720p|1080p|2160p|4K|BD|BDRip|BluRay|Blu-Ray|HEVC|x264|x265|H264|H265|WEB|WEBRip|DVDRip|TVRip)\b/i', ' ', $title);
