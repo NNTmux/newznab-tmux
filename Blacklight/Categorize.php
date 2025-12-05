@@ -326,7 +326,7 @@ class Categorize
 
             return true;
         }
-        if (preg_match('/((\[[a-fA-F0-9]{8}\])|(\[[a-z0-9]{8}\])|ANiHLS|HaiKU|ANiURL|SkyAnime|2jzgte|^shiteater|(Erai|New)\-raws)|(LostYears|Vodes)$/i', $this->releaseName)) {
+        if (preg_match('/((\[[a-fA-F0-9]{8}\])|(\[[a-z0-9]{8}\])|URANiME|ANiHLS|HaiKU|ANiURL|SkyAnime|2jzgte|^shiteater|(Erai|New)\-raws)|(LostYears|Vodes)$/i', $this->releaseName)) {
             $this->tmpCat = Category::TV_ANIME;
 
             return true;
