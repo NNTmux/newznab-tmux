@@ -167,6 +167,36 @@ class PopulateAniList
     }
 
     /**
+     * Refresh AniList data for a specific anidbid.
+     * If anilist_id exists in database, uses it. Otherwise returns false.
+     *
+     * @return bool True on success, false on failure
+     *
+     * @throws \Exception
+     */
+    public function refreshAnimeByAnidbid(int $anidbid): bool
+    {
+        // Get anilist_id from database
+        $anidbInfo = AnidbInfo::query()->where('anidbid', $anidbid)->first();
+        
+        if (! $anidbInfo || ! $anidbInfo->anilist_id) {
+            return false;
+        }
+
+        // Fetch fresh data from AniList
+        $anilistData = $this->getAnimeById($anidbInfo->anilist_id);
+        
+        if ($anilistData === false) {
+            return false;
+        }
+
+        // Update database with fresh data
+        $this->insertAniListInfo($anidbid, $anilistData);
+        
+        return true;
+    }
+
+    /**
      * Get anime by AniList ID.
      *
      * @return array|false
@@ -367,7 +397,7 @@ class PopulateAniList
     /**
      * Insert or update AniList info data.
      */
-    private function insertAniListInfo(int $anidbid, array $anilistData): void
+    protected function insertAniListInfo(int $anidbid, array $anilistData): void
     {
         // Extract data from AniList response
         $startDate = null;
