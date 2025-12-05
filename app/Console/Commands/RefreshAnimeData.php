@@ -12,10 +12,10 @@ use Illuminate\Support\Facades\DB;
 class RefreshAnimeData extends Command
 {
     /**
-     * Conservative rate limit: 35 requests per minute (to stay well below AniList's 90/min limit).
+     * Conservative rate limit: 20 requests per minute (to stay well below AniList's 90/min limit).
      * This allows for multiple API calls per release (search + getById).
      */
-    private const RATE_LIMIT_PER_MINUTE = 35;
+    private const RATE_LIMIT_PER_MINUTE = 20;
 
     /**
      * Track API request timestamps for rate limiting.
@@ -387,8 +387,8 @@ class RefreshAnimeData extends Command
             }
         }
 
-        // Calculate minimum delay between requests (to maintain 35/min rate)
-        // 60 seconds / 35 requests = ~1.71 seconds per request
+        // Calculate minimum delay between requests (to maintain 20/min rate)
+        // 60 seconds / 20 requests = 3 seconds per request
         $minDelay = 60.0 / self::RATE_LIMIT_PER_MINUTE;
         
         // If we have recent requests, ensure we wait at least the minimum delay

@@ -18,9 +18,9 @@ class PopulateAniList
     private const API_URL = 'https://graphql.anilist.co';
 
     /**
-     * Rate limit: 90 requests per minute
+     * Rate limit: 20 requests per minute (conservative limit to avoid hitting AniList's 90/min limit)
      */
-    private const RATE_LIMIT_PER_MINUTE = 90;
+    private const RATE_LIMIT_PER_MINUTE = 20;
 
     /**
      * Whether to echo message output.
