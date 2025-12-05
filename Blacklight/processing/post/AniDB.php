@@ -205,7 +205,7 @@ class AniDB
         
         // Normalize whitespace
         $title = preg_replace('/\s+/', ' ', $title);
-        
+
         return trim((string) $title);
     }
 
@@ -336,7 +336,7 @@ class AniDB
                 if ($anilistId) {
                     // Fetch remote info from AniList
                     $this->palist->populateTable('info', $anilistId);
-                    $type = 'Remote';
+                $type = 'Remote';
                 }
             }
 

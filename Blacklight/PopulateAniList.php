@@ -6,6 +6,7 @@ use App\Models\AnidbInfo;
 use App\Models\AnidbTitle;
 use App\Models\Settings;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Carbon;
 
@@ -40,6 +41,12 @@ class PopulateAniList
      * Rate limiting: track requests and timestamps
      */
     private array $rateLimitQueue = [];
+
+    /**
+     * Track when we received a 429 error and need to pause.
+     * Format: ['timestamp' => int, 'paused_until' => int]
+     */
+    private static ?array $rateLimitPause = null;
 
     protected ColorCLI $colorCli;
 
@@ -289,6 +296,25 @@ class PopulateAniList
      */
     private function makeGraphQLRequest(string $query, array $variables = [])
     {
+        // Check if we're paused due to 429 error
+        if (self::$rateLimitPause !== null) {
+            $now = time();
+            $pausedUntil = self::$rateLimitPause['paused_until'];
+            
+            if ($now < $pausedUntil) {
+                $remainingSeconds = $pausedUntil - $now;
+                if ($this->echooutput) {
+                    $this->colorCli->warning("API calls paused due to 429 error. Resuming in {$remainingSeconds} seconds...");
+                }
+                
+                // Throw exception to stop processing
+                throw new \Exception("AniList API rate limit exceeded (429). Paused until " . date('Y-m-d H:i:s', $pausedUntil));
+            } else {
+                // Pause period expired, clear it
+                self::$rateLimitPause = null;
+            }
+        }
+        
         // Enforce rate limiting
         $this->enforceRateLimit();
 
@@ -302,6 +328,21 @@ class PopulateAniList
 
             $statusCode = $response->getStatusCode();
             $body = json_decode($response->getBody()->getContents(), true);
+
+            // Handle 429 Too Many Requests - pause for 15 minutes
+            if ($statusCode === 429) {
+                $pauseUntil = time() + (15 * 60); // 15 minutes from now
+                self::$rateLimitPause = [
+                    'timestamp' => time(),
+                    'paused_until' => $pauseUntil,
+                ];
+                
+                if ($this->echooutput) {
+                    $this->colorCli->error('AniList API returned 429 (Too Many Requests). Pausing all API calls for 15 minutes.');
+                }
+                
+                return false;
+            }
 
             // Track rate limit from headers
             $remaining = (int) ($response->getHeader('X-RateLimit-Remaining')[0] ?? self::RATE_LIMIT_PER_MINUTE);
@@ -329,6 +370,28 @@ class PopulateAniList
                 }
 
                 return false;
+            }
+
+            return false;
+        } catch (ClientException $e) {
+            // Check if this is a 429 error from Guzzle
+            $statusCode = $e->getResponse()->getStatusCode();
+            if ($statusCode === 429) {
+                $pauseUntil = time() + (15 * 60); // 15 minutes from now
+                self::$rateLimitPause = [
+                    'timestamp' => time(),
+                    'paused_until' => $pauseUntil,
+                ];
+                
+                if ($this->echooutput) {
+                    $this->colorCli->error('AniList API returned 429 (Too Many Requests). Pausing all API calls for 15 minutes.');
+                }
+                
+                throw new \Exception("AniList API rate limit exceeded (429). Paused until " . date('Y-m-d H:i:s', $pauseUntil));
+            }
+            
+            if ($this->echooutput) {
+                $this->colorCli->error('AniList API Request Failed: '.$e->getMessage());
             }
 
             return false;
