@@ -125,8 +125,7 @@
                             </label>
                             <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
                                 @php
-                                    $coverPath = storage_path('covers/anime/' . $anime['anidbid'] . '-cover.jpg');
-                                    $hasCover = file_exists($coverPath);
+                                    $hasCover = $anime['anidbid'] > 0 && file_exists(storage_path('covers/anime/' . $anime['anidbid'] . '-cover.jpg'));
                                 @endphp
                                 @if($hasCover)
                                     <img src="{{ url('/covers/anime/' . $anime['anidbid'] . '-cover.jpg') }}"

@@ -38,6 +38,20 @@ class CoverController extends Controller
                 $filePath = storage_path("covers/{$type}/{$filename}");
             }
         } elseif ($type === 'anime') {
+            // For anime, check if the ID is valid (must be > 0)
+            // Reject covers for anidbid <= 0 (failed processing, no match, etc.)
+            if (preg_match('/^(-?\d+)(?:-cover)?\.jpg$/', $filename, $matches)) {
+                $anidbid = (int) $matches[1];
+                if ($anidbid <= 0) {
+                    // Return placeholder for invalid IDs
+                    $placeholderPath = public_path('assets/images/no-cover.png');
+                    if (file_exists($placeholderPath)) {
+                        return response()->file($placeholderPath);
+                    }
+                    abort(404);
+                }
+            }
+            
             // For anime, try the requested filename first, then fall back to old format (without -cover)
             $filePath = storage_path("covers/{$type}/{$filename}");
             

@@ -507,7 +507,7 @@ if (! function_exists('getReleaseCover')) {
         } elseif (! empty($xxxinfo_id)) {
             $coverType = 'xxx';
             $coverId = $xxxinfo_id;
-        } elseif (! empty($anidbid)) {
+        } elseif (! empty($anidbid) && $anidbid > 0) {
             $coverType = 'anime';
             $coverId = $anidbid;
         }

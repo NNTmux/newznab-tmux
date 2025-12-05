@@ -61,8 +61,7 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @php
-                                    $coverPath = storage_path('covers/anime/' . $anime->anidbid . '-cover.jpg');
-                                    $hasCover = file_exists($coverPath);
+                                    $hasCover = $anime->anidbid > 0 && file_exists(storage_path('covers/anime/' . $anime->anidbid . '-cover.jpg'));
                                 @endphp
                                 @if($hasCover)
                                     <img src="{{ url('/covers/anime/' . $anime->anidbid . '-cover.jpg') }}"
