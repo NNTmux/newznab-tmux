@@ -1,13 +1,19 @@
 #!/bin/bash
 #
 # Redis Monitor - Modern visual monitoring for Redis server
-# Usage: redis-monitor.sh [host] [port] [refresh_interval]
+# Usage: redis-monitor.sh [host] [port] [refresh_interval] [password]
+#        redis-monitor.sh 127.0.0.1 6379 30 mypassword
+#
+# Or set REDIS_PASSWORD environment variable:
+#        export REDIS_PASSWORD=mypassword
+#        redis-monitor.sh
 #
 
 # Configuration
 REDIS_HOST="${1:-127.0.0.1}"
 REDIS_PORT="${2:-6379}"
 REFRESH="${3:-30}"
+REDIS_PASSWORD="${4:-${REDIS_PASSWORD}}"  # Accept as arg or env var
 
 # Colors
 RED='\033[0;31m'
@@ -118,7 +124,11 @@ format_number() {
 }
 
 get_redis_info() {
-    redis-cli -h "$REDIS_HOST" -p "$REDIS_PORT" info 2>/dev/null
+    if [ -n "$REDIS_PASSWORD" ]; then
+        redis-cli -h "$REDIS_HOST" -p "$REDIS_PORT" -a "$REDIS_PASSWORD" --no-auth-warning info 2>/dev/null
+    else
+        redis-cli -h "$REDIS_HOST" -p "$REDIS_PORT" info 2>/dev/null
+    fi
 }
 
 # Terminal control for flicker-free updates
