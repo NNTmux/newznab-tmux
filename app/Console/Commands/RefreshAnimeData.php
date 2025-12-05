@@ -324,6 +324,16 @@ class RefreshAnimeData extends Command
         // Remove language codes (standalone or with separators)
         $title = preg_replace('/\b(ENG|JAP|JPN|SUB|DUB|MULTI|RAW|HARDSUB|SOFTSUB|HARDDUB|SOFTDUB|ITA|SPA|FRE|GER|RUS|CHI|KOR)\b/i', ' ', $title);
         
+        // Remove metadata words (JAV, Uncensored, Censored, etc.)
+        $title = preg_replace('/\b(JAV|Uncensored|Censored|Mosaic|Mosaic-less|HD|SD|FHD|UHD)\b/i', ' ', $title);
+        
+        // Remove date patterns (6-digit dates like 091919, 200101, etc.)
+        $title = preg_replace('/\b\d{6}\b/', ' ', $title);
+        
+        // Remove trailing numbers/underscores (like _01, 01, _001, etc.)
+        $title = preg_replace('/[-_]\s*\d{1,4}\s*$/i', '', $title);
+        $title = preg_replace('/\s+\d{1,4}\s*$/i', '', $title);
+        
         // Remove episode patterns
         $title = preg_replace('/\s*-\s*\d{1,4}\s*$/i', '', $title);
         $title = preg_replace('/\s*-\s*$/i', '', $title);
