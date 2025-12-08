@@ -1,0 +1,321 @@
+<?php
+
+namespace App\Services;
+
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+/**
+ * Custom TMDB (The Movie Database) API Client
+ *
+ * This service provides methods to interact with The Movie Database API
+ * for fetching movie and TV show information.
+ */
+class TmdbClient
+{
+    protected const BASE_URL = 'https://api.themoviedb.org/3';
+
+    protected const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p';
+
+    protected string $apiKey;
+
+    protected int $timeout;
+
+    protected int $retryTimes;
+
+    protected int $retryDelay;
+
+    public function __construct()
+    {
+        $this->apiKey = (string) config('tmdb.api_key', '');
+        $this->timeout = (int) config('tmdb.timeout', 30);
+        $this->retryTimes = (int) config('tmdb.retry_times', 3);
+        $this->retryDelay = (int) config('tmdb.retry_delay', 100);
+    }
+
+    /**
+     * Check if the API key is configured
+     */
+    public function isConfigured(): bool
+    {
+        return ! empty($this->apiKey);
+    }
+
+    /**
+     * Make a GET request to the TMDB API
+     *
+     * @param  string  $endpoint  The API endpoint
+     * @param  array  $params  Additional query parameters
+     * @return array|null Response data or null on failure
+     */
+    protected function get(string $endpoint, array $params = []): ?array
+    {
+        if (! $this->isConfigured()) {
+            Log::warning('TMDB API key is not configured');
+
+            return null;
+        }
+
+        $params['api_key'] = $this->apiKey;
+
+        try {
+            $response = Http::timeout($this->timeout)
+                ->retry($this->retryTimes, $this->retryDelay)
+                ->get(self::BASE_URL.$endpoint, $params);
+
+            if ($response->successful()) {
+                return $response->json();
+            }
+
+            // Handle specific error codes
+            if ($response->status() === 404) {
+                return null;
+            }
+
+            Log::warning('TMDB API request failed', [
+                'endpoint' => $endpoint,
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            return null;
+        } catch (\Throwable $e) {
+            Log::warning('TMDB API request exception', [
+                'endpoint' => $endpoint,
+                'message' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
+     * Get the full image URL
+     *
+     * @param  string|null  $path  The image path from TMDB
+     * @param  string  $size  The image size (w92, w154, w185, w342, w500, w780, original)
+     */
+    public function getImageUrl(?string $path, string $size = 'w500'): string
+    {
+        if (empty($path)) {
+            return '';
+        }
+
+        return self::IMAGE_BASE_URL.'/'.$size.$path;
+    }
+
+    // =========================================================================
+    // MOVIE METHODS
+    // =========================================================================
+
+    /**
+     * Search for movies by title
+     *
+     * @param  string  $query  The search query
+     * @param  int  $page  Page number for pagination
+     * @param  string|null  $year  Filter by release year
+     * @return array|null Search results or null on failure
+     */
+    public function searchMovies(string $query, int $page = 1, ?string $year = null): ?array
+    {
+        $params = [
+            'query' => $query,
+            'page' => $page,
+            'include_adult' => false,
+        ];
+
+        if ($year !== null) {
+            $params['year'] = $year;
+        }
+
+        return $this->get('/search/movie', $params);
+    }
+
+    /**
+     * Get movie details by TMDB ID or IMDB ID
+     *
+     * @param  int|string  $id  The TMDB ID or IMDB ID (with 'tt' prefix)
+     * @param  array  $appendToResponse  Additional data to append (e.g., ['credits', 'external_ids'])
+     * @return array|null Movie data or null on failure
+     */
+    public function getMovie(int|string $id, array $appendToResponse = []): ?array
+    {
+        $params = [];
+
+        if (! empty($appendToResponse)) {
+            $params['append_to_response'] = implode(',', $appendToResponse);
+        }
+
+        return $this->get('/movie/'.$id, $params);
+    }
+
+    /**
+     * Get movie credits (cast and crew)
+     *
+     * @param  int  $movieId  The TMDB movie ID
+     * @return array|null Credits data or null on failure
+     */
+    public function getMovieCredits(int $movieId): ?array
+    {
+        return $this->get('/movie/'.$movieId.'/credits');
+    }
+
+    /**
+     * Get movie external IDs (IMDB, etc.)
+     *
+     * @param  int  $movieId  The TMDB movie ID
+     * @return array|null External IDs or null on failure
+     */
+    public function getMovieExternalIds(int $movieId): ?array
+    {
+        return $this->get('/movie/'.$movieId.'/external_ids');
+    }
+
+    // =========================================================================
+    // TV SHOW METHODS
+    // =========================================================================
+
+    /**
+     * Search for TV shows by title
+     *
+     * @param  string  $query  The search query
+     * @param  int  $page  Page number for pagination
+     * @param  int|null  $firstAirDateYear  Filter by first air date year
+     * @return array|null Search results or null on failure
+     */
+    public function searchTv(string $query, int $page = 1, ?int $firstAirDateYear = null): ?array
+    {
+        $params = [
+            'query' => $query,
+            'page' => $page,
+            'include_adult' => false,
+        ];
+
+        if ($firstAirDateYear !== null) {
+            $params['first_air_date_year'] = $firstAirDateYear;
+        }
+
+        return $this->get('/search/tv', $params);
+    }
+
+    /**
+     * Get TV show details by ID
+     *
+     * @param  int|string  $id  The TMDB TV show ID
+     * @param  array  $appendToResponse  Additional data to append
+     * @return array|null TV show data or null on failure
+     */
+    public function getTvShow(int|string $id, array $appendToResponse = []): ?array
+    {
+        $params = [];
+
+        if (! empty($appendToResponse)) {
+            $params['append_to_response'] = implode(',', $appendToResponse);
+        }
+
+        return $this->get('/tv/'.$id, $params);
+    }
+
+    /**
+     * Get TV show external IDs (IMDB, TVDB, etc.)
+     *
+     * @param  int  $tvId  The TMDB TV show ID
+     * @return array|null External IDs or null on failure
+     */
+    public function getTvExternalIds(int $tvId): ?array
+    {
+        return $this->get('/tv/'.$tvId.'/external_ids');
+    }
+
+    /**
+     * Get TV show alternative titles
+     *
+     * @param  int  $tvId  The TMDB TV show ID
+     * @return array|null Alternative titles or null on failure
+     */
+    public function getTvAlternativeTitles(int $tvId): ?array
+    {
+        return $this->get('/tv/'.$tvId.'/alternative_titles');
+    }
+
+    /**
+     * Get TV season details
+     *
+     * @param  int  $tvId  The TMDB TV show ID
+     * @param  int  $seasonNumber  The season number
+     * @return array|null Season data or null on failure
+     */
+    public function getTvSeason(int $tvId, int $seasonNumber): ?array
+    {
+        return $this->get('/tv/'.$tvId.'/season/'.$seasonNumber);
+    }
+
+    /**
+     * Get TV episode details
+     *
+     * @param  int  $tvId  The TMDB TV show ID
+     * @param  int  $seasonNumber  The season number
+     * @param  int  $episodeNumber  The episode number
+     * @return array|null Episode data or null on failure
+     */
+    public function getTvEpisode(int $tvId, int $seasonNumber, int $episodeNumber): ?array
+    {
+        return $this->get('/tv/'.$tvId.'/season/'.$seasonNumber.'/episode/'.$episodeNumber);
+    }
+
+    // =========================================================================
+    // HELPER METHODS FOR NULL-SAFE DATA EXTRACTION
+    // =========================================================================
+
+    /**
+     * Safely get a string value from an array
+     */
+    public static function getString(array $data, string $key, string $default = ''): string
+    {
+        return isset($data[$key]) && is_string($data[$key]) ? $data[$key] : $default;
+    }
+
+    /**
+     * Safely get an integer value from an array
+     */
+    public static function getInt(array $data, string $key, int $default = 0): int
+    {
+        return isset($data[$key]) && is_numeric($data[$key]) ? (int) $data[$key] : $default;
+    }
+
+    /**
+     * Safely get a float value from an array
+     */
+    public static function getFloat(array $data, string $key, float $default = 0.0): float
+    {
+        return isset($data[$key]) && is_numeric($data[$key]) ? (float) $data[$key] : $default;
+    }
+
+    /**
+     * Safely get an array value from an array
+     */
+    public static function getArray(array $data, string $key, array $default = []): array
+    {
+        return isset($data[$key]) && is_array($data[$key]) ? $data[$key] : $default;
+    }
+
+    /**
+     * Safely get a nested value from an array using dot notation
+     */
+    public static function getNested(array $data, string $path, mixed $default = null): mixed
+    {
+        $keys = explode('.', $path);
+        $value = $data;
+
+        foreach ($keys as $key) {
+            if (! is_array($value) || ! array_key_exists($key, $value)) {
+                return $default;
+            }
+            $value = $value[$key];
+        }
+
+        return $value ?? $default;
+    }
+}
+

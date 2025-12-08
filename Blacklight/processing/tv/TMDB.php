@@ -2,13 +2,8 @@
 
 namespace Blacklight\processing\tv;
 
+use App\Services\TmdbClient;
 use Blacklight\ReleaseImage;
-use Tmdb\Client;
-use Tmdb\Exception\TmdbApiException;
-use Tmdb\Helper\ImageHelper;
-use Tmdb\Laravel\Facades\Tmdb as TmdbClient;
-use Tmdb\Repository\ConfigurationRepository;
-use Tmdb\Token\Api\ApiToken;
 
 class TMDB extends TV
 {
@@ -19,15 +14,10 @@ class TMDB extends TV
      */
     public string $posterUrl = '';
 
-    public ApiToken $token;
-
-    public Client $client;
-
-    public ConfigurationRepository $configRepository;
-
-    public \Tmdb\Model\Configuration $config;
-
-    public ImageHelper $helper;
+    /**
+     * Custom TMDB API client
+     */
+    protected TmdbClient $tmdbClient;
 
     /**
      * Fetch banner from site.
@@ -67,8 +57,8 @@ class TMDB extends TV
                 // Clean the show name for better match probability
                 $release = $this->parseInfo($row['searchname']);
 
-                if (\is_array($release) && $release['name'] !== '') {
-                    if (\in_array($release['cleanname'], $this->titleCache, false)) {
+                if (is_array($release) && $release['name'] !== '') {
+                    if (in_array($release['cleanname'], $this->titleCache, false)) {
                         if ($this->echooutput) {
                             $this->colorCli->primaryOver('    → ');
                             $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
@@ -101,7 +91,7 @@ class TMDB extends TV
                         // Get the show from TMDB
                         $tmdbShow = $this->getShowInfo((string) $release['cleanname']);
 
-                        if (\is_array($tmdbShow)) {
+                        if (is_array($tmdbShow)) {
                             // Check if we have the TMDB ID already, if we do use that Video ID
                             $dupeCheck = $this->getVideoIDFromSiteID('tvdb', $tmdbShow['tvdb']);
                             if ($dupeCheck === false) {
@@ -263,17 +253,19 @@ class TMDB extends TV
      */
     protected function getShowInfo(string $name): bool|array
     {
-        $return = $response = false;
+        $return = false;
 
-        try {
-            $response = TmdbClient::getSearchApi()->searchTv($name);
-        } catch (TmdbApiException|\ErrorException $e) {
+        $this->tmdbClient = app(TmdbClient::class);
+
+        if (! $this->tmdbClient->isConfigured()) {
             return false;
         }
 
+        $response = $this->tmdbClient->searchTv($name);
+
         sleep(1);
 
-        if (\is_array($response) && ! empty($response['results'])) {
+        if ($response !== null && ! empty($response['results']) && is_array($response['results'])) {
             $return = $this->matchShowInfo($response['results'], $name);
         }
 
@@ -287,45 +279,62 @@ class TMDB extends TV
     {
         $return = false;
         $highestMatch = 0;
+        $highest = null;
 
-        $show = [];
         foreach ($shows as $show) {
-            if ($this->checkRequiredAttr($show, 'tmdbS')) {
-                // Check for exact title match first and then terminate if found
-                if (strtolower($show['name']) === strtolower($cleanName)) {
-                    $highest = $show;
-                    break;
-                }
-                // Check each show title for similarity and then find the highest similar value
-                $matchPercent = $this->checkMatch(strtolower($show['name']), strtolower($cleanName), self::MATCH_PROBABILITY);
+            if (! is_array($show) || ! $this->checkRequiredAttr($show, 'tmdbS')) {
+                continue;
+            }
 
-                // If new match has a higher percentage, set as new matched title
-                if ($matchPercent > $highestMatch) {
-                    $highestMatch = $matchPercent;
-                    $highest = $show;
-                }
+            $showName = TmdbClient::getString($show, 'name');
+            if (empty($showName)) {
+                continue;
+            }
+
+            // Check for exact title match first and then terminate if found
+            if (strtolower($showName) === strtolower($cleanName)) {
+                $highest = $show;
+                break;
+            }
+
+            // Check each show title for similarity and then find the highest similar value
+            $matchPercent = $this->checkMatch(strtolower($showName), strtolower($cleanName), self::MATCH_PROBABILITY);
+
+            // If new match has a higher percentage, set as new matched title
+            if ($matchPercent > $highestMatch) {
+                $highestMatch = $matchPercent;
+                $highest = $show;
             }
         }
-        if (! empty($highest)) {
-            try {
-                $showAlternativeTitles = TmdbClient::getTvApi()->getAlternativeTitles($highest['id']);
-            } catch (TmdbApiException $e) {
-                return false;
-            }
-            try {
-                $showExternalIds = TmdbClient::getTvApi()->getExternalIds($highest['id']);
-            } catch (TmdbApiException $e) {
+
+        if ($highest !== null && is_array($highest)) {
+            $showId = TmdbClient::getInt($highest, 'id');
+            if ($showId === 0) {
                 return false;
             }
 
-            if (\is_array($showAlternativeTitles)) {
-                foreach ($showAlternativeTitles['results'] as $aka) {
-                    $highest['alternative_titles'][] = $aka['title'];
-                }
-                // Use available network info if present
-                $highest['network'] = $highest['networks'][0]['name'] ?? '';
-                $highest['external_ids'] = $showExternalIds;
+            $showAlternativeTitles = $this->tmdbClient->getTvAlternativeTitles($showId);
+            $showExternalIds = $this->tmdbClient->getTvExternalIds($showId);
+
+            if ($showAlternativeTitles === null || $showExternalIds === null) {
+                return false;
             }
+
+            $alternativeTitles = [];
+            $results = TmdbClient::getArray($showAlternativeTitles, 'results');
+            foreach ($results as $aka) {
+                if (is_array($aka) && isset($aka['title'])) {
+                    $alternativeTitles[] = $aka['title'];
+                }
+            }
+            $highest['alternative_titles'] = $alternativeTitles;
+
+            // Use available network info if present
+            $networks = TmdbClient::getArray($highest, 'networks');
+            $highest['network'] = ! empty($networks[0]['name']) ? $networks[0]['name'] : '';
+
+            $highest['external_ids'] = $showExternalIds;
+
             $return = $this->formatShowInfo($highest);
         }
 
@@ -366,38 +375,61 @@ class TMDB extends TV
     {
         $return = false;
 
-        try {
-            if ($videoId > 0 && (int) $series === -1 && (int) $episode === -1) {
-                // Bulk fetch all episodes for all seasons and insert
-                $tvDetails = TmdbClient::getTvApi()->getTvshow($siteId);
-                if (\is_array($tvDetails) && ! empty($tvDetails['seasons'])) {
-                    foreach ($tvDetails['seasons'] as $seriesInfo) {
-                        if (! empty($seriesInfo['season_number']) && $seriesInfo['season_number'] > 0) {
-                            $seriesData = TmdbClient::getTvSeasonApi()->getSeason($siteId, $seriesInfo['season_number']);
-                            sleep(1);
-                            if (\is_array($seriesData) && ! empty($seriesData['episodes'])) {
-                                foreach ($seriesData['episodes'] as $ep) {
-                                    if ($this->checkRequiredAttr($ep, 'tmdbE')) {
-                                        $this->addEpisode($videoId, $this->formatEpisodeInfo($ep));
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+        if (! isset($this->tmdbClient)) {
+            $this->tmdbClient = app(TmdbClient::class);
+        }
 
-                return false;
-            }
-
-            $response = TmdbClient::getTvEpisodeApi()->getEpisode($siteId, $series, $episode);
-        } catch (TmdbApiException $e) {
+        if (! $this->tmdbClient->isConfigured()) {
             return false;
         }
 
+        // Bulk fetch all episodes for all seasons and insert
+        if ($videoId > 0 && (int) $series === -1 && (int) $episode === -1) {
+            $tvDetails = $this->tmdbClient->getTvShow((int) $siteId);
+
+            if ($tvDetails === null) {
+                return false;
+            }
+
+            $seasons = TmdbClient::getArray($tvDetails, 'seasons');
+            if (empty($seasons)) {
+                return false;
+            }
+
+            foreach ($seasons as $seriesInfo) {
+                if (! is_array($seriesInfo)) {
+                    continue;
+                }
+
+                $seasonNumber = TmdbClient::getInt($seriesInfo, 'season_number');
+                if ($seasonNumber <= 0) {
+                    continue;
+                }
+
+                $seriesData = $this->tmdbClient->getTvSeason((int) $siteId, $seasonNumber);
+                sleep(1);
+
+                if ($seriesData === null) {
+                    continue;
+                }
+
+                $episodes = TmdbClient::getArray($seriesData, 'episodes');
+                foreach ($episodes as $ep) {
+                    if (is_array($ep) && $this->checkRequiredAttr($ep, 'tmdbE')) {
+                        $this->addEpisode($videoId, $this->formatEpisodeInfo($ep));
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        // Single episode lookup
+        $response = $this->tmdbClient->getTvEpisode((int) $siteId, (int) $series, (int) $episode);
         sleep(1);
 
         // Handle Single Episode Lookups
-        if (\is_array($response) && $this->checkRequiredAttr($response, 'tmdbE')) {
+        if ($response !== null && is_array($response) && $this->checkRequiredAttr($response, 'tmdbE')) {
             $return = $this->formatEpisodeInfo($response);
         }
 
@@ -410,30 +442,41 @@ class TMDB extends TV
      */
     protected function formatShowInfo($show): array
     {
+        if (! is_array($show)) {
+            return [];
+        }
+
+        $posterPath = TmdbClient::getString($show, 'poster_path');
         // Prefer a reasonable default size for posters if we only have a path
-        $this->posterUrl = isset($show['poster_path']) && $show['poster_path'] !== ''
-            ? 'https://image.tmdb.org/t/p/w500'.$show['poster_path']
+        $this->posterUrl = ! empty($posterPath)
+            ? 'https://image.tmdb.org/t/p/w500'.$posterPath
             : '';
 
-        if (isset($show['external_ids']['imdb_id'])) {
-            preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show['external_ids']['imdb_id'], $imdb);
+        $imdbId = 0;
+        $externalIds = TmdbClient::getArray($show, 'external_ids');
+        if (! empty($externalIds['imdb_id'])) {
+            preg_match('/tt(?P<imdbid>\d{6,7})$/i', $externalIds['imdb_id'], $imdb);
+            $imdbId = $imdb['imdbid'] ?? 0;
         }
+
+        $originCountry = TmdbClient::getArray($show, 'origin_country');
+        $alternativeTitles = TmdbClient::getArray($show, 'alternative_titles');
 
         return [
             'type' => parent::TYPE_TV,
-            'title' => $show['name'],
-            'summary' => $show['overview'],
-            'started' => $show['first_air_date'],
-            'publisher' => $show['network'] ?? '',
-            'country' => $show['origin_country'][0] ?? '',
+            'title' => TmdbClient::getString($show, 'name'),
+            'summary' => TmdbClient::getString($show, 'overview'),
+            'started' => TmdbClient::getString($show, 'first_air_date'),
+            'publisher' => TmdbClient::getString($show, 'network'),
+            'country' => ! empty($originCountry[0]) ? $originCountry[0] : '',
             'source' => parent::SOURCE_TMDB,
-            'imdb' => $imdb['imdbid'] ?? 0,
-            'tvdb' => $show['external_ids']['tvdb_id'] ?? 0,
+            'imdb' => $imdbId,
+            'tvdb' => TmdbClient::getInt($externalIds, 'tvdb_id'),
             'trakt' => 0,
-            'tvrage' => $show['external_ids']['tvrage_id'] ?? 0,
+            'tvrage' => TmdbClient::getInt($externalIds, 'tvrage_id'),
             'tvmaze' => 0,
-            'tmdb' => $show['id'],
-            'aliases' => ! empty($show['alternative_titles']) ? $show['alternative_titles'] : '',
+            'tmdb' => TmdbClient::getInt($show, 'id'),
+            'aliases' => ! empty($alternativeTitles) ? $alternativeTitles : '',
             'localzone' => "''",
         ];
     }
@@ -444,13 +487,20 @@ class TMDB extends TV
      */
     protected function formatEpisodeInfo($episode): array
     {
+        if (! is_array($episode)) {
+            return [];
+        }
+
+        $seasonNumber = TmdbClient::getInt($episode, 'season_number');
+        $episodeNumber = TmdbClient::getInt($episode, 'episode_number');
+
         return [
-            'title' => (string) $episode['name'],
-            'series' => (int) $episode['season_number'],
-            'episode' => (int) $episode['episode_number'],
-            'se_complete' => 'S'.sprintf('%02d', $episode['season_number']).'E'.sprintf('%02d', $episode['episode_number']),
-            'firstaired' => (string) $episode['air_date'],
-            'summary' => (string) $episode['overview'],
+            'title' => TmdbClient::getString($episode, 'name'),
+            'series' => $seasonNumber,
+            'episode' => $episodeNumber,
+            'se_complete' => 'S'.sprintf('%02d', $seasonNumber).'E'.sprintf('%02d', $episodeNumber),
+            'firstaired' => TmdbClient::getString($episode, 'air_date'),
+            'summary' => TmdbClient::getString($episode, 'overview'),
         ];
     }
 }

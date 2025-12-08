@@ -8,6 +8,7 @@ use App\Models\MovieInfo;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Services\ImdbScraper;
+use App\Services\TmdbClient;
 use Blacklight\libraries\FanartTV;
 use Blacklight\processing\tv\TraktTv;
 use Blacklight\utility\Utility;
@@ -25,8 +26,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str; // ensure scraper imported
-use Tmdb; // add TMDB facade
+use Illuminate\Support\Str;
 
 /**
  * Class Movie.
@@ -744,18 +744,25 @@ class Movie
         }
 
         try {
-            // Fetch movie data from TMDB
-            $tmdbLookup = Tmdb::getMoviesApi()->getMovie($lookupId, ['append_to_response' => 'credits']);
+            $tmdbClient = app(TmdbClient::class);
 
-            if (empty($tmdbLookup)) {
+            if (! $tmdbClient->isConfigured()) {
+                return false;
+            }
+
+            // Fetch movie data from TMDB
+            $tmdbLookup = $tmdbClient->getMovie($lookupId, ['credits']);
+
+            if ($tmdbLookup === null || empty($tmdbLookup)) {
                 Cache::put($cacheKey, false, $expiresAt);
 
                 return false;
             }
 
             // Title similarity check
-            if ($this->currentTitle !== '') {
-                similar_text($this->currentTitle, $tmdbLookup['title'], $percent);
+            $title = TmdbClient::getString($tmdbLookup, 'title');
+            if ($this->currentTitle !== '' && ! empty($title)) {
+                similar_text($this->currentTitle, $title, $percent);
                 if ($percent < self::MATCH_PERCENT) {
                     Cache::put($cacheKey, false, $expiresAt);
 
@@ -764,31 +771,29 @@ class Movie
             }
 
             // Year similarity check
-            if ($this->currentYear !== '') {
-                $tmdbYear = ! empty($tmdbLookup['release_date'])
-                    ? Carbon::parse($tmdbLookup['release_date'])->year
-                    : '';
+            $releaseDate = TmdbClient::getString($tmdbLookup, 'release_date');
+            if ($this->currentYear !== '' && ! empty($releaseDate)) {
+                $tmdbYear = Carbon::parse($releaseDate)->year;
 
-                if ($tmdbYear !== '') {
-                    similar_text($this->currentYear, $tmdbYear, $percent);
-                    if ($percent < self::YEAR_MATCH_PERCENT) {
-                        Cache::put($cacheKey, false, $expiresAt);
+                similar_text($this->currentYear, (string) $tmdbYear, $percent);
+                if ($percent < self::YEAR_MATCH_PERCENT) {
+                    Cache::put($cacheKey, false, $expiresAt);
 
-                        return false;
-                    }
+                    return false;
                 }
             }
 
             // Build the return array with proper null handling
+            $imdbIdFromResponse = TmdbClient::getString($tmdbLookup, 'imdb_id');
             $ret = [
-                'title' => $tmdbLookup['title'] ?? '',
-                'tmdbid' => $tmdbLookup['id'] ?? 0,
-                'imdbid' => str_replace('tt', '', $tmdbLookup['imdb_id'] ?? ''),
+                'title' => $title,
+                'tmdbid' => TmdbClient::getInt($tmdbLookup, 'id'),
+                'imdbid' => str_replace('tt', '', $imdbIdFromResponse),
                 'rating' => '',
                 'actors' => '',
                 'director' => '',
-                'plot' => $tmdbLookup['overview'] ?? '',
-                'tagline' => $tmdbLookup['tagline'] ?? '',
+                'plot' => TmdbClient::getString($tmdbLookup, 'overview'),
+                'tagline' => TmdbClient::getString($tmdbLookup, 'tagline'),
                 'year' => '',
                 'genre' => '',
                 'cover' => '',
@@ -796,48 +801,66 @@ class Movie
             ];
 
             // Rating
-            $vote = $tmdbLookup['vote_average'] ?? null;
-            if ($vote !== null && (int) $vote !== 0) {
+            $vote = TmdbClient::getFloat($tmdbLookup, 'vote_average');
+            if ($vote > 0) {
                 $ret['rating'] = $vote;
             }
 
             // Actors
-            $actors = Arr::pluck($tmdbLookup['credits']['cast'] ?? [], 'name');
-            if (! empty($actors)) {
-                $ret['actors'] = $actors;
+            $credits = TmdbClient::getArray($tmdbLookup, 'credits');
+            $cast = TmdbClient::getArray($credits, 'cast');
+            if (! empty($cast)) {
+                $actors = [];
+                foreach ($cast as $member) {
+                    if (is_array($member) && ! empty($member['name'])) {
+                        $actors[] = $member['name'];
+                    }
+                }
+                if (! empty($actors)) {
+                    $ret['actors'] = $actors;
+                }
             }
 
             // Director - get first director only
-            foreach ($tmdbLookup['credits']['crew'] ?? [] as $crew) {
-                if ($crew['department'] === 'Directing' && $crew['job'] === 'Director') {
-                    $ret['director'] = $crew['name'];
+            $crew = TmdbClient::getArray($credits, 'crew');
+            foreach ($crew as $crewMember) {
+                if (! is_array($crewMember)) {
+                    continue;
+                }
+                $department = TmdbClient::getString($crewMember, 'department');
+                $job = TmdbClient::getString($crewMember, 'job');
+                if ($department === 'Directing' && $job === 'Director') {
+                    $ret['director'] = TmdbClient::getString($crewMember, 'name');
                     break;
                 }
             }
 
             // Year
-            $released = $tmdbLookup['release_date'] ?? '';
-            if (! empty($released)) {
-                $ret['year'] = Carbon::parse($released)->year;
+            if (! empty($releaseDate)) {
+                $ret['year'] = Carbon::parse($releaseDate)->year;
             }
 
             // Genres
-            $genresa = $tmdbLookup['genres'] ?? [];
+            $genresa = TmdbClient::getArray($tmdbLookup, 'genres');
             if (! empty($genresa)) {
                 $genres = [];
                 foreach ($genresa as $genre) {
-                    $genres[] = $genre['name'];
+                    if (is_array($genre) && ! empty($genre['name'])) {
+                        $genres[] = $genre['name'];
+                    }
                 }
-                $ret['genre'] = $genres;
+                if (! empty($genres)) {
+                    $ret['genre'] = $genres;
+                }
             }
 
             // Cover and backdrop
-            $posterPath = $tmdbLookup['poster_path'] ?? '';
+            $posterPath = TmdbClient::getString($tmdbLookup, 'poster_path');
             if (! empty($posterPath)) {
                 $ret['cover'] = 'https://image.tmdb.org/t/p/original'.$posterPath;
             }
 
-            $backdropPath = $tmdbLookup['backdrop_path'] ?? '';
+            $backdropPath = TmdbClient::getString($tmdbLookup, 'backdrop_path');
             if (! empty($backdropPath)) {
                 $ret['backdrop'] = 'https://image.tmdb.org/t/p/original'.$backdropPath;
             }
@@ -1543,21 +1566,36 @@ class Movie
     private function searchTMDB(int $releaseId): bool
     {
         try {
-            $data = Tmdb::getSearchApi()->searchMovies($this->currentTitle);
-            if (empty($data['total_results']) || empty($data['results'])) {
+            $tmdbClient = app(TmdbClient::class);
+
+            if (! $tmdbClient->isConfigured()) {
                 return false;
             }
 
-            foreach ($data['results'] as $result) {
+            $data = $tmdbClient->searchMovies($this->currentTitle);
+
+            if ($data === null || empty($data['total_results']) || empty($data['results'])) {
+                return false;
+            }
+
+            $results = TmdbClient::getArray($data, 'results');
+            foreach ($results as $result) {
+                if (! is_array($result)) {
+                    continue;
+                }
+
                 // Skip results without ID or release date
-                if (empty($result['id']) || empty($result['release_date'])) {
+                $resultId = TmdbClient::getInt($result, 'id');
+                $releaseDate = TmdbClient::getString($result, 'release_date');
+
+                if ($resultId === 0 || empty($releaseDate)) {
                     continue;
                 }
 
                 // Compare release years
                 similar_text(
                     $this->currentYear,
-                    Carbon::parse($result['release_date'])->year,
+                    (string) Carbon::parse($releaseDate)->year,
                     $percent
                 );
 
@@ -1566,7 +1604,7 @@ class Movie
                 }
 
                 // Try to get IMDB ID from TMDB
-                $ret = $this->fetchTMDBProperties($result['id'], true);
+                $ret = $this->fetchTMDBProperties((string) $resultId, true);
                 if ($ret === false || empty($ret['imdbid'])) {
                     continue;
                 }
