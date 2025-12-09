@@ -38,7 +38,6 @@ if ($argCnt === 2) {
             '                  executable  = Remove releases containing an exe file.'.$n.
             '                  gibberish   = Remove releases where the name is letters/numbers only and 15 characters or longer.'.$n.
             '                  hashed      = Remove releases where the name is letters/numbers only and 25 characters or longer.'.$n.
-            '                  huge        = Remove releases with single file with size of over 200 megabytes.'.$n.
             '                  nzb         = Remove releases having 1 file that is an nzb file.'.$n.
             '                  installbin  = Remove releases which contain an install.bin file.'.$n.
             '                  passworded  = Remove releases which contain the word password in the title.'.$n.
@@ -47,7 +46,7 @@ if ($argCnt === 2) {
             '                  scr         = Remove releases where .scr extension is found in the files or subject.'.$n.
             '                  short       = Remove releases where the name is only numbers or letters and is 5 characters or less.'.$n.
             '                  wmv_all     = Remove releases where the release contains WMV file in any group!!.'.$n.
-            '                  size        = Remove releases smaller than 1MB and have only 1 file and not in books or mp3 section.'.$n.$n.
+            '                  size        = Remove releases smaller than minimum size to create a release set in site settings.'.$n.$n.
             'examples:'.$n.
             "php $argv[0] true 12 blacklist     = Remove releases up to 12 hours old using site blacklists.".$n.
             "php $argv[0] false full            = Show what releases could have been removed.".$n.
