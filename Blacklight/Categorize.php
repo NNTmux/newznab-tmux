@@ -776,6 +776,13 @@ class Categorize
             return false;
         }
 
+        // Guard: avoid misclassifying TV shows as PC games.
+        // TV patterns like S01E01, 1x01, Season 1, etc. should not be classified as games.
+        $tvPatterns = '/\b(S\d{1,4}[._ -]?E\d{1,4}|S\d{1,4}[._ -]?D\d{1,4}|\d{1,2}x\d{2,3}|Season[._ -]?\d{1,3}|Episode[._ -]?\d{1,4}|HDTV|PDTV|DSR|WEB[._ -]?DL|WEB[._ -]?RIP|TVRip)\b/i';
+        if (preg_match($tvPatterns, $this->releaseName)) {
+            return false;
+        }
+
         // Expanded PC game markers: common scene/p2p groups and tags seen in 2020-2025.
         $pcGroups = '(?:0x0007|ALiAS|ANOMALY|BACKLASH|BAT|CODEX|CPY|DARKS(?:iDERS|IDERS)|DEViANCE|DOGE|DODI|ELAMIGOS|EMPRESS|FITGIRL|FAS(?:DOX|iSO)|FLT(?:[._ -]|COGENT|DOX)?|GOG(?:-GAMES)?|GOLDBERG|HI2U|HOODLUM|INLAWS|JAGUAR|MAZE|MONEY|OUTLAWS|PLAZA|PROPHET|RAZOR1911|RAiN|RELOADED|RUNE|SiMPLEX|SKIDROW|TENOKE|TiNYiSO|UNLEASHED|P2P)';
 
