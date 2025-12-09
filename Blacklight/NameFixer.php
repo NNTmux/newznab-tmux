@@ -2205,7 +2205,7 @@ class NameFixer
         // Remove common video file extensions
         $t = preg_replace('/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx)$/i', '', $t) ?? $t;
         // Remove archive and metadata file extensions
-        $t = preg_replace('/\.(par2?|nfo|sfv|nzb|rar|zip|r\d{2,3}|pkg|exe|msi|jpe?g|png|gif|bmp)$/i', '', $t) ?? $t;
+        $t = preg_replace('/\.(par2?|nfo|sfv|nzb|rar|zip|7z|gz|tar|bz2|xz|r\d{2,3}|\d{3}|pkg|exe|msi|jpe?g|png|gif|bmp)$/i', '', $t) ?? $t;
         // Remove common trailing segment markers like .part01, .vol12+3, -r12, r12
         $t = preg_replace('/[.\-_ ](?:part|vol|r)\d+(?:\+\d+)?$/i', '', $t) ?? $t;
         // Collapse multiple spaces/underscores
@@ -2274,70 +2274,101 @@ class NameFixer
     {
         $t = trim($title);
 
-        // Remove common separators and file extensions for analysis
-        $cleaned = preg_replace('/[.\-_\s]+/', '', $t);
-        $cleaned = preg_replace('/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx|par2?|nfo|sfv|nzb|rar|zip)$/i', '', $cleaned);
+        // Remove common file extensions for analysis
+        $cleaned = preg_replace('/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx|par2?|nfo|sfv|nzb|rar|r\d{2,3}|zip|7z|gz|tar|001)$/i', '', $t);
+        // Remove common separators to get the core name
+        $coreName = preg_replace('/[.\-_\s]+/', '', $cleaned);
 
         // Reject UUID patterns: 8-4-4-4-12 hex format
-        if (preg_match('/^[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}$/i', $cleaned)) {
+        if (preg_match('/^[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}$/i', $coreName)) {
             return true;
         }
 
         // Reject pure hex strings (MD5, SHA1, etc.) - at least 16 hex chars with no other content
-        if (preg_match('/^[a-f0-9]{16,}$/i', $cleaned)) {
+        if (preg_match('/^[a-f0-9]{16,}$/i', $coreName)) {
             return true;
         }
 
-        // Reject base64-like random strings: mostly alphanumeric with no recognizable words
-        // Check if the name is predominantly random-looking by analyzing character distribution
-        if (strlen($cleaned) >= 12) {
-            // Count transitions between character types (letter to number, uppercase to lowercase, etc.)
+        // Check for long alphanumeric strings that look random/obfuscated
+        $coreLen = strlen($coreName);
+        if ($coreLen >= 16 && preg_match('/^[a-zA-Z0-9]+$/', $coreName)) {
+            // Count character type transitions (uppercase<->lowercase, letter<->digit)
             $transitions = 0;
-            $len = strlen($cleaned);
-            for ($i = 1; $i < $len; $i++) {
-                $prev = $cleaned[$i - 1];
-                $curr = $cleaned[$i];
+            for ($i = 1; $i < $coreLen; $i++) {
+                $prev = $coreName[$i - 1];
+                $curr = $coreName[$i];
                 $prevIsDigit = ctype_digit($prev);
                 $currIsDigit = ctype_digit($curr);
                 $prevIsUpper = ctype_upper($prev);
                 $currIsUpper = ctype_upper($curr);
 
                 // Count type transitions
-                if ($prevIsDigit !== $currIsDigit || ($prevIsUpper !== $currIsUpper && !$prevIsDigit && !$currIsDigit)) {
+                if ($prevIsDigit !== $currIsDigit) {
+                    $transitions++;
+                } elseif (!$prevIsDigit && !$currIsDigit && $prevIsUpper !== $currIsUpper) {
                     $transitions++;
                 }
             }
 
-            // High transition rate suggests random/hashed content
-            $transitionRate = $transitions / ($len - 1);
-            if ($transitionRate > 0.5 && $len >= 16) {
+            // Calculate transition rate
+            $transitionRate = $transitions / ($coreLen - 1);
+
+            // High transition rate (>0.35) suggests random/hashed content
+            // Most legitimate release names have words that are consistent case
+            if ($transitionRate > 0.35) {
                 // Additional check: does it contain any recognizable media-related words?
-                if (!preg_match('/\b(movie|film|series|episode|season|show|video|audio|music|album|dvd|bluray|hdtv|webrip|xvid|x264|x265|hevc|aac|mp3|flac|720p|1080p|2160p|4k|complete|proper|repack|dubbed|subbed|english|french|german|spanish|italian)\b/i', $t)) {
+                if (!preg_match('/\b(movie|film|series|episode|season|show|video|audio|music|album|dvd|bluray|hdtv|webrip|xvid|x264|x265|hevc|aac|mp3|flac|720p|1080p|2160p|4k|complete|proper|repack|dubbed|subbed|english|french|german|spanish|italian|rip|web|hdr|remux|disc|internal|retail)\b/i', $t)) {
+                    return true;
+                }
+            }
+
+            // Check for strings that look like random IDs (mixed case + digits, no real words)
+            // Count consecutive same-type characters
+            $maxConsecutiveLetters = 0;
+            $currentConsecutive = 0;
+            $lastWasLetter = false;
+
+            for ($i = 0; $i < $coreLen; $i++) {
+                $isLetter = ctype_alpha($coreName[$i]);
+                if ($isLetter) {
+                    if ($lastWasLetter) {
+                        $currentConsecutive++;
+                    } else {
+                        $currentConsecutive = 1;
+                    }
+                    $maxConsecutiveLetters = max($maxConsecutiveLetters, $currentConsecutive);
+                }
+                $lastWasLetter = $isLetter;
+            }
+
+            // If long string has no word-like sequences (5+ consecutive letters), likely obfuscated
+            // Real release names have words like "Movie", "Show", "Episode", "BluRay", etc.
+            if ($coreLen >= 20 && $maxConsecutiveLetters < 5) {
+                // But allow if it matches common patterns (like numbers at end for parts)
+                if (!preg_match('/^[a-zA-Z]+\d{1,4}$/', $coreName)) {
+                    return true;
+                }
+            }
+
+            // Reject if no lowercase letters at all or no uppercase letters (unusual for real names)
+            // combined with digits mixed in
+            $hasLower = preg_match('/[a-z]/', $coreName);
+            $hasUpper = preg_match('/[A-Z]/', $coreName);
+            $hasDigit = preg_match('/\d/', $coreName);
+            $digitCount = preg_match_all('/\d/', $coreName);
+
+            // If digits make up significant portion of a long mixed-case string, likely obfuscated
+            if ($coreLen >= 24 && $hasLower && $hasUpper && $hasDigit) {
+                $digitRatio = $digitCount / $coreLen;
+                if ($digitRatio >= 0.2 && $digitRatio <= 0.6 && $maxConsecutiveLetters < 6) {
                     return true;
                 }
             }
         }
 
-        // Reject names that are entirely alphanumeric with high digit ratio and no spaces/readable structure
-        if (preg_match('/^[a-zA-Z0-9]{16,}$/', $cleaned)) {
-            $digitCount = preg_match_all('/\d/', $cleaned);
-            $letterCount = preg_match_all('/[a-zA-Z]/', $cleaned);
-            $totalLen = strlen($cleaned);
-
-            // If digits make up more than 40% of a long alphanumeric string, likely obfuscated
-            if ($totalLen >= 20 && $digitCount / $totalLen > 0.4) {
-                return true;
-            }
-
-            // If letters and digits are mixed randomly with no common word patterns
-            if ($totalLen >= 24 && !preg_match('/[a-zA-Z]{4,}/', $cleaned)) {
-                return true;
-            }
-        }
-
         // Reject common obfuscation patterns: random-looking prefix/suffix with numbers
-        if (preg_match('/^[a-zA-Z]{1,3}\d{6,}[a-zA-Z]*$/i', $cleaned) ||
-            preg_match('/^[a-zA-Z0-9]{2,4}\d{8,}$/i', $cleaned)) {
+        if (preg_match('/^[a-zA-Z]{1,3}\d{6,}[a-zA-Z]*$/i', $coreName) ||
+            preg_match('/^[a-zA-Z0-9]{2,4}\d{8,}$/i', $coreName)) {
             return true;
         }
 
