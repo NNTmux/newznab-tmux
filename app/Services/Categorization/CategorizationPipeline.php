@@ -2,54 +2,56 @@
 
 namespace App\Services\Categorization;
 
-use App\Models\Category;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
-use App\Services\Categorization\Contracts\CategorizerInterface;
+use App\Services\Categorization\Pipes\AbstractCategorizationPipe;
+use App\Services\Categorization\Pipes\CategorizationPassable;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 
 /**
- * Pipeline-based categorization service.
+ * Pipeline-based categorization service using Laravel Pipeline.
  *
- * This service orchestrates multiple categorizers to determine the best
- * category for a release. Each categorizer is responsible for a specific
- * category domain and returns a result with a confidence score.
+ * This service uses Laravel's Pipeline to orchestrate multiple categorizers
+ * to determine the best category for a release. Each categorizer (pipe) is
+ * responsible for a specific category domain and returns a result with a
+ * confidence score.
  */
 class CategorizationPipeline
 {
     /**
-     * @var Collection<CategorizerInterface>
+     * @var Collection<AbstractCategorizationPipe>
      */
-    protected Collection $categorizers;
+    protected Collection $pipes;
 
     protected bool $categorizeForeign;
     protected bool $catWebDL;
 
     /**
-     * @param iterable<CategorizerInterface> $categorizers
+     * @param iterable<AbstractCategorizationPipe> $pipes
      */
-    public function __construct(iterable $categorizers = [])
+    public function __construct(iterable $pipes = [])
     {
-        $this->categorizers = collect($categorizers)
-            ->sortBy(fn (CategorizerInterface $c) => $c->getPriority());
+        $this->pipes = collect($pipes)
+            ->sortBy(fn (AbstractCategorizationPipe $p) => $p->getPriority());
 
         $this->categorizeForeign = (bool) Settings::settingValue('categorizeforeign');
         $this->catWebDL = (bool) Settings::settingValue('catwebdl');
     }
 
     /**
-     * Register a categorizer in the pipeline.
+     * Register a categorizer pipe in the pipeline.
      */
-    public function addCategorizer(CategorizerInterface $categorizer): self
+    public function addCategorizer(AbstractCategorizationPipe $pipe): self
     {
-        $this->categorizers->push($categorizer);
-        $this->categorizers = $this->categorizers->sortBy(fn (CategorizerInterface $c) => $c->getPriority());
+        $this->pipes->push($pipe);
+        $this->pipes = $this->pipes->sortBy(fn (AbstractCategorizationPipe $p) => $p->getPriority());
 
         return $this;
     }
 
     /**
-     * Determine the category for a release.
+     * Determine the category for a release using Laravel Pipeline.
      *
      * @param int|string $groupId The usenet group ID
      * @param string $releaseName The name of the release
@@ -74,62 +76,25 @@ class CategorizationPipeline
             catWebDL: $this->catWebDL,
         );
 
-        $bestResult = CategorizationResult::noMatch();
-        $allResults = [];
+        $passable = new CategorizationPassable($context, $debug);
 
-        foreach ($this->categorizers as $categorizer) {
-            // Skip if categorizer determines it shouldn't process this release
-            if ($categorizer->shouldSkip($context)) {
-                continue;
-            }
+        /** @var CategorizationPassable $result */
+        $result = app(Pipeline::class)
+            ->send($passable)
+            ->through($this->pipes->values()->all())
+            ->thenReturn();
 
-            $result = $categorizer->categorize($context);
-
-            if ($debug) {
-                $allResults[$categorizer->getName()] = [
-                    'category_id' => $result->categoryId,
-                    'confidence' => $result->confidence,
-                    'matched_by' => $result->matchedBy,
-                ];
-            }
-
-            // If this result is better than our current best, use it
-            if ($result->isSuccessful() && $result->shouldOverride($bestResult)) {
-                $bestResult = $result;
-
-                // If we have a very high confidence match, we can stop early
-                if ($result->confidence >= 0.95) {
-                    break;
-                }
-            }
-        }
-
-        // Build the return array
-        $returnValue = ['categories_id' => $bestResult->categoryId];
-
-        if ($debug) {
-            $returnValue['debug'] = [
-                'final_category' => $bestResult->categoryId,
-                'final_confidence' => $bestResult->confidence,
-                'matched_by' => $bestResult->matchedBy,
-                'release_name' => $releaseName,
-                'group_name' => $groupName,
-                'all_results' => $allResults,
-                'categorizer_details' => $bestResult->debug,
-            ];
-        }
-
-        return $returnValue;
+        return $result->toArray();
     }
 
     /**
-     * Get all registered categorizers.
+     * Get all registered categorizers (pipes).
      *
-     * @return Collection<CategorizerInterface>
+     * @return Collection<AbstractCategorizationPipe>
      */
     public function getCategorizers(): Collection
     {
-        return $this->categorizers;
+        return $this->pipes;
     }
 
     /**
@@ -138,15 +103,15 @@ class CategorizationPipeline
     public static function createDefault(): self
     {
         return new self([
-            new Categorizers\GroupNameCategorizer(),
-            new Categorizers\XxxCategorizer(),
-            new Categorizers\TvCategorizer(),
-            new Categorizers\MovieCategorizer(),
-            new Categorizers\BookCategorizer(),
-            new Categorizers\MusicCategorizer(),
-            new Categorizers\PcCategorizer(),
-            new Categorizers\ConsoleCategorizer(),
-            new Categorizers\MiscCategorizer(),
+            new Pipes\GroupNamePipe(),
+            new Pipes\XxxPipe(),
+            new Pipes\TvPipe(),
+            new Pipes\MoviePipe(),
+            new Pipes\BookPipe(),
+            new Pipes\MusicPipe(),
+            new Pipes\PcPipe(),
+            new Pipes\ConsolePipe(),
+            new Pipes\MiscPipe(),
         ]);
     }
 }

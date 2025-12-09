@@ -2,10 +2,10 @@
 
 namespace App\Services\Categorization;
 
-use App\Models\Category;
+use App\Services\Categorization\Pipes\AbstractCategorizationPipe;
 
 /**
- * Categorization service using the new pipeline-based system.
+ * Categorization service using Laravel Pipeline.
  *
  * This class is a drop-in replacement for the legacy Blacklight\Categorize
  * with additional features like confidence scoring and debug information.
@@ -70,11 +70,11 @@ class CategorizationService
     }
 
     /**
-     * Add a custom categorizer to the pipeline.
+     * Add a custom categorizer pipe to the pipeline.
      */
-    public function addCategorizer(Contracts\CategorizerInterface $categorizer): self
+    public function addCategorizer(AbstractCategorizationPipe $pipe): self
     {
-        $this->pipeline->addCategorizer($categorizer);
+        $this->pipeline->addCategorizer($pipe);
         return $this;
     }
 
