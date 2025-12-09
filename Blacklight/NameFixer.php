@@ -844,25 +844,24 @@ class NameFixer
 
                     echo PHP_EOL;
 
-                    $this->colorCLI->headerOver('New name:  ').
-                        $this->colorCLI->info(substr($newName, 0, 299)).
-                        $this->colorCLI->headerOver('Old name:  ').
-                        $this->colorCLI->info($release->searchname).
-                        $this->colorCLI->headerOver('Use name:  ').
-                        $this->colorCLI->info($release->name).
-                        $this->colorCLI->headerOver('New cat:   ').
-                        $this->colorCLI->info($newCatName).
-                        $this->colorCLI->headerOver('Old cat:   ').
-                        $this->colorCLI->info($oldCatName).
-                        $this->colorCLI->headerOver('Group:     ').
-                        $this->colorCLI->info($groupName).
-                        $this->colorCLI->headerOver('Method:    ').
-                        $this->colorCLI->info($type.$method).
-                        $this->colorCLI->headerOver('Releases ID: ').
-                        $this->colorCLI->info($release->releases_id);
+                    // Display release information with clean formatting
+                    $this->colorCLI->primary('Release Information:');
+
+                    echo '  ' . $this->colorCLI->headerOver('New name:   ') . $this->colorCLI->primary(substr($newName, 0, 100)) . PHP_EOL;
+                    echo '  ' . $this->colorCLI->headerOver('Old name:   ') . $this->colorCLI->primary(substr($release->searchname, 0, 100)) . PHP_EOL;
+                    echo '  ' . $this->colorCLI->headerOver('Use name:   ') . $this->colorCLI->primary(substr($release->name, 0, 100)) . PHP_EOL;
+                    echo PHP_EOL;
+
+                    echo '  ' . $this->colorCLI->headerOver('New cat:    ') . $this->colorCLI->primary($newCatName) . PHP_EOL;
+                    echo '  ' . $this->colorCLI->headerOver('Old cat:    ') . $this->colorCLI->primary($oldCatName) . PHP_EOL;
+                    echo '  ' . $this->colorCLI->headerOver('Group:      ') . $this->colorCLI->primary($groupName) . PHP_EOL;
+                    echo PHP_EOL;
+
+                    echo '  ' . $this->colorCLI->headerOver('Method:     ') . $this->colorCLI->primary($type.$method) . PHP_EOL;
+                    echo '  ' . $this->colorCLI->headerOver('Release ID: ') . $this->colorCLI->primary($release->releases_id) . PHP_EOL;
+
                     if (! empty($release->filename)) {
-                        $this->colorCLI->headerOver('Filename:  ').
-                            $this->colorCLI->info($release->filename);
+                        echo '  ' . $this->colorCLI->headerOver('Filename:   ') . $this->colorCLI->primary(substr($release->filename, 0, 100)) . PHP_EOL;
                     }
 
                     if ($type !== 'PAR2, ') {
