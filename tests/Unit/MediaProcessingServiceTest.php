@@ -3,8 +3,8 @@
 namespace Tests\Unit;
 
 use App\Models\Release as ReleaseModel;
+use App\Services\Categorization\CategorizationService;
 use App\Services\MediaProcessingService;
-use Blacklight\Categorize;
 use Blacklight\ElasticSearchSiteSearch;
 use Blacklight\ManticoreSearch;
 use Blacklight\ReleaseExtra;
@@ -53,7 +53,7 @@ class MediaProcessingServiceTest extends TestCase
         ?ReleaseExtra $releaseExtra = null,
         ?ManticoreSearch $manticore = null,
         ?ElasticSearchSiteSearch $elastic = null,
-        ?Categorize $categorize = null
+        ?CategorizationService $categorize = null
     ): MediaProcessingService {
         $ffmpeg ??= Mockery::mock(FFMpeg::class);
         $ffprobe ??= Mockery::mock(FFProbe::class);
@@ -62,7 +62,7 @@ class MediaProcessingServiceTest extends TestCase
         $releaseExtra ??= Mockery::mock(ReleaseExtra::class);
         $manticore ??= Mockery::mock(ManticoreSearch::class);
         $elastic ??= Mockery::mock(ElasticSearchSiteSearch::class);
-        $categorize ??= Mockery::mock(Categorize::class);
+        $categorize ??= Mockery::mock(CategorizationService::class);
 
         return new MediaProcessingService($ffmpeg, $ffprobe, $mediaInfo, $releaseImage, $releaseExtra, $manticore, $elastic, $categorize);
     }

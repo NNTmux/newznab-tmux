@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Category;
 use App\Models\Release;
-use Blacklight\Categorize;
+use App\Services\Categorization\CategorizationService;
 use Blacklight\ElasticSearchSiteSearch;
 use Blacklight\ManticoreSearch;
 use Blacklight\ReleaseExtra;
@@ -30,7 +30,7 @@ class MediaProcessingService
         private readonly ReleaseExtra $releaseExtra,
         private readonly ManticoreSearch $manticore,
         private readonly ElasticSearchSiteSearch $elasticsearch,
-        private readonly Categorize $categorize,
+        private readonly CategorizationService $categorize,
     ) {}
 
     public function getVideoTime(string $videoLocation): string

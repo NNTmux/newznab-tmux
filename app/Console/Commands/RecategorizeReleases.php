@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Category;
 use App\Models\Release;
-use Blacklight\Categorize;
+use App\Services\Categorization\CategorizationService;
 use Illuminate\Console\Command;
 
 class RecategorizeReleases extends Command
@@ -66,7 +66,7 @@ class RecategorizeReleases extends Command
 
         $count = $countQuery->count();
 
-        $cat = new Categorize;
+        $cat = new CategorizationService();
         $results = $countQuery->select(['id', 'searchname', 'fromname', 'groups_id', 'categories_id'])->get();
         $bar = $this->output->createProgressBar($count);
         $bar->start();

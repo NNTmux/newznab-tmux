@@ -8,9 +8,9 @@ use App\Models\MusicInfo;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
+use App\Services\Categorization\CategorizationService;
 use App\Services\CollectionCleanupService;
 use App\Services\ReleaseCreationService;
-use Blacklight\Categorize;
 use Blacklight\ColorCLI;
 use Blacklight\Genres;
 use Blacklight\NNTP;
@@ -190,7 +190,7 @@ class ProcessReleases
      */
     public function categorizeRelease(string $type, $groupId): int
     {
-        $cat = new Categorize;
+        $cat = new CategorizationService();
         $categorized = $total = 0;
         $releasesQuery = Release::query()->where(['categories_id' => Category::OTHER_MISC, 'iscategorized' => 0]);
         if (! empty($groupId)) {

@@ -9,7 +9,7 @@ use App\Models\Release;
 use App\Models\ReleaseFile;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
-use Blacklight\Categorize;
+use App\Services\Categorization\CategorizationService;
 use Blacklight\ColorCLI;
 use Blacklight\ElasticSearchSiteSearch;
 use Blacklight\ManticoreSearch;
@@ -111,7 +111,7 @@ class ProcessAdditional
 
     protected NNTP $_nntp;
 
-    protected Categorize $_categorize;
+    protected CategorizationService $_categorize;
 
     protected NameFixer $_nameFixer;
 
@@ -276,7 +276,7 @@ class ProcessAdditional
 
         $this->_nzb = new NZB;
         $this->_archiveInfo = new ArchiveInfo;
-        $this->_categorize = new Categorize;
+        $this->_categorize = new CategorizationService();
         $this->_nameFixer = new NameFixer;
         $this->_releaseExtra = new ReleaseExtra;
         $this->_releaseImage = new ReleaseImage;

@@ -9,7 +9,7 @@ use App\Models\Release;
 use App\Models\ReleaseRegex;
 use App\Models\ReleasesGroups;
 use App\Models\UsenetGroup;
-use Blacklight\Categorize;
+use App\Services\Categorization\CategorizationService;
 use Blacklight\ColorCLI;
 use Blacklight\NZB;
 use Blacklight\processing\ProcessReleases;
@@ -32,7 +32,7 @@ class ReleaseCreationService
     public function createReleases(int|string|null $groupID, int $limit, bool $echoCLI): array
     {
         $startTime = now()->toImmutable();
-        $categorize = new Categorize;
+        $categorize = new CategorizationService();
         $returnCount = 0;
         $duplicate = 0;
 

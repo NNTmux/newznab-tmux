@@ -2,6 +2,7 @@
 
 return [
     App\Providers\AppServiceProvider::class,
+    App\Providers\CategorizationServiceProvider::class,
     App\Providers\ForumServiceProvider::class,
     App\Providers\HorizonServiceProvider::class,
     App\Providers\RouteServiceProvider::class,

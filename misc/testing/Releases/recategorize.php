@@ -4,7 +4,7 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\Category;
 use App\Models\Release;
-use Blacklight\Categorize;
+use App\Services\Categorization\CategorizationService;
 use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
 
@@ -69,7 +69,7 @@ function categorizeRelease($argv, $echoOutput = false): int
     $relCount = $chgCount = 0;
     if ($total > 0) {
         $query->chunk('100', function ($results) use ($update, $relCount, $chgCount) {
-            $cat = new Categorize;
+            $cat = new CategorizationService();
             foreach ($results as $result) {
                 $catId = $cat->determineCategory($result->groups_id, $result->searchname, $result->fromname);
                 if ((int) $result->categories_id !== (int) $catId['categories_id']) {

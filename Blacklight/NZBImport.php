@@ -6,6 +6,7 @@ use App\Models\Release;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\BlacklistService;
+use App\Services\Categorization\CategorizationService;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
@@ -27,7 +28,7 @@ class NZBImport
      */
     protected mixed $crossPostt;
 
-    protected Categorize $category;
+    protected CategorizationService $category;
 
     /**
      * List of all the group names/ids in the DB.
@@ -67,7 +68,7 @@ class NZBImport
     {
         $this->echoCLI = config('nntmux.echocli');
         $this->blacklistService = new BlacklistService;
-        $this->category = new Categorize;
+        $this->category = new CategorizationService();
         $this->nzb = new NZB;
         $this->releaseCleaner = new ReleaseCleaning;
         $this->colorCli = new ColorCLI;

@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Predb;
 use App\Models\Release;
 use App\Models\UsenetGroup;
+use App\Services\Categorization\CategorizationService;
 use Blacklight\utility\Utility;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -104,7 +105,7 @@ class NameFixer
     public ColorCLI $colorCLI;
 
     /**
-     * @var Categorize
+     * @var CategorizationService
      */
     public mixed $category;
 
@@ -131,7 +132,7 @@ class NameFixer
         $this->_fileName = '';
         $this->done = $this->matched = false;
         $this->colorCLI = new ColorCLI;
-        $this->category = new Categorize;
+        $this->category = new CategorizationService();
         $this->manticore = new ManticoreSearch;
         $this->elasticsearch = new ElasticSearchSiteSearch;
     }
