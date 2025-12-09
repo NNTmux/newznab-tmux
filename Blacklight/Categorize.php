@@ -173,12 +173,59 @@ class Categorize
     }
 
     //
+    /**
+     * Check if the release name appears to be a hash/random string that should not be categorized as TV.
+     * This helps prevent false positives from random alphanumeric strings that accidentally match
+     * TV patterns like \d+x\d+ (e.g., "1X7" in "IvwWjFAxJ9m3WT1X7BzWZd").
+     *
+     * @return bool True if the name appears to be a hash/random string
+     */
+    private function looksLikeHash(): bool
+    {
+        // Remove common usenet prefixes like "[01/16] - " and file extensions
+        $cleanName = preg_replace('/^\[\d+\/\d+\]\s*-\s*"?|"?\s*yEnc.*$|\.(?:7z|rar|zip|par2?|nfo|sfv|nzb)(?:\.\d+)?$/i', '', $this->releaseName);
+        $cleanName = trim($cleanName, '"');
+
+        // If the name is just one long alphanumeric string without proper separators, it's likely a hash
+        // This matches strings like "IvwWjFAxJ9m3WT1X7BzWZd" but not "Show.Name.S01E01"
+        if (preg_match('/^[a-zA-Z0-9]{16,}$/', $cleanName)) {
+            // Exception: if it contains known TV markers with proper word boundaries, allow it
+            if (preg_match('/\b(S\d{1,4}[._ -]?E\d{1,4}|Season|Episode|Complete|HDTV|BluRay|WEB[._ -]?DL)\b/i', $cleanName)) {
+                return false;
+            }
+            return true;
+        }
+
+        // Check for release names that are mostly random characters without meaningful separators
+        // Count the ratio of separators (dots, spaces, underscores, hyphens) to total length
+        $separatorCount = preg_match_all('/[._ -]/', $cleanName);
+        $alphanumCount = preg_match_all('/[a-zA-Z0-9]/', $cleanName);
+
+        // Normal release names have regular separators (e.g., "Show.Name.S01E01.720p")
+        // Random strings have few to no separators
+        // If less than 10% of the name is separators AND there are no clear TV patterns, it's suspicious
+        if ($alphanumCount > 15 && ($separatorCount / max($alphanumCount, 1)) < 0.05) {
+            // Final check: must have proper TV identifiers if it's a long string without separators
+            if (! preg_match('/S\d{1,4}[._ -]?(E|D)\d{1,4}|Season[._ -]?\d{1,3}|HDTV|BluRay|WEB[._ -]?(DL|RIP)|720p|1080p|2160p/i', $cleanName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     // Beginning of functions to determine category by release name.
     //
 
     public function isTV(): bool
     {
         if ($this->hasAdultMarkers()) {
+            return false;
+        }
+
+        // Guard: Reject hash-like release names that may accidentally match TV patterns
+        // Example: "IvwWjFAxJ9m3WT1X7BzWZd" contains "1X7" which matches \d+x\d+ but isn't TV
+        if ($this->looksLikeHash()) {
             return false;
         }
 
@@ -192,7 +239,9 @@ class Categorize
             return false;
         }
 
-        if (preg_match('/Daily[\-_\.]Show|Nightly News|^\[[a-zA-Z\.\-]+\].*[\-_].*\d{1,3}[\-_. ](([\[\(])(h264-)?\d{3,4}([pi])([\]\)])\s?(\[AAC\])?|\[[a-fA-F0-9]{8}\]|(8|10)BIT|hi10p)(\[[a-fA-F0-9]{8}\])?|(\d\d-){2}[12]\d{3}|[12]\d{3}(\.\d\d){2}|\d+x\d+|\.e\d{1,3}\.|s\d{1,4}[._ -]?[ed]\d{1,3}([ex]\d{1,3}|[\-.\w ])|[._ -](\dx\d\d|C4TV|Complete[._ -]Season|DSR|([DHPS])DTV|EP[._ -]?\d{1,3}|S\d{1,3}.+Extras|SUBPACK|Season[._ -]\d{1,2})([._ -]|$)|TVRIP|TV[._ -](19|20)\d\d|Troll(HD|UHD)/i', $this->releaseName)
+        // Main TV pattern check - require proper word boundaries for \d+x\d+ pattern
+        // Changed \d+x\d+ to [._ -]\d+x\d+[._ -] to require separators around episode format
+        if (preg_match('/Daily[\-_\.]Show|Nightly News|^\[[a-zA-Z\.\-]+\].*[\-_].*\d{1,3}[\-_. ](([\[\(])(h264-)?\d{3,4}([pi])([\]\)])\s?(\[AAC\])?|\[[a-fA-F0-9]{8}\]|(8|10)BIT|hi10p)(\[[a-fA-F0-9]{8}\])?|(\d\d-){2}[12]\d{3}|[12]\d{3}(\.\d\d){2}|[._ -]\d+x\d+[._ -]|\.e\d{1,3}\.|s\d{1,4}[._ -]?[ed]\d{1,3}([ex]\d{1,3}|[\-.\w ])|[._ -](\dx\d\d|C4TV|Complete[._ -]Season|DSR|([DHPS])DTV|EP[._ -]?\d{1,3}|S\d{1,3}.+Extras|SUBPACK|Season[._ -]\d{1,2})([._ -]|$)|TVRIP|TV[._ -](19|20)\d\d|Troll(HD|UHD)/i', $this->releaseName)
             && ! preg_match('/^(Defloration|MetArt|MetArtX|SexArt|TheLifeErotic|VivThomas|CzechVR|VRBangers|WankzVR|BadoinkVR|NaughtyAmerica)(.|\s)?\d{4}[._ -]\d{2}[._ -]\d{2}|[._ -](flac|imageset|mp3|xxx|XXX|porn|adult|sex)[._ -]|[ .]exe$|[._ -](shemale|transsexual|bisexual|siterip|JAV|JavHD)\b/i', $this->releaseName)) {
             switch (true) {
                 case $this->isOtherTV():
@@ -305,7 +354,17 @@ class Categorize
             return false;
         }
 
+        // Match WEB-DL, WEBRIP patterns
         if (preg_match('/(S\d+).*.web[._-]?(dl|rip).*/i', $this->releaseName)) {
+            $this->tmpCat = Category::TV_WEBDL;
+
+            return true;
+        }
+
+        // Match .WEB. followed by codec (h264, h265, x264, x265, HEVC, AVC)
+        // e.g., "Show.S01E01.1080p.WEB.h265-GROUP" or "Show.S01E01.2160p.WEB.H265-GROUP"
+        if (preg_match('/S\d+[._ -]?E\d+/i', $this->releaseName) &&
+            preg_match('/[._-]WEB[._-](h\.?26[45]|x\.?26[45]|HEVC|AVC)/i', $this->releaseName)) {
             $this->tmpCat = Category::TV_WEBDL;
 
             return true;
@@ -366,6 +425,16 @@ class Categorize
             return false;
         }
 
+        // Match any TV show with 2160p resolution (UHD/4K)
+        // Must have season/episode pattern and 2160p anywhere in the name
+        if (preg_match('/S\d+[._ -]?E\d+/i', $this->releaseName) &&
+            preg_match('/2160p/i', $this->releaseName)) {
+            $this->tmpCat = Category::TV_UHD;
+
+            return true;
+        }
+
+        // Also match streaming service releases with specific groups (legacy pattern)
         if (preg_match('/(S\d+).*(2160p).*(Netflix|Amazon|NF|AMZN).*(TrollUHD|NTb|VLAD|DEFLATE|POFUDUK|CMRG)/i', $this->releaseName)) {
             $this->tmpCat = Category::TV_UHD;
 
