@@ -2232,6 +2232,12 @@ class NameFixer
         if ($wordCount < 2) {
             return false;
         }
+
+        // Reject hashed/obfuscated names early
+        if ($this->looksLikeHashedName($t)) {
+            return false;
+        }
+
         // Reject if it still ends with a segment marker
         if (preg_match('/(?:^|[.\-_ ])(?:part|vol|r)\d+(?:\+\d+)?$/i', $t)) {
             return false;
@@ -2255,6 +2261,83 @@ class NameFixer
         // - Has quality indicator (standalone)
         // - Has TV episode identifier (standalone)
         if ($hasGroupSuffix || ($hasTV && $hasQuality) || ($hasYear && ($hasQuality || $hasTV)) || $hasXXX || $hasQuality || $hasTV) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Detect if a string looks like a hashed/obfuscated name (random alphanumeric strings, UUIDs, etc.)
+     */
+    private function looksLikeHashedName(string $title): bool
+    {
+        $t = trim($title);
+
+        // Remove common separators and file extensions for analysis
+        $cleaned = preg_replace('/[.\-_\s]+/', '', $t);
+        $cleaned = preg_replace('/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx|par2?|nfo|sfv|nzb|rar|zip)$/i', '', $cleaned);
+
+        // Reject UUID patterns: 8-4-4-4-12 hex format
+        if (preg_match('/^[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}$/i', $cleaned)) {
+            return true;
+        }
+
+        // Reject pure hex strings (MD5, SHA1, etc.) - at least 16 hex chars with no other content
+        if (preg_match('/^[a-f0-9]{16,}$/i', $cleaned)) {
+            return true;
+        }
+
+        // Reject base64-like random strings: mostly alphanumeric with no recognizable words
+        // Check if the name is predominantly random-looking by analyzing character distribution
+        if (strlen($cleaned) >= 12) {
+            // Count transitions between character types (letter to number, uppercase to lowercase, etc.)
+            $transitions = 0;
+            $len = strlen($cleaned);
+            for ($i = 1; $i < $len; $i++) {
+                $prev = $cleaned[$i - 1];
+                $curr = $cleaned[$i];
+                $prevIsDigit = ctype_digit($prev);
+                $currIsDigit = ctype_digit($curr);
+                $prevIsUpper = ctype_upper($prev);
+                $currIsUpper = ctype_upper($curr);
+
+                // Count type transitions
+                if ($prevIsDigit !== $currIsDigit || ($prevIsUpper !== $currIsUpper && !$prevIsDigit && !$currIsDigit)) {
+                    $transitions++;
+                }
+            }
+
+            // High transition rate suggests random/hashed content
+            $transitionRate = $transitions / ($len - 1);
+            if ($transitionRate > 0.5 && $len >= 16) {
+                // Additional check: does it contain any recognizable media-related words?
+                if (!preg_match('/\b(movie|film|series|episode|season|show|video|audio|music|album|dvd|bluray|hdtv|webrip|xvid|x264|x265|hevc|aac|mp3|flac|720p|1080p|2160p|4k|complete|proper|repack|dubbed|subbed|english|french|german|spanish|italian)\b/i', $t)) {
+                    return true;
+                }
+            }
+        }
+
+        // Reject names that are entirely alphanumeric with high digit ratio and no spaces/readable structure
+        if (preg_match('/^[a-zA-Z0-9]{16,}$/', $cleaned)) {
+            $digitCount = preg_match_all('/\d/', $cleaned);
+            $letterCount = preg_match_all('/[a-zA-Z]/', $cleaned);
+            $totalLen = strlen($cleaned);
+
+            // If digits make up more than 40% of a long alphanumeric string, likely obfuscated
+            if ($totalLen >= 20 && $digitCount / $totalLen > 0.4) {
+                return true;
+            }
+
+            // If letters and digits are mixed randomly with no common word patterns
+            if ($totalLen >= 24 && !preg_match('/[a-zA-Z]{4,}/', $cleaned)) {
+                return true;
+            }
+        }
+
+        // Reject common obfuscation patterns: random-looking prefix/suffix with numbers
+        if (preg_match('/^[a-zA-Z]{1,3}\d{6,}[a-zA-Z]*$/i', $cleaned) ||
+            preg_match('/^[a-zA-Z0-9]{2,4}\d{8,}$/i', $cleaned)) {
             return true;
         }
 
