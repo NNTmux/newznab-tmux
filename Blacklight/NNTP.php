@@ -109,6 +109,23 @@ class NNTP extends \Net_NNTP_Client
     protected $_socket = null;
 
     /**
+     * Cached config values for performance.
+     */
+    protected string $_configServer;
+    protected string $_configAlternateServer;
+    protected int $_configPort;
+    protected int $_configAlternatePort;
+    protected bool $_configSsl;
+    protected bool $_configAlternateSsl;
+    protected string $_configUsername;
+    protected string $_configPassword;
+    protected string $_configAlternateUsername;
+    protected string $_configAlternatePassword;
+    protected int $_configSocketTimeout;
+    protected int $_configAlternateSocketTimeout;
+    protected bool $_configCompressedHeaders;
+
+    /**
      * Default constructor.
      */
     public function __construct()
@@ -119,8 +136,24 @@ class NNTP extends \Net_NNTP_Client
         $this->_tmux = new Tmux;
         $this->_nntpRetries = Settings::settingValue('nntpretries') !== '' ? (int) Settings::settingValue('nntpretries') : 0 + 1;
         $this->colorCli = new ColorCLI;
-        $this->_currentPort = config('nntmux_nntp.port');
-        $this->_currentServer = config('nntmux_nntp.server');
+
+        // Cache config values to avoid repeated lookups
+        $this->_configServer = config('nntmux_nntp.server');
+        $this->_configAlternateServer = config('nntmux_nntp.alternate_server');
+        $this->_configPort = (int) config('nntmux_nntp.port');
+        $this->_configAlternatePort = (int) config('nntmux_nntp.alternate_server_port');
+        $this->_configSsl = (bool) config('nntmux_nntp.ssl');
+        $this->_configAlternateSsl = (bool) config('nntmux_nntp.alternate_server_ssl');
+        $this->_configUsername = config('nntmux_nntp.username') ?? '';
+        $this->_configPassword = config('nntmux_nntp.password') ?? '';
+        $this->_configAlternateUsername = config('nntmux_nntp.alternate_server_username') ?? '';
+        $this->_configAlternatePassword = config('nntmux_nntp.alternate_server_password') ?? '';
+        $this->_configSocketTimeout = (int) (config('nntmux_nntp.socket_timeout') ?: $this->_socketTimeout);
+        $this->_configAlternateSocketTimeout = (int) (config('nntmux_nntp.alternate_server_socket_timeout') ?: $this->_socketTimeout);
+        $this->_configCompressedHeaders = (bool) config('nntmux_nntp.compressed_headers');
+
+        $this->_currentPort = $this->_configPort;
+        $this->_currentServer = $this->_configServer;
         $this->_primaryNntpConnections = config('nntmux_nntp.main_nntp_connections');
         $this->_alternateNntpConnections = config('nntmux_nntp.alternate_nntp_connections');
         $this->_selectedGroupSummary = null;
@@ -149,16 +182,16 @@ class NNTP extends \Net_NNTP_Client
     public function doConnect(bool $compression = true, bool $alternate = false): mixed
     {
         $primaryUSP = [
-            'ip' => gethostbyname(config('nntmux_nntp.server')),
-            'port' => config('nntmux_nntp.port'),
+            'ip' => gethostbyname($this->_configServer),
+            'port' => $this->_configPort,
         ];
         $alternateUSP = [
-            'ip_a' => gethostbyname(config('nntmux_nntp.alternate_server')),
-            'port_a' => config('nntmux_nntp.alternate_server_port'),
+            'ip_a' => gethostbyname($this->_configAlternateServer),
+            'port_a' => $this->_configAlternatePort,
         ];
         $primaryConnections = $this->_tmux->getUSPConnections('primary', $primaryUSP);
         $alternateConnections = $this->_tmux->getUSPConnections('alternate', $alternateUSP);
-        if ($this->_isConnected() && (($alternate && $this->_currentServer === config('nntmux_nntp.alternate_server') && ($this->_primaryNntpConnections < $alternateConnections['alternate']['active'])) || (! $alternate && $this->_currentServer === config('nntmux_nntp.server') && ($this->_primaryNntpConnections < $primaryConnections['primary']['active'])))) {
+        if ($this->_isConnected() && (($alternate && $this->_currentServer === $this->_configAlternateServer && ($this->_primaryNntpConnections < $alternateConnections['alternate']['active'])) || (! $alternate && $this->_currentServer === $this->_configServer && ($this->_primaryNntpConnections < $primaryConnections['primary']['active'])))) {
             return true;
         }
 
@@ -168,19 +201,19 @@ class NNTP extends \Net_NNTP_Client
 
         // Set variables to connect based on if we are using the alternate provider or not.
         if (! $alternate) {
-            $sslEnabled = (bool) config('nntmux_nntp.ssl');
-            $this->_currentServer = config('nntmux_nntp.server');
-            $this->_currentPort = config('nntmux_nntp.port');
-            $userName = config('nntmux_nntp.username');
-            $password = config('nntmux_nntp.password');
-            $socketTimeout = ! empty(config('nntmux_nntp.socket_timeout')) ? config('nntmux_nntp.socket_timeout') : $this->_socketTimeout;
+            $sslEnabled = $this->_configSsl;
+            $this->_currentServer = $this->_configServer;
+            $this->_currentPort = $this->_configPort;
+            $userName = $this->_configUsername;
+            $password = $this->_configPassword;
+            $socketTimeout = $this->_configSocketTimeout;
         } else {
-            $sslEnabled = (bool) config('nntmux_nntp.alternate_server_ssl');
-            $this->_currentServer = config('nntmux_nntp.alternate_server');
-            $this->_currentPort = config('nntmux_nntp.alternate_server_port');
-            $userName = config('nntmux_nntp.alternate_server_username');
-            $password = config('nntmux_nntp.alternate_server_password');
-            $socketTimeout = ! empty(config('nntmux_nntp.alternate_server_socket_timeout')) ? config('nntmux_nntp.alternate_server_socket_timeout') : $this->_socketTimeout;
+            $sslEnabled = $this->_configAlternateSsl;
+            $this->_currentServer = $this->_configAlternateServer;
+            $this->_currentPort = $this->_configAlternatePort;
+            $userName = $this->_configAlternateUsername;
+            $password = $this->_configAlternatePassword;
+            $socketTimeout = $this->_configAlternateSocketTimeout;
         }
 
         $enc = ($sslEnabled ? ' (ssl)' : ' (non-ssl)');
@@ -268,7 +301,7 @@ class NNTP extends \Net_NNTP_Client
             // If we are connected and authenticated, try enabling compression if we have it enabled.
             if ($connected && $authenticated) {
                 // Check if we should use compression on the connection.
-                if (! $compression || config('nntmux_nntp.compressed_headers') === false) {
+                if (! $compression || ! $this->_configCompressedHeaders) {
                     $this->_compressionSupported = false;
                 }
 
@@ -333,7 +366,7 @@ class NNTP extends \Net_NNTP_Client
      */
     public function enableCompression(): void
     {
-        if (config('nntmux_nntp.compressed_headers') === false) {
+        if (! $this->_configCompressedHeaders) {
             return;
         }
         $this->_enableCompression();
@@ -451,36 +484,37 @@ class NNTP extends \Net_NNTP_Client
             }
             $this->_overviewFormatCache = $overview;
         }
-        // Add the "Number" key.
-        $overview = array_merge(['Number' => false], $overview);
 
-        // Iterator used for selecting the header elements to insert into the overview format array.
-        $iterator = 0;
+        // Pre-compute keys array and Xref position for faster processing
+        $keys = array_merge(['Number'], array_keys($overview));
+        $keyCount = \count($keys);
+        $xrefIndex = array_search('Xref', $keys, true);
 
         // Loop over strings of headers.
         foreach ($data as $key => $header) {
             // Split the individual headers by tab.
-            $header = explode("\t", $header);
+            $parts = explode("\t", $header);
 
             // Make sure it's not empty.
-            if ($header === false) {
+            if ($parts === false || empty($parts)) {
                 continue;
             }
 
-            // Temp array to store the header.
-            $headerArray = $overview;
+            // Build header array using pre-computed keys
+            $headerArray = [];
+            $partCount = \count($parts);
 
-            // Loop over the overview format and insert the individual header elements.
-            foreach ($overview as $name => $element) {
-                // Strip Xref:
-                if ($element === true) {
-                    $header[$iterator] = substr($header[$iterator], 6);
+            for ($i = 0; $i < $keyCount && $i < $partCount; $i++) {
+                $value = $parts[$i];
+                // Strip "Xref: " prefix if this is the Xref field
+                if ($i === $xrefIndex && isset($value[5])) {
+                    $value = substr($value, 6);
                 }
-                $headerArray[$name] = $header[$iterator++];
+                $headerArray[$keys[$i]] = $value;
             }
+
             // Add the individual header array back to the return array.
             $data[$key] = $headerArray;
-            $iterator = 0;
         }
 
         // Return the array of headers.
@@ -562,9 +596,10 @@ class NNTP extends \Net_NNTP_Client
                     // If there is an error try the alternate provider or return the PEAR error.
                 } elseif ($alternate) {
                     if (! $aConnected) {
-                        $compressedHeaders = config('nntmux_nntp.compressed_headers');
                         // Check if the current connected server is the alternate or not.
-                        $aConnected = $this->_currentServer === config('nntmux_nntp.server') ? $nntp->doConnect($compressedHeaders, true) : $nntp->doConnect();
+                        $aConnected = $this->_currentServer === $this->_configServer
+                            ? $nntp->doConnect($this->_configCompressedHeaders, true)
+                            : $nntp->doConnect();
                     }
                     // If we connected successfully to usenet try to download the article body.
                     if ($aConnected === true) {
@@ -599,8 +634,7 @@ class NNTP extends \Net_NNTP_Client
         } elseif (\is_string($identifiers) || is_numeric($identifiers)) {
             $body = $this->_getMessage($groupName, $identifiers);
             if ($alternate && self::isError($body)) {
-                $compressedHeaders = config('nntmux_nntp.compressed_headers');
-                $nntp->doConnect($compressedHeaders, true);
+                $nntp->doConnect($this->_configCompressedHeaders, true);
                 $body = $nntp->_getMessage($groupName, $identifiers);
                 $aConnected = true;
             }
@@ -661,9 +695,8 @@ class NNTP extends \Net_NNTP_Client
             // Primary failed, try alternate if requested
             if ($alternate) {
                 if (! $aConnected) {
-                    $compressed = config('nntmux_nntp.compressed_headers');
-                    $aConnected = $this->_currentServer === config('nntmux_nntp.server')
-                        ? $alt->doConnect($compressed, true)
+                    $aConnected = $this->_currentServer === $this->_configServer
+                        ? $alt->doConnect($this->_configCompressedHeaders, true)
                         : $alt->doConnect();
                 }
                 if ($aConnected === true) {
@@ -714,19 +747,24 @@ class NNTP extends \Net_NNTP_Client
         if ($response !== NET_NNTP_PROTOCOL_RESPONSECODE_BODY_FOLLOWS) {
             return $this->_handleErrorResponse($response);
         }
-        $body = '';
-        while (! feof($this->_socket)) {
-            $line = fgets($this->_socket, 1024);
+
+        // Use array to accumulate lines (faster than string concatenation)
+        $bodyParts = [];
+        $socket = $this->_socket;
+
+        while (! feof($socket)) {
+            $line = fgets($socket, 8192);
             if ($line === false) {
                 return $this->throwError('Failed to read line from socket.', null);
             }
             if ($line === ".\r\n") {
-                return \App\Extensions\util\PhpYenc::decodeIgnore($body);
+                $body = implode('', $bodyParts);
+                return PhpYenc::decodeIgnore($body);
             }
-            if (str_starts_with($line, '.') && isset($line[1]) && $line[1] === '.') {
+            if ($line[0] === '.' && isset($line[1]) && $line[1] === '.') {
                 $line = substr($line, 1);
             }
-            $body .= $line;
+            $bodyParts[] = $line;
         }
 
         return $this->throwError('End of stream! Connection lost?', null);
@@ -888,35 +926,34 @@ class NNTP extends \Net_NNTP_Client
     protected function &_getXFeatureTextResponse(): array|string
     {
         $possibleTerm = false;
-        $data = null;
+        // Use array accumulation for better performance with large data
+        $dataParts = [];
+        $socket = $this->_socket;
 
-        while (! feof($this->_socket)) {
+        while (! feof($socket)) {
             // Did we find a possible ending ? (.\r\n)
             if ($possibleTerm) {
-                // Loop, sleeping shortly, to allow the server time to upload data, if it has any.
-                for ($i = 0; $i < 3; $i++) {
-                    // If the socket is really empty, fGets will get stuck here, so set the socket to non blocking in case.
-                    stream_set_blocking($this->_socket, 0);
+                // Use stream_select for more efficient socket polling
+                $read = [$socket];
+                $write = $except = null;
 
-                    // Now try to download from the socket.
-                    $buffer = fgets($this->_socket);
+                // Check if data is available with a short timeout (5ms)
+                $ready = @stream_select($read, $write, $except, 0, 5000);
 
-                    // And set back the socket to blocking.
-                    stream_set_blocking($this->_socket, 1);
-
-                    // Don't sleep on last iteration.
-                    if (! empty($buffer)) {
-                        break;
-                    }
-                    if ($i < 2) {
-                        usleep(10000);
-                    }
+                if ($ready > 0) {
+                    // Data available, read it
+                    stream_set_blocking($socket, false);
+                    $buffer = fgets($socket, 16384);
+                    stream_set_blocking($socket, true);
+                } else {
+                    $buffer = '';
                 }
 
                 // If the buffer was really empty, then we know $possibleTerm was the real ending.
-                if (empty($buffer)) {
-                    // Remove .\r\n from end, decompress data.
-                    $deComp = @gzuncompress(mb_substr($data, 0, -3, '8bit'));
+                if ($buffer === '' || $buffer === false) {
+                    // Join all parts and remove .\r\n from end, decompress data.
+                    $data = implode('', $dataParts);
+                    $deComp = @gzuncompress(substr($data, 0, -3));
 
                     if (! empty($deComp)) {
                         $bytesReceived = \strlen($data);
@@ -938,17 +975,18 @@ class NNTP extends \Net_NNTP_Client
                 }
                 // The buffer was not empty, so we know this was not the real ending, so reset $possibleTerm.
                 $possibleTerm = false;
+                $dataParts[] = $buffer;
             } else {
-                // Get data from the stream.
-                $buffer = fgets($this->_socket);
+                // Get data from the stream with larger buffer.
+                $buffer = fgets($socket, 16384);
             }
 
             // If we got no data at all try one more time to pull data.
             if (empty($buffer)) {
-                usleep(10000);
-                $buffer = fgets($this->_socket);
+                usleep(5000);
+                $buffer = fgets($socket, 16384);
 
-                // If wet got nothing again, return error.
+                // If we got nothing again, return error.
                 if (empty($buffer)) {
                     $message = 'Error fetching data from usenet server while downloading OVER headers.';
 
@@ -956,11 +994,12 @@ class NNTP extends \Net_NNTP_Client
                 }
             }
 
-            // Append current buffer to rest of the buffer.
-            $data .= $buffer;
+            // Append current buffer to parts array.
+            $dataParts[] = $buffer;
 
-            // Check if we have the ending (.\r\n)
-            if (str_ends_with($buffer, ".\r\n")) {
+            // Check if we have the ending (.\r\n) - check last 3 chars directly
+            $bufLen = \strlen($buffer);
+            if ($bufLen >= 3 && $buffer[$bufLen - 3] === '.' && $buffer[$bufLen - 2] === "\r" && $buffer[$bufLen - 1] === "\n") {
                 // We have a possible ending, next loop check if it is.
                 $possibleTerm = true;
             }
@@ -1028,32 +1067,35 @@ class NNTP extends \Net_NNTP_Client
             return $response;
         }
 
-        $body = '';
         if ($response === NET_NNTP_PROTOCOL_RESPONSECODE_BODY_FOLLOWS) {
+            // Use array to accumulate lines (faster than string concatenation for many appends)
+            $bodyParts = [];
+            $socket = $this->_socket;
+
             // Continue until connection is lost
-            while (! feof($this->_socket)) {
-                // Retrieve and append up to 1024 characters from the server.
-                $line = fgets($this->_socket, 1024);
+            while (! feof($socket)) {
+                // Retrieve and append up to 8192 characters from the server (larger buffer = fewer syscalls)
+                $line = fgets($socket, 8192);
 
                 // If the socket is empty/ an error occurs, false is returned.
-                // Since the socket is blocking, the socket should not be empty, so it's definitely an error.
                 if ($line === false) {
                     return $this->throwError('Failed to read line from socket.', null);
                 }
 
                 // Check if the line terminates the text response.
                 if ($line === ".\r\n") {
-                    // Attempt to yEnc decode and return the body.
+                    // Join all parts and attempt to yEnc decode
+                    $body = implode('', $bodyParts);
                     return PhpYenc::decodeIgnore($body);
                 }
 
                 // Check for line that starts with double period, remove one.
-                if (str_starts_with($line, '.') && $line[1] === '.') {
+                if ($line[0] === '.' && isset($line[1]) && $line[1] === '.') {
                     $line = substr($line, 1);
                 }
 
-                // Add the line to the rest of the lines.
-                $body .= $line;
+                // Add the line to the array
+                $bodyParts[] = $line;
             }
 
             return $this->throwError('End of stream! Connection lost?', null);
@@ -1079,13 +1121,13 @@ class NNTP extends \Net_NNTP_Client
             $retVal = true;
         } else {
             switch ($this->_currentServer) {
-                case config('nntmux_nntp.server'):
+                case $this->_configServer:
                     if (\is_resource($this->_socket)) {
                         $this->doQuit(true);
                     }
                     $retVal = $this->doConnect();
                     break;
-                case config('nntmux_nntp.alternate_server'):
+                case $this->_configAlternateServer:
                     if (\is_resource($this->_socket)) {
                         $this->doQuit(true);
                     }
