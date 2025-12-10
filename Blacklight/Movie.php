@@ -1215,12 +1215,10 @@ class Movie
      */
     public function doMovieUpdate(string $buffer, string $service, int $id, int $processImdb = 1): string|false
     {
-        // Create a cache key for this request
-        $cacheKey = 'release_imdb_'.md5($buffer.$id);
-
-        // Check if we have this cached
-        if (Cache::has($cacheKey)) {
-            return Cache::get($cacheKey);
+        // First check if this release already has an IMDB ID to avoid duplicate processing
+        $existingImdbId = Release::query()->where('id', $id)->value('imdbid');
+        if ($existingImdbId !== null && $existingImdbId !== '' && $existingImdbId !== '0000000') {
+            return $existingImdbId;
         }
 
         // Extract IMDB ID using regex
@@ -1272,23 +1270,14 @@ class Movie
                     }
                 }
 
-                // Cache the IMDB ID for future use
-                Cache::put($cacheKey, $imdbId, now()->addDays(1));
-
                 return $imdbId;
             } catch (\Exception $e) {
                 // Log the error
                 Log::error('Error updating movie information: '.$e->getMessage());
 
-                // Cache the failure but for shorter time
-                Cache::put($cacheKey, false, now()->addHours(1));
-
                 return false;
             }
         }
-
-        // Cache negative result to avoid repeated processing
-        Cache::put($cacheKey, false, now()->addHours(3));
 
         return $imdbId;
     }
@@ -1317,39 +1306,29 @@ class Movie
             return;
         }
 
-        // Create a cache key for this query
-        $cacheKey = 'movie_releases_'.md5($groupID.$guidChar.$lookupIMDB);
-        $shortCacheTime = now()->addHours(1);
+        // Always query fresh data to avoid processing already-processed releases
+        // Build query to get releases without IMDB IDs
+        $query = Release::query()
+            ->select(['searchname', 'id'])
+            ->whereBetween('categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER])
+            ->whereNull('imdbid');
 
-        // Check if we have cached results
-        if (Cache::has($cacheKey)) {
-            $res = Cache::get($cacheKey);
-        } else {
-            // Build query to get releases without IMDB IDs
-            $query = Release::query()
-                ->select(['searchname', 'id'])
-                ->whereBetween('categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER])
-                ->whereNull('imdbid');
-
-            // Apply filters if provided
-            if ($groupID !== '') {
-                $query->where('groups_id', $groupID);
-            }
-
-            if ($guidChar !== '') {
-                $query->where('leftguid', $guidChar);
-            }
-
-            if ((int) $lookupIMDB === 2) {
-                $query->where('isrenamed', '=', 1);
-            }
-
-            // Execute the query with limit, ordering by latest releases first
-            $res = $query->orderByDesc('id')->limit($this->movieqty)->get();
-
-            // Cache the results
-            Cache::put($cacheKey, $res, $shortCacheTime);
+        // Apply filters if provided
+        if ($groupID !== '') {
+            $query->where('groups_id', $groupID);
         }
+
+        if ($guidChar !== '') {
+            $query->where('leftguid', $guidChar);
+        }
+
+        if ((int) $lookupIMDB === 2) {
+            $query->where('isrenamed', '=', 1);
+        }
+
+        // Execute the query with limit, ordering by latest releases first
+        $res = $query->orderByDesc('id')->limit($this->movieqty)->get();
+
 
         $movieCount = count($res);
         $failedIDs = []; // Track IDs that need to be marked as unidentifiable
@@ -1425,7 +1404,7 @@ class Movie
 
                 // Use chunk to avoid huge queries for many IDs
                 foreach (array_chunk($failedIDs, 100) as $chunk) {
-                    Release::query()->whereIn('id', $chunk)->update(['imdbid' => 0000000]);
+                    Release::query()->whereIn('id', $chunk)->update(['imdbid' => '0000000']);
                 }
             }
         }
