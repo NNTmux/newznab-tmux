@@ -3,12 +3,20 @@
 namespace Blacklight;
 
 use App\Models\SteamApp;
+use App\Services\SteamService;
+use App\Support\DTOs\SteamGameData;
 use b3rs3rk\steamfront\Main;
 use DivineOmega\CliProgressBar\ProgressBar;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class Steam.
+ *
+ * Legacy wrapper around SteamService for backward compatibility.
+ * New code should use App\Services\SteamService directly.
+ *
+ * @deprecated Use App\Services\SteamService instead
  */
 class Steam
 {
@@ -30,9 +38,10 @@ class Steam
 
     protected ColorCLI $colorCli;
 
+    protected SteamService $steamService;
+
     /**
      * Steam constructor.
-     *
      *
      * @throws \Exception
      */
@@ -46,6 +55,7 @@ class Steam
         );
 
         $this->colorCli = new ColorCLI;
+        $this->steamService = new SteamService();
     }
 
     /**
@@ -55,6 +65,13 @@ class Steam
      */
     public function getAll(int $appID): bool|array
     {
+        // Try new service first
+        $result = $this->steamService->getGameDetails($appID);
+        if ($result !== false) {
+            return $result;
+        }
+
+        // Fall back to legacy steamfront library
         $res = $this->steamFront->getAppDetails($appID);
 
         if ($res !== false) {
@@ -152,23 +169,38 @@ class Steam
     }
 
     /**
-     * Searches Steam Apps table for best title match -- prefers 100% match but returns highest over 90%.
+     * Searches Steam Apps table for best title match.
      *
      * @param  string  $searchTerm  The parsed game name from the release searchname
-     * @return false|int $bestMatch The Best match from the given search term
+     * @return false|int The Best match from the given search term
      *
      * @throws \Exception
      */
     public function search(string $searchTerm): bool|int
     {
-        $bestMatch = false;
-
         $searchTerm = trim($searchTerm);
         if ($searchTerm === '') {
             $this->colorCli->notice('Search term cannot be empty');
-
             return false;
         }
+
+        // Use new service for search
+        $appId = $this->steamService->search($searchTerm);
+
+        if ($appId !== null) {
+            return $appId;
+        }
+
+        // Fall back to legacy matching if new service fails
+        return $this->legacySearch($searchTerm);
+    }
+
+    /**
+     * Legacy search implementation for backward compatibility.
+     */
+    protected function legacySearch(string $searchTerm): bool|int
+    {
+        $bestMatch = false;
 
         // Generate query variants from the original term to improve recall.
         $variants = $this->generateQueryVariants($searchTerm);
@@ -265,32 +297,51 @@ class Steam
     public function populateSteamAppsTable(): void
     {
         $bar = new ProgressBar;
-        $fullAppArray = $this->steamFront->getFullAppList();
-        $inserted = $dupe = 0;
         $this->colorCli->info('Populating steam apps table');
-        $appsArray = Arr::pluck($fullAppArray, 'apps');
-        $max = count($appsArray[0]);
-        $bar->setMaxProgress($max);
-        foreach ($appsArray as $appArray) {
-            foreach ($appArray as $app) {
-                $dupeCheck = SteamApp::query()->where('appid', '=', $app['appid'])->first(['appid']);
-                if ($dupeCheck === null) {
-                    SteamApp::query()->insert(['name' => $app['name'], 'appid' => $app['appid']]);
-                    $inserted++;
-                } else {
-                    $dupe++;
-                }
-                $bar->advance()->display();
+
+        $stats = $this->steamService->populateSteamAppsTable(function ($processed, $total) use ($bar) {
+            if ($bar->getMaxProgress() === 0) {
+                $bar->setMaxProgress($total);
             }
-        }
+            $bar->setProgress($processed)->display();
+        });
 
         $bar->complete();
 
-        \Laravel\Prompts\info('Added '.$inserted.' new steam app(s), '.$dupe.' duplicates skipped');
+        \Laravel\Prompts\info(sprintf(
+            'Added %d new steam app(s), %d skipped, %d errors',
+            $stats['inserted'],
+            $stats['skipped'],
+            $stats['errors']
+        ));
+    }
+
+    /**
+     * Get player count for a game.
+     */
+    public function getPlayerCount(int $appId): ?int
+    {
+        return $this->steamService->getPlayerCount($appId);
+    }
+
+    /**
+     * Get reviews summary for a game.
+     */
+    public function getReviewsSummary(int $appId): ?array
+    {
+        return $this->steamService->getReviewsSummary($appId);
+    }
+
+    /**
+     * Get the underlying SteamService instance.
+     */
+    public function getService(): SteamService
+    {
+        return $this->steamService;
     }
 
     // --------------------
-    // Matching helpers
+    // Matching helpers (kept for backward compatibility)
     // --------------------
 
     /**
