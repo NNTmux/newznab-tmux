@@ -22,30 +22,65 @@
 namespace App\Extensions\util;
 
 /**
- * Class Php.
+ * Class PhpYenc.
+ * Optimized yEnc encoder/decoder implementation.
  */
 class PhpYenc
 {
+    /**
+     * Pre-computed decode translation table for non-escaped characters.
+     * Maps yEnc encoded byte to decoded byte: (byte - 42) % 256
+     * @var array<string, string>|null
+     */
+    private static ?array $decodeTable = null;
+
+    /**
+     * Pre-computed decode translation table for escaped characters.
+     * Maps yEnc escaped byte to decoded byte: ((byte - 64) - 42) % 256
+     * @var array<string, string>|null
+     */
+    private static ?array $escapeDecodeTable = null;
+
+    /**
+     * Initialize the decode translation tables (lazy initialization).
+     */
+    private static function initDecodeTables(): void
+    {
+        if (self::$decodeTable !== null) {
+            return;
+        }
+
+        self::$decodeTable = [];
+        self::$escapeDecodeTable = [];
+
+        for ($i = 0; $i < 256; $i++) {
+            $char = \chr($i);
+            // Standard decode: (byte - 42) % 256
+            self::$decodeTable[$char] = \chr(($i - 42 + 256) % 256);
+            // Escape decode: ((byte - 64) - 42) % 256
+            self::$escapeDecodeTable[$char] = \chr((($i - 64 - 42) + 512) % 256);
+        }
+    }
+
     public static function decode(&$text, bool $ignore = false): bool|string
     {
         $crc = '';
         // Extract the yEnc string itself.
         if (preg_match(
-            '/=ybegin.*size=([^ $]+).*\\r\\n(.*)\\r\\n=yend.*size=([^ $\\r\\n]+)(.*)/ims',
+            '/=ybegin.*size=(\d+).*\r\n(.*)(?:\r\n)?=yend.*size=(\d+)(.*)/ims',
             $text,
             $encoded
         )) {
-            if (preg_match('/crc32=([^ $\\r\\n]+)/ims', $encoded[4], $trailer)) {
+            if (preg_match('/crc32=([0-9a-fA-F]+)/i', $encoded[4], $trailer)) {
                 $crc = trim($trailer[1]);
             }
 
-            [$headerSize, $encoded, $trailerSize] = $encoded;
+            $headerSize = (int) $encoded[1];
+            $trailerSize = (int) $encoded[3];
+            $encoded = $encoded[2];
         } else {
             return false;
         }
-
-        // Remove line breaks from the string.
-        $encoded = trim(str_replace("\r\n", '', $encoded));
 
         // Make sure the header and trailer file sizes match up.
         if ($headerSize !== $trailerSize) {
@@ -53,32 +88,73 @@ class PhpYenc
             throw new \RuntimeException($message);
         }
 
-        // Decode.
-        $decoded = '';
-        $encodedLength = \strlen($encoded);
-        for ($chr = 0; $chr < $encodedLength; $chr++) {
-            $decoded .= (
-                $encoded[$chr] === '=' ?
-                    \chr((\ord($encoded[$chr]) - 42) % 256) :
-                    \chr((((\ord($encoded[++$chr]) - 64) % 256) - 42) % 256)
-            );
-        }
+        // Remove line breaks from the string (use str_replace with array for speed).
+        $encoded = str_replace(["\r\n", "\r", "\n"], '', $encoded);
+
+        // Fast decode using optimized method
+        $decoded = self::fastDecode($encoded);
 
         // Make sure the decoded file size is the same as the size specified in the header.
-        if (\strlen($decoded) !== $headerSize) {
-            $message = 'Header file size ('.$headerSize.') and actual file size ('.\strlen($decoded).') do not match. The file is probably corrupt.';
+        $decodedLength = \strlen($decoded);
+        if ($decodedLength !== $headerSize) {
+            $message = 'Header file size ('.$headerSize.') and actual file size ('.$decodedLength.') do not match. The file is probably corrupt.';
 
             throw new \RuntimeException($message);
         }
 
         // Check the CRC value
-        if ($crc !== '' && (strtolower($crc) !== strtolower(sprintf('%04X', crc32($decoded))))) {
+        if ($crc !== '' && (strcasecmp($crc, sprintf('%X', crc32($decoded))) !== 0)) {
             $message = 'CRC32 checksums do not match. The file is probably corrupt.';
 
             throw new \RuntimeException($message);
         }
 
         return $decoded;
+    }
+
+    /**
+     * Fast yEnc decode using strtr and optimized escape handling.
+     *
+     * @param string $encoded The encoded string (without headers/line breaks)
+     * @return string The decoded string
+     */
+    private static function fastDecode(string $encoded): string
+    {
+        self::initDecodeTables();
+
+        /** @var array<string, string> $decodeTable */
+        $decodeTable = self::$decodeTable;
+        /** @var array<string, string> $escapeDecodeTable */
+        $escapeDecodeTable = self::$escapeDecodeTable;
+
+        // Check if there are any escape sequences
+        $escapePos = strpos($encoded, '=');
+
+        if ($escapePos === false) {
+            // No escape sequences - use fast strtr translation
+            return strtr($encoded, $decodeTable);
+        }
+
+        // Handle escape sequences
+        // First, process escape sequences by splitting on '='
+        $parts = explode('=', $encoded);
+        $result = strtr($parts[0], $decodeTable);
+
+        $count = \count($parts);
+        for ($i = 1; $i < $count; $i++) {
+            $part = $parts[$i];
+            if ($part === '') {
+                continue;
+            }
+            // First character after '=' is the escaped character
+            $result .= $escapeDecodeTable[$part[0]];
+            // Rest of the part is normal encoded data
+            if (isset($part[1])) {
+                $result .= strtr(substr($part, 1), $decodeTable);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -90,34 +166,14 @@ class PhpYenc
     public static function decodeIgnore(string &$text): string
     {
         if (preg_match('/^(=yBegin.*=yEnd[^$]*)$/ims', $text, $input)) {
-            $text = '';
-            $input =
-                trim(
-                    preg_replace(
-                        '/\r\n/im',
-                        '',
-                        preg_replace(
-                            '/(^=yEnd.*)/im',
-                            '',
-                            preg_replace(
-                                '/(^=yPart.*\\r\\n)/im',
-                                '',
-                                preg_replace('/(^=yBegin.*\\r\\n)/im', '', $input[1], 1),
-                                1
-                            ),
-                            1
-                        )
-                    )
-                );
+            // Extract the encoded data, removing headers and line breaks
+            $input = preg_replace('/(^=yBegin.*\r\n)/im', '', $input[1], 1);
+            $input = preg_replace('/(^=yPart.*\r\n)/im', '', $input, 1);
+            $input = preg_replace('/(^=yEnd.*)/im', '', $input, 1);
+            $input = str_replace(["\r\n", "\r", "\n"], '', trim($input));
 
-            $length = \strlen($input);
-            for ($chr = 0; $chr < $length; $chr++) {
-                $text .= (
-                    $input[$chr] === '=' ?
-                        \chr((((\ord($input[++$chr]) - 64) % 256) - 42) % 256) :
-                        \chr((\ord($input[$chr]) - 42) % 256)
-                );
-            }
+            // Use the fast decode method
+            $text = self::fastDecode($input);
         }
 
         return $text;
