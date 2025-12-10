@@ -25,24 +25,24 @@ use MarcReichel\IGDBLaravel\Models\Game;
  */
 class Games
 {
-    protected const GAME_MATCH_PERCENTAGE = 85;
+    protected const int GAME_MATCH_PERCENTAGE = 85;
 
     // Rate limiting constants
-    protected const STEAM_RATE_LIMIT_KEY = 'steam_api_rate_limit';
-    protected const IGDB_RATE_LIMIT_KEY = 'igdb_api_rate_limit';
-    protected const STEAM_REQUESTS_PER_MINUTE = 10;
-    protected const IGDB_REQUESTS_PER_MINUTE = 4;
+    protected const string STEAM_RATE_LIMIT_KEY = 'steam_api_rate_limit';
+    protected const string IGDB_RATE_LIMIT_KEY = 'igdb_api_rate_limit';
+    protected const int STEAM_REQUESTS_PER_MINUTE = 10;
+    protected const int IGDB_REQUESTS_PER_MINUTE = 4;
 
     // Cache TTL in seconds
-    protected const GAME_CACHE_TTL = 86400; // 24 hours
-    protected const FAILED_LOOKUP_CACHE_TTL = 3600; // 1 hour for failed lookups
+    protected const int GAME_CACHE_TTL = 86400; // 24 hours
+    protected const int FAILED_LOOKUP_CACHE_TTL = 3600; // 1 hour for failed lookups
 
     // Retry configuration
-    protected const MAX_RETRIES = 3;
-    protected const RETRY_DELAY_SECONDS = 5;
+    protected const int MAX_RETRIES = 3;
+    protected const int RETRY_DELAY_SECONDS = 5;
 
     // Expanded to cover many popular scene/p2p groups and tag forms.
-    protected const SCENE_GROUPS = [
+    protected const array SCENE_GROUPS = [
         'CODEX', 'PLAZA', 'GOG', 'CPY', 'HOODLUM', 'EMPRESS', 'RUNE', 'TENOKE', 'FLT',
         'RELOADED', 'SKIDROW', 'PROPHET', 'RAZOR1911', 'CORE', 'REFLEX', 'P2P', 'GOLDBERG',
         'DARKSIDERS', 'TINYISO', 'DOGE', 'ANOMALY', 'ELAMIGOS', 'FITGIRL', 'DODI', 'XATAB',
@@ -51,7 +51,7 @@ class Games
         'PROPHET', 'ALI213', 'FLTDOX', '3DMGAME', 'POSTMORTEM', 'VACE', 'ROGUE', 'OUTLAWS',
     ];
 
-    protected const GAMES_TITLE_PARSE_REGEX =
+    protected const string GAMES_TITLE_PARSE_REGEX =
         '#(?P<title>[\w\s\.]+)(-(?P<relgrp>FLT|RELOADED|Elamigos|SKIDROW|PROPHET|RAZOR1911|CORE|REFLEX))?\s?(\s*(\?('.
         '(?P<reltype>PROPER|MULTI\d|RETAIL|CRACK(FIX)?|ISO|(RE)?(RIP|PACK))|(?P<year>(19|20)\d{2})|V\s?'.
         '(?P<version>(\d+\.)+\d+)|(-\s)?(?P=relgrp))\)?)\s?)*\s?(\.\w{2,4})?#i';
@@ -829,7 +829,8 @@ class Games
     }
 
     /**
-     * Fetch game from IGDB with rate limiting.
+     * Fetch game from IGDB with rate limiting and improved search.
+     * Uses multiple search strategies for better matching.
      *
      * @return array|false
      */
@@ -837,79 +838,446 @@ class Games
     {
         $this->_classUsed = 'IGDB';
 
-        $result = RateLimiter::attempt(
-            self::IGDB_RATE_LIMIT_KEY,
-            self::IGDB_REQUESTS_PER_MINUTE,
-            function () use ($title) {
-                return Game::where('name', $title)->get();
-            },
-            60
-        );
+        // Try multiple search strategies
+        $game = $this->searchIGDBWithStrategies($title);
 
-        if (empty($result)) {
-            $this->colorCli->notice('IGDB found no valid results');
+        if ($game === null) {
+            $this->colorCli->notice('IGDB found no valid results for: ' . $title);
+            Log::debug('Games: IGDB search failed', ['title' => $title]);
             return false;
         }
 
-        $bestMatch = false;
-        $bestMatchPct = 0;
-        $normQuery = $this->normalizeForMatch($title);
+        return $this->buildGameDataFromIGDB($game, $genreName);
+    }
 
-        foreach ($result as $res) {
-            $score1 = $this->computeSimilarity($normQuery, $this->normalizeForMatch($res->name));
-            if ($score1 >= self::GAME_MATCH_PERCENTAGE && $score1 > $bestMatchPct) {
-                $bestMatch = $res->id;
-                $bestMatchPct = $score1;
+    /**
+     * Search IGDB using multiple strategies for better match rates.
+     *
+     * @param string $title The game title to search for
+     * @return Game|null
+     */
+    protected function searchIGDBWithStrategies(string $title): ?Game
+    {
+        $normalizedTitle = $this->normalizeForMatch($title);
+
+        // Strategy 1: Exact name search with PC platform filter
+        $game = $this->searchIGDBExact($title);
+        if ($game !== null) {
+            Log::debug('Games: IGDB exact match found', ['title' => $title, 'matched' => $game->name]);
+            return $game;
+        }
+
+        // Strategy 2: Search with fuzzy matching (using IGDB's search endpoint)
+        $game = $this->searchIGDBFuzzy($title);
+        if ($game !== null) {
+            Log::debug('Games: IGDB fuzzy match found', ['title' => $title, 'matched' => $game->name]);
+            return $game;
+        }
+
+        // Strategy 3: Search without special characters
+        $cleanTitle = preg_replace('/[^a-zA-Z0-9\s]/', '', $title);
+        if ($cleanTitle !== $title) {
+            $game = $this->searchIGDBFuzzy($cleanTitle);
+            if ($game !== null) {
+                Log::debug('Games: IGDB clean title match found', ['title' => $title, 'matched' => $game->name]);
+                return $game;
             }
         }
 
-        if ($bestMatch === false) {
-            $this->colorCli->notice('IGDB returned no valid results');
-            return false;
+        // Strategy 4: Try with common subtitle patterns removed
+        $baseTitle = $this->extractBaseTitle($title);
+        if ($baseTitle !== $title && $baseTitle !== $cleanTitle) {
+            $game = $this->searchIGDBFuzzy($baseTitle);
+            if ($game !== null) {
+                Log::debug('Games: IGDB base title match found', ['title' => $title, 'matched' => $game->name]);
+                return $game;
+            }
         }
 
-        $this->_gameResults = Game::with([
-            'cover' => ['url'],
-            'screenshots' => ['url'],
-            'involved_companies' => ['company', 'publisher'],
-            'themes',
-        ])->where('id', $bestMatch)->first();
+        return null;
+    }
 
+    /**
+     * Exact name search on IGDB with PC platform filter.
+     */
+    protected function searchIGDBExact(string $title): ?Game
+    {
+        try {
+            $result = RateLimiter::attempt(
+                self::IGDB_RATE_LIMIT_KEY,
+                self::IGDB_REQUESTS_PER_MINUTE,
+                function () use ($title) {
+                    // PC platform IDs: 6 (PC Windows), 13 (DOS), 14 (Mac), 3 (Linux)
+                    return Game::where('name', $title)
+                        ->whereIn('platforms', [6, 13, 14, 3])
+                        ->with([
+                            'cover' => ['url', 'image_id'],
+                            'screenshots' => ['url', 'image_id'],
+                            'artworks' => ['url', 'image_id'],
+                            'videos' => ['video_id', 'name'],
+                            'involved_companies' => ['company', 'publisher', 'developer'],
+                            'genres' => ['name'],
+                            'themes' => ['name'],
+                            'game_modes' => ['name'],
+                            'player_perspectives' => ['name'],
+                            'age_ratings' => ['rating', 'category'],
+                            'websites' => ['url', 'category'],
+                            'platforms' => ['name', 'abbreviation'],
+                            'release_dates' => ['date', 'platform', 'human'],
+                        ])
+                        ->orderByDesc('aggregated_rating_count')
+                        ->first();
+                },
+                60
+            );
+
+            return $result;
+        } catch (\Exception $e) {
+            Log::warning('Games: IGDB exact search error', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    /**
+     * Fuzzy search on IGDB using the search endpoint for better matching.
+     */
+    protected function searchIGDBFuzzy(string $title): ?Game
+    {
+        try {
+            $results = RateLimiter::attempt(
+                self::IGDB_RATE_LIMIT_KEY,
+                self::IGDB_REQUESTS_PER_MINUTE,
+                function () use ($title) {
+                    // Use IGDB's search which supports fuzzy matching
+                    return Game::search($title)
+                        ->whereIn('platforms', [6, 13, 14, 3]) // PC platforms
+                        ->where('category', 0) // Main game only (not DLC, expansion, etc.)
+                        ->with([
+                            'cover' => ['url', 'image_id'],
+                            'screenshots' => ['url', 'image_id'],
+                            'artworks' => ['url', 'image_id'],
+                            'videos' => ['video_id', 'name'],
+                            'involved_companies' => ['company', 'publisher', 'developer'],
+                            'genres' => ['name'],
+                            'themes' => ['name'],
+                            'game_modes' => ['name'],
+                            'player_perspectives' => ['name'],
+                            'age_ratings' => ['rating', 'category'],
+                            'websites' => ['url', 'category'],
+                            'release_dates' => ['date', 'platform', 'human'],
+                        ])
+                        ->orderByDesc('aggregated_rating_count')
+                        ->limit(10)
+                        ->get();
+                },
+                60
+            );
+
+            if (empty($results)) {
+                return null;
+            }
+
+            // Find best match using similarity scoring
+            return $this->findBestIGDBMatch($results, $title);
+        } catch (\Exception $e) {
+            Log::warning('Games: IGDB fuzzy search error', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    /**
+     * Find the best matching game from IGDB results.
+     */
+    protected function findBestIGDBMatch($results, string $title): ?Game
+    {
+        $bestMatch = null;
+        $bestScore = 0;
+        $normalizedQuery = $this->normalizeForMatch($title);
+
+        foreach ($results as $game) {
+            $normalizedName = $this->normalizeForMatch($game->name);
+            $score = $this->computeSimilarity($normalizedQuery, $normalizedName);
+
+            // Boost score for games with more ratings (more popular/verified)
+            if (isset($game->aggregated_rating_count) && $game->aggregated_rating_count > 10) {
+                $score += min(5, $game->aggregated_rating_count / 100);
+            }
+
+            // Boost score for games with covers (more complete data)
+            if (isset($game->cover)) {
+                $score += 2;
+            }
+
+            // Check alternative names if available
+            if (isset($game->alternative_names)) {
+                foreach ($game->alternative_names as $altName) {
+                    $altScore = $this->computeSimilarity($normalizedQuery, $this->normalizeForMatch($altName['name'] ?? ''));
+                    if ($altScore > $score) {
+                        $score = $altScore;
+                    }
+                }
+            }
+
+            if ($score >= self::GAME_MATCH_PERCENTAGE && $score > $bestScore) {
+                $bestMatch = $game;
+                $bestScore = $score;
+            }
+        }
+
+        if ($bestMatch !== null) {
+            Log::debug('Games: IGDB best match selected', [
+                'query' => $title,
+                'matched' => $bestMatch->name,
+                'score' => $bestScore
+            ]);
+        }
+
+        return $bestMatch;
+    }
+
+    /**
+     * Extract base title by removing common subtitle patterns.
+     */
+    protected function extractBaseTitle(string $title): string
+    {
+        // Remove common subtitle separators and everything after
+        $patterns = [
+            '/\s*[-:]\s+.*$/',           // "Game - Subtitle" or "Game: Subtitle"
+            '/\s+(?:Episode|Chapter|Part)\s+\d+.*/i',  // Episode/Chapter/Part numbers
+            '/\s+(?:Vol(?:ume)?\.?\s*\d+).*/i',        // Volume numbers
+            '/\s+\d+$/',                  // Trailing numbers (sequels)
+        ];
+
+        $baseTitle = $title;
+        foreach ($patterns as $pattern) {
+            $baseTitle = preg_replace($pattern, '', $baseTitle);
+        }
+
+        return trim($baseTitle);
+    }
+
+    /**
+     * Build game data array from IGDB Game model.
+     */
+    protected function buildGameDataFromIGDB(Game $game, string &$genreName): array
+    {
+        // Extract publishers and developers
         $publishers = [];
-        if (!empty($this->_gameResults->involved_companies)) {
-            foreach ($this->_gameResults->involved_companies as $publisher) {
-                if ($publisher['publisher'] === true) {
-                    $company = Company::find($publisher['company']);
-                    $publishers[] = $company['name'];
+        $developers = [];
+        if (!empty($game->involved_companies)) {
+            foreach ($game->involved_companies as $company) {
+                if (isset($company['publisher']) && $company['publisher'] === true) {
+                    $companyData = Company::find($company['company']);
+                    if ($companyData) {
+                        $publishers[] = $companyData->name;
+                    }
+                }
+                if (isset($company['developer']) && $company['developer'] === true) {
+                    $companyData = Company::find($company['company']);
+                    if ($companyData) {
+                        $developers[] = $companyData->name;
+                    }
                 }
             }
         }
 
+        // Extract genres (prefer genres over themes)
         $genres = [];
-        if (!empty($this->_gameResults->themes)) {
-            foreach ($this->_gameResults->themes as $theme) {
-                $genres[] = $theme['name'];
+        if (!empty($game->genres)) {
+            foreach ($game->genres as $genre) {
+                $genres[] = $genre['name'] ?? '';
+            }
+        }
+        // Fall back to themes if no genres
+        if (empty($genres) && !empty($game->themes)) {
+            foreach ($game->themes as $theme) {
+                $genres[] = $theme['name'] ?? '';
+            }
+        }
+        $genreName = $this->_matchGenre(implode(',', array_filter($genres)));
+
+        // Get best cover image URL (prefer higher quality)
+        $coverUrl = $this->getIGDBImageUrl($game->cover ?? null, 'cover_big');
+
+        // Get best backdrop/screenshot
+        $backdropUrl = '';
+        if (!empty($game->artworks)) {
+            $backdropUrl = $this->getIGDBImageUrl($game->artworks[0] ?? null, '1080p');
+        } elseif (!empty($game->screenshots)) {
+            $backdropUrl = $this->getIGDBImageUrl($game->screenshots[0] ?? null, '1080p');
+        }
+
+        // Get trailer URL if available
+        $trailerUrl = '';
+        if (!empty($game->videos)) {
+            foreach ($game->videos as $video) {
+                if (isset($video['video_id'])) {
+                    $trailerUrl = 'https://www.youtube.com/watch?v=' . $video['video_id'];
+                    break;
+                }
             }
         }
 
-        $genreName = $this->_matchGenre(implode(',', $genres));
+        // Get rating (ESRB or PEGI)
+        $esrb = $this->getIGDBAgeRating($game->age_ratings ?? []);
 
-        $releaseDate = now()->format('Y-m-d');
-        if (isset($this->_gameResults->first_release_date) && strtotime($this->_gameResults->first_release_date) !== false) {
-            $releaseDate = $this->_gameResults->first_release_date->format('Y-m-d');
+        // Get release date for PC
+        $releaseDate = $this->getIGDBReleaseDate($game);
+
+        // Get game URL
+        $gameUrl = $game->url ?? ('https://www.igdb.com/games/' . ($game->slug ?? $game->id));
+
+        // Build summary/review text
+        $review = $game->summary ?? '';
+        if (empty($review) && isset($game->storyline)) {
+            $review = $game->storyline;
         }
 
+        // Add additional info to review
+        $additionalInfo = [];
+        if (!empty($developers)) {
+            $additionalInfo[] = 'Developer: ' . implode(', ', array_slice($developers, 0, 3));
+        }
+        if (!empty($game->game_modes)) {
+            $modes = array_map(fn($m) => $m['name'] ?? '', $game->game_modes);
+            $additionalInfo[] = 'Modes: ' . implode(', ', array_filter($modes));
+        }
+        if (!empty($additionalInfo) && !empty($review)) {
+            $review .= "\n\n" . implode("\n", $additionalInfo);
+        }
+
+        Log::info('Games: IGDB data retrieved', [
+            'title' => $game->name,
+            'id' => $game->id,
+            'has_cover' => !empty($coverUrl),
+            'has_backdrop' => !empty($backdropUrl),
+            'genres' => $genres,
+        ]);
+
         return [
-            'title' => $this->_gameResults->name,
-            'asin' => $this->_gameResults->id,
-            'review' => $this->_gameResults->summary ?? '',
-            'coverurl' => isset($this->_gameResults->cover) ? 'https:' . $this->_gameResults->cover['url'] : '',
+            'title' => $game->name,
+            'asin' => 'igdb-' . $game->id, // Prefix to distinguish from Steam IDs
+            'review' => $review,
+            'coverurl' => $coverUrl,
             'releasedate' => $releaseDate,
-            'esrb' => isset($this->_gameResults->aggregated_rating) ? round($this->_gameResults->aggregated_rating) . '%' : 'Not Rated',
-            'url' => $this->_gameResults->url ?? '',
-            'backdropurl' => isset($this->_gameResults->screenshots) ? 'https:' . str_replace('t_thumb', 't_cover_big', $this->_gameResults->screenshots[0]['url']) : '',
-            'publisher' => !empty($publishers) ? implode(',', $publishers) : 'Unknown',
+            'esrb' => $esrb,
+            'url' => $gameUrl,
+            'backdropurl' => $backdropUrl,
+            'trailer' => $trailerUrl,
+            'publisher' => !empty($publishers) ? implode(', ', array_slice($publishers, 0, 3)) : 'Unknown',
+            'developer' => !empty($developers) ? implode(', ', array_slice($developers, 0, 3)) : '',
         ];
+    }
+
+    /**
+     * Get properly formatted IGDB image URL.
+     *
+     * @param array|null $imageData
+     * @param string $size Size: thumb, cover_small, cover_big, 720p, 1080p
+     * @return string
+     */
+    protected function getIGDBImageUrl(?array $imageData, string $size = 'cover_big'): string
+    {
+        if (empty($imageData)) {
+            return '';
+        }
+
+        // If we have image_id, construct the URL properly
+        if (isset($imageData['image_id'])) {
+            return 'https://images.igdb.com/igdb/image/upload/t_' . $size . '/' . $imageData['image_id'] . '.jpg';
+        }
+
+        // Fall back to URL manipulation if we have a URL
+        if (isset($imageData['url'])) {
+            $url = $imageData['url'];
+            // Ensure https
+            if (strpos($url, '//') === 0) {
+                $url = 'https:' . $url;
+            }
+            // Replace size in URL
+            return preg_replace('/t_[a-z0-9_]+/', 't_' . $size, $url);
+        }
+
+        return '';
+    }
+
+    /**
+     * Get age rating string from IGDB age ratings.
+     */
+    protected function getIGDBAgeRating(array $ageRatings): string
+    {
+        if (empty($ageRatings)) {
+            return 'Not Rated';
+        }
+
+        // IGDB age rating categories: 1 = ESRB, 2 = PEGI
+        // ESRB ratings: 6=RP, 7=EC, 8=E, 9=E10, 10=T, 11=M, 12=AO
+        $esrbMap = [
+            6 => 'RP (Rating Pending)',
+            7 => 'EC (Early Childhood)',
+            8 => 'E (Everyone)',
+            9 => 'E10+ (Everyone 10+)',
+            10 => 'T (Teen)',
+            11 => 'M (Mature 17+)',
+            12 => 'AO (Adults Only)',
+        ];
+
+        // PEGI ratings: 1=3, 2=7, 3=12, 4=16, 5=18
+        $pegiMap = [
+            1 => 'PEGI 3',
+            2 => 'PEGI 7',
+            3 => 'PEGI 12',
+            4 => 'PEGI 16',
+            5 => 'PEGI 18',
+        ];
+
+        foreach ($ageRatings as $rating) {
+            $category = $rating['category'] ?? 0;
+            $ratingValue = $rating['rating'] ?? 0;
+
+            // Prefer ESRB
+            if ($category === 1 && isset($esrbMap[$ratingValue])) {
+                return $esrbMap[$ratingValue];
+            }
+            // Fall back to PEGI
+            if ($category === 2 && isset($pegiMap[$ratingValue])) {
+                return $pegiMap[$ratingValue];
+            }
+        }
+
+        return 'Not Rated';
+    }
+
+    /**
+     * Get PC release date from IGDB game data.
+     */
+    protected function getIGDBReleaseDate(Game $game): string
+    {
+        // Try to get PC-specific release date
+        if (!empty($game->release_dates)) {
+            foreach ($game->release_dates as $release) {
+                // Platform 6 = PC (Windows)
+                if (isset($release['platform']) && $release['platform'] === 6 && isset($release['date'])) {
+                    return Carbon::createFromTimestamp($release['date'])->format('Y-m-d');
+                }
+            }
+            // Fall back to first release date
+            if (isset($game->release_dates[0]['date'])) {
+                return Carbon::createFromTimestamp($game->release_dates[0]['date'])->format('Y-m-d');
+            }
+        }
+
+        // Fall back to first_release_date
+        if (isset($game->first_release_date)) {
+            if ($game->first_release_date instanceof Carbon) {
+                return $game->first_release_date->format('Y-m-d');
+            }
+            if (is_numeric($game->first_release_date)) {
+                return Carbon::createFromTimestamp($game->first_release_date)->format('Y-m-d');
+            }
+        }
+
+        return now()->format('Y-m-d');
     }
 
     /**
