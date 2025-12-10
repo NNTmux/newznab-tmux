@@ -1344,8 +1344,8 @@ class Movie
                 $query->where('isrenamed', '=', 1);
             }
 
-            // Execute the query with limit
-            $res = $query->limit($this->movieqty)->get();
+            // Execute the query with limit, ordering by latest releases first
+            $res = $query->orderByDesc('id')->limit($this->movieqty)->get();
 
             // Cache the results
             Cache::put($cacheKey, $res, $shortCacheTime);
