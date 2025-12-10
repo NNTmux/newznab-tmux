@@ -13,11 +13,11 @@ class PcCategorizer extends AbstractCategorizer
 {
     protected int $priority = 30;
 
-    // Common PC game release groups
-    protected const PC_GROUPS = '0x0007|ALiAS|ANOMALY|BACKLASH|BAT|CODEX|CPY|DARKS(?:iDERS|IDERS)|DEViANCE|DOGE|DODI|ELAMIGOS|EMPRESS|FITGIRL|FAS(?:DOX|iSO)|FLT|GOG(?:-GAMES)?|GOLDBERG|HI2U|HOODLUM|INLAWS|JAGUAR|MAZE|MONEY|OUTLAWS|PLAZA|PROPHET|RAZOR1911|RAiN|RELOADED|RUNE|SiMPLEX|SKIDROW|TENOKE|TiNYiSO|UNLEASHED|P2P';
+    // Common PC game release groups (matched at end of release name only)
+    protected const PC_GROUPS = '0x0007|ALiAS|ANOMALY|BACKLASH|BAT|BLASTCiTY|CHRONOS|CODEX|CONSPIRACY|CPY|CROSSFiRE|DARKS(?:iDERS|IDERS)|DELiGHT|DEViANCE|DINOByTES|DOGE|DODI|DVN|ELAMIGOS|EMPRESS|ENiGMA|FANiSO|FAS(?:DOX|iSO)|FCKDRM|FITGIRL|FLT|FLTDOX|GGS|GOG(?:-?GAMES)?|GOLDBERG|HATRED|HI2U|HOODLUM|I_KnoW|iNLAWS|iNTERNAL|JAGUAR|KACZKRULL|KAOS|KaOsKrew|LAZARUS|LiGHTFORCE|MEPHISTO|OUTLAWS|PARADOX|PHOENIX|PLAZA|POSTMORTEM|PROPHET|PROVOKED|RADIUM|RAZOR(?:1911|DOX)|RELOADED|REVOLUTiON|RUNE|SAFARi|SCRUBS|SiLENTGATE|SiMPLEX|SKIDROW|SPLiNTERCELL|STEAMPUNKS|SUXXORS|TENOKE|TiNYiSO|UBERMENCH|UNLEASHED|VENGEANCE|ViTALiTY|VENOM|VACE|ZEKE|P2P';
 
-    // PC-only keywords
-    protected const PC_KEYWORDS = 'PC[ _.-]?GAMES?|\[(?:PC)\]|\(PC\)|Steam(?:[ ._-]?Rip|\b)|GOG(?:\b|[ ._-])|Retail\s*PC|DRM-?Free|Win(All|32|64)\b|Windows(?:\s?10|\s?11)?\b|Repack';
+    // PC-only keywords (can appear anywhere)
+    protected const PC_KEYWORDS = 'PC[ _.-]?GAMES?|\[(?:PC)\]|\(PC\)|Steam(?:[ ._-]?Rip|\b)|Retail\s*PC|DRM-?Free|Win(All|32|64)\b|Repack';
 
     public function getName(): string
     {
@@ -108,9 +108,12 @@ class PcCategorizer extends AbstractCategorizer
         }
 
         // Check for PC game patterns
-        $pattern = '/(?:(?:^|[\s\._-])(?:' . self::PC_GROUPS . ')(?:$|[\s\._-])|' . self::PC_KEYWORDS . ')/i';
+        // PC_GROUPS must be at the END of the release name (scene naming: Game.Name-GROUP)
+        // PC_KEYWORDS can appear anywhere
+        $groupPattern = '/[-.](' . self::PC_GROUPS . ')$/i';
+        $keywordPattern = '/' . self::PC_KEYWORDS . '/i';
 
-        if (preg_match($pattern, $name)) {
+        if (preg_match($groupPattern, $name) || preg_match($keywordPattern, $name)) {
             return $this->matched(Category::PC_GAMES, 0.9, 'pc_game');
         }
 
