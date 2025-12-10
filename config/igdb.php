@@ -17,7 +17,7 @@ return [
      *
      * Recommended: 86400 (24 hours) for game data that rarely changes
      */
-    'cache_lifetime' => env('IGDB_CACHE_LIFETIME', 86400),
+    'cache_lifetime' => (int) env('IGDB_CACHE_LIFETIME', 86400),
 
     /*
      * Path where the webhooks should be handled.
