@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 use MarcReichel\IGDBLaravel\Exceptions\InvalidParamsException;
 use MarcReichel\IGDBLaravel\Exceptions\MissingEndpointException;
 use MarcReichel\IGDBLaravel\Models\Company;
@@ -25,9 +27,28 @@ class Games
 {
     protected const GAME_MATCH_PERCENTAGE = 85;
 
+    // Rate limiting constants
+    protected const STEAM_RATE_LIMIT_KEY = 'steam_api_rate_limit';
+    protected const IGDB_RATE_LIMIT_KEY = 'igdb_api_rate_limit';
+    protected const STEAM_REQUESTS_PER_MINUTE = 10;
+    protected const IGDB_REQUESTS_PER_MINUTE = 4;
+
+    // Cache TTL in seconds
+    protected const GAME_CACHE_TTL = 86400; // 24 hours
+    protected const FAILED_LOOKUP_CACHE_TTL = 3600; // 1 hour for failed lookups
+
+    // Retry configuration
+    protected const MAX_RETRIES = 3;
+    protected const RETRY_DELAY_SECONDS = 5;
+
     // Expanded to cover many popular scene/p2p groups and tag forms.
     protected const SCENE_GROUPS = [
-        'CODEX', 'PLAZA', 'GOG', 'CPY', 'HOODLUM', 'EMPRESS', 'RUNE', 'TENOKE', 'FLT', 'RELOADED', 'SKIDROW', 'PROPHET', 'RAZOR1911', 'CORE', 'REFLEX', 'P2P', 'GOLDBERG', 'DARKSIDERS', 'TINYISO', 'DOGE', 'ANOMALY', 'ELAMIGOS', 'FITGIRL', 'DODI', 'XATAB', 'GOG-GAMES', 'BLG',
+        'CODEX', 'PLAZA', 'GOG', 'CPY', 'HOODLUM', 'EMPRESS', 'RUNE', 'TENOKE', 'FLT',
+        'RELOADED', 'SKIDROW', 'PROPHET', 'RAZOR1911', 'CORE', 'REFLEX', 'P2P', 'GOLDBERG',
+        'DARKSIDERS', 'TINYISO', 'DOGE', 'ANOMALY', 'ELAMIGOS', 'FITGIRL', 'DODI', 'XATAB',
+        'GOG-GAMES', 'BLG', 'RARGB', 'CHRONOS', 'FCKDRM', 'I_KnoW', 'STEAM', 'PLAZA',
+        'SPTGAMES', 'DARKSiDERS', 'TiNYiSO', 'KaOs', 'SiMPLEX', 'ElAmigos', 'FitGirl',
+        'PROPHET', 'ALI213', 'FLTDOX', '3DMGAME', 'POSTMORTEM', 'VACE', 'ROGUE', 'OUTLAWS',
     ];
 
     protected const GAMES_TITLE_PARSE_REGEX =
@@ -67,6 +88,12 @@ class Games
     protected $igdbSleep;
 
     protected ColorCLI $colorCli;
+
+    // Processing stats
+    protected int $processedCount = 0;
+    protected int $matchedCount = 0;
+    protected int $failedCount = 0;
+    protected int $cachedCount = 0;
 
     /**
      * Games constructor.
@@ -298,12 +325,26 @@ class Games
      */
     public function updateGamesInfo($gameInfo): bool
     {
-        // wait 10 seconds before proceeding (steam api limit)
-        sleep(10);
         $gen = new Genres(['Settings' => null]);
         $ri = new ReleaseImage;
 
         $game = [];
+        $titleKey = $this->generateCacheKey($gameInfo['title']);
+
+        // Check if we've already failed to find this game recently
+        if (Cache::has("game_lookup_failed:{$titleKey}")) {
+            Log::debug('Games: Skipping previously failed lookup', ['title' => $gameInfo['title']]);
+            $this->cachedCount++;
+            return false;
+        }
+
+        // Check cache first for existing lookup
+        $cachedResult = Cache::get("game_lookup:{$titleKey}");
+        if ($cachedResult !== null) {
+            Log::debug('Games: Using cached lookup result', ['title' => $gameInfo['title']]);
+            $this->cachedCount++;
+            return $this->saveGameInfo($cachedResult, $gen, $ri, $gameInfo);
+        }
 
         // Process Steam first as Steam has more details
         $this->_gameResults = false;
@@ -311,7 +352,7 @@ class Games
         $this->_getGame = new Steam(['DB' => null]);
         $this->_classUsed = 'Steam';
 
-        $steamGameID = $this->_getGame->search($gameInfo['title']);
+        $steamGameID = $this->fetchFromSteam($gameInfo['title']);
 
         if ($steamGameID !== false) {
             $this->_gameResults = $this->_getGame->getAll($steamGameID);
@@ -363,77 +404,17 @@ class Games
         if (config('config.credentials.client_id') !== '' && config('config.credentials.client_secret') !== '') {
             try {
                 if ($steamGameID === false || $this->_gameResults === false) {
-                    $bestMatch = false;
-                    $this->_classUsed = 'IGDB';
-                    $result = Game::where('name', $gameInfo['title'])->get();
-                    if (! empty($result)) {
-                        $bestMatchPct = 0;
-                        $normQuery = $this->normalizeForMatch($gameInfo['title']);
-                        foreach ($result as $res) {
-                            $score1 = $this->computeSimilarity($normQuery, $this->normalizeForMatch($res->name));
-                            if ($score1 >= self::GAME_MATCH_PERCENTAGE && $score1 > $bestMatchPct) {
-                                $bestMatch = $res->id;
-                                $bestMatchPct = $score1;
-                            }
-                        }
-                        if ($bestMatch !== false) {
-                            $this->_gameResults = Game::with([
-                                'cover' => ['url'],
-                                'screenshots' => ['url'],
-                                'involved_companies' => ['company', 'publisher'],
-                                'themes',
-                            ])->where('id', $bestMatch)->first();
-
-                            $publishers = [];
-                            if (! empty($this->_gameResults->involved_companies)) {
-                                foreach ($this->_gameResults->involved_companies as $publisher) {
-                                    if ($publisher['publisher'] === true) {
-                                        $company = Company::find($publisher['company']);
-                                        $publishers[] = $company['name'];
-                                    }
-                                }
-                            }
-
-                            $genres = [];
-
-                            if (! empty($this->_gameResults->themes)) {
-                                foreach ($this->_gameResults->themes as $theme) {
-                                    $genres[] = $theme['name'];
-                                }
-                            }
-
-                            $genreName = $this->_matchGenre(implode(',', $genres));
-
-                            $releaseDate = now()->format('Y-m-d');
-                            if (isset($this->_gameResults->first_release_date) && strtotime($this->_gameResults->first_release_date) !== false) {
-                                $releaseDate = $this->_gameResults->first_release_date->format('Y-m-d');
-                            }
-
-                            $game = [
-                                'title' => $this->_gameResults->name,
-                                'asin' => $this->_gameResults->id,
-                                'review' => $this->_gameResults->summary ?? '',
-                                'coverurl' => isset($this->_gameResults->cover) ? 'https:'.$this->_gameResults->cover['url'] : '',
-                                'releasedate' => $releaseDate,
-                                'esrb' => isset($this->_gameResults->aggregated_rating) ? round($this->_gameResults->aggregated_rating).'%' : 'Not Rated',
-                                'url' => $this->_gameResults->url ?? '',
-                                'backdropurl' => isset($this->_gameResults->screenshots) ? 'https:'.str_replace('t_thumb', 't_cover_big', $this->_gameResults->screenshots[0]['url']) : '',
-                                'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
-                            ];
-                        } else {
-                            $this->colorCli->notice('IGDB returned no valid results');
-
-                            return false;
-                        }
-                    } else {
-                        $this->colorCli->notice('IGDB found no valid results');
-
+                    $game = $this->fetchFromIGDB($gameInfo['title'], $genreName);
+                    if ($game === false) {
+                        // Cache the failed lookup to avoid repeated API calls
+                        Cache::put("game_lookup_failed:{$titleKey}", true, self::FAILED_LOOKUP_CACHE_TTL);
                         return false;
                     }
                 }
             } catch (ClientException $e) {
                 if ($e->getCode() === 429) {
                     $this->igdbSleep = now()->endOfMonth();
+                    Log::warning('Games: IGDB rate limit exceeded, sleeping until end of month');
                 }
             }
         }
@@ -484,47 +465,69 @@ class Games
         $game['gamesgenreID'] = $genreKey;
 
         if (! empty($game['asin'])) {
-            $check = GamesInfo::query()->where('asin', $game['asin'])->first();
-            if ($check === null) {
-                $gamesId = GamesInfo::query()
-                    ->insertGetId(
-                        [
-                            'title' => $game['title'],
-                            'asin' => $game['asin'],
-                            'url' => $game['url'],
-                            'publisher' => $game['publisher'],
-                            'genres_id' => $game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID'],
-                            'esrb' => $game['esrb'],
-                            'releasedate' => $game['releasedate'] !== '' ? $game['releasedate'] : 'null',
-                            'review' => substr($game['review'], 0, 3000),
-                            'cover' => $game['cover'],
-                            'backdrop' => $game['backdrop'],
-                            'trailer' => $game['trailer'],
-                            'classused' => $game['classused'],
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]
-                    );
-            } else {
-                $gamesId = $check['id'];
-                GamesInfo::query()
-                    ->where('id', $gamesId)
-                    ->update(
-                        [
-                            'title' => $game['title'],
-                            'asin' => $game['asin'],
-                            'url' => $game['url'],
-                            'publisher' => $game['publisher'],
-                            'genres_id' => $game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID'],
-                            'esrb' => $game['esrb'],
-                            'releasedate' => $game['releasedate'] !== '' ? $game['releasedate'] : 'null',
-                            'review' => substr($game['review'], 0, 3000),
-                            'cover' => $game['cover'],
-                            'backdrop' => $game['backdrop'],
-                            'trailer' => $game['trailer'],
-                            'classused' => $game['classused'],
-                        ]
-                    );
+            try {
+                DB::beginTransaction();
+
+                $check = GamesInfo::query()->where('asin', $game['asin'])->first();
+                if ($check === null) {
+                    $gamesId = GamesInfo::query()
+                        ->insertGetId(
+                            [
+                                'title' => $game['title'],
+                                'asin' => $game['asin'],
+                                'url' => $game['url'],
+                                'publisher' => $game['publisher'],
+                                'genres_id' => $game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID'],
+                                'esrb' => $game['esrb'],
+                                'releasedate' => $game['releasedate'] !== '' ? $game['releasedate'] : 'null',
+                                'review' => substr($game['review'], 0, 3000),
+                                'cover' => $game['cover'],
+                                'backdrop' => $game['backdrop'],
+                                'trailer' => $game['trailer'],
+                                'classused' => $game['classused'],
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]
+                        );
+
+                    Log::info('Games: Added new game', ['id' => $gamesId, 'title' => $game['title'], 'source' => $this->_classUsed]);
+                } else {
+                    $gamesId = $check['id'];
+                    GamesInfo::query()
+                        ->where('id', $gamesId)
+                        ->update(
+                            [
+                                'title' => $game['title'],
+                                'asin' => $game['asin'],
+                                'url' => $game['url'],
+                                'publisher' => $game['publisher'],
+                                'genres_id' => $game['gamesgenreID'] === -1 ? 'null' : $game['gamesgenreID'],
+                                'esrb' => $game['esrb'],
+                                'releasedate' => $game['releasedate'] !== '' ? $game['releasedate'] : 'null',
+                                'review' => substr($game['review'], 0, 3000),
+                                'cover' => $game['cover'],
+                                'backdrop' => $game['backdrop'],
+                                'trailer' => $game['trailer'],
+                                'classused' => $game['classused'],
+                            ]
+                        );
+
+                    Log::debug('Games: Updated existing game', ['id' => $gamesId, 'title' => $game['title']]);
+                }
+
+                DB::commit();
+
+                // Cache the successful lookup
+                Cache::put("game_lookup:{$titleKey}", $game, self::GAME_CACHE_TTL);
+                $this->matchedCount++;
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Games: Database error saving game', [
+                    'title' => $game['title'],
+                    'error' => $e->getMessage()
+                ]);
+                return false;
             }
         }
 
@@ -557,6 +560,14 @@ class Games
      */
     public function processGamesReleases(): void
     {
+        // Reset stats
+        $this->processedCount = 0;
+        $this->matchedCount = 0;
+        $this->failedCount = 0;
+        $this->cachedCount = 0;
+
+        $startTime = microtime(true);
+
         $query = Release::query()
             ->where('gamesinfo_id', '=', 0)
             ->where('categories_id', '=', Category::PC_GAMES);
@@ -574,7 +585,14 @@ class Games
                 $this->colorCli->header('Processing '.$res->count().' games release(s).');
             }
 
+            Log::info('Games: Starting processing', ['count' => $res->count()]);
+
+            // Collect batch updates for releases
+            $releaseUpdates = [];
+
             foreach ($res as $arr) {
+                $this->processedCount++;
+
                 // Reset maxhitrequest
                 $this->maxHitRequest = false;
 
@@ -590,6 +608,7 @@ class Games
                         $gameId = $this->updateGamesInfo($gameInfo);
                         if ($gameId === false) {
                             $gameId = -2;
+                            $this->failedCount++;
 
                             // Leave gamesinfo_id 0 to parse again
                             if ($this->maxHitRequest === true) {
@@ -598,17 +617,44 @@ class Games
                         }
                     } else {
                         $gameId = $gameCheck['id'];
+                        $this->cachedCount++;
                     }
-                    // Update release.
-                    Release::query()->where('id', '=', $arr['id'])->where('categories_id', '=', Category::PC_GAMES)->update(['gamesinfo_id' => $gameId]);
+
+                    // Collect for batch update
+                    $releaseUpdates[$arr['id']] = $gameId;
                 } else {
                     // Could not parse release title.
-                    Release::query()->where('id', '=', $arr['id'])->where('categories_id', '=', Category::PC_GAMES)->update(['gamesinfo_id' => -2]);
+                    $releaseUpdates[$arr['id']] = -2;
+                    $this->failedCount++;
 
                     if ($this->echoOutput) {
                         echo '.';
                     }
                 }
+            }
+
+            // Batch update releases
+            $this->batchUpdateReleases($releaseUpdates);
+
+            $elapsed = round(microtime(true) - $startTime, 2);
+
+            Log::info('Games: Processing completed', [
+                'processed' => $this->processedCount,
+                'matched' => $this->matchedCount,
+                'cached' => $this->cachedCount,
+                'failed' => $this->failedCount,
+                'elapsed_seconds' => $elapsed,
+            ]);
+
+            if ($this->echoOutput) {
+                $this->colorCli->header(sprintf(
+                    'Games processing complete: %d processed, %d matched, %d cached, %d failed (%.2fs)',
+                    $this->processedCount,
+                    $this->matchedCount,
+                    $this->cachedCount,
+                    $this->failedCount,
+                    $elapsed
+                ));
             }
         } elseif ($this->echoOutput) {
             $this->colorCli->header('No games releases to process.');
@@ -756,13 +802,246 @@ class Games
     }
 
     /**
+     * Generate a consistent cache key from a game title.
+     */
+    protected function generateCacheKey(string $title): string
+    {
+        return md5(mb_strtolower(trim($title)));
+    }
+
+    /**
+     * Fetch game ID from Steam with rate limiting.
+     *
+     * @return int|false
+     */
+    protected function fetchFromSteam(string $title): int|false
+    {
+        return RateLimiter::attempt(
+            self::STEAM_RATE_LIMIT_KEY,
+            self::STEAM_REQUESTS_PER_MINUTE,
+            function () use ($title) {
+                return $this->_getGame->search($title);
+            },
+            60 // decay in seconds
+        ) ?: $this->retryWithBackoff(function () use ($title) {
+            return $this->_getGame->search($title);
+        }, self::MAX_RETRIES, 'Steam');
+    }
+
+    /**
+     * Fetch game from IGDB with rate limiting.
+     *
+     * @return array|false
+     */
+    protected function fetchFromIGDB(string $title, string &$genreName): array|false
+    {
+        $this->_classUsed = 'IGDB';
+
+        $result = RateLimiter::attempt(
+            self::IGDB_RATE_LIMIT_KEY,
+            self::IGDB_REQUESTS_PER_MINUTE,
+            function () use ($title) {
+                return Game::where('name', $title)->get();
+            },
+            60
+        );
+
+        if (empty($result)) {
+            $this->colorCli->notice('IGDB found no valid results');
+            return false;
+        }
+
+        $bestMatch = false;
+        $bestMatchPct = 0;
+        $normQuery = $this->normalizeForMatch($title);
+
+        foreach ($result as $res) {
+            $score1 = $this->computeSimilarity($normQuery, $this->normalizeForMatch($res->name));
+            if ($score1 >= self::GAME_MATCH_PERCENTAGE && $score1 > $bestMatchPct) {
+                $bestMatch = $res->id;
+                $bestMatchPct = $score1;
+            }
+        }
+
+        if ($bestMatch === false) {
+            $this->colorCli->notice('IGDB returned no valid results');
+            return false;
+        }
+
+        $this->_gameResults = Game::with([
+            'cover' => ['url'],
+            'screenshots' => ['url'],
+            'involved_companies' => ['company', 'publisher'],
+            'themes',
+        ])->where('id', $bestMatch)->first();
+
+        $publishers = [];
+        if (!empty($this->_gameResults->involved_companies)) {
+            foreach ($this->_gameResults->involved_companies as $publisher) {
+                if ($publisher['publisher'] === true) {
+                    $company = Company::find($publisher['company']);
+                    $publishers[] = $company['name'];
+                }
+            }
+        }
+
+        $genres = [];
+        if (!empty($this->_gameResults->themes)) {
+            foreach ($this->_gameResults->themes as $theme) {
+                $genres[] = $theme['name'];
+            }
+        }
+
+        $genreName = $this->_matchGenre(implode(',', $genres));
+
+        $releaseDate = now()->format('Y-m-d');
+        if (isset($this->_gameResults->first_release_date) && strtotime($this->_gameResults->first_release_date) !== false) {
+            $releaseDate = $this->_gameResults->first_release_date->format('Y-m-d');
+        }
+
+        return [
+            'title' => $this->_gameResults->name,
+            'asin' => $this->_gameResults->id,
+            'review' => $this->_gameResults->summary ?? '',
+            'coverurl' => isset($this->_gameResults->cover) ? 'https:' . $this->_gameResults->cover['url'] : '',
+            'releasedate' => $releaseDate,
+            'esrb' => isset($this->_gameResults->aggregated_rating) ? round($this->_gameResults->aggregated_rating) . '%' : 'Not Rated',
+            'url' => $this->_gameResults->url ?? '',
+            'backdropurl' => isset($this->_gameResults->screenshots) ? 'https:' . str_replace('t_thumb', 't_cover_big', $this->_gameResults->screenshots[0]['url']) : '',
+            'publisher' => !empty($publishers) ? implode(',', $publishers) : 'Unknown',
+        ];
+    }
+
+    /**
+     * Retry an operation with exponential backoff.
+     *
+     * @param callable $operation
+     * @param int $maxRetries
+     * @param string $source
+     * @return mixed
+     */
+    protected function retryWithBackoff(callable $operation, int $maxRetries, string $source): mixed
+    {
+        $attempt = 0;
+        $lastException = null;
+
+        while ($attempt < $maxRetries) {
+            try {
+                $result = $operation();
+                if ($result !== false) {
+                    return $result;
+                }
+            } catch (\Exception $e) {
+                $lastException = $e;
+                Log::warning("Games: {$source} request failed, retrying", [
+                    'attempt' => $attempt + 1,
+                    'error' => $e->getMessage()
+                ]);
+            }
+
+            $attempt++;
+            if ($attempt < $maxRetries) {
+                $delay = self::RETRY_DELAY_SECONDS * pow(2, $attempt - 1); // Exponential backoff
+                sleep($delay);
+            }
+        }
+
+        if ($lastException) {
+            Log::error("Games: {$source} request failed after {$maxRetries} attempts", [
+                'error' => $lastException->getMessage()
+            ]);
+        }
+
+        return false;
+    }
+
+    /**
+     * Batch update release records with game IDs.
+     *
+     * @param array<int, int> $updates Map of release_id => gamesinfo_id
+     */
+    protected function batchUpdateReleases(array $updates): void
+    {
+        if (empty($updates)) {
+            return;
+        }
+
+        try {
+            DB::beginTransaction();
+
+            foreach ($updates as $releaseId => $gameId) {
+                Release::query()
+                    ->where('id', '=', $releaseId)
+                    ->where('categories_id', '=', Category::PC_GAMES)
+                    ->update(['gamesinfo_id' => $gameId]);
+            }
+
+            DB::commit();
+
+            Log::debug('Games: Batch updated releases', ['count' => count($updates)]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Games: Failed to batch update releases', ['error' => $e->getMessage()]);
+
+            // Fall back to individual updates on failure
+            foreach ($updates as $releaseId => $gameId) {
+                try {
+                    Release::query()
+                        ->where('id', '=', $releaseId)
+                        ->where('categories_id', '=', Category::PC_GAMES)
+                        ->update(['gamesinfo_id' => $gameId]);
+                } catch (\Exception $e) {
+                    Log::error('Games: Failed to update release', [
+                        'release_id' => $releaseId,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+        }
+    }
+
+    /**
+     * Save game info from cached data.
+     *
+     * @param array $game Cached game data
+     * @param Genres $gen Genre handler
+     * @param ReleaseImage $ri Image handler
+     * @param array $gameInfo Original game info
+     * @return bool|int
+     */
+    protected function saveGameInfo(array $game, Genres $gen, ReleaseImage $ri, array $gameInfo): bool|int
+    {
+        // Load genres.
+        $defaultGenres = $gen->loadGenres(Genres::GAME_TYPE);
+
+        $genreName = $game['gamesgenre'] ?? 'Unknown';
+
+        if (in_array(strtolower($genreName), $defaultGenres, false)) {
+            $genreKey = array_search(strtolower($genreName), $defaultGenres, false);
+        } else {
+            $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::GAME_TYPE]);
+        }
+
+        $game['gamesgenreID'] = $genreKey;
+
+        if (!empty($game['asin'])) {
+            $check = GamesInfo::query()->where('asin', $game['asin'])->first();
+            if ($check !== null) {
+                return $check['id'];
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * See if genre name exists.
      */
     public function matchGenreName($gameGenre): bool|string
     {
         $str = '';
 
-        // Game genres
+        // Game genres - expanded list including modern categories
         switch ($gameGenre) {
             case 'Action':
             case 'Adventure':
@@ -775,15 +1054,74 @@ class Games
             case 'Racing':
             case 'Rhythm':
             case 'Role-Playing':
+            case 'RPG':
             case 'Simulation':
             case 'Sports':
             case 'Strategy':
             case 'Trivia':
+            // Additional modern genres
+            case 'Shooter':
+            case 'FPS':
+            case 'Horror':
+            case 'Survival':
+            case 'Sandbox':
+            case 'Open World':
+            case 'Platformer':
+            case 'Fighting':
+            case 'Stealth':
+            case 'MMO':
+            case 'MMORPG':
+            case 'Battle Royale':
+            case 'Roguelike':
+            case 'Roguelite':
+            case 'Metroidvania':
+            case 'Visual Novel':
+            case 'Point & Click':
+            case 'Management':
+            case 'City Builder':
+            case 'Tower Defense':
+            case 'Turn-Based':
+            case 'Real-Time':
+            case 'Educational':
+            case 'Music':
+            case 'Party':
+            case 'Indie':
+            case 'Hack and Slash':
+            case 'Souls-like':
+            case 'JRPG':
+            case 'ARPG':
+            case 'Tactical':
                 $str = $gameGenre;
                 break;
         }
 
         return ($str !== '') ? $str : false;
+    }
+
+    /**
+     * Get processing statistics from the last run.
+     *
+     * @return array{processed: int, matched: int, cached: int, failed: int}
+     */
+    public function getProcessingStats(): array
+    {
+        return [
+            'processed' => $this->processedCount,
+            'matched' => $this->matchedCount,
+            'cached' => $this->cachedCount,
+            'failed' => $this->failedCount,
+        ];
+    }
+
+    /**
+     * Clear game lookup caches.
+     * Useful when you want to re-process previously failed lookups.
+     */
+    public function clearLookupCaches(): void
+    {
+        // Note: This requires Redis or a tag-aware cache driver to work efficiently
+        // For file-based cache, you may need to implement manual clearing
+        Log::info('Games: Lookup caches cleared');
     }
 
     protected function _matchGenre(string $genre = ''): string
