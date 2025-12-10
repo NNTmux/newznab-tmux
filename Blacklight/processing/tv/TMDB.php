@@ -251,7 +251,7 @@ class TMDB extends TV
      *
      * @return array|false
      */
-    protected function getShowInfo(string $name): bool|array
+    public function getShowInfo(string $name): bool|array
     {
         $return = false;
 
@@ -371,7 +371,7 @@ class TMDB extends TV
      *
      * @return array|false
      */
-    protected function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode, string $airdate = '', int $videoId = 0): bool|array
+    public function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode, string $airdate = '', int $videoId = 0): bool|array
     {
         $return = false;
 
@@ -440,7 +440,7 @@ class TMDB extends TV
      * Assigns API show response values to a formatted array for insertion
      * Returns the formatted array.
      */
-    protected function formatShowInfo($show): array
+    public function formatShowInfo($show): array
     {
         if (! is_array($show)) {
             return [];
@@ -485,7 +485,7 @@ class TMDB extends TV
      * Assigns API episode response values to a formatted array for insertion
      * Returns the formatted array.
      */
-    protected function formatEpisodeInfo($episode): array
+    public function formatEpisodeInfo($episode): array
     {
         if (! is_array($episode)) {
             return [];

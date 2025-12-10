@@ -147,32 +147,32 @@ class LocalDB extends TV
     /**
      * These abstract methods are required by parent TV class but not used for local lookups.
      */
-    protected function getBanner(int $videoID, int $siteId): mixed
+    public function getBanner(int $videoID, int $siteId): mixed
     {
         return false;
     }
 
-    protected function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode): array|bool
+    public function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode): array|bool
     {
         return false;
     }
 
-    protected function getPoster(int $videoId): int
+    public function getPoster(int $videoId): int
     {
         return (new ReleaseImage)->saveImage($videoId, '', $this->imgSavePath, '', '', parent::TYPE_TV);
     }
 
-    protected function getShowInfo(string $name): bool|array
+    public function getShowInfo(string $name): bool|array
     {
         return false;
     }
 
-    protected function formatShowInfo($show): array
+    public function formatShowInfo($show): array
     {
         return [];
     }
 
-    protected function formatEpisodeInfo($episode): array
+    public function formatEpisodeInfo($episode): array
     {
         return [];
     }

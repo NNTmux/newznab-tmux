@@ -62,12 +62,12 @@ abstract class Videos
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
      */
-    abstract protected function processSite(int $groupID, string $guidChar, int $process, bool $local = false): void;
+    abstract public function processSite(int $groupID, string $guidChar, int $process, bool $local = false): void;
 
     /**
      * @return false|mixed
      */
-    protected function getSiteIDFromVideoID(string $siteColumn, int $videoID): mixed
+    public function getSiteIDFromVideoID(string $siteColumn, int $videoID): mixed
     {
         if (\in_array($siteColumn, self::$sites, false)) {
             $result = Video::query()->where('id', $videoID)->first([$siteColumn]);
@@ -83,7 +83,7 @@ abstract class Videos
      *
      * @return string Empty string if no query return or tz style timezone
      */
-    protected function getLocalZoneFromVideoID(int $videoID): string
+    public function getLocalZoneFromVideoID(int $videoID): string
     {
         $result = TvInfo::query()->where('videos_id', $videoID)->first(['localzone']);
 

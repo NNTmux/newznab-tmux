@@ -287,7 +287,7 @@ class TVDB extends TV
     /**
      * Placeholder for Videos getBanner.
      */
-    protected function getBanner($videoID, $siteId): bool
+    public function getBanner($videoID, $siteId): bool
     {
         return false;
     }
@@ -301,7 +301,7 @@ class TVDB extends TV
      * @throws ParseException
      * @throws ExceptionInterface
      */
-    protected function getShowInfo(string $name): bool|array
+    public function getShowInfo(string $name): bool|array
     {
         $return = $response = false;
         $highestMatch = 0;
@@ -386,7 +386,7 @@ class TVDB extends TV
      * @throws UnauthorizedException
      * @throws ExceptionInterface
      */
-    protected function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode, int $videoId = 0): bool|array
+    public function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode, int $videoId = 0): bool|array
     {
         $return = $response = false;
 
@@ -441,7 +441,7 @@ class TVDB extends TV
      * @throws ExceptionInterface
      * @throws ParseException
      */
-    protected function formatShowInfo($show): array
+    public function formatShowInfo($show): array
     {
         try {
             $poster = $this->client->series()->artworks($show->tvdb_id);
@@ -491,7 +491,7 @@ class TVDB extends TV
      * Assigns API episode response values to a formatted array for insertion
      * Returns the formatted array.
      */
-    protected function formatEpisodeInfo($episode): array
+    public function formatEpisodeInfo($episode): array
     {
         return [
             'title' => (string) $episode->name,

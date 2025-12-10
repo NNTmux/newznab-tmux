@@ -272,7 +272,7 @@ class TVMaze extends TV
      * Calls the API to perform initial show name match to TVDB title
      * Returns a formatted array of show data or false if no match.
      */
-    protected function getShowInfo(string $name): array|bool
+    public function getShowInfo(string $name): array|bool
     {
         $return = $response = false;
 
@@ -384,7 +384,7 @@ class TVMaze extends TV
         return $hasCover;
     }
 
-    protected function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode, string $airDate = '', int $videoId = 0): array|bool
+    public function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode, string $airDate = '', int $videoId = 0): array|bool
     {
         $return = $response = false;
 
@@ -425,7 +425,7 @@ class TVMaze extends TV
      * Assigns API show response values to a formatted array for insertion
      * Returns the formatted array.
      */
-    protected function formatShowInfo($show): array
+    public function formatShowInfo($show): array
     {
         $this->posterUrl = (string) ($show->mediumImage ?? '');
 
@@ -452,7 +452,7 @@ class TVMaze extends TV
      * Assigns API episode response values to a formatted array for insertion
      * Returns the formatted array.
      */
-    protected function formatEpisodeInfo($episode): array
+    public function formatEpisodeInfo($episode): array
     {
         return [
             'title' => (string) $episode->name,

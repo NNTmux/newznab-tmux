@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Services\TvProcessing\TvProcessingPipeline;
 use App\Services\TvProcessor;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -16,7 +17,7 @@ class PostProcessTvPipeline extends Command
     protected $signature = 'postprocess:tv-pipeline
                             {guid : First character of release guid (a-f, 0-9)}
                             {renamed? : Process renamed only (optional)}
-                            {--mode=pipeline : Processing mode: pipeline or parallel}';
+                            {--mode=pipeline : Processing mode: pipeline, parallel, or laravel}';
 
     /**
      * The console command description.
@@ -40,15 +41,22 @@ class PostProcessTvPipeline extends Command
             return self::FAILURE;
         }
 
-        if (! in_array($mode, ['pipeline', 'parallel'], true)) {
-            $this->error('Mode must be either "pipeline" or "parallel".');
+        if (! in_array($mode, ['pipeline', 'parallel', 'laravel'], true)) {
+            $this->error('Mode must be either "pipeline", "parallel", or "laravel".');
 
             return self::FAILURE;
         }
 
         try {
-            $tvProcessor = new TvProcessor(true); // true = echo output
-            $tvProcessor->process('', $guid, $renamed, $mode);
+            if ($mode === 'laravel') {
+                // Use the new Laravel Pipeline-based processor
+                $pipeline = TvProcessingPipeline::createDefault(echoOutput: true);
+                $pipeline->process('', $guid, $renamed);
+            } else {
+                // Use the legacy processor for backward compatibility
+                $tvProcessor = new TvProcessor(true); // true = echo output
+                $tvProcessor->process('', $guid, $renamed, $mode);
+            }
 
             return self::SUCCESS;
         } catch (\Throwable $e) {

@@ -7,6 +7,7 @@ return [
     App\Providers\HorizonServiceProvider::class,
     App\Providers\RouteServiceProvider::class,
     App\Providers\TelescopeServiceProvider::class,
+    App\Providers\TvProcessingServiceProvider::class,
     App\Providers\UserServiceProvider::class,
     App\Providers\VoltServiceProvider::class,
 ];

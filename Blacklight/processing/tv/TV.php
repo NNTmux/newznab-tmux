@@ -89,21 +89,21 @@ abstract class TV extends Videos
     /**
      * Retrieve banner image from site using its API.
      */
-    abstract protected function getBanner(int $videoID, int $siteId): mixed;
+    abstract public function getBanner(int $videoID, int $siteId): mixed;
 
     /**
      * Retrieve info of TV episode from site using its API.
      *
      * @return array|false False on failure, an array of information fields otherwise.
      */
-    abstract protected function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode): array|bool;
+    abstract public function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode): array|bool;
 
     /**
      * Retrieve poster image for TV episode from site using its API.
      *
      * @param  int  $videoId  ID from videos table.
      */
-    abstract protected function getPoster(int $videoId): int;
+    abstract public function getPoster(int $videoId): int;
 
     /**
      * Retrieve info of TV programme from site using it's API.
@@ -111,19 +111,19 @@ abstract class TV extends Videos
      * @param  string  $name  Title of programme to look up. Usually a cleaned up version from releases table.
      * @return array|false False on failure, an array of information fields otherwise.
      */
-    abstract protected function getShowInfo(string $name): bool|array;
+    abstract public function getShowInfo(string $name): bool|array;
 
     /**
      * Assigns API show response values to a formatted array for insertion
      * Returns the formatted array.
      */
-    abstract protected function formatShowInfo($show): array;
+    abstract public function formatShowInfo($show): array;
 
     /**
      * Assigns API episode response values to a formatted array for insertion
      * Returns the formatted array.
      */
-    abstract protected function formatEpisodeInfo($episode): array;
+    abstract public function formatEpisodeInfo($episode): array;
 
     /**
      * @return Release[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection|int
