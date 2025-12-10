@@ -725,8 +725,8 @@ class TmuxTaskRunner
             $commands[] = "nice -n{$niceness} {$artisan} update:postprocess music 2>&1 | tee -a {$log}";
         }
 
-        // Console processing
-        $processConsole = (int) ($runVar['settings']['processconsole'] ?? 0);
+        // Console processing (uses same lookupgames setting as games)
+        $processConsole = (int) ($runVar['settings']['processgames'] ?? 0);
         $hasConsoleWork = (int) ($runVar['counts']['now']['processconsole'] ?? 0) > 0;
         if ($processConsole > 0 && $hasConsoleWork) {
             $commands[] = "nice -n{$niceness} {$artisan} update:postprocess console 2>&1 | tee -a {$log}";
