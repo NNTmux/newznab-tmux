@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Jobs\SendAccountChangedEmail;
 use App\Models\User;
 use App\Models\UserActivity;
 
@@ -51,6 +52,9 @@ class UserActivityObserver
                     'updated_by' => auth()->user()?->username ?? 'System',
                 ],
             ]);
+
+            // Send email notification to user about role change
+            SendAccountChangedEmail::dispatch($user);
         }
     }
 
