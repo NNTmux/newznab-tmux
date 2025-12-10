@@ -115,12 +115,25 @@ class TvCategorizer extends AbstractCategorizer
         if (preg_match('/^\[.+\].*\d{2,3}.*\[[a-fA-F0-9]{8}\]/i', $name)) {
             return $this->matched(Category::TV_ANIME, 0.9, 'anime_hash');
         }
+        // Japanese title pattern with "no" particle (e.g., Shuumatsu.no.Valkyrie, Shingeki.no.Kyojin)
+        // Combined with episode-only pattern (E05 without season prefix) or roman numeral season
+        if (preg_match('/[._ ]no[._ ]/i', $name) &&
+            (preg_match('/[._ ](I{1,3}|IV|V|VI{0,3}|IX|X)[._ ]?E\d{1,4}[._ ]/i', $name) ||
+             (preg_match('/[._ ]E\d{1,4}[._ ]/i', $name) && !preg_match('/[._ ]S\d{1,3}[._ ]?E\d/i', $name)))) {
+            return $this->matched(Category::TV_ANIME, 0.9, 'anime_japanese_title');
+        }
         // Episode pattern with known anime indicators
         if (preg_match('/[._ -]E\d{1,4}[._ -]/i', $name) &&
             preg_match('/\b(BluRay|BD|BDRip)\b/i', $name) &&
             !preg_match('/\bS\d{1,3}\b/i', $name)) {
             // Episode-only pattern with BluRay but no season - likely anime
             return $this->matched(Category::TV_ANIME, 0.8, 'anime_episode_bluray');
+        }
+        // Roman numeral season with episode-only pattern (common in anime)
+        // e.g., Title.III.E05, Title.II.E12 - typically anime naming convention
+        if (preg_match('/[._ ](I{1,3}|IV|V|VI{0,3}|IX|X)[._ ]E\d{1,4}[._ ]/i', $name) &&
+            !preg_match('/[._ ]S\d{1,3}[._ ]?E\d/i', $name)) {
+            return $this->matched(Category::TV_ANIME, 0.85, 'anime_roman_numeral_season');
         }
         return null;
     }
