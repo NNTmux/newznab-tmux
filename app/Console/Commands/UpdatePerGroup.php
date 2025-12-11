@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Models\Settings;
@@ -36,27 +38,28 @@ class UpdatePerGroup extends Command
     {
         $groupId = $this->argument('groupId');
 
-        if (! is_numeric($groupId)) {
+        if (!is_numeric($groupId)) {
             $this->error('Group ID must be numeric.');
 
             return self::FAILURE;
         }
 
         try {
-            $groupMySQL = UsenetGroup::find($groupId)->toArray();
+            $group = UsenetGroup::find($groupId);
 
-            if ($groupMySQL === null) {
+            if ($group === null) {
                 $this->error("Group not found with id {$groupId}");
 
                 return self::FAILURE;
             }
 
+            $groupMySQL = $group->toArray();
             $nntp = $this->getNntp();
-            $backFill = new Backfill;
+            $backFill = new Backfill();
 
             // Update the group for new binaries
             $this->info("Updating binaries for group: {$groupMySQL['name']}");
-            (new Binaries)->updateGroup($groupMySQL);
+            (new Binaries())->updateGroup($groupMySQL);
 
             // BackFill the group with 20k articles
             $this->info("Backfilling group: {$groupMySQL['name']}");
@@ -64,19 +67,19 @@ class UpdatePerGroup extends Command
 
             // Create releases
             $this->info("Processing releases for group: {$groupMySQL['name']}");
-            $this->processReleases(new ProcessReleases, $groupId);
+            $this->processReleases(new ProcessReleases(), (string) $groupId);
 
             // Post process the releases
             $this->info("Post-processing additional for group: {$groupMySQL['name']}");
             (new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp]))->start($groupId);
 
             $this->info("Processing NFO files for group: {$groupMySQL['name']}");
-            (new Nfo)->processNfoFiles(
+            (new Nfo())->processNfoFiles(
                 $nntp,
                 $groupId,
                 '',
-                (int) Settings::settingValue('lookupimdb'),
-                (int) Settings::settingValue('lookuptv')
+                (bool)Settings::settingValue('lookupimdb'),
+                (bool)Settings::settingValue('lookuptv')
             );
 
             $this->info("Completed all processing for group: {$groupMySQL['name']}");
@@ -92,37 +95,44 @@ class UpdatePerGroup extends Command
 
     /**
      * Create / process releases for a groupID.
+     *
+     * Uses the ProcessReleases DTO-based workflow for cleaner code.
      */
     private function processReleases(ProcessReleases $releases, string $groupID): void
     {
-        $releaseCreationLimit = Settings::settingValue('maxnzbsprocessed') !== ''
-            ? (int) Settings::settingValue('maxnzbsprocessed')
-            : 1000;
+        $limit = $releases->getReleaseCreationLimit();
 
         $releases->processIncompleteCollections($groupID);
         $releases->processCollectionSizes($groupID);
         $releases->deleteUnwantedCollections($groupID);
 
         do {
-            $releasesCount = $releases->createReleases($groupID);
+            $result = $releases->createReleases($groupID);
             $nzbFilesAdded = $releases->createNZBs($groupID);
-        } while ($releaseCreationLimit <= $releasesCount['added'] + $releasesCount['dupes']
-                 || $nzbFilesAdded >= $releaseCreationLimit);
+
+            // Continue if we processed up to the limit (more work may be available)
+            $shouldContinue = $result->total() >= $limit || $nzbFilesAdded >= $limit;
+        } while ($shouldContinue);
 
         $releases->deleteCollections($groupID);
     }
 
     /**
      * Get NNTP connection.
+     *
+     * @throws \Exception If unable to connect to usenet
      */
     private function getNntp(): NNTP
     {
-        $nntp = new NNTP;
+        $nntp = new NNTP();
 
-        if ((config('nntmux_nntp.use_alternate_nntp_server') === true
+        $useAlternate = config('nntmux_nntp.use_alternate_nntp_server') === true;
+        $connected = $useAlternate
             ? $nntp->doConnect(false, true)
-            : $nntp->doConnect()) !== true) {
-            throw new \Exception('Unable to connect to usenet.');
+            : $nntp->doConnect();
+
+        if ($connected !== true) {
+            throw new \RuntimeException('Unable to connect to usenet.');
         }
 
         return $nntp;

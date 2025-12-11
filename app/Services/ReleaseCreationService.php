@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\CollectionFileCheckStatus;
 use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Predb;
@@ -12,10 +13,9 @@ use App\Models\UsenetGroup;
 use App\Services\Categorization\CategorizationService;
 use Blacklight\ColorCLI;
 use Blacklight\NZB;
-use Blacklight\processing\ProcessReleases;
 use Blacklight\ReleaseCleaning;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str; // for constants
+use Illuminate\Support\Str;
 
 class ReleaseCreationService
 {
@@ -28,6 +28,7 @@ class ReleaseCreationService
      * Create releases from complete collections.
      *
      * @return array{added:int,dupes:int}
+     * @throws \Throwable
      */
     public function createReleases(int|string|null $groupID, int $limit, bool $echoCLI): array
     {
@@ -41,7 +42,7 @@ class ReleaseCreationService
         }
 
         $collectionsQuery = Collection::query()
-            ->where('collections.filecheck', ProcessReleases::COLLFC_SIZED)
+            ->where('collections.filecheck', CollectionFileCheckStatus::Sized->value)
             ->where('collections.filesize', '>', 0);
         if (! empty($groupID)) {
             $collectionsQuery->where('collections.groups_id', $groupID);
@@ -119,7 +120,7 @@ class ReleaseCreationService
                 if ($releaseID !== null) {
                     DB::transaction(static function () use ($collection, $releaseID) {
                         Collection::query()->where('id', $collection->id)->update([
-                            'filecheck' => ProcessReleases::COLLFC_INSERTED,
+                            'filecheck' => CollectionFileCheckStatus::Inserted->value,
                             'releases_id' => $releaseID,
                         ]);
                     }, 10);

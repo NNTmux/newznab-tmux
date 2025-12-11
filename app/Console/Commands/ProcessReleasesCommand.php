@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
-use App\Models\Settings;
 use Blacklight\processing\ProcessReleases;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -31,10 +32,10 @@ class ProcessReleasesCommand extends Command
         $groupId = $this->argument('groupId');
 
         try {
-            $releases = new ProcessReleases;
+            $releases = new ProcessReleases();
 
             if (is_numeric($groupId)) {
-                $this->processReleasesForGroup($releases, $groupId);
+                $this->processReleasesForGroup($releases, (string) $groupId);
             } else {
                 $this->processReleasesForGroup($releases, '');
                 $this->runPostProcessingTasks($releases);
@@ -51,22 +52,24 @@ class ProcessReleasesCommand extends Command
 
     /**
      * Create / process releases for a groupID.
+     *
+     * Uses the ProcessReleases DTO-based workflow for cleaner code.
      */
     private function processReleasesForGroup(ProcessReleases $releases, string $groupID): void
     {
-        $releaseCreationLimit = Settings::settingValue('maxnzbsprocessed') !== ''
-            ? (int) Settings::settingValue('maxnzbsprocessed')
-            : 1000;
+        $limit = $releases->getReleaseCreationLimit();
 
         $releases->processIncompleteCollections($groupID);
         $releases->processCollectionSizes($groupID);
         $releases->deleteUnwantedCollections($groupID);
 
         do {
-            $releasesCount = $releases->createReleases($groupID);
+            $result = $releases->createReleases($groupID);
             $nzbFilesAdded = $releases->createNZBs($groupID);
-        } while ($releaseCreationLimit <= $releasesCount['added'] + $releasesCount['dupes']
-                 || $nzbFilesAdded >= $releaseCreationLimit);
+
+            // Continue if we processed up to the limit (more work may be available)
+            $shouldContinue = $result->total() >= $limit || $nzbFilesAdded >= $limit;
+        } while ($shouldContinue);
 
         $releases->deleteCollections($groupID);
     }
