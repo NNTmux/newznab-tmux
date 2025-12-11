@@ -87,12 +87,6 @@ final class ProcessReleases
     /** Chunk size for NZB creation */
     private const int NZB_CHUNK_SIZE = 100;
 
-    /** Console output separator line */
-    private const string SEPARATOR = '════════════════════════════════════════════════════════════════════';
-
-    /** Console output thin separator */
-    private const string THIN_SEPARATOR = '────────────────────────────────────────────────────────────────────';
-
     public bool $echoCLI;
 
     private readonly ProcessReleasesSettings $settings;
@@ -187,7 +181,7 @@ final class ProcessReleases
     // ========================================================================
 
     /**
-     * Output a section header with decorative borders.
+     * Output a section header.
      */
     private function outputHeader(string $title): void
     {
@@ -196,9 +190,8 @@ final class ProcessReleases
         }
 
         echo PHP_EOL;
-        $this->colorCLI->header(self::SEPARATOR);
-        $this->colorCLI->header("  ▶ {$title}");
-        $this->colorCLI->header(self::SEPARATOR);
+        $this->colorCLI->header(strtoupper($title));
+        $this->colorCLI->header(str_repeat('-', strlen($title)));
     }
 
     /**
@@ -210,14 +203,11 @@ final class ProcessReleases
             return;
         }
 
-        echo PHP_EOL;
-        $this->colorCLI->notice(self::THIN_SEPARATOR);
         $this->colorCLI->notice("  {$title}");
-        $this->colorCLI->notice(self::THIN_SEPARATOR);
     }
 
     /**
-     * Output a success message with checkmark.
+     * Output a success message.
      */
     private function outputSuccess(string $message): void
     {
@@ -225,7 +215,7 @@ final class ProcessReleases
             return;
         }
 
-        $this->colorCLI->primary("  ✓ {$message}");
+        $this->colorCLI->primary("    {$message}");
     }
 
     /**
@@ -237,7 +227,7 @@ final class ProcessReleases
             return;
         }
 
-        $this->colorCLI->info("  ℹ {$message}");
+        $this->colorCLI->info("    {$message}");
     }
 
     /**
@@ -250,13 +240,13 @@ final class ProcessReleases
         }
 
         $formattedValue = is_int($value) ? number_format($value) : $value;
-        $this->colorCLI->primary("    • {$label}: {$formattedValue}{$suffix}");
+        $this->colorCLI->primary("      {$label}: {$formattedValue}{$suffix}");
     }
 
     /**
-     * Output elapsed time in a human-readable format.
+     * Output elapsed time.
      */
-    private function outputElapsedTime(DateTimeInterface $startTime, string $prefix = 'Completed in'): void
+    private function outputElapsedTime(DateTimeInterface $startTime, string $prefix = 'Time'): void
     {
         if (!$this->echoCLI) {
             return;
@@ -264,43 +254,33 @@ final class ProcessReleases
 
         $elapsed = now()->diffInSeconds($startTime, true);
         $timeStr = $this->formatElapsedTime($elapsed);
-        $this->colorCLI->primary("  ⏱ {$prefix} {$timeStr}");
+        $this->colorCLI->info("      {$prefix}: {$timeStr}");
     }
 
     /**
-     * Format elapsed time in a human-readable way.
+     * Format elapsed time.
      */
     private function formatElapsedTime(int|float $seconds): string
     {
         if ($seconds < 1) {
-            return sprintf('%.2f ms', $seconds * 1000);
+            return sprintf('%dms', (int) ($seconds * 1000));
         }
 
         if ($seconds < 60) {
-            return sprintf('%.2f %s', $seconds, Str::plural('second', (int) $seconds));
+            return sprintf('%.1fs', $seconds);
         }
 
         $minutes = floor($seconds / 60);
         $remainingSeconds = $seconds % 60;
 
         if ($minutes < 60) {
-            return sprintf('%d %s %.0f %s',
-                $minutes,
-                Str::plural('minute', (int) $minutes),
-                $remainingSeconds,
-                Str::plural('second', (int) $remainingSeconds)
-            );
+            return sprintf('%dm %ds', $minutes, (int) $remainingSeconds);
         }
 
         $hours = floor($minutes / 60);
         $remainingMinutes = $minutes % 60;
 
-        return sprintf('%d %s %d %s',
-            $hours,
-            Str::plural('hour', (int) $hours),
-            $remainingMinutes,
-            Str::plural('minute', (int) $remainingMinutes)
-        );
+        return sprintf('%dh %dm', $hours, $remainingMinutes);
     }
 
     /**
@@ -313,10 +293,7 @@ final class ProcessReleases
         }
 
         $percent = min(100, (int) (($current / $total) * 100));
-        $bar = str_repeat('█', (int) ($percent / 5));
-        $empty = str_repeat('░', 20 - (int) ($percent / 5));
-
-        echo "\r  [{$bar}{$empty}] {$percent}% - {$action}: " . number_format($current) . '/' . number_format($total);
+        echo "\r      {$action}: " . number_format($current) . '/' . number_format($total) . " ({$percent}%)   ";
 
         if ($current >= $total) {
             echo PHP_EOL;
@@ -452,11 +429,8 @@ final class ProcessReleases
         }
 
         echo PHP_EOL;
-        $this->colorCLI->alternate('╔══════════════════════════════════════════════════════════════════╗');
-        $this->colorCLI->alternate('║           🚀 NNTmux Release Processing System 🚀                 ║');
-        $this->colorCLI->alternate('╚══════════════════════════════════════════════════════════════════╝');
-        $this->colorCLI->info('  Started: ' . now()->format('Y-m-d H:i:s'));
-        echo PHP_EOL;
+        $this->colorCLI->header('NNTmux Release Processing');
+        $this->colorCLI->info('Started: ' . now()->format('Y-m-d H:i:s'));
     }
 
     /**
@@ -476,16 +450,15 @@ final class ProcessReleases
         $elapsed = now()->diffInSeconds($startTime, true);
 
         echo PHP_EOL;
-        $this->colorCLI->alternate('╔══════════════════════════════════════════════════════════════════╗');
-        $this->colorCLI->alternate('║                    📊 Processing Summary                         ║');
-        $this->colorCLI->alternate('╠══════════════════════════════════════════════════════════════════╣');
-        $this->colorCLI->primary(sprintf('║  ✓ Releases Added:     %10s                              ║', number_format($releasesAdded)));
-        $this->colorCLI->primary(sprintf('║  ✓ NZBs Created:       %10s                              ║', number_format($nzbsCreated)));
-        $this->colorCLI->primary(sprintf('║  ✗ Duplicates Skipped: %10s                              ║', number_format($dupes)));
-        $this->colorCLI->primary(sprintf('║  ⟳ Processing Cycles:  %10s                              ║', number_format($iterations)));
-        $this->colorCLI->alternate('╠══════════════════════════════════════════════════════════════════╣');
-        $this->colorCLI->info(sprintf('║  ⏱ Total Time: %-51s║', $this->formatElapsedTime($elapsed)));
-        $this->colorCLI->alternate('╚══════════════════════════════════════════════════════════════════╝');
+        $this->colorCLI->header('SUMMARY');
+        $this->colorCLI->header('-------');
+        $this->colorCLI->primary('  Releases added: ' . number_format($releasesAdded));
+        $this->colorCLI->primary('  NZBs created: ' . number_format($nzbsCreated));
+        if ($dupes > 0) {
+            $this->colorCLI->warning('  Duplicates skipped: ' . number_format($dupes));
+        }
+        $this->colorCLI->info('  Processing cycles: ' . number_format($iterations));
+        $this->colorCLI->info('  Total time: ' . $this->formatElapsedTime($elapsed));
         echo PHP_EOL;
     }
 
