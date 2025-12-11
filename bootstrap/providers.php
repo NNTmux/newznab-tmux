@@ -1,6 +1,7 @@
 <?php
 
 return [
+    App\Providers\AdditionalProcessingServiceProvider::class,
     App\Providers\AppServiceProvider::class,
     App\Providers\CategorizationServiceProvider::class,
     App\Providers\ForumServiceProvider::class,
