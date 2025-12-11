@@ -87,6 +87,12 @@ final class ProcessReleases
     /** Chunk size for NZB creation */
     private const int NZB_CHUNK_SIZE = 100;
 
+    /** Console output separator line */
+    private const string SEPARATOR = '════════════════════════════════════════════════════════════════════';
+
+    /** Console output thin separator */
+    private const string THIN_SEPARATOR = '────────────────────────────────────────────────────────────────────';
+
     public bool $echoCLI;
 
     private readonly ProcessReleasesSettings $settings;
@@ -176,6 +182,151 @@ final class ProcessReleases
         }
     }
 
+    // ========================================================================
+    // Console Output Helper Methods
+    // ========================================================================
+
+    /**
+     * Output a section header with decorative borders.
+     */
+    private function outputHeader(string $title): void
+    {
+        if (!$this->echoCLI) {
+            return;
+        }
+
+        echo PHP_EOL;
+        $this->colorCLI->header(self::SEPARATOR);
+        $this->colorCLI->header("  ▶ {$title}");
+        $this->colorCLI->header(self::SEPARATOR);
+    }
+
+    /**
+     * Output a sub-section header.
+     */
+    private function outputSubHeader(string $title): void
+    {
+        if (!$this->echoCLI) {
+            return;
+        }
+
+        echo PHP_EOL;
+        $this->colorCLI->notice(self::THIN_SEPARATOR);
+        $this->colorCLI->notice("  {$title}");
+        $this->colorCLI->notice(self::THIN_SEPARATOR);
+    }
+
+    /**
+     * Output a success message with checkmark.
+     */
+    private function outputSuccess(string $message): void
+    {
+        if (!$this->echoCLI) {
+            return;
+        }
+
+        $this->colorCLI->primary("  ✓ {$message}");
+    }
+
+    /**
+     * Output an info message.
+     */
+    private function outputInfo(string $message): void
+    {
+        if (!$this->echoCLI) {
+            return;
+        }
+
+        $this->colorCLI->info("  ℹ {$message}");
+    }
+
+    /**
+     * Output a stat line with label and value.
+     */
+    private function outputStat(string $label, string|int $value, string $suffix = ''): void
+    {
+        if (!$this->echoCLI) {
+            return;
+        }
+
+        $formattedValue = is_int($value) ? number_format($value) : $value;
+        $this->colorCLI->primary("    • {$label}: {$formattedValue}{$suffix}");
+    }
+
+    /**
+     * Output elapsed time in a human-readable format.
+     */
+    private function outputElapsedTime(DateTimeInterface $startTime, string $prefix = 'Completed in'): void
+    {
+        if (!$this->echoCLI) {
+            return;
+        }
+
+        $elapsed = now()->diffInSeconds($startTime, true);
+        $timeStr = $this->formatElapsedTime($elapsed);
+        $this->colorCLI->primary("  ⏱ {$prefix} {$timeStr}");
+    }
+
+    /**
+     * Format elapsed time in a human-readable way.
+     */
+    private function formatElapsedTime(int|float $seconds): string
+    {
+        if ($seconds < 1) {
+            return sprintf('%.2f ms', $seconds * 1000);
+        }
+
+        if ($seconds < 60) {
+            return sprintf('%.2f %s', $seconds, Str::plural('second', (int) $seconds));
+        }
+
+        $minutes = floor($seconds / 60);
+        $remainingSeconds = $seconds % 60;
+
+        if ($minutes < 60) {
+            return sprintf('%d %s %.0f %s',
+                $minutes,
+                Str::plural('minute', (int) $minutes),
+                $remainingSeconds,
+                Str::plural('second', (int) $remainingSeconds)
+            );
+        }
+
+        $hours = floor($minutes / 60);
+        $remainingMinutes = $minutes % 60;
+
+        return sprintf('%d %s %d %s',
+            $hours,
+            Str::plural('hour', (int) $hours),
+            $remainingMinutes,
+            Str::plural('minute', (int) $remainingMinutes)
+        );
+    }
+
+    /**
+     * Output a progress indicator.
+     */
+    private function outputProgress(int $current, int $total, string $action): void
+    {
+        if (!$this->echoCLI || $total === 0) {
+            return;
+        }
+
+        $percent = min(100, (int) (($current / $total) * 100));
+        $bar = str_repeat('█', (int) ($percent / 5));
+        $empty = str_repeat('░', 20 - (int) ($percent / 5));
+
+        echo "\r  [{$bar}{$empty}] {$percent}% - {$action}: " . number_format($current) . '/' . number_format($total);
+
+        if ($current >= $total) {
+            echo PHP_EOL;
+        }
+    }
+
+    // ========================================================================
+    // Public Getters
+    // ========================================================================
+
     /**
      * Get the current completion percentage setting.
      */
@@ -233,11 +384,10 @@ final class ProcessReleases
     public function processReleases(int $categorize, int $postProcess, string $groupName, NNTP $nntp): int
     {
         $this->echoCLI = (bool) config('nntmux.echocli');
+        $overallStartTime = now()->toImmutable();
 
         if ($this->echoCLI) {
-            $this->colorCLI->header(
-                'Starting release update process (' . now()->format('Y-m-d H:i:s') . ')'
-            );
+            $this->outputBanner();
         }
 
         if (!$this->validateNzbPath()) {
@@ -247,20 +397,32 @@ final class ProcessReleases
         $groupID = $this->resolveGroupId($groupName);
         $normalizedGroupId = $this->normalizeGroupId($groupID);
 
+        if ($this->echoCLI && $groupName !== '') {
+            $this->outputInfo("Processing group: {$groupName}");
+        }
+
         // Phase 1: Collection processing
+        $this->outputHeader('Phase 1: Collection Processing');
         $this->processIncompleteCollections($normalizedGroupId);
         $this->processCollectionSizes($normalizedGroupId);
         $this->deleteUnwantedCollections($normalizedGroupId);
 
         // Phase 2: Release creation loop
+        $this->outputHeader('Phase 2: Release Creation');
         $totalReleasesAdded = 0;
+        $totalNzbsCreated = 0;
+        $totalDupes = 0;
+        $iterations = 0;
         $limit = $this->settings->releaseCreationLimit;
 
         do {
+            $iterations++;
             $result = $this->createReleases($normalizedGroupId);
             $totalReleasesAdded += $result->added;
+            $totalDupes += $result->dupes;
 
             $nzbFilesAdded = $this->createNZBs($normalizedGroupId);
+            $totalNzbsCreated += $nzbFilesAdded;
 
             $this->categorizeReleases($categorize, $normalizedGroupId);
             $this->postProcessReleases($postProcess, $nntp);
@@ -271,9 +433,60 @@ final class ProcessReleases
         } while ($shouldContinue);
 
         // Phase 3: Cleanup
+        $this->outputHeader('Phase 3: Cleanup');
         $this->deleteReleases();
 
+        // Final summary
+        $this->outputFinalSummary($totalReleasesAdded, $totalNzbsCreated, $totalDupes, $iterations, $overallStartTime);
+
         return $totalReleasesAdded;
+    }
+
+    /**
+     * Output the application banner.
+     */
+    private function outputBanner(): void
+    {
+        if (!$this->echoCLI) {
+            return;
+        }
+
+        echo PHP_EOL;
+        $this->colorCLI->alternate('╔══════════════════════════════════════════════════════════════════╗');
+        $this->colorCLI->alternate('║           🚀 NNTmux Release Processing System 🚀                 ║');
+        $this->colorCLI->alternate('╚══════════════════════════════════════════════════════════════════╝');
+        $this->colorCLI->info('  Started: ' . now()->format('Y-m-d H:i:s'));
+        echo PHP_EOL;
+    }
+
+    /**
+     * Output the final processing summary.
+     */
+    private function outputFinalSummary(
+        int $releasesAdded,
+        int $nzbsCreated,
+        int $dupes,
+        int $iterations,
+        DateTimeInterface $startTime
+    ): void {
+        if (!$this->echoCLI) {
+            return;
+        }
+
+        $elapsed = now()->diffInSeconds($startTime, true);
+
+        echo PHP_EOL;
+        $this->colorCLI->alternate('╔══════════════════════════════════════════════════════════════════╗');
+        $this->colorCLI->alternate('║                    📊 Processing Summary                         ║');
+        $this->colorCLI->alternate('╠══════════════════════════════════════════════════════════════════╣');
+        $this->colorCLI->primary(sprintf('║  ✓ Releases Added:     %10s                              ║', number_format($releasesAdded)));
+        $this->colorCLI->primary(sprintf('║  ✓ NZBs Created:       %10s                              ║', number_format($nzbsCreated)));
+        $this->colorCLI->primary(sprintf('║  ✗ Duplicates Skipped: %10s                              ║', number_format($dupes)));
+        $this->colorCLI->primary(sprintf('║  ⟳ Processing Cycles:  %10s                              ║', number_format($iterations)));
+        $this->colorCLI->alternate('╠══════════════════════════════════════════════════════════════════╣');
+        $this->colorCLI->info(sprintf('║  ⏱ Total Time: %-51s║', $this->formatElapsedTime($elapsed)));
+        $this->colorCLI->alternate('╚══════════════════════════════════════════════════════════════════╝');
+        echo PHP_EOL;
     }
 
     /**
@@ -355,6 +568,8 @@ final class ProcessReleases
             return 0;
         }
 
+        $this->outputSubHeader('Categorizing Releases');
+
         $query->chunkById(self::CATEGORIZE_CHUNK_SIZE, function ($releases) use ($categorizer, $type, &$categorized, $total): bool {
             foreach ($releases as $release) {
                 $categoryResult = $categorizer->determineCategory(
@@ -371,20 +586,11 @@ final class ProcessReleases
                     ]);
 
                 $categorized++;
-
-                if ($this->echoCLI) {
-                    $this->colorCLI->overWritePrimary(
-                        'Categorizing: ' . $this->colorCLI->percentString($categorized, $total)
-                    );
-                }
+                $this->outputProgress($categorized, $total, 'Categorizing');
             }
 
             return true;
         });
-
-        if ($this->echoCLI && $categorized > 0) {
-            echo PHP_EOL;
-        }
 
         return $categorized;
     }
@@ -399,9 +605,7 @@ final class ProcessReleases
     {
         $startTime = now()->toImmutable();
 
-        if ($this->echoCLI) {
-            $this->colorCLI->header('Process Releases -> Attempting to find complete collections.');
-        }
+        $this->outputSubHeader('Finding Complete Collections');
 
         $normalizedGroupId = $this->normalizeGroupId($groupID);
         $whereSql = $this->buildGroupWhereSql($normalizedGroupId, 'c');
@@ -415,16 +619,9 @@ final class ProcessReleases
         $this->runCollectionFileCheckStage5($normalizedGroupId ?? 0);
         $this->runCollectionFileCheckStage6($whereSql);
 
-        if ($this->echoCLI) {
-            $count = $this->countCompleteCollections($normalizedGroupId);
-            $elapsed = now()->diffInSeconds($startTime, true);
-
-            $this->colorCLI->primary(
-                "{$count} collections were found to be complete. Time: {$elapsed}" .
-                Str::plural(' second', $elapsed),
-                true
-            );
-        }
+        $count = $this->countCompleteCollections($normalizedGroupId);
+        $this->outputStat('Complete collections found', $count);
+        $this->outputElapsedTime($startTime);
     }
 
     /**
@@ -452,11 +649,10 @@ final class ProcessReleases
     {
         $startTime = now()->toImmutable();
 
-        if ($this->echoCLI) {
-            $this->colorCLI->header('Process Releases -> Calculating collection sizes (in bytes).');
-        }
+        $this->outputSubHeader('Calculating Collection Sizes');
 
-        DB::transaction(function () use ($groupID, $startTime): void {
+        $updated = 0;
+        DB::transaction(function () use ($groupID, &$updated): void {
             $normalizedGroupId = $this->normalizeGroupId($groupID);
             $whereSql = $normalizedGroupId !== null
                 ? " AND c.groups_id = {$normalizedGroupId} "
@@ -478,19 +674,10 @@ final class ProcessReleases
                 CollectionFileCheckStatus::Sized->value,
                 CollectionFileCheckStatus::CompleteParts->value,
             ]);
-
-            if ($updated > 0 && $this->echoCLI) {
-                $elapsed = now()->diffInSeconds($startTime, true);
-                $this->colorCLI->primary(
-                    "{$updated} collections set to filecheck = 3 (size calculated)",
-                    true
-                );
-                $this->colorCLI->primary(
-                    $elapsed . Str::plural(' second', $elapsed),
-                    true
-                );
-            }
         }, 10);
+
+        $this->outputStat('Collections sized', $updated);
+        $this->outputElapsedTime($startTime);
     }
 
     /**
@@ -503,11 +690,7 @@ final class ProcessReleases
     {
         $startTime = now()->toImmutable();
 
-        if ($this->echoCLI) {
-            $this->colorCLI->header(
-                'Process Releases -> Delete collections smaller/larger than minimum size/file count from group/site setting.'
-            );
-        }
+        $this->outputSubHeader('Filtering Collections by Size/File Count');
 
         $normalizedGroupId = $this->normalizeGroupId($groupID);
         $groupIDs = $normalizedGroupId === null
@@ -578,17 +761,16 @@ final class ProcessReleases
     private function outputCollectionDeleteStats(array $stats, DateTimeInterface $startTime): void
     {
         $totalDeleted = $stats['minSize'] + $stats['maxSize'] + $stats['minFiles'];
-        $elapsed = now()->diffInSeconds($startTime, true);
 
-        if ($this->echoCLI && $totalDeleted > 0) {
-            $this->colorCLI->primary(
-                "Deleted {$totalDeleted} collections: " . PHP_EOL .
-                "{$stats['minSize']} smaller than, {$stats['maxSize']} bigger than, " .
-                "{$stats['minFiles']} with less files than site/group settings in: " .
-                $elapsed . Str::plural(' second', $elapsed),
-                true
-            );
+        if ($totalDeleted > 0) {
+            $this->outputStat('Too small', $stats['minSize']);
+            $this->outputStat('Too large', $stats['maxSize']);
+            $this->outputStat('Too few files', $stats['minFiles']);
+            $this->outputStat('Total removed', $totalDeleted);
+        } else {
+            $this->outputInfo('No collections filtered');
         }
+        $this->outputElapsedTime($startTime);
     }
 
     /**
@@ -616,9 +798,7 @@ final class ProcessReleases
     {
         $startTime = now()->toImmutable();
 
-        if ($this->echoCLI) {
-            $this->colorCLI->header('Process Releases -> Create the NZB, delete collections/binaries/parts.');
-        }
+        $this->outputSubHeader('Creating NZB Files');
 
         $query = Release::query()
             ->with('category.parent')
@@ -637,25 +817,15 @@ final class ProcessReleases
                 foreach ($releases as $release) {
                     if ($this->nzb->writeNzbForReleaseId($release)) {
                         $nzbCount++;
-                        if ($this->echoCLI) {
-                            echo "Creating NZBs and deleting Collections: {$nzbCount}/{$total}.\r";
-                        }
+                        $this->outputProgress($nzbCount, $total, 'Creating NZBs');
                     }
                 }
                 return true;
             });
         }
 
-        $elapsed = now()->diffInSeconds($startTime, true);
-
-        if ($this->echoCLI) {
-            $this->colorCLI->primary(
-                number_format($nzbCount) . ' NZBs created/Collections deleted in ' .
-                $elapsed . Str::plural(' second', $elapsed) . PHP_EOL .
-                'Total time: ' . $elapsed . Str::plural(' second', $elapsed),
-                true
-            );
-        }
+        $this->outputStat('NZBs created', $nzbCount);
+        $this->outputElapsedTime($startTime);
 
         return $nzbCount;
     }
@@ -672,21 +842,16 @@ final class ProcessReleases
     {
         $startTime = now()->toImmutable();
 
-        if ($this->echoCLI) {
-            $this->colorCLI->header('Process Releases -> Categorize releases.');
-        }
-
         $type = match ($categorize) {
             2 => 'searchname',
             default => 'name',
         };
 
-        $this->categorizeRelease($type, $groupID);
+        $count = $this->categorizeRelease($type, $groupID);
 
-        $elapsed = now()->diffInSeconds($startTime, true);
-
-        if ($this->echoCLI) {
-            $this->colorCLI->primary($elapsed . Str::plural(' second', $elapsed));
+        if ($count > 0) {
+            $this->outputStat('Releases categorized', $count);
+            $this->outputElapsedTime($startTime);
         }
     }
 
@@ -698,15 +863,9 @@ final class ProcessReleases
     public function postProcessReleases(int $postProcess, NNTP $nntp): void
     {
         if ($postProcess === 1) {
+            $this->outputSubHeader('Post-Processing Releases');
             (new PostProcess(['Echo' => $this->echoCLI]))->processAll($nntp);
             return;
-        }
-
-        if ($this->echoCLI) {
-            $this->colorCLI->info(
-                'Post-processing is not running inside the Process Releases class.' . PHP_EOL .
-                'If you are using tmux or screen they might have their own scripts running Post-processing.'
-            );
         }
     }
 
@@ -835,15 +994,12 @@ final class ProcessReleases
         $elapsed = now()->diffInSeconds($startTime, true);
         $total = $stats['minSize'] + $stats['maxSize'] + $stats['minFiles'];
 
-        if ($this->echoCLI) {
-            $this->colorCLI->primary(
-                "Deleted {$total} releases: " . PHP_EOL .
-                "{$stats['minSize']} smaller than, {$stats['maxSize']} bigger than, " .
-                "{$stats['minFiles']} with less files than site/groups setting in: " .
-                $elapsed . Str::plural(' second', $elapsed),
-                true
-            );
+        if ($total > 0) {
+            $this->outputStat('Too small', $stats['minSize']);
+            $this->outputStat('Too large', $stats['maxSize']);
+            $this->outputStat('Too few files', $stats['minFiles']);
         }
+        $this->outputElapsedTime($startTime);
     }
 
     /**
@@ -855,9 +1011,7 @@ final class ProcessReleases
     {
         $startTime = now()->toImmutable();
 
-        if ($this->echoCLI) {
-            $this->colorCLI->header('Process Releases -> Delete old releases and passworded releases.');
-        }
+        $this->outputSubHeader('Removing Unwanted Releases');
 
         $stats = new ReleaseDeleteStats();
 
@@ -1126,33 +1280,43 @@ final class ProcessReleases
             return;
         }
 
-        $completionSuffix = $this->settings->hasCompletionCleanup()
-            ? ', ' . number_format($stats->completion) . " under {$this->settings->completion}% completion."
-            : '.';
-
-        $this->colorCLI->primary(
-            'Removed releases: ' .
-            number_format($stats->retention) . ' past retention, ' .
-            number_format($stats->password) . ' passworded, ' .
-            number_format($stats->duplicate) . ' crossposted, ' .
-            number_format($stats->disabledCategory) . ' from disabled categories, ' .
-            number_format($stats->categoryMinSize) . ' smaller than category settings, ' .
-            number_format($stats->disabledGenre) . ' from disabled music genres, ' .
-            number_format($stats->miscOther) . ' from misc->other ' .
-            number_format($stats->miscHashed) . ' from misc->hashed' .
-            $completionSuffix,
-            true
-        );
-
         $total = $stats->total();
+
         if ($total > 0) {
-            $elapsed = now()->diffInSeconds($startTime, true);
-            $this->colorCLI->primary(
-                'Removed ' . number_format($total) . ' releases in ' .
-                $elapsed . Str::plural(' second', $elapsed),
-                true
-            );
+            if ($stats->retention > 0) {
+                $this->outputStat('Past retention', $stats->retention);
+            }
+            if ($stats->password > 0) {
+                $this->outputStat('Passworded', $stats->password);
+            }
+            if ($stats->duplicate > 0) {
+                $this->outputStat('Cross-posted', $stats->duplicate);
+            }
+            if ($stats->completion > 0) {
+                $this->outputStat("Under {$this->settings->completion}% complete", $stats->completion);
+            }
+            if ($stats->disabledCategory > 0) {
+                $this->outputStat('Disabled categories', $stats->disabledCategory);
+            }
+            if ($stats->categoryMinSize > 0) {
+                $this->outputStat('Under category min size', $stats->categoryMinSize);
+            }
+            if ($stats->disabledGenre > 0) {
+                $this->outputStat('Disabled genres', $stats->disabledGenre);
+            }
+            if ($stats->miscOther > 0) {
+                $this->outputStat('Misc->Other expired', $stats->miscOther);
+            }
+            if ($stats->miscHashed > 0) {
+                $this->outputStat('Misc->Hashed expired', $stats->miscHashed);
+            }
+
+            $this->outputStat('Total releases removed', $total);
+        } else {
+            $this->outputInfo('No releases removed');
         }
+
+        $this->outputElapsedTime($startTime);
     }
 
     /**
