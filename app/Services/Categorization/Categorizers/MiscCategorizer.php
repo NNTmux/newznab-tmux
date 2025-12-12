@@ -105,10 +105,12 @@ class MiscCategorizer extends AbstractCategorizer
             return $this->matched(Category::OTHER_HASHED, 0.7, 'obfuscated_uppercase');
         }
 
-        // Long alphanumeric strings without typical release patterns
-        if (preg_match('/^[a-zA-Z0-9]{25,}$/', $name) &&
-            !preg_match('/\b(19|20)\d{2}\b/', $name)) {
-            return $this->matched(Category::OTHER_HASHED, 0.65, 'obfuscated_long');
+        // Mixed-case alphanumeric strings without separators (common obfuscation pattern)
+        // These look like random strings: e.g., "AA7Jl2toE8Q53yNZmQ5R6G"
+        if (preg_match('/^[a-zA-Z0-9]{15,}$/', $name) &&
+            !preg_match('/\b(19|20)\d{2}\b/', $name) &&
+            !preg_match('/^[A-Z][a-z]+([A-Z][a-z]+)+$/', $name)) { // Exclude CamelCase words
+            return $this->matched(Category::OTHER_HASHED, 0.7, 'obfuscated_mixed_alphanumeric');
         }
 
         // Only punctuation and numbers with no clear structure

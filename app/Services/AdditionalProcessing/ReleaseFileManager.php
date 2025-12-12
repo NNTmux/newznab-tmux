@@ -345,7 +345,12 @@ class ReleaseFileManager
     }
 
     /**
-     * Process NFO file.
+     * Process NFO file with enhanced detection capabilities.
+     *
+     * Supports multiple NFO naming conventions:
+     * - Standard: .nfo, .diz, .info
+     * - Alternative: file_id.diz, readme.txt, info.txt
+     * - Scene-style: 00-groupname.nfo, groupname-releasename.nfo
      */
     public function processNfoFile(
         string $fileLocation,
@@ -354,6 +359,10 @@ class ReleaseFileManager
     ): bool {
         try {
             $data = File::get($fileLocation);
+
+            // Try to detect and convert encoding
+            $data = $this->normalizeNfoEncoding($data);
+
             if ($this->nfo->isNFO($data, $context->release->guid)
                 && $this->nfo->addAlternateNfo($data, $context->release, $nntp)
             ) {
@@ -365,6 +374,84 @@ class ReleaseFileManager
         }
 
         return false;
+    }
+
+    /**
+     * Check if a filename looks like an NFO file.
+     *
+     * @param string $filename The filename to check.
+     * @return bool True if the filename matches NFO patterns.
+     */
+    public function isNfoFilename(string $filename): bool
+    {
+        // Standard NFO extensions
+        if (preg_match('/\.(?:nfo|diz|info?)$/i', $filename)) {
+            return true;
+        }
+
+        // Alternative NFO filenames
+        $nfoPatterns = [
+            '/^(?:file[_-]?id|readme|release|info(?:rmation)?|about|notes?)\.(?:txt|diz)$/i',
+            '/^00-[a-z0-9_-]+\.nfo$/i',           // Scene: 00-group.nfo
+            '/^0+-[a-z0-9_-]+\.nfo$/i',           // Scene variations
+            '/^[a-z0-9_-]+-[a-z0-9_.-]+\.nfo$/i', // Scene: group-release.nfo
+            '/info\.txt$/i',                      // info.txt (common alternative)
+        ];
+
+        $basename = basename($filename);
+        foreach ($nfoPatterns as $pattern) {
+            if (preg_match($pattern, $basename)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Normalize NFO encoding to UTF-8.
+     *
+     * NFO files often use CP437 (DOS) encoding for ASCII art.
+     * This method attempts to detect and convert various encodings.
+     *
+     * @param string $data Raw NFO data.
+     * @return string UTF-8 encoded NFO data.
+     */
+    protected function normalizeNfoEncoding(string $data): string
+    {
+        // Check for UTF-8 BOM and remove it
+        if (str_starts_with($data, "\xEF\xBB\xBF")) {
+            $data = substr($data, 3);
+        }
+
+        // Check for UTF-16 BOM
+        if (str_starts_with($data, "\xFF\xFE")) {
+            // UTF-16 LE
+            $data = mb_convert_encoding(substr($data, 2), 'UTF-8', 'UTF-16LE');
+        } elseif (str_starts_with($data, "\xFE\xFF")) {
+            // UTF-16 BE
+            $data = mb_convert_encoding(substr($data, 2), 'UTF-8', 'UTF-16BE');
+        }
+
+        // If already valid UTF-8, return as-is
+        if (mb_check_encoding($data, 'UTF-8')) {
+            return $data;
+        }
+
+        // Try CP437 (DOS encoding - common for scene NFOs with ASCII art)
+        // Use the utility function if available
+        if (class_exists('\Blacklight\utility\Utility') && method_exists('\Blacklight\utility\Utility', 'cp437toUTF')) {
+            return \Blacklight\utility\Utility::cp437toUTF($data);
+        }
+
+        // Fallback: try ISO-8859-1 (Latin-1)
+        $converted = @mb_convert_encoding($data, 'UTF-8', 'ISO-8859-1');
+        if ($converted !== false) {
+            return $converted;
+        }
+
+        // Last resort: force UTF-8 with error handling
+        return mb_convert_encoding($data, 'UTF-8', 'UTF-8');
     }
 
     /**

@@ -158,18 +158,78 @@ class NZBContents
             }
 
             // --- NFO Detection ---
-            // Check for explicit NFO files first
-            if ($nfoCheck && ! $foundNFO && isset($firstSegmentId) && preg_match('/\.\b(nfo|diz|info?)\b(?![.-])/i', $subject)) {
-                $nfoMessageId = ['hidden' => false, 'id' => $firstSegmentId];
-                $foundNFO = true; // Found an explicit NFO, prioritize this
+            // Check for explicit NFO files first (with enhanced patterns)
+            if ($nfoCheck && ! $foundNFO && isset($firstSegmentId)) {
+                // Standard NFO extensions
+                if (preg_match('/\.\b(nfo|diz|info?)\b(?![.-])/i', $subject)) {
+                    $nfoMessageId = ['hidden' => false, 'id' => $firstSegmentId, 'priority' => 1];
+                    $foundNFO = true;
+                }
+                // Alternative NFO naming patterns (group-specific or obfuscated)
+                elseif (preg_match('/(?:^|["\s])(?:file(?:_?id)?|readme|release|info(?:rmation)?|about|desc(?:ription)?|notes?|read\.?me|00-|000-|0-|_-_).*?\.(?:txt|nfo|diz)(?:["\s]|$)/i', $subject)) {
+                    $nfoMessageId = ['hidden' => false, 'id' => $firstSegmentId, 'priority' => 2];
+                    $foundNFO = true;
+                }
             }
-            // Check for potential "hidden" NFOs (single segment, common name, not other known types)
+
+            // Check for potential "hidden" NFOs with improved detection
             // Only consider this if an explicit NFO wasn't found yet
-            elseif ($nfoCheck && ! $foundNFO && ! $hiddenNFO && isset($firstSegmentId) && $segmentCountInFile === 1 && preg_match('/\(1\/1\)$/i', $subject)) {
-                // Simplified exclusion: check if it's NOT likely another common file type based on extension pattern
-                if (! preg_match('/\.(?:exe|com|bat|cmd|scr|dll|zip|rar|[rst]\d{2}|[a-z0-9]{3}|7z|ace|tar|gz|bz2|iso|bin|cue|img|mdf|nrg|dmg|vhd|mp3|flac|ogg|aac|wav|wma|avi|mkv|mp4|mov|wmv|mpg|mpeg|ts|vob|jpg|jpeg|png|gif|bmp|tif|tiff|psd|pdf|doc|docx|xls|xlsx|ppt|pptx|txt|log|xml|html|css|js|php|py|java|c|cpp|h|cs|sql|db|dbf|mdb|accdb|par2?|sfv|md5|sha1|sha256|url|lnk|cfg|ini|inf|sys|tmp|bak|msi|pkg|deb|rpm|apk|ipa)\b/i', $subject)) {
-                    $nfoMessageId = ['hidden' => true, 'id' => $firstSegmentId];
-                    $hiddenNFO = true; // Found a potential hidden NFO
+            if ($nfoCheck && ! $foundNFO && ! $hiddenNFO && isset($firstSegmentId)) {
+                $isHiddenNfoCandidate = false;
+
+                // Pattern 1: Single segment files with (1/1)
+                if ($segmentCountInFile === 1 && preg_match('/\(1\/1\)$/i', $subject)) {
+                    $isHiddenNfoCandidate = true;
+                }
+
+                // Pattern 2: Small segment count (1-2) with NFO-like names but no extension
+                if (! $isHiddenNfoCandidate && $segmentCountInFile <= 2 && preg_match('/(?:^|["\s])(?:nfo|info|readme|release|file_?id|about)(?:["\s]|$)/i', $subject)) {
+                    $isHiddenNfoCandidate = true;
+                }
+
+                // Pattern 3: Scene-style NFO naming (group-release.nfo without extension visible)
+                if (! $isHiddenNfoCandidate && $segmentCountInFile === 1 && preg_match('/^[a-z0-9._-]+["\s]*\(1\/1\)/i', $subject)) {
+                    // Check for scene-like naming pattern
+                    if (preg_match('/^[a-z0-9]+[._-][a-z0-9._-]+["\s]*\(1\/1\)/i', $subject)) {
+                        $isHiddenNfoCandidate = true;
+                    }
+                }
+
+                // Pattern 4: Very small files (NFOs are typically small)
+                // Files described as very small in bytes could be NFOs
+                if (! $isHiddenNfoCandidate && $segmentCountInFile === 1 && preg_match('/yEnc\s*\(\d+\)\s*\[1\/1\]/i', $subject)) {
+                    $isHiddenNfoCandidate = true;
+                }
+
+                if ($isHiddenNfoCandidate) {
+                    // Enhanced exclusion: check if it's NOT likely another common file type
+                    $excludedExtensions = '/\.(?:' .
+                        // Executables
+                        'exe|com|bat|cmd|scr|dll|msi|pkg|deb|rpm|apk|ipa|app|' .
+                        // Archives
+                        'zip|rar|[rst]\d{2}|7z|ace|tar|gz|bz2|xz|lzma|cab|iso|bin|cue|img|mdf|nrg|dmg|vhd|' .
+                        // Audio
+                        'mp3|flac|ogg|aac|wav|wma|m4a|opus|ape|wv|mpc|' .
+                        // Video
+                        'avi|mkv|mp4|mov|wmv|mpg|mpeg|ts|vob|m2ts|webm|flv|ogv|divx|xvid|' .
+                        // Images
+                        'jpg|jpeg|png|gif|bmp|tif|tiff|psd|webp|svg|ico|raw|cr2|nef|' .
+                        // Documents
+                        'pdf|doc|docx|xls|xlsx|ppt|pptx|odt|ods|odp|rtf|epub|mobi|azw|' .
+                        // Code
+                        'html|htm|css|js|php|py|java|c|cpp|h|cs|sql|json|xml|yml|yaml|' .
+                        // Data
+                        'db|dbf|mdb|accdb|sqlite|csv|' .
+                        // Verification
+                        'par2?|sfv|md5|sha1|sha256|sha512|crc|' .
+                        // Misc
+                        'url|lnk|cfg|ini|inf|sys|tmp|bak|log|srt|sub|idx|ass|ssa|vtt' .
+                        ')\b/i';
+
+                    if (! preg_match($excludedExtensions, $subject)) {
+                        $nfoMessageId = ['hidden' => true, 'id' => $firstSegmentId, 'priority' => 10];
+                        $hiddenNFO = true;
+                    }
                 }
             }
 

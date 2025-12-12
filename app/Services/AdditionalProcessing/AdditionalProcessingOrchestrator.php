@@ -626,12 +626,22 @@ class AdditionalProcessingOrchestrator
                 continue;
             }
 
-            // NFO files
-            if ($context->releaseHasNoNFO && preg_match('/(\.(nfo|inf|ofn)|info\.txt)$/i', $filePath)) {
-                if ($this->releaseManager->processNfoFile($filePath, $context, $this->downloadService->getNNTP())) {
-                    $this->output->echoNfoFound();
+            // NFO files - enhanced detection with multiple patterns
+            if ($context->releaseHasNoNFO) {
+                // Standard NFO extensions
+                if (preg_match('/(\.(nfo|inf|ofn|diz)|info\.txt)$/i', $filePath)) {
+                    if ($this->releaseManager->processNfoFile($filePath, $context, $this->downloadService->getNNTP())) {
+                        $this->output->echoNfoFound();
+                    }
+                    continue;
                 }
-                continue;
+                // Alternative NFO filenames (file_id.diz, readme.txt, etc.)
+                elseif ($this->releaseManager->isNfoFilename($filePath)) {
+                    if ($this->releaseManager->processNfoFile($filePath, $context, $this->downloadService->getNNTP())) {
+                        $this->output->echoNfoFound();
+                    }
+                    continue;
+                }
             }
 
             // Audio files
