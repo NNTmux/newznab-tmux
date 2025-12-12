@@ -140,7 +140,14 @@ class NameFixer
     /**
      * Attempts to fix release names using the NFO.
      *
+     * Enhanced to use the new Nfo class metadata extraction features for better
+     * release name identification from IMDB, TVDB, TMDB, and other media sources.
      *
+     * @param  int|string  $time  Time limit for query
+     * @param  bool  $echo  Whether to actually update the database
+     * @param  int  $cats  Category filter (2=misc/hashed, 3=predb)
+     * @param  bool  $nameStatus  Whether to update status columns
+     * @param  bool  $show  Whether to show output
      *
      * @throws \Exception
      */
@@ -148,6 +155,9 @@ class NameFixer
     {
         $this->_echoStartMessage($time, '.nfo files');
         $type = 'NFO, ';
+
+        // Initialize the Nfo parser
+        $nfoParser = new Nfo();
 
         // Only select releases we haven't checked here before
         $preId = false;
@@ -208,13 +218,260 @@ class NameFixer
                 }
 
                 $this->reset();
-                $this->checkName($releaseRow[0], $echo, $type, $nameStatus, $show, $preId);
+
+                // First, try to extract metadata using the enhanced Nfo parser
+                $nfoMetadata = $nfoParser->parseNfoMetadata($releaseRow[0]->textstring);
+
+                // Try to find a better name using extracted media IDs
+                $betterNameFound = $this->tryNfoMetadataRename($releaseRow[0], $nfoMetadata, $echo, $type, $nameStatus, $show, $preId);
+
+                // If metadata extraction didn't find a name, fall back to traditional checks
+                if (! $betterNameFound) {
+                    $this->checkName($releaseRow[0], $echo, $type, $nameStatus, $show, $preId);
+                }
+
                 $this->_echoRenamed($show);
             }
             $this->_echoFoundCount($echo, ' NFO\'s');
         } else {
             $this->colorCLI->info('Nothing to fix.');
         }
+    }
+
+    /**
+     * Try to rename a release using extracted NFO metadata.
+     *
+     * Uses media IDs (IMDB, TVDB, TMDB) and codec info from NFO to build
+     * a better release name.
+     *
+     * @param  object  $release  The release object
+     * @param  array  $nfoMetadata  Metadata extracted from NFO by Nfo::parseNfoMetadata()
+     * @param  bool  $echo  Whether to update database
+     * @param  string  $type  The type string for logging
+     * @param  bool  $nameStatus  Whether to update status columns
+     * @param  bool  $show  Whether to show output
+     * @param  bool  $preId  Whether processing for PreDB
+     * @return bool True if a better name was found and applied
+     *
+     * @throws \Exception
+     */
+    protected function tryNfoMetadataRename(object $release, array $nfoMetadata, bool $echo, string $type, $nameStatus, bool $show, bool $preId = false): bool
+    {
+        // Skip if already processed
+        if ($this->done || $this->relid === (int) $release->releases_id) {
+            return false;
+        }
+
+        // Try to get a name from media database IDs
+        $mediaIds = $nfoMetadata['media_ids'] ?? [];
+        $codecInfo = $nfoMetadata['codec_info'] ?? [];
+        $releaseGroup = $nfoMetadata['group'] ?? null;
+
+        // Priority order: IMDB (movies/TV), TMDB, TVDB, TVMaze
+        foreach ($mediaIds as $mediaId) {
+            $newName = $this->getNameFromMediaId($mediaId['source'], $mediaId['id']);
+            if ($newName !== null) {
+                // Enhance the name with codec info if available
+                $enhancedName = $this->enhanceNameWithCodecInfo($newName, $codecInfo, $releaseGroup);
+
+                $this->updateRelease(
+                    $release,
+                    $enhancedName,
+                    'nfoCheck: Media ID ('.$mediaId['source'].': '.$mediaId['id'].')',
+                    $echo,
+                    $type,
+                    $nameStatus,
+                    $show
+                );
+
+                return true;
+            }
+        }
+
+        // If we have codec info but no media ID match, try to enhance existing name patterns
+        if (! empty($codecInfo)) {
+            // Check if there's a recognizable title pattern in the NFO
+            $titleFromNfo = $this->extractTitleFromNfoContent($release->textstring);
+            if ($titleFromNfo !== null) {
+                $enhancedName = $this->enhanceNameWithCodecInfo($titleFromNfo, $codecInfo, $releaseGroup);
+                if (strtolower($enhancedName) !== strtolower($release->searchname)) {
+                    $this->updateRelease(
+                        $release,
+                        $enhancedName,
+                        'nfoCheck: NFO Title with Codec Info',
+                        $echo,
+                        $type,
+                        $nameStatus,
+                        $show
+                    );
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get a release name from a media database ID.
+     *
+     * Queries local database or external APIs to resolve media IDs to titles.
+     *
+     * @param  string  $source  The source database (imdb, thetvdb, tmdb_movie, tmdb_tv, tvmaze, anidb, mal)
+     * @param  string  $id  The media ID
+     * @return string|null The title if found, null otherwise
+     */
+    protected function getNameFromMediaId(string $source, string $id): ?string
+    {
+        switch ($source) {
+            case 'imdb':
+                // Check if we have this IMDB ID in our movieinfo table
+                $movie = \App\Models\MovieInfo::where('imdbid', ltrim($id, 't'))->first(['title', 'year']);
+                if ($movie !== null) {
+                    return $movie->year > 0 ? "{$movie->title} ({$movie->year})" : $movie->title;
+                }
+                // Also check Video table for TV shows with IMDB ID
+                $video = \App\Models\Video::where('imdb', (int) ltrim($id, 't'))->first(['title']);
+                if ($video !== null) {
+                    return $video->title;
+                }
+                break;
+
+            case 'thetvdb':
+                // Check Video table for TVDB ID
+                $video = \App\Models\Video::where('tvdb', (int) $id)->first(['title']);
+                if ($video !== null) {
+                    return $video->title;
+                }
+                break;
+
+            case 'tmdb_movie':
+                // Check local movie database for TMDB ID
+                $movie = \App\Models\MovieInfo::where('tmdbid', (int) $id)->first(['title', 'year']);
+                if ($movie !== null) {
+                    return $movie->year > 0 ? "{$movie->title} ({$movie->year})" : $movie->title;
+                }
+                break;
+
+            case 'tmdb_tv':
+                // Check Video table for TMDB ID
+                $video = \App\Models\Video::where('tmdb', (int) $id)->first(['title']);
+                if ($video !== null) {
+                    return $video->title;
+                }
+                break;
+
+            case 'tvmaze':
+                // Check Video table for TVMaze ID
+                $video = \App\Models\Video::where('tvmaze', (int) $id)->first(['title']);
+                if ($video !== null) {
+                    return $video->title;
+                }
+                break;
+
+            case 'anidb':
+                // Check AniDB table - uses Video table with anidb column
+                $video = \App\Models\Video::where('anidb', (int) $id)->first(['title']);
+                if ($video !== null) {
+                    return $video->title;
+                }
+                // Also check anidb_titles table
+                $anime = \App\Models\AnidbTitle::where('anidbid', (int) $id)->first(['title']);
+                if ($anime !== null) {
+                    return $anime->title;
+                }
+                break;
+
+            case 'trakt':
+                // Check Video table for Trakt ID
+                $video = \App\Models\Video::where('trakt', (int) $id)->first(['title']);
+                if ($video !== null) {
+                    return $video->title;
+                }
+                break;
+
+            case 'mal':
+                // MyAnimeList - currently no direct support in the database
+                break;
+        }
+
+        return null;
+    }
+
+    /**
+     * Enhance a title with codec/resolution information.
+     *
+     * @param  string  $title  The base title
+     * @param  array  $codecInfo  Codec info from Nfo::extractCodecInfo()
+     * @param  string|null  $releaseGroup  The release group name if found
+     * @return string The enhanced title
+     */
+    protected function enhanceNameWithCodecInfo(string $title, array $codecInfo, ?string $releaseGroup = null): string
+    {
+        $parts = [$title];
+
+        // Add resolution
+        if (! empty($codecInfo['resolution'])) {
+            $parts[] = $codecInfo['resolution'];
+        }
+
+        // Add video codec
+        if (! empty($codecInfo['video'])) {
+            $parts[] = $codecInfo['video'];
+        }
+
+        // Add audio codec
+        if (! empty($codecInfo['audio'])) {
+            $parts[] = $codecInfo['audio'];
+        }
+
+        // Add release group
+        if ($releaseGroup !== null) {
+            $parts[] = '-'.$releaseGroup;
+
+            return implode('.', array_slice($parts, 0, -1)).$parts[count($parts) - 1];
+        }
+
+        return implode('.', $parts);
+    }
+
+    /**
+     * Extract a recognizable title from NFO content.
+     *
+     * Looks for common title patterns like "Title (Year)" or scene-style names.
+     *
+     * @param  string  $nfoContent  The NFO content
+     * @return string|null The extracted title or null if not found
+     */
+    protected function extractTitleFromNfoContent(string $nfoContent): ?string
+    {
+        // Look for "Title (Year)" pattern - common in movie NFOs
+        if (preg_match('/^[\s\S]*?([A-Z][A-Za-z0-9\s\.\'\-\:]+(?:\s+\((?:19|20)\d{2}\)))/m', $nfoContent, $matches)) {
+            $title = trim($matches[1]);
+            // Validate it's not too short or too long
+            if (strlen($title) >= 5 && strlen($title) <= 150) {
+                return $title;
+            }
+        }
+
+        // Look for release name patterns (Scene style)
+        if (preg_match('/(?:Release|Rls|Name)\s*[:\-]?\s*([A-Za-z0-9][\w.\-]+(?:[\s._-][\w.\-]+)+)/i', $nfoContent, $matches)) {
+            $title = trim($matches[1]);
+            if (strlen($title) >= 5 && strlen($title) <= 150) {
+                return $title;
+            }
+        }
+
+        // Look for title in common NFO header patterns
+        if (preg_match('/(?:presents|proudly brings)\s*[:\-]?\s*([A-Za-z0-9][\w.\s\-\']+(?:[\s._-][\w.\s\-\']+)*)/i', $nfoContent, $matches)) {
+            $title = trim($matches[1]);
+            if (strlen($title) >= 5 && strlen($title) <= 150) {
+                return $title;
+            }
+        }
+
+        return null;
     }
 
     /**

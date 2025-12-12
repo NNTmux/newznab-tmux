@@ -574,8 +574,82 @@ class ArchiveExtractionService
      */
     private function getAllowedExtensions(): array
     {
-        return ['nfo', 'srt', 'mkv', 'mpeg', 'avi', 'jpg', 'jpeg', 'exe', 'mp4', 'mp3', 'm4a',
-            'flac', 'png', 'epub', 'cbz', 'cbr', 'djvu'];
+        return [
+            // NFO and info files (prioritized for extraction)
+            'nfo', 'diz', 'inf', 'txt',
+            // Subtitles
+            'srt', 'sub', 'idx', 'ass', 'ssa', 'vtt',
+            // Video
+            'mkv', 'mpeg', 'avi', 'mp4', 'm4v', 'mov', 'wmv', 'flv', 'ts', 'vob', 'm2ts', 'webm',
+            // Audio
+            'mp3', 'm4a', 'flac', 'ogg', 'aac', 'wav', 'wma', 'opus', 'ape',
+            // Images
+            'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp',
+            // Documents
+            'epub', 'pdf', 'cbz', 'cbr', 'djvu', 'mobi', 'azw', 'azw3',
+            // Executables (for software releases)
+            'exe', 'msi',
+        ];
+    }
+
+    /**
+     * Check if a file is an NFO or info file.
+     *
+     * @param string $filename The filename to check.
+     * @return bool True if it's an NFO-like file.
+     */
+    public function isNfoFile(string $filename): bool
+    {
+        $basename = strtolower(basename($filename));
+
+        // Standard NFO extensions
+        if (preg_match('/\.(nfo|diz|inf)$/i', $basename)) {
+            return true;
+        }
+
+        // Common NFO alternative names
+        $nfoNames = [
+            'file_id.diz', 'fileid.diz', 'file-id.diz',
+            'readme.txt', 'readme.1st', 'read.me', 'readmenow.txt',
+            'info.txt', 'information.txt', 'about.txt', 'notes.txt',
+            'release.txt', 'release.nfo',
+        ];
+
+        if (in_array($basename, $nfoNames, true)) {
+            return true;
+        }
+
+        // Scene-style NFO naming: 00-groupname.nfo, group-release.nfo
+        if (preg_match('/^(?:00?-[a-z0-9_-]+|[a-z0-9]+-[a-z0-9._-]+)\.(?:nfo|txt)$/i', $basename)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Sort files to prioritize NFO files for processing.
+     *
+     * @param array $files Array of file info arrays.
+     * @return array Sorted array with NFO files first.
+     */
+    public function sortFilesWithNfoPriority(array $files): array
+    {
+        usort($files, function ($a, $b) {
+            $aIsNfo = $this->isNfoFile($a['name'] ?? '');
+            $bIsNfo = $this->isNfoFile($b['name'] ?? '');
+
+            if ($aIsNfo && ! $bIsNfo) {
+                return -1;
+            }
+            if (! $aIsNfo && $bIsNfo) {
+                return 1;
+            }
+
+            return 0;
+        });
+
+        return $files;
     }
 
     /**
