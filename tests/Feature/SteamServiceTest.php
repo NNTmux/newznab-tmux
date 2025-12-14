@@ -6,8 +6,8 @@ namespace Tests\Feature;
 
 use App\Models\SteamApp;
 use App\Services\SteamService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
@@ -16,15 +16,31 @@ use Tests\TestCase;
  */
 class SteamServiceTest extends TestCase
 {
-    use RefreshDatabase;
-
     protected SteamService $service;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        // Use in-memory SQLite database for test isolation
+        config(['database.default' => 'sqlite', 'database.connections.sqlite.database' => ':memory:']);
+        DB::purge();
+        DB::reconnect();
+
+        // Create minimal steam_apps table for testing
+        DB::statement('CREATE TABLE IF NOT EXISTS steam_apps (
+            appid INTEGER PRIMARY KEY,
+            name VARCHAR(255)
+        )');
+
         $this->service = new SteamService();
         Cache::flush();
+    }
+
+    protected function tearDown(): void
+    {
+        DB::disconnect();
+        parent::tearDown();
     }
 
     // ==========================================

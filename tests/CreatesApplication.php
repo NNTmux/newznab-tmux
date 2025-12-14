@@ -11,6 +11,7 @@ trait CreatesApplication
      */
     public function createApplication()
     {
+
         // Require the configured application instance.
         $app = require __DIR__.'/../bootstrap/app.php';
 

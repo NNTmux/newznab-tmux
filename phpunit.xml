@@ -13,6 +13,8 @@
   </testsuites>
   <php>
     <env name="APP_ENV" value="testing"/>
+    <env name="DB_CONNECTION" value="testing" force="true"/>
+    <env name="DB_DATABASE" value=":memory:" force="true"/>
     <env name="BCRYPT_ROUNDS" value="4"/>
     <env name="CACHE_STORE" value="array"/>
     <env name="SESSION_DRIVER" value="array"/>

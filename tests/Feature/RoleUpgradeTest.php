@@ -2,19 +2,27 @@
 namespace Tests\Feature;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 final class RoleUpgradeTest extends TestCase
 {
-    use RefreshDatabase;
     private User $user;
     private Role $userRole;
     private Role $supporterRole;
     protected function setUp(): void
     {
         parent::setUp();
+
+        // Use in-memory SQLite database for test isolation
+        config(['database.default' => 'sqlite', 'database.connections.sqlite.database' => ':memory:']);
+        DB::purge();
+        DB::reconnect();
+
+        // Create minimal tables needed for testing
+        $this->createTestTables();
+
         // Create the basic User role
         $this->userRole = Role::firstOrCreate(
             ['name' => 'User'],
@@ -47,19 +55,134 @@ final class RoleUpgradeTest extends TestCase
         $this->user = $this->createTestUser($this->userRole->id);
         $this->user->assignRole($this->userRole);
     }
+
+    protected function tearDown(): void
+    {
+        DB::disconnect();
+        parent::tearDown();
+    }
+
+    /**
+     * Create the minimal database tables needed for testing.
+     */
+    private function createTestTables(): void
+    {
+        // Users table
+        DB::statement('CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            password VARCHAR(255) NOT NULL,
+            roles_id INTEGER DEFAULT 1,
+            rolechangedate DATETIME NULL,
+            pending_roles_id INTEGER NULL,
+            pending_role_start_date DATETIME NULL,
+            api_token VARCHAR(255) NULL,
+            grabs INTEGER DEFAULT 0,
+            invites INTEGER DEFAULT 0,
+            notes TEXT DEFAULT "",
+            movieview INTEGER DEFAULT 1,
+            xxxview INTEGER DEFAULT 0,
+            musicview INTEGER DEFAULT 1,
+            consoleview INTEGER DEFAULT 1,
+            bookview INTEGER DEFAULT 1,
+            gameview INTEGER DEFAULT 1,
+            verified INTEGER DEFAULT 1,
+            can_post INTEGER DEFAULT 1,
+            rate_limit INTEGER DEFAULT 60,
+            email_verified_at DATETIME NULL,
+            created_at DATETIME NULL,
+            updated_at DATETIME NULL,
+            deleted_at DATETIME NULL
+        )');
+
+        // Roles table (spatie/laravel-permission)
+        DB::statement('CREATE TABLE IF NOT EXISTS roles (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name VARCHAR(255) NOT NULL,
+            guard_name VARCHAR(255) NOT NULL,
+            addyears INTEGER DEFAULT 0,
+            apirequests INTEGER DEFAULT 10,
+            downloadrequests INTEGER DEFAULT 5,
+            defaultinvites INTEGER DEFAULT 0,
+            isdefault INTEGER DEFAULT 0,
+            donation INTEGER DEFAULT 0,
+            canpreview INTEGER DEFAULT 0,
+            created_at DATETIME NULL,
+            updated_at DATETIME NULL
+        )');
+
+        // Model has roles table (spatie/laravel-permission)
+        DB::statement('CREATE TABLE IF NOT EXISTS model_has_roles (
+            role_id INTEGER NOT NULL,
+            model_type VARCHAR(255) NOT NULL,
+            model_id INTEGER NOT NULL,
+            PRIMARY KEY (role_id, model_type, model_id)
+        )');
+
+        // Permissions table (spatie/laravel-permission)
+        DB::statement('CREATE TABLE IF NOT EXISTS permissions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name VARCHAR(255) NOT NULL,
+            guard_name VARCHAR(255) NOT NULL,
+            created_at DATETIME NULL,
+            updated_at DATETIME NULL
+        )');
+
+        // Model has permissions table (spatie/laravel-permission)
+        DB::statement('CREATE TABLE IF NOT EXISTS model_has_permissions (
+            permission_id INTEGER NOT NULL,
+            model_type VARCHAR(255) NOT NULL,
+            model_id INTEGER NOT NULL,
+            PRIMARY KEY (permission_id, model_type, model_id)
+        )');
+
+        // Role has permissions table (spatie/laravel-permission)
+        DB::statement('CREATE TABLE IF NOT EXISTS role_has_permissions (
+            permission_id INTEGER NOT NULL,
+            role_id INTEGER NOT NULL,
+            PRIMARY KEY (permission_id, role_id)
+        )');
+
+        // User role history table (if needed)
+        DB::statement('CREATE TABLE IF NOT EXISTS user_role_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            users_id INTEGER NOT NULL,
+            old_roles_id INTEGER NULL,
+            new_roles_id INTEGER NOT NULL,
+            old_rolechangedate DATETIME NULL,
+            new_rolechangedate DATETIME NULL,
+            changed_by_user_id INTEGER NULL,
+            reason TEXT NULL,
+            created_at DATETIME NULL
+        )');
+    }
     /**
      * Helper to create a test user without factory.
      */
     private function createTestUser(int $roleId, ?string $roleChangeDate = null): User
     {
-        return User::create([
-            'username' => 'testuser_'.Str::random(8),
-            'email' => Str::random(8).'@test.com',
-            'password' => bcrypt('password'),
+        // Use forceCreate to bypass hashed cast
+        $user = new User();
+        $user->username = 'testuser_'.Str::random(8);
+        $user->email = Str::random(8).'@test.com';
+        $user->roles_id = $roleId;
+        $user->rolechangedate = $roleChangeDate;
+        $user->api_token = md5(Str::random(32));
+
+        // Insert directly to avoid hashed cast issue
+        DB::table('users')->insert([
+            'username' => $user->username,
+            'email' => $user->email,
+            'password' => 'hashed_password_placeholder',
             'roles_id' => $roleId,
             'rolechangedate' => $roleChangeDate,
-            'api_token' => md5(Str::random(32)),
+            'api_token' => $user->api_token,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
+
+        return User::where('email', $user->email)->first();
     }
     /**
      * Test that updating a user role to Supporter with addYears=2 correctly applies 2 years.
