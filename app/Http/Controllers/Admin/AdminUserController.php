@@ -173,7 +173,20 @@ class AdminUserController extends BasePageController
 
                     // CRITICAL: Capture the ORIGINAL rolechangedate BEFORE any updates
                     // This is needed for accurate role history tracking
-                    $originalRoleChangeDate = $editedUser->rolechangedate;
+                    // Convert to string to avoid any Carbon object reference issues
+                    $originalRoleChangeDate = $editedUser->rolechangedate
+                        ? $editedUser->rolechangedate->toDateTimeString()
+                        : null;
+
+                    \Log::info('AdminUserController - Before updates', [
+                        'user_id' => $editedUser->id,
+                        'originalRoleChangeDate' => $originalRoleChangeDate,
+                        'current_roles_id' => $editedUser->roles_id,
+                        'requested_role' => $request->input('role'),
+                        'roleChanged' => $roleChanged,
+                        'stackRole' => $stackRole,
+                        'form_rolechangedate' => $request->input('rolechangedate'),
+                    ]);
 
                     // Handle pending role cancellation
                     if ($request->has('cancel_pending_role') && $request->input('cancel_pending_role')) {
@@ -193,11 +206,24 @@ class AdminUserController extends BasePageController
                             $editedUser->update(['rolechangedate' => null]);
                         }
                         $editedUser->refresh();
+
+                        \Log::info('AdminUserController - After expiry update', [
+                            'user_id' => $editedUser->id,
+                            'new_rolechangedate' => $editedUser->rolechangedate,
+                            'adminManuallySetExpiry' => $adminManuallySetExpiry,
+                        ]);
                     }
 
                     // If role is changing, handle it with stacking logic
                     // Pass the original expiry so history records the correct old_expiry_date
                     if ($roleChanged && $request->input('role') !== null) {
+                        \Log::info('AdminUserController - About to call updateUserRole', [
+                            'user_id' => $editedUser->id,
+                            'new_role' => (int) $request->input('role'),
+                            'originalRoleChangeDate_passed' => $originalRoleChangeDate,
+                            'current_user_rolechangedate' => $editedUser->rolechangedate,
+                        ]);
+
                         User::updateUserRole(
                             $editedUser->id,
                             (int) $request->input('role'), // Cast to integer

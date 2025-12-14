@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use App\Enums\QueueType;
+use App\Enums\SignupError;
+use App\Enums\UserRole;
 use App\Jobs\SendAccountExpiredEmail;
 use App\Jobs\SendAccountWillExpireEmail;
 use App\Rules\ValidEmailDomain;
 use App\Services\InvitationService;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -30,33 +34,29 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
- * App\Models\User.
- *
- * App\Models\User.
- *
  * @property int $id
  * @property string $username
  * @property string|null $firstname
  * @property string|null $lastname
  * @property string $email
  * @property string $password
- * @property int $user_roles_id FK to roles.id
+ * @property int $roles_id
  * @property string|null $host
  * @property int $grabs
- * @property string $rsstoken
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
+ * @property string $api_token
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property string|null $resetguid
- * @property string|null $lastlogin
- * @property string|null $apiaccess
+ * @property Carbon|null $lastlogin
+ * @property Carbon|null $apiaccess
  * @property int $invites
  * @property int|null $invitedby
- * @property int $movieview
- * @property int $xxxview
- * @property int $musicview
- * @property int $consoleview
- * @property int $bookview
- * @property int $gameview
+ * @property bool $movieview
+ * @property bool $xxxview
+ * @property bool $musicview
+ * @property bool $consoleview
+ * @property bool $bookview
+ * @property bool $gameview
  * @property string|null $saburl
  * @property string|null $sabapikey
  * @property bool|null $sabapikeytype
@@ -70,159 +70,135 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $cp_url
  * @property string|null $cp_api
  * @property string|null $style
- * @property string|null $rolechangedate When does the role expire
- * @property string|null $pending_role_start_date When the pending role change takes effect
- * @property int|null $pending_roles_id The role that will be applied after current role expires
+ * @property Carbon|null $rolechangedate
+ * @property Carbon|null $pending_role_start_date
+ * @property int|null $pending_roles_id
  * @property string|null $remember_token
- * @property-read Collection|\App\Models\ReleaseComment[] $comment
- * @property-read Collection|\App\Models\UserDownload[] $download
- * @property-read Collection|\App\Models\DnzbFailure[] $failedRelease
- * @property-read Collection|\App\Models\Invitation[] $invitation
- * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\NotififupdateUsertcations\DatabaseNotification[] $notifications
- * @property-read Collection|\App\Models\UsersRelease[] $release
- * @property-read Collection|\App\Models\UserRequest[] $request
- * @property-read Collection|\App\Models\UserSerie[] $series
- *
- * @method static Builder|\App\Models\User whereApiaccess($value)
- * @method static Builder|\App\Models\User whereBookview($value)
- * @method static Builder|\App\Models\User whereConsoleview($value)
- * @method static Builder|\App\Models\User whereCpApi($value)
- * @method static Builder|\App\Models\User whereCpUrl($value)
- * @method static Builder|\App\Models\User whereCreatedAt($value)
- * @method static Builder|\App\Models\User whereEmail($value)
- * @method static Builder|\App\Models\User whereFirstname($value)
- * @method static Builder|\App\Models\User whereGameview($value)
- * @method static Builder|\App\Models\User whereGrabs($value)
- * @method static Builder|\App\Models\User whereHost($value)
- * @method static Builder|\App\Models\User whereId($value)
- * @method static Builder|\App\Models\User whereInvitedby($value)
- * @method static Builder|\App\Models\User whereInvites($value)
- * @method static Builder|\App\Models\User whereLastlogin($value)
- * @method static Builder|\App\Models\User whereLastname($value)
- * @method static Builder|\App\Models\User whereMovieview($value)
- * @method static Builder|\App\Models\User whereMusicview($value)
- * @method static Builder|\App\Models\User whereNotes($value)
- * @method static Builder|\App\Models\User whereNzbgetpassword($value)
- * @method static Builder|\App\Models\User whereNzbgeturl($value)
- * @method static Builder|\App\Models\User whereNzbgetusername($value)
- * @method static Builder|\App\Models\User whereNzbvortexApiKey($value)
- * @method static Builder|\App\Models\User whereNzbvortexServerUrl($value)
- * @method static Builder|\App\Models\User wherePassword($value)
- * @method static Builder|\App\Models\User whereRememberToken($value)
- * @method static Builder|\App\Models\User whereResetguid($value)
- * @method static Builder|\App\Models\User whereRolechangedate($value)
- * @method static Builder|\App\Models\User whereRsstoken($value)
- * @method static Builder|\App\Models\User whereSabapikey($value)
- * @method static Builder|\App\Models\User whereSabapikeytype($value)
- * @method static Builder|\App\Models\User whereSabpriority($value)
- * @method static Builder|\App\Models\User whereSaburl($value)
- * @method static Builder|\App\Models\User whereStyle($value)
- * @method static Builder|\App\Models\User whereUpdatedAt($value)
- * @method static Builder|\App\Models\User whereUserRolesId($value)
- * @method static Builder|\App\Models\User whereUsername($value)
- * @method static Builder|\App\Models\User whereXxxview($value)
- * @method static Builder|\App\Models\User whereVerified($value)
- * @method static Builder|\App\Models\User whereApiToken($value)
- *
- * @mixin \Eloquent
- *
- * @property int $roles_id FK to roles.id
- * @property string $api_token
  * @property int $rate_limit
- * @property string|null $email_verified_at
- * @property int $verified
+ * @property Carbon|null $email_verified_at
+ * @property bool $verified
  * @property string|null $verification_token
- * @property-read Collection|\Junaidnasir\Larainvite\Models\LaraInviteModel[] $invitationPending
- * @property-read Collection|\Junaidnasir\Larainvite\Models\LaraInviteModel[] $invitationSuccess
- * @property-read Collection|\Junaidnasir\Larainvite\Models\LaraInviteModel[] $invitations
- * @property-read Collection|\Spatie\Permission\Models\Permission[] $permissions
- * @property-read Role $role
- * @property-read Collection|\Spatie\Permission\Models\Role[] $roles
+ * @property string|null $timezone
+ * @property bool $can_post
+ * @property-read Collection<int, ReleaseComment> $comments
+ * @property-read Collection<int, UserDownload> $downloads
+ * @property-read Collection<int, DnzbFailure> $failedReleases
+ * @property-read Collection<int, Invitation> $invitations
+ * @property-read Collection<int, UsersRelease> $releases
+ * @property-read Collection<int, UserRequest> $requests
+ * @property-read Collection<int, UserSerie> $series
+ * @property-read Collection<int, RolePromotionStat> $promotionStats
+ * @property-read Collection<int, UserRoleHistory> $roleHistory
+ * @property-read Role|null $role
+ * @property-read PasswordSecurity|null $passwordSecurity
  *
- * @method static Builder|\App\Models\User newModelQuery()
- * @method static Builder|\App\Models\User newQuery()
- * @method static Builder|\App\Models\User permission($permissions)
- * @method static Builder|\App\Models\User query()
- * @method static Builder|\App\Models\User whereEmailVerifiedAt($value)
- * @method static Builder|\App\Models\User whereRateLimit($value)
- * @method static Builder|\App\Models\User whereRolesId($value)
- * @method static Builder|\App\Models\User whereVerificationToken($value)
+ * @method static Builder|User whereUsername(string $value)
+ * @method static Builder|User whereEmail(string $value)
+ * @method static Builder|User whereApiToken(string $value)
+ * @method static Builder|User whereResetguid(string $value)
+ * @method static Builder|User whereVerified(int $value)
+ * @method static Builder|User active()
+ * @method static Builder|User verified()
+ * @method static Builder|User withRole(int|string $role)
+ * @method static Builder|User expiringSoon(int $days = 7)
+ * @method static Builder|User expired()
  */
-class User extends Authenticatable
+final class User extends Authenticatable
 {
-    use HasRoles, Notifiable, SoftDeletes, UserVerification;
-
-    public const ERR_SIGNUP_BADUNAME = -1;
-
-    public const ERR_SIGNUP_BADPASS = -2;
-
-    public const ERR_SIGNUP_BADEMAIL = -3;
-
-    public const ERR_SIGNUP_UNAMEINUSE = -4;
-
-    public const ERR_SIGNUP_EMAILINUSE = -5;
-
-    public const ERR_SIGNUP_BADINVITECODE = -6;
-
-    public const SUCCESS = 1;
-
-    public const ROLE_USER = 1;
-
-    public const ROLE_ADMIN = 2;
-
-    public const ROLE_DISABLED = 3;
-
-    public const ROLE_MODERATOR = 4;
+    use HasRoles;
+    use Notifiable;
+    use SoftDeletes;
+    use UserVerification;
 
     /**
-     * Users SELECT queue type.
+     * @var list<string>
      */
-    public const QUEUE_NONE = 0;
-
-    public const QUEUE_SABNZBD = 1;
-
-    public const QUEUE_NZBGET = 2;
-
-    /**
-     * @var string
-     */
+    protected $hidden = [
+        'remember_token',
+        'password',
+    ];
 
     /**
-     * @var bool
-     */
-    protected $dateFormat = false;
-
-    /**
-     * @var array
-     */
-    protected $hidden = ['remember_token', 'password'];
-
-    /**
-     * @var array
+     * @var list<string>
      */
     protected $guarded = [];
+
+    /**
+     * Roles excluded from promotions.
+     *
+     * @var list<string>
+     */
+    private const PROMOTION_EXCLUDED_ROLES = [
+        'User',
+        'Admin',
+        'Moderator',
+        'Disabled',
+        'Friend',
+    ];
+
+    /**
+     * Days in a year for subscription calculations.
+     */
+    private const DAYS_PER_YEAR = 365;
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'lastlogin' => 'datetime',
+            'apiaccess' => 'datetime',
+            'rolechangedate' => 'datetime',
+            'pending_role_start_date' => 'datetime',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+            'password' => 'hashed',
+            'movieview' => 'boolean',
+            'xxxview' => 'boolean',
+            'musicview' => 'boolean',
+            'consoleview' => 'boolean',
+            'bookview' => 'boolean',
+            'gameview' => 'boolean',
+            'sabapikeytype' => 'boolean',
+            'sabpriority' => 'boolean',
+            'verified' => 'boolean',
+            'can_post' => 'boolean',
+            'grabs' => 'integer',
+            'invites' => 'integer',
+            'rate_limit' => 'integer',
+            'roles_id' => 'integer',
+            'pending_roles_id' => 'integer',
+            'invitedby' => 'integer',
+        ];
+    }
 
     protected function getDefaultGuardName(): string
     {
         return 'web';
     }
 
+    // ===== Relationships =====
+
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class, 'roles_id');
     }
 
-    public function request(): HasMany
+    public function requests(): HasMany
     {
         return $this->hasMany(UserRequest::class, 'users_id');
     }
 
-    public function download(): HasMany
+    public function downloads(): HasMany
     {
         return $this->hasMany(UserDownload::class, 'users_id');
     }
 
-    public function release(): HasMany
+    public function releases(): HasMany
     {
         return $this->hasMany(UsersRelease::class, 'users_id');
     }
@@ -232,17 +208,17 @@ class User extends Authenticatable
         return $this->hasMany(UserSerie::class, 'users_id');
     }
 
-    public function invitation(): HasMany
+    public function invitations(): HasMany
     {
         return $this->hasMany(Invitation::class, 'invited_by');
     }
 
-    public function failedRelease(): HasMany
+    public function failedReleases(): HasMany
     {
         return $this->hasMany(DnzbFailure::class, 'users_id');
     }
 
-    public function comment(): HasMany
+    public function comments(): HasMany
     {
         return $this->hasMany(ReleaseComment::class, 'users_id');
     }
@@ -257,8 +233,167 @@ class User extends Authenticatable
         return $this->hasMany(UserRoleHistory::class);
     }
 
+    public function passwordSecurity(): HasOne
+    {
+        return $this->hasOne(PasswordSecurity::class);
+    }
+
+    // ===== Backward Compatibility Aliases =====
+
+    public function request(): HasMany
+    {
+        return $this->requests();
+    }
+
+    public function download(): HasMany
+    {
+        return $this->downloads();
+    }
+
+    public function release(): HasMany
+    {
+        return $this->releases();
+    }
+
+    public function invitation(): HasMany
+    {
+        return $this->invitations();
+    }
+
+    public function failedRelease(): HasMany
+    {
+        return $this->failedReleases();
+    }
+
+    public function comment(): HasMany
+    {
+        return $this->comments();
+    }
+
+    // ===== Query Scopes =====
+
     /**
-     * Check if user has a pending stacked role
+     * Scope to get active (non-disabled) users.
+     */
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('roles_id', '!=', UserRole::DISABLED->value);
+    }
+
+    /**
+     * Scope to get verified users.
+     */
+    public function scopeVerified(Builder $query): Builder
+    {
+        return $query->where('verified', true);
+    }
+
+    /**
+     * Scope to filter users by role.
+     */
+    public function scopeWithRole(Builder $query, int|string $role): Builder
+    {
+        if (is_numeric($role)) {
+            return $query->where('roles_id', (int) $role);
+        }
+
+        return $query->whereHas('role', fn (Builder $q) => $q->where('name', $role));
+    }
+
+    /**
+     * Scope to get users with roles expiring within specified days.
+     */
+    public function scopeExpiringSoon(Builder $query, int $days = 7): Builder
+    {
+        return $query->whereNotNull('rolechangedate')
+            ->whereBetween('rolechangedate', [now(), now()->addDays($days)]);
+    }
+
+    /**
+     * Scope to get users with expired roles.
+     */
+    public function scopeExpired(Builder $query): Builder
+    {
+        return $query->whereNotNull('rolechangedate')
+            ->where('rolechangedate', '<', now());
+    }
+
+    /**
+     * Scope to exclude sharing email.
+     */
+    public function scopeExcludeSharing(Builder $query): Builder
+    {
+        return $query->where('email', '!=', 'sharing@nZEDb.com');
+    }
+
+    // ===== Attribute Accessors =====
+
+    /**
+     * Get the user's full name.
+     */
+    protected function fullName(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): string => trim("{$this->firstname} {$this->lastname}") ?: $this->username,
+        );
+    }
+
+    /**
+     * Get the user's timezone or default.
+     */
+    protected function effectiveTimezone(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): string => $this->timezone ?? 'UTC',
+        );
+    }
+
+    /**
+     * Check if user has admin privileges.
+     */
+    protected function isAdmin(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): bool => $this->roles_id === UserRole::ADMIN->value,
+        );
+    }
+
+    /**
+     * Check if user is disabled.
+     */
+    protected function isDisabled(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): bool => $this->roles_id === UserRole::DISABLED->value,
+        );
+    }
+
+    /**
+     * Check if role is expired.
+     */
+    protected function isRoleExpired(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): bool => $this->rolechangedate?->isPast() ?? false,
+        );
+    }
+
+    /**
+     * Get days until role expires.
+     */
+    protected function daysUntilExpiry(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): ?int => $this->rolechangedate
+                ? (int) now()->diffInDays($this->rolechangedate, false)
+                : null,
+        );
+    }
+
+    // ===== Pending Role Methods =====
+
+    /**
+     * Check if user has a pending stacked role.
      */
     public function hasPendingRole(): bool
     {
@@ -266,11 +401,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the pending role details
+     * Get the pending role.
      */
     public function getPendingRole(): ?Role
     {
-        if (!$this->hasPendingRole()) {
+        if (! $this->hasPendingRole()) {
             return null;
         }
 
@@ -278,11 +413,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Cancel a pending stacked role
+     * Cancel a pending stacked role.
      */
     public function cancelPendingRole(): bool
     {
-        if (!$this->hasPendingRole()) {
+        if (! $this->hasPendingRole()) {
             return false;
         }
 
@@ -293,85 +428,163 @@ class User extends Authenticatable
     }
 
     /**
-     * Get role expiry information including pending roles
+     * Get comprehensive role expiry information.
+     *
+     * @return array{
+     *     current_role: Role|null,
+     *     current_expiry: Carbon|null,
+     *     has_expiry: bool,
+     *     is_expired: bool,
+     *     days_until_expiry: int|null,
+     *     pending_role: Role|null,
+     *     pending_start: Carbon|null,
+     *     has_pending_role: bool
+     * }
      */
     public function getRoleExpiryInfo(): array
     {
-        $currentRole = $this->role;
-        $currentExpiry = $this->rolechangedate ? Carbon::parse($this->rolechangedate) : null;
-        $pendingRole = $this->getPendingRole();
-        $pendingStart = $this->pending_role_start_date ? Carbon::parse($this->pending_role_start_date) : null;
-
         return [
-            'current_role' => $currentRole,
-            'current_expiry' => $currentExpiry,
-            'has_expiry' => $currentExpiry !== null,
-            'is_expired' => $currentExpiry ? $currentExpiry->isPast() : false,
-            'days_until_expiry' => $currentExpiry ? Carbon::now()->diffInDays($currentExpiry, false) : null,
-            'pending_role' => $pendingRole,
-            'pending_start' => $pendingStart,
+            'current_role' => $this->role,
+            'current_expiry' => $this->rolechangedate,
+            'has_expiry' => $this->rolechangedate !== null,
+            'is_expired' => $this->is_role_expired,
+            'days_until_expiry' => $this->days_until_expiry,
+            'pending_role' => $this->getPendingRole(),
+            'pending_start' => $this->pending_role_start_date,
             'has_pending_role' => $this->hasPendingRole(),
         ];
     }
 
+    // ===== Static Query Methods =====
+
     /**
-     * Get the user's timezone or default to UTC
+     * Get count of users matching filters.
      */
-    public function getTimezone(): string
-    {
-        return $this->timezone ?? 'UTC';
+    public static function getCount(
+        ?string $role = null,
+        ?string $username = '',
+        ?string $host = '',
+        ?string $email = '',
+        ?string $createdFrom = '',
+        ?string $createdTo = '',
+    ): int {
+        return static::query()
+            ->withTrashed()
+            ->excludeSharing()
+            ->when($role, fn (Builder $q) => $q->where('roles_id', $role))
+            ->when($username, fn (Builder $q) => $q->where('username', 'like', "%{$username}%"))
+            ->when($host, fn (Builder $q) => $q->where('host', 'like', "%{$host}%"))
+            ->when($email, fn (Builder $q) => $q->where('email', 'like', "%{$email}%"))
+            ->when($createdFrom, fn (Builder $q) => $q->where('created_at', '>=', "{$createdFrom} 00:00:00"))
+            ->when($createdTo, fn (Builder $q) => $q->where('created_at', '<=', "{$createdTo} 23:59:59"))
+            ->count();
     }
 
     /**
+     * Find user by username.
+     */
+    public static function findByUsername(string $username): ?static
+    {
+        return static::whereUsername($username)->first();
+    }
+
+    /**
+     * Find user by email.
+     */
+    public static function findByEmail(string $email): ?static
+    {
+        return static::whereEmail($email)->first();
+    }
+
+    /**
+     * Find user by RSS token.
+     */
+    public static function findByRssToken(string $token): ?static
+    {
+        return static::whereApiToken($token)->first();
+    }
+
+    /**
+     * Find user by password reset GUID.
+     */
+    public static function findByResetGuid(string $guid): ?static
+    {
+        return static::whereResetguid($guid)->first();
+    }
+
+    // ===== Backward Compatibility Aliases =====
+
+    /**
+     * @deprecated Use findByUsername() instead
+     */
+    public static function getByUsername(string $userName): ?static
+    {
+        return static::findByUsername($userName);
+    }
+
+    /**
+     * @deprecated Use findByEmail() instead
+     */
+    public static function getByEmail(string $email): ?static
+    {
+        return static::findByEmail($email);
+    }
+
+    /**
+     * @deprecated Use findByRssToken() instead
+     */
+    public static function getByRssToken(string $rssToken): ?static
+    {
+        return static::findByRssToken($rssToken);
+    }
+
+    /**
+     * @deprecated Use findByResetGuid() instead
+     */
+    public static function getByPassResetGuid(string $guid): ?static
+    {
+        return static::findByResetGuid($guid);
+    }
+
+    // ===== User Management Methods =====
+
+    /**
+     * Delete user by ID.
+     *
      * @throws \Exception
      */
-    public static function deleteUser($id): void
+    public static function deleteUser(int $id): void
     {
-        self::find($id)->delete();
+        static::findOrFail($id)->delete();
     }
 
-    public static function getCount(?string $role = null, ?string $username = '', ?string $host = '', ?string $email = '', ?string $createdFrom = '', ?string $createdTo = ''): int
-    {
-        $res = self::query()->withTrashed()->where('email', '<>', 'sharing@nZEDb.com');
+    /**
+     * Update user details.
+     */
+    public static function updateUser(
+        int $id,
+        string $userName,
+        ?string $email,
+        int $grabs,
+        int $role,
+        ?string $notes,
+        int $invites,
+        int $movieview,
+        int $musicview,
+        int $gameview,
+        int $xxxview,
+        int $consoleview,
+        int $bookview,
+        string $style = 'None',
+    ): int {
+        $user = static::findOrFail($id);
+        $roleModel = Role::find($role);
 
-        if (! empty($role)) {
-            $res->where('roles_id', $role);
-        }
-
-        if ($username !== '') {
-            $res->where('username', 'like', '%'.$username.'%');
-        }
-
-        if ($host !== '') {
-            $res->where('host', 'like', '%'.$host.'%');
-        }
-
-        if ($email !== '') {
-            $res->where('email', 'like', '%'.$email.'%');
-        }
-
-        if ($createdFrom !== '') {
-            $res->where('created_at', '>=', $createdFrom.' 00:00:00');
-        }
-
-        if ($createdTo !== '') {
-            $res->where('created_at', '<=', $createdTo.' 23:59:59');
-        }
-
-        return $res->count(['id']);
-    }
-
-    public static function updateUser(int $id, string $userName, ?string $email, int $grabs, int $role, ?string $notes, int $invites, int $movieview, int $musicview, int $gameview, int $xxxview, int $consoleview, int $bookview, string $style = 'None'): int
-    {
-        $userName = trim($userName);
-
-        $rateLimit = Role::query()->where('id', $role)->first();
-
-        $sql = [
-            'username' => $userName,
+        $user->update([
+            'username' => trim($userName),
             'grabs' => $grabs,
             'roles_id' => $role,
-            'notes' => substr($notes, 0, 255),
+            'notes' => substr($notes ?? '', 0, 255),
             'invites' => $invites,
             'movieview' => $movieview,
             'musicview' => $musicview,
@@ -380,556 +593,515 @@ class User extends Authenticatable
             'consoleview' => $consoleview,
             'bookview' => $bookview,
             'style' => $style,
-            'rate_limit' => $rateLimit ? $rateLimit['rate_limit'] : 60,
-        ];
+            'rate_limit' => $roleModel?->rate_limit ?? 60,
+            ...($email ? ['email' => trim($email)] : []),
+        ]);
 
-        if (! empty($email)) {
-            $email = trim($email);
-            $sql += ['email' => $email];
+        if ($roleModel) {
+            $user->syncRoles([$roleModel->name]);
         }
 
-        $user = self::find($id);
-        $user->update($sql);
-        $user->syncRoles([$rateLimit['name']]);
-
-        return self::SUCCESS;
+        return SignupError::SUCCESS->value;
     }
 
     /**
-     * @return User|Builder|Model|object|null
+     * Update user role with optional stacking and promotions.
      */
-    public static function getByUsername(string $userName)
-    {
-        return self::whereUsername($userName)->first();
-    }
+    public static function updateUserRole(
+        int $uid,
+        int|string $role,
+        bool $applyPromotions = true,
+        bool $stackRole = true,
+        ?int $changedBy = null,
+        ?string $originalExpiryBeforeEdits = null,
+        bool $preserveCurrentExpiry = false,
+        ?int $addYears = null,
+    ): bool {
+        Log::info('updateUserRole called', [
+            'uid' => $uid,
+            'role' => $role,
+            'applyPromotions' => $applyPromotions,
+            'stackRole' => $stackRole,
+            'changedBy' => $changedBy,
+            'originalExpiryBeforeEdits' => $originalExpiryBeforeEdits,
+            'preserveCurrentExpiry' => $preserveCurrentExpiry,
+            'addYears' => $addYears,
+        ]);
 
-    /**
-     * @param  string  $email
-     * @return Model|static
-     *
-     */
-    public static function getByEmail(string $email): Model|static
-    {
-        return self::whereEmail($email)->first();
-    }
+        $roleModel = is_numeric($role)
+            ? Role::find((int) $role)
+            : Role::where('name', $role)->first();
 
-    public static function updateUserRole(int $uid, int|string $role, bool $applyPromotions = true, bool $stackRole = true, ?int $changedBy = null, ?string $originalExpiryBeforeEdits = null, bool $preserveCurrentExpiry = false, ?int $addYears = null): bool
-    {
-        // Handle role parameter - can be int, numeric string, or role name
-        if (is_numeric($role)) {
-            $roleQuery = Role::query()->where('id', (int) $role)->first();
-        } else {
-            $roleQuery = Role::query()->where('name', $role)->first();
-        }
+        if (! $roleModel) {
+            Log::error('Role not found', ['role' => $role]);
 
-        if (!$roleQuery) {
-            Log::error('Role not found', ['role' => $role, 'role_type' => gettype($role)]);
             return false;
         }
 
-        $roleName = $roleQuery->name;
-        $user = self::find($uid);
-
-        if (!$user) {
+        $user = static::find($uid);
+        if (! $user) {
             Log::error('User not found', ['uid' => $uid]);
+
             return false;
         }
 
         $currentRoleId = $user->roles_id;
-        // Use the original expiry from before any edits if provided, otherwise use current
         $oldExpiryDate = $originalExpiryBeforeEdits
             ? Carbon::parse($originalExpiryBeforeEdits)
-            : ($user->rolechangedate ? Carbon::parse($user->rolechangedate) : null);
+            : $user->rolechangedate;
+        $currentExpiryDate = $user->rolechangedate;
 
-        // The current expiry (after any updates in controller) is what we use for stacking logic
-        $currentExpiryDate = $user->rolechangedate ? Carbon::parse($user->rolechangedate) : null;
-
-        Log::info('User current state', [
-            'currentRoleId' => $currentRoleId,
+        Log::info('updateUserRole - expiry date values', [
+            'originalExpiryBeforeEdits_raw' => $originalExpiryBeforeEdits,
+            'user_rolechangedate_raw' => $user->rolechangedate,
             'oldExpiryDate' => $oldExpiryDate?->toDateTimeString(),
             'currentExpiryDate' => $currentExpiryDate?->toDateTimeString(),
-            'oldExpiryIsFuture' => $oldExpiryDate?->isFuture(),
-            'currentExpiryIsFuture' => $currentExpiryDate?->isFuture()
+            'currentRoleId' => $currentRoleId,
+            'newRoleId' => $roleModel->id,
         ]);
 
-        // Check if role is actually changing
-        if ($currentRoleId === $roleQuery->id) {
-            Log::info('Role not changing, but checking for promotions and addYears', [
-                'applyPromotions' => $applyPromotions,
-                'currentRoleId' => $currentRoleId,
-                'addYears' => $addYears
-            ]);
-
-            // Define roles that should not receive promotions
-            $excludedRoles = ['User', 'Admin', 'Moderator', 'Disabled', 'Friend'];
-
-            // If addYears is provided, extend the subscription from current expiry
-            if ($addYears !== null && $addYears > 0) {
-                $additionalDays = $addYears * 365;
-                $promotionDays = 0;
-
-                if ($applyPromotions && !in_array($roleName, $excludedRoles, true)) {
-                    $promotionDays = RolePromotion::calculateAdditionalDays($roleQuery->id);
-                }
-
-                $totalDays = $additionalDays + $promotionDays;
-
-                Log::info('Applying addYears to existing role', [
-                    'addYears' => $addYears,
-                    'additionalDays' => $additionalDays,
-                    'promotionDays' => $promotionDays,
-                    'totalDays' => $totalDays,
-                    'currentExpiryDate' => $currentExpiryDate?->toDateTimeString()
-                ]);
-
-                // Calculate new expiry date - extend from current expiry if it exists and is in future
-                $newExpiryDate = null;
-                if ($currentExpiryDate && $currentExpiryDate->isFuture()) {
-                    // Extend from the current expiry date
-                    $newExpiryDate = $currentExpiryDate->copy()->addDays($totalDays);
-                } else {
-                    // No expiry date or expired, create one from now
-                    $newExpiryDate = Carbon::now()->addDays($totalDays);
-                }
-
-                // Update the user's expiry date
-                $updated = $user->update([
-                    'rolechangedate' => $newExpiryDate,
-                ]);
-
-                Log::info('Updated expiry date with addYears', [
-                    'updated' => $updated,
-                    'new_expiry_date' => $newExpiryDate?->toDateTimeString()
-                ]);
-
-                // Track promotion statistics if applicable
-                if ($updated && $promotionDays > 0) {
-                    $promotions = RolePromotion::getActivePromotions($roleQuery->id);
-                    foreach ($promotions as $promotion) {
-                        $promotion->trackApplication(
-                            $user->id,
-                            $roleQuery->id,
-                            $currentExpiryDate,
-                            $newExpiryDate
-                        );
-                    }
-
-                    Log::info('Tracked promotion application for existing role with addYears', [
-                        'promotions_count' => $promotions->count()
-                    ]);
-                }
-
-                return $updated;
-            }
-
-            // Even if a role isn't changing, apply promotions if requested (and no addYears provided)
-            if ($applyPromotions && !in_array($roleName, $excludedRoles, true)) {
-                $promotionDays = RolePromotion::calculateAdditionalDays($roleQuery->id);
-
-                if ($promotionDays > 0) {
-                    Log::info('Applying promotion days to existing role', [
-                        'promotionDays' => $promotionDays,
-                        'currentExpiryDate' => $currentExpiryDate?->toDateTimeString()
-                    ]);
-
-                    // Calculate a new expiry date by adding promotion days
-                    $newExpiryDate = null;
-                    if ($currentExpiryDate) {
-                        // Extend from the current expiry date
-                        $newExpiryDate = $currentExpiryDate->copy()->addDays($promotionDays);
-                    } else {
-                        // No expiry date, create one from now
-                        $newExpiryDate = Carbon::now()->addDays($promotionDays);
-                    }
-
-                    // Update the user's expiry date
-                    $updated = $user->update([
-                        'rolechangedate' => $newExpiryDate,
-                    ]);
-
-                    Log::info('Updated expiry date with promotions', [
-                        'updated' => $updated,
-                        'new_expiry_date' => $newExpiryDate?->toDateTimeString()
-                    ]);
-
-                    // Track promotion statistics
-                    if ($updated) {
-                        $promotions = RolePromotion::getActivePromotions($roleQuery->id);
-                        foreach ($promotions as $promotion) {
-                            $promotion->trackApplication(
-                                $user->id,
-                                $roleQuery->id,
-                                $currentExpiryDate,
-                                $newExpiryDate
-                            );
-                        }
-
-                        Log::info('Tracked promotion application for existing role', [
-                            'promotions_count' => $promotions->count()
-                        ]);
-                    }
-
-                    return $updated;
-                }
-            }
-
-            Log::info('No promotions to apply, returning');
-            return true; // No change needed
+        // No role change needed
+        if ($currentRoleId === $roleModel->id) {
+            return self::handleSameRoleUpdate(
+                $user,
+                $roleModel,
+                $applyPromotions,
+                $addYears,
+                $currentExpiryDate
+            );
         }
 
-        // Determine if we should stack this role change (based on CURRENT expiry, not old)
-        $shouldStack = $stackRole && $currentExpiryDate && $currentExpiryDate->isFuture();
-
-        Log::info('Stack decision', [
-            'shouldStack' => $shouldStack,
-            'stackRole' => $stackRole,
-            'hasCurrentExpiry' => $currentExpiryDate !== null,
-            'isFuture' => $currentExpiryDate?->isFuture()
-        ]);
+        // Determine if we should stack
+        $shouldStack = $stackRole && $currentExpiryDate?->isFuture();
 
         if ($shouldStack) {
-            // Determine the effective start date for the stacked role
-            // If currentExpiryDate is in the future and different from oldExpiryDate, use currentExpiryDate
-            // This handles the case where a user already has a pending role stacking and the expiry was extended
-            $stackingStartDate = $currentExpiryDate;
-            if ($oldExpiryDate && $currentExpiryDate && $currentExpiryDate->isFuture() && $currentExpiryDate->gt($oldExpiryDate)) {
-                // Use the newer (current) expiry date as the stacking start date
-                $stackingStartDate = $currentExpiryDate;
-                Log::info('Using updated expiry date for stacking (expiry was extended)', [
-                    'oldExpiryDate' => $oldExpiryDate->toDateTimeString(),
-                    'currentExpiryDate' => $currentExpiryDate->toDateTimeString(),
-                    'stackingStartDate' => $stackingStartDate->toDateTimeString()
-                ]);
-            } elseif ($oldExpiryDate && $oldExpiryDate->isFuture()) {
-                // Use oldExpiryDate if it's still in the future (original behavior for backward compatibility)
-                $stackingStartDate = $oldExpiryDate;
-            }
+            return self::handleStackedRoleChange(
+                $user,
+                $roleModel,
+                $currentRoleId,
+                $oldExpiryDate,
+                $currentExpiryDate,
+                $applyPromotions,
+                $addYears,
+                $changedBy
+            );
+        }
 
-            Log::info('Stacking role change', [
-                'oldExpiryDate' => $oldExpiryDate?->toDateTimeString(),
-                'currentExpiryDate' => $currentExpiryDate->toDateTimeString(),
-                'stackingStartDate' => $stackingStartDate->toDateTimeString()
-            ]);
+        return self::handleImmediateRoleChange(
+            $user,
+            $roleModel,
+            $currentRoleId,
+            $oldExpiryDate,
+            $currentExpiryDate,
+            $applyPromotions,
+            $addYears,
+            $changedBy,
+            $preserveCurrentExpiry
+        );
+    }
 
-            // Calculate a new expiry date for the pending role
-            // Start with the role's base duration (addyears field converted to days)
-            // Use the provided addYears parameter if available, otherwise use role's default
-            $baseDays = ($addYears !== null ? $addYears : $roleQuery->addyears) * 365;
-            $promotionDays = 0;
-
-            // Define roles that should not receive promotions
-            $excludedRoles = ['User', 'Admin', 'Moderator', 'Disabled', 'Friend'];
-
-            if ($applyPromotions && !in_array($roleName, $excludedRoles, true)) {
-                $promotionDays = RolePromotion::calculateAdditionalDays($roleQuery->id);
-            }
-
-            $totalDays = $baseDays + $promotionDays;
-
-            // New role will start at stackingStartDate (the most recent future expiry date)
-            // Then add the total days (base + promotion) to calculate when it will expire
-            $newExpiryDate = $stackingStartDate->copy()->addDays($totalDays);
-
-            Log::info('Calculated new expiry for pending role', [
-                'stackingStartDate' => $stackingStartDate->toDateTimeString(),
-                'baseDays' => $baseDays,
-                'promotionDays' => $promotionDays,
-                'totalDays' => $totalDays,
-                'newExpiryDate' => $newExpiryDate->toDateTimeString()
-            ]);
-
-            // Stack the role change - set it as pending
-            // Use stackingStartDate (most recent future expiry) for when the role will start
-            $user->update([
-                'pending_roles_id' => $roleQuery->id,
-                'pending_role_start_date' => $stackingStartDate,
-            ]);
-
-            Log::info('Pending role updated', [
-                'pending_roles_id' => $roleQuery->id,
-                'pending_role_start_date' => $stackingStartDate->toDateTimeString(),
-                'pending_role_start_date_formatted' => $stackingStartDate->format('Y-m-d H:i:s')
-            ]);
-
-            // Record in history as a stacked change
-            // effective_date should match stackingStartDate (when the stacked role will start)
-            try {
-                $history = UserRoleHistory::recordRoleChange(
-                    userId: $user->id,
-                    oldRoleId: $currentRoleId,
-                    newRoleId: $roleQuery->id,
-                    oldExpiryDate: $stackingStartDate, // When current role expires (using the most recent future date)
-                    newExpiryDate: $newExpiryDate, // When the NEW role will expire (calculated from stackingStartDate)
-                    effectiveDate: $stackingStartDate, // Same as old_expiry_date - when the new role starts
-                    isStacked: true,
-                    changeReason: 'stacked_role_change',
-                    changedBy: $changedBy
-                );
-
-                Log::info('Role history recorded for stacked change', [
-                    'history_id' => $history->id,
-                    'effective_date' => $history->effective_date->toDateTimeString(),
-                    'old_expiry_date' => $history->old_expiry_date?->toDateTimeString(),
-                    'new_expiry_date' => $history->new_expiry_date?->toDateTimeString(),
-                    'note' => 'effective_date equals stackingStartDate (when stacked role starts)'
-                ]);
-            } catch (\Exception $e) {
-                Log::error('Failed to record role history', [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
-                ]);
-            }
-
+    /**
+     * Handle role update when role is not changing.
+     */
+    private static function handleSameRoleUpdate(
+        self $user,
+        Role $roleModel,
+        bool $applyPromotions,
+        ?int $addYears,
+        ?Carbon $currentExpiryDate,
+    ): bool {
+        if (in_array($roleModel->name, self::PROMOTION_EXCLUDED_ROLES, true)) {
             return true;
         }
 
-        // Apply the role change immediately
-        // Calculate base days from role's addyears field
-        // Use the provided addYears parameter if available, otherwise use role's default
-        $baseDays = ($addYears !== null ? $addYears : $roleQuery->addyears) * 365;
-        $promotionDays = 0;
+        $additionalDays = ($addYears ?? 0) * self::DAYS_PER_YEAR;
+        $promotionDays = $applyPromotions
+            ? RolePromotion::calculateAdditionalDays($roleModel->id)
+            : 0;
+        $totalDays = $additionalDays + $promotionDays;
 
-        // Define roles that should not receive promotions
-        $excludedRoles = ['User', 'Admin', 'Moderator', 'Disabled', 'Friend'];
-
-        if ($applyPromotions && !in_array($roleName, $excludedRoles, true)) {
-            $promotionDays = RolePromotion::calculateAdditionalDays($roleQuery->id);
+        if ($totalDays <= 0) {
+            return true;
         }
 
-        $totalDays = $baseDays + $promotionDays;
+        $newExpiryDate = $currentExpiryDate?->isFuture()
+            ? $currentExpiryDate->copy()->addDays($totalDays)
+            : now()->addDays($totalDays);
 
-        Log::info('Applying immediate role change', [
-            'baseDays' => $baseDays,
-            'promotionDays' => $promotionDays,
-            'totalDays' => $totalDays,
-            'applyPromotions' => $applyPromotions
+        $updated = $user->update(['rolechangedate' => $newExpiryDate]);
+
+        if ($updated && $promotionDays > 0) {
+            self::trackPromotionApplication($user, $roleModel->id, $currentExpiryDate, $newExpiryDate);
+        }
+
+        return $updated;
+    }
+
+    /**
+     * Handle stacked role change.
+     */
+    private static function handleStackedRoleChange(
+        self $user,
+        Role $roleModel,
+        int $currentRoleId,
+        ?Carbon $oldExpiryDate,
+        Carbon $currentExpiryDate,
+        bool $applyPromotions,
+        ?int $addYears,
+        ?int $changedBy,
+    ): bool {
+        // Determine the stacking start date
+        // If user already has a pending stacked role, we need to calculate when THAT role would expire
+        // and use that as the starting point for this new stacked role
+
+        $stackingStartDate = $currentExpiryDate;
+
+        // Check if there's already a pending role - if so, calculate when it would expire
+        if ($user->hasPendingRole()) {
+            $pendingRole = $user->getPendingRole();
+            $pendingStartDate = $user->pending_role_start_date;
+
+            if ($pendingRole && $pendingStartDate) {
+                // Calculate when the pending role would expire
+                $pendingRoleBaseDays = $pendingRole->addyears * self::DAYS_PER_YEAR;
+                $pendingRolePromotionDays = ! in_array($pendingRole->name, self::PROMOTION_EXCLUDED_ROLES, true)
+                    ? RolePromotion::calculateAdditionalDays($pendingRole->id)
+                    : 0;
+                $pendingRoleTotalDays = $pendingRoleBaseDays + $pendingRolePromotionDays;
+                $pendingRoleExpiryDate = Carbon::parse($pendingStartDate)->addDays($pendingRoleTotalDays);
+
+                Log::info('Existing pending role detected - calculating new stacking start date', [
+                    'pendingRoleId' => $pendingRole->id,
+                    'pendingRoleName' => $pendingRole->name,
+                    'pendingStartDate' => $pendingStartDate->toDateTimeString(),
+                    'pendingRoleBaseDays' => $pendingRoleBaseDays,
+                    'pendingRolePromotionDays' => $pendingRolePromotionDays,
+                    'pendingRoleExpiryDate' => $pendingRoleExpiryDate->toDateTimeString(),
+                ]);
+
+                // Use the pending role's expiry date as the new stacking start date
+                if ($pendingRoleExpiryDate->isFuture()) {
+                    $stackingStartDate = $pendingRoleExpiryDate;
+                }
+            }
+        } else {
+            // No pending role - use the latest of oldExpiryDate and currentExpiryDate
+            Log::info('No pending role - comparing old and current expiry dates', [
+                'oldExpiryDate' => $oldExpiryDate?->toDateTimeString(),
+                'currentExpiryDate' => $currentExpiryDate->toDateTimeString(),
+            ]);
+
+            // Use the greater of the two dates if old expiry exists and is in the future
+            if ($oldExpiryDate !== null && $oldExpiryDate->isFuture() && $oldExpiryDate->gt($currentExpiryDate)) {
+                $stackingStartDate = $oldExpiryDate;
+            }
+        }
+
+        Log::info('Final stacking start date selected', [
+            'stackingStartDate' => $stackingStartDate->toDateTimeString(),
+            'hadPendingRole' => $user->hasPendingRole(),
         ]);
 
-        // Calculate new expiry date
-        $newExpiryDate = null;
-        if ($preserveCurrentExpiry && $currentExpiryDate) {
-            // Admin manually set an expiry date - preserve it as-is
-            $newExpiryDate = $currentExpiryDate;
-            Log::info('Preserving admin-set expiry date', [
-                'preservedDate' => $newExpiryDate->toDateTimeString()
-            ]);
-        } elseif ($totalDays > 0) {
-            // For immediate changes, start from now (not from old expiry)
-            $baseDate = Carbon::now();
-            $newExpiryDate = $baseDate->copy()->addDays($totalDays);
+        $baseDays = ($addYears ?? $roleModel->addyears) * self::DAYS_PER_YEAR;
+        $promotionDays = ! in_array($roleModel->name, self::PROMOTION_EXCLUDED_ROLES, true) && $applyPromotions
+            ? RolePromotion::calculateAdditionalDays($roleModel->id)
+            : 0;
+        $totalDays = $baseDays + $promotionDays;
+        $newExpiryDate = $stackingStartDate->copy()->addDays($totalDays);
 
-            Log::info('Calculated new expiry date', [
-                'baseDate' => $baseDate->toDateTimeString(),
-                'totalDays' => $totalDays,
-                'newExpiryDate' => $newExpiryDate->toDateTimeString()
-            ]);
+        $user->update([
+            'pending_roles_id' => $roleModel->id,
+            'pending_role_start_date' => $stackingStartDate,
+        ]);
+
+        try {
+            UserRoleHistory::recordRoleChange(
+                userId: $user->id,
+                oldRoleId: $currentRoleId,
+                newRoleId: $roleModel->id,
+                oldExpiryDate: $stackingStartDate,
+                newExpiryDate: $newExpiryDate,
+                effectiveDate: $stackingStartDate,
+                isStacked: true,
+                changeReason: 'stacked_role_change',
+                changedBy: $changedBy
+            );
+        } catch (\Exception $e) {
+            Log::error('Failed to record role history', ['error' => $e->getMessage()]);
         }
 
-        // Update the user's role
+        return true;
+    }
+
+    /**
+     * Handle immediate role change.
+     */
+    private static function handleImmediateRoleChange(
+        self $user,
+        Role $roleModel,
+        int $currentRoleId,
+        ?Carbon $oldExpiryDate,
+        ?Carbon $currentExpiryDate,
+        bool $applyPromotions,
+        ?int $addYears,
+        ?int $changedBy,
+        bool $preserveCurrentExpiry,
+    ): bool {
+        $baseDays = ($addYears ?? $roleModel->addyears) * self::DAYS_PER_YEAR;
+        $promotionDays = ! in_array($roleModel->name, self::PROMOTION_EXCLUDED_ROLES, true) && $applyPromotions
+            ? RolePromotion::calculateAdditionalDays($roleModel->id)
+            : 0;
+        $totalDays = $baseDays + $promotionDays;
+
+        $newExpiryDate = match (true) {
+            $preserveCurrentExpiry && $currentExpiryDate !== null => $currentExpiryDate,
+            $totalDays > 0 => now()->addDays($totalDays),
+            default => null,
+        };
+
         $updated = $user->update([
-            'roles_id' => $roleQuery->id,
+            'roles_id' => $roleModel->id,
             'rolechangedate' => $newExpiryDate,
         ]);
 
-        Log::info('User role updated', [
-            'updated' => $updated,
-            'new_roles_id' => $roleQuery->id,
-            'new_rolechangedate' => $newExpiryDate?->toDateTimeString()
-        ]);
+        $user->syncRoles([$roleModel->name]);
 
-        // Sync Spatie roles
-        $user->syncRoles([$roleName]);
-
-        // Record in history
         if ($updated) {
             try {
-                $history = UserRoleHistory::recordRoleChange(
+                UserRoleHistory::recordRoleChange(
                     userId: $user->id,
                     oldRoleId: $currentRoleId,
-                    newRoleId: $roleQuery->id,
+                    newRoleId: $roleModel->id,
                     oldExpiryDate: $oldExpiryDate,
                     newExpiryDate: $newExpiryDate,
-                    effectiveDate: Carbon::now(),
+                    effectiveDate: now(),
                     isStacked: false,
                     changeReason: 'immediate_role_change',
                     changedBy: $changedBy
                 );
-
-                \Log::info('Role history recorded for immediate change', [
-                    'history_id' => $history->id,
-                    'effective_date' => $history->effective_date->toDateTimeString(),
-                    'old_expiry_date' => $history->old_expiry_date?->toDateTimeString(),
-                    'new_expiry_date' => $history->new_expiry_date?->toDateTimeString()
-                ]);
             } catch (\Exception $e) {
-                Log::error('Failed to record role history for immediate change', [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
-                ]);
+                Log::error('Failed to record role history', ['error' => $e->getMessage()]);
             }
 
-            // Track promotion statistics if applicable
             if ($applyPromotions && $promotionDays > 0) {
-                $promotions = RolePromotion::getActivePromotions($roleQuery->id);
-                foreach ($promotions as $promotion) {
-                    $promotion->trackApplication(
-                        $user->id,
-                        $roleQuery->id,
-                        $oldExpiryDate,
-                        $newExpiryDate
-                    );
-                }
+                self::trackPromotionApplication($user, $roleModel->id, $oldExpiryDate, $newExpiryDate);
             }
         }
 
         return $updated;
     }
+
+    /**
+     * Track promotion application statistics.
+     */
+    private static function trackPromotionApplication(
+        self $user,
+        int $roleId,
+        ?Carbon $oldExpiryDate,
+        ?Carbon $newExpiryDate,
+    ): void {
+        $promotions = RolePromotion::getActivePromotions($roleId);
+        foreach ($promotions as $promotion) {
+            $promotion->trackApplication($user->id, $roleId, $oldExpiryDate, $newExpiryDate);
+        }
+    }
+
+    /**
+     * Process expired roles and send notifications.
+     */
     public static function updateExpiredRoles(): void
     {
         $now = CarbonImmutable::now();
-        $period = [
+
+        // Send expiration warnings
+        self::sendExpirationWarnings($now);
+
+        // Process expired roles
+        self::processExpiredRoles($now);
+    }
+
+    /**
+     * Send expiration warning emails.
+     */
+    private static function sendExpirationWarnings(CarbonImmutable $now): void
+    {
+        $periods = [
             'day' => $now->addDay(),
             'week' => $now->addWeek(),
             'month' => $now->addMonth(),
         ];
 
-        foreach ($period as $value) {
-            $users = self::query()->whereDate('rolechangedate', '=', $value)->get();
-            $days = $now->diffInDays($value, true);
+        foreach ($periods as $period) {
+            $users = static::whereDate('rolechangedate', '=', $period)->get();
+            $days = $now->diffInDays($period, true);
+
             foreach ($users as $user) {
                 SendAccountWillExpireEmail::dispatch($user, $days)->onQueue('emails');
             }
         }
-
-        // Process expired roles
-        foreach (self::query()->whereDate('rolechangedate', '<', $now)->get() as $expired) {
-            $oldRoleId = $expired->roles_id;
-            $oldExpiryDate = $expired->rolechangedate ? Carbon::parse($expired->rolechangedate) : null;
-
-            // Check if there's a pending stacked role
-            if ($expired->pending_roles_id && $expired->pending_role_start_date) {
-                $pendingStartDate = Carbon::parse($expired->pending_role_start_date);
-
-                // If the pending role should start now or earlier
-                if ($pendingStartDate->lte($now)) {
-                    // Apply the pending role
-                    $newRoleId = $expired->pending_roles_id;
-                    $roleQuery = Role::query()->where('id', $newRoleId)->first();
-
-                    if ($roleQuery) {
-                        // Calculate base days from role's addyears field
-                        $baseDays = $roleQuery->addyears * 365;
-                        $promotionDays = RolePromotion::calculateAdditionalDays($newRoleId);
-                        $totalDays = $baseDays + $promotionDays;
-
-                        // Calculate new expiry date from now (when the role is being activated)
-                        $newExpiryDate = $totalDays > 0 ? $now->addDays($totalDays) : null;
-
-                        // Update user with pending role
-                        $expired->update([
-                            'roles_id' => $newRoleId,
-                            'rolechangedate' => $newExpiryDate,
-                            'pending_roles_id' => null,
-                            'pending_role_start_date' => null,
-                        ]);
-                        $expired->syncRoles([$roleQuery->name]);
-
-                        // Record in history
-                        UserRoleHistory::recordRoleChange(
-                            userId: $expired->id,
-                            oldRoleId: $oldRoleId,
-                            newRoleId: $newRoleId,
-                            oldExpiryDate: $oldExpiryDate,
-                            newExpiryDate: $newExpiryDate,
-                            effectiveDate: Carbon::instance($now),
-                            isStacked: true,
-                            changeReason: 'stacked_role_activated',
-                            changedBy: null
-                        );
-
-                        continue; // Skip the default expiry handling
-                    }
-                }
-            }
-
-            // Default behavior: downgrade to User role
-            $expired->update([
-                'roles_id' => self::ROLE_USER,
-                'rolechangedate' => null,
-                'pending_roles_id' => null,
-                'pending_role_start_date' => null,
-            ]);
-            $expired->syncRoles(['User']);
-
-            // Record in history
-            UserRoleHistory::recordRoleChange(
-                userId: $expired->id,
-                oldRoleId: $oldRoleId,
-                newRoleId: self::ROLE_USER,
-                oldExpiryDate: $oldExpiryDate,
-                newExpiryDate: null,
-                effectiveDate: Carbon::instance($now),
-                isStacked: false,
-                changeReason: 'role_expired',
-                changedBy: null
-            );
-
-            SendAccountExpiredEmail::dispatch($expired)->onQueue('emails');
-        }
     }
 
     /**
+     * Process users with expired roles.
+     */
+    private static function processExpiredRoles(CarbonImmutable $now): void
+    {
+        static::expired()->each(function (self $user) use ($now) {
+            $oldRoleId = $user->roles_id;
+            $oldExpiryDate = $user->rolechangedate;
+
+            // Check for pending stacked role
+            if ($user->hasPendingRole() && $user->pending_role_start_date?->lte($now)) {
+                self::activatePendingRole($user, $oldRoleId, $oldExpiryDate, $now);
+
+                return;
+            }
+
+            // Downgrade to default user role
+            self::downgradeToDefaultRole($user, $oldRoleId, $oldExpiryDate, $now);
+        });
+    }
+
+    /**
+     * Activate a pending stacked role.
+     */
+    private static function activatePendingRole(
+        self $user,
+        int $oldRoleId,
+        ?Carbon $oldExpiryDate,
+        CarbonImmutable $now,
+    ): void {
+        $roleModel = Role::find($user->pending_roles_id);
+        if (! $roleModel) {
+            return;
+        }
+
+        $baseDays = $roleModel->addyears * self::DAYS_PER_YEAR;
+        $promotionDays = RolePromotion::calculateAdditionalDays($roleModel->id);
+        $totalDays = $baseDays + $promotionDays;
+        $newExpiryDate = $totalDays > 0 ? $now->addDays($totalDays) : null;
+
+        $user->update([
+            'roles_id' => $roleModel->id,
+            'rolechangedate' => $newExpiryDate,
+            'pending_roles_id' => null,
+            'pending_role_start_date' => null,
+        ]);
+        $user->syncRoles([$roleModel->name]);
+
+        UserRoleHistory::recordRoleChange(
+            userId: $user->id,
+            oldRoleId: $oldRoleId,
+            newRoleId: $roleModel->id,
+            oldExpiryDate: $oldExpiryDate,
+            newExpiryDate: $newExpiryDate,
+            effectiveDate: Carbon::instance($now),
+            isStacked: true,
+            changeReason: 'stacked_role_activated',
+            changedBy: null
+        );
+    }
+
+    /**
+     * Downgrade user to default role.
+     */
+    private static function downgradeToDefaultRole(
+        self $user,
+        int $oldRoleId,
+        ?Carbon $oldExpiryDate,
+        CarbonImmutable $now,
+    ): void {
+        $user->update([
+            'roles_id' => UserRole::USER->value,
+            'rolechangedate' => null,
+            'pending_roles_id' => null,
+            'pending_role_start_date' => null,
+        ]);
+        $user->syncRoles(['User']);
+
+        UserRoleHistory::recordRoleChange(
+            userId: $user->id,
+            oldRoleId: $oldRoleId,
+            newRoleId: UserRole::USER->value,
+            oldExpiryDate: $oldExpiryDate,
+            newExpiryDate: null,
+            effectiveDate: Carbon::instance($now),
+            isStacked: false,
+            changeReason: 'role_expired',
+            changedBy: null
+        );
+
+        SendAccountExpiredEmail::dispatch($user)->onQueue('emails');
+    }
+
+    /**
+     * Get paginated user list with filters.
+     *
+     * @return Collection<int, static>
      * @throws \Throwable
      */
-    public static function getRange($start, $offset, $orderBy, ?string $userName = '', ?string $email = '', ?string $host = '', ?string $role = '', bool $apiRequests = false, ?string $createdFrom = '', ?string $createdTo = ''): Collection
-    {
-        if ($apiRequests) {
-            UserRequest::clearApiRequests(false);
-            $query = "
-				SELECT users.*, roles.name AS rolename, COUNT(user_requests.id) AS apirequests
-				FROM users
-				INNER JOIN roles ON roles.id = users.roles_id
-				LEFT JOIN user_requests ON user_requests.users_id = users.id
-				WHERE users.id != 0 %s %s %s %s %s %s
-				AND email != 'sharing@nZEDb.com'
-				GROUP BY users.id
-				ORDER BY %s %s %s ";
-        } else {
-            $query = '
-				SELECT users.*, roles.name AS rolename
-				FROM users
-				INNER JOIN roles ON roles.id = users.roles_id
-				WHERE 1=1 %s %s %s %s %s %s
-				ORDER BY %s %s %s';
-        }
+    public static function getRange(
+        int|false $start,
+        int $offset,
+        string $orderBy,
+        ?string $userName = '',
+        ?string $email = '',
+        ?string $host = '',
+        ?string $role = '',
+        bool $apiRequests = false,
+        ?string $createdFrom = '',
+        ?string $createdTo = '',
+    ): Collection {
         $order = self::getBrowseOrder($orderBy);
 
-        return self::fromQuery(
+        if ($apiRequests) {
+            UserRequest::clearApiRequests(false);
+
+            $query = '
+                SELECT users.*, roles.name AS rolename, COUNT(user_requests.id) AS apirequests
+                FROM users
+                INNER JOIN roles ON roles.id = users.roles_id
+                LEFT JOIN user_requests ON user_requests.users_id = users.id
+                WHERE users.id != 0 %s %s %s %s %s %s
+                AND email != \'sharing@nZEDb.com\'
+                GROUP BY users.id
+                ORDER BY %s %s %s';
+        } else {
+            $query = '
+                SELECT users.*, roles.name AS rolename
+                FROM users
+                INNER JOIN roles ON roles.id = users.roles_id
+                WHERE 1=1 %s %s %s %s %s %s
+                ORDER BY %s %s %s';
+        }
+
+        return static::fromQuery(
             sprintf(
                 $query,
-                ! empty($userName) ? 'AND users.username '.'LIKE '.escapeString('%'.$userName.'%') : '',
-                ! empty($email) ? 'AND users.email '.'LIKE '.escapeString('%'.$email.'%') : '',
-                ! empty($host) ? 'AND users.host '.'LIKE '.escapeString('%'.$host.'%') : '',
-                (! empty($role) ? ('AND users.roles_id = '.$role) : ''),
-                ! empty($createdFrom) ? 'AND users.created_at >= '.escapeString($createdFrom.' 00:00:00') : '',
-                ! empty($createdTo) ? 'AND users.created_at <= '.escapeString($createdTo.' 23:59:59') : '',
+                $userName ? 'AND users.username LIKE '.escapeString("%{$userName}%") : '',
+                $email ? 'AND users.email LIKE '.escapeString("%{$email}%") : '',
+                $host ? 'AND users.host LIKE '.escapeString("%{$host}%") : '',
+                $role ? "AND users.roles_id = {$role}" : '',
+                $createdFrom ? 'AND users.created_at >= '.escapeString("{$createdFrom} 00:00:00") : '',
+                $createdTo ? 'AND users.created_at <= '.escapeString("{$createdTo} 23:59:59") : '',
                 $order[0],
                 $order[1],
-                ($start === false ? '' : ('LIMIT '.$offset.' OFFSET '.$start))
+                $start === false ? '' : "LIMIT {$offset} OFFSET {$start}"
             )
         );
     }
 
     /**
-     * Get sort types for sorting users on the web page user list.
+     * Get sort configuration for user browsing.
      *
-     * @return string[]
+     * @return array{0: string, 1: string}
      */
-    public static function getBrowseOrder($orderBy): array
+    public static function getBrowseOrder(string $orderBy = ''): array
     {
-        $order = (empty($orderBy) ? 'username_desc' : $orderBy);
-        $orderArr = explode('_', $order);
-        $orderField = match ($orderArr[0]) {
+        $order = $orderBy ?: 'username_desc';
+        $parts = explode('_', $order);
+
+        $field = match ($parts[0]) {
             'email' => 'email',
             'host' => 'host',
             'createdat' => 'created_at',
@@ -941,100 +1113,43 @@ class User extends Authenticatable
             'verification' => 'verified',
             default => 'username',
         };
-        $orderSort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 
-        return [$orderField, $orderSort];
+        $direction = isset($parts[1]) && preg_match('/^asc|desc$/i', $parts[1])
+            ? $parts[1]
+            : 'desc';
+
+        return [$field, $direction];
     }
 
+    // ===== Password Methods =====
+
     /**
-     * Verify a password against a hash.
-     *
-     * Automatically update the hash if it needs to be.
-     *
-     * @param  string  $password  Password to check against hash.
-     * @param  bool|string  $hash  Hash to check against password.
-     * @param  int  $userID  ID of the user.
+     * Verify password and rehash if needed.
      */
-    public static function checkPassword(string $password, bool|string $hash, int $userID = -1): bool
+    public static function checkPassword(string $password, string $hash, int $userId = -1): bool
     {
-        if (Hash::check($password, $hash) === false) {
+        if (! Hash::check($password, $hash)) {
             return false;
         }
 
-        // Update the hash if it needs to be.
-        if (is_numeric($userID) && $userID > 0 && Hash::needsRehash($hash)) {
-            $hash = self::hashPassword($password);
-
-            if ($hash !== false) {
-                self::find($userID)->update(['password' => $hash]);
-            }
+        if ($userId > 0 && Hash::needsRehash($hash)) {
+            static::find($userId)?->update(['password' => Hash::make($password)]);
         }
 
         return true;
     }
 
-    public static function updateRssKey($uid): int
-    {
-        self::find($uid)->update(['api_token' => md5(Password::getRepository()->createNewToken())]);
-
-        return self::SUCCESS;
-    }
-
-    public static function updatePassResetGuid($id, $guid): int
-    {
-        self::find($id)->update(['resetguid' => $guid]);
-
-        return self::SUCCESS;
-    }
-
-    public static function updatePassword(int $id, string $password): int
-    {
-        self::find($id)->update(['password' => self::hashPassword($password)]);
-
-        return self::SUCCESS;
-    }
-
-    public static function updateUserRoleChangeDate(int $id, string $roleChangeDate): int
-    {
-        self::find($id)->update(['rolechangedate' => $roleChangeDate]);
-
-        return self::SUCCESS;
-    }
-
-    public static function hashPassword($password): string
+    /**
+     * Hash a password.
+     */
+    public static function hashPassword(string $password): string
     {
         return Hash::make($password);
     }
 
     /**
-     * @return Model|static
+     * Generate a secure random password.
      *
-     * @throws ModelNotFoundException
-     */
-    public static function getByPassResetGuid(string $guid)
-    {
-        return self::whereResetguid($guid)->first();
-    }
-
-    public static function incrementGrabs(int $id, int $num = 1): void
-    {
-        self::find($id)->increment('grabs', $num);
-    }
-
-    /**
-     * @return Model|null|static
-     */
-    public static function getByRssToken(string $rssToken)
-    {
-        return self::whereApiToken($rssToken)->first();
-    }
-
-    public static function isValidUrl($url): bool
-    {
-        return (! preg_match('/^(http|https|ftp):\/\/([A-Z0-9][A-Z0-9_-]*(?:\.[A-Z0-9][A-Z0-9_-]*)+):?(\d+)?\/?/i', $url)) ? false : true;
-    }
-
-    /**
      * @throws \Exception
      */
     public static function generatePassword(int $length = 15): string
@@ -1042,22 +1157,107 @@ class User extends Authenticatable
         return Str::password($length);
     }
 
+    // ===== Update Methods =====
+
     /**
+     * Regenerate RSS key.
+     */
+    public static function updateRssKey(int $uid): int
+    {
+        static::find($uid)?->update([
+            'api_token' => md5(Password::getRepository()->createNewToken()),
+        ]);
+
+        return SignupError::SUCCESS->value;
+    }
+
+    /**
+     * Update password reset GUID.
+     */
+    public static function updatePassResetGuid(int $id, ?string $guid): int
+    {
+        static::find($id)?->update(['resetguid' => $guid]);
+
+        return SignupError::SUCCESS->value;
+    }
+
+    /**
+     * Update user password.
+     */
+    public static function updatePassword(int $id, string $password): int
+    {
+        static::find($id)?->update(['password' => Hash::make($password)]);
+
+        return SignupError::SUCCESS->value;
+    }
+
+    /**
+     * Update user role change date.
+     */
+    public static function updateUserRoleChangeDate(int $id, string $roleChangeDate): int
+    {
+        static::find($id)?->update(['rolechangedate' => $roleChangeDate]);
+
+        return SignupError::SUCCESS->value;
+    }
+
+    /**
+     * Increment user's grab count.
+     */
+    public static function incrementGrabs(int $id, int $num = 1): void
+    {
+        static::find($id)?->increment('grabs', $num);
+    }
+
+    // ===== Validation Methods =====
+
+    /**
+     * Validate a URL format.
+     */
+    public static function isValidUrl(string $url): bool
+    {
+        return (bool) preg_match(
+            '/^(https?|ftp):\/\/([A-Z0-9][A-Z0-9_-]*(?:\.[A-Z0-9][A-Z0-9_-]*)+):?(\d+)?\/?/i',
+            $url
+        );
+    }
+
+    // ===== Registration Methods =====
+
+    /**
+     * Register a new user.
+     *
      * @throws \Exception
      */
-    public static function signUp($userName, $password, $email, $host, $notes, int $invites = Invitation::DEFAULT_INVITES, string $inviteCode = '', bool $forceInviteMode = false, int $role = self::ROLE_USER, bool $validate = true): bool|int|string
-    {
-        $user = [
+    public static function signUp(
+        string $userName,
+        string $password,
+        string $email,
+        string $host,
+        ?string $notes,
+        int $invites = Invitation::DEFAULT_INVITES,
+        string $inviteCode = '',
+        bool $forceInviteMode = false,
+        int $role = UserRole::USER->value,
+        bool $validate = true,
+    ): bool|int|string {
+        $userData = [
             'username' => trim($userName),
             'password' => trim($password),
             'email' => trim($email),
         ];
 
         if ($validate) {
-            $validator = Validator::make($user, [
+            $validator = Validator::make($userData, [
                 'username' => ['required', 'string', 'min:5', 'max:255', 'unique:users'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:users', new ValidEmailDomain()],
-                'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users', new ValidEmailDomain],
+                'password' => [
+                    'required',
+                    'string',
+                    'min:8',
+                    'confirmed',
+                    'regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/',
+                ],
             ]);
 
             if ($validator->fails()) {
@@ -1065,24 +1265,32 @@ class User extends Authenticatable
             }
         }
 
-        // Make sure this is the last check, as if a further validation check failed, the invite would still have been used up.
         $invitedBy = 0;
         if (! $forceInviteMode && (int) Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_INVITE) {
             if ($inviteCode === '') {
-                return self::ERR_SIGNUP_BADINVITECODE;
+                return SignupError::BAD_INVITE_CODE->value;
             }
 
             $invitedBy = self::checkAndUseInvite($inviteCode);
             if ($invitedBy < 0) {
-                return self::ERR_SIGNUP_BADINVITECODE;
+                return SignupError::BAD_INVITE_CODE->value;
             }
         }
 
-        return self::add($user['username'], $user['password'], $user['email'], $role, $notes, $host, $invites, $invitedBy);
+        return self::add(
+            $userData['username'],
+            $userData['password'],
+            $userData['email'],
+            $role,
+            $notes,
+            $host,
+            $invites,
+            $invitedBy
+        );
     }
 
     /**
-     * If a invite is used, decrement the person who invited's invite count.
+     * Validate and consume an invite code.
      */
     public static function checkAndUseInvite(string $inviteCode): int
     {
@@ -1091,125 +1299,185 @@ class User extends Authenticatable
             return -1;
         }
 
-        self::query()->where('id', $invite->invited_by)->decrement('invites');
-        $invite->markAsUsed(0); // Will be updated with actual user ID later
+        static::where('id', $invite->invited_by)->decrement('invites');
+        $invite->markAsUsed(0);
 
         return $invite->invited_by;
     }
 
     /**
-     * @return false|int|mixed
+     * Create a new user.
+     *
+     * @return int|false
      */
-    public static function add(string $userName, string $password, string $email, int $role, ?string $notes = '', string $host = '', int $invites = Invitation::DEFAULT_INVITES, int $invitedBy = 0)
-    {
-        $password = self::hashPassword($password);
-        if (! $password) {
-            return false;
-        }
+    public static function add(
+        string $userName,
+        string $password,
+        string $email,
+        int $role,
+        ?string $notes = '',
+        string $host = '',
+        int $invites = Invitation::DEFAULT_INVITES,
+        int $invitedBy = 0,
+    ): int|false {
+        $hashedPassword = Hash::make($password);
 
-        $storeips = config('nntmux:settings.store_user_ip') === true ? $host : '';
+        $storeIps = config('nntmux:settings.store_user_ip') === true ? $host : '';
 
-        $user = self::create(
-            [
-                'username' => $userName,
-                'password' => $password,
-                'email' => $email,
-                'host' => $storeips,
-                'roles_id' => $role,
-                'invites' => $invites,
-                'invitedby' => (int) $invitedBy === 0 ? null : $invitedBy,
-                'notes' => $notes,
-            ]
-        );
+        $user = static::create([
+            'username' => $userName,
+            'password' => $hashedPassword,
+            'email' => $email,
+            'host' => $storeIps,
+            'roles_id' => $role,
+            'invites' => $invites,
+            'invitedby' => $invitedBy === 0 ? null : $invitedBy,
+            'notes' => $notes,
+        ]);
 
         return $user->id;
     }
 
+    // ===== Category Exclusion Methods =====
+
     /**
-     * Get the list of categories the user has excluded.
+     * Get excluded category IDs for a user.
      *
-     * @param  int  $userID  ID of the user.
-     *
+     * @return array<int>
      * @throws \Exception
      */
-    public static function getCategoryExclusionById(int $userID): array
+    public static function getCategoryExclusionById(int $userId): array
     {
-        $ret = [];
-
-        $user = self::find($userID);
+        $user = static::findOrFail($userId);
 
         $userAllowed = $user->getDirectPermissions()->pluck('name')->toArray();
         $roleAllowed = $user->getAllPermissions()->pluck('name')->toArray();
-
         $allowed = array_intersect($roleAllowed, $userAllowed);
 
-        $cats = ['view console', 'view movies', 'view audio', 'view tv', 'view pc', 'view adult', 'view books', 'view other'];
+        $categoryPermissions = [
+            'view console' => 1000,
+            'view movies' => 2000,
+            'view audio' => 3000,
+            'view pc' => 4000,
+            'view tv' => 5000,
+            'view adult' => 6000,
+            'view books' => 7000,
+            'view other' => 1,
+        ];
 
-        if (! empty($allowed)) {
-            foreach ($cats as $cat) {
-                if (! \in_array($cat, $allowed, false)) {
-                    $ret[] = match ($cat) {
-                        'view console' => 1000,
-                        'view movies' => 2000,
-                        'view audio' => 3000,
-                        'view pc' => 4000,
-                        'view tv' => 5000,
-                        'view adult' => 6000,
-                        'view books' => 7000,
-                        'view other' => 1,
-                    };
-                }
+        $excludedRoots = [];
+        foreach ($categoryPermissions as $permission => $rootId) {
+            if (! in_array($permission, $allowed, false)) {
+                $excludedRoots[] = $rootId;
             }
         }
 
-        return Category::query()->whereIn('root_categories_id', $ret)->pluck('id')->toArray();
+        return Category::whereIn('root_categories_id', $excludedRoots)
+            ->pluck('id')
+            ->toArray();
     }
 
     /**
+     * Get excluded categories for API request.
+     *
      * @throws \Exception
      */
     public static function getCategoryExclusionForApi(Request $request): array
     {
-        $apiToken = $request->has('api_token') ? $request->input('api_token') : $request->input('apikey');
-        $user = self::getByRssToken($apiToken);
+        $apiToken = $request->input('api_token') ?? $request->input('apikey');
+        $user = static::findByRssToken($apiToken);
 
-        return self::getCategoryExclusionById($user->id);
+        return $user ? static::getCategoryExclusionById($user->id) : [];
     }
 
+    // ===== Invitation Methods =====
+
     /**
+     * Send an invitation email.
+     *
      * @throws \Exception
      */
-    public static function sendInvite($serverUrl, $uid, $emailTo): string
+    public static function sendInvite(string $serverUrl, int $uid, string $emailTo): string
     {
-        $user = self::find($uid);
+        $user = static::findOrFail($uid);
 
-        // Create invitation using our custom system
         $invitation = Invitation::createInvitation($emailTo, $user->id);
-        $url = $serverUrl.'/register?token='.$invitation->token;
+        $url = "{$serverUrl}/register?token={$invitation->token}";
 
-        // Send invitation email
-        $invitationService = app(InvitationService::class);
-        $invitationService->sendInvitationEmail($invitation);
+        app(InvitationService::class)->sendInvitationEmail($invitation);
 
         return $url;
     }
 
+    // ===== Cleanup Methods =====
+
     /**
-     * Deletes users that have not verified their accounts for 3 or more days.
+     * Delete unverified users older than 3 days.
      */
     public static function deleteUnVerified(): void
     {
-        static::whereVerified(0)->where('created_at', '<', now()->subDays(3))->delete();
+        static::whereVerified(0)
+            ->where('created_at', '<', now()->subDays(3))
+            ->delete();
     }
 
-    public function passwordSecurity(): HasOne
+    /**
+     * Check if user can post.
+     */
+    public static function canPost(int $userId): bool
     {
-        return $this->hasOne(PasswordSecurity::class);
+        return (bool) static::where('id', $userId)->value('can_post');
     }
 
-    public static function canPost($user_id): bool
+    /**
+     * Get the user's timezone.
+     */
+    public function getTimezone(): string
     {
-        // return true if can_post column is true and false if can_post column is false
-        return self::where('id', $user_id)->value('can_post');
+        return $this->timezone ?? 'UTC';
     }
+
+    // ===== Legacy Constants (Deprecated - Use Enums) =====
+
+    /** @deprecated Use SignupError::BAD_USERNAME->value instead */
+    public const ERR_SIGNUP_BADUNAME = SignupError::BAD_USERNAME->value;
+
+    /** @deprecated Use SignupError::BAD_PASSWORD->value instead */
+    public const ERR_SIGNUP_BADPASS = SignupError::BAD_PASSWORD->value;
+
+    /** @deprecated Use SignupError::BAD_EMAIL->value instead */
+    public const ERR_SIGNUP_BADEMAIL = SignupError::BAD_EMAIL->value;
+
+    /** @deprecated Use SignupError::USERNAME_IN_USE->value instead */
+    public const ERR_SIGNUP_UNAMEINUSE = SignupError::USERNAME_IN_USE->value;
+
+    /** @deprecated Use SignupError::EMAIL_IN_USE->value instead */
+    public const ERR_SIGNUP_EMAILINUSE = SignupError::EMAIL_IN_USE->value;
+
+    /** @deprecated Use SignupError::BAD_INVITE_CODE->value instead */
+    public const ERR_SIGNUP_BADINVITECODE = SignupError::BAD_INVITE_CODE->value;
+
+    /** @deprecated Use SignupError::SUCCESS->value instead */
+    public const SUCCESS = SignupError::SUCCESS->value;
+
+    /** @deprecated Use UserRole::USER->value instead */
+    public const ROLE_USER = UserRole::USER->value;
+
+    /** @deprecated Use UserRole::ADMIN->value instead */
+    public const ROLE_ADMIN = UserRole::ADMIN->value;
+
+    /** @deprecated Use UserRole::DISABLED->value instead */
+    public const ROLE_DISABLED = UserRole::DISABLED->value;
+
+    /** @deprecated Use UserRole::MODERATOR->value instead */
+    public const ROLE_MODERATOR = UserRole::MODERATOR->value;
+
+    /** @deprecated Use QueueType::NONE->value instead */
+    public const QUEUE_NONE = QueueType::NONE->value;
+
+    /** @deprecated Use QueueType::SABNZBD->value instead */
+    public const QUEUE_SABNZBD = QueueType::SABNZBD->value;
+
+    /** @deprecated Use QueueType::NZBGET->value instead */
+    public const QUEUE_NZBGET = QueueType::NZBGET->value;
 }
