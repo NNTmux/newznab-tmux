@@ -588,10 +588,27 @@ class User extends Authenticatable
         ]);
 
         if ($shouldStack) {
+            // Determine the effective start date for the stacked role
+            // If currentExpiryDate is in the future and different from oldExpiryDate, use currentExpiryDate
+            // This handles the case where a user already has a pending role stacking and the expiry was extended
+            $stackingStartDate = $currentExpiryDate;
+            if ($oldExpiryDate && $currentExpiryDate && $currentExpiryDate->isFuture() && $currentExpiryDate->gt($oldExpiryDate)) {
+                // Use the newer (current) expiry date as the stacking start date
+                $stackingStartDate = $currentExpiryDate;
+                Log::info('Using updated expiry date for stacking (expiry was extended)', [
+                    'oldExpiryDate' => $oldExpiryDate->toDateTimeString(),
+                    'currentExpiryDate' => $currentExpiryDate->toDateTimeString(),
+                    'stackingStartDate' => $stackingStartDate->toDateTimeString()
+                ]);
+            } elseif ($oldExpiryDate && $oldExpiryDate->isFuture()) {
+                // Use oldExpiryDate if it's still in the future (original behavior for backward compatibility)
+                $stackingStartDate = $oldExpiryDate;
+            }
+
             Log::info('Stacking role change', [
-                'oldExpiryDate' => $oldExpiryDate->toDateTimeString(),
+                'oldExpiryDate' => $oldExpiryDate?->toDateTimeString(),
                 'currentExpiryDate' => $currentExpiryDate->toDateTimeString(),
-                'pendingRoleStartDate' => $oldExpiryDate->toDateTimeString()
+                'stackingStartDate' => $stackingStartDate->toDateTimeString()
             ]);
 
             // Calculate a new expiry date for the pending role
@@ -609,12 +626,12 @@ class User extends Authenticatable
 
             $totalDays = $baseDays + $promotionDays;
 
-            // New role will start at oldExpiryDate (original expiry date before any admin edits)
+            // New role will start at stackingStartDate (the most recent future expiry date)
             // Then add the total days (base + promotion) to calculate when it will expire
-            $newExpiryDate = $oldExpiryDate->copy()->addDays($totalDays);
+            $newExpiryDate = $stackingStartDate->copy()->addDays($totalDays);
 
             Log::info('Calculated new expiry for pending role', [
-                'pendingRoleStartDate' => $oldExpiryDate->toDateTimeString(),
+                'stackingStartDate' => $stackingStartDate->toDateTimeString(),
                 'baseDays' => $baseDays,
                 'promotionDays' => $promotionDays,
                 'totalDays' => $totalDays,
@@ -622,28 +639,28 @@ class User extends Authenticatable
             ]);
 
             // Stack the role change - set it as pending
-            // Use oldExpiryDate (original expiry) for when the role will start
+            // Use stackingStartDate (most recent future expiry) for when the role will start
             $user->update([
                 'pending_roles_id' => $roleQuery->id,
-                'pending_role_start_date' => $oldExpiryDate,
+                'pending_role_start_date' => $stackingStartDate,
             ]);
 
             Log::info('Pending role updated', [
                 'pending_roles_id' => $roleQuery->id,
-                'pending_role_start_date' => $oldExpiryDate->toDateTimeString(),
-                'pending_role_start_date_formatted' => $oldExpiryDate->format('Y-m-d H:i:s')
+                'pending_role_start_date' => $stackingStartDate->toDateTimeString(),
+                'pending_role_start_date_formatted' => $stackingStartDate->format('Y-m-d H:i:s')
             ]);
 
             // Record in history as a stacked change
-            // effective_date should match old_expiry_date (when the stacked role will start)
+            // effective_date should match stackingStartDate (when the stacked role will start)
             try {
                 $history = UserRoleHistory::recordRoleChange(
                     userId: $user->id,
                     oldRoleId: $currentRoleId,
                     newRoleId: $roleQuery->id,
-                    oldExpiryDate: $oldExpiryDate, // When current role expires
-                    newExpiryDate: $newExpiryDate, // When the NEW role will expire (calculated from oldExpiryDate)
-                    effectiveDate: $oldExpiryDate, // Same as old_expiry_date - when the new role starts
+                    oldExpiryDate: $stackingStartDate, // When current role expires (using the most recent future date)
+                    newExpiryDate: $newExpiryDate, // When the NEW role will expire (calculated from stackingStartDate)
+                    effectiveDate: $stackingStartDate, // Same as old_expiry_date - when the new role starts
                     isStacked: true,
                     changeReason: 'stacked_role_change',
                     changedBy: $changedBy
@@ -654,7 +671,7 @@ class User extends Authenticatable
                     'effective_date' => $history->effective_date->toDateTimeString(),
                     'old_expiry_date' => $history->old_expiry_date?->toDateTimeString(),
                     'new_expiry_date' => $history->new_expiry_date?->toDateTimeString(),
-                    'note' => 'effective_date equals old_expiry_date (when stacked role starts)'
+                    'note' => 'effective_date equals stackingStartDate (when stacked role starts)'
                 ]);
             } catch (\Exception $e) {
                 Log::error('Failed to record role history', [

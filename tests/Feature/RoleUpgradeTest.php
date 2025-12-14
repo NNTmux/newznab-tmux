@@ -400,4 +400,150 @@ final class RoleUpgradeTest extends TestCase
         );
         Carbon::setTestNow();
     }
+
+    /**
+     * Test that when a user has a role stacking and the expiry date is extended,
+     * subsequent role stackings use the new extended expiry date.
+     *
+     * Scenario:
+     * 1. User has Supporter role expiring on 2025-07-01
+     * 2. Admin extends the user's expiry to 2025-12-01
+     * 3. User purchases another Supporter subscription (stacking)
+     * 4. The stacked role should start from 2025-12-01, NOT 2025-07-01
+     */
+    public function test_role_stacking_uses_updated_expiry_when_extended(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-01 12:00:00'));
+
+        // Step 1: User has Supporter role expiring in 6 months (2025-07-01)
+        $originalExpiryDate = Carbon::parse('2025-07-01 12:00:00');
+
+        $this->user->update([
+            'roles_id' => $this->supporterRole->id,
+            'rolechangedate' => $originalExpiryDate,
+        ]);
+        $this->user->syncRoles([$this->supporterRole->name]);
+        $this->user->refresh();
+
+        // Step 2: Admin extends the expiry to 2025-12-01
+        $extendedExpiryDate = Carbon::parse('2025-12-01 12:00:00');
+        $this->user->update([
+            'rolechangedate' => $extendedExpiryDate,
+        ]);
+        $this->user->refresh();
+
+        // Verify the extended expiry is set
+        $this->assertEquals(
+            $extendedExpiryDate->toDateString(),
+            Carbon::parse($this->user->rolechangedate)->toDateString(),
+            'Expiry date should be extended to 2025-12-01'
+        );
+
+        $addYears = 1;
+
+        // Step 3: User purchases another Supporter 1 year subscription (stacking)
+        // The originalExpiryBeforeEdits simulates what the controller would pass
+        // (the expiry before the admin extended it)
+        $result = User::updateUserRole(
+            uid: $this->user->id,
+            role: 'Supporter',
+            applyPromotions: false,
+            stackRole: true,
+            changedBy: null,
+            originalExpiryBeforeEdits: $originalExpiryDate->toDateTimeString(), // Old value
+            addYears: $addYears
+        );
+
+        $this->assertTrue($result, 'updateUserRole should return true');
+
+        $this->user->refresh();
+
+        // Step 4: The stacked role should use the EXTENDED expiry date (2025-12-01)
+        // NOT the original expiry date (2025-07-01)
+        $this->assertNotNull($this->user->pending_role_start_date, 'Pending role start date should be set');
+
+        $pendingStartDate = Carbon::parse($this->user->pending_role_start_date);
+
+        // The pending role should start from the extended expiry (2025-12-01),
+        // not the original expiry (2025-07-01)
+        $this->assertEquals(
+            $extendedExpiryDate->toDateString(),
+            $pendingStartDate->toDateString(),
+            "BUG: Role stacking should use the extended expiry date (2025-12-01), not the original (2025-07-01). " .
+            "The pending_role_start_date was {$pendingStartDate->toDateString()}."
+        );
+
+        Carbon::setTestNow();
+    }
+
+    /**
+     * Test that role stacking correctly handles the case where currentExpiryDate is newer than oldExpiryDate.
+     * This tests the fix where the stacking start date should be the most recent future date.
+     */
+    public function test_role_stacking_prefers_newer_expiry_date(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2025-01-01 12:00:00'));
+
+        // Create another paid role for testing
+        $premiumRole = Role::firstOrCreate(
+            ['name' => 'Premium'],
+            [
+                'guard_name' => 'web',
+                'addyears' => 2,
+                'apirequests' => 200,
+                'downloadrequests' => 100,
+                'defaultinvites' => 10,
+                'isdefault' => 0,
+                'donation' => 25,
+                'canpreview' => 1,
+            ]
+        );
+
+        // User has Supporter role with expiry date that was extended
+        $currentExpiryDate = Carbon::parse('2026-01-01 12:00:00'); // Extended date
+
+        $this->user->update([
+            'roles_id' => $this->supporterRole->id,
+            'rolechangedate' => $currentExpiryDate,
+        ]);
+        $this->user->syncRoles([$this->supporterRole->name]);
+        $this->user->refresh();
+
+        // Simulate that the original expiry was earlier (before extension)
+        $oldExpiryDate = Carbon::parse('2025-06-01 12:00:00');
+
+        $addYears = 2;
+
+        // Stack a Premium role upgrade
+        $result = User::updateUserRole(
+            uid: $this->user->id,
+            role: 'Premium',
+            applyPromotions: false,
+            stackRole: true,
+            changedBy: null,
+            originalExpiryBeforeEdits: $oldExpiryDate->toDateTimeString(),
+            addYears: $addYears
+        );
+
+        $this->assertTrue($result, 'updateUserRole should return true');
+
+        $this->user->refresh();
+
+        // Verify the pending role is set
+        $this->assertEquals($premiumRole->id, $this->user->pending_roles_id, 'Pending role should be Premium');
+        $this->assertNotNull($this->user->pending_role_start_date, 'Pending role start date should be set');
+
+        $pendingStartDate = Carbon::parse($this->user->pending_role_start_date);
+
+        // The stacking should use the NEWER (current) expiry date: 2026-01-01
+        // Not the older expiry date: 2025-06-01
+        $this->assertEquals(
+            $currentExpiryDate->toDateString(),
+            $pendingStartDate->toDateString(),
+            "Role stacking should use the newer expiry date (2026-01-01) when currentExpiryDate > oldExpiryDate. " .
+            "Got {$pendingStartDate->toDateString()} instead."
+        );
+
+        Carbon::setTestNow();
+    }
 }
