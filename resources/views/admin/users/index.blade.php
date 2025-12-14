@@ -203,8 +203,8 @@
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200" title="Soft Deleted on {{ \Carbon\Carbon::parse($user->deleted_at)->format('M j, Y g:i A') }}">
                                             <i class="fa fa-trash mr-1"></i>Deleted
                                         </span>
-                                    @elseif(isset($user->apiaccess) && $user->apiaccess == 0)
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200" title="API Access Disabled">
+                                    @elseif($user->roles_id === \App\Enums\UserRole::DISABLED->value)
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200" title="User Disabled">
                                             <i class="fa fa-ban mr-1"></i>Disabled
                                         </span>
                                     @else
