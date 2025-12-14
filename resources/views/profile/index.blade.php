@@ -139,7 +139,50 @@
                                     </div>
                                 @endif
 
-                                @if($user->hasPendingRole())
+                                @php
+                                    $allPendingRoles = $user->getAllPendingStackedRoles();
+                                @endphp
+                                @if($allPendingRoles->count() > 0)
+                                    <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
+                                        <div class="w-1/3 text-gray-600">Pending Role{{ $allPendingRoles->count() > 1 ? 's' : '' }}</div>
+                                        <div class="w-2/3">
+                                            <div class="space-y-3">
+                                                @foreach($allPendingRoles as $index => $pendingRoleInfo)
+                                                    <div class="@if(!$loop->last) pb-3 border-b border-gray-100 dark:border-gray-700 @endif">
+                                                        <div class="flex items-center">
+                                                            <span class="flex items-center justify-center w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-full mr-2">
+                                                                {{ $index + 1 }}
+                                                            </span>
+                                                            <i class="fa fa-layer-group text-blue-400 mr-2"></i>
+                                                            <span class="font-medium text-blue-600 dark:text-blue-400">{{ $pendingRoleInfo['role_name'] }}</span>
+                                                            <span class="ml-2 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded">
+                                                                <i class="fa fa-clock mr-1"></i>Scheduled
+                                                            </span>
+                                                        </div>
+                                                        <div class="ml-8 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                                            <div>
+                                                                <i class="fa fa-play-circle text-green-500 mr-1"></i>
+                                                                <span class="font-medium">Starts:</span> {{ $pendingRoleInfo['start_date']->format('M d, Y g:i A') }}
+                                                                <span class="text-gray-400">({{ $pendingRoleInfo['start_date']->diffForHumans() }})</span>
+                                                            </div>
+                                                            @if($pendingRoleInfo['end_date'])
+                                                                <div class="mt-1">
+                                                                    <i class="fa fa-stop-circle text-red-400 mr-1"></i>
+                                                                    <span class="font-medium">Ends:</span> {{ $pendingRoleInfo['end_date']->format('M d, Y g:i A') }}
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                                <div class="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 p-2 rounded mt-2">
+                                                    <i class="fa fa-info-circle mr-1"></i>
+                                                    These roles will automatically activate in sequence as each previous role expires
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @elseif($user->hasPendingRole())
+                                    {{-- Fallback to old display if no history records but pending_roles_id is set --}}
                                     <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
                                         <div class="w-1/3 text-gray-600">Pending Role</div>
                                         <div class="w-2/3">

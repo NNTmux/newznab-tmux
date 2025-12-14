@@ -428,6 +428,40 @@ final class User extends Authenticatable
     }
 
     /**
+     * Get all pending stacked role changes for this user.
+     * Returns an array of stacked role changes that haven't been activated yet (effective_date is in the future).
+     *
+     * @return \Illuminate\Support\Collection<int, array{
+     *     role: Role|null,
+     *     role_name: string,
+     *     start_date: Carbon,
+     *     end_date: Carbon,
+     *     is_current_pending: bool
+     * }>
+     */
+    public function getAllPendingStackedRoles(): \Illuminate\Support\Collection
+    {
+        // Get all stacked role changes from history where effective_date is in the future
+        $stackedHistory = UserRoleHistory::where('user_id', $this->id)
+            ->where('is_stacked', true)
+            ->where('effective_date', '>', now())
+            ->orderBy('effective_date', 'asc')
+            ->get();
+
+        return $stackedHistory->map(function ($history) {
+            $role = Role::find($history->new_role_id);
+            return [
+                'role' => $role,
+                'role_name' => $role?->name ?? 'Unknown Role',
+                'start_date' => $history->effective_date,
+                'end_date' => $history->new_expiry_date,
+                'is_current_pending' => $this->pending_roles_id === $history->new_role_id
+                    && $this->pending_role_start_date?->equalTo($history->effective_date),
+            ];
+        });
+    }
+
+    /**
      * Get comprehensive role expiry information.
      *
      * @return array{
