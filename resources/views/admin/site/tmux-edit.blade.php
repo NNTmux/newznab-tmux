@@ -352,6 +352,22 @@
                     </div>
                 </div>
 
+                <!-- Scrapers -->
+                <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Scrapers</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <x-form.group label="IRC Scraper" for="run_ircscraper" help="Enable scraping of IRC announce channels (requires proper IRC settings).">
+                            <x-select id="run_ircscraper" name="run_ircscraper" class="w-full">
+                                @foreach($yesno_ids as $index => $val)
+                                    <option value="{{ $val }}" {{ ($site['run_ircscraper'] ?? 0) == $val ? 'selected' : '' }}>
+                                        {{ $yesno_names[$index] }}
+                                    </option>
+                                @endforeach
+                            </x-select>
+                        </x-form.group>
+                    </div>
+                </div>
+
 
                 <!-- Console & Monitoring Tools -->
                 <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
