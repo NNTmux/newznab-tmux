@@ -221,10 +221,10 @@ final class BackfillService
 
         $targetPost = $isArticleBased
             ? (int) round($groupArr['first_record'] - (int) $articles)
-            : $this->binaries->daytopost($groupArr['backfill_target'], $serverData);
+            : (int) $this->binaries->daytopost($groupArr['backfill_target'], $serverData);
 
         // Ensure target is not below server's oldest article
-        return max($targetPost, $serverData['first']);
+        return max($targetPost, (int) $serverData['first']);
     }
 
     /**
