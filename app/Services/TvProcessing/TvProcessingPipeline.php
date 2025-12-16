@@ -112,25 +112,19 @@ class TvProcessingPipeline
         $this->resetStats();
         $startTime = microtime(true);
 
-        $this->displayHeader($guidChar);
-
         // Get releases that need processing
         $releases = $this->getTvReleases($groupID, $guidChar, $processTV);
         $totalCount = count($releases);
 
         if ($totalCount === 0) {
             if ($this->echoOutput) {
-                $this->colorCli->primary('  No TV releases to process');
+                $this->colorCli->header('No TV releases to process.');
             }
             return;
         }
 
         if ($this->echoOutput) {
-            echo "\n";
-            $this->colorCli->primaryOver('  Processing ');
-            $this->colorCli->warning($totalCount);
-            $this->colorCli->primary(' releases through pipeline');
-            echo "\n";
+            $this->colorCli->header('Processing '.$totalCount.' TV release(s).');
         }
 
         foreach ($releases as $release) {
@@ -248,20 +242,7 @@ class TvProcessingPipeline
      */
     protected function displayHeader(string $guidChar = ''): void
     {
-        if (! $this->echoOutput) {
-            return;
-        }
-
-        echo "\n";
-        $this->colorCli->headerOver('▶ TV Processing');
-        $this->colorCli->primaryOver(' → ');
-        $this->colorCli->headerOver('PIPELINE Mode');
-        if ($guidChar !== '') {
-            $this->colorCli->primaryOver(' → ');
-            $this->colorCli->warningOver('Bucket: ');
-            $this->colorCli->header(strtoupper($guidChar));
-        }
-        echo "\n";
+        // Header is now shown in process() after we know the release count
     }
 
     /**
@@ -273,26 +254,20 @@ class TvProcessingPipeline
             return;
         }
 
-        echo "\n";
-        $this->colorCli->primaryOver('✓ Pipeline Complete');
-        $this->colorCli->primaryOver(' → ');
-        $this->colorCli->warningOver(sprintf(
-            '%d processed, %d matched, %d failed',
+        $this->colorCli->header(sprintf(
+            'TV processing complete: %d processed, %d matched, %d failed (%.2fs)',
             $this->stats['processed'],
             $this->stats['matched'],
-            $this->stats['failed']
+            $this->stats['failed'],
+            $this->stats['duration']
         ));
-        $this->colorCli->primaryOver(' in ');
-        $this->colorCli->warning(sprintf('%.2fs', $this->stats['duration']));
-        echo "\n";
 
         if (! empty($this->stats['providers'])) {
             $providerSummary = [];
             foreach ($this->stats['providers'] as $provider => $count) {
                 $providerSummary[] = "$provider: $count";
             }
-            $this->colorCli->primary('  Matches by provider: ' . implode(', ', $providerSummary));
-            echo "\n";
+            $this->colorCli->primary('Matches by provider: '.implode(', ', $providerSummary));
         }
     }
 

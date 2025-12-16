@@ -259,23 +259,7 @@ class TvProcessor
      */
     private function displayHeader(string $guidChar = ''): void
     {
-        if (! $this->echooutput) {
-            return;
-        }
-
-        echo "\n";
-        $this->colorCli->headerOver('▶ TV Processing');
-        if ($guidChar !== '') {
-            $this->colorCli->primaryOver(' → ');
-            $this->colorCli->headerOver('PIPELINE Mode');
-            $this->colorCli->primaryOver(' → ');
-            $this->colorCli->warningOver('Bucket: ');
-            $this->colorCli->header(strtoupper($guidChar));
-        } else {
-            $this->colorCli->primaryOver(' → ');
-            $this->colorCli->header('PIPELINE Mode');
-        }
-        echo "\n";
+        // Header shown when processing starts
     }
 
     /**
@@ -283,23 +267,7 @@ class TvProcessor
      */
     private function displayHeaderParallel(string $guidChar = ''): void
     {
-        if (! $this->echooutput) {
-            return;
-        }
-
-        echo "\n";
-        $this->colorCli->headerOver('▶ TV Processing');
-        if ($guidChar !== '') {
-            $this->colorCli->primaryOver(' → ');
-            $this->colorCli->headerOver('PARALLEL Mode');
-            $this->colorCli->primaryOver(' → ');
-            $this->colorCli->warningOver('Bucket: ');
-            $this->colorCli->header(strtoupper($guidChar));
-        } else {
-            $this->colorCli->primaryOver(' → ');
-            $this->colorCli->header('PARALLEL Mode');
-        }
-        echo "\n";
+        // Header shown when processing starts
     }
 
     /**
@@ -307,18 +275,7 @@ class TvProcessor
      */
     private function displayProviderHeader(string $providerName, int $step, int $total): void
     {
-        if (! $this->echooutput) {
-            return;
-        }
-
-        echo "\n";
-        $this->colorCli->primaryOver('  [');
-        $this->colorCli->warningOver($step);
-        $this->colorCli->primaryOver('/');
-        $this->colorCli->warningOver($total);
-        $this->colorCli->primaryOver('] ');
-        $this->colorCli->headerOver('→ ');
-        $this->colorCli->header($providerName);
+        // Provider header shown in displayProviderPreview
     }
 
     /**
@@ -330,21 +287,7 @@ class TvProcessor
             return;
         }
 
-        echo "\n";
-        $this->colorCli->primaryOver('       ↳ ');
-        $this->colorCli->warningOver($total);
-        $this->colorCli->primaryOver(' pending release(s)');
-        $this->colorCli->primaryOver(' | Filter: ');
-        $this->colorCli->alternate($this->formatStatusLabel($status));
-
-        echo "\n";
-        $this->colorCli->primaryOver('         · Next: ');
-        $this->colorCli->headerOver($release->searchname ?? 'n/a');
-        $this->colorCli->primaryOver(' | ID ');
-        $this->colorCli->warningOver((string) $release->id);
-        $this->colorCli->primaryOver(' | GUID ');
-        $this->colorCli->warningOver((string) $release->guid);
-        echo "\n";
+        $this->colorCli->header('Processing '.$total.' TV release(s) via '.$providerName.'.');
     }
 
     /**
@@ -352,19 +295,7 @@ class TvProcessor
      */
     private function displayProviderSkip(string $providerName, int $step, int $total): void
     {
-        if (! $this->echooutput) {
-            return;
-        }
-
-        echo "\n";
-        $this->colorCli->primaryOver('  [');
-        $this->colorCli->warningOver($step);
-        $this->colorCli->primaryOver('/');
-        $this->colorCli->warningOver($total);
-        $this->colorCli->primaryOver('] ');
-        $this->colorCli->alternateOver('→ ');
-        $this->colorCli->alternate($providerName.' → No work remaining, skipping');
-        echo "\n";
+        // No output needed for skipped providers
     }
 
     /**
@@ -372,17 +303,7 @@ class TvProcessor
      */
     private function displayProviderComplete(string $providerName, float $elapsedTime): void
     {
-        if (! $this->echooutput) {
-            return;
-        }
-
-        echo "\n";
-        $this->colorCli->primaryOver('  ✓ ');
-        $this->colorCli->primaryOver($providerName);
-        $this->colorCli->primaryOver(' → ');
-        $this->colorCli->alternateOver('Completed in ');
-        $this->colorCli->warning(sprintf('%.2fs', $elapsedTime));
-        echo "\n";
+        // No output needed for individual provider completion
     }
 
     /**
@@ -390,15 +311,7 @@ class TvProcessor
      */
     private function displaySummary(): void
     {
-        if (! $this->echooutput) {
-            return;
-        }
-
-        echo "\n";
-        $this->colorCli->primaryOver('✓ Pipeline Complete');
-        $this->colorCli->primaryOver(' → ');
-        $this->colorCli->primary('Local DB → TVDB → TVMaze → TMDB → Trakt');
-        echo "\n";
+        // Summary handled by individual providers
     }
 
     /**
@@ -406,26 +319,6 @@ class TvProcessor
      */
     private function displaySummaryParallel(float $totalTime): void
     {
-        if (! $this->echooutput) {
-            return;
-        }
-
-        echo "\n";
-        $this->colorCli->primaryOver('✓ Parallel Processing Complete');
-        $this->colorCli->primaryOver(' → ');
-        $this->colorCli->warningOver('Total: ');
-        $this->colorCli->warning(sprintf('%.2fs', $totalTime));
-        echo "\n";
-    }
-
-    private function formatStatusLabel(int $status): string
-    {
-        return match ($status) {
-            0 => 'tv_episodes_id = 0 (Unmatched)',
-            -1 => 'tv_episodes_id = -1 (Awaiting TVMaze)',
-            -2 => 'tv_episodes_id = -2 (Awaiting TMDB)',
-            -3 => 'tv_episodes_id = -3 (Awaiting Trakt)',
-            default => 'tv_episodes_id = '.$status,
-        };
+        // Summary handled by individual providers
     }
 }
