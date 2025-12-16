@@ -202,7 +202,7 @@ class ReleaseUpdateService
     /**
      * Echo release information to CLI.
      */
-    protected function echoReleaseInfo(
+    public function echoReleaseInfo(
         object $release,
         string $newName,
         array $determinedCategory,
