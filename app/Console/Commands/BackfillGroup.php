@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Settings;
-use Blacklight\Backfill;
+use App\Services\Backfill\BackfillService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -50,7 +50,7 @@ class BackfillGroup extends Command
             }
 
             $this->info("Backfilling group: {$group}");
-            (new Backfill)->backfillAllGroups($group, $quantity);
+            (new BackfillService(nntp: $nntp))->backfillAllGroups($group, $quantity);
 
             return self::SUCCESS;
         } catch (\Throwable $e) {

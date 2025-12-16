@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\Backfill;
+use App\Services\Backfill\BackfillService;
 use Blacklight\NNTP;
 use Illuminate\Console\Command;
 
@@ -34,7 +34,7 @@ class UpdateBackfill extends Command
 
         try {
             $nntp = $this->getNntp();
-            $backfill = new Backfill(['NNTP' => $nntp]);
+            $backfill = new BackfillService(nntp: $nntp);
 
             match (true) {
                 $mode === 'all' && ! isset($quantity) => $backfill->backfillAllGroups(),
