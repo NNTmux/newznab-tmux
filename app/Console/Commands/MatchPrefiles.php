@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\NameFixer;
+use App\Services\NameFixing\NameFixingService;
 use Exception;
 use Illuminate\Console\Command;
 
@@ -40,7 +40,7 @@ class MatchPrefiles extends Command
             return 1;
         }
 
-        // Build the arguments array for NameFixer
+        // Build the arguments array for NameFixingService
         $argv = [
             'match_prefiles.php',
             $limit,
@@ -51,8 +51,8 @@ class MatchPrefiles extends Command
         }
 
         try {
-            $nameFixer = new NameFixer;
-            $nameFixer->getPreFileNames($argv);
+            $nameFixingService = new NameFixingService;
+            $nameFixingService->getPreFileNames($argv);
 
             return 0;
         } catch (Exception $e) {

@@ -12,7 +12,7 @@ use App\Services\AdditionalProcessing\ReleaseFileManager;
 use App\Services\AdditionalProcessing\UsenetDownloadService;
 use App\Services\Categorization\CategorizationService;
 use App\Services\TempWorkspaceService;
-use Blacklight\NameFixer;
+use App\Services\NameFixing\NameFixingService;
 use Blacklight\Nfo;
 use Blacklight\NZB;
 use Blacklight\ReleaseExtra;
@@ -72,7 +72,7 @@ class ProcessAdditional
                 new ReleaseImage(),
                 new Nfo(),
                 new NZB(),
-                new NameFixer()
+                new NameFixingService()
             ),
             new TempWorkspaceService(),
             new ConsoleOutputService($config->echoCLI)

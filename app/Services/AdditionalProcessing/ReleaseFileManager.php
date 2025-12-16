@@ -9,9 +9,10 @@ use App\Models\ReleaseFile;
 use Blacklight\Releases;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
+use App\Services\NameFixing\NameFixingService;
+use App\Services\NameFixing\ReleaseUpdateService;
 use Blacklight\ElasticSearchSiteSearch;
 use Blacklight\ManticoreSearch;
-use Blacklight\NameFixer;
 use Blacklight\Nfo;
 use Blacklight\NZB;
 use Blacklight\ReleaseExtra;
@@ -36,7 +37,7 @@ class ReleaseFileManager
         private readonly ReleaseImage $releaseImage,
         private readonly Nfo $nfo,
         private readonly NZB $nzb,
-        private readonly NameFixer $nameFixer
+        private readonly NameFixingService $nameFixingService
     ) {}
 
     /**
@@ -129,7 +130,7 @@ class ReleaseFileManager
                 // Run PreDB filename check
                 $context->release['filename'] = $file['name'];
                 $context->release['releases_id'] = $context->release->id;
-                $this->nameFixer->matchPreDbFiles($context->release, 1, 1, true);
+                $this->nameFixingService->matchPreDbFiles($context->release, true, true, true);
             }
 
             return true;
@@ -331,7 +332,7 @@ class ReleaseFileManager
             if (! $foundName) {
                 $context->release->textstring = $file['name'];
                 $context->release->releases_id = $context->release->id;
-                if ($this->nameFixer->checkName($context->release, $this->config->echoCLI, 'PAR2, ', 1, 1)) {
+                if ($this->nameFixingService->checkName($context->release, $this->config->echoCLI, 'PAR2, ', true, true)) {
                     $foundName = true;
                 }
             }
@@ -480,7 +481,7 @@ class ReleaseFileManager
             $candidate = $this->normalizeCandidateTitle($candidate);
 
             if ($this->isPlausibleReleaseTitle($candidate)) {
-                (new NameFixer())->updateRelease(
+                (new ReleaseUpdateService())->updateRelease(
                     $context->release,
                     $candidate,
                     'RarInfo FileName Match',
@@ -506,7 +507,7 @@ class ReleaseFileManager
                 $candidate = $this->normalizeCandidateTitle($candidate);
 
                 if ($this->isPlausibleReleaseTitle($candidate)) {
-                    (new NameFixer())->updateRelease(
+                    (new ReleaseUpdateService())->updateRelease(
                         $context->release,
                         $candidate,
                         'RarInfo FileName Match',
@@ -537,7 +538,7 @@ class ReleaseFileManager
             return ucwords($match[1], '.-_ ');
         }
 
-        if (preg_match(NameFixer::PREDB_REGEX, $cleaned, $hit)) {
+        if (preg_match(ReleaseUpdateService::PREDB_REGEX, $cleaned, $hit)) {
             return ucwords($hit[0], '.');
         }
 

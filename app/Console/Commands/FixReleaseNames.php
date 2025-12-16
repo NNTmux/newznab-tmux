@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\NameFixer;
+use App\Services\NameFixing\NameFixingService;
 use Blacklight\NNTP;
 use Illuminate\Console\Command;
 
@@ -30,12 +30,12 @@ class FixReleaseNames extends Command
     /**
      * Execute the console command.
      */
-    public function handle(NameFixer $nameFixer, NNTP $nntp): int
+    public function handle(NameFixingService $nameFixingService, NNTP $nntp): int
     {
         $method = $this->argument('method');
-        $update = $this->option('update');
-        $setStatus = $this->option('set-status');
-        $show = $this->option('show') ? 1 : 2;
+        $update = (bool) $this->option('update');
+        $setStatus = (bool) $this->option('set-status');
+        $show = $this->option('show');
 
         // Set category option
         $categoryOption = $this->option('category');
@@ -60,58 +60,58 @@ class FixReleaseNames extends Command
 
         switch ($method) {
             case '3':
-                $nameFixer->fixNamesWithNfo(1, $update, $other, $setStatus, $show);
+                $nameFixingService->fixNamesWithNfo(1, $update, $other, $setStatus, $show);
                 break;
             case '4':
-                $nameFixer->fixNamesWithNfo(2, $update, $other, $setStatus, $show);
+                $nameFixingService->fixNamesWithNfo(2, $update, $other, $setStatus, $show);
                 break;
             case '5':
-                $nameFixer->fixNamesWithFiles(1, $update, $other, $setStatus, $show);
+                $nameFixingService->fixNamesWithFiles(1, $update, $other, $setStatus, $show);
                 break;
             case '6':
-                $nameFixer->fixNamesWithFiles(2, $update, $other, $setStatus, $show);
+                $nameFixingService->fixNamesWithFiles(2, $update, $other, $setStatus, $show);
                 break;
             case '7':
-                $nameFixer->fixNamesWithPar2(1, $update, $other, $setStatus, $show, $nntp);
+                $nameFixingService->fixNamesWithPar2(1, $update, $other, $setStatus, $show, $nntp);
                 break;
             case '8':
-                $nameFixer->fixNamesWithPar2(2, $update, $other, $setStatus, $show, $nntp);
+                $nameFixingService->fixNamesWithPar2(2, $update, $other, $setStatus, $show, $nntp);
                 break;
             case '9':
-                $nameFixer->fixNamesWithMedia(1, $update, $other, $setStatus, $show);
+                $nameFixingService->fixNamesWithMedia(1, $update, $other, $setStatus, $show);
                 break;
             case '10':
-                $nameFixer->fixNamesWithMedia(2, $update, $other, $setStatus, $show);
+                $nameFixingService->fixNamesWithMedia(2, $update, $other, $setStatus, $show);
                 break;
             case '11':
-                $nameFixer->fixXXXNamesWithFiles(1, $update, $other, $setStatus, $show);
+                $nameFixingService->fixXXXNamesWithFiles(1, $update, $other, $setStatus, $show);
                 break;
             case '12':
-                $nameFixer->fixXXXNamesWithFiles(2, $update, $other, $setStatus, $show);
+                $nameFixingService->fixXXXNamesWithFiles(2, $update, $other, $setStatus, $show);
                 break;
             case '13':
-                $nameFixer->fixNamesWithSrr(1, $update, $other, $setStatus, $show);
+                $nameFixingService->fixNamesWithSrr(1, $update, $other, $setStatus, $show);
                 break;
             case '14':
-                $nameFixer->fixNamesWithSrr(2, $update, $other, $setStatus, $show);
+                $nameFixingService->fixNamesWithSrr(2, $update, $other, $setStatus, $show);
                 break;
             case '15':
-                $nameFixer->fixNamesWithParHash(1, $update, $other, $setStatus, $show);
+                $nameFixingService->fixNamesWithParHash(1, $update, $other, $setStatus, $show);
                 break;
             case '16':
-                $nameFixer->fixNamesWithParHash(2, $update, $other, $setStatus, $show);
+                $nameFixingService->fixNamesWithParHash(2, $update, $other, $setStatus, $show);
                 break;
             case '17':
-                $nameFixer->fixNamesWithMediaMovieName(1, $update, $other, $setStatus, $show);
+                $nameFixingService->fixNamesWithMediaMovieName(1, $update, $other, $setStatus, $show);
                 break;
             case '18':
-                $nameFixer->fixNamesWithMediaMovieName(2, $update, $other, $setStatus, $show);
+                $nameFixingService->fixNamesWithMediaMovieName(2, $update, $other, $setStatus, $show);
                 break;
             case '19':
-                $nameFixer->fixNamesWithCrc(1, $update, $other, $setStatus, $show);
+                $nameFixingService->fixNamesWithCrc(1, $update, $other, $setStatus, $show);
                 break;
             case '20':
-                $nameFixer->fixNamesWithCrc(2, $update, $other, $setStatus, $show);
+                $nameFixingService->fixNamesWithCrc(2, $update, $other, $setStatus, $show);
                 break;
             default:
                 $this->showHelp();

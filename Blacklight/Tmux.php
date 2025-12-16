@@ -4,6 +4,7 @@ namespace Blacklight;
 
 use App\Models\Category;
 use App\Models\Settings;
+use App\Services\NameFixing\NameFixingService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -331,14 +332,14 @@ class Tmux
                     Category::XXX_ROOT,
                     Category::XXX_X264,
                     Nfo::NfoQueryString(),
-                    NameFixer::IS_RENAMED_NONE,
+                    NameFixingService::IS_RENAMED_NONE,
                     Nfo::NFO_UNPROC,
                     Nfo::NFO_FOUND,
-                    NameFixer::PROC_NFO_NONE,
-                    NameFixer::PROC_FILES_NONE,
-                    NameFixer::PROC_PAR2_NONE,
+                    NameFixingService::PROC_NFO_NONE,
+                    NameFixingService::PROC_FILES_NONE,
+                    NameFixingService::PROC_PAR2_NONE,
                     Category::getCategoryOthersGroup(),
-                    NameFixer::IS_RENAMED_DONE
+                    NameFixingService::IS_RENAMED_DONE
                 );
 
             case 2:

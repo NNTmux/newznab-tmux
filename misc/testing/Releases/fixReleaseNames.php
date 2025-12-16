@@ -10,12 +10,12 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\NameFixer;
+use App\Services\NameFixing\NameFixingService;
 use Blacklight\NNTP;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 $output = new ConsoleOutput;
-$nameFixer = new NameFixer;
+$nameFixingService = new NameFixingService;
 $nntp = new NNTP;
 
 if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
@@ -28,7 +28,7 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
     }
     $setStatus = $argv[4] === 'yes';
 
-    $show = isset($argv[5]) && $argv[5] === 'show' ? 1 : 2;
+    $show = isset($argv[5]) && $argv[5] === 'show';
     if ($argv[1] === '7' || $argv[1] === '8') {
         $compressedHeaders = config('nntmux_nntp.compressed_headers');
         if ((config('nntmux_nntp.use_alternate_nntp_server') === true ? $nntp->doConnect($compressedHeaders, true) : $nntp->doConnect()) !== true) {
@@ -40,58 +40,58 @@ if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
 
     switch ($argv[1]) {
         case '3':
-            $nameFixer->fixNamesWithNfo(1, $update, $other, $setStatus, $show);
+            $nameFixingService->fixNamesWithNfo(1, $update, $other, $setStatus, $show);
             break;
         case '4':
-            $nameFixer->fixNamesWithNfo(2, $update, $other, $setStatus, $show);
+            $nameFixingService->fixNamesWithNfo(2, $update, $other, $setStatus, $show);
             break;
         case '5':
-            $nameFixer->fixNamesWithFiles(1, $update, $other, $setStatus, $show);
+            $nameFixingService->fixNamesWithFiles(1, $update, $other, $setStatus, $show);
             break;
         case '6':
-            $nameFixer->fixNamesWithFiles(2, $update, $other, $setStatus, $show);
+            $nameFixingService->fixNamesWithFiles(2, $update, $other, $setStatus, $show);
             break;
         case '7':
-            $nameFixer->fixNamesWithPar2(1, $update, $other, $setStatus, $show, $nntp);
+            $nameFixingService->fixNamesWithPar2(1, $update, $other, $setStatus, $show, $nntp);
             break;
         case '8':
-            $nameFixer->fixNamesWithPar2(2, $update, $other, $setStatus, $show, $nntp);
+            $nameFixingService->fixNamesWithPar2(2, $update, $other, $setStatus, $show, $nntp);
             break;
         case '9':
-            $nameFixer->fixNamesWithMedia(1, $update, $other, $setStatus, $show);
+            $nameFixingService->fixNamesWithMedia(1, $update, $other, $setStatus, $show);
             break;
         case '10':
-            $nameFixer->fixNamesWithMedia(2, $update, $other, $setStatus, $show);
+            $nameFixingService->fixNamesWithMedia(2, $update, $other, $setStatus, $show);
             break;
         case '11':
-            $nameFixer->fixXXXNamesWithFiles(1, $update, $other, $setStatus, $show);
+            $nameFixingService->fixXXXNamesWithFiles(1, $update, $other, $setStatus, $show);
             break;
         case '12':
-            $nameFixer->fixXXXNamesWithFiles(2, $update, $other, $setStatus, $show);
+            $nameFixingService->fixXXXNamesWithFiles(2, $update, $other, $setStatus, $show);
             break;
         case '13':
-            $nameFixer->fixNamesWithSrr(1, $update, $other, $setStatus, $show);
+            $nameFixingService->fixNamesWithSrr(1, $update, $other, $setStatus, $show);
             break;
         case '14':
-            $nameFixer->fixNamesWithSrr(2, $update, $other, $setStatus, $show);
+            $nameFixingService->fixNamesWithSrr(2, $update, $other, $setStatus, $show);
             break;
         case '15':
-            $nameFixer->fixNamesWithParHash(1, $update, $other, $setStatus, $show);
+            $nameFixingService->fixNamesWithParHash(1, $update, $other, $setStatus, $show);
             break;
         case '16':
-            $nameFixer->fixNamesWithParHash(2, $update, $other, $setStatus, $show);
+            $nameFixingService->fixNamesWithParHash(2, $update, $other, $setStatus, $show);
             break;
         case '17':
-            $nameFixer->fixNamesWithMediaMovieName(1, $update, $other, $setStatus, $show);
+            $nameFixingService->fixNamesWithMediaMovieName(1, $update, $other, $setStatus, $show);
             break;
         case '18':
-            $nameFixer->fixNamesWithMediaMovieName(2, $update, $other, $setStatus, $show);
+            $nameFixingService->fixNamesWithMediaMovieName(2, $update, $other, $setStatus, $show);
             break;
         case '19':
-            $nameFixer->fixNamesWithCrc(1, $update, $other, $setStatus, $show);
+            $nameFixingService->fixNamesWithCrc(1, $update, $other, $setStatus, $show);
             break;
         case '20':
-            $nameFixer->fixNamesWithCrc(2, $update, $other, $setStatus, $show);
+            $nameFixingService->fixNamesWithCrc(2, $update, $other, $setStatus, $show);
             break;
         default:
             $output->writeln('<error>'.PHP_EOL.'ERROR: Wrong argument, type php '.$argv[0].' to see a list of valid arguments.</error>');

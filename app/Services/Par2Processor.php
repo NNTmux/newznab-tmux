@@ -6,7 +6,7 @@ use App\Models\Category;
 use App\Models\Release;
 use App\Models\ReleaseFile;
 use App\Models\UsenetGroup;
-use Blacklight\NameFixer;
+use App\Services\NameFixing\NameFixingService;
 use Blacklight\NNTP;
 use dariusiii\rarinfo\Par2Info;
 use Illuminate\Support\Carbon;
@@ -16,7 +16,7 @@ use Illuminate\Support\Carbon;
  */
 class Par2Processor
 {
-    private NameFixer $nameFixer;
+    private NameFixingService $nameFixingService;
 
     private Par2Info $par2Info;
 
@@ -24,9 +24,9 @@ class Par2Processor
 
     private bool $alternateNNTP;
 
-    public function __construct(NameFixer $nameFixer, Par2Info $par2Info, bool $addPar2, bool $alternateNNTP)
+    public function __construct(NameFixingService $nameFixingService, Par2Info $par2Info, bool $addPar2, bool $alternateNNTP)
     {
-        $this->nameFixer = $nameFixer;
+        $this->nameFixingService = $nameFixingService;
         $this->par2Info = $par2Info;
         $this->addPar2 = $addPar2;
         $this->alternateNNTP = $alternateNNTP;
@@ -112,7 +112,7 @@ class Par2Processor
                 // Try to get a new name.
                 if ($foundName === false) {
                     $query['textstring'] = $file['name'];
-                    if ($this->nameFixer->checkName($query, 1, 'PAR2, ', 1, $show)) {
+                    if ($this->nameFixingService->checkName($query, true, 'PAR2, ', true, $show)) {
                         $foundName = true;
                     }
                 }

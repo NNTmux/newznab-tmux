@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Release;
 use App\Models\ReleaseInform;
 use App\Models\User;
-use Blacklight\NameFixer;
+use App\Services\NameFixing\ReleaseUpdateService;
 use Illuminate\Http\Request;
 
 class ApiInformController extends Controller
@@ -31,7 +31,7 @@ class ApiInformController extends Controller
             ReleaseInform::insertOrIgnore(['relOName' => $releaseObName, 'relPName' => $releasePrName, 'api_token' => $apiToken, 'created_at' => now(), 'updated_at' => now()]);
             $release = Release::whereSearchname($releaseObName)->first();
             if (! empty($release)) {
-                (new NameFixer)->updateRelease($release, $releasePrName, 'Release Inform API', true, 'Filenames, ', 1, true);
+                (new ReleaseUpdateService())->updateRelease($release, $releasePrName, 'Release Inform API', true, 'Filenames, ', true, true);
             }
 
             return response()->json(['message' => 'Release Information Added!'], 200);

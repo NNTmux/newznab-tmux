@@ -8,11 +8,11 @@ use App\Services\ConsolesProcessor;
 use App\Services\GamesProcessor;
 use App\Services\MoviesProcessor;
 use App\Services\MusicProcessor;
+use App\Services\NameFixing\NameFixingService;
 use App\Services\NfoProcessor;
 use App\Services\Par2Processor;
 use App\Services\TvProcessor;
 use App\Services\XXXProcessor;
-use Blacklight\NameFixer;
 use Blacklight\Nfo;
 use Blacklight\NNTP;
 use Blacklight\processing\post\ProcessAdditional;
@@ -20,7 +20,7 @@ use dariusiii\rarinfo\Par2Info;
 
 class PostProcess
 {
-    protected NameFixer $nameFixer;
+    protected NameFixingService $nameFixingService;
 
     protected Par2Info $_par2Info;
 
@@ -68,7 +68,7 @@ class PostProcess
 
         // Class instances.
         $this->_par2Info = new Par2Info;
-        $this->nameFixer = new NameFixer;
+        $this->nameFixingService = new NameFixingService;
         $this->Nfo = new Nfo;
 
         // Site settings.
@@ -76,7 +76,7 @@ class PostProcess
         $this->alternateNNTP = config('nntmux_nntp.use_alternate_nntp_server');
 
         // Services.
-        $this->par2Processor = new Par2Processor($this->nameFixer, $this->_par2Info, $this->addpar2, $this->alternateNNTP);
+        $this->par2Processor = new Par2Processor($this->nameFixingService, $this->_par2Info, $this->addpar2, $this->alternateNNTP);
         $this->tvProcessor = new TvProcessor($this->echooutput);
         $this->nfoProcessor = new NfoProcessor($this->Nfo, $this->echooutput);
 

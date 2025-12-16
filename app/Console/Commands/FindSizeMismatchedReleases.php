@@ -3,7 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\Release;
-use Blacklight\NameFixer;
+use App\Services\NameFixing\NameFixingService;
+use App\Services\NameFixing\ReleaseUpdateService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -20,7 +21,7 @@ class FindSizeMismatchedReleases extends Command
         $checkSeasonPack = $this->option('season-pack');
         $direction = $this->option('direction');
         $shouldRename = $this->option('rename');
-        $nameFixer = new NameFixer;
+        $nameFixingService = new NameFixingService;
 
         $query = Release::query()
             ->select([
@@ -59,8 +60,8 @@ class FindSizeMismatchedReleases extends Command
         $mismatches = $query->get();
 
         if ($checkSeasonPack) {
-            $mismatches = $mismatches->filter(function ($release) use ($nameFixer) {
-                return $nameFixer->isSeasonPack($release->name);
+            $mismatches = $mismatches->filter(function ($release) use ($nameFixingService) {
+                return $nameFixingService->isSeasonPack($release->name);
             });
         }
 
@@ -75,7 +76,7 @@ class FindSizeMismatchedReleases extends Command
             $this->info("\nAttempting to rename ".$mismatches->count()." releases...\n");
 
             foreach ($mismatches as $release) {
-                $this->attemptRename($release, $nameFixer);
+                $this->attemptRename($release, $nameFixingService);
             }
 
             $this->outputReleaseIdsAsCsv($mismatches);
@@ -102,19 +103,19 @@ class FindSizeMismatchedReleases extends Command
         $this->outputReleaseIdsAsCsv($mismatches);
     }
 
-    private function attemptRename(Release $release, NameFixer $nameFixer): ?string
+    private function attemptRename(Release $release, NameFixingService $nameFixingService): ?string
     {
-        if (preg_match(NameFixer::PREDB_REGEX, $this->stripDomainFromString($release->name), $matches)) {
+        if (preg_match(ReleaseUpdateService::PREDB_REGEX, $this->stripDomainFromString($release->name), $matches)) {
             $newName = $matches[1];
             if ($newName) {
-                $nameFixer->updateRelease(
+                $nameFixingService->getUpdateService()->updateRelease(
                     release: $release,
                     name: $newName,
                     method: 'size-mismatch / season pack',
                     echo: true,
                     type: '',
-                    nameStatus: 1,
-                    show: '1',
+                    nameStatus: true,
+                    show: true,
                     preId: 0
                 );
 
