@@ -346,10 +346,10 @@ final class BackfillService
         $this->log(sprintf(
             "Group %s's oldest article is %s, newest is %s. Our target article is %s. Our oldest article is article %s.",
             $shortGroupName,
-            number_format($serverData['first']),
-            number_format($serverData['last']),
+            number_format((float) $serverData['first']),
+            number_format((float) $serverData['last']),
             number_format($targetPost),
-            number_format($groupArr['first_record'])
+            number_format((float) $groupArr['first_record'])
         ));
     }
 
