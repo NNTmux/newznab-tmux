@@ -931,7 +931,8 @@ class Games
                 60
             );
 
-            return $result;
+            // RateLimiter::attempt returns true if rate limited, so check for actual Game instance
+            return $result instanceof Game ? $result : null;
         } catch (\Exception $e) {
             Log::warning('Games: IGDB exact search error', ['error' => $e->getMessage()]);
             return null;
@@ -973,7 +974,8 @@ class Games
                 60
             );
 
-            if (empty($results)) {
+            // RateLimiter::attempt returns true if rate limited
+            if ($results === true || empty($results)) {
                 return null;
             }
 
