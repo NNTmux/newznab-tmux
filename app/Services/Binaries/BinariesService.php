@@ -2,50 +2,30 @@
 
 declare(strict_types=1);
 
-namespace Blacklight;
+namespace App\Services\Binaries;
 
 use App\Models\Settings;
 use App\Models\UsenetGroup;
-use App\Services\Binaries\BinariesConfig;
-use App\Services\Binaries\HeaderParser;
-use App\Services\Binaries\HeaderStorageService;
-use App\Services\Binaries\MissedPartHandler;
+use Blacklight\ColorCLI;
+use Blacklight\NNTP;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 /**
- * Handles downloading and processing of Usenet binary headers.
+ * Service for downloading and processing of Usenet binary headers.
  *
- * This class has been refactored to use dedicated service classes for:
- * - Header parsing and filtering (HeaderParser)
- * - Header storage (HeaderStorageService)
- * - Missed part repair (MissedPartHandler)
- * - Configuration (BinariesConfig)
+ * This service orchestrates the header processing workflow using:
+ * - HeaderParser for parsing and filtering headers
+ * - HeaderStorageService for storing headers to database
+ * - MissedPartHandler for part repair tracking
+ * - BinariesConfig for configuration
  */
-class Binaries
+class BinariesService
 {
-    // Operation type constants
-    public const OPTYPE_BLACKLIST = 1;
-
-    public const OPTYPE_WHITELIST = 2;
-
-    // Blacklist status constants
-
-    public const BLACKLIST_ENABLED = 1;
-
-    // Blacklist field constants
-    public const BLACKLIST_FIELD_SUBJECT = 1;
-
-    public const BLACKLIST_FIELD_FROM = 2;
-
-    public const BLACKLIST_FIELD_MESSAGEID = 3;
-
-    // Configuration
     private BinariesConfig $config;
 
-    // Services
     private HeaderParser $headerParser;
 
     private HeaderStorageService $headerStorage;
@@ -54,7 +34,7 @@ class Binaries
 
     private ColorCLI $colorCli;
 
-    private NNTP $nntp;
+    private ?NNTP $nntp = null;
 
     // Timing metrics
     private float $timeHeaders = 0;
@@ -84,40 +64,60 @@ class Binaries
 
     private array $headersReceived = [];
 
-    /**
-     * @param  BinariesConfig|array|null  $options  Config object or legacy options array
-     */
-    public function __construct(BinariesConfig|array|null $options = null)
-    {
-        // Handle legacy array options for backward compatibility
-        if (\is_array($options)) {
-            $this->config = BinariesConfig::fromSettings();
-
-            // Use provided NNTP if available
-            if (isset($options['NNTP']) && $options['NNTP'] instanceof NNTP) {
-                $this->nntp = $options['NNTP'];
-            } else {
-                $this->nntp = new NNTP;
-            }
-        } else {
-            $this->config = $options ?? BinariesConfig::fromSettings();
-            $this->nntp = new NNTP;
-        }
-
-        $this->colorCli = new ColorCLI;
-        $this->headerParser = new HeaderParser;
-        $this->headerStorage = new HeaderStorageService(config: $this->config);
-        $this->missedPartHandler = new MissedPartHandler(
+    public function __construct(
+        ?BinariesConfig $config = null,
+        ?HeaderParser $headerParser = null,
+        ?HeaderStorageService $headerStorage = null,
+        ?MissedPartHandler $missedPartHandler = null,
+        ?ColorCLI $colorCli = null,
+        ?NNTP $nntp = null
+    ) {
+        $this->config = $config ?? BinariesConfig::fromSettings();
+        $this->headerParser = $headerParser ?? new HeaderParser;
+        $this->headerStorage = $headerStorage ?? new HeaderStorageService(config: $this->config);
+        $this->missedPartHandler = $missedPartHandler ?? new MissedPartHandler(
             $this->config->partRepairLimit,
             $this->config->partRepairMaxTries
         );
-
+        $this->colorCli = $colorCli ?? new ColorCLI;
+        $this->nntp = $nntp;
         $this->startUpdate = now();
+    }
 
-        // Initialize legacy BC properties
-        $this->messageBuffer = $this->config->messageBuffer;
-        $this->blackList = [];
-        $this->whiteList = [];
+    /**
+     * Set NNTP connection (for external injection).
+     */
+    public function setNntp(NNTP $nntp): void
+    {
+        $this->nntp = $nntp;
+    }
+
+    /**
+     * Get the NNTP connection, creating one if needed.
+     */
+    public function getNntp(): NNTP
+    {
+        if ($this->nntp === null) {
+            $this->nntp = new NNTP;
+        }
+
+        return $this->nntp;
+    }
+
+    /**
+     * Get the configuration object.
+     */
+    public function getConfig(): BinariesConfig
+    {
+        return $this->config;
+    }
+
+    /**
+     * Get the message buffer size.
+     */
+    public function getMessageBuffer(): int
+    {
+        return $this->config->messageBuffer;
     }
 
     /**
@@ -198,8 +198,10 @@ class Binaries
         $startGroup = now();
         $this->logIndexerStart();
 
+        $nntp = $this->getNntp();
+
         // Select the group on the NNTP server
-        $groupNNTP = $this->selectNntpGroup($groupMySQL);
+        $groupNNTP = $this->selectNntpGroup($groupMySQL, $nntp);
         if ($groupNNTP === null) {
             return;
         }
@@ -406,6 +408,7 @@ class Binaries
      */
     public function postdate(int|string $post, array $groupData): int
     {
+        $nntp = $this->getNntp();
         $currentPost = (int) $post;
         $attempts = 0;
         $date = 0;
@@ -428,8 +431,8 @@ class Binaries
             }
 
             // Try usenet
-            $header = $this->nntp->getXOVER((string) $currentPost);
-            if (! $this->nntp::isError($header) && isset($header[0]['Date']) && $header[0]['Date'] !== '') {
+            $header = $nntp->getXOVER((string) $currentPost);
+            if (! NNTP::isError($header) && isset($header[0]['Date']) && $header[0]['Date'] !== '') {
                 $date = $header[0]['Date'];
                 break;
             }
@@ -481,18 +484,18 @@ class Binaries
 
     // ==================== Private Helper Methods ====================
 
-    private function selectNntpGroup(array &$groupMySQL): ?array
+    private function selectNntpGroup(array &$groupMySQL, NNTP $nntp): ?array
     {
-        $groupNNTP = $this->nntp->selectGroup($groupMySQL['name']);
+        $groupNNTP = $nntp->selectGroup($groupMySQL['name']);
 
-        if ($this->nntp::isError($groupNNTP)) {
-            $groupNNTP = $this->nntp->dataError($this->nntp, $groupMySQL['name']);
+        if (NNTP::isError($groupNNTP)) {
+            $groupNNTP = $nntp->dataError($nntp, $groupMySQL['name']);
 
             if (isset($groupNNTP['code']) && (int) $groupNNTP['code'] === 411) {
                 UsenetGroup::disableIfNotExist($groupMySQL['id']);
             }
 
-            if ($this->nntp::isError($groupNNTP)) {
+            if (NNTP::isError($groupNNTP)) {
                 return null;
             }
         }
@@ -649,28 +652,30 @@ class Binaries
 
     private function downloadHeaders(bool $partRepair): ?array
     {
+        $nntp = $this->getNntp();
+
         if ($partRepair) {
-            $headers = $this->nntp->getOverview($this->first.'-'.$this->last, true, false);
+            $headers = $nntp->getOverview($this->first.'-'.$this->last, true, false);
         } else {
-            $headers = $this->nntp->getXOVER($this->first.'-'.$this->last);
+            $headers = $nntp->getXOVER($this->first.'-'.$this->last);
         }
 
-        if ($this->nntp::isError($headers)) {
+        if (NNTP::isError($headers)) {
             if ($partRepair) {
                 return null;
             }
 
             // Retry without compression
-            $this->nntp->doQuit();
-            if ($this->nntp->doConnect(false) !== true) {
+            $nntp->doQuit();
+            if ($nntp->doConnect(false) !== true) {
                 return null;
             }
 
-            $this->nntp->selectGroup($this->groupMySQL['name']);
-            $headers = $this->nntp->getXOVER($this->first.'-'.$this->last);
-            $this->nntp->enableCompression();
+            $nntp->selectGroup($this->groupMySQL['name']);
+            $headers = $nntp->getXOVER($this->first.'-'.$this->last);
+            $nntp->enableCompression();
 
-            if ($this->nntp::isError($headers)) {
+            if (NNTP::isError($headers)) {
                 $message = ((int) $headers->code === 0 ? 'Unknown error' : $headers->message);
                 $this->log("Code {$headers->code}: $message\nSkipping group: {$this->groupMySQL['name']}", __FUNCTION__, 'error');
 
@@ -896,22 +901,5 @@ class Binaries
             Log::error($message);
         }
     }
-
-    // ==================== Legacy BC Properties ====================
-
-    /**
-     * @deprecated Use BinariesConfig instead
-     */
-    public int $messageBuffer;
-
-    /**
-     * @deprecated Use BlacklistService instead
-     */
-    public array $blackList = [];
-
-    /**
-     * @deprecated Use BlacklistService instead
-     */
-    public array $whiteList = [];
 }
 

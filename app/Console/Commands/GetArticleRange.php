@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Settings;
 use App\Models\UsenetGroup;
-use Blacklight\Binaries;
+use App\Services\Binaries\BinariesService;
 use Blacklight\NNTP;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -61,7 +61,8 @@ class GetArticleRange extends Command
                 return self::FAILURE;
             }
 
-            $binaries = new Binaries(['NNTP' => $nntp, 'Groups' => null]);
+            $binaries = new BinariesService();
+            $binaries->setNntp($nntp);
             $return = $binaries->scan(
                 $groupMySQL,
                 $firstArticle,

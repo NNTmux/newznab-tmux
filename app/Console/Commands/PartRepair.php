@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\UsenetGroup;
-use Blacklight\Binaries;
+use App\Services\Binaries\BinariesService;
 use Blacklight\NNTP;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -48,7 +48,9 @@ class PartRepair extends Command
                 return self::FAILURE;
             }
 
-            (new Binaries(['NNTP' => $nntp]))->partRepair($groupMySQL);
+            $binaries = new BinariesService();
+            $binaries->setNntp($nntp);
+            $binaries->partRepair($groupMySQL);
 
             return self::SUCCESS;
         } catch (\Throwable $e) {

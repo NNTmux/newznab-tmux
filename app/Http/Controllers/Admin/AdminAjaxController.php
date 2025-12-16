@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
 use App\Models\UsenetGroup;
-use Blacklight\Binaries;
+use App\Services\BlacklistService;
 use Blacklight\Regexes;
 use Illuminate\Http\Request;
 
@@ -19,13 +19,11 @@ class AdminAjaxController extends BasePageController
             return response()->json(['success' => false, 'message' => 'No action specified'], 400);
         }
 
-        $settings = ['Settings' => $this->settings];
-
         try {
             switch ($request->input('action')) {
                 case 'binary_blacklist_delete':
                     $id = (int) $request->input('row_id');
-                    (new Binaries($settings))->deleteBlacklist($id);
+                    (new BlacklistService())->deleteBlacklist($id);
                     echo "Blacklist $id deleted.";
                     break;
 

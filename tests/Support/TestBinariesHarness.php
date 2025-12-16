@@ -3,12 +3,12 @@
 namespace Tests\Support;
 
 use App\Services\Binaries\BinariesConfig;
+use App\Services\Binaries\BinariesService;
 use App\Services\Binaries\HeaderStorageService;
 use App\Services\Binaries\MissedPartHandler;
-use Blacklight\Binaries;
 use Illuminate\Support\Facades\DB;
 
-class TestBinariesHarness extends Binaries
+class TestBinariesHarness extends BinariesService
 {
     public bool $failPartsInsert = false;
 

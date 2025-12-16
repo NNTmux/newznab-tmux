@@ -2,6 +2,7 @@
 
 namespace Blacklight;
 
+use App\Enums\BlacklistConstants;
 use App\Models\Category;
 use App\Models\Settings;
 use Exception;
@@ -591,7 +592,7 @@ class ReleaseRemover
     protected function removeBlacklist(): bool
     {
         $status = (empty($this->blacklistID) || $this->delete)
-            ? sprintf('AND status = %d', Binaries::BLACKLIST_ENABLED)
+            ? sprintf('AND status = %d', BlacklistConstants::BLACKLIST_ENABLED)
             : '';
 
         $regexList = DB::select(sprintf(
@@ -600,9 +601,9 @@ class ReleaseRemover
             WHERE optype = %d
             AND msgcol IN (%d, %d) %s %s
             ORDER BY id ASC',
-            Binaries::OPTYPE_BLACKLIST,
-            Binaries::BLACKLIST_FIELD_SUBJECT,
-            Binaries::BLACKLIST_FIELD_FROM,
+            BlacklistConstants::OPTYPE_BLACKLIST,
+            BlacklistConstants::BLACKLIST_FIELD_SUBJECT,
+            BlacklistConstants::BLACKLIST_FIELD_FROM,
             $this->blacklistID,
             $status
         ));
@@ -665,8 +666,8 @@ class ReleaseRemover
     private function buildBlacklistRegexSQL(int $msgcol, string $dbRegex): array
     {
         return match ($msgcol) {
-            Binaries::BLACKLIST_FIELD_SUBJECT => [sprintf('WHERE r.searchname REGEXP %s', $dbRegex), 'Subject'],
-            Binaries::BLACKLIST_FIELD_FROM => ['WHERE r.fromname REGEXP '.$dbRegex, 'Poster'],
+            BlacklistConstants::BLACKLIST_FIELD_SUBJECT => [sprintf('WHERE r.searchname REGEXP %s', $dbRegex), 'Subject'],
+            BlacklistConstants::BLACKLIST_FIELD_FROM => ['WHERE r.fromname REGEXP '.$dbRegex, 'Poster'],
             default => ['', ''],
         };
     }
@@ -698,9 +699,9 @@ class ReleaseRemover
             AND optype = %d
             AND msgcol = %d
             ORDER BY id ASC',
-            Binaries::BLACKLIST_ENABLED,
-            Binaries::OPTYPE_BLACKLIST,
-            Binaries::BLACKLIST_FIELD_SUBJECT
+            BlacklistConstants::BLACKLIST_ENABLED,
+            BlacklistConstants::OPTYPE_BLACKLIST,
+            BlacklistConstants::BLACKLIST_FIELD_SUBJECT
         ));
 
         if (empty($allRegex)) {

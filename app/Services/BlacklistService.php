@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\BlacklistConstants;
 use App\Models\BinaryBlacklist;
 use Illuminate\Support\Facades\DB;
 
@@ -35,9 +36,9 @@ class BlacklistService
 
         $blackListed = false;
         $field = [
-            \Blacklight\Binaries::BLACKLIST_FIELD_SUBJECT => $msg['Subject'] ?? '',
-            \Blacklight\Binaries::BLACKLIST_FIELD_FROM => $msg['From'] ?? '',
-            \Blacklight\Binaries::BLACKLIST_FIELD_MESSAGEID => $msg['Message-ID'] ?? '',
+            BlacklistConstants::BLACKLIST_FIELD_SUBJECT => $msg['Subject'] ?? '',
+            BlacklistConstants::BLACKLIST_FIELD_FROM => $msg['From'] ?? '',
+            BlacklistConstants::BLACKLIST_FIELD_MESSAGEID => $msg['Message-ID'] ?? '',
         ];
 
         // Whitelist first: if any whitelist matches, allow; otherwise treat as blacklisted.
@@ -93,8 +94,8 @@ class BlacklistService
     public function getBlacklist(bool $activeOnly = true, int|string $opType = -1, string $groupName = '', bool $groupRegex = false): array
     {
         $opTypeSql = match ($opType) {
-            \Blacklight\Binaries::OPTYPE_BLACKLIST => 'AND bb.optype = '.\Blacklight\Binaries::OPTYPE_BLACKLIST,
-            \Blacklight\Binaries::OPTYPE_WHITELIST => 'AND bb.optype = '.\Blacklight\Binaries::OPTYPE_WHITELIST,
+            BlacklistConstants::OPTYPE_BLACKLIST => 'AND bb.optype = '.BlacklistConstants::OPTYPE_BLACKLIST,
+            BlacklistConstants::OPTYPE_WHITELIST => 'AND bb.optype = '.BlacklistConstants::OPTYPE_WHITELIST,
             default => '',
         };
 
@@ -156,10 +157,10 @@ class BlacklistService
     private function retrieveLists(string $groupName): void
     {
         if (! isset($this->blackList[$groupName])) {
-            $this->blackList[$groupName] = $this->getBlacklist(true, \Blacklight\Binaries::OPTYPE_BLACKLIST, $groupName, true);
+            $this->blackList[$groupName] = $this->getBlacklist(true, BlacklistConstants::OPTYPE_BLACKLIST, $groupName, true);
         }
         if (! isset($this->whiteList[$groupName])) {
-            $this->whiteList[$groupName] = $this->getBlacklist(true, \Blacklight\Binaries::OPTYPE_WHITELIST, $groupName, true);
+            $this->whiteList[$groupName] = $this->getBlacklist(true, BlacklistConstants::OPTYPE_WHITELIST, $groupName, true);
         }
         $this->listsFound[$groupName] = ($this->blackList[$groupName] || $this->whiteList[$groupName]);
     }

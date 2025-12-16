@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\BlacklistConstants;
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
 use App\Services\BlacklistService;
-use Blacklight\Binaries;
 use Illuminate\Http\Request;
 
 class AdminBlacklistController extends BasePageController
@@ -100,9 +100,9 @@ class AdminBlacklistController extends BasePageController
             'optype_ids' => [1, 2],
             'optype_names' => ['Black', 'White'],
             'msgcol_ids' => [
-                Binaries::BLACKLIST_FIELD_SUBJECT,
-                Binaries::BLACKLIST_FIELD_FROM,
-                Binaries::BLACKLIST_FIELD_MESSAGEID,
+                BlacklistConstants::BLACKLIST_FIELD_SUBJECT,
+                BlacklistConstants::BLACKLIST_FIELD_FROM,
+                BlacklistConstants::BLACKLIST_FIELD_MESSAGEID,
             ],
             'msgcol_names' => ['Subject', 'Poster', 'MessageId'],
             'title' => $title,

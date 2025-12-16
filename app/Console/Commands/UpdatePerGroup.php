@@ -6,8 +6,8 @@ namespace App\Console\Commands;
 
 use App\Models\Settings;
 use App\Models\UsenetGroup;
+use App\Services\Binaries\BinariesService;
 use Blacklight\Backfill;
-use Blacklight\Binaries;
 use Blacklight\Nfo;
 use Blacklight\NNTP;
 use Blacklight\processing\post\ProcessAdditional;
@@ -59,7 +59,7 @@ class UpdatePerGroup extends Command
 
             // Update the group for new binaries
             $this->info("Updating binaries for group: {$groupMySQL['name']}");
-            (new Binaries())->updateGroup($groupMySQL);
+            (new BinariesService())->updateGroup($groupMySQL);
 
             // BackFill the group with 20k articles
             $this->info("Backfilling group: {$groupMySQL['name']}");

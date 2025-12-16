@@ -4,6 +4,7 @@ namespace Blacklight;
 
 use App\Models\Settings;
 use App\Models\UsenetGroup;
+use App\Services\Binaries\BinariesService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\DB;
  */
 class Backfill
 {
-    protected Binaries $_binaries;
+    protected BinariesService $_binaries;
 
     protected NNTP $_nntp;
 
@@ -50,7 +51,7 @@ class Backfill
         $this->_echoCLI = config('nntmux.echocli');
 
         $this->_nntp = new NNTP;
-        $this->_binaries = new Binaries;
+        $this->_binaries = new BinariesService;
 
         $this->colorCli = new ColorCLI;
 
@@ -214,7 +215,7 @@ class Backfill
         // Set first and last, moving the window by max messages.
         $last = ($groupArr['first_record'] - 1);
         // Set the initial "chunk".
-        $first = ($last - $this->_binaries->messageBuffer + 1);
+        $first = ($last - $this->_binaries->getMessageBuffer() + 1);
 
         // Just in case this is the last chunk we needed.
         if ($targetpost > $first) {
@@ -263,7 +264,7 @@ class Backfill
             } else {
                 // Keep going: set new last, new first, check for last chunk.
                 $last = ($first - 1);
-                $first = ($last - $this->_binaries->messageBuffer + 1);
+                $first = ($last - $this->_binaries->getMessageBuffer() + 1);
                 if ($targetpost > $first) {
                     $first = $targetpost;
                 }

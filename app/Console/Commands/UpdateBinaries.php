@@ -6,7 +6,7 @@ namespace App\Console\Commands;
 
 use App\Models\Settings;
 use App\Models\UsenetGroup;
-use Blacklight\Binaries;
+use App\Services\Binaries\BinariesService;
 use Blacklight\ColorCLI;
 use Blacklight\NNTP;
 use Illuminate\Console\Command;
@@ -55,7 +55,8 @@ class UpdateBinaries extends Command
             $this->outputBanner();
 
             $nntp = $this->getNntp();
-            $binaries = new Binaries(['NNTP' => $nntp]);
+            $binaries = new BinariesService();
+            $binaries->setNntp($nntp);
 
             if ($groupName && !is_numeric($groupName)) {
                 $this->outputHeader('Updating Single Group');
@@ -82,7 +83,7 @@ class UpdateBinaries extends Command
     /**
      * Update a single group.
      */
-    private function updateSingleGroup(Binaries $binaries, string $groupName, int $maxHeaders): void
+    private function updateSingleGroup(BinariesService $binaries, string $groupName, int $maxHeaders): void
     {
         $group = UsenetGroup::getByName($groupName);
 
