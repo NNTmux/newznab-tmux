@@ -398,15 +398,15 @@ class Binaries
     /**
      * Returns unix time for an article number.
      *
-     * @param  int  $post  The article number to get the time from.
+     * @param  int|string  $post  The article number to get the time from.
      * @param  array  $groupData  Usenet group info from NNTP selectGroup method.
      * @return int Timestamp.
      *
      * @throws \Exception
      */
-    public function postdate(int $post, array $groupData): int
+    public function postdate(int|string $post, array $groupData): int
     {
-        $currentPost = $post;
+        $currentPost = (int) $post;
         $attempts = 0;
         $date = 0;
 
