@@ -1023,6 +1023,7 @@ class ManticoreSearch
             $search = (new Search($this->manticoreSearch))
                 ->setTable($index)
                 ->search($searchExpr)
+                ->sort('id', 'desc') // Sort by id descending to get latest results first
                 ->limit($autocompleteConfig['max_results'] * 3) // Get more to dedupe
                 ->stripBadUtf8(true);
 

@@ -276,7 +276,9 @@ class ElasticSearchSiteSearch
                     'size' => $maxResults * 3,
                     '_source' => ['searchname'],
                     'sort' => [
-                        '_score' => ['order' => 'desc'],
+                        // Sort by date first to get latest results, then by score
+                        ['add_date' => ['order' => 'desc', 'unmapped_type' => 'date', 'missing' => '_last']],
+                        ['_score' => ['order' => 'desc']],
                     ],
                 ],
             ];
