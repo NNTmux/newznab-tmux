@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Manticoresearch\Client;
 use Manticoresearch\Exceptions\ResponseException;
-use Manticoresearch\Index;
+use Manticoresearch\Table;
 
 class CreateManticoreIndexes extends Command
 {
@@ -36,8 +36,8 @@ class CreateManticoreIndexes extends Command
         $dropExisting = $this->option('drop');
 
         // Get connection details from config
-        $host = config('sphinxsearch.host', '127.0.0.1');
-        $port = config('sphinxsearch.port', 9308);
+        $host = config('manticoresearch.host', '127.0.0.1');
+        $port = config('manticoresearch.port', 9308);
 
         // Create client
         $this->client = new Client([

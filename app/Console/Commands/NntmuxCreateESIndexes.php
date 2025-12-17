@@ -35,6 +35,15 @@ class NntmuxCreateESIndexes extends Command
                 'settings' => [
                     'number_of_shards' => 2,
                     'number_of_replicas' => 0,
+                    'analysis' => [
+                        'analyzer' => [
+                            'release_analyzer' => [
+                                'type' => 'custom',
+                                'tokenizer' => 'standard',
+                                'filter' => ['lowercase', 'asciifolding'],
+                            ],
+                        ],
+                    ],
                 ],
                 'mappings' => [
                     'properties' => [
@@ -42,10 +51,18 @@ class NntmuxCreateESIndexes extends Command
                             'type' => 'long',
                             'index' => false,
                         ],
-                        'name' => ['type' => 'text'],
+                        'name' => [
+                            'type' => 'text',
+                            'analyzer' => 'release_analyzer',
+                        ],
                         'searchname' => [
                             'type' => 'text',
+                            'analyzer' => 'release_analyzer',
                             'fields' => [
+                                'keyword' => [
+                                    'type' => 'keyword',
+                                    'ignore_above' => 256,
+                                ],
                                 'sort' => [
                                     'type' => 'keyword',
                                 ],
@@ -53,20 +70,27 @@ class NntmuxCreateESIndexes extends Command
                         ],
                         'plainsearchname' => [
                             'type' => 'text',
+                            'analyzer' => 'release_analyzer',
                             'fields' => [
+                                'keyword' => [
+                                    'type' => 'keyword',
+                                    'ignore_above' => 256,
+                                ],
                                 'sort' => [
                                     'type' => 'keyword',
                                 ],
                             ],
                         ],
                         'categories_id' => [
-                            'type' => 'text',
+                            'type' => 'integer',
                         ],
                         'fromname' => [
                             'type' => 'text',
+                            'analyzer' => 'release_analyzer',
                         ],
                         'filename' => [
                             'type' => 'text',
+                            'analyzer' => 'release_analyzer',
                         ],
                         'add_date' => [
                             'type' => 'date',

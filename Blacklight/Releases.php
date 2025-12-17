@@ -446,8 +446,18 @@ class Releases extends Release
         array $cat = [-1],
         int $minSize = 0
     ): mixed {
+        Log::debug('Releases::search called', [
+            'searchArr' => $searchArr,
+            'limit' => $limit,
+        ]);
+
         // Get search results from index
         $searchResult = $this->performIndexSearch($searchArr, $limit);
+
+        Log::debug('Releases::search after performIndexSearch', [
+            'result_count' => count($searchResult),
+        ]);
+
         if (count($searchResult) === 0) {
             return collect();
         }
@@ -515,13 +525,24 @@ class Releases extends Release
         });
 
         if (empty($searchFields)) {
+            Log::debug('performIndexSearch: searchFields is empty');
             return [];
         }
 
         $phrases = array_values($searchFields);
 
-        if (config('nntmux.elasticsearch_enabled') === true) {
-            return $this->elasticSearch->indexSearch($phrases, $limit);
+        $esEnabled = config('nntmux.elasticsearch_enabled');
+        Log::debug('performIndexSearch: starting search', [
+            'elasticsearch_enabled' => $esEnabled,
+            'elasticsearch_enabled_type' => gettype($esEnabled),
+            'phrases' => $phrases,
+            'limit' => $limit,
+        ]);
+
+        if ($esEnabled === true) {
+            $result = $this->elasticSearch->indexSearch($phrases, $limit);
+            Log::debug('performIndexSearch: Elasticsearch result count', ['count' => count($result)]);
+            return $result;
         }
 
         $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', '', [], $searchFields);
