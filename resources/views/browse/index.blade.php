@@ -277,7 +277,7 @@
     @endif
 
     <!-- Preview/Sample Image Modal -->
-    <div id="previewModal" class="hidden fixed inset-0 bg-black bg-opacity-75 items-center justify-center p-4" style="display: none; z-index: 9999 !important;">
+    <div id="previewModal" class="hidden fixed inset-0 bg-black bg-opacity-75 items-center justify-center p-4 preview-modal-hidden">
         <div class="relative max-w-4xl w-full">
             <button type="button" data-close-preview-modal class="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl font-bold z-10">
                 <i class="fas fa-times"></i>
@@ -293,7 +293,7 @@
     </div>
 
     <!-- MediaInfo Modal -->
-    <div id="mediainfoModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4" style="display: none; z-index: 9999 !important;">
+    <div id="mediainfoModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 modal-hidden modal-z-index">
         <div class="relative max-w-4xl w-full bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-2xl max-h-[90vh] overflow-hidden">
             <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 dark:border-gray-700">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 dark:text-gray-200 flex items-center">
@@ -303,7 +303,7 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div id="mediainfoContent" class="p-6 overflow-y-auto" style="max-height: calc(90vh - 80px);">
+            <div id="mediainfoContent" class="p-6 overflow-y-auto modal-content-scroll">
                 <div class="text-center py-8">
                     <i class="fas fa-spinner fa-spin text-3xl text-blue-600 dark:text-blue-400 dark:text-blue-400"></i>
                     <p class="text-gray-600 dark:text-gray-400 dark:text-gray-400 mt-2">Loading media information...</p>
@@ -313,7 +313,7 @@
     </div>
 
     <!-- File List Modal -->
-    <div id="filelistModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4" style="display: none; z-index: 9999 !important;">
+    <div id="filelistModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 modal-hidden modal-z-index">
         <div class="relative max-w-4xl w-full bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-2xl max-h-[90vh] overflow-hidden">
             <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 dark:border-gray-700">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 dark:text-gray-200 flex items-center">
@@ -323,7 +323,7 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div id="filelistContent" class="p-6 overflow-y-auto" style="max-height: calc(90vh - 80px);">
+            <div id="filelistContent" class="p-6 overflow-y-auto modal-content-scroll">
                 <div class="text-center py-8">
                     <i class="fas fa-spinner fa-spin text-3xl text-green-600 dark:text-green-400"></i>
                     <p class="text-gray-600 dark:text-gray-400 dark:text-gray-400 mt-2">Loading file list...</p>

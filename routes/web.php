@@ -98,6 +98,11 @@ Route::get('2fa/verify', [PasswordSecurityController::class, 'getVerify2fa'])->n
 Route::post('2fa/verify', [PasswordSecurityController::class, 'verify2fa'])->name('2fa.post');
 Route::post('2faVerify', [PasswordSecurityController::class, 'verify2fa'])->name('2faVerify');
 
+// Search autocomplete and suggest API routes (no auth required for better UX)
+Route::get('api/search/autocomplete', [\App\Http\Controllers\SearchSuggestController::class, 'autocomplete'])->name('api.search.autocomplete');
+Route::get('api/search/suggest', [\App\Http\Controllers\SearchSuggestController::class, 'suggest'])->name('api.search.suggest');
+Route::get('api/search/assist', [\App\Http\Controllers\SearchSuggestController::class, 'searchAssist'])->name('api.search.assist');
+
 Route::middleware('isVerified')->group(function () {
     Route::match(['GET', 'POST'], 'resetpassword', [ResetPasswordController::class, 'reset'])->name('resetpassword');
     Route::match(['GET', 'POST'], 'profile', [ProfileController::class, 'show'])->name('profile');
@@ -148,6 +153,8 @@ Route::middleware('isVerified')->group(function () {
     Route::match(['GET', 'POST'], 'profile_delete', [ProfileController::class, 'destroy'])->name('profile_delete');
     Route::post('profile/update-theme', [ProfileController::class, 'updateTheme'])->name('profile.update-theme');
     Route::match(['GET', 'POST'], 'search', [SearchController::class, 'search'])->name('search');
+
+
     Route::match(['GET', 'POST'], 'mymovies', [MyMoviesController::class, 'show'])->name('mymovies');
     Route::match(['GET', 'POST'], 'myshows', [MyShowsController::class, 'show'])->name('myshows');
     Route::match(['GET', 'POST'], 'myshows/browse', [MyShowsController::class, 'browse'])->name('myshows.browse');

@@ -122,8 +122,8 @@
                     <i class="fa fa-search text-lg"></i>
                 </button>
 
-                <!-- Desktop Search Form -->
-                <form method="GET" action="{{ route('search') }}" class="hidden lg:flex items-center">
+                <!-- Desktop Search Form with Autocomplete -->
+                <form method="GET" action="{{ route('search') }}" class="hidden lg:flex items-center relative" id="header-search-form">
                     <select name="t" class="bg-gray-700 text-white text-sm rounded-l px-3 py-2 border-r border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="-1">All</option>
                         @if(isset($parentcatlist))
@@ -135,7 +135,18 @@
                             @endforeach
                         @endif
                     </select>
-                    <input type="search" name="search" value="{{ $header_menu_search ?? '' }}" placeholder="Search..." class="bg-gray-700 text-white text-sm px-3 py-2 w-48 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="relative">
+                        <input type="search"
+                               name="search"
+                               id="header-search-input"
+                               value="{{ $header_menu_search ?? '' }}"
+                               placeholder="Search..."
+                               autocomplete="off"
+                               class="bg-gray-700 text-white text-sm px-3 py-2 w-48 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <!-- Autocomplete dropdown for header -->
+                        <div id="header-autocomplete-dropdown" class="hidden absolute z-50 w-64 mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto right-0">
+                        </div>
+                    </div>
                     <button type="submit" class="bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-800 text-white px-4 py-2 rounded-r transition">
                         <i class="fa fa-search"></i>
                     </button>
@@ -143,7 +154,7 @@
 
                 <!-- Mobile Search Form (Hidden by default) -->
                 <div id="mobile-search-form" class="lg:hidden hidden absolute top-16 left-0 right-0 bg-gray-800 dark:bg-gray-950 p-4 shadow-lg z-50">
-                    <form method="GET" action="{{ route('search') }}" class="space-y-3">
+                    <form method="GET" action="{{ route('search') }}" class="space-y-3" id="mobile-search-form-el">
                         <select name="t" class="w-full bg-gray-700 text-white text-sm rounded px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 touch-target">
                             <option value="-1">All Categories</option>
                             @if(isset($parentcatlist))
@@ -155,7 +166,18 @@
                                 @endforeach
                             @endif
                         </select>
-                        <input type="search" name="search" value="{{ $header_menu_search ?? '' }}" placeholder="Search releases..." class="w-full bg-gray-700 text-white text-sm px-3 py-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 touch-target">
+                        <div class="relative">
+                            <input type="search"
+                                   name="search"
+                                   id="mobile-search-input"
+                                   value="{{ $header_menu_search ?? '' }}"
+                                   placeholder="Search releases..."
+                                   autocomplete="off"
+                                   class="w-full bg-gray-700 text-white text-sm px-3 py-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 touch-target">
+                            <!-- Autocomplete dropdown for mobile -->
+                            <div id="mobile-autocomplete-dropdown" class="hidden absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                            </div>
+                        </div>
                         <button type="submit" class="w-full bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-800 text-white px-4 py-3 rounded transition touch-target font-semibold">
                             <i class="fa fa-search mr-2"></i>Search
                         </button>
@@ -221,5 +243,4 @@
         </div>
     </div>
 </nav>
-
 

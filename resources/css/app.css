@@ -355,3 +355,33 @@
     }
 }
 
+/* Preview Modal CSP-Safe Styles */
+.preview-modal-hidden,
+.modal-hidden {
+    display: none;
+}
+
+#previewModal,
+.modal-z-index {
+    z-index: 9999;
+}
+
+#previewModal.flex {
+    display: flex;
+}
+
+/* Modal content scroll area */
+.modal-content-scroll {
+    max-height: calc(90vh - 80px);
+}
+
+/* Search highlight styling */
+.search-highlight,
+mark {
+    @apply bg-yellow-200 px-0.5 rounded;
+}
+
+.dark .search-highlight,
+.dark mark {
+    @apply bg-yellow-700;
+}

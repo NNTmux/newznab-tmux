@@ -472,14 +472,14 @@
                     $anidbDescription = $anidbData['description'] ?? ($anidb->description ?? null);
                     $anidbCategories = $anidbData['categories'] ?? ($anidb->categories ?? null);
                     $anidbCreators = $anidbData['creators'] ?? ($anidb->creators ?? null);
-                    
+
                     // Get country name from country code
                     $countryName = null;
                     if (!empty($anidbCountry)) {
                         $country = \App\Models\Country::where('iso_3166_2', $anidbCountry)->first();
                         $countryName = $country->name ?? $anidbCountry;
                     }
-                    
+
                     // Format status
                     $statusLabels = [
                         'FINISHED' => 'Finished',
@@ -489,7 +489,7 @@
                         'HIATUS' => 'Hiatus',
                     ];
                     $anidbStatusLabel = $statusLabels[$anidbStatus] ?? $anidbStatus;
-                    
+
                     // Format source
                     $sourceLabels = [
                         'ORIGINAL' => 'Original',
@@ -509,7 +509,7 @@
                 @endphp
                 <div class="bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-900 dark:to-purple-900 rounded-lg p-6 border border-pink-100 dark:border-pink-800">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-dragon mr-2 text-pink-600 dark:text-pink-400"></i> 
+                        <i class="fas fa-dragon mr-2 text-pink-600 dark:text-pink-400"></i>
                         @if($anidbMediaType === 'MANGA')
                             Manga Information
                         @else
@@ -591,8 +591,8 @@
                                 <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">
                                     <span class="inline-flex items-center">
                                         @if(!empty($country))
-                                            <img src="{{ asset('assets/images/flags/' . strtolower($anidbCountry) . '.png') }}" 
-                                                 alt="{{ $countryName }}" 
+                                            <img src="{{ asset('assets/images/flags/' . strtolower($anidbCountry) . '.png') }}"
+                                                 alt="{{ $countryName }}"
                                                  class="w-4 h-3 mr-1"
                                                  onerror="this.style.display='none'">
                                         @endif
@@ -672,7 +672,7 @@
                             </div>
                         @endif
                     </div>
-                    
+
                     <!-- External Links -->
                     @php
                         $anilistId = $anidbData['anilist_id'] ?? ($anidb->anilist_id ?? null);
@@ -1117,7 +1117,7 @@
 @endsection
 
 <!-- Image Modal -->
-<div id="imageModal" class="image-modal-backdrop hidden" style="display: none;">
+<div id="imageModal" class="image-modal-backdrop hidden modal-hidden">
     <div class="image-modal-container">
         <button type="button" class="image-modal-close" data-close-image-modal>
             <i class="fas fa-times"></i>

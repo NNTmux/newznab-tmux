@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Log;
 use Manticoresearch\Client;
 use Manticoresearch\Exceptions\ResponseException;
 use Manticoresearch\Exceptions\RuntimeException;
+use Manticoresearch\Query\BoolQuery;
+use Manticoresearch\Query\In;
+use Manticoresearch\Query\MatchQuery;
+use Manticoresearch\Query\Range;
 use Manticoresearch\Search;
 
 /**
@@ -67,14 +71,12 @@ class ManticoreSearch
 
     /**
      * Establishes a connection to ManticoreSearch HTTP port.
+     * Supports single host or multiple hosts for high availability.
      */
     public function __construct(?Client $client = null)
     {
         $this->config = $this->loadConfig();
-        $this->connection = [
-            'host' => $this->config['host'],
-            'port' => $this->config['port'],
-        ];
+        $this->connection = $this->buildConnectionConfig();
 
         $this->manticoreSearch = $client ?? new Client($this->connection);
         $this->cli = new ColorCLI;
@@ -82,6 +84,46 @@ class ManticoreSearch
         $this->retryAttempts = $this->config['retry_attempts'] ?? self::DEFAULT_RETRY_ATTEMPTS;
         $this->retryDelayMs = $this->config['retry_delay_ms'] ?? self::DEFAULT_RETRY_DELAY_MS;
         $this->cacheMinutes = $this->config['cache_minutes'] ?? self::DEFAULT_CACHE_MINUTES;
+    }
+
+    /**
+     * Build connection configuration supporting single or multiple hosts.
+     */
+    private function buildConnectionConfig(): array
+    {
+        // Check for multiple hosts configuration
+        $hostsString = $this->config['hosts'] ?? '';
+
+        if (! empty($hostsString)) {
+            $connections = [];
+            $hosts = explode(',', $hostsString);
+
+            foreach ($hosts as $hostEntry) {
+                $hostEntry = trim($hostEntry);
+                if (empty($hostEntry)) {
+                    continue;
+                }
+
+                $parts = explode(':', $hostEntry);
+                $connections[] = [
+                    'host' => $parts[0],
+                    'port' => (int) ($parts[1] ?? self::DEFAULT_PORT),
+                ];
+            }
+
+            if (! empty($connections)) {
+                return [
+                    'connections' => $connections,
+                    'retries' => $this->config['retries'] ?? count($connections),
+                ];
+            }
+        }
+
+        // Single host configuration
+        return [
+            'host' => $this->config['host'],
+            'port' => $this->config['port'],
+        ];
     }
 
     /**
@@ -94,6 +136,8 @@ class ManticoreSearch
         return [
             'host' => $config['host'] ?? self::DEFAULT_HOST,
             'port' => $config['port'] ?? self::DEFAULT_PORT,
+            'hosts' => $config['hosts'] ?? '',
+            'retries' => $config['retries'] ?? 2,
             'indexes' => $config['indexes'] ?? [
                 'releases' => self::INDEX_RELEASES,
                 'predb' => self::INDEX_PREDB,
@@ -103,6 +147,17 @@ class ManticoreSearch
             'cache_minutes' => $config['cache_minutes'] ?? self::DEFAULT_CACHE_MINUTES,
             'max_matches' => $config['max_matches'] ?? self::DEFAULT_MAX_MATCHES,
             'batch_size' => $config['batch_size'] ?? self::DEFAULT_BATCH_SIZE,
+            'autocomplete' => $config['autocomplete'] ?? [
+                'enabled' => true,
+                'min_length' => 2,
+                'max_results' => 10,
+                'fuzziness' => 1,
+                'cache_minutes' => 10,
+            ],
+            'suggest' => $config['suggest'] ?? [
+                'enabled' => true,
+                'max_edits' => 4,
+            ],
         ];
     }
 
@@ -922,5 +977,493 @@ class ManticoreSearch
     public function getConfig(): array
     {
         return $this->config;
+    }
+
+    /**
+     * Get autocomplete suggestions for a search query.
+     * Searches the releases index and returns matching searchnames.
+     *
+     * @param  string  $query  The partial search query
+     * @param  string|null  $index  Index to search (defaults to releases index)
+     * @return array<array{suggest: string, distance: int, docs: int}>
+     */
+    public function autocomplete(string $query, ?string $index = null): array
+    {
+        $autocompleteConfig = $this->config['autocomplete'];
+
+        if (! $autocompleteConfig['enabled']) {
+            return [];
+        }
+
+        $query = trim($query);
+        if (strlen($query) < $autocompleteConfig['min_length']) {
+            return [];
+        }
+
+        $index = $index ?? $this->getReleasesIndex();
+        $cacheKey = 'manticore:autocomplete:'.md5($index.$query);
+
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        $suggestions = [];
+
+        try {
+            // Search releases index for matching searchnames
+            $escapedQuery = self::escapeString($query);
+            if (empty($escapedQuery)) {
+                return [];
+            }
+
+            // Use relaxed search on searchname field
+            $searchExpr = '@@relaxed @searchname '.$escapedQuery;
+
+            $search = (new Search($this->manticoreSearch))
+                ->setTable($index)
+                ->search($searchExpr)
+                ->limit($autocompleteConfig['max_results'] * 3) // Get more to dedupe
+                ->stripBadUtf8(true);
+
+            $results = $search->get();
+
+            $seen = [];
+            foreach ($results as $doc) {
+                $data = $doc->getData();
+                $searchname = $data['searchname'] ?? '';
+
+                if (empty($searchname)) {
+                    continue;
+                }
+
+                // Create a clean suggestion from the searchname
+                $suggestion = $this->extractSuggestion($searchname, $query);
+
+                if (! empty($suggestion) && ! isset($seen[strtolower($suggestion)])) {
+                    $seen[strtolower($suggestion)] = true;
+                    $suggestions[] = [
+                        'suggest' => $suggestion,
+                        'distance' => 0,
+                        'docs' => 1,
+                    ];
+                }
+
+                if (count($suggestions) >= $autocompleteConfig['max_results']) {
+                    break;
+                }
+            }
+        } catch (\Throwable $e) {
+            if (config('app.debug')) {
+                Log::warning('ManticoreSearch autocomplete error: '.$e->getMessage());
+            }
+        }
+
+        if (! empty($suggestions)) {
+            Cache::put($cacheKey, $suggestions, now()->addMinutes((int) $autocompleteConfig['cache_minutes']));
+        }
+
+        return $suggestions;
+    }
+
+    /**
+     * Extract a clean suggestion from a searchname.
+     *
+     * @param  string  $searchname  The full searchname
+     * @param  string  $query  The user's query
+     * @return string|null The extracted suggestion
+     */
+    private function extractSuggestion(string $searchname, string $query): ?string
+    {
+        // Clean up the searchname - remove file extensions, quality tags at the end
+        $clean = preg_replace('/\.(mkv|avi|mp4|wmv|nfo|nzb|par2|rar|zip|r\d+)$/i', '', $searchname);
+
+        // Replace dots and underscores with spaces for readability
+        $clean = str_replace(['.', '_'], ' ', $clean);
+
+        // Remove multiple spaces
+        $clean = preg_replace('/\s+/', ' ', $clean);
+        $clean = trim($clean);
+
+        if (empty($clean)) {
+            return null;
+        }
+
+        // If the clean name is reasonable length, use it
+        if (strlen($clean) <= 80) {
+            return $clean;
+        }
+
+        // For very long names, try to extract the relevant part
+        // Find where the query matches and extract context around it
+        $pos = stripos($clean, $query);
+        if ($pos !== false) {
+            // Get up to 80 chars starting from the match position, or from beginning if match is early
+            $start = max(0, $pos - 10);
+            $extracted = substr($clean, $start, 80);
+
+            // Clean up - don't cut mid-word
+            if ($start > 0) {
+                $extracted = preg_replace('/^\S*\s/', '', $extracted);
+            }
+            $extracted = preg_replace('/\s\S*$/', '', $extracted);
+
+            return trim($extracted);
+        }
+
+        // Fallback: just truncate
+        return substr($clean, 0, 80);
+    }
+
+
+    /**
+     * Get spell correction suggestions ("Did you mean?").
+     * Uses CALL SUGGEST or falls back to searching releases for similar terms.
+     *
+     * @param  string  $query  The search query to check
+     * @param  string|null  $index  Index to use for suggestions
+     * @return array<array{suggest: string, distance: int, docs: int}>
+     */
+    public function suggest(string $query, ?string $index = null): array
+    {
+        $suggestConfig = $this->config['suggest'];
+
+        if (! $suggestConfig['enabled']) {
+            return [];
+        }
+
+        $query = trim($query);
+        if (empty($query)) {
+            return [];
+        }
+
+        $index = $index ?? $this->getReleasesIndex();
+        $cacheKey = 'manticore:suggest:'.md5($index.$query);
+
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        $suggestions = [];
+
+        try {
+            // Try native CALL SUGGEST first
+            $result = $this->manticoreSearch->suggest([
+                'table' => $index,
+                'body' => [
+                    'query' => $query,
+                    'options' => [
+                        'limit' => 5,
+                        'max_edits' => $suggestConfig['max_edits'],
+                    ],
+                ],
+            ]);
+
+            if (! empty($result) && is_array($result)) {
+                foreach ($result as $item) {
+                    if (isset($item['suggest']) && $item['suggest'] !== $query) {
+                        $suggestions[] = [
+                            'suggest' => $item['suggest'],
+                            'distance' => $item['distance'] ?? 0,
+                            'docs' => $item['docs'] ?? 0,
+                        ];
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            if (config('app.debug')) {
+                Log::debug('ManticoreSearch native suggest failed: '.$e->getMessage());
+            }
+        }
+
+        // If native suggest didn't return results, try a fuzzy search fallback
+        if (empty($suggestions)) {
+            $suggestions = $this->suggestFallback($query, $index);
+        }
+
+        if (! empty($suggestions)) {
+            Cache::put($cacheKey, $suggestions, now()->addMinutes((int) $this->cacheMinutes));
+        }
+
+        return $suggestions;
+    }
+
+    /**
+     * Fallback suggest using similar searchname matches.
+     *
+     * @param  string  $query  The search query
+     * @param  string  $index  Index to search
+     * @return array<array{suggest: string, distance: int, docs: int}>
+     */
+    private function suggestFallback(string $query, string $index): array
+    {
+        try {
+            // Try to find releases with similar searchnames
+            // This helps when users misspell common terms
+            $escapedQuery = self::escapeString($query);
+            if (empty($escapedQuery)) {
+                return [];
+            }
+
+            // Use relaxed search to find partial matches
+            $searchExpr = '@@relaxed @searchname '.$escapedQuery;
+
+            $search = (new Search($this->manticoreSearch))
+                ->setTable($index)
+                ->search($searchExpr)
+                ->limit(20)
+                ->stripBadUtf8(true);
+
+            $results = $search->get();
+
+            // Extract common terms from the results that differ from the query
+            $termCounts = [];
+            foreach ($results as $doc) {
+                $data = $doc->getData();
+                $searchname = $data['searchname'] ?? '';
+
+                // Extract words from searchname
+                $words = preg_split('/[\s\.\-\_]+/', strtolower($searchname));
+                foreach ($words as $word) {
+                    if (strlen($word) >= 3 && $word !== strtolower($query)) {
+                        // Check if word is similar to query (within edit distance)
+                        $distance = levenshtein(strtolower($query), $word);
+                        if ($distance > 0 && $distance <= 3) {
+                            if (! isset($termCounts[$word])) {
+                                $termCounts[$word] = ['count' => 0, 'distance' => $distance];
+                            }
+                            $termCounts[$word]['count']++;
+                        }
+                    }
+                }
+            }
+
+            // Sort by count (most common first)
+            uasort($termCounts, fn($a, $b) => $b['count'] - $a['count']);
+
+            $suggestions = [];
+            foreach (array_slice($termCounts, 0, 5, true) as $term => $data) {
+                $suggestions[] = [
+                    'suggest' => $term,
+                    'distance' => $data['distance'],
+                    'docs' => $data['count'],
+                ];
+            }
+
+            return $suggestions;
+        } catch (\Throwable $e) {
+            if (config('app.debug')) {
+                Log::warning('ManticoreSearch suggest fallback error: '.$e->getMessage());
+            }
+            return [];
+        }
+    }
+
+    /**
+     * Search with result highlighting.
+     *
+     * @param  string  $index  Index to search
+     * @param  string  $query  Search query
+     * @param  array<string>  $highlightFields  Fields to highlight
+     * @param  int  $limit  Maximum results
+     * @return array{results: array, total: int}
+     */
+    public function searchWithHighlight(
+        string $index,
+        string $query,
+        array $highlightFields = ['searchname', 'name'],
+        int $limit = 100
+    ): array {
+        if (empty($query)) {
+            return ['results' => [], 'total' => 0];
+        }
+
+        $cacheKey = 'manticore:highlight:'.md5($index.$query.implode(',', $highlightFields).$limit);
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        try {
+            $escapedQuery = self::escapeString($query);
+            if (empty($escapedQuery)) {
+                return ['results' => [], 'total' => 0];
+            }
+
+            $search = (new Search($this->manticoreSearch))
+                ->setTable($index)
+                ->search($escapedQuery)
+                ->highlight($highlightFields, [
+                    'pre_tags' => '<mark class="search-highlight bg-yellow-200 dark:bg-yellow-700 px-0.5 rounded">',
+                    'post_tags' => '</mark>',
+                    'limit' => 256,
+                    'no_match_size' => 0,
+                ])
+                ->limit($limit)
+                ->maxMatches($this->config['max_matches'])
+                ->stripBadUtf8(true);
+
+            $resultSet = $search->get();
+
+            $results = [];
+            foreach ($resultSet as $doc) {
+                $results[] = [
+                    'id' => $doc->getId(),
+                    'data' => $doc->getData(),
+                    'highlight' => $doc->getHighlight() ?? [],
+                ];
+            }
+
+            $response = [
+                'results' => $results,
+                'total' => $resultSet->getTotal() ?? count($results),
+            ];
+
+            Cache::put($cacheKey, $response, now()->addMinutes($this->cacheMinutes));
+
+            return $response;
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch searchWithHighlight error: '.$e->getMessage(), [
+                'index' => $index,
+                'query' => $query,
+            ]);
+
+            return ['results' => [], 'total' => 0];
+        }
+    }
+
+    /**
+     * Advanced search using structured BoolQuery with filters.
+     *
+     * @param  string  $index  Index to search
+     * @param  array{
+     *     search?: string,
+     *     searchname?: string,
+     *     name?: string,
+     *     fromname?: string,
+     *     filename?: string,
+     *     categories?: array<int>,
+     *     exclude_categories?: array<int>,
+     *     min_date?: string,
+     *     max_date?: string,
+     *     sort_field?: string,
+     *     sort_dir?: string,
+     *     limit?: int,
+     *     offset?: int
+     * }  $params  Search parameters
+     * @return array{ids: array<int>, total: int}
+     */
+    public function advancedSearch(string $index, array $params): array
+    {
+        $cacheKey = 'manticore:advsearch:'.md5($index.serialize($params));
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        try {
+            $query = new BoolQuery;
+            $hasQuery = false;
+
+            // Full-text search across multiple fields
+            if (! empty($params['search'])) {
+                $escaped = self::escapeString($params['search']);
+                if (! empty($escaped)) {
+                    $query->must(new MatchQuery($escaped, 'searchname,name,filename'));
+                    $hasQuery = true;
+                }
+            }
+
+            // Field-specific searches
+            $fieldMappings = [
+                'searchname' => 'searchname',
+                'name' => 'name',
+                'fromname' => 'fromname',
+                'filename' => 'filename',
+            ];
+
+            foreach ($fieldMappings as $paramKey => $field) {
+                if (! empty($params[$paramKey])) {
+                    $escaped = self::escapeString($params[$paramKey]);
+                    if (! empty($escaped)) {
+                        $query->must(new MatchQuery($escaped, $field));
+                        $hasQuery = true;
+                    }
+                }
+            }
+
+            // Category filter
+            if (! empty($params['categories']) && is_array($params['categories'])) {
+                $query->must(new In('categories_id', array_map('intval', $params['categories'])));
+                $hasQuery = true;
+            }
+
+            // Exclude categories
+            if (! empty($params['exclude_categories']) && is_array($params['exclude_categories'])) {
+                $query->mustNot(new In('categories_id', array_map('intval', $params['exclude_categories'])));
+            }
+
+            if (! $hasQuery) {
+                return ['ids' => [], 'total' => 0];
+            }
+
+            $limit = $params['limit'] ?? $this->config['max_matches'];
+            $offset = $params['offset'] ?? 0;
+
+            $search = (new Search($this->manticoreSearch))
+                ->setTable($index)
+                ->search($query)
+                ->limit($limit)
+                ->offset($offset)
+                ->maxMatches($this->config['max_matches'])
+                ->stripBadUtf8(true);
+
+            // Sorting
+            $sortField = $params['sort_field'] ?? 'id';
+            $sortDir = strtolower($params['sort_dir'] ?? 'desc');
+            if (in_array($sortDir, ['asc', 'desc'])) {
+                $search->sort($sortField, $sortDir);
+            }
+
+            $resultSet = $search->get();
+
+            $ids = [];
+            foreach ($resultSet as $doc) {
+                $ids[] = $doc->getId();
+            }
+
+            $response = [
+                'ids' => $ids,
+                'total' => $resultSet->getTotal() ?? count($ids),
+            ];
+
+            Cache::put($cacheKey, $response, now()->addMinutes($this->cacheMinutes));
+
+            return $response;
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch advancedSearch error: '.$e->getMessage(), [
+                'index' => $index,
+                'params' => $params,
+            ]);
+
+            return ['ids' => [], 'total' => 0];
+        }
+    }
+
+    /**
+     * Check if autocomplete is enabled.
+     */
+    public function isAutocompleteEnabled(): bool
+    {
+        return $this->config['autocomplete']['enabled'] ?? false;
+    }
+
+    /**
+     * Check if suggest is enabled.
+     */
+    public function isSuggestEnabled(): bool
+    {
+        return $this->config['suggest']['enabled'] ?? false;
     }
 }

@@ -4,11 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\UsenetGroup;
+use Blacklight\ManticoreSearch;
 use Blacklight\Releases;
 use Illuminate\Http\Request;
 
 class SearchController extends BasePageController
 {
+    private ManticoreSearch $manticore;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->manticore = new ManticoreSearch;
+    }
+
     /**
      * @throws \Exception
      */
@@ -133,6 +142,22 @@ class SearchController extends BasePageController
         $searchVars['selectedsizefrom'] = $searchVars['searchadvsizefrom'];
         $searchVars['selectedsizeto'] = $searchVars['searchadvsizeto'];
 
+        // Get spell correction suggestions if we have a search query but few/no results
+        $spellSuggestion = null;
+        $searchQuery = $search ?: ($searchVars['searchadvr'] ?? '');
+        if (! empty($searchQuery) && $this->manticore->isSuggestEnabled()) {
+            // Get suggestions from ManticoreSearch
+            $suggestions = $this->manticore->suggest($searchQuery);
+            if (! empty($suggestions)) {
+                // Sort by doc count descending to get best suggestion
+                usort($suggestions, fn ($a, $b) => $b['docs'] - $a['docs']);
+                // Only show suggestion if it's different from the query
+                if ($suggestions[0]['suggest'] !== $searchQuery) {
+                    $spellSuggestion = $suggestions[0]['suggest'];
+                }
+            }
+        }
+
         if ($searchType !== 'basic' && $request->missing('id') && $request->missing('subject') && $request->anyFilled(['searchadvr', 'searchadvsubject', 'searchadvfilename', 'searchadvposter', 'minage', 'maxage', 'group', 'minsize', 'maxsize', 'search'])) {
             $orderByString = '';
             foreach ($searchVars as $searchVarKey => $searchVar) {
@@ -189,6 +214,10 @@ class SearchController extends BasePageController
             'meta_title' => 'Search Nzbs',
             'meta_keywords' => 'search,nzb,description,details',
             'meta_description' => 'Search for Nzbs',
+            // ManticoreSearch enhanced features
+            'spellSuggestion' => $spellSuggestion,
+            'autocompleteEnabled' => $this->manticore->isAutocompleteEnabled(),
+            'suggestEnabled' => $this->manticore->isSuggestEnabled(),
         ]);
 
         return view('search.index', $this->viewData);

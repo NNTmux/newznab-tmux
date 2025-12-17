@@ -8,17 +8,36 @@
     </div>
 
     <!-- Search Form -->
-    <form method="GET" action="{{ route('search') }}" class="mb-8">
+    <form method="GET" action="{{ route('search') }}" class="mb-8" id="searchForm">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-            <!-- Search Query -->
-            <div class="lg:col-span-2">
+            <!-- Search Query with Autocomplete -->
+            <div class="lg:col-span-2 relative">
                 <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Search Terms</label>
-                <input type="text"
-                       id="search"
-                       name="search"
-                       value="{{ request('search') }}"
-                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                       placeholder="Enter search terms...">
+                <div class="relative">
+                    <input type="text"
+                           id="search"
+                           name="search"
+                           value="{{ request('search') }}"
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                           placeholder="Enter search terms..."
+                           autocomplete="off"
+                           @if(isset($autocompleteEnabled) && $autocompleteEnabled) data-autocomplete="true" @endif>
+                    <!-- Autocomplete dropdown -->
+                    <div id="autocomplete-dropdown" class="hidden absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    </div>
+                </div>
+
+                <!-- Spell Suggestion ("Did you mean?") -->
+                @if(isset($spellSuggestion) && !empty($spellSuggestion))
+                    <div class="mt-2 text-sm">
+                        <span class="text-gray-600 dark:text-gray-400">Did you mean: </span>
+                        <a href="{{ route('search', array_merge(request()->except('search'), ['search' => $spellSuggestion])) }}"
+                           class="text-blue-600 dark:text-blue-400 hover:underline font-medium">
+                            {{ $spellSuggestion }}
+                        </a>
+                        <span class="text-gray-500 dark:text-gray-500">?</span>
+                    </div>
+                @endif
             </div>
 
             <!-- Category -->
@@ -261,7 +280,7 @@
                                         {{ $result->category_name ?? 'Other' }}
                                     </span>
                                 </td>
-                                <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400">
+                                <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
                                     {{ userDateDiffForHumans($result->adddate) }}
                                 </td>
                                 <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
@@ -402,7 +421,7 @@
     @endif
 
     <!-- Preview/Sample Image Modal -->
-    <div id="previewModal" class="hidden fixed inset-0 bg-black bg-opacity-75 items-center justify-center p-4" style="display: none; z-index: 9999 !important;">
+    <div id="previewModal" class="hidden fixed inset-0 bg-black bg-opacity-75 items-center justify-center p-4 preview-modal-hidden">
         <div class="relative max-w-4xl w-full">
             <button type="button" data-close-preview-modal class="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl font-bold z-10">
                 <i class="fas fa-times"></i>
