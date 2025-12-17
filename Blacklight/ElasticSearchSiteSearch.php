@@ -38,6 +38,12 @@ class ElasticSearchSiteSearch
 
     private const INDEX_PREDB = 'predb';
 
+    private const AUTOCOMPLETE_CACHE_MINUTES = 10;
+
+    private const AUTOCOMPLETE_MAX_RESULTS = 10;
+
+    private const AUTOCOMPLETE_MIN_LENGTH = 2;
+
     private static ?Client $client = null;
 
     private static ?bool $availabilityCache = null;
@@ -178,6 +184,352 @@ class ElasticSearchSiteSearch
         self::$client = null;
         self::$availabilityCache = null;
         self::$availabilityCacheTime = null;
+    }
+
+    /**
+     * Check if autocomplete is enabled.
+     */
+    public function isAutocompleteEnabled(): bool
+    {
+        return config('elasticsearch.autocomplete.enabled', true) && $this->isElasticsearchAvailable();
+    }
+
+    /**
+     * Check if suggest is enabled.
+     */
+    public function isSuggestEnabled(): bool
+    {
+        return config('elasticsearch.suggest.enabled', true) && $this->isElasticsearchAvailable();
+    }
+
+    /**
+     * Get the releases index name.
+     */
+    public function getReleasesIndex(): string
+    {
+        return self::INDEX_RELEASES;
+    }
+
+    /**
+     * Get autocomplete suggestions for a search query.
+     * Searches the releases index and returns matching searchnames.
+     *
+     * @param  string  $query  The partial search query
+     * @param  string|null  $index  Index to search (defaults to releases index)
+     * @return array<array{suggest: string, distance: int, docs: int}>
+     */
+    public function autocomplete(string $query, ?string $index = null): array
+    {
+        if (! $this->isAutocompleteEnabled()) {
+            return [];
+        }
+
+        $query = trim($query);
+        $minLength = (int) config('elasticsearch.autocomplete.min_length', self::AUTOCOMPLETE_MIN_LENGTH);
+        if (strlen($query) < $minLength) {
+            return [];
+        }
+
+        $index = $index ?? self::INDEX_RELEASES;
+        $cacheKey = 'es:autocomplete:'.md5($index.$query);
+
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        $suggestions = [];
+        $maxResults = (int) config('elasticsearch.autocomplete.max_results', self::AUTOCOMPLETE_MAX_RESULTS);
+
+        try {
+            $client = $this->getClient();
+
+            // Use a prefix/match query on searchname field
+            $searchParams = [
+                'index' => $index,
+                'body' => [
+                    'query' => [
+                        'bool' => [
+                            'should' => [
+                                // Prefix match for autocomplete-like behavior
+                                [
+                                    'match_phrase_prefix' => [
+                                        'searchname' => [
+                                            'query' => $query,
+                                            'max_expansions' => 50,
+                                        ],
+                                    ],
+                                ],
+                                // Also include regular match for better results
+                                [
+                                    'match' => [
+                                        'searchname' => [
+                                            'query' => $query,
+                                            'fuzziness' => 'AUTO',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                            'minimum_should_match' => 1,
+                        ],
+                    ],
+                    'size' => $maxResults * 3,
+                    '_source' => ['searchname'],
+                    'sort' => [
+                        '_score' => ['order' => 'desc'],
+                    ],
+                ],
+            ];
+
+            $response = $client->search($searchParams);
+
+            $seen = [];
+            if (isset($response['hits']['hits'])) {
+                foreach ($response['hits']['hits'] as $hit) {
+                    $searchname = $hit['_source']['searchname'] ?? '';
+
+                    if (empty($searchname)) {
+                        continue;
+                    }
+
+                    // Create a clean suggestion from the searchname
+                    $suggestion = $this->extractSuggestion($searchname, $query);
+
+                    if (! empty($suggestion) && ! isset($seen[strtolower($suggestion)])) {
+                        $seen[strtolower($suggestion)] = true;
+                        $suggestions[] = [
+                            'suggest' => $suggestion,
+                            'distance' => 0,
+                            'docs' => 1,
+                        ];
+                    }
+
+                    if (count($suggestions) >= $maxResults) {
+                        break;
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            if (config('app.debug')) {
+                Log::warning('ElasticSearch autocomplete error: '.$e->getMessage());
+            }
+        }
+
+        if (! empty($suggestions)) {
+            $cacheMinutes = (int) config('elasticsearch.autocomplete.cache_minutes', self::AUTOCOMPLETE_CACHE_MINUTES);
+            Cache::put($cacheKey, $suggestions, now()->addMinutes($cacheMinutes));
+        }
+
+        return $suggestions;
+    }
+
+    /**
+     * Get spell correction suggestions ("Did you mean?").
+     *
+     * @param  string  $query  The search query to check
+     * @param  string|null  $index  Index to use for suggestions
+     * @return array<array{suggest: string, distance: int, docs: int}>
+     */
+    public function suggest(string $query, ?string $index = null): array
+    {
+        if (! $this->isSuggestEnabled()) {
+            return [];
+        }
+
+        $query = trim($query);
+        if (empty($query)) {
+            return [];
+        }
+
+        $index = $index ?? self::INDEX_RELEASES;
+        $cacheKey = 'es:suggest:'.md5($index.$query);
+
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        $suggestions = [];
+
+        try {
+            $client = $this->getClient();
+
+            // Use Elasticsearch suggest API with phrase suggester
+            $searchParams = [
+                'index' => $index,
+                'body' => [
+                    'suggest' => [
+                        'text' => $query,
+                        'searchname_suggest' => [
+                            'phrase' => [
+                                'field' => 'searchname',
+                                'size' => 5,
+                                'gram_size' => 3,
+                                'direct_generator' => [
+                                    [
+                                        'field' => 'searchname',
+                                        'suggest_mode' => 'popular',
+                                    ],
+                                ],
+                                'highlight' => [
+                                    'pre_tag' => '',
+                                    'post_tag' => '',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ];
+
+            $response = $client->search($searchParams);
+
+            if (isset($response['suggest']['searchname_suggest'][0]['options'])) {
+                foreach ($response['suggest']['searchname_suggest'][0]['options'] as $option) {
+                    $suggestedText = $option['text'] ?? '';
+                    if (! empty($suggestedText) && strtolower($suggestedText) !== strtolower($query)) {
+                        $suggestions[] = [
+                            'suggest' => $suggestedText,
+                            'distance' => 1,
+                            'docs' => (int) ($option['freq'] ?? 1),
+                        ];
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            if (config('app.debug')) {
+                Log::debug('ElasticSearch native suggest failed: '.$e->getMessage());
+            }
+        }
+
+        // Fallback: if native suggest didn't work, use fuzzy search
+        if (empty($suggestions)) {
+            $suggestions = $this->suggestFallback($query, $index);
+        }
+
+        if (! empty($suggestions)) {
+            Cache::put($cacheKey, $suggestions, now()->addMinutes(self::CACHE_TTL_MINUTES));
+        }
+
+        return $suggestions;
+    }
+
+    /**
+     * Fallback suggest using fuzzy search on searchnames.
+     *
+     * @param  string  $query  The search query
+     * @param  string  $index  Index to search
+     * @return array<array{suggest: string, distance: int, docs: int}>
+     */
+    private function suggestFallback(string $query, string $index): array
+    {
+        try {
+            $client = $this->getClient();
+
+            // Use fuzzy match to find similar terms
+            $searchParams = [
+                'index' => $index,
+                'body' => [
+                    'query' => [
+                        'match' => [
+                            'searchname' => [
+                                'query' => $query,
+                                'fuzziness' => 'AUTO',
+                            ],
+                        ],
+                    ],
+                    'size' => 20,
+                    '_source' => ['searchname'],
+                ],
+            ];
+
+            $response = $client->search($searchParams);
+
+            // Extract common terms from results that differ from the query
+            $termCounts = [];
+            if (isset($response['hits']['hits'])) {
+                foreach ($response['hits']['hits'] as $hit) {
+                    $searchname = $hit['_source']['searchname'] ?? '';
+                    $words = preg_split('/[\s.\-_]+/', strtolower($searchname));
+
+                    foreach ($words as $word) {
+                        if (strlen($word) >= 3 && $word !== strtolower($query)) {
+                            $distance = levenshtein(strtolower($query), $word);
+                            if ($distance > 0 && $distance <= 3) {
+                                if (! isset($termCounts[$word])) {
+                                    $termCounts[$word] = ['count' => 0, 'distance' => $distance];
+                                }
+                                $termCounts[$word]['count']++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Sort by count
+            uasort($termCounts, fn ($a, $b) => $b['count'] - $a['count']);
+
+            $suggestions = [];
+            foreach (array_slice($termCounts, 0, 5, true) as $term => $data) {
+                $suggestions[] = [
+                    'suggest' => $term,
+                    'distance' => $data['distance'],
+                    'docs' => $data['count'],
+                ];
+            }
+
+            return $suggestions;
+        } catch (\Throwable $e) {
+            if (config('app.debug')) {
+                Log::warning('ElasticSearch suggest fallback error: '.$e->getMessage());
+            }
+
+            return [];
+        }
+    }
+
+    /**
+     * Extract a clean suggestion from a searchname.
+     *
+     * @param  string  $searchname  The full searchname
+     * @param  string  $query  The user's query
+     * @return string|null The extracted suggestion
+     */
+    private function extractSuggestion(string $searchname, string $query): ?string
+    {
+        // Clean up the searchname - remove file extensions
+        $clean = preg_replace('/\.(mkv|avi|mp4|wmv|nfo|nzb|par2|rar|zip|r\d+)$/i', '', $searchname);
+
+        // Replace dots and underscores with spaces for readability
+        $clean = str_replace(['.', '_'], ' ', $clean);
+
+        // Remove multiple spaces
+        $clean = preg_replace('/\s+/', ' ', $clean);
+        $clean = trim($clean);
+
+        if (empty($clean)) {
+            return null;
+        }
+
+        // If the clean name is reasonable length, use it
+        if (strlen($clean) <= 80) {
+            return $clean;
+        }
+
+        // For very long names, try to extract the relevant part
+        $pos = stripos($clean, $query);
+        if ($pos !== false) {
+            $start = max(0, $pos - 10);
+            $extracted = substr($clean, $start, 80);
+
+            if ($start > 0) {
+                $extracted = preg_replace('/^\S*\s/', '', $extracted);
+            }
+            $extracted = preg_replace('/\s\S*$/', '', $extracted);
+
+            return trim($extracted);
+        }
+
+        return substr($clean, 0, 80);
     }
 
     /**

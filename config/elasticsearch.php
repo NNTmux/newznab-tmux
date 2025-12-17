@@ -197,4 +197,31 @@ return [
 
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Autocomplete Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configure autocomplete behavior for search suggestions.
+    |
+    */
+    'autocomplete' => [
+        'enabled' => env('ELASTICSEARCH_AUTOCOMPLETE_ENABLED', true),
+        'min_length' => (int) env('ELASTICSEARCH_AUTOCOMPLETE_MIN_LENGTH', 2),
+        'max_results' => (int) env('ELASTICSEARCH_AUTOCOMPLETE_MAX_RESULTS', 10),
+        'cache_minutes' => (int) env('ELASTICSEARCH_AUTOCOMPLETE_CACHE', 10),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Suggest/Spell Correction Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configure "Did you mean?" spell correction.
+    |
+    */
+    'suggest' => [
+        'enabled' => env('ELASTICSEARCH_SUGGEST_ENABLED', true),
+    ],
+
 ];
