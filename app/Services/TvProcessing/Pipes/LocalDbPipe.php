@@ -5,7 +5,6 @@ namespace App\Services\TvProcessing\Pipes;
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
 use Blacklight\processing\tv\LocalDB;
-use Blacklight\processing\tv\TV;
 
 /**
  * Pipe for local database lookups.
@@ -13,6 +12,9 @@ use Blacklight\processing\tv\TV;
  */
 class LocalDbPipe extends AbstractTvProviderPipe
 {
+    // Video type constants (matching Videos class protected constants)
+    private const TYPE_TV = 0;
+
     protected int $priority = 10;
     private ?LocalDB $localDb = null;
 
@@ -50,7 +52,7 @@ class LocalDbPipe extends AbstractTvProviderPipe
         $localDb = $this->getLocalDb();
 
         // Try to find the show in our local database by title
-        $videoId = $localDb->getByTitle($cleanName, TV::TYPE_TV, 0);
+        $videoId = $localDb->getByTitle($cleanName, self::TYPE_TV, 0);
 
         if ($videoId === 0 || $videoId === false) {
             $this->outputNotFound($cleanName);

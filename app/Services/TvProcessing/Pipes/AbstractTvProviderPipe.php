@@ -137,11 +137,87 @@ abstract class AbstractTvProviderPipe
     /**
      * Output match success message.
      */
-    protected function outputMatch(string $title): void
+    protected function outputMatch(string $title, ?int $season = null, ?int $episode = null, ?string $airdate = null): void
     {
-        if ($this->echoOutput) {
-            $this->colorCli->primary('Matched: '.$this->truncateTitle($title));
+        if (! $this->echoOutput) {
+            return;
         }
+
+        $this->colorCli->primaryOver('    → ');
+        $this->colorCli->headerOver($this->truncateTitle($title));
+
+        if ($airdate !== null) {
+            $this->colorCli->primaryOver(' | ');
+            $this->colorCli->warningOver($airdate);
+        } elseif ($season !== null && $episode !== null) {
+            $this->colorCli->primaryOver(' S');
+            $this->colorCli->warningOver(sprintf('%02d', $season));
+            $this->colorCli->primaryOver('E');
+            $this->colorCli->warningOver(sprintf('%02d', $episode));
+        }
+
+        $this->colorCli->primaryOver(' ✓ ');
+        $this->colorCli->primary('MATCHED (' . $this->getName() . ')');
+    }
+
+    /**
+     * Output not found message.
+     */
+    protected function outputNotFound(string $title): void
+    {
+        if (! $this->echoOutput) {
+            return;
+        }
+
+        $this->colorCli->primaryOver('    → ');
+        $this->colorCli->alternateOver($this->truncateTitle($title));
+        $this->colorCli->primaryOver(' → ');
+        $this->colorCli->alternate('Not found in ' . $this->getName());
+    }
+
+    /**
+     * Output skipped message.
+     */
+    protected function outputSkipped(string $title): void
+    {
+        if (! $this->echoOutput) {
+            return;
+        }
+
+        $this->colorCli->primaryOver('    → ');
+        $this->colorCli->alternateOver($this->truncateTitle($title));
+        $this->colorCli->primaryOver(' → ');
+        $this->colorCli->alternate('Skipped (previously failed)');
+    }
+
+    /**
+     * Output searching message.
+     */
+    protected function outputSearching(string $title): void
+    {
+        if (! $this->echoOutput) {
+            return;
+        }
+
+        $this->colorCli->primaryOver('    → ');
+        $this->colorCli->headerOver($this->truncateTitle($title));
+        $this->colorCli->primaryOver(' → ');
+        $this->colorCli->info('Searching ' . $this->getName() . '...');
+    }
+
+    /**
+     * Output found in DB message.
+     */
+    protected function outputFoundInDb(string $title): void
+    {
+        if (! $this->echoOutput) {
+            return;
+        }
+
+        $this->colorCli->primaryOver('    → ');
+        $this->colorCli->headerOver($this->truncateTitle($title));
+        $this->colorCli->primaryOver(' → ');
+        $this->colorCli->info('Found in DB');
     }
 }
 

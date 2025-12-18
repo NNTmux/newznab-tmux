@@ -23,7 +23,12 @@ class TvReleaseContext
      */
     public static function fromRelease(array|object $release): self
     {
-        $data = is_array($release) ? $release : (array) $release;
+        // Handle Eloquent models properly - use toArray() instead of casting
+        if ($release instanceof \Illuminate\Database\Eloquent\Model) {
+            $data = $release->toArray();
+        } else {
+            $data = is_array($release) ? $release : (array) $release;
+        }
 
         return new self(
             releaseId: (int) ($data['id'] ?? 0),

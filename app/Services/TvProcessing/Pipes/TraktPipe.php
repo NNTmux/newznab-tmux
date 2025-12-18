@@ -11,6 +11,10 @@ use Blacklight\processing\tv\TraktTv;
  */
 class TraktPipe extends AbstractTvProviderPipe
 {
+    // Video type and source constants (matching Videos class protected constants)
+    private const TYPE_TV = 0;
+    private const SOURCE_TRAKT = 5;
+
     protected int $priority = 50;
     private ?TraktTv $trakt = null;
 
@@ -56,7 +60,7 @@ class TraktPipe extends AbstractTvProviderPipe
         $siteId = false;
 
         // Find the Video ID if it already exists
-        $videoId = $trakt->getByTitle($cleanName, TraktTv::TYPE_TV, TraktTv::SOURCE_TRAKT);
+        $videoId = $trakt->getByTitle($cleanName, self::TYPE_TV, self::SOURCE_TRAKT);
 
         if ($videoId !== 0) {
             $siteId = $trakt->getSiteIDFromVideoID('trakt', $videoId);

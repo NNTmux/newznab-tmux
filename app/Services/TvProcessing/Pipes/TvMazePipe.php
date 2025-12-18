@@ -11,6 +11,10 @@ use Blacklight\processing\tv\TVMaze;
  */
 class TvMazePipe extends AbstractTvProviderPipe
 {
+    // Video type and source constants (matching Videos class protected constants)
+    private const TYPE_TV = 0;
+    private const SOURCE_TVMAZE = 4;
+
     protected int $priority = 30;
     private ?TVMaze $tvmaze = null;
 
@@ -56,7 +60,7 @@ class TvMazePipe extends AbstractTvProviderPipe
         $siteId = false;
 
         // Find the Video ID if it already exists
-        $videoId = $tvmaze->getByTitle($cleanName, TVMaze::TYPE_TV, TVMaze::SOURCE_TVMAZE);
+        $videoId = $tvmaze->getByTitle($cleanName, self::TYPE_TV, self::SOURCE_TVMAZE);
 
         if ($videoId !== 0) {
             $siteId = $tvmaze->getSiteByID('tvmaze', $videoId);

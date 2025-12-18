@@ -12,6 +12,9 @@ use Blacklight\processing\tv\TVDB;
  */
 class TvdbPipe extends AbstractTvProviderPipe
 {
+    // Video type constants (matching Videos class protected constants)
+    private const TYPE_TV = 0;
+
     protected int $priority = 20;
     private ?TVDB $tvdb = null;
     private ?FanartTV $fanart = null;
@@ -59,7 +62,7 @@ class TvdbPipe extends AbstractTvProviderPipe
         $posterUrl = '';
 
         // Find the Video ID if it already exists by checking the title
-        $videoId = $tvdb->getByTitle($cleanName, TVDB::TYPE_TV);
+        $videoId = $tvdb->getByTitle($cleanName, self::TYPE_TV);
 
         if ($videoId !== 0) {
             $siteId = $tvdb->getSiteByID('tvdb', $videoId);

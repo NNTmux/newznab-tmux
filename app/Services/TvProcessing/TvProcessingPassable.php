@@ -81,6 +81,7 @@ class TvProcessingPassable
     {
         $returnValue = [
             'status' => $this->result->status,
+            'matched' => $this->result->isMatched(),
             'video_id' => $this->result->videoId,
             'episode_id' => $this->result->episodeId,
             'provider' => $this->result->providerName,

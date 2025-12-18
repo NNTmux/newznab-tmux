@@ -11,6 +11,10 @@ use Blacklight\processing\tv\TMDB;
  */
 class TmdbPipe extends AbstractTvProviderPipe
 {
+    // Video type and source constants (matching Videos class protected constants)
+    private const TYPE_TV = 0;
+    private const SOURCE_TMDB = 2;
+
     protected int $priority = 40;
     private ?TMDB $tmdb = null;
 
@@ -56,7 +60,7 @@ class TmdbPipe extends AbstractTvProviderPipe
         $siteId = false;
 
         // Find the Video ID if it already exists
-        $videoId = $tmdb->getByTitle($cleanName, TMDB::TYPE_TV, TMDB::SOURCE_TMDB);
+        $videoId = $tmdb->getByTitle($cleanName, self::TYPE_TV, self::SOURCE_TMDB);
 
         if ($videoId !== 0) {
             $siteId = $tmdb->getSiteByID('tmdb', $videoId);
