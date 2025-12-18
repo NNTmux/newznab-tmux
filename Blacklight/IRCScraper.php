@@ -4,6 +4,8 @@ namespace Blacklight;
 
 use App\Models\Predb;
 use App\Models\UsenetGroup;
+use App\Services\Search\ElasticSearchService;
+use App\Services\Search\ManticoreSearchService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -49,9 +51,9 @@ class IRCScraper extends IRCClient
      */
     protected string|false $_titleIgnoreRegex = false;
 
-    protected ManticoreSearch $manticoreSearch;
+    protected ManticoreSearchService $manticoreSearch;
 
-    private ElasticSearchSiteSearch $elasticsearch;
+    private ElasticSearchService $elasticsearch;
 
     /**
      * Construct.
@@ -106,8 +108,8 @@ class IRCScraper extends IRCClient
             $this->_titleIgnoreRegex = (string) config('irc_settings.scrape_irc_title_ignore');
         }
 
-        $this->elasticsearch = new ElasticSearchSiteSearch;
-        $this->manticoreSearch = new ManticoreSearch;
+        $this->elasticsearch = app(ElasticSearchService::class);
+        $this->manticoreSearch = app(ManticoreSearchService::class);
 
         $this->_groupList = [];
         $this->_silent = $silent;

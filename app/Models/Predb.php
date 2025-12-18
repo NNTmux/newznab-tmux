@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use App\Services\Search\ElasticSearchService;
+use App\Services\Search\ManticoreSearchService;
 use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
-use Blacklight\ElasticSearchSiteSearch;
-use Blacklight\ManticoreSearch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Arr;
@@ -201,9 +201,9 @@ class Predb extends Model
             ->orderByDesc('predb.predate');
         if (! empty($search)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $ids = (new ElasticSearchSiteSearch)->predbIndexSearch($search);
+                $ids = app(ElasticSearchService::class)->predbIndexSearch($search);
             } else {
-                $manticore = new ManticoreSearch;
+                $manticore = app(ManticoreSearchService::class);
                 $ids = Arr::get($manticore->searchIndexes('predb_rt', $search, ['title']), 'id');
             }
             $sql->whereIn('predb.id', $ids);

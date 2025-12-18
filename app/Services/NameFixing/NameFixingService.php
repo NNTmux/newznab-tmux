@@ -10,10 +10,10 @@ use App\Services\NameFixing\Contracts\NameSourceFixerInterface;
 use App\Services\NameFixing\DTO\NameFixResult;
 use App\Services\NameFixing\Extractors\NfoNameExtractor;
 use App\Services\NameFixing\Extractors\FileNameExtractor;
+use App\Services\Search\ElasticSearchService;
+use App\Services\Search\ManticoreSearchService;
 use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
-use Blacklight\ElasticSearchSiteSearch;
-use Blacklight\ManticoreSearch;
 use Illuminate\Support\Arr;
 
 /**
@@ -50,8 +50,8 @@ class NameFixingService
     protected FileNameExtractor $fileExtractor;
     protected FileNameCleaner $fileNameCleaner;
     protected FilePrioritizer $filePrioritizer;
-    protected ManticoreSearch $manticore;
-    protected ElasticSearchSiteSearch $elasticsearch;
+    protected ManticoreSearchService $manticore;
+    protected ElasticSearchService $elasticsearch;
     protected ColorCLI $colorCLI;
     protected bool $echoOutput;
 
@@ -70,8 +70,8 @@ class NameFixingService
         ?FileNameExtractor $fileExtractor = null,
         ?FileNameCleaner $fileNameCleaner = null,
         ?FilePrioritizer $filePrioritizer = null,
-        ?ManticoreSearch $manticore = null,
-        ?ElasticSearchSiteSearch $elasticsearch = null,
+        ?ManticoreSearchService $manticore = null,
+        ?ElasticSearchService $elasticsearch = null,
         ?ColorCLI $colorCLI = null
     ) {
         $this->updateService = $updateService ?? new ReleaseUpdateService();
@@ -80,8 +80,8 @@ class NameFixingService
         $this->fileExtractor = $fileExtractor ?? new FileNameExtractor();
         $this->fileNameCleaner = $fileNameCleaner ?? new FileNameCleaner();
         $this->filePrioritizer = $filePrioritizer ?? new FilePrioritizer();
-        $this->manticore = $manticore ?? new ManticoreSearch();
-        $this->elasticsearch = $elasticsearch ?? new ElasticSearchSiteSearch();
+        $this->manticore = $manticore ?? app(ManticoreSearchService::class);
+        $this->elasticsearch = $elasticsearch ?? app(ElasticSearchService::class);
         $this->colorCLI = $colorCLI ?? new ColorCLI();
         $this->echoOutput = config('nntmux.echocli');
 

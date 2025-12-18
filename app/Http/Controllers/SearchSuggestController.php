@@ -2,24 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Blacklight\ElasticSearchSiteSearch;
-use Blacklight\ManticoreSearch;
+use App\Services\Search\Contracts\SearchServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 
 class SearchSuggestController extends Controller
 {
-    private ManticoreSearch|ElasticSearchSiteSearch $searchEngine;
+    private SearchServiceInterface $searchEngine;
 
-    public function __construct()
+    public function __construct(SearchServiceInterface $searchEngine)
     {
-        // Use Elasticsearch if enabled, otherwise fall back to ManticoreSearch
-        if (config('nntmux.elasticsearch_enabled', false)) {
-            $this->searchEngine = new ElasticSearchSiteSearch;
-        } else {
-            $this->searchEngine = new ManticoreSearch;
-        }
+        $this->searchEngine = $searchEngine;
     }
 
     /**

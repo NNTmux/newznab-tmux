@@ -6,13 +6,13 @@ use App\Models\MediaInfo as MediaInfoModel;
 use App\Models\Predb;
 use App\Models\Release;
 use App\Models\ReleaseFile;
+use App\Services\Search\ElasticSearchService;
+use App\Services\Search\ManticoreSearchService;
 use Blacklight\Releases;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
 use App\Services\NameFixing\NameFixingService;
 use App\Services\NameFixing\ReleaseUpdateService;
-use Blacklight\ElasticSearchSiteSearch;
-use Blacklight\ManticoreSearch;
 use Blacklight\Nfo;
 use Blacklight\NZB;
 use Blacklight\ReleaseExtra;
@@ -28,8 +28,8 @@ use Illuminate\Support\Facades\Log;
  */
 class ReleaseFileManager
 {
-    private ?ManticoreSearch $manticore = null;
-    private ?ElasticSearchSiteSearch $elasticsearch = null;
+    private ?ManticoreSearchService $manticore = null;
+    private ?ElasticSearchService $elasticsearch = null;
 
     public function __construct(
         private readonly ProcessingConfiguration $config,
@@ -590,18 +590,18 @@ class ReleaseFileManager
         return $hasGroupSuffix || ($hasTV && $hasQuality) || ($hasYear && ($hasQuality || $hasTV)) || $hasXXX;
     }
 
-    private function manticore(): ManticoreSearch
+    private function manticore(): ManticoreSearchService
     {
         if ($this->manticore === null) {
-            $this->manticore = new ManticoreSearch();
+            $this->manticore = app(ManticoreSearchService::class);
         }
         return $this->manticore;
     }
 
-    private function elasticsearch(): ElasticSearchSiteSearch
+    private function elasticsearch(): ElasticSearchService
     {
         if ($this->elasticsearch === null) {
-            $this->elasticsearch = new ElasticSearchSiteSearch();
+            $this->elasticsearch = app(ElasticSearchService::class);
         }
         return $this->elasticsearch;
     }

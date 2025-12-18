@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Predb;
 use App\Models\Release;
-use Blacklight\ManticoreSearch;
+use App\Services\Search\ManticoreSearchService;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -92,7 +92,7 @@ class NntmuxOffsetWorker extends Command
         $startTime = microtime(true);
 
         if ($engine === 'manticore') {
-            $manticore = new ManticoreSearch;
+            $manticore = app(ManticoreSearchService::class);
             $batchData = [];
 
             $query->chunk($batchSize, function ($items) use ($manticore, $indexName, $transformer, &$processed, &$errors, &$batchData, $batchSize, $workerId) {
@@ -248,7 +248,7 @@ class NntmuxOffsetWorker extends Command
     /**
      * Process ManticoreSearch batch
      */
-    private function processManticoreBatch(ManticoreSearch $manticore, string $indexName, array $data, int $workerId): void
+    private function processManticoreBatch(ManticoreSearchService $manticore, string $indexName, array $data, int $workerId): void
     {
         $retries = 3;
         $attempt = 0;

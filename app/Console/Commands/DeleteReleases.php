@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\ElasticSearchSiteSearch;
-use Blacklight\ManticoreSearch;
+use App\Services\Search\ElasticSearchService;
+use App\Services\Search\ManticoreSearchService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -147,9 +147,8 @@ class DeleteReleases extends Command
                     DB::delete('DELETE FROM releases WHERE id = ?', [$releaseId]);
 
                     // Delete from search indexes
-                    $identifiers = ['id' => $releaseId, 'g' => $release->guid];
-                    ManticoreSearch::deleteRelease($identifiers);
-                    ElasticSearchSiteSearch::deleteRelease($releaseId);
+                    app(ManticoreSearchService::class)->deleteRelease($releaseId);
+                    app(ElasticSearchService::class)->deleteRelease($releaseId);
 
                     $deleted++;
 

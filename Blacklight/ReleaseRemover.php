@@ -576,10 +576,10 @@ class ReleaseRemover
     private function performSearch(string $regexMatch): array|string
     {
         if (config('nntmux.elasticsearch_enabled') === true) {
-            return (new ElasticSearchSiteSearch)->indexSearch($regexMatch, 100);
+            return app(\App\Services\Search\ElasticSearchService::class)->indexSearch($regexMatch, 100);
         }
 
-        $searchResult = (new ManticoreSearch)->searchIndexes('releases_rt', $regexMatch, ['name,searchname']);
+        $searchResult = app(\App\Services\Search\ManticoreSearchService::class)->searchIndexes('releases_rt', $regexMatch, ['name,searchname']);
 
         return ! empty($searchResult) ? Arr::wrap(Arr::get($searchResult, 'id')) : '';
     }

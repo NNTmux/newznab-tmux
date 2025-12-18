@@ -5,8 +5,8 @@ namespace App\Services;
 use App\Models\Category;
 use App\Models\Release;
 use App\Services\Categorization\CategorizationService;
-use Blacklight\ElasticSearchSiteSearch;
-use Blacklight\ManticoreSearch;
+use App\Services\Search\ElasticSearchService;
+use App\Services\Search\ManticoreSearchService;
 use Blacklight\ReleaseExtra;
 use Blacklight\ReleaseImage;
 use FFMpeg\Coordinate\Dimension;
@@ -28,8 +28,8 @@ class MediaProcessingService
         private readonly MediaInfo $mediaInfo,
         private readonly ReleaseImage $releaseImage,
         private readonly ReleaseExtra $releaseExtra,
-        private readonly ManticoreSearch $manticore,
-        private readonly ElasticSearchSiteSearch $elasticsearch,
+        private readonly ManticoreSearchService $manticore,
+        private readonly ElasticSearchService $elasticsearch,
         private readonly CategorizationService $categorize,
     ) {}
 

@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Predb;
 use App\Models\Release;
-use Blacklight\ManticoreSearch;
+use App\Services\Search\ManticoreSearchService;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
@@ -276,7 +276,7 @@ class NntmuxOffsetPopulate extends Command
     private function clearIndex(string $engine, string $index): void
     {
         if ($engine === 'manticore') {
-            $manticore = new ManticoreSearch;
+            $manticore = app(ManticoreSearchService::class);
             $indexName = $index === 'releases' ? 'releases_rt' : 'predb_rt';
             $manticore->truncateRTIndex(Arr::wrap($indexName));
             $this->info("Truncated ManticoreSearch index: {$indexName}");

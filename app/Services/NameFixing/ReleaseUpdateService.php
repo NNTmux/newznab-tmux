@@ -9,10 +9,10 @@ use App\Models\Predb;
 use App\Models\Release;
 use App\Models\UsenetGroup;
 use App\Services\Categorization\CategorizationService;
+use App\Services\Search\ElasticSearchService;
+use App\Services\Search\ManticoreSearchService;
 use Blacklight\ColorCLI;
 use Blacklight\ConsoleTools;
-use Blacklight\ElasticSearchSiteSearch;
-use Blacklight\ManticoreSearch;
 use Blacklight\ReleaseCleaning;
 use Illuminate\Support\Arr;
 
@@ -50,8 +50,8 @@ class ReleaseUpdateService
     public const IS_RENAMED_DONE = 1;
 
     protected CategorizationService $category;
-    protected ManticoreSearch $manticore;
-    protected ElasticSearchSiteSearch $elasticsearch;
+    protected ManticoreSearchService $manticore;
+    protected ElasticSearchService $elasticsearch;
     protected FileNameCleaner $fileNameCleaner;
     protected ColorCLI $colorCLI;
     protected bool $echoOutput;
@@ -83,14 +83,14 @@ class ReleaseUpdateService
 
     public function __construct(
         ?CategorizationService $category = null,
-        ?ManticoreSearch $manticore = null,
-        ?ElasticSearchSiteSearch $elasticsearch = null,
+        ?ManticoreSearchService $manticore = null,
+        ?ElasticSearchService $elasticsearch = null,
         ?FileNameCleaner $fileNameCleaner = null,
         ?ColorCLI $colorCLI = null
     ) {
         $this->category = $category ?? new CategorizationService();
-        $this->manticore = $manticore ?? new ManticoreSearch();
-        $this->elasticsearch = $elasticsearch ?? new ElasticSearchSiteSearch();
+        $this->manticore = $manticore ?? app(ManticoreSearchService::class);
+        $this->elasticsearch = $elasticsearch ?? app(ElasticSearchService::class);
         $this->fileNameCleaner = $fileNameCleaner ?? new FileNameCleaner();
         $this->colorCLI = $colorCLI ?? new ColorCLI();
         $this->echoOutput = config('nntmux.echocli');

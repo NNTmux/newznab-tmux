@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Predb;
 use App\Models\Release;
-use Blacklight\ManticoreSearch;
+use App\Services\Search\ManticoreSearchService;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
@@ -116,7 +116,7 @@ class NntmuxPopulateSearchIndexes extends Command
         $this->info('Optimizing ManticoreSearch indexes...');
 
         try {
-            (new ManticoreSearch)->optimizeRTIndex();
+            app(ManticoreSearchService::class)->optimizeRTIndex();
             $this->info('Optimization completed successfully!');
 
             return Command::SUCCESS;
@@ -155,7 +155,7 @@ class NntmuxPopulateSearchIndexes extends Command
 
     private function manticoreReleases(): int
     {
-        $manticore = new ManticoreSearch;
+        $manticore = app(ManticoreSearchService::class);
         $indexName = 'releases_rt';
 
         $manticore->truncateRTIndex(Arr::wrap($indexName));
@@ -208,7 +208,7 @@ class NntmuxPopulateSearchIndexes extends Command
      */
     private function manticorePredb(): int
     {
-        $manticore = new ManticoreSearch;
+        $manticore = app(ManticoreSearchService::class);
         $indexName = 'predb_rt';
 
         $manticore->truncateRTIndex([$indexName]);
@@ -244,7 +244,7 @@ class NntmuxPopulateSearchIndexes extends Command
      */
     private function processManticoreData(string $indexName, int $total, $query, callable $transformer): int
     {
-        $manticore = new ManticoreSearch;
+        $manticore = app(ManticoreSearchService::class);
         $chunkSize = $this->getChunkSize();
         $batchSize = $this->getBatchSize();
 
@@ -487,7 +487,7 @@ class NntmuxPopulateSearchIndexes extends Command
     /**
      * Process ManticoreSearch batch with retry logic
      */
-    private function processBatch(ManticoreSearch $manticore, string $indexName, array $data): void
+    private function processBatch(ManticoreSearchService $manticore, string $indexName, array $data): void
     {
         $retries = 3;
         $attempt = 0;

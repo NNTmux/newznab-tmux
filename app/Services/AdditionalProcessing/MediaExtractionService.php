@@ -7,9 +7,8 @@ use App\Models\Release;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
 use App\Services\Categorization\CategorizationService;
-use Blacklight\ElasticSearchSiteSearch;
-use Blacklight\ManticoreSearch;
-use Blacklight\NameFixer;
+use App\Services\Search\ElasticSearchService;
+use App\Services\Search\ManticoreSearchService;
 use Blacklight\ReleaseExtra;
 use Blacklight\ReleaseImage;
 use FFMpeg\Coordinate\Dimension;
@@ -32,8 +31,8 @@ class MediaExtractionService
     private ?FFMpeg $ffmpeg = null;
     private ?FFProbe $ffprobe = null;
     private ?MediaInfo $mediaInfo = null;
-    private ?ManticoreSearch $manticore = null;
-    private ?ElasticSearchSiteSearch $elasticsearch = null;
+    private ?ManticoreSearchService $manticore = null;
+    private ?ElasticSearchService $elasticsearch = null;
 
     public function __construct(
         private readonly ProcessingConfiguration $config,
@@ -471,18 +470,18 @@ class MediaExtractionService
         return $this->mediaInfo;
     }
 
-    private function manticore(): ManticoreSearch
+    private function manticore(): ManticoreSearchService
     {
         if ($this->manticore === null) {
-            $this->manticore = new ManticoreSearch();
+            $this->manticore = app(ManticoreSearchService::class);
         }
         return $this->manticore;
     }
 
-    private function elasticsearch(): ElasticSearchSiteSearch
+    private function elasticsearch(): ElasticSearchService
     {
         if ($this->elasticsearch === null) {
-            $this->elasticsearch = new ElasticSearchSiteSearch();
+            $this->elasticsearch = app(ElasticSearchService::class);
         }
         return $this->elasticsearch;
     }

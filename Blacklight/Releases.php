@@ -6,6 +6,8 @@ use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
+use App\Services\Search\ElasticSearchService;
+use App\Services\Search\ManticoreSearchService;
 use Elasticsearch;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Illuminate\Database\Eloquent\Collection;
@@ -29,9 +31,9 @@ class Releases extends Release
 
     public int $passwordStatus;
 
-    private ManticoreSearch $manticoreSearch;
+    private ManticoreSearchService $manticoreSearch;
 
-    private ElasticSearchSiteSearch $elasticSearch;
+    private ElasticSearchService $elasticSearch;
 
     /**
      * @var array Class instances.
@@ -41,8 +43,8 @@ class Releases extends Release
     public function __construct()
     {
         parent::__construct();
-        $this->manticoreSearch = new ManticoreSearch;
-        $this->elasticSearch = new ElasticSearchSiteSearch;
+        $this->manticoreSearch = app(ManticoreSearchService::class);
+        $this->elasticSearch = app(ElasticSearchService::class);
     }
 
     /**

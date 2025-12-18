@@ -4,7 +4,7 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\Release;
 use App\Models\UsenetGroup;
-use Blacklight\ManticoreSearch;
+use App\Services\Search\ManticoreSearchService;
 use Blacklight\ReleaseCleaning;
 
 $message =
@@ -52,7 +52,7 @@ if (\count($releases) === 0) {
 }
 
 $releaseCleaner = new ReleaseCleaning;
-$manticore = new ManticoreSearch;
+$manticore = app(ManticoreSearchService::class);
 
 foreach ($releases as $release) {
     echo '.';

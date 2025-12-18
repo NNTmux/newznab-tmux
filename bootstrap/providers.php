@@ -12,6 +12,7 @@ return [
     App\Providers\TvProcessingServiceProvider::class,
     App\Providers\UserServiceProvider::class,
     App\Providers\VoltServiceProvider::class,
+    App\Providers\SearchServiceProvider::class,
 ];
 
 

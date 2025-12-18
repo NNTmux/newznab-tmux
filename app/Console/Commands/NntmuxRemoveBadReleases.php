@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Release;
 use App\Models\ReleaseFile;
-use Blacklight\ManticoreSearch;
+use App\Services\Search\ManticoreSearchService;
 use Blacklight\NZB;
 use Blacklight\ReleaseImage;
 use Elasticsearch;
@@ -64,12 +64,8 @@ class NntmuxRemoveBadReleases extends Command
                     // we do nothing here just catch the error, we don't care if release is missing from ES, we are deleting it anyway
                 }
             } else {
-                $identifiers = [
-                    'i' => $badRelease->id,
-                    'g' => $badRelease->guid,
-                ];
-                // Delete from sphinx.
-                (new ManticoreSearch)->deleteRelease($identifiers);
+                // Delete from Manticore
+                app(ManticoreSearchService::class)->deleteRelease($badRelease->id);
             }
             $badRelease->delete();
         }

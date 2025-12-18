@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Blacklight\ElasticSearchSiteSearch;
-use Blacklight\ManticoreSearch;
+use App\Services\Search\ElasticSearchService;
+use App\Services\Search\ManticoreSearchService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -136,9 +136,9 @@ class Release extends Model
             );
 
         if (config('nntmux.elasticsearch_enabled') === true) {
-            (new ElasticSearchSiteSearch)->insertRelease($parameters);
+            app(ElasticSearchService::class)->insertRelease($parameters);
         } else {
-            (new ManticoreSearch)->insertRelease($parameters);
+            app(ManticoreSearchService::class)->insertRelease($parameters);
         }
 
         return $parameters['id'];
@@ -173,9 +173,9 @@ class Release extends Model
         );
 
         if (config('nntmux.elasticsearch_enabled') === true) {
-            (new ElasticSearchSiteSearch)->updateRelease($id);
+            app(ElasticSearchService::class)->updateRelease($id);
         } else {
-            (new ManticoreSearch)->updateRelease($id);
+            app(ManticoreSearchService::class)->updateRelease($id);
         }
     }
 
@@ -397,9 +397,9 @@ class Release extends Model
 
         if (! empty($similar)) {
             if (config('nntmux.elasticsearch_enabled') === true) {
-                $searchResult = (new ElasticSearchSiteSearch)->indexSearch($similar[1], 10);
+                $searchResult = app(ElasticSearchService::class)->indexSearch($similar[1], 10);
             } else {
-                $searchResult = (new ManticoreSearch)->searchIndexes('releases_rt', $similar[1]);
+                $searchResult = app(ManticoreSearchService::class)->searchIndexes('releases_rt', $similar[1]);
                 if (! empty($searchResult)) {
                     $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
                 }

@@ -4,18 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\UsenetGroup;
-use Blacklight\ManticoreSearch;
+use App\Services\Search\Contracts\SearchServiceInterface;
 use Blacklight\Releases;
 use Illuminate\Http\Request;
 
 class SearchController extends BasePageController
 {
-    private ManticoreSearch $manticore;
+    private SearchServiceInterface $searchService;
 
-    public function __construct()
+    public function __construct(SearchServiceInterface $searchService)
     {
         parent::__construct();
-        $this->manticore = new ManticoreSearch;
+        $this->searchService = $searchService;
     }
 
     /**
@@ -145,9 +145,9 @@ class SearchController extends BasePageController
         // Get spell correction suggestions if we have a search query but few/no results
         $spellSuggestion = null;
         $searchQuery = $search ?: ($searchVars['searchadvr'] ?? '');
-        if (! empty($searchQuery) && $this->manticore->isSuggestEnabled()) {
-            // Get suggestions from ManticoreSearch
-            $suggestions = $this->manticore->suggest($searchQuery);
+        if (! empty($searchQuery) && $this->searchService->isSuggestEnabled()) {
+            // Get suggestions from search service
+            $suggestions = $this->searchService->suggest($searchQuery);
             if (! empty($suggestions)) {
                 // Sort by doc count descending to get best suggestion
                 usort($suggestions, fn ($a, $b) => $b['docs'] - $a['docs']);
@@ -214,10 +214,10 @@ class SearchController extends BasePageController
             'meta_title' => 'Search Nzbs',
             'meta_keywords' => 'search,nzb,description,details',
             'meta_description' => 'Search for Nzbs',
-            // ManticoreSearch enhanced features
+            // Search enhanced features
             'spellSuggestion' => $spellSuggestion,
-            'autocompleteEnabled' => $this->manticore->isAutocompleteEnabled(),
-            'suggestEnabled' => $this->manticore->isSuggestEnabled(),
+            'autocompleteEnabled' => $this->searchService->isAutocompleteEnabled(),
+            'suggestEnabled' => $this->searchService->isSuggestEnabled(),
         ]);
 
         return view('search.index', $this->viewData);
