@@ -375,8 +375,16 @@ class Releases extends Release
                 }
             }
         } else {
-            // Delete from sphinx.
-            $this->manticoreSearch->deleteRelease($identifiers);
+            // Delete from Manticore
+            if ($identifiers['i'] === false) {
+                $release = Release::query()->where('guid', $identifiers['g'])->first(['id']);
+                if ($release !== null) {
+                    $identifiers['i'] = $release->id;
+                }
+            }
+            if (!empty($identifiers['i'])) {
+                $this->manticoreSearch->deleteRelease((int) $identifiers['i']);
+            }
         }
 
         // Delete from DB.
