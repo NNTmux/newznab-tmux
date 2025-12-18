@@ -559,40 +559,11 @@ class ManticoreSearch
             return '';
         }
 
-        // Characters that need escaping in Manticore
-        $specialChars = [
-            '\\' => '\\\\',
-            '(' => '\(',
-            ')' => '\)',
-            '@' => '\@',
-            '~' => '\~',
-            '"' => '\"',
-            '&' => '\&',
-            '/' => '\/',
-            '$' => '\$',
-            '=' => '\=',
-            "'" => "\'",
-            '-' => '\-',
-            '!' => '\!',
-            '[' => '\[',
-            ']' => '\]',
-            '^' => '\^',
-            '{' => '\{',
-            '}' => '\}',
-            '<' => '\<',
-            '>' => '\>',
-            '|' => '\|',
-        ];
+        // Characters that need escaping in Manticore full-text search
+        $from = ['\\', '(', ')', '|', '-', '!', '@', '~', '"', '&', '/', '^', '$', '=', "'", "\x00", "\n", "\r", "\x1a"];
+        $to = ['\\\\', '\(', '\)', '\|', '\-', '\!', '\@', '\~', '\"', '\&', '\/', '\^', '\$', '\=', "\'", '\\0', '\\n', '\\r', '\\Z'];
 
-        $string = strtr($string, $specialChars);
-
-        // Remove double escaping for already escaped sequences
-        $string = preg_replace('/\\\\{3,}/', '\\\\', $string) ?? $string;
-
-        // Clean up trailing special characters that might cause issues
-        $string = rtrim($string, '-!\\');
-
-        return trim($string);
+        return str_replace($from, $to, $string);
     }
 
     /**
@@ -859,6 +830,7 @@ class ManticoreSearch
 
         return null;
     }
+
 
     /**
      * Execute the search query with retry on sort error.
