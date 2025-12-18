@@ -336,16 +336,16 @@
         },
         {
             "name": "canihavesomecoffee/thetvdbapi",
-            "version": "2.1.11",
+            "version": "2.1.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/canihavesomecoffee/theTVDbAPI.git",
-                "reference": "d5e7a65085fa7eecb5da1e0870e1e9b70fb4c465"
+                "reference": "d87984c9bd5c8801009da71999dce1c7d2e67348"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/canihavesomecoffee/theTVDbAPI/zipball/d5e7a65085fa7eecb5da1e0870e1e9b70fb4c465",
-                "reference": "d5e7a65085fa7eecb5da1e0870e1e9b70fb4c465",
+                "url": "https://api.github.com/repos/canihavesomecoffee/theTVDbAPI/zipball/d87984c9bd5c8801009da71999dce1c7d2e67348",
+                "reference": "d87984c9bd5c8801009da71999dce1c7d2e67348",
                 "shasum": ""
             },
             "require": {
@@ -379,9 +379,9 @@
             "description": "PHP implementation for the 4th version of the TheTVDb API.",
             "support": {
                 "issues": "https://github.com/canihavesomecoffee/theTVDbAPI/issues",
-                "source": "https://github.com/canihavesomecoffee/theTVDbAPI/tree/2.1.11"
+                "source": "https://github.com/canihavesomecoffee/theTVDbAPI/tree/2.1.12"
             },
-            "time": "2025-09-10T14:55:46+00:00"
+            "time": "2025-12-17T12:49:02+00:00"
         },
         {
             "name": "carbonphp/carbon-doctrine-types",
@@ -7747,16 +7747,16 @@
         },
         {
             "name": "psy/psysh",
-            "version": "v0.12.17",
+            "version": "v0.12.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bobthecow/psysh.git",
-                "reference": "85fbbd9f3064e157fc21fe4362b2b5c19f2ea631"
+                "reference": "ddff0ac01beddc251786fe70367cd8bbdb258196"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/85fbbd9f3064e157fc21fe4362b2b5c19f2ea631",
-                "reference": "85fbbd9f3064e157fc21fe4362b2b5c19f2ea631",
+                "url": "https://api.github.com/repos/bobthecow/psysh/zipball/ddff0ac01beddc251786fe70367cd8bbdb258196",
+                "reference": "ddff0ac01beddc251786fe70367cd8bbdb258196",
                 "shasum": ""
             },
             "require": {
@@ -7820,9 +7820,9 @@
             ],
             "support": {
                 "issues": "https://github.com/bobthecow/psysh/issues",
-                "source": "https://github.com/bobthecow/psysh/tree/v0.12.17"
+                "source": "https://github.com/bobthecow/psysh/tree/v0.12.18"
             },
-            "time": "2025-12-15T04:55:34+00:00"
+            "time": "2025-12-17T14:35:46+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
@@ -14302,16 +14302,16 @@
         },
         {
             "name": "driftingly/rector-laravel",
-            "version": "2.1.7",
+            "version": "2.1.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/driftingly/rector-laravel.git",
-                "reference": "2a64c96fa363bc85e4e6d4162c6a6bb7a78fd122"
+                "reference": "5c5f97354e562b6742b2b7989959061bde60fa71"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/driftingly/rector-laravel/zipball/2a64c96fa363bc85e4e6d4162c6a6bb7a78fd122",
-                "reference": "2a64c96fa363bc85e4e6d4162c6a6bb7a78fd122",
+                "url": "https://api.github.com/repos/driftingly/rector-laravel/zipball/5c5f97354e562b6742b2b7989959061bde60fa71",
+                "reference": "5c5f97354e562b6742b2b7989959061bde60fa71",
                 "shasum": ""
             },
             "require": {
@@ -14332,9 +14332,9 @@
             "description": "Rector upgrades rules for Laravel Framework",
             "support": {
                 "issues": "https://github.com/driftingly/rector-laravel/issues",
-                "source": "https://github.com/driftingly/rector-laravel/tree/2.1.7"
+                "source": "https://github.com/driftingly/rector-laravel/tree/2.1.8"
             },
-            "time": "2025-12-10T11:30:42+00:00"
+            "time": "2025-12-17T15:29:24+00:00"
         },
         {
             "name": "ergebnis/composer-normalize",
