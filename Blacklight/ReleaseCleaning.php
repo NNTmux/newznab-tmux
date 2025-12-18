@@ -162,7 +162,7 @@ class ReleaseCleaning
                 $title = Predb::query()->where(['predb.requestid' => $hit[1], 'g.name' => $reqGname])->join('usenet_groups as g', 'g.id', '=', 'predb.groups_id')->first(['predb.title', 'predb.id']);
             }
             // don't match against ab.teevee if title is for just the season
-            if ($groupName === 'alt.binaries.teevee' && preg_match('/\.S\d\d\./', $title['title'], $hit)) {
+            if ($title !== null && $groupName === 'alt.binaries.teevee' && preg_match('/\.S\d\d\./', $title['title'], $hit)) {
                 $title = null;
             }
             if ($title !== null) {
