@@ -458,6 +458,9 @@ abstract class TV extends Videos
         $showName = preg_replace('/'.$following.'/i', ' ', $showName);
         // Remove leading date if present
         $showName = preg_replace('/^\d{6}/', '', $showName);
+        // Handle acronyms with dots (e.g., G.R.I.T.S, S.H.I.E.L.D, C.S.I) before removing dots.
+        // This converts "G.R.I.T.S" to "GRITS" instead of "G R I T S".
+        $showName = $this->convertAcronyms($showName);
         // Remove periods, underscored, anything between parenthesis.
         $showName = preg_replace('/\(.*?\)|[._]/i', ' ', $showName);
         // Finally remove multiple spaces and trim leading spaces.
@@ -467,12 +470,35 @@ abstract class TV extends Videos
     }
 
     /**
+     * Convert acronyms with dots to condensed form.
+     * E.g., "G.R.I.T.S" becomes "GRITS", "S.H.I.E.L.D" becomes "SHIELD".
+     * This prevents acronyms from being split into individual letters with spaces.
+     */
+    private function convertAcronyms(string $str): string
+    {
+        // Match acronyms: 2 or more single letters separated by dots (optionally ending with a dot)
+        // Pattern matches things like: G.R.I.T.S, S.H.I.E.L.D., C.S.I, N.C.I.S
+        return preg_replace_callback(
+            '/\b((?:[A-Za-z]\.){2,}[A-Za-z]?\.?)\b/',
+            function ($matches) {
+                // Remove all dots from the acronym
+                return str_replace('.', '', $matches[1]);
+            },
+            $str
+        );
+    }
+
+    /**
      * Normalize well-known daily/talk show titles to their canonical names.
      */
     protected function normalizeShowTitle(string $cleanName): string
     {
         $normalized = strtolower(trim($cleanName));
         $aliases = [
+            // Acronym-based show titles
+            'grits' => 'Girls Raised in the South',
+            'shield' => 'Agents of S.H.I.E.L.D.',
+            // Talk shows
             'stephen colbert' => 'The Late Show with Stephen Colbert',
             'late show with stephen colbert' => 'The Late Show with Stephen Colbert',
             'late show stephen colbert' => 'The Late Show with Stephen Colbert',
