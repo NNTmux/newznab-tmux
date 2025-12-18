@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Services\Search\ElasticSearchService;
 use App\Services\Search\ManticoreSearchService;
 use Blacklight\ColorCLI;
-use Blacklight\ConsoleTools;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Arr;
@@ -108,7 +107,7 @@ class Predb extends Model
      */
     public static function checkPre(bool|int|string $dateLimit = false): void
     {
-        $consoleTools = new ConsoleTools;
+        $consoleTools = new ColorCLI;
         $updated = 0;
 
         if (config('nntmux.echocli')) {

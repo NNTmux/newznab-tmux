@@ -13,7 +13,6 @@ use App\Services\NameFixing\Extractors\FileNameExtractor;
 use App\Services\Search\ElasticSearchService;
 use App\Services\Search\ManticoreSearchService;
 use Blacklight\ColorCLI;
-use Blacklight\ConsoleTools;
 use Illuminate\Support\Arr;
 
 /**
@@ -1373,7 +1372,7 @@ class NameFixingService
                         $counted++;
                     }
                     if ($show === false) {
-                        $this->colorCLI->info('Renamed Releases: [' . number_format($counted) . '] ' . (new ConsoleTools())->percentString(++$counter, $total));
+                        $this->colorCLI->info('Renamed Releases: [' . number_format($counted) . '] ' . (new ColorCLI())->percentString(++$counter, $total));
                     }
                 }
                 $this->colorCLI->info(PHP_EOL . 'Renamed ' . number_format($counted) . ' releases in ' . now()->diffInSeconds($timeStart, true) . ' seconds.');

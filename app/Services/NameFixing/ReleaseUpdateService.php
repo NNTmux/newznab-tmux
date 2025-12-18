@@ -12,7 +12,6 @@ use App\Services\Categorization\CategorizationService;
 use App\Services\Search\ElasticSearchService;
 use App\Services\Search\ManticoreSearchService;
 use Blacklight\ColorCLI;
-use Blacklight\ConsoleTools;
 use Blacklight\ReleaseCleaning;
 use Illuminate\Support\Arr;
 

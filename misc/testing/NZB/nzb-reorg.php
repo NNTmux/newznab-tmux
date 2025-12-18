@@ -3,7 +3,7 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\Settings;
-use Blacklight\ConsoleTools;
+use Blacklight\ColorCLI;
 use Blacklight\NZB;
 
 if (! isset($argv[1]) || ! isset($argv[2])) {
@@ -11,7 +11,7 @@ if (! isset($argv[1]) || ! isset($argv[2])) {
 }
 
 $nzb = new NZB;
-$consoleTools = new ConsoleTools;
+$consoleTools = new ColorCLI;
 
 $newLevel = $argv[1];
 $sourcePath = $argv[2];

@@ -6,7 +6,6 @@ use App\Models\Category;
 use App\Models\Release;
 use App\Services\Categorization\CategorizationService;
 use Blacklight\ColorCLI;
-use Blacklight\ConsoleTools;
 
 $colorCli = new ColorCLI;
 
@@ -65,7 +64,7 @@ function categorizeRelease($argv, $echoOutput = false): int
     $total = $query->count();
     $colorCli = new ColorCLI;
     $colorCli->header('Categorizing ['.$total.'] releases. This can take a while, be patient.');
-    $consoleTools = new ConsoleTools;
+    $consoleTools = new ColorCLI;
     $relCount = $chgCount = 0;
     if ($total > 0) {
         $query->chunk('100', function ($results) use ($update, $relCount, $chgCount) {

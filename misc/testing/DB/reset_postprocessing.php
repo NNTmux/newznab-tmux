@@ -4,10 +4,9 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\Category;
 use Blacklight\ColorCLI;
-use Blacklight\ConsoleTools;
 use Illuminate\Support\Facades\DB;
 
-$consoletools = new ConsoleTools;
+$consoletools = new ColorCLI;
 $colorCli = new ColorCLI;
 $ran = false;
 

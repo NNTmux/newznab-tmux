@@ -7,7 +7,6 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\Release;
 use Blacklight\ColorCLI;
-use Blacklight\ConsoleTools;
 use Blacklight\NZB;
 use Blacklight\ReleaseImage;
 use Blacklight\Releases;
@@ -22,7 +21,7 @@ if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
     $releases = new Releases;
     $nzb = new NZB;
     $releaseImage = new ReleaseImage;
-    $consoletools = new ConsoleTools;
+    $consoletools = new ColorCLI;
     $couldbe = $argv[1] === 'true' ? $couldbe = 'were ' : 'could be ';
     $limit = $counterfixed = 0;
     if (isset($argv[2]) && is_numeric($argv[2])) {
