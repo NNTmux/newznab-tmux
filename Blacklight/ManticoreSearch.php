@@ -55,6 +55,22 @@ class ManticoreSearch
     }
 
     /**
+     * Get the releases index name.
+     */
+    public function getReleasesIndex(): string
+    {
+        return $this->config['indexes']['releases'] ?? 'releases_rt';
+    }
+
+    /**
+     * Get the predb index name.
+     */
+    public function getPredbIndex(): string
+    {
+        return $this->config['indexes']['predb'] ?? 'predb_rt';
+    }
+
+    /**
      * Insert release into ManticoreSearch releases_rt realtime index
      */
     public function insertRelease(array $parameters): void
