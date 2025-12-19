@@ -1,6 +1,6 @@
 <?php
 
-namespace Blacklight\libraries\Runners;
+namespace App\Services\Runners;
 
 use App\Models\Settings;
 use App\Models\UsenetGroup;
@@ -195,3 +195,4 @@ class ReleasesRunner extends BaseRunner
         }
     }
 }
+

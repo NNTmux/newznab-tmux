@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\libraries\Forking;
+use App\Services\ForkingService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -38,7 +38,7 @@ class ProcessBackfill extends Command
         }
 
         try {
-            (new Forking)->processWorkType('backfill', $options);
+            (new ForkingService)->backfill($options);
 
             return self::SUCCESS;
         } catch (\Exception $e) {

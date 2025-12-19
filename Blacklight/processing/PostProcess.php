@@ -200,18 +200,15 @@ class PostProcess
      */
     public function processTv(string $groupID = '', string $guidChar = '', int|string|null $processTV = '', string $mode = 'pipeline'): void
     {
-        // If no GUID character specified, use parallel-pipeline processing via Forking
+        // If no GUID character specified, use parallel-pipeline processing via ForkingService
         if ($guidChar === '') {
-            $forking = new \Blacklight\libraries\Forking;
-            $options = [];
+            $forkingService = new \App\Services\ForkingService;
 
             // Convert processTV setting to renamed-only flag
             $processTV = (is_numeric($processTV) ? $processTV : \App\Models\Settings::settingValue('lookuptv'));
-            if ($processTV == 2) {
-                $options = [0 => true]; // renamed only
-            }
+            $renamedOnly = ($processTV == 2);
 
-            $forking->processWorkType('postProcess_tv', $options);
+            $forkingService->processTv($renamedOnly);
         } else {
             // Process single GUID bucket with pipeline
             $this->tvProcessor->process($groupID, $guidChar, $processTV, $mode);

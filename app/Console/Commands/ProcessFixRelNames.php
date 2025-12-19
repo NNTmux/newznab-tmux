@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\libraries\Forking;
+use App\Services\ForkingService;
 use Illuminate\Console\Command;
 
 class ProcessFixRelNames extends Command
@@ -39,7 +39,7 @@ class ProcessFixRelNames extends Command
         }
 
         try {
-            (new Forking)->processWorkType('fixRelNames_'.$type, [0 => $type]);
+            (new ForkingService)->fixRelNames($type);
 
             return self::SUCCESS;
         } catch (\Exception $e) {

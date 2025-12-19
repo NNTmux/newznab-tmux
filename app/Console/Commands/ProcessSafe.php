@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\libraries\Forking;
+use App\Services\ForkingService;
 use Illuminate\Console\Command;
 
 class ProcessSafe extends Command
@@ -39,7 +39,12 @@ class ProcessSafe extends Command
         }
 
         try {
-            (new Forking)->processWorkType('safe_'.$type);
+            $service = new ForkingService;
+
+            match ($type) {
+                'binaries' => $service->safeBinaries(),
+                'backfill' => $service->safeBackfill(),
+            };
 
             return self::SUCCESS;
         } catch (\Exception $e) {

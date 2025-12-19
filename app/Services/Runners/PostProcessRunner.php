@@ -1,6 +1,6 @@
 <?php
 
-namespace Blacklight\libraries\Runners;
+namespace App\Services\Runners;
 
 use App\Models\Settings;
 use Illuminate\Support\Facades\Concurrency;
@@ -340,3 +340,4 @@ class PostProcessRunner extends BaseRunner
         $this->runPostProcess($queue, $maxProcesses, 'books', 'books postprocessing');
     }
 }
+

@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\libraries\Forking;
+use App\Services\ForkingService;
 use Illuminate\Console\Command;
 
 class ProcessUpdatePerGroup extends Command
@@ -27,7 +27,7 @@ class ProcessUpdatePerGroup extends Command
     public function handle(): int
     {
         try {
-            (new Forking)->processWorkType('update_per_group');
+            (new ForkingService)->updatePerGroup();
 
             return self::SUCCESS;
         } catch (\Exception $e) {

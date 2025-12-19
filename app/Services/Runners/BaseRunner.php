@@ -1,6 +1,6 @@
 <?php
 
-namespace Blacklight\libraries\Runners;
+namespace App\Services\Runners;
 
 use Blacklight\ColorCLI;
 use Symfony\Component\Process\Process;
@@ -13,7 +13,6 @@ abstract class BaseRunner
     {
         $this->colorCli = $colorCli ?? new ColorCLI;
     }
-
 
     protected function buildDnrCommand(string $args): string
     {
@@ -125,7 +124,7 @@ abstract class BaseRunner
     }
 
     /**
-     * Public wrapper for buildDnrCommand (used by Forking class).
+     * Public wrapper for buildDnrCommand (used by ForkingService).
      */
     public function buildDnrCommandPublic(string $args): string
     {
@@ -225,3 +224,4 @@ abstract class BaseRunner
         }
     }
 }
+

@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\libraries\Forking;
+use App\Services\ForkingService;
 use Illuminate\Console\Command;
 
 class ProcessReleasesMulti extends Command
@@ -27,7 +27,7 @@ class ProcessReleasesMulti extends Command
     public function handle(): int
     {
         try {
-            (new Forking)->processWorkType('releases');
+            (new ForkingService)->releases();
 
             return self::SUCCESS;
         } catch (\Exception $e) {

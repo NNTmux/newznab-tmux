@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\libraries\Forking;
+use App\Services\ForkingService;
 use Illuminate\Console\Command;
 
 class ProcessPostProcess extends Command
@@ -48,12 +48,17 @@ class ProcessPostProcess extends Command
         }
 
         try {
-            $options = [];
-            if ($renamed === 'true' || $renamed === true) {
-                $options = [0 => true];
-            }
+            $renamedOnly = $renamed === 'true' || $renamed === true;
+            $service = new ForkingService;
 
-            (new Forking)->processWorkType('postProcess_'.$type, $options);
+            match ($type) {
+                'ama' => $service->processBooks(),
+                'add' => $service->processAdditional(),
+                'ani' => $service->processAnime(),
+                'mov' => $service->processMovies($renamedOnly),
+                'nfo' => $service->processNfo(),
+                'tv' => $service->processTv($renamedOnly),
+            };
 
             return self::SUCCESS;
         } catch (\Exception $e) {

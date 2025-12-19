@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\libraries\Forking;
+use App\Services\ForkingService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -31,7 +31,7 @@ class ProcessBinaries extends Command
         $max = (int) $this->argument('max');
 
         try {
-            (new Forking)->processWorkType('binaries', [0 => $max]);
+            (new ForkingService)->binaries($max);
 
             return self::SUCCESS;
         } catch (\Exception $e) {
