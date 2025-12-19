@@ -7,9 +7,9 @@ use App\Models\Category;
 use App\Models\MovieInfo;
 use App\Models\Release;
 use App\Models\Settings;
+use App\Services\FanartTvService;
 use App\Services\ImdbScraper;
 use App\Services\TmdbClient;
-use Blacklight\libraries\FanartTV;
 use Blacklight\processing\tv\TraktTv;
 use Blacklight\utility\Utility;
 use GuzzleHttp\Client;
@@ -65,7 +65,7 @@ class Movie
      */
     protected string $lookuplanguage;
 
-    public FanartTV $fanart;
+    public FanartTvService $fanart;
 
     /**
      * @var null|string
@@ -115,9 +115,7 @@ class Movie
         }
         $this->client = new Client;
         $this->fanartapikey = config('nntmux_api.fanarttv_api_key');
-        if ($this->fanartapikey !== null) {
-            $this->fanart = new FanartTV($this->fanartapikey);
-        }
+        $this->fanart = new FanartTvService($this->fanartapikey);
         $this->omdbapikey = config('nntmux_api.omdb_api_key');
         if ($this->omdbapikey !== null) {
             $this->omdbApi = new OMDbAPI($this->omdbapikey);
@@ -661,42 +659,22 @@ class Movie
      */
     protected function fetchFanartTVProperties($imdbId): false|array
     {
-        if ($this->fanartapikey !== null) {
-            try {
-                $art = $this->fanart->getMovieFanArt('tt'.$imdbId);
+        if (! $this->fanart->isConfigured()) {
+            return false;
+        }
 
-                if (! empty($art)) {
-                    if (isset($art['status']) && $art['status'] === 'error') {
-                        return false;
-                    }
-                    $ret = [];
-                    if (! empty($art['moviebackground'][0]['url'])) {
-                        $ret['backdrop'] = $art['moviebackground'][0]['url'];
-                    } elseif (! empty($art['moviethumb'][0]['url'])) {
-                        $ret['backdrop'] = $art['moviethumb'][0]['url'];
-                    }
-                    if (! empty($art['movieposter'][0]['url'])) {
-                        $ret['cover'] = $art['movieposter'][0]['url'];
-                    }
-                    if (! empty($art['moviebanner'][0]['url'])) {
-                        $ret['banner'] = $art['moviebanner'][0]['url'];
-                    }
+        try {
+            $result = $this->fanart->getMovieProperties($imdbId);
 
-                    if (isset($ret['backdrop'], $ret['cover'])) {
-                        $ret['title'] = $imdbId;
-                        if (isset($art['name'])) {
-                            $ret['title'] = $art['name'];
-                        }
-                        if ($this->echooutput) {
-                            $this->colorCli->info('Fanart found '.$ret['title']);
-                        }
-
-                        return $ret;
-                    }
+            if ($result !== null) {
+                if ($this->echooutput) {
+                    $this->colorCli->info('Fanart found '.$result['title']);
                 }
-            } catch (\Throwable $e) {
-                Log::warning('FanartTV API error for '.$imdbId.': '.$e->getMessage());
+
+                return $result;
             }
+        } catch (\Throwable $e) {
+            Log::warning('FanartTV API error for '.$imdbId.': '.$e->getMessage());
         }
 
         return false;

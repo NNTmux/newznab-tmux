@@ -2,10 +2,10 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use App\Services\FanartTvService;
 use Blacklight\ColorCLI;
-use Blacklight\libraries\FanartTV;
 
-$fanart = new FanartTV(config('nntmux_api.fanarttv_api_key'));
+$fanart = new FanartTvService();
 $colorCli = new ColorCLI;
 
 if (! empty($argv[1])) {

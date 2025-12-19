@@ -2,9 +2,9 @@
 
 namespace App\Services\TvProcessing\Pipes;
 
+use App\Services\FanartTvService;
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
-use Blacklight\libraries\FanartTV;
 use Blacklight\processing\tv\TVDB;
 
 /**
@@ -17,7 +17,7 @@ class TvdbPipe extends AbstractTvProviderPipe
 
     protected int $priority = 20;
     private ?TVDB $tvdb = null;
-    private ?FanartTV $fanart = null;
+    private ?FanartTvService $fanart = null;
 
     public function getName(): string
     {
@@ -179,22 +179,18 @@ class TvdbPipe extends AbstractTvProviderPipe
      */
     private function fetchFanartPoster(int $videoId, int $siteId): void
     {
-        $fanartApiKey = config('nntmux_api.fanarttv_api_key');
-        if ($fanartApiKey === null) {
+        if ($this->fanart === null) {
+            $this->fanart = new FanartTvService();
+        }
+
+        if (! $this->fanart->isConfigured()) {
             return;
         }
 
-        if ($this->fanart === null) {
-            $this->fanart = new FanartTV($fanartApiKey);
-        }
-
-        $poster = $this->fanart->getTVFanArt($siteId);
-        if (is_array($poster) && ! empty($poster['tvposter'])) {
-            $best = collect($poster['tvposter'])->sortByDesc('likes')->first();
-            if (! empty($best['url'])) {
-                $this->getTvdb()->posterUrl = $best['url'];
-                $this->getTvdb()->getPoster($videoId);
-            }
+        $posterUrl = $this->fanart->getBestTvPoster($siteId);
+        if (! empty($posterUrl)) {
+            $this->getTvdb()->posterUrl = $posterUrl;
+            $this->getTvdb()->getPoster($videoId);
         }
     }
 

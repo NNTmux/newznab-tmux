@@ -2,7 +2,7 @@
 
 namespace Blacklight\processing\tv;
 
-use Blacklight\libraries\FanartTV;
+use App\Services\FanartTvService;
 use Blacklight\ReleaseImage;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ParseException;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ResourceNotFoundException;
@@ -34,7 +34,7 @@ class TVDB extends TV
      */
     private bool $local;
 
-    private FanartTV $fanart;
+    private FanartTvService $fanart;
 
     private mixed $fanartapikey;
 
@@ -52,9 +52,7 @@ class TVDB extends TV
         $this->authorizeTvdb();
 
         $this->fanartapikey = config('nntmux_api.fanarttv_api_key');
-        if ($this->fanartapikey !== null) {
-            $this->fanart = new FanartTV($this->fanartapikey);
-        }
+        $this->fanart = new FanartTvService($this->fanartapikey);
     }
 
     /**
@@ -145,14 +143,11 @@ class TVDB extends TV
                 if ((int) $videoId > 0 && (int) $siteId > 0) {
                     if (! empty($tvdbShow['poster'])) { // Use TVDB poster if available
                         $this->getPoster($videoId);
-                    } else { // Check Fanart.tv for poster
-                        $poster = $this->fanart->getTVFanArt($siteId);
-                        if (is_array($poster) && ! empty($poster['tvposter'])) {
-                            $best = collect($poster['tvposter'])->sortByDesc('likes')->first();
-                            if (! empty($best['url'])) {
-                                $this->posterUrl = $best['url'];
-                                $this->getPoster($videoId);
-                            }
+                    } elseif ($this->fanart->isConfigured()) { // Check Fanart.tv for poster
+                        $posterUrl = $this->fanart->getBestTvPoster($siteId);
+                        if (! empty($posterUrl)) {
+                            $this->posterUrl = $posterUrl;
+                            $this->getPoster($videoId);
                         }
                     }
 
