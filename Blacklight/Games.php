@@ -1174,23 +1174,34 @@ class Games
     /**
      * Get properly formatted IGDB image URL.
      *
-     * @param array|null $imageData
+     * @param array|object|null $imageData Can be an array or an IGDB model object (Cover, Screenshot, Artwork)
      * @param string $size Size: thumb, cover_small, cover_big, 720p, 1080p
      * @return string
      */
-    protected function getIGDBImageUrl(?array $imageData, string $size = 'cover_big'): string
+    protected function getIGDBImageUrl(array|object|null $imageData, string $size = 'cover_big'): string
     {
         if (empty($imageData)) {
             return '';
         }
 
+        // Convert object to array if needed (IGDB Laravel package returns model objects)
+        if (is_object($imageData)) {
+            // Try to get properties from the object
+            $imageId = $imageData->image_id ?? ($imageData->imageId ?? null);
+            $url = $imageData->url ?? null;
+            $imageData = [
+                'image_id' => $imageId,
+                'url' => $url,
+            ];
+        }
+
         // If we have image_id, construct the URL properly
-        if (isset($imageData['image_id'])) {
+        if (!empty($imageData['image_id'])) {
             return 'https://images.igdb.com/igdb/image/upload/t_' . $size . '/' . $imageData['image_id'] . '.jpg';
         }
 
         // Fall back to URL manipulation if we have a URL
-        if (isset($imageData['url'])) {
+        if (!empty($imageData['url'])) {
             $url = $imageData['url'];
             // Ensure https
             if (strpos($url, '//') === 0) {
