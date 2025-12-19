@@ -290,7 +290,7 @@ class Movie
         }
 
         if ($this->traktcheck !== null) {
-            $data = $this->traktTv->client->movieSummary('tt'.$imdbId, 'full');
+            $data = $this->traktTv->client->getMovieSummary('tt'.$imdbId, 'full');
             if (($data !== false) && ! empty($data['trailer'])) {
                 return $data['trailer'];
             }
@@ -921,7 +921,7 @@ class Movie
 
         try {
             // Fetch movie data from Trakt.tv
-            $resp = $this->traktTv->client->movieSummary('tt'.$imdbId, 'full');
+            $resp = $this->traktTv->client->getMovieSummary('tt'.$imdbId, 'full');
 
             // If no result or no title, cache the failure and return
             if ($resp === false || empty($resp['title'])) {
@@ -1406,7 +1406,7 @@ class Movie
         }
 
         try {
-            $data = $this->traktTv->client->movieSummary($movieName, 'full');
+            $data = $this->traktTv->client->getMovieSummary($movieName, 'full');
             if ($data === false || empty($data['ids']['imdb'])) {
                 return false;
             }

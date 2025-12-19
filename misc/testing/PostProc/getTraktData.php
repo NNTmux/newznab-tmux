@@ -17,7 +17,7 @@ if ($count > 0) {
     $colorCli->primary('Updating '.number_format($count).' movies for TraktTV id.');
     foreach ($movies as $mov) {
         $traktTv = new TraktTv(['Settings' => null]);
-        $traktmovie = $traktTv->client->movieSummary('tt'.$mov['imdbid'], 'full');
+        $traktmovie = $traktTv->client->getMovieSummary('tt'.$mov['imdbid'], 'full');
         if ($traktmovie !== false) {
             $colorCli->info('Updating IMDb id: tt'.$mov['imdbid']);
             $trakt = $movie->parseTraktTv($traktmovie);
