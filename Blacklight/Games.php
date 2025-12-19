@@ -1067,15 +1067,25 @@ class Games
         $publishers = [];
         $developers = [];
         if (!empty($game->involved_companies)) {
-            foreach ($game->involved_companies as $company) {
-                if (isset($company['publisher']) && $company['publisher'] === true) {
-                    $companyData = Company::find($company['company']);
+            $involvedCompanies = $game->involved_companies;
+            // Convert Collection to array if needed
+            if ($involvedCompanies instanceof \Illuminate\Support\Collection) {
+                $involvedCompanies = $involvedCompanies->toArray();
+            }
+            foreach ($involvedCompanies as $company) {
+                // Handle both array and object access
+                $isPublisher = is_array($company) ? ($company['publisher'] ?? false) : ($company->publisher ?? false);
+                $isDeveloper = is_array($company) ? ($company['developer'] ?? false) : ($company->developer ?? false);
+                $companyId = is_array($company) ? ($company['company'] ?? null) : ($company->company ?? null);
+
+                if ($isPublisher === true && $companyId) {
+                    $companyData = Company::find($companyId);
                     if ($companyData) {
                         $publishers[] = $companyData->name;
                     }
                 }
-                if (isset($company['developer']) && $company['developer'] === true) {
-                    $companyData = Company::find($company['company']);
+                if ($isDeveloper === true && $companyId) {
+                    $companyData = Company::find($companyId);
                     if ($companyData) {
                         $developers[] = $companyData->name;
                     }
@@ -1086,14 +1096,22 @@ class Games
         // Extract genres (prefer genres over themes)
         $genres = [];
         if (!empty($game->genres)) {
-            foreach ($game->genres as $genre) {
-                $genres[] = $genre['name'] ?? '';
+            $gameGenres = $game->genres;
+            if ($gameGenres instanceof \Illuminate\Support\Collection) {
+                $gameGenres = $gameGenres->toArray();
+            }
+            foreach ($gameGenres as $genre) {
+                $genres[] = is_array($genre) ? ($genre['name'] ?? '') : ($genre->name ?? '');
             }
         }
         // Fall back to themes if no genres
         if (empty($genres) && !empty($game->themes)) {
-            foreach ($game->themes as $theme) {
-                $genres[] = $theme['name'] ?? '';
+            $gameThemes = $game->themes;
+            if ($gameThemes instanceof \Illuminate\Support\Collection) {
+                $gameThemes = $gameThemes->toArray();
+            }
+            foreach ($gameThemes as $theme) {
+                $genres[] = is_array($theme) ? ($theme['name'] ?? '') : ($theme->name ?? '');
             }
         }
         $genreName = $this->_matchGenre(implode(',', array_filter($genres)));
@@ -1104,24 +1122,37 @@ class Games
         // Get best backdrop/screenshot
         $backdropUrl = '';
         if (!empty($game->artworks)) {
-            $backdropUrl = $this->getIGDBImageUrl($game->artworks[0] ?? null, '1080p');
+            $artworks = $game->artworks;
+            $firstArtwork = ($artworks instanceof \Illuminate\Support\Collection) ? $artworks->first() : ($artworks[0] ?? null);
+            $backdropUrl = $this->getIGDBImageUrl($firstArtwork, '1080p');
         } elseif (!empty($game->screenshots)) {
-            $backdropUrl = $this->getIGDBImageUrl($game->screenshots[0] ?? null, '1080p');
+            $screenshots = $game->screenshots;
+            $firstScreenshot = ($screenshots instanceof \Illuminate\Support\Collection) ? $screenshots->first() : ($screenshots[0] ?? null);
+            $backdropUrl = $this->getIGDBImageUrl($firstScreenshot, '1080p');
         }
 
         // Get trailer URL if available
         $trailerUrl = '';
         if (!empty($game->videos)) {
-            foreach ($game->videos as $video) {
-                if (isset($video['video_id'])) {
-                    $trailerUrl = 'https://www.youtube.com/watch?v=' . $video['video_id'];
+            $videos = $game->videos;
+            if ($videos instanceof \Illuminate\Support\Collection) {
+                $videos = $videos->toArray();
+            }
+            foreach ($videos as $video) {
+                $videoId = is_array($video) ? ($video['video_id'] ?? null) : ($video->video_id ?? null);
+                if ($videoId) {
+                    $trailerUrl = 'https://www.youtube.com/watch?v=' . $videoId;
                     break;
                 }
             }
         }
 
         // Get rating (ESRB or PEGI)
-        $esrb = $this->getIGDBAgeRating($game->age_ratings ?? []);
+        $ageRatings = $game->age_ratings ?? [];
+        if ($ageRatings instanceof \Illuminate\Support\Collection) {
+            $ageRatings = $ageRatings->toArray();
+        }
+        $esrb = $this->getIGDBAgeRating($ageRatings);
 
         // Get release date for PC
         $releaseDate = $this->getIGDBReleaseDate($game);
@@ -1141,7 +1172,13 @@ class Games
             $additionalInfo[] = 'Developer: ' . implode(', ', array_slice($developers, 0, 3));
         }
         if (!empty($game->game_modes)) {
-            $modes = array_map(fn($m) => $m['name'] ?? '', $game->game_modes);
+            $gameModes = $game->game_modes;
+            // Handle both Collection and array types
+            if ($gameModes instanceof \Illuminate\Support\Collection) {
+                $modes = $gameModes->map(fn($m) => is_array($m) ? ($m['name'] ?? '') : ($m->name ?? ''))->toArray();
+            } else {
+                $modes = array_map(fn($m) => $m['name'] ?? '', $gameModes);
+            }
             $additionalInfo[] = 'Modes: ' . implode(', ', array_filter($modes));
         }
         if (!empty($additionalInfo) && !empty($review)) {
@@ -1245,8 +1282,8 @@ class Games
         ];
 
         foreach ($ageRatings as $rating) {
-            $category = $rating['category'] ?? 0;
-            $ratingValue = $rating['rating'] ?? 0;
+            $category = is_array($rating) ? ($rating['category'] ?? 0) : ($rating->category ?? 0);
+            $ratingValue = is_array($rating) ? ($rating['rating'] ?? 0) : ($rating->rating ?? 0);
 
             // Prefer ESRB
             if ($category === 1 && isset($esrbMap[$ratingValue])) {
