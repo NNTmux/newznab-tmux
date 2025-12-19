@@ -12,10 +12,6 @@ use App\Services\TmdbClient;
 use Blacklight\libraries\FanartTV;
 use Blacklight\processing\tv\TraktTv;
 use Blacklight\utility\Utility;
-use DariusIII\ItunesApi\Exceptions\InvalidProviderException;
-use DariusIII\ItunesApi\Exceptions\MovieNotFoundException;
-use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
-use DariusIII\ItunesApi\iTunes;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Builder;
@@ -387,7 +383,7 @@ class Movie
      *
      * @return array|string
      */
-    protected function setVariables(string|array $variable1, string|array $variable2, string|array $variable3, string|array $variable4, string|array $variable5)
+    protected function setVariables(string|array $variable1, string|array $variable2, string|array $variable3, string|array $variable4, string|array $variable5 = '')
     {
         if (! empty($variable1)) {
             return $variable1;
@@ -479,11 +475,7 @@ class Movie
         // Check OMDb for movie info
         $omdb = $this->fetchOmdbAPIProperties($imdbId);
 
-        // Check iTunes for movie info as last resort (iTunes do not provide all the info we need)
-
-        $iTunes = $this->fetchItunesMovieProperties($this->currentTitle);
-
-        if (! $imdb && ! $tmdb && ! $trakt && ! $omdb && empty($iTunes)) {
+        if (! $imdb && ! $tmdb && ! $trakt && ! $omdb) {
             return false;
         }
 
@@ -548,18 +540,6 @@ class Movie
             }
         }
 
-        if ($mov['cover'] === 0 && ! empty($iTunes['cover'])) {
-            try {
-                $mov['cover'] = $this->releaseImage->saveImage($imdbId.'-cover', $iTunes['cover'], $this->imgSavePath);
-                if ($mov['cover'] === 0) {
-                    Log::warning('Failed to save iTunes cover for '.$imdbId.' from URL: '.$iTunes['cover']);
-                }
-            } catch (\Throwable $e) {
-                Log::error('Error saving iTunes cover for '.$imdbId.': '.$e->getMessage());
-                $mov['cover'] = 0;
-            }
-        }
-
         // Backdrops.
         if (! empty($fanart['backdrop'])) {
             try {
@@ -594,12 +574,12 @@ class Movie
             $mov['rtrating'] = $omdb['rtRating'];
         }
 
-        $mov['title'] = $this->setVariables($imdb['title'] ?? '', $tmdb['title'] ?? '', $trakt['title'] ?? '', $omdb['title'] ?? '', $iTunes['title'] ?? '');
-        $mov['rating'] = $this->setVariables($imdb['rating'] ?? '', $tmdb['rating'] ?? '', $trakt['rating'] ?? '', $omdb['rating'] ?? '', $iTunes['rating'] ?? '');
-        $mov['plot'] = $this->setVariables($imdb['plot'] ?? '', $tmdb['plot'] ?? '', $trakt['overview'] ?? '', $omdb['plot'] ?? '', $iTunes['plot'] ?? '');
-        $mov['tagline'] = $this->setVariables($imdb['tagline'] ?? '', $tmdb['tagline'] ?? '', $trakt['tagline'] ?? '', $omdb['tagline'] ?? '', $iTunes['tagline'] ?? '');
-        $mov['year'] = $this->setVariables($imdb['year'] ?? '', $tmdb['year'] ?? '', $trakt['year'] ?? '', $omdb['year'] ?? '', $iTunes['year'] ?? '');
-        $mov['genre'] = $this->setVariables($imdb['genre'] ?? '', $tmdb['genre'] ?? '', $trakt['genres'] ?? '', $omdb['genre'] ?? '', $iTunes['genre'] ?? '');
+        $mov['title'] = $this->setVariables($imdb['title'] ?? '', $tmdb['title'] ?? '', $trakt['title'] ?? '', $omdb['title'] ?? '');
+        $mov['rating'] = $this->setVariables($imdb['rating'] ?? '', $tmdb['rating'] ?? '', $trakt['rating'] ?? '', $omdb['rating'] ?? '');
+        $mov['plot'] = $this->setVariables($imdb['plot'] ?? '', $tmdb['plot'] ?? '', $trakt['overview'] ?? '', $omdb['plot'] ?? '');
+        $mov['tagline'] = $this->setVariables($imdb['tagline'] ?? '', $tmdb['tagline'] ?? '', $trakt['tagline'] ?? '', $omdb['tagline'] ?? '');
+        $mov['year'] = $this->setVariables($imdb['year'] ?? '', $tmdb['year'] ?? '', $trakt['year'] ?? '', $omdb['year'] ?? '');
+        $mov['genre'] = $this->setVariables($imdb['genre'] ?? '', $tmdb['genre'] ?? '', $trakt['genres'] ?? '', $omdb['genre'] ?? '');
 
         if (! empty($imdb['type'])) {
             $mov['type'] = $imdb['type'];
@@ -1122,80 +1102,6 @@ class Movie
             Log::warning('OMDB API error for '.$imdbId.': '.$e->getMessage());
 
             // Cache the failure but for shorter time
-            Cache::put($cacheKey, false, now()->addHours(6));
-
-            return false;
-        }
-    }
-
-    /**
-     * Fetch movie information from iTunes API using movie title.
-     *
-     * @param  string  $title  The movie title to search for
-     * @return array|false Movie data array or false if not found/matched
-     *
-     * @throws InvalidProviderException If there's an issue with the iTunes provider
-     */
-    public function fetchItunesMovieProperties(string $title): array|false
-    {
-        // Skip empty titles
-        if (empty(trim($title))) {
-            return false;
-        }
-
-        // Create a cache key for this request
-        $cacheKey = 'itunes_movie_'.md5($title);
-        $expiresAt = now()->addDays(7); // Cache for 7 days since movie data rarely changes
-
-        // Check if we have this cached
-        if (Cache::has($cacheKey)) {
-            return Cache::get($cacheKey);
-        }
-
-        try {
-            // Fetch movie data from iTunes
-            $iTunesMovie = iTunes::load('movie')->fetchOneByName($title);
-
-            // Title similarity check
-            similar_text($this->currentTitle, $iTunesMovie->getName(), $percent);
-            if ($percent < self::MATCH_PERCENT) {
-                // Movie found but title doesn't match closely enough
-                Cache::put($cacheKey, false, now()->addHours(6));
-
-                return false;
-            }
-
-            // Build the movie data array
-            $movieData = [
-                'title' => $iTunesMovie->getName(),
-                'director' => $iTunesMovie->getDirector() ?? '',
-                'tagline' => $iTunesMovie->getTagLine() ?? '',
-                'cover' => str_replace('100x100', '800x800', $iTunesMovie->getCover()),
-                'genre' => $iTunesMovie->getGenre() ?? '',
-                'plot' => $iTunesMovie->getDescription() ?? '',
-                'year' => $iTunesMovie->getReleaseDate() ? $iTunesMovie->getReleaseDate()->format('Y') : '',
-                'rating' => '', // iTunes doesn't provide ratings
-            ];
-
-            // Log success
-            if ($this->echooutput) {
-                $this->colorCli->info('iTunes found '.$movieData['title']);
-            }
-
-            // Cache the successful result
-            Cache::put($cacheKey, $movieData, $expiresAt);
-
-            return $movieData;
-
-        } catch (MovieNotFoundException|SearchNoResultsException $e) {
-            // Not found or no results
-            Log::info('iTunes movie not found for "'.$title.'": '.$e->getMessage());
-            Cache::put($cacheKey, false, now()->addHours(6));
-
-            return false;
-        } catch (\Throwable $e) {
-            // General error
-            Log::warning('iTunes API error for "'.$title.'": '.$e->getMessage());
             Cache::put($cacheKey, false, now()->addHours(6));
 
             return false;
@@ -1855,25 +1761,6 @@ class Movie
             }
         } catch (\Throwable $e) {
             Log::debug('OMDB cover fetch failed for '.$imdbId.': '.$e->getMessage());
-        }
-        // iTunes (requires currentTitle; attempt fallback if title known in DB)
-        try {
-            if (empty($this->currentTitle)) {
-                $info = MovieInfo::query()->select('title')->where('imdbid', $imdbId)->first();
-                if ($info !== null && ! empty($info->title)) {
-                    $this->currentTitle = $info->title;
-                }
-            }
-            if (! empty($this->currentTitle)) {
-                $itunes = $this->fetchItunesMovieProperties($this->currentTitle);
-                if (! empty($itunes['cover'])) {
-                    if ($this->releaseImage->saveImage($imdbId.'-cover', $itunes['cover'], $this->imgSavePath)) {
-                        return true;
-                    }
-                }
-            }
-        } catch (\Throwable $e) {
-            Log::debug('iTunes cover fetch failed for '.$imdbId.': '.$e->getMessage());
         }
 
         return false;

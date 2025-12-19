@@ -6,9 +6,7 @@ use App\Models\BookInfo;
 use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
-use DariusIII\ItunesApi\Exceptions\EbookNotFoundException;
-use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
-use DariusIII\ItunesApi\iTunes;
+use App\Services\ItunesService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -496,44 +494,40 @@ class Books
 
     /**
      * @return array|bool
-     *
-     * @throws \DariusIII\ItunesApi\Exceptions\InvalidProviderException
      */
     public function fetchItunesBookProperties(string $bookInfo)
     {
-        $book = true;
-        try {
-            $iTunesBook = iTunes::load('ebook')->fetchOneByName($bookInfo);
-        } catch (EbookNotFoundException $e) {
-            $book = false;
-        } catch (SearchNoResultsException $e) {
-            $book = false;
+        $itunes = new ItunesService();
+        $iTunesBook = $itunes->findEbook($bookInfo);
+
+        if ($iTunesBook === null) {
+            $this->colorCli->notice('Could not find a match on iTunes!');
+
+            return false;
         }
 
-        if ($book) {
-            $this->colorCli->info('Found matching title: '.$iTunesBook->getName());
-            $book = [
-                'title' => $iTunesBook->getName(),
-                'author' => $iTunesBook->getAuthor(),
-                'asin' => $iTunesBook->getItunesId(),
-                'isbn' => 'null',
-                'ean' => 'null',
-                'url' => $iTunesBook->getStoreUrl(),
-                'salesrank' => '',
-                'publisher' => '',
-                'pages' => '',
-                'coverurl' => ! empty($iTunesBook->getCover()) ? str_replace('100x100', '800x800', $iTunesBook->getCover()) : '',
-                'genre' => implode(', ', $iTunesBook->getGenre()),
-                'overview' => strip_tags($iTunesBook->getDescription()),
-                'publishdate' => $iTunesBook->getReleaseDate()->format('Y-m-d'),
-            ];
-            if (! empty($book['coverurl'])) {
-                $book['cover'] = 1;
-            } else {
-                $book['cover'] = 0;
-            }
+        $this->colorCli->info('Found matching title: '.$iTunesBook['name']);
+
+        $book = [
+            'title' => $iTunesBook['name'],
+            'author' => $iTunesBook['author'],
+            'asin' => $iTunesBook['id'],
+            'isbn' => 'null',
+            'ean' => 'null',
+            'url' => $iTunesBook['store_url'],
+            'salesrank' => '',
+            'publisher' => '',
+            'pages' => '',
+            'coverurl' => ! empty($iTunesBook['cover']) ? $iTunesBook['cover'] : '',
+            'genre' => is_array($iTunesBook['genres']) ? implode(', ', $iTunesBook['genres']) : $iTunesBook['genre'],
+            'overview' => strip_tags($iTunesBook['description'] ?? ''),
+            'publishdate' => $iTunesBook['release_date'],
+        ];
+
+        if (! empty($book['coverurl'])) {
+            $book['cover'] = 1;
         } else {
-            $this->colorCli->notice('Could not find a match on iTunes!');
+            $book['cover'] = 0;
         }
 
         return $book;

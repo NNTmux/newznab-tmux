@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "60f2d300dbd8d23493f46be6cea08fa4",
+    "content-hash": "7eea2735024f68804cd270d1aed9638b",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -654,63 +654,6 @@
             "time": "2025-02-22T19:11:54+00:00"
         },
         {
-            "name": "dariusiii/php-itunes-api",
-            "version": "v1.0.14",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/DariusIII/php-itunes-api.git",
-                "reference": "912bc7bcce3c234060353b1f5b0b34269efa723c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/php-itunes-api/zipball/912bc7bcce3c234060353b1f5b0b34269efa723c",
-                "reference": "912bc7bcce3c234060353b1f5b0b34269efa723c",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "php": ">=7.2.0"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^2.13",
-                "phpunit/phpunit": "^7.4.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "DariusIII\\ItunesApi\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Jacopo Andrea Nuzzi",
-                    "email": "jacoz@php.net"
-                },
-                {
-                    "name": "DariusIII"
-                }
-            ],
-            "description": "Query iTunes API System",
-            "homepage": "https://github.com/DariusIII/php-itunes-api",
-            "keywords": [
-                "api",
-                "apple",
-                "itunes",
-                "movies",
-                "music",
-                "query"
-            ],
-            "support": {
-                "issues": "https://github.com/DariusIII/php-itunes-api/issues",
-                "source": "https://github.com/DariusIII/php-itunes-api/tree/v1.0.14"
-            },
-            "time": "2025-05-29T21:37:11+00:00"
-        },
-        {
             "name": "dariusiii/rarinfo",
             "version": "v2.7.6",
             "source": {
@@ -763,16 +706,16 @@
         },
         {
             "name": "dariusiii/tv-maze-php-api",
-            "version": "2.0.5",
+            "version": "2.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper.git",
-                "reference": "ab6438930be11495b10d34ecd2e351bec9a0beda"
+                "reference": "dd8b52140c40b9b7eabf4166f3ab1ba1d5d22314"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/TVMaze-PHP-API-Wrapper/zipball/ab6438930be11495b10d34ecd2e351bec9a0beda",
-                "reference": "ab6438930be11495b10d34ecd2e351bec9a0beda",
+                "url": "https://api.github.com/repos/DariusIII/TVMaze-PHP-API-Wrapper/zipball/dd8b52140c40b9b7eabf4166f3ab1ba1d5d22314",
+                "reference": "dd8b52140c40b9b7eabf4166f3ab1ba1d5d22314",
                 "shasum": ""
             },
             "type": "library",
@@ -796,9 +739,9 @@
             ],
             "description": "TVMaze-API-Wrapper",
             "support": {
-                "source": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper/tree/2.0.5"
+                "source": "https://github.com/DariusIII/TVMaze-PHP-API-Wrapper/tree/2.0.6"
             },
-            "time": "2025-12-05T19:09:25+00:00"
+            "time": "2025-12-18T17:29:05+00:00"
         },
         {
             "name": "dasprid/enum",
@@ -14934,16 +14877,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v3.92.2",
+            "version": "v3.92.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer.git",
-                "reference": "64fab3553dce507ce247f7d1a7d65f74ef658c3f"
+                "reference": "2ba8f5a60f6f42fb65758cfb3768434fa2d1c7e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/64fab3553dce507ce247f7d1a7d65f74ef658c3f",
-                "reference": "64fab3553dce507ce247f7d1a7d65f74ef658c3f",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/2ba8f5a60f6f42fb65758cfb3768434fa2d1c7e8",
+                "reference": "2ba8f5a60f6f42fb65758cfb3768434fa2d1c7e8",
                 "shasum": ""
             },
             "require": {
@@ -15026,7 +14969,7 @@
             ],
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues",
-                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.92.2"
+                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.92.3"
             },
             "funding": [
                 {
@@ -15034,7 +14977,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-17T00:04:16+00:00"
+            "time": "2025-12-18T10:45:02+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",
@@ -15978,16 +15921,16 @@
         },
         {
             "name": "php-coveralls/php-coveralls",
-            "version": "v2.9.0",
+            "version": "v2.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-coveralls/php-coveralls.git",
-                "reference": "468f5247e9e36ecc9b34f501cab868e7ac7c1f73"
+                "reference": "916bdb118597f61ce6715fb738ab8f234b89a2cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-coveralls/php-coveralls/zipball/468f5247e9e36ecc9b34f501cab868e7ac7c1f73",
-                "reference": "468f5247e9e36ecc9b34f501cab868e7ac7c1f73",
+                "url": "https://api.github.com/repos/php-coveralls/php-coveralls/zipball/916bdb118597f61ce6715fb738ab8f234b89a2cb",
+                "reference": "916bdb118597f61ce6715fb738ab8f234b89a2cb",
                 "shasum": ""
             },
             "require": {
@@ -16055,9 +15998,9 @@
             ],
             "support": {
                 "issues": "https://github.com/php-coveralls/php-coveralls/issues",
-                "source": "https://github.com/php-coveralls/php-coveralls/tree/v2.9.0"
+                "source": "https://github.com/php-coveralls/php-coveralls/tree/v2.9.1"
             },
-            "time": "2025-11-06T10:39:48+00:00"
+            "time": "2025-12-18T13:08:37+00:00"
         },
         {
             "name": "phpstan/phpstan",

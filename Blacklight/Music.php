@@ -7,11 +7,7 @@ use App\Models\Genre;
 use App\Models\MusicInfo;
 use App\Models\Release;
 use App\Models\Settings;
-use DariusIII\ItunesApi\Exceptions\AlbumNotFoundException;
-use DariusIII\ItunesApi\Exceptions\ArtistNotFoundException;
-use DariusIII\ItunesApi\Exceptions\SearchNoResultsException;
-use DariusIII\ItunesApi\Exceptions\TrackNotFoundException;
-use DariusIII\ItunesApi\iTunes;
+use App\Services\ItunesService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -605,61 +601,68 @@ class Music
 
     /**
      * @return array|bool
-     *
-     * @throws \DariusIII\ItunesApi\Exceptions\InvalidProviderException
-     * @throws \Exception
      */
     protected function fetchItunesMusicProperties(string $title)
     {
-        $mus = true;
         // Load genres.
         $defaultGenres = (new Genres)->loadGenres(Genres::MUSIC_TYPE);
 
-        try {
-            $album = iTunes::load('album')->fetchOneByName($title);
-            $track = iTunes::load('track')->fetchOneByName($title);
-            $artist = iTunes::load('artist')->fetchById($track->getArtistId());
-            $genreName = $album->getGenre();
-        } catch (AlbumNotFoundException $e) {
-            try {
-                $track = iTunes::load('track')->fetchOneByName($title);
-                $album = iTunes::load('album')->fetchById($track->getAlbumId());
-                $artist = iTunes::load('artist')->fetchById($track->getArtistId());
-                $genreName = $album->getGenre();
-            } catch (TrackNotFoundException $e) {
-                $mus = false;
-            } catch (SearchNoResultsException $e) {
-                $mus = false;
-            } catch (ArtistNotFoundException $e) {
-                $mus = false;
+        $itunes = new ItunesService();
+
+        // Try to find album first
+        $album = $itunes->findAlbum($title);
+
+        if ($album === null) {
+            // Try finding a track instead
+            $track = $itunes->findTrack($title);
+            if ($track === null) {
+                return false;
             }
-        } catch (SearchNoResultsException $e) {
-            $mus = false;
-        } catch (ArtistNotFoundException $e) {
-            $mus = false;
+            // Use track info to build album-like data
+            $album = [
+                'name' => $track['album'] ?? $track['name'],
+                'id' => $track['album_id'] ?? $track['id'],
+                'artist' => $track['artist'],
+                'artist_id' => $track['artist_id'],
+                'genre' => $track['genre'],
+                'release_date' => $track['release_date'],
+                'cover' => $track['cover'],
+                'store_url' => $track['store_url'],
+            ];
         }
-        if ($mus !== false) {
+
+        $genreName = $album['genre'] ?? '';
+
+        if (! empty($genreName)) {
             if (\in_array(strtolower($genreName), $defaultGenres, false)) {
                 $genreKey = array_search(strtolower($genreName), $defaultGenres, false);
             } else {
                 $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::MUSIC_TYPE]);
             }
-            $mus = [
-                'title' => $album->getName(),
-                'asin' => $album->getItunesId(),
-                'url' => $album->getStoreUrl(),
-                'salesrank' => '',
-                'artist' => $artist->getName(),
-                'publisher' => $album->getPublisher(),
-                'releasedate' => $album->getReleaseDate(),
-                'review' => '',
-                'coverurl' => str_replace('100x100', '800x800', $album->getCover()),
-                'tracks' => '',
-                'musicgenre' => $genreName,
-                'musicgenres_id' => $genreKey,
-            ];
+        } else {
+            $genreKey = -1;
         }
 
-        return $mus;
+        // Get artist name - either from album data or lookup
+        $artistName = $album['artist'] ?? '';
+        if (empty($artistName) && ! empty($album['artist_id'])) {
+            $artistData = $itunes->lookupArtist($album['artist_id']);
+            $artistName = $artistData['artistName'] ?? '';
+        }
+
+        return [
+            'title' => $album['name'],
+            'asin' => $album['id'],
+            'url' => $album['store_url'] ?? '',
+            'salesrank' => '',
+            'artist' => $artistName,
+            'publisher' => $album['copyright'] ?? '',
+            'releasedate' => $album['release_date'],
+            'review' => '',
+            'coverurl' => $album['cover'],
+            'tracks' => $album['track_count'] ?? '',
+            'musicgenre' => $genreName,
+            'musicgenres_id' => $genreKey,
+        ];
     }
 }
