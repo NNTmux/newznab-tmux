@@ -4,7 +4,7 @@ namespace App\Services\TvProcessing\Pipes;
 
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
-use Blacklight\processing\tv\LocalDB;
+use App\Services\TvProcessing\Providers\LocalDbProvider;
 
 /**
  * Pipe for local database lookups.
@@ -16,7 +16,7 @@ class LocalDbPipe extends AbstractTvProviderPipe
     private const TYPE_TV = 0;
 
     protected int $priority = 10;
-    private ?LocalDB $localDb = null;
+    private ?LocalDbProvider $localDb = null;
 
     public function getName(): string
     {
@@ -31,10 +31,10 @@ class LocalDbPipe extends AbstractTvProviderPipe
     /**
      * Get or create the LocalDB instance.
      */
-    private function getLocalDb(): LocalDB
+    private function getLocalDb(): LocalDbProvider
     {
         if ($this->localDb === null) {
-            $this->localDb = new LocalDB();
+            $this->localDb = new LocalDbProvider();
         }
         return $this->localDb;
     }

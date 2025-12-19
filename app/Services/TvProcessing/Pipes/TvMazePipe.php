@@ -4,7 +4,7 @@ namespace App\Services\TvProcessing\Pipes;
 
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
-use Blacklight\processing\tv\TVMaze;
+use App\Services\TvProcessing\Providers\TvMazeProvider;
 
 /**
  * Pipe for TVMaze API lookups.
@@ -16,7 +16,7 @@ class TvMazePipe extends AbstractTvProviderPipe
     private const SOURCE_TVMAZE = 4;
 
     protected int $priority = 30;
-    private ?TVMaze $tvmaze = null;
+    private ?TvMazeProvider $tvmaze = null;
 
     public function getName(): string
     {
@@ -31,10 +31,10 @@ class TvMazePipe extends AbstractTvProviderPipe
     /**
      * Get or create the TVMaze instance.
      */
-    private function getTvMaze(): TVMaze
+    private function getTvMaze(): TvMazeProvider
     {
         if ($this->tvmaze === null) {
-            $this->tvmaze = new TVMaze();
+            $this->tvmaze = new TvMazeProvider();
         }
         return $this->tvmaze;
     }

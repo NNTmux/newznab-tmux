@@ -21,7 +21,7 @@
  * @copyright 2015 nZEDb
  */
 
-namespace Blacklight\processing;
+namespace App\Services\TvProcessing\Providers;
 
 use App\Models\TvInfo;
 use App\Models\Video;
@@ -31,7 +31,7 @@ use Illuminate\Support\Facades\Cache;
 /**
  * Parent class for TV/Film and any similar classes to inherit from.
  */
-abstract class Videos
+abstract class BaseVideoProvider
 {
     // Video Type Identifiers
     protected const TYPE_TV = 0; // Type of video is a TV Programme/Show
@@ -333,3 +333,4 @@ abstract class Videos
         return $return->isEmpty() ? false : $return;
     }
 }
+

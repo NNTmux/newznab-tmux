@@ -1,11 +1,11 @@
 <?php
 
-namespace Blacklight\processing\tv;
+namespace App\Services\TvProcessing\Providers;
 
 use App\Services\TmdbClient;
 use Blacklight\ReleaseImage;
 
-class TMDB extends TV
+class TmdbProvider extends AbstractTvProvider
 {
     protected const MATCH_PROBABILITY = 75;
 
@@ -236,7 +236,7 @@ class TMDB extends TV
     /**
      * Truncate title for display purposes.
      */
-    private function truncateTitle(string $title, int $maxLength = 45): string
+    protected function truncateTitle(string $title, int $maxLength = 45): string
     {
         if (mb_strlen($title) <= $maxLength) {
             return $title;

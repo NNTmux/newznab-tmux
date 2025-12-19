@@ -1,14 +1,14 @@
 <?php
 
-namespace Blacklight\processing\tv;
+namespace App\Services\TvProcessing\Providers;
 
 use Blacklight\ReleaseImage;
 
 /**
- * Class LocalDB -- performs local database lookups before hitting external APIs.
+ * Class LocalDbProvider -- performs local database lookups before hitting external APIs.
  * This reduces unnecessary API calls by matching releases against already scraped data.
  */
-class LocalDB extends TV
+class LocalDbProvider extends AbstractTvProvider
 {
     /**
      * Main processing director function for local database lookups.

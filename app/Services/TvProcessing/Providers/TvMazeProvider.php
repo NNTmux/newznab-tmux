@@ -1,16 +1,16 @@
 <?php
 
-namespace Blacklight\processing\tv;
+namespace App\Services\TvProcessing\Providers;
 
 use Blacklight\ReleaseImage;
 use DariusIII\TVMaze\TVMaze as Client;
 
 /**
- * Class TVMaze.
+ * Class TvMazeProvider.
  *
  * Process information retrieved from the TVMaze API.
  */
-class TVMaze extends TV
+class TvMazeProvider extends AbstractTvProvider
 {
     private const MATCH_PROBABILITY = 75;
 
@@ -237,7 +237,7 @@ class TVMaze extends TV
     /**
      * Truncate title for display purposes.
      */
-    private function truncateTitle(string $title, int $maxLength = 45): string
+    protected function truncateTitle(string $title, int $maxLength = 45): string
     {
         if (mb_strlen($title) <= $maxLength) {
             return $title;
@@ -464,3 +464,4 @@ class TVMaze extends TV
         ];
     }
 }
+

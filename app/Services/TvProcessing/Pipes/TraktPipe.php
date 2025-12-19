@@ -4,7 +4,7 @@ namespace App\Services\TvProcessing\Pipes;
 
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
-use Blacklight\processing\tv\TraktTv;
+use App\Services\TvProcessing\Providers\TraktProvider;
 
 /**
  * Pipe for Trakt.tv API lookups.
@@ -16,7 +16,7 @@ class TraktPipe extends AbstractTvProviderPipe
     private const SOURCE_TRAKT = 5;
 
     protected int $priority = 50;
-    private ?TraktTv $trakt = null;
+    private ?TraktProvider $trakt = null;
 
     public function getName(): string
     {
@@ -31,10 +31,10 @@ class TraktPipe extends AbstractTvProviderPipe
     /**
      * Get or create the Trakt instance.
      */
-    private function getTrakt(): TraktTv
+    private function getTrakt(): TraktProvider
     {
         if ($this->trakt === null) {
-            $this->trakt = new TraktTv();
+            $this->trakt = new TraktProvider();
         }
         return $this->trakt;
     }

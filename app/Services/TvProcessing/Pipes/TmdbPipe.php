@@ -4,7 +4,7 @@ namespace App\Services\TvProcessing\Pipes;
 
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
-use Blacklight\processing\tv\TMDB;
+use App\Services\TvProcessing\Providers\TmdbProvider;
 
 /**
  * Pipe for TMDB API lookups.
@@ -16,7 +16,7 @@ class TmdbPipe extends AbstractTvProviderPipe
     private const SOURCE_TMDB = 2;
 
     protected int $priority = 40;
-    private ?TMDB $tmdb = null;
+    private ?TmdbProvider $tmdb = null;
 
     public function getName(): string
     {
@@ -31,10 +31,10 @@ class TmdbPipe extends AbstractTvProviderPipe
     /**
      * Get or create the TMDB instance.
      */
-    private function getTmdb(): TMDB
+    private function getTmdb(): TmdbProvider
     {
         if ($this->tmdb === null) {
-            $this->tmdb = new TMDB();
+            $this->tmdb = new TmdbProvider();
         }
         return $this->tmdb;
     }

@@ -4,12 +4,12 @@ namespace App\Services;
 
 use App\Models\Release;
 use App\Models\Settings;
+use App\Services\TvProcessing\Providers\LocalDbProvider;
+use App\Services\TvProcessing\Providers\TmdbProvider;
+use App\Services\TvProcessing\Providers\TraktProvider;
+use App\Services\TvProcessing\Providers\TvdbProvider;
+use App\Services\TvProcessing\Providers\TvMazeProvider;
 use Blacklight\ColorCLI;
-use Blacklight\processing\tv\LocalDB;
-use Blacklight\processing\tv\TMDB;
-use Blacklight\processing\tv\TraktTv;
-use Blacklight\processing\tv\TVDB;
-use Blacklight\processing\tv\TVMaze;
 
 class TvProcessor
 {
@@ -179,11 +179,11 @@ class TvProcessor
     private function buildProviderPipeline(): array
     {
         return [
-            ['name' => 'Local DB', 'factory' => static fn () => new LocalDB, 'status' => 0],
-            ['name' => 'TVDB', 'factory' => static fn () => new TVDB, 'status' => 0],
-            ['name' => 'TVMaze', 'factory' => static fn () => new TVMaze, 'status' => -1],
-            ['name' => 'TMDB', 'factory' => static fn () => new TMDB, 'status' => -2],
-            ['name' => 'Trakt', 'factory' => static fn () => new TraktTv, 'status' => -3],
+            ['name' => 'Local DB', 'factory' => static fn () => new LocalDbProvider, 'status' => 0],
+            ['name' => 'TVDB', 'factory' => static fn () => new TvdbProvider, 'status' => 0],
+            ['name' => 'TVMaze', 'factory' => static fn () => new TvMazeProvider, 'status' => -1],
+            ['name' => 'TMDB', 'factory' => static fn () => new TmdbProvider, 'status' => -2],
+            ['name' => 'Trakt', 'factory' => static fn () => new TraktProvider, 'status' => -3],
         ];
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Blacklight\processing\tv;
+namespace App\Services\TvProcessing\Providers;
 
 use App\Models\Category;
 use App\Models\Release;
@@ -9,16 +9,15 @@ use App\Models\TvEpisode;
 use App\Models\TvInfo;
 use App\Models\Video;
 use Blacklight\ColorCLI;
-use Blacklight\processing\Videos;
 use Blacklight\Releases;
 use Blacklight\utility\Country;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Class TV -- abstract extension of Videos
+ * Class AbstractTvProvider -- abstract extension of BaseVideoProvider
  * Contains functions suitable for re-use in all TV scrapers.
  */
-abstract class TV extends Videos
+abstract class AbstractTvProvider extends BaseVideoProvider
 {
     // Television Sources
     protected const SOURCE_NONE = 0;   // No Scrape source
@@ -71,8 +70,7 @@ abstract class TV extends Videos
     protected ColorCLI $colorCli;
 
     /**
-     * TV constructor.
-     *
+     * AbstractTvProvider constructor.
      *
      * @throws \Exception
      */
@@ -397,17 +395,12 @@ abstract class TV extends Videos
             $showInfo += $this->parseSeasonEp($relname);
 
             // --- Post-parse correction for daily talk shows misclassified as Season = Year ---
-            // Some date-based releases like Show.2025.11.03.* wrongly match the 2009.E01 pattern and set season=2025, episode=11.
-            // If we detect a full YYYY.MM.DD (or YYYY-MM-DD / YYYY/MM/DD) date in the original release name and season is a 4-digit year
-            // we convert it to an airdate form (season=0, episode=0, airdate=YYYY-MM-DD) to allow later API season/episode resolution.
             if (isset($showInfo['season'], $showInfo['episode']) && ! isset($showInfo['airdate'])) {
                 if (is_numeric($showInfo['season']) && (int) $showInfo['season'] >= 1900 && (int) $showInfo['season'] <= (int) date('Y') + 1) {
-                    // Look for full date pattern.
                     if (preg_match('/(?P<year>(19|20)\d{2})[.\-\/](?P<month>\d{2})[.\-\/](?P<day>\d{2})/i', $relname, $dateHits)) {
                         $year = (int) $dateHits['year'];
                         $month = (int) $dateHits['month'];
                         $day = (int) $dateHits['day'];
-                        // Basic sanity checks for month/day ranges.
                         if ($month >= 1 && $month <= 12 && $day >= 1 && $day <= 31) {
                             $showInfo['airdate'] = sprintf('%04d-%02d-%02d', $year, $month, $day);
                             $showInfo['season'] = 0;
@@ -416,15 +409,12 @@ abstract class TV extends Videos
                     }
                 }
             }
-            // --- End correction ---
 
             if (isset($showInfo['season'], $showInfo['episode'])) {
                 if (! isset($showInfo['airdate'])) {
-                    // If year is present in the release name, add it to the cleaned name for title search
                     if (preg_match('/[^a-z0-9](?P<year>(19|20)(\d{2}))[^a-z0-9]/i', $relname, $yearMatch)) {
                         $showInfo['cleanname'] .= ' ('.$yearMatch['year'].')';
                     }
-                    // Check for multi episode release.
                     if (\is_array($showInfo['episode'])) {
                         $showInfo['episode'] = $showInfo['episode'][0];
                     }
@@ -447,23 +437,15 @@ abstract class TV extends Videos
 
         $following = '[^a-z0-9]([(|\[]\w+[)|\]]\s)*?(\d\d-\d\d|\d{1,3}x\d{2,3}|\(?(19|20)\d{2}\)?|(480|720|1080|2160)[ip]|AAC2?|BD-?Rip|Blu-?Ray|D0?\d|DD5|DiVX|DLMux|DTS|DVD(-?Rip)?|E\d{2,3}|[HX][\-_. ]?26[45]|ITA(-ENG)?|HEVC|[HPS]DTV|PROPER|REPACK|Season|Episode|S\d+[^a-z0-9]?((E\d+)[abr]?)*|WEB[\-_. ]?(DL|Rip)|XViD)[^a-z0-9]?';
 
-        // For names that don't start with the title.
         if (preg_match('/^([^a-z0-9]{2,}|(sample|proof|repost)-)(?P<name>[\w .-]*?)'.$following.'/i', $relname, $hits)) {
             $showName = $hits['name'];
         } elseif (preg_match('/^(?P<name>[\w+][\s\w\'._-]*?)'.$following.'/i', $relname, $hits)) {
-            // For names that start with the title.
             $showName = $hits['name'];
         }
-        // If we still have any of the words in $following, remove them.
         $showName = preg_replace('/'.$following.'/i', ' ', $showName);
-        // Remove leading date if present
         $showName = preg_replace('/^\d{6}/', '', $showName);
-        // Handle acronyms with dots (e.g., G.R.I.T.S, S.H.I.E.L.D, C.S.I) before removing dots.
-        // This converts "G.R.I.T.S" to "GRITS" instead of "G R I T S".
         $showName = $this->convertAcronyms($showName);
-        // Remove periods, underscored, anything between parenthesis.
         $showName = preg_replace('/\(.*?\)|[._]/i', ' ', $showName);
-        // Finally remove multiple spaces and trim leading spaces.
         $showName = trim(preg_replace('/\s{2,}/', ' ', $showName));
 
         return $showName;
@@ -471,17 +453,12 @@ abstract class TV extends Videos
 
     /**
      * Convert acronyms with dots to condensed form.
-     * E.g., "G.R.I.T.S" becomes "GRITS", "S.H.I.E.L.D" becomes "SHIELD".
-     * This prevents acronyms from being split into individual letters with spaces.
      */
     private function convertAcronyms(string $str): string
     {
-        // Match acronyms: 2 or more single letters separated by dots (optionally ending with a dot)
-        // Pattern matches things like: G.R.I.T.S, S.H.I.E.L.D., C.S.I, N.C.I.S
         return preg_replace_callback(
             '/\b((?:[A-Za-z]\.){2,}[A-Za-z]?\.?)\b/',
             function ($matches) {
-                // Remove all dots from the acronym
                 return str_replace('.', '', $matches[1]);
             },
             $str
@@ -495,10 +472,8 @@ abstract class TV extends Videos
     {
         $normalized = strtolower(trim($cleanName));
         $aliases = [
-            // Acronym-based show titles
             'grits' => 'Girls Raised in the South',
             'shield' => 'Agents of S.H.I.E.L.D.',
-            // Talk shows
             'stephen colbert' => 'The Late Show with Stephen Colbert',
             'late show with stephen colbert' => 'The Late Show with Stephen Colbert',
             'late show stephen colbert' => 'The Late Show with Stephen Colbert',
@@ -545,7 +520,7 @@ abstract class TV extends Videos
             $episodeArr['season'] = (int) $hits[2];
             $episodeArr['episode'] = [(int) $hits[3], (int) $hits[4]];
         }
-        // S01E0102 and S01E01E02 - lame no delimit numbering, regex would collide if there was ever 1000 ep season.
+        // S01E0102 and S01E01E02
         elseif (preg_match('/^(.*?)[^a-z0-9]s(\d{2})[^a-z0-9]?e(\d{2})e?(\d{2})[^a-z0-9]?/i', $relname, $hits)) {
             $episodeArr['season'] = (int) $hits[2];
             $episodeArr['episode'] = (int) $hits[3];
@@ -574,22 +549,21 @@ abstract class TV extends Videos
         elseif (preg_match('/^(.*?)[^a-z0-9](?P<airdate>(19|20)(\d{2})[.\/-](\d{2})[.\/-](\d{2}))[^a-z0-9]?/i', $relname, $hits)) {
             $episodeArr['season'] = 0;
             $episodeArr['episode'] = 0;
-            $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $hits['airdate']))); // yyyy-mm-dd
+            $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $hits['airdate'])));
         }
         // 01.01.2009
         elseif (preg_match('/^(.*?)[^a-z0-9](?P<airdate>(\d{2})[^a-z0-9](\d{2})[^a-z0-9](19|20)(\d{2}))[^a-z0-9]?/i', $relname, $hits)) {
             $episodeArr['season'] = 0;
             $episodeArr['episode'] = 0;
-            $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $hits['airdate']))); // yyyy-mm-dd
+            $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $hits['airdate'])));
         }
         // 01.01.09
         elseif (preg_match('/^(.*?)[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9]?/i', $relname, $hits)) {
-            // Add extra logic to capture the proper YYYY year
             $year = ($hits[4] <= 99 && $hits[4] > 15) ? '19'.$hits[4] : '20'.$hits[4];
             $airdate = $year.'/'.$hits[2].'/'.$hits[3];
             $episodeArr['season'] = 0;
             $episodeArr['episode'] = 0;
-            $episodeArr['airdate'] = date('Y-m-d', strtotime($airdate)); // yyyy-mm-dd
+            $episodeArr['airdate'] = date('Y-m-d', strtotime($airdate));
         }
         // 2009.E01
         elseif (preg_match('/^(.*?)[^a-z0-9]20(\d{2})[^a-z0-9](\d{1,3})[^a-z0-9]?/i', $relname, $hits)) {
@@ -606,7 +580,6 @@ abstract class TV extends Videos
             $episodeArr['season'] = 1;
             $episodeArr['episode'] = (int) $hits[2];
         }
-
         // Band.Of.Brothers.EP06.Bastogne.DVDRiP.XviD-DEiTY
         elseif (preg_match('/^(.*?)[^a-z0-9]EP?[^a-z0-9]?(\d{1,3})/i', $relname, $hits)) {
             $episodeArr['season'] = 1;
@@ -626,7 +599,6 @@ abstract class TV extends Videos
      */
     private function parseCountry(string $showName): string
     {
-        // Country or origin matching.
         if (preg_match('/[^a-z0-9](US|UK|AU|NZ|CA|NL|Canada|Australia|America|United[^a-z0-9]States|United[^a-z0-9]Kingdom)/i', $showName, $countryMatch)) {
             $currentCountry = strtolower($countryMatch[1]);
             if ($currentCountry === 'canada') {
@@ -650,7 +622,6 @@ abstract class TV extends Videos
     /**
      * Supplementary to parseInfo
      * Cleans a derived local 'showname' for better matching probability
-     * Returns the cleaned string.
      */
     public function cleanName(string $str): string
     {
@@ -666,18 +637,17 @@ abstract class TV extends Videos
 
         $str = str_replace('&', 'and', $str);
         $str = preg_replace('/^(history|discovery) channel/i', '', $str);
-        $str = str_replace(['\'', ':', '!', '"', '#', '*', '’', ',', '(', ')', '?'], '', $str);
+        $str = str_replace(["'", ':', '!', '"', '#', '*', "'", ',', '(', ')', '?'], '', $str);
         $str = str_replace('$', 's', $str);
         $str = preg_replace('/\s{2,}/', ' ', $str);
 
-        $str = trim($str, '\"');
+        $str = trim($str, '"');
 
         return trim($str);
     }
 
     /**
      * Simple function that compares two strings of text
-     * Returns percentage of similarity.
      */
     public function checkMatch($ourName, $scrapeName, $probability): float|int
     {
@@ -690,13 +660,8 @@ abstract class TV extends Videos
         return 0;
     }
 
-    //
-
     /**
-     * Convert 2012-24-07 to 2012-07-24, there is probably a better way.
-     *
-     * This shouldn't ever happen as I've never heard of a date starting with year being followed by day value.
-     * Could this be a mistake? i.e. trying to solve the mm-dd-yyyy/dd-mm-yyyy confusion into a yyyy-mm-dd?
+     * Convert 2012-24-07 to 2012-07-24
      */
     public function checkDate(bool|string|null $date): string
     {
@@ -715,7 +680,6 @@ abstract class TV extends Videos
 
     /**
      * Checks API response returns have all REQUIRED attributes set
-     * Returns true or false.
      */
     public function checkRequiredAttr($array, string $type): bool
     {
@@ -735,7 +699,6 @@ abstract class TV extends Videos
                 $required = ['name', 'season', 'number', 'airdate', 'summary'];
                 break;
             case 'tmdbS':
-                // TMDB search results use 'name' for the primary title; prefer it over 'original_name'
                 $required = ['id', 'name', 'overview', 'first_air_date', 'origin_country'];
                 break;
             case 'tmdbE':
@@ -745,7 +708,6 @@ abstract class TV extends Videos
                 $required = ['title', 'ids', 'overview', 'first_aired', 'airs', 'country'];
                 break;
             case 'traktE':
-                // Trakt uses 'number' for the episode number in episode summaries
                 $required = ['title', 'season', 'number', 'overview', 'first_aired'];
                 break;
         }
@@ -762,4 +724,17 @@ abstract class TV extends Videos
 
         return true;
     }
+
+    /**
+     * Truncates title for display.
+     */
+    protected function truncateTitle(string $title, int $maxLength = 45): string
+    {
+        if (mb_strlen($title) <= $maxLength) {
+            return $title;
+        }
+
+        return mb_substr($title, 0, $maxLength - 3).'...';
+    }
 }
+

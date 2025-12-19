@@ -1,17 +1,17 @@
 <?php
 
-namespace Blacklight\processing\tv;
+namespace App\Services\TvProcessing\Providers;
 
 use App\Services\TraktService;
 use Blacklight\ReleaseImage;
 use Illuminate\Support\Carbon;
 
 /**
- * Class TraktTv.
+ * Class TraktProvider.
  *
  * Process information retrieved from the Trakt API.
  */
-class TraktTv extends TV
+class TraktProvider extends AbstractTvProvider
 {
     private const MATCH_PROBABILITY = 75;
 
@@ -219,7 +219,7 @@ class TraktTv extends TV
     /**
      * Truncate title for display purposes.
      */
-    private function truncateTitle(string $title, int $maxLength = 45): string
+    protected function truncateTitle(string $title, int $maxLength = 45): string
     {
         if (mb_strlen($title) <= $maxLength) {
             return $title;

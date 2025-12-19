@@ -5,7 +5,7 @@ namespace App\Services\TvProcessing\Pipes;
 use App\Services\FanartTvService;
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
-use Blacklight\processing\tv\TVDB;
+use App\Services\TvProcessing\Providers\TvdbProvider;
 
 /**
  * Pipe for TVDB API lookups.
@@ -16,7 +16,7 @@ class TvdbPipe extends AbstractTvProviderPipe
     private const TYPE_TV = 0;
 
     protected int $priority = 20;
-    private ?TVDB $tvdb = null;
+    private ?TvdbProvider $tvdb = null;
     private ?FanartTvService $fanart = null;
 
     public function getName(): string
@@ -32,10 +32,10 @@ class TvdbPipe extends AbstractTvProviderPipe
     /**
      * Get or create the TVDB instance.
      */
-    private function getTvdb(): TVDB
+    private function getTvdb(): TvdbProvider
     {
         if ($this->tvdb === null) {
-            $this->tvdb = new TVDB();
+            $this->tvdb = new TvdbProvider();
         }
         return $this->tvdb;
     }

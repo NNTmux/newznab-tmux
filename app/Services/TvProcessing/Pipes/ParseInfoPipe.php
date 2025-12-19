@@ -4,7 +4,7 @@ namespace App\Services\TvProcessing\Pipes;
 
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
-use Blacklight\processing\tv\LocalDB;
+use App\Services\TvProcessing\Providers\LocalDbProvider;
 use Closure;
 
 /**
@@ -14,7 +14,7 @@ use Closure;
 class ParseInfoPipe extends AbstractTvProviderPipe
 {
     protected int $priority = 1;
-    private ?LocalDB $localDb = null;
+    private ?LocalDbProvider $localDb = null;
 
     public function getName(): string
     {
@@ -29,10 +29,10 @@ class ParseInfoPipe extends AbstractTvProviderPipe
     /**
      * Get or create the LocalDB instance for parsing.
      */
-    private function getLocalDb(): LocalDB
+    private function getLocalDb(): LocalDbProvider
     {
         if ($this->localDb === null) {
-            $this->localDb = new LocalDB();
+            $this->localDb = new LocalDbProvider();
         }
         return $this->localDb;
     }

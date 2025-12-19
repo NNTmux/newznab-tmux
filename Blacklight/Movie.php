@@ -10,7 +10,7 @@ use App\Models\Settings;
 use App\Services\FanartTvService;
 use App\Services\ImdbScraper;
 use App\Services\TmdbClient;
-use Blacklight\processing\tv\TraktTv;
+use App\Services\TvProcessing\Providers\TraktProvider;
 use Blacklight\utility\Utility;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -90,7 +90,7 @@ class Movie
 
     public string $service;
 
-    public TraktTv $traktTv;
+    public TraktProvider $traktTv;
 
     public ?OMDbAPI $omdbApi;
 
@@ -111,7 +111,7 @@ class Movie
         $this->colorCli = new ColorCLI;
         $this->traktcheck = config('nntmux_api.trakttv_api_key');
         if ($this->traktcheck !== null) {
-            $this->traktTv = new TraktTv(['Settings' => null]);
+            $this->traktTv = new TraktProvider();
         }
         $this->client = new Client;
         $this->fanartapikey = config('nntmux_api.fanarttv_api_key');
