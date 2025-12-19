@@ -529,7 +529,7 @@ class SteamService
      */
     protected function fetchAppDetails(int $appId): ?array
     {
-        return RateLimiter::attempt(
+        $result = RateLimiter::attempt(
             self::RATE_LIMIT_KEY,
             self::REQUESTS_PER_MINUTE,
             function () use ($appId) {
@@ -556,6 +556,9 @@ class SteamService
             },
             self::DECAY_SECONDS
         );
+
+        // RateLimiter::attempt returns true when rate limit is exceeded
+        return is_array($result) ? $result : null;
     }
 
     /**
