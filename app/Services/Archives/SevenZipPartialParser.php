@@ -1,6 +1,6 @@
 <?php
 
-namespace Blacklight\processing\post;
+namespace App\Services\Archives;
 
 /**
  * Enhanced partial 7z header parser to recover file information from an in-memory buffer.
@@ -1485,7 +1485,7 @@ class SevenZipPartialParser
         }
 
         // Should not have too many special characters
-        $specialCount = preg_match_all('/[^\w\s\.\-_\/\\\\]/', $name);
+        $specialCount = preg_match_all('/[^\w\s.\-_\/\\\\]/', $name);
         if ($specialCount > 5) {
             return false;
         }
@@ -1722,3 +1722,4 @@ class SevenZipPartialParser
         return $largest;
     }
 }
+
