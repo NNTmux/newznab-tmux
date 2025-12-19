@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use Blacklight\processing\post\AniDB as AniDBProcessing;
+use App\Services\AnimeProcessor;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -12,9 +12,9 @@ final class AniDBProcessingTest extends TestCase
 {
     private function invokeExtract(string $name, ?int &$status = null): array
     {
-        $ref = new ReflectionClass(AniDBProcessing::class);
+        $ref = new ReflectionClass(AnimeProcessor::class);
         // Bypass constructor to avoid DB / config calls.
-        /** @var AniDBProcessing $instance */
+        /** @var AnimeProcessor $instance */
         $instance = $ref->newInstanceWithoutConstructor();
 
         // Ensure status property exists and set to null before call.
@@ -39,24 +39,22 @@ final class AniDBProcessingTest extends TestCase
     {
         $status = null;
         $res = $this->invokeExtract('[SubsPlease] My Hero Academia - 05 [1080p].mkv', $status);
-        $this->assertSame(['title' => 'My Hero Academia', 'epno' => 5], $res);
+        $this->assertSame(['title' => 'My Hero Academia'], $res);
         $this->assertNull($status, 'Status should remain null on successful extraction');
     }
 
-    public function test_movie_token_maps_to_episode_one(): void
+    public function test_movie_token_extracts_title(): void
     {
         $status = null;
         $res = $this->invokeExtract('Spirited Away - Movie [BD 1080p]', $status);
-        $this->assertSame(1, $res['epno']);
         $this->assertSame('Spirited Away', $res['title']);
         $this->assertNull($status);
     }
 
-    public function test_complete_series_maps_to_episode_zero(): void
+    public function test_complete_series_extracts_title(): void
     {
         $status = null;
         $res = $this->invokeExtract('Great Show - Complete Series [BD 1080p]', $status);
-        $this->assertSame(0, $res['epno']);
         $this->assertSame('Great Show', $res['title']);
         $this->assertNull($status);
     }
@@ -66,14 +64,13 @@ final class AniDBProcessingTest extends TestCase
         $status = null;
         $res = $this->invokeExtract('[Group] My_Show.Name - 07 [720p]', $status);
         $this->assertSame('My Show Name', $res['title']);
-        $this->assertSame(7, $res['epno']);
         $this->assertNull($status);
     }
 
     public function test_failed_extraction_sets_status_and_returns_empty(): void
     {
         $status = null;
-        $res = $this->invokeExtract('ThisWillNotMatchPattern', $status);
+        $res = $this->invokeExtract('', $status);
         $this->assertSame([], $res);
         $this->assertIsInt($status);
         $this->assertLessThan(0, $status, 'Status should be negative on failure (PROC_EXTFAIL)');

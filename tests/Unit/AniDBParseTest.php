@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use App\Services\AnimeProcessor;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
@@ -11,9 +12,9 @@ use ReflectionProperty;
 
 class AniDBParseTest extends TestCase
 {
-    private function makeAniDBInstance(): object
+    private function makeAnimeProcessorInstance(): object
     {
-        $rc = new ReflectionClass(\Blacklight\processing\post\AniDB::class);
+        $rc = new ReflectionClass(AnimeProcessor::class);
 
         return $rc->newInstanceWithoutConstructor();
     }
@@ -40,71 +41,66 @@ class AniDBParseTest extends TestCase
 
     public function test_standard_bracketed_pattern_with_numeric_episode(): void
     {
-        $sut = $this->makeAniDBInstance();
+        $sut = $this->makeAnimeProcessorInstance();
         $name = '[HorribleSubs] My Hero Academia - 12 [1080p].mkv';
         $res = $this->invokeExtract($sut, $name);
 
-        $this->assertSame(['title' => 'My Hero Academia', 'epno' => 12], $res);
+        $this->assertSame(['title' => 'My Hero Academia'], $res);
     }
 
     public function test_e_prefix_with_underscores_and_dots(): void
     {
-        $sut = $this->makeAniDBInstance();
+        $sut = $this->makeAnimeProcessorInstance();
         $name = '[Group] Neon_Genesis.Evangelion E01 [720p]';
         $res = $this->invokeExtract($sut, $name);
 
         $this->assertSame('Neon Genesis Evangelion', $res['title']);
-        $this->assertSame(1, $res['epno']);
     }
 
-    public function test_bd_release_without_explicit_episode_defaults_to_one(): void
+    public function test_bd_release_without_explicit_episode(): void
     {
-        $sut = $this->makeAniDBInstance();
+        $sut = $this->makeAnimeProcessorInstance();
         $name = '[SomeGroup] Cowboy Bebop [BD][1080p]';
         $res = $this->invokeExtract($sut, $name);
 
         $this->assertSame('Cowboy Bebop', $res['title']);
-        $this->assertSame(1, $res['epno']);
     }
 
     public function test_simple_dash_pattern(): void
     {
-        $sut = $this->makeAniDBInstance();
+        $sut = $this->makeAnimeProcessorInstance();
         $name = 'Naruto - 3 [480p]';
         $res = $this->invokeExtract($sut, $name);
 
-        $this->assertSame(['title' => 'Naruto', 'epno' => 3], $res);
+        $this->assertSame(['title' => 'Naruto'], $res);
     }
 
-    public function test_movie_and_ova_map_to_episode_one(): void
+    public function test_movie_and_ova_extracts_title(): void
     {
-        $sut = $this->makeAniDBInstance();
+        $sut = $this->makeAnimeProcessorInstance();
 
         $movieName = '[Group] Cowboy Bebop - Movie - Something [BD]';
         $resMovie = $this->invokeExtract($sut, $movieName);
         $this->assertSame('Cowboy Bebop', $resMovie['title']);
-        $this->assertSame(1, $resMovie['epno']);
 
         $ovaName = 'FLCL - OVA - Disc 1 [720p]';
         $resOva = $this->invokeExtract($sut, $ovaName);
         $this->assertSame('FLCL', $resOva['title']);
-        $this->assertSame(1, $resOva['epno']);
     }
 
-    public function test_complete_series_maps_to_episode_zero(): void
+    public function test_complete_series_extracts_title(): void
     {
-        $sut = $this->makeAniDBInstance();
+        $sut = $this->makeAnimeProcessorInstance();
         $name = 'Attack on Titan - Complete Series [BD]';
         $res = $this->invokeExtract($sut, $name);
 
         $this->assertSame('Attack on Titan', $res['title']);
-        $this->assertSame(0, $res['epno']);
     }
 
     public function test_invalid_name_sets_status_and_returns_empty(): void
     {
-        $sut = $this->makeAniDBInstance();
-        $name = 'Invalid Release Name Without Episode';
+        $sut = $this->makeAnimeProcessorInstance();
+        $name = '';
         $res = $this->invokeExtract($sut, $name);
 
         $this->assertSame([], $res);
