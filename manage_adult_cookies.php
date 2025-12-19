@@ -15,7 +15,7 @@
 
 require __DIR__.'/vendor/autoload.php';
 
-use Blacklight\processing\adult\AgeVerificationManager;
+use App\Services\AdultProcessing\AgeVerificationManager;
 
 $command = $argv[1] ?? 'help';
 $argument = $argv[2] ?? null;

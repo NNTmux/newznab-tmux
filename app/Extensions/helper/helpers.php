@@ -40,11 +40,11 @@ if (! function_exists('getRawHtml')) {
         }
 
         // For adult sites, use age verification manager if available
-        if ($isAdultSite && class_exists('\Blacklight\processing\adult\AgeVerificationManager')) {
+        if ($isAdultSite && class_exists('\App\Services\AdultProcessing\AgeVerificationManager')) {
             try {
                 static $ageVerificationManager = null;
                 if ($ageVerificationManager === null) {
-                    $ageVerificationManager = new \Blacklight\processing\adult\AgeVerificationManager;
+                    $ageVerificationManager = new \App\Services\AdultProcessing\AgeVerificationManager;
                 }
 
                 if ($postData !== null) {

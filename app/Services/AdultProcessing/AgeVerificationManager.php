@@ -1,6 +1,6 @@
 <?php
 
-namespace Blacklight\processing\adult;
+namespace App\Services\AdultProcessing;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
@@ -78,9 +78,7 @@ class AgeVerificationManager
         if ($cookieDir !== null) {
             $this->cookieDir = $cookieDir;
         } else {
-            // Use relative path from this file's location
-            // This works both in Laravel and standalone contexts
-            $this->cookieDir = __DIR__.'/../../../storage/app/cookies/adult_sites';
+            $this->cookieDir = storage_path('app/cookies/adult_sites');
         }
 
         // Create cookie directory if it doesn't exist
@@ -346,3 +344,4 @@ class AgeVerificationManager
         return $this->cookieDir;
     }
 }
+

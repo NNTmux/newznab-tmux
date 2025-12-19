@@ -7,7 +7,7 @@
  * that automatically handles age verification for adult sites.
  */
 
-use Blacklight\processing\adult\AgeVerificationManager;
+use App\Services\AdultProcessing\AgeVerificationManager;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 

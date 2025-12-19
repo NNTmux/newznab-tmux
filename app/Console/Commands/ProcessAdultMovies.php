@@ -16,7 +16,6 @@ class ProcessAdultMovies extends Command
     protected $signature = 'nntmux:process-adult
                             {--title= : Process a specific movie title}
                             {--debug : Enable debug output}
-                            {--no-pipeline : Use legacy processing instead of pipeline}
                             {--limit= : Limit number of releases to process}';
 
     /**
@@ -36,84 +35,77 @@ class ProcessAdultMovies extends Command
             return Command::FAILURE;
         }
 
-        $usePipeline = !$this->option('no-pipeline');
         $debug = $this->option('debug');
         $title = $this->option('title');
         $limit = $this->option('limit');
 
-        if ($usePipeline) {
-            $pipeline = new AdultProcessingPipeline([], true);
+        $pipeline = new AdultProcessingPipeline([], true);
 
-            if ($title) {
-                // Process a single title
-                $this->info("Looking up: {$title}");
+        if ($title) {
+            // Process a single title
+            $this->info("Looking up: {$title}");
 
-                $result = $pipeline->processMovie($title, $debug);
+            $result = $pipeline->processMovie($title, $debug);
 
-                if ($result['status'] === 'matched') {
-                    $this->info("Match found on {$result['provider']}!");
-                    $title_display = $result['movieData']['title'] ?? 'N/A';
-                    $synopsis_display = substr($result['movieData']['synopsis'] ?? 'N/A', 0, 200);
-                    $this->line("Title: {$title_display}");
-                    $this->line("Synopsis: {$synopsis_display}...");
+            if ($result['status'] === 'matched') {
+                $this->info("Match found on {$result['provider']}!");
+                $title_display = $result['movieData']['title'] ?? 'N/A';
+                $synopsis_display = substr($result['movieData']['synopsis'] ?? 'N/A', 0, 200);
+                $this->line("Title: {$title_display}");
+                $this->line("Synopsis: {$synopsis_display}...");
 
-                    if (!empty($result['movieData']['boxcover'])) {
-                        $cover_url = $result['movieData']['boxcover'];
-                        $this->line("Cover: {$cover_url}");
-                    }
+                if (!empty($result['movieData']['boxcover'])) {
+                    $cover_url = $result['movieData']['boxcover'];
+                    $this->line("Cover: {$cover_url}");
+                }
 
-                    if ($debug && !empty($result['debug'])) {
-                        $this->newLine();
-                        $this->line('Debug Info:');
-                        $this->line(json_encode($result['debug'], JSON_PRETTY_PRINT));
-                    }
-                } else {
-                    $this->warn("No match found for: {$title}");
-
-                    if ($debug && !empty($result['debug'])) {
-                        $this->newLine();
-                        $this->line('Debug Info:');
-                        $this->line(json_encode($result['debug'], JSON_PRETTY_PRINT));
-                    }
+                if ($debug && !empty($result['debug'])) {
+                    $this->newLine();
+                    $this->line('Debug Info:');
+                    $this->line(json_encode($result['debug'], JSON_PRETTY_PRINT));
                 }
             } else {
-                // Process all pending releases
-                $this->info('Processing adult movie releases using pipeline...');
+                $this->warn("No match found for: {$title}");
 
-                if ($limit) {
-                    $this->info("Limited to {$limit} releases");
-                }
-
-                $pipeline->processXXXReleases();
-
-                $stats = $pipeline->getStats();
-
-                $this->newLine();
-                $this->table(
-                    ['Metric', 'Value'],
-                    [
-                        ['Processed', $stats['processed']],
-                        ['Matched', $stats['matched']],
-                        ['Failed', $stats['failed']],
-                        ['Skipped', $stats['skipped']],
-                        ['Duration', sprintf('%.2f seconds', $stats['duration'])],
-                    ]
-                );
-
-                if (!empty($stats['providers'])) {
+                if ($debug && !empty($result['debug'])) {
                     $this->newLine();
-                    $this->info('Provider Statistics:');
-                    $providerData = [];
-                    foreach ($stats['providers'] as $provider => $count) {
-                        $providerData[] = [$provider, $count];
-                    }
-                    $this->table(['Provider', 'Matches'], $providerData);
+                    $this->line('Debug Info:');
+                    $this->line(json_encode($result['debug'], JSON_PRETTY_PRINT));
                 }
             }
         } else {
-            // Legacy processing
-            $this->info('Using legacy processing...');
-            (new \Blacklight\XXX())->processXXXReleases();
+            // Process all pending releases
+            $this->info('Processing adult movie releases using pipeline...');
+
+            if ($limit) {
+                $this->info("Limited to {$limit} releases");
+            }
+
+            $pipeline->processXXXReleases();
+
+            $stats = $pipeline->getStats();
+
+            $this->newLine();
+            $this->table(
+                ['Metric', 'Value'],
+                [
+                    ['Processed', $stats['processed']],
+                    ['Matched', $stats['matched']],
+                    ['Failed', $stats['failed']],
+                    ['Skipped', $stats['skipped']],
+                    ['Duration', sprintf('%.2f seconds', $stats['duration'])],
+                ]
+            );
+
+            if (!empty($stats['providers'])) {
+                $this->newLine();
+                $this->info('Provider Statistics:');
+                $providerData = [];
+                foreach ($stats['providers'] as $provider => $count) {
+                    $providerData[] = [$provider, $count];
+                }
+                $this->table(['Provider', 'Matches'], $providerData);
+            }
         }
 
         return Command::SUCCESS;
