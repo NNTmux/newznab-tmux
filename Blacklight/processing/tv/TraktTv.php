@@ -2,9 +2,8 @@
 
 namespace Blacklight\processing\tv;
 
-use Blacklight\libraries\TraktAPI;
+use App\Services\TraktService;
 use Blacklight\ReleaseImage;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Carbon;
 
 /**
@@ -16,7 +15,7 @@ class TraktTv extends TV
 {
     private const MATCH_PROBABILITY = 75;
 
-    public TraktAPI $client;
+    public TraktService $client;
 
     public $time;
 
@@ -41,14 +40,7 @@ class TraktTv extends TV
     public function __construct()
     {
         parent::__construct();
-        $clientId = config('nntmux_api.trakttv_api_key');
-        $requestHeaders = [
-            'Content-Type' => 'application/json',
-            'trakt-api-version' => 2,
-            'trakt-api-key' => $clientId,
-            'Content-Length' => 0,
-        ];
-        $this->client = new TraktAPI($requestHeaders);
+        $this->client = new TraktService();
     }
 
     /**
@@ -245,13 +237,13 @@ class TraktTv extends TV
     }
 
     /**
-     * @throws GuzzleException
+     * Get episode information from Trakt.
      */
     public function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode): array|bool
     {
         $return = false;
 
-        $response = $this->client->episodeSummary($siteId, $series, $episode);
+        $response = $this->client->getEpisodeSummary($siteId, $series, $episode);
 
         sleep(1);
 
@@ -295,9 +287,9 @@ class TraktTv extends TV
     }
 
     /**
-     * @return array|false
+     * Get show information from Trakt by name.
      *
-     * @throws GuzzleException
+     * @return array|false
      */
     public function getShowInfo(string $name): array|bool
     {
@@ -309,7 +301,7 @@ class TraktTv extends TV
         // Do this for the API Search only as a local lookup should require it
         $name = preg_replace('# \((19|20)\d{2}\)$#', '', $name);
 
-        $response = (array) $this->client->showSearch($name);
+        $response = (array) $this->client->searchShows($name);
 
         sleep(1);
 
@@ -333,7 +325,7 @@ class TraktTv extends TV
                 }
             }
             if ($highest !== null) {
-                $fullShow = $this->client->showSummary($highest['show']['ids']['trakt']);
+                $fullShow = $this->client->getShowSummary($highest['show']['ids']['trakt']);
                 if ($this->checkRequiredAttr($fullShow, 'traktS')) {
                     $return = $this->formatShowInfo($fullShow);
                 }
