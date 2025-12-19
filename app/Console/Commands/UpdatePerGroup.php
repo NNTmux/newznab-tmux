@@ -6,11 +6,11 @@ namespace App\Console\Commands;
 
 use App\Models\Settings;
 use App\Models\UsenetGroup;
+use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\Backfill\BackfillService;
 use App\Services\Binaries\BinariesService;
 use Blacklight\Nfo;
 use Blacklight\NNTP;
-use Blacklight\processing\post\ProcessAdditional;
 use Blacklight\processing\ProcessReleases;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -71,7 +71,7 @@ class UpdatePerGroup extends Command
 
             // Post process the releases
             $this->info("Post-processing additional for group: {$groupMySQL['name']}");
-            (new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp]))->start($groupId);
+            app(AdditionalProcessingOrchestrator::class)->start($groupId);
 
             $this->info("Processing NFO files for group: {$groupMySQL['name']}");
             (new Nfo())->processNfoFiles(

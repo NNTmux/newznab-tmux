@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Release;
-use Blacklight\processing\post\ProcessAdditional;
+use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use Illuminate\Console\Command;
 
 class ProcessAdditionalGuid extends Command
@@ -80,7 +80,7 @@ class ProcessAdditionalGuid extends Command
             config(['nntmux.echocli' => false]);
         }
 
-        $processor = new ProcessAdditional;
+        $processor = app(AdditionalProcessingOrchestrator::class);
         $ok = $processor->processSingleGuid($guid);
 
         if (! $ok) {

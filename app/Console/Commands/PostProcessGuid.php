@@ -3,9 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\Settings;
+use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use Blacklight\Nfo;
 use Blacklight\NNTP;
-use Blacklight\processing\post\ProcessAdditional;
 use Blacklight\processing\PostProcess;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -48,7 +48,7 @@ class PostProcessGuid extends Command
             switch ($type) {
                 case 'additional':
                     $nntp = $this->getNntp();
-                    (new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp]))->start('', $guid);
+                    app(AdditionalProcessingOrchestrator::class)->start('', $guid);
                     break;
 
                 case 'nfo':

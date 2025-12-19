@@ -13,9 +13,9 @@ use App\Services\NfoProcessor;
 use App\Services\Par2Processor;
 use App\Services\TvProcessor;
 use App\Services\XXXProcessor;
+use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use Blacklight\Nfo;
 use Blacklight\NNTP;
-use Blacklight\processing\post\ProcessAdditional;
 use dariusiii\rarinfo\Par2Info;
 
 class PostProcess
@@ -237,7 +237,7 @@ class PostProcess
      */
     public function processAdditional(int|string $groupID = '', string $guidChar = ''): void
     {
-        (new ProcessAdditional)->start($groupID, $guidChar);
+        app(AdditionalProcessingOrchestrator::class)->start($groupID, $guidChar);
     }
 
     /**
