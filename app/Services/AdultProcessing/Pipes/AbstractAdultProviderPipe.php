@@ -25,7 +25,7 @@ use voku\helper\HtmlDomParser;
  * Each pipe is responsible for processing releases through a specific adult site provider.
  *
  * Note: This class intentionally uses lazy loading for HtmlDomParser to avoid
- * serialization issues with DOMDocument when using spatie/async.
+ * serialization issues with DOMDocument when using Laravel's Concurrency facade.
  */
 abstract class AbstractAdultProviderPipe
 {

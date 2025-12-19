@@ -20,8 +20,8 @@ use Blacklight\ReleaseImage;
 use Blacklight\Releases;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Concurrency;
 use Illuminate\Support\Facades\Log;
-use Spatie\Async\Pool;
 
 /**
  * Pipeline-based adult movie processing service using Laravel Pipeline.
@@ -29,7 +29,7 @@ use Spatie\Async\Pool;
  * This service uses Laravel's Pipeline to orchestrate multiple adult movie data providers
  * to process releases and match them against movie metadata from various sources.
  *
- * It also supports parallel processing of multiple releases using spatie/async.
+ * It also supports parallel processing of multiple releases using Laravel's native Concurrency facade.
  */
 class AdultProcessingPipeline
 {
@@ -183,7 +183,7 @@ class AdultProcessingPipeline
     /**
      * Process all XXX releases where xxxinfo_id is 0.
      *
-     * Uses spatie/async for parallel processing when possible.
+     * Uses Laravel's native Concurrency facade for parallel processing when possible.
      */
     public function processXXXReleases(): void
     {
@@ -236,7 +236,7 @@ class AdultProcessingPipeline
     }
 
     /**
-     * Process a batch of releases using spatie/async for parallel execution.
+     * Process a batch of releases using Laravel's native Concurrency for parallel execution.
      *
      * Note: Due to serialization limitations with DOMDocument and HtmlDomParser,
      * we process releases sequentially within the batch but can process multiple
@@ -278,29 +278,28 @@ class AdultProcessingPipeline
             return;
         }
 
-        // For async processing, we need to avoid serializing $this
-        // Instead, we create independent tasks with only serializable data
-        $pool = Pool::create()
-            ->concurrency(count($batch))
-            ->timeout(120);
-
+        // For async processing using Laravel's native Concurrency facade
+        // We create independent tasks with only serializable data
         $cookie = $this->cookie;
         $echoOutput = $this->echoOutput;
         $imgSavePath = $this->imgSavePath;
 
-        foreach ($batch as $release) {
+        $tasks = [];
+        foreach ($batch as $idx => $release) {
             // Extract only the serializable data needed
             $releaseData = [
                 'id' => $release['id'],
                 'searchname' => $release['searchname'],
             ];
 
-            $pool->add(function () use ($releaseData, $cookie, $echoOutput, $imgSavePath) {
-                // Create a fresh pipeline instance in the child process
-                // This avoids serialization issues with DOMDocument
-                return self::processReleaseInChildProcess($releaseData, $cookie, $echoOutput, $imgSavePath);
-            })->then(function ($result) {
-                // Update stats based on result
+            $tasks[$idx] = fn () => self::processReleaseInChildProcess($releaseData, $cookie, $echoOutput, $imgSavePath);
+        }
+
+        try {
+            $results = Concurrency::run($tasks);
+
+            // Update stats based on results
+            foreach ($results as $result) {
                 if (is_array($result)) {
                     if ($result['matched']) {
                         $this->stats['matched']++;
@@ -311,20 +310,20 @@ class AdultProcessingPipeline
                     }
                 }
                 $this->stats['processed']++;
-            })->catch(function (\Throwable $e) use ($releaseData) {
-                Log::error('Async processing failed for release ' . ($releaseData['id'] ?? 'unknown') . ': ' . $e->getMessage());
+            }
+        } catch (\Throwable $e) {
+            Log::error('Async batch processing failed: ' . $e->getMessage());
+
+            // Mark all releases in batch as processed with error to avoid infinite loop
+            foreach ($batch as $release) {
                 $this->stats['failed']++;
-
-                // Mark release as processed with error to avoid infinite loop
                 try {
-                    Release::query()->where('id', $releaseData['id'])->update(['xxxinfo_id' => -2]);
+                    Release::query()->where('id', $release['id'])->update(['xxxinfo_id' => -2]);
                 } catch (\Throwable $updateError) {
-                    Log::error('Failed to mark release ' . $releaseData['id'] . ' as processed: ' . $updateError->getMessage());
+                    Log::error('Failed to mark release ' . $release['id'] . ' as processed: ' . $updateError->getMessage());
                 }
-            });
+            }
         }
-
-        $pool->wait();
     }
 
     /**
@@ -613,7 +612,7 @@ class AdultProcessingPipeline
      */
     protected function canUseAsync(): bool
     {
-        return class_exists('Spatie\Async\Pool') &&
+        return class_exists('Illuminate\Support\Facades\Concurrency') &&
                function_exists('pcntl_fork') &&
                !defined('HHVM_VERSION');
     }

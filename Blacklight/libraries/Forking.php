@@ -11,7 +11,6 @@ use Blacklight\libraries\Runners\ReleasesRunner;
 use Blacklight\Nfo;
 use Blacklight\processing\PostProcess;
 use Illuminate\Support\Facades\DB;
-use Spatie\Async\Pool;
 use Symfony\Component\Process\Process;
 
 /**
@@ -146,17 +145,6 @@ class Forking
      */
     private bool $ppRenamedOnly;
 
-    /**
-     * Helper to ensure concurrency is at least 1 and with a common timeout.
-     */
-    private function createPool(int $concurrency): Pool
-    {
-        $concurrency = max(1, $concurrency);
-
-        return Pool::create()
-            ->concurrency($concurrency)
-            ->timeout(config('nntmux.multiprocessing_max_child_time'));
-    }
 
     /**
      * Helper to build artisan command from legacy command format.

@@ -3,8 +3,9 @@
 namespace Blacklight\libraries\Runners;
 
 use App\Models\Settings;
+use Illuminate\Support\Facades\Concurrency;
 use Illuminate\Support\Facades\DB;
-use Spatie\Async\Output\SerializableException;
+use Illuminate\Support\Facades\Log;
 
 class BinariesRunner extends BaseRunner
 {
@@ -37,26 +38,30 @@ class BinariesRunner extends BaseRunner
             return;
         }
 
-        $pool = $this->createPool($maxProcesses);
-
         $this->headerStart('binaries', $count, $maxProcesses);
 
-        $taskNum = $count;
-        foreach ($work as $group) {
-            $pool->add(function () use ($group) {
-                return $this->executeCommand(PHP_BINARY.' artisan update:binaries '.$group->name.' '.$group->max);
-            }, self::ASYNC_BUFFER_SIZE)->then(function ($output) use ($group, &$taskNum) {
-                echo $output;
-                $this->colorCli->primary('Task #'.$taskNum.' Updated group '.$group->name);
-                $taskNum--;
-            })->catch(function (\Throwable $exception) {
-                echo $exception->getMessage();
-            })->catch(static function (SerializableException $serializableException) {
-                // swallow
-            });
-        }
+        // Process in batches using Laravel's native Concurrency facade
+        $batches = array_chunk($work, max(1, $maxProcesses));
 
-        $pool->wait();
+        foreach ($batches as $batchIndex => $batch) {
+            $tasks = [];
+            foreach ($batch as $group) {
+                $command = PHP_BINARY.' artisan update:binaries '.$group->name.' '.$group->max;
+                $tasks[$group->name] = fn () => $this->executeCommand($command);
+            }
+
+            try {
+                $results = Concurrency::run($tasks);
+
+                foreach ($results as $groupName => $output) {
+                    echo $output;
+                    $this->colorCli->primary('Updated group '.$groupName);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Binaries batch failed: '.$e->getMessage());
+                $this->colorCli->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
+            }
+        }
     }
 
     public function safeBinaries(): void
@@ -132,25 +137,32 @@ class BinariesRunner extends BaseRunner
             return;
         }
 
-        $pool = $this->createPool($maxProcesses);
         $this->headerStart('safe_binaries', count($queues), $maxProcesses);
 
-        foreach ($queues as $queue) {
-            preg_match('/alt\..+/i', $queue, $hit);
-            $pool->add(function () use ($queue) {
-                return $this->executeCommand($this->buildDnrCommand($queue));
-            }, self::ASYNC_BUFFER_SIZE)->then(function ($output) use ($hit) {
-                if (! empty($hit)) {
-                    echo $output;
-                    $this->colorCli->primary('Updated group '.$hit[0]);
-                }
-            })->catch(function (\Throwable $exception) {
-                echo $exception->getMessage();
-            })->catch(static function (SerializableException $serializableException) {
-                // swallow
-            });
-        }
+        // Process in batches using Laravel's native Concurrency facade
+        $batches = array_chunk($queues, max(1, $maxProcesses), true);
 
-        $pool->wait();
+        foreach ($batches as $batchIndex => $batch) {
+            $tasks = [];
+            foreach ($batch as $idx => $queue) {
+                preg_match('/alt\..+/i', $queue, $hit);
+                $command = $this->buildDnrCommand($queue);
+                $tasks[$idx] = fn () => ['output' => $this->executeCommand($command), 'group' => $hit[0] ?? ''];
+            }
+
+            try {
+                $results = Concurrency::run($tasks);
+
+                foreach ($results as $result) {
+                    if (! empty($result['group'])) {
+                        echo $result['output'];
+                        $this->colorCli->primary('Updated group '.$result['group']);
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::error('Safe binaries batch failed: '.$e->getMessage());
+                $this->colorCli->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
+            }
+        }
     }
 }

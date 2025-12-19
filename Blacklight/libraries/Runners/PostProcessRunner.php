@@ -3,8 +3,9 @@
 namespace Blacklight\libraries\Runners;
 
 use App\Models\Settings;
+use Illuminate\Support\Facades\Concurrency;
 use Illuminate\Support\Facades\DB;
-use Spatie\Async\Output\SerializableException;
+use Illuminate\Support\Facades\Log;
 
 class PostProcessRunner extends BaseRunner
 {
@@ -30,29 +31,33 @@ class PostProcessRunner extends BaseRunner
             return;
         }
 
-        $pool = $this->createPool($maxProcesses);
         $count = count($releases);
         $this->headerStart('postprocess: '.$desc, $count, $maxProcesses);
 
-        foreach ($releases as $release) {
-            $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
-            $pool->add(function () use ($char, $type) {
-                // Use postprocess:guid command which accepts the GUID character
-                return $this->executeCommand(PHP_BINARY.' artisan postprocess:guid '.$type.' '.$char);
-            }, self::ASYNC_BUFFER_SIZE)->then(function ($output) use (&$count, $desc) {
-                echo $output;
-                $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
-                $count--;
-            })->catch(function (\Throwable $exception) {
-                echo $exception->getMessage();
-            })->catch(static function (SerializableException $serializableException) {
-                // swallow
-            })->timeout(function () use ($desc, &$count) {
-                $this->colorCli->notice('Task #'.$count.' ('.$desc.'): Timeout occurred.');
-            });
-        }
+        // Process in batches using Laravel's native Concurrency facade
+        $batches = array_chunk($releases, max(1, $maxProcesses));
 
-        $pool->wait();
+        foreach ($batches as $batchIndex => $batch) {
+            $tasks = [];
+            foreach ($batch as $idx => $release) {
+                $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
+                // Use postprocess:guid command which accepts the GUID character
+                $command = PHP_BINARY.' artisan postprocess:guid '.$type.' '.$char;
+                $tasks[$idx] = fn () => $this->executeCommand($command);
+            }
+
+            try {
+                $results = Concurrency::run($tasks);
+
+                foreach ($results as $taskIdx => $output) {
+                    echo $output;
+                    $this->colorCli->primary('Finished task for '.$desc);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Postprocess batch failed: '.$e->getMessage());
+                $this->colorCli->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
+            }
+        }
     }
 
     public function processAdditional(): void
@@ -215,30 +220,34 @@ class PostProcessRunner extends BaseRunner
             return;
         }
 
-        $pool = $this->createPool($maxProcesses);
         $count = count($releases);
         $this->headerStart('postprocess: '.$desc, $count, $maxProcesses);
 
-        foreach ($releases as $release) {
-            $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
-            $renamed = isset($release->renamed) ? $release->renamed : '';
-            $pool->add(function () use ($char, $renamed) {
-                // Use the pipelined TV command for each GUID bucket
-                return $this->executeCommand(PHP_BINARY.' artisan postprocess:tv-pipeline '.$char.($renamed ? ' '.$renamed : '').' --mode=pipeline');
-            }, self::ASYNC_BUFFER_SIZE)->then(function ($output) use (&$count, $desc) {
-                echo $output;
-                $this->colorCli->primary('Finished task #'.$count.' for '.$desc);
-                $count--;
-            })->catch(function (\Throwable $exception) {
-                echo $exception->getMessage();
-            })->catch(static function (SerializableException $serializableException) {
-                // swallow
-            })->timeout(function () use ($desc, &$count) {
-                $this->colorCli->notice('Task #'.$count.' ('.$desc.'): Timeout occurred.');
-            });
-        }
+        // Process in batches using Laravel's native Concurrency facade
+        $batches = array_chunk($releases, max(1, $maxProcesses));
 
-        $pool->wait();
+        foreach ($batches as $batchIndex => $batch) {
+            $tasks = [];
+            foreach ($batch as $idx => $release) {
+                $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
+                $renamed = isset($release->renamed) ? $release->renamed : '';
+                // Use the pipelined TV command for each GUID bucket
+                $command = PHP_BINARY.' artisan postprocess:tv-pipeline '.$char.($renamed ? ' '.$renamed : '').' --mode=pipeline';
+                $tasks[$idx] = fn () => $this->executeCommand($command);
+            }
+
+            try {
+                $results = Concurrency::run($tasks);
+
+                foreach ($results as $taskIdx => $output) {
+                    echo $output;
+                    $this->colorCli->primary('Finished task for '.$desc);
+                }
+            } catch (\Throwable $e) {
+                Log::error('TV pipeline batch failed: '.$e->getMessage());
+                $this->colorCli->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
+            }
+        }
     }
 
     /**

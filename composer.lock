@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7eea2735024f68804cd270d1aed9638b",
+    "content-hash": "578bb49b5102526e3d269681e6d2d504",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -8352,73 +8352,6 @@
                 }
             ],
             "time": "2025-12-02T10:37:40+00:00"
-        },
-        {
-            "name": "spatie/async",
-            "version": "1.8.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/spatie/async.git",
-                "reference": "f9e9d4908ac1b7887a5725322399ae5935bea077"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/spatie/async/zipball/f9e9d4908ac1b7887a5725322399ae5935bea077",
-                "reference": "f9e9d4908ac1b7887a5725322399ae5935bea077",
-                "shasum": ""
-            },
-            "require": {
-                "laravel/serializable-closure": "^1.3.7|^2.0.0",
-                "php": "^8.3|^8.4|^8.5",
-                "symfony/process": "^7.2|^8.0"
-            },
-            "require-dev": {
-                "larapack/dd": "^1.1",
-                "pestphp/pest": "^3.0|^4.0",
-                "symfony/stopwatch": "^7.2|^8.0"
-            },
-            "suggest": {
-                "ext-pcntl": "Required to use async processes",
-                "ext-posix": "Required to use async processes"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "src/helpers.php"
-                ],
-                "psr-4": {
-                    "Spatie\\Async\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Brent Roose",
-                    "email": "brent@spatie.be",
-                    "homepage": "https://spatie.be",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Asynchronous and parallel PHP with the PCNTL extension",
-            "homepage": "https://github.com/spatie/async",
-            "keywords": [
-                "async",
-                "spatie"
-            ],
-            "support": {
-                "issues": "https://github.com/spatie/async/issues",
-                "source": "https://github.com/spatie/async/tree/1.8.1"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/spatie",
-                    "type": "github"
-                }
-            ],
-            "time": "2025-11-28T10:22:46+00:00"
         },
         {
             "name": "spatie/backtrace",

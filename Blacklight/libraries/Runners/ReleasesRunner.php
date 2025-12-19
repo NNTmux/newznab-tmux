@@ -4,9 +4,9 @@ namespace Blacklight\libraries\Runners;
 
 use App\Models\Settings;
 use App\Models\UsenetGroup;
+use Illuminate\Support\Facades\Concurrency;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Spatie\Async\Output\SerializableException;
 
 class ReleasesRunner extends BaseRunner
 {
@@ -47,26 +47,30 @@ class ReleasesRunner extends BaseRunner
             return;
         }
 
-        $pool = $this->createPool($maxProcesses);
-
         $this->headerStart('releases', $count, $maxProcesses);
 
-        $taskNum = $count;
-        foreach ($uGroups as $group) {
-            $pool->add(function () use ($group) {
-                return $this->executeCommand($this->buildDnrCommand('releases  '.$group['id']));
-            }, self::ASYNC_BUFFER_SIZE)->then(function ($output) use (&$taskNum) {
-                echo $output;
-                $this->colorCli->primary('Task #'.$taskNum.' Finished performing release processing');
-                $taskNum--;
-            })->catch(function (\Throwable $exception) {
-                echo $exception->getMessage();
-            })->catch(static function (SerializableException $serializableException) {
-                // swallow
-            });
-        }
+        // Process in batches using Laravel's native Concurrency facade
+        $batches = array_chunk($uGroups, max(1, $maxProcesses));
 
-        $pool->wait();
+        foreach ($batches as $batchIndex => $batch) {
+            $tasks = [];
+            foreach ($batch as $group) {
+                $command = $this->buildDnrCommand('releases  '.$group['id']);
+                $tasks[$group['id']] = fn () => $this->executeCommand($command);
+            }
+
+            try {
+                $results = Concurrency::run($tasks);
+
+                foreach ($results as $groupId => $output) {
+                    echo $output;
+                    $this->colorCli->primary('Finished performing release processing for group ID: '.$groupId);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Release processing batch failed: '.$e->getMessage());
+                $this->colorCli->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
+            }
+        }
     }
 
     public function updatePerGroup(): void
@@ -92,24 +96,31 @@ class ReleasesRunner extends BaseRunner
             return;
         }
 
-        $pool = $this->createPool($maxProcesses);
         $this->headerStart('update_per_group', $count, $maxProcesses);
 
-        foreach ($groups as $group) {
-            $pool->add(function () use ($group) {
-                return $this->executeCommand($this->buildDnrCommand('update_per_group  '.$group->id));
-            }, self::ASYNC_BUFFER_SIZE)->then(function ($output) use ($group) {
-                echo $output;
-                $name = UsenetGroup::getNameByID($group->id);
-                $this->colorCli->primary('Finished updating binaries, processing releases and additional postprocessing for group:'.$name);
-            })->catch(function (\Throwable $exception) {
-                echo $exception->getMessage();
-            })->catch(static function (SerializableException $serializableException) {
-                echo $serializableException->asThrowable()->getMessage();
-            });
-        }
+        // Process in batches using Laravel's native Concurrency facade
+        $batches = array_chunk($groups, max(1, $maxProcesses));
 
-        $pool->wait();
+        foreach ($batches as $batchIndex => $batch) {
+            $tasks = [];
+            foreach ($batch as $group) {
+                $command = $this->buildDnrCommand('update_per_group  '.$group->id);
+                $tasks[$group->id] = fn () => $this->executeCommand($command);
+            }
+
+            try {
+                $results = Concurrency::run($tasks);
+
+                foreach ($results as $groupId => $output) {
+                    echo $output;
+                    $name = UsenetGroup::getNameByID($groupId);
+                    $this->colorCli->primary('Finished updating binaries, processing releases and additional postprocessing for group: '.$name);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Update per group batch failed: '.$e->getMessage());
+                $this->colorCli->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
+            }
+        }
     }
 
     public function fixRelNames(string $mode, int $maxPerRun, int $maxThreads): void
@@ -157,26 +168,30 @@ class ReleasesRunner extends BaseRunner
             return;
         }
 
-        $pool = $this->createPool($maxThreads);
-
         $this->headerStart('fixRelNames_'.$mode, $count, $maxThreads);
 
-        $taskNum = $count;
-        foreach ($queues as $queue) {
-            $pool->add(function () use ($queue) {
-                // Updated to use new script location (modernized)
-                return $this->executeCommand(PHP_BINARY.' app/Services/Tmux/Scripts/groupfixrelnames.php "'.$queue.'" true');
-            }, self::ASYNC_BUFFER_SIZE)->then(function ($output) use (&$taskNum) {
-                echo $output;
-                $this->colorCli->primary('Task #'.$taskNum.' Finished fixing releases names');
-                $taskNum--;
-            })->catch(function (\Throwable $exception) {
-                echo $exception->getMessage();
-            })->catch(static function (SerializableException $serializableException) {
-                // swallow
-            });
-        }
+        // Process in batches using Laravel's native Concurrency facade
+        $batches = array_chunk($queues, max(1, $maxThreads), true);
 
-        $pool->wait();
+        foreach ($batches as $batchIndex => $batch) {
+            $tasks = [];
+            foreach ($batch as $idx => $queue) {
+                // Updated to use new script location (modernized)
+                $command = PHP_BINARY.' app/Services/Tmux/Scripts/groupfixrelnames.php "'.$queue.'" true';
+                $tasks[$idx] = fn () => $this->executeCommand($command);
+            }
+
+            try {
+                $results = Concurrency::run($tasks);
+
+                foreach ($results as $taskIdx => $output) {
+                    echo $output;
+                    $this->colorCli->primary('Task #'.$taskIdx.' Finished fixing releases names');
+                }
+            } catch (\Throwable $e) {
+                Log::error('Fix rel names batch failed: '.$e->getMessage());
+                $this->colorCli->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
+            }
+        }
     }
 }

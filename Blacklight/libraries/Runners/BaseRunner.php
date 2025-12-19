@@ -3,28 +3,17 @@
 namespace Blacklight\libraries\Runners;
 
 use Blacklight\ColorCLI;
-use Spatie\Async\Pool;
 use Symfony\Component\Process\Process;
 
 abstract class BaseRunner
 {
     protected ColorCLI $colorCli;
 
-    protected const ASYNC_BUFFER_SIZE = 2000000;
-
     public function __construct(?ColorCLI $colorCli = null)
     {
         $this->colorCli = $colorCli ?? new ColorCLI;
     }
 
-    protected function createPool(int $concurrency): Pool
-    {
-        $concurrency = max(1, $concurrency);
-
-        return Pool::create()
-            ->concurrency($concurrency)
-            ->timeout(config('nntmux.multiprocessing_max_child_time'));
-    }
 
     protected function buildDnrCommand(string $args): string
     {
