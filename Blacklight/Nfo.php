@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Blacklight;
 
 use App\Models\Release;
 use App\Models\ReleaseNfo;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
-use Blacklight\processing\PostProcess;
+use App\Services\PostProcessService;
 use Blacklight\utility\Utility;
 use dariusiii\rarinfo\Par2Info;
 use dariusiii\rarinfo\SfvInfo;
@@ -147,31 +149,32 @@ class Nfo
      */
     public function __construct()
     {
-        $this->echo = config('nntmux.echocli');
-        $this->colorCli = new ColorCLI;
+        $this->echo = (bool) config('nntmux.echocli');
+        $this->colorCli = new ColorCLI();
 
         // Cache settings to reduce database queries
-        $this->nzbs = Cache::remember('nfo_maxnfoprocessed', self::SETTINGS_CACHE_TTL, function () {
+        // Note: Cast after Cache::remember as cached values may be stored as strings
+        $this->nzbs = (int) Cache::remember('nfo_maxnfoprocessed', self::SETTINGS_CACHE_TTL, function () {
             $value = Settings::settingValue('maxnfoprocessed');
 
             return $value !== '' ? (int) $value : 100;
         });
 
-        $maxRetries = Cache::remember('nfo_maxnforetries', self::SETTINGS_CACHE_TTL, function () {
+        $maxRetries = (int) Cache::remember('nfo_maxnforetries', self::SETTINGS_CACHE_TTL, function () {
             return (int) Settings::settingValue('maxnforetries');
         });
         $this->maxRetries = $maxRetries >= 0 ? -($maxRetries + 1) : self::NFO_UNPROC;
         $this->maxRetries = max($this->maxRetries, -8);
 
-        $this->maxSize = Cache::remember('nfo_maxsizetoprocessnfo', self::SETTINGS_CACHE_TTL, function () {
+        $this->maxSize = (int) Cache::remember('nfo_maxsizetoprocessnfo', self::SETTINGS_CACHE_TTL, function () {
             return (int) Settings::settingValue('maxsizetoprocessnfo');
         });
 
-        $this->minSize = Cache::remember('nfo_minsizetoprocessnfo', self::SETTINGS_CACHE_TTL, function () {
+        $this->minSize = (int) Cache::remember('nfo_minsizetoprocessnfo', self::SETTINGS_CACHE_TTL, function () {
             return (int) Settings::settingValue('minsizetoprocessnfo');
         });
 
-        $this->tmpPath = rtrim(config('nntmux.tmp_unrar_path'), '/\\').'/';
+        $this->tmpPath = rtrim((string) config('nntmux.tmp_unrar_path'), '/\\') . '/';
     }
 
     /**
@@ -481,7 +484,7 @@ class Nfo
                         'NNTP' => $nntp,
                         'Nfo' => $this,
                         'Settings' => null,
-                        'PostProcess' => new PostProcess(['Echo' => $this->echo, 'Nfo' => $this]),
+                        'PostProcess' => app(PostProcessService::class),
                     ]
                 );
                 $nzbContents->parseNZB($release->guid, $release->id, $release->guid);

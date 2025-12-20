@@ -7,6 +7,7 @@ return [
     App\Providers\CategorizationServiceProvider::class,
     App\Providers\ForumServiceProvider::class,
     App\Providers\HorizonServiceProvider::class,
+    App\Providers\ProcessingServiceProvider::class,
     App\Providers\RouteServiceProvider::class,
     App\Providers\TelescopeServiceProvider::class,
     App\Providers\TvProcessingServiceProvider::class,

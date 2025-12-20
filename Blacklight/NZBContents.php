@@ -1,15 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Blacklight;
 
 use App\Models\Release;
 use App\Models\Settings;
-use Blacklight\processing\PostProcess;
+use App\Services\PostProcessService;
 use Blacklight\utility\Utility;
 
 /**
  * Gets information contained within the NZB.
- *
  *
  * Class NZBContents
  */
@@ -19,29 +20,25 @@ class NZBContents
 
     protected Nfo $nfo;
 
-    protected PostProcess $pp;
+    protected PostProcessService $postProcessService;
 
     protected NZB $nzb;
 
     protected bool $lookuppar2;
 
-    /**
-     * @var bool
-     */
-    protected mixed $echooutput;
+    protected bool $echooutput;
 
     protected bool $alternateNNTP;
 
     public function __construct()
     {
-
-        $this->echooutput = config('nntmux.echocli');
-        $this->nntp = new NNTP;
-        $this->nfo = new Nfo;
-        $this->pp = new PostProcess;
-        $this->nzb = new NZB;
+        $this->echooutput = (bool) config('nntmux.echocli');
+        $this->nntp = new NNTP();
+        $this->nfo = new Nfo();
+        $this->postProcessService = app(PostProcessService::class);
+        $this->nzb = new NZB();
         $this->lookuppar2 = (int) Settings::settingValue('lookuppar2') === 1;
-        $this->alternateNNTP = config('nntmux_nntp.use_alternate_nntp_server');
+        $this->alternateNNTP = (bool) config('nntmux_nntp.use_alternate_nntp_server');
     }
 
     /**
@@ -237,9 +234,8 @@ class NZBContents
             // Look specifically for the .par2 index file (often small, but not always 1/1)
             if ($this->lookuppar2 && ! $foundPAR2 && isset($firstSegmentId) && preg_match('/\.par2$/i', $subject)) {
                 // Attempt to parse the PAR2 file using its first segment ID
-                // Ensure $this->pp is initialized and parsePAR2 exists and accepts these parameters
-                if (method_exists($this->pp, 'parsePAR2') && $this->pp->parsePAR2($firstSegmentId, $relID, $groupID, $this->nntp, 1) === true) {
-                    Release::query()->where('id', $relID)->update(['proc_par2' => 1]); // Use constant if available
+                if ($this->postProcessService->parsePAR2($firstSegmentId, $relID, $groupID, $this->nntp, 1) === true) {
+                    Release::query()->where('id', $relID)->update(['proc_par2' => 1]);
                     $foundPAR2 = true;
                 }
             }
@@ -329,7 +325,6 @@ class NZBContents
     /**
      * Attempts to get the release name from a par2 file.
      *
-     *
      * @throws \Exception
      */
     public function checkPAR2(string $guid, int $relID, int $groupID, int $nameStatus, int $show): bool
@@ -337,13 +332,17 @@ class NZBContents
         $nzbFile = $this->loadNzb($guid);
         if ($nzbFile !== false) {
             foreach ($nzbFile->file as $nzbContents) {
-                if ($nameStatus === 1 && $this->pp->parsePAR2((string) $nzbContents->segments->segment, $relID, $groupID, $this->nntp, $show) && preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)/i', (string) $nzbContents->attributes()->subject)) {
+                if ($nameStatus === 1
+                    && $this->postProcessService->parsePAR2((string) $nzbContents->segments->segment, $relID, $groupID, $this->nntp, $show)
+                    && preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)/i', (string) $nzbContents->attributes()->subject)
+                ) {
                     Release::query()->where('id', $relID)->update(['proc_par2' => 1]);
 
                     return true;
                 }
             }
         }
+
         if ($nameStatus === 1) {
             Release::query()->where('id', $relID)->update(['proc_par2' => 1]);
         }

@@ -9,9 +9,9 @@ use App\Models\UsenetGroup;
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\Backfill\BackfillService;
 use App\Services\Binaries\BinariesService;
+use App\Services\ReleaseProcessingService;
 use Blacklight\Nfo;
 use Blacklight\NNTP;
-use Blacklight\processing\ProcessReleases;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -30,6 +30,12 @@ class UpdatePerGroup extends Command
      * @var string
      */
     protected $description = 'Do a single group (update_binaries/backFill/update_releases/postprocess)';
+
+    public function __construct(
+        private readonly ReleaseProcessingService $releaseProcessingService
+    ) {
+        parent::__construct();
+    }
 
     /**
      * Execute the console command.
@@ -67,7 +73,7 @@ class UpdatePerGroup extends Command
 
             // Create releases
             $this->info("Processing releases for group: {$groupMySQL['name']}");
-            $this->processReleases(new ProcessReleases(), (string) $groupId);
+            $this->processReleases((string) $groupId);
 
             // Post process the releases
             $this->info("Post-processing additional for group: {$groupMySQL['name']}");
@@ -78,8 +84,8 @@ class UpdatePerGroup extends Command
                 $nntp,
                 $groupId,
                 '',
-                (bool)Settings::settingValue('lookupimdb'),
-                (bool)Settings::settingValue('lookuptv')
+                (bool) Settings::settingValue('lookupimdb'),
+                (bool) Settings::settingValue('lookuptv')
             );
 
             $this->info("Completed all processing for group: {$groupMySQL['name']}");
@@ -95,26 +101,23 @@ class UpdatePerGroup extends Command
 
     /**
      * Create / process releases for a groupID.
-     *
-     * Uses the ProcessReleases DTO-based workflow for cleaner code.
      */
-    private function processReleases(ProcessReleases $releases, string $groupID): void
+    private function processReleases(string $groupID): void
     {
-        $limit = $releases->getReleaseCreationLimit();
+        $limit = $this->releaseProcessingService->getReleaseCreationLimit();
 
-        $releases->processIncompleteCollections($groupID);
-        $releases->processCollectionSizes($groupID);
-        $releases->deleteUnwantedCollections($groupID);
+        $this->releaseProcessingService->processIncompleteCollections($groupID);
+        $this->releaseProcessingService->processCollectionSizes($groupID);
+        $this->releaseProcessingService->deleteUnwantedCollections($groupID);
 
         do {
-            $result = $releases->createReleases($groupID);
-            $nzbFilesAdded = $releases->createNZBs($groupID);
+            $result = $this->releaseProcessingService->createReleases($groupID);
+            $nzbFilesAdded = $this->releaseProcessingService->createNZBs($groupID);
 
-            // Continue if we processed up to the limit (more work may be available)
             $shouldContinue = $result->total() >= $limit || $nzbFilesAdded >= $limit;
         } while ($shouldContinue);
 
-        $releases->deleteCollections($groupID);
+        $this->releaseProcessingService->deleteCollections($groupID);
     }
 
     /**

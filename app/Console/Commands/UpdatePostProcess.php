@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
+use App\Services\PostProcessService;
 use Blacklight\NNTP;
-use Blacklight\processing\PostProcess;
 use Illuminate\Console\Command;
 
 class UpdatePostProcess extends Command
@@ -26,11 +28,13 @@ class UpdatePostProcess extends Command
 
     /**
      * Valid types and whether they require NNTP.
+     *
+     * @var array<string, bool>
      */
-    private array $validTypes = [
+    private const array VALID_TYPES = [
         'additional' => false,
         'all' => true,
-        'amazon' => false, // Alias for book, music, console, games, xxx
+        'amazon' => false,
         'anime' => false,
         'book' => false,
         'console' => false,
@@ -42,16 +46,20 @@ class UpdatePostProcess extends Command
         'xxx' => false,
     ];
 
+    public function __construct(
+        private readonly PostProcessService $postProcessService
+    ) {
+        parent::__construct();
+    }
+
     /**
      * Execute the console command.
      */
     public function handle(): int
     {
         $type = $this->argument('type');
-        $echoArg = $this->argument('echo');
-        $echo = ($echoArg === null || $echoArg === 'true');
 
-        if (! array_key_exists($type, $this->validTypes)) {
+        if (!array_key_exists($type, self::VALID_TYPES)) {
             $this->error("Invalid type: {$type}");
             $this->showHelp();
 
@@ -59,22 +67,21 @@ class UpdatePostProcess extends Command
         }
 
         try {
-            $nntp = $this->validTypes[$type] ? $this->getNntp() : null;
-            $postProcess = new PostProcess;
+            $nntp = self::VALID_TYPES[$type] ? $this->getNntp() : null;
 
             match ($type) {
-                'all' => $postProcess->processAll($nntp),
-                'amazon' => $this->processAmazon($postProcess),
-                'nfo' => $postProcess->processNfos($nntp),
-                'movies' => $postProcess->processMovies(),
-                'music' => $postProcess->processMusic(),
-                'console' => $postProcess->processConsoles(),
-                'games' => $postProcess->processGames(),
-                'book' => $postProcess->processBooks(),
-                'anime' => $postProcess->processAnime(),
-                'tv' => $postProcess->processTv(),
-                'xxx' => $postProcess->processXXX(),
-                'additional' => $postProcess->processAdditional(),
+                'all' => $this->postProcessService->processAll($nntp),
+                'amazon' => $this->processAmazon(),
+                'nfo' => $this->postProcessService->processNfos($nntp),
+                'movies' => $this->postProcessService->processMovies(),
+                'music' => $this->postProcessService->processMusic(),
+                'console' => $this->postProcessService->processConsoles(),
+                'games' => $this->postProcessService->processGames(),
+                'book' => $this->postProcessService->processBooks(),
+                'anime' => $this->postProcessService->processAnime(),
+                'tv' => $this->postProcessService->processTv(),
+                'xxx' => $this->postProcessService->processXXX(),
+                'additional' => $this->postProcessService->processAdditional(),
                 default => throw new \Exception("Unhandled type: {$type}"),
             };
 
@@ -110,13 +117,13 @@ class UpdatePostProcess extends Command
     /**
      * Process amazon types (books, music, console, games, xxx).
      */
-    private function processAmazon(PostProcess $postProcess): void
+    private function processAmazon(): void
     {
-        $postProcess->processBooks();
-        $postProcess->processMusic();
-        $postProcess->processConsoles();
-        $postProcess->processGames();
-        $postProcess->processXXX();
+        $this->postProcessService->processBooks();
+        $this->postProcessService->processMusic();
+        $this->postProcessService->processConsoles();
+        $this->postProcessService->processGames();
+        $this->postProcessService->processXXX();
     }
 
     /**
@@ -124,12 +131,12 @@ class UpdatePostProcess extends Command
      */
     private function getNntp(): NNTP
     {
-        $nntp = new NNTP;
+        $nntp = new NNTP();
 
         if ((config('nntmux_nntp.use_alternate_nntp_server') === true
             ? $nntp->doConnect(false, true)
             : $nntp->doConnect()) !== true) {
-            throw new \Exception('Unable to connect to usenet.');
+            throw new \RuntimeException('Unable to connect to usenet.');
         }
 
         return $nntp;

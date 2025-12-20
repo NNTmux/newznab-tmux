@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use Blacklight\processing\ProcessReleases;
+use App\Services\ReleaseProcessingService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -24,6 +24,12 @@ class ProcessReleasesCommand extends Command
      */
     protected $description = 'Process releases for a specific group or all groups';
 
+    public function __construct(
+        private readonly ReleaseProcessingService $releaseProcessingService
+    ) {
+        parent::__construct();
+    }
+
     /**
      * Execute the console command.
      */
@@ -32,13 +38,11 @@ class ProcessReleasesCommand extends Command
         $groupId = $this->argument('groupId');
 
         try {
-            $releases = new ProcessReleases();
-
             if (is_numeric($groupId)) {
-                $this->processReleasesForGroup($releases, (string) $groupId);
+                $this->processReleasesForGroup((string) $groupId);
             } else {
-                $this->processReleasesForGroup($releases, '');
-                $this->runPostProcessingTasks($releases);
+                $this->processReleasesForGroup('');
+                $this->runPostProcessingTasks();
             }
 
             return self::SUCCESS;
@@ -52,35 +56,32 @@ class ProcessReleasesCommand extends Command
 
     /**
      * Create / process releases for a groupID.
-     *
-     * Uses the ProcessReleases DTO-based workflow for cleaner code.
      */
-    private function processReleasesForGroup(ProcessReleases $releases, string $groupID): void
+    private function processReleasesForGroup(string $groupID): void
     {
-        $limit = $releases->getReleaseCreationLimit();
+        $limit = $this->releaseProcessingService->getReleaseCreationLimit();
 
-        $releases->processIncompleteCollections($groupID);
-        $releases->processCollectionSizes($groupID);
-        $releases->deleteUnwantedCollections($groupID);
+        $this->releaseProcessingService->processIncompleteCollections($groupID);
+        $this->releaseProcessingService->processCollectionSizes($groupID);
+        $this->releaseProcessingService->deleteUnwantedCollections($groupID);
 
         do {
-            $result = $releases->createReleases($groupID);
-            $nzbFilesAdded = $releases->createNZBs($groupID);
+            $result = $this->releaseProcessingService->createReleases($groupID);
+            $nzbFilesAdded = $this->releaseProcessingService->createNZBs($groupID);
 
-            // Continue if we processed up to the limit (more work may be available)
             $shouldContinue = $result->total() >= $limit || $nzbFilesAdded >= $limit;
         } while ($shouldContinue);
 
-        $releases->deleteCollections($groupID);
+        $this->releaseProcessingService->deleteCollections($groupID);
     }
 
     /**
      * Run post-processing tasks after all group releases are processed.
      */
-    private function runPostProcessingTasks(ProcessReleases $releases): void
+    private function runPostProcessingTasks(): void
     {
-        $releases->deletedReleasesByGroup();
-        $releases->deleteReleases();
-        $releases->categorizeReleases(2);
+        $this->releaseProcessingService->deletedReleasesByGroup();
+        $this->releaseProcessingService->deleteReleases();
+        $this->releaseProcessingService->categorizeReleases(2);
     }
 }

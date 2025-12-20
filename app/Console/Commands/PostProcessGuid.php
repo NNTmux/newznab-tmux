@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Models\Settings;
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
+use App\Services\PostProcessService;
 use Blacklight\Nfo;
 use Blacklight\NNTP;
-use Blacklight\processing\PostProcess;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -29,6 +31,13 @@ class PostProcessGuid extends Command
      */
     protected $description = 'Post process releases by GUID character';
 
+    public function __construct(
+        private readonly PostProcessService $postProcessService,
+        private readonly AdditionalProcessingOrchestrator $additionalProcessor
+    ) {
+        parent::__construct();
+    }
+
     /**
      * Execute the console command.
      */
@@ -38,51 +47,24 @@ class PostProcessGuid extends Command
         $guid = $this->argument('guid');
         $renamed = $this->argument('renamed') ?? '';
 
-        if (! $this->isValidChar($guid)) {
+        if (!$this->isValidChar($guid)) {
             $this->error('GUID character must be a-f or 0-9.');
 
             return self::FAILURE;
         }
 
         try {
-            switch ($type) {
-                case 'additional':
-                    $nntp = $this->getNntp();
-                    app(AdditionalProcessingOrchestrator::class)->start('', $guid);
-                    break;
-
-                case 'nfo':
-                    $nntp = $this->getNntp();
-                    (new Nfo)->processNfoFiles(
-                        $nntp,
-                        '',
-                        $guid,
-                        (int) Settings::settingValue('lookupimdb'),
-                        (int) Settings::settingValue('lookuptv')
-                    );
-                    break;
-
-                case 'movie':
-                    (new PostProcess)->processMovies('', $guid, $renamed);
-                    break;
-
-                case 'tv':
-                    (new PostProcess)->processTv('', $guid, $renamed);
-                    break;
-
-                case 'anime':
-                    (new PostProcess)->processAnime('', $guid);
-                    break;
-
-                case 'books':
-                    (new PostProcess)->processBooks('', $guid);
-                    break;
-
-                default:
-                    $this->error('Invalid type. Must be: additional, nfo, movie, tv, anime, or books.');
-
-                    return self::FAILURE;
-            }
+            match ($type) {
+                'additional' => $this->processAdditional($guid),
+                'nfo' => $this->processNfo($guid),
+                'movie' => $this->postProcessService->processMovies('', $guid, $renamed),
+                'tv' => $this->postProcessService->processTv('', $guid, $renamed),
+                'anime' => $this->postProcessService->processAnime('', $guid),
+                'books' => $this->postProcessService->processBooks('', $guid),
+                default => throw new \InvalidArgumentException(
+                    'Invalid type. Must be: additional, nfo, movie, tv, anime, or books.'
+                ),
+            };
 
             return self::SUCCESS;
         } catch (\Throwable $e) {
@@ -91,6 +73,29 @@ class PostProcessGuid extends Command
 
             return self::FAILURE;
         }
+    }
+
+    /**
+     * Process additional data for releases.
+     */
+    private function processAdditional(string $guid): void
+    {
+        $this->additionalProcessor->start('', $guid);
+    }
+
+    /**
+     * Process NFO files for releases.
+     */
+    private function processNfo(string $guid): void
+    {
+        $nntp = $this->getNntp();
+        (new Nfo())->processNfoFiles(
+            $nntp,
+            '',
+            $guid,
+            (bool) Settings::settingValue('lookupimdb'),
+            (bool) Settings::settingValue('lookuptv')
+        );
     }
 
     /**
@@ -110,12 +115,12 @@ class PostProcessGuid extends Command
      */
     private function getNntp(): NNTP
     {
-        $nntp = new NNTP;
+        $nntp = new NNTP();
 
         if ((config('nntmux_nntp.use_alternate_nntp_server') === true
             ? $nntp->doConnect(false, true)
             : $nntp->doConnect()) !== true) {
-            throw new \Exception('Unable to connect to usenet.');
+            throw new \RuntimeException('Unable to connect to usenet.');
         }
 
         return $nntp;

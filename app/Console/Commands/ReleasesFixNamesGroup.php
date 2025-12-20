@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Models\Category;
 use App\Models\Predb;
 use App\Models\Release;
 use App\Services\NameFixing\NameFixingService;
+use App\Services\PostProcessService;
 use Blacklight\Nfo;
 use Blacklight\NNTP;
 use Blacklight\NZBContents;
-use Blacklight\processing\PostProcess;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -209,7 +211,7 @@ class ReleasesFixNamesGroup extends Command
             if ((int) $release->proc_par2 === NameFixingService::PROC_PAR2_NONE) {
                 // Initialize NZB contents if needed
                 if (! isset($nzbcontents)) {
-                    $nntp = new NNTP;
+                    $nntp = new NNTP();
                     $compressedHeaders = config('nntmux_nntp.compressed_headers');
 
                     if ((config('nntmux_nntp.use_alternate_nntp_server') === true
@@ -217,12 +219,12 @@ class ReleasesFixNamesGroup extends Command
                         : $nntp->doConnect()) !== true) {
                         $this->warn('Unable to connect to usenet for PAR2 processing');
                     } else {
-                        $Nfo = new Nfo;
+                        $Nfo = new Nfo();
                         $nzbcontents = new NZBContents([
                             'Echo' => false,
                             'NNTP' => $nntp,
                             'Nfo' => $Nfo,
-                            'PostProcess' => new PostProcess(),
+                            'PostProcess' => app(PostProcessService::class),
                         ]);
                     }
                 }
