@@ -400,11 +400,11 @@ class UsenetGroup extends Model
 
         $res->get();
 
-        $releases = new Releases;
+        $releaseManagement = app(\App\Services\Releases\ReleaseManagementService::class);
         $nzb = new NZB;
         $releaseImage = new ReleaseImage;
         foreach ($res as $row) {
-            $releases->deleteSingle(
+            $releaseManagement->deleteSingle(
                 [
                     'g' => $row['guid'],
                     'i' => $row['id'],

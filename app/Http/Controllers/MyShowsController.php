@@ -6,11 +6,19 @@ use App\Models\Category;
 use App\Models\Settings;
 use App\Models\UserSerie;
 use App\Models\Video;
-use Blacklight\Releases;
+use App\Services\Releases\ReleaseBrowseService;
 use Illuminate\Http\Request;
 
 class MyShowsController extends BasePageController
 {
+    private ReleaseBrowseService $releaseBrowseService;
+
+    public function __construct(ReleaseBrowseService $releaseBrowseService)
+    {
+        parent::__construct();
+        $this->releaseBrowseService = $releaseBrowseService;
+    }
+
     public function show(Request $request)
     {
         $action = $request->input('action') ?? '';
@@ -168,15 +176,13 @@ class MyShowsController extends BasePageController
 
         $shows = UserSerie::getShows($this->userdata->id);
 
-        $releases = new Releases;
-
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
-        $ordering = $releases->getBrowseOrdering();
+        $ordering = $this->releaseBrowseService->getBrowseOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
         $browseCount = $shows ? $shows->count() : 0;
 
-        $rslt = $releases->getShowsRange($shows ?? [], $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata->categoryexclusions);
+        $rslt = $this->releaseBrowseService->getShowsRange($shows ?? [], $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata->categoryexclusions);
         $results = $this->paginate($rslt ?? [], $browseCount, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
         $this->viewData['covgroup'] = '';

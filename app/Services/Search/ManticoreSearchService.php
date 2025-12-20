@@ -402,6 +402,15 @@ class ManticoreSearchService implements SearchServiceInterface
             return [];
         }
 
+        if (config('app.debug')) {
+            Log::debug('ManticoreSearch::searchIndexes called', [
+                'rt_index' => $rt_index,
+                'searchString' => $searchString,
+                'column' => $column,
+                'searchArray' => $searchArray,
+            ]);
+        }
+
         // Create cache key for search results
         $cacheKey = md5(serialize([
             'index' => $rt_index,
@@ -412,6 +421,12 @@ class ManticoreSearchService implements SearchServiceInterface
 
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
+            if (config('app.debug')) {
+                Log::debug('ManticoreSearch::searchIndexes returning cached result', [
+                    'cacheKey' => $cacheKey,
+                    'cached_ids_count' => count($cached['id'] ?? []),
+                ]);
+            }
             return $cached;
         }
 
@@ -430,11 +445,17 @@ class ManticoreSearchService implements SearchServiceInterface
             if (! empty($terms)) {
                 $searchExpr = implode(' ', $terms);
             } else {
+                if (config('app.debug')) {
+                    Log::debug('ManticoreSearch::searchIndexes no terms after escaping searchArray');
+                }
                 return [];
             }
         } elseif (! empty($searchString)) {
             $escapedSearch = self::escapeString($searchString);
             if (empty($escapedSearch)) {
+                if (config('app.debug')) {
+                    Log::debug('ManticoreSearch::searchIndexes escapedSearch is empty');
+                }
                 return [];
             }
 

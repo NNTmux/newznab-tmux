@@ -17,7 +17,6 @@ use App\Services\AdultProcessing\Pipes\IafdPipe;
 use App\Services\AdultProcessing\Pipes\PoppornPipe;
 use Blacklight\ColorCLI;
 use Blacklight\ReleaseImage;
-use Blacklight\Releases;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Concurrency;
@@ -74,7 +73,7 @@ class AdultProcessingPipeline
         // Try to get settings from database, but handle failures gracefully (e.g., in child processes)
         try {
             $this->movieQty = (int) (Settings::settingValue('maxxxxprocessed') ?? 100);
-            $this->showPasswords = (new Releases())->showPasswords();
+            $this->showPasswords = app(\App\Services\Releases\ReleaseBrowseService::class)->showPasswords();
         } catch (\Exception $e) {
             // Fallback values for child processes where DB might not be available
             $this->movieQty = 100;

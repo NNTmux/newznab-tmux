@@ -129,7 +129,7 @@ class Movie
 
         $this->imdburl = (int) Settings::settingValue('imdburl') !== 0;
         $this->movieqty = Settings::settingValue('maximdbprocessed') !== '' ? (int) Settings::settingValue('maximdbprocessed') : 100;
-        $this->showPasswords = (new Releases)->showPasswords();
+        $this->showPasswords = app(\App\Services\Releases\ReleaseBrowseService::class)->showPasswords();
 
         $this->echooutput = config('nntmux.echocli');
         $this->imgSavePath = storage_path('covers/movies/');

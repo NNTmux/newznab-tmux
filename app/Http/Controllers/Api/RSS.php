@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Category;
 use App\Models\Release;
-use Blacklight\Releases;
+use App\Services\Releases\ReleaseBrowseService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
  */
 class RSS extends ApiController
 {
-    public Releases $releases;
+    public ReleaseBrowseService $releaseBrowseService;
 
     /**
      * @throws \Exception
@@ -23,7 +23,7 @@ class RSS extends ApiController
     public function __construct()
     {
         parent::__construct();
-        $this->releases = new Releases;
+        $this->releaseBrowseService = app(ReleaseBrowseService::class);
     }
 
     /**
@@ -72,7 +72,7 @@ class RSS extends ApiController
 				%s %s %s %s
 				ORDER BY postdate DESC %s",
                 $cartSearch,
-                $this->releases->showPasswords(),
+                $this->releaseBrowseService->showPasswords(),
                 $catSearch,
                 ($videosId > 0 ? sprintf('AND r.videos_id = %d %s', $videosId, ($catSearch === '' ? $catLimit : '')) : ''),
                 ($aniDbID > 0 ? sprintf('AND r.anidbid = %d %s', $aniDbID, ($catSearch === '' ? $catLimit : '')) : ''),

@@ -205,7 +205,7 @@ class Games
         $order = $this->getGamesOrder($orderBy);
         $gamesSql =
             "SELECT SQL_CALC_FOUND_ROWS gi.id, GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id FROM gamesinfo gi LEFT JOIN releases r ON gi.id = r.gamesinfo_id WHERE gi.title != '' AND gi.cover = 1 AND r.passwordstatus "
-            .(new Releases)->showPasswords().
+            .app(\App\Services\Releases\ReleaseBrowseService::class)->showPasswords().
             $browseBy.
             $catsrch.
             $maxAge.

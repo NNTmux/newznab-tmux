@@ -10,10 +10,11 @@ use App\Models\Settings;
 use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UserRequest;
+use App\Services\Releases\ReleaseBrowseService;
+use App\Services\Releases\ReleaseSearchService;
 use App\Transformers\ApiTransformer;
 use App\Transformers\CategoryTransformer;
 use App\Transformers\DetailsTransformer;
-use Blacklight\Releases;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,10 +24,17 @@ use Illuminate\Support\Facades\DB;
 class ApiV2Controller extends BasePageController
 {
     private ApiController $api;
+    private ReleaseSearchService $releaseSearchService;
+    private ReleaseBrowseService $releaseBrowseService;
 
-    public function __construct()
-    {
-        $this->api = new ApiController;
+    public function __construct(
+        ApiController $api,
+        ReleaseSearchService $releaseSearchService,
+        ReleaseBrowseService $releaseBrowseService
+    ) {
+        $this->api = $api;
+        $this->releaseSearchService = $releaseSearchService;
+        $this->releaseBrowseService = $releaseBrowseService;
     }
 
     public function capabilities(): JsonResponse
@@ -93,7 +101,7 @@ class ApiV2Controller extends BasePageController
         ];
 
         // Perform search
-        $relData = (new Releases)->moviesSearch(
+        $relData = $this->releaseSearchService->moviesSearch(
             $params['imdbId'],
             $params['tmdbId'],
             $params['traktId'],
@@ -137,7 +145,6 @@ class ApiV2Controller extends BasePageController
         if ($request->missing('api_token') || $request->isNotFilled('api_token')) {
             return response()->json(['error' => 'Missing parameter (api_token)'], 403);
         }
-        $releases = new Releases;
         $user = User::query()->where('api_token', $request->input('api_token'))->first();
         $offset = $this->api->offset($request);
         $catExclusions = User::getCategoryExclusionForApi($request);
@@ -150,7 +157,7 @@ class ApiV2Controller extends BasePageController
         $limit = $this->api->limit($request);
 
         if ($request->has('id')) {
-            $relData = $releases->apiSearch(
+            $relData = $this->releaseSearchService->apiSearch(
                 $request->input('id'),
                 $groupName,
                 $offset,
@@ -161,7 +168,7 @@ class ApiV2Controller extends BasePageController
                 $minSize
             );
         } else {
-            $relData = $releases->getBrowseRange(
+            $relData = $this->releaseBrowseService->getBrowseRange(
                 1,
                 $categoryID,
                 $offset,
@@ -202,7 +209,6 @@ class ApiV2Controller extends BasePageController
         if ($request->missing('api_token') || $request->isNotFilled('api_token')) {
             return response()->json(['error' => 'Missing parameter (api_token)'], 403);
         }
-        $releases = new Releases;
         $user = User::query()->where('api_token', $request->input('api_token'))->first();
         if ($user === null) {
             return response()->json(['error' => 'Invalid API Token'], 403);
@@ -242,7 +248,7 @@ class ApiV2Controller extends BasePageController
             $airDate = str_replace('/', '-', $year[0].'-'.$episode);
         }
 
-        $relData = $releases->apiTvSearch(
+        $relData = $this->releaseSearchService->apiTvSearch(
             $siteIdArr,
             $series,
             $episode,

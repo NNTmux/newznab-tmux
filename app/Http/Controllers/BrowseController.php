@@ -4,24 +4,30 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\RootCategory;
-use Blacklight\Releases;
+use App\Services\Releases\ReleaseBrowseService;
 use Illuminate\Http\Request;
 
 class BrowseController extends BasePageController
 {
+    private ReleaseBrowseService $releaseBrowseService;
+
+    public function __construct(ReleaseBrowseService $releaseBrowseService)
+    {
+        parent::__construct();
+        $this->releaseBrowseService = $releaseBrowseService;
+    }
+
     /**
      * @throws \Exception
      */
     public function index(Request $request)
     {
-        $releases = new Releases;
-
-        $ordering = $releases->getBrowseOrdering();
+        $ordering = $this->releaseBrowseService->getBrowseOrdering();
         $orderBy = $request->has('ob') && ! empty($request->input('ob')) ? $request->input('ob') : '';
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
 
-        $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), $orderBy, -1, $this->userdata->categoryexclusions, -1);
+        $rslt = $this->releaseBrowseService->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), $orderBy, -1, $this->userdata->categoryexclusions, -1);
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
         // Build order by URLs
@@ -48,7 +54,6 @@ class BrowseController extends BasePageController
      */
     public function show(Request $request, string $parentCategory, string $id = 'All')
     {
-        $releases = new Releases;
 
         $parentId = RootCategory::query()->where('title', $parentCategory)->value('id');
 
@@ -65,12 +70,12 @@ class BrowseController extends BasePageController
         $catarray = [];
         $catarray[] = $category;
 
-        $ordering = $releases->getBrowseOrdering();
+        $ordering = $this->releaseBrowseService->getBrowseOrdering();
         $orderBy = $request->has('ob') && ! empty($request->input('ob')) ? $request->input('ob') : '';
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
 
-        $rslt = $releases->getBrowseRange($page, $catarray, $offset, config('nntmux.items_per_page'), $orderBy, -1, $this->userdata->categoryexclusions, $grp);
+        $rslt = $this->releaseBrowseService->getBrowseRange($page, $catarray, $offset, config('nntmux.items_per_page'), $orderBy, -1, $this->userdata->categoryexclusions, $grp);
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
         $covgroup = '';
@@ -139,12 +144,11 @@ class BrowseController extends BasePageController
      */
     public function group(Request $request)
     {
-        $releases = new Releases;
         if ($request->has('g')) {
             $group = $request->input('g');
             $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
             $offset = ($page - 1) * config('nntmux.items_per_page');
-            $rslt = $releases->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), '', -1, $this->userdata->categoryexclusions, $group);
+            $rslt = $this->releaseBrowseService->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), '', -1, $this->userdata->categoryexclusions, $group);
             $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
             $this->viewData = array_merge($this->viewData, [

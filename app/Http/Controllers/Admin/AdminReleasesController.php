@@ -5,11 +5,19 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
 use App\Models\Release;
-use Blacklight\Releases;
+use App\Services\Releases\ReleaseManagementService;
 use Illuminate\Http\Request;
 
 class AdminReleasesController extends BasePageController
 {
+    private ReleaseManagementService $releaseManagement;
+
+    public function __construct(ReleaseManagementService $releaseManagement)
+    {
+        parent::__construct();
+        $this->releaseManagement = $releaseManagement;
+    }
+
     /**
      * @throws \Exception
      */
@@ -88,8 +96,7 @@ class AdminReleasesController extends BasePageController
     {
         try {
             if ($id) {
-                $releases = new Releases;
-                $releases->deleteMultiple($id);
+                $this->releaseManagement->deleteMultiple($id);
 
                 // Handle AJAX requests
                 if (request()->wantsJson() || request()->ajax()) {

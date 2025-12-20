@@ -4,18 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\UsenetGroup;
+use App\Services\Releases\ReleaseBrowseService;
+use App\Services\Releases\ReleaseSearchService;
 use App\Services\Search\Contracts\SearchServiceInterface;
-use Blacklight\Releases;
 use Illuminate\Http\Request;
 
 class SearchController extends BasePageController
 {
     private SearchServiceInterface $searchService;
+    private ReleaseSearchService $releaseSearchService;
+    private ReleaseBrowseService $releaseBrowseService;
 
-    public function __construct(SearchServiceInterface $searchService)
-    {
+    public function __construct(
+        SearchServiceInterface $searchService,
+        ReleaseSearchService $releaseSearchService,
+        ReleaseBrowseService $releaseBrowseService
+    ) {
         parent::__construct();
         $this->searchService = $searchService;
+        $this->releaseSearchService = $releaseSearchService;
+        $this->releaseBrowseService = $releaseBrowseService;
     }
 
     /**
@@ -23,7 +31,6 @@ class SearchController extends BasePageController
      */
     public function search(Request $request)
     {
-        $releases = new Releases;
 
         $results = [];
 
@@ -32,7 +39,7 @@ class SearchController extends BasePageController
             $searchType = 'advanced';
         }
 
-        $ordering = $releases->getBrowseOrdering();
+        $ordering = $this->releaseBrowseService->getBrowseOrdering();
         $orderBy = ($request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '');
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
@@ -68,11 +75,11 @@ class SearchController extends BasePageController
             }
 
             $orderByUrls = [];
-            foreach ($releases->getBrowseOrdering() as $orderType) {
+            foreach ($this->releaseBrowseService->getBrowseOrdering() as $orderType) {
                 $orderByUrls['orderby'.$orderType] = url('/search?search='.htmlentities($searchString['searchname'], ENT_QUOTES | ENT_HTML5).'&t='.implode(',', $categoryID).'&ob='.$orderType);
             }
 
-            $rslt = $releases->search(
+            $rslt = $this->releaseSearchService->search(
                 $searchString,
                 -1,
                 -1,
@@ -177,7 +184,7 @@ class SearchController extends BasePageController
                 'filename' => $searchVars['searchadvfilename'] === '' ? -1 : $searchVars['searchadvfilename'],
             ];
 
-            $rslt = $releases->search(
+            $rslt = $this->releaseSearchService->search(
                 $searchArr,
                 $searchVars['searchadvgroups'],
                 $searchVars['searchadvsizefrom'],

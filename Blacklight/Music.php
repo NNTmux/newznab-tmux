@@ -151,7 +151,7 @@ class Music
 				%s %s %s
 				GROUP BY m.id
 				ORDER BY %s %s %s",
-                (new Releases)->showPasswords(),
+                app(\App\Services\Releases\ReleaseBrowseService::class)->showPasswords(),
                 $browseby,
                 $catsrch,
                 $exccatlist,

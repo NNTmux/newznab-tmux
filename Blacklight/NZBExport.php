@@ -3,6 +3,7 @@
 namespace Blacklight;
 
 use App\Models\UsenetGroup;
+use App\Services\Releases\ReleaseManagementService;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
@@ -17,7 +18,7 @@ class NZBExport
 
     protected NZB $nzb;
 
-    protected Releases $releases;
+    protected ReleaseManagementService $releaseManagement;
 
     protected bool $echoCLI;
 
@@ -30,7 +31,7 @@ class NZBExport
     public function __construct()
     {
         $this->echoCLI = config('nntmux.echocli');
-        $this->releases = new Releases;
+        $this->releaseManagement = app(ReleaseManagementService::class);
         $this->nzb = new NZB;
     }
 
@@ -104,7 +105,7 @@ class NZBExport
         foreach ($groups as $group) {
             $currentExport = 0;
             // Get all the releases based on the parameters.
-            $releases = $this->releases->getForExport($fromDate, $toDate, $group['id']);
+            $releases = $this->releaseManagement->getForExport($fromDate, $toDate, $group['id']);
             $totalFound = \count($releases);
             if ($totalFound === 0) {
                 if ($this->echoCLI) {

@@ -163,7 +163,7 @@ class Console
 					%s %s %s
 					GROUP BY con.id
 					ORDER BY %s %s %s",
-            (new Releases)->showPasswords(),
+            app(\App\Services\Releases\ReleaseBrowseService::class)->showPasswords(),
             $browseBy,
             $catsrch,
             $exccatlist,

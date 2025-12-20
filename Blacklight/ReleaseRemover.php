@@ -5,6 +5,7 @@ namespace Blacklight;
 use App\Enums\BlacklistConstants;
 use App\Models\Category;
 use App\Models\Settings;
+use App\Services\Releases\ReleaseManagementService;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -41,7 +42,7 @@ class ReleaseRemover
     protected bool $ignoreUserCheck = false;
     protected string $method = '';
     protected string $query = '';
-    protected Releases $releases;
+    protected ReleaseManagementService $releaseManagement;
     protected array $result = [];
     private NZB $nzb;
     private ReleaseImage $releaseImage;
@@ -54,7 +55,7 @@ class ReleaseRemover
     public function __construct()
     {
         $this->colorCLI = new ColorCLI;
-        $this->releases = new Releases;
+        $this->releaseManagement = app(ReleaseManagementService::class);
         $this->nzb = new NZB;
         $this->releaseImage = new ReleaseImage;
         $this->echoCLI = config('nntmux.echocli');
@@ -844,7 +845,7 @@ class ReleaseRemover
         $deletedCount = 0;
         foreach ($this->result as $release) {
             if ($this->delete) {
-                $this->releases->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
+                $this->releaseManagement->deleteSingle(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 if ($this->echoCLI) {
                     $this->colorCLI->primary('Deleting: '.$this->method.': '.$release->searchname, true);
                 }

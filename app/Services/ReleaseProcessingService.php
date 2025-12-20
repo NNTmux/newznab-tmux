@@ -13,6 +13,7 @@ use App\Models\Release;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\Categorization\CategorizationService;
+use App\Services\Releases\ReleaseManagementService;
 use App\Support\DTOs\ProcessReleasesSettings;
 use App\Support\DTOs\ReleaseCreationResult;
 use App\Support\DTOs\ReleaseDeleteStats;
@@ -22,7 +23,6 @@ use Blacklight\NNTP;
 use Blacklight\NZB;
 use Blacklight\ReleaseCleaning;
 use Blacklight\ReleaseImage;
-use Blacklight\Releases;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -53,7 +53,7 @@ final class ReleaseProcessingService
     private readonly ColorCLI $colorCLI;
     private readonly NZB $nzb;
     private readonly ReleaseCleaning $releaseCleaning;
-    private readonly Releases $releases;
+    private readonly ReleaseManagementService $releaseManagement;
     private readonly ReleaseImage $releaseImage;
     private readonly ReleaseCreationService $releaseCreationService;
     private readonly CollectionCleanupService $collectionCleanupService;
@@ -63,7 +63,7 @@ final class ReleaseProcessingService
         ?ColorCLI $colorCLI = null,
         ?NZB $nzb = null,
         ?ReleaseCleaning $releaseCleaning = null,
-        ?Releases $releases = null,
+        ?ReleaseManagementService $releaseManagement = null,
         ?ReleaseImage $releaseImage = null,
         ?ReleaseCreationService $releaseCreationService = null,
         ?CollectionCleanupService $collectionCleanupService = null,
@@ -74,7 +74,7 @@ final class ReleaseProcessingService
         $this->colorCLI = $colorCLI ?? new ColorCLI();
         $this->nzb = $nzb ?? new NZB();
         $this->releaseCleaning = $releaseCleaning ?? new ReleaseCleaning();
-        $this->releases = $releases ?? new Releases();
+        $this->releaseManagement = $releaseManagement ?? app(ReleaseManagementService::class);
         $this->releaseImage = $releaseImage ?? new ReleaseImage();
 
         $this->releaseCreationService = $releaseCreationService
@@ -1217,7 +1217,7 @@ final class ReleaseProcessingService
 
     private function deleteSingleRelease(object $release): void
     {
-        $this->releases->deleteSingle(
+        $this->releaseManagement->deleteSingle(
             ['g' => $release->guid, 'i' => $release->id],
             $this->nzb,
             $this->releaseImage

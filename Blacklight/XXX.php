@@ -48,7 +48,7 @@ class XXX
         $this->colorCli = new ColorCLI;
 
         $this->movieQty = Settings::settingValue('maxxxxprocessed') ?? 100;
-        $this->showPasswords = (new Releases)->showPasswords();
+        $this->showPasswords = app(\App\Services\Releases\ReleaseBrowseService::class)->showPasswords();
         $this->echoOutput = config('nntmux.echocli');
         $this->imgSavePath = storage_path('covers/xxx/');
         $this->cookie = resource_path('tmp/xxx.cookie');

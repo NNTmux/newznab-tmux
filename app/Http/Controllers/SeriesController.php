@@ -5,19 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\TvEpisode;
 use App\Models\UserSerie;
 use App\Models\Video;
-use Blacklight\Releases;
+use App\Services\Releases\ReleaseSearchService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
 class SeriesController extends BasePageController
 {
+    private ReleaseSearchService $releaseSearchService;
+
+    public function __construct(ReleaseSearchService $releaseSearchService)
+    {
+        parent::__construct();
+        $this->releaseSearchService = $releaseSearchService;
+    }
+
     /**
      * @throws \Exception
      */
     public function index(Request $request, string $id = '')
     {
-        $releases = new Releases;
 
         if ($id && ctype_digit($id)) {
             $category = -1;
@@ -33,7 +40,7 @@ class SeriesController extends BasePageController
             $page = max($page, 1);
             $offset = $seriesLimit > 0 ? ($page - 1) * $seriesLimit : 0;
 
-            $rel = $releases->tvSearch(['id' => $id], '', '', '', $offset, $seriesLimit, '', $catarray, -1);
+            $rel = $this->releaseSearchService->tvSearch(['id' => $id], '', '', '', $offset, $seriesLimit, '', $catarray, -1);
 
             $show = Video::getByVideoID($id);
 

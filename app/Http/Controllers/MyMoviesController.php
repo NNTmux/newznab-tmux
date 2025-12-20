@@ -5,12 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\UserMovie;
+use App\Services\Releases\ReleaseBrowseService;
 use Blacklight\Movie;
-use Blacklight\Releases;
 use Illuminate\Http\Request;
 
 class MyMoviesController extends BasePageController
 {
+    private ReleaseBrowseService $releaseBrowseService;
+
+    public function __construct(ReleaseBrowseService $releaseBrowseService)
+    {
+        parent::__construct();
+        $this->releaseBrowseService = $releaseBrowseService;
+    }
+
     public function show(Request $request)
     {
         $mv = new Movie;
@@ -141,7 +149,7 @@ class MyMoviesController extends BasePageController
                     }
                 }
 
-                $ordering = (new Releases)->getBrowseOrdering();
+                $ordering = $this->releaseBrowseService->getBrowseOrdering();
 
                 $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
 

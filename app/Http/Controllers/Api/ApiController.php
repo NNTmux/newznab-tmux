@@ -12,8 +12,9 @@ use App\Models\UsenetGroup;
 use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UserRequest;
+use App\Services\Releases\ReleaseBrowseService;
+use App\Services\Releases\ReleaseSearchService;
 use Blacklight\NZB;
-use Blacklight\Releases;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,6 +28,17 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class ApiController extends BasePageController
 {
     private string $type;
+    private ReleaseSearchService $releaseSearchService;
+    private ReleaseBrowseService $releaseBrowseService;
+
+    public function __construct(
+        ReleaseSearchService $releaseSearchService,
+        ReleaseBrowseService $releaseBrowseService
+    ) {
+        parent::__construct();
+        $this->releaseSearchService = $releaseSearchService;
+        $this->releaseBrowseService = $releaseBrowseService;
+    }
 
     /**
      * @return Application|\Illuminate\Foundation\Application|RedirectResponse|Redirector|StreamedResponse|void
@@ -119,7 +131,6 @@ class ApiController extends BasePageController
             }
         }
 
-        $releases = new Releases;
 
         // Set Query Parameters based on Request objects
         $outputXML = ! ($request->has('o') && $request->input('o') === 'json');
@@ -155,7 +166,7 @@ class ApiController extends BasePageController
                 ];
 
                 if ($request->has('q')) {
-                    $relData = $releases->search(
+                    $relData = $this->releaseSearchService->search(
                         $searchArr,
                         $groupName,
                         -1,
@@ -172,7 +183,7 @@ class ApiController extends BasePageController
                         $minSize
                     );
                 } else {
-                    $relData = $releases->getBrowseRange(
+                    $relData = $this->releaseBrowseService->getBrowseRange(
                         1,
                         $categoryID,
                         $offset,
@@ -220,7 +231,7 @@ class ApiController extends BasePageController
                     $airDate = str_replace('/', '-', $year[0].'-'.$episode);
                 }
 
-                $relData = $releases->tvSearch(
+                $relData = $this->releaseSearchService->tvSearch(
                     $siteIdArr,
                     $series,
                     $episode,
@@ -248,7 +259,7 @@ class ApiController extends BasePageController
                 $tmdbId = $request->has('tmdbid') && $request->filled('tmdbid') ? (int) $request->input('tmdbid') : -1;
                 $traktId = $request->has('traktid') && $request->filled('traktid') ? (int) $request->input('traktid') : -1;
 
-                $relData = $releases->moviesSearch(
+                $relData = $this->releaseSearchService->moviesSearch(
                     $imdbId,
                     $tmdbId,
                     $traktId,

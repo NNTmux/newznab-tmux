@@ -127,7 +127,7 @@ class Books
 				%s %s %s
 				GROUP BY boo.id
 				ORDER BY %s %s %s",
-            (new Releases)->showPasswords(),
+            app(\App\Services\Releases\ReleaseBrowseService::class)->showPasswords(),
             $browseby,
             $catsrch,
             $exccatlist,

@@ -12,6 +12,7 @@ use App\Models\ReleaseRegex;
 use App\Models\Settings;
 use App\Models\UserDownload;
 use App\Models\Video;
+use App\Services\Releases\ReleaseSearchService;
 use Blacklight\AniDB;
 use Blacklight\Books;
 use Blacklight\Console;
@@ -19,16 +20,22 @@ use Blacklight\Games;
 use Blacklight\Movie;
 use Blacklight\Music;
 use Blacklight\ReleaseExtra;
-use Blacklight\Releases;
 use Blacklight\XXX;
 use Illuminate\Http\Request;
 
 class DetailsController extends BasePageController
 {
+    private ReleaseSearchService $releaseSearchService;
+
+    public function __construct(ReleaseSearchService $releaseSearchService)
+    {
+        parent::__construct();
+        $this->releaseSearchService = $releaseSearchService;
+    }
+
     public function show(Request $request, string $guid)
     {
         if ($guid !== null) {
-            $releases = new Releases;
             $re = new ReleaseExtra;
             $data = Release::getByGuid($guid);
             $releaseRegex = '';
@@ -52,7 +59,7 @@ class DetailsController extends BasePageController
             $reAudio = $re->getAudio($data['id']);
             $reSubs = $re->getSubs($data['id']);
             $comments = ReleaseComment::getComments($data['id']);
-            $similars = $releases->searchSimilar($data['id'], $data['searchname'], $this->userdata->categoryexclusions);
+            $similars = $this->releaseSearchService->searchSimilar($data['id'], $data['searchname'], $this->userdata->categoryexclusions);
             $failed = DnzbFailure::getFailedCount($data['id']);
             $downloadedBy = UserDownload::query()->with('user')->where('releases_id', $data['id'])->get(['users_id']);
 
@@ -121,7 +128,7 @@ class DetailsController extends BasePageController
             $AniDBAPIArray = '';
             if ($data['anidbid'] > 0) {
                 $AniDBAPIArray = (new AniDB)->getAnimeInfo($data['anidbid']);
-                
+
                 // If we have anilist_id but missing details, fetch from AniList
                 if ($AniDBAPIArray && !empty($AniDBAPIArray->anilist_id)) {
                     $anilistId = is_object($AniDBAPIArray) ? $AniDBAPIArray->anilist_id : ($AniDBAPIArray['anilist_id'] ?? null);

@@ -3,9 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\Release;
+use App\Services\Releases\ReleaseManagementService;
 use Blacklight\NZB;
 use Blacklight\ReleaseImage;
-use Blacklight\Releases;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
@@ -80,20 +80,20 @@ class CleanNZB extends Command
     {
         // Setup
         $nzb = new NZB;
-        $rel = new Releases;
+        $releaseManagement = app(ReleaseManagementService::class);
         $checked = $deleted = 0;
 
         $this->info('Getting list of releases from database to check if they have a corresponding NZB on disk');
         $total = Release::count();
         $this->alert("Total releases to check: $total");
 
-        Release::where('nzbstatus', 1)->chunkById((int) $this->option('chunksize'), function (Collection $releases) use ($delete, &$checked, &$deleted, $nzb, $rel) {
+        Release::where('nzbstatus', 1)->chunkById((int) $this->option('chunksize'), function (Collection $releases) use ($delete, &$checked, &$deleted, $nzb, $releaseManagement) {
             echo 'Total done: '.$checked."\r";
             foreach ($releases as $r) {
 
                 if (! $nzb->NZBPath($r->guid)) {
                     if ($delete) {
-                        $rel->deleteSingle(['g' => $r->guid, 'i' => $r->id], $nzb, new ReleaseImage);
+                        $releaseManagement->deleteSingle(['g' => $r->guid, 'i' => $r->id], $nzb, new ReleaseImage);
                     }
                     $deleted++;
                     $this->line("Deleted: $r->searchname -> $r->guid");
