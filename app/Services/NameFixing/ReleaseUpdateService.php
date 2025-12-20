@@ -105,7 +105,7 @@ class ReleaseUpdateService
      * @param string $type The type string for logging
      * @param bool $nameStatus Whether to update status columns
      * @param bool $show Whether to show output
-     * @param int $preId PreDB ID if matched
+     * @param int|null $preId PreDB ID if matched
      * @throws \Exception
      */
     public function updateRelease(
@@ -116,8 +116,9 @@ class ReleaseUpdateService
         string $type,
         bool $nameStatus,
         bool $show,
-        int $preId = 0
+        ?int $preId = 0
     ): void {
+        $preId = $preId ?? 0;
         if (is_array($release)) {
             $release = (object) $release;
         }
