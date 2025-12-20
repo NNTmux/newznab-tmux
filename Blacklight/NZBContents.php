@@ -7,7 +7,6 @@ namespace Blacklight;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Services\PostProcessService;
-use Blacklight\utility\Utility;
 
 /**
  * Gets information contained within the NZB.
@@ -293,7 +292,7 @@ class NZBContents
         }
 
         // Attempt to decompress the NZB file
-        $nzbContents = Utility::unzipGzipFile($nzbPath);
+        $nzbContents = unzipGzipFile($nzbPath);
         if (empty($nzbContents)) {
             if ($this->echooutput) {
                 $perms = fileperms($nzbPath);

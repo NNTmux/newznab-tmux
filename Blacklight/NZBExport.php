@@ -3,7 +3,6 @@
 namespace Blacklight;
 
 use App\Models\UsenetGroup;
-use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
@@ -149,7 +148,7 @@ class NZBExport
                     }
                     // If not, decompress it and create a file to store it in.
                 } else {
-                    $nzbContents = Utility::unzipGzipFile($nzbFile);
+                    $nzbContents = unzipGzipFile($nzbFile);
                     if (! $nzbContents) {
                         if ($this->echoCLI) {
                             echo 'Unable to export NZB with GUID: '.$release['guid'];

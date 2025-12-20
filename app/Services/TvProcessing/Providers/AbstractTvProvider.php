@@ -10,7 +10,6 @@ use App\Models\TvInfo;
 use App\Models\Video;
 use Blacklight\ColorCLI;
 use Blacklight\Releases;
-use Blacklight\utility\Country;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -182,7 +181,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
 
         // Check if the country is not a proper code and retrieve if not
         if ($show['country'] !== '' && \strlen($show['country']) > 2) {
-            $show['country'] = Country::countryCode($show['country']);
+            $show['country'] = countryCode($show['country']);
         }
 
         // Check if video already exists based on site ID info
@@ -257,7 +256,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     public function update(int $videoId, array $show = []): void
     {
         if ($show['country'] !== '') {
-            $show['country'] = Country::countryCode($show['country']);
+            $show['country'] = countryCode($show['country']);
         }
 
         $ifStringID = 'IF(%s = 0, %s, %s)';

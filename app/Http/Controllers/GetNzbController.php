@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UsersRelease;
 use Blacklight\NZB;
-use Blacklight\utility\Utility;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -100,7 +99,7 @@ class GetNzbController extends BasePageController
     private function getUserDataFromSession()
     {
         if ($this->userdata->hasRole('Disabled')) {
-            return Utility::showApiError(101);
+            return showApiError(101);
         }
 
         return [
@@ -119,16 +118,16 @@ class GetNzbController extends BasePageController
     private function getUserDataFromRssToken(Request $request)
     {
         if ($request->missing('r')) {
-            return Utility::showApiError(200);
+            return showApiError(200);
         }
 
         $user = User::getByRssToken($request->input('r'));
         if (! $user) {
-            return Utility::showApiError(100);
+            return showApiError(100);
         }
 
         if ($user->hasRole('Disabled')) {
-            return Utility::showApiError(101);
+            return showApiError(101);
         }
 
         return [
@@ -150,7 +149,7 @@ class GetNzbController extends BasePageController
     {
         $requests = UserDownload::getDownloadRequests($uid);
         if ($requests > $maxDownloads) {
-            return Utility::showApiError(501);
+            return showApiError(501);
         }
 
         return null;
@@ -166,7 +165,7 @@ class GetNzbController extends BasePageController
         $id = $request->input('id');
 
         if (empty($id)) {
-            return Utility::showApiError(200, 'Parameter id is required');
+            return showApiError(200, 'Parameter id is required');
         }
 
         // Remove .nzb suffix if present
@@ -204,7 +203,7 @@ class GetNzbController extends BasePageController
         // Check if zip download would exceed limits
         $requests = UserDownload::getDownloadRequests($uid);
         if ($requests + $guidCount > $maxDownloads) {
-            return Utility::showApiError(501);
+            return showApiError(501);
         }
 
         $zip = getStreamingZip($guids);
@@ -254,13 +253,13 @@ class GetNzbController extends BasePageController
         // Get NZB file path and validate
         $nzbPath = (new NZB)->getNZBPath($releaseId);
         if (! File::exists($nzbPath)) {
-            return Utility::showApiError(300, 'NZB file not found!');
+            return showApiError(300, 'NZB file not found!');
         }
 
         // Get release data
         $releaseData = Release::getByGuid($releaseId);
         if ($releaseData === null) {
-            return Utility::showApiError(300, 'Release not found!');
+            return showApiError(300, 'Release not found!');
         }
 
         // Update statistics

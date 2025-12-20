@@ -3,7 +3,6 @@
 namespace App\Services\AdditionalProcessing;
 
 use Blacklight\NZB;
-use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
@@ -32,7 +31,7 @@ class NzbContentParser
             return ['contents' => [], 'error' => 'NZB not found for GUID: '.$guid];
         }
 
-        $nzbContents = Utility::unzipGzipFile($nzbPath);
+        $nzbContents = unzipGzipFile($nzbPath);
         if (! $nzbContents) {
             // Try repair on raw file contents
             $nzbContents = $this->attemptRawRepair($nzbPath);

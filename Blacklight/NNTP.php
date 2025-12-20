@@ -4,7 +4,6 @@ namespace Blacklight;
 
 use App\Extensions\util\PhpYenc;
 use App\Models\Settings;
-use Blacklight\utility\Utility;
 
 /*
  * Class for connecting to the usenet, retrieving articles and article headers,
@@ -1274,7 +1273,7 @@ class NNTP extends \Net_NNTP_Client
         // Attempt to connect to usenet.
         // Only create SSL context if using TLS/SSL transport
         $context = preg_match('/tls|ssl/', $transport)
-            ? stream_context_create(Utility::streamSslContextOptions())
+            ? stream_context_create(streamSslContextOptions())
             : null;
 
         $socket = stream_socket_client(

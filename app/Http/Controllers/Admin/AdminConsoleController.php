@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BasePageController;
 use Blacklight\Console;
 use Blacklight\Genres;
-use Blacklight\utility\Utility;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -22,7 +21,7 @@ class AdminConsoleController extends BasePageController
 
         $meta_title = $title = 'Console List';
 
-        $consoleList = Utility::getRange('consoleinfo');
+        $consoleList = getRange('consoleinfo');
 
         return view('admin.console.index', compact('consoleList', 'title', 'meta_title'));
     }

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BasePageController;
 use Blacklight\Genres;
 use Blacklight\Music;
-use Blacklight\utility\Utility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -22,10 +21,10 @@ class AdminMusicController extends BasePageController
         $search = $request->input('musicsearch', '');
 
         if (! empty($search)) {
-            $musicList = Utility::getRange('musicinfo', $search);
+            $musicList = getRange('musicinfo', $search);
             $lastSearch = $search;
         } else {
-            $musicList = Utility::getRange('musicinfo');
+            $musicList = getRange('musicinfo');
             $lastSearch = '';
         }
 

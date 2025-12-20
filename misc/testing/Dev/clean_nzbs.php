@@ -7,7 +7,6 @@ use Blacklight\ColorCLI;
 use Blacklight\NZB;
 use Blacklight\ReleaseImage;
 use Blacklight\Releases;
-use Blacklight\utility\Utility;
 use Illuminate\Support\Facades\File;
 
 $dir = resource_path().'/movednzbs/';
@@ -41,7 +40,7 @@ $itr = new RecursiveIteratorIterator($dirItr, RecursiveIteratorIterator::LEAVES_
 foreach ($itr as $filePath) {
     $guid = stristr($filePath->getFilename(), '.nzb.gz', true);
     if (File::isFile($filePath) && $guid) {
-        $nzbfile = Utility::unzipGzipFile($filePath);
+        $nzbfile = unzipGzipFile($filePath);
         $nzbContents = $nzb->nzbFileList($nzbfile, ['no-file-key' => false, 'strip-count' => true]);
         if (! $nzbfile || ! @simplexml_load_string($nzbfile) || count($nzbContents) === 0) {
             if ($argv[1] === 'move') {

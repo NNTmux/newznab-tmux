@@ -7,7 +7,6 @@ use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\BlacklistService;
 use App\Services\Categorization\CategorizationService;
-use Blacklight\utility\Utility;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -123,7 +122,7 @@ class NZBImport
             if (File::isFile($nzbFile)) {
                 // Get the contents of the NZB file as a string.
                 if (Str::endsWith($nzbFile, '.nzb.gz')) {
-                    $nzbString = Utility::unzipGzipFile($nzbFile);
+                    $nzbString = unzipGzipFile($nzbFile);
                 } else {
                     $nzbString = File::get($nzbFile);
                 }

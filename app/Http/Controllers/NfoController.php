@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Release;
 use App\Models\ReleaseNfo;
-use Blacklight\utility\Utility;
 use Illuminate\Http\Request;
 
 class NfoController extends BasePageController
@@ -24,7 +23,7 @@ class NfoController extends BasePageController
             $nfo = ReleaseNfo::getReleaseNfo($rel['id']);
 
             if ($nfo !== null) {
-                $nfo['nfoUTF'] = Utility::cp437toUTF($nfo['nfo']);
+                $nfo['nfoUTF'] = cp437toUTF($nfo['nfo']);
 
                 $modal = $request->has('modal');
 

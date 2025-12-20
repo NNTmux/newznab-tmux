@@ -2,7 +2,6 @@
 
 namespace Blacklight;
 
-use Blacklight\utility\Utility;
 
 /**
  * Basic IRC client for fetching IRCScraper.
@@ -556,7 +555,7 @@ class IRCClient
 
         // Create SSL/TLS context if using secure connection
         $context = $this->_remote_tls
-            ? stream_context_create(Utility::streamSslContextOptions(true))
+            ? stream_context_create(streamSslContextOptions(true))
             : null;
 
         $socket = stream_socket_client(

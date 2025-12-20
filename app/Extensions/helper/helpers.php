@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\Country as CountryModel;
 use App\Models\Release;
 use Blacklight\NZB;
-use Blacklight\utility\Utility;
 use Blacklight\XXX;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
@@ -304,7 +304,7 @@ if (! function_exists('getStreamingZip')) {
         foreach ($guids as $guid) {
             $nzbPath = $nzb->NZBPath($guid);
             if ($nzbPath) {
-                $nzbContents = Utility::unzipGzipFile($nzbPath);
+                $nzbContents = unzipGzipFile($nzbPath);
                 if ($nzbContents) {
                     $filename = $guid;
                     $r = Release::query()->where('guid', $guid)->first();
@@ -680,5 +680,308 @@ if (! function_exists('getAvailableTimezones')) {
         }
 
         return $timezones;
+    }
+}
+
+if (! function_exists('countryCode')) {
+    /**
+     * Get a country code for a country name.
+     *
+     * @return mixed
+     */
+    function countryCode(string $country)
+    {
+        if (\strlen($country) > 2) {
+            $code = CountryModel::whereFullName($country)->orWhere('name', $country)->first(['iso_3166_2']);
+            if ($code !== null && isset($code['iso_3166_2'])) {
+                return $code['iso_3166_2'];
+            }
+        }
+
+        return '';
+    }
+}
+
+if (! function_exists('unzipGzipFile')) {
+    /**
+     * Unzip a gzip file, return the output. Return false on error / empty.
+     *
+     * @return bool|string
+     */
+    function unzipGzipFile(string $filePath)
+    {
+        $string = '';
+        $gzFile = @gzopen($filePath, 'rb', 0);
+        if ($gzFile) {
+            while (! gzeof($gzFile)) {
+                $temp = gzread($gzFile, 1024);
+                // Check for empty string.
+                // Without this the loop would be endless and consume 100% CPU.
+                // Do not set $string empty here, as the data might still be good.
+                if (! $temp) {
+                    break;
+                }
+                $string .= $temp;
+            }
+            gzclose($gzFile);
+        }
+
+        return $string === '' ? false : $string;
+    }
+}
+
+if (! function_exists('streamSslContextOptions')) {
+    /**
+     * Creates an array to be used with stream_context_create() to verify openssl certificates
+     * when connecting to a tls or ssl connection when using stream functions (fopen/file_get_contents/etc).
+     *
+     * @param  bool  $forceIgnore  Force ignoring of verification (useful for self-signed certs in development).
+     * @return array Stream context options for SSL/TLS connections
+     */
+    function streamSslContextOptions(bool $forceIgnore = false): array
+    {
+        $cafile = config('nntmux_ssl.ssl_cafile', '');
+        $capath = config('nntmux_ssl.ssl_capath', '');
+        $hasCustomCerts = $cafile !== '' || $capath !== '';
+
+        // Base options - either insecure (no certs configured) or configured
+        $options = [
+            'verify_peer' => ! $forceIgnore && $hasCustomCerts && config('nntmux_ssl.ssl_verify_peer', false),
+            'verify_peer_name' => ! $forceIgnore && $hasCustomCerts && config('nntmux_ssl.ssl_verify_host', false),
+            'allow_self_signed' => $forceIgnore ? true : config('nntmux_ssl.ssl_allow_self_signed', true),
+        ];
+
+        // Add certificate paths if configured
+        if ($hasCustomCerts && ! $forceIgnore) {
+            if ($cafile !== '') {
+                $options['cafile'] = $cafile;
+            }
+            if ($capath !== '') {
+                $options['capath'] = $capath;
+            }
+        }
+
+        // Additional security options for modern TLS
+        $options['crypto_method'] = STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT;
+        $options['disable_compression'] = true; // Prevent CRIME attacks
+        $options['SNI_enabled'] = true; // Enable Server Name Indication
+
+        // If we set the transport to tls and the server falls back to ssl,
+        // the context options would be for tls and would not apply to ssl,
+        // so set both tls and ssl context in case the server does not support tls.
+        return ['tls' => $options, 'ssl' => $options];
+    }
+}
+
+if (! function_exists('getCoverURL')) {
+    function getCoverURL(array $options = []): string
+    {
+        $defaults = [
+            'id' => null,
+            'suffix' => '-cover.jpg',
+            'type' => '',
+        ];
+        $options += $defaults;
+        $fileSpecTemplate = '%s/%s%s';
+        $fileSpec = '';
+
+        if (! empty($options['id']) && \in_array(
+            $options['type'],
+            ['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies', 'music', 'preview', 'sample', 'tvrage', 'video', 'xxx'],
+            false
+        )
+        ) {
+            $fileSpec = sprintf($fileSpecTemplate, $options['type'], $options['id'], $options['suffix']);
+            $fileSpec = file_exists(storage_path('covers/').$fileSpec) ? $fileSpec :
+                sprintf($fileSpecTemplate, $options['type'], 'no', $options['suffix']);
+        }
+
+        return $fileSpec;
+    }
+}
+
+if (! function_exists('fileInfo')) {
+    /**
+     * Return file type/info using magic numbers.
+     * Try using `file` program where available, fallback to using PHP's finfo class.
+     *
+     * @param  string  $path  Path to the file / folder to check.
+     * @return string File info. Empty string on failure.
+     *
+     * @throws \Exception
+     */
+    function fileInfo(string $path): string
+    {
+        $magicPath = config('nntmux_settings.magic_file_path');
+        if ($magicPath !== null && \Illuminate\Support\Facades\Process::run('which file')->successful()) {
+            $magicSwitch = " -m $magicPath";
+            $output = runCmd('file'.$magicSwitch.' -b "'.$path.'"');
+        } else {
+            $fileInfo = $magicPath === null ? finfo_open(FILEINFO_RAW) : finfo_open(FILEINFO_RAW, $magicPath);
+
+            $output = finfo_file($fileInfo, $path);
+            if (empty($output)) {
+                $output = '';
+            }
+            finfo_close($fileInfo);
+        }
+
+        return $output;
+    }
+}
+
+if (! function_exists('cp437toUTF')) {
+    /**
+     * Convert Code page 437 chars to UTF.
+     */
+    function cp437toUTF(string $string): string
+    {
+        return iconv('CP437', 'UTF-8//IGNORE//TRANSLIT', $string);
+    }
+}
+
+if (! function_exists('imdb_trailers')) {
+    /**
+     * Fetches an embeddable video to a IMDB trailer from http://www.traileraddict.com.
+     */
+    function imdb_trailers($imdbID): string
+    {
+        $xml = getRawHtml('https://api.traileraddict.com/?imdb='.$imdbID);
+        if ($xml !== false && preg_match('#(v\.traileraddict\.com/\d+)#i', $xml, $html)) {
+            return 'https://'.$html[1];
+        }
+
+        return '';
+    }
+}
+
+if (! function_exists('showApiError')) {
+    function showApiError(int $errorCode = 900, string $errorText = '')
+    {
+        $errorHeader = 'HTTP 1.1 400 Bad Request';
+        if ($errorText === '') {
+            switch ($errorCode) {
+                case 100:
+                    $errorText = 'Incorrect user credentials';
+                    $errorHeader = 'HTTP 1.1 401 Unauthorized';
+                    break;
+                case 101:
+                    $errorText = 'Account suspended';
+                    $errorHeader = 'HTTP 1.1 403 Forbidden';
+                    break;
+                case 102:
+                    $errorText = 'Insufficient privileges/not authorized';
+                    $errorHeader = 'HTTP 1.1 401 Unauthorized';
+                    break;
+                case 103:
+                    $errorText = 'Registration denied';
+                    $errorHeader = 'HTTP 1.1 403 Forbidden';
+                    break;
+                case 104:
+                    $errorText = 'Registrations are closed';
+                    $errorHeader = 'HTTP 1.1 403 Forbidden';
+                    break;
+                case 105:
+                    $errorText = 'Invalid registration (Email Address Taken)';
+                    $errorHeader = 'HTTP 1.1 403 Forbidden';
+                    break;
+                case 106:
+                    $errorText = 'Invalid registration (Email Address Bad Format)';
+                    $errorHeader = 'HTTP 1.1 403 Forbidden';
+                    break;
+                case 107:
+                    $errorText = 'Registration Failed (Data error)';
+                    $errorHeader = 'HTTP 1.1 400 Bad Request';
+                    break;
+                case 200:
+                    $errorText = 'Missing parameter';
+                    $errorHeader = 'HTTP 1.1 400 Bad Request';
+                    break;
+                case 201:
+                    $errorText = 'Incorrect parameter';
+                    $errorHeader = 'HTTP 1.1 400 Bad Request';
+                    break;
+                case 202:
+                    $errorText = 'No such function';
+                    $errorHeader = 'HTTP 1.1 404 Not Found';
+                    break;
+                case 203:
+                    $errorText = 'Function not available';
+                    $errorHeader = 'HTTP 1.1 400 Bad Request';
+                    break;
+                case 300:
+                    $errorText = 'No such item';
+                    $errorHeader = 'HTTP 1.1 404 Not Found';
+                    break;
+                case 500:
+                    $errorText = 'Request limit reached';
+                    $errorHeader = 'HTTP 1.1 429 Too Many Requests';
+                    break;
+                case 501:
+                    $errorText = 'Download limit reached';
+                    $errorHeader = 'HTTP 1.1 429 Too Many Requests';
+                    break;
+                case 910:
+                    $errorText = 'API disabled';
+                    $errorHeader = 'HTTP 1.1 401 Unauthorized';
+                    break;
+                default:
+                    $errorText = 'Unknown error';
+                    $errorHeader = 'HTTP 1.1 400 Bad Request';
+                    break;
+            }
+        }
+
+        $response =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".
+            '<error code="'.$errorCode.'" description="'.$errorText."\"/>\n";
+
+        return response($response)->header('Content-type', 'text/xml')->header('Content-Length', strlen($response))->header('X-NNTmux', 'API ERROR ['.$errorCode.'] '.$errorText)->header('HTTP/1.1', $errorHeader);
+    }
+}
+
+if (! function_exists('getRange')) {
+    function getRange($tableName): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    {
+        $range = \Illuminate\Support\Facades\DB::table($tableName);
+        if ($tableName === 'xxxinfo') {
+            $range->selectRaw('UNCOMPRESS(plot) AS plot');
+        }
+
+        return $range->orderByDesc('created_at')->paginate(config('nntmux.items_per_page'));
+    }
+}
+
+if (! function_exists('isValidNewznabNzb')) {
+    /**
+     * Validate if the content is a valid Newznab NZB file.
+     *
+     * @param  string  $content  The NZB file content
+     * @return bool True if valid NZB, false otherwise
+     */
+    function isValidNewznabNzb(string $content): bool
+    {
+        // Check if content starts with valid XML declaration and contains NZB namespace
+        if (empty($content)) {
+            return false;
+        }
+
+        // Try to load as XML
+        libxml_use_internal_errors(true);
+        $xml = @simplexml_load_string($content);
+
+        if ($xml === false) {
+            libxml_clear_errors();
+            return false;
+        }
+
+        // Check for NZB namespace or nzb root element
+        $namespaces = $xml->getNamespaces(true);
+        $hasNzbNamespace = isset($namespaces['']) && str_contains($namespaces[''], 'nzb');
+        $isNzbRoot = strtolower($xml->getName()) === 'nzb';
+
+        libxml_clear_errors();
+
+        return $hasNzbNamespace || $isNzbRoot;
     }
 }

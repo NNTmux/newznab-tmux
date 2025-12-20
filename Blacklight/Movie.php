@@ -11,7 +11,6 @@ use App\Services\FanartTvService;
 use App\Services\ImdbScraper;
 use App\Services\TmdbClient;
 use App\Services\TvProcessing\Providers\TraktProvider;
-use Blacklight\utility\Utility;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Builder;
@@ -296,7 +295,7 @@ class Movie
             }
         }
 
-        $trailer = Utility::imdb_trailers($imdbId);
+        $trailer = imdb_trailers($imdbId);
         if ($trailer) {
             MovieInfo::query()->where('imdbid', $imdbId)->update(['trailer' => $trailer]);
 

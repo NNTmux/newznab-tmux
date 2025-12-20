@@ -8,7 +8,6 @@ use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
 use App\Services\TempWorkspaceService;
 use Blacklight\Releases;
-use Blacklight\utility\Utility;
 use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -685,7 +684,7 @@ class AdditionalProcessingOrchestrator
             }
 
             // Check file magic
-            $output = Utility::fileInfo($filePath);
+            $output = fileInfo($filePath);
             if (empty($output)) {
                 continue;
             }

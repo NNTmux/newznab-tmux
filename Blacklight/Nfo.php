@@ -9,7 +9,6 @@ use App\Models\ReleaseNfo;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\PostProcessService;
-use Blacklight\utility\Utility;
 use dariusiii\rarinfo\Par2Info;
 use dariusiii\rarinfo\SfvInfo;
 use Illuminate\Support\Facades\Cache;
@@ -275,8 +274,8 @@ class Nfo
             // File/GetId3 work with files, so save to disk.
             File::put($tmpPath, $possibleNFO);
 
-            // Use 'file' command via Utility::fileInfo if available
-            $result = Utility::fileInfo($tmpPath);
+            // Use 'file' command via fileInfo if available
+            $result = fileInfo($tmpPath);
             if (! empty($result)) {
                 if (preg_match($this->_textFileRegex, $result)) {
                     $isNfo = true;
@@ -1214,7 +1213,7 @@ class Nfo
     public function cleanNfoContent(string $nfoContent): string
     {
         // Convert to UTF-8 if needed (CP437 is common for NFOs)
-        $content = Utility::cp437toUTF($nfoContent);
+        $content = cp437toUTF($nfoContent);
 
         // Normalize line endings
         $content = str_replace(["\r\n", "\r"], "\n", $content);

@@ -440,9 +440,9 @@ class ReleaseFileManager
         }
 
         // Try CP437 (DOS encoding - common for scene NFOs with ASCII art)
-        // Use the utility function if available
-        if (class_exists('\Blacklight\utility\Utility') && method_exists('\Blacklight\utility\Utility', 'cp437toUTF')) {
-            return \Blacklight\utility\Utility::cp437toUTF($data);
+        // Use the cp437toUTF helper function
+        if (function_exists('cp437toUTF')) {
+            return cp437toUTF($data);
         }
 
         // Fallback: try ISO-8859-1 (Latin-1)
