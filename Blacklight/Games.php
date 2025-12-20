@@ -7,6 +7,7 @@ use App\Models\GamesInfo;
 use App\Models\Genre;
 use App\Models\Release;
 use App\Models\Settings;
+use App\Services\SteamService;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
@@ -79,7 +80,7 @@ class Games
 
     protected mixed $_gameResults;
 
-    protected $_getGame;
+    protected SteamService $_getGame;
 
     protected int $_resultsFound = 0;
 
@@ -105,6 +106,7 @@ class Games
     {
         $this->echoOutput = config('nntmux.echocli');
         $this->colorCli = new ColorCLI;
+        $this->_getGame = new SteamService;
         $this->gameQty = Settings::settingValue('maxgamesprocessed') !== '' ? (int) Settings::settingValue('maxgamesprocessed') : 150;
         $this->imgSavePath = config('nntmux_settings.covers_path').'/games/';
         $this->renamed = (int) Settings::settingValue('lookupgames') === 2 ? 'AND isrenamed = 1' : '';
@@ -349,7 +351,6 @@ class Games
         // Process Steam first as Steam has more details
         $this->_gameResults = false;
         $genreName = '';
-        $this->_getGame = new Steam(['DB' => null]);
         $this->_classUsed = 'Steam';
 
         $steamGameID = $this->fetchFromSteam($gameInfo['title']);

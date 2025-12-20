@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use Blacklight\Steam;
+use App\Services\SteamService;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -17,14 +17,9 @@ class SteamMatchTest extends TestCase
         return $m->invokeArgs($obj, $args);
     }
 
-    private function getInstance(): Steam
+    private function getInstance(): SteamService
     {
-        // Bypass constructor to avoid external dependencies
-        $ref = new ReflectionClass(Steam::class);
-        /** @var Steam $inst */
-        $inst = $ref->newInstanceWithoutConstructor();
-
-        return $inst;
+        return new SteamService;
     }
 
     public function test_normalize_title_handles_scene_noise_and_roman_numerals(): void
@@ -52,10 +47,10 @@ class SteamMatchTest extends TestCase
         $this->assertGreaterThanOrEqual(90.0, $score);
     }
 
-    public function test_to_sql_like_builds_reasonable_pattern(): void
+    public function test_build_like_pattern_builds_reasonable_pattern(): void
     {
         $steam = $this->getInstance();
-        $like = $this->invokePrivate($steam, 'toSqlLike', ['Resident Evil VII Biohazard']);
+        $like = $this->invokePrivate($steam, 'buildLikePattern', ['Resident Evil VII Biohazard']);
         $this->assertIsString($like);
         $this->assertStringStartsWith('%', $like);
         $this->assertStringContainsString('%resident%evil%', $like);
