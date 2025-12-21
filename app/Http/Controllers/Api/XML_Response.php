@@ -565,7 +565,7 @@ class XML_Response
             "\t<li>Poster: {$this->release->fromname}</li>\n".
             "\t<li>Posted: {$this->release->postdate}</li>\n";
 
-        $pstatus = match ($this->release->passwordstatus) {
+        $pstatus = match ($this->release->passwordstatus ?? 0) {
             0 => 'None',
             1 => 'Possibly Passworded',
             2 => 'Probably not viable',
