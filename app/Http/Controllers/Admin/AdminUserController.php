@@ -59,24 +59,9 @@ class AdminUserController extends BasePageController
 
         $results = $this->paginate($result ?? [], User::getCount($variables['role'], $variables['username'], $variables['host'], $variables['email'], $variables['created_from'], $variables['created_to']) ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
-        // Add country data to each user based on their host IP
-        foreach ($results as $user) {
-            $position = null;
-            if (! empty($user->host) && filter_var($user->host, FILTER_VALIDATE_IP)) {
-                $position = Location::get($user->host);
-            }
-            $user->country_name = $position ? $position->countryName : null;
-            $user->country_code = $position ? $position->countryCode : null;
-
-            // Add daily API and download counts
-            try {
-                $user->daily_api_count = UserRequest::getApiRequests($user->id);
-                $user->daily_download_count = UserDownload::getDownloadRequests($user->id);
-            } catch (\Exception $e) {
-                $user->daily_api_count = 0;
-                $user->daily_download_count = 0;
-            }
-        }
+        // Note: API request counts are already included via the getRange query when $apiRequests = true
+        // Country lookups and additional counts removed to improve performance on large datasets
+        // These can be added back via individual user profile pages or AJAX calls if needed
 
         // Build order by URLs
         $orderByUrls = [];

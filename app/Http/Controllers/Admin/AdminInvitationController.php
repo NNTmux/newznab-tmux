@@ -124,42 +124,46 @@ class AdminInvitationController extends BasePageController
     }
 
     /**
-     * Get overall invitation statistics
+     * Get overall invitation statistics with caching
      */
     private function getOverallStats(): array
     {
-        return [
-            'total' => Invitation::count(),
-            'pending' => Invitation::valid()->count(),
-            'used' => Invitation::used()->count(),
-            'expired' => Invitation::expired()->count(),
-            'cancelled' => Invitation::where('is_active', false)->whereNull('used_at')->count(),
-            'today' => Invitation::whereDate('created_at', today())->count(),
-            'this_week' => Invitation::whereBetween('created_at', [
-                now()->startOfWeek(),
-                now()->endOfWeek(),
-            ])->count(),
-            'this_month' => Invitation::whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)
-                ->count(),
-        ];
+        return \Illuminate\Support\Facades\Cache::remember('admin_invitation_stats', 300, function () {
+            return [
+                'total' => Invitation::count(),
+                'pending' => Invitation::valid()->count(),
+                'used' => Invitation::used()->count(),
+                'expired' => Invitation::expired()->count(),
+                'cancelled' => Invitation::where('is_active', false)->whereNull('used_at')->count(),
+                'today' => Invitation::whereDate('created_at', today())->count(),
+                'this_week' => Invitation::whereBetween('created_at', [
+                    now()->startOfWeek(),
+                    now()->endOfWeek(),
+                ])->count(),
+                'this_month' => Invitation::whereMonth('created_at', now()->month)
+                    ->whereYear('created_at', now()->year)
+                    ->count(),
+            ];
+        });
     }
 
     /**
-     * Get top inviters statistics
+     * Get top inviters statistics with caching
      */
     private function getTopInviters(int $limit = 10): array
     {
-        return User::select('users.*')
-            ->selectRaw('COUNT(invitations.id) as total_invitations')
-            ->selectRaw('COUNT(CASE WHEN invitations.used_at IS NOT NULL THEN 1 END) as successful_invitations')
-            ->leftJoin('invitations', 'users.id', '=', 'invitations.invited_by')
-            ->groupBy('users.id')
-            ->having('total_invitations', '>', 0)
-            ->orderBy('total_invitations', 'desc')
-            ->limit($limit)
-            ->get()
-            ->toArray();
+        return \Illuminate\Support\Facades\Cache::remember('admin_top_inviters', 300, function () use ($limit) {
+            return User::select('users.*')
+                ->selectRaw('COUNT(invitations.id) as total_invitations')
+                ->selectRaw('COUNT(CASE WHEN invitations.used_at IS NOT NULL THEN 1 END) as successful_invitations')
+                ->leftJoin('invitations', 'users.id', '=', 'invitations.invited_by')
+                ->groupBy('users.id')
+                ->having('total_invitations', '>', 0)
+                ->orderBy('total_invitations', 'desc')
+                ->limit($limit)
+                ->get()
+                ->toArray();
+        });
     }
 
     /**

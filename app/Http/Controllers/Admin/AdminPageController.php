@@ -26,16 +26,18 @@ class AdminPageController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        // Get user statistics
-        $userStats = [
-            'users_by_role' => $this->userStatsService->getUsersByRole(),
-            'downloads_per_hour' => $this->userStatsService->getDownloadsPerHour(168), // Last 7 days in hours
-            'downloads_per_minute' => $this->userStatsService->getDownloadsPerMinute(60),
-            'api_hits_per_hour' => $this->userStatsService->getApiHitsPerHour(168), // Last 7 days in hours
-            'api_hits_per_minute' => $this->userStatsService->getApiHitsPerMinute(60),
-            'summary' => $this->userStatsService->getSummaryStats(),
-            'top_downloaders' => $this->userStatsService->getTopDownloaders(5),
-        ];
+        // Cache user statistics for 2 minutes
+        $userStats = \Illuminate\Support\Facades\Cache::remember('admin_user_stats', 120, function () {
+            return [
+                'users_by_role' => $this->userStatsService->getUsersByRole(),
+                'downloads_per_hour' => $this->userStatsService->getDownloadsPerHour(168), // Last 7 days in hours
+                'downloads_per_minute' => $this->userStatsService->getDownloadsPerMinute(60),
+                'api_hits_per_hour' => $this->userStatsService->getApiHitsPerHour(168), // Last 7 days in hours
+                'api_hits_per_minute' => $this->userStatsService->getApiHitsPerMinute(60),
+                'summary' => $this->userStatsService->getSummaryStats(),
+                'top_downloaders' => $this->userStatsService->getTopDownloaders(5),
+            ];
+        });
 
         return view('admin.dashboard', array_merge($this->viewData, [
             'meta_title' => 'Admin Home',
@@ -48,25 +50,27 @@ class AdminPageController extends BasePageController
     }
 
     /**
-     * Get recent user activity from the user_activities table
+     * Get recent user activity from the user_activities table with caching
      */
     protected function getRecentUserActivity(): array
     {
-        $activities = \App\Models\UserActivity::orderBy('created_at', 'desc')
-            ->limit(10)
-            ->get();
+        return \Illuminate\Support\Facades\Cache::remember('admin_recent_activity', 60, function () {
+            $activities = \App\Models\UserActivity::orderBy('created_at', 'desc')
+                ->limit(10)
+                ->get();
 
-        return $activities->map(function ($activity) {
-            return (object) [
-                'type' => $activity->activity_type,
-                'message' => $activity->description,
-                'icon' => $activity->icon,
-                'icon_bg' => 'bg-'.$activity->color_class.'-100 dark:bg-'.$activity->color_class.'-900',
-                'icon_color' => 'text-'.$activity->color_class.'-600 dark:text-'.$activity->color_class.'-400',
-                'created_at' => $activity->created_at,
-                'username' => $activity->username,
-            ];
-        })->toArray();
+            return $activities->map(function ($activity) {
+                return (object) [
+                    'type' => $activity->activity_type,
+                    'message' => $activity->description,
+                    'icon' => $activity->icon,
+                    'icon_bg' => 'bg-'.$activity->color_class.'-100 dark:bg-'.$activity->color_class.'-900',
+                    'icon_color' => 'text-'.$activity->color_class.'-600 dark:text-'.$activity->color_class.'-400',
+                    'created_at' => $activity->created_at,
+                    'username' => $activity->username,
+                ];
+            })->toArray();
+        });
     }
 
     /**
@@ -93,20 +97,54 @@ class AdminPageController extends BasePageController
     }
 
     /**
-     * Get default dashboard statistics
+     * Get default dashboard statistics with caching for expensive queries
      */
     protected function getDefaultStats(): array
     {
         $today = now()->format('Y-m-d');
 
+        // Cache total releases count for 5 minutes (expensive query on large tables)
+        $releasesCount = \Illuminate\Support\Facades\Cache::remember('admin_stats_releases_count', 300, function () {
+            return \App\Models\Release::count();
+        });
+
+        // Cache users count for 5 minutes
+        $usersCount = \Illuminate\Support\Facades\Cache::remember('admin_stats_users_count', 300, function () {
+            return \App\Models\User::whereNull('deleted_at')->count();
+        });
+
+        // Cache groups count for 10 minutes (rarely changes)
+        $groupsCount = \Illuminate\Support\Facades\Cache::remember('admin_stats_groups_count', 600, function () {
+            return \App\Models\UsenetGroup::count();
+        });
+
+        // Cache active groups count for 10 minutes
+        $activeGroupsCount = \Illuminate\Support\Facades\Cache::remember('admin_stats_active_groups_count', 600, function () {
+            return \App\Models\UsenetGroup::where('active', 1)->count();
+        });
+
+        // Cache failed count for 5 minutes
+        $failedCount = \Illuminate\Support\Facades\Cache::remember('admin_stats_failed_count', 300, function () {
+            return \App\Models\DnzbFailure::count();
+        });
+
+        // Today's counts can be cached for 1 minute since they change frequently
+        $releasesToday = \Illuminate\Support\Facades\Cache::remember('admin_stats_releases_today_'.$today, 60, function () use ($today) {
+            return \App\Models\Release::whereRaw('DATE(adddate) = ?', [$today])->count();
+        });
+
+        $usersToday = \Illuminate\Support\Facades\Cache::remember('admin_stats_users_today_'.$today, 60, function () use ($today) {
+            return \App\Models\User::whereRaw('DATE(created_at) = ?', [$today])->count();
+        });
+
         return [
-            'releases' => \App\Models\Release::count(),
-            'releases_today' => \App\Models\Release::whereRaw('DATE(adddate) = ?', [$today])->count(),
-            'users' => \App\Models\User::whereNull('deleted_at')->count(),
-            'users_today' => \App\Models\User::whereRaw('DATE(created_at) = ?', [$today])->count(),
-            'groups' => \App\Models\UsenetGroup::count(),
-            'active_groups' => \App\Models\UsenetGroup::where('active', 1)->count(),
-            'failed' => \App\Models\DnzbFailure::count(),
+            'releases' => $releasesCount,
+            'releases_today' => $releasesToday,
+            'users' => $usersCount,
+            'users_today' => $usersToday,
+            'groups' => $groupsCount,
+            'active_groups' => $activeGroupsCount,
+            'failed' => $failedCount,
             'disk_free' => $this->getDiskSpace(),
         ];
     }
@@ -131,20 +169,44 @@ class AdminPageController extends BasePageController
     }
 
     /**
-     * Get system metrics (CPU and RAM usage)
+     * Get system metrics (CPU and RAM usage) with caching
      */
     protected function getSystemMetrics(): array
     {
-        $cpuUsage = $this->getCpuUsage();
-        $ramUsage = $this->getRamUsage();
-        $cpuInfo = $this->getCpuInfo();
-        $loadAverage = $this->getLoadAverage();
+        // Cache CPU info for 1 hour (doesn't change)
+        $cpuInfo = \Illuminate\Support\Facades\Cache::remember('admin_cpu_info', 3600, function () {
+            return $this->getCpuInfo();
+        });
 
-        // Get historical data from database - both hourly (24h) and daily (30d)
-        $cpuHistory24h = $this->systemMetricsService->getHourlyMetrics('cpu', 24);
-        $cpuHistory30d = $this->systemMetricsService->getDailyMetrics('cpu', 30);
-        $ramHistory24h = $this->systemMetricsService->getHourlyMetrics('ram', 24);
-        $ramHistory30d = $this->systemMetricsService->getDailyMetrics('ram', 30);
+        // Cache current metrics for 30 seconds
+        $cpuUsage = \Illuminate\Support\Facades\Cache::remember('admin_cpu_usage', 30, function () {
+            return $this->getCpuUsage();
+        });
+
+        $ramUsage = \Illuminate\Support\Facades\Cache::remember('admin_ram_usage', 30, function () {
+            return $this->getRamUsage();
+        });
+
+        $loadAverage = \Illuminate\Support\Facades\Cache::remember('admin_load_average', 30, function () {
+            return $this->getLoadAverage();
+        });
+
+        // Cache historical data for 5 minutes (from database)
+        $cpuHistory24h = \Illuminate\Support\Facades\Cache::remember('admin_cpu_history_24h', 300, function () {
+            return $this->systemMetricsService->getHourlyMetrics('cpu', 24);
+        });
+
+        $cpuHistory30d = \Illuminate\Support\Facades\Cache::remember('admin_cpu_history_30d', 300, function () {
+            return $this->systemMetricsService->getDailyMetrics('cpu', 30);
+        });
+
+        $ramHistory24h = \Illuminate\Support\Facades\Cache::remember('admin_ram_history_24h', 300, function () {
+            return $this->systemMetricsService->getHourlyMetrics('ram', 24);
+        });
+
+        $ramHistory30d = \Illuminate\Support\Facades\Cache::remember('admin_ram_history_30d', 300, function () {
+            return $this->systemMetricsService->getDailyMetrics('ram', 30);
+        });
 
         return [
             'cpu' => [
