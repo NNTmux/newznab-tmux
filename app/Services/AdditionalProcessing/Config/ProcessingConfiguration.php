@@ -49,9 +49,10 @@ final readonly class ProcessingConfiguration
     public function __construct()
     {
         $this->echoCLI = (bool) config('nntmux.echocli');
-        $this->innerFileBlacklist = Settings::settingValue('innerfileblacklist') === '' 
-            ? false 
-            : Settings::settingValue('innerfileblacklist');
+        $innerFileBlacklistValue = Settings::settingValue('innerfileblacklist');
+        $this->innerFileBlacklist = ($innerFileBlacklistValue === '' || $innerFileBlacklistValue === null)
+            ? false
+            : $innerFileBlacklistValue;
         $this->maxNestedLevels = (int) Settings::settingValue('maxnestedlevels') ?: 3;
         $this->extractUsingRarInfo = (int) Settings::settingValue('extractusingrarinfo') !== 0;
         $this->fetchLastFiles = (bool) config('nntmux_settings.fetch_last_file');
@@ -83,7 +84,7 @@ final readonly class ProcessingConfiguration
         $this->processJPGSample = (int) Settings::settingValue('processjpg') !== 0;
         $this->processMediaInfo = (bool) $this->mediaInfoPath;
         $this->processAudioInfo = $this->processMediaInfo;
-        $this->processPasswords = config('nntmux_settings.check_passworded_rars') === true 
+        $this->processPasswords = config('nntmux_settings.check_passworded_rars') === true
             && ! empty(config('nntmux_settings.unrar_path'));
         $this->audioSavePath = config('nntmux_settings.covers_path').'/audiosample/';
         $this->tmpUnrarPath = config('nntmux.tmp_unrar_path');
