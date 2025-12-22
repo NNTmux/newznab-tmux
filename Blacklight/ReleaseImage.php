@@ -3,6 +3,7 @@
 namespace Blacklight;
 
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Intervention\Image\Drivers\Imagick\Driver;
 use Intervention\Image\Exceptions\NotWritableException;
 use Intervention\Image\ImageManager;
@@ -63,9 +64,10 @@ class ReleaseImage
             $context = stream_context_create([
                 'http' => [
                     'timeout' => 30,
-                    'user_agent' => 'Mozilla/5.0 (compatible; NNTmux/1.0)',
+                    'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                     'follow_location' => true,
                     'max_redirects' => 5,
+                    'ignore_errors' => true,
                 ],
                 'ssl' => [
                     'verify_peer' => true,
@@ -76,15 +78,31 @@ class ReleaseImage
 
             $imageData = @file_get_contents($imgLoc, false, $context);
 
+            // Check HTTP response headers if available
+            if (isset($http_response_header) && ! empty($http_response_header)) {
+                $statusLine = $http_response_header[0] ?? '';
+                if (preg_match('/HTTP\/\d\.\d\s+(\d+)/', $statusLine, $matches)) {
+                    $httpCode = (int) $matches[1];
+                    if ($httpCode >= 400) {
+                        Log::debug('HTTP error fetching image from '.$imgLoc.': '.$statusLine);
+                        $this->colorCli->notice('HTTP error fetching image: '.$statusLine);
+
+                        return false;
+                    }
+                }
+            }
+
             if ($imageData === false) {
                 $error = error_get_last();
                 $errorMsg = $error !== null && isset($error['message']) ? $error['message'] : 'Unknown error fetching image';
+                Log::debug('Failed to fetch image from '.$imgLoc.': '.$errorMsg);
                 $this->colorCli->notice('Failed to fetch image from '.$imgLoc.': '.$errorMsg);
 
                 return false;
             }
 
             if (empty($imageData)) {
+                Log::debug('Empty image data received from '.$imgLoc);
                 $this->colorCli->notice('Empty image data received from '.$imgLoc);
 
                 return false;
@@ -98,11 +116,13 @@ class ReleaseImage
             } elseif ($e->getCode() === 503) {
                 $this->colorCli->notice('Service unavailable');
             } else {
+                Log::debug('Exception fetching image from '.$imgLoc.': '.$e->getMessage());
                 $this->colorCli->notice('Unable to fetch image: '.$e->getMessage());
             }
 
             $img = false;
         } catch (\Error $e) {
+            Log::debug('Error fetching image from '.$imgLoc.': '.$e->getMessage());
             $this->colorCli->info($e->getMessage());
             $img = false;
         }
@@ -161,10 +181,14 @@ class ReleaseImage
             // Optimize the image.
             ImageOptimizer::optimize($coverPath);
         } catch (NotWritableException $e) {
+            Log::debug('NotWritableException saving image to '.$coverPath.': '.$e->getMessage());
+
             return 0;
         }
         // Check if it's on the drive.
         if (! File::isReadable($coverPath)) {
+            Log::debug('Image was not readable after save: '.$coverPath);
+
             return 0;
         }
 
