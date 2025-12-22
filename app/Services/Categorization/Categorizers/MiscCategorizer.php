@@ -8,11 +8,12 @@ use App\Services\Categorization\ReleaseContext;
 
 /**
  * Categorizer for miscellaneous content and hash detection.
- * This runs last as a fallback.
+ * This runs FIRST with high priority to detect hashes early and prevent
+ * them from being incorrectly categorized by group-based or content-based rules.
  */
 class MiscCategorizer extends AbstractCategorizer
 {
-    protected int $priority = 100; // Lowest priority - run last
+    protected int $priority = 1; // Highest priority - run first to catch hashes
 
     public function getName(): string
     {
@@ -48,24 +49,24 @@ class MiscCategorizer extends AbstractCategorizer
 
     protected function checkHash(string $name): ?CategorizationResult
     {
-        // MD5 hash (32 hex characters)
-        if (preg_match('/\b[a-f0-9]{32}\b/i', $name)) {
-            return $this->matched(Category::OTHER_HASHED, 0.8, 'hash_md5');
+        // MD5 hash (32 hex characters) - match with word boundaries or quotes/punctuation
+        if (preg_match('/(?:^|["\'\s\[\]\/\-])([a-f0-9]{32})(?:["\'\s\[\]\/\-\.]|$)/i', $name)) {
+            return $this->matched(Category::OTHER_HASHED, 0.95, 'hash_md5');
         }
 
-        // SHA-1 hash (40 hex characters)
-        if (preg_match('/\b[a-f0-9]{40}\b/i', $name)) {
-            return $this->matched(Category::OTHER_HASHED, 0.85, 'hash_sha1');
+        // SHA-1 hash (40 hex characters) - match with word boundaries or quotes/punctuation
+        if (preg_match('/(?:^|["\'\s\[\]\/\-])([a-f0-9]{40})(?:["\'\s\[\]\/\-\.]|$)/i', $name)) {
+            return $this->matched(Category::OTHER_HASHED, 0.95, 'hash_sha1');
         }
 
-        // SHA-256 hash (64 hex characters)
-        if (preg_match('/\b[a-f0-9]{64}\b/i', $name)) {
-            return $this->matched(Category::OTHER_HASHED, 0.9, 'hash_sha256');
+        // SHA-256 hash (64 hex characters) - match with word boundaries or quotes/punctuation
+        if (preg_match('/(?:^|["\'\s\[\]\/\-])([a-f0-9]{64})(?:["\'\s\[\]\/\-\.]|$)/i', $name)) {
+            return $this->matched(Category::OTHER_HASHED, 0.95, 'hash_sha256');
         }
 
-        // Generic long hex hash
-        if (preg_match('/\b[a-f0-9]{32,128}\b/i', $name)) {
-            return $this->matched(Category::OTHER_HASHED, 0.75, 'hash_generic');
+        // Generic long hex hash (32-128 chars) - match with word boundaries or quotes/punctuation
+        if (preg_match('/(?:^|["\'\s\[\]\/\-])([a-f0-9]{32,128})(?:["\'\s\[\]\/\-\.]|$)/i', $name)) {
+            return $this->matched(Category::OTHER_HASHED, 0.95, 'hash_generic');
         }
 
         return null;

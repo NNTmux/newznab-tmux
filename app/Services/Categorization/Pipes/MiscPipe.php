@@ -8,11 +8,12 @@ use App\Services\Categorization\ReleaseContext;
 
 /**
  * Pipe for miscellaneous content and hash detection.
- * This runs last as a fallback.
+ * This runs FIRST with high priority to detect hashes early and prevent
+ * them from being incorrectly categorized by group-based or content-based rules.
  */
 class MiscPipe extends AbstractCategorizationPipe
 {
-    protected int $priority = 100;
+    protected int $priority = 1; // Run first to catch hashes early
     private MiscCategorizer $categorizer;
 
     public function __construct()
