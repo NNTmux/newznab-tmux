@@ -80,6 +80,9 @@ class AdePipe extends AbstractAdultProviderPipe
             return false;
         }
 
+        // Initialize session with age verification cookies
+        $this->initializeSession();
+
         $searchUrl = self::BASE_URL . self::SEARCH_URL . rawurlencode($movie);
         $response = $this->fetchHtml($searchUrl, $this->cookie);
 
@@ -364,6 +367,28 @@ class AdePipe extends AbstractAdultProviderPipe
         }
 
         return $res;
+    }
+
+    /**
+     * Initialize session by visiting the site to establish cookies.
+     * ADE uses JavaScript-based age verification with cookies.
+     */
+    protected function initializeSession(): void
+    {
+        try {
+            $client = $this->getHttpClient();
+
+            // Visit the homepage first to establish a session
+            $client->get(self::BASE_URL, [
+                'headers' => $this->getDefaultHeaders(),
+                'allow_redirects' => true,
+            ]);
+
+            usleep(300000); // 300ms delay
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::debug('ADE session initialization: ' . $e->getMessage());
+        }
     }
 }
 

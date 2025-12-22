@@ -37,6 +37,8 @@ class AgeVerificationManager
                 ['name' => 'age_verified', 'value' => '1'],
                 ['name' => 'age_gate_passed', 'value' => 'true'],
                 ['name' => 'over18', 'value' => '1'],
+                ['name' => 'ageConfirmed', 'value' => 'true'],
+                ['name' => 'isAdult', 'value' => 'true'],
             ],
             'detection' => ['ageConfirmationButton', 'age-confirmation', 'confirm you are over'],
         ],
@@ -44,6 +46,7 @@ class AgeVerificationManager
             'cookies' => [
                 ['name' => 'age_verified', 'value' => '1'],
                 ['name' => 'over18', 'value' => 'yes'],
+                ['name' => 'ageConfirmed', 'value' => 'true'],
             ],
             'detection' => ['age verification', 'are you 18'],
         ],
@@ -51,6 +54,7 @@ class AgeVerificationManager
             'cookies' => [
                 ['name' => 'age_verified', 'value' => '1'],
                 ['name' => 'aebn_age_check', 'value' => 'passed'],
+                ['name' => 'over18', 'value' => 'true'],
             ],
             'detection' => ['age verification', 'over 18'],
         ],
@@ -58,6 +62,8 @@ class AgeVerificationManager
             'cookies' => [
                 ['name' => 'age_verified', 'value' => '1'],
                 ['name' => 'over18', 'value' => 'true'],
+                ['name' => 'ageConfirmed', 'value' => 'true'],
+                ['name' => 'hmAgeVerified', 'value' => '1'],
             ],
             'detection' => ['age verification', 'enter'],
         ],
@@ -65,8 +71,13 @@ class AgeVerificationManager
             'cookies' => [
                 ['name' => 'age_verified', 'value' => '1'],
                 ['name' => 'over_18', 'value' => 'yes'],
+                ['name' => 'ageVerified', 'value' => 'true'],
+                ['name' => 'popAgeConfirmed', 'value' => '1'],
+                ['name' => 'adultConsent', 'value' => 'true'],
+                // Note: etoken is dynamically set by the server, we can't pre-set it
             ],
-            'detection' => ['age verification', 'over 18'],
+            'detection' => ['age verification', 'over 18', 'AgeConfirmation'],
+            'redirectBypass' => true, // Indicates this site uses redirect-based verification
         ],
     ];
 
@@ -100,7 +111,7 @@ class AgeVerificationManager
             $this->cookieJars[$domain] = new FileCookieJar($cookieFile, true);
 
             // If cookie file is new or empty, set age verification cookies
-            if (filesize($cookieFile) < 10) {
+            if (!file_exists($cookieFile) || filesize($cookieFile) < 10) {
                 $this->setAgeVerificationCookies($domain, $this->cookieJars[$domain]);
             }
         }
@@ -216,16 +227,44 @@ class AgeVerificationManager
         $parsed = parse_url($url);
         $host = $parsed['host'] ?? '';
 
+        // Remove www. prefix if present
+        $host = preg_replace('/^www\./', '', $host);
+
         // Map known subdomains to main domains
         $domainMap = [
             'straight.theater.aebn.net' => 'straight.theater.aebn.net',
-            'www.adultdvdempire.com' => 'adultdvdempire.com',
-            'www.adultdvdmarketplace.com' => 'adultdvdmarketplace.com',
-            'www.hotmovies.com' => 'hotmovies.com',
-            'www.popporn.com' => 'popporn.com',
+            'adultdvdempire.com' => 'adultdvdempire.com',
+            'adultdvdmarketplace.com' => 'adultdvdmarketplace.com',
+            'hotmovies.com' => 'hotmovies.com',
+            'popporn.com' => 'popporn.com',
         ];
 
         return $domainMap[$host] ?? $host;
+    }
+
+    /**
+     * Force refresh cookies for a domain.
+     */
+    public function refreshCookies(string $url): FileCookieJar
+    {
+        $domain = $this->extractDomain($url);
+        $cookieFile = $this->getCookieFilePath($domain);
+
+        // Clear existing cookie jar
+        if (isset($this->cookieJars[$domain])) {
+            unset($this->cookieJars[$domain]);
+        }
+
+        // Delete old cookie file if exists
+        if (file_exists($cookieFile)) {
+            unlink($cookieFile);
+        }
+
+        // Create new jar with fresh cookies
+        $this->cookieJars[$domain] = new FileCookieJar($cookieFile, true);
+        $this->setAgeVerificationCookies($domain, $this->cookieJars[$domain]);
+
+        return $this->cookieJars[$domain];
     }
 
     /**

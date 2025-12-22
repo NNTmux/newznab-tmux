@@ -4,10 +4,12 @@ namespace App\Services\AdultProcessing\Pipes;
 
 use App\Services\AdultProcessing\AdultProcessingPassable;
 use App\Services\AdultProcessing\AdultProcessingResult;
+use App\Services\AdultProcessing\AgeVerificationManager;
 use Blacklight\ColorCLI;
 use Closure;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\FileCookieJar;
 use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
@@ -48,7 +50,12 @@ abstract class AbstractAdultProviderPipe
     /**
      * Cookie jar for maintaining session cookies.
      */
-    protected ?CookieJar $cookieJar = null;
+    protected CookieJar|FileCookieJar|null $cookieJar = null;
+
+    /**
+     * Age verification manager for handling site-specific cookies.
+     */
+    protected ?AgeVerificationManager $ageVerificationManager = null;
 
     /**
      * Maximum number of retry attempts for failed requests.
@@ -276,6 +283,7 @@ abstract class AbstractAdultProviderPipe
     {
         $attempt = 0;
         $lastException = null;
+        $ageVerificationAttempted = false;
 
         while ($attempt < $this->maxRetries) {
             try {
@@ -301,6 +309,16 @@ abstract class AbstractAdultProviderPipe
 
                 $body = $response->getBody()->getContents();
 
+                // Check if we were redirected to an age verification page
+                $finalUrl = $response->getHeaderLine('X-Guzzle-Redirect-History');
+                if (empty($finalUrl)) {
+                    // Use the effective URI if available
+                    $effectiveUri = $response->getHeader('X-Guzzle-Redirect-History');
+                    if (!empty($effectiveUri)) {
+                        $finalUrl = end($effectiveUri);
+                    }
+                }
+
                 // Check for common error pages
                 if ($this->isErrorPage($body)) {
                     Log::warning('Received error page from ' . $this->getName() . ': ' . $url);
@@ -313,6 +331,21 @@ abstract class AbstractAdultProviderPipe
 
                 // Check for age verification requirement
                 if ($this->requiresAgeVerification($body)) {
+                    // If we haven't tried age verification yet, refresh cookies and retry
+                    if (!$ageVerificationAttempted) {
+                        $ageVerificationAttempted = true;
+
+                        // Refresh cookies using the manager
+                        $this->getAgeVerificationManager()->refreshCookies($this->getBaseUrl());
+
+                        // Reset HTTP client to pick up new cookies
+                        $this->httpClient = null;
+                        $this->cookieJar = null;
+
+                        Log::info('Refreshed age verification cookies for ' . $this->getName() . ', retrying...');
+                        continue;
+                    }
+
                     $body = $this->handleAgeVerification($url, $body);
                     if ($body === false) {
                         return false;
@@ -428,6 +461,30 @@ abstract class AbstractAdultProviderPipe
      */
     protected function requiresAgeVerification(string $html): bool
     {
+        // First check if this looks like a proper content page
+        // Content pages have actual movie info, cast, etc.
+        $contentIndicators = [
+            '<title>.*?DVD.*?</title>',
+            'product-info',
+            'movie-details',
+            'cast-list',
+            'genre-list',
+            '"@type":\s*"Movie"',
+            '"@type":\s*"Product"',
+        ];
+
+        foreach ($contentIndicators as $pattern) {
+            if (preg_match('/' . $pattern . '/is', $html)) {
+                return false; // This is a content page, not an age verification page
+            }
+        }
+
+        // Check for short page that might just be a redirect/age gate
+        if (strlen($html) < 500) {
+            return true; // Very short response likely means we got redirected
+        }
+
+        // Now check for explicit age verification indicators
         $agePatterns = [
             'age verification',
             'are you 18',
@@ -435,18 +492,32 @@ abstract class AbstractAdultProviderPipe
             'confirm your age',
             'enter your age',
             'must be 18',
-            'adults only',
             'age-gate',
             'ageGate',
+            'AgeConfirmation', // PopPorn specific
+            'ageConfirmationButton', // ADE specific
+            'age-confirmation', // Generic
+            'verify your age',
+            'adult content warning',
+            'I am 18 or older',
+            'I am over 18',
+            'this site contains adult',
         ];
 
+        // Count how many patterns match - if multiple match on a short page, it's likely age verification
+        $matchCount = 0;
         foreach ($agePatterns as $pattern) {
             if (stripos($html, $pattern) !== false) {
-                return true;
+                $matchCount++;
+                // If the page is relatively short and has an age pattern, it's probably an age gate
+                if (strlen($html) < 10000) {
+                    return true;
+                }
             }
         }
 
-        return false;
+        // If multiple patterns match, it's likely an age verification page
+        return $matchCount >= 2;
     }
 
     /**
@@ -454,6 +525,17 @@ abstract class AbstractAdultProviderPipe
      */
     protected function handleAgeVerification(string $url, string $html): string|false
     {
+        // First, try to use site-specific cookies from the AgeVerificationManager
+        $manager = $this->getAgeVerificationManager();
+        $domain = parse_url($this->getBaseUrl(), PHP_URL_HOST);
+        $domain = preg_replace('/^www\./', '', $domain);
+
+        // Re-initialize cookies from the manager and retry
+        if ($this->cookieJar) {
+            // The manager already handles setting cookies, but let's ensure they're fresh
+            Log::info('Attempting to handle age verification for ' . $this->getName() . ' with domain: ' . $domain);
+        }
+
         // Try to find and submit age verification form
         $this->getHtmlParser()->loadHtml($html);
 
@@ -465,7 +547,9 @@ abstract class AbstractAdultProviderPipe
 
             // Check if this looks like an age verification form
             $formHtml = $form->innerHtml ?? '';
-            if (stripos($formHtml, 'age') !== false || stripos($formHtml, '18') !== false) {
+            if (stripos($formHtml, 'age') !== false || stripos($formHtml, '18') !== false ||
+                stripos($formHtml, 'adult') !== false || stripos($formHtml, 'enter') !== false ||
+                stripos($formHtml, 'confirm') !== false) {
                 // Try to submit the form with age confirmation
                 $postData = $this->extractAgeVerificationFormData($form);
 
@@ -482,12 +566,57 @@ abstract class AbstractAdultProviderPipe
                             'headers' => $this->getDefaultHeaders(),
                         ]);
 
-                        return $response->getBody()->getContents();
+                        $body = $response->getBody()->getContents();
+
+                        // Check if we still get age verification after submit
+                        if (!$this->requiresAgeVerification($body)) {
+                            return $body;
+                        }
                     } catch (\Exception $e) {
                         Log::warning('Age verification submission failed for ' . $this->getName() . ': ' . $e->getMessage());
                     }
                 }
             }
+        }
+
+        // Look for JavaScript-based age verification (click to enter)
+        if (preg_match('/onclick\s*=\s*["\'].*?(enter|agree|confirm|over18|adult).*?["\']/i', $html) ||
+            preg_match('/<a[^>]*href\s*=\s*["\']([^"\']*)["\'][^>]*>(Enter|I am over 18|Agree|Enter Site|I Agree)/i', $html, $matches)) {
+            // Try to follow the link or simulate the click
+            if (!empty($matches[1])) {
+                $enterUrl = $matches[1];
+                if (!str_starts_with($enterUrl, 'http')) {
+                    $enterUrl = $this->getBaseUrl() . '/' . ltrim($enterUrl, '/');
+                }
+
+                try {
+                    $response = $this->getHttpClient()->get($enterUrl, [
+                        'headers' => $this->getDefaultHeaders(),
+                    ]);
+                    $body = $response->getBody()->getContents();
+
+                    if (!$this->requiresAgeVerification($body)) {
+                        return $body;
+                    }
+                } catch (\Exception $e) {
+                    Log::warning('Age verification link follow failed for ' . $this->getName() . ': ' . $e->getMessage());
+                }
+            }
+        }
+
+        // If all else fails, try to just refetch the original URL
+        // (sometimes the cookies from previous attempts work)
+        try {
+            $response = $this->getHttpClient()->get($url, [
+                'headers' => $this->getDefaultHeaders(),
+            ]);
+            $body = $response->getBody()->getContents();
+
+            if (!$this->requiresAgeVerification($body)) {
+                return $body;
+            }
+        } catch (\Exception $e) {
+            Log::warning('Age verification retry failed for ' . $this->getName() . ': ' . $e->getMessage());
         }
 
         // If we couldn't handle age verification, log and return false
@@ -557,12 +686,24 @@ abstract class AbstractAdultProviderPipe
     }
 
     /**
+     * Get the age verification manager instance.
+     */
+    protected function getAgeVerificationManager(): AgeVerificationManager
+    {
+        if ($this->ageVerificationManager === null) {
+            $this->ageVerificationManager = new AgeVerificationManager();
+        }
+        return $this->ageVerificationManager;
+    }
+
+    /**
      * Get or create HTTP client with retry middleware.
      */
     protected function getHttpClient(): Client
     {
         if ($this->httpClient === null) {
-            $this->cookieJar = new CookieJar();
+            // Use the AgeVerificationManager to get proper cookie jar with age verification cookies
+            $this->cookieJar = $this->getAgeVerificationManager()->getCookieJar($this->getBaseUrl());
 
             $this->httpClient = new Client([
                 'timeout' => 30,

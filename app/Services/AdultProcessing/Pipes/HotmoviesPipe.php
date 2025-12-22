@@ -81,6 +81,9 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
             return false;
         }
 
+        // Initialize session with age verification
+        $this->initializeSession();
+
         $searchUrl = self::BASE_URL . self::SEARCH_URL . urlencode($movie) . self::EXTRA_SEARCH;
         $response = $this->fetchHtml($searchUrl, $this->cookie);
 
@@ -330,6 +333,28 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
         }
 
         return $res;
+    }
+
+    /**
+     * Initialize session by visiting the site to establish cookies.
+     * HotMovies uses cookie-based age verification.
+     */
+    protected function initializeSession(): void
+    {
+        try {
+            $client = $this->getHttpClient();
+
+            // Visit the homepage first to establish a session
+            $client->get(self::BASE_URL, [
+                'headers' => $this->getDefaultHeaders(),
+                'allow_redirects' => true,
+            ]);
+
+            usleep(300000); // 300ms delay
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::debug('HotMovies session initialization: ' . $e->getMessage());
+        }
     }
 }
 

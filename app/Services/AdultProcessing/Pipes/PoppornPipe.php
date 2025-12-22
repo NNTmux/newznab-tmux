@@ -80,6 +80,9 @@ class PoppornPipe extends AbstractAdultProviderPipe
             return false;
         }
 
+        // First, establish a session by visiting the AgeConfirmation endpoint to set cookies
+        $this->acceptAgeVerification();
+
         $searchUrl = self::BASE_URL . self::SEARCH_ENDPOINT . urlencode($movie);
         $response = $this->fetchHtml($searchUrl, $this->cookie);
 
@@ -459,6 +462,64 @@ class PoppornPipe extends AbstractAdultProviderPipe
         $res['genres'] = array_unique(array_filter($genres));
 
         return $res;
+    }
+
+    /**
+     * Accept age verification by visiting the confirmation endpoint.
+     * PopPorn uses a redirect-based age verification system.
+     */
+    protected function acceptAgeVerification(): void
+    {
+        try {
+            // PopPorn requires visiting the AgeConfirmation endpoint with the URL you want to go to
+            // The confirmation sets a cookie that allows access
+            $client = $this->getHttpClient();
+
+            // PopPorn redirects to /AgeConfirmation?url2=/ on first visit
+            // We need to visit that page and follow through to set the etoken cookie
+
+            // First, make a request that disables redirects to see where we're being sent
+            try {
+                $response = $client->get(self::BASE_URL . '/', [
+                    'headers' => $this->getDefaultHeaders(),
+                    'allow_redirects' => false,
+                    'http_errors' => false,
+                ]);
+
+                // Check for redirect to age confirmation
+                $statusCode = $response->getStatusCode();
+                if ($statusCode === 302 || $statusCode === 301) {
+                    $location = $response->getHeaderLine('Location');
+
+                    // If redirected to AgeConfirmation, follow the flow
+                    if (stripos($location, 'AgeConfirmation') !== false) {
+                        // The redirect URL includes ?url2= parameter, we need to visit it
+                        $ageConfirmUrl = $location;
+                        if (!str_starts_with($ageConfirmUrl, 'http')) {
+                            $ageConfirmUrl = self::BASE_URL . $ageConfirmUrl;
+                        }
+
+                        // Visit the age confirmation page
+                        $ageResponse = $client->get($ageConfirmUrl, [
+                            'headers' => $this->getDefaultHeaders(),
+                            'allow_redirects' => true,
+                            'http_errors' => false,
+                        ]);
+
+                        \Illuminate\Support\Facades\Log::debug('PopPorn age confirmation visited: ' . $ageConfirmUrl);
+                    }
+                }
+            } catch (\Exception $e) {
+                // Ignore redirect errors
+            }
+
+            // Wait a moment to simulate human behavior
+            usleep(500000); // 500ms
+
+        } catch (\Exception $e) {
+            // Log but don't fail - we'll try the search anyway
+            \Illuminate\Support\Facades\Log::debug('PopPorn age verification setup: ' . $e->getMessage());
+        }
     }
 }
 
