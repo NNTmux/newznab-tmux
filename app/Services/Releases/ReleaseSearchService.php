@@ -168,8 +168,8 @@ class ReleaseSearchService
                 }
             }
 
-            // Fall back to MySQL if both Elasticsearch and Manticore failed
-            if (empty($searchResult)) {
+            // Fall back to MySQL if both Elasticsearch and Manticore failed (only if enabled)
+            if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
                 if (config('app.debug')) {
                     Log::debug('apiSearch: Falling back to MySQL search');
                 }
@@ -380,8 +380,8 @@ class ReleaseSearchService
                 }
             }
 
-            // Fall back to MySQL if both Elasticsearch and Manticore failed
-            if (empty($searchResult)) {
+            // Fall back to MySQL if both Elasticsearch and Manticore failed (only if enabled)
+            if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
                 $searchResult = $this->performMySQLSearch(['searchname' => $searchName], $limit);
             }
 
@@ -529,8 +529,8 @@ class ReleaseSearchService
                 }
             }
 
-            // Fall back to MySQL if both Elasticsearch and Manticore failed
-            if (empty($searchResult)) {
+            // Fall back to MySQL if both Elasticsearch and Manticore failed (only if enabled)
+            if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
                 $searchResult = $this->performMySQLSearch(['searchname' => $name], $limit);
             }
 
@@ -601,8 +601,8 @@ class ReleaseSearchService
                 }
             }
 
-            // Fall back to MySQL if both Elasticsearch and Manticore failed
-            if (empty($searchResult)) {
+            // Fall back to MySQL if both Elasticsearch and Manticore failed (only if enabled)
+            if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
                 $searchResult = $this->performMySQLSearch(['searchname' => $name], $limit);
             }
 
@@ -679,8 +679,8 @@ class ReleaseSearchService
                 }
             }
 
-            // Fall back to MySQL if both Elasticsearch and Manticore failed
-            if (empty($searchResult)) {
+            // Fall back to MySQL if both Elasticsearch and Manticore failed (only if enabled)
+            if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
                 $searchResult = $this->performMySQLSearch(['searchname' => $name], $limit);
             }
 
@@ -874,12 +874,16 @@ class ReleaseSearchService
             return Arr::wrap(Arr::get($searchResult, 'id'));
         }
 
-        // Fallback to MySQL LIKE search when both Elasticsearch and Manticore are unavailable
-        if (config('app.debug')) {
-            Log::debug('performIndexSearch: Falling back to MySQL search');
+        // Fallback to MySQL LIKE search when both Elasticsearch and Manticore are unavailable (only if enabled)
+        if (config('nntmux.mysql_search_fallback', false) === true) {
+            if (config('app.debug')) {
+                Log::debug('performIndexSearch: Falling back to MySQL search');
+            }
+
+            return $this->performMySQLSearch($searchFields, $limit);
         }
 
-        return $this->performMySQLSearch($searchFields, $limit);
+        return [];
     }
 
     /**
