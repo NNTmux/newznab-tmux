@@ -474,7 +474,8 @@ abstract class AbstractAdultProviderPipe
         ];
 
         foreach ($contentIndicators as $pattern) {
-            if (preg_match('/' . $pattern . '/is', $html)) {
+            // Note: Using # as delimiter to avoid issues with / in patterns like </title>
+            if (preg_match('#' . $pattern . '#is', $html)) {
                 return false; // This is a content page, not an age verification page
             }
         }
@@ -834,7 +835,8 @@ abstract class AbstractAdultProviderPipe
      */
     protected function extractJsonLd(string $html): ?array
     {
-        if (preg_match_all('/<script[^>]*type=["\']application\/ld\+json["\'][^>]*>(.*?)<\/script>/si', $html, $matches)) {
+        // Note: Using # as delimiter because pattern contains / in </script>
+        if (preg_match_all('#<script[^>]*type=["\']application/ld\+json["\'][^>]*>(.*?)</script>#si', $html, $matches)) {
             foreach ($matches[1] as $json) {
                 $data = json_decode(trim($json), true);
                 if (json_last_error() === JSON_ERROR_NONE && is_array($data)) {
