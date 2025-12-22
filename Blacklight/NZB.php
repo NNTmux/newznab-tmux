@@ -190,7 +190,7 @@ class NZB
         }
 
         // Delete CBP for release that has its NZB created.
-        Collection::query()->where('collections.releases_id', $release->id)->delete();
+        Collection::query()->where('releases_id', $release->id)->delete();
 
         // Chmod to fix issues some users have with file permissions.
         chmod($path, 0777);
