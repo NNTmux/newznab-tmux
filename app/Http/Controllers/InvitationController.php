@@ -64,11 +64,11 @@ class InvitationController extends BasePageController
                 $invitationData['used_by_user'] = $invitation->usedBy->toArray();
             }
 
-            // Convert timestamps
-            $invitationData['created_at'] = strtotime($invitation->created_at);
-            $invitationData['expires_at'] = strtotime($invitation->expires_at);
+            // Convert timestamps - use Carbon's timestamp property instead of strtotime
+            $invitationData['created_at'] = $invitation->created_at?->timestamp;
+            $invitationData['expires_at'] = $invitation->expires_at?->timestamp;
             if ($invitation->used_at) {
-                $invitationData['used_at'] = strtotime($invitation->used_at);
+                $invitationData['used_at'] = $invitation->used_at->timestamp;
             }
 
             $invitationsArray[] = $invitationData;
@@ -173,9 +173,9 @@ class InvitationController extends BasePageController
 
         $preview = $this->invitationService->getInvitationPreview($token);
 
-        // Convert timestamps
+        // Convert timestamps - use Carbon's timestamp property
         if ($preview && isset($preview['expires_at'])) {
-            $preview['expires_at'] = strtotime($preview['expires_at']);
+            $preview['expires_at'] = $preview['expires_at']->timestamp;
         }
 
         // Add role name if role is set
