@@ -114,6 +114,20 @@ class MiscCategorizer extends AbstractCategorizer
             return $this->matched(Category::OTHER_HASHED, 0.7, 'obfuscated_mixed_alphanumeric');
         }
 
+        // Obfuscated filename embedded in usenet subject line format
+        // Matches patterns like: [XX/XX] - "RANDOMSTRING.partXX.rar" or "RANDOMSTRING.7z.001"
+        // The filename inside quotes is random alphanumeric with no meaningful words
+        if (preg_match('/\[\d+\/\d+\]\s*-\s*"([a-zA-Z0-9]{12,})\.(part\d+\.rar|7z\.\d{3}|rar|zip|vol\d+\+\d+\.par2|par2)"/i', $name, $matches)) {
+            $filename = $matches[1];
+            // Ensure the filename looks random (not a real title)
+            // Real titles would have words/structure, obfuscated ones are random chars
+            if (!preg_match('/[._ -]/', $filename) && // No separators
+                !preg_match('/\b(19|20)\d{2}\b/', $filename) && // No year
+                $this->looksLikeRandomString($filename)) { // Additional entropy check
+                return $this->matched(Category::OTHER_HASHED, 0.85, 'obfuscated_usenet_filename');
+            }
+        }
+
         // Only punctuation and numbers with no clear structure
         if (preg_match('/^[^a-zA-Z]*[A-Z0-9\._\-]{5,}[^a-zA-Z]*$/', $name) &&
             !preg_match('/\.(mkv|avi|mp4|mp3|flac|pdf|epub|exe|iso)$/i', $name)) {
@@ -122,5 +136,60 @@ class MiscCategorizer extends AbstractCategorizer
 
         return null;
     }
-}
 
+    /**
+     * Check if a string looks like a random/obfuscated string rather than a real title.
+     * Uses multiple heuristics to detect randomly generated filenames.
+     */
+    protected function looksLikeRandomString(string $str): bool
+    {
+        // If it's all uppercase or all lowercase with no pattern, likely random
+        if (preg_match('/^[A-Z]+$/', $str) || preg_match('/^[a-z]+$/', $str)) {
+            return strlen($str) >= 12;
+        }
+
+        // Count character type transitions (upper to lower, letter to digit, etc.)
+        // Random strings have more irregular transitions
+        $transitions = 0;
+        $len = strlen($str);
+        for ($i = 1; $i < $len; $i++) {
+            $prevIsUpper = ctype_upper($str[$i - 1]);
+            $currIsUpper = ctype_upper($str[$i]);
+            $prevIsDigit = ctype_digit($str[$i - 1]);
+            $currIsDigit = ctype_digit($str[$i]);
+
+            if (($prevIsUpper !== $currIsUpper && !$prevIsDigit && !$currIsDigit) ||
+                ($prevIsDigit !== $currIsDigit)) {
+                $transitions++;
+            }
+        }
+
+        // High transition ratio suggests random string
+        $transitionRatio = $transitions / max(1, $len - 1);
+
+        // Random strings typically have:
+        // - Many case transitions (not following CamelCase pattern)
+        // - Mix of letters and numbers throughout
+        // - No recognizable word patterns
+
+        // Check for common English word patterns (consonant-vowel patterns)
+        $hasWordPattern = preg_match('/[bcdfghjklmnpqrstvwxyz]{1,2}[aeiou][bcdfghjklmnpqrstvwxyz]{1,2}[aeiou]/i', $str);
+
+        // If transition ratio is high and no word patterns, likely random
+        if ($transitionRatio > 0.3 && !$hasWordPattern) {
+            return true;
+        }
+
+        // Check for sequences of consonants that are unlikely in real words
+        if (preg_match('/[bcdfghjklmnpqrstvwxyz]{5,}/i', $str)) {
+            return true;
+        }
+
+        // If mixed case and digits with no clear structure
+        if (preg_match('/[A-Z]/', $str) && preg_match('/[a-z]/', $str) && preg_match('/\d/', $str)) {
+            return true;
+        }
+
+        return false;
+    }
+}
