@@ -1055,30 +1055,8 @@ function initPreviewModal() {
         });
     });
 
-    // Event listeners for NFO badges
-    document.querySelectorAll('.nfo-badge').forEach(function(badge) {
-        badge.addEventListener('click', function() {
-            const guid = this.getAttribute('data-guid');
-            if (guid) {
-                fetch('/getnfo/' + guid)
-                    .then(response => response.text())
-                    .then(data => {
-                        const nfoContent = document.getElementById('nfo-content');
-                        if (nfoContent) {
-                            nfoContent.textContent = data;
-                            const nfoModal = document.getElementById('nfo-modal');
-                            if (nfoModal) {
-                                nfoModal.classList.remove('hidden');
-                                nfoModal.classList.add('flex');
-                            }
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching NFO:', error);
-                    });
-            }
-        });
-    });
+    // NFO badge clicks are handled by initNfoModal() which uses event delegation
+    // and the correct endpoint /nfo/{guid}?modal=1
 
     // Close preview modal on background click
     const previewModal = document.getElementById('previewModal');
