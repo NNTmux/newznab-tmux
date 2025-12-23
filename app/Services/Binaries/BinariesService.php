@@ -660,7 +660,7 @@ class BinariesService
             $headers = $nntp->getXOVER($this->first.'-'.$this->last);
         }
 
-        if (NNTPService::isError($headers)) {
+        if (NNTPService::isError($headers) || ! \is_array($headers)) {
             if ($partRepair) {
                 return null;
             }
@@ -675,9 +675,13 @@ class BinariesService
             $headers = $nntp->getXOVER($this->first.'-'.$this->last);
             $nntp->enableCompression();
 
-            if (NNTPService::isError($headers)) {
-                $message = ((int) $headers->code === 0 ? 'Unknown error' : $headers->message);
-                $this->log("Code {$headers->code}: $message\nSkipping group: {$this->groupMySQL['name']}", __FUNCTION__, 'error');
+            if (NNTPService::isError($headers) || ! \is_array($headers)) {
+                if (\is_object($headers) && isset($headers->code, $headers->message)) {
+                    $message = ((int) $headers->code === 0 ? 'Unknown error' : $headers->message);
+                    $this->log("Code {$headers->code}: $message\nSkipping group: {$this->groupMySQL['name']}", __FUNCTION__, 'error');
+                } else {
+                    $this->log("Unknown error\nSkipping group: {$this->groupMySQL['name']}", __FUNCTION__, 'error');
+                }
 
                 return null;
             }
