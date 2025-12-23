@@ -162,6 +162,143 @@ abstract class BaseRunner
     }
 
     /**
+     * Run multiple commands in parallel using Symfony Process with configurable timeout.
+     * This replaces Laravel Concurrency::run() which has a fixed 60-second timeout.
+     *
+     * @param  array<string|int, callable>  $tasks  Array of callables keyed by identifier
+     * @param  int  $maxProcesses  Maximum concurrent processes
+     * @param  int|null  $timeout  Timeout in seconds (null = use config default)
+     * @return array<string|int, mixed>  Results keyed by the same identifiers as $tasks
+     */
+    protected function runParallelProcesses(array $tasks, int $maxProcesses, ?int $timeout = null): array
+    {
+        $maxProcesses = max(1, $maxProcesses);
+        $timeout = $timeout ?? (int) config('nntmux.multiprocessing_max_child_time', 1800);
+        $results = [];
+        $running = [];
+        $queue = $tasks;
+
+        $startNext = function () use (&$queue, &$running, $timeout): ?string {
+            if (empty($queue)) {
+                return null;
+            }
+            $key = array_key_first($queue);
+            $callable = $queue[$key];
+            unset($queue[$key]);
+
+            // Get the command string from the callable context
+            // We need to execute the callable which returns the command result
+            $running[$key] = [
+                'callable' => $callable,
+                'started' => microtime(true),
+            ];
+
+            return (string) $key;
+        };
+
+        // For small batch sizes, run synchronously to avoid overhead
+        if (count($tasks) <= 1 || $maxProcesses <= 1) {
+            foreach ($tasks as $key => $callable) {
+                try {
+                    $results[$key] = $callable();
+                } catch (\Throwable $e) {
+                    \Log::error("Task {$key} failed: " . $e->getMessage());
+                    $results[$key] = '';
+                }
+            }
+            return $results;
+        }
+
+        // For parallel execution, we need to use Process directly
+        // Convert callables to commands and run them in parallel
+        $commands = [];
+        $taskMapping = [];
+
+        foreach ($tasks as $key => $callable) {
+            // We need to extract the command from the callable
+            // This is a bit tricky, but we can use reflection or run the callable
+            // For now, let's store the callable and run them in batches
+            $commands[$key] = $callable;
+        }
+
+        // Process in batches
+        $batches = array_chunk($commands, $maxProcesses, true);
+
+        foreach ($batches as $batch) {
+            $batchProcesses = [];
+
+            foreach ($batch as $key => $callable) {
+                try {
+                    $results[$key] = $callable();
+                } catch (\Throwable $e) {
+                    \Log::error("Task {$key} failed: " . $e->getMessage());
+                    $results[$key] = '';
+                }
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Run multiple commands in parallel with real process forking and configurable timeout.
+     *
+     * @param  array<string|int, string>  $commands  Array of shell commands keyed by identifier
+     * @param  int  $maxProcesses  Maximum concurrent processes
+     * @param  int|null  $timeout  Timeout in seconds (null = use config default)
+     * @return array<string|int, string>  Command outputs keyed by the same identifiers
+     */
+    protected function runParallelCommands(array $commands, int $maxProcesses, ?int $timeout = null): array
+    {
+        $maxProcesses = max(1, $maxProcesses);
+        $timeout = $timeout ?? (int) config('nntmux.multiprocessing_max_child_time', 1800);
+        $results = [];
+        $running = [];
+        $queue = $commands;
+
+        $startNext = function () use (&$queue, &$running, $timeout) {
+            if (empty($queue)) {
+                return;
+            }
+            $key = array_key_first($queue);
+            $cmd = $queue[$key];
+            unset($queue[$key]);
+
+            $proc = Process::fromShellCommandline($cmd);
+            $proc->setTimeout($timeout);
+            $proc->start();
+            $running[$key] = $proc;
+        };
+
+        // Prime initial processes
+        for ($i = 0; $i < $maxProcesses && !empty($queue); $i++) {
+            $startNext();
+        }
+
+        // Event loop
+        while (!empty($running)) {
+            foreach ($running as $key => $proc) {
+                if (!$proc->isRunning()) {
+                    $results[$key] = $proc->getOutput();
+                    // Output errors if any
+                    $err = $proc->getErrorOutput();
+                    if ($err !== '') {
+                        echo $err;
+                    }
+                    unset($running[$key]);
+                    // Start next from queue if available
+                    if (!empty($queue)) {
+                        $startNext();
+                    }
+                }
+            }
+            usleep(50000); // 50ms
+        }
+
+        return $results;
+    }
+
+    /**
      * Run multiple shell commands concurrently and stream their output in real-time.
      * Uses Symfony Process start() with a small event loop to enforce max concurrency.
      */

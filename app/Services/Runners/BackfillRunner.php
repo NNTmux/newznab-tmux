@@ -4,9 +4,7 @@ namespace App\Services\Runners;
 
 use App\Models\Settings;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Concurrency;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class BackfillRunner extends BaseRunner
 {
@@ -41,27 +39,18 @@ class BackfillRunner extends BaseRunner
 
         $this->headerStart('backfill', $count, $maxProcesses);
 
-        // Process in batches using Laravel's native Concurrency facade
-        $batches = array_chunk($work, max(1, $maxProcesses));
+        // Build commands array for parallel execution
+        $commands = [];
+        foreach ($work as $group) {
+            $commands[$group->name] = PHP_BINARY.' artisan update:backfill '.$group->name.(isset($group->max) ? (' '.$group->max) : '');
+        }
 
-        foreach ($batches as $batchIndex => $batch) {
-            $tasks = [];
-            foreach ($batch as $idx => $group) {
-                $command = PHP_BINARY.' artisan update:backfill '.$group->name.(isset($group->max) ? (' '.$group->max) : '');
-                $tasks[$group->name] = fn () => $this->executeCommand($command);
-            }
+        // Process using parallel commands with configurable timeout
+        $results = $this->runParallelCommands($commands, $maxProcesses);
 
-            try {
-                $results = Concurrency::run($tasks);
-
-                foreach ($results as $groupName => $output) {
-                    echo $output;
-                    $this->colorCli->primary('Backfilled group '.$groupName);
-                }
-            } catch (\Throwable $e) {
-                Log::error('Backfill batch failed: '.$e->getMessage());
-                $this->colorCli->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
-            }
+        foreach ($results as $groupName => $output) {
+            echo $output;
+            $this->colorCli->primary('Backfilled group '.$groupName);
         }
     }
 
@@ -150,27 +139,18 @@ class BackfillRunner extends BaseRunner
 
         $this->headerStart('safe_backfill', count($queues), $threads);
 
-        // Process in batches using Laravel's native Concurrency facade
-        $batches = array_chunk($queues, max(1, $threads), true);
+        // Build commands array for parallel execution
+        $commands = [];
+        foreach ($queues as $idx => $queue) {
+            $commands[$idx] = $this->buildDnrCommand($queue);
+        }
 
-        foreach ($batches as $batchIndex => $batch) {
-            $tasks = [];
-            foreach ($batch as $idx => $queue) {
-                $command = $this->buildDnrCommand($queue);
-                $tasks[$idx] = fn () => $this->executeCommand($command);
-            }
+        // Process using parallel commands with configurable timeout
+        $results = $this->runParallelCommands($commands, $threads);
 
-            try {
-                $results = Concurrency::run($tasks);
-
-                foreach ($results as $idx => $output) {
-                    echo $output;
-                    $this->colorCli->primary('Backfilled group '.$groupName);
-                }
-            } catch (\Throwable $e) {
-                Log::error('Safe backfill batch failed: '.$e->getMessage());
-                $this->colorCli->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
-            }
+        foreach ($results as $idx => $output) {
+            echo $output;
+            $this->colorCli->primary('Backfilled group '.$groupName);
         }
     }
 }

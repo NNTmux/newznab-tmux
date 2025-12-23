@@ -3,9 +3,7 @@
 namespace App\Services\Runners;
 
 use App\Models\Settings;
-use Illuminate\Support\Facades\Concurrency;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class BinariesRunner extends BaseRunner
 {
@@ -40,27 +38,18 @@ class BinariesRunner extends BaseRunner
 
         $this->headerStart('binaries', $count, $maxProcesses);
 
-        // Process in batches using Laravel's native Concurrency facade
-        $batches = array_chunk($work, max(1, $maxProcesses));
+        // Build commands array for parallel execution
+        $commands = [];
+        foreach ($work as $group) {
+            $commands[$group->name] = PHP_BINARY.' artisan update:binaries '.$group->name.' '.$group->max;
+        }
 
-        foreach ($batches as $batchIndex => $batch) {
-            $tasks = [];
-            foreach ($batch as $group) {
-                $command = PHP_BINARY.' artisan update:binaries '.$group->name.' '.$group->max;
-                $tasks[$group->name] = fn () => $this->executeCommand($command);
-            }
+        // Process using parallel commands with configurable timeout
+        $results = $this->runParallelCommands($commands, $maxProcesses);
 
-            try {
-                $results = Concurrency::run($tasks);
-
-                foreach ($results as $groupName => $output) {
-                    echo $output;
-                    $this->colorCli->primary('Updated group '.$groupName);
-                }
-            } catch (\Throwable $e) {
-                Log::error('Binaries batch failed: '.$e->getMessage());
-                $this->colorCli->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
-            }
+        foreach ($results as $groupName => $output) {
+            echo $output;
+            $this->colorCli->primary('Updated group '.$groupName);
         }
     }
 
@@ -139,29 +128,23 @@ class BinariesRunner extends BaseRunner
 
         $this->headerStart('safe_binaries', count($queues), $maxProcesses);
 
-        // Process in batches using Laravel's native Concurrency facade
-        $batches = array_chunk($queues, max(1, $maxProcesses), true);
+        // Build commands array with group info for parallel execution
+        $commands = [];
+        $groupMapping = [];
+        foreach ($queues as $idx => $queue) {
+            preg_match('/alt\..+/i', $queue, $hit);
+            $commands[$idx] = $this->buildDnrCommand($queue);
+            $groupMapping[$idx] = $hit[0] ?? '';
+        }
 
-        foreach ($batches as $batchIndex => $batch) {
-            $tasks = [];
-            foreach ($batch as $idx => $queue) {
-                preg_match('/alt\..+/i', $queue, $hit);
-                $command = $this->buildDnrCommand($queue);
-                $tasks[$idx] = fn () => ['output' => $this->executeCommand($command), 'group' => $hit[0] ?? ''];
-            }
+        // Process using parallel commands with configurable timeout
+        $results = $this->runParallelCommands($commands, $maxProcesses);
 
-            try {
-                $results = Concurrency::run($tasks);
-
-                foreach ($results as $result) {
-                    if (! empty($result['group'])) {
-                        echo $result['output'];
-                        $this->colorCli->primary('Updated group '.$result['group']);
-                    }
-                }
-            } catch (\Throwable $e) {
-                Log::error('Safe binaries batch failed: '.$e->getMessage());
-                $this->colorCli->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
+        foreach ($results as $idx => $output) {
+            $group = $groupMapping[$idx] ?? '';
+            if (!empty($group)) {
+                echo $output;
+                $this->colorCli->primary('Updated group '.$group);
             }
         }
     }
