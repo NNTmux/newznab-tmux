@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\IRCScraper;
+use App\Services\IRCScraper;
 use Illuminate\Console\Command;
 
 class IrcScraperCommand extends Command

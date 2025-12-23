@@ -1,6 +1,6 @@
 <?php
 
-namespace Blacklight;
+namespace App\Services;
 
 use App\Models\Predb;
 use App\Models\UsenetGroup;

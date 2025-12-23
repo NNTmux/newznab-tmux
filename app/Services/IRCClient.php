@@ -1,6 +1,6 @@
 <?php
 
-namespace Blacklight;
+namespace App\Services;
 
 
 /**
@@ -623,3 +623,4 @@ class IRCClient
         return is_string($result) ? $result : $text;
     }
 }
+
