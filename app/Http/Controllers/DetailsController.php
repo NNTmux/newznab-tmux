@@ -15,7 +15,7 @@ use App\Models\Video;
 use App\Services\MovieService;
 use App\Services\Releases\ReleaseSearchService;
 use App\Services\BookService;
-use Blacklight\AniDB;
+use App\Services\AnidbService;
 use Blacklight\Console;
 use Blacklight\Games;
 use Blacklight\Music;
@@ -129,7 +129,7 @@ class DetailsController extends BasePageController
 
             $AniDBAPIArray = '';
             if ($data['anidbid'] > 0) {
-                $AniDBAPIArray = (new AniDB)->getAnimeInfo($data['anidbid']);
+                $AniDBAPIArray = (new AnidbService)->getAnimeInfo($data['anidbid']);
 
                 // If we have anilist_id but missing details, fetch from AniList
                 if ($AniDBAPIArray && !empty($AniDBAPIArray->anilist_id)) {
@@ -140,7 +140,7 @@ class DetailsController extends BasePageController
                             $palist = new \Blacklight\PopulateAniList;
                             $palist->populateTable('info', $anilistId);
                             // Refresh the data
-                            $AniDBAPIArray = (new AniDB)->getAnimeInfo($data['anidbid']);
+                            $AniDBAPIArray = (new AnidbService)->getAnimeInfo($data['anidbid']);
                         } catch (\Exception $e) {
                             // Silently fail, use existing data
                         }

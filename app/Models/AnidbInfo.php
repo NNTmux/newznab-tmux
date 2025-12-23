@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * App\Models\AnidbInfo.
@@ -84,9 +85,81 @@ class AnidbInfo extends Model
      */
     protected $table = 'anidb_info';
 
+    /**
+     * Get the title associated with this info.
+     */
     public function title(): BelongsTo
     {
         return $this->belongsTo(AnidbTitle::class, 'anidbid');
     }
 
+    /**
+     * Get the releases associated with this anime.
+     */
+    public function releases(): HasMany
+    {
+        return $this->hasMany(Release::class, 'anidbid', 'anidbid');
+    }
+
+    /**
+     * Get the picture path.
+     */
+    public function getPicturePath(): string
+    {
+        return storage_path('covers/anime/'.$this->anidbid.'.jpg');
+    }
+
+    /**
+     * Check if picture image exists locally.
+     */
+    public function hasPictureImage(): bool
+    {
+        return file_exists($this->getPicturePath());
+    }
+
+    /**
+     * Get the picture URL.
+     */
+    public function getPictureUrl(): ?string
+    {
+        if (empty($this->picture)) {
+            return null;
+        }
+
+        // If picture is already a URL, return it
+        if (filter_var($this->picture, FILTER_VALIDATE_URL)) {
+            return $this->picture;
+        }
+
+        // Otherwise construct the local path
+        if ($this->hasPictureImage()) {
+            return url('/covers/anime/'.$this->anidbid.'.jpg');
+        }
+
+        return null;
+    }
+
+    /**
+     * Get AniList URL if anilist_id exists.
+     */
+    public function getAnilistUrl(): ?string
+    {
+        if (empty($this->anilist_id)) {
+            return null;
+        }
+
+        return 'https://anilist.co/anime/'.$this->anilist_id;
+    }
+
+    /**
+     * Get MyAnimeList URL if mal_id exists.
+     */
+    public function getMalUrl(): ?string
+    {
+        if (empty($this->mal_id)) {
+            return null;
+        }
+
+        return 'https://myanimelist.net/anime/'.$this->mal_id;
+    }
 }

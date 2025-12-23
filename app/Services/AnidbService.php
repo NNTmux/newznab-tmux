@@ -1,25 +1,39 @@
 <?php
 
-namespace Blacklight;
+namespace App\Services;
 
+use App\Models\AnidbInfo;
 use App\Models\AnidbTitle;
 use App\Models\Category;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Class AniDB.
+ * Service class for AniDB data fetching and processing.
  */
-class AniDB
+class AnidbService
 {
-    public function __construct() {}
-
     /**
      * Updates stored AniList entries in the database.
      * Note: AniList doesn't support episodes, so episode-related parameters are ignored.
      */
-    public function updateTitle(int $anidbID, string $title, string $type, string $startdate, string $enddate, string $related, string $similar, string $creators, string $description, string $rating, string $categories, string $characters, string $epnos = '', string $airdates = '', string $episodetitles = ''): void
-    {
+    public function updateTitle(
+        int $anidbID,
+        string $title,
+        string $type,
+        string $startdate,
+        string $enddate,
+        string $related,
+        string $similar,
+        string $creators,
+        string $description,
+        string $rating,
+        string $categories,
+        string $characters,
+        string $epnos = '',
+        string $airdates = '',
+        string $episodetitles = ''
+    ): void {
         DB::update(
             sprintf(
                 '
@@ -45,6 +59,8 @@ class AniDB
     }
 
     /**
+     * Deletes an AniDB title and associated info.
+     *
      * @throws \Throwable
      */
     public function deleteTitle(int $anidbID): void
@@ -120,11 +136,15 @@ class AniDB
     }
 
     /**
-     * Retrieves all info for a specific AniList ID.
+     * Retrieves all info for a specific AniDB ID.
      * Note: AniList doesn't support episodes, so episode data is not included.
      */
-    public function getAnimeInfo(int $anidbID): mixed
+    public function getAnimeInfo(?int $anidbID): mixed
     {
+        if ($anidbID === null || $anidbID <= 0) {
+            return null;
+        }
+
         // Get main info with primary title (prefer English, fallback to any)
         $animeInfo = DB::select(
             sprintf(
@@ -136,7 +156,7 @@ class AniDB
 				FROM anidb_titles AS at
 				LEFT JOIN anidb_info AS ai USING (anidbid)
 				WHERE at.anidbid = %d
-				ORDER BY CASE 
+				ORDER BY CASE
 					WHEN at.lang = "en" THEN 1
 					WHEN at.lang = "x-jat" THEN 2
 					ELSE 3
@@ -147,7 +167,7 @@ class AniDB
         );
 
         $result = $animeInfo[0] ?? false;
-        
+
         if ($result) {
             // Get English title separately
             $englishTitle = DB::selectOne(
@@ -160,7 +180,7 @@ class AniDB
                     $anidbID
                 )
             );
-            
+
             // Get native title (prefer ja, then x-jat, then any non-English title)
             $nativeTitle = DB::selectOne(
                 sprintf(
@@ -168,7 +188,7 @@ class AniDB
 					SELECT title, lang
 					FROM anidb_titles
 					WHERE anidbid = %d AND lang NOT IN ("en")
-					ORDER BY CASE 
+					ORDER BY CASE
 						WHEN lang = "ja" THEN 1
 						WHEN lang = "x-jat" THEN 2
 						ELSE 3
@@ -177,7 +197,7 @@ class AniDB
                     $anidbID
                 )
             );
-            
+
             // Get romaji title separately
             $romajiTitle = DB::selectOne(
                 sprintf(
@@ -189,20 +209,20 @@ class AniDB
                     $anidbID
                 )
             );
-            
+
             // If we found a native title, use it; otherwise use romaji as original
             $originalTitle = $nativeTitle;
-            if (!$originalTitle && $romajiTitle) {
+            if (! $originalTitle && $romajiTitle) {
                 $originalTitle = $romajiTitle;
             }
-            
+
             // Add titles to result
             if ($englishTitle && isset($englishTitle->title)) {
                 $result->english_title = $englishTitle->title;
             } else {
                 $result->english_title = null;
             }
-            
+
             if ($originalTitle && isset($originalTitle->title)) {
                 $result->original_title = $originalTitle->title;
                 $result->original_lang = $originalTitle->lang;
@@ -210,7 +230,7 @@ class AniDB
                 $result->original_title = null;
                 $result->original_lang = null;
             }
-            
+
             // Add romaji title separately (even if it's also the original)
             if ($romajiTitle && isset($romajiTitle->title)) {
                 $result->romaji_title = $romajiTitle->title;
@@ -222,3 +242,4 @@ class AniDB
         return $result;
     }
 }
+

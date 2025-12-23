@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
 use App\Models\Release;
-use Blacklight\AniDB;
+use App\Services\AnidbService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -18,11 +18,11 @@ class AdminAnidbController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $AniDB = new AniDB;
+        $anidbService = new AnidbService;
         $title = $meta_title = 'AniDB List';
 
         $animetitle = $request->input('animetitle', '');
-        $anidblist = $AniDB->getAnimeRange($animetitle);
+        $anidblist = $anidbService->getAnimeRange($animetitle);
 
         return view('admin.anidb.index', compact('anidblist', 'animetitle', 'title', 'meta_title'));
     }
@@ -34,14 +34,14 @@ class AdminAnidbController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $AniDB = new AniDB;
+        $anidbService = new AnidbService;
 
         // Set the current action.
         $action = $request->input('action', 'view');
 
         switch ($action) {
             case 'submit':
-                $AniDB->updateTitle(
+                $anidbService->updateTitle(
                     $request->input('anidbid'),
                     $request->input('title'),
                     $request->input('type'),
@@ -65,7 +65,7 @@ class AdminAnidbController extends BasePageController
             default:
                 if (! empty($id)) {
                     $title = $meta_title = 'AniDB Edit';
-                    $anime = $AniDB->getAnimeInfo($id);
+                    $anime = $anidbService->getAnimeInfo($id);
 
                     return view('admin.anidb.edit', compact('anime', 'title', 'meta_title'));
                 }
