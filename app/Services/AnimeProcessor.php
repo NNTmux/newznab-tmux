@@ -9,8 +9,8 @@ use App\Models\AnidbTitle;
 use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
+use App\Services\PopulateAniListService as PaList;
 use Blacklight\ColorCLI;
-use Blacklight\PopulateAniList as PaList;
 
 class AnimeProcessor
 {

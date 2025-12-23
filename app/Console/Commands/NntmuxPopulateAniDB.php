@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\PopulateAniList;
+use App\Services\PopulateAniListService;
 use Illuminate\Console\Command;
 
 class NntmuxPopulateAniDB extends Command
@@ -28,8 +28,8 @@ class NntmuxPopulateAniDB extends Command
      */
     public function handle(): void
     {
-        $palist = new PopulateAniList;
-        
+        $palist = new PopulateAniListService;
+
         if ($this->option('info') && is_numeric($this->option('anilistid'))) {
             $palist->populateTable('info', $this->option('anilistid'));
         } elseif ($this->option('info')) {
@@ -38,7 +38,7 @@ class NntmuxPopulateAniDB extends Command
             $this->error('Please specify --info option');
             return;
         }
-        
+
         $this->info('AniList tables populated with requested data');
     }
 }

@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Models\AnidbInfo;
 use App\Models\Category;
 use App\Models\Release;
-use Blacklight\PopulateAniList;
+use App\Services\PopulateAniListService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -93,7 +93,7 @@ class RefreshAnimeData extends Command
         }
 
         $this->info("Found {$totalCount} anime releases to process.");
-        
+
         if ($limit > 0) {
             $releases = $releases->take($limit);
             $totalCount = $releases->count();
@@ -102,7 +102,7 @@ class RefreshAnimeData extends Command
 
         $this->newLine();
 
-        $populateAniList = new PopulateAniList;
+        $populateAniList = new PopulateAniListService;
         $processed = 0;
         $successful = 0;
         $failed = 0;
@@ -125,7 +125,7 @@ class RefreshAnimeData extends Command
                 try {
                     // Extract clean title from searchname
                     $titleData = $this->extractTitleFromSearchname($searchname);
-                    
+
                     if (empty($titleData) || empty($titleData['title'])) {
                         $notFound++;
                         $failedSearchnames[] = [
@@ -168,7 +168,7 @@ class RefreshAnimeData extends Command
                     // Search AniList for this title (with rate limiting)
                     $this->enforceRateLimit();
                     $searchResults = $populateAniList->searchAnime($cleanTitle, 1);
-                    
+
                     if (! $searchResults || empty($searchResults)) {
                         // Try with spaces replaced for broader matching
                         $altTitle = preg_replace('/\s+/', ' ', $cleanTitle);
@@ -246,7 +246,7 @@ class RefreshAnimeData extends Command
                         $this->warn('Please wait 15 minutes before running this command again.');
                         $progressBar->finish();
                         $this->newLine();
-                        
+
                         // Show summary of what was processed before the error
                         $this->info('Summary (before rate limit error):');
                         $this->table(
@@ -259,7 +259,7 @@ class RefreshAnimeData extends Command
                                 ['Skipped', $skipped],
                             ]
                         );
-                        
+
                         // Show failed searchnames if any
                         if (!empty($failedSearchnames)) {
                             $this->newLine();
@@ -274,10 +274,10 @@ class RefreshAnimeData extends Command
                                 $this->line("  ... and " . (count($failedSearchnames) - 10) . " more.");
                             }
                         }
-                        
+
                         return self::FAILURE;
                     }
-                    
+
                     $failed++;
                     if ($this->getOutput()->isVerbose()) {
                         $this->newLine();
@@ -312,7 +312,7 @@ class RefreshAnimeData extends Command
             $this->newLine();
             $this->warn("Failed to fetch data for {$notFound} release(s):");
             $this->newLine();
-            
+
             // Show up to 20 examples
             $examples = array_slice($failedSearchnames, 0, 20);
             $rows = [];
@@ -324,12 +324,12 @@ class RefreshAnimeData extends Command
                     $item['reason'],
                 ];
             }
-            
+
             $this->table(
                 ['Searchname', 'Cleaned Title', 'Reason'],
                 $rows
             );
-            
+
             if (count($failedSearchnames) > 20) {
                 $this->line("... and " . (count($failedSearchnames) - 20) . " more. Use --verbose to see all.");
             }
@@ -365,7 +365,7 @@ class RefreshAnimeData extends Command
         // Remove language codes and tags
         $s = preg_replace('/\[(?:ENG|JAP|JPN|SUB|DUB|MULTI|RAW|HARDSUB|SOFTSUB|HARDDUB|SOFTDUB|ITA|SPA|FRE|GER|RUS|CHI|KOR)\]/i', ' ', $s);
         $s = preg_replace('/\((?:ENG|JAP|JPN|SUB|DUB|MULTI|RAW|HARDSUB|SOFTSUB|HARDDUB|SOFTDUB|ITA|SPA|FRE|GER|RUS|CHI|KOR)\)/i', ' ', $s);
-        
+
         // Extract title by removing episode patterns
         $title = '';
 
@@ -416,13 +416,13 @@ class RefreshAnimeData extends Command
         // Pattern: Ã¢Â_Â, Ã¢Â Â, Ã¢Â, etc.
         $text = preg_replace('/Ã¢Â[_\sÂ]*/u', '', $text);
         $text = preg_replace('/Ã[¢Â©€£]/u', '', $text);
-        
+
         // Remove standalone Â characters (common encoding artifact)
         $text = preg_replace('/Â+/u', '', $text);
-        
+
         // Remove any remaining Ã sequences (encoding artifacts)
         $text = preg_replace('/Ã[^\s]*/u', '', $text);
-        
+
         // Try to detect and fix double-encoding issues
         // Common patterns: Ã©, Ã, etc. (UTF-8 interpreted as ISO-8859-1)
         if (preg_match('/Ã[^\s]/u', $text)) {
@@ -432,19 +432,19 @@ class RefreshAnimeData extends Command
                 $text = $converted;
             }
         }
-        
+
         // Remove any remaining non-printable or control characters except spaces
         $text = preg_replace('/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/u', '', $text);
-        
+
         // Normalize Unicode (NFD -> NFC) if available
         if (function_exists('normalizer_normalize')) {
             $text = normalizer_normalize($text, \Normalizer::FORM_C);
         }
-        
+
         // Final cleanup: remove any remaining isolated non-ASCII control-like characters
         // This catches any remaining encoding artifacts
         $text = preg_replace('/[\xC0-\xC1\xC2-\xC5]/u', '', $text);
-        
+
         return $text;
     }
 
@@ -455,26 +455,26 @@ class RefreshAnimeData extends Command
     {
         // Fix encoding issues first
         $title = $this->fixEncoding($title);
-        
+
         // Remove all bracketed tags (language, quality, etc.)
         $title = preg_replace('/\[[^\]]+\]/', ' ', $title);
-        
+
         // Remove all parenthesized tags
         $title = preg_replace('/\([^)]+\)/', ' ', $title);
-        
+
         // Remove language codes (standalone or with separators)
         $title = preg_replace('/\b(ENG|JAP|JPN|SUB|DUB|MULTI|RAW|HARDSUB|SOFTSUB|HARDDUB|SOFTDUB|ITA|SPA|FRE|GER|RUS|CHI|KOR)\b/i', ' ', $title);
-        
+
         // Remove metadata words (JAV, Uncensored, Censored, etc.)
         $title = preg_replace('/\b(JAV|Uncensored|Censored|Mosaic|Mosaic-less|HD|SD|FHD|UHD)\b/i', ' ', $title);
-        
+
         // Remove date patterns (6-digit dates like 091919, 200101, etc.)
         $title = preg_replace('/\b\d{6}\b/', ' ', $title);
-        
+
         // Remove trailing numbers/underscores (like _01, 01, _001, etc.)
         $title = preg_replace('/[-_]\s*\d{1,4}\s*$/i', '', $title);
         $title = preg_replace('/\s+\d{1,4}\s*$/i', '', $title);
-        
+
         // Remove episode patterns (including episode titles that follow)
         // Remove " - 1x18 - Episode Title" or " - 1x18" patterns
         $title = preg_replace('/\s*-\s*\d+x\d+.*$/i', '', $title);
@@ -485,23 +485,23 @@ class RefreshAnimeData extends Command
         $title = preg_replace('/\s*-\s*$/i', '', $title);
         // Remove " E0*NNN" or " Ep NNN" patterns
         $title = preg_replace('/\s+E(?:p(?:isode)?)?\s*0*\d{1,4}\s*$/i', '', $title);
-        
+
         // Remove quality/resolution tags
         $title = preg_replace('/\b(480p|720p|1080p|2160p|4K|BD|BDRip|BluRay|Blu-Ray|HEVC|x264|x265|H264|H265|WEB|WEBRip|DVDRip|TVRip)\b/i', ' ', $title);
-        
+
         // Remove common release tags
         $title = preg_replace('/\b(PROPER|REPACK|RIP|ISO|CRACK|BETA|ALPHA|FINAL|COMPLETE|FULL)\b/i', ' ', $title);
-        
+
         // Remove volume/chapter markers
         $title = preg_replace('/\s+Vol\.?\s*\d*\s*$/i', '', $title);
         $title = preg_replace('/\s+Ch\.?\s*\d*\s*$/i', '', $title);
-        
+
         // Remove trailing dashes and separators
         $title = preg_replace('/\s*[-_]\s*$/', '', $title);
-        
+
         // Normalize whitespace
         $title = preg_replace('/\s+/', ' ', $title);
-        
+
         return trim($title);
     }
 
@@ -512,7 +512,7 @@ class RefreshAnimeData extends Command
     private function enforceRateLimit(): void
     {
         $now = time();
-        
+
         // Clean old timestamps (older than 1 minute)
         $this->requestTimestamps = array_filter($this->requestTimestamps, function ($timestamp) use ($now) {
             return ($now - $timestamp) < 60;
@@ -533,7 +533,7 @@ class RefreshAnimeData extends Command
                         $this->warn("Rate limit reached ({$requestCount}/" . self::RATE_LIMIT_PER_MINUTE . "). Waiting {$waitTime} seconds...");
                     }
                     sleep($waitTime);
-                    
+
                     // Clean timestamps again after waiting
                     $now = time();
                     $this->requestTimestamps = array_filter($this->requestTimestamps, function ($timestamp) use ($now) {
@@ -546,12 +546,12 @@ class RefreshAnimeData extends Command
         // Calculate minimum delay between requests (to maintain 20/min rate)
         // 60 seconds / 20 requests = 3 seconds per request
         $minDelay = 60.0 / self::RATE_LIMIT_PER_MINUTE;
-        
+
         // If we have recent requests, ensure we wait at least the minimum delay
         if (! empty($this->requestTimestamps)) {
             $lastRequest = max($this->requestTimestamps);
             $timeSinceLastRequest = $now - $lastRequest;
-            
+
             if ($timeSinceLastRequest < $minDelay) {
                 $waitTime = $minDelay - $timeSinceLastRequest;
                 if ($waitTime > 0 && $waitTime < 2) { // Only wait if less than 2 seconds

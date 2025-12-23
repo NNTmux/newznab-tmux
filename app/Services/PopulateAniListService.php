@@ -1,16 +1,17 @@
 <?php
 
-namespace Blacklight;
+declare(strict_types=1);
+
+namespace App\Services;
 
 use App\Models\AnidbInfo;
 use App\Models\AnidbTitle;
-use App\Models\Settings;
+use Blacklight\ColorCLI;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Support\Carbon;
 
-class PopulateAniList
+class PopulateAniListService
 {
     /**
      * AniList GraphQL API endpoint
@@ -185,21 +186,21 @@ class PopulateAniList
     {
         // Get anilist_id from database
         $anidbInfo = AnidbInfo::query()->where('anidbid', $anidbid)->first();
-        
+
         if (! $anidbInfo || ! $anidbInfo->anilist_id) {
             return false;
         }
 
         // Fetch fresh data from AniList
         $anilistData = $this->getAnimeById($anidbInfo->anilist_id);
-        
+
         if ($anilistData === false) {
             return false;
         }
 
         // Update database with fresh data
         $this->insertAniListInfo($anidbid, $anilistData);
-        
+
         return true;
     }
 
@@ -300,13 +301,13 @@ class PopulateAniList
         if (self::$rateLimitPause !== null) {
             $now = time();
             $pausedUntil = self::$rateLimitPause['paused_until'];
-            
+
             if ($now < $pausedUntil) {
                 $remainingSeconds = $pausedUntil - $now;
                 if ($this->echooutput) {
                     $this->colorCli->warning("API calls paused due to 429 error. Resuming in {$remainingSeconds} seconds...");
                 }
-                
+
                 // Throw exception to stop processing
                 throw new \Exception("AniList API rate limit exceeded (429). Paused until " . date('Y-m-d H:i:s', $pausedUntil));
             } else {
@@ -314,7 +315,7 @@ class PopulateAniList
                 self::$rateLimitPause = null;
             }
         }
-        
+
         // Enforce rate limiting
         $this->enforceRateLimit();
 
@@ -336,11 +337,11 @@ class PopulateAniList
                     'timestamp' => time(),
                     'paused_until' => $pauseUntil,
                 ];
-                
+
                 if ($this->echooutput) {
                     $this->colorCli->error('AniList API returned 429 (Too Many Requests). Pausing all API calls for 15 minutes.');
                 }
-                
+
                 return false;
             }
 
@@ -382,14 +383,14 @@ class PopulateAniList
                     'timestamp' => time(),
                     'paused_until' => $pauseUntil,
                 ];
-                
+
                 if ($this->echooutput) {
                     $this->colorCli->error('AniList API returned 429 (Too Many Requests). Pausing all API calls for 15 minutes.');
                 }
-                
+
                 throw new \Exception("AniList API rate limit exceeded (429). Paused until " . date('Y-m-d H:i:s', $pauseUntil));
             }
-            
+
             if ($this->echooutput) {
                 $this->colorCli->error('AniList API Request Failed: '.$e->getMessage());
             }
@@ -549,7 +550,7 @@ class PopulateAniList
         // Use updateOrInsert to handle race conditions atomically
         // This prevents duplicate key errors when multiple processes try to insert the same record
         $check = AnidbInfo::query()->where('anidbid', $anidbid)->first();
-        
+
         $data = [
             'anidbid' => $anidbid,
             'anilist_id' => $anilistId,
@@ -631,7 +632,7 @@ class PopulateAniList
         // This matches the format used by movies: {id}-cover.jpg
         $coverFilename = $anidbid.'-cover.jpg';
         $coverPath = $this->imgSavePath.$coverFilename;
-        
+
         if (file_exists($coverPath)) {
             return; // Already exists
         }
@@ -649,14 +650,14 @@ class PopulateAniList
 
             // Write the image file
             $bytesWritten = file_put_contents($coverPath, $imageData);
-            
+
             if ($bytesWritten === false) {
                 throw new \RuntimeException("Failed to write cover image to {$coverPath}");
             }
-            
+
             // Set proper file permissions
             chmod($coverPath, 0644);
-            
+
             if ($this->echooutput) {
                 $this->colorCli->info("Downloaded cover image for ID {$anidbid} from AniList to {$coverPath}");
             }
@@ -733,5 +734,4 @@ class PopulateAniList
         }
     }
 }
-
 

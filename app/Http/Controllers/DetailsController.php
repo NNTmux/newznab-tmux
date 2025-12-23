@@ -137,7 +137,7 @@ class DetailsController extends BasePageController
                     if ($anilistId && (empty($AniDBAPIArray->country) && empty($AniDBAPIArray->media_type))) {
                         // Fetch fresh data from AniList if country/media_type is missing
                         try {
-                            $palist = new \Blacklight\PopulateAniList;
+                            $palist = new \App\Services\PopulateAniListService;
                             $palist->populateTable('info', $anilistId);
                             // Refresh the data
                             $AniDBAPIArray = (new AnidbService)->getAnimeInfo($data['anidbid']);
