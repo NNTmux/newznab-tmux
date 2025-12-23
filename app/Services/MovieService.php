@@ -102,8 +102,12 @@ class MovieService
     /**
      * Get movie info by IMDB ID.
      */
-    public function getMovieInfo(string $imdbId): ?MovieInfo
+    public function getMovieInfo(?string $imdbId): ?MovieInfo
     {
+        if ($imdbId === null || $imdbId === '' || $imdbId === '0000000') {
+            return null;
+        }
+
         return MovieInfo::query()->where('imdbid', $imdbId)->first();
     }
 
