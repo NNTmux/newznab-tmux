@@ -18,8 +18,8 @@ require_once __DIR__.'/../../../../bootstrap/autoload.php';
 use App\Models\Settings;
 use App\Services\Tmux\TmuxMonitorService;
 use App\Services\Tmux\TmuxTaskRunner;
+use App\Services\Tmux\TmuxOutput;
 use Blacklight\ColorCLI;
-use Blacklight\TmuxOutput;
 
 $colorCli = new ColorCLI;
 

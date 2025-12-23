@@ -1,7 +1,8 @@
 <?php
 
-namespace Blacklight;
+namespace App\Services\Tmux;
 
+use Blacklight\ColorCLI;
 use Illuminate\Support\Facades\Process;
 
 /**
@@ -523,3 +524,4 @@ class TmuxOutput extends Tmux
         $this->_colourMasks[5] = $this->colorCli->ansiString('%-16.16s %25.25s %25.25s', 'yellow').PHP_EOL;
     }
 }
+

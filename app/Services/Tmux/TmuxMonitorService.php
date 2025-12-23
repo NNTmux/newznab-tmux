@@ -6,7 +6,6 @@ use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Release;
 use App\Models\Settings;
-use Blacklight\Tmux;
 use Illuminate\Support\Facades\DB;
 
 /**
