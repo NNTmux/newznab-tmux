@@ -14,6 +14,7 @@ use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
 use App\Services\NameFixing\NameFixingService;
 use App\Services\NameFixing\ReleaseUpdateService;
+use App\Services\NNTP\NNTPService;
 use Blacklight\Nfo;
 use Blacklight\NZB;
 use Blacklight\ReleaseExtra;
