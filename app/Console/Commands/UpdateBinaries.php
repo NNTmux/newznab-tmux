@@ -7,8 +7,8 @@ namespace App\Console\Commands;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\Binaries\BinariesService;
+use App\Services\NNTP\NNTPService;
 use Blacklight\ColorCLI;
-use Blacklight\NNTP;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -97,9 +97,9 @@ class UpdateBinaries extends Command
     /**
      * Get NNTP connection.
      */
-    private function getNntp(): NNTP
+    private function getNntp(): NNTPService
     {
-        $nntp = new NNTP();
+        $nntp = new NNTPService();
 
         if ($nntp->doConnect() !== true) {
             throw new \RuntimeException('Unable to connect to usenet.');

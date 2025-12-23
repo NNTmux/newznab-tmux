@@ -6,6 +6,7 @@ namespace Blacklight;
 
 use App\Models\Release;
 use App\Models\Settings;
+use App\Services\NNTP\NNTPService;
 use App\Services\PostProcessService;
 
 /**
@@ -15,7 +16,7 @@ use App\Services\PostProcessService;
  */
 class NZBContents
 {
-    protected NNTP $nntp;
+    protected NNTPService $nntp;
 
     protected Nfo $nfo;
 
@@ -32,7 +33,7 @@ class NZBContents
     public function __construct()
     {
         $this->echooutput = (bool) config('nntmux.echocli');
-        $this->nntp = new NNTP();
+        $this->nntp = new NNTPService();
         $this->nfo = new Nfo();
         $this->postProcessService = app(PostProcessService::class);
         $this->nzb = new NZB();

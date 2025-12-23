@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\UsenetGroup;
 use App\Services\Binaries\BinariesService;
-use Blacklight\NNTP;
+use App\Services\NNTP\NNTPService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -44,7 +44,7 @@ class PartRepair extends Command
 
             $data = $nntp->selectGroup($groupMySQL['name']);
 
-            if (NNTP::isError($data) && $nntp->dataError($nntp, $groupMySQL['name']) === false) {
+            if (NNTPService::isError($data) && $nntp->dataError($nntp, $groupMySQL['name']) === false) {
                 return self::FAILURE;
             }
 
@@ -64,9 +64,9 @@ class PartRepair extends Command
     /**
      * Get NNTP connection.
      */
-    private function getNntp(): NNTP
+    private function getNntp(): NNTPService
     {
-        $nntp = new NNTP;
+        $nntp = new NNTPService;
 
         if ((config('nntmux_nntp.use_alternate_nntp_server') === true
             ? $nntp->doConnect(false, true)

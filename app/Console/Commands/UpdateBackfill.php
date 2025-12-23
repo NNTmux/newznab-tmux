@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Services\Backfill\BackfillService;
-use Blacklight\NNTP;
+use App\Services\NNTP\NNTPService;
 use Illuminate\Console\Command;
 
 class UpdateBackfill extends Command
@@ -72,9 +72,9 @@ class UpdateBackfill extends Command
     /**
      * Get NNTP connection.
      */
-    private function getNntp(): NNTP
+    private function getNntp(): NNTPService
     {
-        $nntp = new NNTP;
+        $nntp = new NNTPService;
 
         if ($nntp->doConnect() !== true) {
             throw new \Exception('Unable to connect to usenet.');

@@ -10,6 +10,7 @@ use App\Services\NameFixing\Contracts\NameSourceFixerInterface;
 use App\Services\NameFixing\DTO\NameFixResult;
 use App\Services\NameFixing\Extractors\NfoNameExtractor;
 use App\Services\NameFixing\Extractors\FileNameExtractor;
+use App\Services\NNTP\NNTPService;
 use App\Services\Search\ElasticSearchService;
 use App\Services\Search\ManticoreSearchService;
 use Blacklight\ColorCLI;
@@ -956,7 +957,7 @@ class NameFixingService
     /**
      * Fix names using PAR2 files (requires NNTP connection).
      */
-    public function fixNamesWithPar2(int $time, bool $echo, int $cats, bool $nameStatus, bool $show, \Blacklight\NNTP $nntp): void
+    public function fixNamesWithPar2(int $time, bool $echo, int $cats, bool $nameStatus, bool $show, NNTPService $nntp): void
     {
         $this->echoStartMessage($time, 'par2 files');
 

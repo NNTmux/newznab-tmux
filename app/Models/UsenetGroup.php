@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Services\ReleaseImageService;
+use App\Services\NNTP\NNTPService;
 use Blacklight\ColorCLI;
-use Blacklight\NNTP;
 use Blacklight\NZB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
@@ -426,7 +426,7 @@ class UsenetGroup extends Model
         if (preg_match('/^\s*$/m', $groupList)) {
             $ret = 'No group list provided.';
         } else {
-            $nntp = new NNTP(['Echo' => false]);
+            $nntp = new NNTPService();
             if ($nntp->doConnect() !== true) {
                 return 'Problem connecting to usenet.';
             }

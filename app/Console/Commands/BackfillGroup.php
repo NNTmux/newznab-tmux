@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Settings;
 use App\Services\Backfill\BackfillService;
+use App\Services\NNTP\NNTPService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -64,9 +65,9 @@ class BackfillGroup extends Command
     /**
      * Get NNTP connection.
      */
-    private function getNntp(): \Blacklight\NNTP
+    private function getNntp(): NNTPService
     {
-        $nntp = new \Blacklight\NNTP;
+        $nntp = new NNTPService;
 
         if ((config('nntmux_nntp.use_alternate_nntp_server') === true
             ? $nntp->doConnect(false, true)

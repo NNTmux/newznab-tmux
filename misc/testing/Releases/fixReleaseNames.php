@@ -11,12 +11,12 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Services\NameFixing\NameFixingService;
-use Blacklight\NNTP;
+use App\Services\NNTP\NNTPService;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 $output = new ConsoleOutput;
 $nameFixingService = new NameFixingService;
-$nntp = new NNTP;
+$nntp = new NNTPService;
 
 if (isset($argv[1], $argv[2], $argv[3], $argv[4])) {
     $update = $argv[2] === 'true';

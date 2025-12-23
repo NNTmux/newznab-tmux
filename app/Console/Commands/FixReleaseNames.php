@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Services\NameFixing\NameFixingService;
-use Blacklight\NNTP;
+use App\Services\NNTP\NNTPService;
 use Illuminate\Console\Command;
 
 class FixReleaseNames extends Command
@@ -30,7 +30,7 @@ class FixReleaseNames extends Command
     /**
      * Execute the console command.
      */
-    public function handle(NameFixingService $nameFixingService, NNTP $nntp): int
+    public function handle(NameFixingService $nameFixingService, NNTPService $nntp): int
     {
         $method = $this->argument('method');
         $update = (bool) $this->option('update');

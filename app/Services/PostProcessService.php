@@ -6,8 +6,8 @@ namespace App\Services;
 
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\NameFixing\NameFixingService;
+use App\Services\NNTP\NNTPService;
 use Blacklight\Nfo;
-use Blacklight\NNTP;
 use dariusiii\rarinfo\Par2Info;
 use Illuminate\Contracts\Foundation\Application;
 
@@ -179,13 +179,13 @@ final class PostProcessService
     /**
      * Process NFO files for releases.
      *
-     * @param NNTP $nntp NNTP connection for downloading NFOs
+     * @param NNTPService $nntp NNTP connection for downloading NFOs
      * @param string $groupID Optional group ID filter
      * @param string $guidChar Optional GUID character filter
      *
      * @throws \Exception
      */
-    public function processNfos(NNTP $nntp, string $groupID = '', string $guidChar = ''): void
+    public function processNfos(NNTPService $nntp, string $groupID = '', string $guidChar = ''): void
     {
         $this->nfoProcessor->process($nntp, $groupID, $guidChar);
     }
@@ -248,7 +248,7 @@ final class PostProcessService
      * @param string $messageID Message ID from NZB
      * @param int $relID Release ID
      * @param int $groupID Group ID
-     * @param NNTP $nntp NNTP connection
+     * @param NNTPService $nntp NNTP connection
      * @param int $show Display mode (0=apply, 1=show only)
      *
      * @throws \Exception
@@ -257,7 +257,7 @@ final class PostProcessService
         string $messageID,
         int $relID,
         int $groupID,
-        NNTP $nntp,
+        NNTPService $nntp,
         int $show
     ): bool {
         return $this->par2Processor->parseFromMessage($messageID, $relID, $groupID, $nntp, $show);

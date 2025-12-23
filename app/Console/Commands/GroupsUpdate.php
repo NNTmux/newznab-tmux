@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\ShortGroup;
 use App\Models\UsenetGroup;
-use Blacklight\NNTP;
+use App\Services\NNTP\NNTPService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -33,7 +33,7 @@ class GroupsUpdate extends Command
         $start = now();
 
         // Create NNTP connection
-        $nntp = new NNTP;
+        $nntp = new NNTPService;
         if ($nntp->doConnect() !== true) {
             $this->error('❌ Unable to connect to usenet server');
 

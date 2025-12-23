@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Services\PostProcessService;
-use Blacklight\NNTP;
+use App\Services\NNTP\NNTPService;
 use Illuminate\Console\Command;
 
 class UpdatePostProcess extends Command
@@ -129,9 +129,9 @@ class UpdatePostProcess extends Command
     /**
      * Get NNTP connection.
      */
-    private function getNntp(): NNTP
+    private function getNntp(): NNTPService
     {
-        $nntp = new NNTP();
+        $nntp = new NNTPService();
 
         if ((config('nntmux_nntp.use_alternate_nntp_server') === true
             ? $nntp->doConnect(false, true)

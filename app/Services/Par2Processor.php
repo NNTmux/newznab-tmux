@@ -7,7 +7,7 @@ use App\Models\Release;
 use App\Models\ReleaseFile;
 use App\Models\UsenetGroup;
 use App\Services\NameFixing\NameFixingService;
-use Blacklight\NNTP;
+use App\Services\NNTP\NNTPService;
 use dariusiii\rarinfo\Par2Info;
 use Illuminate\Support\Carbon;
 
@@ -38,10 +38,10 @@ class Par2Processor
      * @param  string  $messageID  MessageID from NZB file.
      * @param  int  $relID  ID of the release.
      * @param  int  $groupID  Group ID of the release.
-     * @param  NNTP  $nntp  Class NNTP
+     * @param  NNTPService  $nntp  Class NNTPService
      * @param  int  $show  Only show result or apply it.
      */
-    public function parseFromMessage(string $messageID, int $relID, int $groupID, NNTP $nntp, int $show): bool
+    public function parseFromMessage(string $messageID, int $relID, int $groupID, NNTPService $nntp, int $show): bool
     {
         if ($messageID === '') {
             return false;

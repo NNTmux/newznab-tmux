@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\Binaries\BinariesService;
-use Blacklight\NNTP;
+use App\Services\NNTP\NNTPService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -56,8 +56,8 @@ class GetArticleRange extends Command
                 return self::FAILURE;
             }
 
-            if (NNTP::isError($nntp->selectGroup($groupMySQL['name']))
-                && NNTP::isError($nntp->dataError($nntp, $groupMySQL['name']))) {
+            if (NNTPService::isError($nntp->selectGroup($groupMySQL['name']))
+                && NNTPService::isError($nntp->dataError($nntp, $groupMySQL['name']))) {
                 return self::FAILURE;
             }
 
@@ -139,9 +139,9 @@ class GetArticleRange extends Command
     /**
      * Get NNTP connection.
      */
-    private function getNntp(): NNTP
+    private function getNntp(): NNTPService
     {
-        $nntp = new NNTP;
+        $nntp = new NNTPService;
 
         if ((config('nntmux_nntp.use_alternate_nntp_server') === true
             ? $nntp->doConnect(false, true)

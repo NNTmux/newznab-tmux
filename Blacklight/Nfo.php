@@ -8,6 +8,7 @@ use App\Models\Release;
 use App\Models\ReleaseNfo;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
+use App\Services\NNTP\NNTPService;
 use App\Services\PostProcessService;
 use dariusiii\rarinfo\Par2Info;
 use dariusiii\rarinfo\SfvInfo;
@@ -456,12 +457,12 @@ class Nfo
      * Add an NFO from alternate sources. ex.: PreDB, rar, zip, etc...
      *
      * @param  string  $nfo  The nfo.
-     * @param  NNTP  $nntp  Instance of class NNTP.
+     * @param  NNTPService  $nntp  Instance of class NNTPService.
      * @return bool True on success, False on failure.
      *
      * @throws \Exception
      */
-    public function addAlternateNfo(string &$nfo, $release, NNTP $nntp): bool
+    public function addAlternateNfo(string &$nfo, $release, NNTPService $nntp): bool
     {
         if ($release->id > 0 && $this->isNFO($nfo, $release->guid)) {
             $check = ReleaseNfo::whereReleasesId($release->id)->first(['releases_id']);
@@ -498,7 +499,7 @@ class Nfo
     /**
      * Attempt to find NFO files inside the NZB's of releases.
      *
-     * @param  NNTP  $nntp  The NNTP connection object
+     * @param  NNTPService  $nntp  The NNTP connection object
      * @param  string  $groupID  (optional) Group ID to filter releases by
      * @param  string  $guidChar  (optional) First character of the GUID for parallel processing
      * @param  bool  $processImdb  (optional) Process IMDB IDs (currently unused)
@@ -507,7 +508,7 @@ class Nfo
      *
      * @throws \Exception If NNTP operations fail
      */
-    public function processNfoFiles(NNTP $nntp, string $groupID = '', string $guidChar = '', bool $processImdb = true, bool $processTv = true): int
+    public function processNfoFiles(NNTPService $nntp, string $groupID = '', string $guidChar = '', bool $processImdb = true, bool $processTv = true): int
     {
         $processedCount = 0;
 

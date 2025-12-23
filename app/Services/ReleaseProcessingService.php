@@ -17,9 +17,9 @@ use App\Services\Releases\ReleaseManagementService;
 use App\Support\DTOs\ProcessReleasesSettings;
 use App\Support\DTOs\ReleaseCreationResult;
 use App\Support\DTOs\ReleaseDeleteStats;
+use App\Services\NNTP\NNTPService;
 use Blacklight\ColorCLI;
 use Blacklight\Genres;
-use Blacklight\NNTP;
 use Blacklight\NZB;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
@@ -177,7 +177,7 @@ final class ReleaseProcessingService
      * @param int $categorize Categorization type (1=name, 2=searchname)
      * @param int $postProcess Whether to run post-processing (1=yes)
      * @param string $groupName Optional group name to filter processing
-     * @param NNTP $nntp NNTP connection for post-processing
+     * @param NNTPService $nntp NNTP connection for post-processing
      * @return int Total number of releases added
      *
      * @throws Throwable
@@ -186,7 +186,7 @@ final class ReleaseProcessingService
         int $categorize,
         int $postProcess,
         string $groupName,
-        NNTP $nntp
+        NNTPService $nntp
     ): int {
         $this->echoCLI = (bool) config('nntmux.echocli');
         $overallStartTime = now()->toImmutable();
@@ -238,7 +238,7 @@ final class ReleaseProcessingService
         ?int $normalizedGroupId,
         int $categorize,
         int $postProcess,
-        NNTP $nntp
+        NNTPService $nntp
     ): array {
         $totals = ['releases' => 0, 'nzbs' => 0, 'dupes' => 0, 'iterations' => 0];
         $limit = $this->settings->releaseCreationLimit;
@@ -537,7 +537,7 @@ final class ReleaseProcessingService
      *
      * @throws \Exception
      */
-    public function postProcessReleases(int $postProcess, NNTP $nntp): void
+    public function postProcessReleases(int $postProcess, NNTPService $nntp): void
     {
         if ($postProcess !== 1) {
             return;

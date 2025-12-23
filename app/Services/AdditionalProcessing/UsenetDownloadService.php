@@ -3,7 +3,7 @@
 namespace App\Services\AdditionalProcessing;
 
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
-use Blacklight\NNTP;
+use App\Services\NNTP\NNTPService;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
@@ -13,12 +13,12 @@ use Illuminate\Support\Facades\Log;
  */
 class UsenetDownloadService
 {
-    private NNTP $nntp;
+    private NNTPService $nntp;
 
     public function __construct(
         private readonly ProcessingConfiguration $config
     ) {
-        $this->nntp = new NNTP();
+        $this->nntp = new NNTPService();
     }
 
     /**
@@ -187,7 +187,7 @@ class UsenetDownloadService
     /**
      * Get the NNTP client instance.
      */
-    public function getNNTP(): NNTP
+    public function getNNTP(): NNTPService
     {
         return $this->nntp;
     }

@@ -356,7 +356,7 @@ class ReleaseFileManager
     public function processNfoFile(
         string $fileLocation,
         ReleaseProcessingContext $context,
-        \Blacklight\NNTP $nntp
+        NNTPService $nntp
     ): bool {
         try {
             $data = File::get($fileLocation);

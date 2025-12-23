@@ -6,8 +6,8 @@ namespace App\Services\Binaries;
 
 use App\Models\Settings;
 use App\Models\UsenetGroup;
+use App\Services\NNTP\NNTPService;
 use Blacklight\ColorCLI;
-use Blacklight\NNTP;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -34,7 +34,7 @@ class BinariesService
 
     private ColorCLI $colorCli;
 
-    private ?NNTP $nntp = null;
+    private ?NNTPService $nntp = null;
 
     // Timing metrics
     private float $timeHeaders = 0;
@@ -70,7 +70,7 @@ class BinariesService
         ?HeaderStorageService $headerStorage = null,
         ?MissedPartHandler $missedPartHandler = null,
         ?ColorCLI $colorCli = null,
-        ?NNTP $nntp = null
+        ?NNTPService $nntp = null
     ) {
         $this->config = $config ?? BinariesConfig::fromSettings();
         $this->headerParser = $headerParser ?? new HeaderParser;
@@ -87,7 +87,7 @@ class BinariesService
     /**
      * Set NNTP connection (for external injection).
      */
-    public function setNntp(NNTP $nntp): void
+    public function setNntp(NNTPService $nntp): void
     {
         $this->nntp = $nntp;
     }
@@ -95,10 +95,10 @@ class BinariesService
     /**
      * Get the NNTP connection, creating one if needed.
      */
-    public function getNntp(): NNTP
+    public function getNntp(): NNTPService
     {
         if ($this->nntp === null) {
-            $this->nntp = new NNTP;
+            $this->nntp = new NNTPService;
         }
 
         return $this->nntp;
@@ -432,7 +432,7 @@ class BinariesService
 
             // Try usenet
             $header = $nntp->getXOVER((string) $currentPost);
-            if (! NNTP::isError($header) && isset($header[0]['Date']) && $header[0]['Date'] !== '') {
+            if (! NNTPService::isError($header) && isset($header[0]['Date']) && $header[0]['Date'] !== '') {
                 $date = $header[0]['Date'];
                 break;
             }
@@ -484,18 +484,18 @@ class BinariesService
 
     // ==================== Private Helper Methods ====================
 
-    private function selectNntpGroup(array &$groupMySQL, NNTP $nntp): ?array
+    private function selectNntpGroup(array &$groupMySQL, NNTPService $nntp): ?array
     {
         $groupNNTP = $nntp->selectGroup($groupMySQL['name']);
 
-        if (NNTP::isError($groupNNTP)) {
+        if (NNTPService::isError($groupNNTP)) {
             $groupNNTP = $nntp->dataError($nntp, $groupMySQL['name']);
 
             if (isset($groupNNTP['code']) && (int) $groupNNTP['code'] === 411) {
                 UsenetGroup::disableIfNotExist($groupMySQL['id']);
             }
 
-            if (NNTP::isError($groupNNTP)) {
+            if (NNTPService::isError($groupNNTP)) {
                 return null;
             }
         }
@@ -660,7 +660,7 @@ class BinariesService
             $headers = $nntp->getXOVER($this->first.'-'.$this->last);
         }
 
-        if (NNTP::isError($headers)) {
+        if (NNTPService::isError($headers)) {
             if ($partRepair) {
                 return null;
             }
@@ -675,7 +675,7 @@ class BinariesService
             $headers = $nntp->getXOVER($this->first.'-'.$this->last);
             $nntp->enableCompression();
 
-            if (NNTP::isError($headers)) {
+            if (NNTPService::isError($headers)) {
                 $message = ((int) $headers->code === 0 ? 'Unknown error' : $headers->message);
                 $this->log("Code {$headers->code}: $message\nSkipping group: {$this->groupMySQL['name']}", __FUNCTION__, 'error');
 

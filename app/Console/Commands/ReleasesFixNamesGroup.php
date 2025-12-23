@@ -9,8 +9,8 @@ use App\Models\Predb;
 use App\Models\Release;
 use App\Services\NameFixing\NameFixingService;
 use App\Services\PostProcessService;
+use App\Services\NNTP\NNTPService;
 use Blacklight\Nfo;
-use Blacklight\NNTP;
 use Blacklight\NZBContents;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -211,7 +211,7 @@ class ReleasesFixNamesGroup extends Command
             if ((int) $release->proc_par2 === NameFixingService::PROC_PAR2_NONE) {
                 // Initialize NZB contents if needed
                 if (! isset($nzbcontents)) {
-                    $nntp = new NNTP();
+                    $nntp = new NNTPService();
                     $compressedHeaders = config('nntmux_nntp.compressed_headers');
 
                     if ((config('nntmux_nntp.use_alternate_nntp_server') === true

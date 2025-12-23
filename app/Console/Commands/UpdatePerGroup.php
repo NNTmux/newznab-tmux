@@ -10,8 +10,8 @@ use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\Backfill\BackfillService;
 use App\Services\Binaries\BinariesService;
 use App\Services\ReleaseProcessingService;
+use App\Services\NNTP\NNTPService;
 use Blacklight\Nfo;
-use Blacklight\NNTP;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -125,9 +125,9 @@ class UpdatePerGroup extends Command
      *
      * @throws \Exception If unable to connect to usenet
      */
-    private function getNntp(): NNTP
+    private function getNntp(): NNTPService
     {
-        $nntp = new NNTP();
+        $nntp = new NNTPService();
 
         $useAlternate = config('nntmux_nntp.use_alternate_nntp_server') === true;
         $connected = $useAlternate
