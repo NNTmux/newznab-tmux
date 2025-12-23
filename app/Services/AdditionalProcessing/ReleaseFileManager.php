@@ -6,6 +6,7 @@ use App\Models\MediaInfo as MediaInfoModel;
 use App\Models\Predb;
 use App\Models\Release;
 use App\Models\ReleaseFile;
+use App\Services\ReleaseImageService;
 use App\Services\Search\ElasticSearchService;
 use App\Services\Search\ManticoreSearchService;
 use App\Services\Releases\ReleaseBrowseService;
@@ -16,7 +17,6 @@ use App\Services\NameFixing\ReleaseUpdateService;
 use Blacklight\Nfo;
 use Blacklight\NZB;
 use Blacklight\ReleaseExtra;
-use Blacklight\ReleaseImage;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
@@ -34,7 +34,7 @@ class ReleaseFileManager
     public function __construct(
         private readonly ProcessingConfiguration $config,
         private readonly ReleaseExtra $releaseExtra,
-        private readonly ReleaseImage $releaseImage,
+        private readonly ReleaseImageService $releaseImage,
         private readonly Nfo $nfo,
         private readonly NZB $nzb,
         private readonly NameFixingService $nameFixingService

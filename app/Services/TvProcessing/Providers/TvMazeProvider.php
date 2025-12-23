@@ -2,7 +2,7 @@
 
 namespace App\Services\TvProcessing\Providers;
 
-use Blacklight\ReleaseImage;
+use App\Services\ReleaseImageService;
 use DariusIII\TVMaze\TVMaze as Client;
 
 /**
@@ -367,7 +367,7 @@ class TvMazeProvider extends AbstractTvProvider
      */
     public function getPoster(int $videoId): int
     {
-        $ri = new ReleaseImage;
+        $ri = new ReleaseImageService;
 
         $hasCover = 0;
 

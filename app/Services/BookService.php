@@ -7,7 +7,6 @@ use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
 use Blacklight\ColorCLI;
-use Blacklight\ReleaseImage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -444,7 +443,7 @@ class BookService
      */
     public function updateBookInfo(string $bookInfo = '', $amazdata = null)
     {
-        $ri = new ReleaseImage;
+        $ri = new ReleaseImageService;
 
         $bookId = -2;
 

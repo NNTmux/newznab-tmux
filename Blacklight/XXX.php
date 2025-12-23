@@ -7,6 +7,7 @@ use App\Models\Genre;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\XxxInfo;
+use App\Services\ReleaseImageService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -32,7 +33,7 @@ class XXX
 
     protected string $imgSavePath;
 
-    protected ReleaseImage $releaseImage;
+    protected ReleaseImageService $releaseImage;
 
     protected string|int|null $movieQty;
 
@@ -44,7 +45,7 @@ class XXX
 
     public function __construct()
     {
-        $this->releaseImage = new ReleaseImage;
+        $this->releaseImage = new ReleaseImageService;
         $this->colorCli = new ColorCLI;
 
         $this->movieQty = Settings::settingValue('maxxxxprocessed') ?? 100;

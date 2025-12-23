@@ -9,10 +9,10 @@ use App\Models\Predb;
 use App\Models\Release;
 use App\Models\UsenetGroup;
 use App\Services\Categorization\CategorizationService;
+use App\Services\ReleaseCleaningService;
 use App\Services\Search\ElasticSearchService;
 use App\Services\Search\ManticoreSearchService;
 use Blacklight\ColorCLI;
-use Blacklight\ReleaseCleaning;
 use Illuminate\Support\Arr;
 
 /**
@@ -129,7 +129,7 @@ class ReleaseUpdateService
         }
 
         if ($this->relid !== $release->releases_id) {
-            $newName = (new ReleaseCleaning())->fixerCleaner($name);
+            $newName = (new ReleaseCleaningService())->fixerCleaner($name);
             // Normalize and sanity-check candidate for non-trusted sources
             $newName = $this->fileNameCleaner->normalizeCandidateTitle($newName);
 

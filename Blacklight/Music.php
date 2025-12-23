@@ -298,7 +298,7 @@ class Music
      */
     public function updateMusicInfo($title, $year, $amazdata = null)
     {
-        $ri = new ReleaseImage;
+        $ri = new \App\Services\ReleaseImageService;
 
         $mus = [];
         if ($amazdata !== null) {

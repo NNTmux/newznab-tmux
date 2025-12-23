@@ -3,8 +3,8 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\Category;
+use App\Services\ReleaseImageService;
 use Blacklight\ColorCLI;
-use Blacklight\ReleaseImage;
 use Illuminate\Support\Facades\DB;
 
 $pdo = DB::connection()->getPdo();
@@ -13,7 +13,7 @@ $colorCli = new ColorCLI;
 $path2cover = storage_path('covers/sample/');
 
 if (isset($argv[1]) && ($argv[1] === 'true' || $argv[1] === 'check')) {
-    $releaseImage = new ReleaseImage;
+    $releaseImage = new ReleaseImageService;
     $couldbe = $argv[1] === 'true' ? $couldbe = 'had ' : 'could have ';
     $limit = $counterfixed = 0;
     if (isset($argv[2]) && is_numeric($argv[2])) {

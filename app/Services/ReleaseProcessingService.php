@@ -21,8 +21,6 @@ use Blacklight\ColorCLI;
 use Blacklight\Genres;
 use Blacklight\NNTP;
 use Blacklight\NZB;
-use Blacklight\ReleaseCleaning;
-use Blacklight\ReleaseImage;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -52,9 +50,9 @@ final class ReleaseProcessingService
     private readonly ProcessReleasesSettings $settings;
     private readonly ColorCLI $colorCLI;
     private readonly NZB $nzb;
-    private readonly ReleaseCleaning $releaseCleaning;
+    private readonly ReleaseCleaningService $releaseCleaning;
     private readonly ReleaseManagementService $releaseManagement;
-    private readonly ReleaseImage $releaseImage;
+    private readonly ReleaseImageService $releaseImage;
     private readonly ReleaseCreationService $releaseCreationService;
     private readonly CollectionCleanupService $collectionCleanupService;
     private readonly ?PostProcessService $postProcessService;
@@ -62,9 +60,9 @@ final class ReleaseProcessingService
     public function __construct(
         ?ColorCLI $colorCLI = null,
         ?NZB $nzb = null,
-        ?ReleaseCleaning $releaseCleaning = null,
+        ?ReleaseCleaningService $releaseCleaning = null,
         ?ReleaseManagementService $releaseManagement = null,
-        ?ReleaseImage $releaseImage = null,
+        ?ReleaseImageService $releaseImage = null,
         ?ReleaseCreationService $releaseCreationService = null,
         ?CollectionCleanupService $collectionCleanupService = null,
         ?PostProcessService $postProcessService = null,
@@ -73,9 +71,9 @@ final class ReleaseProcessingService
 
         $this->colorCLI = $colorCLI ?? new ColorCLI();
         $this->nzb = $nzb ?? new NZB();
-        $this->releaseCleaning = $releaseCleaning ?? new ReleaseCleaning();
+        $this->releaseCleaning = $releaseCleaning ?? new ReleaseCleaningService();
         $this->releaseManagement = $releaseManagement ?? app(ReleaseManagementService::class);
-        $this->releaseImage = $releaseImage ?? new ReleaseImage();
+        $this->releaseImage = $releaseImage ?? new ReleaseImageService();
 
         $this->releaseCreationService = $releaseCreationService
             ?? new ReleaseCreationService($this->colorCLI, $this->releaseCleaning);

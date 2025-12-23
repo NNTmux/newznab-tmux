@@ -7,6 +7,7 @@ use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\BlacklistService;
 use App\Services\Categorization\CategorizationService;
+use App\Services\ReleaseCleaningService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -18,7 +19,7 @@ class NZBImport
 {
     protected BlacklistService $blacklistService;
 
-    protected ReleaseCleaning $releaseCleaner;
+    protected ReleaseCleaningService $releaseCleaner;
 
     protected \stdClass|bool $site;
 
@@ -69,7 +70,7 @@ class NZBImport
         $this->blacklistService = new BlacklistService;
         $this->category = new CategorizationService();
         $this->nzb = new NZB;
-        $this->releaseCleaner = new ReleaseCleaning;
+        $this->releaseCleaner = new ReleaseCleaningService;
         $this->colorCli = new ColorCLI;
         $this->crossPostt = Settings::settingValue('crossposttime') !== '' ? Settings::settingValue('crossposttime') : 2;
 

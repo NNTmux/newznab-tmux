@@ -2,7 +2,7 @@
 
 namespace App\Services\TvProcessing\Providers;
 
-use Blacklight\ReleaseImage;
+use App\Services\ReleaseImageService;
 
 /**
  * Class LocalDbProvider -- performs local database lookups before hitting external APIs.
@@ -159,7 +159,7 @@ class LocalDbProvider extends AbstractTvProvider
 
     public function getPoster(int $videoId): int
     {
-        return (new ReleaseImage)->saveImage($videoId, '', $this->imgSavePath, '', '', parent::TYPE_TV);
+        return (new ReleaseImageService)->saveImage($videoId, '', $this->imgSavePath, '', '', parent::TYPE_TV);
     }
 
     public function getShowInfo(string $name): bool|array

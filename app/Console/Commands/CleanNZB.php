@@ -3,9 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\Release;
+use App\Services\ReleaseImageService;
 use App\Services\Releases\ReleaseManagementService;
 use Blacklight\NZB;
-use Blacklight\ReleaseImage;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
@@ -93,7 +93,7 @@ class CleanNZB extends Command
 
                 if (! $nzb->NZBPath($r->guid)) {
                     if ($delete) {
-                        $releaseManagement->deleteSingle(['g' => $r->guid, 'i' => $r->id], $nzb, new ReleaseImage);
+                        $releaseManagement->deleteSingleWithService(['g' => $r->guid, 'i' => $r->id], $nzb, new ReleaseImageService);
                     }
                     $deleted++;
                     $this->line("Deleted: $r->searchname -> $r->guid");

@@ -5,7 +5,7 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 use App\Models\Release;
 use App\Models\UsenetGroup;
 use App\Services\Search\ManticoreSearchService;
-use Blacklight\ReleaseCleaning;
+use App\Services\ReleaseCleaningService;
 
 $message =
     'Shows old searchname vs new searchname for releases in a group using the releaseCleaning class. (Good for testing new regex)'.
@@ -51,7 +51,7 @@ if (\count($releases) === 0) {
     exit('No releases found in your database for group '.$argv[1].PHP_EOL);
 }
 
-$releaseCleaner = new ReleaseCleaning;
+$releaseCleaner = new ReleaseCleaningService;
 $manticore = app(ManticoreSearchService::class);
 
 foreach ($releases as $release) {

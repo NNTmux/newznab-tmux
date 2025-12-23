@@ -3,9 +3,9 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\Release;
+use App\Services\ReleaseImageService;
 use Blacklight\ColorCLI;
 use Blacklight\NZB;
-use Blacklight\ReleaseImage;
 use Blacklight\Releases;
 use Illuminate\Support\Facades\File;
 
@@ -25,7 +25,7 @@ if (! File::isDirectory($dir) && ! File::makeDirectory($dir)) {
 
 $releases = new Releases;
 $nzb = new NZB;
-$releaseImage = new ReleaseImage;
+$releaseImage = new ReleaseImageService;
 
 $timestart = now()->toRfc2822String();
 $checked = $moved = 0;

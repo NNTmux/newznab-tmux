@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Binaries;
 
 use App\Models\Collection;
+use App\Services\CollectionsCleaningService;
 use App\Services\XrefService;
-use Blacklight\CollectionsCleaning;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
  */
 final class CollectionHandler
 {
-    private CollectionsCleaning $collectionsCleaning;
+    private CollectionsCleaningService $collectionsCleaning;
 
     private XrefService $xrefService;
 
@@ -29,10 +29,10 @@ final class CollectionHandler
     private array $batchCollectionHashes = [];
 
     public function __construct(
-        ?CollectionsCleaning $collectionsCleaning = null,
+        ?CollectionsCleaningService $collectionsCleaning = null,
         ?XrefService $xrefService = null
     ) {
-        $this->collectionsCleaning = $collectionsCleaning ?? new CollectionsCleaning;
+        $this->collectionsCleaning = $collectionsCleaning ?? new CollectionsCleaningService;
         $this->xrefService = $xrefService ?? new XrefService;
     }
 

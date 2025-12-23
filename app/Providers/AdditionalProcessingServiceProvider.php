@@ -11,12 +11,12 @@ use App\Services\AdditionalProcessing\NzbContentParser;
 use App\Services\AdditionalProcessing\ReleaseFileManager;
 use App\Services\AdditionalProcessing\UsenetDownloadService;
 use App\Services\Categorization\CategorizationService;
+use App\Services\ReleaseImageService;
 use App\Services\TempWorkspaceService;
 use App\Services\NameFixing\NameFixingService;
 use Blacklight\Nfo;
 use Blacklight\NZB;
 use Blacklight\ReleaseExtra;
-use Blacklight\ReleaseImage;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -70,7 +70,7 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
             return new ReleaseFileManager(
                 $app->make(ProcessingConfiguration::class),
                 new ReleaseExtra(),
-                new ReleaseImage(),
+                new ReleaseImageService(),
                 new Nfo(),
                 new NZB(),
                 new NameFixingService()
@@ -81,7 +81,7 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
         $this->app->singleton(MediaExtractionService::class, function ($app) {
             return new MediaExtractionService(
                 $app->make(ProcessingConfiguration::class),
-                new ReleaseImage(),
+                new ReleaseImageService(),
                 new ReleaseExtra(),
                 new CategorizationService()
             );

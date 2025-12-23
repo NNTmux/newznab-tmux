@@ -566,7 +566,7 @@ class Console
      */
     protected function _updateConsoleTable(array $con = [])
     {
-        $ri = new ReleaseImage;
+        $ri = new \App\Services\ReleaseImageService;
 
         $check = ConsoleInfo::query()->where('asin', $con['asin'])->first();
 

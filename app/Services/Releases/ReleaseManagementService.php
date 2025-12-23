@@ -3,9 +3,9 @@
 namespace App\Services\Releases;
 
 use App\Models\Release;
+use App\Services\ReleaseImageService;
 use App\Services\Search\ManticoreSearchService;
 use Blacklight\NZB;
-use Blacklight\ReleaseImage;
 use Elasticsearch;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Illuminate\Support\Facades\DB;
@@ -32,10 +32,10 @@ class ReleaseManagementService
         $list = (array) $list;
 
         $nzb = new NZB;
-        $releaseImage = new ReleaseImage;
+        $releaseImage = new ReleaseImageService;
 
         foreach ($list as $identifier) {
-            $this->deleteSingle(['g' => $identifier, 'i' => false], $nzb, $releaseImage);
+            $this->deleteSingleWithService(['g' => $identifier, 'i' => false], $nzb, $releaseImage);
         }
     }
 
@@ -47,7 +47,7 @@ class ReleaseManagementService
      *
      * @throws \Exception
      */
-    public function deleteSingle(array $identifiers, NZB $nzb, ReleaseImage $releaseImage): void
+    public function deleteSingle(array $identifiers, NZB $nzb, ReleaseImageService $releaseImage): void
     {
         // Delete NZB from disk.
         $nzbPath = $nzb->NZBPath($identifiers['g']);
@@ -92,6 +92,18 @@ class ReleaseManagementService
 
         // Delete from DB.
         Release::whereGuid($identifiers['g'])->delete();
+    }
+
+    /**
+     * Alias for deleteSingle for backwards compatibility.
+     *
+     * @param  array  $identifiers  ['g' => Release GUID(mandatory), 'i => ReleaseID(optional, pass false)]
+     *
+     * @throws \Exception
+     */
+    public function deleteSingleWithService(array $identifiers, NZB $nzb, ReleaseImageService $releaseImage): void
+    {
+        $this->deleteSingle($identifiers, $nzb, $releaseImage);
     }
 
     /**

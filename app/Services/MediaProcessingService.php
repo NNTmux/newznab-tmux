@@ -8,7 +8,6 @@ use App\Services\Categorization\CategorizationService;
 use App\Services\Search\ElasticSearchService;
 use App\Services\Search\ManticoreSearchService;
 use Blacklight\ReleaseExtra;
-use Blacklight\ReleaseImage;
 use FFMpeg\Coordinate\Dimension;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
@@ -26,7 +25,7 @@ class MediaProcessingService
         private readonly FFMpeg $ffmpeg,
         private readonly FFProbe $ffprobe,
         private readonly MediaInfo $mediaInfo,
-        private readonly ReleaseImage $releaseImage,
+        private readonly ReleaseImageService $releaseImage,
         private readonly ReleaseExtra $releaseExtra,
         private readonly ManticoreSearchService $manticore,
         private readonly ElasticSearchService $elasticsearch,

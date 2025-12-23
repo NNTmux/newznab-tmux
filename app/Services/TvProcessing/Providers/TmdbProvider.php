@@ -2,8 +2,8 @@
 
 namespace App\Services\TvProcessing\Providers;
 
+use App\Services\ReleaseImageService;
 use App\Services\TmdbClient;
-use Blacklight\ReleaseImage;
 
 class TmdbProvider extends AbstractTvProvider
 {
@@ -348,7 +348,7 @@ class TmdbProvider extends AbstractTvProvider
      */
     public function getPoster(int $videoId): int
     {
-        $ri = new ReleaseImage;
+        $ri = new ReleaseImageService;
 
         $hascover = 0;
 

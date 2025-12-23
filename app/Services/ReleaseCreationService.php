@@ -11,9 +11,9 @@ use App\Models\ReleaseRegex;
 use App\Models\ReleasesGroups;
 use App\Models\UsenetGroup;
 use App\Services\Categorization\CategorizationService;
+use App\Services\ReleaseCleaningService;
 use Blacklight\ColorCLI;
 use Blacklight\NZB;
-use Blacklight\ReleaseCleaning;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -21,7 +21,7 @@ class ReleaseCreationService
 {
     public function __construct(
         private readonly ColorCLI $colorCLI,
-        private readonly ReleaseCleaning $releaseCleaning
+        private readonly ReleaseCleaningService $releaseCleaning
     ) {}
 
     /**

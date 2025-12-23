@@ -3,7 +3,7 @@
 namespace App\Services\TvProcessing\Providers;
 
 use App\Services\FanartTvService;
-use Blacklight\ReleaseImage;
+use App\Services\ReleaseImageService;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ParseException;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ResourceNotFoundException;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException;
@@ -306,7 +306,7 @@ class TvdbProvider extends AbstractTvProvider
 
     public function getPoster(int $videoId): int
     {
-        $ri = new ReleaseImage;
+        $ri = new ReleaseImageService;
         $hasCover = 0;
 
         if (! empty($this->posterUrl)) {

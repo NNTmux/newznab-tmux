@@ -2,8 +2,8 @@
 
 namespace App\Services\TvProcessing\Providers;
 
+use App\Services\ReleaseImageService;
 use App\Services\TraktService;
-use Blacklight\ReleaseImage;
 use Illuminate\Support\Carbon;
 
 /**
@@ -266,7 +266,7 @@ class TraktProvider extends AbstractTvProvider
     public function getPoster(int $videoId): int
     {
         $hasCover = 0;
-        $ri = new ReleaseImage;
+        $ri = new ReleaseImageService;
 
         if ($this->posterUrl !== '') {
             // Try to get the Poster

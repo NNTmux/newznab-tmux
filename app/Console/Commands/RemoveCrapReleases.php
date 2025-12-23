@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\ReleaseRemover;
+use App\Services\ReleaseRemoverService;
 use Illuminate\Console\Command;
 
 class RemoveCrapReleases extends Command
@@ -32,7 +32,7 @@ class RemoveCrapReleases extends Command
         }
 
         try {
-            $remover = new ReleaseRemover;
+            $remover = new ReleaseRemoverService;
             $result = $remover->removeCrap($delete, $time, $type, $blacklistId);
 
             if ($result === true) {

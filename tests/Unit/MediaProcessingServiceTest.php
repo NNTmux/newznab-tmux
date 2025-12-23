@@ -8,7 +8,7 @@ use App\Services\MediaProcessingService;
 use App\Services\Search\ElasticSearchService;
 use App\Services\Search\ManticoreSearchService;
 use Blacklight\ReleaseExtra;
-use Blacklight\ReleaseImage;
+use App\Services\ReleaseImageService;
 use FFMpeg\FFMpeg;
 use FFMpeg\FFProbe;
 use Illuminate\Container\Container;
@@ -49,7 +49,7 @@ class MediaProcessingServiceTest extends TestCase
         ?FFMpeg $ffmpeg = null,
         ?FFProbe $ffprobe = null,
         ?MediaInfo $mediaInfo = null,
-        ?ReleaseImage $releaseImage = null,
+        ?ReleaseImageService $releaseImage = null,
         ?ReleaseExtra $releaseExtra = null,
         ?ManticoreSearchService $manticore = null,
         ?ElasticSearchService $elastic = null,
@@ -58,7 +58,7 @@ class MediaProcessingServiceTest extends TestCase
         $ffmpeg ??= Mockery::mock(FFMpeg::class);
         $ffprobe ??= Mockery::mock(FFProbe::class);
         $mediaInfo ??= Mockery::mock(MediaInfo::class);
-        $releaseImage ??= Mockery::mock(ReleaseImage::class);
+        $releaseImage ??= Mockery::mock(ReleaseImageService::class);
         $releaseExtra ??= Mockery::mock(ReleaseExtra::class);
         $manticore ??= Mockery::mock(ManticoreSearchService::class);
         $elastic ??= Mockery::mock(ElasticSearchService::class);

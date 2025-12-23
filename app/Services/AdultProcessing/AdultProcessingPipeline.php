@@ -15,8 +15,8 @@ use App\Services\AdultProcessing\Pipes\Data18Pipe;
 use App\Services\AdultProcessing\Pipes\HotmoviesPipe;
 use App\Services\AdultProcessing\Pipes\IafdPipe;
 use App\Services\AdultProcessing\Pipes\PoppornPipe;
+use App\Services\ReleaseImageService;
 use Blacklight\ColorCLI;
-use Blacklight\ReleaseImage;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Concurrency;
@@ -40,7 +40,7 @@ class AdultProcessingPipeline
     protected int $movieQty;
     protected bool $echoOutput;
     protected ColorCLI $colorCli;
-    protected ReleaseImage $releaseImage;
+    protected ReleaseImageService $releaseImage;
     protected string $imgSavePath;
     protected string $cookie;
     protected string $showPasswords;
@@ -82,7 +82,7 @@ class AdultProcessingPipeline
 
         $this->echoOutput = $echoOutput;
         $this->colorCli = new ColorCLI();
-        $this->releaseImage = new ReleaseImage();
+        $this->releaseImage = new ReleaseImageService();
         $this->imgSavePath = storage_path('covers/xxx/');
         $this->cookie = resource_path('tmp/xxx.cookie');
     }

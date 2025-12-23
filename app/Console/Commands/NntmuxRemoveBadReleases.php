@@ -4,9 +4,9 @@ namespace App\Console\Commands;
 
 use App\Models\Release;
 use App\Models\ReleaseFile;
+use App\Services\ReleaseImageService;
 use App\Services\Search\ManticoreSearchService;
 use Blacklight\NZB;
-use Blacklight\ReleaseImage;
 use Elasticsearch;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Illuminate\Console\Command;
@@ -51,7 +51,7 @@ class NntmuxRemoveBadReleases extends Command
         foreach ($badReleases as $badRelease) {
             $nzbPath = (new NZB)->getNZBPath($badRelease->guid);
             File::delete($nzbPath);
-            (new ReleaseImage)->delete($badRelease->guid);
+            (new ReleaseImageService)->delete($badRelease->guid);
             if (config('nntmux.elasticsearch_enabled') === true) {
                 $params = [
                     'index' => 'releases',

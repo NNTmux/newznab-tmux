@@ -328,7 +328,7 @@ class Games
     public function updateGamesInfo($gameInfo): bool
     {
         $gen = new Genres(['Settings' => null]);
-        $ri = new ReleaseImage;
+        $ri = new \App\Services\ReleaseImageService;
 
         $game = [];
         $titleKey = $this->generateCacheKey($gameInfo['title']);
@@ -1424,11 +1424,11 @@ class Games
      *
      * @param array $game Cached game data
      * @param Genres $gen Genre handler
-     * @param ReleaseImage $ri Image handler
+     * @param \App\Services\ReleaseImageService $ri Image handler
      * @param array $gameInfo Original game info
      * @return bool|int
      */
-    protected function saveGameInfo(array $game, Genres $gen, ReleaseImage $ri, array $gameInfo): bool|int
+    protected function saveGameInfo(array $game, Genres $gen, \App\Services\ReleaseImageService $ri, array $gameInfo): bool|int
     {
         // Load genres.
         $defaultGenres = $gen->loadGenres(Genres::GAME_TYPE);

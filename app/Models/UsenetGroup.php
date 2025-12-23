@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use App\Services\ReleaseImageService;
 use Blacklight\ColorCLI;
 use Blacklight\NNTP;
 use Blacklight\NZB;
-use Blacklight\ReleaseImage;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -401,9 +401,9 @@ class UsenetGroup extends Model
 
         $releaseManagement = app(\App\Services\Releases\ReleaseManagementService::class);
         $nzb = new NZB;
-        $releaseImage = new ReleaseImage;
+        $releaseImage = new ReleaseImageService;
         foreach ($res as $row) {
-            $releaseManagement->deleteSingle(
+            $releaseManagement->deleteSingleWithService(
                 [
                     'g' => $row['guid'],
                     'i' => $row['id'],

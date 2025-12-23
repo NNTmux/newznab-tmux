@@ -9,7 +9,6 @@ use App\Models\Release;
 use App\Models\Settings;
 use App\Services\TvProcessing\Providers\TraktProvider;
 use Blacklight\ColorCLI;
-use Blacklight\ReleaseImage;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Carbon;
@@ -35,7 +34,7 @@ class MovieService
 
     protected string $showPasswords;
 
-    protected ReleaseImage $releaseImage;
+    protected ReleaseImageService $releaseImage;
 
     protected Client $client;
 
@@ -70,7 +69,7 @@ class MovieService
      */
     public function __construct()
     {
-        $this->releaseImage = new ReleaseImage;
+        $this->releaseImage = new ReleaseImageService;
         $this->colorCli = new ColorCLI;
         $this->traktcheck = config('nntmux_api.trakttv_api_key');
         if ($this->traktcheck !== null) {
