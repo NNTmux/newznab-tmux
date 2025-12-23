@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Settings;
-use Blacklight\Movie;
 use GuzzleHttp\Exception\GuzzleException;
 
 class MoviesProcessor
@@ -24,7 +23,7 @@ class MoviesProcessor
     {
         $processMovies = (is_numeric($processMovies) ? $processMovies : Settings::settingValue('lookupimdb'));
         if ($processMovies > 0) {
-            (new Movie)->processMovieReleases($groupID, $guidChar, $processMovies);
+            (new MovieService)->processMovieReleases($groupID, $guidChar, $processMovies);
         }
     }
 }

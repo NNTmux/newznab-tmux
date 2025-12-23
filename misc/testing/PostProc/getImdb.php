@@ -3,12 +3,13 @@
 // This script will update all records in the movieinfo table
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use App\Services\MovieService;
 use Blacklight\ColorCLI;
-use Blacklight\Movie;
 use Illuminate\Support\Facades\DB;
 
 $pdo = DB::connection()->getPdo();
-$movie = new Movie(['Echo' => true]);
+$movie = new MovieService();
+$movie->echooutput = true;
 $colorCli = new ColorCLI;
 
 $movies = $pdo->query('SELECT imdbid FROM movieinfo WHERE tmdbid = 0 ORDER BY id ASC');

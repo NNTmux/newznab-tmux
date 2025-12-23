@@ -4,11 +4,12 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\MovieInfo;
+use App\Services\MovieService;
+use App\Services\TvProcessing\Providers\TraktProvider;
 use Blacklight\ColorCLI;
-use Blacklight\Movie;
-use Blacklight\processing\tv\TraktTv;
 
-$movie = new Movie(['Echo' => true]);
+$movie = new MovieService();
+$movie->echooutput = true;
 $colorCli = new ColorCLI;
 
 $movies = MovieInfo::query()->where('imdbid', '<>', 0)->where('traktid', '=', 0)->get(['imdbid']);
@@ -16,7 +17,7 @@ $count = $movies->count();
 if ($count > 0) {
     $colorCli->primary('Updating '.number_format($count).' movies for TraktTV id.');
     foreach ($movies as $mov) {
-        $traktTv = new TraktTv(['Settings' => null]);
+        $traktTv = new TraktProvider();
         $traktmovie = $traktTv->client->getMovieSummary('tt'.$mov['imdbid'], 'full');
         if ($traktmovie !== false) {
             $colorCli->info('Updating IMDb id: tt'.$mov['imdbid']);

@@ -5,11 +5,19 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BasePageController;
 use App\Models\MovieInfo;
 use App\Models\Release;
-use Blacklight\Movie;
+use App\Services\MovieService;
 use Illuminate\Http\Request;
 
 class AdminMovieController extends BasePageController
 {
+    protected MovieService $movieService;
+
+    public function __construct(MovieService $movieService)
+    {
+        parent::__construct();
+        $this->movieService = $movieService;
+    }
+
     /**
      * @throws \Exception
      */
@@ -56,8 +64,7 @@ class AdminMovieController extends BasePageController
         }
 
         // Check if movie already exists
-        $movie = new Movie(['Settings' => null]);
-        $movCheck = $movie->getMovieInfo($id);
+        $movCheck = $this->movieService->getMovieInfo($id);
 
         if ($movCheck !== null) {
             return redirect()->to('/admin/movie-edit?id='.$id)
@@ -66,7 +73,7 @@ class AdminMovieController extends BasePageController
 
         // Try to fetch and add the movie from TMDB
         try {
-            $movieInfo = $movie->updateMovieInfo($id);
+            $movieInfo = $this->movieService->updateMovieInfo($id);
 
             if ($movieInfo) {
                 // Link any existing releases to this movie
@@ -101,7 +108,6 @@ class AdminMovieController extends BasePageController
      */
     public function edit(Request $request)
     {
-        $movie = new Movie;
         $title = 'Movie Edit';
 
         // Check if ID is provided
@@ -111,7 +117,7 @@ class AdminMovieController extends BasePageController
         }
 
         $id = $request->input('id');
-        $mov = $movie->getMovieInfo($id);
+        $mov = $this->movieService->getMovieInfo($id);
 
         if ($mov === null) {
             return redirect()->to('admin/movie-list')
@@ -125,7 +131,7 @@ class AdminMovieController extends BasePageController
                     \define('STDOUT', fopen('php://stdout', 'wb'));
                 }
 
-                $movieInfo = $movie->updateMovieInfo($id);
+                $movieInfo = $this->movieService->updateMovieInfo($id);
 
                 if ($movieInfo) {
                     return redirect()->back()
@@ -168,7 +174,7 @@ class AdminMovieController extends BasePageController
                 $request->merge(['cover' => file_exists($coverLoc) ? 1 : 0]);
                 $request->merge(['backdrop' => file_exists($backdropLoc) ? 1 : 0]);
 
-                $movie->update([
+                $this->movieService->update([
                     'actors' => $request->input('actors'),
                     'backdrop' => $request->input('backdrop'),
                     'cover' => $request->input('cover'),

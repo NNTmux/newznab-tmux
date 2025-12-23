@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\Movie;
+use App\Services\MovieService;
 use Illuminate\Console\Command;
 
 class FetchMovieByImdb extends Command
@@ -32,7 +32,7 @@ class FetchMovieByImdb extends Command
             return self::FAILURE;
         }
 
-        $movie = app(Movie::class);
+        $movie = app(MovieService::class);
         $movie->echooutput = true;
         $movie->service = 'console';
 

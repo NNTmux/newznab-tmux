@@ -4,10 +4,11 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\MovieInfo;
+use App\Services\MovieService;
 use Blacklight\ColorCLI;
-use Blacklight\Movie;
 
-$movie = new Movie(['Echo' => true]);
+$movie = new MovieService();
+$movie->echooutput = true;
 $colorCli = new ColorCLI;
 
 $movies = MovieInfo::query()->where('cover', '=', 0)->orderBy('year')->orderByDesc('id')->get(['imdbid']);

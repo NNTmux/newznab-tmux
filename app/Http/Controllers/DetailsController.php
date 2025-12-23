@@ -12,12 +12,12 @@ use App\Models\ReleaseRegex;
 use App\Models\Settings;
 use App\Models\UserDownload;
 use App\Models\Video;
+use App\Services\MovieService;
 use App\Services\Releases\ReleaseSearchService;
 use Blacklight\AniDB;
 use Blacklight\Books;
 use Blacklight\Console;
 use Blacklight\Games;
-use Blacklight\Movie;
 use Blacklight\Music;
 use Blacklight\ReleaseExtra;
 use Blacklight\XXX;
@@ -27,10 +27,13 @@ class DetailsController extends BasePageController
 {
     private ReleaseSearchService $releaseSearchService;
 
-    public function __construct(ReleaseSearchService $releaseSearchService)
+    private MovieService $movieService;
+
+    public function __construct(ReleaseSearchService $releaseSearchService, MovieService $movieService)
     {
         parent::__construct();
         $this->releaseSearchService = $releaseSearchService;
+        $this->movieService = $movieService;
     }
 
     public function show(Request $request, string $guid)
@@ -70,15 +73,14 @@ class DetailsController extends BasePageController
 
             $mov = '';
             if ($data['imdbid'] !== '' && $data['imdbid'] !== 0000000) {
-                $movie = new Movie(['Settings' => $this->settings]);
-                $mov = $movie->getMovieInfo($data['imdbid']);
+                $mov = $this->movieService->getMovieInfo($data['imdbid']);
                 if (! empty($mov['title'])) {
                     $mov['title'] = str_replace(['/', '\\'], '', $mov['title']);
                     $mov['actors'] = makeFieldLinks($mov, 'actors', 'movies');
                     $mov['genre'] = makeFieldLinks($mov, 'genre', 'movies');
                     $mov['director'] = makeFieldLinks($mov, 'director', 'movies');
                     if (Settings::settingValue('trailers_display')) {
-                        $trailer = empty($mov['trailer']) || $mov['trailer'] === '' ? $movie->getTrailer($data['imdbid']) : $mov['trailer'];
+                        $trailer = empty($mov['trailer']) || $mov['trailer'] === '' ? $this->movieService->getTrailer($data['imdbid']) : $mov['trailer'];
                         if ($trailer) {
                             $mov['trailer'] = sprintf('<iframe width="%d" height="%d" src="%s"></iframe>', Settings::settingValue('trailers_size_x'), Settings::settingValue('trailers_size_y'), $trailer);
                         }

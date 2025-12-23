@@ -3,18 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use Blacklight\Movie;
+use App\Services\MovieBrowseService;
+use App\Services\MovieService;
 use Illuminate\Http\Request;
 
 class MovieController extends BasePageController
 {
+    protected MovieBrowseService $movieBrowseService;
+
+    protected MovieService $movieService;
+
+    public function __construct(MovieBrowseService $movieBrowseService, MovieService $movieService)
+    {
+        parent::__construct();
+        $this->movieBrowseService = $movieBrowseService;
+        $this->movieService = $movieService;
+    }
+
     /**
      * @throws \Exception
      */
     public function showMovies(Request $request, string $id = '')
     {
-        $movie = new Movie(['Settings' => $this->settings]);
-
         $moviecats = Category::getChildren(Category::MOVIE_ROOT)->map(function ($mcat) {
             return ['id' => $mcat->id, 'title' => $mcat->title];
         });
@@ -31,12 +41,12 @@ class MovieController extends BasePageController
         $offset = ($page - 1) * config('nntmux.items_per_cover_page');
 
         $orderby = $request->input('ob', '');
-        $ordering = $movie->getMovieOrdering();
+        $ordering = $this->movieBrowseService->getMovieOrdering();
         if (! in_array($orderby, $ordering, false)) {
             $orderby = '';
         }
 
-        $rslt = $movie->getMovieRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, $this->userdata->categoryexclusions);
+        $rslt = $this->movieBrowseService->getMovieRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, $this->userdata->categoryexclusions);
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
         $movies = $results->map(function ($result) {
@@ -67,7 +77,7 @@ class MovieController extends BasePageController
             'director' => stripslashes($request->input('director', '')),
             'ratings' => range(1, 9),
             'rating' => $request->input('rating', ''),
-            'genres' => $movie->getGenres(),
+            'genres' => $this->movieBrowseService->getGenres(),
             'genre' => $request->input('genre', ''),
             'years' => $years,
             'year' => $request->input('year', ''),
@@ -94,17 +104,15 @@ class MovieController extends BasePageController
      */
     public function showMovie(Request $request, string $imdbid)
     {
-        $movie = new Movie(['Settings' => $this->settings]);
-
         // Get movie info
-        $movieInfo = $movie->getMovieInfo($imdbid);
+        $movieInfo = $this->movieService->getMovieInfo($imdbid);
 
         if (! $movieInfo) {
             return redirect()->route('Movies')->with('error', 'Movie not found');
         }
 
         // Get all releases for this movie
-        $rslt = $movie->getMovieRange(1, [], 0, 1000, '', -1, $this->userdata->categoryexclusions);
+        $rslt = $this->movieBrowseService->getMovieRange(1, [], 0, 1000, '', -1, $this->userdata->categoryexclusions);
 
         // Filter to only this movie's IMDB ID
         $movieData = collect($rslt)->firstWhere('imdbid', $imdbid);
@@ -183,10 +191,8 @@ class MovieController extends BasePageController
      */
     public function showTrailer(Request $request)
     {
-        $movie = new Movie;
-
         if ($request->has('id') && ctype_digit($request->input('id'))) {
-            $mov = $movie->getMovieInfo($request->input('id'));
+            $mov = $this->movieService->getMovieInfo($request->input('id'));
 
             if (! $mov) {
                 return response()->json(['message' => 'There is no trailer for this movie.'], 404);
@@ -224,7 +230,6 @@ class MovieController extends BasePageController
      */
     public function showTrending(Request $request)
     {
-        $movie = new Movie(['Settings' => $this->settings]);
 
         // Cache key for trending movies (48 hours)
         $cacheKey = 'trending_movies_top_15_48h';

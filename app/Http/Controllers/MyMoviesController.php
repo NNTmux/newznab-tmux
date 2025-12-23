@@ -5,24 +5,32 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Models\UserMovie;
+use App\Services\MovieBrowseService;
+use App\Services\MovieService;
 use App\Services\Releases\ReleaseBrowseService;
-use Blacklight\Movie;
 use Illuminate\Http\Request;
 
 class MyMoviesController extends BasePageController
 {
     private ReleaseBrowseService $releaseBrowseService;
 
-    public function __construct(ReleaseBrowseService $releaseBrowseService)
-    {
+    private MovieService $movieService;
+
+    private MovieBrowseService $movieBrowseService;
+
+    public function __construct(
+        ReleaseBrowseService $releaseBrowseService,
+        MovieService $movieService,
+        MovieBrowseService $movieBrowseService
+    ) {
         parent::__construct();
         $this->releaseBrowseService = $releaseBrowseService;
+        $this->movieService = $movieService;
+        $this->movieBrowseService = $movieBrowseService;
     }
 
     public function show(Request $request)
     {
-        $mv = new Movie;
-
         $action = $request->input('id') ?? '';
         $imdbid = $request->input('imdb') ?? '';
 
@@ -53,7 +61,7 @@ class MyMoviesController extends BasePageController
                     return redirect()->to('/mymovies');
                 }
 
-                $movie = $mv->getMovieInfo($imdbid);
+                $movie = $this->movieService->getMovieInfo($imdbid);
                 if (! $movie) {
                     return redirect()->to('/mymovies');
                 }
@@ -149,11 +157,11 @@ class MyMoviesController extends BasePageController
                     }
                 }
 
-                $ordering = $this->releaseBrowseService->getBrowseOrdering();
+                $ordering = $request->input('ob', '');
 
                 $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
 
-                $results = $mv->getMovieRange($page, $movie['categoryNames'], $offset, config('nntmux.items_per_cover_page'), $ordering, -1, $this->userdata->categoryexclusions);
+                $results = $this->movieBrowseService->getMovieRange($page, [], $offset, config('nntmux.items_per_cover_page'), $ordering, -1, $this->userdata->categoryexclusions);
 
                 $this->viewData['covgroup'] = '';
 
