@@ -1,48 +1,37 @@
 <?php
 
-namespace Blacklight;
+namespace App\Services;
 
 use App\Models\BookInfo;
 use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
-use App\Services\ItunesService;
+use Blacklight\ColorCLI;
+use Blacklight\ReleaseImage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Class Books.
+ * Service class for book data fetching and processing.
  */
-class Books
+class BookService
 {
     public bool $echooutput;
 
-    /**
-     * @var null|string
-     */
-    public mixed $pubkey;
+    public ?string $pubkey;
 
-    /**
-     * @var null|string
-     */
-    public mixed $privkey;
+    public ?string $privkey;
 
-    /**
-     * @var null|string
-     */
-    public mixed $asstag;
+    public ?string $asstag;
 
-    public string|int|null $bookqty;
+    public int $bookqty;
 
-    public string|int|null $sleeptime;
+    public int $sleeptime;
 
     public string $imgSavePath;
 
-    /**
-     * @var null|string
-     */
-    public mixed $bookreqids;
+    public ?string $bookreqids;
 
     public string $renamed;
 
@@ -51,14 +40,11 @@ class Books
     protected ColorCLI $colorCli;
 
     /**
-     * @param  array  $options  Class instances / Echo to cli.
-     *
      * @throws \Exception
      */
     public function __construct()
     {
         $this->echooutput = config('nntmux.echocli');
-
         $this->colorCli = new ColorCLI;
 
         $this->pubkey = Settings::settingValue('amazonpubkey');
@@ -75,16 +61,22 @@ class Books
     }
 
     /**
-     * @return Model|null|static
+     * Get book info by ID.
      */
-    public function getBookInfo($id)
+    public function getBookInfo(?int $id): ?Model
     {
+        if ($id === null) {
+            return null;
+        }
+
         return BookInfo::query()->where('id', $id)->first();
     }
 
+    /**
+     * Get book info by name using full-text search.
+     */
     public function getBookInfoByName(string $title): ?Model
     {
-        // only used to get a count of words
         $searchWords = '';
         $title = preg_replace(['/( - | -|\(.+\)|\(|\))/', '/[^\w ]+/'], [' ', ''], $title);
         $title = trim(trim(preg_replace('/\s\s+/i', ' ', $title)));
@@ -100,7 +92,10 @@ class Books
         return BookInfo::search($searchWords)->first();
     }
 
-    public function getBookRange($page, $cat, $start, $num, $orderBy, array $excludedCats = []): array
+    /**
+     * Get book range with pagination.
+     */
+    public function getBookRange(int $page, array $cat, int $start, int $num, string $orderBy, array $excludedCats = []): array
     {
         $page = max(1, $page);
         $start = max(0, $start);
@@ -188,7 +183,10 @@ class Books
         return $return;
     }
 
-    public function getBookOrder($orderBy): array
+    /**
+     * Get book order array.
+     */
+    public function getBookOrder(string $orderBy): array
     {
         $order = $orderBy === '' ? 'r.postdate' : $orderBy;
         $orderArr = explode('_', $order);
@@ -206,6 +204,9 @@ class Books
         return [$orderfield, $ordersort];
     }
 
+    /**
+     * Get book ordering options.
+     */
     public function getBookOrdering(): array
     {
         return [
@@ -226,11 +227,17 @@ class Books
         ];
     }
 
+    /**
+     * Get browse by options.
+     */
     public function getBrowseByOptions(): array
     {
         return ['author' => 'author', 'title' => 'title'];
     }
 
+    /**
+     * Get browse by SQL clause.
+     */
     public function getBrowseBy(): string
     {
         $browseby = ' ';
@@ -242,6 +249,30 @@ class Books
         }
 
         return $browseby;
+    }
+
+    /**
+     * Update book by ID.
+     */
+    public function update(
+        int $id,
+        string $title,
+        ?string $asin,
+        ?string $url,
+        ?string $author,
+        ?string $publisher,
+        $publishdate,
+        int $cover
+    ): bool {
+        return BookInfo::query()->where('id', $id)->update([
+            'title' => $title,
+            'asin' => $asin,
+            'url' => $url,
+            'author' => $author,
+            'publisher' => $publisher,
+            'publishdate' => $publishdate,
+            'cover' => $cover,
+        ]) > 0;
     }
 
     /**
@@ -283,6 +314,8 @@ class Books
     }
 
     /**
+     * Process book releases helper.
+     *
      * @throws \Exception
      */
     protected function processBookReleasesHelper($res, $categoryID): void
@@ -349,6 +382,8 @@ class Books
     }
 
     /**
+     * Parse release title.
+     *
      * @return bool|string
      */
     public function parseTitle($release_name, $releaseID, $releasetype)
@@ -401,6 +436,8 @@ class Books
     }
 
     /**
+     * Update book info from external sources.
+     *
      * @return false|int|string
      *
      * @throws \Exception
@@ -493,6 +530,8 @@ class Books
     }
 
     /**
+     * Fetch book properties from iTunes.
+     *
      * @return array|bool
      */
     public function fetchItunesBookProperties(string $bookInfo)
@@ -533,3 +572,4 @@ class Books
         return $book;
     }
 }
+

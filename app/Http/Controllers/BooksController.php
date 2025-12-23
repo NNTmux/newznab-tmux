@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use Blacklight\Books;
+use App\Services\BookService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
@@ -14,7 +14,7 @@ class BooksController extends BasePageController
      */
     public function index(Request $request, string $id = '')
     {
-        $book = new Books(['Settings' => $this->settings]);
+        $bookService = new BookService;
 
         $boocats = Category::getChildren(Category::BOOKS_ROOT);
 
@@ -38,13 +38,13 @@ class BooksController extends BasePageController
         $catarray = [];
         $catarray[] = $category;
 
-        $ordering = $book->getBookOrdering();
+        $ordering = $bookService->getBookOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
 
         $books = [];
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_cover_page');
-        $rslt = $book->getBookRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, $this->userdata->categoryexclusions);
+        $rslt = $bookService->getBookRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, $this->userdata->categoryexclusions);
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
         $maxwords = 50;
         foreach ($results as $result) {

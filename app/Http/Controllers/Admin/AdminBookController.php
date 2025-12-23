@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
 use App\Models\BookInfo;
-use Blacklight\Books;
+use App\Services\BookService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -32,7 +32,7 @@ class AdminBookController extends BasePageController
     public function edit(Request $request): View|RedirectResponse
     {
         $this->setAdminPrefs();
-        $book = new Books;
+        $bookService = new BookService;
 
         $meta_title = $title = 'Book Edit';
 
@@ -41,7 +41,7 @@ class AdminBookController extends BasePageController
 
         if ($request->has('id')) {
             $id = $request->input('id');
-            $b = $book->getBookInfo($id);
+            $b = $bookService->getBookInfo($id);
 
             if (! $b) {
                 abort(404);
@@ -64,7 +64,7 @@ class AdminBookController extends BasePageController
                         ? ($b['publishdate'] ?? null)
                         : Carbon::parse($request->input('publishdate'))->timestamp;
 
-                    $book->update(
+                    $bookService->update(
                         $id,
                         $request->input('title'),
                         $request->input('asin'),
@@ -78,7 +78,7 @@ class AdminBookController extends BasePageController
                     return redirect()->route('admin.book-list')->with('success', 'Book updated successfully');
                 case 'view':
                 default:
-                    return view('admin.books.edit', compact('book', 'title', 'meta_title'))->with('book', $b);
+                    return view('admin.books.edit', compact('title', 'meta_title'))->with('book', $b);
             }
         }
 

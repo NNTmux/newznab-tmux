@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Scout\Searchable;
 
 /**
@@ -78,5 +79,41 @@ class BookInfo extends Model
             'author' => $this->author,
             'title' => $this->title,
         ];
+    }
+
+    /**
+     * Get the releases associated with this book.
+     */
+    public function releases(): HasMany
+    {
+        return $this->hasMany(Release::class, 'bookinfo_id');
+    }
+
+    /**
+     * Get the cover image path.
+     */
+    public function getCoverPath(): string
+    {
+        return storage_path('covers/book/'.$this->id.'.jpg');
+    }
+
+    /**
+     * Check if cover image exists.
+     */
+    public function hasCoverImage(): bool
+    {
+        return file_exists($this->getCoverPath());
+    }
+
+    /**
+     * Get the cover URL.
+     */
+    public function getCoverUrl(): ?string
+    {
+        if (! $this->cover || ! $this->hasCoverImage()) {
+            return null;
+        }
+
+        return url('/covers/book/'.$this->id.'.jpg');
     }
 }

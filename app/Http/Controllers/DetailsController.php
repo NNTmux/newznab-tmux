@@ -14,8 +14,8 @@ use App\Models\UserDownload;
 use App\Models\Video;
 use App\Services\MovieService;
 use App\Services\Releases\ReleaseSearchService;
+use App\Services\BookService;
 use Blacklight\AniDB;
-use Blacklight\Books;
 use Blacklight\Console;
 use Blacklight\Games;
 use Blacklight\Music;
@@ -119,7 +119,7 @@ class DetailsController extends BasePageController
 
             $book = '';
             if ($data['bookinfo_id'] !== '') {
-                $book = (new Books)->getBookInfo($data['bookinfo_id']);
+                $book = (new BookService)->getBookInfo($data['bookinfo_id']);
             }
 
             $con = '';
