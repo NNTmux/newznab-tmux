@@ -229,10 +229,11 @@ class IRCClient
     /**
      * Log in to a IRC server.
      *
-     * @param  string  $nickName  The nick name - visible in the channel.
-     * @param  string  $userName  The user name - visible in the host name.
-     * @param  string  $realName  The real name - visible in the WhoIs.
-     * @param  null  $password  The password  - some servers require a password.
+     * @param string $nickName The nick name - visible in the channel.
+     * @param string $userName The user name - visible in the host name.
+     * @param string $realName The real name - visible in the WhoIs.
+     * @param string|null $password The password - some servers require a password.
+     * @return bool
      */
     public function login(string $nickName, string $userName, string $realName, ?string $password = null): bool
     {
@@ -266,7 +267,7 @@ class IRCClient
             return false;
         }
 
-        // Loop over socket buffer until we find "001".
+        // Loop over the socket buffer until we find "001".
         while (true) {
             $this->_readSocket();
 
@@ -301,7 +302,7 @@ class IRCClient
                         return false;
                     }
                 }
-                // ERROR :Closing Link: kevin123[100.100.100.100] (This server is full.)
+                // ERROR: Closing Link: kevin123[100.100.100.100] (This server is full.)
             } elseif (preg_match('/^ERROR\s*:/', (string) $this->_buffer)) {
                 echo $this->_buffer.PHP_EOL;
 
@@ -473,13 +474,13 @@ class IRCClient
             stream_set_timeout($this->_socket, 5);
             $line = fgets($this->_socket, 1024);
 
-            // Check if connection is still alive and handle timeout/errors
+            // Check if the connection is still alive and handle timeout/errors
             if ($line === false) {
                 $meta = stream_get_meta_data($this->_socket);
 
                 // If stream timed out, it's OK - just no data available
                 if ($meta['timed_out']) {
-                    // Check if connection is still valid
+                    // Check if the connection is still valid
                     if (! $this->_connected()) {
                         echo 'Connection lost (timeout), attempting to reconnect...'.PHP_EOL;
                         $this->_reconnect();
@@ -487,7 +488,7 @@ class IRCClient
                     break;
                 }
 
-                // If EOF or other error, connection is dead
+                // If EOF or other error, the connection is dead
                 if ($meta['eof'] || ! $this->_connected()) {
                     echo 'Connection lost, attempting to reconnect...'.PHP_EOL;
                     $this->_reconnect();
