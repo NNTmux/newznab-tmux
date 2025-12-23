@@ -8,6 +8,7 @@ use App\Models\Settings;
 use App\Models\TvEpisode;
 use App\Models\TvInfo;
 use App\Models\Video;
+use App\Services\Releases\ReleaseBrowseService;
 use Blacklight\ColorCLI;
 use Illuminate\Support\Facades\DB;
 
@@ -157,7 +158,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
             ->where('id', $releaseId)
             ->update(['videos_id' => $videoId, 'tv_episodes_id' => $episodeId]);
 
-        Releases::bumpCacheVersion();
+        ReleaseBrowseService::bumpCacheVersion();
     }
 
     /**
