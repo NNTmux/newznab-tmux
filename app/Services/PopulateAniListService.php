@@ -80,7 +80,7 @@ class PopulateAniListService
     {
         switch ($type) {
             case 'info':
-                $this->populateInfoTable($anilistId);
+                $this->populateInfoTable((string) $anilistId);
                 break;
         }
     }
