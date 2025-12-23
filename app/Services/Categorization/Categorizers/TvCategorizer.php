@@ -96,7 +96,7 @@ class TvCategorizer extends AbstractCategorizer
             return true;
         }
         // Known anime release groups (should be treated as TV)
-        if (preg_match('/[.\-_ ](URANiME|ANiHLS|HaiKU|ANiURL|SkyAnime|Erai-raws|LostYears|Vodes|SubsPlease|Judas|Ember|EMBER|YuiSubs|ASW|Tsundere-Raws|Anime-Raws)[.\-_ ]?/i', $name)) {
+        if (preg_match('/(?:^|[.\-_ \[])(URANiME|ANiHLS|HaiKU|ANiURL|SkyAnime|Erai-raws|LostYears|Vodes|SubsPlease|Judas|Ember|EMBER|YuiSubs|ASW|Tsundere-Raws|Anime-Raws)(?:[.\-_ \]]|$)/i', $name)) {
             return true;
         }
         return false;
@@ -107,8 +107,8 @@ class TvCategorizer extends AbstractCategorizer
         if (preg_match('/[._ -]Anime[._ -]/i', $name)) {
             return $this->matched(Category::TV_ANIME, 0.95, 'anime_pattern');
         }
-        // Known anime release groups - now matches anywhere in the name, not just at the end
-        if (preg_match('/[.\-_ ](URANiME|ANiHLS|HaiKU|ANiURL|SkyAnime|Erai-raws|LostYears|Vodes|SubsPlease|Judas|Ember|EMBER|YuiSubs|ASW|Tsundere-Raws|Anime-Raws)[.\-_ ]?/i', $name)) {
+        // Known anime release groups - matches with brackets, dots, dashes, underscores, spaces, or at the start
+        if (preg_match('/(?:^|[.\-_ \[])(URANiME|ANiHLS|HaiKU|ANiURL|SkyAnime|Erai-raws|LostYears|Vodes|SubsPlease|Judas|Ember|EMBER|YuiSubs|ASW|Tsundere-Raws|Anime-Raws)(?:[.\-_ \]]|$)/i', $name)) {
             return $this->matched(Category::TV_ANIME, 0.95, 'anime_group');
         }
         // Anime hash pattern: [GroupName] Title - 01 [ABCD1234]

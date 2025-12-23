@@ -36,7 +36,7 @@ class MovieCategorizer extends AbstractCategorizer
         }
 
         // Skip known anime release groups
-        if (preg_match('/[.\-_ ](URANiME|ANiHLS|HaiKU|ANiURL|SkyAnime|Erai-raws|LostYears|Vodes|SubsPlease|Judas|Ember|YuiSubs|ASW|Tsundere-Raws|Anime-Raws)[.\-_ ]?/i', $context->releaseName)) {
+        if (preg_match('/(?:^|[.\-_ \[])(URANiME|ANiHLS|HaiKU|ANiURL|SkyAnime|Erai-raws|LostYears|Vodes|SubsPlease|Judas|Ember|YuiSubs|ASW|Tsundere-Raws|Anime-Raws)(?:[.\-_ \]]|$)/i', $context->releaseName)) {
             return true;
         }
 
