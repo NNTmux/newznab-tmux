@@ -9,7 +9,6 @@ use App\Models\TvEpisode;
 use App\Models\TvInfo;
 use App\Models\Video;
 use Blacklight\ColorCLI;
-use Blacklight\Releases;
 use Illuminate\Support\Facades\DB;
 
 /**

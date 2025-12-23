@@ -8,7 +8,7 @@ use App\Models\Release;
 use App\Models\ReleaseFile;
 use App\Services\Search\ElasticSearchService;
 use App\Services\Search\ManticoreSearchService;
-use Blacklight\Releases;
+use App\Services\Releases\ReleaseBrowseService;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
 use App\Services\NameFixing\NameFixingService;
@@ -63,7 +63,7 @@ class ReleaseFileManager
         // Check for password
         if (isset($file['pass']) && $file['pass'] === true) {
             $context->releaseHasPassword = true;
-            $context->passwordStatus = Releases::PASSWD_RAR;
+            $context->passwordStatus = ReleaseBrowseService::PASSWD_RAR;
             return false;
         }
 
@@ -72,7 +72,7 @@ class ReleaseFileManager
             && preg_match($this->config->innerFileBlacklist, $file['name'])
         ) {
             $context->releaseHasPassword = true;
-            $context->passwordStatus = Releases::PASSWD_RAR;
+            $context->passwordStatus = ReleaseBrowseService::PASSWD_RAR;
             return false;
         }
 
@@ -125,7 +125,7 @@ class ReleaseFileManager
                     Log::debug('Codec spam found, setting release to potentially passworded.');
                 }
                 $context->releaseHasPassword = true;
-                $context->passwordStatus = Releases::PASSWD_RAR;
+                $context->passwordStatus = ReleaseBrowseService::PASSWD_RAR;
             } elseif ($file['name'] !== '' && ! str_starts_with($file['name'], '.')) {
                 // Run PreDB filename check
                 $context->release['filename'] = $file['name'];
@@ -185,7 +185,7 @@ class ReleaseFileManager
         if (! $context->releaseHasPassword && $context->nzbHasCompressedFile && $releaseFilesCount === 0) {
             Release::query()->where('id', $context->release->id)->update($updateRows);
         } else {
-            $updateRows['passwordstatus'] = $processPasswords ? $passwordStatus : Releases::PASSWD_NONE;
+            $updateRows['passwordstatus'] = $processPasswords ? $passwordStatus : ReleaseBrowseService::PASSWD_NONE;
             $updateRows['rarinnerfilecount'] = $releaseFilesCount;
             Release::query()->where('id', $context->release->id)->update($updateRows);
         }

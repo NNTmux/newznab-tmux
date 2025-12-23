@@ -6,8 +6,8 @@ use App\Models\Release;
 use App\Models\UsenetGroup;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
+use App\Services\Releases\ReleaseBrowseService;
 use App\Services\TempWorkspaceService;
-use Blacklight\Releases;
 use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -248,7 +248,7 @@ class AdditionalProcessingOrchestrator
             $this->config->processThumbnails
         );
 
-        $context->passwordStatus = Releases::PASSWD_NONE;
+        $context->passwordStatus = ReleaseBrowseService::PASSWD_NONE;
         $context->releaseHasPassword = false;
         $context->releaseGroupName = UsenetGroup::getNameByID($context->release->groups_id);
         $context->releaseHasNoNFO = (int) $context->release->nfostatus !== 1;

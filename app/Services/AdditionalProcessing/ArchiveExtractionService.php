@@ -4,7 +4,7 @@ namespace App\Services\AdditionalProcessing;
 
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
-use Blacklight\Releases;
+use App\Services\Releases\ReleaseBrowseService;
 use dariusiii\rarinfo\ArchiveInfo;
 use dariusiii\rarinfo\Par2Info;
 use Illuminate\Support\Facades\File;
@@ -45,7 +45,7 @@ class ArchiveExtractionService
             'success' => false,
             'files' => [],
             'hasPassword' => false,
-            'passwordStatus' => Releases::PASSWD_NONE,
+            'passwordStatus' => ReleaseBrowseService::PASSWD_NONE,
         ];
 
         $context->compressedFilesChecked++;
@@ -79,7 +79,7 @@ class ArchiveExtractionService
                     'success' => false,
                     'files' => [],
                     'hasPassword' => false,
-                    'passwordStatus' => Releases::PASSWD_NONE,
+                    'passwordStatus' => ReleaseBrowseService::PASSWD_NONE,
                     'standaloneVideoType' => $videoType,
                     'standaloneVideoData' => $compressedData,
                 ];
@@ -114,7 +114,7 @@ class ArchiveExtractionService
                 'success' => false,
                 'files' => [],
                 'hasPassword' => true,
-                'passwordStatus' => Releases::PASSWD_RAR,
+                'passwordStatus' => ReleaseBrowseService::PASSWD_RAR,
             ];
         }
 
@@ -134,7 +134,7 @@ class ArchiveExtractionService
             'success' => true,
             'files' => $files,
             'hasPassword' => false,
-            'passwordStatus' => Releases::PASSWD_NONE,
+            'passwordStatus' => ReleaseBrowseService::PASSWD_NONE,
             'archiveMarker' => $archiveMarker,
             'dataSummary' => $dataSummary,
         ];
@@ -204,7 +204,7 @@ class ArchiveExtractionService
             'success' => false,
             'files' => [],
             'hasPassword' => false,
-            'passwordStatus' => Releases::PASSWD_NONE,
+            'passwordStatus' => ReleaseBrowseService::PASSWD_NONE,
         ];
 
         if (! $this->config->sevenZipPath) {
@@ -219,7 +219,7 @@ class ArchiveExtractionService
                     'success' => false,
                     'files' => [],
                     'hasPassword' => true,
-                    'passwordStatus' => Releases::PASSWD_RAR,
+                    'passwordStatus' => ReleaseBrowseService::PASSWD_RAR,
                 ];
             }
 
@@ -229,7 +229,7 @@ class ArchiveExtractionService
                     'success' => true,
                     'files' => $files,
                     'hasPassword' => false,
-                    'passwordStatus' => Releases::PASSWD_NONE,
+                    'passwordStatus' => ReleaseBrowseService::PASSWD_NONE,
                     'archiveMarker' => '7z',
                 ];
             }
@@ -251,7 +251,7 @@ class ArchiveExtractionService
                 'success' => true,
                 'files' => $files,
                 'hasPassword' => false,
-                'passwordStatus' => Releases::PASSWD_NONE,
+                'passwordStatus' => ReleaseBrowseService::PASSWD_NONE,
                 'archiveMarker' => '7z',
             ];
         }
@@ -480,7 +480,7 @@ class ArchiveExtractionService
             'success' => false,
             'files' => [],
             'hasPassword' => false,
-            'passwordStatus' => Releases::PASSWD_NONE,
+            'passwordStatus' => ReleaseBrowseService::PASSWD_NONE,
         ];
 
         if ($this->config->extractUsingRarInfo || ! $this->config->sevenZipPath) {
@@ -528,7 +528,7 @@ class ArchiveExtractionService
                     'success' => true,
                     'files' => $this->filterExtractedFiles($files),
                     'hasPassword' => false,
-                    'passwordStatus' => Releases::PASSWD_NONE,
+                    'passwordStatus' => ReleaseBrowseService::PASSWD_NONE,
                     'archiveMarker' => $marker,
                 ];
             }
