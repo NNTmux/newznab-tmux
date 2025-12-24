@@ -62,6 +62,15 @@ class BtcPaymentController extends BasePageController
             })->first();
             if ($checkOrder !== null) {
                 $user = User::query()->where('email', '=', $checkOrder->email)->first();
+
+                // If user not found and email ends with pm.me, try proton.me and protonmail.com
+                if (! $user && str_ends_with($checkOrder->email, '@pm.me')) {
+                    $emailLocalPart = substr($checkOrder->email, 0, -6); // Remove @pm.me
+                    $user = User::query()->where('email', '=', $emailLocalPart.'@proton.me')->first();
+                    if (! $user) {
+                        $user = User::query()->where('email', '=', $emailLocalPart.'@protonmail.com')->first();
+                    }
+                }
                 if ($user) {
                     // Extract role name and addYears from item_description using regex
                     // Matches patterns like "User 1", "Admin ++ 2", "Friend 3"
