@@ -2,10 +2,9 @@
 
 namespace App\Services;
 
+use App\Facades\Search;
 use App\Models\Predb;
 use App\Models\UsenetGroup;
-use App\Services\Search\ElasticSearchService;
-use App\Services\Search\ManticoreSearchService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -51,9 +50,6 @@ class IRCScraper extends IRCClient
      */
     protected string|false $_titleIgnoreRegex = false;
 
-    protected ManticoreSearchService $manticoreSearch;
-
-    private ElasticSearchService $elasticsearch;
 
     /**
      * Construct.
@@ -108,8 +104,6 @@ class IRCScraper extends IRCClient
             $this->_titleIgnoreRegex = (string) config('irc_settings.scrape_irc_title_ignore');
         }
 
-        $this->elasticsearch = app(ElasticSearchService::class);
-        $this->manticoreSearch = app(ManticoreSearchService::class);
 
         $this->_groupList = [];
         $this->_silent = $silent;
@@ -384,11 +378,7 @@ class IRCScraper extends IRCClient
                 'source' => $this->_curPre['source'] ?? null,
             ];
 
-            if (config('nntmux.elasticsearch_enabled') === true) {
-                $this->elasticsearch->insertPreDb($parameters);
-            } else {
-                $this->manticoreSearch->insertPredb($parameters);
-            }
+            Search::insertPredb($parameters);
 
             $this->_doEcho(true);
         } catch (\Exception $e) {
@@ -448,11 +438,7 @@ class IRCScraper extends IRCClient
                 'source' => $this->_curPre['source'] ?? null,
             ];
 
-            if (config('nntmux.elasticsearch_enabled') === true) {
-                $this->elasticsearch->updatePreDb($parameters);
-            } else {
-                $this->manticoreSearch->updatePreDb($parameters);
-            }
+            Search::updatePreDb($parameters);
         }
 
         $this->_doEcho(false);

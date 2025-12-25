@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\NameFixing;
 
+use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
 use App\Services\NameFixing\Contracts\NameSourceFixerInterface;
@@ -11,8 +12,6 @@ use App\Services\NameFixing\DTO\NameFixResult;
 use App\Services\NameFixing\Extractors\NfoNameExtractor;
 use App\Services\NameFixing\Extractors\FileNameExtractor;
 use App\Services\NNTP\NNTPService;
-use App\Services\Search\ElasticSearchService;
-use App\Services\Search\ManticoreSearchService;
 use Blacklight\ColorCLI;
 use Illuminate\Support\Arr;
 
@@ -50,8 +49,6 @@ class NameFixingService
     protected FileNameExtractor $fileExtractor;
     protected FileNameCleaner $fileNameCleaner;
     protected FilePrioritizer $filePrioritizer;
-    protected ManticoreSearchService $manticore;
-    protected ElasticSearchService $elasticsearch;
     protected ColorCLI $colorCLI;
     protected bool $echoOutput;
 
@@ -70,8 +67,6 @@ class NameFixingService
         ?FileNameExtractor $fileExtractor = null,
         ?FileNameCleaner $fileNameCleaner = null,
         ?FilePrioritizer $filePrioritizer = null,
-        ?ManticoreSearchService $manticore = null,
-        ?ElasticSearchService $elasticsearch = null,
         ?ColorCLI $colorCLI = null
     ) {
         $this->updateService = $updateService ?? new ReleaseUpdateService();
@@ -80,8 +75,6 @@ class NameFixingService
         $this->fileExtractor = $fileExtractor ?? new FileNameExtractor();
         $this->fileNameCleaner = $fileNameCleaner ?? new FileNameCleaner();
         $this->filePrioritizer = $filePrioritizer ?? new FilePrioritizer();
-        $this->manticore = $manticore ?? app(ManticoreSearchService::class);
-        $this->elasticsearch = $elasticsearch ?? app(ElasticSearchService::class);
         $this->colorCLI = $colorCLI ?? new ColorCLI();
         $this->echoOutput = config('nntmux.echocli');
 
@@ -758,40 +751,21 @@ class NameFixingService
             return false;
         }
 
-        if (config('nntmux.elasticsearch_enabled') === true) {
-            $results = $this->elasticsearch->searchPreDb($fileName);
-            foreach ($results as $hit) {
-                if (!empty($hit)) {
-                    $this->updateService->updateRelease(
-                        $release,
-                        $hit['title'],
-                        'PreDb: Filename match',
-                        $echo,
-                        $type,
-                        $nameStatus,
-                        $show,
-                        $hit['id']
-                    );
-                    return true;
-                }
-            }
-        } else {
-            $predbSearch = Arr::get($this->manticore->searchIndexes('predb_rt', $fileName, ['filename', 'title']), 'data');
-            if (!empty($predbSearch)) {
-                foreach ($predbSearch as $hit) {
-                    if (!empty($hit)) {
-                        $this->updateService->updateRelease(
-                            $release,
-                            $hit['title'],
-                            'PreDb: Filename match',
-                            $echo,
-                            $type,
-                            $nameStatus,
-                            $show
-                        );
-                        return true;
-                    }
-                }
+        $results = Search::searchPredb($fileName);
+        foreach ($results as $hit) {
+            if (!empty($hit)) {
+                $hitData = is_array($hit) ? $hit : (array)$hit;
+                $this->updateService->updateRelease(
+                    $release,
+                    $hitData['title'] ?? '',
+                    'PreDb: Filename match',
+                    $echo,
+                    $type,
+                    $nameStatus,
+                    $show,
+                    $hitData['id'] ?? null
+                );
+                return true;
             }
         }
 
@@ -809,40 +783,21 @@ class NameFixingService
             return false;
         }
 
-        if (config('nntmux.elasticsearch_enabled') === true) {
-            $results = $this->elasticsearch->searchPreDb($fileName);
-            foreach ($results as $hit) {
-                if (!empty($hit)) {
-                    $this->updateService->updateRelease(
-                        $release,
-                        $hit['title'],
-                        'PreDb: Title match',
-                        $echo,
-                        $type,
-                        $nameStatus,
-                        $show,
-                        $hit['id']
-                    );
-                    return true;
-                }
-            }
-        } else {
-            $results = Arr::get($this->manticore->searchIndexes('predb_rt', $fileName, ['title']), 'data');
-            if (!empty($results)) {
-                foreach ($results as $hit) {
-                    if (!empty($hit)) {
-                        $this->updateService->updateRelease(
-                            $release,
-                            $hit['title'],
-                            'PreDb: Title match',
-                            $echo,
-                            $type,
-                            $nameStatus,
-                            $show
-                        );
-                        return true;
-                    }
-                }
+        $results = Search::searchPredb($fileName);
+        foreach ($results as $hit) {
+            if (!empty($hit)) {
+                $hitData = is_array($hit) ? $hit : (array)$hit;
+                $this->updateService->updateRelease(
+                    $release,
+                    $hitData['title'] ?? '',
+                    'PreDb: Title match',
+                    $echo,
+                    $type,
+                    $nameStatus,
+                    $show,
+                    $hitData['id'] ?? null
+                );
+                return true;
             }
         }
 
@@ -1265,21 +1220,18 @@ class NameFixingService
 
             $preMatch = $this->preMatch($cleanedFileName);
             if ($preMatch[0] === true) {
-                if (config('nntmux.elasticsearch_enabled') === true) {
-                    $results = $this->elasticsearch->searchPreDb($preMatch[1]);
-                } else {
-                    $results = Arr::get($this->manticore->searchIndexes('predb_rt', $preMatch[1], ['filename', 'title']), 'data');
-                }
+                $results = Search::searchPredb($preMatch[1]);
 
                 if (!empty($results)) {
                     foreach ($results as $result) {
                         if (!empty($result)) {
-                            $preFtMatch = $this->preMatch($result['filename'] ?? '');
+                            $resultData = is_array($result) ? $result : (array)$result;
+                            $preFtMatch = $this->preMatch($resultData['filename'] ?? '');
                             if ($preFtMatch[0] === true) {
-                                if ($result['title'] !== $release->searchname) {
-                                    $this->updateService->updateRelease($release, $result['title'], 'file matched source: ' . $result['source'], $echo, 'PreDB file match, ', $nameStatus, $show);
+                                if ($resultData['title'] !== $release->searchname) {
+                                    $this->updateService->updateRelease($release, $resultData['title'], 'file matched source: ' . ($resultData['source'] ?? ''), $echo, 'PreDB file match, ', $nameStatus, $show);
                                 } else {
-                                    $this->updateService->updateSingleColumn('predb_id', $result['id'], $release->releases_id);
+                                    $this->updateService->updateSingleColumn('predb_id', $resultData['id'] ?? 0, $release->releases_id);
                                 }
                                 $matching++;
                                 return $matching;

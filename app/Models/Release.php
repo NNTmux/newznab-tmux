@@ -2,8 +2,7 @@
 
 namespace App\Models;
 
-use App\Services\Search\ElasticSearchService;
-use App\Services\Search\ManticoreSearchService;
+use App\Facades\Search;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -135,11 +134,7 @@ class Release extends Model
                 ]
             );
 
-        if (config('nntmux.elasticsearch_enabled') === true) {
-            app(ElasticSearchService::class)->insertRelease($parameters);
-        } else {
-            app(ManticoreSearchService::class)->insertRelease($parameters);
-        }
+        Search::insertRelease($parameters);
 
         return $parameters['id'];
     }
@@ -172,11 +167,7 @@ class Release extends Model
             ]
         );
 
-        if (config('nntmux.elasticsearch_enabled') === true) {
-            app(ElasticSearchService::class)->updateRelease($id);
-        } else {
-            app(ManticoreSearchService::class)->updateRelease($id);
-        }
+        Search::updateRelease($id);
     }
 
     /**
@@ -396,14 +387,7 @@ class Release extends Model
         preg_match('/(^\w+[-_. ].+?\.(\d+p)).+/i', $rel['searchname'], $similar);
 
         if (! empty($similar)) {
-            if (config('nntmux.elasticsearch_enabled') === true) {
-                $searchResult = app(ElasticSearchService::class)->indexSearch($similar[1], 10);
-            } else {
-                $searchResult = app(ManticoreSearchService::class)->searchIndexes('releases_rt', $similar[1]);
-                if (! empty($searchResult)) {
-                    $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
-                }
-            }
+            $searchResult = Search::searchReleases($similar[1], 10);
 
             if (empty($searchResult)) {
                 return false;

@@ -2,11 +2,10 @@
 
 namespace App\Services;
 
+use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
 use App\Services\Categorization\CategorizationService;
-use App\Services\Search\ElasticSearchService;
-use App\Services\Search\ManticoreSearchService;
 use FFMpeg\Coordinate\Dimension;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
@@ -26,8 +25,6 @@ class MediaProcessingService
         private readonly MediaInfo $mediaInfo,
         private readonly ReleaseImageService $releaseImage,
         private readonly ReleaseExtraService $releaseExtra,
-        private readonly ManticoreSearchService $manticore,
-        private readonly ElasticSearchService $elasticsearch,
         private readonly CategorizationService $categorize,
     ) {}
 
@@ -283,11 +280,7 @@ class MediaProcessingService
                                         'isrenamed' => 1,
                                         'proc_pp' => 1,
                                     ]);
-                                    if (config('nntmux.elasticsearch_enabled') === true) {
-                                        $this->elasticsearch->updateRelease($release->id);
-                                    } else {
-                                        $this->manticore->updateRelease($release->id);
-                                    }
+                                    Search::updateRelease($release->id);
                                 }
                                 $this->releaseExtra->addFromXml($release->id, $xmlArray);
                                 $retVal = true;

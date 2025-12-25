@@ -98,5 +98,31 @@ interface SearchServiceInterface
      * @return array<array{suggest: string, distance: int, docs: int}>
      */
     public function suggest(string $query, ?string $index = null): array;
+    /**
+     * Truncate/clear an index (remove all documents).
+     *
+     * @param  array|string  $indexes  Index name(s) to truncate
+     */
+    public function truncateIndex(array|string $indexes): void;
+
+    /**
+     * Optimize index for better search performance.
+     */
+    public function optimizeIndex(): void;
+
+    /**
+     * Bulk insert multiple releases into the index.
+     *
+     * @param  array  $releases  Array of release data arrays
+     * @return array Results with 'success' and 'errors' counts
+     */
+    public function bulkInsertReleases(array $releases): array;
+
+    /**
+     * Delete a predb record from the index.
+     *
+     * @param  int  $id  Predb ID
+     */
+    public function deletePreDb(int $id): void;
 }
 

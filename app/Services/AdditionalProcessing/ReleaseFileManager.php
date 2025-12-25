@@ -7,8 +7,6 @@ use App\Models\Predb;
 use App\Models\Release;
 use App\Models\ReleaseFile;
 use App\Services\ReleaseImageService;
-use App\Services\Search\ElasticSearchService;
-use App\Services\Search\ManticoreSearchService;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
@@ -29,8 +27,6 @@ use Illuminate\Support\Facades\Log;
  */
 class ReleaseFileManager
 {
-    private ?ManticoreSearchService $manticore = null;
-    private ?ElasticSearchService $elasticsearch = null;
 
     public function __construct(
         private readonly ProcessingConfiguration $config,
@@ -145,11 +141,7 @@ class ReleaseFileManager
      */
     public function updateSearchIndex(int $releaseId): void
     {
-        if ($this->config->elasticsearchEnabled) {
-            $this->elasticsearch()->updateRelease($releaseId);
-        } else {
-            $this->manticore()->updateRelease($releaseId);
-        }
+        \App\Facades\Search::updateRelease($releaseId);
     }
 
     /**
@@ -244,11 +236,7 @@ class ReleaseFileManager
 
             // Delete from search index
             try {
-                if ($this->config->elasticsearchEnabled) {
-                    $this->elasticsearch()->deleteRelease($id);
-                } else {
-                    $this->manticore()->deleteRelease(['i' => $id, 'g' => $guid]);
-                }
+                \App\Facades\Search::deleteRelease($id);
             } catch (\Throwable) {
                 // Ignore
             }
@@ -589,22 +577,6 @@ class ReleaseFileManager
         $hasXXX = (bool) preg_match('/\bXXX\b/i', $t);
 
         return $hasGroupSuffix || ($hasTV && $hasQuality) || ($hasYear && ($hasQuality || $hasTV)) || $hasXXX;
-    }
-
-    private function manticore(): ManticoreSearchService
-    {
-        if ($this->manticore === null) {
-            $this->manticore = app(ManticoreSearchService::class);
-        }
-        return $this->manticore;
-    }
-
-    private function elasticsearch(): ElasticSearchService
-    {
-        if ($this->elasticsearch === null) {
-            $this->elasticsearch = app(ElasticSearchService::class);
-        }
-        return $this->elasticsearch;
     }
 }
 

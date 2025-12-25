@@ -2,14 +2,13 @@
 
 namespace App\Services\AdditionalProcessing;
 
+use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
 use App\Services\Categorization\CategorizationService;
 use App\Services\ReleaseImageService;
-use App\Services\Search\ElasticSearchService;
-use App\Services\Search\ManticoreSearchService;
 use App\Services\ReleaseExtraService;
 use FFMpeg\Coordinate\Dimension;
 use FFMpeg\Coordinate\TimeCode;
@@ -31,8 +30,6 @@ class MediaExtractionService
     private ?FFMpeg $ffmpeg = null;
     private ?FFProbe $ffprobe = null;
     private ?MediaInfo $mediaInfo = null;
-    private ?ManticoreSearchService $manticore = null;
-    private ?ElasticSearchService $elasticsearch = null;
 
     public function __construct(
         private readonly ProcessingConfiguration $config,
@@ -323,11 +320,7 @@ class MediaExtractionService
                                     'proc_pp' => 1,
                                 ]);
 
-                                if ($this->config->elasticsearchEnabled) {
-                                    $this->elasticsearch()->updateRelease($context->release->id);
-                                } else {
-                                    $this->manticore()->updateRelease($context->release->id);
-                                }
+                                Search::updateRelease($context->release->id);
 
                                 if ($this->config->echoCLI) {
                                     NameFixer::echoChangedReleaseName([

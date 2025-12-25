@@ -2,12 +2,11 @@
 
 namespace App\Services\Releases;
 
+use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
-use App\Services\Search\ElasticSearchService;
-use App\Services\Search\ManticoreSearchService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
@@ -25,15 +24,8 @@ class ReleaseSearchService
     public const PASSWD_NONE = 0;
     public const PASSWD_RAR = 1;
 
-    private ManticoreSearchService $manticoreSearch;
-    private ElasticSearchService $elasticSearch;
-
-    public function __construct(
-        ManticoreSearchService $manticoreSearch,
-        ElasticSearchService $elasticSearch
-    ) {
-        $this->manticoreSearch = $manticoreSearch;
-        $this->elasticSearch = $elasticSearch;
+    public function __construct()
+    {
     }
 
     /**
@@ -149,26 +141,10 @@ class ReleaseSearchService
         // Early return if searching with no results
         $searchResult = [];
         if ($searchName !== -1 && $searchName !== '' && $searchName !== null) {
-            // Try Elasticsearch first if enabled
-            if (config('nntmux.elasticsearch_enabled') === true) {
-                $searchResult = $this->elasticSearch->indexSearchApi($searchName, $limit);
-            }
+            // Use the unified Search facade
+            $searchResult = Search::searchReleases($searchName, $limit);
 
-            // Fall back to Manticore if Elasticsearch didn't return results
-            if (empty($searchResult)) {
-                $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $searchName, ['searchname']);
-                if (config('app.debug')) {
-                    Log::debug('apiSearch: Manticore searchIndexes result', [
-                        'searchName' => $searchName,
-                        'result' => $searchResult,
-                    ]);
-                }
-                if (! empty($searchResult)) {
-                    $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
-                }
-            }
-
-            // Fall back to MySQL if both Elasticsearch and Manticore failed (only if enabled)
+            // Fall back to MySQL if search engine returned no results (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
                 if (config('app.debug')) {
                     Log::debug('apiSearch: Falling back to MySQL search');
@@ -588,20 +564,10 @@ class ReleaseSearchService
     {
         $searchResult = [];
         if (! empty($name)) {
-            // Try Elasticsearch first if enabled
-            if (config('nntmux.elasticsearch_enabled') === true) {
-                $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
-            }
+            // Use the unified Search facade
+            $searchResult = Search::searchReleases($name, $limit);
 
-            // Fall back to Manticore if Elasticsearch didn't return results
-            if (empty($searchResult)) {
-                $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $name, ['searchname']);
-                if (! empty($searchResult)) {
-                    $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
-                }
-            }
-
-            // Fall back to MySQL if both Elasticsearch and Manticore failed (only if enabled)
+            // Fall back to MySQL if search engine returned no results (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
                 $searchResult = $this->performMySQLSearch(['searchname' => $name], $limit);
             }
@@ -666,20 +632,10 @@ class ReleaseSearchService
         // Early return if searching by name yields no results
         $searchResult = [];
         if (! empty($name)) {
-            // Try Elasticsearch first if enabled
-            if (config('nntmux.elasticsearch_enabled') === true) {
-                $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
-            }
+            // Use the unified Search facade
+            $searchResult = Search::searchReleases($name, $limit);
 
-            // Fall back to Manticore if Elasticsearch didn't return results
-            if (empty($searchResult)) {
-                $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $name, ['searchname']);
-                if (! empty($searchResult)) {
-                    $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
-                }
-            }
-
-            // Fall back to MySQL if both Elasticsearch and Manticore failed (only if enabled)
+            // Fall back to MySQL if search engine returned no results (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
                 $searchResult = $this->performMySQLSearch(['searchname' => $name], $limit);
             }
@@ -832,49 +788,28 @@ class ReleaseSearchService
             return [];
         }
 
-        $phrases = array_values($searchFields);
-
         $esEnabled = config('nntmux.elasticsearch_enabled');
         if (config('app.debug')) {
             Log::debug('performIndexSearch: starting search', [
                 'elasticsearch_enabled' => $esEnabled,
                 'elasticsearch_enabled_type' => gettype($esEnabled),
                 'searchFields' => $searchFields,
-                'phrases' => $phrases,
                 'limit' => $limit,
             ]);
         }
 
-        // Try Elasticsearch first if enabled
-        if ($esEnabled === true) {
-            $result = $this->elasticSearch->indexSearch($phrases, $limit);
-            if (config('app.debug')) {
-                Log::debug('performIndexSearch: Elasticsearch result count', ['count' => count($result)]);
-            }
-            // If Elasticsearch returned results, use them
-            if (!empty($result)) {
-                return $result;
-            }
-            // Otherwise fall through to Manticore
-            if (config('app.debug')) {
-                Log::debug('performIndexSearch: Elasticsearch returned empty, falling back to Manticore');
-            }
-        }
-
-        // Try Manticore search
-        $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', '', [], $searchFields);
-
+        // Use the unified Search facade - pass searchFields with keys preserved
+        $result = Search::searchReleases($searchFields, $limit);
         if (config('app.debug')) {
-            Log::debug('performIndexSearch: Manticore result', [
-                'result' => $searchResult,
-            ]);
+            Log::debug('performIndexSearch: Search result count', ['count' => count($result)]);
         }
 
-        if (!empty($searchResult) && !empty($searchResult['id'])) {
-            return Arr::wrap(Arr::get($searchResult, 'id'));
+        // If search returned results, use them
+        if (!empty($result)) {
+            return $result;
         }
 
-        // Fallback to MySQL LIKE search when both Elasticsearch and Manticore are unavailable (only if enabled)
+        // Fallback to MySQL LIKE search when search engine is unavailable (only if enabled)
         if (config('nntmux.mysql_search_fallback', false) === true) {
             if (config('app.debug')) {
                 Log::debug('performIndexSearch: Falling back to MySQL search');

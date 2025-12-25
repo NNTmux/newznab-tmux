@@ -2,9 +2,12 @@
 
 namespace App\Providers;
 
+use App\Services\Search\Contracts\SearchDriverInterface;
 use App\Services\Search\Contracts\SearchServiceInterface;
-use App\Services\Search\ElasticSearchService;
-use App\Services\Search\ManticoreSearchService;
+use App\Services\Search\Drivers\ElasticSearchDriver;
+use App\Services\Search\Drivers\ManticoreSearchDriver;
+use App\Services\Search\SearchService;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
 class SearchServiceProvider extends ServiceProvider
@@ -14,27 +17,44 @@ class SearchServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Register ManticoreSearchService as singleton
-        $this->app->singleton(ManticoreSearchService::class, function ($app) {
-            return new ManticoreSearchService();
+        // Merge the search configuration
+        $this->mergeConfigFrom(
+            base_path('config/search.php'),
+            'search'
+        );
+
+        // Register the SearchService as a singleton (Manager pattern)
+        $this->app->singleton(SearchService::class, function (Application $app) {
+            return new SearchService($app);
         });
 
-        // Register ElasticSearchService as singleton
-        $this->app->singleton(ElasticSearchService::class, function ($app) {
-            return new ElasticSearchService();
+        // Bind the interface to the SearchService
+        $this->app->singleton(SearchServiceInterface::class, function (Application $app) {
+            return $app->make(SearchService::class);
         });
 
-        // Bind the interface to the appropriate implementation based on config
-        $this->app->singleton(SearchServiceInterface::class, function ($app) {
-            if (config('nntmux.elasticsearch_enabled') === true) {
-                return $app->make(ElasticSearchService::class);
-            }
-
-            return $app->make(ManticoreSearchService::class);
+        // Bind SearchDriverInterface to current driver
+        $this->app->bind(SearchDriverInterface::class, function (Application $app) {
+            return $app->make(SearchService::class)->driver();
         });
 
-        // Register alias for ManticoreSearch (for backward compatibility)
-        $this->app->alias(ManticoreSearchService::class, 'manticore');
+        // Register individual drivers as singletons for direct access
+        $this->app->singleton(ManticoreSearchDriver::class, function (Application $app) {
+            $config = config('search.drivers.manticore', []);
+
+            return new ManticoreSearchDriver($config);
+        });
+
+        $this->app->singleton(ElasticSearchDriver::class, function (Application $app) {
+            $config = config('search.drivers.elasticsearch', []);
+
+            return new ElasticSearchDriver($config);
+        });
+
+        // Register aliases (using prefixed names to avoid conflicts with other packages)
+        $this->app->alias(SearchService::class, 'search');
+        $this->app->alias(ManticoreSearchDriver::class, 'search.manticore');
+        $this->app->alias(ElasticSearchDriver::class, 'search.elasticsearch');
     }
 
     /**

@@ -2,12 +2,10 @@
 
 namespace App\Services\Releases;
 
+use App\Facades\Search;
 use App\Models\Release;
 use App\Services\ReleaseImageService;
-use App\Services\Search\ManticoreSearchService;
 use Blacklight\NZB;
-use Elasticsearch;
-use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
@@ -16,12 +14,8 @@ use Illuminate\Support\Facades\File;
  */
 class ReleaseManagementService
 {
-    private ManticoreSearchService $manticoreSearch;
-
-    public function __construct(
-        ManticoreSearchService $manticoreSearch
-    ) {
-        $this->manticoreSearch = $manticoreSearch;
+    public function __construct()
+    {
     }
 
     /**
@@ -58,36 +52,17 @@ class ReleaseManagementService
         // Delete images.
         $releaseImage->delete($identifiers['g']);
 
-        if (config('nntmux.elasticsearch_enabled') === true) {
-            if ($identifiers['i'] === false) {
-                $identifiers['i'] = Release::query()->where('guid', $identifiers['g'])->first(['id']);
-                if ($identifiers['i'] !== null) {
-                    $identifiers['i'] = $identifiers['i']['id'];
-                }
+        // Get release ID if not provided
+        if ($identifiers['i'] === false) {
+            $release = Release::query()->where('guid', $identifiers['g'])->first(['id']);
+            if ($release !== null) {
+                $identifiers['i'] = $release->id;
             }
-            if ($identifiers['i'] !== null) {
-                $params = [
-                    'index' => 'releases',
-                    'id' => $identifiers['i'],
-                ];
+        }
 
-                try {
-                    Elasticsearch::delete($params);
-                } catch (Missing404Exception $e) {
-                    // we do nothing here just catch the error, we don't care if release is missing from ES, we are deleting it anyway
-                }
-            }
-        } else {
-            // Delete from Manticore
-            if ($identifiers['i'] === false) {
-                $release = Release::query()->where('guid', $identifiers['g'])->first(['id']);
-                if ($release !== null) {
-                    $identifiers['i'] = $release->id;
-                }
-            }
-            if (!empty($identifiers['i'])) {
-                $this->manticoreSearch->deleteRelease((int) $identifiers['i']);
-            }
+        // Delete from search index
+        if (!empty($identifiers['i'])) {
+            Search::deleteRelease((int) $identifiers['i']);
         }
 
         // Delete from DB.

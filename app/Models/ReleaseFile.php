@@ -2,8 +2,7 @@
 
 namespace App\Models;
 
-use App\Services\Search\ElasticSearchService;
-use App\Services\Search\ManticoreSearchService;
+use App\Facades\Search;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -125,11 +124,7 @@ class ReleaseFile extends Model
             if (\strlen($hash) === 32) {
                 ParHash::insertOrIgnore(['releases_id' => $id, 'hash' => $hash]);
             }
-            if (config('nntmux.elasticsearch_enabled') === true) {
-                app(ElasticSearchService::class)->updateRelease($id);
-            } else {
-                app(ManticoreSearchService::class)->updateRelease($id);
-            }
+            Search::updateRelease($id);
         }
 
         return $insert ?? 0;

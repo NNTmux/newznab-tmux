@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Facades\Search;
 use App\Models\Predb;
 use App\Models\Release;
-use App\Services\Search\ManticoreSearchService;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
@@ -113,10 +113,10 @@ class NntmuxPopulateSearchIndexes extends Command
      */
     private function handleOptimize(): int
     {
-        $this->info('Optimizing ManticoreSearch indexes...');
+        $this->info('Optimizing search indexes...');
 
         try {
-            app(ManticoreSearchService::class)->optimizeRTIndex();
+            Search::optimizeIndex();
             $this->info('Optimization completed successfully!');
 
             return Command::SUCCESS;
@@ -155,10 +155,9 @@ class NntmuxPopulateSearchIndexes extends Command
 
     private function manticoreReleases(): int
     {
-        $manticore = app(ManticoreSearchService::class);
         $indexName = 'releases_rt';
 
-        $manticore->truncateRTIndex(Arr::wrap($indexName));
+        Search::truncateIndex([$indexName]);
 
         $total = Release::count();
         if (! $total) {
@@ -208,10 +207,9 @@ class NntmuxPopulateSearchIndexes extends Command
      */
     private function manticorePredb(): int
     {
-        $manticore = app(ManticoreSearchService::class);
         $indexName = 'predb_rt';
 
-        $manticore->truncateRTIndex([$indexName]);
+        Search::truncateIndex([$indexName]);
 
         $total = Predb::count();
         if (! $total) {
@@ -244,7 +242,6 @@ class NntmuxPopulateSearchIndexes extends Command
      */
     private function processManticoreData(string $indexName, int $total, $query, callable $transformer): int
     {
-        $manticore = app(ManticoreSearchService::class);
         $chunkSize = $this->getChunkSize();
         $batchSize = $this->getBatchSize();
 
@@ -252,7 +249,7 @@ class NntmuxPopulateSearchIndexes extends Command
         $this->setGroupConcatMaxLen();
 
         $this->info(sprintf(
-            "Populating ManticoreSearch index '%s' with %s rows using chunks of %s and batch size of %s.",
+            "Populating search index '%s' with %s rows using chunks of %s and batch size of %s.",
             $indexName,
             number_format($total),
             number_format($chunkSize),
@@ -268,7 +265,7 @@ class NntmuxPopulateSearchIndexes extends Command
         $batchData = [];
 
         try {
-            $query->chunk($chunkSize, function ($items) use ($manticore, $indexName, $transformer, $bar, &$processedCount, &$errorCount, $batchSize, &$batchData) {
+            $query->chunk($chunkSize, function ($items) use ($indexName, $transformer, $bar, &$processedCount, &$errorCount, $batchSize, &$batchData) {
                 foreach ($items as $item) {
                     try {
                         $batchData[] = $transformer($item);
@@ -276,7 +273,7 @@ class NntmuxPopulateSearchIndexes extends Command
 
                         // Process in optimized batch sizes
                         if (count($batchData) >= $batchSize) {
-                            $this->processBatch($manticore, $indexName, $batchData);
+                            $this->processBatch($indexName, $batchData);
                             $batchData = [];
                         }
                     } catch (Exception $e) {
@@ -291,7 +288,7 @@ class NntmuxPopulateSearchIndexes extends Command
 
             // Process remaining items
             if (! empty($batchData)) {
-                $this->processBatch($manticore, $indexName, $batchData);
+                $this->processBatch($indexName, $batchData);
             }
 
             $bar->finish();
@@ -300,7 +297,7 @@ class NntmuxPopulateSearchIndexes extends Command
             if ($errorCount > 0) {
                 $this->warn("Completed with {$errorCount} errors out of {$processedCount} processed items.");
             } else {
-                $this->info('ManticoreSearch population completed successfully!');
+                $this->info('Search index population completed successfully!');
             }
 
             return Command::SUCCESS;
@@ -485,16 +482,16 @@ class NntmuxPopulateSearchIndexes extends Command
     }
 
     /**
-     * Process ManticoreSearch batch with retry logic
+     * Process search index batch with retry logic
      */
-    private function processBatch(ManticoreSearchService $manticore, string $indexName, array $data): void
+    private function processBatch(string $indexName, array $data): void
     {
         $retries = 3;
         $attempt = 0;
 
         while ($attempt < $retries) {
             try {
-                $manticore->manticoreSearch->table($indexName)->replaceDocuments($data);
+                Search::bulkInsertReleases($data);
                 break;
             } catch (Exception $e) {
                 $attempt++;

@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Facades\Search;
 use App\Models\Predb;
 use App\Models\Release;
-use App\Services\Search\ManticoreSearchService;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
@@ -276,9 +276,8 @@ class NntmuxOffsetPopulate extends Command
     private function clearIndex(string $engine, string $index): void
     {
         if ($engine === 'manticore') {
-            $manticore = app(ManticoreSearchService::class);
             $indexName = $index === 'releases' ? 'releases_rt' : 'predb_rt';
-            $manticore->truncateRTIndex(Arr::wrap($indexName));
+            Search::truncateIndex([$indexName]);
             $this->info("Truncated ManticoreSearch index: {$indexName}");
         } else {
             // For ElasticSearch, just clear the data instead of recreating the index

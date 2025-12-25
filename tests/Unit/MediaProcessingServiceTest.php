@@ -5,9 +5,7 @@ namespace Tests\Unit;
 use App\Models\Release as ReleaseModel;
 use App\Services\Categorization\CategorizationService;
 use App\Services\MediaProcessingService;
-use App\Services\Search\ElasticSearchService;
-use App\Services\Search\ManticoreSearchService;
-use Blacklight\ReleaseExtra;
+use App\Services\ReleaseExtraService;
 use App\Services\ReleaseImageService;
 use FFMpeg\FFMpeg;
 use FFMpeg\FFProbe;
@@ -50,21 +48,17 @@ class MediaProcessingServiceTest extends TestCase
         ?FFProbe $ffprobe = null,
         ?MediaInfo $mediaInfo = null,
         ?ReleaseImageService $releaseImage = null,
-        ?ReleaseExtra $releaseExtra = null,
-        ?ManticoreSearchService $manticore = null,
-        ?ElasticSearchService $elastic = null,
+        ?ReleaseExtraService $releaseExtra = null,
         ?CategorizationService $categorize = null
     ): MediaProcessingService {
         $ffmpeg ??= Mockery::mock(FFMpeg::class);
         $ffprobe ??= Mockery::mock(FFProbe::class);
         $mediaInfo ??= Mockery::mock(MediaInfo::class);
         $releaseImage ??= Mockery::mock(ReleaseImageService::class);
-        $releaseExtra ??= Mockery::mock(ReleaseExtra::class);
-        $manticore ??= Mockery::mock(ManticoreSearchService::class);
-        $elastic ??= Mockery::mock(ElasticSearchService::class);
+        $releaseExtra ??= Mockery::mock(ReleaseExtraService::class);
         $categorize ??= Mockery::mock(CategorizationService::class);
 
-        return new MediaProcessingService($ffmpeg, $ffprobe, $mediaInfo, $releaseImage, $releaseExtra, $manticore, $elastic, $categorize);
+        return new MediaProcessingService($ffmpeg, $ffprobe, $mediaInfo, $releaseImage, $releaseExtra, $categorize);
     }
 
     #[WithoutErrorHandler]
@@ -121,7 +115,7 @@ class MediaProcessingServiceTest extends TestCase
         $ffmpeg = Mockery::mock(FFMpeg::class);
         $ffmpeg->shouldReceive('open')->andReturn($openMock);
 
-        $releaseImage = Mockery::mock(ReleaseImage::class);
+        $releaseImage = Mockery::mock(ReleaseImageService::class);
         $releaseImage->imgSavePath = $this->tmpDir;
         $releaseImage->shouldReceive('saveImage')->andReturn(1);
 

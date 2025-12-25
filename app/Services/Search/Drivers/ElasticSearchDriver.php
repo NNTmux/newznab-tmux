@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Services\Search;
+namespace App\Services\Search\Drivers;
 
 use App\Models\Release;
-use App\Services\Search\Contracts\SearchServiceInterface;
+use App\Services\Search\Contracts\SearchDriverInterface;
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
 use Elasticsearch\Common\Exceptions\ElasticsearchException;
@@ -16,12 +16,12 @@ use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 /**
- * Elasticsearch site search service for releases and predb data.
+ * Elasticsearch driver for full-text search functionality.
  *
  * Provides search functionality for the releases and predb indices with
  * caching, connection pooling, and automatic reconnection.
  */
-class ElasticSearchService implements SearchServiceInterface
+class ElasticSearchDriver implements SearchDriverInterface
 {
     private const CACHE_TTL_MINUTES = 5;
 
@@ -35,10 +35,6 @@ class ElasticSearchService implements SearchServiceInterface
 
     private const DEFAULT_CONNECT_TIMEOUT = 5;
 
-    private const INDEX_RELEASES = 'releases';
-
-    private const INDEX_PREDB = 'predb';
-
     private const AUTOCOMPLETE_CACHE_MINUTES = 10;
 
     private const AUTOCOMPLETE_MAX_RESULTS = 10;
@@ -50,6 +46,29 @@ class ElasticSearchService implements SearchServiceInterface
     private static ?bool $availabilityCache = null;
 
     private static ?int $availabilityCacheTime = null;
+
+    protected array $config;
+
+    public function __construct(array $config = [])
+    {
+        $this->config = ! empty($config) ? $config : config('search.drivers.elasticsearch');
+    }
+
+    /**
+     * Get the driver name.
+     */
+    public function getDriverName(): string
+    {
+        return 'elasticsearch';
+    }
+
+    /**
+     * Check if Elasticsearch is available.
+     */
+    public function isAvailable(): bool
+    {
+        return $this->isElasticsearchAvailable();
+    }
 
     /**
      * Get or create an Elasticsearch client with proper cURL configuration.
@@ -66,14 +85,12 @@ class ElasticSearchService implements SearchServiceInterface
                     throw new RuntimeException('cURL extension is not loaded');
                 }
 
-                $config = config('elasticsearch.connections.default');
-
-                if (empty($config)) {
+                if (empty($this->config)) {
                     throw new RuntimeException('Elasticsearch configuration not found');
                 }
 
                 $clientBuilder = ClientBuilder::create();
-                $hosts = $this->buildHostsArray($config['hosts'] ?? []);
+                $hosts = $this->buildHostsArray($this->config['hosts'] ?? []);
 
                 if (empty($hosts)) {
                     throw new RuntimeException('No Elasticsearch hosts configured');
@@ -88,12 +105,12 @@ class ElasticSearchService implements SearchServiceInterface
                 $clientBuilder->setHosts($hosts);
                 $clientBuilder->setHandler(new CurlHandler);
                 $clientBuilder->setConnectionParams([
-                    'timeout' => config('elasticsearch.connections.default.timeout', self::DEFAULT_TIMEOUT),
-                    'connect_timeout' => config('elasticsearch.connections.default.connect_timeout', self::DEFAULT_CONNECT_TIMEOUT),
+                    'timeout' => $this->config['timeout'] ?? self::DEFAULT_TIMEOUT,
+                    'connect_timeout' => $this->config['connect_timeout'] ?? self::DEFAULT_CONNECT_TIMEOUT,
                 ]);
 
                 // Enable retries for better resilience
-                $clientBuilder->setRetries(2);
+                $clientBuilder->setRetries($this->config['retries'] ?? 2);
 
                 self::$client = $clientBuilder->build();
 
@@ -198,7 +215,7 @@ class ElasticSearchService implements SearchServiceInterface
      */
     public function isAutocompleteEnabled(): bool
     {
-        return config('elasticsearch.autocomplete.enabled', true) && $this->isElasticsearchAvailable();
+        return ($this->config['autocomplete']['enabled'] ?? true) && $this->isElasticsearchAvailable();
     }
 
     /**
@@ -206,7 +223,7 @@ class ElasticSearchService implements SearchServiceInterface
      */
     public function isSuggestEnabled(): bool
     {
-        return config('elasticsearch.suggest.enabled', true) && $this->isElasticsearchAvailable();
+        return ($this->config['suggest']['enabled'] ?? true) && $this->isElasticsearchAvailable();
     }
 
     /**
@@ -214,7 +231,7 @@ class ElasticSearchService implements SearchServiceInterface
      */
     public function getReleasesIndex(): string
     {
-        return self::INDEX_RELEASES;
+        return $this->config['indexes']['releases'] ?? 'releases';
     }
 
     /**
@@ -222,7 +239,25 @@ class ElasticSearchService implements SearchServiceInterface
      */
     public function getPredbIndex(): string
     {
-        return self::INDEX_PREDB;
+        return $this->config['indexes']['predb'] ?? 'predb';
+    }
+
+    /**
+     * Escape special characters for Elasticsearch.
+     */
+    public static function escapeString(string $string): string
+    {
+        if (empty($string) || $string === '*') {
+            return '';
+        }
+
+        // Replace dots with spaces for release name searches
+        $string = str_replace('.', ' ', $string);
+
+        // Remove multiple consecutive spaces
+        $string = preg_replace('/\s+/', ' ', trim($string));
+
+        return $string;
     }
 
     /**
@@ -240,12 +275,12 @@ class ElasticSearchService implements SearchServiceInterface
         }
 
         $query = trim($query);
-        $minLength = (int) config('elasticsearch.autocomplete.min_length', self::AUTOCOMPLETE_MIN_LENGTH);
+        $minLength = (int) ($this->config['autocomplete']['min_length'] ?? self::AUTOCOMPLETE_MIN_LENGTH);
         if (strlen($query) < $minLength) {
             return [];
         }
 
-        $index = $index ?? self::INDEX_RELEASES;
+        $index = $index ?? $this->getReleasesIndex();
         $cacheKey = 'es:autocomplete:'.md5($index.$query);
 
         $cached = Cache::get($cacheKey);
@@ -254,7 +289,7 @@ class ElasticSearchService implements SearchServiceInterface
         }
 
         $suggestions = [];
-        $maxResults = (int) config('elasticsearch.autocomplete.max_results', self::AUTOCOMPLETE_MAX_RESULTS);
+        $maxResults = (int) ($this->config['autocomplete']['max_results'] ?? self::AUTOCOMPLETE_MAX_RESULTS);
 
         try {
             $client = $this->getClient();
@@ -333,7 +368,7 @@ class ElasticSearchService implements SearchServiceInterface
         }
 
         if (! empty($suggestions)) {
-            $cacheMinutes = (int) config('elasticsearch.autocomplete.cache_minutes', self::AUTOCOMPLETE_CACHE_MINUTES);
+            $cacheMinutes = (int) ($this->config['autocomplete']['cache_minutes'] ?? self::AUTOCOMPLETE_CACHE_MINUTES);
             Cache::put($cacheKey, $suggestions, now()->addMinutes($cacheMinutes));
         }
 
@@ -358,7 +393,7 @@ class ElasticSearchService implements SearchServiceInterface
             return [];
         }
 
-        $index = $index ?? self::INDEX_RELEASES;
+        $index = $index ?? $this->getReleasesIndex();
         $cacheKey = 'es:suggest:'.md5($index.$query);
 
         $cached = Cache::get($cacheKey);
@@ -424,7 +459,7 @@ class ElasticSearchService implements SearchServiceInterface
         }
 
         if (! empty($suggestions)) {
-            Cache::put($cacheKey, $suggestions, now()->addMinutes(self::CACHE_TTL_MINUTES));
+            Cache::put($cacheKey, $suggestions, now()->addMinutes($this->config['cache_minutes'] ?? self::CACHE_TTL_MINUTES));
         }
 
         return $suggestions;
@@ -552,13 +587,31 @@ class ElasticSearchService implements SearchServiceInterface
     /**
      * Search releases index.
      *
-     * @param  array|string  $phrases  Search phrases
+     * @param  array|string  $phrases  Search phrases - can be a string, indexed array of terms, or associative array with field names
      * @param  int  $limit  Maximum number of results
      * @return array Array of release IDs
      */
     public function searchReleases(array|string $phrases, int $limit = 1000): array
     {
-        $result = $this->indexSearch($phrases, $limit);
+        // Normalize the input to a search string
+        if (is_string($phrases)) {
+            $searchString = $phrases;
+        } elseif (is_array($phrases)) {
+            // Check if it's an associative array (has string keys like 'searchname')
+            $isAssociative = count(array_filter(array_keys($phrases), 'is_string')) > 0;
+
+            if ($isAssociative) {
+                // Extract values from associative array
+                $searchString = implode(' ', array_values($phrases));
+            } else {
+                // Indexed array - combine values
+                $searchString = implode(' ', $phrases);
+            }
+        } else {
+            return [];
+        }
+
+        $result = $this->indexSearch($searchString, $limit);
 
         return is_array($result) ? $result : $result->toArray();
     }
@@ -621,14 +674,14 @@ class ElasticSearchService implements SearchServiceInterface
 
         try {
             $search = $this->buildSearchQuery(
-                index: self::INDEX_RELEASES,
+                index: $this->getReleasesIndex(),
                 keywords: $keywords,
                 fields: ['searchname^2', 'plainsearchname^1.5', 'fromname', 'filename', 'name^1.2'],
                 limit: $limit
             );
 
             $result = $this->executeSearch($search);
-            Cache::put($cacheKey, $result, now()->addMinutes(self::CACHE_TTL_MINUTES));
+            Cache::put($cacheKey, $result, now()->addMinutes($this->config['cache_minutes'] ?? self::CACHE_TTL_MINUTES));
 
             return $result;
 
@@ -668,14 +721,14 @@ class ElasticSearchService implements SearchServiceInterface
 
         try {
             $search = $this->buildSearchQuery(
-                index: self::INDEX_RELEASES,
+                index: $this->getReleasesIndex(),
                 keywords: $keywords,
                 fields: ['searchname^2', 'plainsearchname^1.5', 'fromname', 'filename', 'name^1.2'],
                 limit: $limit
             );
 
             $result = $this->executeSearch($search);
-            Cache::put($cacheKey, $result, now()->addMinutes(self::CACHE_TTL_MINUTES));
+            Cache::put($cacheKey, $result, now()->addMinutes($this->config['cache_minutes'] ?? self::CACHE_TTL_MINUTES));
 
             return $result;
 
@@ -715,7 +768,7 @@ class ElasticSearchService implements SearchServiceInterface
 
         try {
             $search = $this->buildSearchQuery(
-                index: self::INDEX_RELEASES,
+                index: $this->getReleasesIndex(),
                 keywords: $keywords,
                 fields: ['searchname^2', 'plainsearchname^1.5'],
                 limit: $limit,
@@ -725,7 +778,7 @@ class ElasticSearchService implements SearchServiceInterface
             );
 
             $result = $this->executeSearch($search);
-            Cache::put($cacheKey, $result, now()->addMinutes(self::CACHE_TTL_MINUTES));
+            Cache::put($cacheKey, $result, now()->addMinutes($this->config['cache_minutes'] ?? self::CACHE_TTL_MINUTES));
 
             return $result;
 
@@ -764,7 +817,7 @@ class ElasticSearchService implements SearchServiceInterface
 
         try {
             $search = $this->buildSearchQuery(
-                index: self::INDEX_PREDB,
+                index: $this->getPredbIndex(),
                 keywords: $keywords,
                 fields: ['title^2', 'filename'],
                 limit: 1000,
@@ -775,7 +828,7 @@ class ElasticSearchService implements SearchServiceInterface
             );
 
             $result = $this->executeSearch($search, fullResults: true);
-            Cache::put($cacheKey, $result, now()->addMinutes(self::CACHE_TTL_MINUTES));
+            Cache::put($cacheKey, $result, now()->addMinutes($this->config['cache_minutes'] ?? self::CACHE_TTL_MINUTES));
 
             return $result;
 
@@ -840,7 +893,7 @@ class ElasticSearchService implements SearchServiceInterface
 
             $params['body'][] = [
                 'index' => [
-                    '_index' => self::INDEX_RELEASES,
+                    '_index' => $this->getReleasesIndex(),
                     '_id' => $release['id'],
                 ],
             ];
@@ -916,7 +969,7 @@ class ElasticSearchService implements SearchServiceInterface
                     ],
                     'doc_as_upsert' => true,
                 ],
-                'index' => self::INDEX_RELEASES,
+                'index' => $this->getReleasesIndex(),
                 'id' => $release->id,
             ];
 
@@ -960,7 +1013,7 @@ class ElasticSearchService implements SearchServiceInterface
                     'source' => $parameters['source'] ?? '',
                     'filename' => $parameters['filename'] ?? '',
                 ],
-                'index' => self::INDEX_PREDB,
+                'index' => $this->getPredbIndex(),
                 'id' => $parameters['id'],
             ];
 
@@ -1006,7 +1059,7 @@ class ElasticSearchService implements SearchServiceInterface
                     ],
                     'doc_as_upsert' => true,
                 ],
-                'index' => self::INDEX_PREDB,
+                'index' => $this->getPredbIndex(),
                 'id' => $parameters['id'],
             ];
 
@@ -1042,7 +1095,7 @@ class ElasticSearchService implements SearchServiceInterface
         try {
             $client = $this->getClient();
             $client->delete([
-                'index' => self::INDEX_RELEASES,
+                'index' => $this->getReleasesIndex(),
                 'id' => $id,
             ]);
 
@@ -1080,7 +1133,7 @@ class ElasticSearchService implements SearchServiceInterface
         try {
             $client = $this->getClient();
             $client->delete([
-                'index' => self::INDEX_PREDB,
+                'index' => $this->getPredbIndex(),
                 'id' => $id,
             ]);
 
@@ -1118,6 +1171,86 @@ class ElasticSearchService implements SearchServiceInterface
             Log::error('ElasticSearch indexExists error: '.$e->getMessage(), ['index' => $index]);
 
             return false;
+        }
+    }
+
+    /**
+     * Truncate/clear an index (remove all documents).
+     * Implements SearchServiceInterface::truncateIndex
+     *
+     * @param  array|string  $indexes  Index name(s) to truncate
+     */
+    public function truncateIndex(array|string $indexes): void
+    {
+        if (! $this->isElasticsearchAvailable()) {
+            return;
+        }
+
+        $indexArray = is_array($indexes) ? $indexes : [$indexes];
+
+        foreach ($indexArray as $index) {
+            try {
+                $client = $this->getClient();
+
+                // Check if index exists
+                if (! $client->indices()->exists(['index' => $index])) {
+                    Log::info("ElasticSearch truncateIndex: index {$index} does not exist, skipping");
+                    continue;
+                }
+
+                // Delete all documents from the index
+                $client->deleteByQuery([
+                    'index' => $index,
+                    'body' => [
+                        'query' => ['match_all' => (object) []],
+                    ],
+                    'conflicts' => 'proceed',
+                ]);
+
+                // Force refresh to ensure deletions are visible
+                $client->indices()->refresh(['index' => $index]);
+
+                Log::info("ElasticSearch: Truncated index {$index}");
+
+            } catch (\Throwable $e) {
+                Log::error("ElasticSearch truncateIndex error for {$index}: ".$e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * Optimize index for better search performance.
+     * Implements SearchServiceInterface::optimizeIndex
+     */
+    public function optimizeIndex(): void
+    {
+        if (! $this->isElasticsearchAvailable()) {
+            return;
+        }
+
+        try {
+            $client = $this->getClient();
+
+            // Force merge the releases index
+            $client->indices()->forcemerge([
+                'index' => $this->getReleasesIndex(),
+                'max_num_segments' => 1,
+            ]);
+
+            // Force merge the predb index
+            $client->indices()->forcemerge([
+                'index' => $this->getPredbIndex(),
+                'max_num_segments' => 1,
+            ]);
+
+            // Refresh both indexes
+            $client->indices()->refresh(['index' => $this->getReleasesIndex()]);
+            $client->indices()->refresh(['index' => $this->getPredbIndex()]);
+
+            Log::info('ElasticSearch: Optimized indexes');
+
+        } catch (\Throwable $e) {
+            Log::error('ElasticSearch optimizeIndex error: '.$e->getMessage());
         }
     }
 
@@ -1281,7 +1414,7 @@ class ElasticSearchService implements SearchServiceInterface
                 'add_date' => now()->format('Y-m-d H:i:s'),
                 'post_date' => $parameters['postdate'] ?? now()->format('Y-m-d H:i:s'),
             ],
-            'index' => self::INDEX_RELEASES,
+            'index' => $this->getReleasesIndex(),
             'id' => $parameters['id'],
         ];
     }

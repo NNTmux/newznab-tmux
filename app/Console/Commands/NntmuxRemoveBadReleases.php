@@ -2,13 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Facades\Search;
 use App\Models\Release;
 use App\Models\ReleaseFile;
 use App\Services\ReleaseImageService;
-use App\Services\Search\ManticoreSearchService;
 use Blacklight\NZB;
-use Elasticsearch;
-use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -52,21 +50,8 @@ class NntmuxRemoveBadReleases extends Command
             $nzbPath = (new NZB)->getNZBPath($badRelease->guid);
             File::delete($nzbPath);
             (new ReleaseImageService)->delete($badRelease->guid);
-            if (config('nntmux.elasticsearch_enabled') === true) {
-                $params = [
-                    'index' => 'releases',
-                    'id' => $badRelease->id,
-                ];
-
-                try {
-                    Elasticsearch::delete($params);
-                } catch (Missing404Exception $e) {
-                    // we do nothing here just catch the error, we don't care if release is missing from ES, we are deleting it anyway
-                }
-            } else {
-                // Delete from Manticore
-                app(ManticoreSearchService::class)->deleteRelease($badRelease->id);
-            }
+            // Delete from search index
+            Search::deleteRelease($badRelease->id);
             $badRelease->delete();
         }
         Release::query()->where('passwordstatus', '=', -2)->delete();

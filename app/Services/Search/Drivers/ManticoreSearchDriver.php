@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Services\Search;
+namespace App\Services\Search\Drivers;
 
 use App\Models\Release;
-use App\Services\Search\Contracts\SearchServiceInterface;
+use App\Services\Search\Contracts\SearchDriverInterface;
 use Blacklight\ColorCLI;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -14,11 +14,11 @@ use Manticoresearch\Exceptions\RuntimeException;
 use Manticoresearch\Search;
 
 /**
- * ManticoreSearch service for full-text search functionality.
+ * ManticoreSearch driver for full-text search functionality.
  */
-class ManticoreSearchService implements SearchServiceInterface
+class ManticoreSearchDriver implements SearchDriverInterface
 {
-    protected mixed $config;
+    protected array $config;
 
     protected array $connection;
 
@@ -31,13 +31,39 @@ class ManticoreSearchService implements SearchServiceInterface
     /**
      * Establishes a connection to ManticoreSearch HTTP port.
      */
-    public function __construct()
+    public function __construct(array $config = [])
     {
-        $this->config = config('manticoresearch');
+        $this->config = ! empty($config) ? $config : config('search.drivers.manticore');
         $this->connection = ['host' => $this->config['host'], 'port' => $this->config['port']];
         $this->manticoreSearch = new Client($this->connection);
         $this->search = new Search($this->manticoreSearch);
         $this->cli = new ColorCLI;
+    }
+
+    /**
+     * Get the driver name.
+     */
+    public function getDriverName(): string
+    {
+        return 'manticore';
+    }
+
+    /**
+     * Check if ManticoreSearch is available.
+     */
+    public function isAvailable(): bool
+    {
+        try {
+            $status = $this->manticoreSearch->nodes()->status();
+
+            return ! empty($status);
+        } catch (\Throwable $e) {
+            if (config('app.debug')) {
+                Log::debug('ManticoreSearch not available: '.$e->getMessage());
+            }
+
+            return false;
+        }
     }
 
     /**
@@ -169,6 +195,75 @@ class ManticoreSearchService implements SearchServiceInterface
                 'id' => $id,
             ]);
         }
+    }
+
+    /**
+     * Delete a predb record from the index.
+     *
+     * @param  int  $id  Predb ID
+     */
+    public function deletePreDb(int $id): void
+    {
+        if (empty($id)) {
+            Log::warning('ManticoreSearch: Cannot delete predb without ID');
+
+            return;
+        }
+
+        try {
+            $this->manticoreSearch->table($this->config['indexes']['predb'])
+                ->deleteDocument($id);
+        } catch (ResponseException $e) {
+            Log::error('ManticoreSearch deletePreDb error: '.$e->getMessage(), [
+                'id' => $id,
+            ]);
+        }
+    }
+
+    /**
+     * Bulk insert multiple releases into the index.
+     *
+     * @param  array  $releases  Array of release data arrays
+     * @return array Results with 'success' and 'errors' counts
+     */
+    public function bulkInsertReleases(array $releases): array
+    {
+        if (empty($releases)) {
+            return ['success' => 0, 'errors' => 0];
+        }
+
+        $success = 0;
+        $errors = 0;
+
+        $documents = [];
+        foreach ($releases as $release) {
+            if (empty($release['id'])) {
+                $errors++;
+                continue;
+            }
+
+            $documents[] = [
+                'id' => $release['id'],
+                'name' => $release['name'] ?? '',
+                'searchname' => $release['searchname'] ?? '',
+                'fromname' => $release['fromname'] ?? '',
+                'categories_id' => (string) ($release['categories_id'] ?? ''),
+                'filename' => $release['filename'] ?? '',
+            ];
+        }
+
+        if (! empty($documents)) {
+            try {
+                $this->manticoreSearch->table($this->config['indexes']['releases'])
+                    ->replaceDocuments($documents);
+                $success = count($documents);
+            } catch (\Throwable $e) {
+                Log::error('ManticoreSearch bulkInsertReleases error: '.$e->getMessage());
+                $errors += count($documents);
+            }
+        }
+
+        return ['success' => $success, 'errors' => $errors];
     }
 
     /**
@@ -312,6 +407,18 @@ class ManticoreSearchService implements SearchServiceInterface
     }
 
     /**
+     * Truncate/clear an index (remove all documents).
+     * Implements SearchServiceInterface::truncateIndex
+     *
+     * @param  array|string  $indexes  Index name(s) to truncate
+     */
+    public function truncateIndex(array|string $indexes): void
+    {
+        $indexArray = is_array($indexes) ? $indexes : [$indexes];
+        $this->truncateRTIndex($indexArray);
+    }
+
+    /**
      * Create index if it doesn't exist
      */
     private function createIndexIfNotExists(string $index): void
@@ -364,15 +471,40 @@ class ManticoreSearchService implements SearchServiceInterface
     }
 
     /**
+     * Optimize index for better search performance.
+     * Implements SearchServiceInterface::optimizeIndex
+     */
+    public function optimizeIndex(): void
+    {
+        $this->optimizeRTIndex();
+    }
+
+    /**
      * Search releases index.
      *
-     * @param  array|string  $phrases  Search phrases
+     * @param  array|string  $phrases  Search phrases - can be a string, indexed array of terms, or associative array with field names
      * @param  int  $limit  Maximum number of results
      * @return array Array of release IDs
      */
     public function searchReleases(array|string $phrases, int $limit = 1000): array
     {
-        $searchArray = is_array($phrases) ? $phrases : ['searchname' => $phrases];
+        if (is_string($phrases)) {
+            // Simple string search - search in searchname field
+            $searchArray = ['searchname' => $phrases];
+        } elseif (is_array($phrases)) {
+            // Check if it's an associative array (has string keys like 'searchname')
+            $isAssociative = count(array_filter(array_keys($phrases), 'is_string')) > 0;
+
+            if ($isAssociative) {
+                // Already has field names as keys
+                $searchArray = $phrases;
+            } else {
+                // Indexed array - combine values and search in searchname
+                $searchArray = ['searchname' => implode(' ', $phrases)];
+            }
+        } else {
+            return [];
+        }
 
         $result = $this->searchIndexes($this->getReleasesIndex(), '', [], $searchArray);
 
@@ -427,6 +559,7 @@ class ManticoreSearchService implements SearchServiceInterface
                     'cached_ids_count' => count($cached['id'] ?? []),
                 ]);
             }
+
             return $cached;
         }
 
@@ -448,6 +581,7 @@ class ManticoreSearchService implements SearchServiceInterface
                 if (config('app.debug')) {
                     Log::debug('ManticoreSearch::searchIndexes no terms after escaping searchArray');
                 }
+
                 return [];
             }
         } elseif (! empty($searchString)) {
@@ -456,6 +590,7 @@ class ManticoreSearchService implements SearchServiceInterface
                 if (config('app.debug')) {
                     Log::debug('ManticoreSearch::searchIndexes escapedSearch is empty');
                 }
+
                 return [];
             }
 
@@ -554,7 +689,7 @@ class ManticoreSearchService implements SearchServiceInterface
         ];
 
         // Cache results for 5 minutes
-        Cache::put($cacheKey, $result, now()->addMinutes(5));
+        Cache::put($cacheKey, $result, now()->addMinutes($this->config['cache_minutes'] ?? 5));
 
         return $result;
     }
@@ -773,7 +908,7 @@ class ManticoreSearchService implements SearchServiceInterface
         }
 
         if (! empty($suggestions)) {
-            Cache::put($cacheKey, $suggestions, now()->addMinutes(5));
+            Cache::put($cacheKey, $suggestions, now()->addMinutes($this->config['cache_minutes'] ?? 5));
         }
 
         return $suggestions;

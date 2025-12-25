@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Facades\Search;
 use App\Models\Predb;
 use App\Models\Release;
-use App\Services\Search\ManticoreSearchService;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -92,10 +92,9 @@ class NntmuxOffsetWorker extends Command
         $startTime = microtime(true);
 
         if ($engine === 'manticore') {
-            $manticore = app(ManticoreSearchService::class);
             $batchData = [];
 
-            $query->chunk($batchSize, function ($items) use ($manticore, $indexName, $transformer, &$processed, &$errors, &$batchData, $batchSize, $workerId) {
+            $query->chunk($batchSize, function ($items) use ($indexName, $transformer, &$processed, &$errors, &$batchData, $batchSize, $workerId) {
                 $this->info("Worker {$workerId}: Processing chunk of {$items->count()} items");
 
                 foreach ($items as $item) {
@@ -104,7 +103,7 @@ class NntmuxOffsetWorker extends Command
                         $processed++;
 
                         if (count($batchData) >= $batchSize) {
-                            $this->processManticoreBatch($manticore, $indexName, $batchData, $workerId);
+                            $this->processSearchBatch($batchData, $workerId);
                             $this->info("Worker {$workerId}: Inserted batch of ".count($batchData).' records');
                             $batchData = [];
                         }
@@ -117,7 +116,7 @@ class NntmuxOffsetWorker extends Command
 
             // Process remaining items
             if (! empty($batchData)) {
-                $this->processManticoreBatch($manticore, $indexName, $batchData, $workerId);
+                $this->processSearchBatch($batchData, $workerId);
                 $this->info("Worker {$workerId}: Inserted final batch of ".count($batchData).' records');
             }
 
@@ -246,21 +245,21 @@ class NntmuxOffsetWorker extends Command
     }
 
     /**
-     * Process ManticoreSearch batch
+     * Process search batch
      */
-    private function processManticoreBatch(ManticoreSearchService $manticore, string $indexName, array $data, int $workerId): void
+    private function processSearchBatch(array $data, int $workerId): void
     {
         $retries = 3;
         $attempt = 0;
 
         while ($attempt < $retries) {
             try {
-                $manticore->manticoreSearch->table($indexName)->replaceDocuments($data);
+                Search::bulkInsertReleases($data);
                 break;
             } catch (Exception $e) {
                 $attempt++;
                 if ($attempt >= $retries) {
-                    throw new Exception("Worker {$workerId}: Failed to process ManticoreSearch batch after {$retries} attempts: {$e->getMessage()}");
+                    throw new Exception("Worker {$workerId}: Failed to process search batch after {$retries} attempts: {$e->getMessage()}");
                 }
                 usleep(200000); // 200ms delay before retry
             }

@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Facades\Search;
 use App\Models\UsenetGroup;
-use App\Services\Search\ManticoreSearchService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -171,7 +171,7 @@ class NntmuxResetDb extends Command
 
                 $this->info('All done! ElasticSearch indexes are deleted and recreated.');
             } else {
-                app(ManticoreSearchService::class)->truncateRTIndex(['releases_rt', 'predb_rt']);
+                Search::truncateIndex(['releases_rt', 'predb_rt']);
             }
 
             $this->info('Deleting nzbfiles subfolders.');

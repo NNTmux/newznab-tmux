@@ -2,12 +2,10 @@
 
 namespace App\Models;
 
-use App\Services\Search\ElasticSearchService;
-use App\Services\Search\ManticoreSearchService;
+use App\Facades\Search;
 use Blacklight\ColorCLI;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Scout\Searchable;
 
@@ -199,12 +197,7 @@ class Predb extends Model
             ->select('predb.*', 'releases.guid')
             ->orderByDesc('predb.predate');
         if (! empty($search)) {
-            if (config('nntmux.elasticsearch_enabled') === true) {
-                $ids = app(ElasticSearchService::class)->predbIndexSearch($search);
-            } else {
-                $manticore = app(ManticoreSearchService::class);
-                $ids = Arr::get($manticore->searchIndexes('predb_rt', $search, ['title']), 'id');
-            }
+            $ids = Search::searchPredb($search);
             $sql->whereIn('predb.id', $ids);
         }
 
