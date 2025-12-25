@@ -26,7 +26,7 @@ class MediaProcessingService
         private readonly FFProbe $ffprobe,
         private readonly MediaInfo $mediaInfo,
         private readonly ReleaseImageService $releaseImage,
-        private readonly ReleaseExtra $releaseExtra,
+        private readonly ReleaseExtraService $releaseExtra,
         private readonly ManticoreSearchService $manticore,
         private readonly ElasticSearchService $elasticsearch,
         private readonly CategorizationService $categorize,

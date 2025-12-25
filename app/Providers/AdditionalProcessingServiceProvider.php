@@ -16,7 +16,7 @@ use App\Services\TempWorkspaceService;
 use App\Services\NameFixing\NameFixingService;
 use Blacklight\Nfo;
 use Blacklight\NZB;
-use Blacklight\ReleaseExtra;
+use App\Services\ReleaseExtraService;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -33,6 +33,11 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
         // Configuration is a singleton since it loads settings once
         $this->app->singleton(ProcessingConfiguration::class, function () {
             return new ProcessingConfiguration();
+        });
+
+        // Release extra service for video/audio/subtitle data
+        $this->app->singleton(ReleaseExtraService::class, function () {
+            return new ReleaseExtraService();
         });
 
         // Console output service
@@ -69,7 +74,7 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
         $this->app->singleton(ReleaseFileManager::class, function ($app) {
             return new ReleaseFileManager(
                 $app->make(ProcessingConfiguration::class),
-                new ReleaseExtra(),
+                $app->make(ReleaseExtraService::class),
                 new ReleaseImageService(),
                 new Nfo(),
                 new NZB(),
@@ -82,7 +87,7 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
             return new MediaExtractionService(
                 $app->make(ProcessingConfiguration::class),
                 new ReleaseImageService(),
-                new ReleaseExtra(),
+                $app->make(ReleaseExtraService::class),
                 new CategorizationService()
             );
         });

@@ -21,7 +21,7 @@ use App\Services\XxxBrowseService;
 use Blacklight\Console;
 use Blacklight\Games;
 use Blacklight\Music;
-use Blacklight\ReleaseExtra;
+use App\Services\ReleaseExtraService;
 use Illuminate\Http\Request;
 
 class DetailsController extends BasePageController
@@ -32,18 +32,24 @@ class DetailsController extends BasePageController
 
     private XxxBrowseService $xxxBrowseService;
 
-    public function __construct(ReleaseSearchService $releaseSearchService, MovieService $movieService, XxxBrowseService $xxxBrowseService)
-    {
+    private ReleaseExtraService $releaseExtraService;
+
+    public function __construct(
+        ReleaseSearchService $releaseSearchService,
+        MovieService $movieService,
+        XxxBrowseService $xxxBrowseService,
+        ReleaseExtraService $releaseExtraService
+    ) {
         parent::__construct();
         $this->releaseSearchService = $releaseSearchService;
         $this->movieService = $movieService;
         $this->xxxBrowseService = $xxxBrowseService;
+        $this->releaseExtraService = $releaseExtraService;
     }
 
     public function show(Request $request, string $guid)
     {
         if ($guid !== null) {
-            $re = new ReleaseExtra;
             $data = Release::getByGuid($guid);
             $releaseRegex = '';
             if (! empty($data)) {
@@ -62,9 +68,9 @@ class DetailsController extends BasePageController
 
             $nfoData = ReleaseNfo::getReleaseNfo($data['id']);
             $nfo = $nfoData ? $nfoData->nfo : null;
-            $reVideo = $re->getVideo($data['id']);
-            $reAudio = $re->getAudio($data['id']);
-            $reSubs = $re->getSubs($data['id']);
+            $reVideo = $this->releaseExtraService->getVideo($data['id']);
+            $reAudio = $this->releaseExtraService->getAudio($data['id']);
+            $reSubs = $this->releaseExtraService->getSubs($data['id']);
             $comments = ReleaseComment::getComments($data['id']);
             $similars = $this->releaseSearchService->searchSimilar($data['id'], $data['searchname'], $this->userdata->categoryexclusions);
             $failed = DnzbFailure::getFailedCount($data['id']);

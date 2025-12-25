@@ -44,7 +44,7 @@ Route::prefix('inform')->middleware('auth:api')->group(function () {
 
 // Mediainfo endpoint (no auth required for internal use)
 Route::get('release/{id}/mediainfo', function ($id) {
-    $releaseExtra = new \Blacklight\ReleaseExtra;
+    $releaseExtra = app(\App\Services\ReleaseExtraService::class);
 
     $video = $releaseExtra->getVideo($id);
     $audio = $releaseExtra->getAudio($id);

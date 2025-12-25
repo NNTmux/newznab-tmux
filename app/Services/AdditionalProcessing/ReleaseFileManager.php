@@ -17,7 +17,7 @@ use App\Services\NameFixing\ReleaseUpdateService;
 use App\Services\NNTP\NNTPService;
 use Blacklight\Nfo;
 use Blacklight\NZB;
-use Blacklight\ReleaseExtra;
+use App\Services\ReleaseExtraService;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
@@ -34,7 +34,7 @@ class ReleaseFileManager
 
     public function __construct(
         private readonly ProcessingConfiguration $config,
-        private readonly ReleaseExtra $releaseExtra,
+        private readonly ReleaseExtraService $releaseExtra,
         private readonly ReleaseImageService $releaseImage,
         private readonly Nfo $nfo,
         private readonly NZB $nzb,

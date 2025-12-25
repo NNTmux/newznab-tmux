@@ -10,7 +10,7 @@ use App\Services\Categorization\CategorizationService;
 use App\Services\ReleaseImageService;
 use App\Services\Search\ElasticSearchService;
 use App\Services\Search\ManticoreSearchService;
-use Blacklight\ReleaseExtra;
+use App\Services\ReleaseExtraService;
 use FFMpeg\Coordinate\Dimension;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
@@ -37,7 +37,7 @@ class MediaExtractionService
     public function __construct(
         private readonly ProcessingConfiguration $config,
         private readonly ReleaseImageService $releaseImage,
-        private readonly ReleaseExtra $releaseExtra,
+        private readonly ReleaseExtraService $releaseExtra,
         private readonly CategorizationService $categorize
     ) {}
 
