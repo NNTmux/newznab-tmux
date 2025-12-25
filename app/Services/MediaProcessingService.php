@@ -7,7 +7,6 @@ use App\Models\Release;
 use App\Services\Categorization\CategorizationService;
 use App\Services\Search\ElasticSearchService;
 use App\Services\Search\ManticoreSearchService;
-use Blacklight\ReleaseExtra;
 use FFMpeg\Coordinate\Dimension;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
