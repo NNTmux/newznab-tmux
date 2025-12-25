@@ -2,8 +2,8 @@
 
 use App\Models\Country as CountryModel;
 use App\Models\Release;
+use App\Models\XxxInfo;
 use Blacklight\NZB;
-use Blacklight\XXX;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
@@ -122,7 +122,7 @@ if (! function_exists('makeFieldLinks')) {
                 continue;
             }
             if ($type === 'xxx' && $field === 'genre') {
-                $ta = (new XXX)->getGenres(true, $ta);
+                $ta = XxxInfo::getGenres(true, $ta);
                 $ta = $ta['title'] ?? '';
             }
             if ($i > 7) {

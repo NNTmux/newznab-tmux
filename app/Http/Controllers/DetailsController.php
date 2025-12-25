@@ -12,15 +12,16 @@ use App\Models\ReleaseRegex;
 use App\Models\Settings;
 use App\Models\UserDownload;
 use App\Models\Video;
+use App\Models\XxxInfo;
 use App\Services\MovieService;
 use App\Services\Releases\ReleaseSearchService;
 use App\Services\BookService;
 use App\Services\AnidbService;
+use App\Services\XxxBrowseService;
 use Blacklight\Console;
 use Blacklight\Games;
 use Blacklight\Music;
 use Blacklight\ReleaseExtra;
-use Blacklight\XXX;
 use Illuminate\Http\Request;
 
 class DetailsController extends BasePageController
@@ -29,11 +30,14 @@ class DetailsController extends BasePageController
 
     private MovieService $movieService;
 
-    public function __construct(ReleaseSearchService $releaseSearchService, MovieService $movieService)
+    private XxxBrowseService $xxxBrowseService;
+
+    public function __construct(ReleaseSearchService $releaseSearchService, MovieService $movieService, XxxBrowseService $xxxBrowseService)
     {
         parent::__construct();
         $this->releaseSearchService = $releaseSearchService;
         $this->movieService = $movieService;
+        $this->xxxBrowseService = $xxxBrowseService;
     }
 
     public function show(Request $request, string $guid)
@@ -90,11 +94,10 @@ class DetailsController extends BasePageController
 
             $xxx = '';
             if ($data['xxxinfo_id'] !== '' && $data['xxxinfo_id'] !== 0) {
-                $x = new XXX;
-                $xxx = $x->getXXXInfo($data['xxxinfo_id']);
+                $xxx = XxxInfo::getXXXInfo($data['xxxinfo_id']);
 
                 if (isset($xxx['trailers'])) {
-                    $xxx['trailers'] = $x->insertSwf($xxx['classused'], $xxx['trailers']);
+                    $xxx['trailers'] = $this->xxxBrowseService->insertSwf($xxx['classused'], $xxx['trailers']);
                 }
 
                 if ($xxx && isset($xxx['title'])) {

@@ -3,19 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use Blacklight\XXX;
+use App\Models\XxxInfo;
+use App\Services\XxxBrowseService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
 class AdultController extends BasePageController
 {
+    private XxxBrowseService $xxxBrowseService;
+
+    public function __construct(XxxBrowseService $xxxBrowseService)
+    {
+        parent::__construct();
+        $this->xxxBrowseService = $xxxBrowseService;
+    }
+
     /**
      * @throws \Exception
      */
     public function show(Request $request, string $id = '')
     {
-        $adult = new XXX;
-
         $moviecats = Category::getChildren(Category::XXX_ROOT);
         $mtmp = [];
         foreach ($moviecats as $mcat) {
@@ -36,12 +43,12 @@ class AdultController extends BasePageController
         $catarray = [];
         $catarray[] = $category;
 
-        $ordering = $adult->getXXXOrdering();
+        $ordering = $this->xxxBrowseService->getXXXOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
 
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
-        $rslt = $adult->getXXXRange($page, $catarray, $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata['categoryexclusions']);
+        $rslt = $this->xxxBrowseService->getXXXRange($page, $catarray, $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata['categoryexclusions']);
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
@@ -50,7 +57,7 @@ class AdultController extends BasePageController
 
         $director = ($request->has('director') && ! empty($request->input('director'))) ? stripslashes($request->input('director')) : '';
 
-        $genres = $adult->getAllGenres(true);
+        $genres = XxxInfo::getAllGenres(true);
         $genre = ($request->has('genre') && \in_array($request->input('genre'), $genres, false)) ? $request->input('genre') : '';
 
         $browseby_link = '&title='.$title.'&actors='.$actors.'&director='.$director.'&genre='.$genre;
