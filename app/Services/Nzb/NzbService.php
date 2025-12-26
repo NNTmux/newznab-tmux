@@ -123,9 +123,9 @@ class NzbService
 
                 $subject = $binary->name.'(1/'.$binary->totalparts.')';
                 $XMLWriter->startElement('file');
-                $XMLWriter->writeAttribute('poster', $poster);
-                $XMLWriter->writeAttribute('date', $collection->udate);
-                $XMLWriter->writeAttribute('subject', $subject);
+                $XMLWriter->writeAttribute('poster', (string) $poster);
+                $XMLWriter->writeAttribute('date', (string) $collection->udate);
+                $XMLWriter->writeAttribute('subject', (string) $subject);
                 $XMLWriter->startElement('groups');
                 if (preg_match_all('#(\S+):\S+#', $collection->xref, $hits)) {
                     $hits = array_values(array_unique($hits[1]));
@@ -147,8 +147,8 @@ class NzbService
                         $nzb_guid = $part->messageid;
                     }
                     $XMLWriter->startElement('segment');
-                    $XMLWriter->writeAttribute('bytes', $part->size);
-                    $XMLWriter->writeAttribute('number', $part->partnumber);
+                    $XMLWriter->writeAttribute('bytes', (string) $part->size);
+                    $XMLWriter->writeAttribute('number', (string) $part->partnumber);
                     $XMLWriter->text($part->messageid);
                     $XMLWriter->endElement();
                 }
