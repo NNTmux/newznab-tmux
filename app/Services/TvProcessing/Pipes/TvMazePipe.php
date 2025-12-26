@@ -70,6 +70,14 @@ class TvMazePipe extends AbstractTvProviderPipe
 
         if ($videoId !== 0) {
             $siteId = $tvmaze->getSiteByID('tvmaze', $videoId);
+            // If show exists in local DB but doesn't have a TVMaze ID, use the existing video
+            // and process episode matching without trying to search TVMaze API
+            if ($siteId === false || $siteId === 0) {
+                // Show exists in our DB (likely from another source like TMDB)
+                // Skip TVMaze API search and proceed to episode matching
+                $this->outputFoundInDb($cleanName);
+                return $this->processEpisodeForExistingVideo($passable, $tvmaze, $videoId, $parsedInfo);
+            }
         }
 
         if ($videoId === 0) {
@@ -191,5 +199,62 @@ class TvMazePipe extends AbstractTvProviderPipe
         $this->colorCli->primaryOver(' → ');
         $this->colorCli->primary('Full Season matched');
     }
-}
 
+    /**
+     * Process episode matching for a video that already exists in local DB.
+     * This is used when the show was added from another source (e.g., TMDB) and doesn't have a TVMaze ID.
+     */
+    private function processEpisodeForExistingVideo(
+        TvProcessingPassable $passable,
+        TvMazeProvider $tvmaze,
+        int $videoId,
+        array $parsedInfo
+    ): TvProcessingResult {
+        $context = $passable->context;
+        $cleanName = $parsedInfo['cleanname'];
+
+        $seriesNo = ! empty($parsedInfo['season']) ? preg_replace('/^S0*/i', '', (string) $parsedInfo['season']) : '';
+        $episodeNo = ! empty($parsedInfo['episode']) ? preg_replace('/^E0*/i', '', (string) $parsedInfo['episode']) : '';
+        $hasAirdate = ! empty($parsedInfo['airdate']);
+
+        if ($episodeNo === 'all') {
+            // Full season release
+            $tvmaze->setVideoIdFound($videoId, $context->releaseId, 0);
+            $this->outputFullSeason($cleanName);
+            return TvProcessingResult::matched($videoId, 0, $this->getName(), ['full_season' => true]);
+        }
+
+        // Try to find episode in local DB
+        $episode = $tvmaze->getBySeasonEp($videoId, $seriesNo, $episodeNo, $parsedInfo['airdate'] ?? '');
+
+        if ($episode !== false && is_numeric($episode) && $episode > 0) {
+            $tvmaze->setVideoIdFound($videoId, $context->releaseId, $episode);
+            $this->outputMatch(
+                $cleanName,
+                $seriesNo !== '' ? (int) $seriesNo : null,
+                $episodeNo !== '' ? (int) $episodeNo : null,
+                $hasAirdate ? $parsedInfo['airdate'] : null
+            );
+            return TvProcessingResult::matched($videoId, (int) $episode, $this->getName());
+        }
+
+        // Episode not found in local DB - mark video but episode not matched
+        $tvmaze->setVideoIdFound($videoId, $context->releaseId, 0);
+
+        if ($this->echoOutput) {
+            $this->colorCli->primaryOver('    → ');
+            $this->colorCli->alternateOver($this->truncateTitle($cleanName));
+            if ($hasAirdate) {
+                $this->colorCli->primaryOver(' | ');
+                $this->colorCli->warningOver($parsedInfo['airdate']);
+            }
+            $this->colorCli->primaryOver(' → ');
+            $this->colorCli->warning('Episode not in local DB');
+        }
+
+        return TvProcessingResult::notFound($this->getName(), [
+            'video_id' => $videoId,
+            'episode_not_found' => true,
+        ]);
+    }
+}

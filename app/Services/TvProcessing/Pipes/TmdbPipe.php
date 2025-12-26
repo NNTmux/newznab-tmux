@@ -70,6 +70,15 @@ class TmdbPipe extends AbstractTvProviderPipe
 
         if ($videoId !== 0) {
             $siteId = $tmdb->getSiteByID('tmdb', $videoId);
+            // If show exists in local DB with a TMDB ID, use it directly
+            if ($siteId !== false && $siteId !== 0) {
+                $this->outputFoundInDb($cleanName);
+            } else {
+                // Show exists in local DB but without TMDB ID (from another source)
+                // Skip TMDB API search and proceed to episode matching
+                $this->outputFoundInDb($cleanName);
+                return $this->processEpisodeForExistingVideo($passable, $tmdb, $videoId, $parsedInfo);
+            }
         }
 
         if ($videoId === 0) {
@@ -92,8 +101,6 @@ class TmdbPipe extends AbstractTvProviderPipe
                 $videoId = $tmdb->add($tmdbShow);
                 $siteId = (int) $tmdbShow['tmdb'];
             }
-        } else {
-            $this->outputFoundInDb($cleanName);
         }
 
         if ((int) $videoId === 0 || (int) $siteId === 0) {
@@ -191,5 +198,62 @@ class TmdbPipe extends AbstractTvProviderPipe
         $this->colorCli->primaryOver(' → ');
         $this->colorCli->primary('Full Season matched');
     }
-}
 
+    /**
+     * Process episode matching for a video that already exists in local DB.
+     * This is used when the show was added from another source and doesn't have a TMDB ID.
+     */
+    private function processEpisodeForExistingVideo(
+        TvProcessingPassable $passable,
+        TmdbProvider $tmdb,
+        int $videoId,
+        array $parsedInfo
+    ): TvProcessingResult {
+        $context = $passable->context;
+        $cleanName = $parsedInfo['cleanname'];
+
+        $seriesNo = ! empty($parsedInfo['season']) ? preg_replace('/^S0*/i', '', (string) $parsedInfo['season']) : '';
+        $episodeNo = ! empty($parsedInfo['episode']) ? preg_replace('/^E0*/i', '', (string) $parsedInfo['episode']) : '';
+        $hasAirdate = ! empty($parsedInfo['airdate']);
+
+        if ($episodeNo === 'all') {
+            // Full season release
+            $tmdb->setVideoIdFound($videoId, $context->releaseId, 0);
+            $this->outputFullSeason($cleanName);
+            return TvProcessingResult::matched($videoId, 0, $this->getName(), ['full_season' => true]);
+        }
+
+        // Try to find episode in local DB
+        $episode = $tmdb->getBySeasonEp($videoId, $seriesNo, $episodeNo, $parsedInfo['airdate'] ?? '');
+
+        if ($episode !== false && is_numeric($episode) && $episode > 0) {
+            $tmdb->setVideoIdFound($videoId, $context->releaseId, $episode);
+            $this->outputMatch(
+                $cleanName,
+                $seriesNo !== '' ? (int) $seriesNo : null,
+                $episodeNo !== '' ? (int) $episodeNo : null,
+                $hasAirdate ? $parsedInfo['airdate'] : null
+            );
+            return TvProcessingResult::matched($videoId, (int) $episode, $this->getName());
+        }
+
+        // Episode not found in local DB - mark video but episode not matched
+        $tmdb->setVideoIdFound($videoId, $context->releaseId, 0);
+
+        if ($this->echoOutput) {
+            $this->colorCli->primaryOver('    → ');
+            $this->colorCli->alternateOver($this->truncateTitle($cleanName));
+            if ($hasAirdate) {
+                $this->colorCli->primaryOver(' | ');
+                $this->colorCli->warningOver($parsedInfo['airdate']);
+            }
+            $this->colorCli->primaryOver(' → ');
+            $this->colorCli->warning('Episode not in local DB');
+        }
+
+        return TvProcessingResult::notFound($this->getName(), [
+            'video_id' => $videoId,
+            'episode_not_found' => true,
+        ]);
+    }
+}

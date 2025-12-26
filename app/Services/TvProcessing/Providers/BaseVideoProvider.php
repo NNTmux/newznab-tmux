@@ -120,6 +120,15 @@ abstract class BaseVideoProvider
             return $res;
         }
 
+        // If title contains a year in parentheses, try without the year
+        if (preg_match('/^(.+?)\s*\(\d{4}\)$/', $title, $yearMatch)) {
+            $titleWithoutYear = trim($yearMatch[1]);
+            $res = $this->getTitleExact($titleWithoutYear, $type, $source);
+            if ($res !== 0) {
+                return $res;
+            }
+        }
+
         // Check alt. title (Strip ' and :) Maybe strip more in the future.
         $res = $this->getAlternativeTitleExact($title, $type, $source);
         if ($res !== 0) {
