@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use Blacklight\Games;
+use App\Services\GamesService;
 use Blacklight\Genres;
 use Illuminate\Http\Request;
 
@@ -14,7 +14,7 @@ class GamesController extends BasePageController
      */
     public function show(Request $request)
     {
-        $games = new Games(['Settings' => $this->settings]);
+        $games = new GamesService;
         $gen = new Genres(['Settings' => $this->settings]);
 
         $concats = Category::getChildren(Category::PC_ROOT);

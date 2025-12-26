@@ -4,12 +4,12 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
+use App\Services\GamesService;
 use Blacklight\ColorCLI;
-use Blacklight\Games;
 use Illuminate\Support\Facades\DB;
 
 $pdo = DB::connection()->getPdo();
-$game = new Games(['Echo' => true]);
+$game = new GamesService;
 $colorCli = new ColorCLI;
 
 $res = $pdo->query(
@@ -34,7 +34,7 @@ if ($total > 0) {
             }
         }
 
-        // amazon limits are 1 per 1 sec
+        // Rate limiting - 1 per second
         $diff = floor((now()->timestamp - $starttime) * 1000000);
         if (1000000 - $diff > 0) {
             $colorCli->alternate('Sleeping');

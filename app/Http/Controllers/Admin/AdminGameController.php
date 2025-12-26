@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
-use Blacklight\Games;
+use App\Services\GamesService;
 use Blacklight\Genres;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -15,7 +15,7 @@ class AdminGameController extends BasePageController
      */
     public function index(Request $request)
     {
-        $game = new Games(['Settings' => null]);
+        $game = new GamesService;
 
         $meta_title = $title = 'Game List';
 
@@ -38,7 +38,7 @@ class AdminGameController extends BasePageController
      */
     public function edit(Request $request)
     {
-        $games = new Games(['Settings' => null]);
+        $games = new GamesService;
         $gen = new Genres(['Settings' => null]);
         $meta_title = $title = 'Game Edit';
 

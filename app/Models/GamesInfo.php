@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Scout\Searchable;
 
 /**
@@ -23,6 +25,9 @@ use Laravel\Scout\Searchable;
  * @property string $classused
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
+ *
+ * @property-read Genre|null $genre
+ * @property-read \Illuminate\Database\Eloquent\Collection|Release[] $releases
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GamesInfo whereAsin($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\GamesInfo whereBackdrop($value)
@@ -65,6 +70,32 @@ class GamesInfo extends Model
      */
     protected $guarded = [];
 
+    /**
+     * @var array
+     */
+    protected $casts = [
+        'cover' => 'boolean',
+        'backdrop' => 'boolean',
+        'genres_id' => 'integer',
+        'releasedate' => 'date',
+    ];
+
+    /**
+     * Get the genre for this game.
+     */
+    public function genre(): BelongsTo
+    {
+        return $this->belongsTo(Genre::class, 'genres_id');
+    }
+
+    /**
+     * Get the releases for this game.
+     */
+    public function releases(): HasMany
+    {
+        return $this->hasMany(Release::class, 'gamesinfo_id');
+    }
+
     public function searchableAs(): string
     {
         return 'ix_title_ft';
@@ -75,5 +106,31 @@ class GamesInfo extends Model
         return [
             'title' => $this->title,
         ];
+    }
+
+    /**
+     * Get the cover image path.
+     */
+    public function getCoverPath(): ?string
+    {
+        if (!$this->cover) {
+            return null;
+        }
+
+        $path = config('nntmux_settings.covers_path') . '/games/' . $this->id . '.jpg';
+        return file_exists($path) ? $path : null;
+    }
+
+    /**
+     * Get the backdrop image path.
+     */
+    public function getBackdropPath(): ?string
+    {
+        if (!$this->backdrop) {
+            return null;
+        }
+
+        $path = config('nntmux_settings.covers_path') . '/games/' . $this->id . '-backdrop.jpg';
+        return file_exists($path) ? $path : null;
     }
 }

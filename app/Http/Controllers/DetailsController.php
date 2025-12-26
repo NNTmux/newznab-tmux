@@ -18,8 +18,8 @@ use App\Services\Releases\ReleaseSearchService;
 use App\Services\BookService;
 use App\Services\AnidbService;
 use App\Services\XxxBrowseService;
+use App\Services\GamesService;
 use Blacklight\Console;
-use Blacklight\Games;
 use Blacklight\Music;
 use App\Services\ReleaseExtraService;
 use Illuminate\Http\Request;
@@ -118,7 +118,7 @@ class DetailsController extends BasePageController
 
             $game = '';
             if ($data['gamesinfo_id'] !== '') {
-                $game = (new Games)->getGamesInfoById($data['gamesinfo_id']);
+                $game = (new GamesService)->getGamesInfoById($data['gamesinfo_id']);
             }
 
             $mus = '';
