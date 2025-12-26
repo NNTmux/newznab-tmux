@@ -64,6 +64,12 @@ class TvdbPipe extends AbstractTvProviderPipe
         // Find the Video ID if it already exists by checking the title
         $videoId = $tvdb->getByTitle($cleanName, self::TYPE_TV);
 
+        // If not found and cleanName contains a year in parentheses, try without the year
+        if ($videoId === 0 && preg_match('/^(.+?)\s*\(\d{4}\)$/', $cleanName, $yearMatch)) {
+            $nameWithoutYear = trim($yearMatch[1]);
+            $videoId = $tvdb->getByTitle($nameWithoutYear, self::TYPE_TV);
+        }
+
         if ($videoId !== 0) {
             $siteId = $tvdb->getSiteByID('tvdb', $videoId);
         }
@@ -80,6 +86,12 @@ class TvdbPipe extends AbstractTvProviderPipe
             $this->outputSearching($cleanName);
 
             $tvdbShow = $tvdb->getShowInfo((string) $cleanName);
+
+            // If not found and cleanName contains a year in parentheses, try without the year
+            if ($tvdbShow === false && preg_match('/^(.+?)\s*\(\d{4}\)$/', $cleanName, $yearMatch)) {
+                $nameWithoutYear = trim($yearMatch[1]);
+                $tvdbShow = $tvdb->getShowInfo($nameWithoutYear);
+            }
 
             if (is_array($tvdbShow)) {
                 $tvdbShow['country'] = $country;

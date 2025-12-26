@@ -62,6 +62,12 @@ class TvMazePipe extends AbstractTvProviderPipe
         // Find the Video ID if it already exists
         $videoId = $tvmaze->getByTitle($cleanName, self::TYPE_TV, self::SOURCE_TVMAZE);
 
+        // If not found and cleanName contains a year in parentheses, try without the year
+        if ($videoId === 0 && preg_match('/^(.+?)\s*\(\d{4}\)$/', $cleanName, $yearMatch)) {
+            $nameWithoutYear = trim($yearMatch[1]);
+            $videoId = $tvmaze->getByTitle($nameWithoutYear, self::TYPE_TV, self::SOURCE_TVMAZE);
+        }
+
         if ($videoId !== 0) {
             $siteId = $tvmaze->getSiteByID('tvmaze', $videoId);
         }
@@ -71,6 +77,12 @@ class TvMazePipe extends AbstractTvProviderPipe
             $this->outputSearching($cleanName);
 
             $tvmazeShow = $tvmaze->getShowInfo((string) $cleanName);
+
+            // If not found and cleanName contains a year in parentheses, try without the year
+            if ($tvmazeShow === false && preg_match('/^(.+?)\s*\(\d{4}\)$/', $cleanName, $yearMatch)) {
+                $nameWithoutYear = trim($yearMatch[1]);
+                $tvmazeShow = $tvmaze->getShowInfo($nameWithoutYear);
+            }
 
             if (is_array($tvmazeShow)) {
                 // Check if we have a valid country

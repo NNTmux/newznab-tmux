@@ -638,6 +638,13 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         $str = preg_replace('/^(history|discovery) channel/i', '', $str);
         $str = str_replace(["'", ':', '!', '"', '#', '*', "'", ',', '(', ')', '?'], '', $str);
         $str = str_replace('$', 's', $str);
+
+        // Remove language tags that are commonly found in release names
+        $str = preg_replace('/\b(German|French|Spanish|Italian|Dutch|Russian|Japanese|Korean|Chinese|Portuguese|Swedish|Norwegian|Danish|Finnish|Polish|Czech|Hungarian|Romanian|Greek|Turkish|Arabic|Hebrew|Hindi|Thai|Vietnamese|Indonesian|Malay|Tagalog|DL|Dubbed|Subbed|MULTI|MULTi)\b/i', '', $str);
+
+        // Remove common subtitle/episode indicators that aren't part of the show title
+        $str = preg_replace('/\s+-\s+.*(wo andere|where others|Arbeiten|Working).*$/i', '', $str);
+
         $str = preg_replace('/\s{2,}/', ' ', $str);
 
         $str = trim($str, '"');
