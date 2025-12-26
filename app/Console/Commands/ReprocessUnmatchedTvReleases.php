@@ -47,12 +47,13 @@ class ReprocessUnmatchedTvReleases extends Command
         $debug = (bool) $this->option('debug');
         $sleep = (int) $this->option('sleep');
 
-        // Build query for unmatched TV releases
+        // Build query for unmatched TV releases (newest to oldest by adddate, then postdate)
         $query = Release::query()
-            ->select(['id', 'guid', 'searchname', 'videos_id', 'tv_episodes_id', 'categories_id'])
+            ->select(['id', 'guid', 'searchname', 'videos_id', 'tv_episodes_id', 'categories_id', 'adddate', 'postdate'])
             ->where('videos_id', 0)
             ->whereBetween('categories_id', [Category::TV_ROOT, Category::TV_OTHER])
-            ->orderBy('id', 'desc');
+            ->orderBy('adddate', 'desc')
+            ->orderBy('postdate', 'desc');
 
         $totalCount = (clone $query)->count();
 
