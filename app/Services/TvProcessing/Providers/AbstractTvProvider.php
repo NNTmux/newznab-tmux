@@ -490,11 +490,13 @@ abstract class AbstractTvProvider extends BaseVideoProvider
 
     /**
      * Normalize well-known daily/talk show titles to their canonical names.
+     * Also includes German-to-English mappings for popular shows.
      */
     protected function normalizeShowTitle(string $cleanName): string
     {
         $normalized = strtolower(trim($cleanName));
         $aliases = [
+            // English show aliases
             'grits' => 'Girls Raised in the South',
             'shield' => 'Agents of S.H.I.E.L.D.',
             'stephen colbert' => 'The Late Show with Stephen Colbert',
@@ -522,6 +524,31 @@ abstract class AbstractTvProvider extends BaseVideoProvider
             'the tonight show starring jimmy fallon' => 'The Tonight Show Starring Jimmy Fallon',
             'tonight show with jimmy fallon' => 'The Tonight Show Starring Jimmy Fallon',
             'tonight show jimmy fallon' => 'The Tonight Show Starring Jimmy Fallon',
+
+            // German title to English title mappings
+            'oak island fluch und legende' => 'The Curse of Oak Island',
+            'oak island - fluch und legende' => 'The Curse of Oak Island',
+            'tierische freundschaften' => 'Animal Odd Couples',
+            'zwischen meer und maloche' => 'Zwischen Meer und Maloche',
+            'die schatzsucher von oak island' => 'The Curse of Oak Island',
+            'game of thrones das lied von eis und feuer' => 'Game of Thrones',
+            'die simpsons' => 'The Simpsons',
+            'die wilden siebziger' => 'That 70s Show',
+            'how i met your mother' => 'How I Met Your Mother',
+            'scrubs die anfanger' => 'Scrubs',
+            'scrubs die anfaenger' => 'Scrubs',
+            'der prinz von bel-air' => 'The Fresh Prince of Bel-Air',
+            'prinz von bel-air' => 'The Fresh Prince of Bel-Air',
+            'der prinz von bel air' => 'The Fresh Prince of Bel-Air',
+            'alarm fur cobra 11' => 'Alarm for Cobra 11',
+            'alarm fuer cobra 11' => 'Alarm for Cobra 11',
+            'soko' => 'SOKO',
+            'der bergdoktor' => 'Der Bergdoktor',
+            'das boot' => 'Das Boot',
+            'babylon berlin' => 'Babylon Berlin',
+            'dark' => 'Dark',
+            'tatort' => 'Tatort',
+            'polizeiruf 110' => 'Polizeiruf 110',
         ];
 
         if (isset($aliases[$normalized])) {
