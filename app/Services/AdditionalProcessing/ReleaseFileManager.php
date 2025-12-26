@@ -6,6 +6,7 @@ use App\Models\MediaInfo as MediaInfoModel;
 use App\Models\Predb;
 use App\Models\Release;
 use App\Models\ReleaseFile;
+use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
@@ -14,7 +15,6 @@ use App\Services\NameFixing\NameFixingService;
 use App\Services\NameFixing\ReleaseUpdateService;
 use App\Services\NNTP\NNTPService;
 use Blacklight\Nfo;
-use Blacklight\NZB;
 use App\Services\ReleaseExtraService;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Carbon;
@@ -33,7 +33,7 @@ class ReleaseFileManager
         private readonly ReleaseExtraService $releaseExtra,
         private readonly ReleaseImageService $releaseImage,
         private readonly Nfo $nfo,
-        private readonly NZB $nzb,
+        private readonly NzbService $nzb,
         private readonly NameFixingService $nameFixingService
     ) {}
 
@@ -199,7 +199,7 @@ class ReleaseFileManager
 
             // Delete NZB file
             try {
-                $nzbPath = $this->nzb->NZBPath($guid);
+                $nzbPath = $this->nzb->nzbPath($guid);
                 if ($nzbPath && File::exists($nzbPath)) {
                     File::delete($nzbPath);
                 }

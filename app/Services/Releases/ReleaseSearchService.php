@@ -326,37 +326,23 @@ class ReleaseSearchService
             }
 
             if (! $hasValidSiteIds) {
+                // Build search name with season/episode for the full-text search
                 if (! empty($series) && (int) $series < 1900) {
                     $searchName .= sprintf(' S%s', str_pad($series, 2, '0', STR_PAD_LEFT));
                     $seriesNum = (int) preg_replace('/^s0*/i', '', $series);
-                    $conditions[] = sprintf('tve.series = %d', $seriesNum);
-                    $needsEpisodeJoin = true;
                     if (! empty($episode) && ! str_contains($episode, '/')) {
                         $searchName .= sprintf('E%s', str_pad($episode, 2, '0', STR_PAD_LEFT));
                         $episodeNum = (int) preg_replace('/^e0*/i', '', $episode);
-                        $conditions[] = sprintf('tve.episode = %d', $episodeNum);
                     }
                 } elseif (! empty($airDate)) {
                     $searchName .= ' '.str_replace(['/', '-', '.', '_'], ' ', $airDate);
-                    $conditions[] = sprintf('DATE(tve.firstaired) = %s', escapeString($airDate));
-                    $needsEpisodeJoin = true;
                 }
             }
 
-            // Try Elasticsearch first if enabled
-            if (config('nntmux.elasticsearch_enabled') === true) {
-                $searchResult = $this->elasticSearch->indexSearchTMA($searchName, $limit);
-            }
+            // Use the unified Search facade
+            $searchResult = Search::searchReleases(['searchname' => $searchName], $limit);
 
-            // Fall back to Manticore if Elasticsearch didn't return results
-            if (empty($searchResult)) {
-                $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $searchName, ['searchname']);
-                if (! empty($searchResult)) {
-                    $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
-                }
-            }
-
-            // Fall back to MySQL if both Elasticsearch and Manticore failed (only if enabled)
+            // Fall back to MySQL if search engine failed (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
                 $searchResult = $this->performMySQLSearch(['searchname' => $searchName], $limit);
             }
@@ -366,6 +352,43 @@ class ReleaseSearchService
             }
 
             $conditions[] = sprintf('r.id IN (%s)', implode(',', array_map('intval', $searchResult)));
+
+            // Try to add episode conditions if season/episode data is provided and no valid site IDs
+            // This will filter results to only those with matching episode data in tv_episodes table
+            // If this results in no matches, we'll fall back to results without episode conditions
+            if (! $hasValidSiteIds && (! empty($series) || ! empty($airDate))) {
+                $episodeConditions = [];
+                if (! empty($series) && (int) $series < 1900) {
+                    $seriesNum = (int) preg_replace('/^s0*/i', '', $series);
+                    $episodeConditions[] = sprintf('tve.series = %d', $seriesNum);
+                    if (! empty($episode) && ! str_contains($episode, '/')) {
+                        $episodeNum = (int) preg_replace('/^e0*/i', '', $episode);
+                        $episodeConditions[] = sprintf('tve.episode = %d', $episodeNum);
+                    }
+                } elseif (! empty($airDate)) {
+                    $episodeConditions[] = sprintf('DATE(tve.firstaired) = %s', escapeString($airDate));
+                }
+
+                if (! empty($episodeConditions)) {
+                    // Check if any of the found releases have matching episode data
+                    $checkSql = sprintf(
+                        'SELECT r.id FROM releases r INNER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id WHERE r.id IN (%s) AND %s LIMIT 1',
+                        implode(',', array_map('intval', $searchResult)),
+                        implode(' AND ', $episodeConditions)
+                    );
+                    $hasEpisodeMatches = Release::fromQuery($checkSql);
+
+                    if ($hasEpisodeMatches->isNotEmpty()) {
+                        // Some releases have matching episode data, add the conditions
+                        foreach ($episodeConditions as $cond) {
+                            $conditions[] = $cond;
+                        }
+                        $needsEpisodeJoin = true;
+                    }
+                    // If no matches with episode data, don't add episode conditions
+                    // The search will return results based on searchname match only
+                }
+            }
         }
 
         $catQuery = Category::getCategorySearch($cat, 'tv');
@@ -492,20 +515,10 @@ class ReleaseSearchService
         }
         $searchResult = [];
         if (! empty($name)) {
-            // Try Elasticsearch first if enabled
-            if (config('nntmux.elasticsearch_enabled') === true) {
-                $searchResult = $this->elasticSearch->indexSearchTMA($name, $limit);
-            }
+            // Use the unified Search facade
+            $searchResult = Search::searchReleases(['searchname' => $name], $limit);
 
-            // Fall back to Manticore if Elasticsearch didn't return results
-            if (empty($searchResult)) {
-                $searchResult = $this->manticoreSearch->searchIndexes('releases_rt', $name, ['searchname']);
-                if (! empty($searchResult)) {
-                    $searchResult = Arr::wrap(Arr::get($searchResult, 'id'));
-                }
-            }
-
-            // Fall back to MySQL if both Elasticsearch and Manticore failed (only if enabled)
+            // Fall back to MySQL if search engine failed (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
                 $searchResult = $this->performMySQLSearch(['searchname' => $name], $limit);
             }

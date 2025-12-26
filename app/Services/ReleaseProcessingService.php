@@ -13,6 +13,7 @@ use App\Models\Release;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\Categorization\CategorizationService;
+use App\Services\Nzb\NzbService;
 use App\Services\Releases\ReleaseManagementService;
 use App\Support\DTOs\ProcessReleasesSettings;
 use App\Support\DTOs\ReleaseCreationResult;
@@ -20,7 +21,6 @@ use App\Support\DTOs\ReleaseDeleteStats;
 use App\Services\NNTP\NNTPService;
 use Blacklight\ColorCLI;
 use Blacklight\Genres;
-use Blacklight\NZB;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -49,7 +49,7 @@ final class ReleaseProcessingService
     private bool $echoCLI;
     private readonly ProcessReleasesSettings $settings;
     private readonly ColorCLI $colorCLI;
-    private readonly NZB $nzb;
+    private readonly NzbService $nzb;
     private readonly ReleaseCleaningService $releaseCleaning;
     private readonly ReleaseManagementService $releaseManagement;
     private readonly ReleaseImageService $releaseImage;
@@ -59,7 +59,7 @@ final class ReleaseProcessingService
 
     public function __construct(
         ?ColorCLI $colorCLI = null,
-        ?NZB $nzb = null,
+        ?NzbService $nzb = null,
         ?ReleaseCleaningService $releaseCleaning = null,
         ?ReleaseManagementService $releaseManagement = null,
         ?ReleaseImageService $releaseImage = null,
@@ -70,7 +70,7 @@ final class ReleaseProcessingService
         $this->echoCLI = (bool) config('nntmux.echocli');
 
         $this->colorCLI = $colorCLI ?? new ColorCLI();
-        $this->nzb = $nzb ?? new NZB();
+        $this->nzb = $nzb ?? app(NzbService::class);
         $this->releaseCleaning = $releaseCleaning ?? new ReleaseCleaningService();
         $this->releaseManagement = $releaseManagement ?? app(ReleaseManagementService::class);
         $this->releaseImage = $releaseImage ?? new ReleaseImageService();
@@ -482,7 +482,7 @@ final class ReleaseProcessingService
 
         $query = Release::query()
             ->with('category.parent')
-            ->where('nzbstatus', '=', NZB::NZB_NONE)
+            ->where('nzbstatus', '=', NzbService::NZB_NONE)
             ->select(['id', 'guid', 'name', 'categories_id']);
 
         if (!empty($groupID)) {

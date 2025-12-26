@@ -2,7 +2,8 @@
 
 namespace App\Services\AdditionalProcessing;
 
-use Blacklight\NZB;
+use App\Services\Nzb\NzbParserService;
+use App\Services\Nzb\NzbService;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
@@ -13,7 +14,8 @@ use Illuminate\Support\Facades\Log;
 class NzbContentParser
 {
     public function __construct(
-        private readonly NZB $nzb,
+        private readonly NzbService $nzb,
+        private readonly NzbParserService $nzbParser,
         private readonly bool $debugMode = false,
         private readonly bool $echoCLI = false
     ) {}
@@ -26,7 +28,7 @@ class NzbContentParser
      */
     public function parseNzb(string $guid): array
     {
-        $nzbPath = $this->nzb->NZBPath($guid);
+        $nzbPath = $this->nzb->nzbPath($guid);
         if ($nzbPath === false) {
             return ['contents' => [], 'error' => 'NZB not found for GUID: '.$guid];
         }
@@ -41,12 +43,12 @@ class NzbContentParser
         }
 
         // Get a list of files in the NZB
-        $fileList = $this->nzb->nzbFileList($nzbContents, ['no-file-key' => false, 'strip-count' => true]);
+        $fileList = $this->nzbParser->parseNzbFileList($nzbContents, ['no-file-key' => false, 'strip-count' => true]);
         if (count($fileList) === 0) {
             // Attempt repair if initial parse yielded no files
             $repaired = $this->repairNzb($nzbContents, $nzbPath, $guid);
             if ($repaired !== null) {
-                $fileList = $this->nzb->nzbFileList($repaired, ['no-file-key' => false, 'strip-count' => true]);
+                $fileList = $this->nzbParser->parseNzbFileList($repaired, ['no-file-key' => false, 'strip-count' => true]);
             }
             if (count($fileList) === 0) {
                 return ['contents' => [], 'error' => 'NZB is potentially broken for GUID: '.$guid];
@@ -257,7 +259,7 @@ class NzbContentParser
      */
     public function getNzbPath(string $guid): string|false
     {
-        return $this->nzb->NZBPath($guid);
+        return $this->nzb->nzbPath($guid);
     }
 }
 

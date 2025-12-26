@@ -7,9 +7,9 @@ namespace App\Services;
 use App\Enums\BlacklistConstants;
 use App\Models\Category;
 use App\Models\Settings;
+use App\Services\Nzb\NzbService;
 use App\Services\Releases\ReleaseManagementService;
 use Blacklight\ColorCLI;
-use Blacklight\NZB;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -48,7 +48,7 @@ class ReleaseRemoverService
     protected string $query = '';
     protected ReleaseManagementService $releaseManagement;
     protected array $result = [];
-    private NZB $nzb;
+    private NzbService $nzb;
     private ReleaseImageService $releaseImage;
 
     /**
@@ -59,12 +59,12 @@ class ReleaseRemoverService
     public function __construct(
         ?ColorCLI $colorCLI = null,
         ?ReleaseManagementService $releaseManagement = null,
-        ?NZB $nzb = null,
+        ?NzbService $nzb = null,
         ?ReleaseImageService $releaseImage = null
     ) {
         $this->colorCLI = $colorCLI ?? new ColorCLI;
         $this->releaseManagement = $releaseManagement ?? app(ReleaseManagementService::class);
-        $this->nzb = $nzb ?? new NZB;
+        $this->nzb = $nzb ?? app(NzbService::class);
         $this->releaseImage = $releaseImage ?? new ReleaseImageService;
         $this->echoCLI = config('nntmux.echocli');
 

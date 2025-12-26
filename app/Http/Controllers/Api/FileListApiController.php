@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Release;
-use Blacklight\NZB;
+use App\Services\Nzb\NzbParserService;
+use App\Services\Nzb\NzbService;
 use Illuminate\Http\JsonResponse;
 
 class FileListApiController extends Controller
@@ -14,14 +15,15 @@ class FileListApiController extends Controller
      */
     public function getFileList(string $guid): JsonResponse
     {
-        $nzb = new NZB;
+        $nzb = app(NzbService::class);
+        $nzbParser = app(NzbParserService::class);
 
         $rel = Release::getByGuid($guid);
         if (! $rel) {
             return response()->json(['error' => 'Release not found'], 404);
         }
 
-        $nzbpath = $nzb->NZBPath($guid);
+        $nzbpath = $nzb->nzbPath($guid);
 
         if (! file_exists($nzbpath)) {
             return response()->json(['error' => 'NZB file not found'], 404);
@@ -31,7 +33,7 @@ class FileListApiController extends Controller
         @readgzfile($nzbpath);
         $nzbfile = ob_get_clean();
 
-        $files = $nzb->nzbFileList($nzbfile);
+        $files = $nzbParser->parseNzbFileList($nzbfile);
 
         return response()->json([
             'release' => [

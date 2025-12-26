@@ -3,7 +3,7 @@
 use App\Models\Country as CountryModel;
 use App\Models\Release;
 use App\Models\XxxInfo;
-use Blacklight\NZB;
+use App\Services\Nzb\NzbService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
@@ -299,10 +299,10 @@ if (! function_exists('getStreamingZip')) {
      */
     function getStreamingZip(array $guids = []): STS\ZipStream\Builder
     {
-        $nzb = new NZB;
+        $nzb = app(NzbService::class);
         $zipped = ZipStream::create(now()->format('Ymdhis').'.zip');
         foreach ($guids as $guid) {
-            $nzbPath = $nzb->NZBPath($guid);
+            $nzbPath = $nzb->nzbPath($guid);
             if ($nzbPath) {
                 $nzbContents = unzipGzipFile($nzbPath);
                 if ($nzbContents) {

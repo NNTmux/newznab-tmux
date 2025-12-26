@@ -11,9 +11,9 @@ use App\Models\ReleaseRegex;
 use App\Models\ReleasesGroups;
 use App\Models\UsenetGroup;
 use App\Services\Categorization\CategorizationService;
+use App\Services\Nzb\NzbService;
 use App\Services\ReleaseCleaningService;
 use Blacklight\ColorCLI;
-use Blacklight\NZB;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -113,7 +113,7 @@ class ReleaseCreationService
                     'categories_id' => $determinedCategory['categories_id'] ?? Category::OTHER_MISC,
                     'isrenamed' => $properName === true ? 1 : 0,
                     'predb_id' => $preID === false ? 0 : $preID,
-                    'nzbstatus' => NZB::NZB_NONE,
+                    'nzbstatus' => NzbService::NZB_NONE,
                     'ishashed' => preg_match('/^[a-fA-F0-9]{32}\b|^[a-fA-F0-9]{40}\b|^[a-fA-F0-9]{64}\b|^[a-fA-F0-9]{96}\b|^[a-fA-F0-9]{128}\b/i', $searchName) ? 1 : 0,
                 ]);
 

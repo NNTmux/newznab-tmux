@@ -3,9 +3,10 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\Release;
+use App\Services\Nzb\NzbParserService;
+use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
 use Blacklight\ColorCLI;
-use Blacklight\NZB;
 use Blacklight\Releases;
 use Illuminate\Support\Facades\File;
 
@@ -24,7 +25,8 @@ if (! File::isDirectory($dir) && ! File::makeDirectory($dir)) {
 }
 
 $releases = new Releases;
-$nzb = new NZB;
+$nzb = app(NzbService::class);
+$nzbParser = app(NzbParserService::class);
 $releaseImage = new ReleaseImageService;
 
 $timestart = now()->toRfc2822String();
@@ -41,7 +43,7 @@ foreach ($itr as $filePath) {
     $guid = stristr($filePath->getFilename(), '.nzb.gz', true);
     if (File::isFile($filePath) && $guid) {
         $nzbfile = unzipGzipFile($filePath);
-        $nzbContents = $nzb->nzbFileList($nzbfile, ['no-file-key' => false, 'strip-count' => true]);
+        $nzbContents = $nzbParser->parseNzbFileList($nzbfile, ['no-file-key' => false, 'strip-count' => true]);
         if (! $nzbfile || ! @simplexml_load_string($nzbfile) || count($nzbContents) === 0) {
             if ($argv[1] === 'move') {
                 rename($filePath, $dir.$guid.'.nzb.gz');
@@ -62,7 +64,7 @@ $checked = $deleted = 0;
 
 $res = Release::query()->select(['id', 'guid', 'nzbstatus'])->get();
 foreach ($res as $row) {
-    $nzbpath = $nzb->getNZBPath($row->guid);
+    $nzbpath = $nzb->getNzbPath($row->guid);
     if (! File::isFile($nzbpath)) {
         $deleted++;
         $releases->deleteSingle(['g' => $row->guid, 'i' => $row->id], $nzb, $releaseImage);

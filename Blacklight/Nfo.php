@@ -9,6 +9,7 @@ use App\Models\ReleaseNfo;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\NNTP\NNTPService;
+use App\Services\Nzb\NzbContentsService;
 use App\Services\PostProcessService;
 use dariusiii\rarinfo\Par2Info;
 use dariusiii\rarinfo\SfvInfo;
@@ -478,16 +479,11 @@ class Nfo
             }
 
             if ($release->completion === 0) {
-                $nzbContents = new NZBContents(
-                    [
-                        'Echo' => $this->echo,
-                        'NNTP' => $nntp,
-                        'Nfo' => $this,
-                        'Settings' => null,
-                        'PostProcess' => app(PostProcessService::class),
-                    ]
-                );
-                $nzbContents->parseNZB($release->guid, $release->id, $release->guid);
+                $nzbContentsService = app(NzbContentsService::class);
+                $nzbContentsService->setNntp($nntp);
+                $nzbContentsService->setNfo($this);
+                $nzbContentsService->setEchoOutput($this->echo);
+                $nzbContentsService->parseNzb($release->guid, $release->id, $release->groups_id ?? 0);
             }
 
             return true;
@@ -534,12 +530,14 @@ class Nfo
             }
 
             // Process each release
-            $nzbContents = new NZBContents(['NNTP' => $nntp, 'Nfo' => $this]);
+            $nzbContentsService = app(NzbContentsService::class);
+            $nzbContentsService->setNntp($nntp);
+            $nzbContentsService->setNfo($this);
 
             foreach ($releases as $release) {
                 try {
                     $groupName = UsenetGroup::getNameByID($release['groups_id']);
-                    $fetchedBinary = $nzbContents->getNfoFromNZB($release['guid'], $release['id'], $release['groups_id'], $groupName);
+                    $fetchedBinary = $nzbContentsService->getNfoFromNzb($release['guid'], $release['id'], $release['groups_id'], $groupName);
 
                     if ($fetchedBinary !== false) {
                         DB::beginTransaction();

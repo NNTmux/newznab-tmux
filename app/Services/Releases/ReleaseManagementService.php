@@ -4,8 +4,8 @@ namespace App\Services\Releases;
 
 use App\Facades\Search;
 use App\Models\Release;
+use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
-use Blacklight\NZB;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
@@ -25,7 +25,7 @@ class ReleaseManagementService
     {
         $list = (array) $list;
 
-        $nzb = new NZB;
+        $nzb = app(NzbService::class);
         $releaseImage = new ReleaseImageService;
 
         foreach ($list as $identifier) {
@@ -41,10 +41,10 @@ class ReleaseManagementService
      *
      * @throws \Exception
      */
-    public function deleteSingle(array $identifiers, NZB $nzb, ReleaseImageService $releaseImage): void
+    public function deleteSingle(array $identifiers, NzbService $nzb, ReleaseImageService $releaseImage): void
     {
         // Delete NZB from disk.
-        $nzbPath = $nzb->NZBPath($identifiers['g']);
+        $nzbPath = $nzb->nzbPath($identifiers['g']);
         if (! empty($nzbPath)) {
             File::delete($nzbPath);
         }
@@ -76,7 +76,7 @@ class ReleaseManagementService
      *
      * @throws \Exception
      */
-    public function deleteSingleWithService(array $identifiers, NZB $nzb, ReleaseImageService $releaseImage): void
+    public function deleteSingleWithService(array $identifiers, NzbService $nzb, ReleaseImageService $releaseImage): void
     {
         $this->deleteSingle($identifiers, $nzb, $releaseImage);
     }

@@ -8,10 +8,10 @@ use App\Models\Category;
 use App\Models\Predb;
 use App\Models\Release;
 use App\Services\NameFixing\NameFixingService;
+use App\Services\Nzb\NzbContentsService;
 use App\Services\PostProcessService;
 use App\Services\NNTP\NNTPService;
 use Blacklight\Nfo;
-use Blacklight\NZBContents;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -226,17 +226,15 @@ class ReleasesFixNamesGroup extends Command
                         $this->warn($errorMessage);
                     } else {
                         $Nfo = new Nfo();
-                        $nzbcontents = new NZBContents([
-                            'Echo' => false,
-                            'NNTP' => $nntp,
-                            'Nfo' => $Nfo,
-                            'PostProcess' => app(PostProcessService::class),
-                        ]);
+                        $nzbcontents = app(NzbContentsService::class);
+                        $nzbcontents->setNntp($nntp);
+                        $nzbcontents->setNfo($Nfo);
+                        $nzbcontents->setEchoOutput(false);
                     }
                 }
 
                 if (isset($nzbcontents)) {
-                    $nzbcontents->checkPAR2($release->guid, $release->releases_id, $release->groups_id, 1, 1);
+                    $nzbcontents->checkPar2($release->guid, $release->releases_id, $release->groups_id, 1, 1);
                 }
             }
 

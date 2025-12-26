@@ -7,6 +7,7 @@ use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\BlacklistService;
 use App\Services\Categorization\CategorizationService;
+use App\Services\Nzb\NzbService;
 use App\Services\ReleaseCleaningService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
@@ -55,7 +56,7 @@ class NZBImport
      */
     public mixed $echoCLI;
 
-    public NZB $nzb;
+    public NzbService $nzb;
 
     /**
      * @var string the MD5 hash of the first segment Message-ID of the NZB
@@ -69,7 +70,7 @@ class NZBImport
         $this->echoCLI = config('nntmux.echocli');
         $this->blacklistService = new BlacklistService;
         $this->category = new CategorizationService();
-        $this->nzb = new NZB;
+        $this->nzb = app(NzbService::class);
         $this->releaseCleaner = new ReleaseCleaningService;
         $this->colorCli = new ColorCLI;
         $this->crossPostt = Settings::settingValue('crossposttime') !== '' ? Settings::settingValue('crossposttime') : 2;
@@ -163,7 +164,7 @@ class NZBImport
 
                 if ($inserted) {
                     // Try to copy the NZB to the NZB folder.
-                    $path = $this->nzb->getNZBPath($this->relGuid, 0, true);
+                    $path = $this->nzb->getNzbPath($this->relGuid, 0, true);
 
                     // Try to compress the NZB file in the NZB folder.
                     $fp = gzopen($path, 'w5');
@@ -393,7 +394,7 @@ class NZBImport
                     'categories_id' => $determinedCategory['categories_id'],
                     'isrenamed' => $renamed,
                     'predb_id' => 0,
-                    'nzbstatus' => NZB::NZB_ADDED,
+                    'nzbstatus' => NzbService::NZB_ADDED,
                     'ishashed' => 0,
                 ]
             );

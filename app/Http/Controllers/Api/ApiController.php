@@ -14,7 +14,6 @@ use App\Models\UserDownload;
 use App\Models\UserRequest;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\Releases\ReleaseSearchService;
-use Blacklight\NZB;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

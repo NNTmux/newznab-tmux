@@ -6,7 +6,7 @@ use App\Models\Release;
 use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UsersRelease;
-use Blacklight\NZB;
+use App\Services\Nzb\NzbService;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -251,7 +251,7 @@ class GetNzbController extends BasePageController
         string $releaseId
     ) {
         // Get NZB file path and validate
-        $nzbPath = (new NZB)->getNZBPath($releaseId);
+        $nzbPath = app(NzbService::class)->getNzbPath($releaseId);
         if (! File::exists($nzbPath)) {
             return showApiError(300, 'NZB file not found!');
         }

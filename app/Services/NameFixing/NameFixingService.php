@@ -943,10 +943,10 @@ class NameFixingService
         if ($total > 0) {
             $this->_totalReleases = $total;
             $this->colorCLI->info(number_format($total) . ' releases to process.');
-            $nzbContents = new \Blacklight\NZBContents();
+            $nzbContentsService = app(\App\Services\Nzb\NzbContentsService::class);
 
             foreach ($releases as $release) {
-                if ($nzbContents->checkPAR2($release->guid, $release->releases_id, $release->groups_id, (int) $nameStatus, (int) $show)) {
+                if ($nzbContentsService->checkPar2($release->guid, $release->releases_id, $release->groups_id, (int) $nameStatus, (int) $show)) {
                     $this->updateService->fixed++;
                 }
 

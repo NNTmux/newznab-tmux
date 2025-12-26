@@ -3,9 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\Release;
+use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
 use App\Services\Releases\ReleaseManagementService;
-use Blacklight\NZB;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
@@ -79,7 +79,7 @@ class CleanNZB extends Command
     private function GetReleasesWithNoNZBOnDisk($delete = false)
     {
         // Setup
-        $nzb = new NZB;
+        $nzb = app(NzbService::class);
         $releaseManagement = app(ReleaseManagementService::class);
         $checked = $deleted = 0;
 
@@ -91,7 +91,7 @@ class CleanNZB extends Command
             echo 'Total done: '.$checked."\r";
             foreach ($releases as $r) {
 
-                if (! $nzb->NZBPath($r->guid)) {
+                if (! $nzb->nzbPath($r->guid)) {
                     if ($delete) {
                         $releaseManagement->deleteSingleWithService(['g' => $r->guid, 'i' => $r->id], $nzb, new ReleaseImageService);
                     }
