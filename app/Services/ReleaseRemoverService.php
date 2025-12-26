@@ -9,7 +9,6 @@ use App\Models\Category;
 use App\Models\Settings;
 use App\Services\Nzb\NzbService;
 use App\Services\Releases\ReleaseManagementService;
-use Blacklight\ColorCLI;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -37,7 +36,6 @@ class ReleaseRemoverService
     private const string TYPE_WMV_ALL = 'wmv_all';
 
     protected string $blacklistID = '';
-    protected ColorCLI $colorCLI;
     protected string $crapTime = '';
     protected bool $delete = false;
     protected int $deletedCount = 0;
@@ -57,12 +55,10 @@ class ReleaseRemoverService
     private array $removalHandlers;
 
     public function __construct(
-        ?ColorCLI $colorCLI = null,
         ?ReleaseManagementService $releaseManagement = null,
         ?NzbService $nzb = null,
         ?ReleaseImageService $releaseImage = null
     ) {
-        $this->colorCLI = $colorCLI ?? new ColorCLI;
         $this->releaseManagement = $releaseManagement ?? app(ReleaseManagementService::class);
         $this->nzb = $nzb ?? app(NzbService::class);
         $this->releaseImage = $releaseImage ?? new ReleaseImageService;
@@ -261,8 +257,8 @@ class ReleaseRemoverService
     private function logCompletion(\Carbon\Carbon $timeStart): void
     {
         if ($this->echoCLI) {
-            $this->colorCLI->headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
-            $this->colorCLI->header(now()->diffInSeconds($timeStart, true).' seconds', true);
+            cli()->headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
+            cli()->header(now()->diffInSeconds($timeStart, true).' seconds', true);
         }
     }
 
@@ -272,7 +268,7 @@ class ReleaseRemoverService
     private function logHeader(string $message): void
     {
         if ($this->echoCLI) {
-            $this->colorCLI->header($message, true);
+            cli()->header($message, true);
         }
     }
 
@@ -612,7 +608,7 @@ class ReleaseRemoverService
         ));
 
         if (empty($regexList)) {
-            $this->colorCLI->error("No regular expressions were selected for blacklist removal. Make sure you have activated REGEXPs in Site Edit and you're specifying a valid ID.", true);
+            cli()->error("No regular expressions were selected for blacklist removal. Make sure you have activated REGEXPs in Site Edit and you're specifying a valid ID.", true);
 
             return true;
         }
@@ -680,7 +676,7 @@ class ReleaseRemoverService
      */
     private function logBlacklistOperation(string $opTypeName, string $regexMatch): void
     {
-        $this->colorCLI->header(sprintf(
+        cli()->header(sprintf(
             'Finding crap releases for %s: Using only REGEXP method against release %s.%s',
             $this->method,
             $opTypeName,
@@ -737,7 +733,7 @@ class ReleaseRemoverService
 
         $this->method = 'Blacklist Files '.$regex->id;
 
-        $this->colorCLI->header(sprintf(
+        cli()->header(sprintf(
             'Finding crap releases for %s: Using only REGEXP method against release filenames.%s',
             $this->method,
             PHP_EOL
@@ -849,10 +845,10 @@ class ReleaseRemoverService
             if ($this->delete) {
                 $this->releaseManagement->deleteSingleWithService(['g' => $release->guid, 'i' => $release->id], $this->nzb, $this->releaseImage);
                 if ($this->echoCLI) {
-                    $this->colorCLI->primary('Deleting: '.$this->method.': '.$release->searchname, true);
+                    cli()->primary('Deleting: '.$this->method.': '.$release->searchname, true);
                 }
             } elseif ($this->echoCLI) {
-                $this->colorCLI->primary('Would be deleting: '.$this->method.': '.$release->searchname, true);
+                cli()->primary('Would be deleting: '.$this->method.': '.$release->searchname, true);
             }
             $deletedCount++;
         }
@@ -1060,7 +1056,7 @@ class ReleaseRemoverService
             return true;
         }
 
-        $this->colorCLI->primary(
+        cli()->primary(
             'This is the query we have formatted using your criteria, you can run it in SQL to see if you like the results:'.
             PHP_EOL.$this->query.';'.PHP_EOL.
             'If you are satisfied, type yes and press enter. Anything else will exit.',
@@ -1069,7 +1065,7 @@ class ReleaseRemoverService
 
         $userInput = trim(fgets(fopen('php://stdin', 'rtb')));
         if ($userInput !== 'yes') {
-            $this->colorCLI->primary('You typed: "'.$userInput.'", the program will exit.', true);
+            cli()->primary('You typed: "'.$userInput.'", the program will exit.', true);
 
             return false;
         }
@@ -1104,7 +1100,7 @@ class ReleaseRemoverService
     protected function returnError(): bool
     {
         if ($this->echoCLI && $this->error !== '') {
-            $this->colorCLI->error($this->error, true);
+            cli()->error($this->error, true);
         }
 
         return false;

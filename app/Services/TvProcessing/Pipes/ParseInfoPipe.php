@@ -53,7 +53,7 @@ class ParseInfoPipe extends AbstractTvProviderPipe
             );
 
             if ($this->echoOutput) {
-                $this->colorCli->error(sprintf(
+                cli()->error(sprintf(
                     '  ✗ Parse failed: %s',
                     mb_substr($passable->context->searchName, 0, 50)
                 ));

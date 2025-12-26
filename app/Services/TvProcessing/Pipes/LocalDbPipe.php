@@ -99,23 +99,23 @@ class LocalDbPipe extends AbstractTvProviderPipe
         $localDb->setVideoIdFound($videoId, $context->releaseId, 0);
 
         if ($this->echoOutput) {
-            $this->colorCli->primaryOver('    → ');
-            $this->colorCli->headerOver($this->truncateTitle($cleanName));
+            cli()->primaryOver('    → ');
+            cli()->headerOver($this->truncateTitle($cleanName));
             if ($hasAirdate) {
-                $this->colorCli->primaryOver(' | ');
-                $this->colorCli->warningOver($parsedInfo['airdate']);
-                $this->colorCli->headerOver(' → ');
-                $this->colorCli->notice('Series matched, airdate not in local DB');
+                cli()->primaryOver(' | ');
+                cli()->warningOver($parsedInfo['airdate']);
+                cli()->headerOver(' → ');
+                cli()->notice('Series matched, airdate not in local DB');
             } elseif ($hasEpisodeNumbers) {
-                $this->colorCli->primaryOver(' S');
-                $this->colorCli->warningOver(sprintf('%02d', (int) $parsedInfo['season']));
-                $this->colorCli->primaryOver('E');
-                $this->colorCli->warningOver(sprintf('%02d', (int) $parsedInfo['episode']));
-                $this->colorCli->headerOver(' → ');
-                $this->colorCli->notice('Series matched, episode not in local DB');
+                cli()->primaryOver(' S');
+                cli()->warningOver(sprintf('%02d', (int) $parsedInfo['season']));
+                cli()->primaryOver('E');
+                cli()->warningOver(sprintf('%02d', (int) $parsedInfo['episode']));
+                cli()->headerOver(' → ');
+                cli()->notice('Series matched, episode not in local DB');
             } else {
-                $this->colorCli->primaryOver(' → ');
-                $this->colorCli->notice('Series matched (no episode info)');
+                cli()->primaryOver(' → ');
+                cli()->notice('Series matched (no episode info)');
             }
         }
 

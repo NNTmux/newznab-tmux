@@ -49,7 +49,7 @@ class BinariesRunner extends BaseRunner
 
         foreach ($results as $groupName => $output) {
             echo $output;
-            $this->colorCli->primary('Updated group '.$groupName);
+            cli()->primary('Updated group '.$groupName);
         }
     }
 
@@ -64,7 +64,7 @@ class BinariesRunner extends BaseRunner
         // Prevent division by zero - ensure maxmssgs is at least 1
         if ($maxMessages < 1) {
             $defaultMaxMessages = 20000;
-            $this->colorCli->warning('maxmssgs setting is invalid or not set, using default of '.$defaultMaxMessages);
+            cli()->warning('maxmssgs setting is invalid or not set, using default of '.$defaultMaxMessages);
             $maxMessages = $defaultMaxMessages;
         }
 
@@ -144,7 +144,7 @@ class BinariesRunner extends BaseRunner
             $group = $groupMapping[$idx] ?? '';
             if (!empty($group)) {
                 echo $output;
-                $this->colorCli->primary('Updated group '.$group);
+                cli()->primary('Updated group '.$group);
             }
         }
     }

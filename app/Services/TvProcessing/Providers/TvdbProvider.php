@@ -82,10 +82,10 @@ class TvdbProvider extends AbstractTvProvider
             if (\is_array($release) && $release['name'] !== '') {
                 if (\in_array($release['cleanname'], $this->titleCache, false)) {
                     if ($this->echooutput) {
-                        $this->colorCli->primaryOver('    → ');
-                        $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
-                        $this->colorCli->primaryOver(' → ');
-                        $this->colorCli->alternate('Skipped (previously failed)');
+                        cli()->primaryOver('    → ');
+                        cli()->alternateOver($this->truncateTitle($release['cleanname']));
+                        cli()->primaryOver(' → ');
+                        cli()->alternate('Skipped (previously failed)');
                     }
                     $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
                     $skipped++;
@@ -105,10 +105,10 @@ class TvdbProvider extends AbstractTvProvider
 
                 if ($siteId === false && $lookupSetting) {
                     if ($this->echooutput) {
-                        $this->colorCli->primaryOver('    → ');
-                        $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
-                        $this->colorCli->primaryOver(' → ');
-                        $this->colorCli->info('Searching TVDB...');
+                        cli()->primaryOver('    → ');
+                        cli()->headerOver($this->truncateTitle($release['cleanname']));
+                        cli()->primaryOver(' → ');
+                        cli()->info('Searching TVDB...');
                     }
 
                     $country = (
@@ -125,10 +125,10 @@ class TvdbProvider extends AbstractTvProvider
                         $siteId = (int) $tvdbShow['tvdb'];
                     }
                 } elseif ($this->echooutput && $siteId !== false) {
-                    $this->colorCli->primaryOver('    → ');
-                    $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
-                    $this->colorCli->primaryOver(' → ');
-                    $this->colorCli->info('Found in DB');
+                    cli()->primaryOver('    → ');
+                    cli()->headerOver($this->truncateTitle($release['cleanname']));
+                    cli()->primaryOver(' → ');
+                    cli()->info('Found in DB');
                 }
 
                 if ((int) $videoId > 0 && (int) $siteId > 0) {
@@ -149,10 +149,10 @@ class TvdbProvider extends AbstractTvProvider
                     if ($episodeNo === 'all') {
                         $this->setVideoIdFound($videoId, $row['id'], 0);
                         if ($this->echooutput) {
-                            $this->colorCli->primaryOver('    → ');
-                            $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
-                            $this->colorCli->primaryOver(' → ');
-                            $this->colorCli->primary('Full Season matched');
+                            cli()->primaryOver('    → ');
+                            cli()->headerOver($this->truncateTitle($release['cleanname']));
+                            cli()->primaryOver(' → ');
+                            cli()->primary('Full Season matched');
                         }
                         $matched++;
                         continue;
@@ -181,50 +181,50 @@ class TvdbProvider extends AbstractTvProvider
                     if ($episode !== false && is_numeric($episode) && $episode > 0) {
                         $this->setVideoIdFound($videoId, $row['id'], $episode);
                         if ($this->echooutput) {
-                            $this->colorCli->primaryOver('    → ');
-                            $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
+                            cli()->primaryOver('    → ');
+                            cli()->headerOver($this->truncateTitle($release['cleanname']));
                             if ($seriesNo !== '' && $episodeNo !== '') {
-                                $this->colorCli->primaryOver(' S');
-                                $this->colorCli->warningOver(sprintf('%02d', $seriesNo));
-                                $this->colorCli->primaryOver('E');
-                                $this->colorCli->warningOver(sprintf('%02d', $episodeNo));
+                                cli()->primaryOver(' S');
+                                cli()->warningOver(sprintf('%02d', $seriesNo));
+                                cli()->primaryOver('E');
+                                cli()->warningOver(sprintf('%02d', $episodeNo));
                             } elseif ($hasAirdate) {
-                                $this->colorCli->primaryOver(' | ');
-                                $this->colorCli->warningOver($release['airdate']);
+                                cli()->primaryOver(' | ');
+                                cli()->warningOver($release['airdate']);
                             }
-                            $this->colorCli->primaryOver(' ✓ ');
-                            $this->colorCli->primary('MATCHED (TVDB)');
+                            cli()->primaryOver(' ✓ ');
+                            cli()->primary('MATCHED (TVDB)');
                         }
                         $matched++;
                     } else {
                         $this->setVideoIdFound($videoId, $row['id'], 0);
                         $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
                         if ($this->echooutput) {
-                            $this->colorCli->primaryOver('    → ');
-                            $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
+                            cli()->primaryOver('    → ');
+                            cli()->alternateOver($this->truncateTitle($release['cleanname']));
                             if ($hasAirdate) {
-                                $this->colorCli->primaryOver(' | ');
-                                $this->colorCli->warningOver($release['airdate']);
+                                cli()->primaryOver(' | ');
+                                cli()->warningOver($release['airdate']);
                             }
-                            $this->colorCli->primaryOver(' → ');
-                            $this->colorCli->warning('Episode not found');
+                            cli()->primaryOver(' → ');
+                            cli()->warning('Episode not found');
                         }
                     }
                 } else {
                     $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
                     $this->titleCache[] = $release['cleanname'] ?? null;
                     if ($this->echooutput) {
-                        $this->colorCli->primaryOver('    → ');
-                        $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
-                        $this->colorCli->primaryOver(' → ');
-                        $this->colorCli->warning('Not found');
+                        cli()->primaryOver('    → ');
+                        cli()->alternateOver($this->truncateTitle($release['cleanname']));
+                        cli()->primaryOver(' → ');
+                        cli()->warning('Not found');
                     }
                 }
             } else {
                 $this->setVideoNotFound(parent::FAILED_PARSE, $row['id']);
                 $this->titleCache[] = $release['cleanname'] ?? null;
                 if ($this->echooutput) {
-                    $this->colorCli->error(sprintf(
+                    cli()->error(sprintf(
                         '  ✗ [%d/%d] Parse failed: %s',
                         $processed,
                         $tvCount,
@@ -236,8 +236,8 @@ class TvdbProvider extends AbstractTvProvider
 
         if ($this->echooutput && $matched > 0) {
             echo "\n";
-            $this->colorCli->primaryOver('  ✓ TVDB: ');
-            $this->colorCli->primary(sprintf('%d matched, %d skipped', $matched, $skipped));
+            cli()->primaryOver('  ✓ TVDB: ');
+            cli()->primary(sprintf('%d matched, %d skipped', $matched, $skipped));
         }
     }
 
@@ -259,12 +259,12 @@ class TvdbProvider extends AbstractTvProvider
             $response = $this->client->search()->search($name, ['type' => 'series']);
         } catch (ResourceNotFoundException $e) {
             $response = false;
-            $this->colorCli->error('Show not found on TVDB');
+            cli()->error('Show not found on TVDB');
         } catch (UnauthorizedException $e) {
             try {
                 $this->authorizeTvdb();
             } catch (UnauthorizedException $error) {
-                $this->colorCli->error('Not authorized to access TVDB');
+                cli()->error('Not authorized to access TVDB');
             }
         }
 
@@ -338,7 +338,7 @@ class TvdbProvider extends AbstractTvProvider
                     try {
                         $this->authorizeTvdb();
                     } catch (UnauthorizedException $error) {
-                        $this->colorCli->error('Not authorized to access TVDB');
+                        cli()->error('Not authorized to access TVDB');
                     }
                 }
             } else {
@@ -382,12 +382,12 @@ class TvdbProvider extends AbstractTvProvider
             $poster = collect($poster)->where('type', 2)->sortByDesc('score')->first();
             $this->posterUrl = ! empty($poster->image) ? $poster->image : '';
         } catch (ResourceNotFoundException $e) {
-            $this->colorCli->error('Poster image not found on TVDB');
+            cli()->error('Poster image not found on TVDB');
         } catch (UnauthorizedException $error) {
             try {
                 $this->authorizeTvdb();
             } catch (UnauthorizedException $error) {
-                $this->colorCli->error('Not authorized to access TVDB');
+                cli()->error('Not authorized to access TVDB');
             }
         }
 
@@ -395,9 +395,9 @@ class TvdbProvider extends AbstractTvProvider
             $imdbId = $this->client->series()->extended($show->tvdb_id);
             preg_match('/tt(?P<imdbid>\d{6,9})$/i', $imdbId->getIMDBId(), $imdb);
         } catch (ResourceNotFoundException $e) {
-            $this->colorCli->error('Show ImdbId not found on TVDB');
+            cli()->error('Show ImdbId not found on TVDB');
         } catch (\Exception) {
-            $this->colorCli->error('Error on TVDB, aborting');
+            cli()->error('Error on TVDB, aborting');
         }
 
         return [
@@ -435,13 +435,13 @@ class TvdbProvider extends AbstractTvProvider
     {
         $this->token = '';
         if (config('tvdb.api_key') === null || config('tvdb.user_pin') === null) {
-            $this->colorCli->warning('TVDB API key or user pin not set. Running in local mode only!', true);
+            cli()->warning('TVDB API key or user pin not set. Running in local mode only!', true);
             $this->local = true;
         } else {
             try {
                 $this->token = $this->client->authentication()->login(config('tvdb.api_key'), config('tvdb.user_pin'));
             } catch (UnauthorizedException $error) {
-                $this->colorCli->warning('Could not reach TVDB API. Running in local mode only!', true);
+                cli()->warning('Could not reach TVDB API. Running in local mode only!', true);
                 $this->local = true;
             }
 

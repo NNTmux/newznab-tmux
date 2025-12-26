@@ -7,7 +7,6 @@ namespace App\Services\Binaries;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\NNTP\NNTPService;
-use Blacklight\ColorCLI;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -31,8 +30,6 @@ class BinariesService
     private HeaderStorageService $headerStorage;
 
     private MissedPartHandler $missedPartHandler;
-
-    private ColorCLI $colorCli;
 
     private ?NNTPService $nntp = null;
 
@@ -69,7 +66,6 @@ class BinariesService
         ?HeaderParser $headerParser = null,
         ?HeaderStorageService $headerStorage = null,
         ?MissedPartHandler $missedPartHandler = null,
-        ?ColorCLI $colorCli = null,
         ?NNTPService $nntp = null
     ) {
         $this->config = $config ?? BinariesConfig::fromSettings();
@@ -79,7 +75,6 @@ class BinariesService
             $this->config->partRepairLimit,
             $this->config->partRepairMaxTries
         );
-        $this->colorCli = $colorCli ?? new ColorCLI;
         $this->nntp = $nntp;
         $this->startUpdate = now();
     }
@@ -207,17 +202,17 @@ class BinariesService
         }
 
         if ($this->config->echoCli) {
-            $this->colorCli->primary('Processing '.$groupMySQL['name']);
+            cli()->primary('Processing '.$groupMySQL['name']);
         }
 
         // Attempt to repair any missing parts before grabbing new ones
         if ((int) $groupMySQL['last_record'] !== 0 && $this->config->partRepair) {
             if ($this->config->echoCli) {
-                $this->colorCli->primary('Part repair enabled. Checking for missing parts.');
+                cli()->primary('Part repair enabled. Checking for missing parts.');
             }
             $this->partRepair($groupMySQL);
         } elseif ($this->config->echoCli && (int) $groupMySQL['last_record'] !== 0) {
-            $this->colorCli->primary('Part repair disabled by user.');
+            cli()->primary('Part repair disabled by user.');
         }
 
         // Generate postdate for first record, for those that upgraded
@@ -242,7 +237,7 @@ class BinariesService
 
         if ($this->config->echoCli) {
             $endGroup = now()->diffInSeconds($startGroup, true);
-            $this->colorCli->primary(
+            cli()->primary(
                 PHP_EOL.'Group '.$groupMySQL['name'].' processed in '.$endGroup.Str::plural(' second', $endGroup)
             );
         }
@@ -364,7 +359,7 @@ class BinariesService
         }
 
         if ($this->config->echoCli) {
-            $this->colorCli->primary('Attempting to repair '.number_format($missingCount).' parts.');
+            cli()->primary('Attempting to repair '.number_format($missingCount).' parts.');
         }
 
         // Group into continuous ranges
@@ -390,7 +385,7 @@ class BinariesService
         }
 
         if ($this->config->echoCli) {
-            $this->colorCli->primary(PHP_EOL.number_format($partsRepaired).' parts repaired.');
+            cli()->primary(PHP_EOL.number_format($partsRepaired).' parts repaired.');
         }
 
         // Remove articles that exceeded max tries
@@ -474,7 +469,7 @@ class BinariesService
         }
 
         if ($this->config->echoCli) {
-            $this->colorCli->primary(
+            cli()->primary(
                 'Searching for an approximate article number for group '.$data['group'].' '.$days.' days back.'
             );
         }
@@ -596,7 +591,7 @@ class BinariesService
             $first++;
 
             if ($this->config->echoCli) {
-                $this->colorCli->header(
+                cli()->header(
                     PHP_EOL.'Getting '.number_format($last - $first + 1).' articles ('.number_format($first).
                     ' to '.number_format($last).') from '.$groupMySQL['name'].' - ('.
                     number_format($groupLast - $last).' articles in queue).'
@@ -708,7 +703,7 @@ class BinariesService
                 $this->missedPartHandler->addMissingParts($rangeNotReceived, $this->groupMySQL['id']);
 
                 if ($this->config->echoCli) {
-                    $this->colorCli->alternate(
+                    cli()->alternate(
                         'Server did not return '.$notReceivedCount.' articles from '.$this->groupMySQL['name'].'.'
                     );
                 }
@@ -814,7 +809,7 @@ class BinariesService
             $goalCarbon = Carbon::createFromTimestamp($goalTime, date_default_timezone_get());
             $articleCarbon = Carbon::createFromTimestamp($articleTime, date_default_timezone_get());
             $diffDays = $goalCarbon->diffInDays($articleCarbon, true);
-            $this->colorCli->primary(
+            cli()->primary(
                 PHP_EOL.'Found article #'.$wantedArticle.' which has a date of '.date('r', $articleTime).
                 ', vs wanted date of '.date('r', $goalTime).'. Difference from goal is '.$diffDays.' days.'
             );
@@ -828,7 +823,7 @@ class BinariesService
     private function outputNoNewArticles(array $groupMySQL, array $groupNNTP, array $range): void
     {
         if ($this->config->echoCli) {
-            $this->colorCli->primary(
+            cli()->primary(
                 'No new articles for '.$groupMySQL['name'].' (first '.number_format((int) $range['first']).
                 ', last '.number_format((int) $range['last']).', grouplast '.number_format((int) $groupMySQL['last_record']).
                 ', total '.number_format((int) $range['total']).")\n".'Server oldest: '.number_format((int) $groupNNTP['first']).
@@ -850,7 +845,7 @@ class BinariesService
                   : number_format($this->config->newGroupMessagesToScan).' messages').' worth.'
             : 'Group '.$groupNNTP['group'].' has '.number_format((int) $range['realTotal']).' new articles.';
 
-        $this->colorCli->primary(
+        cli()->primary(
             $message.
             ' Leaving '.number_format((int) $range['leaveOver']).
             " for next pass.\nServer oldest: ".number_format((int) $groupNNTP['first']).
@@ -861,7 +856,7 @@ class BinariesService
 
     private function outputHeaderInitial(): void
     {
-        $this->colorCli->primary(
+        cli()->primary(
             'Received '.\count($this->headersReceived).
             ' articles of '.number_format($this->last - $this->first + 1).' requested, '.
             $this->headersBlackListed.' blacklisted, '.$this->notYEnc.' not yEnc.'
@@ -875,16 +870,16 @@ class BinariesService
         }
 
         $currentMicroTime = now();
-        $this->colorCli->alternateOver(number_format($this->timeHeaders, 2).'s').
-        $this->colorCli->primaryOver(' to download articles, ').
-        $this->colorCli->alternateOver(number_format($this->timeCleaning, 2).'s').
-        $this->colorCli->primaryOver(' to process collections, ').
-        $this->colorCli->alternateOver(number_format($this->timeInsert, 2).'s').
-        $this->colorCli->primaryOver(' to insert binaries/parts, ').
-        $this->colorCli->alternateOver(number_format($currentMicroTime->diffInSeconds($this->startPR, true), 2).'s').
-        $this->colorCli->primaryOver(' for part repair, ').
-        $this->colorCli->alternateOver(number_format($currentMicroTime->diffInSeconds($this->startLoop, true), 2).'s').
-        $this->colorCli->primary(' total.');
+        cli()->alternateOver(number_format($this->timeHeaders, 2).'s').
+        cli()->primaryOver(' to download articles, ').
+        cli()->alternateOver(number_format($this->timeCleaning, 2).'s').
+        cli()->primaryOver(' to process collections, ').
+        cli()->alternateOver(number_format($this->timeInsert, 2).'s').
+        cli()->primaryOver(' to insert binaries/parts, ').
+        cli()->alternateOver(number_format($currentMicroTime->diffInSeconds($this->startPR, true), 2).'s').
+        cli()->primaryOver(' for part repair, ').
+        cli()->alternateOver(number_format($currentMicroTime->diffInSeconds($this->startLoop, true), 2).'s').
+        cli()->primary(' total.');
     }
 
     // ==================== Logging Methods ====================
@@ -892,14 +887,14 @@ class BinariesService
     private function log(string $message, string $method, string $color): void
     {
         if ($this->config->echoCli) {
-            $this->colorCli->$color($message.' ['.__CLASS__."::$method]");
+            cli()->$color($message.' ['.__CLASS__."::$method]");
         }
     }
 
     private function logError(string $message): void
     {
         if ($this->config->echoCli) {
-            $this->colorCli->error($message);
+            cli()->error($message);
         }
         if (config('app.debug')) {
             Log::error($message);

@@ -5,7 +5,6 @@ namespace App\Services\Tmux;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Services\NameFixing\NameFixingService;
-use Blacklight\ColorCLI;
 use Blacklight\Nfo;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -22,15 +21,12 @@ class Tmux
 
     public $tmux_session;
 
-    protected ColorCLI $colorCli;
-
     /**
      * Tmux constructor.
      */
     public function __construct()
     {
         $this->pdo = DB::connection()->getPdo();
-        $this->colorCli = new ColorCLI;
     }
 
     /**
@@ -417,12 +413,12 @@ class Tmux
         if ($this->isRunning()) {
             Settings::query()->where(['name' => 'running'])->update(['value' => 0]);
             $sleep = Settings::settingValue('monitor_delay');
-            $this->colorCli->header('Stopping tmux scripts and waiting '.$sleep.' seconds for all panes to shutdown');
+            cli()->header('Stopping tmux scripts and waiting '.$sleep.' seconds for all panes to shutdown');
             sleep($sleep);
 
             return true;
         }
-        $this->colorCli->info('Tmux scripts are not running!');
+        cli()->info('Tmux scripts are not running!');
 
         return false;
     }

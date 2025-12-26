@@ -2,7 +2,6 @@
 
 namespace App\Services\Tmux;
 
-use Blacklight\ColorCLI;
 use Illuminate\Support\Facades\Process;
 
 /**
@@ -482,8 +481,8 @@ class TmuxOutput extends Tmux
             ['Slow', '/.*\bSlow[^:]*?: (\d+)\b.*/'],
             ['QPS', '/.*\bQueries[^:]*?: (\d+)\b.*/'],
         ] as $v) {
-            $pieces[] = $this->colorCli->ansiString($v[0].' = ', 'green').
-                $this->colorCli->ansiString(preg_replace($v[1], '$1', $info), 'yellow');
+            $pieces[] = cli()->ansiString($v[0].' = ', 'green').
+                cli()->ansiString(preg_replace($v[1], '$1', $info), 'yellow');
         }
         $buffer .= PHP_EOL.implode(', ', $pieces).PHP_EOL;
 
@@ -516,12 +515,12 @@ class TmuxOutput extends Tmux
 
     protected function _setColourMasks(): void
     {
-        $this->_colourMasks[1] = $this->colorCli->ansiString('%-18s', 'yellow').' '.$this->colorCli->ansiString('%-60.60s', 'yellow').PHP_EOL;
-        $this->_colourMasks['2.0'] = $this->colorCli->ansiString('%-20s', 'magenta').' '.$this->colorCli->ansiString('%-33.33s', 'yellow').PHP_EOL;
-        $this->_colourMasks['2.1'] = $this->colorCli->ansiString('%-20s', 'yellow').' '.$this->colorCli->ansiString('%-33.33s', 'yellow').PHP_EOL;
-        $this->_colourMasks[3] = $this->colorCli->ansiString('%-16.16s %25.25s %25.25s', 'yellow').PHP_EOL;
-        $this->_colourMasks[4] = $this->colorCli->ansiString('%-16.16s', 'green').' '.$this->colorCli->ansiString('%25.25s %25.25s', 'yellow').PHP_EOL;
-        $this->_colourMasks[5] = $this->colorCli->ansiString('%-16.16s %25.25s %25.25s', 'yellow').PHP_EOL;
+        $this->_colourMasks[1] = cli()->ansiString('%-18s', 'yellow').' '.cli()->ansiString('%-60.60s', 'yellow').PHP_EOL;
+        $this->_colourMasks['2.0'] = cli()->ansiString('%-20s', 'magenta').' '.cli()->ansiString('%-33.33s', 'yellow').PHP_EOL;
+        $this->_colourMasks['2.1'] = cli()->ansiString('%-20s', 'yellow').' '.cli()->ansiString('%-33.33s', 'yellow').PHP_EOL;
+        $this->_colourMasks[3] = cli()->ansiString('%-16.16s %25.25s %25.25s', 'yellow').PHP_EOL;
+        $this->_colourMasks[4] = cli()->ansiString('%-16.16s', 'green').' '.cli()->ansiString('%25.25s %25.25s', 'yellow').PHP_EOL;
+        $this->_colourMasks[5] = cli()->ansiString('%-16.16s %25.25s %25.25s', 'yellow').PHP_EOL;
     }
 }
 

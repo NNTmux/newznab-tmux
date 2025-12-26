@@ -9,7 +9,6 @@ use App\Models\TvEpisode;
 use App\Models\TvInfo;
 use App\Models\Video;
 use App\Services\Releases\ReleaseBrowseService;
-use Blacklight\ColorCLI;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -66,8 +65,6 @@ abstract class AbstractTvProvider extends BaseVideoProvider
      */
     public string $catWhere;
 
-    protected ColorCLI $colorCli;
-
     /**
      * AbstractTvProvider constructor.
      *
@@ -76,7 +73,6 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     public function __construct()
     {
         parent::__construct();
-        $this->colorCli = new ColorCLI;
         $this->catWhere = 'categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER.' AND categories_id != '.Category::TV_ANIME;
         $this->tvqty = Settings::settingValue('maxrageprocessed') !== '' ? (int) Settings::settingValue('maxrageprocessed') : 75;
         $this->imgSavePath = storage_path('covers/tvshows/');

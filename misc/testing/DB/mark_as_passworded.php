@@ -2,7 +2,7 @@
 
 use App\Models\Release;
 use App\Models\ReleaseFile;
-use Blacklight\ColorCLI;
+
 use Blacklight\Releases;
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
@@ -22,4 +22,4 @@ if ($passFiles->isNotEmpty()) {
         }
     }
 }
-(new ColorCLI)->info($count2.' releases marked as passworded');
+cli()->info($count2.' releases marked as passworded');

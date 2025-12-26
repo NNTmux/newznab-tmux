@@ -3,7 +3,6 @@
 namespace App\Services\Tmux;
 
 use App\Models\Settings;
-use Blacklight\ColorCLI;
 
 /**
  * Service for running tasks in tmux panes
@@ -12,15 +11,12 @@ class TmuxTaskRunner
 {
     protected TmuxPaneManager $paneManager;
 
-    protected ColorCLI $colorCli;
-
     protected string $sessionName;
 
     public function __construct(string $sessionName)
     {
         $this->sessionName = $sessionName;
         $this->paneManager = new TmuxPaneManager($sessionName);
-        $this->colorCli = new ColorCLI;
     }
 
     /**
@@ -601,7 +597,7 @@ class TmuxTaskRunner
             } else {
                 // Log that TV processing was skipped due to no work
                 if ($this->echooutput ?? true) {
-                    $this->colorCli->notice('Skipping TV processing - no work available');
+                    cli()->notice('Skipping TV processing - no work available');
                 }
             }
         }

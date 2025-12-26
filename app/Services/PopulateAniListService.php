@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Models\AnidbInfo;
 use App\Models\AnidbTitle;
-use Blacklight\ColorCLI;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -49,15 +48,12 @@ class PopulateAniListService
      */
     private static ?array $rateLimitPause = null;
 
-    protected ColorCLI $colorCli;
-
     /**
      * @throws \Exception
      */
     public function __construct()
     {
         $this->echooutput = config('nntmux.echocli');
-        $this->colorCli = new ColorCLI;
 
         // Use storage_path directly to match CoverController expectations
         $this->imgSavePath = storage_path('covers/anime/');
@@ -305,7 +301,7 @@ class PopulateAniListService
             if ($now < $pausedUntil) {
                 $remainingSeconds = $pausedUntil - $now;
                 if ($this->echooutput) {
-                    $this->colorCli->warning("API calls paused due to 429 error. Resuming in {$remainingSeconds} seconds...");
+                    cli()->warning("API calls paused due to 429 error. Resuming in {$remainingSeconds} seconds...");
                 }
 
                 // Throw exception to stop processing
@@ -339,7 +335,7 @@ class PopulateAniListService
                 ];
 
                 if ($this->echooutput) {
-                    $this->colorCli->error('AniList API returned 429 (Too Many Requests). Pausing all API calls for 15 minutes.');
+                    cli()->error('AniList API returned 429 (Too Many Requests). Pausing all API calls for 15 minutes.');
                 }
 
                 return false;
@@ -367,7 +363,7 @@ class PopulateAniListService
 
             if (isset($body['errors'])) {
                 if ($this->echooutput) {
-                    $this->colorCli->error('AniList API Error: '.json_encode($body['errors']));
+                    cli()->error('AniList API Error: '.json_encode($body['errors']));
                 }
 
                 return false;
@@ -385,20 +381,20 @@ class PopulateAniListService
                 ];
 
                 if ($this->echooutput) {
-                    $this->colorCli->error('AniList API returned 429 (Too Many Requests). Pausing all API calls for 15 minutes.');
+                    cli()->error('AniList API returned 429 (Too Many Requests). Pausing all API calls for 15 minutes.');
                 }
 
                 throw new \Exception("AniList API rate limit exceeded (429). Paused until " . date('Y-m-d H:i:s', $pauseUntil));
             }
 
             if ($this->echooutput) {
-                $this->colorCli->error('AniList API Request Failed: '.$e->getMessage());
+                cli()->error('AniList API Request Failed: '.$e->getMessage());
             }
 
             return false;
         } catch (GuzzleException $e) {
             if ($this->echooutput) {
-                $this->colorCli->error('AniList API Request Failed: '.$e->getMessage());
+                cli()->error('AniList API Request Failed: '.$e->getMessage());
             }
 
             return false;
@@ -428,7 +424,7 @@ class PopulateAniListService
 
                 if ($waitTime > 0 && $waitTime <= 60) {
                     if ($this->echooutput) {
-                        $this->colorCli->warning("Rate limit approaching. Waiting {$waitTime} seconds...");
+                        cli()->warning("Rate limit approaching. Waiting {$waitTime} seconds...");
                     }
                     sleep($waitTime);
                 }
@@ -659,15 +655,15 @@ class PopulateAniListService
             chmod($coverPath, 0644);
 
             if ($this->echooutput) {
-                $this->colorCli->info("Downloaded cover image for ID {$anidbid} from AniList to {$coverPath}");
+                cli()->info("Downloaded cover image for ID {$anidbid} from AniList to {$coverPath}");
             }
         } catch (GuzzleException $e) {
             if ($this->echooutput) {
-                $this->colorCli->warning("Failed to download cover image for ID {$anidbid}: ".$e->getMessage());
+                cli()->warning("Failed to download cover image for ID {$anidbid}: ".$e->getMessage());
             }
         } catch (\Exception $e) {
             if ($this->echooutput) {
-                $this->colorCli->error("Error saving cover image for ID {$anidbid}: ".$e->getMessage());
+                cli()->error("Error saving cover image for ID {$anidbid}: ".$e->getMessage());
             }
         }
     }
@@ -713,7 +709,7 @@ class PopulateAniListService
 
             if ($anilistData === false) {
                 if ($this->echooutput) {
-                    $this->colorCli->info("Anime with AniList ID: {$anilistId} not found.");
+                    cli()->info("Anime with AniList ID: {$anilistId} not found.");
                 }
 
                 return;

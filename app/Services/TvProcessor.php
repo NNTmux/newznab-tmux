@@ -9,7 +9,6 @@ use App\Services\TvProcessing\Providers\TmdbProvider;
 use App\Services\TvProcessing\Providers\TraktProvider;
 use App\Services\TvProcessing\Providers\TvdbProvider;
 use App\Services\TvProcessing\Providers\TvMazeProvider;
-use Blacklight\ColorCLI;
 
 class TvProcessor
 {
@@ -19,8 +18,6 @@ class TvProcessor
     public const MODE_PARALLEL = 'parallel';  // Parallel processing (faster, more API calls)
 
     private bool $echooutput;
-
-    private ColorCLI $colorCli;
 
     /**
      * @var array<int, array{name: string, factory: callable, status: int}>
@@ -36,7 +33,6 @@ class TvProcessor
     public function __construct(bool $echooutput)
     {
         $this->echooutput = $echooutput;
-        $this->colorCli = new ColorCLI;
         $this->providers = $this->buildProviderPipeline();
     }
 
@@ -287,7 +283,7 @@ class TvProcessor
             return;
         }
 
-        $this->colorCli->header('Processing '.$total.' TV release(s) via '.$providerName.'.');
+        cli()->header('Processing '.$total.' TV release(s) via '.$providerName.'.');
     }
 
     /**

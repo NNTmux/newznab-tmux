@@ -4,7 +4,7 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Services\TvProcessing\Providers\TvdbProvider;
 
-$c = new Blacklight\ColorCLI;
+
 $tvDB = new TvdbProvider;
 
 if (! empty($argv[1]) && isset($argv[2], $argv[3]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
@@ -57,12 +57,12 @@ if (! empty($argv[1]) && isset($argv[2], $argv[3]) && is_numeric($argv[2]) && is
                 }
             }
         } else {
-            exit($c->error('Invalid episode data returned from TVDB API.'));
+            exit(cli()->error('Invalid episode data returned from TVDB API.'));
         }
     } else {
-        exit($c->error('Invalid show data returned from TVDB API.'));
+        exit(cli()->error('Invalid show data returned from TVDB API.'));
     }
 } else {
-    exit($c->error('Invalid arguments. This script requires a text string (show name) followed by a season and episode number.')
+    exit(cli()->error('Invalid arguments. This script requires a text string (show name) followed by a season and episode number.')
     );
 }

@@ -1,28 +1,26 @@
 <?php
 namespace App\Services\AdditionalProcessing;
-use Blacklight\ColorCLI;
+
 /**
  * Service for CLI output during additional processing.
  * Centralizes all echo/output functionality.
  */
 class ConsoleOutputService
 {
-    private ColorCLI $colorCLI;
     public function __construct(
         private readonly bool $echoCLI = false
     ) {
-        $this->colorCLI = new ColorCLI();
     }
     public function echo(string $message, string $type = 'primary'): void
     {
         if ($this->echoCLI) {
-            $this->colorCLI->$type($message);
+            cli()->$type($message);
         }
     }
     public function debug(string $message): void
     {
         if ($this->echoCLI && config('app.env') === 'local' && config('app.debug') === true) {
-            $this->colorCLI->debug('DEBUG: '.$message);
+            cli()->debug('DEBUG: '.$message);
         }
     }
     public function echoDescription(int $totalReleases): void

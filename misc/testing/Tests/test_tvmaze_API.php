@@ -4,7 +4,7 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Services\TvProcessing\Providers\TvMazeProvider;
 
-$c = new Blacklight\ColorCLI;
+
 $tvmaze = new TvMazeProvider;
 
 if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
@@ -19,7 +19,7 @@ if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
 
     // Use the first show found (highest match) and get the requested season/episode from $argv
     if ($series) {
-        echo PHP_EOL.$c->info('Server Time: '.$serverTime).PHP_EOL;
+        echo PHP_EOL.cli()->info('Server Time: '.$serverTime).PHP_EOL;
         print_r($series[0]);
 
         if ($season > 0 and $episode > 0) {
@@ -36,11 +36,11 @@ if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
                 }
             }
         } else {
-            exit($c->error('Invalid episode data returned from TVMaze API.'));
+            exit(cli()->error('Invalid episode data returned from TVMaze API.'));
         }
     } else {
-        exit($c->error('Invalid show data returned from TVMaze API.'));
+        exit(cli()->error('Invalid show data returned from TVMaze API.'));
     }
 } else {
-    exit($c->error('Invalid arguments.  This script requires a text string (show name) followed by a season and episode number.'));
+    exit(cli()->error('Invalid arguments.  This script requires a text string (show name) followed by a season and episode number.'));
 }

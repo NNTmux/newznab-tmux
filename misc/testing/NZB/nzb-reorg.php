@@ -4,14 +4,14 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\Settings;
 use App\Services\Nzb\NzbService;
-use Blacklight\ColorCLI;
+
 
 if (! isset($argv[1]) || ! isset($argv[2])) {
     exit("ERROR: You must supply the level you want to reorganize it to, and the source directory  (You would use: 3 .../newznab/resources/nzb/ to move it to 3 levels deep)\n");
 }
 
 $nzb = app(NzbService::class);
-$consoleTools = new ColorCLI;
+
 
 $newLevel = $argv[1];
 $sourcePath = $argv[2];
@@ -39,9 +39,9 @@ foreach ($objects as $filestoprocess => $nzbFile) {
     }
     $iFilesProcessed++;
     if ($iFilesProcessed % 100 == 0) {
-        $consoleTools->overWrite("Reorganized $iFilesProcessed");
+        cli()->overWrite("Reorganized $iFilesProcessed");
     }
 }
 
 Settings::query()->where(['name' => 'nzbsplitlevel'])->update(['value' => $argv[1]]);
-$consoleTools->overWrite("Processed $iFilesProcessed nzbs in ".$time->diffForHumans()."\n");
+cli()->overWrite("Processed $iFilesProcessed nzbs in ".$time->diffForHumans()."\n");

@@ -64,11 +64,11 @@ class ReleasesRunner extends BaseRunner
 
                 foreach ($results as $groupId => $output) {
                     echo $output;
-                    $this->colorCli->primary('Finished performing release processing for group ID: '.$groupId);
+                    cli()->primary('Finished performing release processing for group ID: '.$groupId);
                 }
             } catch (\Throwable $e) {
                 Log::error('Release processing batch failed: '.$e->getMessage());
-                $this->colorCli->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
+                cli()->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
             }
         }
     }
@@ -114,11 +114,11 @@ class ReleasesRunner extends BaseRunner
                 foreach ($results as $groupId => $output) {
                     echo $output;
                     $name = UsenetGroup::getNameByID($groupId);
-                    $this->colorCli->primary('Finished updating binaries, processing releases and additional postprocessing for group: '.$name);
+                    cli()->primary('Finished updating binaries, processing releases and additional postprocessing for group: '.$name);
                 }
             } catch (\Throwable $e) {
                 Log::error('Update per group batch failed: '.$e->getMessage());
-                $this->colorCli->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
+                cli()->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
             }
         }
     }
@@ -186,11 +186,11 @@ class ReleasesRunner extends BaseRunner
 
                 foreach ($results as $taskIdx => $output) {
                     echo $output;
-                    $this->colorCli->primary('Task #'.$taskIdx.' Finished fixing releases names');
+                    cli()->primary('Task #'.$taskIdx.' Finished fixing releases names');
                 }
             } catch (\Throwable $e) {
                 Log::error('Fix rel names batch failed: '.$e->getMessage());
-                $this->colorCli->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
+                cli()->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
             }
         }
     }

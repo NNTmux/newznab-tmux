@@ -5,12 +5,12 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 use App\Models\Category;
 use App\Models\Release;
 use App\Services\Categorization\CategorizationService;
-use Blacklight\ColorCLI;
 
-$colorCli = new ColorCLI;
+
+
 
 if (! (isset($argv[1]) && ($argv[1] === 'all' || $argv[1] === 'misc' || preg_match('/\([\d, ]+\)/', $argv[1]) || is_numeric($argv[1])))) {
-    $colorCli->error(
+    cli()->error(
         "\nThis script will attempt to re-categorize releases and is useful if changes have been made to Category.php.\n"
         ."No updates will be done unless the category changes\n"
         ."An optional last argument, false, will display the number of category changes that would be made\n"
@@ -27,22 +27,22 @@ reCategorize($argv);
 
 function reCategorize($argv): void
 {
-    $colorCli = new ColorCLI;
+    
 
     if (isset($argv[1]) && (is_numeric($argv[1]) || preg_match('/\([\d, ]+\)/', $argv[1]))) {
-        $colorCli->header('Categorizing all releases in '.$argv[1].' using searchname. This can take a while, be patient.');
+        cli()->header('Categorizing all releases in '.$argv[1].' using searchname. This can take a while, be patient.');
     } elseif (isset($argv[1]) && $argv[1] === 'misc') {
-        $colorCli->header('Categorizing all releases in misc categories using searchname. This can take a while, be patient.');
+        cli()->header('Categorizing all releases in misc categories using searchname. This can take a while, be patient.');
     } else {
-        $colorCli->header('Categorizing all releases using searchname. This can take a while, be patient.');
+        cli()->header('Categorizing all releases using searchname. This can take a while, be patient.');
     }
     $timeStart = now();
     $chgCount = categorizeRelease($argv, true);
     $time = now()->diffInSeconds($timeStart, true);
     if (! isset($argv[2])) {
-        $colorCli->header('Finished re-categorizing '.number_format($chgCount).' releases in '.$time.' seconds, using the searchname.').PHP_EOL;
+        cli()->header('Finished re-categorizing '.number_format($chgCount).' releases in '.$time.' seconds, using the searchname.').PHP_EOL;
     } else {
-        $colorCli->header('Finished re-categorizing in '.$time.' seconds , using the searchname.'.PHP_EOL
+        cli()->header('Finished re-categorizing in '.$time.' seconds , using the searchname.'.PHP_EOL
             .'This would have changed '.number_format($chgCount).' releases but no updates were done.').PHP_EOL;
     }
 }
@@ -62,9 +62,9 @@ function categorizeRelease($argv, $echoOutput = false): int
         $update = false;
     }
     $total = $query->count();
-    $colorCli = new ColorCLI;
-    $colorCli->header('Categorizing ['.$total.'] releases. This can take a while, be patient.');
-    $consoleTools = new ColorCLI;
+    
+    cli()->header('Categorizing ['.$total.'] releases. This can take a while, be patient.');
+    
     $relCount = $chgCount = 0;
     if ($total > 0) {
         $query->chunk('100', function ($results) use ($update, $relCount, $chgCount) {
@@ -104,7 +104,7 @@ function categorizeRelease($argv, $echoOutput = false): int
         });
 
         if ($echoOutput) {
-            $consoleTools->overWritePrimary('Re-Categorized: ['.number_format($chgCount).'] '.$consoleTools->percentString($relCount, $total).PHP_EOL);
+            cli()->overWritePrimary('Re-Categorized: ['.number_format($chgCount).'] '.cli()->percentString($relCount, $total).PHP_EOL);
         }
     }
 

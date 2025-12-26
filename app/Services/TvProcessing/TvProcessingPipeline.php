@@ -12,7 +12,6 @@ use App\Services\TvProcessing\Pipes\TmdbPipe;
 use App\Services\TvProcessing\Pipes\TraktPipe;
 use App\Services\TvProcessing\Pipes\TvdbPipe;
 use App\Services\TvProcessing\Pipes\TvMazePipe;
-use Blacklight\ColorCLI;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 
@@ -31,7 +30,6 @@ class TvProcessingPipeline
 
     protected int $tvqty;
     protected bool $echoOutput;
-    protected ColorCLI $colorCli;
 
     protected array $stats = [
         'processed' => 0,
@@ -55,7 +53,6 @@ class TvProcessingPipeline
             : 75;
 
         $this->echoOutput = $echoOutput;
-        $this->colorCli = new ColorCLI();
     }
 
     /**
@@ -118,13 +115,13 @@ class TvProcessingPipeline
 
         if ($totalCount === 0) {
             if ($this->echoOutput) {
-                $this->colorCli->header('No TV releases to process.');
+                cli()->header('No TV releases to process.');
             }
             return;
         }
 
         if ($this->echoOutput) {
-            $this->colorCli->header('Processing '.$totalCount.' TV release(s).');
+            cli()->header('Processing '.$totalCount.' TV release(s).');
         }
 
         foreach ($releases as $release) {
@@ -254,7 +251,7 @@ class TvProcessingPipeline
             return;
         }
 
-        $this->colorCli->header(sprintf(
+        cli()->header(sprintf(
             'TV processing complete: %d processed, %d matched, %d failed (%.2fs)',
             $this->stats['processed'],
             $this->stats['matched'],
@@ -267,7 +264,7 @@ class TvProcessingPipeline
             foreach ($this->stats['providers'] as $provider => $count) {
                 $providerSummary[] = "$provider: $count";
             }
-            $this->colorCli->primary('Matches by provider: '.implode(', ', $providerSummary));
+            cli()->primary('Matches by provider: '.implode(', ', $providerSummary));
         }
     }
 

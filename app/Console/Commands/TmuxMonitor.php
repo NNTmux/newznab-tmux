@@ -8,7 +8,6 @@ use App\Services\Tmux\TmuxMonitorService;
 use App\Services\Tmux\TmuxSessionManager;
 use App\Services\Tmux\TmuxTaskRunner;
 use App\Services\Tmux\TmuxOutput;
-use Blacklight\ColorCLI;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -38,14 +37,11 @@ class TmuxMonitor extends Command
 
     private TmuxOutput $tmuxOutput;
 
-    private ColorCLI $colorCli;
-
     /**
      * Execute the console command.
      */
     public function handle(): int
     {
-        $this->colorCli = new ColorCLI;
 
         try {
             // Reset old collections if requested
@@ -71,7 +67,7 @@ class TmuxMonitor extends Command
                 return Command::FAILURE;
             }
 
-            $this->colorCli->header('Starting Tmux Monitor');
+            cli()->header('Starting Tmux Monitor');
             $this->info("📊 Monitoring session: {$sessionName}");
 
             // Initialize monitor
@@ -124,7 +120,7 @@ class TmuxMonitor extends Command
     {
         $delayTime = (int) (Settings::settingValue('delaytime') ?? 2);
 
-        $this->colorCli->header('Resetting expired collections...');
+        cli()->header('Resetting expired collections...');
 
         try {
             DB::transaction(function () use ($delayTime) {

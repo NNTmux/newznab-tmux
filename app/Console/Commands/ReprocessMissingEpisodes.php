@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Models\Category;
 use App\Models\Release;
 use App\Services\TvProcessing\TvProcessingPipeline;
-use Blacklight\ColorCLI;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -34,12 +33,9 @@ class ReprocessMissingEpisodes extends Command
      */
     protected $description = 'Reprocess TV releases with matched shows but missing episode matches (videos_id > 0, tv_episodes_id = 0)';
 
-    protected ColorCLI $colorCli;
-
     public function __construct()
     {
         parent::__construct();
-        $this->colorCli = new ColorCLI();
     }
 
     /**
@@ -137,7 +133,7 @@ class ReprocessMissingEpisodes extends Command
                         $matched++;
                         if ($debug) {
                             $this->newLine();
-                            $this->colorCli->primary("Episode matched: {$release->searchname}");
+                            cli()->primary("Episode matched: {$release->searchname}");
                             $this->info('  Provider: ' . ($result['provider'] ?? 'Unknown'));
                             $this->info('  Video ID: ' . ($result['video_id'] ?? 'N/A'));
                             $this->info('  Episode ID: ' . ($result['episode_id'] ?? 'N/A'));
@@ -146,7 +142,7 @@ class ReprocessMissingEpisodes extends Command
                         $failed++;
                         if ($debug) {
                             $this->newLine();
-                            $this->colorCli->warning("Episode not found: {$release->searchname}");
+                            cli()->warning("Episode not found: {$release->searchname}");
                         }
                     }
                 } catch (\Throwable $e) {

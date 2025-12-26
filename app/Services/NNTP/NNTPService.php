@@ -5,7 +5,6 @@ namespace App\Services\NNTP;
 use App\Extensions\util\PhpYenc;
 use App\Models\Settings;
 use App\Services\Tmux\Tmux;
-use Blacklight\ColorCLI;
 
 /*
  * Response codes not defined in Net_NNTP
@@ -23,8 +22,6 @@ defined('NET_NNTP_PROTOCOL_RESPONSECODE_TLS_FAILED_NEGOTIATION') || define('NET_
  */
 class NNTPService extends \Net_NNTP_Client
 {
-    protected ColorCLI $colorCli;
-
     protected bool $_debugBool;
 
     protected bool $_echo;
@@ -140,14 +137,13 @@ class NNTPService extends \Net_NNTP_Client
     /**
      * Create a new NNTP service instance.
      */
-    public function __construct(?ColorCLI $colorCli = null, ?Tmux $tmux = null)
+    public function __construct(?Tmux $tmux = null)
     {
         parent::__construct();
 
         $this->_echo = config('nntmux.echocli');
         $this->_tmux = $tmux ?? new Tmux;
         $this->_nntpRetries = Settings::settingValue('nntpretries') !== '' ? (int) Settings::settingValue('nntpretries') : 0 + 1;
-        $this->colorCli = $colorCli ?? new ColorCLI;
 
         $this->initializeConfig();
     }
@@ -275,7 +271,7 @@ class NNTPService extends \Net_NNTP_Client
                     ': '.
                     $cError;
 
-                return $this->throwError($this->colorCli->error($message));
+                return $this->throwError(cli()->error($message));
             }
 
             // If we are connected, try to authenticate.
@@ -313,7 +309,7 @@ class NNTPService extends \Net_NNTP_Client
                             $userName.
                             ' ('.$aError.')';
 
-                        return $this->throwError($this->colorCli->error($message));
+                        return $this->throwError(cli()->error($message));
                     }
                 }
             }
@@ -337,7 +333,7 @@ class NNTPService extends \Net_NNTP_Client
         // If we somehow got out of the loop, return an error.
         $message = 'Unable to connect to '.$this->_currentServer.$enc;
 
-        return $this->throwError($this->colorCli->error($message));
+        return $this->throwError(cli()->error($message));
     }
 
     /**
@@ -660,7 +656,7 @@ class NNTPService extends \Net_NNTP_Client
         } else {
             $message = 'Wrong Identifier type, array, int or string accepted. This type of var was passed: '.gettype($identifiers);
 
-            return $this->throwError($this->colorCli->error($message));
+            return $this->throwError(cli()->error($message));
         }
 
         if ($aConnected === true) {
@@ -815,7 +811,7 @@ class NNTPService extends \Net_NNTP_Client
             $message = "Code {$data->code}: {$data->message}\nSkipping group: {$group}";
 
             if ($this->_echo) {
-                $this->colorCli->error($message);
+                cli()->error($message);
             }
             $nntp->doQuit();
         }
@@ -961,7 +957,7 @@ class NNTPService extends \Net_NNTP_Client
                     if (! empty($deComp)) {
                         $bytesReceived = \strlen($data);
                         if ($this->_echo && $bytesReceived > 10240) {
-                            $this->colorCli->primaryOver(
+                            cli()->primaryOver(
                                 'Received '.round($bytesReceived / 1024).
                                 'KB from group ('.$this->group().').'
                             );
@@ -974,7 +970,7 @@ class NNTPService extends \Net_NNTP_Client
                     }
                     $message = 'Decompression of OVER headers failed.';
 
-                    return $this->throwError($this->colorCli->error($message), 1000);
+                    return $this->throwError(cli()->error($message), 1000);
                 }
                 // The buffer was not empty, so we know this was not the real ending, so reset $possibleTerm.
                 $possibleTerm = false;
@@ -993,7 +989,7 @@ class NNTPService extends \Net_NNTP_Client
                 if (empty($buffer)) {
                     $message = 'Error fetching data from usenet server while downloading OVER headers.';
 
-                    return $this->throwError($this->colorCli->error($message), 1000);
+                    return $this->throwError(cli()->error($message), 1000);
                 }
             }
 
@@ -1010,7 +1006,7 @@ class NNTPService extends \Net_NNTP_Client
 
         $message = 'Unspecified error while downloading OVER headers.';
 
-        return $this->throwError($this->colorCli->error($message), 1000);
+        return $this->throwError(cli()->error($message), 1000);
     }
 
     /**

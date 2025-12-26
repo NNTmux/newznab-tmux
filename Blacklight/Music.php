@@ -65,16 +65,10 @@ class Music
      */
     public $failCache;
 
-    /**
-     * @var ColorCLI
-     */
-    protected $colorCli;
-
     public function __construct()
     {
         $this->echooutput = config('nntmux.echocli');
 
-        $this->colorCli = new ColorCLI;
 
         $this->pubkey = Settings::settingValue('amazonpubkey');
         $this->privkey = Settings::settingValue('amazonprivkey');
@@ -355,7 +349,7 @@ class Music
 
         if ($musicId) {
             if ($this->echooutput) {
-                $this->colorCli->header(
+                cli()->header(
                     PHP_EOL.'Added/updated album: '.PHP_EOL.
                     '   Artist: '.
                     $mus['artist'].PHP_EOL.
@@ -373,7 +367,7 @@ class Music
                 $artist = 'Artist: '.$mus['artist'].', Album: ';
             }
 
-            $this->colorCli->headerOver(
+            cli()->headerOver(
                 'Nothing to update: '.
                 $artist.
                 $mus['title'].
@@ -418,7 +412,7 @@ class Music
                     $newname = $album['name'].' ('.$album['year'].')';
 
                     if ($this->echooutput) {
-                        $this->colorCli->info('Looking up: '.$newname);
+                        cli()->info('Looking up: '.$newname);
                     }
 
                     // Do a local lookup first
@@ -427,7 +421,7 @@ class Music
                     if ($musicCheck === null && \in_array($album['name'].$album['year'], $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
-                            $this->colorCli->headerOver('Cached previous failure. Skipping.');
+                            cli()->headerOver('Cached previous failure. Skipping.');
                         }
                         $albumId = -2;
                     } elseif ($musicCheck === null && $local === false) {
@@ -459,7 +453,7 @@ class Music
                 echo PHP_EOL;
             }
         } elseif ($this->echooutput) {
-            $this->colorCli->header('No music releases to process.');
+            cli()->header('No music releases to process.');
         }
     }
 

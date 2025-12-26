@@ -2,7 +2,7 @@
 
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\ColorCLI;
+
 use Blacklight\ReleaseRemover;
 
 // New line for CLI.
@@ -11,12 +11,12 @@ $n = PHP_EOL;
 // Include config.php
 
 // ColorCLI class.
-$cli = new ColorCLI;
+
 
 // Print arguments/usage.
 $totalArgs = count($argv);
 if ($totalArgs < 2) {
-    exit($cli->info(
+    exit(cli()->info(
         $n.
         'This deletes releases based on a list of criteria you pass.'.$n.
         'Usage:'.$n.$n.

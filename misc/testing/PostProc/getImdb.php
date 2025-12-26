@@ -4,19 +4,19 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Services\MovieService;
-use Blacklight\ColorCLI;
+
 use Illuminate\Support\Facades\DB;
 
 $pdo = DB::connection()->getPdo();
 $movie = new MovieService();
 $movie->echooutput = true;
-$colorCli = new ColorCLI;
+
 
 $movies = $pdo->query('SELECT imdbid FROM movieinfo WHERE tmdbid = 0 ORDER BY id ASC');
 if ($movies instanceof Traversable) {
     $count = $movies->rowCount();
     if ($count > 0) {
-        $colorCli->header('Updating movie info for '.number_format($count).' movies.');
+        cli()->header('Updating movie info for '.number_format($count).' movies.');
 
         foreach ($movies as $mov) {
             $startTime = now()->timestamp;
@@ -30,6 +30,6 @@ if ($movies instanceof Traversable) {
             }
         }
     } else {
-        $colorCli->header('No movies to update');
+        cli()->header('No movies to update');
     }
 }

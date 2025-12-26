@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Models\Category;
 use App\Models\Release;
 use App\Services\TvProcessing\TvProcessingPipeline;
-use Blacklight\ColorCLI;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -29,12 +28,9 @@ class ReprocessUnmatchedTvReleases extends Command
      */
     protected $description = 'Reprocess all TV releases that are not matched to any show in the database (videos_id = 0)';
 
-    protected ColorCLI $colorCli;
-
     public function __construct()
     {
         parent::__construct();
-        $this->colorCli = new ColorCLI();
     }
 
     /**
@@ -123,7 +119,7 @@ class ReprocessUnmatchedTvReleases extends Command
                         $matched++;
                         if ($debug) {
                             $this->newLine();
-                            $this->colorCli->primary("Matched: {$release->searchname}");
+                            cli()->primary("Matched: {$release->searchname}");
                             $this->info('  Provider: ' . ($result['provider'] ?? 'Unknown'));
                             $this->info('  Video ID: ' . ($result['video_id'] ?? 'N/A'));
                             $this->info('  Episode ID: ' . ($result['episode_id'] ?? 'N/A'));
@@ -132,7 +128,7 @@ class ReprocessUnmatchedTvReleases extends Command
                         $failed++;
                         if ($debug) {
                             $this->newLine();
-                            $this->colorCli->warning("No match: {$release->searchname}");
+                            cli()->warning("No match: {$release->searchname}");
                         }
                     }
                 } catch (\Throwable $e) {

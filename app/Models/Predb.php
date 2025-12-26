@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Facades\Search;
-use Blacklight\ColorCLI;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Cache;
@@ -105,11 +104,10 @@ class Predb extends Model
      */
     public static function checkPre(bool|int|string $dateLimit = false): void
     {
-        $consoleTools = new ColorCLI;
         $updated = 0;
 
         if (config('nntmux.echocli')) {
-            (new ColorCLI)->header('Querying DB for release search names not matched with PreDB titles.');
+            cli()->header('Querying DB for release search names not matched with PreDB titles.');
         }
 
         $query = self::query()
@@ -124,14 +122,14 @@ class Predb extends Model
 
         if ($res !== null) {
             $total = \count($res);
-            (new ColorCLI)->primary(number_format($total).' releases to match.');
+            cli()->primary(number_format($total).' releases to match.');
 
             foreach ($res as $row) {
                 Release::query()->where('id', $row['releases_id'])->update(['predb_id' => $row['predb_id']]);
 
                 if (config('nntmux.echocli')) {
-                    $consoleTools->overWritePrimary(
-                        'Matching up preDB titles with release searchnames: '.$consoleTools->percentString(++$updated, $total)
+                    cli()->overWritePrimary(
+                        'Matching up preDB titles with release searchnames: '.cli()->percentString(++$updated, $total)
                     );
                 }
             }
@@ -140,7 +138,7 @@ class Predb extends Model
             }
 
             if (config('nntmux.echocli')) {
-                (new ColorCLI)->header(
+                cli()->header(
                     'Matched '.number_format(($updated > 0) ? $updated : 0).' PreDB titles to release search names.'
                 );
             }

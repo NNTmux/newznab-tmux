@@ -3,14 +3,14 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\XxxInfo;
-use Blacklight\ColorCLI;
+
 use Illuminate\Support\Facades\File;
 
 $covers = $updated = $deleted = 0;
-$colorCli = new ColorCLI;
+
 
 if ($argc === 1 || $argv[1] !== 'true') {
-    $colorCli->error("\nThis script will check all images in covers/xxx and compare to db->xxxinfo.\nTo run:\nphp $argv[0] true\n");
+    cli()->error("\nThis script will check all images in covers/xxx and compare to db->xxxinfo.\nTo run:\nphp $argv[0] true\n");
     exit();
 }
 
@@ -27,7 +27,7 @@ foreach ($itr as $filePath) {
             } else {
                 $run = XxxInfo::query()->where('id', $hit[1])->select(['id'])->get();
                 if ($run->count() === 0) {
-                    $colorCli->info($filePath->getPathname().' not found in db.');
+                    cli()->info($filePath->getPathname().' not found in db.');
                 }
             }
         }
@@ -41,7 +41,7 @@ foreach ($itr as $filePath) {
             } else {
                 $run = XxxInfo::query()->where('id', $match1[1])->select(['id'])->get();
                 if ($run->count() === 0) {
-                    $colorCli->info($filePath->getPathname().' not found in db.');
+                    cli()->info($filePath->getPathname().' not found in db.');
                 }
             }
         }
@@ -52,7 +52,7 @@ $qry = XxxInfo::query()->where('cover', '=', 1)->select(['id'])->get();
 foreach ($qry as $rows) {
     if (! is_file($path2covers.$rows['id'].'-cover.jpg')) {
         XxxInfo::query()->where(['cover' => 1, 'id' => $rows['id']])->update(['cover' => 0]);
-        $colorCli->info($path2covers.$rows['id'].'-cover.jpg does not exist.');
+        cli()->info($path2covers.$rows['id'].'-cover.jpg does not exist.');
         $deleted++;
     }
 }
@@ -60,10 +60,10 @@ $qry1 = XxxInfo::query()->where('backdrop', '=', 1)->select(['id'])->get();
 foreach ($qry1 as $rows) {
     if (! is_file($path2covers.$rows['id'].'-backdrop.jpg')) {
         XxxInfo::query()->where(['backdrop' => 1, 'id' => $rows['id']])->update(['backdrop' => 0]);
-        $colorCli->info($path2covers.$rows['id'].'-backdrop.jpg does not exist.');
+        cli()->info($path2covers.$rows['id'].'-backdrop.jpg does not exist.');
         $deleted++;
     }
 }
-$colorCli->header($covers.' covers set.');
-$colorCli->header($updated.' backdrops set.');
-$colorCli->header($deleted.' movies unset.');
+cli()->header($covers.' covers set.');
+cli()->header($updated.' backdrops set.');
+cli()->header($deleted.' movies unset.');

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use Blacklight\ColorCLI;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Intervention\Image\Drivers\Imagick\Driver;
@@ -45,14 +44,11 @@ class ReleaseImageService
      */
     public string $vidSavePath;
 
-    protected ColorCLI $colorCli;
-
     /**
      * ReleaseImageService constructor.
      */
     public function __construct()
     {
-        $this->colorCli = new ColorCLI;
         $this->audSavePath = storage_path('covers/audiosample/');
         $this->imgSavePath = storage_path('covers/preview/');
         $this->jpgSavePath = storage_path('covers/sample/');
@@ -88,7 +84,7 @@ class ReleaseImageService
                     $httpCode = (int) $matches[1];
                     if ($httpCode >= 400) {
                         Log::debug('HTTP error fetching image from '.$imgLoc.': '.$statusLine);
-                        $this->colorCli->notice('HTTP error fetching image: '.$statusLine);
+                        cli()->notice('HTTP error fetching image: '.$statusLine);
 
                         return false;
                     }
@@ -99,14 +95,14 @@ class ReleaseImageService
                 $error = error_get_last();
                 $errorMsg = $error !== null && isset($error['message']) ? $error['message'] : 'Unknown error fetching image';
                 Log::debug('Failed to fetch image from '.$imgLoc.': '.$errorMsg);
-                $this->colorCli->notice('Failed to fetch image from '.$imgLoc.': '.$errorMsg);
+                cli()->notice('Failed to fetch image from '.$imgLoc.': '.$errorMsg);
 
                 return false;
             }
 
             if (empty($imageData)) {
                 Log::debug('Empty image data received from '.$imgLoc);
-                $this->colorCli->notice('Empty image data received from '.$imgLoc);
+                cli()->notice('Empty image data received from '.$imgLoc);
 
                 return false;
             }
@@ -115,18 +111,18 @@ class ReleaseImageService
             $img = $manager->read($imageData);
         } catch (\Exception $e) {
             if ($e->getCode() === 404) {
-                $this->colorCli->notice('Data not available on server');
+                cli()->notice('Data not available on server');
             } elseif ($e->getCode() === 503) {
-                $this->colorCli->notice('Service unavailable');
+                cli()->notice('Service unavailable');
             } else {
                 Log::debug('Exception fetching image from '.$imgLoc.': '.$e->getMessage());
-                $this->colorCli->notice('Unable to fetch image: '.$e->getMessage());
+                cli()->notice('Unable to fetch image: '.$e->getMessage());
             }
 
             $img = false;
         } catch (\Error $e) {
             Log::debug('Error fetching image from '.$imgLoc.': '.$e->getMessage());
-            $this->colorCli->info($e->getMessage());
+            cli()->info($e->getMessage());
             $img = false;
         }
 

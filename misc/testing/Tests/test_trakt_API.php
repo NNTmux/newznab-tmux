@@ -4,7 +4,7 @@ require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Services\TraktService;
 
-$c = new Blacklight\ColorCLI;
+
 $trakt = new TraktService;
 
 if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
@@ -22,8 +22,8 @@ if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
         print_r($series);
         print_r($episode);
     } else {
-        exit($c->error('Error retrieving Trakt data.'));
+        exit(cli()->error('Error retrieving Trakt data.'));
     }
 } else {
-    exit($c->error('Invalid arguments.  This script requires a text string (show name) followed by a season and episode number.'));
+    exit(cli()->error('Invalid arguments.  This script requires a text string (show name) followed by a season and episode number.'));
 }

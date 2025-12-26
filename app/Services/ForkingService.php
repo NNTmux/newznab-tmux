@@ -7,7 +7,6 @@ use App\Services\Runners\BackfillRunner;
 use App\Services\Runners\BinariesRunner;
 use App\Services\Runners\PostProcessRunner;
 use App\Services\Runners\ReleasesRunner;
-use Blacklight\ColorCLI;
 use Blacklight\Nfo;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -21,8 +20,6 @@ use Symfony\Component\Process\Process;
  */
 class ForkingService
 {
-    protected ColorCLI $colorCli;
-
     protected BackfillRunner $backfillRunner;
 
     protected BinariesRunner $binariesRunner;
@@ -37,10 +34,8 @@ class ForkingService
 
     protected int $maxRetries;
 
-    public function __construct(?ColorCLI $colorCli = null)
+    public function __construct()
     {
-        $this->colorCli = $colorCli ?? new ColorCLI;
-
         $this->maxSize = (int) Settings::settingValue('maxsizetoprocessnfo');
         $this->minSize = (int) Settings::settingValue('minsizetoprocessnfo');
         $this->maxRetries = (int) Settings::settingValue('maxnforetries') >= 0
@@ -49,10 +44,10 @@ class ForkingService
         $this->maxRetries = max($this->maxRetries, -8);
 
         // Initialize runners
-        $this->backfillRunner = new BackfillRunner($this->colorCli);
-        $this->binariesRunner = new BinariesRunner($this->colorCli);
-        $this->releasesRunner = new ReleasesRunner($this->colorCli);
-        $this->postProcessRunner = new PostProcessRunner($this->colorCli);
+        $this->backfillRunner = new BackfillRunner();
+        $this->binariesRunner = new BinariesRunner();
+        $this->releasesRunner = new ReleasesRunner();
+        $this->postProcessRunner = new PostProcessRunner();
     }
 
     /**
@@ -220,7 +215,7 @@ class ForkingService
         }
 
         if (config('nntmux.echocli')) {
-            $this->colorCli->header(
+            cli()->header(
                 "Multi-processing for {$taskName} finished in " . (now()->timestamp - $startTime) .
                 ' seconds at ' . now()->toRfc2822String() . '.' . PHP_EOL
             );

@@ -50,7 +50,7 @@ class BackfillRunner extends BaseRunner
 
         foreach ($results as $groupName => $output) {
             echo $output;
-            $this->colorCli->primary('Backfilled group '.$groupName);
+            cli()->primary('Backfilled group '.$groupName);
         }
     }
 
@@ -111,7 +111,7 @@ class BackfillRunner extends BaseRunner
         if ($count <= 0) {
             $this->headerNone();
             if (config('nntmux.echocli') && $groupName !== '') {
-                $this->colorCli->primary('No backfill needed for group '.$groupName);
+                cli()->primary('No backfill needed for group '.$groupName);
             }
 
             return;
@@ -150,7 +150,7 @@ class BackfillRunner extends BaseRunner
 
         foreach ($results as $idx => $output) {
             echo $output;
-            $this->colorCli->primary('Backfilled group '.$groupName);
+            cli()->primary('Backfilled group '.$groupName);
         }
     }
 }

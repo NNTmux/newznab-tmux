@@ -8,7 +8,6 @@ use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\Binaries\BinariesService;
 use App\Services\NNTP\NNTPService;
-use Blacklight\ColorCLI;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -30,8 +29,6 @@ class UpdateBinaries extends Command
      */
     protected $description = 'Update binaries for a specific group or all groups';
 
-    private ColorCLI $colorCLI;
-
     private bool $echoCLI;
 
     /**
@@ -39,7 +36,6 @@ class UpdateBinaries extends Command
      */
     public function handle(): int
     {
-        $this->colorCLI = new ColorCLI();
         $this->echoCLI = (bool) config('nntmux.echocli');
 
         $groupName = $this->argument('group');
@@ -74,7 +70,7 @@ class UpdateBinaries extends Command
             return self::SUCCESS;
         } catch (\Throwable $e) {
             Log::error($e->getMessage());
-            $this->colorCLI->error('Error: ' . $e->getMessage());
+            cli()->error('Error: ' . $e->getMessage());
 
             return self::FAILURE;
         }
@@ -124,8 +120,8 @@ class UpdateBinaries extends Command
         }
 
         echo PHP_EOL;
-        $this->colorCLI->header('NNTmux Binary Update');
-        $this->colorCLI->info('Started: ' . now()->format('Y-m-d H:i:s'));
+        cli()->header('NNTmux Binary Update');
+        cli()->info('Started: ' . now()->format('Y-m-d H:i:s'));
     }
 
     /**
@@ -138,8 +134,8 @@ class UpdateBinaries extends Command
         }
 
         echo PHP_EOL;
-        $this->colorCLI->header(strtoupper($title));
-        $this->colorCLI->header(str_repeat('-', strlen($title)));
+        cli()->header(strtoupper($title));
+        cli()->header(str_repeat('-', strlen($title)));
     }
 
     /**
@@ -151,7 +147,7 @@ class UpdateBinaries extends Command
             return;
         }
 
-        $this->colorCLI->info("  {$message}");
+        cli()->info("  {$message}");
     }
 
     /**
@@ -167,9 +163,9 @@ class UpdateBinaries extends Command
         $timeStr = $this->formatElapsedTime($elapsed);
 
         echo PHP_EOL;
-        $this->colorCLI->header('COMPLETE');
-        $this->colorCLI->header('--------');
-        $this->colorCLI->info("  Total time: {$timeStr}");
+        cli()->header('COMPLETE');
+        cli()->header('--------');
+        cli()->info("  Total time: {$timeStr}");
         echo PHP_EOL;
     }
 

@@ -60,10 +60,10 @@ class TmdbProvider extends AbstractTvProvider
                 if (is_array($release) && $release['name'] !== '') {
                     if (in_array($release['cleanname'], $this->titleCache, false)) {
                         if ($this->echooutput) {
-                            $this->colorCli->primaryOver('    → ');
-                            $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
-                            $this->colorCli->primaryOver(' → ');
-                            $this->colorCli->alternate('Skipped (previously failed)');
+                            cli()->primaryOver('    → ');
+                            cli()->alternateOver($this->truncateTitle($release['cleanname']));
+                            cli()->primaryOver(' → ');
+                            cli()->alternate('Skipped (previously failed)');
                         }
                         $this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
                         $skipped++;
@@ -82,10 +82,10 @@ class TmdbProvider extends AbstractTvProvider
                     // If lookups are allowed lets try to get it.
                     if ($videoId === 0 && $lookupSetting) {
                         if ($this->echooutput) {
-                            $this->colorCli->primaryOver('    → ');
-                            $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
-                            $this->colorCli->primaryOver(' → ');
-                            $this->colorCli->info('Searching TMDB...');
+                            cli()->primaryOver('    → ');
+                            cli()->headerOver($this->truncateTitle($release['cleanname']));
+                            cli()->primaryOver(' → ');
+                            cli()->info('Searching TMDB...');
                         }
 
                         // Get the show from TMDB
@@ -106,10 +106,10 @@ class TmdbProvider extends AbstractTvProvider
                         }
                     } else {
                         if ($this->echooutput && $videoId > 0) {
-                            $this->colorCli->primaryOver('    → ');
-                            $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
-                            $this->colorCli->primaryOver(' → ');
-                            $this->colorCli->info('Found in DB');
+                            cli()->primaryOver('    → ');
+                            cli()->headerOver($this->truncateTitle($release['cleanname']));
+                            cli()->primaryOver(' → ');
+                            cli()->info('Found in DB');
                         }
                         $siteId = $this->getSiteIDFromVideoID('tmdb', $videoId);
                     }
@@ -126,10 +126,10 @@ class TmdbProvider extends AbstractTvProvider
                             // Set the video ID and leave episode 0
                             $this->setVideoIdFound($videoId, $row['id'], 0);
                             if ($this->echooutput) {
-                                $this->colorCli->primaryOver('    → ');
-                                $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
-                                $this->colorCli->primaryOver(' → ');
-                                $this->colorCli->primary('Full Season matched');
+                                cli()->primaryOver('    → ');
+                                cli()->headerOver($this->truncateTitle($release['cleanname']));
+                                cli()->primaryOver(' → ');
+                                cli()->primary('Full Season matched');
                             }
                             $matched++;
 
@@ -170,19 +170,19 @@ class TmdbProvider extends AbstractTvProvider
                             // Mark the releases video and episode IDs
                             $this->setVideoIdFound($videoId, $row['id'], $episode);
                             if ($this->echooutput) {
-                                $this->colorCli->primaryOver('    → ');
-                                $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
+                                cli()->primaryOver('    → ');
+                                cli()->headerOver($this->truncateTitle($release['cleanname']));
                                 if ($seriesNo !== '' && $episodeNo !== '') {
-                                    $this->colorCli->primaryOver(' S');
-                                    $this->colorCli->warningOver(sprintf('%02d', $seriesNo));
-                                    $this->colorCli->primaryOver('E');
-                                    $this->colorCli->warningOver(sprintf('%02d', $episodeNo));
+                                    cli()->primaryOver(' S');
+                                    cli()->warningOver(sprintf('%02d', $seriesNo));
+                                    cli()->primaryOver('E');
+                                    cli()->warningOver(sprintf('%02d', $episodeNo));
                                 } elseif ($hasAirdate) {
-                                    $this->colorCli->primaryOver(' | ');
-                                    $this->colorCli->warningOver($release['airdate']);
+                                    cli()->primaryOver(' | ');
+                                    cli()->warningOver($release['airdate']);
                                 }
-                                $this->colorCli->primaryOver(' ✓ ');
-                                $this->colorCli->primary('MATCHED (TMDB)');
+                                cli()->primaryOver(' ✓ ');
+                                cli()->primary('MATCHED (TMDB)');
                             }
                             $matched++;
                         } else {
@@ -190,14 +190,14 @@ class TmdbProvider extends AbstractTvProvider
                             $this->setVideoIdFound($videoId, $row['id'], 0);
                             $this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
                             if ($this->echooutput) {
-                                $this->colorCli->primaryOver('    → ');
-                                $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
+                                cli()->primaryOver('    → ');
+                                cli()->alternateOver($this->truncateTitle($release['cleanname']));
                                 if ($hasAirdate) {
-                                    $this->colorCli->primaryOver(' | ');
-                                    $this->colorCli->warningOver($release['airdate']);
+                                    cli()->primaryOver(' | ');
+                                    cli()->warningOver($release['airdate']);
                                 }
-                                $this->colorCli->primaryOver(' → ');
-                                $this->colorCli->warning('Episode not found');
+                                cli()->primaryOver(' → ');
+                                cli()->warning('Episode not found');
                             }
                         }
                     } else {
@@ -205,10 +205,10 @@ class TmdbProvider extends AbstractTvProvider
                         $this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
                         $this->titleCache[] = $release['cleanname'] ?? null;
                         if ($this->echooutput) {
-                            $this->colorCli->primaryOver('    → ');
-                            $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
-                            $this->colorCli->primaryOver(' → ');
-                            $this->colorCli->warning('Not found');
+                            cli()->primaryOver('    → ');
+                            cli()->alternateOver($this->truncateTitle($release['cleanname']));
+                            cli()->primaryOver(' → ');
+                            cli()->warning('Not found');
                         }
                     }
                 } else {
@@ -216,10 +216,10 @@ class TmdbProvider extends AbstractTvProvider
                     $this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
                     $this->titleCache[] = $release['cleanname'] ?? null;
                     if ($this->echooutput) {
-                        $this->colorCli->primaryOver('    → ');
-                        $this->colorCli->alternateOver(mb_substr($row['searchname'], 0, 50));
-                        $this->colorCli->primaryOver(' → ');
-                        $this->colorCli->error('Parse failed');
+                        cli()->primaryOver('    → ');
+                        cli()->alternateOver(mb_substr($row['searchname'], 0, 50));
+                        cli()->primaryOver(' → ');
+                        cli()->error('Parse failed');
                     }
                 }
             }
@@ -227,8 +227,8 @@ class TmdbProvider extends AbstractTvProvider
             // Display summary
             if ($this->echooutput && $matched > 0) {
                 echo "\n";
-                $this->colorCli->primaryOver('  ✓ TMDB: ');
-                $this->colorCli->primary(sprintf('%d matched, %d skipped', $matched, $skipped));
+                cli()->primaryOver('  ✓ TMDB: ');
+                cli()->primary(sprintf('%d matched, %d skipped', $matched, $skipped));
             }
         }
     }

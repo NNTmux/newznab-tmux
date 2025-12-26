@@ -139,8 +139,6 @@ class Nfo
 
     public const NFO_FOUND = 1; // Release has an NFO.
 
-    protected ColorCLI $colorCli;
-
     /**
      * Default constructor.
      *
@@ -151,7 +149,6 @@ class Nfo
     public function __construct()
     {
         $this->echo = (bool) config('nntmux.echocli');
-        $this->colorCli = new ColorCLI();
 
         // Cache settings to reduce database queries
         // Note: Cast after Cache::remember as cached values may be stored as strings
@@ -558,13 +555,13 @@ class Nfo
                         } catch (\Exception $e) {
                             DB::rollBack();
                             if ($this->echo) {
-                                $this->colorCli->error("Error saving NFO for release {$release['id']}: {$e->getMessage()}");
+                                cli()->error("Error saving NFO for release {$release['id']}: {$e->getMessage()}");
                             }
                         }
                     }
                 } catch (\Exception $e) {
                     if ($this->echo) {
-                        $this->colorCli->error("Error processing release {$release['id']}: {$e->getMessage()}");
+                        cli()->error("Error processing release {$release['id']}: {$e->getMessage()}");
                     }
                 }
             }
@@ -579,7 +576,7 @@ class Nfo
                 echo PHP_EOL;
             }
             if ($processedCount > 0) {
-                $this->colorCli->primary($processedCount.' NFO file(s) found/processed.');
+                cli()->primary($processedCount.' NFO file(s) found/processed.');
             }
         }
 
@@ -618,7 +615,7 @@ class Nfo
      */
     private function displayProcessingHeader(string $guidChar, string $groupID, int $nfoCount): void
     {
-        $this->colorCli->primary(
+        cli()->primary(
             PHP_EOL.
             ($guidChar === '' ? '' : '['.$guidChar.'] ').
             ($groupID === '' ? '' : '['.$groupID.'] ').
@@ -644,7 +641,7 @@ class Nfo
             foreach ($nfoStats as $row) {
                 $outString .= ', '.$row['status'].' = '.number_format($row['count']);
             }
-            $this->colorCli->header($outString.'.');
+            cli()->header($outString.'.');
         }
     }
 
@@ -680,7 +677,7 @@ class Nfo
             } catch (\Exception $e) {
                 DB::rollBack();
                 if ($this->echo) {
-                    $this->colorCli->error("Error handling failed NFO attempts: {$e->getMessage()}");
+                    cli()->error("Error handling failed NFO attempts: {$e->getMessage()}");
                 }
             }
         });

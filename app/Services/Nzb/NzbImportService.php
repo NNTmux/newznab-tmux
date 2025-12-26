@@ -10,7 +10,6 @@ use App\Models\UsenetGroup;
 use App\Services\BlacklistService;
 use App\Services\Categorization\CategorizationService;
 use App\Services\ReleaseCleaningService;
-use Blacklight\ColorCLI;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -59,8 +58,6 @@ class NzbImportService
      */
     protected string $nzbGuid;
 
-    protected ColorCLI $colorCli;
-
     public function __construct(array $options = [])
     {
         $this->echoCLI = config('nntmux.echocli');
@@ -68,7 +65,6 @@ class NzbImportService
         $this->category = new CategorizationService();
         $this->nzb = app(NzbService::class);
         $this->releaseCleaner = new ReleaseCleaningService;
-        $this->colorCli = new ColorCLI;
         $this->crossPostt = Settings::settingValue('crossposttime') !== '' ? Settings::settingValue('crossposttime') : 2;
 
         // Set properties from options
@@ -448,7 +444,7 @@ class NzbImportService
         if ($this->browser) {
             $this->retVal .= $message.'<br />';
         } elseif ($this->echoCLI) {
-            $this->colorCli->notice($message);
+            cli()->notice($message);
         }
     }
 

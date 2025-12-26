@@ -5,7 +5,6 @@ namespace App\Services\TvProcessing\Pipes;
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
 use App\Services\TvProcessing\TvReleaseContext;
-use Blacklight\ColorCLI;
 use Closure;
 
 /**
@@ -17,12 +16,10 @@ abstract class AbstractTvProviderPipe
 {
     protected int $priority = 50;
     protected bool $echoOutput = true;
-    protected ColorCLI $colorCli;
     protected array $titleCache = [];
 
     public function __construct()
     {
-        $this->colorCli = new ColorCLI();
     }
 
     /**
@@ -143,21 +140,21 @@ abstract class AbstractTvProviderPipe
             return;
         }
 
-        $this->colorCli->primaryOver('    → ');
-        $this->colorCli->headerOver($this->truncateTitle($title));
+        cli()->primaryOver('    → ');
+        cli()->headerOver($this->truncateTitle($title));
 
         if ($airdate !== null) {
-            $this->colorCli->primaryOver(' | ');
-            $this->colorCli->warningOver($airdate);
+            cli()->primaryOver(' | ');
+            cli()->warningOver($airdate);
         } elseif ($season !== null && $episode !== null) {
-            $this->colorCli->primaryOver(' S');
-            $this->colorCli->warningOver(sprintf('%02d', $season));
-            $this->colorCli->primaryOver('E');
-            $this->colorCli->warningOver(sprintf('%02d', $episode));
+            cli()->primaryOver(' S');
+            cli()->warningOver(sprintf('%02d', $season));
+            cli()->primaryOver('E');
+            cli()->warningOver(sprintf('%02d', $episode));
         }
 
-        $this->colorCli->primaryOver(' ✓ ');
-        $this->colorCli->primary('MATCHED (' . $this->getName() . ')');
+        cli()->primaryOver(' ✓ ');
+        cli()->primary('MATCHED (' . $this->getName() . ')');
     }
 
     /**
@@ -169,10 +166,10 @@ abstract class AbstractTvProviderPipe
             return;
         }
 
-        $this->colorCli->primaryOver('    → ');
-        $this->colorCli->alternateOver($this->truncateTitle($title));
-        $this->colorCli->primaryOver(' → ');
-        $this->colorCli->alternate('Not found in ' . $this->getName());
+        cli()->primaryOver('    → ');
+        cli()->alternateOver($this->truncateTitle($title));
+        cli()->primaryOver(' → ');
+        cli()->alternate('Not found in ' . $this->getName());
     }
 
     /**
@@ -184,10 +181,10 @@ abstract class AbstractTvProviderPipe
             return;
         }
 
-        $this->colorCli->primaryOver('    → ');
-        $this->colorCli->alternateOver($this->truncateTitle($title));
-        $this->colorCli->primaryOver(' → ');
-        $this->colorCli->alternate('Skipped (previously failed)');
+        cli()->primaryOver('    → ');
+        cli()->alternateOver($this->truncateTitle($title));
+        cli()->primaryOver(' → ');
+        cli()->alternate('Skipped (previously failed)');
     }
 
     /**
@@ -199,10 +196,10 @@ abstract class AbstractTvProviderPipe
             return;
         }
 
-        $this->colorCli->primaryOver('    → ');
-        $this->colorCli->headerOver($this->truncateTitle($title));
-        $this->colorCli->primaryOver(' → ');
-        $this->colorCli->info('Searching ' . $this->getName() . '...');
+        cli()->primaryOver('    → ');
+        cli()->headerOver($this->truncateTitle($title));
+        cli()->primaryOver(' → ');
+        cli()->info('Searching ' . $this->getName() . '...');
     }
 
     /**
@@ -214,10 +211,10 @@ abstract class AbstractTvProviderPipe
             return;
         }
 
-        $this->colorCli->primaryOver('    → ');
-        $this->colorCli->headerOver($this->truncateTitle($title));
-        $this->colorCli->primaryOver(' → ');
-        $this->colorCli->info('Found in DB');
+        cli()->primaryOver('    → ');
+        cli()->headerOver($this->truncateTitle($title));
+        cli()->primaryOver(' → ');
+        cli()->info('Found in DB');
     }
 }
 

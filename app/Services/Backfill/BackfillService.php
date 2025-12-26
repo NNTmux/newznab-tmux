@@ -7,7 +7,6 @@ namespace App\Services\Backfill;
 use App\Models\UsenetGroup;
 use App\Services\Binaries\BinariesService;
 use App\Services\NNTP\NNTPService;
-use Blacklight\ColorCLI;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -30,18 +29,14 @@ final class BackfillService
 
     private NNTPService $nntp;
 
-    private ColorCLI $colorCli;
-
     public function __construct(
         ?BackfillConfig $config = null,
         ?BinariesService $binaries = null,
         ?NNTPService $nntp = null,
-        ?ColorCLI $colorCli = null,
     ) {
         $this->config = $config ?? BackfillConfig::fromSettings();
         $this->binaries = $binaries ?? new BinariesService;
         $this->nntp = $nntp ?? new NNTPService;
-        $this->colorCli = $colorCli ?? new ColorCLI;
     }
 
     /**
@@ -302,11 +297,11 @@ final class BackfillService
         }
 
         match ($type) {
-            'header' => $this->colorCli->header($message),
-            'warning' => $this->colorCli->warning($message),
-            'error' => $this->colorCli->error($message),
-            'notice' => $this->colorCli->notice($message),
-            default => $this->colorCli->primary($message),
+            'header' => cli()->header($message),
+            'warning' => cli()->warning($message),
+            'error' => cli()->error($message),
+            'notice' => cli()->notice($message),
+            default => cli()->primary($message),
         };
     }
 

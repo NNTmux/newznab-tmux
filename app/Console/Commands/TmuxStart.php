@@ -6,7 +6,6 @@ use App\Models\Collection;
 use App\Models\Settings;
 use App\Services\Tmux\TmuxLayoutBuilder;
 use App\Services\Tmux\TmuxSessionManager;
-use Blacklight\ColorCLI;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -33,17 +32,13 @@ class TmuxStart extends Command
 
     private TmuxLayoutBuilder $layoutBuilder;
 
-    private ColorCLI $colorCli;
-
     /**
      * Execute the console command.
      */
     public function handle(): int
     {
-        $this->colorCli = new ColorCLI;
-
         try {
-            $this->colorCli->header('Starting Tmux Processing');
+            cli()->header('Starting Tmux Processing');
 
             // Get session name
             $sessionName = $this->option('session')

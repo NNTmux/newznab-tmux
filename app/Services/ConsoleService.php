@@ -9,7 +9,6 @@ use App\Models\ConsoleInfo;
 use App\Models\Genre;
 use App\Models\Release;
 use App\Models\Settings;
-use Blacklight\ColorCLI;
 use Blacklight\Genres;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Database\Eloquent\Model;
@@ -55,8 +54,6 @@ class ConsoleService
 
     public array $failCache;
 
-    protected ColorCLI $colorCli;
-
     protected ReleaseImageService $imageService;
 
     protected $igdbSleep;
@@ -64,7 +61,6 @@ class ConsoleService
     public function __construct(?ReleaseImageService $imageService = null)
     {
         $this->echoOutput = config('nntmux.echocli');
-        $this->colorCli = new ColorCLI;
         $this->imageService = $imageService ?? new ReleaseImageService;
 
         $this->pubkey = Settings::settingValue('amazonpubkey');
@@ -356,13 +352,13 @@ class ConsoleService
             $consoleId = $this->updateConsoleTable($igdb);
 
             if ($this->echoOutput && $consoleId !== -2) {
-                $this->colorCli->header('Added/updated game: ') .
-                    $this->colorCli->alternateOver('   Title:    ') .
-                    $this->colorCli->primary($igdb['title']) .
-                    $this->colorCli->alternateOver('   Platform: ') .
-                    $this->colorCli->primary($igdb['platform']) .
-                    $this->colorCli->alternateOver('   Genre: ') .
-                    $this->colorCli->primary($igdb['consolegenre']);
+                cli()->header('Added/updated game: ') .
+                    cli()->alternateOver('   Title:    ') .
+                    cli()->primary($igdb['title']) .
+                    cli()->alternateOver('   Platform: ') .
+                    cli()->primary($igdb['platform']) .
+                    cli()->alternateOver('   Genre: ') .
+                    cli()->primary($igdb['consolegenre']);
             }
         }
 
@@ -452,12 +448,12 @@ class ConsoleService
                         ];
                     }
 
-                    $this->colorCli->notice('IGDB returned no valid results');
+                    cli()->notice('IGDB returned no valid results');
 
                     return false;
                 }
 
-                $this->colorCli->notice('IGDB found no valid results');
+                cli()->notice('IGDB found no valid results');
 
                 return false;
             } catch (ClientException $e) {
@@ -465,7 +461,7 @@ class ConsoleService
                     $this->igdbSleep = now()->endOfMonth();
                 }
             } catch (\Exception $e) {
-                $this->colorCli->error('Error fetching IGDB properties: ' . $e->getMessage());
+                cli()->error('Error fetching IGDB properties: ' . $e->getMessage());
 
                 return false;
             }
@@ -499,7 +495,7 @@ class ConsoleService
         $releaseCount = $res->count();
         if ($res instanceof \Traversable && $releaseCount > 0) {
             if ($this->echoOutput) {
-                $this->colorCli->header('Processing ' . $releaseCount . ' console release(s).');
+                cli()->header('Processing ' . $releaseCount . ' console release(s).');
             }
 
             foreach ($res as $arr) {
@@ -510,7 +506,7 @@ class ConsoleService
 
                 if ($gameInfo !== false) {
                     if ($this->echoOutput) {
-                        $this->colorCli->info('Looking up: ' . $gameInfo['title'] . ' (' . $gameInfo['platform'] . ')');
+                        cli()->info('Looking up: ' . $gameInfo['title'] . ' (' . $gameInfo['platform'] . ')');
                     }
 
                     // Check for existing console entry.
@@ -519,7 +515,7 @@ class ConsoleService
                     if ($gameCheck === false && \in_array($gameInfo['title'] . $gameInfo['platform'], $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echoOutput) {
-                            $this->colorCli->info('Cached previous failure. Skipping.');
+                            cli()->info('Cached previous failure. Skipping.');
                         }
                         $gameId = -2;
                     } elseif ($gameCheck === false) {
@@ -531,8 +527,8 @@ class ConsoleService
                         }
                     } else {
                         if ($this->echoOutput) {
-                            $this->colorCli->headerOver('Found Local: ') .
-                                $this->colorCli->primary("{$gameInfo['title']} - {$gameInfo['platform']}");
+                            cli()->headerOver('Found Local: ') .
+                                cli()->primary("{$gameInfo['title']} - {$gameInfo['platform']}");
                         }
                         $gameId = $gameCheck['id'] ?? -2;
                     }
@@ -550,7 +546,7 @@ class ConsoleService
                 }
             }
         } elseif ($this->echoOutput) {
-            $this->colorCli->header('No console releases to process.');
+            cli()->header('No console releases to process.');
         }
     }
 

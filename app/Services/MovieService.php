@@ -8,7 +8,6 @@ use App\Models\MovieInfo;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Services\TvProcessing\Providers\TraktProvider;
-use Blacklight\ColorCLI;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Carbon;
@@ -62,15 +61,12 @@ class MovieService
 
     protected ?string $traktcheck;
 
-    protected ColorCLI $colorCli;
-
     /**
      * @throws \Exception
      */
     public function __construct()
     {
         $this->releaseImage = new ReleaseImageService;
-        $this->colorCli = new ColorCLI;
         $this->traktcheck = config('nntmux_api.trakttv_api_key');
         if ($this->traktcheck !== null) {
             $this->traktTv = new TraktProvider();
@@ -281,7 +277,7 @@ class MovieService
     public function updateMovieInfo(string $imdbId): bool
     {
         if ($this->echooutput && $this->service !== '') {
-            $this->colorCli->primary('Fetching IMDB info from TMDB/IMDB/Trakt/OMDB/iTunes using IMDB id: '.$imdbId);
+            cli()->primary('Fetching IMDB info from TMDB/IMDB/Trakt/OMDB/iTunes using IMDB id: '.$imdbId);
         }
 
         // Check TMDB for IMDB info.
@@ -464,8 +460,8 @@ class MovieService
         }
 
         if ($this->echooutput && $this->service !== '') {
-            PHP_EOL.$this->colorCli->headerOver('Added/updated movie: ').
-            $this->colorCli->primary(
+            PHP_EOL.cli()->headerOver('Added/updated movie: ').
+            cli()->primary(
                 $mov['title'].
                 ' ('.
                 $mov['year'].
@@ -491,7 +487,7 @@ class MovieService
 
             if ($result !== null) {
                 if ($this->echooutput) {
-                    $this->colorCli->info('Fanart found '.$result['title']);
+                    cli()->info('Fanart found '.$result['title']);
                 }
 
                 return $result;
@@ -630,7 +626,7 @@ class MovieService
             }
 
             if ($this->echooutput) {
-                $this->colorCli->info('TMDb found '.$ret['title']);
+                cli()->info('TMDb found '.$ret['title']);
             }
 
             Cache::put($cacheKey, $ret, $expiresAt);
@@ -681,7 +677,7 @@ class MovieService
             }
             Cache::put($cacheKey, $scraped, $expiresAt);
             if ($this->echooutput) {
-                $this->colorCli->info('IMDb scraped '.$scraped['title']);
+                cli()->info('IMDb scraped '.$scraped['title']);
             }
 
             return $scraped;
@@ -753,7 +749,7 @@ class MovieService
             ];
 
             if ($this->echooutput) {
-                $this->colorCli->info('Trakt found '.$movieData['title']);
+                cli()->info('Trakt found '.$movieData['title']);
             }
 
             Cache::put($cacheKey, $movieData, $expiresAt);
@@ -836,7 +832,7 @@ class MovieService
             ];
 
             if ($this->echooutput) {
-                $this->colorCli->info('OMDbAPI Found '.$movieData['title']);
+                cli()->info('OMDbAPI Found '.$movieData['title']);
             }
 
             Cache::put($cacheKey, $movieData, $expiresAt);
@@ -872,7 +868,7 @@ class MovieService
             try {
                 $this->service = $service;
                 if ($this->echooutput && $this->service !== '') {
-                    $this->colorCli->info($this->service.' found IMDBid: tt'.$imdbId);
+                    cli()->info($this->service.' found IMDBid: tt'.$imdbId);
                 }
 
                 $movieInfoId = MovieInfo::query()->where('imdbid', $imdbId)->first(['id']);
@@ -951,7 +947,7 @@ class MovieService
 
         if ($movieCount > 0) {
             if ($this->echooutput && $movieCount > 1) {
-                $this->colorCli->header('Processing '.$movieCount.' movie releases.');
+                cli()->header('Processing '.$movieCount.' movie releases.');
             }
 
             foreach ($res as $arr) {
@@ -965,7 +961,7 @@ class MovieService
                 $movieName = $this->formatMovieName();
 
                 if ($this->echooutput) {
-                    $this->colorCli->info('Looking up: '.$movieName);
+                    cli()->info('Looking up: '.$movieName);
                 }
 
                 $foundIMDB = $this->searchLocalDatabase($arr['id']) ||
@@ -976,7 +972,7 @@ class MovieService
 
                 if ($foundIMDB) {
                     if ($this->echooutput) {
-                        $this->colorCli->primary('Successfully updated release with IMDB ID');
+                        cli()->primary('Successfully updated release with IMDB ID');
                     }
 
                     continue;
@@ -984,7 +980,7 @@ class MovieService
                     $releaseCheck = Release::query()->where('id', $arr['id'])->whereNotNull('imdbid')->exists();
                     if ($releaseCheck) {
                         if ($this->echooutput) {
-                            $this->colorCli->info('Release already has IMDB ID, skipping');
+                            cli()->info('Release already has IMDB ID, skipping');
                         }
 
                         continue;
@@ -1001,9 +997,9 @@ class MovieService
                         ->whereIn('id', $failedIDs)
                         ->get();
 
-                    $this->colorCli->header('Failed to find IMDB IDs for '.count($failedIDs).' releases:');
+                    cli()->header('Failed to find IMDB IDs for '.count($failedIDs).' releases:');
                     foreach ($failedReleases as $release) {
-                        $this->colorCli->error("ID: {$release->id} - {$release->searchname}");
+                        cli()->error("ID: {$release->id} - {$release->searchname}");
                     }
                 }
 
@@ -1218,7 +1214,7 @@ class MovieService
                 Cache::put($cacheKey, $match['imdbid'], now()->addDays(7));
 
                 if ($this->echooutput) {
-                    $this->colorCli->info("Found local match: {$match['title']} ({$match['imdbid']})");
+                    cli()->info("Found local match: {$match['title']} ({$match['imdbid']})");
                 }
 
                 return $match['imdbid'];

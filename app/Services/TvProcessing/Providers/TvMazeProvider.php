@@ -75,10 +75,10 @@ class TvMazeProvider extends AbstractTvProvider
                 if (\is_array($release) && $release['name'] !== '') {
                     if (\in_array($release['cleanname'], $this->titleCache, false)) {
                         if ($this->echooutput) {
-                            $this->colorCli->primaryOver('    → ');
-                            $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
-                            $this->colorCli->primaryOver(' → ');
-                            $this->colorCli->alternate('Skipped (previously failed)');
+                            cli()->primaryOver('    → ');
+                            cli()->alternateOver($this->truncateTitle($release['cleanname']));
+                            cli()->primaryOver(' → ');
+                            cli()->alternate('Skipped (previously failed)');
                         }
                         $this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
                         $skipped++;
@@ -96,10 +96,10 @@ class TvMazeProvider extends AbstractTvProvider
                     if ($videoId === 0 && $lookupSetting) {
                         // If lookups are allowed lets try to get it.
                         if ($this->echooutput) {
-                            $this->colorCli->primaryOver('    → ');
-                            $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
-                            $this->colorCli->primaryOver(' → ');
-                            $this->colorCli->info('Searching TVMaze...');
+                            cli()->primaryOver('    → ');
+                            cli()->headerOver($this->truncateTitle($release['cleanname']));
+                            cli()->primaryOver(' → ');
+                            cli()->info('Searching TVMaze...');
                         }
 
                         // Get the show from TVMaze
@@ -125,10 +125,10 @@ class TvMazeProvider extends AbstractTvProvider
                         }
                     } else {
                         if ($this->echooutput && $videoId > 0) {
-                            $this->colorCli->primaryOver('    → ');
-                            $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
-                            $this->colorCli->primaryOver(' → ');
-                            $this->colorCli->info('Found in DB');
+                            cli()->primaryOver('    → ');
+                            cli()->headerOver($this->truncateTitle($release['cleanname']));
+                            cli()->primaryOver(' → ');
+                            cli()->info('Found in DB');
                         }
                         $siteId = $this->getSiteIDFromVideoID('tvmaze', $videoId);
                     }
@@ -144,10 +144,10 @@ class TvMazeProvider extends AbstractTvProvider
                             // Set the video ID and leave episode 0
                             $this->setVideoIdFound($videoId, $row['id'], 0);
                             if ($this->echooutput) {
-                                $this->colorCli->primaryOver('    → ');
-                                $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
-                                $this->colorCli->primaryOver(' → ');
-                                $this->colorCli->primary('Full Season matched');
+                                cli()->primaryOver('    → ');
+                                cli()->headerOver($this->truncateTitle($release['cleanname']));
+                                cli()->primaryOver(' → ');
+                                cli()->primary('Full Season matched');
                             }
                             $matched++;
 
@@ -180,14 +180,14 @@ class TvMazeProvider extends AbstractTvProvider
                             // Mark the releases video and episode IDs
                             $this->setVideoIdFound($videoId, $row['id'], $episode);
                             if ($this->echooutput) {
-                                $this->colorCli->primaryOver('    → ');
-                                $this->colorCli->headerOver($this->truncateTitle($release['cleanname']));
-                                $this->colorCli->primaryOver(' S');
-                                $this->colorCli->warningOver(sprintf('%02d', $seriesNo));
-                                $this->colorCli->primaryOver('E');
-                                $this->colorCli->warningOver(sprintf('%02d', $episodeNo));
-                                $this->colorCli->primaryOver(' ✓ ');
-                                $this->colorCli->primary('MATCHED (TVMaze)');
+                                cli()->primaryOver('    → ');
+                                cli()->headerOver($this->truncateTitle($release['cleanname']));
+                                cli()->primaryOver(' S');
+                                cli()->warningOver(sprintf('%02d', $seriesNo));
+                                cli()->primaryOver('E');
+                                cli()->warningOver(sprintf('%02d', $episodeNo));
+                                cli()->primaryOver(' ✓ ');
+                                cli()->primary('MATCHED (TVMaze)');
                             }
                             $matched++;
                         } else {
@@ -195,10 +195,10 @@ class TvMazeProvider extends AbstractTvProvider
                             $this->setVideoIdFound($videoId, $row['id'], 0);
                             $this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
                             if ($this->echooutput) {
-                                $this->colorCli->primaryOver('    → ');
-                                $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
-                                $this->colorCli->primaryOver(' → ');
-                                $this->colorCli->warning('Episode not found');
+                                cli()->primaryOver('    → ');
+                                cli()->alternateOver($this->truncateTitle($release['cleanname']));
+                                cli()->primaryOver(' → ');
+                                cli()->warning('Episode not found');
                             }
                         }
                     } else {
@@ -206,10 +206,10 @@ class TvMazeProvider extends AbstractTvProvider
                         $this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
                         $this->titleCache[] = $release['cleanname'] ?? null;
                         if ($this->echooutput) {
-                            $this->colorCli->primaryOver('    → ');
-                            $this->colorCli->alternateOver($this->truncateTitle($release['cleanname']));
-                            $this->colorCli->primaryOver(' → ');
-                            $this->colorCli->warning('Not found');
+                            cli()->primaryOver('    → ');
+                            cli()->alternateOver($this->truncateTitle($release['cleanname']));
+                            cli()->primaryOver(' → ');
+                            cli()->warning('Not found');
                         }
                     }
                 } else {
@@ -217,10 +217,10 @@ class TvMazeProvider extends AbstractTvProvider
                     $this->setVideoNotFound(parent::PROCESS_TMDB, $row['id']);
                     $this->titleCache[] = $release['cleanname'] ?? null;
                     if ($this->echooutput) {
-                        $this->colorCli->primaryOver('    → ');
-                        $this->colorCli->alternateOver(mb_substr($row['searchname'], 0, 50));
-                        $this->colorCli->primaryOver(' → ');
-                        $this->colorCli->error('Parse failed');
+                        cli()->primaryOver('    → ');
+                        cli()->alternateOver(mb_substr($row['searchname'], 0, 50));
+                        cli()->primaryOver(' → ');
+                        cli()->error('Parse failed');
                     }
                 }
             }
@@ -228,8 +228,8 @@ class TvMazeProvider extends AbstractTvProvider
             // Display summary
             if ($this->echooutput && $matched > 0) {
                 echo "\n";
-                $this->colorCli->primaryOver('  ✓ TVMaze: ');
-                $this->colorCli->primary(sprintf('%d matched, %d skipped', $matched, $skipped));
+                cli()->primaryOver('  ✓ TVMaze: ');
+                cli()->primary(sprintf('%d matched, %d skipped', $matched, $skipped));
             }
         }
     }

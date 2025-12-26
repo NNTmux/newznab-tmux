@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
 use App\Services\NNTP\NNTPService;
-use Blacklight\ColorCLI;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -492,6 +491,6 @@ class UsenetGroup extends Model
     public static function disableIfNotExist(int $id): void
     {
         self::updateGroupStatus($id, 'active');
-        (new ColorCLI)->error('Group does not exist on server, disabling');
+        cli()->error('Group does not exist on server, disabling');
     }
 }

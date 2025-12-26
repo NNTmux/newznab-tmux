@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\Settings;
 use App\Services\Tmux\TmuxSessionManager;
-use Blacklight\ColorCLI;
 use Illuminate\Console\Command;
 
 class TmuxStop extends Command
@@ -27,14 +26,11 @@ class TmuxStop extends Command
 
     private TmuxSessionManager $sessionManager;
 
-    private ColorCLI $colorCli;
-
     /**
      * Execute the console command.
      */
     public function handle(): int
     {
-        $this->colorCli = new ColorCLI;
 
         try {
             // Get session name
@@ -60,7 +56,7 @@ class TmuxStop extends Command
                 }
             }
 
-            $this->colorCli->header('Stopping Tmux Session');
+            cli()->header('Stopping Tmux Session');
 
             // Set running flag to 0
             Settings::query()->where('name', 'running')->update(['value' => 0]);

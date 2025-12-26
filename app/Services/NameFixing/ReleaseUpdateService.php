@@ -11,7 +11,6 @@ use App\Models\Release;
 use App\Models\UsenetGroup;
 use App\Services\Categorization\CategorizationService;
 use App\Services\ReleaseCleaningService;
-use Blacklight\ColorCLI;
 use Illuminate\Support\Arr;
 
 /**
@@ -49,7 +48,6 @@ class ReleaseUpdateService
 
     protected CategorizationService $category;
     protected FileNameCleaner $fileNameCleaner;
-    protected ColorCLI $colorCLI;
     protected bool $echoOutput;
 
     /**
@@ -79,12 +77,10 @@ class ReleaseUpdateService
 
     public function __construct(
         ?CategorizationService $category = null,
-        ?FileNameCleaner $fileNameCleaner = null,
-        ?ColorCLI $colorCLI = null
+        ?FileNameCleaner $fileNameCleaner = null
     ) {
         $this->category = $category ?? new CategorizationService();
         $this->fileNameCleaner = $fileNameCleaner ?? new FileNameCleaner();
-        $this->colorCLI = $colorCLI ?? new ColorCLI();
         $this->echoOutput = config('nntmux.echocli');
     }
 
@@ -212,23 +208,23 @@ class ReleaseUpdateService
 
         echo PHP_EOL;
 
-        $this->colorCLI->primary('Release Information:');
+        cli()->primary('Release Information:');
 
-        echo '  ' . $this->colorCLI->headerOver('New name:   ') . $this->colorCLI->primary(substr($newName, 0, 100)) . PHP_EOL;
-        echo '  ' . $this->colorCLI->headerOver('Old name:   ') . $this->colorCLI->primary(substr((string) $release->searchname, 0, 100)) . PHP_EOL;
-        echo '  ' . $this->colorCLI->headerOver('Use name:   ') . $this->colorCLI->primary(substr((string) $release->name, 0, 100)) . PHP_EOL;
+        echo '  ' . cli()->headerOver('New name:   ') . cli()->primary(substr($newName, 0, 100)) . PHP_EOL;
+        echo '  ' . cli()->headerOver('Old name:   ') . cli()->primary(substr((string) $release->searchname, 0, 100)) . PHP_EOL;
+        echo '  ' . cli()->headerOver('Use name:   ') . cli()->primary(substr((string) $release->name, 0, 100)) . PHP_EOL;
         echo PHP_EOL;
 
-        echo '  ' . $this->colorCLI->headerOver('New cat:    ') . $this->colorCLI->primary($newCatName) . PHP_EOL;
-        echo '  ' . $this->colorCLI->headerOver('Old cat:    ') . $this->colorCLI->primary($oldCatName) . PHP_EOL;
-        echo '  ' . $this->colorCLI->headerOver('Group:      ') . $this->colorCLI->primary($groupName) . PHP_EOL;
+        echo '  ' . cli()->headerOver('New cat:    ') . cli()->primary($newCatName) . PHP_EOL;
+        echo '  ' . cli()->headerOver('Old cat:    ') . cli()->primary($oldCatName) . PHP_EOL;
+        echo '  ' . cli()->headerOver('Group:      ') . cli()->primary($groupName) . PHP_EOL;
         echo PHP_EOL;
 
-        echo '  ' . $this->colorCLI->headerOver('Method:     ') . $this->colorCLI->primary($type . $method) . PHP_EOL;
-        echo '  ' . $this->colorCLI->headerOver('Release ID: ') . $this->colorCLI->primary((string) $release->releases_id) . PHP_EOL;
+        echo '  ' . cli()->headerOver('Method:     ') . cli()->primary($type . $method) . PHP_EOL;
+        echo '  ' . cli()->headerOver('Release ID: ') . cli()->primary((string) $release->releases_id) . PHP_EOL;
 
         if (!empty($release->filename)) {
-            echo '  ' . $this->colorCLI->headerOver('Filename:   ') . $this->colorCLI->primary(substr((string) $release->filename, 0, 100)) . PHP_EOL;
+            echo '  ' . cli()->headerOver('Filename:   ') . cli()->primary(substr((string) $release->filename, 0, 100)) . PHP_EOL;
         }
 
         if ($type !== 'PAR2, ') {

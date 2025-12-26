@@ -3,9 +3,9 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Services\TmdbClient;
-use Blacklight\ColorCLI;
 
-$colorCli = new ColorCLI;
+
+
 
 if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
     // Test if your TMDB API configuration is working
@@ -14,7 +14,7 @@ if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
     $tmdbClient = app(TmdbClient::class);
 
     if (! $tmdbClient->isConfigured()) {
-        exit($colorCli->error('TMDB API key is not configured. Please set your API key in the configuration.'));
+        exit(cli()->error('TMDB API key is not configured. Please set your API key in the configuration.'));
     }
 
     $season = (int) $argv[2];
@@ -31,7 +31,7 @@ if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
         $showId = TmdbClient::getInt($results[0], 'id');
 
         if ($showId === 0) {
-            exit($colorCli->error('Invalid show ID returned from TMDB API.'));
+            exit(cli()->error('Invalid show ID returned from TMDB API.'));
         }
 
         // Get TV show details with networks
@@ -57,7 +57,7 @@ if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
                 echo "Season: $season, Episode: $episode\n";
                 print_r($episodeObj);
             } else {
-                exit($colorCli->error('Episode not found on TMDB API.'));
+                exit(cli()->error('Episode not found on TMDB API.'));
             }
         } elseif ($season === 0 && $episode === 0) {
             $tvShowFull = $tmdbClient->getTvShow($showId);
@@ -65,11 +65,11 @@ if (! empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
                 print_r($tvShowFull);
             }
         } else {
-            exit($colorCli->error('Invalid episode data returned from TMDB API.'));
+            exit(cli()->error('Invalid episode data returned from TMDB API.'));
         }
     } else {
-        exit($colorCli->error('Invalid show data returned from TMDB API.'));
+        exit(cli()->error('Invalid show data returned from TMDB API.'));
     }
 } else {
-    exit($colorCli->error('Invalid arguments.  This script requires a text string (show name) followed by a season and episode number.'));
+    exit(cli()->error('Invalid arguments.  This script requires a text string (show name) followed by a season and episode number.'));
 }

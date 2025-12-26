@@ -4,15 +4,13 @@ namespace App\Services;
 
 use App\Models\Collection;
 use App\Models\Settings;
-use Blacklight\ColorCLI;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class CollectionCleanupService
 {
-    public function __construct(
-        private readonly ColorCLI $colorCLI
-    ) {}
+    public function __construct()
+    {}
 
     /**
      * Deletes finished/old collections, cleans orphans, and removes collections missed after NZB creation.
@@ -26,8 +24,8 @@ class CollectionCleanupService
         $deletedCount = 0;
 
         if ($echoCLI) {
-            echo $this->colorCLI->header('Process Releases -> Delete finished collections.'.PHP_EOL).
-                $this->colorCLI->primary(sprintf(
+            echo cli()->header('Process Releases -> Delete finished collections.'.PHP_EOL).
+                cli()->primary(sprintf(
                     'Deleting collections/binaries/parts older than %d hours.',
                     Settings::settingValue('partretentionhours')
                 ), true);
@@ -57,7 +55,7 @@ class CollectionCleanupService
                     $attempt++;
                     if ($attempt >= $maxRetries) {
                         if ($echoCLI) {
-                            $this->colorCLI->error('Cleanup delete failed after retries: '.$e->getMessage());
+                            cli()->error('Cleanup delete failed after retries: '.$e->getMessage());
                         }
                         break;
                     }
@@ -77,7 +75,7 @@ class CollectionCleanupService
 
         if ($echoCLI) {
             $elapsed = now()->diffInSeconds($startTime, true);
-            $this->colorCLI->primary(
+            cli()->primary(
                 'Finished deleting '.$batchDeleted.' old collections/binaries/parts in '.
                 $elapsed.Str::plural(' second', $elapsed),
                 true
@@ -87,8 +85,8 @@ class CollectionCleanupService
         // Occasionally prune CBP orphans (low frequency to avoid heavy load).
         if (random_int(0, 200) <= 1) {
             if ($echoCLI) {
-                echo $this->colorCLI->header('Process Releases -> Remove CBP orphans.'.PHP_EOL).
-                    $this->colorCLI->primary('Deleting orphaned collections.');
+                echo cli()->header('Process Releases -> Remove CBP orphans.'.PHP_EOL).
+                    cli()->primary('Deleting orphaned collections.');
             }
 
             $deleted = 0;
@@ -108,12 +106,12 @@ class CollectionCleanupService
             $totalTime = now()->diffInSeconds($startTime);
 
             if ($echoCLI) {
-                $this->colorCLI->primary('Finished deleting '.$deleted.' orphaned collections in '.$totalTime.Str::plural(' second', $totalTime), true);
+                cli()->primary('Finished deleting '.$deleted.' orphaned collections in '.$totalTime.Str::plural(' second', $totalTime), true);
             }
         }
 
         if ($echoCLI) {
-            $this->colorCLI->primary('Deleting collections that were missed after NZB creation.', true);
+            cli()->primary('Deleting collections that were missed after NZB creation.', true);
         }
 
         $deleted = 0;
@@ -132,7 +130,7 @@ class CollectionCleanupService
         $totalTime = now()->diffInSeconds($startTime, true);
 
         if ($echoCLI) {
-            $this->colorCLI->primary(
+            cli()->primary(
                 'Finished deleting '.$deleted.' collections missed after NZB creation in '.($totalTime).Str::plural(' second', $totalTime).
                 PHP_EOL.'Removed '.number_format($deletedCount).' parts/binaries/collection rows in '.$totalTime.Str::plural(' second', $totalTime),
                 true

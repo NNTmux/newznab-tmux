@@ -13,14 +13,12 @@ use App\Models\UsenetGroup;
 use App\Services\Categorization\CategorizationService;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseCleaningService;
-use Blacklight\ColorCLI;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ReleaseCreationService
 {
     public function __construct(
-        private readonly ColorCLI $colorCLI,
         private readonly ReleaseCleaningService $releaseCleaning
     ) {}
 
@@ -38,7 +36,7 @@ class ReleaseCreationService
         $duplicate = 0;
 
         if ($echoCLI) {
-            $this->colorCLI->header('Process Releases -> Create releases from complete collections.');
+            cli()->header('Process Releases -> Create releases from complete collections.');
         }
 
         $collectionsQuery = Collection::query()
@@ -53,7 +51,7 @@ class ReleaseCreationService
         $collections = $collectionsQuery->get();
 
         if ($echoCLI && $collections->count() > 0) {
-            $this->colorCLI->primary(\count($collections).' Collections ready to be converted to releases.', true);
+            cli()->primary(\count($collections).' Collections ready to be converted to releases.', true);
         }
 
         foreach ($collections as $collection) {
@@ -181,7 +179,7 @@ class ReleaseCreationService
 
         $totalTime = now()->diffInSeconds($startTime, true);
         if ($echoCLI) {
-            $this->colorCLI->primary(
+            cli()->primary(
                 PHP_EOL.
                 number_format($returnCount).
                 ' Releases added and '.

@@ -6,7 +6,6 @@ use App\Models\BookInfo;
 use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
-use Blacklight\ColorCLI;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -36,15 +35,12 @@ class BookService
 
     public array $failCache;
 
-    protected ColorCLI $colorCli;
-
     /**
      * @throws \Exception
      */
     public function __construct()
     {
         $this->echooutput = config('nntmux.echocli');
-        $this->colorCli = new ColorCLI;
 
         $this->pubkey = Settings::settingValue('amazonpubkey');
         $this->privkey = Settings::settingValue('amazonprivkey');
@@ -321,7 +317,7 @@ class BookService
     {
         if ($res->count() > 0) {
             if ($this->echooutput) {
-                $this->colorCli->header('Processing '.$res->count().' book release(s) for categories id '.$categoryID);
+                cli()->header('Processing '.$res->count().' book release(s) for categories id '.$categoryID);
             }
 
             $bookId = -2;
@@ -339,7 +335,7 @@ class BookService
 
                 if ($bookInfo !== false) {
                     if ($this->echooutput) {
-                        $this->colorCli->info('Looking up: '.$bookInfo);
+                        cli()->info('Looking up: '.$bookInfo);
                     }
 
                     // Do a local lookup first
@@ -348,7 +344,7 @@ class BookService
                     if ($bookCheck === null && \in_array($bookInfo, $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
-                            $this->colorCli->info('Cached previous failure. Skipping.');
+                            cli()->info('Cached previous failure. Skipping.');
                         }
                         $bookId = -2;
                     } elseif ($bookCheck === null) {
@@ -376,7 +372,7 @@ class BookService
                 }
             }
         } elseif ($this->echooutput) {
-            $this->colorCli->header('No book releases to process for categories id '.$categoryID);
+            cli()->header('No book releases to process for categories id '.$categoryID);
         }
     }
 
@@ -401,7 +397,7 @@ class BookService
         if ($releasetype === 'ebook') {
             if (preg_match('/^([a-z0-9] )+$|ArtofUsenet|ekiosk|(ebook|mobi).+collection|erotica|Full Video|ImwithJamie|linkoff org|Mega.+pack|^[a-z0-9]+ (?!((January|February|March|April|May|June|July|August|September|O([ck])tober|November|De([cz])ember)))[a-z]+( (ebooks?|The))?$|NY Times|(Book|Massive) Dump|Sexual/i', $releasename)) {
                 if ($this->echooutput) {
-                    $this->colorCli->headerOver('Changing category to misc books: ').$this->colorCli->primary($releasename);
+                    cli()->headerOver('Changing category to misc books: ').cli()->primary($releasename);
                 }
                 Release::query()->where('id', $releaseID)->update(['categories_id' => Category::BOOKS_UNKNOWN]);
 
@@ -410,7 +406,7 @@ class BookService
 
             if (preg_match('/^([a-z0-9ü!]+ ){1,2}(N|Vol)?\d{1,4}([abc])?$|^([a-z0-9]+ ){1,2}(Jan( |unar|$)|Feb( |ruary|$)|Mar( |ch|$)|Apr( |il|$)|May(?![a-z0-9])|Jun([ e$])|Jul([ y$])|Aug( |ust|$)|Sep( |tember|$)|O([ck])t( |ober|$)|Nov( |ember|$)|De([cz])( |ember|$))/ui', $releasename) && ! preg_match('/Part \d+/i', $releasename)) {
                 if ($this->echooutput) {
-                    $this->colorCli->headerOver('Changing category to magazines: ').$this->colorCli->primary($releasename);
+                    cli()->headerOver('Changing category to magazines: ').cli()->primary($releasename);
                 }
                 Release::query()->where('id', $releaseID)->update(['categories_id' => Category::BOOKS_MAGAZINES]);
 
@@ -450,7 +446,7 @@ class BookService
         $book = false;
         if ($bookInfo !== '') {
             if (! $book) {
-                $this->colorCli->info('Fetching data from iTunes for '.$bookInfo);
+                cli()->info('Fetching data from iTunes for '.$bookInfo);
                 $book = $this->fetchItunesBookProperties($bookInfo);
             } elseif ($amazdata !== null) {
                 $book = $amazdata;
@@ -507,20 +503,20 @@ class BookService
 
         if ($bookId && $bookId !== -2) {
             if ($this->echooutput) {
-                $this->colorCli->header('Added/updated book: ');
+                cli()->header('Added/updated book: ');
                 if ($book['author'] !== '') {
-                    $this->colorCli->alternateOver('   Author: ').$this->colorCli->primary($book['author']);
+                    cli()->alternateOver('   Author: ').cli()->primary($book['author']);
                 }
-                $this->colorCli->alternateOver('   Title: ').$this->colorCli->primary(' '.$book['title']);
+                cli()->alternateOver('   Title: ').cli()->primary(' '.$book['title']);
                 if ($book['genre'] !== 'null') {
-                    $this->colorCli->alternateOver('   Genre: ').$this->colorCli->primary(' '.$book['genre']);
+                    cli()->alternateOver('   Genre: ').cli()->primary(' '.$book['genre']);
                 }
             }
 
             $book['cover'] = $ri->saveImage($bookId, $book['coverurl'], $this->imgSavePath, 250, 250);
         } elseif ($this->echooutput) {
-            $this->colorCli->header('Nothing to update: ').
-            $this->colorCli->header($book['author'].
+            cli()->header('Nothing to update: ').
+            cli()->header($book['author'].
                 ' - '.
                 $book['title']);
         }
@@ -539,12 +535,12 @@ class BookService
         $iTunesBook = $itunes->findEbook($bookInfo);
 
         if ($iTunesBook === null) {
-            $this->colorCli->notice('Could not find a match on iTunes!');
+            cli()->notice('Could not find a match on iTunes!');
 
             return false;
         }
 
-        $this->colorCli->info('Found matching title: '.$iTunesBook['name']);
+        cli()->info('Found matching title: '.$iTunesBook['name']);
 
         $book = [
             'title' => $iTunesBook['name'],

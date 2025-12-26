@@ -16,7 +16,6 @@ use App\Services\AdultProcessing\Pipes\HotmoviesPipe;
 use App\Services\AdultProcessing\Pipes\IafdPipe;
 use App\Services\AdultProcessing\Pipes\PoppornPipe;
 use App\Services\ReleaseImageService;
-use Blacklight\ColorCLI;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Concurrency;
@@ -39,7 +38,6 @@ class AdultProcessingPipeline
 
     protected int $movieQty;
     protected bool $echoOutput;
-    protected ColorCLI $colorCli;
     protected ReleaseImageService $releaseImage;
     protected string $imgSavePath;
     protected string $cookie;
@@ -81,7 +79,6 @@ class AdultProcessingPipeline
         }
 
         $this->echoOutput = $echoOutput;
-        $this->colorCli = new ColorCLI();
         $this->releaseImage = new ReleaseImageService();
         $this->imgSavePath = storage_path('covers/xxx/');
         $this->cookie = resource_path('tmp/xxx.cookie');
@@ -195,13 +192,13 @@ class AdultProcessingPipeline
 
             if ($releaseCount === 0) {
                 if ($this->echoOutput) {
-                    $this->colorCli->header('No XXX releases to process.');
+                    cli()->header('No XXX releases to process.');
                 }
                 return;
             }
 
             if ($this->echoOutput) {
-                $this->colorCli->header('Processing ' . $releaseCount . ' XXX releases using pipeline.');
+                cli()->header('Processing ' . $releaseCount . ' XXX releases using pipeline.');
             }
 
             // Process releases in batches for parallel processing
@@ -210,7 +207,7 @@ class AdultProcessingPipeline
 
             foreach ($batches as $batchIndex => $batch) {
                 if ($this->echoOutput) {
-                    $this->colorCli->info('Processing batch ' . ($batchIndex + 1) . ' of ' . count($batches));
+                    cli()->info('Processing batch ' . ($batchIndex + 1) . ' of ' . count($batches));
                 }
                 $this->processBatch($batch);
             }
@@ -223,7 +220,7 @@ class AdultProcessingPipeline
             ]);
 
             if ($this->echoOutput) {
-                $this->colorCli->error('Error during processing: ' . $e->getMessage());
+                cli()->error('Error during processing: ' . $e->getMessage());
             }
         }
 
@@ -400,7 +397,7 @@ class AdultProcessingPipeline
 
             if ($cleanTitle === false) {
                 if ($this->echoOutput) {
-                    $this->colorCli->primary('.');
+                    cli()->primary('.');
                 }
                 $this->updateReleaseXxxId($releaseId, $idCheck);
                 $this->stats['skipped']++;
@@ -412,13 +409,13 @@ class AdultProcessingPipeline
 
             if ($existingInfo !== null) {
                 if ($this->echoOutput) {
-                    $this->colorCli->info('Local match found for XXX Movie: ' . $cleanTitle);
+                    cli()->info('Local match found for XXX Movie: ' . $cleanTitle);
                 }
                 $idCheck = (int) $existingInfo['id'];
             } else {
                 if ($this->echoOutput) {
-                    $this->colorCli->info('Looking up: ' . $cleanTitle);
-                    $this->colorCli->info('Local match not found, checking web!');
+                    cli()->info('Looking up: ' . $cleanTitle);
+                    cli()->info('Local match not found, checking web!');
                 }
 
                 $idCheck = $this->updateXXXInfo($cleanTitle, $release);
@@ -480,7 +477,7 @@ class AdultProcessingPipeline
                 'hotm' => 'HotMovies',
                 default => $providerName,
             };
-            $this->colorCli->primary('Fetching XXX info from: ' . $fromStr);
+            cli()->primary('Fetching XXX info from: ' . $fromStr);
         }
 
         // Track provider usage
@@ -574,7 +571,7 @@ class AdultProcessingPipeline
         }
 
         if ($this->echoOutput) {
-            $this->colorCli->primary(
+            cli()->primary(
                 ($xxxID !== false ? 'Added/updated XXX movie: ' . $mov['title'] : 'Nothing to update for XXX movie: ' . $mov['title']),
                 true
             );
@@ -729,17 +726,17 @@ class AdultProcessingPipeline
      */
     protected function outputStats(): void
     {
-        $this->colorCli->header("\n=== Adult Processing Statistics ===");
-        $this->colorCli->primary('Processed: ' . $this->stats['processed']);
-        $this->colorCli->primary('Matched: ' . $this->stats['matched']);
-        $this->colorCli->primary('Failed: ' . $this->stats['failed']);
-        $this->colorCli->primary('Skipped: ' . $this->stats['skipped']);
-        $this->colorCli->primary(sprintf('Duration: %.2f seconds', $this->stats['duration']));
+        cli()->header("\n=== Adult Processing Statistics ===");
+        cli()->primary('Processed: ' . $this->stats['processed']);
+        cli()->primary('Matched: ' . $this->stats['matched']);
+        cli()->primary('Failed: ' . $this->stats['failed']);
+        cli()->primary('Skipped: ' . $this->stats['skipped']);
+        cli()->primary(sprintf('Duration: %.2f seconds', $this->stats['duration']));
 
         if (!empty($this->stats['providers'])) {
-            $this->colorCli->header("\nProvider Statistics:");
+            cli()->header("\nProvider Statistics:");
             foreach ($this->stats['providers'] as $provider => $count) {
-                $this->colorCli->primary("  {$provider}: {$count} matches");
+                cli()->primary("  {$provider}: {$count} matches");
             }
         }
     }

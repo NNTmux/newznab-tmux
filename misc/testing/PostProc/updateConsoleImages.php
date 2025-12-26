@@ -3,14 +3,14 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\ConsoleInfo;
-use Blacklight\ColorCLI;
+
 use Illuminate\Support\Facades\File;
 
 $covers = $updated = $deleted = 0;
-$colorCli = new ColorCLI;
+
 
 if ($argc === 1 || $argv[1] !== 'true') {
-    $colorCli->error("\nThis script will check all images in covers/console and compare to db->consoleinfo.\nTo run:\nphp $argv[0] true\n");
+    cli()->error("\nThis script will check all images in covers/console and compare to db->consoleinfo.\nTo run:\nphp $argv[0] true\n");
     exit();
 }
 
@@ -32,7 +32,7 @@ foreach ($itr as $filePath) {
             } else {
                 $run = ConsoleInfo::query()->where('id', $hit[1])->value('id');
                 if ($run === 0) {
-                    $colorCli->info($filePath.' not found in db.');
+                    cli()->info($filePath.' not found in db.');
                 }
             }
         }
@@ -48,9 +48,9 @@ foreach ($qry as $rows) {
                 ['id' => $rows['id']],
             ]
         )->update(['cover' => 0]);
-        $colorCli->info($path2covers.$rows['id'].'.jpg does not exist.');
+        cli()->info($path2covers.$rows['id'].'.jpg does not exist.');
         $deleted++;
     }
 }
-$colorCli->header($covers.' covers set.');
-$colorCli->header($deleted.' consoles unset.');
+cli()->header($covers.' covers set.');
+cli()->header($deleted.' consoles unset.');

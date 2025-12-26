@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\Release;
 use App\Services\TvProcessing\TvProcessingPipeline;
-use Blacklight\ColorCLI;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -27,12 +26,9 @@ class ReprocessTvRelease extends Command
      */
     protected $description = 'Reprocess a specific TV release by GUID to rematch it against TV databases';
 
-    protected ColorCLI $colorCli;
-
     public function __construct()
     {
         parent::__construct();
-        $this->colorCli = new ColorCLI();
     }
 
     /**
@@ -84,12 +80,12 @@ class ReprocessTvRelease extends Command
             $this->newLine();
 
             if ($result['matched']) {
-                $this->colorCli->primary('Successfully matched!');
+                cli()->primary('Successfully matched!');
                 $this->info('Provider: ' . ($result['provider'] ?? 'Unknown'));
                 $this->info('Video ID: ' . ($result['video_id'] ?? 'N/A'));
                 $this->info('Episode ID: ' . ($result['episode_id'] ?? 'N/A'));
             } else {
-                $this->colorCli->warning('No match found.');
+                cli()->warning('No match found.');
                 $this->info('Status: ' . ($result['status'] ?? 'Unknown'));
                 if (isset($result['provider'])) {
                     $this->info('Last provider tried: ' . $result['provider']);

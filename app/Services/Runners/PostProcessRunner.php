@@ -51,11 +51,11 @@ class PostProcessRunner extends BaseRunner
 
                 foreach ($results as $taskIdx => $output) {
                     echo $output;
-                    $this->colorCli->primary('Finished task for '.$desc);
+                    cli()->primary('Finished task for '.$desc);
                 }
             } catch (\Throwable $e) {
                 Log::error('Postprocess batch failed: '.$e->getMessage());
-                $this->colorCli->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
+                cli()->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
             }
         }
     }
@@ -241,11 +241,11 @@ class PostProcessRunner extends BaseRunner
 
                 foreach ($results as $taskIdx => $output) {
                     echo $output;
-                    $this->colorCli->primary('Finished task for '.$desc);
+                    cli()->primary('Finished task for '.$desc);
                 }
             } catch (\Throwable $e) {
                 Log::error('TV pipeline batch failed: '.$e->getMessage());
-                $this->colorCli->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
+                cli()->error('Batch '.($batchIndex + 1).' failed: '.$e->getMessage());
             }
         }
     }

@@ -5,7 +5,6 @@ namespace App\Services\AdultProcessing\Pipes;
 use App\Services\AdultProcessing\AdultProcessingPassable;
 use App\Services\AdultProcessing\AdultProcessingResult;
 use App\Services\AdultProcessing\AgeVerificationManager;
-use Blacklight\ColorCLI;
 use Closure;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
@@ -33,7 +32,6 @@ abstract class AbstractAdultProviderPipe
 {
     protected int $priority = 50;
     protected bool $echoOutput = true;
-    protected ?ColorCLI $colorCli = null;
     protected ?HtmlDomParser $html = null;
     protected ?string $cookie = null;
 
@@ -89,18 +87,7 @@ abstract class AbstractAdultProviderPipe
 
     public function __construct()
     {
-        // Lazy load ColorCLI and HtmlDomParser to avoid serialization issues
-    }
-
-    /**
-     * Get the ColorCLI instance (lazy loaded).
-     */
-    protected function getColorCli(): ColorCLI
-    {
-        if ($this->colorCli === null) {
-            $this->colorCli = new ColorCLI();
-        }
-        return $this->colorCli;
+        // Lazy load HtmlDomParser to avoid serialization issues
     }
 
     /**

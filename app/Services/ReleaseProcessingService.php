@@ -19,7 +19,6 @@ use App\Support\DTOs\ProcessReleasesSettings;
 use App\Support\DTOs\ReleaseCreationResult;
 use App\Support\DTOs\ReleaseDeleteStats;
 use App\Services\NNTP\NNTPService;
-use Blacklight\ColorCLI;
 use Blacklight\Genres;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
@@ -48,7 +47,6 @@ final class ReleaseProcessingService
 
     private bool $echoCLI;
     private readonly ProcessReleasesSettings $settings;
-    private readonly ColorCLI $colorCLI;
     private readonly NzbService $nzb;
     private readonly ReleaseCleaningService $releaseCleaning;
     private readonly ReleaseManagementService $releaseManagement;
@@ -58,7 +56,6 @@ final class ReleaseProcessingService
     private readonly ?PostProcessService $postProcessService;
 
     public function __construct(
-        ?ColorCLI $colorCLI = null,
         ?NzbService $nzb = null,
         ?ReleaseCleaningService $releaseCleaning = null,
         ?ReleaseManagementService $releaseManagement = null,
@@ -69,16 +66,15 @@ final class ReleaseProcessingService
     ) {
         $this->echoCLI = (bool) config('nntmux.echocli');
 
-        $this->colorCLI = $colorCLI ?? new ColorCLI();
         $this->nzb = $nzb ?? app(NzbService::class);
         $this->releaseCleaning = $releaseCleaning ?? new ReleaseCleaningService();
         $this->releaseManagement = $releaseManagement ?? app(ReleaseManagementService::class);
         $this->releaseImage = $releaseImage ?? new ReleaseImageService();
 
         $this->releaseCreationService = $releaseCreationService
-            ?? new ReleaseCreationService($this->colorCLI, $this->releaseCleaning);
+            ?? new ReleaseCreationService($this->releaseCleaning);
         $this->collectionCleanupService = $collectionCleanupService
-            ?? new CollectionCleanupService($this->colorCLI);
+            ?? new CollectionCleanupService();
         $this->postProcessService = $postProcessService;
 
         $this->settings = $this->loadSettings();
@@ -112,7 +108,7 @@ final class ReleaseProcessingService
     private function validateSettings(): void
     {
         if (!$this->settings->hasValidCompletion()) {
-            $this->colorCLI->error(
+            cli()->error(
                 PHP_EOL . 'Invalid completion setting. Value must be between 0 and 100.'
             );
         }
@@ -570,7 +566,7 @@ final class ReleaseProcessingService
         $stats = ['minSize' => 0, 'maxSize' => 0, 'minFiles' => 0];
 
         if ($this->echoCLI) {
-            $this->colorCLI->header(
+            cli()->header(
                 'Process Releases -> Delete releases smaller/larger than minimum size/file count from group/site setting.'
             );
         }
@@ -622,7 +618,7 @@ final class ReleaseProcessingService
 
         if (!file_exists($nzbPath)) {
             if ($this->echoCLI) {
-                $this->colorCLI->error("Bad or missing NZB directory - {$nzbPath}");
+                cli()->error("Bad or missing NZB directory - {$nzbPath}");
             }
             return false;
         }
@@ -882,7 +878,7 @@ final class ReleaseProcessingService
         } while (true);
 
         if ($this->echoCLI && $totalDeleted > 0) {
-            $this->colorCLI->primary("Deleted {$totalDeleted} broken/stuck collections.", true);
+            cli()->primary("Deleted {$totalDeleted} broken/stuck collections.", true);
         }
     }
 
@@ -928,7 +924,7 @@ final class ReleaseProcessingService
                 $attempt++;
                 if ($attempt >= self::MAX_RETRIES) {
                     if ($this->echoCLI) {
-                        $this->colorCLI->error(
+                        cli()->error(
                             'Stuck collections delete failed after retries: ' . $e->getMessage()
                         );
                     }
@@ -1233,8 +1229,8 @@ final class ReleaseProcessingService
         }
 
         echo PHP_EOL;
-        $this->colorCLI->header('NNTmux Release Processing');
-        $this->colorCLI->info('Started: ' . now()->format('Y-m-d H:i:s'));
+        cli()->header('NNTmux Release Processing');
+        cli()->info('Started: ' . now()->format('Y-m-d H:i:s'));
     }
 
     private function outputHeader(string $title): void
@@ -1244,8 +1240,8 @@ final class ReleaseProcessingService
         }
 
         echo PHP_EOL;
-        $this->colorCLI->header(strtoupper($title));
-        $this->colorCLI->header(str_repeat('-', strlen($title)));
+        cli()->header(strtoupper($title));
+        cli()->header(str_repeat('-', strlen($title)));
     }
 
     private function outputSubHeader(string $title): void
@@ -1254,7 +1250,7 @@ final class ReleaseProcessingService
             return;
         }
 
-        $this->colorCLI->notice("  {$title}");
+        cli()->notice("  {$title}");
     }
 
     private function outputSuccess(string $message): void
@@ -1263,7 +1259,7 @@ final class ReleaseProcessingService
             return;
         }
 
-        $this->colorCLI->primary("    {$message}");
+        cli()->primary("    {$message}");
     }
 
     private function outputInfo(string $message): void
@@ -1272,7 +1268,7 @@ final class ReleaseProcessingService
             return;
         }
 
-        $this->colorCLI->info("    {$message}");
+        cli()->info("    {$message}");
     }
 
     private function outputStat(string $label, string|int $value, string $suffix = ''): void
@@ -1282,7 +1278,7 @@ final class ReleaseProcessingService
         }
 
         $formattedValue = is_int($value) ? number_format($value) : $value;
-        $this->colorCLI->primary("      {$label}: {$formattedValue}{$suffix}");
+        cli()->primary("      {$label}: {$formattedValue}{$suffix}");
     }
 
     private function outputElapsedTime(DateTimeInterface $startTime, string $prefix = 'Time'): void
@@ -1293,7 +1289,7 @@ final class ReleaseProcessingService
 
         $elapsed = now()->diffInSeconds($startTime, true);
         $timeStr = $this->formatElapsedTime($elapsed);
-        $this->colorCLI->info("      {$prefix}: {$timeStr}");
+        cli()->info("      {$prefix}: {$timeStr}");
     }
 
     private function formatElapsedTime(int|float $seconds): string
@@ -1347,15 +1343,15 @@ final class ReleaseProcessingService
         $elapsed = now()->diffInSeconds($startTime, true);
 
         echo PHP_EOL;
-        $this->colorCLI->header('SUMMARY');
-        $this->colorCLI->header('-------');
-        $this->colorCLI->primary('  Releases added: ' . number_format($releasesAdded));
-        $this->colorCLI->primary('  NZBs created: ' . number_format($nzbsCreated));
+        cli()->header('SUMMARY');
+        cli()->header('-------');
+        cli()->primary('  Releases added: ' . number_format($releasesAdded));
+        cli()->primary('  NZBs created: ' . number_format($nzbsCreated));
         if ($dupes > 0) {
-            $this->colorCLI->warning('  Duplicates skipped: ' . number_format($dupes));
+            cli()->warning('  Duplicates skipped: ' . number_format($dupes));
         }
-        $this->colorCLI->info('  Processing cycles: ' . number_format($iterations));
-        $this->colorCLI->info('  Total time: ' . $this->formatElapsedTime($elapsed));
+        cli()->info('  Processing cycles: ' . number_format($iterations));
+        cli()->info('  Total time: ' . $this->formatElapsedTime($elapsed));
         echo PHP_EOL;
     }
 

@@ -3,10 +3,10 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use aharen\OMDbAPI;
-use Blacklight\ColorCLI;
+
 
 $omdb = new OMDbAPI(config('nntmux_api.omdb_api_key'));
-$colorCli = new ColorCLI;
+
 
 if (! empty($argv[1]) && ! empty($argv[2]) && ($argv[2] !== 'series' || $argv[2] !== 'movie')) {
     // Test if your OMDb API key and configuration are working
@@ -24,10 +24,10 @@ if (! empty($argv[1]) && ! empty($argv[2]) && ($argv[2] !== 'series' || $argv[2]
 
         dump($search);
     } else {
-        $colorCli->error('Error retrieving OMDb API data.');
+        cli()->error('Error retrieving OMDb API data.');
         exit();
     }
 } else {
-    $colorCli->error('Invalid arguments. This script requires a text string (show name), and a second argument, movie or series.');
+    cli()->error('Invalid arguments. This script requires a text string (show name), and a second argument, movie or series.');
     exit();
 }

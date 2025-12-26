@@ -2,16 +2,12 @@
 
 namespace App\Services\Runners;
 
-use Blacklight\ColorCLI;
 use Symfony\Component\Process\Process;
 
 abstract class BaseRunner
 {
-    protected ColorCLI $colorCli;
-
-    public function __construct(?ColorCLI $colorCli = null)
+    public function __construct()
     {
-        $this->colorCli = $colorCli ?? new ColorCLI;
     }
 
     protected function buildDnrCommand(string $args): string
@@ -147,7 +143,7 @@ abstract class BaseRunner
     protected function headerStart(string $workType, int $count, int $maxProcesses): void
     {
         if (config('nntmux.echocli')) {
-            $this->colorCli->header(
+            cli()->header(
                 'Multi-processing started at '.now()->toRfc2822String().' for '.$workType.' with '.$count.
                 ' job(s) to do using a max of '.max(1, $maxProcesses).' child process(es).'
             );
@@ -157,7 +153,7 @@ abstract class BaseRunner
     protected function headerNone(): void
     {
         if (config('nntmux.echocli')) {
-            $this->colorCli->header('No work to do!');
+            cli()->header('No work to do!');
         }
     }
 
@@ -349,7 +345,7 @@ abstract class BaseRunner
                     unset($running[$key]);
                     $finished++;
                     if (config('nntmux.echocli')) {
-                        $this->colorCli->primary('Finished task #'.($total - $finished + 1).' for '.$desc);
+                        cli()->primary('Finished task #'.($total - $finished + 1).' for '.$desc);
                     }
                     // Start next from queue if available
                     if (! empty($queue)) {

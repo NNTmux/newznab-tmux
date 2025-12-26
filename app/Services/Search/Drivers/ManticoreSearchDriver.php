@@ -4,7 +4,6 @@ namespace App\Services\Search\Drivers;
 
 use App\Models\Release;
 use App\Services\Search\Contracts\SearchDriverInterface;
-use Blacklight\ColorCLI;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -26,8 +25,6 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
     public Search $search;
 
-    private ColorCLI $cli;
-
     /**
      * Establishes a connection to ManticoreSearch HTTP port.
      */
@@ -37,7 +34,6 @@ class ManticoreSearchDriver implements SearchDriverInterface
         $this->connection = ['host' => $this->config['host'], 'port' => $this->config['port']];
         $this->manticoreSearch = new Client($this->connection);
         $this->search = new Search($this->manticoreSearch);
-        $this->cli = new ColorCLI;
     }
 
     /**

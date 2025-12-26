@@ -3,17 +3,17 @@
 /* This script deletes releases that match certain criteria, type php removeCrapReleases.php false for details. */
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\ColorCLI;
+
 use Blacklight\ReleaseRemover;
 
-$cli = new ColorCLI;
+
 
 $n = PHP_EOL;
 
 $argCnt = count($argv);
 if ($argCnt === 1) {
     exit(
-        $cli->error(
+        cli()->error(
             $n.
             'Run fixReleaseNames.php first to attempt to fix release names.'.$n.
             'This will miss some releases if you have not set fixReleaseNames to set the release as checked.'.$n.$n.
@@ -54,11 +54,11 @@ if ($argCnt === 2) {
             "php $argv[0] true full blacklist 1 = Remove releases matching blacklist id 1.".$n
         );
     } else {
-        exit($cli->error("Wrong usage! Type php $argv[0] false"));
+        exit(cli()->error("Wrong usage! Type php $argv[0] false"));
     }
 }
 if ($argCnt < 3) {
-    exit($cli->error("Wrong usage! Type php $argv[0] false"));
+    exit(cli()->error("Wrong usage! Type php $argv[0] false"));
 }
 
 if (isset($argv[3]) && $argv[3] === 'blacklist' && isset($argv[4])) {

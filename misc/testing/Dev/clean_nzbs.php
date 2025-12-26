@@ -6,15 +6,15 @@ use App\Models\Release;
 use App\Services\Nzb\NzbParserService;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
-use Blacklight\ColorCLI;
+
 use Blacklight\Releases;
 use Illuminate\Support\Facades\File;
 
 $dir = resource_path().'/movednzbs/';
-$colorCli = new ColorCLI;
+
 
 if (! isset($argv[1]) || ! in_array($argv[1], ['true', 'move'])) {
-    $colorCli->error("This script can remove all nzbs not found in the db and all releases with no nzbs found. It can also move invalid nzbs.\n\n"
+    cli()->error("This script can remove all nzbs not found in the db and all releases with no nzbs found. It can also move invalid nzbs.\n\n"
         ."php $argv[0] true     ...: For a dry run, to see how many would be moved.\n"
         ."php $argv[0] move     ...: Move NZBs that are possibly bad or have no release. They are moved into this folder: $dir");
     exit();
@@ -33,8 +33,8 @@ $timestart = now()->toRfc2822String();
 $checked = $moved = 0;
 $couldbe = ($argv[1] === 'true') ? 'could be ' : '';
 
-$colorCli->header('Getting List of nzbs to check against db.');
-$colorCli->header("Checked / {$couldbe}moved\n");
+cli()->header('Getting List of nzbs to check against db.');
+cli()->header("Checked / {$couldbe}moved\n");
 
 $dirItr = new RecursiveDirectoryIterator(config('nntux_settings.path_to_nzbs'));
 $itr = new RecursiveIteratorIterator($dirItr, RecursiveIteratorIterator::LEAVES_ONLY);
@@ -56,9 +56,9 @@ foreach ($itr as $filePath) {
     }
 }
 
-$colorCli->header("\n".number_format($checked).' nzbs checked, '.number_format($moved).' nzbs '.$couldbe.'moved.');
-$colorCli->header('Getting List of releases to check against nzbs.');
-$colorCli->header("Checked / releases deleted\n");
+cli()->header("\n".number_format($checked).' nzbs checked, '.number_format($moved).' nzbs '.$couldbe.'moved.');
+cli()->header('Getting List of releases to check against nzbs.');
+cli()->header("Checked / releases deleted\n");
 
 $checked = $deleted = 0;
 
@@ -74,5 +74,5 @@ foreach ($res as $row) {
     $checked++;
     echo "$checked / $deleted\r";
 }
-$colorCli->header("\n".number_format($checked).' releases checked, '.number_format($deleted).' releases deleted.');
-$colorCli->header("Script started at [$timestart], finished at [".now()->toRfc2822String().']');
+cli()->header("\n".number_format($checked).' releases checked, '.number_format($deleted).' releases deleted.');
+cli()->header("Script started at [$timestart], finished at [".now()->toRfc2822String().']');

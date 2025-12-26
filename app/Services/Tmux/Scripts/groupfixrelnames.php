@@ -12,12 +12,8 @@
 
 require_once __DIR__.'/../../../../bootstrap/autoload.php';
 
-use Blacklight\ColorCLI;
-
-$colorCli = new ColorCLI;
-
 if (! isset($argv[1])) {
-    $colorCli->error('This script is not intended to be run manually, it is called from Multiprocessing.');
+    cli()->error('This script is not intended to be run manually, it is called from Multiprocessing.');
     exit(1);
 }
 
@@ -30,7 +26,7 @@ $artisan = base_path('artisan');
 switch ($type) {
     case 'standard':
         if ($guidChar === null || $maxPerRun === null || ! is_numeric($maxPerRun)) {
-            $colorCli->error('Invalid arguments for standard type');
+            cli()->error('Invalid arguments for standard type');
             exit(1);
         }
 
@@ -39,7 +35,7 @@ switch ($type) {
 
     case 'predbft':
         if (! isset($maxPerRun) || ! is_numeric($maxPerRun) || ! isset($thread) || ! is_numeric($thread)) {
-            $colorCli->error('Invalid arguments for predbft type');
+            cli()->error('Invalid arguments for predbft type');
             exit(1);
         }
 
@@ -47,7 +43,7 @@ switch ($type) {
         break;
 
     default:
-        $colorCli->error("Unknown type: {$type}");
+        cli()->error("Unknown type: {$type}");
         exit(1);
 }
 

@@ -10,7 +10,6 @@ use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Services\PopulateAniListService as PaList;
-use Blacklight\ColorCLI;
 
 class AnimeProcessor
 {
@@ -28,8 +27,6 @@ class AnimeProcessor
 
     /** @var int|null The status of the release being processed */
     private ?int $status;
-
-    protected ColorCLI $colorCli;
 
     /**
      * Simple cache of looked up titles -> anidbid to reduce repeat queries within one run.
@@ -52,7 +49,6 @@ class AnimeProcessor
     {
         $this->echooutput = $echooutput && (bool) config('nntmux.echocli');
         $this->palist = new PaList;
-        $this->colorCli = new ColorCLI;
 
         $quantity = (int) Settings::settingValue('maxanidbprocessed');
         $this->aniqty = $quantity > 0 ? $quantity : 100;
@@ -113,7 +109,7 @@ class AnimeProcessor
                 }
             }
         } else {
-            $this->colorCli->info('No anidb releases to process.');
+            cli()->info('No anidb releases to process.');
         }
     }
 
@@ -350,7 +346,7 @@ class AnimeProcessor
             }
         } catch (\Exception $e) {
             if ($this->echooutput) {
-                $this->colorCli->error('AniList search failed: '.$e->getMessage());
+                cli()->error('AniList search failed: '.$e->getMessage());
             }
         }
 
@@ -376,7 +372,7 @@ class AnimeProcessor
         $title = $cleanArr['title'];
 
         if ($this->echooutput) {
-            $this->colorCli->info('Looking Up: Title: '.$title);
+            cli()->info('Looking Up: Title: '.$title);
         }
 
         $anidbTitle = $this->getAnidbByName($title);
@@ -404,7 +400,7 @@ class AnimeProcessor
                         }
                     } catch (\Exception $e) {
                         if ($this->echooutput) {
-                            $this->colorCli->warning('AniList search failed: '.$e->getMessage());
+                            cli()->warning('AniList search failed: '.$e->getMessage());
                         }
                     }
                 }
@@ -419,10 +415,10 @@ class AnimeProcessor
             $this->updateRelease($anidbId, (int) $release->id);
 
             if ($this->echooutput) {
-                $this->colorCli->headerOver('Matched '.$type.' AniList ID: ');
-                $this->colorCli->primary((string) $anidbId);
-                $this->colorCli->alternateOver('   Title: ');
-                $this->colorCli->primary($anidbTitle->title);
+                cli()->headerOver('Matched '.$type.' AniList ID: ');
+                cli()->primary((string) $anidbId);
+                cli()->alternateOver('   Title: ');
+                cli()->primary($anidbTitle->title);
             }
             $matched = true;
         } else {

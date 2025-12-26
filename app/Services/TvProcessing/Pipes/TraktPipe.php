@@ -160,14 +160,14 @@ class TraktPipe extends AbstractTvProviderPipe
         $trakt->setVideoIdFound($videoId, $context->releaseId, 0);
 
         if ($this->echoOutput) {
-            $this->colorCli->primaryOver('    → ');
-            $this->colorCli->alternateOver($this->truncateTitle($cleanName));
+            cli()->primaryOver('    → ');
+            cli()->alternateOver($this->truncateTitle($cleanName));
             if ($hasAirdate) {
-                $this->colorCli->primaryOver(' | ');
-                $this->colorCli->warningOver($parsedInfo['airdate']);
+                cli()->primaryOver(' | ');
+                cli()->warningOver($parsedInfo['airdate']);
             }
-            $this->colorCli->primaryOver(' → ');
-            $this->colorCli->warning('Episode not found');
+            cli()->primaryOver(' → ');
+            cli()->warning('Episode not found');
         }
 
         return TvProcessingResult::notFound($this->getName(), [
@@ -185,10 +185,10 @@ class TraktPipe extends AbstractTvProviderPipe
             return;
         }
 
-        $this->colorCli->primaryOver('    → ');
-        $this->colorCli->headerOver($this->truncateTitle($title));
-        $this->colorCli->primaryOver(' → ');
-        $this->colorCli->primary('Full Season matched');
+        cli()->primaryOver('    → ');
+        cli()->headerOver($this->truncateTitle($title));
+        cli()->primaryOver(' → ');
+        cli()->primary('Full Season matched');
     }
 
     /**
@@ -233,14 +233,14 @@ class TraktPipe extends AbstractTvProviderPipe
         $trakt->setVideoIdFound($videoId, $context->releaseId, 0);
 
         if ($this->echoOutput) {
-            $this->colorCli->primaryOver('    → ');
-            $this->colorCli->alternateOver($this->truncateTitle($cleanName));
+            cli()->primaryOver('    → ');
+            cli()->alternateOver($this->truncateTitle($cleanName));
             if ($hasAirdate) {
-                $this->colorCli->primaryOver(' | ');
-                $this->colorCli->warningOver($parsedInfo['airdate']);
+                cli()->primaryOver(' | ');
+                cli()->warningOver($parsedInfo['airdate']);
             }
-            $this->colorCli->primaryOver(' → ');
-            $this->colorCli->warning('Episode not in local DB');
+            cli()->primaryOver(' → ');
+            cli()->warning('Episode not in local DB');
         }
 
         return TvProcessingResult::notFound($this->getName(), [

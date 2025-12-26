@@ -9,7 +9,6 @@ use App\Models\GamesInfo;
 use App\Models\Genre;
 use App\Models\Release;
 use App\Models\Settings;
-use Blacklight\ColorCLI;
 use Blacklight\Genres;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -47,7 +46,6 @@ class GamesService
     protected IGDBService $igdbService;
     protected GamesTitleParser $titleParser;
     protected ReleaseImageService $imageService;
-    protected ColorCLI $colorCli;
 
     // Processing stats
     protected int $processedCount = 0;
@@ -68,7 +66,6 @@ class GamesService
         ?ReleaseImageService $imageService = null
     ) {
         $this->echoOutput = config('nntmux.echocli');
-        $this->colorCli = new ColorCLI;
         $this->steamService = $steamService ?? new SteamService;
         $this->igdbService = $igdbService ?? new IGDBService;
         $this->titleParser = $titleParser ?? new GamesTitleParser;
@@ -541,11 +538,11 @@ class GamesService
 
         if (!empty($gamesId)) {
             if ($this->echoOutput) {
-                $this->colorCli->header('Added/updated game: ') .
-                $this->colorCli->alternateOver('   Title:    ') .
-                $this->colorCli->primary($game['title']) .
-                $this->colorCli->alternateOver('   Source:   ') .
-                $this->colorCli->primary($this->_classUsed);
+                cli()->header('Added/updated game: ') .
+                cli()->alternateOver('   Title:    ') .
+                cli()->primary($game['title']) .
+                cli()->alternateOver('   Source:   ') .
+                cli()->primary($this->_classUsed);
             }
 
             // Save cover image
@@ -558,8 +555,8 @@ class GamesService
                 $game['backdrop'] = $this->imageService->saveImage($gamesId . '-backdrop', $game['backdropurl'], $this->imgSavePath, 1920, 1024);
             }
         } elseif ($this->echoOutput) {
-            $this->colorCli->headerOver('Nothing to update: ') .
-            $this->colorCli->primary($game['title'] . ' (PC)');
+            cli()->headerOver('Nothing to update: ') .
+            cli()->primary($game['title'] . ' (PC)');
         }
 
         return $gamesId !== false ? $gamesId : false;
@@ -626,7 +623,7 @@ class GamesService
 
         if ($res->count() > 0) {
             if ($this->echoOutput) {
-                $this->colorCli->header('Processing ' . $res->count() . ' games release(s).');
+                cli()->header('Processing ' . $res->count() . ' games release(s).');
             }
 
             Log::info('GamesService: Starting processing', ['count' => $res->count()]);
@@ -641,7 +638,7 @@ class GamesService
 
                 if ($gameInfo !== false) {
                     if ($this->echoOutput) {
-                        $this->colorCli->info('Looking up: ' . $gameInfo['title'] . ' (PC)');
+                        cli()->info('Looking up: ' . $gameInfo['title'] . ' (PC)');
                     }
 
                     // Check for existing games entry
@@ -687,7 +684,7 @@ class GamesService
             ]);
 
             if ($this->echoOutput) {
-                $this->colorCli->header(sprintf(
+                cli()->header(sprintf(
                     'Games processing complete: %d processed, %d matched, %d cached, %d failed (%.2fs)',
                     $this->processedCount,
                     $this->matchedCount,
@@ -697,7 +694,7 @@ class GamesService
                 ));
             }
         } elseif ($this->echoOutput) {
-            $this->colorCli->header('No games releases to process.');
+            cli()->header('No games releases to process.');
         }
     }
 

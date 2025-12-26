@@ -19,9 +19,6 @@ use App\Models\Settings;
 use App\Services\Tmux\TmuxMonitorService;
 use App\Services\Tmux\TmuxTaskRunner;
 use App\Services\Tmux\TmuxOutput;
-use Blacklight\ColorCLI;
-
-$colorCli = new ColorCLI;
 
 try {
     // Get session name
@@ -42,7 +39,7 @@ try {
         logger()->error('Failed to spawn IRC scraper: '.$e->getMessage());
     }
 
-    $colorCli->header('Tmux Monitor Started');
+    cli()->header('Tmux Monitor Started');
     echo "Session: {$sessionName}\n";
     echo "Press Ctrl+C to stop (or set exit flag in settings)\n\n";
 
@@ -81,10 +78,10 @@ try {
         sleep(10);
     }
 
-    $colorCli->info('Monitor stopped by exit flag');
+    cli()->info('Monitor stopped by exit flag');
 
 } catch (Exception $e) {
-    $colorCli->error('Monitor failed: '.$e->getMessage());
+    cli()->error('Monitor failed: '.$e->getMessage());
     logger()->error('Tmux monitor error', [
         'message' => $e->getMessage(),
         'trace' => $e->getTraceAsString(),
