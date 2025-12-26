@@ -214,10 +214,16 @@ class ReleasesFixNamesGroup extends Command
                     $nntp = new NNTPService();
                     $compressedHeaders = config('nntmux_nntp.compressed_headers');
 
-                    if ((config('nntmux_nntp.use_alternate_nntp_server') === true
+                    $connectResult = config('nntmux_nntp.use_alternate_nntp_server') === true
                         ? $nntp->doConnect($compressedHeaders, true)
-                        : $nntp->doConnect()) !== true) {
-                        $this->warn('Unable to connect to usenet for PAR2 processing');
+                        : $nntp->doConnect();
+
+                    if ($connectResult !== true) {
+                        $errorMessage = 'Unable to connect to usenet for PAR2 processing';
+                        if (NNTPService::isError($connectResult)) {
+                            $errorMessage .= ' Error: '.$connectResult->getMessage();
+                        }
+                        $this->warn($errorMessage);
                     } else {
                         $Nfo = new Nfo();
                         $nzbcontents = new NZBContents([

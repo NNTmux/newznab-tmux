@@ -130,12 +130,16 @@ class UpdatePerGroup extends Command
         $nntp = new NNTPService();
 
         $useAlternate = config('nntmux_nntp.use_alternate_nntp_server') === true;
-        $connected = $useAlternate
+        $connectResult = $useAlternate
             ? $nntp->doConnect(false, true)
             : $nntp->doConnect();
 
-        if ($connected !== true) {
-            throw new \RuntimeException('Unable to connect to usenet.');
+        if ($connectResult !== true) {
+            $errorMessage = 'Unable to connect to usenet.';
+            if (NNTPService::isError($connectResult)) {
+                $errorMessage .= ' Error: '.$connectResult->getMessage();
+            }
+            throw new \RuntimeException($errorMessage);
         }
 
         return $nntp;

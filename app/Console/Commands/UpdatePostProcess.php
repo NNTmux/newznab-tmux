@@ -133,10 +133,16 @@ class UpdatePostProcess extends Command
     {
         $nntp = new NNTPService();
 
-        if ((config('nntmux_nntp.use_alternate_nntp_server') === true
+        $connectResult = config('nntmux_nntp.use_alternate_nntp_server') === true
             ? $nntp->doConnect(false, true)
-            : $nntp->doConnect()) !== true) {
-            throw new \RuntimeException('Unable to connect to usenet.');
+            : $nntp->doConnect();
+
+        if ($connectResult !== true) {
+            $errorMessage = 'Unable to connect to usenet.';
+            if (NNTPService::isError($connectResult)) {
+                $errorMessage .= ' Error: '.$connectResult->getMessage();
+            }
+            throw new \RuntimeException($errorMessage);
         }
 
         return $nntp;

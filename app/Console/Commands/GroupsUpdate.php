@@ -34,8 +34,13 @@ class GroupsUpdate extends Command
 
         // Create NNTP connection
         $nntp = new NNTPService;
-        if ($nntp->doConnect() !== true) {
-            $this->error('❌ Unable to connect to usenet server');
+        $connectResult = $nntp->doConnect();
+        if ($connectResult !== true) {
+            $errorMessage = '❌ Unable to connect to usenet server';
+            if (NNTPService::isError($connectResult)) {
+                $errorMessage .= ' Error: '.$connectResult->getMessage();
+            }
+            $this->error($errorMessage);
 
             return Command::FAILURE;
         }

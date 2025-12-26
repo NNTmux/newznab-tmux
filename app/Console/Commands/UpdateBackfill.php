@@ -76,8 +76,14 @@ class UpdateBackfill extends Command
     {
         $nntp = new NNTPService;
 
-        if ($nntp->doConnect() !== true) {
-            throw new \Exception('Unable to connect to usenet.');
+        $connectResult = $nntp->doConnect();
+
+        if ($connectResult !== true) {
+            $errorMessage = 'Unable to connect to usenet.';
+            if (NNTPService::isError($connectResult)) {
+                $errorMessage .= ' Error: '.$connectResult->getMessage();
+            }
+            throw new \Exception($errorMessage);
         }
 
         return $nntp;

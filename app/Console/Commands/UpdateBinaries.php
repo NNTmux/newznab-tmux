@@ -101,8 +101,14 @@ class UpdateBinaries extends Command
     {
         $nntp = new NNTPService();
 
-        if ($nntp->doConnect() !== true) {
-            throw new \RuntimeException('Unable to connect to usenet.');
+        $connectResult = $nntp->doConnect();
+
+        if ($connectResult !== true) {
+            $errorMessage = 'Unable to connect to usenet.';
+            if (NNTPService::isError($connectResult)) {
+                $errorMessage .= ' Error: '.$connectResult->getMessage();
+            }
+            throw new \RuntimeException($errorMessage);
         }
 
         return $nntp;
