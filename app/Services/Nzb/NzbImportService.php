@@ -95,12 +95,14 @@ class NzbImportService
         $start = now()->toImmutable()->format('Y-m-d H:i:s');
         $nzbsImported = $nzbsSkipped = 0;
 
-        // Filter files to only process NZB files
-        $nzbFiles = array_filter($filesToProcess, function ($file) {
+        // Convert all files to string paths and filter to only process NZB files
+        $nzbFiles = [];
+        foreach ($filesToProcess as $file) {
             $filePath = $file instanceof \SplFileInfo ? $file->getPathname() : (string) $file;
-
-            return Str::endsWith($filePath, '.nzb') || Str::endsWith($filePath, '.nzb.gz');
-        });
+            if (Str::endsWith($filePath, '.nzb') || Str::endsWith($filePath, '.nzb.gz')) {
+                $nzbFiles[] = $filePath;
+            }
+        }
 
         if (empty($nzbFiles)) {
             $this->echoOut('No NZB files found to process.');
@@ -117,11 +119,9 @@ class NzbImportService
         }
 
         // Loop over the NZB file names only.
-        foreach ($nzbFiles as $nzbFile) {
+        foreach ($nzbFiles as $nzbFilePath) {
             $this->nzbGuid = '';
 
-            // Convert SplFileInfo to string path if necessary
-            $nzbFilePath = $nzbFile instanceof \SplFileInfo ? $nzbFile->getPathname() : (string) $nzbFile;
 
             // Check if the file is really there.
             if (File::isFile($nzbFilePath)) {
