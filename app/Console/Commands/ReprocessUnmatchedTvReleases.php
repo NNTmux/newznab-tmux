@@ -108,52 +108,52 @@ class ReprocessUnmatchedTvReleases extends Command
         try {
             $pipeline = TvProcessingPipeline::createDefault(echoOutput: false);
 
-            $query->chunkById(100, function ($releases) use ($pipeline, $debug, $sleep, $bar, &$matched, &$failed, &$processed, $limit) {
-                foreach ($releases as $release) {
-                    if ($limit > 0 && $processed >= $limit) {
-                        return false; // Stop chunking
-                    }
+            // Use cursor to iterate without chunking issues when ordering by non-id columns
+            $cursor = $query->cursor();
 
-                    try {
-                        $result = $pipeline->processRelease($release, $debug);
+            foreach ($cursor as $release) {
+                if ($limit > 0 && $processed >= $limit) {
+                    break;
+                }
 
-                        if ($result['matched']) {
-                            $matched++;
-                            if ($debug) {
-                                $this->newLine();
-                                $this->colorCli->primary("Matched: {$release->searchname}");
-                                $this->info('  Provider: ' . ($result['provider'] ?? 'Unknown'));
-                                $this->info('  Video ID: ' . ($result['video_id'] ?? 'N/A'));
-                                $this->info('  Episode ID: ' . ($result['episode_id'] ?? 'N/A'));
-                            }
-                        } else {
-                            $failed++;
-                            if ($debug) {
-                                $this->newLine();
-                                $this->colorCli->warning("No match: {$release->searchname}");
-                            }
-                        }
-                    } catch (\Throwable $e) {
-                        $failed++;
-                        Log::error("Error processing release {$release->guid}: " . $e->getMessage());
+                try {
+                    $result = $pipeline->processRelease($release, $debug);
+
+                    if ($result['matched']) {
+                        $matched++;
                         if ($debug) {
                             $this->newLine();
-                            $this->error("Error processing {$release->searchname}: " . $e->getMessage());
+                            $this->colorCli->primary("Matched: {$release->searchname}");
+                            $this->info('  Provider: ' . ($result['provider'] ?? 'Unknown'));
+                            $this->info('  Video ID: ' . ($result['video_id'] ?? 'N/A'));
+                            $this->info('  Episode ID: ' . ($result['episode_id'] ?? 'N/A'));
+                        }
+                    } else {
+                        $failed++;
+                        if ($debug) {
+                            $this->newLine();
+                            $this->colorCli->warning("No match: {$release->searchname}");
                         }
                     }
-
-                    $processed++;
-                    $bar->setMessage((string) $matched, 'matched');
-                    $bar->setMessage((string) $failed, 'failed');
-                    $bar->advance();
-
-                    if ($sleep > 0) {
-                        usleep($sleep * 1000);
+                } catch (\Throwable $e) {
+                    $failed++;
+                    Log::error("Error processing release {$release->guid}: " . $e->getMessage());
+                    if ($debug) {
+                        $this->newLine();
+                        $this->error("Error processing {$release->searchname}: " . $e->getMessage());
                     }
                 }
 
-                return true;
-            });
+                $processed++;
+                $bar->setMessage((string) $matched, 'matched');
+                $bar->setMessage((string) $failed, 'failed');
+                $bar->advance();
+
+                if ($sleep > 0) {
+                    usleep($sleep * 1000);
+                }
+            }
+
 
         } catch (\Throwable $e) {
             $bar->finish();
