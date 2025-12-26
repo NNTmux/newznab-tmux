@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
-use Blacklight\Console;
+use App\Services\ConsoleService;
 use Blacklight\Genres;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,6 +12,14 @@ use Illuminate\View\View;
 
 class AdminConsoleController extends BasePageController
 {
+    protected ConsoleService $consoleService;
+
+    public function __construct(ConsoleService $consoleService)
+    {
+        parent::__construct();
+        $this->consoleService = $consoleService;
+    }
+
     /**
      * Display a listing of console games
      */
@@ -32,7 +40,6 @@ class AdminConsoleController extends BasePageController
     public function edit(Request $request): View|RedirectResponse
     {
         $this->setAdminPrefs();
-        $console = new Console(['Settings' => null]);
         $gen = new Genres;
         $meta_title = $title = 'Console Edit';
 
@@ -41,7 +48,7 @@ class AdminConsoleController extends BasePageController
 
         if ($request->has('id')) {
             $id = $request->input('id');
-            $con = $console->getConsoleInfo($id);
+            $con = $this->consoleService->getConsoleInfo($id);
 
             if (! $con) {
                 abort(404);
@@ -65,7 +72,7 @@ class AdminConsoleController extends BasePageController
                         ? $con['releasedate']
                         : Carbon::parse($request->input('releasedate'))->timestamp;
 
-                    $console->update(
+                    $this->consoleService->update(
                         $id,
                         $request->input('title'),
                         $request->input('asin'),

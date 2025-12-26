@@ -16,6 +16,8 @@ use MarcReichel\IGDBLaravel\Models\Platform;
 
 /**
  * Class Console.
+ *
+ * @deprecated Use \App\Services\ConsoleService instead. This class is kept for backwards compatibility.
  */
 class Console
 {

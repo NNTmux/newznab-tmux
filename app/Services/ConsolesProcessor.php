@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Settings;
-use Blacklight\Console;
 
 class ConsolesProcessor
 {
@@ -17,7 +16,7 @@ class ConsolesProcessor
     public function process(): void
     {
         if ((int) Settings::settingValue('lookupgames') !== 0) {
-            (new Console)->processConsoleReleases();
+            (new ConsoleService)->processConsoleReleases();
         }
     }
 }

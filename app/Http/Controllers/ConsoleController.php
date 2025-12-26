@@ -3,13 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use Blacklight\Console;
+use App\Services\ConsoleService;
 use Blacklight\Genres;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
 class ConsoleController extends BasePageController
 {
+    protected ConsoleService $consoleService;
+
+    public function __construct(ConsoleService $consoleService)
+    {
+        parent::__construct();
+        $this->consoleService = $consoleService;
+    }
+
     /**
      * @throws \Exception
      */
@@ -18,7 +26,6 @@ class ConsoleController extends BasePageController
         if ($id === 'WiiVare') {
             $id = 'WiiVareVC';
         }
-        $console = new Console;
         $gen = new Genres;
 
         $concats = Category::getChildren(Category::GAME_ROOT);
@@ -42,13 +49,13 @@ class ConsoleController extends BasePageController
         $catarray = [];
         $catarray[] = $category;
 
-        $ordering = $console->getConsoleOrdering();
+        $ordering = $this->consoleService->getConsoleOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_cover_page');
 
         $consoles = [];
-        $rslt = $console->getConsoleRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, $this->userdata->categoryexclusions);
+        $rslt = $this->consoleService->getConsoleRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, $this->userdata->categoryexclusions);
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
         $maxwords = 50;

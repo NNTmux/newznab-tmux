@@ -5,12 +5,12 @@
 require_once dirname(__DIR__, 3).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
 use App\Models\Category;
+use App\Services\ConsoleService;
 use Blacklight\ColorCLI;
-use Blacklight\Console;
 use Illuminate\Support\Facades\DB;
 
 $pdo = DB::connection()->getPdo();
-$console = new Console(['Echo' => true]);
+$console = new ConsoleService;
 $colorCli = new ColorCLI;
 
 $res = $pdo->query(

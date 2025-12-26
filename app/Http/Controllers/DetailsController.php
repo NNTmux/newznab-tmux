@@ -19,7 +19,7 @@ use App\Services\BookService;
 use App\Services\AnidbService;
 use App\Services\XxxBrowseService;
 use App\Services\GamesService;
-use Blacklight\Console;
+use App\Services\ConsoleService;
 use Blacklight\Music;
 use App\Services\ReleaseExtraService;
 use Illuminate\Http\Request;
@@ -133,7 +133,7 @@ class DetailsController extends BasePageController
 
             $con = '';
             if ($data['consoleinfo_id'] !== '') {
-                $con = (new Console)->getConsoleInfo($data['consoleinfo_id']);
+                $con = (new ConsoleService)->getConsoleInfo($data['consoleinfo_id']);
             }
 
             $AniDBAPIArray = '';
