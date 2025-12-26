@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Blacklight\NZBImport;
+use App\Services\Nzb\NzbImportService;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\File;
@@ -59,7 +59,7 @@ class ImportNzbs extends Command
             if (empty($folders)) {
                 $this->info('Importing NZB files from '.$importFolder);
                 $files = File::allFiles($importFolder);
-                $NZBImport = new NZBImport;
+                $NZBImport = new NzbImportService;
 
                 try {
                     $NZBImport->beginImport($files, $useNzbName, $deleteNZB, $deleteFailedNZB, $source);
@@ -70,7 +70,7 @@ class ImportNzbs extends Command
                 foreach ($folders as $folder) {
                     $this->info('Importing NZB files from '.$folder);
                     $files = File::allFiles($folder);
-                    $NZBImport = new NZBImport;
+                    $NZBImport = new NzbImportService;
 
                     try {
                         $NZBImport->beginImport($files, $useNzbName, $deleteNZB, $deleteFailedNZB, $source);

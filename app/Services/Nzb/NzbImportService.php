@@ -1,22 +1,24 @@
 <?php
 
-namespace Blacklight;
+declare(strict_types=1);
+
+namespace App\Services\Nzb;
 
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\BlacklistService;
 use App\Services\Categorization\CategorizationService;
-use App\Services\Nzb\NzbService;
 use App\Services\ReleaseCleaningService;
+use Blacklight\ColorCLI;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 /**
- * Class NZBImport.
+ * Service for importing NZB files into the database.
  */
-class NZBImport
+class NzbImportService
 {
     protected BlacklistService $blacklistService;
 
@@ -24,9 +26,6 @@ class NZBImport
 
     protected \stdClass|bool $site;
 
-    /**
-     * @var int
-     */
     protected mixed $crossPostt;
 
     protected CategorizationService $category;
@@ -51,15 +50,12 @@ class NZBImport
      */
     protected string $relGuid;
 
-    /**
-     * @var bool
-     */
     public mixed $echoCLI;
 
     public NzbService $nzb;
 
     /**
-     * @var string the MD5 hash of the first segment Message-ID of the NZB
+     * The MD5 hash of the first segment Message-ID of the NZB
      */
     protected string $nzbGuid;
 
@@ -76,11 +72,13 @@ class NZBImport
         $this->crossPostt = Settings::settingValue('crossposttime') !== '' ? Settings::settingValue('crossposttime') : 2;
 
         // Set properties from options
-        $this->browser = isset($options['Browser']) ? $options['Browser'] : '';
+        $this->browser = isset($options['Browser']) ? (bool) $options['Browser'] : false;
         $this->retVal = '';
     }
 
     /**
+     * Begin importing NZB files.
+     *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function beginImport($filesToProcess, bool $useNzbName = false, bool $delete = false, bool $deleteFailed = false, int $source = 1): bool|string
@@ -99,7 +97,9 @@ class NZBImport
 
         // Filter files to only process NZB files
         $nzbFiles = array_filter($filesToProcess, function ($file) {
-            return Str::endsWith($file, '.nzb') || Str::endsWith($file, '.nzb.gz');
+            $filePath = $file instanceof \SplFileInfo ? $file->getPathname() : (string) $file;
+
+            return Str::endsWith($filePath, '.nzb') || Str::endsWith($filePath, '.nzb.gz');
         });
 
         if (empty($nzbFiles)) {
@@ -120,20 +120,23 @@ class NZBImport
         foreach ($nzbFiles as $nzbFile) {
             $this->nzbGuid = '';
 
+            // Convert SplFileInfo to string path if necessary
+            $nzbFilePath = $nzbFile instanceof \SplFileInfo ? $nzbFile->getPathname() : (string) $nzbFile;
+
             // Check if the file is really there.
-            if (File::isFile($nzbFile)) {
+            if (File::isFile($nzbFilePath)) {
                 // Get the contents of the NZB file as a string.
-                if (Str::endsWith($nzbFile, '.nzb.gz')) {
-                    $nzbString = unzipGzipFile($nzbFile);
+                if (Str::endsWith($nzbFilePath, '.nzb.gz')) {
+                    $nzbString = unzipGzipFile($nzbFilePath);
                 } else {
-                    $nzbString = File::get($nzbFile);
+                    $nzbString = File::get($nzbFilePath);
                 }
 
                 if ($nzbString === false) {
-                    $this->echoOut('ERROR: Unable to read: '.$nzbFile);
+                    $this->echoOut('ERROR: Unable to read: '.$nzbFilePath);
 
                     if ($deleteFailed) {
-                        File::delete($nzbFile);
+                        File::delete($nzbFilePath);
                     }
                     $nzbsSkipped++;
 
@@ -143,10 +146,10 @@ class NZBImport
                 // Load it as an XML object.
                 $nzbXML = @simplexml_load_string($nzbString);
                 if ($nzbXML === false || strtolower($nzbXML->getName()) !== 'nzb') {
-                    $this->echoOut('ERROR: Unable to load NZB XML data: '.$nzbFile);
+                    $this->echoOut('ERROR: Unable to load NZB XML data: '.$nzbFilePath);
 
                     if ($deleteFailed) {
-                        File::delete($nzbFile);
+                        File::delete($nzbFilePath);
                     }
                     $nzbsSkipped++;
 
@@ -154,11 +157,11 @@ class NZBImport
                 }
 
                 // Try to insert the NZB details into the DB.
-                $nzbFileName = $useNzbName === true ? str_ireplace('.nzb', '', basename($nzbFile)) : '';
+                $nzbFileName = $useNzbName === true ? str_ireplace('.nzb', '', basename($nzbFilePath)) : '';
                 try {
                     $inserted = $this->scanNZBFile($nzbXML, $nzbFileName, $source);
                 } catch (\Exception $e) {
-                    $this->echoOut('ERROR: Problem inserting: '.$nzbFile);
+                    $this->echoOut('ERROR: Problem inserting: '.$nzbFilePath);
                     $inserted = false;
                 }
 
@@ -178,14 +181,14 @@ class NZBImport
                         Release::query()->where('guid', $this->relGuid)->delete();
 
                         if ($deleteFailed) {
-                            File::delete($nzbFile);
+                            File::delete($nzbFilePath);
                         }
                         $nzbsSkipped++;
                     } else {
                         $this->updateNzbGuid();
                         if ($delete) {
                             // Remove the nzb file.
-                            File::delete($nzbFile);
+                            File::delete($nzbFilePath);
                         }
 
                         $nzbsImported++;
@@ -193,12 +196,12 @@ class NZBImport
                 } else {
                     $this->echoOut('ERROR: Failed to insert NZB!');
                     if ($deleteFailed) {
-                        File::delete($nzbFile);
+                        File::delete($nzbFilePath);
                     }
                     $nzbsSkipped++;
                 }
             } else {
-                $this->echoOut('ERROR: Unable to fetch: '.$nzbFile);
+                $this->echoOut('ERROR: Unable to fetch: '.$nzbFilePath);
                 $nzbsSkipped++;
             }
         }
@@ -219,6 +222,8 @@ class NZBImport
     }
 
     /**
+     * Scan and process an NZB file.
+     *
      * @throws \Exception
      */
     protected function scanNZBFile(&$nzbXML, $nzbFileName = ''): bool
@@ -344,7 +349,6 @@ class NZBImport
     /**
      * Insert the NZB details into the database.
      *
-     *
      * @throws \Exception
      */
     protected function insertNZB($nzbDetails): bool
@@ -460,3 +464,4 @@ class NZBImport
         }
     }
 }
+

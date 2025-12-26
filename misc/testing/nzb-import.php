@@ -2,7 +2,7 @@
 
 require_once dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
 
-use Blacklight\NZBImport;
+use App\Services\Nzb\NzbImportService;
 use Illuminate\Support\Str;
 
 $n = PHP_EOL;
@@ -74,8 +74,8 @@ if ($i > 1) {
     $deleteFailedNZB = ($argv[3] === 'true');
     $useNzbName = ($argv[4] === 'true');
 
-    // Create a new instance of NZBImport and send it the file locations.
-    $NZBImport = new NZBImport;
+    // Create a new instance of NzbImportService and send it the file locations.
+    $NZBImport = new NzbImportService;
 
     $NZBImport->beginImport($nzbFiles, $useNzbName, $deleteNZB, $deleteFailedNZB);
 } else {
