@@ -9,6 +9,7 @@ class TestCategorization extends Command
 {
     protected $signature = 'nntmux:test-categorization
                             {--release= : Release name to test}
+                            {--poster= : Poster/From name to test}
                             {--compare : Compare pipeline vs legacy categorizer}
                             {--list-categorizers : List all registered categorizers}';
 
@@ -53,9 +54,13 @@ class TestCategorization extends Command
 
     protected function categorizeRelease(CategorizationService $service, string $releaseName): void
     {
-        $result = $service->determineCategory(0, $releaseName, '', true);
+        $poster = $this->option('poster') ?? '';
+        $result = $service->determineCategory(0, $releaseName, $poster, true);
 
         $this->info("Release: {$releaseName}");
+        if ($poster) {
+            $this->info("Poster: {$poster}");
+        }
         $this->info("Category ID: {$result['categories_id']}");
 
         if (isset($result['debug'])) {

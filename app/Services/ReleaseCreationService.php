@@ -97,7 +97,7 @@ class ReleaseCreationService
                     }
                 }
 
-                $determinedCategory = $categorize->determineCategory($collection->groups_id, $cleanedName);
+                $determinedCategory = $categorize->determineCategory($collection->groups_id, $cleanedName, $fromName);
 
                 $searchName = ! empty($cleanedName) ? mb_convert_encoding($cleanedName, 'UTF-8', mb_list_encodings()) : $cleanRelName;
 

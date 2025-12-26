@@ -31,7 +31,7 @@ class TvCategorizer extends AbstractCategorizer
             return $this->noMatch();
         }
 
-        if ($result = $this->checkAnime($name)) {
+        if ($result = $this->checkAnime($name, $context)) {
             return $result;
         }
         if ($result = $this->checkSport($name)) {
@@ -96,19 +96,23 @@ class TvCategorizer extends AbstractCategorizer
             return true;
         }
         // Known anime release groups (should be treated as TV)
-        if (preg_match('/(?:^|[.\-_ \[])(URANiME|ANiHLS|HaiKU|ANiURL|SkyAnime|Erai-raws|LostYears|Vodes|SubsPlease|Judas|Ember|EMBER|YuiSubs|ASW|Tsundere-Raws|Anime-Raws)(?:[.\-_ \]]|$)/i', $name)) {
+        if (preg_match('/(?:^|[.\-_ \[])(URANiME|ANiHLS|HaiKU|ANiURL|SkyAnime|Erai-raws|LostYears|Vodes|SubsPlease|Judas|Ember|EMBER|YuiSubs|ASW|Tsundere-Raws|Anime-Raws|Kekkan)(?:[.\-_ \]]|$)/i', $name)) {
             return true;
         }
         return false;
     }
 
-    protected function checkAnime(string $name): ?CategorizationResult
+    protected function checkAnime(string $name, ReleaseContext $context): ?CategorizationResult
     {
+        // Check for Anime Tosho poster
+        if (preg_match('/animetosho\.org|usenet\.bot@animetosho\.org/i', $context->poster)) {
+            return $this->matched(Category::TV_ANIME, 0.98, 'anime_tosho_poster');
+        }
         if (preg_match('/[._ -]Anime[._ -]/i', $name)) {
             return $this->matched(Category::TV_ANIME, 0.95, 'anime_pattern');
         }
         // Known anime release groups - matches with brackets, dots, dashes, underscores, spaces, or at the start
-        if (preg_match('/(?:^|[.\-_ \[])(URANiME|ANiHLS|HaiKU|ANiURL|SkyAnime|Erai-raws|LostYears|Vodes|SubsPlease|Judas|Ember|EMBER|YuiSubs|ASW|Tsundere-Raws|Anime-Raws)(?:[.\-_ \]]|$)/i', $name)) {
+        if (preg_match('/(?:^|[.\-_ \[])(URANiME|ANiHLS|HaiKU|ANiURL|SkyAnime|Erai-raws|LostYears|Vodes|SubsPlease|Judas|Ember|EMBER|YuiSubs|ASW|Tsundere-Raws|Anime-Raws|Kekkan)(?:[.\-_ \]]|$)/i', $name)) {
             return $this->matched(Category::TV_ANIME, 0.95, 'anime_group');
         }
         // Anime hash pattern: [GroupName] Title - 01 [ABCD1234]
