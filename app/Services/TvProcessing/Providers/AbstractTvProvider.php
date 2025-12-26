@@ -436,11 +436,35 @@ abstract class AbstractTvProvider extends BaseVideoProvider
 
         $following = '[^a-z0-9]([(|\[]\w+[)|\]]\s)*?(\d\d-\d\d|\d{1,3}x\d{2,3}|\(?(19|20)\d{2}\)?|(480|720|1080|2160)[ip]|AAC2?|BD-?Rip|Blu-?Ray|D0?\d|DD5|DiVX|DLMux|DTS|DVD(-?Rip)?|E\d{2,3}|[HX][\-_. ]?26[45]|ITA(-ENG)?|HEVC|[HPS]DTV|PROPER|REPACK|Season|Episode|S\d+[^a-z0-9]?((E\d+)[abr]?)*|WEB[\-_. ]?(DL|Rip)|XViD)[^a-z0-9]?';
 
-        if (preg_match('/^([^a-z0-9]{2,}|(sample|proof|repost)-)(?P<name>[\w .-]*?)'.$following.'/i', $relname, $hits)) {
+        // Handle fansub/release group prefixes like [SubsPlease], [Erai-raws], [ASW], etc.
+        $cleanRelname = preg_replace('/^\[[^\]]+\][_\s]*/i', '', $relname);
+
+        if (preg_match('/^([^a-z0-9]{2,}|(sample|proof|repost)-)(?P<name>[\w .\-!&]+?)'.$following.'/i', $cleanRelname, $hits)) {
             $showName = $hits['name'];
-        } elseif (preg_match('/^(?P<name>[\w+][\s\w\'._-]*?)'.$following.'/i', $relname, $hits)) {
+        } elseif (preg_match('/^(?P<name>[\w!&][\s\w\'._\-!&]*?)'.$following.'/i', $cleanRelname, $hits)) {
             $showName = $hits['name'];
         }
+
+        // If still no match, try extracting name before common delimiters
+        if (empty($showName)) {
+            // Try to extract name before - SxxExx pattern
+            if (preg_match('/^(?P<name>.+?)[_\s]*[-_\s]+S\d{1,2}E\d{1,3}/i', $cleanRelname, $hits)) {
+                $showName = $hits['name'];
+            }
+            // Try to extract name before standalone episode number like "- 06 [" or "_09_["
+            elseif (preg_match('/^(?P<name>.+?)[_\s]+[-_]+[_\s]*\d{1,3}[_\s]*[\[(]/i', $cleanRelname, $hits)) {
+                $showName = $hits['name'];
+            }
+            // Handle anime-style "Show_Name_-_Episode_Title_-_XX_[quality]" format (extract before first _-_)
+            elseif (preg_match('/^(?P<name>.+?)_-_.+?_-_\d{1,3}_[\[(]/i', $cleanRelname, $hits)) {
+                $showName = $hits['name'];
+            }
+            // Simpler pattern: extract everything before "_-_" for anime releases
+            elseif (preg_match('/^(?P<name>[^_]+(?:_[^_-]+)*)_-_/i', $cleanRelname, $hits)) {
+                $showName = $hits['name'];
+            }
+        }
+
         $showName = preg_replace('/'.$following.'/i', ' ', $showName);
         $showName = preg_replace('/^\d{6}/', '', $showName);
         $showName = $this->convertAcronyms($showName);
@@ -584,6 +608,11 @@ abstract class AbstractTvProvider extends BaseVideoProvider
             $episodeArr['season'] = 1;
             $episodeArr['episode'] = (int) $hits[2];
         }
+        // Anime style: [Fansub]_Show_Name_-_06_[quality] or Show_-_Episode_Title_-_06_[
+        elseif (preg_match('/[_\s][-_][_\s](\d{1,3})[_\s]*[\[(]/i', $relname, $hits)) {
+            $episodeArr['season'] = 1;
+            $episodeArr['episode'] = (int) $hits[1];
+        }
         // Season.1
         elseif (preg_match('/^(.*?)[^a-z0-9]Seasons?[^a-z0-9]?(\d{1,2})/i', $relname, $hits)) {
             $episodeArr['season'] = (int) $hits[2];
@@ -645,9 +674,14 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         // Remove common subtitle/episode indicators that aren't part of the show title
         $str = preg_replace('/\s+-\s+.*(wo andere|where others|Arbeiten|Working).*$/i', '', $str);
 
+        // Clean up trailing hyphens, episode numbers, and other artifacts
+        $str = preg_replace('/\s*-\s*$/', '', $str);  // Trailing hyphen
+        $str = preg_replace('/\s+\d{1,3}\s*$/', '', $str);  // Trailing episode number
+        $str = preg_replace('/\s+-$/', '', $str);  // Another trailing hyphen cleanup
+
         $str = preg_replace('/\s{2,}/', ' ', $str);
 
-        $str = trim($str, '"');
+        $str = trim($str, '"-');  // Trim quotes and hyphens from both ends
 
         return trim($str);
     }
