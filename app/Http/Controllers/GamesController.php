@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Services\GamesService;
-use Blacklight\Genres;
+use App\Services\GenreService;
 use Illuminate\Http\Request;
 
 class GamesController extends BasePageController
@@ -15,7 +15,7 @@ class GamesController extends BasePageController
     public function show(Request $request)
     {
         $games = new GamesService;
-        $gen = new Genres(['Settings' => $this->settings]);
+        $gen = new GenreService;
 
         $concats = Category::getChildren(Category::PC_ROOT);
         $ctmp = [];
@@ -39,7 +39,7 @@ class GamesController extends BasePageController
 
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
 
-        $genres = $gen->getGenres(Genres::GAME_TYPE, true);
+        $genres = $gen->getGenres((string) GenreService::GAME_TYPE, true);
         $tmpgnr = [];
         foreach ($genres as $gn) {
             $tmpgnr[$gn->id] = $gn->title;

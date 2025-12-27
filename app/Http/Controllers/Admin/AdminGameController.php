@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
 use App\Services\GamesService;
-use Blacklight\Genres;
+use App\Services\GenreService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -39,7 +39,7 @@ class AdminGameController extends BasePageController
     public function edit(Request $request)
     {
         $games = new GamesService;
-        $gen = new Genres(['Settings' => null]);
+        $gen = new GenreService;
         $meta_title = $title = 'Game Edit';
 
         // Set the current action.
@@ -87,7 +87,7 @@ class AdminGameController extends BasePageController
 
                 case 'view':
                 default:
-                    $genres = $gen->getGenres(Genres::GAME_TYPE);
+                    $genres = $gen->getGenres((string) GenreService::GAME_TYPE);
 
                     return view('admin.games.edit', compact('title', 'meta_title', 'game', 'genres'));
             }

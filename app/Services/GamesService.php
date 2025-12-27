@@ -9,7 +9,6 @@ use App\Models\GamesInfo;
 use App\Models\Genre;
 use App\Models\Release;
 use App\Models\Settings;
-use Blacklight\Genres;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
@@ -326,7 +325,7 @@ class GamesService
      */
     public function updateGamesInfo(array $gameInfo): bool|int
     {
-        $gen = new Genres(['Settings' => null]);
+        $gen = new GenreService;
 
         $game = [];
         $titleKey = $this->generateCacheKey($gameInfo['title']);
@@ -436,10 +435,10 @@ class GamesService
     /**
      * Save game to database.
      */
-    protected function saveGameToDatabase(array $game, string $genreName, Genres $gen, array $gameInfo, string $titleKey): bool|int
+    protected function saveGameToDatabase(array $game, string $genreName, GenreService $gen, array $gameInfo, string $titleKey): bool|int
     {
         // Load genres
-        $defaultGenres = $gen->loadGenres(Genres::GAME_TYPE);
+        $defaultGenres = $gen->loadGenres((string) GenreService::GAME_TYPE);
 
         // Prepare database values
         $game['cover'] = isset($game['coverurl']) ? 1 : 0;
@@ -465,7 +464,7 @@ class GamesService
         if (in_array(strtolower($genreName), $defaultGenres, false)) {
             $genreKey = array_search(strtolower($genreName), $defaultGenres, false);
         } else {
-            $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::GAME_TYPE]);
+            $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => GenreService::GAME_TYPE]);
         }
 
         $game['gamesgenre'] = $genreName;
@@ -565,15 +564,15 @@ class GamesService
     /**
      * Save game info from cached data.
      */
-    protected function saveGameInfoFromCache(array $game, Genres $gen, array $gameInfo): bool|int
+    protected function saveGameInfoFromCache(array $game, GenreService $gen, array $gameInfo): bool|int
     {
-        $defaultGenres = $gen->loadGenres(Genres::GAME_TYPE);
+        $defaultGenres = $gen->loadGenres((string) GenreService::GAME_TYPE);
         $genreName = $game['gamesgenre'] ?? 'Unknown';
 
         if (in_array(strtolower($genreName), $defaultGenres, false)) {
             $genreKey = array_search(strtolower($genreName), $defaultGenres, false);
         } else {
-            $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::GAME_TYPE]);
+            $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => GenreService::GAME_TYPE]);
         }
 
         $game['gamesgenreID'] = $genreKey;

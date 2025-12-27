@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Services\MusicService;
-use Blacklight\Genres;
+use App\Services\GenreService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
@@ -16,7 +16,7 @@ class MusicController extends BasePageController
     public function show(Request $request, string $id = '')
     {
         $music = new MusicService;
-        $gen = new Genres(['Settings' => $this->settings]);
+        $gen = new GenreService;
 
         $musiccats = Category::getChildren(Category::MUSIC_ROOT);
         $mtmp = [];
@@ -53,7 +53,7 @@ class MusicController extends BasePageController
 
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
 
-        $genres = $gen->getGenres(Genres::MUSIC_TYPE, true);
+        $genres = $gen->getGenres((string) GenreService::MUSIC_TYPE, true);
         $tmpgnr = [];
         foreach ($genres as $gn) {
             $tmpgnr[$gn->id] = $gn->title;

@@ -19,7 +19,6 @@ use App\Support\DTOs\ProcessReleasesSettings;
 use App\Support\DTOs\ReleaseCreationResult;
 use App\Support\DTOs\ReleaseDeleteStats;
 use App\Services\NNTP\NNTPService;
-use Blacklight\Genres;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -1141,7 +1140,7 @@ final class ReleaseProcessingService
 
     private function deleteDisabledGenreReleases(ReleaseDeleteStats $stats): ReleaseDeleteStats
     {
-        $genres = new Genres();
+        $genres = new GenreService;
         $genreList = $genres->getDisabledIDs();
 
         if ($genreList === null || $genreList->isEmpty()) {

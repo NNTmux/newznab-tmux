@@ -9,7 +9,6 @@ use App\Models\ConsoleInfo;
 use App\Models\Genre;
 use App\Models\Release;
 use App\Models\Settings;
-use Blacklight\Genres;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
@@ -782,7 +781,7 @@ class ConsoleService
         if (\in_array(strtolower($genreName), $genreassoc, false)) {
             $genreKey = array_search(strtolower($genreName), $genreassoc, false);
         } else {
-            $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::CONSOLE_TYPE]);
+            $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => GenreService::CONSOLE_TYPE]);
         }
 
         return $genreKey;
@@ -795,9 +794,9 @@ class ConsoleService
      */
     protected function loadGenres(): array
     {
-        $gen = new Genres(['Settings' => null]);
+        $gen = new GenreService;
 
-        return $gen->loadGenres(Genres::CONSOLE_TYPE);
+        return $gen->loadGenres((string) GenreService::CONSOLE_TYPE);
     }
 }
 

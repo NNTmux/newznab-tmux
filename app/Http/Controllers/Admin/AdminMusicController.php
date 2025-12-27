@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
 use App\Services\MusicService;
-use Blacklight\Genres;
+use App\Services\GenreService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -37,7 +37,7 @@ class AdminMusicController extends BasePageController
     public function edit(Request $request)
     {
         $music = new MusicService;
-        $gen = new Genres;
+        $gen = new GenreService;
 
         $meta_title = $title = 'Music Edit';
 
@@ -94,7 +94,7 @@ class AdminMusicController extends BasePageController
 
                 case 'view':
                 default:
-                    $genres = $gen->getGenres(Genres::MUSIC_TYPE);
+                    $genres = $gen->getGenres((string) GenreService::MUSIC_TYPE);
 
                     return view('admin.music.edit', compact('title', 'meta_title', 'mus', 'genres'));
             }

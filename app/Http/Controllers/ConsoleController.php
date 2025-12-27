@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Services\ConsoleService;
-use Blacklight\Genres;
+use App\Services\GenreService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
@@ -26,7 +26,7 @@ class ConsoleController extends BasePageController
         if ($id === 'WiiVare') {
             $id = 'WiiVareVC';
         }
-        $gen = new Genres;
+        $gen = new GenreService;
 
         $concats = Category::getChildren(Category::GAME_ROOT);
         $ctmp = [];
@@ -73,7 +73,7 @@ class ConsoleController extends BasePageController
         $platform = ($request->has('platform') && ! empty($request->input('platform'))) ? stripslashes($request->input('platform')) : '';
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
 
-        $genres = $gen->getGenres(Genres::CONSOLE_TYPE, true);
+        $genres = $gen->getGenres((string) GenreService::CONSOLE_TYPE, true);
         $tmpgnr = [];
         foreach ($genres as $gn) {
             $tmpgnr[$gn->id] = $gn->title;

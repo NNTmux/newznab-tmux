@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
 use App\Services\ConsoleService;
-use Blacklight\Genres;
+use App\Services\GenreService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -40,7 +40,7 @@ class AdminConsoleController extends BasePageController
     public function edit(Request $request): View|RedirectResponse
     {
         $this->setAdminPrefs();
-        $gen = new Genres;
+        $gen = new GenreService;
         $meta_title = $title = 'Console Edit';
 
         // set the current action
@@ -90,7 +90,7 @@ class AdminConsoleController extends BasePageController
 
                 case 'view':
                 default:
-                    $genres = $gen->getGenres(Genres::CONSOLE_TYPE);
+                    $genres = $gen->getGenres((string) GenreService::CONSOLE_TYPE);
 
                     return view('admin.console.edit', compact('con', 'genres', 'title', 'meta_title'));
             }

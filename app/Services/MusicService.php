@@ -8,7 +8,6 @@ use App\Models\MusicInfo;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Services\Releases\ReleaseBrowseService;
-use Blacklight\Genres;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -615,7 +614,7 @@ class MusicService
     protected function fetchItunesMusicProperties(string $title): array|false
     {
         // Load genres.
-        $defaultGenres = (new Genres)->loadGenres(Genres::MUSIC_TYPE);
+        $defaultGenres = (new GenreService)->loadGenres((string) GenreService::MUSIC_TYPE);
 
         $itunes = new ItunesService;
 
@@ -647,7 +646,7 @@ class MusicService
             if (\in_array(strtolower($genreName), $defaultGenres, false)) {
                 $genreKey = array_search(strtolower($genreName), $defaultGenres, false);
             } else {
-                $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => Genres::MUSIC_TYPE]);
+                $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => GenreService::MUSIC_TYPE]);
             }
         } else {
             $genreKey = -1;
