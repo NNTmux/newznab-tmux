@@ -146,12 +146,13 @@ class TmdbProvider extends AbstractTvProvider
 
                         if ($episode === false) {
                             if ($seriesNo !== '' && $episodeNo !== '') {
-                                // Send the request for the episode to TMDB using season/episode numbers
+                                // Send the request for the episode to TMDB with fallback to other IDs
                                 $tmdbEpisode = $this->getEpisodeInfo(
                                     $siteId,
                                     $seriesNo,
                                     $episodeNo,
-                                    $release['airdate']
+                                    $release['airdate'],
+                                    $videoId
                                 );
 
                                 if ($tmdbEpisode) {
@@ -366,6 +367,29 @@ class TmdbProvider extends AbstractTvProvider
     }
 
     /**
+     * Get all external IDs for a video from the database.
+     *
+     * @param  int  $videoId  The local video ID
+     * @return array Array of external IDs: ['tmdb' => X, 'tvdb' => Y, 'imdb' => Z]
+     */
+    protected function getAllSiteIdsFromVideoID(int $videoId): array
+    {
+        $result = \App\Models\Video::query()
+            ->where('id', $videoId)
+            ->first(['tmdb', 'tvdb', 'imdb']);
+
+        if ($result === null) {
+            return ['tmdb' => 0, 'tvdb' => 0, 'imdb' => 0];
+        }
+
+        return [
+            'tmdb' => (int) ($result->tmdb ?? 0),
+            'tvdb' => (int) ($result->tvdb ?? 0),
+            'imdb' => (int) ($result->imdb ?? 0),
+        ];
+    }
+
+    /**
      * Gets the specific episode info for the parsed release after match
      * Returns a formatted array of episode data or false if no match.
      *
@@ -424,8 +448,20 @@ class TmdbProvider extends AbstractTvProvider
             return false;
         }
 
-        // Single episode lookup
-        $response = $this->tmdbClient->getTvEpisode((int) $siteId, (int) $series, (int) $episode);
+        // Single episode lookup - try with fallback to other IDs if we have a videoId
+        $response = null;
+        if ($videoId > 0) {
+            $ids = $this->getAllSiteIdsFromVideoID($videoId);
+            // Ensure the provided siteId is used as the TMDB ID if available
+            if ((int) $siteId > 0) {
+                $ids['tmdb'] = (int) $siteId;
+            }
+            $response = $this->tmdbClient->getTvEpisodeWithFallback($ids, (int) $series, (int) $episode);
+        } else {
+            // Legacy behavior: just use the provided site ID
+            $response = $this->tmdbClient->getTvEpisode((int) $siteId, (int) $series, (int) $episode);
+        }
+
         sleep(1);
 
         // Handle Single Episode Lookups
@@ -462,6 +498,13 @@ class TmdbProvider extends AbstractTvProvider
         $originCountry = TmdbClient::getArray($show, 'origin_country');
         $alternativeTitles = TmdbClient::getArray($show, 'alternative_titles');
 
+        // Try to get Trakt ID by looking up via TMDB ID
+        $traktId = 0;
+        $tmdbId = TmdbClient::getInt($show, 'id');
+        if ($tmdbId > 0) {
+            $traktId = $this->lookupTraktId($tmdbId, $imdbId, TmdbClient::getInt($externalIds, 'tvdb_id'));
+        }
+
         return [
             'type' => parent::TYPE_TV,
             'title' => TmdbClient::getString($show, 'name'),
@@ -472,13 +515,61 @@ class TmdbProvider extends AbstractTvProvider
             'source' => parent::SOURCE_TMDB,
             'imdb' => $imdbId,
             'tvdb' => TmdbClient::getInt($externalIds, 'tvdb_id'),
-            'trakt' => 0,
+            'trakt' => $traktId,
             'tvrage' => TmdbClient::getInt($externalIds, 'tvrage_id'),
             'tvmaze' => 0,
-            'tmdb' => TmdbClient::getInt($show, 'id'),
+            'tmdb' => $tmdbId,
             'aliases' => ! empty($alternativeTitles) ? $alternativeTitles : '',
             'localzone' => "''",
         ];
+    }
+
+    /**
+     * Look up Trakt ID using available external IDs.
+     * Tries TMDB ID first, then IMDB, then TVDB.
+     *
+     * @param  int  $tmdbId  TMDB show ID
+     * @param  int|string  $imdbId  IMDB ID (numeric, without 'tt' prefix)
+     * @param  int  $tvdbId  TVDB show ID
+     * @return int Trakt ID or 0 if not found
+     */
+    protected function lookupTraktId(int $tmdbId, int|string $imdbId, int $tvdbId): int
+    {
+        try {
+            $traktService = app(\App\Services\TraktService::class);
+
+            if (! $traktService->isConfigured()) {
+                return 0;
+            }
+
+            // Try TMDB ID first
+            if ($tmdbId > 0) {
+                $ids = $traktService->lookupShowIds($tmdbId, 'tmdb');
+                if ($ids !== null && ! empty($ids['trakt'])) {
+                    return (int) $ids['trakt'];
+                }
+            }
+
+            // Try IMDB ID
+            if (! empty($imdbId) && $imdbId > 0) {
+                $ids = $traktService->lookupShowIds($imdbId, 'imdb');
+                if ($ids !== null && ! empty($ids['trakt'])) {
+                    return (int) $ids['trakt'];
+                }
+            }
+
+            // Try TVDB ID
+            if ($tvdbId > 0) {
+                $ids = $traktService->lookupShowIds($tvdbId, 'tvdb');
+                if ($ids !== null && ! empty($ids['trakt'])) {
+                    return (int) $ids['trakt'];
+                }
+            }
+        } catch (\Throwable $e) {
+            // Silently fail - Trakt ID lookup is optional enrichment
+        }
+
+        return 0;
     }
 
     /**

@@ -129,7 +129,7 @@ class TmdbPipe extends AbstractTvProviderPipe
 
         // Download all episodes if new show to reduce API/bandwidth usage
         if (! $tmdb->countEpsByVideoID($videoId)) {
-            $tmdb->getEpisodeInfo($siteId, -1, -1);
+            $tmdb->getEpisodeInfo($siteId, -1, -1, '', $videoId);
         }
 
         // Check if we have the episode for this video ID
@@ -137,8 +137,8 @@ class TmdbPipe extends AbstractTvProviderPipe
 
         if ($episode === false) {
             if ($seriesNo !== '' && $episodeNo !== '') {
-                // Try to get episode from TMDB
-                $tmdbEpisode = $tmdb->getEpisodeInfo($siteId, (int) $seriesNo, (int) $episodeNo);
+                // Try to get episode from TMDB with fallback to other IDs
+                $tmdbEpisode = $tmdb->getEpisodeInfo($siteId, (int) $seriesNo, (int) $episodeNo, '', $videoId);
 
                 if ($tmdbEpisode) {
                     $episode = $tmdb->addEpisode($videoId, $tmdbEpisode);
@@ -147,7 +147,7 @@ class TmdbPipe extends AbstractTvProviderPipe
 
             if ($episode === false && $hasAirdate) {
                 // Refresh episode cache and attempt airdate match
-                $tmdb->getEpisodeInfo($siteId, -1, -1);
+                $tmdb->getEpisodeInfo($siteId, -1, -1, '', $videoId);
                 $episode = $tmdb->getBySeasonEp($videoId, 0, 0, $parsedInfo['airdate']);
             }
         }

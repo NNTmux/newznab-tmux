@@ -429,6 +429,18 @@ class TvMazeProvider extends AbstractTvProvider
     {
         $this->posterUrl = (string) ($show->mediumImage ?? '');
 
+        $tvdbId = (int) ($show->externalIDs['thetvdb'] ?? 0);
+        $imdbId = 0;
+
+        // Extract IMDB ID if available
+        if (! empty($show->externalIDs['imdb'])) {
+            preg_match('/tt(?P<imdbid>\d{6,9})$/i', $show->externalIDs['imdb'], $imdb);
+            $imdbId = (int) ($imdb['imdbid'] ?? 0);
+        }
+
+        // Look up TMDB and Trakt IDs using available external IDs
+        $externalIds = $this->lookupExternalIds($tvdbId, $imdbId);
+
         return [
             'type' => parent::TYPE_TV,
             'title' => (string) $show->name,
@@ -437,15 +449,80 @@ class TvMazeProvider extends AbstractTvProvider
             'publisher' => (string) $show->network,
             'country' => (string) $show->country,
             'source' => parent::SOURCE_TVMAZE,
-            'imdb' => 0,
-            'tvdb' => (int) ($show->externalIDs['thetvdb'] ?? 0),
+            'imdb' => $imdbId,
+            'tvdb' => $tvdbId,
             'tvmaze' => (int) $show->id,
-            'trakt' => 0,
+            'trakt' => $externalIds['trakt'],
             'tvrage' => (int) ($show->externalIDs['tvrage'] ?? 0),
-            'tmdb' => 0,
+            'tmdb' => $externalIds['tmdb'],
             'aliases' => ! empty($show->akas) ? (array) $show->akas : '',
             'localzone' => "''",
         ];
+    }
+
+    /**
+     * Look up TMDB and Trakt IDs using TVDB ID and IMDB ID.
+     *
+     * @param  int  $tvdbId  TVDB show ID
+     * @param  int|string  $imdbId  IMDB ID (numeric, without 'tt' prefix)
+     * @return array ['tmdb' => int, 'trakt' => int]
+     */
+    protected function lookupExternalIds(int $tvdbId, int|string $imdbId): array
+    {
+        $result = ['tmdb' => 0, 'trakt' => 0];
+
+        try {
+            // Try to get TMDB ID via TMDB's find endpoint
+            $tmdbClient = app(\App\Services\TmdbClient::class);
+            if ($tmdbClient->isConfigured()) {
+                // Try TVDB ID first
+                if ($tvdbId > 0) {
+                    $tmdbIds = $tmdbClient->lookupTvShowIds($tvdbId, 'tvdb');
+                    if ($tmdbIds !== null) {
+                        $result['tmdb'] = $tmdbIds['tmdb'] ?? 0;
+                    }
+                }
+                // Try IMDB ID if TMDB not found
+                if ($result['tmdb'] === 0 && ! empty($imdbId) && $imdbId > 0) {
+                    $tmdbIds = $tmdbClient->lookupTvShowIds($imdbId, 'imdb');
+                    if ($tmdbIds !== null) {
+                        $result['tmdb'] = $tmdbIds['tmdb'] ?? 0;
+                    }
+                }
+            }
+
+            // Try to get Trakt ID via Trakt's search endpoint
+            $traktService = app(\App\Services\TraktService::class);
+            if ($traktService->isConfigured()) {
+                // Try TVDB ID first
+                if ($tvdbId > 0) {
+                    $traktIds = $traktService->lookupShowIds($tvdbId, 'tvdb');
+                    if ($traktIds !== null && ! empty($traktIds['trakt'])) {
+                        $result['trakt'] = (int) $traktIds['trakt'];
+                        // Also get TMDB if we didn't find it above
+                        if ($result['tmdb'] === 0 && ! empty($traktIds['tmdb'])) {
+                            $result['tmdb'] = (int) $traktIds['tmdb'];
+                        }
+                        return $result;
+                    }
+                }
+
+                // Try IMDB ID as fallback
+                if (! empty($imdbId) && $imdbId > 0) {
+                    $traktIds = $traktService->lookupShowIds($imdbId, 'imdb');
+                    if ($traktIds !== null && ! empty($traktIds['trakt'])) {
+                        $result['trakt'] = (int) $traktIds['trakt'];
+                        if ($result['tmdb'] === 0 && ! empty($traktIds['tmdb'])) {
+                            $result['tmdb'] = (int) $traktIds['tmdb'];
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            // Silently fail - external ID lookup is optional enrichment
+        }
+
+        return $result;
     }
 
     /**

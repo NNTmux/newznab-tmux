@@ -146,11 +146,12 @@ class TraktProvider extends AbstractTvProvider
                         $episode = $this->getBySeasonEp($videoId, $seasonNo, $episodeNo, $release['airdate']);
 
                         if ($episode === false && $lookupSetting) {
-                            // Send the request for the episode to TRAKT
+                            // Send the request for the episode to TRAKT with fallback to other IDs
                             $traktEpisode = $this->getEpisodeInfo(
                                 $traktid,
                                 $seasonNo,
-                                $episodeNo
+                                $episodeNo,
+                                $videoId
                             );
 
                             if ($traktEpisode) {
@@ -237,13 +238,54 @@ class TraktProvider extends AbstractTvProvider
     }
 
     /**
-     * Get episode information from Trakt.
+     * Get all external IDs for a video from the database.
+     *
+     * @param  int  $videoId  The local video ID
+     * @return array Array of external IDs: ['trakt' => X, 'tmdb' => Y, 'tvdb' => Z, 'imdb' => W]
      */
-    public function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode): array|bool
+    protected function getAllSiteIdsFromVideoID(int $videoId): array
+    {
+        $result = \App\Models\Video::query()
+            ->where('id', $videoId)
+            ->first(['trakt', 'tmdb', 'tvdb', 'imdb']);
+
+        if ($result === null) {
+            return ['trakt' => 0, 'tmdb' => 0, 'tvdb' => 0, 'imdb' => 0];
+        }
+
+        return [
+            'trakt' => (int) ($result->trakt ?? 0),
+            'tmdb' => (int) ($result->tmdb ?? 0),
+            'tvdb' => (int) ($result->tvdb ?? 0),
+            'imdb' => (int) ($result->imdb ?? 0),
+        ];
+    }
+
+    /**
+     * Get episode information from Trakt using all available IDs with fallback.
+     *
+     * @param  int|string  $siteId  The primary site ID (Trakt)
+     * @param  int|string  $series  The season number
+     * @param  int|string  $episode  The episode number
+     * @param  int  $videoId  Optional video ID to fetch all external IDs for fallback
+     * @return array|bool Episode data or false on failure
+     */
+    public function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode, int $videoId = 0): array|bool
     {
         $return = false;
 
-        $response = $this->client->getEpisodeSummary($siteId, $series, $episode);
+        // If we have a video ID, get all available external IDs for fallback
+        if ($videoId > 0) {
+            $ids = $this->getAllSiteIdsFromVideoID($videoId);
+            // Ensure the provided siteId is used as the Trakt ID if available
+            if ((int) $siteId > 0) {
+                $ids['trakt'] = (int) $siteId;
+            }
+            $response = $this->client->getEpisodeSummaryWithFallback($ids, $series, $episode);
+        } else {
+            // Legacy behavior: just use the provided site ID as Trakt ID
+            $response = $this->client->getEpisodeSummary($siteId, $series, $episode);
+        }
 
         sleep(1);
 
@@ -344,7 +386,13 @@ class TraktProvider extends AbstractTvProvider
         preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show['ids']['imdb'], $imdb);
         $this->posterUrl = $show['images']['poster']['thumb'] ?? '';
         $this->fanartUrl = $show['images']['fanart']['thumb'] ?? '';
-        $this->localizedTZ = $show['airs']['timezone'];
+        $this->localizedTZ = $show['airs']['timezone'] ?? '';
+
+        $imdbId = $imdb['imdbid'] ?? 0;
+        $tvdbId = $show['ids']['tvdb'] ?? 0;
+
+        // Look up TVMaze ID using TVDB or IMDB
+        $tvmazeId = $this->lookupTvMazeId($tvdbId, $imdbId);
 
         return [
             'type' => parent::TYPE_TV,
@@ -354,15 +402,50 @@ class TraktProvider extends AbstractTvProvider
             'publisher' => $show['network'],
             'country' => $show['country'],
             'source' => parent::SOURCE_TRAKT,
-            'imdb' => $imdb['imdbid'] ?? 0,
-            'tvdb' => $show['ids']['tvdb'] ?? 0,
+            'imdb' => $imdbId,
+            'tvdb' => $tvdbId,
             'trakt' => $show['ids']['trakt'],
             'tvrage' => $show['ids']['tvrage'] ?? 0,
-            'tvmaze' => 0,
+            'tvmaze' => $tvmazeId,
             'tmdb' => $show['ids']['tmdb'] ?? 0,
             'aliases' => isset($show['aliases']) && ! empty($show['aliases']) ? $show['aliases'] : '',
             'localzone' => $this->localizedTZ,
         ];
+    }
+
+    /**
+     * Look up TVMaze ID using TVDB ID or IMDB ID.
+     *
+     * @param  int  $tvdbId  TVDB show ID
+     * @param  int|string  $imdbId  IMDB ID (numeric, without 'tt' prefix)
+     * @return int TVMaze ID or 0 if not found
+     */
+    protected function lookupTvMazeId(int $tvdbId, int|string $imdbId): int
+    {
+        try {
+            $tvmazeClient = new \DariusIII\TVMaze\TVMaze();
+
+            // Try TVDB ID first
+            if ($tvdbId > 0) {
+                $result = $tvmazeClient->getShowBySiteID('thetvdb', $tvdbId);
+                if ($result !== null && isset($result->id)) {
+                    return (int) $result->id;
+                }
+            }
+
+            // Try IMDB ID as fallback
+            if (! empty($imdbId) && $imdbId > 0) {
+                $imdbFormatted = 'tt' . str_pad((string) $imdbId, 7, '0', STR_PAD_LEFT);
+                $result = $tvmazeClient->getShowBySiteID('imdb', $imdbFormatted);
+                if ($result !== null && isset($result->id)) {
+                    return (int) $result->id;
+                }
+            }
+        } catch (\Throwable $e) {
+            // Silently fail - TVMaze ID lookup is optional enrichment
+        }
+
+        return 0;
     }
 
     /**

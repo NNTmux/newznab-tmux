@@ -121,7 +121,7 @@ class TraktPipe extends AbstractTvProviderPipe
 
         // Download all episodes if new show to reduce API/bandwidth usage
         if (! $trakt->countEpsByVideoID($videoId)) {
-            $trakt->getEpisodeInfo($siteId, -1, -1);
+            $trakt->getEpisodeInfo($siteId, -1, -1, $videoId);
         }
 
         // Check if we have the episode for this video ID
@@ -129,8 +129,8 @@ class TraktPipe extends AbstractTvProviderPipe
 
         if ($episode === false) {
             if ($seriesNo !== '' && $episodeNo !== '') {
-                // Try to get episode from Trakt
-                $traktEpisode = $trakt->getEpisodeInfo($siteId, (int) $seriesNo, (int) $episodeNo);
+                // Try to get episode from Trakt with fallback to other IDs
+                $traktEpisode = $trakt->getEpisodeInfo($siteId, (int) $seriesNo, (int) $episodeNo, $videoId);
 
                 if ($traktEpisode) {
                     $episode = $trakt->addEpisode($videoId, $traktEpisode);
@@ -139,7 +139,7 @@ class TraktPipe extends AbstractTvProviderPipe
 
             if ($episode === false && $hasAirdate) {
                 // Refresh episode cache and attempt airdate match
-                $trakt->getEpisodeInfo($siteId, -1, -1);
+                $trakt->getEpisodeInfo($siteId, -1, -1, $videoId);
                 $episode = $trakt->getBySeasonEp($videoId, 0, 0, $parsedInfo['airdate']);
             }
         }

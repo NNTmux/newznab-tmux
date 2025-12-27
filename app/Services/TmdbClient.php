@@ -61,15 +61,24 @@ class TmdbClient
 
         try {
             $response = Http::timeout($this->timeout)
-                ->retry($this->retryTimes, $this->retryDelay)
+                ->retry($this->retryTimes, $this->retryDelay, function (\Exception $exception, $request) {
+                    // Don't retry on 404 errors - resource simply doesn't exist
+                    if ($exception instanceof \Illuminate\Http\Client\RequestException) {
+                        return $exception->response->status() !== 404;
+                    }
+
+                    return true;
+                }, throw: false)
                 ->get(self::BASE_URL.$endpoint, $params);
 
             if ($response->successful()) {
                 return $response->json();
             }
 
-            // Handle specific error codes
+            // Handle specific error codes - 404 is normal (resource not found)
             if ($response->status() === 404) {
+                Log::debug('TMDB: Resource not found', ['endpoint' => $endpoint]);
+
                 return null;
             }
 
@@ -81,6 +90,13 @@ class TmdbClient
 
             return null;
         } catch (\Throwable $e) {
+            // Check if this is a 404 wrapped in an exception
+            if ($e instanceof \Illuminate\Http\Client\RequestException && $e->response->status() === 404) {
+                Log::debug('TMDB: Resource not found', ['endpoint' => $endpoint]);
+
+                return null;
+            }
+
             Log::warning('TMDB API request exception', [
                 'endpoint' => $endpoint,
                 'message' => $e->getMessage(),
@@ -272,6 +288,146 @@ class TmdbClient
         }
 
         return $this->get('/tv/'.$tvId.'/season/'.$seasonNumber.'/episode/'.$episodeNumber);
+    }
+
+    /**
+     * Find a TV show by external ID (IMDB, TVDB, etc.)
+     *
+     * @param  string  $externalId  The external ID value
+     * @param  string  $source  The source: 'imdb_id', 'tvdb_id', 'tvrage_id'
+     * @return array|null The TMDB TV show data or null if not found
+     */
+    public function findTvByExternalId(string $externalId, string $source = 'tvdb_id'): ?array
+    {
+        if (empty($externalId)) {
+            return null;
+        }
+
+        $validSources = ['imdb_id', 'tvdb_id', 'tvrage_id'];
+        if (! in_array($source, $validSources, true)) {
+            return null;
+        }
+
+        $result = $this->get('/find/'.$externalId, [
+            'external_source' => $source,
+        ]);
+
+        if ($result === null || empty($result['tv_results'])) {
+            return null;
+        }
+
+        // Return the first TV result
+        return $result['tv_results'][0] ?? null;
+    }
+
+    /**
+     * Get TV episode with fallback using multiple external IDs.
+     * Tries TMDB ID first, then looks up by TVDB or IMDB if needed.
+     *
+     * @param  array  $ids  Array of IDs: ['tmdb' => X, 'tvdb' => Y, 'imdb' => Z]
+     * @param  int  $seasonNumber  The season number
+     * @param  int  $episodeNumber  The episode number
+     * @return array|null Episode data or null on failure
+     */
+    public function getTvEpisodeWithFallback(array $ids, int $seasonNumber, int $episodeNumber): ?array
+    {
+        // First try with TMDB ID if available
+        $tmdbId = (int) ($ids['tmdb'] ?? 0);
+        if ($tmdbId > 0) {
+            $result = $this->getTvEpisode($tmdbId, $seasonNumber, $episodeNumber);
+            if ($result !== null) {
+                return $result;
+            }
+        }
+
+        // Try to find the show by TVDB ID
+        $tvdbId = (int) ($ids['tvdb'] ?? 0);
+        if ($tvdbId > 0) {
+            $show = $this->findTvByExternalId((string) $tvdbId, 'tvdb_id');
+            if ($show !== null && isset($show['id'])) {
+                $result = $this->getTvEpisode((int) $show['id'], $seasonNumber, $episodeNumber);
+                if ($result !== null) {
+                    return $result;
+                }
+            }
+        }
+
+        // Try to find the show by IMDB ID
+        $imdbId = $ids['imdb'] ?? 0;
+        if (! empty($imdbId)) {
+            // Format IMDB ID with tt prefix if it's numeric
+            $imdbFormatted = is_numeric($imdbId)
+                ? 'tt' . str_pad((string) $imdbId, 7, '0', STR_PAD_LEFT)
+                : (string) $imdbId;
+
+            $show = $this->findTvByExternalId($imdbFormatted, 'imdb_id');
+            if ($show !== null && isset($show['id'])) {
+                $result = $this->getTvEpisode((int) $show['id'], $seasonNumber, $episodeNumber);
+                if ($result !== null) {
+                    return $result;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Look up a TV show and get all its external IDs.
+     * Can be used to cross-reference between providers.
+     *
+     * @param  int|string  $id  The external ID
+     * @param  string  $source  The ID source: 'tmdb', 'tvdb', 'imdb'
+     * @return array|null Array with all IDs: ['tmdb' => X, 'imdb' => Y, 'tvdb' => Z] or null
+     */
+    public function lookupTvShowIds(int|string $id, string $source = 'tmdb'): ?array
+    {
+        $show = null;
+
+        if ($source === 'tmdb' && is_numeric($id) && (int) $id > 0) {
+            // Direct TMDB lookup
+            $show = $this->getTvShow((int) $id);
+            if ($show !== null) {
+                $externalIds = $this->getTvExternalIds((int) $id);
+                if ($externalIds !== null) {
+                    $show['external_ids'] = $externalIds;
+                }
+            }
+        } elseif ($source === 'tvdb' && is_numeric($id) && (int) $id > 0) {
+            $show = $this->findTvByExternalId((string) $id, 'tvdb_id');
+        } elseif ($source === 'imdb') {
+            $imdbFormatted = is_numeric($id)
+                ? 'tt' . str_pad((string) $id, 7, '0', STR_PAD_LEFT)
+                : (string) $id;
+            $show = $this->findTvByExternalId($imdbFormatted, 'imdb_id');
+        }
+
+        if ($show === null) {
+            return null;
+        }
+
+        // If we found by external ID, we need to fetch external IDs for full data
+        $tmdbId = self::getInt($show, 'id');
+        if ($tmdbId > 0 && ! isset($show['external_ids'])) {
+            $externalIds = $this->getTvExternalIds($tmdbId);
+            $show['external_ids'] = $externalIds ?? [];
+        }
+
+        $externalIds = self::getArray($show, 'external_ids');
+
+        // Parse IMDB ID to numeric
+        $imdbId = 0;
+        if (! empty($externalIds['imdb_id'])) {
+            preg_match('/tt(?P<imdbid>\d{6,7})$/i', $externalIds['imdb_id'], $imdb);
+            $imdbId = (int) ($imdb['imdbid'] ?? 0);
+        }
+
+        return [
+            'tmdb' => $tmdbId,
+            'imdb' => $imdbId,
+            'tvdb' => self::getInt($externalIds, 'tvdb_id'),
+            'tvrage' => self::getInt($externalIds, 'tvrage_id'),
+        ];
     }
 
     // =========================================================================

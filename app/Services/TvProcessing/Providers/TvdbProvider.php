@@ -391,32 +391,93 @@ class TvdbProvider extends AbstractTvProvider
             }
         }
 
+        $imdbId = 0;
+        $imdbIdObj = null;
         try {
-            $imdbId = $this->client->series()->extended($show->tvdb_id);
-            preg_match('/tt(?P<imdbid>\d{6,9})$/i', $imdbId->getIMDBId(), $imdb);
+            $imdbIdObj = $this->client->series()->extended($show->tvdb_id);
+            preg_match('/tt(?P<imdbid>\d{6,9})$/i', $imdbIdObj->getIMDBId(), $imdb);
+            $imdbId = $imdb['imdbid'] ?? 0;
         } catch (ResourceNotFoundException $e) {
             cli()->error('Show ImdbId not found on TVDB');
         } catch (\Exception) {
             cli()->error('Error on TVDB, aborting');
         }
 
+        // Look up TMDB and Trakt IDs using available external IDs
+        $externalIds = $this->lookupExternalIds($show->tvdb_id, $imdbId);
+
         return [
             'type' => parent::TYPE_TV,
             'title' => $show->name,
             'summary' => $show->overview,
             'started' => $show->first_air_time,
-            'publisher' => $imdbId->originalNetwork->name ?? '',
+            'publisher' => $imdbIdObj->originalNetwork->name ?? '',
             'poster' => $this->posterUrl,
             'source' => parent::SOURCE_TVDB,
-            'imdb' => $imdb['imdbid'] ?? 0,
+            'imdb' => $imdbId,
             'tvdb' => $show->tvdb_id,
-            'trakt' => 0,
+            'trakt' => $externalIds['trakt'],
             'tvrage' => 0,
             'tvmaze' => 0,
-            'tmdb' => 0,
+            'tmdb' => $externalIds['tmdb'],
             'aliases' => ! empty($show->aliases) ? $show->aliases : '',
             'localzone' => "''",
         ];
+    }
+
+    /**
+     * Look up TMDB and Trakt IDs using TVDB ID and IMDB ID.
+     *
+     * @param  int  $tvdbId  TVDB show ID
+     * @param  int|string  $imdbId  IMDB ID (numeric, without 'tt' prefix)
+     * @return array ['tmdb' => int, 'trakt' => int]
+     */
+    protected function lookupExternalIds(int $tvdbId, int|string $imdbId): array
+    {
+        $result = ['tmdb' => 0, 'trakt' => 0];
+
+        try {
+            // Try to get TMDB ID and other IDs via TMDB's find endpoint
+            $tmdbClient = app(\App\Services\TmdbClient::class);
+            if ($tmdbClient->isConfigured() && $tvdbId > 0) {
+                $tmdbIds = $tmdbClient->lookupTvShowIds($tvdbId, 'tvdb');
+                if ($tmdbIds !== null) {
+                    $result['tmdb'] = $tmdbIds['tmdb'] ?? 0;
+                }
+            }
+
+            // Try to get Trakt ID via Trakt's search endpoint
+            $traktService = app(\App\Services\TraktService::class);
+            if ($traktService->isConfigured()) {
+                // Try TVDB ID first
+                if ($tvdbId > 0) {
+                    $traktIds = $traktService->lookupShowIds($tvdbId, 'tvdb');
+                    if ($traktIds !== null && ! empty($traktIds['trakt'])) {
+                        $result['trakt'] = (int) $traktIds['trakt'];
+                        // Also get TMDB if we didn't find it above
+                        if ($result['tmdb'] === 0 && ! empty($traktIds['tmdb'])) {
+                            $result['tmdb'] = (int) $traktIds['tmdb'];
+                        }
+                        return $result;
+                    }
+                }
+
+                // Try IMDB ID as fallback
+                if (! empty($imdbId) && $imdbId > 0) {
+                    $traktIds = $traktService->lookupShowIds($imdbId, 'imdb');
+                    if ($traktIds !== null && ! empty($traktIds['trakt'])) {
+                        $result['trakt'] = (int) $traktIds['trakt'];
+                        if ($result['tmdb'] === 0 && ! empty($traktIds['tmdb'])) {
+                            $result['tmdb'] = (int) $traktIds['tmdb'];
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            // Silently fail - external ID lookup is optional enrichment
+        }
+
+        return $result;
     }
 
     public function formatEpisodeInfo($episode): array

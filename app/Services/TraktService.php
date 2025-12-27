@@ -80,7 +80,14 @@ class TraktService
 
         try {
             $response = Http::timeout($this->timeout)
-                ->retry($this->retryTimes, $this->retryDelay)
+                ->retry($this->retryTimes, $this->retryDelay, function (\Exception $exception, $request) {
+                    // Don't retry on 404 errors - resource simply doesn't exist
+                    if ($exception instanceof \Illuminate\Http\Client\RequestException) {
+                        return $exception->response->status() !== 404;
+                    }
+
+                    return true;
+                }, throw: false)
                 ->withHeaders($this->getHeaders())
                 ->get($url, $params);
 
@@ -99,7 +106,7 @@ class TraktService
                 return $data;
             }
 
-            // Handle specific error codes
+            // Handle specific error codes - 404 is normal (resource not found)
             if ($response->status() === 404) {
                 Log::debug('Trakt: Resource not found', ['endpoint' => $endpoint]);
 
@@ -114,6 +121,13 @@ class TraktService
 
             return null;
         } catch (\Throwable $e) {
+            // Check if this is a 404 wrapped in an exception
+            if ($e instanceof \Illuminate\Http\Client\RequestException && $e->response->status() === 404) {
+                Log::debug('Trakt: Resource not found', ['endpoint' => $endpoint]);
+
+                return null;
+            }
+
             Log::warning('Trakt API request exception', [
                 'endpoint' => $endpoint,
                 'message' => $e->getMessage(),
@@ -124,19 +138,21 @@ class TraktService
     }
 
     /**
-     * Get episode summary.
+     * Get episode summary using multiple ID types for fallback.
      *
      * @param  int|string  $showId  The show ID (Trakt, IMDB, TMDB, or TVDB)
      * @param  int|string  $season  The season number
      * @param  int|string  $episode  The episode number
      * @param  string  $extended  Extended info level: 'min', 'full', 'aliases', 'full,aliases'
+     * @param  string  $idType  The ID type: 'trakt', 'imdb', 'tmdb', 'tvdb' (default: 'trakt')
      * @return array|null Episode data or null on failure
      */
     public function getEpisodeSummary(
         int|string $showId,
         int|string $season,
         int|string $episode,
-        string $extended = 'min'
+        string $extended = 'min',
+        string $idType = 'trakt'
     ): ?array {
         // Validate parameters to avoid unnecessary API calls with invalid IDs
         $showIdInt = is_numeric($showId) ? (int) $showId : 0;
@@ -154,13 +170,131 @@ class TraktService
             default => 'min',
         };
 
-        $cacheKey = "trakt_episode_{$showId}_{$season}_{$episode}_{$extended}";
+        // Format the show ID based on type for cache key and API call
+        $formattedId = $this->formatShowIdForApi($showId, $idType);
+        if ($formattedId === null) {
+            return null;
+        }
 
-        return Cache::remember($cacheKey, now()->addHours(self::CACHE_TTL_HOURS), function () use ($showId, $season, $episode, $extended) {
-            return $this->get("shows/{$showId}/seasons/{$season}/episodes/{$episode}", [
+        $cacheKey = "trakt_episode_{$idType}_{$showId}_{$season}_{$episode}_{$extended}";
+
+        return Cache::remember($cacheKey, now()->addHours(self::CACHE_TTL_HOURS), function () use ($formattedId, $season, $episode, $extended) {
+            return $this->get("shows/{$formattedId}/seasons/{$season}/episodes/{$episode}", [
                 'extended' => $extended,
             ]);
         });
+    }
+
+    /**
+     * Get episode summary with fallback to multiple ID types.
+     * Tries Trakt ID first, then falls back to TMDB, TVDB, and IMDB.
+     *
+     * @param  array  $ids  Array of IDs: ['trakt' => X, 'tmdb' => Y, 'tvdb' => Z, 'imdb' => W]
+     * @param  int|string  $season  The season number
+     * @param  int|string  $episode  The episode number
+     * @param  string  $extended  Extended info level
+     * @return array|null Episode data or null on failure
+     */
+    public function getEpisodeSummaryWithFallback(
+        array $ids,
+        int|string $season,
+        int|string $episode,
+        string $extended = 'min'
+    ): ?array {
+        // Priority order for ID types
+        $idPriority = ['trakt', 'tmdb', 'tvdb', 'imdb'];
+
+        foreach ($idPriority as $idType) {
+            if (! empty($ids[$idType]) && $ids[$idType] > 0) {
+                $result = $this->getEpisodeSummary($ids[$idType], $season, $episode, $extended, $idType);
+                if ($result !== null) {
+                    return $result;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Format show ID for Trakt API based on ID type.
+     * Trakt API accepts different ID formats for lookups.
+     *
+     * @param  int|string  $id  The show ID
+     * @param  string  $idType  The ID type: 'trakt', 'imdb', 'tmdb', 'tvdb'
+     * @return string|null Formatted ID for API call or null if invalid
+     */
+    protected function formatShowIdForApi(int|string $id, string $idType): ?string
+    {
+        if (! in_array($idType, self::ID_TYPES, true)) {
+            return null;
+        }
+
+        return match ($idType) {
+            'imdb' => is_numeric($id) ? 'tt' . str_pad((string) $id, 7, '0', STR_PAD_LEFT) : (string) $id,
+            'trakt' => (string) $id,
+            'tmdb', 'tvdb' => (string) $id,
+            default => null,
+        };
+    }
+
+    /**
+     * Get show summary with all external IDs.
+     * This enriches the response with IDs from all supported providers.
+     *
+     * @param  int|string  $showId  Show ID
+     * @param  string  $idType  The ID type: 'trakt', 'imdb', 'tmdb', 'tvdb'
+     * @return array|null Show data with all IDs or null on failure
+     */
+    public function getShowWithAllIds(int|string $showId, string $idType = 'trakt'): ?array
+    {
+        $formattedId = $this->formatShowIdForApi($showId, $idType);
+        if ($formattedId === null) {
+            return null;
+        }
+
+        $cacheKey = "trakt_show_ids_{$idType}_{$showId}";
+
+        return Cache::remember($cacheKey, now()->addHours(self::CACHE_TTL_HOURS), function () use ($formattedId) {
+            return $this->get("shows/{$formattedId}", ['extended' => 'full']);
+        });
+    }
+
+    /**
+     * Look up a show by external ID and return all available IDs.
+     * Useful for cross-referencing between TMDB, TVDB, Trakt, and IMDB.
+     *
+     * @param  int|string  $id  The external ID
+     * @param  string  $idType  The ID type: 'imdb', 'tmdb', 'tvdb'
+     * @return array|null Array with all IDs: ['trakt' => X, 'imdb' => Y, 'tmdb' => Z, 'tvdb' => W] or null
+     */
+    public function lookupShowIds(int|string $id, string $idType = 'tmdb'): ?array
+    {
+        if (! in_array($idType, self::ID_TYPES, true)) {
+            return null;
+        }
+
+        // Use the search endpoint to find the show by external ID
+        $results = $this->searchById($id, $idType, 'show');
+
+        if (empty($results) || ! is_array($results)) {
+            return null;
+        }
+
+        // Get the first matching show
+        $show = $results[0]['show'] ?? null;
+        if ($show === null || ! isset($show['ids'])) {
+            return null;
+        }
+
+        return [
+            'trakt' => $show['ids']['trakt'] ?? 0,
+            'imdb' => $show['ids']['imdb'] ?? null,
+            'tmdb' => $show['ids']['tmdb'] ?? 0,
+            'tvdb' => $show['ids']['tvdb'] ?? 0,
+            'tvrage' => $show['ids']['tvrage'] ?? 0,
+            'slug' => $show['ids']['slug'] ?? '',
+        ];
     }
 
     /**
