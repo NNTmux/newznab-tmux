@@ -17,7 +17,7 @@ class TermsController extends BasePageController
         $meta_description = 'Terms and Conditions for '.config('app.name');
 
         // Get terms content from settings
-        $terms_content = $this->settings->tandc ?? '<p>No terms and conditions have been set yet.</p>';
+        $terms_content = $this->settings->get('tandc') ?? '<p>No terms and conditions have been set yet.</p>';
 
         return view('terms', compact('title', 'meta_title', 'meta_keywords', 'meta_description', 'terms_content'));
     }
