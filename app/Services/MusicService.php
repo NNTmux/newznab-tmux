@@ -1,74 +1,48 @@
 <?php
 
-namespace Blacklight;
+namespace App\Services;
 
 use App\Models\Category;
 use App\Models\Genre;
 use App\Models\MusicInfo;
 use App\Models\Release;
 use App\Models\Settings;
-use App\Services\ItunesService;
+use App\Services\Releases\ReleaseBrowseService;
+use Blacklight\Genres;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Class Music.
+ * Music Service - Handles music browsing and lookup operations.
  */
-class Music
+class MusicService
 {
     protected const MATCH_PERCENT = 85;
 
-    /**
-     * @var bool
-     */
-    public $echooutput;
+    public bool $echooutput;
+
+    public ?string $pubkey;
+
+    public ?string $privkey;
+
+    public ?string $asstag;
+
+    public int $musicqty;
+
+    public int $sleeptime;
+
+    public string $imgSavePath;
+
+    public mixed $renamed;
 
     /**
-     * @var null|string
+     * Store names of failed lookup items.
      */
-    public $pubkey;
-
-    /**
-     * @var null|string
-     */
-    public $privkey;
-
-    /**
-     * @var null|string
-     */
-    public $asstag;
-
-    /**
-     * @var int
-     */
-    public $musicqty;
-
-    /**
-     * @var int
-     */
-    public $sleeptime;
-
-    /**
-     * @var string
-     */
-    public $imgSavePath;
-
-    /**
-     * @var bool
-     */
-    public $renamed;
-
-    /**
-     * Store names of failed Amazon lookup items.
-     *
-     * @var array
-     */
-    public $failCache;
+    public array $failCache;
 
     public function __construct()
     {
         $this->echooutput = config('nntmux.echocli');
-
 
         $this->pubkey = Settings::settingValue('amazonpubkey');
         $this->privkey = Settings::settingValue('amazonprivkey');
@@ -82,24 +56,24 @@ class Music
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * Get music info by ID.
      */
-    public function getMusicInfo($id)
+    public function getMusicInfo(int $id): ?MusicInfo
     {
         return MusicInfo::query()->with('genre')->where('id', $id)->first();
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Model|null|static
+     * Get music info by name using full-text search.
      */
-    public function getMusicInfoByName($artist, $album)
+    public function getMusicInfoByName(string $artist, string $album): ?MusicInfo
     {
-        // only used to get a count of words
         $searchwords = '';
         $album = preg_replace('/( - | -|\(.+\)|\(|\))/', ' ', $album);
         $album = preg_replace('/[^\w ]+/', '', $album);
         $album = preg_replace('/(WEB|FLAC|CD)/', '', $album);
         $album = trim(trim(preg_replace('/\s\s+/i', ' ', $album)));
+
         foreach (explode(' ', $album) as $word) {
             $word = trim(rtrim(trim($word), '-'));
             if ($word !== '' && $word !== '-') {
@@ -113,9 +87,9 @@ class Music
     }
 
     /**
-     * @return \Illuminate\Cache\|\Illuminate\Database\Eloquent\Collection|mixed
+     * Get paginated music range for browsing.
      */
-    public function getMusicRange($page, $cat, $start, $num, $orderBy, array $excludedCats = []): mixed
+    public function getMusicRange(int $page, array $cat, int $start, int $num, string $orderBy, array $excludedCats = []): mixed
     {
         $page = max(1, $page);
         $start = max(0, $start);
@@ -131,28 +105,32 @@ class Music
         }
         $order = $this->getMusicOrder($orderBy);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        $musicSql =
-            sprintf(
-                "
-				SELECT SQL_CALC_FOUND_ROWS
-					m.id,
-					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
-				FROM musicinfo m
-				LEFT JOIN releases r ON r.musicinfo_id = m.id
-				WHERE m.title != ''
-				AND m.cover = 1
-				AND r.passwordstatus %s
-				%s %s %s
-				GROUP BY m.id
-				ORDER BY %s %s %s",
-                app(\App\Services\Releases\ReleaseBrowseService::class)->showPasswords(),
-                $browseby,
-                $catsrch,
-                $exccatlist,
-                $order[0],
-                $order[1],
-                ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-            );
+
+        $releaseBrowseService = new ReleaseBrowseService;
+        $passwordClause = $releaseBrowseService->showPasswords();
+
+        $musicSql = sprintf(
+            "
+            SELECT SQL_CALC_FOUND_ROWS
+                m.id,
+                GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
+            FROM musicinfo m
+            LEFT JOIN releases r ON r.musicinfo_id = m.id
+            WHERE m.title != ''
+            AND m.cover = 1
+            AND r.passwordstatus %s
+            %s %s %s
+            GROUP BY m.id
+            ORDER BY %s %s %s",
+            $passwordClause,
+            $browseby,
+            $catsrch,
+            $exccatlist,
+            $order[0],
+            $order[1],
+            ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
+        );
+
         $musicCache = Cache::get(md5($musicSql.$page));
         if ($musicCache !== null) {
             $music = $musicCache;
@@ -161,6 +139,7 @@ class Music
             $music = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
             Cache::put(md5($musicSql.$page), $music, $expiresAt);
         }
+
         $musicIDs = $releaseIDs = [];
         if (\is_array($music['result'])) {
             foreach ($music['result'] as $mus => $id) {
@@ -168,35 +147,39 @@ class Music
                 $releaseIDs[] = $id->grp_release_id;
             }
         }
+
         if (empty($musicIDs) && empty($releaseIDs)) {
             return collect();
         }
+
         $sql = sprintf(
             '
-			SELECT
-				r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, df.failed AS failed,
-				m.*,
-				r.musicinfo_id, r.haspreview,
-				g.name AS group_name,
-				rn.releases_id AS nfoid
-			FROM releases r
-			LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id
-			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-			INNER JOIN musicinfo m ON m.id = r.musicinfo_id
-			%s %s %s
-			GROUP BY m.id
-			ORDER BY %s %s',
+            SELECT
+                r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, df.failed AS failed,
+                m.*,
+                r.musicinfo_id, r.haspreview,
+                g.name AS group_name,
+                rn.releases_id AS nfoid
+            FROM releases r
+            LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id
+            LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
+            LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
+            INNER JOIN musicinfo m ON m.id = r.musicinfo_id
+            %s %s %s
+            GROUP BY m.id
+            ORDER BY %s %s',
             ! empty($musicIDs) ? 'WHERE m.id IN ('.implode(',', $musicIDs).')' : 'AND 1=1',
             (! empty($releaseIDs)) ? 'AND r.id in ('.implode(',', $releaseIDs).')' : '',
             $catsrch,
             $order[0],
             $order[1]
         );
+
         $return = Cache::get(md5($sql.$page));
         if ($return !== null) {
             return $return;
         }
+
         $return = MusicInfo::fromQuery($sql);
         if ($return->isNotEmpty()) {
             $return[0]->_totalcount = $music['total'][0]->total ?? 0;
@@ -206,10 +189,14 @@ class Music
         return $return;
     }
 
-    public function getMusicOrder($orderBy): array
+    /**
+     * Parse order by parameter and return order field and direction.
+     */
+    public function getMusicOrder(string $orderBy): array
     {
         $order = ($orderBy === '') ? 'r.postdate' : $orderBy;
         $orderArr = explode('_', $order);
+
         switch ($orderArr[0]) {
             case 'artist':
                 $orderfield = 'm.artist';
@@ -234,21 +221,39 @@ class Music
                 $orderfield = 'r.postdate';
                 break;
         }
+
         $ordersort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 
         return [$orderfield, $ordersort];
     }
 
+    /**
+     * Get available ordering options.
+     */
     public function getMusicOrdering(): array
     {
-        return ['artist_asc', 'artist_desc', 'posted_asc', 'posted_desc', 'size_asc', 'size_desc', 'files_asc', 'files_desc', 'stats_asc', 'stats_desc', 'year_asc', 'year_desc', 'genre_asc', 'genre_desc'];
+        return [
+            'artist_asc', 'artist_desc',
+            'posted_asc', 'posted_desc',
+            'size_asc', 'size_desc',
+            'files_asc', 'files_desc',
+            'stats_asc', 'stats_desc',
+            'year_asc', 'year_desc',
+            'genre_asc', 'genre_desc',
+        ];
     }
 
+    /**
+     * Get browse by options.
+     */
     public function getBrowseByOptions(): array
     {
         return ['artist' => 'artist', 'title' => 'title', 'genre' => 'genres_id', 'year' => 'year'];
     }
 
+    /**
+     * Build browse by SQL clause.
+     */
     public function getBrowseBy(): string
     {
         $browseby = ' ';
@@ -266,33 +271,46 @@ class Music
         return $browseby;
     }
 
-    public function update($id, $title, $asin, $url, $salesrank, $artist, $publisher, $releasedate, $year, $tracks, $cover, $genres_id): void
-    {
-        MusicInfo::query()->where('id', $id)->update(
-            [
-                'title' => $title,
-                'asin' => $asin,
-                'url' => $url,
-                'salesrank' => $salesrank,
-                'artist' => $artist,
-                'publisher' => $publisher,
-                'releasedate' => $releasedate,
-                'year' => $year,
-                'tracks' => $tracks,
-                'cover' => $cover,
-                'genres_id' => $genres_id,
-            ]
-        );
+    /**
+     * Update music info record.
+     */
+    public function update(
+        int $id,
+        string $title,
+        ?string $asin,
+        ?string $url,
+        ?int $salesrank,
+        ?string $artist,
+        ?string $publisher,
+        ?string $releasedate,
+        ?string $year,
+        ?string $tracks,
+        int $cover,
+        ?int $genres_id
+    ): void {
+        MusicInfo::query()->where('id', $id)->update([
+            'title' => $title,
+            'asin' => $asin,
+            'url' => $url,
+            'salesrank' => $salesrank,
+            'artist' => $artist,
+            'publisher' => $publisher,
+            'releasedate' => $releasedate,
+            'year' => $year,
+            'tracks' => $tracks,
+            'cover' => $cover,
+            'genres_id' => $genres_id,
+        ]);
     }
 
     /**
-     * @return int|mixed
+     * Update or create music info from external data.
      *
      * @throws \Exception
      */
-    public function updateMusicInfo($title, $year, $amazdata = null)
+    public function updateMusicInfo(string $title, string $year, ?array $amazdata = null): int|false
     {
-        $ri = new \App\Services\ReleaseImageService;
+        $ri = new ReleaseImageService;
 
         $mus = [];
         if ($amazdata !== null) {
@@ -306,57 +324,51 @@ class Music
         }
 
         $check = MusicInfo::query()->where('asin', $mus['asin'])->first(['id']);
+
         if ($check === null) {
-            $musicId = MusicInfo::query()->insertGetId(
-                [
-                    'title' => $mus['title'],
-                    'asin' => $mus['asin'],
-                    'url' => $mus['url'],
-                    'salesrank' => $mus['salesrank'],
-                    'artist' => $mus['artist'],
-                    'publisher' => $mus['publisher'],
-                    'releasedate' => $mus['releasedate'],
-                    'review' => $mus['review'],
-                    'year' => $year,
-                    'genres_id' => (int) $mus['musicgenres_id'] === -1 ? 'null' : $mus['musicgenres_id'],
-                    'tracks' => $mus['tracks'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]
-            );
+            $musicId = MusicInfo::query()->insertGetId([
+                'title' => $mus['title'],
+                'asin' => $mus['asin'],
+                'url' => $mus['url'],
+                'salesrank' => $mus['salesrank'],
+                'artist' => $mus['artist'],
+                'publisher' => $mus['publisher'],
+                'releasedate' => $mus['releasedate'],
+                'review' => $mus['review'],
+                'year' => $year,
+                'genres_id' => (int) $mus['musicgenres_id'] === -1 ? null : $mus['musicgenres_id'],
+                'tracks' => $mus['tracks'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
             $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
             MusicInfo::query()->where('id', $musicId)->update(['cover' => $mus['cover']]);
         } else {
             $musicId = $check['id'];
             $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
-            MusicInfo::query()->where('id', $musicId)->update(
-                [
-                    'title' => $mus['title'],
-                    'asin' => $mus['asin'],
-                    'url' => $mus['url'],
-                    'salesrank' => $mus['salesrank'],
-                    'artist' => $mus['artist'],
-                    'publisher' => $mus['publisher'],
-                    'releasedate' => $mus['releasedate'],
-                    'review' => $mus['review'],
-                    'year' => $year,
-                    'genres_id' => (int) $mus['musicgenres_id'] === -1 ? 'null' : $mus['musicgenres_id'],
-                    'tracks' => $mus['tracks'],
-                    'cover' => $mus['cover'],
-                ]
-            );
+            MusicInfo::query()->where('id', $musicId)->update([
+                'title' => $mus['title'],
+                'asin' => $mus['asin'],
+                'url' => $mus['url'],
+                'salesrank' => $mus['salesrank'],
+                'artist' => $mus['artist'],
+                'publisher' => $mus['publisher'],
+                'releasedate' => $mus['releasedate'],
+                'review' => $mus['review'],
+                'year' => $year,
+                'genres_id' => (int) $mus['musicgenres_id'] === -1 ? null : $mus['musicgenres_id'],
+                'tracks' => $mus['tracks'],
+                'cover' => $mus['cover'],
+            ]);
         }
 
         if ($musicId) {
             if ($this->echooutput) {
                 cli()->header(
                     PHP_EOL.'Added/updated album: '.PHP_EOL.
-                    '   Artist: '.
-                    $mus['artist'].PHP_EOL.
-                    '   Title:  '.
-                    $mus['title'].PHP_EOL.
-                    '   Year:   '.
-                    $year
+                    '   Artist: '.$mus['artist'].PHP_EOL.
+                    '   Title:  '.$mus['title'].PHP_EOL.
+                    '   Year:   '.$year
                 );
             }
             $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
@@ -368,12 +380,7 @@ class Music
             }
 
             cli()->headerOver(
-                'Nothing to update: '.
-                $artist.
-                $mus['title'].
-                ' ('.
-                $year.
-                ')'
+                'Nothing to update: '.$artist.$mus['title'].' ('.$year.')'
             );
         }
 
@@ -381,20 +388,22 @@ class Music
     }
 
     /**
+     * Process music releases and lookup metadata.
+     *
      * @throws \Exception
      */
-    public function processMusicReleases(bool $local = false)
+    public function processMusicReleases(bool $local = false): void
     {
         $res = DB::select(
             sprintf(
                 '
-					SELECT searchname, id
-					FROM releases
-					WHERE musicinfo_id IS NULL
-                     %s
-					AND categories_id IN (%s, %s, %s)
-					ORDER BY postdate DESC
-					LIMIT %d',
+                SELECT searchname, id
+                FROM releases
+                WHERE musicinfo_id IS NULL
+                %s
+                AND categories_id IN (%s, %s, %s)
+                ORDER BY postdate DESC
+                LIMIT %d',
                 $this->renamed,
                 Category::MUSIC_MP3,
                 Category::MUSIC_LOSSLESS,
@@ -408,6 +417,7 @@ class Music
                 $startTime = now();
                 $usedAmazon = false;
                 $album = $this->parseArtist($arr->searchname);
+
                 if ($album !== false) {
                     $newname = $album['name'].' ('.$album['year'].')';
 
@@ -435,13 +445,13 @@ class Music
                         $albumId = $musicCheck['id'];
                     }
                     Release::query()->where('id', $arr->id)->update(['musicinfo_id' => $albumId]);
-                } // No album found.
-                else {
+                } else {
+                    // No album found.
                     Release::query()->where('id', $arr->id)->update(['musicinfo_id' => -2]);
                     echo '.';
                 }
 
-                // Sleep to not flood amazon.
+                // Sleep to not flood the API.
                 $sleeptime = $this->sleeptime / 1000;
                 $diff = now()->diffInSeconds($startTime, true);
                 if ($sleeptime - $diff > 0 && $usedAmazon === true) {
@@ -458,9 +468,11 @@ class Music
     }
 
     /**
+     * Parse artist and album name from release name.
+     *
      * @return array|false
      */
-    public function parseArtist(string $releaseName)
+    public function parseArtist(string $releaseName): array|false
     {
         if (preg_match('/(.+?)(\d{1,2} \d{1,2} )?\(?(19\d{2}|20[0-1][\d])\b/', $releaseName, $name)) {
             $result = [];
@@ -489,9 +501,11 @@ class Music
     }
 
     /**
-     * @return bool|string
+     * Match browse node ID to genre name.
+     *
+     * @return string|false
      */
-    public function matchBrowseNode($nodeId)
+    public function matchBrowseNode(string $nodeId): string|false
     {
         $str = '';
 
@@ -594,14 +608,16 @@ class Music
     }
 
     /**
-     * @return array|bool
+     * Fetch music properties from iTunes.
+     *
+     * @return array|false
      */
-    protected function fetchItunesMusicProperties(string $title)
+    protected function fetchItunesMusicProperties(string $title): array|false
     {
         // Load genres.
         $defaultGenres = (new Genres)->loadGenres(Genres::MUSIC_TYPE);
 
-        $itunes = new ItunesService();
+        $itunes = new ItunesService;
 
         // Try to find album first
         $album = $itunes->findAlbum($title);
@@ -660,3 +676,4 @@ class Music
         ];
     }
 }
+

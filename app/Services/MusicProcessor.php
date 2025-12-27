@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Settings;
-use Blacklight\Music;
 
 class MusicProcessor
 {
@@ -17,7 +16,7 @@ class MusicProcessor
     public function process(): void
     {
         if ((int) Settings::settingValue('lookupmusic') !== 0) {
-            (new Music)->processMusicReleases();
+            (new MusicService)->processMusicReleases();
         }
     }
 }

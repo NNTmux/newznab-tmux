@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Services\MusicService;
 use Blacklight\Genres;
-use Blacklight\Music;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
@@ -15,7 +15,7 @@ class MusicController extends BasePageController
      */
     public function show(Request $request, string $id = '')
     {
-        $music = new Music(['Settings' => $this->settings]);
+        $music = new MusicService;
         $gen = new Genres(['Settings' => $this->settings]);
 
         $musiccats = Category::getChildren(Category::MUSIC_ROOT);

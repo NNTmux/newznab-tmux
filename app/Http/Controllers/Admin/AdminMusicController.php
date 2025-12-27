@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
+use App\Services\MusicService;
 use Blacklight\Genres;
-use Blacklight\Music;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -36,7 +36,7 @@ class AdminMusicController extends BasePageController
      */
     public function edit(Request $request)
     {
-        $music = new Music;
+        $music = new MusicService;
         $gen = new Genres;
 
         $meta_title = $title = 'Music Edit';
@@ -45,7 +45,7 @@ class AdminMusicController extends BasePageController
         $action = $request->input('action') ?? 'view';
 
         if ($request->has('id')) {
-            $id = $request->input('id');
+            $id = (int) $request->input('id');
             $mus = $music->getMusicInfo($id);
 
             if (! $mus) {
@@ -65,14 +65,19 @@ class AdminMusicController extends BasePageController
                     }
 
                     $cover = file_exists($coverLoc) ? 1 : 0;
-                    $salesrank = (empty($request->input('salesrank')) || ! ctype_digit($request->input('salesrank'))) ? null : $request->input('salesrank');
-                    $releasedate = (empty($request->input('releasedate')) || ! strtotime($request->input('releasedate')))
-                        ? $mus['releasedate']
-                        : Carbon::parse($request->input('releasedate'))->timestamp;
+                    $salesrankInput = $request->input('salesrank');
+                    $salesrank = (empty($salesrankInput) || ! ctype_digit((string) $salesrankInput)) ? null : (int) $salesrankInput;
+                    $releasedateInput = $request->input('releasedate');
+                    $releasedate = (empty($releasedateInput) || ! strtotime($releasedateInput))
+                        ? $mus->releasedate
+                        : Carbon::parse($releasedateInput)->toDateTimeString();
+
+                    $genreInput = $request->input('genre');
+                    $genreId = ! empty($genreInput) ? (int) $genreInput : null;
 
                     $music->update(
                         $id,
-                        $request->input('title'),
+                        (string) $request->input('title', ''),
                         $request->input('asin'),
                         $request->input('url'),
                         $salesrank,
@@ -82,7 +87,7 @@ class AdminMusicController extends BasePageController
                         $request->input('year'),
                         $request->input('tracks'),
                         $cover,
-                        $request->input('genre')
+                        $genreId
                     );
 
                     return redirect()->route('admin.music-list')->with('success', 'Music updated successfully');

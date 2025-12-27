@@ -20,7 +20,7 @@ use App\Services\AnidbService;
 use App\Services\XxxBrowseService;
 use App\Services\GamesService;
 use App\Services\ConsoleService;
-use Blacklight\Music;
+use App\Services\MusicService;
 use App\Services\ReleaseExtraService;
 use Illuminate\Http\Request;
 
@@ -123,7 +123,7 @@ class DetailsController extends BasePageController
 
             $mus = '';
             if (! empty($data['musicinfo_id'])) {
-                $mus = (new Music)->getMusicInfo($data['musicinfo_id']);
+                $mus = (new MusicService)->getMusicInfo($data['musicinfo_id']);
             }
 
             $book = '';
