@@ -182,10 +182,12 @@
                                                 </div>
                                             </div>
 
+                                            @if(!empty($result->adddate))
                                             <div class="flex items-center text-gray-500 text-sm mb-3">
                                                 <i class="fa fa-clock-o mr-2"></i>
                                                 <span>Added {{ userDateDiffForHumans($result->adddate) }}</span>
                                             </div>
+                                            @endif
 
                                             <div class="flex flex-wrap gap-2 text-xs mb-3">
                                                 @if(!empty($result->group_name))
