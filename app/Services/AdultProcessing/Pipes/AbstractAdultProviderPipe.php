@@ -125,7 +125,7 @@ abstract class AbstractAdultProviderPipe
 
         // Output processing message
         if ($this->echoOutput) {
-            $this->getColorCli()->info('Checking '.$this->getDisplayName().' for movie info');
+            cli()->info('Checking '.$this->getDisplayName().' for movie info');
         }
 
         try {
@@ -242,7 +242,7 @@ abstract class AbstractAdultProviderPipe
 
         if ($cached !== null) {
             if ($this->echoOutput) {
-                $this->getColorCli()->info('Using cached result for: ' . $movie);
+                cli()->info('Using cached result for: ' . $movie);
             }
             return $cached;
         }
@@ -802,7 +802,7 @@ abstract class AbstractAdultProviderPipe
             return;
         }
 
-        $this->getColorCli()->primary('Found match on '.$this->getDisplayName().': '.$title);
+        cli()->primary('Found match on '.$this->getDisplayName().': '.$title);
     }
 
     /**
@@ -814,7 +814,7 @@ abstract class AbstractAdultProviderPipe
             return;
         }
 
-        $this->getColorCli()->notice('No match found on '.$this->getDisplayName());
+        cli()->notice('No match found on '.$this->getDisplayName());
     }
 
     /**
