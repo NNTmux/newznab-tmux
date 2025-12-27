@@ -138,6 +138,17 @@ class TraktService
         int|string $episode,
         string $extended = 'min'
     ): ?array {
+        // Validate parameters to avoid unnecessary API calls with invalid IDs
+        $showIdInt = is_numeric($showId) ? (int) $showId : 0;
+        $seasonInt = is_numeric($season) ? (int) $season : -1;
+        $episodeInt = is_numeric($episode) ? (int) $episode : -1;
+
+        // For numeric show IDs, validate they are positive
+        // Season and episode must be non-negative (season 0 can be specials)
+        if (($showIdInt <= 0 && is_numeric($showId)) || $seasonInt < 0 || $episodeInt < 0) {
+            return null;
+        }
+
         $extended = match ($extended) {
             'aliases', 'full', 'full,aliases' => $extended,
             default => 'min',

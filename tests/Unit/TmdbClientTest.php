@@ -540,5 +540,93 @@ class TmdbClientTest extends TestCase
         $result = $this->client->searchMovies('Test');
         $this->assertNull($result);
     }
-}
 
+    // =========================================================================
+    // PARAMETER VALIDATION TESTS
+    // =========================================================================
+
+    public function test_get_tv_season_returns_null_for_invalid_tv_id(): void
+    {
+        // Should not make any API call
+        Http::fake();
+
+        $this->assertNull($this->client->getTvSeason(0, 1));
+        $this->assertNull($this->client->getTvSeason(-1, 1));
+
+        Http::assertNothingSent();
+    }
+
+    public function test_get_tv_season_returns_null_for_negative_season(): void
+    {
+        // Should not make any API call
+        Http::fake();
+
+        $this->assertNull($this->client->getTvSeason(1396, -1));
+
+        Http::assertNothingSent();
+    }
+
+    public function test_get_tv_episode_returns_null_for_invalid_tv_id(): void
+    {
+        // Should not make any API call
+        Http::fake();
+
+        $this->assertNull($this->client->getTvEpisode(0, 1, 1));
+        $this->assertNull($this->client->getTvEpisode(-1, 1, 1));
+
+        Http::assertNothingSent();
+    }
+
+    public function test_get_tv_episode_returns_null_for_negative_season(): void
+    {
+        // Should not make any API call
+        Http::fake();
+
+        $this->assertNull($this->client->getTvEpisode(1396, -1, 1));
+
+        Http::assertNothingSent();
+    }
+
+    public function test_get_tv_episode_returns_null_for_negative_episode(): void
+    {
+        // Should not make any API call
+        Http::fake();
+
+        $this->assertNull($this->client->getTvEpisode(1396, 1, -1));
+
+        Http::assertNothingSent();
+    }
+
+    public function test_get_tv_season_allows_season_zero_for_specials(): void
+    {
+        Http::fake([
+            'api.themoviedb.org/3/tv/1396/season/0*' => Http::response([
+                'id' => 3577,
+                'season_number' => 0,
+                'name' => 'Specials',
+            ]),
+        ]);
+
+        $result = $this->client->getTvSeason(1396, 0);
+
+        $this->assertNotNull($result);
+        $this->assertSame(0, $result['season_number']);
+    }
+
+    public function test_get_tv_episode_allows_season_and_episode_zero(): void
+    {
+        Http::fake([
+            'api.themoviedb.org/3/tv/1396/season/0/episode/0*' => Http::response([
+                'id' => 12345,
+                'name' => 'Special Episode',
+                'episode_number' => 0,
+                'season_number' => 0,
+            ]),
+        ]);
+
+        $result = $this->client->getTvEpisode(1396, 0, 0);
+
+        $this->assertNotNull($result);
+        $this->assertSame(0, $result['episode_number']);
+    }
+}

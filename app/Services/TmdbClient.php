@@ -248,6 +248,11 @@ class TmdbClient
      */
     public function getTvSeason(int $tvId, int $seasonNumber): ?array
     {
+        // Validate parameters to avoid unnecessary API calls with invalid IDs
+        if ($tvId <= 0 || $seasonNumber < 0) {
+            return null;
+        }
+
         return $this->get('/tv/'.$tvId.'/season/'.$seasonNumber);
     }
 
@@ -261,6 +266,11 @@ class TmdbClient
      */
     public function getTvEpisode(int $tvId, int $seasonNumber, int $episodeNumber): ?array
     {
+        // Validate parameters to avoid unnecessary API calls with invalid IDs
+        if ($tvId <= 0 || $seasonNumber < 0 || $episodeNumber < 0) {
+            return null;
+        }
+
         return $this->get('/tv/'.$tvId.'/season/'.$seasonNumber.'/episode/'.$episodeNumber);
     }
 
