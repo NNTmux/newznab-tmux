@@ -11,6 +11,7 @@ use App\Models\Release;
 use App\Models\Settings;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 /**
@@ -178,8 +179,16 @@ class NzbService
             $release->update(['nzb_guid' => DB::raw('UNHEX( '.escapeString(md5($nzb_guid)).' )')]);
         }
 
-        // Delete CBP for release that has its NZB created.
-        Collection::query()->where('releases_id', $release->id)->delete();
+        // Delete CBP (Collections, Binaries, Parts) for release that has its NZB created.
+        // Use a transaction to ensure cascading deletes complete properly.
+        try {
+            DB::transaction(function () use ($release) {
+                Collection::query()->where('releases_id', $release->id)->delete();
+            });
+        } catch (\Throwable $e) {
+            // Log the error but don't fail the NZB creation since the file was written successfully
+            Log::warning('Failed to delete collections for release '.$release->id.': '.$e->getMessage());
+        }
 
         // Chmod to fix issues some users have with file permissions.
         chmod($path, 0777);
