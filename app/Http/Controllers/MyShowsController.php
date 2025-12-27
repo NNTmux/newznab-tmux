@@ -195,7 +195,7 @@ class MyShowsController extends BasePageController
         $this->viewData['results'] = $results;
         $this->viewData['resultsadd'] = $rslt;
         $this->viewData['shows'] = true;
-        $this->viewData['content'] = view('browse', $this->viewData)->render();
+        $this->viewData['content'] = view('browse.index', $this->viewData)->render();
         $this->viewData = array_merge($this->viewData, compact('title', 'meta_title', 'meta_keywords', 'meta_description'));
 
         return $this->pagerender();
