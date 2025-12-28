@@ -111,6 +111,20 @@ final class BinaryHandler
         int $fileNumber,
         int $partSize
     ): int {
+        // Verify collection exists before insert to avoid FK constraint violation
+        $collectionExists = DB::selectOne(
+            'SELECT id FROM collections WHERE id = ? LIMIT 1',
+            [$collectionId]
+        );
+
+        if ($collectionExists === null) {
+            if (config('app.debug') === true) {
+                Log::warning("Binary insert skipped: collection {$collectionId} no longer exists");
+            }
+
+            return 0;
+        }
+
         DB::statement(
             'INSERT OR IGNORE INTO binaries (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize) VALUES (?, ?, ?, ?, 1, ?, ?)',
             [$hash, $name, $collectionId, $totalParts, $fileNumber, $partSize]
@@ -139,6 +153,20 @@ final class BinaryHandler
         int $fileNumber,
         int $partSize
     ): int {
+        // Verify collection exists before insert to avoid FK constraint violation
+        $collectionExists = DB::selectOne(
+            'SELECT id FROM collections WHERE id = ? LIMIT 1',
+            [$collectionId]
+        );
+
+        if ($collectionExists === null) {
+            if (config('app.debug') === true) {
+                Log::warning("Binary insert skipped: collection {$collectionId} no longer exists");
+            }
+
+            return 0;
+        }
+
         $sql = 'INSERT INTO binaries '
             .'(binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize) '
             .'VALUES (UNHEX(?), ?, ?, ?, 1, ?, ?) '
@@ -203,18 +231,33 @@ final class BinaryHandler
     private function flushUpdatesMysql(array $updates, int $chunkSize): bool
     {
         foreach (array_chunk($updates, $chunkSize) as $chunk) {
-            $placeholders = [];
+            // Build a CASE statement for batch UPDATE instead of INSERT...ON DUPLICATE KEY
+            // This avoids FK constraint violations when collections have been deleted
+            $ids = [];
+            $partsizeCases = [];
+            $currentpartsCases = [];
             $bindings = [];
 
             foreach ($chunk as $row) {
-                $placeholders[] = '(?,?,?)';
+                $ids[] = $row['id'];
+                $partsizeCases[] = 'WHEN id = ? THEN partsize + ?';
+                $currentpartsCases[] = 'WHEN id = ? THEN currentparts + ?';
                 $bindings[] = $row['id'];
                 $bindings[] = $row['partsize'];
+            }
+
+            foreach ($chunk as $row) {
+                $bindings[] = $row['id'];
                 $bindings[] = $row['currentparts'];
             }
 
-            $sql = 'INSERT INTO binaries (id, partsize, currentparts) VALUES '.implode(',', $placeholders)
-                .' ON DUPLICATE KEY UPDATE partsize = partsize + VALUES(partsize), currentparts = currentparts + VALUES(currentparts)';
+            $idPlaceholders = implode(',', array_fill(0, count($ids), '?'));
+            $bindings = array_merge($bindings, $ids);
+
+            $sql = 'UPDATE binaries SET '
+                .'partsize = CASE '.implode(' ', $partsizeCases).' ELSE partsize END, '
+                .'currentparts = CASE '.implode(' ', $currentpartsCases).' ELSE currentparts END '
+                .'WHERE id IN ('.$idPlaceholders.')';
 
             DB::statement($sql, $bindings);
         }
