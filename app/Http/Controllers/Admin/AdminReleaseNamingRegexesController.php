@@ -15,7 +15,7 @@ class AdminReleaseNamingRegexesController extends BasePageController
     public function index(Request $request)
     {
         $this->setAdminPrefs();
-        $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'release_naming_regexes']);
+        $regexes = new RegexService('release_naming_regexes');
 
         $meta_title = $title = 'Release Naming Regex List';
 

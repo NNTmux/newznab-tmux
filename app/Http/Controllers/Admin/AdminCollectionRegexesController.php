@@ -15,7 +15,7 @@ class AdminCollectionRegexesController extends BasePageController
     public function index(Request $request)
     {
         $this->setAdminPrefs();
-        $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'collection_regexes']);
+        $regexes = new RegexService('collection_regexes');
 
         $meta_title = $title = 'Collections Regex List';
 
