@@ -227,6 +227,8 @@ Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
     Route::get('promotions/{id}/toggle', [AdminPromotionController::class, 'toggle'])->name('admin.promotions.toggle');
 
     Route::post('release_naming_regexes-test', [AdminReleaseNamingRegexesController::class, 'testRegex'])->name('admin.release-naming-regexes-test');
+    Route::get('release_naming_regexes-list', [AdminReleaseNamingRegexesController::class, 'index'])->name('admin.release_naming_regexes-list');
+    Route::match(['GET', 'POST'], 'release_naming_regexes-edit', [AdminReleaseNamingRegexesController::class, 'edit'])->name('admin.release_naming_regexes-edit');
     Route::get('category_regexes-list', [AdminCategoryRegexesController::class, 'index'])->name('admin.category_regexes-list');
     Route::match(['GET', 'POST'], 'category_regexes-edit', [AdminCategoryRegexesController::class, 'edit'])->name('admin.category_regexes-edit');
     Route::get('collection_regexes-list', [AdminCollectionRegexesController::class, 'index'])->name('admin.collection_regexes-list');
