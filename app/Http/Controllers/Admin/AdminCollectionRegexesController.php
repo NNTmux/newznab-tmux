@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
-use Blacklight\Regexes;
+use App\Services\RegexService;
 use Illuminate\Http\Request;
 
 class AdminCollectionRegexesController extends BasePageController
@@ -40,7 +40,7 @@ class AdminCollectionRegexesController extends BasePageController
     public function edit(Request $request)
     {
         $this->setAdminPrefs();
-        $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'collection_regexes']);
+        $regexes = new RegexService('collection_regexes');
         $error = '';
         $regex = ['id' => '', 'regex' => '', 'description' => '', 'group_regex' => '', 'ordinal' => '', 'status' => 1];
         $meta_title = $title = 'Collections Regex';
@@ -112,7 +112,7 @@ class AdminCollectionRegexesController extends BasePageController
 
         $data = null;
         if ($group && $regex) {
-            $data = (new Regexes(['Settings' => null, 'Table_Name' => 'collection_regexes']))->testCollectionRegex($group, $regex, $limit);
+            $data = (new RegexService('collection_regexes'))->testCollectionRegex($group, $regex, $limit);
         }
 
         $this->viewData = array_merge($this->viewData, [

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BasePageController;
 use App\Models\UsenetGroup;
 use App\Services\BlacklistService;
-use Blacklight\Regexes;
+use App\Services\RegexService;
 use Illuminate\Http\Request;
 
 class AdminAjaxController extends BasePageController
@@ -29,19 +29,19 @@ class AdminAjaxController extends BasePageController
 
                 case 'category_regex_delete':
                     $id = (int) $request->input('row_id');
-                    (new Regexes(['Settings' => $this->settings, 'Table_Name' => 'category_regexes']))->deleteRegex($id);
+                    (new RegexService('category_regexes'))->deleteRegex($id);
                     echo "Regex $id deleted.";
                     break;
 
                 case 'collection_regex_delete':
                     $id = (int) $request->input('row_id');
-                    (new Regexes(['Settings' => $this->settings, 'Table_Name' => 'collection_regexes']))->deleteRegex($id);
+                    (new RegexService('collection_regexes'))->deleteRegex($id);
                     echo "Regex $id deleted.";
                     break;
 
                 case 'release_naming_regex_delete':
                     $id = (int) $request->input('row_id');
-                    (new Regexes(['Settings' => $this->settings, 'Table_Name' => 'release_naming_regexes']))->deleteRegex($id);
+                    (new RegexService('release_naming_regexes'))->deleteRegex($id);
                     echo "Regex $id deleted.";
                     break;
 

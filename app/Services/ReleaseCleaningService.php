@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Predb;
-use Blacklight\Regexes;
 
 /**
  * Cleans names for releases/imports/namefixer.
@@ -44,7 +43,7 @@ class ReleaseCleaningService
 
     public string $subject = '';
 
-    protected Regexes $_regexes;
+    protected RegexService $_regexes;
 
     /**
      * ReleaseCleaningService constructor.
@@ -57,7 +56,7 @@ class ReleaseCleaningService
         $this->e0 = CollectionsCleaningService::REGEX_FILE_EXTENSIONS;
         $this->e1 = CollectionsCleaningService::REGEX_FILE_EXTENSIONS.CollectionsCleaningService::REGEX_END;
         $this->e2 = CollectionsCleaningService::REGEX_FILE_EXTENSIONS.CollectionsCleaningService::REGEX_SUBJECT_SIZE.CollectionsCleaningService::REGEX_END;
-        $this->_regexes = new Regexes(['Settings' => null, 'Table_Name' => 'release_naming_regexes']);
+        $this->_regexes = new RegexService('release_naming_regexes');
     }
 
     /**

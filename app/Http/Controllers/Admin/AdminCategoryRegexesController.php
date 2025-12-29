@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
-use Blacklight\Regexes;
+use App\Services\RegexService;
 use Illuminate\Http\Request;
 
 class AdminCategoryRegexesController extends BasePageController
@@ -15,7 +15,7 @@ class AdminCategoryRegexesController extends BasePageController
     public function index(Request $request)
     {
         $this->setAdminPrefs();
-        $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'category_regexes']);
+        $regexes = new RegexService('category_regexes');
 
         $meta_title = $title = 'Category Regex List';
 
@@ -40,7 +40,7 @@ class AdminCategoryRegexesController extends BasePageController
     public function edit(Request $request)
     {
         $this->setAdminPrefs();
-        $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'category_regexes']);
+        $regexes = new RegexService('category_regexes');
 
         // Set the current action.
         $action = $request->input('action') ?? 'view';

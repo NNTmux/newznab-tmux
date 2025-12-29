@@ -1,6 +1,8 @@
 <?php
 
-namespace Blacklight;
+declare(strict_types=1);
+
+namespace App\Services;
 
 use App\Models\Category;
 use App\Models\CategoryRegex;
@@ -13,42 +15,38 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Class Regexes.
+ * Service for managing regex patterns for collections, categories, and release naming.
  */
-class Regexes
+class RegexService
 {
     /**
-     * @var mixed The ID of the Regex input string matched or the generic name
+     * The ID of the Regex input string matched or the generic name
      */
-    public $matchedRegex;
+    public mixed $matchedRegex;
 
     /**
-     * @var string Name of the current table we are working on.
+     * Name of the current table we are working on.
      */
-    public $tableName;
+    public string $tableName;
 
     /**
-     * @var array Cache of regex and their TTL.
+     * Cache of regex and their TTL.
      */
-    protected $_regexCache;
+    protected array $_regexCache = [];
 
     /**
-     * @var int
+     * Default category ID
      */
-    protected $_categoriesID = Category::OTHER_MISC;
+    protected int $_categoriesID = Category::OTHER_MISC;
 
     /**
-     * @throws \Exception
+     * RegexService constructor.
+     *
+     * @param  string  $tableName  The table name to work with (collection_regexes, category_regexes, release_naming_regexes)
      */
-    public function __construct(array $options = [])
+    public function __construct(string $tableName = '')
     {
-        $defaults = [
-            'Settings' => null,
-            'Table_Name' => '',
-        ];
-        $options += $defaults;
-
-        $this->tableName = $options['Table_Name'];
+        $this->tableName = $tableName;
     }
 
     /**
@@ -79,8 +77,8 @@ class Regexes
         return (bool) DB::update(
             sprintf(
                 'UPDATE %s
-				SET group_regex = %s, regex = %s, status = %d, description = %s, ordinal = %d %s
-				WHERE id = %d',
+                SET group_regex = %s, regex = %s, status = %d, description = %s, ordinal = %d %s
+                WHERE id = %d',
                 $this->tableName,
                 trim(escapeString($data['group_regex'])),
                 trim(escapeString($data['regex'])),
@@ -102,6 +100,8 @@ class Regexes
     }
 
     /**
+     * Get paginated regex results.
+     *
      * @return mixed
      */
     public function getRegex(string $group_regex = '')
@@ -144,7 +144,6 @@ class Regexes
     /**
      * Delete a regex using its id.
      *
-     *
      * @throws \Throwable
      */
     public function deleteRegex(int $id): void
@@ -159,7 +158,6 @@ class Regexes
      *
      * Requires table per group to be on.
      *
-     *
      * @throws \Exception
      */
     public function testCollectionRegex(string $groupName, string $regex, int $limit): array
@@ -172,11 +170,10 @@ class Regexes
 
         $rows = DB::select(
             'SELECT
-					b.name, b.totalparts, b.currentparts, HEX(b.binaryhash) AS binaryhash,
-					c.fromname, c.collectionhash
-				FROM binaries b
-				INNER JOIN collections c ON c.id = b.collections_id'
-
+                    b.name, b.totalparts, b.currentparts, HEX(b.binaryhash) AS binaryhash,
+                    c.fromname, c.collectionhash
+                FROM binaries b
+                INNER JOIN collections c ON c.id = b.collections_id'
         );
 
         $data = [];
@@ -221,6 +218,8 @@ class Regexes
     }
 
     /**
+     * Test release naming regex against releases.
+     *
      * @throws \Exception
      */
     public function testReleaseNamingRegex($groupName, $regex, $displayLimit, $queryLimit): array
@@ -261,7 +260,6 @@ class Regexes
 
     /**
      * This will try to find regex in the DB for a group and a usenet subject, attempt to match them and return the matches.
-     *
      *
      * @throws \Exception
      */
@@ -319,7 +317,6 @@ class Regexes
      *
      * Requires at least 1 named captured group.
      *
-     *
      * @throws \Exception
      */
     protected function _matchRegex(string $regex, string $subject): string
@@ -339,7 +336,7 @@ class Regexes
                         $returnString .= $value; // Concatenate the string to return.
                         break;
                     case 'category_regexes':
-                        $returnString = $this->_categoriesID; // Regex matched, so return the category ID.
+                        $returnString = (string) $this->_categoriesID; // Regex matched, so return the category ID.
                         break 2;
                 }
             }
@@ -356,3 +353,4 @@ class Regexes
         return $group_regex ? ('WHERE group_regex LIKE '.escapeString('%'.$group_regex.'%')) : '';
     }
 }
+

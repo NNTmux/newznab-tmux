@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
-use Blacklight\Regexes;
+use App\Services\RegexService;
 use Illuminate\Http\Request;
 
 class AdminReleaseNamingRegexesController extends BasePageController
@@ -43,7 +43,7 @@ class AdminReleaseNamingRegexesController extends BasePageController
     public function edit(Request $request)
     {
         $this->setAdminPrefs();
-        $regexes = new Regexes(['Settings' => null, 'Table_Name' => 'release_naming_regexes']);
+        $regexes = new RegexService('release_naming_regexes');
 
         // Set the current action.
         $action = $request->input('action') ?? 'view';
@@ -120,7 +120,7 @@ class AdminReleaseNamingRegexesController extends BasePageController
 
         $data = null;
         if ($group && $regex) {
-            $data = (new Regexes(['Settings' => null, 'Table_Name' => 'release_naming_regexes']))->testReleaseNamingRegex($group, $regex, $showLimit, $queryLimit);
+            $data = (new RegexService('release_naming_regexes'))->testReleaseNamingRegex($group, $regex, $showLimit, $queryLimit);
         }
 
         $this->viewData = array_merge($this->viewData, [

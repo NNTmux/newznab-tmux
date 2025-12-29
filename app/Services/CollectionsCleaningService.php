@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use Blacklight\Regexes;
 
 /**
  * Cleans names for collections/imports/namefixer.
@@ -63,7 +62,7 @@ class CollectionsCleaningService
     /**
      * Regex handler for database-stored patterns
      */
-    protected Regexes $_regexes;
+    protected RegexService $_regexes;
 
     /**
      * CollectionsCleaningService constructor.
@@ -79,7 +78,7 @@ class CollectionsCleaningService
         $this->e1 = self::REGEX_FILE_EXTENSIONS.self::REGEX_END;
         $this->e2 = self::REGEX_FILE_EXTENSIONS.self::REGEX_SUBJECT_SIZE.self::REGEX_END;
 
-        $this->_regexes = new Regexes(['Table_Name' => 'collection_regexes']);
+        $this->_regexes = new RegexService('collection_regexes');
     }
 
     /**
