@@ -7,7 +7,6 @@ use App\Services\Runners\BackfillRunner;
 use App\Services\Runners\BinariesRunner;
 use App\Services\Runners\PostProcessRunner;
 use App\Services\Runners\ReleasesRunner;
-use Blacklight\Nfo;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Process\Process;
@@ -40,7 +39,7 @@ class ForkingService
         $this->minSize = (int) Settings::settingValue('minsizetoprocessnfo');
         $this->maxRetries = (int) Settings::settingValue('maxnforetries') >= 0
             ? -((int) Settings::settingValue('maxnforetries') + 1)
-            : Nfo::NFO_UNPROC;
+            : NfoService::NFO_UNPROC;
         $this->maxRetries = max($this->maxRetries, -8);
 
         // Initialize runners

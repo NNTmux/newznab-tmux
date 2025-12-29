@@ -8,10 +8,10 @@ use App\Models\Category;
 use App\Models\Predb;
 use App\Models\Release;
 use App\Services\NameFixing\NameFixingService;
+use App\Services\NfoService;
 use App\Services\Nzb\NzbContentsService;
 use App\Services\PostProcessService;
 use App\Services\NNTP\NNTPService;
-use Blacklight\Nfo;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -166,7 +166,7 @@ class ReleasesFixNamesGroup extends Command
             }
 
             // Process NFO
-            if ((int) $release->nfostatus === Nfo::NFO_FOUND &&
+            if ((int) $release->nfostatus === NfoService::NFO_FOUND &&
                 (int) $release->proc_nfo === NameFixingService::PROC_NFO_NONE &&
                 ! empty($release->textstring) &&
                 ! preg_match('/^=newz\[NZB\]=\w+/', $release->textstring)) {
@@ -225,7 +225,7 @@ class ReleasesFixNamesGroup extends Command
                         }
                         $this->warn($errorMessage);
                     } else {
-                        $Nfo = new Nfo();
+                        $Nfo = new NfoService();
                         $nzbcontents = app(NzbContentsService::class);
                         $nzbcontents->setNntp($nntp);
                         $nzbcontents->setNfo($Nfo);
@@ -367,8 +367,8 @@ class ReleasesFixNamesGroup extends Command
             LIMIT %s",
             escapeString($guidChar),
             NameFixingService::IS_RENAMED_NONE,
-            Nfo::NFO_UNPROC,
-            Nfo::NFO_FOUND,
+            NfoService::NFO_UNPROC,
+            NfoService::NFO_FOUND,
             NameFixingService::PROC_NFO_NONE,
             NameFixingService::PROC_FILES_NONE,
             NameFixingService::PROC_UID_NONE,

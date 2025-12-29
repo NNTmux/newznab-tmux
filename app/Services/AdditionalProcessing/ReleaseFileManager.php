@@ -13,8 +13,8 @@ use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
 use App\Services\NameFixing\NameFixingService;
 use App\Services\NameFixing\ReleaseUpdateService;
+use App\Services\NfoService;
 use App\Services\NNTP\NNTPService;
-use Blacklight\Nfo;
 use App\Services\ReleaseExtraService;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Carbon;
@@ -32,7 +32,7 @@ class ReleaseFileManager
         private readonly ProcessingConfiguration $config,
         private readonly ReleaseExtraService $releaseExtra,
         private readonly ReleaseImageService $releaseImage,
-        private readonly Nfo $nfo,
+        private readonly NfoService $nfo,
         private readonly NzbService $nzb,
         private readonly NameFixingService $nameFixingService
     ) {}

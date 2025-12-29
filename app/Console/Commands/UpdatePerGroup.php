@@ -9,9 +9,9 @@ use App\Models\UsenetGroup;
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\Backfill\BackfillService;
 use App\Services\Binaries\BinariesService;
+use App\Services\NfoService;
 use App\Services\ReleaseProcessingService;
 use App\Services\NNTP\NNTPService;
-use Blacklight\Nfo;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -80,7 +80,7 @@ class UpdatePerGroup extends Command
             app(AdditionalProcessingOrchestrator::class)->start($groupId);
 
             $this->info("Processing NFO files for group: {$groupMySQL['name']}");
-            (new Nfo())->processNfoFiles(
+            (new NfoService())->processNfoFiles(
                 $nntp,
                 $groupId,
                 '',

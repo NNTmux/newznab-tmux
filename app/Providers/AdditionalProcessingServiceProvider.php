@@ -16,7 +16,7 @@ use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
 use App\Services\TempWorkspaceService;
 use App\Services\NameFixing\NameFixingService;
-use Blacklight\Nfo;
+use App\Services\NfoService;
 use App\Services\ReleaseExtraService;
 use Illuminate\Support\ServiceProvider;
 
@@ -78,7 +78,7 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
                 $app->make(ProcessingConfiguration::class),
                 $app->make(ReleaseExtraService::class),
                 new ReleaseImageService(),
-                new Nfo(),
+                new NfoService(),
                 $app->make(NzbService::class),
                 new NameFixingService()
             );

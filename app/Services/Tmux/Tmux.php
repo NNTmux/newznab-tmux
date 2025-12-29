@@ -5,7 +5,7 @@ namespace App\Services\Tmux;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Services\NameFixing\NameFixingService;
-use Blacklight\Nfo;
+use App\Services\NfoService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -329,10 +329,10 @@ class Tmux
                     Category::PC_GAMES,
                     Category::XXX_ROOT,
                     Category::XXX_X264,
-                    Nfo::NfoQueryString(),
+                    NfoService::NfoQueryString(),
                     NameFixingService::IS_RENAMED_NONE,
-                    Nfo::NFO_UNPROC,
-                    Nfo::NFO_FOUND,
+                    NfoService::NFO_UNPROC,
+                    NfoService::NFO_FOUND,
                     NameFixingService::PROC_NFO_NONE,
                     NameFixingService::PROC_FILES_NONE,
                     NameFixingService::PROC_PAR2_NONE,

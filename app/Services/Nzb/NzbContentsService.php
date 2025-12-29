@@ -6,9 +6,9 @@ namespace App\Services\Nzb;
 
 use App\Models\Release;
 use App\Models\Settings;
+use App\Services\NfoService;
 use App\Services\NNTP\NNTPService;
 use App\Services\PostProcessService;
-use Blacklight\Nfo;
 
 /**
  * Service for processing NZB contents - extracting NFO files, PAR2 information,
@@ -22,7 +22,7 @@ class NzbContentsService
 
     protected NNTPService $nntp;
 
-    protected Nfo $nfo;
+    protected NfoService $nfo;
 
     protected PostProcessService $postProcessService;
 
@@ -36,14 +36,14 @@ class NzbContentsService
         ?NzbService $nzbService = null,
         ?NzbParserService $parserService = null,
         ?NNTPService $nntp = null,
-        ?Nfo $nfo = null,
+        ?NfoService $nfo = null,
         ?PostProcessService $postProcessService = null
     ) {
         $this->echoOutput = (bool) config('nntmux.echocli');
         $this->nzbService = $nzbService ?? app(NzbService::class);
         $this->parserService = $parserService ?? app(NzbParserService::class);
         $this->nntp = $nntp ?? new NNTPService();
-        $this->nfo = $nfo ?? new Nfo();
+        $this->nfo = $nfo ?? new NfoService();
         $this->postProcessService = $postProcessService ?? app(PostProcessService::class);
         $this->lookupPar2 = (int) Settings::settingValue('lookuppar2') === 1;
         $this->alternateNntp = (bool) config('nntmux_nntp.use_alternate_nntp_server');
@@ -71,7 +71,7 @@ class NzbContentsService
                 echo '-';
             }
             // Make sure we set status to NFO_NONFO
-            Release::query()->where('id', $relID)->update(['nfostatus' => Nfo::NFO_NONFO]);
+            Release::query()->where('id', $relID)->update(['nfostatus' => NfoService::NFO_NONFO]);
 
             return false;
         }
@@ -105,7 +105,7 @@ class NzbContentsService
         if ($this->echoOutput) {
             echo '-';
         }
-        Release::query()->where('id', $relID)->update(['nfostatus' => Nfo::NFO_NONFO]);
+        Release::query()->where('id', $relID)->update(['nfostatus' => NfoService::NFO_NONFO]);
 
         return false;
     }
@@ -197,7 +197,7 @@ class NzbContentsService
         // If NFO check was requested but nothing suitable was found
         if ($nfoCheck && $nfoMessageId === null) {
             // Update status to indicate no NFO was found in the NZB structure
-            Release::query()->where('id', $relID)->update(['nfostatus' => Nfo::NFO_NONFO]);
+            Release::query()->where('id', $relID)->update(['nfostatus' => NfoService::NFO_NONFO]);
 
             return false;
         }
@@ -296,7 +296,7 @@ class NzbContentsService
     /**
      * Set NFO handler instance.
      */
-    public function setNfo(Nfo $nfo): void
+    public function setNfo(NfoService $nfo): void
     {
         $this->nfo = $nfo;
     }

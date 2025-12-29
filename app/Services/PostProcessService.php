@@ -7,7 +7,6 @@ namespace App\Services;
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\NameFixing\NameFixingService;
 use App\Services\NNTP\NNTPService;
-use Blacklight\Nfo;
 use dariusiii\rarinfo\Par2Info;
 use Illuminate\Contracts\Foundation\Application;
 
@@ -29,7 +28,7 @@ final class PostProcessService
 
     private readonly NameFixingService $nameFixingService;
     private readonly Par2Info $par2Info;
-    private readonly Nfo $nfo;
+    private readonly NfoService $nfo;
 
     private readonly Par2Processor $par2Processor;
     private readonly TvProcessor $tvProcessor;
@@ -45,7 +44,7 @@ final class PostProcessService
     public function __construct(
         ?NameFixingService $nameFixingService = null,
         ?Par2Info $par2Info = null,
-        ?Nfo $nfo = null,
+        ?NfoService $nfo = null,
         ?Par2Processor $par2Processor = null,
         ?TvProcessor $tvProcessor = null,
         ?NfoProcessor $nfoProcessor = null,
@@ -64,7 +63,7 @@ final class PostProcessService
         // Core dependencies
         $this->nameFixingService = $nameFixingService ?? new NameFixingService();
         $this->par2Info = $par2Info ?? new Par2Info();
-        $this->nfo = $nfo ?? new Nfo();
+        $this->nfo = $nfo ?? new NfoService();
 
         // Processors
         $this->par2Processor = $par2Processor ?? new Par2Processor(

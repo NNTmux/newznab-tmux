@@ -6,9 +6,9 @@ namespace App\Console\Commands;
 
 use App\Models\Settings;
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
+use App\Services\NfoService;
 use App\Services\PostProcessService;
 use App\Services\NNTP\NNTPService;
-use Blacklight\Nfo;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -89,7 +89,7 @@ class PostProcessGuid extends Command
     private function processNfo(string $guid): void
     {
         $nntp = $this->getNntp();
-        (new Nfo())->processNfoFiles(
+        (new NfoService())->processNfoFiles(
             $nntp,
             '',
             $guid,

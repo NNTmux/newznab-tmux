@@ -4,13 +4,12 @@ namespace App\Services;
 
 use App\Models\Settings;
 use App\Services\NNTP\NNTPService;
-use Blacklight\Nfo;
 
 class NfoProcessor
 {
-    private Nfo $nfo;
+    private NfoService $nfo;
 
-    public function __construct(Nfo $nfo, bool $echooutput)
+    public function __construct(NfoService $nfo, bool $echooutput)
     {
         $this->nfo = $nfo;
         // echooutput kept for signature parity

@@ -3,6 +3,7 @@
 namespace App\Services\Runners;
 
 use App\Models\Settings;
+use App\Services\NfoService;
 use Illuminate\Support\Facades\Concurrency;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -90,7 +91,7 @@ class PostProcessRunner extends BaseRunner
             return;
         }
 
-        $nfoQuery = \Blacklight\Nfo::NfoQueryString();
+        $nfoQuery = NfoService::NfoQueryString();
 
         $checkSql = 'SELECT r.id FROM releases r WHERE 1=1 '.$nfoQuery.' LIMIT 1';
         if (count(DB::select($checkSql)) === 0) {
