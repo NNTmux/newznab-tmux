@@ -81,7 +81,7 @@ class AdminCategoryRegexesController extends BasePageController
                     $regexes->updateRegex($request->all());
                 }
 
-                return redirect()->to('admin/category-regexes-list');
+                return redirect()->to('admin/category_regexes-list');
 
             case 'view':
             default:
