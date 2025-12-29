@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 /**
@@ -10,10 +11,7 @@
  * New location: app/Services/Tmux/Scripts/update_groups.php
  */
 
-require_once __DIR__.'/../../../../bootstrap/autoload.php';
+$artisan = dirname(__DIR__, 4).'/artisan';
 
-$artisan = base_path('artisan');
-$command = "php {$artisan} groups:update";
-
-passthru($command, $exitCode);
+passthru("php {$artisan} groups:update", $exitCode);
 exit($exitCode);

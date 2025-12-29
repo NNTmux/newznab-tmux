@@ -224,8 +224,15 @@ class TmuxMonitor extends Command
             return;
         }
 
-        // These tasks would be implemented in TmuxTaskRunner
-        // For now, we're keeping the structure similar to the original
-        // but using the modern service architecture
+        // Run utility tasks (window 1)
+        $this->taskRunner->runPaneTask('fixnames', [], $runVar);
+        $this->taskRunner->runPaneTask('removecrap', [], $runVar);
+
+        // Run post-processing tasks (window 2)
+        $this->taskRunner->runPaneTask('ppadditional', [], $runVar);
+        $this->taskRunner->runPaneTask('tv', [], $runVar);
+        $this->taskRunner->runPaneTask('movies', [], $runVar);
+        $this->taskRunner->runPaneTask('amazon', [], $runVar);
+        $this->taskRunner->runPaneTask('xxx', [], $runVar);
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Services\NNTP;
 
-use App\Extensions\util\PhpYenc;
 use App\Models\Settings;
 use App\Services\Tmux\Tmux;
+use App\Services\YencService;
 
 /*
  * Response codes not defined in Net_NNTP
@@ -135,14 +135,20 @@ class NNTPService extends \Net_NNTP_Client
     protected string $_yEncTempOutput;
 
     /**
+     * YEnc encoding/decoding service.
+     */
+    protected YencService $_yencService;
+
+    /**
      * Create a new NNTP service instance.
      */
-    public function __construct(?Tmux $tmux = null)
+    public function __construct(?Tmux $tmux = null, ?YencService $yencService = null)
     {
         parent::__construct();
 
         $this->_echo = config('nntmux.echocli');
         $this->_tmux = $tmux ?? new Tmux;
+        $this->_yencService = $yencService ?? app(YencService::class);
         $this->_nntpRetries = Settings::settingValue('nntpretries') !== '' ? (int) Settings::settingValue('nntpretries') : 0 + 1;
 
         $this->initializeConfig();
@@ -773,7 +779,7 @@ class NNTPService extends \Net_NNTP_Client
             if ($line === ".\r\n") {
                 $body = implode('', $bodyParts);
 
-                return PhpYenc::decodeIgnore($body);
+                return $this->_yencService->decodeIgnore($body);
             }
             if ($line[0] === '.' && isset($line[1]) && $line[1] === '.') {
                 $line = substr($line, 1);
@@ -1086,7 +1092,7 @@ class NNTPService extends \Net_NNTP_Client
                     // Join all parts and attempt to yEnc decode
                     $body = implode('', $bodyParts);
 
-                    return PhpYenc::decodeIgnore($body);
+                    return $this->_yencService->decodeIgnore($body);
                 }
 
                 // Check for line that starts with double period, remove one.

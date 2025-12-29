@@ -1,6 +1,9 @@
 <?php
 
 /**
+ <?php
+
+/**
  * This file is part of NNTmux.
  *
  * For the full copyright and license information, please view the LICENSE
@@ -12,21 +15,20 @@
  * @version       0.0.1
  */
 
-namespace tests;
+namespace Tests\Install;
 
-require_once \dirname(__DIR__, 2).DIRECTORY_SEPARATOR.'bootstrap/autoload.php';
+use Tests\TestCase;
 
 /**
  * Class InstallTest.
  */
-final class InstallTest extends \PHPUnit\Framework\TestCase
+final class InstallTest extends TestCase
 {
     public function test_full_install(): void
     {
-        passthru('php '.base_path().'/artisan migrate:fresh --seed');
+        $this->artisan('migrate:fresh', ['--seed' => true])
+            ->assertExitCode(0);
 
-        $message = 'NNTmux installation completed successfully';
-
-        $this->assertEquals('NNTmux installation completed successfully', $message, 'Test Failed');
+        $this->assertTrue(true, 'NNTmux installation completed successfully');
     }
 }

@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 /**
@@ -10,10 +11,8 @@
  * New location: app/Services/Tmux/Scripts/groupfixrelnames.php
  */
 
-require_once __DIR__.'/../../../../bootstrap/autoload.php';
-
 if (! isset($argv[1])) {
-    cli()->error('This script is not intended to be run manually, it is called from Multiprocessing.');
+    fwrite(STDERR, "This script is not intended to be run manually, it is called from Multiprocessing.\n");
     exit(1);
 }
 
@@ -21,12 +20,12 @@ if (! isset($argv[1])) {
 [$type, $guidChar, $maxPerRun, $thread] = explode(' ', $argv[1]);
 
 // Build artisan command based on type
-$artisan = base_path('artisan');
+$artisan = dirname(__DIR__, 4).'/artisan';
 
 switch ($type) {
     case 'standard':
         if ($guidChar === null || $maxPerRun === null || ! is_numeric($maxPerRun)) {
-            cli()->error('Invalid arguments for standard type');
+            fwrite(STDERR, "Invalid arguments for standard type\n");
             exit(1);
         }
 
@@ -35,7 +34,7 @@ switch ($type) {
 
     case 'predbft':
         if (! isset($maxPerRun) || ! is_numeric($maxPerRun) || ! isset($thread) || ! is_numeric($thread)) {
-            cli()->error('Invalid arguments for predbft type');
+            fwrite(STDERR, "Invalid arguments for predbft type\n");
             exit(1);
         }
 
@@ -43,7 +42,7 @@ switch ($type) {
         break;
 
     default:
-        cli()->error("Unknown type: {$type}");
+        fwrite(STDERR, "Unknown type: {$type}\n");
         exit(1);
 }
 

@@ -24,6 +24,7 @@ return [
         'RedisManager' => Illuminate\Support\Facades\Redis::class,
         'UserVerification' => Jrean\UserVerification\Facades\UserVerification::class,
         'Gravatar' => Creativeorange\Gravatar\Facades\Gravatar::class,
+        'Yenc' => App\Facades\Yenc::class,
     ])->toArray(),
 
 ];
