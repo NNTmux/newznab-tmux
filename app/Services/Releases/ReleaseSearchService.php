@@ -810,11 +810,9 @@ class ReleaseSearchService
             return [];
         }
 
-        $esEnabled = config('nntmux.elasticsearch_enabled');
         if (config('app.debug')) {
             Log::debug('performIndexSearch: starting search', [
-                'elasticsearch_enabled' => $esEnabled,
-                'elasticsearch_enabled_type' => gettype($esEnabled),
+                'search_driver' => config('search.default'),
                 'searchFields' => $searchFields,
                 'limit' => $limit,
             ]);

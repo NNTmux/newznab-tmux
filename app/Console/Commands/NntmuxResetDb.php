@@ -90,7 +90,7 @@ class NntmuxResetDb extends Command
             }
             unset($value);
 
-            if (config('nntmux.elasticsearch_enabled') === true) {
+            if (config('search.default') === 'elasticsearch') {
                 if (\Elasticsearch::indices()->exists(['index' => 'releases'])) {
                     \Elasticsearch::indices()->delete(['index' => 'releases']);
                 }

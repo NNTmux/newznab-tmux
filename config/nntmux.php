@@ -19,7 +19,6 @@ return [
     'stream_fork_output' => env('STREAM_FORK_OUTPUT', false),
     'purge_inactive_users' => env('PURGE_INACTIVE_USERS', false),
     'purge_inactive_users_days' => env('PURGE_INACTIVE_USERS_DAYS', 180),
-    'elasticsearch_enabled' => env('ELASTICSEARCH_ENABLED', false),
     'mysql_search_fallback' => env('MYSQL_SEARCH_FALLBACK', false), // Disable MySQL LIKE fallback when Manticore/Elasticsearch return no results
     'btcpay_webhook_secret' => env('BTCPAY_SECRET'),
     'tmp_unrar_path' => env('TEMP_UNRAR_PATH', storage_path('tmp/unrar/')),
