@@ -107,7 +107,28 @@ class XxxCategorizer extends AbstractCategorizer
         }
 
         // Check for known studios/sites
-        if (preg_match('/\b(' . self::KNOWN_STUDIOS . ')\b/i', $name)) {
+        if (preg_match('/\b(' . self::KNOWN_STUDIOS . ')\b/i', $name, $matches)) {
+            $matchedStudio = $matches[1];
+
+            // If the studio name appears at the start, check if it's actually a movie release pattern
+            // Movie pattern: Title.Year.Resolution.Source (e.g., Wicked.2024.1080p.WEB-DL)
+            // Adult pattern: Studio.Date.Performer (e.g., Wicked.24.01.15.Performer.Name)
+            if (preg_match('/^' . preg_quote($matchedStudio, '/') . '[.\-_ ]/i', $name)) {
+                // Check if this looks like a movie release: Studio.Year.Resolution or Studio.Title.Year
+                // Movie releases typically have: 4-digit year followed by resolution/source markers
+                if (preg_match('/^' . preg_quote($matchedStudio, '/') . '[.\-_ ](?:[A-Za-z]+[.\-_ ])*(?:19|20)\d{2}[.\-_ ](?:720p|1080p|2160p|4K|UHD)/i', $name) &&
+                    preg_match('/\b(WEB-?DL|WEBRip|BluRay|BDRip|HDRip|HDTV|DVDRip|Remux|PROPER|REPACK|HC|KORSUB)\b/i', $name) &&
+                    !preg_match('/\b(' . self::ADULT_KEYWORDS . ')\b/i', $name)) {
+                    // This looks like a movie release (Title.Year.Resolution.Source), not adult content
+                    return false;
+                }
+
+                // Adult studio releases typically use date patterns: Studio.YY.MM.DD or Studio.YYYY.MM.DD
+                if (preg_match('/^' . preg_quote($matchedStudio, '/') . '[.\-_ ](19|20)?\d{2}[.\-_ ]\d{2}[.\-_ ]\d{2}[.\-_ ]/i', $name)) {
+                    return true;
+                }
+            }
+
             return true;
         }
 
