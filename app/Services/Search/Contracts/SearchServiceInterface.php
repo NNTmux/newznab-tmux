@@ -20,6 +20,16 @@ interface SearchServiceInterface
     public function isSuggestEnabled(): bool;
 
     /**
+     * Check if fuzzy search is enabled.
+     */
+    public function isFuzzyEnabled(): bool;
+
+    /**
+     * Get fuzzy search configuration.
+     */
+    public function getFuzzyConfig(): array;
+
+    /**
      * Get the releases index name.
      */
     public function getReleasesIndex(): string;
@@ -72,6 +82,30 @@ interface SearchServiceInterface
      * @return array Array of release IDs
      */
     public function searchReleases(array|string $phrases, int $limit = 1000): array;
+
+    /**
+     * Search releases with fuzzy fallback.
+     *
+     * If exact search returns no results and fuzzy is enabled, this method
+     * will automatically try a fuzzy search as a fallback.
+     *
+     * @param  array|string  $phrases  Search phrases
+     * @param  int  $limit  Maximum number of results
+     * @param  bool  $forceFuzzy  Force fuzzy search regardless of exact results
+     * @return array Array with 'ids' (release IDs) and 'fuzzy' (bool indicating if fuzzy was used)
+     */
+    public function searchReleasesWithFuzzy(array|string $phrases, int $limit = 1000, bool $forceFuzzy = false): array;
+
+    /**
+     * Perform fuzzy search on releases index.
+     *
+     * Uses search engine's fuzzy matching to find results with typo tolerance.
+     *
+     * @param  array|string  $phrases  Search phrases
+     * @param  int  $limit  Maximum number of results
+     * @return array Array of release IDs
+     */
+    public function fuzzySearchReleases(array|string $phrases, int $limit = 1000): array;
 
     /**
      * Search the predb index.

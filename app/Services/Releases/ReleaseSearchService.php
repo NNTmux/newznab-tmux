@@ -141,8 +141,13 @@ class ReleaseSearchService
         // Early return if searching with no results
         $searchResult = [];
         if ($searchName !== -1 && $searchName !== '' && $searchName !== null) {
-            // Use the unified Search facade
-            $searchResult = Search::searchReleases($searchName, $limit);
+            // Use the unified Search facade with fuzzy fallback
+            $fuzzyResult = Search::searchReleasesWithFuzzy($searchName, $limit);
+            $searchResult = $fuzzyResult['ids'] ?? [];
+
+            if (config('app.debug') && ($fuzzyResult['fuzzy'] ?? false)) {
+                Log::debug('apiSearch: Using fuzzy search results');
+            }
 
             // Fall back to MySQL if search engine returned no results (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
@@ -339,8 +344,9 @@ class ReleaseSearchService
                 }
             }
 
-            // Use the unified Search facade
-            $searchResult = Search::searchReleases(['searchname' => $searchName], $limit);
+            // Use the unified Search facade with fuzzy fallback
+            $fuzzyResult = Search::searchReleasesWithFuzzy(['searchname' => $searchName], $limit);
+            $searchResult = $fuzzyResult['ids'] ?? [];
 
             // Fall back to MySQL if search engine failed (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
@@ -515,8 +521,9 @@ class ReleaseSearchService
         }
         $searchResult = [];
         if (! empty($name)) {
-            // Use the unified Search facade
-            $searchResult = Search::searchReleases(['searchname' => $name], $limit);
+            // Use the unified Search facade with fuzzy fallback
+            $fuzzyResult = Search::searchReleasesWithFuzzy(['searchname' => $name], $limit);
+            $searchResult = $fuzzyResult['ids'] ?? [];
 
             // Fall back to MySQL if search engine failed (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
@@ -577,8 +584,9 @@ class ReleaseSearchService
     {
         $searchResult = [];
         if (! empty($name)) {
-            // Use the unified Search facade
-            $searchResult = Search::searchReleases($name, $limit);
+            // Use the unified Search facade with fuzzy fallback
+            $fuzzyResult = Search::searchReleasesWithFuzzy($name, $limit);
+            $searchResult = $fuzzyResult['ids'] ?? [];
 
             // Fall back to MySQL if search engine returned no results (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
@@ -645,8 +653,9 @@ class ReleaseSearchService
         // Early return if searching by name yields no results
         $searchResult = [];
         if (! empty($name)) {
-            // Use the unified Search facade
-            $searchResult = Search::searchReleases($name, $limit);
+            // Use the unified Search facade with fuzzy fallback
+            $fuzzyResult = Search::searchReleasesWithFuzzy($name, $limit);
+            $searchResult = $fuzzyResult['ids'] ?? [];
 
             // Fall back to MySQL if search engine returned no results (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
@@ -811,10 +820,16 @@ class ReleaseSearchService
             ]);
         }
 
-        // Use the unified Search facade - pass searchFields with keys preserved
-        $result = Search::searchReleases($searchFields, $limit);
+        // Use the unified Search facade with fuzzy fallback
+        // This will try exact search first, then fuzzy if no results
+        $searchResult = Search::searchReleasesWithFuzzy($searchFields, $limit);
+        $result = $searchResult['ids'] ?? [];
+
         if (config('app.debug')) {
-            Log::debug('performIndexSearch: Search result count', ['count' => count($result)]);
+            Log::debug('performIndexSearch: Search result', [
+                'count' => count($result),
+                'fuzzy_used' => $searchResult['fuzzy'] ?? false,
+            ]);
         }
 
         // If search returned results, use them

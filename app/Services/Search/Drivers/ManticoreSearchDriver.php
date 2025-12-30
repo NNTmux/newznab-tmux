@@ -79,6 +79,26 @@ class ManticoreSearchDriver implements SearchDriverInterface
     }
 
     /**
+     * Check if fuzzy search is enabled.
+     */
+    public function isFuzzyEnabled(): bool
+    {
+        return ($this->config['fuzzy']['enabled'] ?? true) === true;
+    }
+
+    /**
+     * Get fuzzy search configuration.
+     */
+    public function getFuzzyConfig(): array
+    {
+        return $this->config['fuzzy'] ?? [
+            'enabled' => true,
+            'max_distance' => 2,
+            'layouts' => 'us',
+        ];
+    }
+
+    /**
      * Get the releases index name.
      */
     public function getReleasesIndex(): string
@@ -369,7 +389,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
     public function truncateRTIndex(array $indexes = []): bool
     {
         if (empty($indexes)) {
-            $this->cli->error('You need to provide index name to truncate');
+            cli()->error('You need to provide index name to truncate');
 
             return false;
         }
@@ -377,7 +397,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
         $success = true;
         foreach ($indexes as $index) {
             if (! \in_array($index, $this->config['indexes'], true)) {
-                $this->cli->error('Unsupported index: '.$index);
+                cli()->error('Unsupported index: '.$index);
                 $success = false;
 
                 continue;
@@ -385,16 +405,16 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
             try {
                 $this->manticoreSearch->table($index)->truncate();
-                $this->cli->info('Truncating index '.$index.' finished.');
+                cli()->info('Truncating index '.$index.' finished.');
             } catch (ResponseException $e) {
                 if ($e->getMessage() === 'Invalid index') {
                     $this->createIndexIfNotExists($index);
                 } else {
-                    $this->cli->error('Error truncating index '.$index.': '.$e->getMessage());
+                    cli()->error('Error truncating index '.$index.': '.$e->getMessage());
                     $success = false;
                 }
             } catch (\Throwable $e) {
-                $this->cli->error('Unexpected error truncating index '.$index.': '.$e->getMessage());
+                cli()->error('Unexpected error truncating index '.$index.': '.$e->getMessage());
                 $success = false;
             }
         }
@@ -428,17 +448,17 @@ class ManticoreSearchDriver implements SearchDriverInterface
                     'filename' => ['type' => 'string'],
                     'categories_id' => ['type' => 'integer'],
                 ]);
-                $this->cli->info('Created releases_rt index');
+                cli()->info('Created releases_rt index');
             } elseif ($index === 'predb_rt') {
                 $this->manticoreSearch->table($index)->create([
                     'title' => ['type' => 'string'],
                     'filename' => ['type' => 'string'],
                     'source' => ['type' => 'string'],
                 ]);
-                $this->cli->info('Created predb_rt index');
+                cli()->info('Created predb_rt index');
             }
         } catch (\Throwable $e) {
-            $this->cli->error('Error creating index '.$index.': '.$e->getMessage());
+            cli()->error('Error creating index '.$index.': '.$e->getMessage());
         }
     }
 
@@ -505,6 +525,213 @@ class ManticoreSearchDriver implements SearchDriverInterface
         $result = $this->searchIndexes($this->getReleasesIndex(), '', [], $searchArray);
 
         return ! empty($result) ? ($result['id'] ?? []) : [];
+    }
+
+    /**
+     * Search releases with fuzzy fallback.
+     *
+     * If exact search returns no results and fuzzy is enabled, this method
+     * will automatically try a fuzzy search as a fallback.
+     *
+     * @param  array|string  $phrases  Search phrases
+     * @param  int  $limit  Maximum number of results
+     * @param  bool  $forceFuzzy  Force fuzzy search regardless of exact results
+     * @return array Array with 'ids' (release IDs) and 'fuzzy' (bool indicating if fuzzy was used)
+     */
+    public function searchReleasesWithFuzzy(array|string $phrases, int $limit = 1000, bool $forceFuzzy = false): array
+    {
+        // First try exact search unless forcing fuzzy
+        if (! $forceFuzzy) {
+            $exactResults = $this->searchReleases($phrases, $limit);
+            if (! empty($exactResults)) {
+                return [
+                    'ids' => $exactResults,
+                    'fuzzy' => false,
+                ];
+            }
+        }
+
+        // If exact search returned nothing (or forcing fuzzy) and fuzzy is enabled, try fuzzy search
+        if ($this->isFuzzyEnabled()) {
+            $fuzzyResults = $this->fuzzySearchReleases($phrases, $limit);
+            if (! empty($fuzzyResults)) {
+                return [
+                    'ids' => $fuzzyResults,
+                    'fuzzy' => true,
+                ];
+            }
+        }
+
+        return [
+            'ids' => [],
+            'fuzzy' => false,
+        ];
+    }
+
+    /**
+     * Perform fuzzy search on releases index.
+     *
+     * Uses Manticore's native fuzzy search with Levenshtein distance algorithm.
+     *
+     * @param  array|string  $phrases  Search phrases
+     * @param  int  $limit  Maximum number of results
+     * @return array Array of release IDs
+     */
+    public function fuzzySearchReleases(array|string $phrases, int $limit = 1000): array
+    {
+        if (! $this->isFuzzyEnabled()) {
+            return [];
+        }
+
+        if (is_string($phrases)) {
+            $searchArray = ['searchname' => $phrases];
+        } elseif (is_array($phrases)) {
+            $isAssociative = count(array_filter(array_keys($phrases), 'is_string')) > 0;
+            if ($isAssociative) {
+                $searchArray = $phrases;
+            } else {
+                $searchArray = ['searchname' => implode(' ', $phrases)];
+            }
+        } else {
+            return [];
+        }
+
+        $result = $this->fuzzySearchIndexes($this->getReleasesIndex(), $searchArray, $limit);
+
+
+        return ! empty($result) ? ($result['id'] ?? []) : [];
+    }
+
+    /**
+     * Perform fuzzy search on an index using Manticore's native fuzzy search.
+     *
+     * Uses Levenshtein distance algorithm to find matches with typo tolerance.
+     * Supports:
+     * - Missing characters: "laptp" → "laptop"
+     * - Extra characters: "laptopp" → "laptop"
+     * - Transposed characters: "lpatop" → "laptop"
+     * - Wrong characters: "laptip" → "laptop"
+     *
+     * @param  string  $index  Index to search
+     * @param  array  $searchArray  Associative array of field => value to search
+     * @param  int  $limit  Maximum number of results
+     * @return array Array with 'id' and 'data' keys
+     */
+    public function fuzzySearchIndexes(string $index, array $searchArray, int $limit = 1000): array
+    {
+        if (empty($index) || empty($searchArray)) {
+            return [];
+        }
+
+        $fuzzyConfig = $this->getFuzzyConfig();
+        $distance = $fuzzyConfig['max_distance'] ?? 2;
+
+        // Create cache key for fuzzy search results
+        $cacheKey = 'manticore:fuzzy:'.md5(serialize([
+            'index' => $index,
+            'array' => $searchArray,
+            'limit' => $limit,
+            'distance' => $distance,
+        ]));
+
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            if (config('app.debug')) {
+                Log::debug('ManticoreSearch::fuzzySearchIndexes returning cached result', [
+                    'cacheKey' => $cacheKey,
+                ]);
+            }
+
+            return $cached;
+        }
+
+        // For fuzzy search, we need to use a simple query string without the @@relaxed @field syntax
+        // The fuzzy option only works with plain query_string queries
+        $searchTerms = [];
+        foreach ($searchArray as $field => $value) {
+            if (! empty($value)) {
+                // Clean value for fuzzy search - remove special characters but keep words
+                $cleanValue = preg_replace('/[^\w\s]/', ' ', $value);
+                $cleanValue = preg_replace('/\s+/', ' ', trim($cleanValue));
+                if (! empty($cleanValue)) {
+                    $searchTerms[] = $cleanValue;
+                }
+            }
+        }
+
+        if (empty($searchTerms)) {
+            return [];
+        }
+
+        $searchExpr = implode(' ', $searchTerms);
+
+        if (config('app.debug')) {
+            Log::debug('ManticoreSearch::fuzzySearchIndexes query', [
+                'index' => $index,
+                'searchExpr' => $searchExpr,
+                'fuzzy' => true,
+                'distance' => $distance,
+            ]);
+        }
+
+        try {
+            // Use Manticore's native fuzzy search with Levenshtein distance
+            // Important: use search() with plain query string for fuzzy to work
+            // Note: Keep options minimal - layouts, stripBadUtf8, and sort can interfere with fuzzy
+            $query = (new Search($this->manticoreSearch))
+                ->setTable($index)
+                ->search($searchExpr)
+                ->option('fuzzy', true)
+                ->option('distance', $distance)
+                ->limit(min($limit, 10000));
+
+            $results = $query->get();
+        } catch (ResponseException $e) {
+            Log::error('ManticoreSearch fuzzySearchIndexes ResponseException: '.$e->getMessage(), [
+                'index' => $index,
+                'searchArray' => $searchArray,
+            ]);
+
+            return [];
+        } catch (RuntimeException $e) {
+            Log::error('ManticoreSearch fuzzySearchIndexes RuntimeException: '.$e->getMessage(), [
+                'index' => $index,
+            ]);
+
+            return [];
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch fuzzySearchIndexes unexpected error: '.$e->getMessage(), [
+                'index' => $index,
+            ]);
+
+            return [];
+        }
+
+        $resultIds = [];
+        $resultData = [];
+        foreach ($results as $doc) {
+            $resultIds[] = $doc->getId();
+            $resultData[] = $doc->getData();
+        }
+
+        $result = [
+            'id' => $resultIds,
+            'data' => $resultData,
+        ];
+
+        if (config('app.debug')) {
+            Log::debug('ManticoreSearch::fuzzySearchIndexes results', [
+                'index' => $index,
+                'total_results' => count($resultIds),
+            ]);
+        }
+
+        // Cache fuzzy results for 5 minutes
+        if (! empty($resultIds)) {
+            Cache::put($cacheKey, $result, now()->addMinutes($this->config['cache_minutes'] ?? 5));
+        }
+
+        return $result;
     }
 
     /**

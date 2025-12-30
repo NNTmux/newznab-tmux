@@ -103,6 +103,22 @@ class SearchService extends Manager implements SearchServiceInterface
     }
 
     /**
+     * Check if fuzzy search is enabled.
+     */
+    public function isFuzzyEnabled(): bool
+    {
+        return $this->driver()->isFuzzyEnabled();
+    }
+
+    /**
+     * Get fuzzy search configuration.
+     */
+    public function getFuzzyConfig(): array
+    {
+        return $this->driver()->getFuzzyConfig();
+    }
+
+    /**
      * Get the releases index name.
      */
     public function getReleasesIndex(): string
@@ -164,6 +180,25 @@ class SearchService extends Manager implements SearchServiceInterface
     public function searchReleases(array|string $phrases, int $limit = 1000): array
     {
         return $this->driver()->searchReleases($phrases, $limit);
+    }
+
+    /**
+     * Search releases with fuzzy fallback.
+     *
+     * If exact search returns no results and fuzzy is enabled, this method
+     * will automatically try a fuzzy search as a fallback.
+     */
+    public function searchReleasesWithFuzzy(array|string $phrases, int $limit = 1000, bool $forceFuzzy = false): array
+    {
+        return $this->driver()->searchReleasesWithFuzzy($phrases, $limit, $forceFuzzy);
+    }
+
+    /**
+     * Perform fuzzy search on releases index.
+     */
+    public function fuzzySearchReleases(array|string $phrases, int $limit = 1000): array
+    {
+        return $this->driver()->fuzzySearchReleases($phrases, $limit);
     }
 
     /**

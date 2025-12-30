@@ -227,6 +227,27 @@ class ElasticSearchDriver implements SearchDriverInterface
     }
 
     /**
+     * Check if fuzzy search is enabled.
+     */
+    public function isFuzzyEnabled(): bool
+    {
+        return ($this->config['fuzzy']['enabled'] ?? true) && $this->isElasticsearchAvailable();
+    }
+
+    /**
+     * Get fuzzy search configuration.
+     */
+    public function getFuzzyConfig(): array
+    {
+        return $this->config['fuzzy'] ?? [
+            'enabled' => true,
+            'fuzziness' => 'AUTO',
+            'prefix_length' => 2,
+            'max_expansions' => 50,
+        ];
+    }
+
+    /**
      * Get the releases index name.
      */
     public function getReleasesIndex(): string
@@ -614,6 +635,175 @@ class ElasticSearchDriver implements SearchDriverInterface
         $result = $this->indexSearch($searchString, $limit);
 
         return is_array($result) ? $result : $result->toArray();
+    }
+
+    /**
+     * Search releases with fuzzy fallback.
+     *
+     * If exact search returns no results and fuzzy is enabled, this method
+     * will automatically try a fuzzy search as a fallback.
+     *
+     * @param  array|string  $phrases  Search phrases
+     * @param  int  $limit  Maximum number of results
+     * @param  bool  $forceFuzzy  Force fuzzy search regardless of exact results
+     * @return array Array with 'ids' (release IDs) and 'fuzzy' (bool indicating if fuzzy was used)
+     */
+    public function searchReleasesWithFuzzy(array|string $phrases, int $limit = 1000, bool $forceFuzzy = false): array
+    {
+        // First try exact search unless forcing fuzzy
+        if (! $forceFuzzy) {
+            $exactResults = $this->searchReleases($phrases, $limit);
+            if (! empty($exactResults)) {
+                return [
+                    'ids' => $exactResults,
+                    'fuzzy' => false,
+                ];
+            }
+        }
+
+        // If exact search returned nothing (or forcing fuzzy) and fuzzy is enabled, try fuzzy search
+        if ($this->isFuzzyEnabled()) {
+            $fuzzyResults = $this->fuzzySearchReleases($phrases, $limit);
+            if (! empty($fuzzyResults)) {
+                return [
+                    'ids' => $fuzzyResults,
+                    'fuzzy' => true,
+                ];
+            }
+        }
+
+        return [
+            'ids' => [],
+            'fuzzy' => false,
+        ];
+    }
+
+    /**
+     * Perform fuzzy search on releases index.
+     *
+     * Uses Elasticsearch's fuzzy matching to find results with typo tolerance.
+     *
+     * @param  array|string  $phrases  Search phrases
+     * @param  int  $limit  Maximum number of results
+     * @return array Array of release IDs
+     */
+    public function fuzzySearchReleases(array|string $phrases, int $limit = 1000): array
+    {
+        if (! $this->isFuzzyEnabled() || ! $this->isElasticsearchAvailable()) {
+            return [];
+        }
+
+        // Normalize the input to a search string
+        if (is_string($phrases)) {
+            $searchString = $phrases;
+        } elseif (is_array($phrases)) {
+            $isAssociative = count(array_filter(array_keys($phrases), 'is_string')) > 0;
+            if ($isAssociative) {
+                $searchString = implode(' ', array_values($phrases));
+            } else {
+                $searchString = implode(' ', $phrases);
+            }
+        } else {
+            return [];
+        }
+
+        $keywords = $this->sanitizeSearchTerms($searchString);
+        if (empty($keywords)) {
+            return [];
+        }
+
+        $fuzzyConfig = $this->getFuzzyConfig();
+        $cacheKey = $this->buildCacheKey('fuzzy_search', [$keywords, $limit, $fuzzyConfig]);
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        try {
+            $client = $this->getClient();
+
+            // Build fuzzy query
+            $searchParams = [
+                'index' => $this->getReleasesIndex(),
+                'body' => [
+                    'query' => [
+                        'bool' => [
+                            'should' => [
+                                // Fuzzy match on searchname
+                                [
+                                    'match' => [
+                                        'searchname' => [
+                                            'query' => $keywords,
+                                            'fuzziness' => $fuzzyConfig['fuzziness'] ?? 'AUTO',
+                                            'prefix_length' => $fuzzyConfig['prefix_length'] ?? 2,
+                                            'max_expansions' => $fuzzyConfig['max_expansions'] ?? 50,
+                                            'boost' => 2,
+                                        ],
+                                    ],
+                                ],
+                                // Fuzzy match on plainsearchname
+                                [
+                                    'match' => [
+                                        'plainsearchname' => [
+                                            'query' => $keywords,
+                                            'fuzziness' => $fuzzyConfig['fuzziness'] ?? 'AUTO',
+                                            'prefix_length' => $fuzzyConfig['prefix_length'] ?? 2,
+                                            'max_expansions' => $fuzzyConfig['max_expansions'] ?? 50,
+                                            'boost' => 1.5,
+                                        ],
+                                    ],
+                                ],
+                                // Fuzzy match on name
+                                [
+                                    'match' => [
+                                        'name' => [
+                                            'query' => $keywords,
+                                            'fuzziness' => $fuzzyConfig['fuzziness'] ?? 'AUTO',
+                                            'prefix_length' => $fuzzyConfig['prefix_length'] ?? 2,
+                                            'max_expansions' => $fuzzyConfig['max_expansions'] ?? 50,
+                                            'boost' => 1.2,
+                                        ],
+                                    ],
+                                ],
+                            ],
+                            'minimum_should_match' => 1,
+                        ],
+                    ],
+                    'size' => min($limit, self::MAX_RESULTS),
+                    '_source' => false,
+                    'sort' => [
+                        ['_score' => ['order' => 'desc']],
+                    ],
+                ],
+            ];
+
+            $response = $client->search($searchParams);
+
+            $ids = [];
+            if (isset($response['hits']['hits'])) {
+                foreach ($response['hits']['hits'] as $hit) {
+                    $ids[] = (int) $hit['_id'];
+                }
+            }
+
+            Cache::put($cacheKey, $ids, now()->addMinutes($this->config['cache_minutes'] ?? self::CACHE_TTL_MINUTES));
+
+            return $ids;
+
+        } catch (ElasticsearchException $e) {
+            Log::error('ElasticSearch fuzzySearchReleases error: '.$e->getMessage(), [
+                'keywords' => $keywords,
+                'limit' => $limit,
+            ]);
+
+            return [];
+        } catch (\Throwable $e) {
+            Log::error('ElasticSearch fuzzySearchReleases unexpected error: '.$e->getMessage(), [
+                'keywords' => $keywords,
+            ]);
+
+            return [];
+        }
     }
 
     /**

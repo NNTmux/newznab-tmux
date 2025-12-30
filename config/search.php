@@ -45,6 +45,11 @@ return [
                 'enabled' => env('MANTICORESEARCH_SUGGEST_ENABLED', true),
                 'max_edits' => env('MANTICORESEARCH_SUGGEST_MAX_EDITS', 4),
             ],
+            'fuzzy' => [
+                'enabled' => env('MANTICORESEARCH_FUZZY_ENABLED', true),
+                'max_distance' => env('MANTICORESEARCH_FUZZY_MAX_DISTANCE', 2),
+                'layouts' => env('MANTICORESEARCH_FUZZY_LAYOUTS', 'us'),
+            ],
         ],
 
         'elasticsearch' => [
@@ -74,6 +79,12 @@ return [
             ],
             'suggest' => [
                 'enabled' => env('ELASTICSEARCH_SUGGEST_ENABLED', true),
+            ],
+            'fuzzy' => [
+                'enabled' => env('ELASTICSEARCH_FUZZY_ENABLED', true),
+                'fuzziness' => env('ELASTICSEARCH_FUZZY_FUZZINESS', 'AUTO'),
+                'prefix_length' => env('ELASTICSEARCH_FUZZY_PREFIX_LENGTH', 2),
+                'max_expansions' => env('ELASTICSEARCH_FUZZY_MAX_EXPANSIONS', 50),
             ],
         ],
 
