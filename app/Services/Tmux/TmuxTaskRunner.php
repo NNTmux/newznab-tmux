@@ -591,15 +591,8 @@ class TmuxTaskRunner
         // TV processing - Check work count before adding to queue
         $processTv = (int) ($runVar['settings']['processtvrage'] ?? 0);
         $hasTvWork = (int) ($runVar['counts']['now']['processtv'] ?? 0) > 0;
-        if ($processTv > 0) {
-            if ($hasTvWork) {
-                $commands[] = "nice -n{$niceness} {$artisan} update:postprocess tv 2>&1 | tee -a {$log}";
-            } else {
-                // Log that TV processing was skipped due to no work
-                if ($this->echooutput ?? true) {
-                    cli()->notice('Skipping TV processing - no work available');
-                }
-            }
+        if ($processTv > 0 && $hasTvWork) {
+            $commands[] = "nice -n{$niceness} {$artisan} update:postprocess tv 2>&1 | tee -a {$log}";
         }
 
         // Anime processing
