@@ -3,8 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Facades\Search;
+use App\Models\MovieInfo;
 use App\Models\Predb;
 use App\Models\Release;
+use App\Models\Video;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
@@ -22,6 +24,8 @@ class NntmuxPopulateSearchIndexes extends Command
                                        {--elastic : Use ElasticSearch}
                                        {--releases : Populates the releases index}
                                        {--predb : Populates the predb index}
+                                       {--movies : Populates the movies index}
+                                       {--tvshows : Populates the TV shows index}
                                        {--count=50000 : Sets the chunk size}
                                        {--parallel=4 : Number of parallel processes}
                                        {--batch-size=5000 : Batch size for bulk operations}
@@ -33,11 +37,11 @@ class NntmuxPopulateSearchIndexes extends Command
      *
      * @var string
      */
-    protected $description = 'Populate Manticore/Elasticsearch indexes with either releases or predb';
+    protected $description = 'Populate Manticore/Elasticsearch indexes with releases, predb, movies, or tvshows';
 
     private const SUPPORTED_ENGINES = ['manticore', 'elastic'];
 
-    private const SUPPORTED_INDEXES = ['releases', 'predb'];
+    private const SUPPORTED_INDEXES = ['releases', 'predb', 'movies', 'tvshows'];
 
     private const GROUP_CONCAT_MAX_LEN = 16384;
 
@@ -169,12 +173,27 @@ class NntmuxPopulateSearchIndexes extends Command
         $query = Release::query()
             ->orderByDesc('releases.id')
             ->leftJoin('release_files', 'releases.id', '=', 'release_files.releases_id')
+            ->leftJoin('movieinfo', 'releases.movieinfo_id', '=', 'movieinfo.id')
+            ->leftJoin('videos', 'releases.videos_id', '=', 'videos.id')
             ->select([
                 'releases.id',
                 'releases.name',
                 'releases.searchname',
                 'releases.fromname',
                 'releases.categories_id',
+                'releases.videos_id',
+                'releases.movieinfo_id',
+                // Movie external IDs
+                'movieinfo.imdbid',
+                'movieinfo.tmdbid',
+                'movieinfo.traktid',
+                // TV show external IDs
+                'videos.tvdb',
+                'videos.tvmaze',
+                'videos.tvrage',
+                DB::raw('videos.trakt as video_trakt'),
+                DB::raw('videos.imdb as video_imdb'),
+                DB::raw('videos.tmdb as video_tmdb'),
             ])
             ->selectRaw('IFNULL(GROUP_CONCAT(release_files.name SEPARATOR " "),"") AS filename')
             ->groupBy([
@@ -183,6 +202,17 @@ class NntmuxPopulateSearchIndexes extends Command
                 'releases.searchname',
                 'releases.fromname',
                 'releases.categories_id',
+                'releases.videos_id',
+                'releases.movieinfo_id',
+                'movieinfo.imdbid',
+                'movieinfo.tmdbid',
+                'movieinfo.traktid',
+                'videos.tvdb',
+                'videos.tvmaze',
+                'videos.tvrage',
+                'videos.trakt',
+                'videos.imdb',
+                'videos.tmdb',
             ]);
 
         return $this->processManticoreData(
@@ -195,8 +225,18 @@ class NntmuxPopulateSearchIndexes extends Command
                     'name' => (string) ($item->name ?: ''),
                     'searchname' => (string) ($item->searchname ?: ''),
                     'fromname' => (string) ($item->fromname ?: ''),
-                    'categories_id' => (string) ($item->categories_id ?: '0'),
+                    'categories_id' => (int) ($item->categories_id ?: 0),
                     'filename' => (string) ($item->filename ?: ''),
+                    'videos_id' => (int) ($item->videos_id ?: 0),
+                    'movieinfo_id' => (int) ($item->movieinfo_id ?: 0),
+                    // Movie external IDs
+                    'imdbid' => (int) ($item->imdbid ?: 0),
+                    'tmdbid' => (int) ($item->tmdbid ?: 0),
+                    'traktid' => (int) ($item->traktid ?: 0),
+                    // TV show external IDs (use video_* for TV shows, fallback to movie IDs)
+                    'tvdb' => (int) ($item->tvdb ?: 0),
+                    'tvmaze' => (int) ($item->tvmaze ?: 0),
+                    'tvrage' => (int) ($item->tvrage ?: 0),
                 ];
             }
         );
@@ -232,6 +272,112 @@ class NntmuxPopulateSearchIndexes extends Command
                     'title' => (string) ($item->title ?? ''),
                     'filename' => (string) ($item->filename ?? ''),
                     'source' => (string) ($item->source ?? ''),
+                ];
+            }
+        );
+    }
+
+    /**
+     * Populate ManticoreSearch movies index
+     */
+    private function manticoreMovies(): int
+    {
+        $indexName = 'movies_rt';
+
+        Search::truncateIndex([$indexName]);
+
+        $total = MovieInfo::count();
+        if (! $total) {
+            $this->warn('MovieInfo table is empty. Nothing to do.');
+
+            return Command::SUCCESS;
+        }
+
+        $query = MovieInfo::query()
+            ->select([
+                'id',
+                'imdbid',
+                'tmdbid',
+                'traktid',
+                'title',
+                'year',
+                'genre',
+                'actors',
+                'director',
+                'rating',
+                'plot',
+            ])
+            ->orderBy('id');
+
+        return $this->processManticoreMoviesData(
+            $indexName,
+            $total,
+            $query,
+            function ($item) {
+                return [
+                    'id' => $item->id,
+                    'imdbid' => (int) ($item->imdbid ?? 0),
+                    'tmdbid' => (int) ($item->tmdbid ?? 0),
+                    'traktid' => (int) ($item->traktid ?? 0),
+                    'title' => (string) ($item->title ?? ''),
+                    'year' => (string) ($item->year ?? ''),
+                    'genre' => (string) ($item->genre ?? ''),
+                    'actors' => (string) ($item->actors ?? ''),
+                    'director' => (string) ($item->director ?? ''),
+                    'rating' => (string) ($item->rating ?? ''),
+                    'plot' => (string) ($item->plot ?? ''),
+                ];
+            }
+        );
+    }
+
+    /**
+     * Populate ManticoreSearch TV shows index
+     */
+    private function manticoreTvshows(): int
+    {
+        $indexName = 'tvshows_rt';
+
+        Search::truncateIndex([$indexName]);
+
+        $total = Video::count();
+        if (! $total) {
+            $this->warn('Videos table is empty. Nothing to do.');
+
+            return Command::SUCCESS;
+        }
+
+        $query = Video::query()
+            ->select([
+                'id',
+                'title',
+                'tvdb',
+                'trakt',
+                'tvmaze',
+                'tvrage',
+                'imdb',
+                'tmdb',
+                'started',
+                'type',
+            ])
+            ->orderBy('id');
+
+        return $this->processManticoreTvShowsData(
+            $indexName,
+            $total,
+            $query,
+            function ($item) {
+                return [
+                    'id' => $item->id,
+                    'title' => (string) ($item->title ?? ''),
+                    'tvdb' => (int) ($item->tvdb ?? 0),
+                    'trakt' => (int) ($item->trakt ?? 0),
+                    'tvmaze' => (int) ($item->tvmaze ?? 0),
+                    'tvrage' => (int) ($item->tvrage ?? 0),
+                    'imdb' => (int) ($item->imdb ?? 0),
+                    'tmdb' => (int) ($item->tmdb ?? 0),
+                    'started' => (string) ($item->started ?? ''),
+                    'type' => (int) ($item->type ?? 0),
                 ];
             }
         );
@@ -306,6 +452,156 @@ class NntmuxPopulateSearchIndexes extends Command
             $bar->finish();
             $this->newLine();
             $this->error("Failed to populate ManticoreSearch: {$e->getMessage()}");
+
+            return Command::FAILURE;
+        } finally {
+            $this->restoreDatabase();
+        }
+    }
+
+    /**
+     * Process data for ManticoreSearch movies index
+     */
+    private function processManticoreMoviesData(string $indexName, int $total, $query, callable $transformer): int
+    {
+        $chunkSize = $this->getChunkSize();
+        $batchSize = $this->getBatchSize();
+
+        $this->optimizeDatabase();
+
+        $this->info(sprintf(
+            "Populating search index '%s' with %s rows using chunks of %s and batch size of %s.",
+            $indexName,
+            number_format($total),
+            number_format($chunkSize),
+            number_format($batchSize)
+        ));
+
+        $bar = $this->output->createProgressBar($total);
+        $bar->setFormat('verbose');
+        $bar->start();
+
+        $processedCount = 0;
+        $errorCount = 0;
+        $batchData = [];
+
+        try {
+            $query->chunk($chunkSize, function ($items) use ($transformer, $bar, &$processedCount, &$errorCount, $batchSize, &$batchData) {
+                foreach ($items as $item) {
+                    try {
+                        $batchData[] = $transformer($item);
+                        $processedCount++;
+
+                        // Process in optimized batch sizes
+                        if (count($batchData) >= $batchSize) {
+                            $this->processMoviesBatch($batchData);
+                            $batchData = [];
+                        }
+                    } catch (Exception $e) {
+                        $errorCount++;
+                        if ($this->output->isVerbose()) {
+                            $this->error("Error processing item {$item->id}: {$e->getMessage()}");
+                        }
+                    }
+                    $bar->advance();
+                }
+            });
+
+            // Process remaining items
+            if (! empty($batchData)) {
+                $this->processMoviesBatch($batchData);
+            }
+
+            $bar->finish();
+            $this->newLine();
+
+            if ($errorCount > 0) {
+                $this->warn("Completed with {$errorCount} errors out of {$processedCount} processed items.");
+            } else {
+                $this->info('Movies index population completed successfully!');
+            }
+
+            return Command::SUCCESS;
+
+        } catch (Exception $e) {
+            $bar->finish();
+            $this->newLine();
+            $this->error("Failed to populate movies index: {$e->getMessage()}");
+
+            return Command::FAILURE;
+        } finally {
+            $this->restoreDatabase();
+        }
+    }
+
+    /**
+     * Process data for ManticoreSearch TV shows index
+     */
+    private function processManticoreTvShowsData(string $indexName, int $total, $query, callable $transformer): int
+    {
+        $chunkSize = $this->getChunkSize();
+        $batchSize = $this->getBatchSize();
+
+        $this->optimizeDatabase();
+
+        $this->info(sprintf(
+            "Populating search index '%s' with %s rows using chunks of %s and batch size of %s.",
+            $indexName,
+            number_format($total),
+            number_format($chunkSize),
+            number_format($batchSize)
+        ));
+
+        $bar = $this->output->createProgressBar($total);
+        $bar->setFormat('verbose');
+        $bar->start();
+
+        $processedCount = 0;
+        $errorCount = 0;
+        $batchData = [];
+
+        try {
+            $query->chunk($chunkSize, function ($items) use ($transformer, $bar, &$processedCount, &$errorCount, $batchSize, &$batchData) {
+                foreach ($items as $item) {
+                    try {
+                        $batchData[] = $transformer($item);
+                        $processedCount++;
+
+                        // Process in optimized batch sizes
+                        if (count($batchData) >= $batchSize) {
+                            $this->processTvShowsBatch($batchData);
+                            $batchData = [];
+                        }
+                    } catch (Exception $e) {
+                        $errorCount++;
+                        if ($this->output->isVerbose()) {
+                            $this->error("Error processing item {$item->id}: {$e->getMessage()}");
+                        }
+                    }
+                    $bar->advance();
+                }
+            });
+
+            // Process remaining items
+            if (! empty($batchData)) {
+                $this->processTvShowsBatch($batchData);
+            }
+
+            $bar->finish();
+            $this->newLine();
+
+            if ($errorCount > 0) {
+                $this->warn("Completed with {$errorCount} errors out of {$processedCount} processed items.");
+            } else {
+                $this->info('TV shows index population completed successfully!');
+            }
+
+            return Command::SUCCESS;
+
+        } catch (Exception $e) {
+            $bar->finish();
+            $this->newLine();
+            $this->error("Failed to populate TV shows index: {$e->getMessage()}");
 
             return Command::FAILURE;
         } finally {
@@ -492,6 +788,50 @@ class NntmuxPopulateSearchIndexes extends Command
         while ($attempt < $retries) {
             try {
                 Search::bulkInsertReleases($data);
+                break;
+            } catch (Exception $e) {
+                $attempt++;
+                if ($attempt >= $retries) {
+                    throw $e;
+                }
+                usleep(100000); // 100ms delay before retry
+            }
+        }
+    }
+
+    /**
+     * Process movies batch with retry logic
+     */
+    private function processMoviesBatch(array $data): void
+    {
+        $retries = 3;
+        $attempt = 0;
+
+        while ($attempt < $retries) {
+            try {
+                Search::bulkInsertMovies($data);
+                break;
+            } catch (Exception $e) {
+                $attempt++;
+                if ($attempt >= $retries) {
+                    throw $e;
+                }
+                usleep(100000); // 100ms delay before retry
+            }
+        }
+    }
+
+    /**
+     * Process TV shows batch with retry logic
+     */
+    private function processTvShowsBatch(array $data): void
+    {
+        $retries = 3;
+        $attempt = 0;
+
+        while ($attempt < $retries) {
+            try {
+                Search::bulkInsertTvShows($data);
                 break;
             } catch (Exception $e) {
                 $attempt++;

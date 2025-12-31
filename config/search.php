@@ -32,6 +32,8 @@ return [
             'indexes' => [
                 'releases' => env('MANTICORESEARCH_INDEX_RELEASES', 'releases_rt'),
                 'predb' => env('MANTICORESEARCH_INDEX_PREDB', 'predb_rt'),
+                'movies' => env('MANTICORESEARCH_INDEX_MOVIES', 'movies_rt'),
+                'tvshows' => env('MANTICORESEARCH_INDEX_TVSHOWS', 'tvshows_rt'),
             ],
             'max_matches' => env('MANTICORESEARCH_MAX_MATCHES', 10000),
             'cache_minutes' => env('MANTICORESEARCH_CACHE_MINUTES', 5),
@@ -69,6 +71,8 @@ return [
             'indexes' => [
                 'releases' => 'releases',
                 'predb' => 'predb',
+                'movies' => 'movies',
+                'tvshows' => 'tvshows',
             ],
             'cache_minutes' => env('ELASTICSEARCH_CACHE_MINUTES', 5),
             'autocomplete' => [

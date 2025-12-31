@@ -263,5 +263,133 @@ class SearchService extends Manager implements SearchServiceInterface
     {
         $this->driver()->deletePreDb($id);
     }
+
+    /**
+     * Get the movies index name.
+     */
+    public function getMoviesIndex(): string
+    {
+        return $this->driver()->getMoviesIndex();
+    }
+
+    /**
+     * Get the TV shows index name.
+     */
+    public function getTvShowsIndex(): string
+    {
+        return $this->driver()->getTvShowsIndex();
+    }
+
+    /**
+     * Insert a movie into the movies search index.
+     */
+    public function insertMovie(array $parameters): void
+    {
+        $this->driver()->insertMovie($parameters);
+    }
+
+    /**
+     * Update a movie in the search index.
+     */
+    public function updateMovie(int $movieId): void
+    {
+        $this->driver()->updateMovie($movieId);
+    }
+
+    /**
+     * Delete a movie from the search index.
+     */
+    public function deleteMovie(int $id): void
+    {
+        $this->driver()->deleteMovie($id);
+    }
+
+    /**
+     * Bulk insert multiple movies into the index.
+     *
+     * @param  array  $movies  Array of movie data arrays
+     * @return array Results with 'success' and 'errors' counts
+     */
+    public function bulkInsertMovies(array $movies): array
+    {
+        return $this->driver()->bulkInsertMovies($movies);
+    }
+
+    /**
+     * Search the movies index.
+     */
+    public function searchMovies(array|string $searchTerm, int $limit = 1000): array
+    {
+        return $this->driver()->searchMovies($searchTerm, $limit);
+    }
+
+    /**
+     * Search movies by external ID (IMDB, TMDB, Trakt).
+     */
+    public function searchMovieByExternalId(string $field, int|string $value): ?array
+    {
+        return $this->driver()->searchMovieByExternalId($field, $value);
+    }
+
+    /**
+     * Insert a TV show into the tvshows search index.
+     */
+    public function insertTvShow(array $parameters): void
+    {
+        $this->driver()->insertTvShow($parameters);
+    }
+
+    /**
+     * Update a TV show in the search index.
+     */
+    public function updateTvShow(int $videoId): void
+    {
+        $this->driver()->updateTvShow($videoId);
+    }
+
+    /**
+     * Delete a TV show from the search index.
+     */
+    public function deleteTvShow(int $id): void
+    {
+        $this->driver()->deleteTvShow($id);
+    }
+
+    /**
+     * Bulk insert multiple TV shows into the index.
+     *
+     * @param  array  $tvShows  Array of TV show data arrays
+     * @return array Results with 'success' and 'errors' counts
+     */
+    public function bulkInsertTvShows(array $tvShows): array
+    {
+        return $this->driver()->bulkInsertTvShows($tvShows);
+    }
+
+    /**
+     * Search the TV shows index.
+     */
+    public function searchTvShows(array|string $searchTerm, int $limit = 1000): array
+    {
+        return $this->driver()->searchTvShows($searchTerm, $limit);
+    }
+
+    /**
+     * Search TV shows by external ID (TVDB, Trakt, TVMaze, TVRage, IMDB, TMDB).
+     */
+    public function searchTvShowByExternalId(string $field, int|string $value): ?array
+    {
+        return $this->driver()->searchTvShowByExternalId($field, $value);
+    }
+
+    /**
+     * Search releases by external media IDs.
+     * Used to find releases associated with a specific movie or TV show.
+     */
+    public function searchReleasesByExternalId(array $externalIds, int $limit = 1000): array
+    {
+        return $this->driver()->searchReleasesByExternalId($externalIds, $limit);
+    }
 }
+
 

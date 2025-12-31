@@ -40,6 +40,16 @@ interface SearchServiceInterface
     public function getPredbIndex(): string;
 
     /**
+     * Get the movies index name.
+     */
+    public function getMoviesIndex(): string;
+
+    /**
+     * Get the TV shows index name.
+     */
+    public function getTvShowsIndex(): string;
+
+    /**
      * Insert a release into the search index.
      *
      * @param  array  $parameters  Release data with 'id', 'name', 'searchname', 'fromname', 'categories_id', 'filename'
@@ -158,5 +168,111 @@ interface SearchServiceInterface
      * @param  int  $id  Predb ID
      */
     public function deletePreDb(int $id): void;
+
+    /**
+     * Insert a movie into the movies search index.
+     *
+     * @param  array  $parameters  Movie data with id, imdbid, tmdbid, traktid, title, year, genre, actors, director, rating
+     */
+    public function insertMovie(array $parameters): void;
+
+    /**
+     * Update a movie in the search index.
+     *
+     * @param  int  $movieId  Movie ID
+     */
+    public function updateMovie(int $movieId): void;
+
+    /**
+     * Delete a movie from the search index.
+     *
+     * @param  int  $id  Movie ID
+     */
+    public function deleteMovie(int $id): void;
+
+    /**
+     * Bulk insert multiple movies into the index.
+     *
+     * @param  array  $movies  Array of movie data arrays
+     * @return array Results with 'success' and 'errors' counts
+     */
+    public function bulkInsertMovies(array $movies): array;
+
+    /**
+     * Search the movies index.
+     *
+     * @param  array|string  $searchTerm  Search term(s)
+     * @param  int  $limit  Maximum number of results
+     * @return array Array with 'id' (movie IDs) and 'data' (movie data)
+     */
+    public function searchMovies(array|string $searchTerm, int $limit = 1000): array;
+
+    /**
+     * Search movies by external ID (IMDB, TMDB, Trakt).
+     *
+     * @param  string  $field  Field name (imdbid, tmdbid, traktid)
+     * @param  int|string  $value  The external ID value
+     * @return array|null Movie data or null if not found
+     */
+    public function searchMovieByExternalId(string $field, int|string $value): ?array;
+
+    /**
+     * Insert a TV show into the tvshows search index.
+     *
+     * @param  array  $parameters  TV show data with id, title, tvdb, trakt, tvmaze, tvrage, imdb, tmdb, started, type
+     */
+    public function insertTvShow(array $parameters): void;
+
+    /**
+     * Update a TV show in the search index.
+     *
+     * @param  int  $videoId  Video/TV show ID
+     */
+    public function updateTvShow(int $videoId): void;
+
+    /**
+     * Delete a TV show from the search index.
+     *
+     * @param  int  $id  TV show ID
+     */
+    public function deleteTvShow(int $id): void;
+
+    /**
+     * Bulk insert multiple TV shows into the index.
+     *
+     * @param  array  $tvShows  Array of TV show data arrays
+     * @return array Results with 'success' and 'errors' counts
+     */
+    public function bulkInsertTvShows(array $tvShows): array;
+
+    /**
+     * Search the TV shows index.
+     *
+     * @param  array|string  $searchTerm  Search term(s)
+     * @param  int  $limit  Maximum number of results
+     * @return array Array with 'id' (TV show IDs) and 'data' (TV show data)
+     */
+    public function searchTvShows(array|string $searchTerm, int $limit = 1000): array;
+
+    /**
+     * Search TV shows by external ID (TVDB, Trakt, TVMaze, TVRage, IMDB, TMDB).
+     *
+     * @param  string  $field  Field name (tvdb, trakt, tvmaze, tvrage, imdb, tmdb)
+     * @param  int|string  $value  The external ID value
+     * @return array|null TV show data or null if not found
+     */
+    public function searchTvShowByExternalId(string $field, int|string $value): ?array;
+
+    /**
+     * Search releases by external media IDs.
+     * Used to find releases associated with a specific movie or TV show.
+     *
+     * @param  array  $externalIds  Associative array of external IDs, e.g., ['imdbid' => 123456, 'tmdbid' => 789]
+     * @param  int  $limit  Maximum number of results
+     * @return array Array of release IDs
+     */
+    public function searchReleasesByExternalId(array $externalIds, int $limit = 1000): array;
 }
+
+
 

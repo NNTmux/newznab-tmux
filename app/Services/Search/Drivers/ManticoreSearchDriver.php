@@ -2,7 +2,9 @@
 
 namespace App\Services\Search\Drivers;
 
+use App\Models\MovieInfo;
 use App\Models\Release;
+use App\Models\Video;
 use App\Services\Search\Contracts\SearchDriverInterface;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -115,6 +117,22 @@ class ManticoreSearchDriver implements SearchDriverInterface
     }
 
     /**
+     * Get the movies index name.
+     */
+    public function getMoviesIndex(): string
+    {
+        return $this->config['indexes']['movies'] ?? 'movies_rt';
+    }
+
+    /**
+     * Get the TV shows index name.
+     */
+    public function getTvShowsIndex(): string
+    {
+        return $this->config['indexes']['tvshows'] ?? 'tvshows_rt';
+    }
+
+    /**
      * Insert release into ManticoreSearch releases_rt realtime index
      */
     public function insertRelease(array $parameters): void
@@ -130,8 +148,17 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 'name' => $parameters['name'] ?? '',
                 'searchname' => $parameters['searchname'] ?? '',
                 'fromname' => $parameters['fromname'] ?? '',
-                'categories_id' => (string) ($parameters['categories_id'] ?? ''),
+                'categories_id' => (int) ($parameters['categories_id'] ?? 0),
                 'filename' => $parameters['filename'] ?? '',
+                // External media IDs for efficient searching
+                'imdbid' => (int) ($parameters['imdbid'] ?? 0),
+                'tmdbid' => (int) ($parameters['tmdbid'] ?? 0),
+                'traktid' => (int) ($parameters['traktid'] ?? 0),
+                'tvdb' => (int) ($parameters['tvdb'] ?? 0),
+                'tvmaze' => (int) ($parameters['tvmaze'] ?? 0),
+                'tvrage' => (int) ($parameters['tvrage'] ?? 0),
+                'videos_id' => (int) ($parameters['videos_id'] ?? 0),
+                'movieinfo_id' => (int) ($parameters['movieinfo_id'] ?? 0),
             ];
 
             $this->manticoreSearch->table($this->config['indexes']['releases'])
@@ -263,8 +290,17 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 'name' => $release['name'] ?? '',
                 'searchname' => $release['searchname'] ?? '',
                 'fromname' => $release['fromname'] ?? '',
-                'categories_id' => (string) ($release['categories_id'] ?? ''),
+                'categories_id' => (int) ($release['categories_id'] ?? 0),
                 'filename' => $release['filename'] ?? '',
+                // External media IDs for efficient searching
+                'imdbid' => (int) ($release['imdbid'] ?? 0),
+                'tmdbid' => (int) ($release['tmdbid'] ?? 0),
+                'traktid' => (int) ($release['traktid'] ?? 0),
+                'tvdb' => (int) ($release['tvdb'] ?? 0),
+                'tvmaze' => (int) ($release['tvmaze'] ?? 0),
+                'tvrage' => (int) ($release['tvrage'] ?? 0),
+                'videos_id' => (int) ($release['videos_id'] ?? 0),
+                'movieinfo_id' => (int) ($release['movieinfo_id'] ?? 0),
             ];
         }
 
@@ -407,15 +443,25 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 $this->manticoreSearch->table($index)->truncate();
                 cli()->info('Truncating index '.$index.' finished.');
             } catch (ResponseException $e) {
-                if ($e->getMessage() === 'Invalid index') {
+                // Handle case where index doesn't exist - create it
+                $message = $e->getMessage();
+                if (str_contains($message, 'does not exist') || $message === 'Invalid index') {
+                    cli()->info('Index '.$index.' does not exist, creating it...');
                     $this->createIndexIfNotExists($index);
                 } else {
-                    cli()->error('Error truncating index '.$index.': '.$e->getMessage());
+                    cli()->error('Error truncating index '.$index.': '.$message);
                     $success = false;
                 }
             } catch (\Throwable $e) {
-                cli()->error('Unexpected error truncating index '.$index.': '.$e->getMessage());
-                $success = false;
+                // Also handle generic exceptions for non-existent tables
+                $message = $e->getMessage();
+                if (str_contains($message, 'does not exist')) {
+                    cli()->info('Index '.$index.' does not exist, creating it...');
+                    $this->createIndexIfNotExists($index);
+                } else {
+                    cli()->error('Unexpected error truncating index '.$index.': '.$message);
+                    $success = false;
+                }
             }
         }
 
@@ -442,20 +488,56 @@ class ManticoreSearchDriver implements SearchDriverInterface
         try {
             if ($index === 'releases_rt') {
                 $this->manticoreSearch->table($index)->create([
-                    'name' => ['type' => 'string'],
-                    'searchname' => ['type' => 'string'],
-                    'fromname' => ['type' => 'string'],
-                    'filename' => ['type' => 'string'],
+                    'name' => ['type' => 'text'],
+                    'searchname' => ['type' => 'text'],
+                    'fromname' => ['type' => 'text'],
+                    'filename' => ['type' => 'text'],
                     'categories_id' => ['type' => 'integer'],
+                    // External media IDs for efficient searching
+                    'imdbid' => ['type' => 'integer'],
+                    'tmdbid' => ['type' => 'integer'],
+                    'traktid' => ['type' => 'integer'],
+                    'tvdb' => ['type' => 'integer'],
+                    'tvmaze' => ['type' => 'integer'],
+                    'tvrage' => ['type' => 'integer'],
+                    'videos_id' => ['type' => 'integer'],
+                    'movieinfo_id' => ['type' => 'integer'],
                 ]);
-                cli()->info('Created releases_rt index');
+                cli()->info('Created releases_rt index with external ID fields');
             } elseif ($index === 'predb_rt') {
                 $this->manticoreSearch->table($index)->create([
-                    'title' => ['type' => 'string'],
-                    'filename' => ['type' => 'string'],
-                    'source' => ['type' => 'string'],
+                    'title' => ['type' => 'text'],
+                    'filename' => ['type' => 'text'],
+                    'source' => ['type' => 'text'],
                 ]);
                 cli()->info('Created predb_rt index');
+            } elseif ($index === 'movies_rt') {
+                $this->manticoreSearch->table($index)->create([
+                    'imdbid' => ['type' => 'integer'],
+                    'tmdbid' => ['type' => 'integer'],
+                    'traktid' => ['type' => 'integer'],
+                    'title' => ['type' => 'text'],
+                    'year' => ['type' => 'text'],
+                    'genre' => ['type' => 'text'],
+                    'actors' => ['type' => 'text'],
+                    'director' => ['type' => 'text'],
+                    'rating' => ['type' => 'text'],
+                    'plot' => ['type' => 'text'],
+                ]);
+                cli()->info('Created movies_rt index');
+            } elseif ($index === 'tvshows_rt') {
+                $this->manticoreSearch->table($index)->create([
+                    'title' => ['type' => 'text'],
+                    'tvdb' => ['type' => 'integer'],
+                    'trakt' => ['type' => 'integer'],
+                    'tvmaze' => ['type' => 'integer'],
+                    'tvrage' => ['type' => 'integer'],
+                    'imdb' => ['type' => 'integer'],
+                    'tmdb' => ['type' => 'integer'],
+                    'started' => ['type' => 'text'],
+                    'type' => ['type' => 'integer'],
+                ]);
+                cli()->info('Created tvshows_rt index');
             }
         } catch (\Throwable $e) {
             cli()->error('Error creating index '.$index.': '.$e->getMessage());
@@ -1206,5 +1288,459 @@ class ManticoreSearchDriver implements SearchDriverInterface
             return [];
         }
     }
+
+    /**
+     * Insert a movie into the movies search index.
+     *
+     * @param  array  $parameters  Movie data
+     */
+    public function insertMovie(array $parameters): void
+    {
+        if (empty($parameters['id'])) {
+            Log::warning('ManticoreSearch: Cannot insert movie without ID');
+
+            return;
+        }
+
+        try {
+            $document = [
+                'imdbid' => (int) ($parameters['imdbid'] ?? 0),
+                'tmdbid' => (int) ($parameters['tmdbid'] ?? 0),
+                'traktid' => (int) ($parameters['traktid'] ?? 0),
+                'title' => (string) ($parameters['title'] ?? ''),
+                'year' => (string) ($parameters['year'] ?? ''),
+                'genre' => (string) ($parameters['genre'] ?? ''),
+                'actors' => (string) ($parameters['actors'] ?? ''),
+                'director' => (string) ($parameters['director'] ?? ''),
+                'rating' => (string) ($parameters['rating'] ?? ''),
+                'plot' => (string) ($parameters['plot'] ?? ''),
+            ];
+
+            $this->manticoreSearch->table($this->getMoviesIndex())
+                ->replaceDocument($document, $parameters['id']);
+
+        } catch (ResponseException $e) {
+            Log::error('ManticoreSearch insertMovie ResponseException: '.$e->getMessage(), [
+                'movie_id' => $parameters['id'],
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch insertMovie unexpected error: '.$e->getMessage(), [
+                'movie_id' => $parameters['id'],
+            ]);
+        }
+    }
+
+    /**
+     * Update a movie in the search index.
+     *
+     * @param  int  $movieId  Movie ID
+     */
+    public function updateMovie(int $movieId): void
+    {
+        if (empty($movieId)) {
+            Log::warning('ManticoreSearch: Cannot update movie without ID');
+
+            return;
+        }
+
+        try {
+            $movie = MovieInfo::find($movieId);
+
+            if ($movie !== null) {
+                $this->insertMovie($movie->toArray());
+            } else {
+                Log::warning('ManticoreSearch: Movie not found for update', ['id' => $movieId]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch updateMovie error: '.$e->getMessage(), [
+                'movie_id' => $movieId,
+            ]);
+        }
+    }
+
+    /**
+     * Delete a movie from the search index.
+     *
+     * @param  int  $id  Movie ID
+     */
+    public function deleteMovie(int $id): void
+    {
+        if (empty($id)) {
+            Log::warning('ManticoreSearch: Cannot delete movie without ID');
+
+            return;
+        }
+
+        try {
+            $this->manticoreSearch->table($this->getMoviesIndex())
+                ->deleteDocument($id);
+        } catch (ResponseException $e) {
+            Log::error('ManticoreSearch deleteMovie error: '.$e->getMessage(), [
+                'id' => $id,
+            ]);
+        }
+    }
+
+    /**
+     * Bulk insert multiple movies into the index.
+     *
+     * @param  array  $movies  Array of movie data arrays
+     * @return array Results with 'success' and 'errors' counts
+     */
+    public function bulkInsertMovies(array $movies): array
+    {
+        if (empty($movies)) {
+            return ['success' => 0, 'errors' => 0];
+        }
+
+        $success = 0;
+        $errors = 0;
+
+        $documents = [];
+        foreach ($movies as $movie) {
+            if (empty($movie['id'])) {
+                $errors++;
+                continue;
+            }
+
+            $documents[] = [
+                'id' => $movie['id'],
+                'imdbid' => (int) ($movie['imdbid'] ?? 0),
+                'tmdbid' => (int) ($movie['tmdbid'] ?? 0),
+                'traktid' => (int) ($movie['traktid'] ?? 0),
+                'title' => (string) ($movie['title'] ?? ''),
+                'year' => (string) ($movie['year'] ?? ''),
+                'genre' => (string) ($movie['genre'] ?? ''),
+                'actors' => (string) ($movie['actors'] ?? ''),
+                'director' => (string) ($movie['director'] ?? ''),
+                'rating' => (string) ($movie['rating'] ?? ''),
+                'plot' => (string) ($movie['plot'] ?? ''),
+            ];
+        }
+
+        if (! empty($documents)) {
+            try {
+                $this->manticoreSearch->table($this->getMoviesIndex())
+                    ->replaceDocuments($documents);
+                $success = count($documents);
+            } catch (\Throwable $e) {
+                Log::error('ManticoreSearch bulkInsertMovies error: '.$e->getMessage());
+                $errors += count($documents);
+            }
+        }
+
+        return ['success' => $success, 'errors' => $errors];
+    }
+
+    /**
+     * Search the movies index.
+     *
+     * @param  array|string  $searchTerm  Search term(s)
+     * @param  int  $limit  Maximum number of results
+     * @return array Array with 'id' (movie IDs) and 'data' (movie data)
+     */
+    public function searchMovies(array|string $searchTerm, int $limit = 1000): array
+    {
+        $searchString = is_array($searchTerm) ? implode(' ', $searchTerm) : $searchTerm;
+
+        return $this->searchIndexes($this->getMoviesIndex(), $searchString, ['title', 'actors', 'director'], []);
+    }
+
+    /**
+     * Search movies by external ID (IMDB, TMDB, Trakt).
+     *
+     * @param  string  $field  Field name (imdbid, tmdbid, traktid)
+     * @param  int|string  $value  The external ID value
+     * @return array|null Movie data or null if not found
+     */
+    public function searchMovieByExternalId(string $field, int|string $value): ?array
+    {
+        if (empty($value) || ! in_array($field, ['imdbid', 'tmdbid', 'traktid'])) {
+            return null;
+        }
+
+        $cacheKey = 'manticore:movie:'.$field.':'.$value;
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        try {
+            $query = (new Search($this->manticoreSearch))
+                ->setTable($this->getMoviesIndex())
+                ->filter($field, '=', (int) $value)
+                ->limit(1);
+
+            $results = $query->get();
+
+            foreach ($results as $doc) {
+                $data = $doc->getData();
+                $data['id'] = $doc->getId();
+                Cache::put($cacheKey, $data, now()->addMinutes($this->config['cache_minutes'] ?? 5));
+
+                return $data;
+            }
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch searchMovieByExternalId error: '.$e->getMessage(), [
+                'field' => $field,
+                'value' => $value,
+            ]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Insert a TV show into the tvshows search index.
+     *
+     * @param  array  $parameters  TV show data
+     */
+    public function insertTvShow(array $parameters): void
+    {
+        if (empty($parameters['id'])) {
+            Log::warning('ManticoreSearch: Cannot insert TV show without ID');
+
+            return;
+        }
+
+        try {
+            $document = [
+                'title' => (string) ($parameters['title'] ?? ''),
+                'tvdb' => (int) ($parameters['tvdb'] ?? 0),
+                'trakt' => (int) ($parameters['trakt'] ?? 0),
+                'tvmaze' => (int) ($parameters['tvmaze'] ?? 0),
+                'tvrage' => (int) ($parameters['tvrage'] ?? 0),
+                'imdb' => (int) ($parameters['imdb'] ?? 0),
+                'tmdb' => (int) ($parameters['tmdb'] ?? 0),
+                'started' => (string) ($parameters['started'] ?? ''),
+                'type' => (int) ($parameters['type'] ?? 0),
+            ];
+
+            $this->manticoreSearch->table($this->getTvShowsIndex())
+                ->replaceDocument($document, $parameters['id']);
+
+        } catch (ResponseException $e) {
+            Log::error('ManticoreSearch insertTvShow ResponseException: '.$e->getMessage(), [
+                'tvshow_id' => $parameters['id'],
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch insertTvShow unexpected error: '.$e->getMessage(), [
+                'tvshow_id' => $parameters['id'],
+            ]);
+        }
+    }
+
+    /**
+     * Update a TV show in the search index.
+     *
+     * @param  int  $videoId  Video/TV show ID
+     */
+    public function updateTvShow(int $videoId): void
+    {
+        if (empty($videoId)) {
+            Log::warning('ManticoreSearch: Cannot update TV show without ID');
+
+            return;
+        }
+
+        try {
+            $video = Video::find($videoId);
+
+            if ($video !== null) {
+                $this->insertTvShow($video->toArray());
+            } else {
+                Log::warning('ManticoreSearch: TV show not found for update', ['id' => $videoId]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch updateTvShow error: '.$e->getMessage(), [
+                'tvshow_id' => $videoId,
+            ]);
+        }
+    }
+
+    /**
+     * Delete a TV show from the search index.
+     *
+     * @param  int  $id  TV show ID
+     */
+    public function deleteTvShow(int $id): void
+    {
+        if (empty($id)) {
+            Log::warning('ManticoreSearch: Cannot delete TV show without ID');
+
+            return;
+        }
+
+        try {
+            $this->manticoreSearch->table($this->getTvShowsIndex())
+                ->deleteDocument($id);
+        } catch (ResponseException $e) {
+            Log::error('ManticoreSearch deleteTvShow error: '.$e->getMessage(), [
+                'id' => $id,
+            ]);
+        }
+    }
+
+    /**
+     * Bulk insert multiple TV shows into the index.
+     *
+     * @param  array  $tvShows  Array of TV show data arrays
+     * @return array Results with 'success' and 'errors' counts
+     */
+    public function bulkInsertTvShows(array $tvShows): array
+    {
+        if (empty($tvShows)) {
+            return ['success' => 0, 'errors' => 0];
+        }
+
+        $success = 0;
+        $errors = 0;
+
+        $documents = [];
+        foreach ($tvShows as $tvShow) {
+            if (empty($tvShow['id'])) {
+                $errors++;
+                continue;
+            }
+
+            $documents[] = [
+                'id' => $tvShow['id'],
+                'title' => (string) ($tvShow['title'] ?? ''),
+                'tvdb' => (int) ($tvShow['tvdb'] ?? 0),
+                'trakt' => (int) ($tvShow['trakt'] ?? 0),
+                'tvmaze' => (int) ($tvShow['tvmaze'] ?? 0),
+                'tvrage' => (int) ($tvShow['tvrage'] ?? 0),
+                'imdb' => (int) ($tvShow['imdb'] ?? 0),
+                'tmdb' => (int) ($tvShow['tmdb'] ?? 0),
+                'started' => (string) ($tvShow['started'] ?? ''),
+                'type' => (int) ($tvShow['type'] ?? 0),
+            ];
+        }
+
+        if (! empty($documents)) {
+            try {
+                $this->manticoreSearch->table($this->getTvShowsIndex())
+                    ->replaceDocuments($documents);
+                $success = count($documents);
+            } catch (\Throwable $e) {
+                Log::error('ManticoreSearch bulkInsertTvShows error: '.$e->getMessage());
+                $errors += count($documents);
+            }
+        }
+
+        return ['success' => $success, 'errors' => $errors];
+    }
+
+    /**
+     * Search the TV shows index.
+     *
+     * @param  array|string  $searchTerm  Search term(s)
+     * @param  int  $limit  Maximum number of results
+     * @return array Array with 'id' (TV show IDs) and 'data' (TV show data)
+     */
+    public function searchTvShows(array|string $searchTerm, int $limit = 1000): array
+    {
+        $searchString = is_array($searchTerm) ? implode(' ', $searchTerm) : $searchTerm;
+
+        return $this->searchIndexes($this->getTvShowsIndex(), $searchString, ['title'], []);
+    }
+
+    /**
+     * Search TV shows by external ID (TVDB, Trakt, TVMaze, TVRage, IMDB, TMDB).
+     *
+     * @param  string  $field  Field name (tvdb, trakt, tvmaze, tvrage, imdb, tmdb)
+     * @param  int|string  $value  The external ID value
+     * @return array|null TV show data or null if not found
+     */
+    public function searchTvShowByExternalId(string $field, int|string $value): ?array
+    {
+        if (empty($value) || ! in_array($field, ['tvdb', 'trakt', 'tvmaze', 'tvrage', 'imdb', 'tmdb'])) {
+            return null;
+        }
+
+        $cacheKey = 'manticore:tvshow:'.$field.':'.$value;
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        try {
+            $query = (new Search($this->manticoreSearch))
+                ->setTable($this->getTvShowsIndex())
+                ->filter($field, '=', (int) $value)
+                ->limit(1);
+
+            $results = $query->get();
+
+            foreach ($results as $doc) {
+                $data = $doc->getData();
+                $data['id'] = $doc->getId();
+                Cache::put($cacheKey, $data, now()->addMinutes($this->config['cache_minutes'] ?? 5));
+
+                return $data;
+            }
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch searchTvShowByExternalId error: '.$e->getMessage(), [
+                'field' => $field,
+                'value' => $value,
+            ]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Search releases by external media IDs.
+     * Used to find releases associated with a specific movie or TV show.
+     *
+     * @param  array  $externalIds  Associative array of external IDs
+     * @param  int  $limit  Maximum number of results
+     * @return array Array of release IDs
+     */
+    public function searchReleasesByExternalId(array $externalIds, int $limit = 1000): array
+    {
+        if (empty($externalIds)) {
+            return [];
+        }
+
+        $cacheKey = 'manticore:releases:extid:'.md5(serialize($externalIds));
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        try {
+            $query = (new Search($this->manticoreSearch))
+                ->setTable($this->getReleasesIndex())
+                ->limit(min($limit, 10000));
+
+            // Add filters for each external ID provided
+            foreach ($externalIds as $field => $value) {
+                if (! empty($value) && in_array($field, ['imdbid', 'tmdbid', 'traktid', 'tvdb', 'tvmaze', 'tvrage'])) {
+                    $query->filter($field, '=', (int) $value);
+                }
+            }
+
+            $results = $query->get();
+
+            $resultIds = [];
+            foreach ($results as $doc) {
+                $resultIds[] = $doc->getId();
+            }
+
+            if (! empty($resultIds)) {
+                Cache::put($cacheKey, $resultIds, now()->addMinutes($this->config['cache_minutes'] ?? 5));
+            }
+
+            return $resultIds;
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch searchReleasesByExternalId error: '.$e->getMessage(), [
+                'externalIds' => $externalIds,
+            ]);
+        }
+
+        return [];
+    }
 }
+
 

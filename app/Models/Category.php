@@ -321,7 +321,7 @@ class Category extends Model
         }
 
         // If multiple categories were sent in a single array position, slice and add them
-        if (str_contains($cat[0], ',')) {
+        if (isset($cat[0]) && is_string($cat[0]) && str_contains($cat[0], ',')) {
             $tmpcats = explode(',', $cat[0]);
             // Reset the category to the first comma separated value in the string
             $cat[0] = $tmpcats[0];
@@ -332,11 +332,12 @@ class Category extends Model
         }
 
         foreach ($cat as $category) {
-            if (is_numeric($category) && $category !== -1 && self::isParent($category)) {
-                $children = RootCategory::find($category)->categories->pluck('id')->toArray();
+            $categoryInt = (int) $category;
+            if (is_numeric($category) && $categoryInt !== -1 && self::isParent($categoryInt)) {
+                $children = RootCategory::find($categoryInt)->categories->pluck('id')->toArray();
                 $categories = array_merge($categories, $children);
-            } elseif (is_numeric($category) && $category > 0) {
-                $categories[] = $category;
+            } elseif (is_numeric($category) && $categoryInt > 0) {
+                $categories[] = $categoryInt;
             }
         }
 

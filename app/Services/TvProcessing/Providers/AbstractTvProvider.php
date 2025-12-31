@@ -150,9 +150,13 @@ abstract class AbstractTvProvider extends BaseVideoProvider
 
     public function setVideoIdFound(int $videoId, int $releaseId, int $episodeId): void
     {
-        Release::query()
-            ->where('id', $releaseId)
-            ->update(['videos_id' => $videoId, 'tv_episodes_id' => $episodeId]);
+        // Use Eloquent model update to trigger the ReleaseObserver
+        $release = Release::find($releaseId);
+        if ($release) {
+            $release->videos_id = $videoId;
+            $release->tv_episodes_id = $episodeId;
+            $release->save();
+        }
 
         ReleaseBrowseService::bumpCacheVersion();
     }
@@ -194,8 +198,8 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         if ($videoId === false) {
             $title = Video::query()->where('title', $show['title'])->first(['title']);
             if ($title === null) {
-                // Insert the Show
-                $videoId = Video::query()->insertGetId([
+                // Insert the Show using Eloquent create() to trigger VideoObserver
+                $video = Video::create([
                     'type' => $show['type'],
                     'title' => $show['title'],
                     'countries_id' => $show['country'] ?? '',
@@ -208,6 +212,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
                     'imdb' => $show['imdb'],
                     'tmdb' => $show['tmdb'],
                 ]);
+                $videoId = $video->id;
                 // Insert the supplementary show info
                 TvInfo::query()->insertOrIgnore([
                     'videos_id' => $videoId,

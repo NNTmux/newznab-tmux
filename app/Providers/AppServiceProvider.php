@@ -2,9 +2,15 @@
 
 namespace App\Providers;
 
+use App\Models\MovieInfo;
+use App\Models\Release;
 use App\Models\RolePromotion;
 use App\Models\User;
+use App\Models\Video;
+use App\Observers\MovieInfoObserver;
+use App\Observers\ReleaseObserver;
 use App\Observers\RolePromotionObserver;
+use App\Observers\VideoObserver;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Event;
@@ -31,6 +37,9 @@ class AppServiceProvider extends ServiceProvider
 
         // Register observers
         RolePromotion::observe(RolePromotionObserver::class);
+        MovieInfo::observe(MovieInfoObserver::class);
+        Video::observe(VideoObserver::class);
+        Release::observe(ReleaseObserver::class);
     }
 
     /**

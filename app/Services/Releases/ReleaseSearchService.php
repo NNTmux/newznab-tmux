@@ -269,8 +269,45 @@ class ReleaseSearchService
         $videoJoinCondition = '';
         $episodeJoinCondition = '';
         $needsEpisodeJoin = false;
+        $needsDatabaseLookup = false;
 
+        // OPTIMIZATION: Try to find releases using search index external IDs first
+        $externalIds = [];
         if (! empty($siteIdArr)) {
+            foreach ($siteIdArr as $column => $id) {
+                if ($id > 0 && $column !== 'id') {
+                    // Map column names to search index field names
+                    $fieldName = match ($column) {
+                        'tvdb' => 'tvdb',
+                        'trakt' => 'traktid', // Note: in releases index we use traktid
+                        'tvmaze' => 'tvmaze',
+                        'tvrage' => 'tvrage',
+                        'imdb' => 'imdbid',
+                        'tmdb' => 'tmdbid',
+                        default => null,
+                    };
+                    if ($fieldName) {
+                        $externalIds[$fieldName] = (int) $id;
+                    }
+                }
+            }
+        }
+
+        // Try to get releases directly from search index using external IDs
+        $searchResult = [];
+        if (! empty($externalIds)) {
+            $searchResult = Search::searchReleasesByExternalId($externalIds, $limit * 2);
+
+            if (config('app.debug') && ! empty($searchResult)) {
+                Log::debug('tvSearch: Found releases via search index by external IDs', [
+                    'externalIds' => $externalIds,
+                    'count' => count($searchResult),
+                ]);
+            }
+        }
+
+        // If search index didn't return results, fall back to database lookup
+        if (empty($searchResult) && ! empty($siteIdArr)) {
             $siteConditions = [];
             foreach ($siteIdArr as $column => $id) {
                 if ($id > 0) {
@@ -279,6 +316,7 @@ class ReleaseSearchService
             }
 
             if (! empty($siteConditions)) {
+                $needsDatabaseLookup = true;
                 $siteUsesVideoIdOnly = count($siteConditions) === 1 && isset($siteIdArr['id']) && (int) $siteIdArr['id'] > 0;
 
                 $seriesFilter = ($series !== '') ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : '';
@@ -319,8 +357,14 @@ class ReleaseSearchService
             }
         }
 
-        $searchResult = [];
-        if (! empty($name)) {
+        // If search index found releases via external IDs, add them to conditions
+        $hasSearchResultFromExternalIds = ! empty($searchResult);
+        if ($hasSearchResultFromExternalIds) {
+            $conditions[] = sprintf('r.id IN (%s)', implode(',', array_map('intval', $searchResult)));
+        }
+
+        // Only do name-based search if we don't already have results from external IDs
+        if (! $hasSearchResultFromExternalIds && ! empty($name)) {
             $searchName = $name;
             $hasValidSiteIds = false;
             foreach ($siteIdArr as $column => $id) {
@@ -474,39 +518,74 @@ class ReleaseSearchService
      */
     public function apiTvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
-        $siteSQL = [];
-        $showSql = '';
+        // OPTIMIZATION: Try to find releases using search index external IDs first
+        $externalIds = [];
         foreach ($siteIdArr as $column => $Id) {
-            if ($Id > 0) {
-                $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
+            if ($Id > 0 && $column !== 'id') {
+                $fieldName = match ($column) {
+                    'tvdb' => 'tvdb',
+                    'trakt' => 'traktid',
+                    'tvmaze' => 'tvmaze',
+                    'tvrage' => 'tvrage',
+                    'imdb' => 'imdbid',
+                    'tmdb' => 'tmdbid',
+                    default => null,
+                };
+                if ($fieldName) {
+                    $externalIds[$fieldName] = (int) $Id;
+                }
             }
         }
 
-        if (\count($siteSQL) > 0) {
-            $showQry = sprintf(
-                "\n\t\t\t\tSELECT v.id AS video, GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes FROM videos v LEFT JOIN tv_episodes tve ON v.id = tve.videos_id WHERE (%s) %s %s %s GROUP BY v.id LIMIT 1",
-                implode(' OR ', $siteSQL),
-                ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
-                ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
-                ($airDate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : '')
-            );
-            $show = Release::fromQuery($showQry);
-            if ($show->isNotEmpty()) {
-                if ((! empty($episode) && ! empty($series)) && $show[0]->episodes !== '') {
-                    $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
-                } elseif (! empty($episode) && $show[0]->episodes !== '') {
-                    $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
-                } elseif (! empty($series) && empty($episode)) {
-                    $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
-                }
-                if ($show[0]->video > 0) {
-                    $showSql .= ' AND r.videos_id = '.$show[0]->video;
-                }
-            } else {
-                return [];
+        // Try to get releases directly from search index using external IDs
+        $indexSearchResult = [];
+        if (! empty($externalIds)) {
+            $indexSearchResult = Search::searchReleasesByExternalId($externalIds, $limit * 2);
+
+            if (config('app.debug') && ! empty($indexSearchResult)) {
+                Log::debug('apiTvSearch: Found releases via search index by external IDs', [
+                    'externalIds' => $externalIds,
+                    'count' => count($indexSearchResult),
+                ]);
             }
         }
-        if (! empty($name) && $showSql === '') {
+
+        // Fall back to database lookup if index search didn't return results
+        $siteSQL = [];
+        $showSql = '';
+        if (empty($indexSearchResult)) {
+            foreach ($siteIdArr as $column => $Id) {
+                if ($Id > 0) {
+                    $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
+                }
+            }
+
+            if (\count($siteSQL) > 0) {
+                $showQry = sprintf(
+                    "\n\t\t\t\tSELECT v.id AS video, GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes FROM videos v LEFT JOIN tv_episodes tve ON v.id = tve.videos_id WHERE (%s) %s %s %s GROUP BY v.id LIMIT 1",
+                    implode(' OR ', $siteSQL),
+                    ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
+                    ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
+                    ($airDate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : '')
+                );
+                $show = Release::fromQuery($showQry);
+                if ($show->isNotEmpty()) {
+                    if ((! empty($episode) && ! empty($series)) && $show[0]->episodes !== '') {
+                        $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
+                    } elseif (! empty($episode) && $show[0]->episodes !== '') {
+                        $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
+                    } elseif (! empty($series) && empty($episode)) {
+                        $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
+                    }
+                    if ($show[0]->video > 0) {
+                        $showSql .= ' AND r.videos_id = '.$show[0]->video;
+                    }
+                } else {
+                    return [];
+                }
+            }
+        }
+        if (! empty($name) && $showSql === '' && empty($indexSearchResult)) {
             if (! empty($series) && (int) $series < 1900) {
                 $name .= sprintf(' S%s', str_pad($series, 2, '0', STR_PAD_LEFT));
                 if (! empty($episode) && ! str_contains($episode, '/')) {
@@ -519,8 +598,8 @@ class ReleaseSearchService
                 $name .= sprintf(' %s', str_replace(['/', '-', '.', '_'], ' ', $airDate));
             }
         }
-        $searchResult = [];
-        if (! empty($name)) {
+        $searchResult = $indexSearchResult; // Use index search result if we have it
+        if (empty($searchResult) && ! empty($name)) {
             // Use the unified Search facade with fuzzy fallback
             $fuzzyResult = Search::searchReleasesWithFuzzy(['searchname' => $name], $limit);
             $searchResult = $fuzzyResult['ids'] ?? [];
@@ -652,7 +731,34 @@ class ReleaseSearchService
     {
         // Early return if searching by name yields no results
         $searchResult = [];
-        if (! empty($name)) {
+
+        // OPTIMIZATION: If we have external IDs, use the search index to find releases directly
+        // This avoids expensive database JOINs by using indexed external ID fields in releases_rt
+        $externalIds = [];
+        if ($imDbId !== -1 && $imDbId > 0) {
+            $externalIds['imdbid'] = $imDbId;
+        }
+        if ($tmDbId !== -1 && $tmDbId > 0) {
+            $externalIds['tmdbid'] = $tmDbId;
+        }
+        if ($traktId !== -1 && $traktId > 0) {
+            $externalIds['traktid'] = $traktId;
+        }
+
+        // Use search index for external ID lookups (much faster than database JOINs)
+        if (! empty($externalIds)) {
+            $searchResult = Search::searchReleasesByExternalId($externalIds, $limit * 2);
+
+            if (config('app.debug') && ! empty($searchResult)) {
+                Log::debug('moviesSearch: Found releases via search index by external IDs', [
+                    'externalIds' => $externalIds,
+                    'count' => count($searchResult),
+                ]);
+            }
+        }
+
+        // If no external IDs provided or index search failed, search by name
+        if (empty($searchResult) && ! empty($name)) {
             // Use the unified Search facade with fuzzy fallback
             $fuzzyResult = Search::searchReleasesWithFuzzy($name, $limit);
             $searchResult = $fuzzyResult['ids'] ?? [];
@@ -667,6 +773,11 @@ class ReleaseSearchService
             }
         }
 
+        // If we still have no results (no name and no external IDs found anything), return empty
+        if (empty($searchResult) && empty($externalIds)) {
+            return collect();
+        }
+
         $conditions = [
             sprintf('r.categories_id BETWEEN %d AND %d', Category::MOVIE_ROOT, Category::MOVIE_OTHER),
             sprintf('r.passwordstatus %s', $this->showPasswords()),
@@ -676,22 +787,20 @@ class ReleaseSearchService
             $conditions[] = sprintf('r.id IN (%s)', implode(',', array_map('intval', $searchResult)));
         }
 
-        // Optimize: Join on imdbid directly (both tables have indexed imdbid columns)
-        // This is more efficient than joining through movieinfo_id
-        // Always join movieinfo to get imdbid, tmdbid, and traktid fields consistently
-
-        if ($imDbId !== -1 && $imDbId) {
-            // Filter on r.imdbid (uses index ix_releases_imdbid)
-            // The join on m.imdbid = r.imdbid will also use the index
-            $conditions[] = sprintf('r.imdbid = %d', $imDbId);
-        }
-
-        if ($tmDbId !== -1 && $tmDbId) {
-            $conditions[] = sprintf('m.tmdbid = %d', $tmDbId);
-        }
-
-        if ($traktId !== -1 && $traktId) {
-            $conditions[] = sprintf('m.traktid = %d', $traktId);
+        // When we have external IDs but no index results, fall back to database query
+        // This handles the case where the index might be empty/out of sync
+        $needsMovieJoin = false;
+        if (empty($searchResult) && ! empty($externalIds)) {
+            $needsMovieJoin = true;
+            if ($imDbId !== -1 && $imDbId > 0) {
+                $conditions[] = sprintf('r.imdbid = %d', $imDbId);
+            }
+            if ($tmDbId !== -1 && $tmDbId > 0) {
+                $conditions[] = sprintf('m.tmdbid = %d', $tmDbId);
+            }
+            if ($traktId !== -1 && $traktId > 0) {
+                $conditions[] = sprintf('m.traktid = %d', $traktId);
+            }
         }
 
         if (! empty($excludedCategories)) {
@@ -711,10 +820,10 @@ class ReleaseSearchService
         }
 
         $whereSql = 'WHERE '.implode(' AND ', $conditions);
-        // Always join on imdbid directly (both tables have indexed imdbid) - more efficient than movieinfo_id
-        // Both ix_releases_imdbid and ix_movieinfo_imdbid are indexed, making this join very fast
-        // This ensures we always get imdbid, tmdbid, and traktid fields in results
-        $joinSql = 'INNER JOIN movieinfo m ON m.imdbid = r.imdbid';
+
+        // Only join movieinfo if we need to filter by tmdbid/traktid (database fallback)
+        // When using search index, we already have the release IDs and don't need the join
+        $joinSql = $needsMovieJoin ? 'INNER JOIN movieinfo m ON m.imdbid = r.imdbid' : 'LEFT JOIN movieinfo m ON m.id = r.movieinfo_id';
 
         // Select only fields required by XML/API transformers
         $baseSql = sprintf(
@@ -745,12 +854,10 @@ class ReleaseSearchService
         $releases = Release::fromQuery($sql);
 
         if ($releases->isNotEmpty()) {
-            // Optimize: Execute count query using same WHERE clause (uses same indexes)
-            // The count query is lightweight and can use index-only scans when possible
-            // Use same join logic as main query (join on imdbid when needed)
+            // Optimize: Execute count query using same WHERE clause
             $countSql = sprintf(
                 'SELECT COUNT(*) as count FROM releases r %s %s',
-                $joinSql,
+                $needsMovieJoin ? $joinSql : '',
                 $whereSql
             );
             $countResult = DB::selectOne($countSql);
@@ -1009,7 +1116,7 @@ class ReleaseSearchService
     private function buildSearchBaseSql(string $whereSql): string
     {
         return sprintf(
-            "SELECT r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size,
+            "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size,
                     r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate,
                     r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,
                     cp.title AS parent_category, c.title AS sub_category,

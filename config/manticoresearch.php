@@ -36,6 +36,8 @@ return [
     'indexes' => [
         'releases' => env('MANTICORESEARCH_INDEX_RELEASES', 'releases_rt'),
         'predb' => env('MANTICORESEARCH_INDEX_PREDB', 'predb_rt'),
+        'movies' => env('MANTICORESEARCH_INDEX_MOVIES', 'movies_rt'),
+        'tvshows' => env('MANTICORESEARCH_INDEX_TVSHOWS', 'tvshows_rt'),
     ],
 
     /*

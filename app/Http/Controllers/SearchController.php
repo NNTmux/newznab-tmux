@@ -69,9 +69,9 @@ class SearchController extends BasePageController
                     $searchString['searchname'] = '';
             }
 
-            $categoryID[] = -1;
+            $categoryID = [-1];
             if ($request->has('t')) {
-                $categoryID = explode(',', $request->input('t'));
+                $categoryID = array_map('intval', explode(',', $request->input('t')));
             }
 
             $orderByUrls = [];

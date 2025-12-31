@@ -169,9 +169,90 @@ class NntmuxResetDb extends Command
 
                 \Elasticsearch::indices()->create($predb_index);
 
+                // Delete and recreate movies index
+                if (\Elasticsearch::indices()->exists(['index' => 'movies'])) {
+                    \Elasticsearch::indices()->delete(['index' => 'movies']);
+                }
+                $movies_index = [
+                    'index' => 'movies',
+                    'body' => [
+                        'settings' => [
+                            'number_of_shards' => 2,
+                            'number_of_replicas' => 0,
+                        ],
+                        'mappings' => [
+                            'properties' => [
+                                'id' => [
+                                    'type' => 'long',
+                                    'index' => false,
+                                ],
+                                'imdbid' => ['type' => 'integer'],
+                                'tmdbid' => ['type' => 'integer'],
+                                'traktid' => ['type' => 'integer'],
+                                'title' => [
+                                    'type' => 'text',
+                                    'fields' => [
+                                        'sort' => [
+                                            'type' => 'keyword',
+                                        ],
+                                    ],
+                                ],
+                                'year' => ['type' => 'text'],
+                                'genre' => ['type' => 'text'],
+                                'actors' => ['type' => 'text'],
+                                'director' => ['type' => 'text'],
+                                'rating' => ['type' => 'text'],
+                                'plot' => ['type' => 'text'],
+                            ],
+                        ],
+                    ],
+                ];
+
+                \Elasticsearch::indices()->create($movies_index);
+
+                // Delete and recreate tvshows index
+                if (\Elasticsearch::indices()->exists(['index' => 'tvshows'])) {
+                    \Elasticsearch::indices()->delete(['index' => 'tvshows']);
+                }
+                $tvshows_index = [
+                    'index' => 'tvshows',
+                    'body' => [
+                        'settings' => [
+                            'number_of_shards' => 2,
+                            'number_of_replicas' => 0,
+                        ],
+                        'mappings' => [
+                            'properties' => [
+                                'id' => [
+                                    'type' => 'long',
+                                    'index' => false,
+                                ],
+                                'title' => [
+                                    'type' => 'text',
+                                    'fields' => [
+                                        'sort' => [
+                                            'type' => 'keyword',
+                                        ],
+                                    ],
+                                ],
+                                'tvdb' => ['type' => 'integer'],
+                                'trakt' => ['type' => 'integer'],
+                                'tvmaze' => ['type' => 'integer'],
+                                'tvrage' => ['type' => 'integer'],
+                                'imdb' => ['type' => 'integer'],
+                                'tmdb' => ['type' => 'integer'],
+                                'started' => ['type' => 'text'],
+                                'type' => ['type' => 'integer'],
+                            ],
+                        ],
+                    ],
+                ];
+
+                \Elasticsearch::indices()->create($tvshows_index);
+
                 $this->info('All done! ElasticSearch indexes are deleted and recreated.');
             } else {
-                Search::truncateIndex(['releases_rt', 'predb_rt']);
+                Search::truncateIndex(['releases_rt', 'predb_rt', 'movies_rt', 'tvshows_rt']);
             }
 
             $this->info('Deleting nzbfiles subfolders.');

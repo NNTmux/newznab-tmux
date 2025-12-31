@@ -2,7 +2,9 @@
 
 namespace App\Services\Search\Drivers;
 
+use App\Models\MovieInfo;
 use App\Models\Release;
+use App\Models\Video;
 use App\Services\Search\Contracts\SearchDriverInterface;
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
@@ -261,6 +263,22 @@ class ElasticSearchDriver implements SearchDriverInterface
     public function getPredbIndex(): string
     {
         return $this->config['indexes']['predb'] ?? 'predb';
+    }
+
+    /**
+     * Get the movies index name.
+     */
+    public function getMoviesIndex(): string
+    {
+        return $this->config['indexes']['movies'] ?? 'movies';
+    }
+
+    /**
+     * Get the TV shows index name.
+     */
+    public function getTvShowsIndex(): string
+    {
+        return $this->config['indexes']['tvshows'] ?? 'tvshows';
     }
 
     /**
@@ -1748,5 +1766,640 @@ class ElasticSearchDriver implements SearchDriverInterface
             Log::error('ElasticSearch bulk unexpected error: '.$e->getMessage());
         }
     }
+
+    /**
+     * Insert a movie into the movies search index.
+     *
+     * @param  array  $parameters  Movie data
+     */
+    public function insertMovie(array $parameters): void
+    {
+        if (empty($parameters['id'])) {
+            Log::warning('ElasticSearch: Cannot insert movie without ID');
+
+            return;
+        }
+
+        try {
+            $client = $this->getClient();
+
+            $document = [
+                'id' => $parameters['id'],
+                'imdbid' => (int) ($parameters['imdbid'] ?? 0),
+                'tmdbid' => (int) ($parameters['tmdbid'] ?? 0),
+                'traktid' => (int) ($parameters['traktid'] ?? 0),
+                'title' => (string) ($parameters['title'] ?? ''),
+                'year' => (string) ($parameters['year'] ?? ''),
+                'genre' => (string) ($parameters['genre'] ?? ''),
+                'actors' => (string) ($parameters['actors'] ?? ''),
+                'director' => (string) ($parameters['director'] ?? ''),
+                'rating' => (string) ($parameters['rating'] ?? ''),
+                'plot' => (string) ($parameters['plot'] ?? ''),
+            ];
+
+            $client->index([
+                'index' => $this->getMoviesIndex(),
+                'id' => $parameters['id'],
+                'body' => $document,
+            ]);
+
+        } catch (ElasticsearchException $e) {
+            Log::error('ElasticSearch insertMovie error: '.$e->getMessage(), [
+                'movie_id' => $parameters['id'],
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('ElasticSearch insertMovie unexpected error: '.$e->getMessage(), [
+                'movie_id' => $parameters['id'],
+            ]);
+        }
+    }
+
+    /**
+     * Update a movie in the search index.
+     *
+     * @param  int  $movieId  Movie ID
+     */
+    public function updateMovie(int $movieId): void
+    {
+        if (empty($movieId)) {
+            Log::warning('ElasticSearch: Cannot update movie without ID');
+
+            return;
+        }
+
+        try {
+            $movie = MovieInfo::find($movieId);
+
+            if ($movie !== null) {
+                $this->insertMovie($movie->toArray());
+            } else {
+                Log::warning('ElasticSearch: Movie not found for update', ['id' => $movieId]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('ElasticSearch updateMovie error: '.$e->getMessage(), [
+                'movie_id' => $movieId,
+            ]);
+        }
+    }
+
+    /**
+     * Delete a movie from the search index.
+     *
+     * @param  int  $id  Movie ID
+     */
+    public function deleteMovie(int $id): void
+    {
+        if (empty($id)) {
+            Log::warning('ElasticSearch: Cannot delete movie without ID');
+
+            return;
+        }
+
+        try {
+            $client = $this->getClient();
+            $client->delete([
+                'index' => $this->getMoviesIndex(),
+                'id' => $id,
+            ]);
+        } catch (Missing404Exception $e) {
+            // Document doesn't exist, that's fine
+        } catch (ElasticsearchException $e) {
+            Log::error('ElasticSearch deleteMovie error: '.$e->getMessage(), [
+                'id' => $id,
+            ]);
+        }
+    }
+
+    /**
+     * Bulk insert multiple movies into the index.
+     *
+     * @param  array  $movies  Array of movie data arrays
+     * @return array Results with 'success' and 'errors' counts
+     */
+    public function bulkInsertMovies(array $movies): array
+    {
+        if (empty($movies)) {
+            return ['success' => 0, 'errors' => 0];
+        }
+
+        $success = 0;
+        $errors = 0;
+
+        $params = ['body' => []];
+
+        foreach ($movies as $movie) {
+            if (empty($movie['id'])) {
+                $errors++;
+                continue;
+            }
+
+            $params['body'][] = [
+                'index' => [
+                    '_index' => $this->getMoviesIndex(),
+                    '_id' => $movie['id'],
+                ],
+            ];
+
+            $params['body'][] = [
+                'id' => $movie['id'],
+                'imdbid' => (int) ($movie['imdbid'] ?? 0),
+                'tmdbid' => (int) ($movie['tmdbid'] ?? 0),
+                'traktid' => (int) ($movie['traktid'] ?? 0),
+                'title' => (string) ($movie['title'] ?? ''),
+                'year' => (string) ($movie['year'] ?? ''),
+                'genre' => (string) ($movie['genre'] ?? ''),
+                'actors' => (string) ($movie['actors'] ?? ''),
+                'director' => (string) ($movie['director'] ?? ''),
+                'rating' => (string) ($movie['rating'] ?? ''),
+                'plot' => (string) ($movie['plot'] ?? ''),
+            ];
+
+            $success++;
+        }
+
+        if (! empty($params['body'])) {
+            try {
+                $this->executeBulk($params);
+            } catch (\Throwable $e) {
+                Log::error('ElasticSearch bulkInsertMovies error: '.$e->getMessage());
+                $errors += $success;
+                $success = 0;
+            }
+        }
+
+        return ['success' => $success, 'errors' => $errors];
+    }
+
+    /**
+     * Search the movies index.
+     *
+     * @param  array|string  $searchTerm  Search term(s)
+     * @param  int  $limit  Maximum number of results
+     * @return array Array with 'id' (movie IDs) and 'data' (movie data)
+     */
+    public function searchMovies(array|string $searchTerm, int $limit = 1000): array
+    {
+        $searchString = is_array($searchTerm) ? implode(' ', $searchTerm) : $searchTerm;
+        $escapedSearch = self::escapeString($searchString);
+
+        if (empty($escapedSearch)) {
+            return ['id' => [], 'data' => []];
+        }
+
+        $cacheKey = 'es:movies:'.md5($escapedSearch.$limit);
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        try {
+            $client = $this->getClient();
+
+            $searchParams = [
+                'index' => $this->getMoviesIndex(),
+                'body' => [
+                    'query' => [
+                        'multi_match' => [
+                            'query' => $escapedSearch,
+                            'fields' => ['title^3', 'actors', 'director', 'genre'],
+                            'type' => 'best_fields',
+                            'fuzziness' => 'AUTO',
+                        ],
+                    ],
+                    'size' => min($limit, self::MAX_RESULTS),
+                ],
+            ];
+
+            $response = $client->search($searchParams);
+
+            $resultIds = [];
+            $resultData = [];
+
+            if (isset($response['hits']['hits'])) {
+                foreach ($response['hits']['hits'] as $hit) {
+                    $resultIds[] = $hit['_id'];
+                    $resultData[] = $hit['_source'];
+                }
+            }
+
+            $result = ['id' => $resultIds, 'data' => $resultData];
+
+            Cache::put($cacheKey, $result, now()->addMinutes(self::CACHE_TTL_MINUTES));
+
+            return $result;
+
+        } catch (\Throwable $e) {
+            Log::error('ElasticSearch searchMovies error: '.$e->getMessage());
+
+            return ['id' => [], 'data' => []];
+        }
+    }
+
+    /**
+     * Search movies by external ID (IMDB, TMDB, Trakt).
+     *
+     * @param  string  $field  Field name (imdbid, tmdbid, traktid)
+     * @param  int|string  $value  The external ID value
+     * @return array|null Movie data or null if not found
+     */
+    public function searchMovieByExternalId(string $field, int|string $value): ?array
+    {
+        if (empty($value) || ! in_array($field, ['imdbid', 'tmdbid', 'traktid'])) {
+            return null;
+        }
+
+        $cacheKey = 'es:movie:'.$field.':'.$value;
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        try {
+            $client = $this->getClient();
+
+            $searchParams = [
+                'index' => $this->getMoviesIndex(),
+                'body' => [
+                    'query' => [
+                        'term' => [
+                            $field => (int) $value,
+                        ],
+                    ],
+                    'size' => 1,
+                ],
+            ];
+
+            $response = $client->search($searchParams);
+
+            if (isset($response['hits']['hits'][0])) {
+                $data = $response['hits']['hits'][0]['_source'];
+                $data['id'] = $response['hits']['hits'][0]['_id'];
+                Cache::put($cacheKey, $data, now()->addMinutes(self::CACHE_TTL_MINUTES));
+
+                return $data;
+            }
+
+        } catch (\Throwable $e) {
+            Log::error('ElasticSearch searchMovieByExternalId error: '.$e->getMessage(), [
+                'field' => $field,
+                'value' => $value,
+            ]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Insert a TV show into the tvshows search index.
+     *
+     * @param  array  $parameters  TV show data
+     */
+    public function insertTvShow(array $parameters): void
+    {
+        if (empty($parameters['id'])) {
+            Log::warning('ElasticSearch: Cannot insert TV show without ID');
+
+            return;
+        }
+
+        try {
+            $client = $this->getClient();
+
+            $document = [
+                'id' => $parameters['id'],
+                'title' => (string) ($parameters['title'] ?? ''),
+                'tvdb' => (int) ($parameters['tvdb'] ?? 0),
+                'trakt' => (int) ($parameters['trakt'] ?? 0),
+                'tvmaze' => (int) ($parameters['tvmaze'] ?? 0),
+                'tvrage' => (int) ($parameters['tvrage'] ?? 0),
+                'imdb' => (int) ($parameters['imdb'] ?? 0),
+                'tmdb' => (int) ($parameters['tmdb'] ?? 0),
+                'started' => (string) ($parameters['started'] ?? ''),
+                'type' => (int) ($parameters['type'] ?? 0),
+            ];
+
+            $client->index([
+                'index' => $this->getTvShowsIndex(),
+                'id' => $parameters['id'],
+                'body' => $document,
+            ]);
+
+        } catch (ElasticsearchException $e) {
+            Log::error('ElasticSearch insertTvShow error: '.$e->getMessage(), [
+                'tvshow_id' => $parameters['id'],
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('ElasticSearch insertTvShow unexpected error: '.$e->getMessage(), [
+                'tvshow_id' => $parameters['id'],
+            ]);
+        }
+    }
+
+    /**
+     * Update a TV show in the search index.
+     *
+     * @param  int  $videoId  Video/TV show ID
+     */
+    public function updateTvShow(int $videoId): void
+    {
+        if (empty($videoId)) {
+            Log::warning('ElasticSearch: Cannot update TV show without ID');
+
+            return;
+        }
+
+        try {
+            $video = Video::find($videoId);
+
+            if ($video !== null) {
+                $this->insertTvShow($video->toArray());
+            } else {
+                Log::warning('ElasticSearch: TV show not found for update', ['id' => $videoId]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('ElasticSearch updateTvShow error: '.$e->getMessage(), [
+                'tvshow_id' => $videoId,
+            ]);
+        }
+    }
+
+    /**
+     * Delete a TV show from the search index.
+     *
+     * @param  int  $id  TV show ID
+     */
+    public function deleteTvShow(int $id): void
+    {
+        if (empty($id)) {
+            Log::warning('ElasticSearch: Cannot delete TV show without ID');
+
+            return;
+        }
+
+        try {
+            $client = $this->getClient();
+            $client->delete([
+                'index' => $this->getTvShowsIndex(),
+                'id' => $id,
+            ]);
+        } catch (Missing404Exception $e) {
+            // Document doesn't exist, that's fine
+        } catch (ElasticsearchException $e) {
+            Log::error('ElasticSearch deleteTvShow error: '.$e->getMessage(), [
+                'id' => $id,
+            ]);
+        }
+    }
+
+    /**
+     * Bulk insert multiple TV shows into the index.
+     *
+     * @param  array  $tvShows  Array of TV show data arrays
+     * @return array Results with 'success' and 'errors' counts
+     */
+    public function bulkInsertTvShows(array $tvShows): array
+    {
+        if (empty($tvShows)) {
+            return ['success' => 0, 'errors' => 0];
+        }
+
+        $success = 0;
+        $errors = 0;
+
+        $params = ['body' => []];
+
+        foreach ($tvShows as $tvShow) {
+            if (empty($tvShow['id'])) {
+                $errors++;
+                continue;
+            }
+
+            $params['body'][] = [
+                'index' => [
+                    '_index' => $this->getTvShowsIndex(),
+                    '_id' => $tvShow['id'],
+                ],
+            ];
+
+            $params['body'][] = [
+                'id' => $tvShow['id'],
+                'title' => (string) ($tvShow['title'] ?? ''),
+                'tvdb' => (int) ($tvShow['tvdb'] ?? 0),
+                'trakt' => (int) ($tvShow['trakt'] ?? 0),
+                'tvmaze' => (int) ($tvShow['tvmaze'] ?? 0),
+                'tvrage' => (int) ($tvShow['tvrage'] ?? 0),
+                'imdb' => (int) ($tvShow['imdb'] ?? 0),
+                'tmdb' => (int) ($tvShow['tmdb'] ?? 0),
+                'started' => (string) ($tvShow['started'] ?? ''),
+                'type' => (int) ($tvShow['type'] ?? 0),
+            ];
+
+            $success++;
+        }
+
+        if (! empty($params['body'])) {
+            try {
+                $this->executeBulk($params);
+            } catch (\Throwable $e) {
+                Log::error('ElasticSearch bulkInsertTvShows error: '.$e->getMessage());
+                $errors += $success;
+                $success = 0;
+            }
+        }
+
+        return ['success' => $success, 'errors' => $errors];
+    }
+
+    /**
+     * Search the TV shows index.
+     *
+     * @param  array|string  $searchTerm  Search term(s)
+     * @param  int  $limit  Maximum number of results
+     * @return array Array with 'id' (TV show IDs) and 'data' (TV show data)
+     */
+    public function searchTvShows(array|string $searchTerm, int $limit = 1000): array
+    {
+        $searchString = is_array($searchTerm) ? implode(' ', $searchTerm) : $searchTerm;
+        $escapedSearch = self::escapeString($searchString);
+
+        if (empty($escapedSearch)) {
+            return ['id' => [], 'data' => []];
+        }
+
+        $cacheKey = 'es:tvshows:'.md5($escapedSearch.$limit);
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        try {
+            $client = $this->getClient();
+
+            $searchParams = [
+                'index' => $this->getTvShowsIndex(),
+                'body' => [
+                    'query' => [
+                        'match' => [
+                            'title' => [
+                                'query' => $escapedSearch,
+                                'fuzziness' => 'AUTO',
+                            ],
+                        ],
+                    ],
+                    'size' => min($limit, self::MAX_RESULTS),
+                ],
+            ];
+
+            $response = $client->search($searchParams);
+
+            $resultIds = [];
+            $resultData = [];
+
+            if (isset($response['hits']['hits'])) {
+                foreach ($response['hits']['hits'] as $hit) {
+                    $resultIds[] = $hit['_id'];
+                    $resultData[] = $hit['_source'];
+                }
+            }
+
+            $result = ['id' => $resultIds, 'data' => $resultData];
+
+            Cache::put($cacheKey, $result, now()->addMinutes(self::CACHE_TTL_MINUTES));
+
+            return $result;
+
+        } catch (\Throwable $e) {
+            Log::error('ElasticSearch searchTvShows error: '.$e->getMessage());
+
+            return ['id' => [], 'data' => []];
+        }
+    }
+
+    /**
+     * Search TV shows by external ID (TVDB, Trakt, TVMaze, TVRage, IMDB, TMDB).
+     *
+     * @param  string  $field  Field name (tvdb, trakt, tvmaze, tvrage, imdb, tmdb)
+     * @param  int|string  $value  The external ID value
+     * @return array|null TV show data or null if not found
+     */
+    public function searchTvShowByExternalId(string $field, int|string $value): ?array
+    {
+        if (empty($value) || ! in_array($field, ['tvdb', 'trakt', 'tvmaze', 'tvrage', 'imdb', 'tmdb'])) {
+            return null;
+        }
+
+        $cacheKey = 'es:tvshow:'.$field.':'.$value;
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        try {
+            $client = $this->getClient();
+
+            $searchParams = [
+                'index' => $this->getTvShowsIndex(),
+                'body' => [
+                    'query' => [
+                        'term' => [
+                            $field => (int) $value,
+                        ],
+                    ],
+                    'size' => 1,
+                ],
+            ];
+
+            $response = $client->search($searchParams);
+
+            if (isset($response['hits']['hits'][0])) {
+                $data = $response['hits']['hits'][0]['_source'];
+                $data['id'] = $response['hits']['hits'][0]['_id'];
+                Cache::put($cacheKey, $data, now()->addMinutes(self::CACHE_TTL_MINUTES));
+
+                return $data;
+            }
+
+        } catch (\Throwable $e) {
+            Log::error('ElasticSearch searchTvShowByExternalId error: '.$e->getMessage(), [
+                'field' => $field,
+                'value' => $value,
+            ]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Search releases by external media IDs.
+     * Used to find releases associated with a specific movie or TV show.
+     *
+     * @param  array  $externalIds  Associative array of external IDs
+     * @param  int  $limit  Maximum number of results
+     * @return array Array of release IDs
+     */
+    public function searchReleasesByExternalId(array $externalIds, int $limit = 1000): array
+    {
+        if (empty($externalIds)) {
+            return [];
+        }
+
+        $cacheKey = 'es:releases:extid:'.md5(serialize($externalIds));
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        try {
+            $client = $this->getClient();
+
+            $shouldClauses = [];
+            foreach ($externalIds as $field => $value) {
+                if (! empty($value) && in_array($field, ['imdbid', 'tmdbid', 'traktid', 'tvdb', 'tvmaze', 'tvrage'])) {
+                    $shouldClauses[] = ['term' => [$field => (int) $value]];
+                }
+            }
+
+            if (empty($shouldClauses)) {
+                return [];
+            }
+
+            $searchParams = [
+                'index' => $this->getReleasesIndex(),
+                'body' => [
+                    'query' => [
+                        'bool' => [
+                            'should' => $shouldClauses,
+                            'minimum_should_match' => 1,
+                        ],
+                    ],
+                    'size' => min($limit, self::MAX_RESULTS),
+                    '_source' => false,
+                ],
+            ];
+
+            $response = $client->search($searchParams);
+
+            $resultIds = [];
+            if (isset($response['hits']['hits'])) {
+                foreach ($response['hits']['hits'] as $hit) {
+                    $resultIds[] = $hit['_id'];
+                }
+            }
+
+            if (! empty($resultIds)) {
+                Cache::put($cacheKey, $resultIds, now()->addMinutes(self::CACHE_TTL_MINUTES));
+            }
+
+            return $resultIds;
+
+        } catch (\Throwable $e) {
+            Log::error('ElasticSearch searchReleasesByExternalId error: '.$e->getMessage(), [
+                'externalIds' => $externalIds,
+            ]);
+        }
+
+        return [];
+    }
 }
+
 
