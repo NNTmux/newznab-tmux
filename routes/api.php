@@ -21,25 +21,18 @@ Route::prefix('v1')->group(function () {
 
 Route::prefix('v2')->group(function () {
     Route::get('capabilities', [ApiV2Controller::class, 'capabilities']);
-    Route::post('capabilities', [ApiV2Controller::class, 'capabilities']);
 });
 
 Route::prefix('v2')->middleware('auth:api', 'throttle:rate_limit,1')->group(function () {
     Route::get('movies', [ApiV2Controller::class, 'movie']);
-    Route::post('movies', [ApiV2Controller::class, 'movie']);
     Route::get('search', [ApiV2Controller::class, 'apiSearch']);
-    Route::post('search', [ApiV2Controller::class, 'apiSearch']);
     Route::get('tv', [ApiV2Controller::class, 'tv']);
-    Route::post('tv', [ApiV2Controller::class, 'tv']);
     Route::get('getnzb', [ApiV2Controller::class, 'getNzb']);
-    Route::post('getnzb', [ApiV2Controller::class, 'getNzb']);
     Route::get('details', [ApiV2Controller::class, 'details']);
-    Route::post('details', [ApiV2Controller::class, 'details']);
 });
 
 Route::prefix('inform')->middleware('auth:api')->group(function () {
     Route::get('release', [ApiInformController::class, 'release']);
-    Route::post('release', [ApiInformController::class, 'release']);
 });
 
 // Mediainfo endpoint (no auth required for internal use)
