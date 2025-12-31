@@ -19,6 +19,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ApiV2Controller extends BasePageController
@@ -78,58 +79,84 @@ class ApiV2Controller extends BasePageController
             return response()->json(['error' => 'Missing parameter (apikey)'], 403);
         }
 
-        $user = User::query()
-            ->where('api_token', $request->input('api_token'))
-            ->with('role') // Eager load role to avoid N+1
-            ->first();
+        $apiToken = $request->input('api_token');
+
+        // Cache user lookup for 5 minutes to reduce DB hits
+        $userCacheKey = 'api_user:'.md5($apiToken);
+        $user = Cache::remember($userCacheKey, 300, function () use ($apiToken) {
+            return User::query()
+                ->where('api_token', $apiToken)
+                ->with('role')
+                ->first();
+        });
 
         if (! $user) {
             return response()->json(['error' => 'Invalid API key'], 403);
         }
 
-        // Process request asynchronously where possible
-        UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
+        // Queue API request logging asynchronously (non-blocking)
+        UserRequest::addApiRequest($apiToken, $request->getRequestUri());
         event(new UserAccessedApi($user));
 
         // Get request parameters efficiently
-        $params = [
-            'imdbId' => $request->input('imdbid', -1),
-            'tmdbId' => $request->input('tmdbid', -1),
-            'traktId' => $request->input('traktid', -1),
-            'minSize' => max(0, (int) $request->input('minsize', 0)),
-            'searchName' => $request->input('id', ''),
-        ];
+        $imdbId = (int) $request->input('imdbid', -1);
+        $tmdbId = (int) $request->input('tmdbid', -1);
+        $traktId = (int) $request->input('traktid', -1);
+        $minSize = max(0, (int) $request->input('minsize', 0));
+        $searchName = $request->input('id', '');
+        $offset = $this->api->offset($request);
+        $limit = $this->api->limit($request);
+        $categoryID = $this->api->categoryID($request);
+        $maxAge = $this->api->maxAge($request);
+        $catExclusions = User::getCategoryExclusionForApi($request);
 
-        // Perform search
-        $relData = $this->releaseSearchService->moviesSearch(
-            $params['imdbId'],
-            $params['tmdbId'],
-            $params['traktId'],
-            $this->api->offset($request),
-            $this->api->limit($request),
-            $params['searchName'],
-            $this->api->categoryID($request),
-            $this->api->maxAge($request),
-            $params['minSize'],
-            User::getCategoryExclusionForApi($request)
-        );
+        // Create cache key for movie search results
+        $searchCacheKey = 'api_movie_search:'.md5(serialize([
+            $imdbId, $tmdbId, $traktId, $offset, $limit, $searchName,
+            $categoryID, $maxAge, $minSize, $catExclusions
+        ]));
 
-        // Get both timestamps in a single query
-        $timestamps = DB::selectOne('
-            SELECT
-                (SELECT MIN(timestamp) FROM user_requests WHERE users_id = ?) as api_time,
-                (SELECT MIN(timestamp) FROM user_downloads WHERE users_id = ?) as grab_time
-        ', [$user->id, $user->id]);
+        // Cache search results for 10 minutes
+        $relData = Cache::remember($searchCacheKey, 600, function () use (
+            $imdbId, $tmdbId, $traktId, $offset, $limit, $searchName,
+            $categoryID, $maxAge, $minSize, $catExclusions
+        ) {
+            return $this->releaseSearchService->moviesSearch(
+                $imdbId,
+                $tmdbId,
+                $traktId,
+                $offset,
+                $limit,
+                $searchName,
+                $categoryID,
+                $maxAge,
+                $minSize,
+                $catExclusions
+            );
+        });
+
+        // Get user stats with a single optimized raw SQL query
+        $userStatsCacheKey = 'api_user_stats:'.$user->id;
+        $userStats = Cache::remember($userStatsCacheKey, 60, function () use ($user) {
+            $oneDayAgo = now()->subDay()->toDateTimeString();
+            return DB::selectOne('
+                SELECT
+                    (SELECT COUNT(*) FROM user_requests WHERE users_id = ? AND timestamp > ?) as api_count,
+                    (SELECT COUNT(*) FROM user_downloads WHERE users_id = ? AND timestamp > ?) as grab_count,
+                    (SELECT MIN(timestamp) FROM user_requests WHERE users_id = ? AND timestamp > ?) as api_time,
+                    (SELECT MIN(timestamp) FROM user_downloads WHERE users_id = ? AND timestamp > ?) as grab_time
+            ', [$user->id, $oneDayAgo, $user->id, $oneDayAgo, $user->id, $oneDayAgo, $user->id, $oneDayAgo]);
+        });
 
         // Build response
         $response = [
             'Total' => $relData[0]->_totalrows ?? 0,
-            'apiCurrent' => UserRequest::getApiRequests($user->id),
+            'apiCurrent' => (int) ($userStats->api_count ?? 0),
             'apiMax' => $user->role->apirequests,
-            'grabCurrent' => UserDownload::getDownloadRequests($user->id),
+            'grabCurrent' => (int) ($userStats->grab_count ?? 0),
             'grabMax' => $user->role->downloadrequests,
-            'apiOldestTime' => $timestamps->api_time ? Carbon::parse($timestamps->api_time)->toRfc2822String() : '',
-            'grabOldestTime' => $timestamps->grab_time ? Carbon::parse($timestamps->grab_time)->toRfc2822String() : '',
+            'apiOldestTime' => $userStats->api_time ? Carbon::parse($userStats->api_time)->toRfc2822String() : '',
+            'grabOldestTime' => $userStats->grab_time ? Carbon::parse($userStats->grab_time)->toRfc2822String() : '',
             'Results' => fractal($relData, new ApiTransformer($user)),
         ];
 
