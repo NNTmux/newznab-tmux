@@ -233,25 +233,34 @@ class TmuxLayoutBuilder
         }
 
         // redis monitoring
-        if ((int) Settings::settingValue('redis') === 1 && $this->commandExists('redis-cli')) {
-            $redisHost = config('database.redis.default.host', '127.0.0.1');
-            $redisPort = config('database.redis.default.port', 6379);
+        if ((int) Settings::settingValue('redis') === 1) {
             $redisArgs = Settings::settingValue('redis_args') ?? '';
-            $refreshInterval = 2;
+            $refreshInterval = 30;
 
             $this->paneManager->createWindow($windowIndex, 'redis');
 
             // Check if custom args provided for simple redis-cli output
-            if (! empty($redisArgs) && $redisArgs !== 'NULL') {
+            if (! empty($redisArgs) && $redisArgs !== 'NULL' && $this->commandExists('redis-cli')) {
+                $redisHost = config('database.redis.default.host', '127.0.0.1');
+                $redisPort = config('database.redis.default.port', 6379);
                 $this->paneManager->respawnPane("{$windowIndex}.0", "watch -n{$refreshInterval} -c 'redis-cli -h {$redisHost} -p {$redisPort} {$redisArgs}'");
             } else {
-                // Use modern visual monitoring script
-                $monitorScript = base_path('misc/redis-monitor.sh');
-                if (file_exists($monitorScript)) {
-                    $this->paneManager->respawnPane("{$windowIndex}.0", "bash {$monitorScript} {$redisHost} {$redisPort} {$refreshInterval}");
+                // Use PHP-based Redis monitor service
+                $redisHost = config('database.redis.default.host', '127.0.0.1');
+                $redisPort = config('database.redis.default.port', 6379);
+                $artisan = base_path('artisan');
+
+                // Determine how to connect to Redis
+                $connectionInfo = $this->resolveRedisConnection($redisHost, (int) $redisPort);
+
+                if ($connectionInfo['use_sail']) {
+                    // Use sail to run inside Docker container
+                    $sail = base_path('sail');
+                    $this->paneManager->respawnPane("{$windowIndex}.0", "{$sail} artisan redis:monitor --refresh={$refreshInterval}");
                 } else {
-                    // Fallback to basic redis-cli info with color
-                    $this->paneManager->respawnPane("{$windowIndex}.0", "watch -n{$refreshInterval} -c 'redis-cli -h {$redisHost} -p {$redisPort} info'");
+                    // Run directly, potentially with host override
+                    $envPrefix = $connectionInfo['override_host'] ? "REDIS_HOST={$connectionInfo['host']} " : '';
+                    $this->paneManager->respawnPane("{$windowIndex}.0", "{$envPrefix}php {$artisan} redis:monitor --refresh={$refreshInterval}");
                 }
             }
             $windowIndex++;
@@ -273,5 +282,40 @@ class TmuxLayoutBuilder
             ->run("which {$command} 2>/dev/null");
 
         return $result->successful() && str_contains($result->output(), $command);
+    }
+
+    /**
+     * Resolve how to connect to Redis from the host
+     *
+     * Returns an array with:
+     * - 'use_sail' => bool - whether to use sail to run inside Docker
+     * - 'override_host' => bool - whether to override REDIS_HOST env var
+     * - 'host' => string - the host to use (only relevant if override_host is true)
+     */
+    protected function resolveRedisConnection(string $host, int $port): array
+    {
+        // If host is already an IP or localhost, use it directly
+        if (filter_var($host, FILTER_VALIDATE_IP) || $host === 'localhost') {
+            return ['use_sail' => false, 'override_host' => false, 'host' => $host];
+        }
+
+        // Try to resolve the hostname
+        $resolved = gethostbyname($host);
+        if ($resolved !== $host) {
+            // Hostname resolves - use it directly
+            return ['use_sail' => false, 'override_host' => false, 'host' => $host];
+        }
+
+        // Hostname doesn't resolve (Docker internal hostname)
+        // Check if Redis is accessible on 127.0.0.1 (Docker port forwarding)
+        $socket = @fsockopen('127.0.0.1', $port, $errno, $errstr, 1);
+        if ($socket !== false) {
+            fclose($socket);
+            // Redis accessible on localhost - override host to 127.0.0.1
+            return ['use_sail' => false, 'override_host' => true, 'host' => '127.0.0.1'];
+        }
+
+        // Redis not accessible on localhost - need to use sail
+        return ['use_sail' => true, 'override_host' => false, 'host' => $host];
     }
 }
