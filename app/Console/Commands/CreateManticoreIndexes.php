@@ -48,7 +48,7 @@ class CreateManticoreIndexes extends Command
         // We'll skip checking for data_dir this way since it may not be accessible via API
         // but instead provide better error handling during index creation
 
-        // If you encounter data_dir errors, ensure it's properly set in manticore.conf:
+        // If you encounter data_dir errors, ensure it's properly set in config/manticore.conf:
         // data_dir = /path/to/data
         // And make sure the path exists and has proper permissions
 

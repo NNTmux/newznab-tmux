@@ -101,7 +101,7 @@ services:
                 hard: -1
         volumes:
             - 'sail-manticore:/var/lib/manticore'
-            - ./misc/manticoresearch/manticore.conf:/etc/manticoresearch/manticore.conf # uncomment if you use a custom config
+            - ./config/manticore.conf:/etc/manticoresearch/manticore.conf
         networks:
             - sail
     elasticsearch:

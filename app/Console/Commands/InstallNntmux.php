@@ -72,6 +72,8 @@ class InstallNntmux extends Command
             $this->info('Paths checked successfully');
         }
 
+        $this->setupManticoreConfig();
+
         if ($this->addAdminUser()) {
             File::put(base_path().'/_install/install.lock', 'application install locked on '.now());
             $this->info('Generating application key');
@@ -96,6 +98,31 @@ class InstallNntmux extends Command
         $nzb_path = config('nntmux_settings.path_to_nzbs');
         $zip_path = config('nntmux_settings.tmp_unzip_path');
         $unrar_path = config('nntmux.tmp_unrar_path');
+
+        // Validate that all required paths are configured
+        if (empty($nzb_path)) {
+            $this->warn('NZB path (nntmux_settings.path_to_nzbs) is not configured. Please check your .env or config files.');
+
+            return false;
+        }
+
+        if (empty($unrar_path)) {
+            $this->warn('Unrar path (nntmux.tmp_unrar_path) is not configured. Please check your .env or config files.');
+
+            return false;
+        }
+
+        if (empty($covers_path)) {
+            $this->warn('Covers path (nntmux_settings.covers_path) is not configured. Please check your .env or config files.');
+
+            return false;
+        }
+
+        if (empty($zip_path)) {
+            $this->warn('Unzip path (nntmux_settings.tmp_unzip_path) is not configured. Please check your .env or config files.');
+
+            return false;
+        }
 
         if (! File::isWritable($nzb_path)) {
             $this->warn($nzb_path.' is not writable. Please fix folder permissions');
@@ -151,5 +178,72 @@ class InstallNntmux extends Command
         }
 
         return true;
+    }
+
+    /**
+     * Setup Manticore configuration by creating a symlink from the system config location
+     * to the project's config file (for native installations, not Docker).
+     */
+    private function setupManticoreConfig(): void
+    {
+        $sourceConfig = base_path('config/manticore.conf');
+        $targetConfig = '/etc/manticoresearch/manticore.conf';
+
+        // Skip if running in Docker (config is mounted via docker-compose)
+        if (app()->runningInConsole() && getenv('LARAVEL_SAIL')) {
+            return;
+        }
+
+        if (! File::exists($sourceConfig)) {
+            return;
+        }
+
+        // Check if target directory exists
+        if (! File::isDirectory('/etc/manticoresearch')) {
+            $this->warn('Manticore config directory /etc/manticoresearch does not exist. Is Manticore installed?');
+
+            return;
+        }
+
+        // Check if symlink or file already exists
+        if (File::exists($targetConfig) || is_link($targetConfig)) {
+            if (is_link($targetConfig) && readlink($targetConfig) === $sourceConfig) {
+                $this->info('Manticore config symlink already exists and points to correct location.');
+
+                return;
+            }
+
+            $this->warn("Manticore config already exists at {$targetConfig}.");
+            $this->warn("To use the project's config, manually run: sudo ln -sf {$sourceConfig} {$targetConfig}");
+
+            return;
+        }
+
+        // Check if we can write to the target directory without sudo
+        $needsSudo = ! is_writable('/etc/manticoresearch');
+
+        if ($needsSudo) {
+            $this->info('Creating symlink for Manticore configuration requires sudo privileges.');
+
+            if (! $this->confirm('Do you want to create the symlink now? You will be prompted for your password.')) {
+                $this->warn("Skipping symlink creation. To create it manually, run: sudo ln -s {$sourceConfig} {$targetConfig}");
+
+                return;
+            }
+
+            // Use TTY mode to allow interactive sudo password prompt
+            $result = Process::forever()->tty()->run("sudo ln -s {$sourceConfig} {$targetConfig}");
+        } else {
+            $this->info('Creating symlink for Manticore configuration...');
+            $result = Process::run("ln -s {$sourceConfig} {$targetConfig}");
+        }
+
+        if ($result->successful()) {
+            $this->info("Manticore config symlink created: {$targetConfig} -> {$sourceConfig}");
+        } else {
+            $this->warn('Could not create Manticore config symlink.');
+            $this->warn($result->errorOutput());
+            $this->warn("Please run manually: sudo ln -s {$sourceConfig} {$targetConfig}");
+        }
     }
 }

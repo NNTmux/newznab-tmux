@@ -132,7 +132,7 @@ services:
           hard: -1
       volumes:
         - 'manticore:/var/lib/manticore'
-#        - ./misc/manticoresearch/manticore.conf:/etc/manticoresearch/manticore.conf
+        - ./config/manticore.conf:/etc/manticoresearch/manticore.conf
       networks:
         - nntmux
     mailpit:
