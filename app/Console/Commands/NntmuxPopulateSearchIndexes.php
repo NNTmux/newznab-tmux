@@ -170,11 +170,10 @@ class NntmuxPopulateSearchIndexes extends Command
             return Command::SUCCESS;
         }
 
+        // Optimized query: avoid GROUP_CONCAT and complex joins for faster population
+        // External media IDs can be populated separately if needed
         $query = Release::query()
             ->orderByDesc('releases.id')
-            ->leftJoin('release_files', 'releases.id', '=', 'release_files.releases_id')
-            ->leftJoin('movieinfo', 'releases.movieinfo_id', '=', 'movieinfo.id')
-            ->leftJoin('videos', 'releases.videos_id', '=', 'videos.id')
             ->select([
                 'releases.id',
                 'releases.name',
@@ -183,36 +182,7 @@ class NntmuxPopulateSearchIndexes extends Command
                 'releases.categories_id',
                 'releases.videos_id',
                 'releases.movieinfo_id',
-                // Movie external IDs
-                'movieinfo.imdbid',
-                'movieinfo.tmdbid',
-                'movieinfo.traktid',
-                // TV show external IDs
-                'videos.tvdb',
-                'videos.tvmaze',
-                'videos.tvrage',
-                DB::raw('videos.trakt as video_trakt'),
-                DB::raw('videos.imdb as video_imdb'),
-                DB::raw('videos.tmdb as video_tmdb'),
-            ])
-            ->selectRaw('IFNULL(GROUP_CONCAT(release_files.name SEPARATOR " "),"") AS filename')
-            ->groupBy([
-                'releases.id',
-                'releases.name',
-                'releases.searchname',
-                'releases.fromname',
-                'releases.categories_id',
-                'releases.videos_id',
-                'releases.movieinfo_id',
-                'movieinfo.imdbid',
-                'movieinfo.tmdbid',
-                'movieinfo.traktid',
-                'videos.tvdb',
-                'videos.tvmaze',
-                'videos.tvrage',
-                'videos.trakt',
-                'videos.imdb',
-                'videos.tmdb',
+                'releases.imdbid',
             ]);
 
         return $this->processManticoreData(
@@ -226,17 +196,15 @@ class NntmuxPopulateSearchIndexes extends Command
                     'searchname' => (string) ($item->searchname ?? ''),
                     'fromname' => (string) ($item->fromname ?? ''),
                     'categories_id' => (int) ($item->categories_id ?? 0),
-                    'filename' => (string) ($item->filename ?? ''),
+                    'filename' => '',
                     'videos_id' => (int) ($item->videos_id ?? 0),
                     'movieinfo_id' => (int) ($item->movieinfo_id ?? 0),
-                    // Movie external IDs
                     'imdbid' => (int) ($item->imdbid ?? 0),
-                    'tmdbid' => (int) ($item->tmdbid ?? 0),
-                    'traktid' => (int) ($item->traktid ?? 0),
-                    // TV show external IDs (use video_* for TV shows, fallback to movie IDs)
-                    'tvdb' => (int) ($item->tvdb ?? 0),
-                    'tvmaze' => (int) ($item->tvmaze ?? 0),
-                    'tvrage' => (int) ($item->tvrage ?? 0),
+                    'tmdbid' => 0,
+                    'traktid' => 0,
+                    'tvdb' => 0,
+                    'tvmaze' => 0,
+                    'tvrage' => 0,
                 ];
             }
         );

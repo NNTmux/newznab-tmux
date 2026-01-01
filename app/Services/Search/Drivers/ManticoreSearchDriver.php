@@ -275,13 +275,9 @@ class ManticoreSearchDriver implements SearchDriverInterface
             return ['success' => 0, 'errors' => 0];
         }
 
-        $success = 0;
-        $errors = 0;
-
         $documents = [];
         foreach ($releases as $release) {
             if (empty($release['id'])) {
-                $errors++;
                 continue;
             }
 
@@ -292,7 +288,6 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 'fromname' => (string) ($release['fromname'] ?? ''),
                 'categories_id' => (int) ($release['categories_id'] ?? 0),
                 'filename' => (string) ($release['filename'] ?? ''),
-                // External media IDs for efficient searching
                 'imdbid' => (int) ($release['imdbid'] ?? 0),
                 'tmdbid' => (int) ($release['tmdbid'] ?? 0),
                 'traktid' => (int) ($release['traktid'] ?? 0),
@@ -304,26 +299,20 @@ class ManticoreSearchDriver implements SearchDriverInterface
             ];
         }
 
-        if (! empty($documents)) {
-            try {
-                // Log first document for debugging if app.debug is enabled
-                if (config('app.debug') && ! empty($documents[0])) {
-                    Log::debug('ManticoreSearch bulkInsertReleases sample document', [
-                        'first_doc' => $documents[0],
-                        'total_docs' => count($documents),
-                    ]);
-                }
-
-                $this->manticoreSearch->table($this->config['indexes']['releases'])
-                    ->replaceDocuments($documents);
-                $success = count($documents);
-            } catch (\Throwable $e) {
-                Log::error('ManticoreSearch bulkInsertReleases error: '.$e->getMessage());
-                $errors += count($documents);
-            }
+        if (empty($documents)) {
+            return ['success' => 0, 'errors' => 0];
         }
 
-        return ['success' => $success, 'errors' => $errors];
+        try {
+            $this->manticoreSearch->table($this->config['indexes']['releases'])
+                ->replaceDocuments($documents);
+
+            return ['success' => count($documents), 'errors' => 0];
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch bulkInsertReleases error: '.$e->getMessage());
+
+            return ['success' => 0, 'errors' => count($documents)];
+        }
     }
 
     /**
@@ -338,13 +327,9 @@ class ManticoreSearchDriver implements SearchDriverInterface
             return ['success' => 0, 'errors' => 0];
         }
 
-        $success = 0;
-        $errors = 0;
-
         $documents = [];
         foreach ($predbRecords as $predb) {
             if (empty($predb['id'])) {
-                $errors++;
                 continue;
             }
 
@@ -356,26 +341,20 @@ class ManticoreSearchDriver implements SearchDriverInterface
             ];
         }
 
-        if (! empty($documents)) {
-            try {
-                // Log first document for debugging if app.debug is enabled
-                if (config('app.debug') && ! empty($documents[0])) {
-                    Log::debug('ManticoreSearch bulkInsertPredb sample document', [
-                        'first_doc' => $documents[0],
-                        'total_docs' => count($documents),
-                    ]);
-                }
-
-                $this->manticoreSearch->table($this->config['indexes']['predb'])
-                    ->replaceDocuments($documents);
-                $success = count($documents);
-            } catch (\Throwable $e) {
-                Log::error('ManticoreSearch bulkInsertPredb error: '.$e->getMessage());
-                $errors += count($documents);
-            }
+        if (empty($documents)) {
+            return ['success' => 0, 'errors' => 0];
         }
 
-        return ['success' => $success, 'errors' => $errors];
+        try {
+            $this->manticoreSearch->table($this->config['indexes']['predb'])
+                ->replaceDocuments($documents);
+
+            return ['success' => count($documents), 'errors' => 0];
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch bulkInsertPredb error: '.$e->getMessage());
+
+            return ['success' => 0, 'errors' => count($documents)];
+        }
     }
 
     /**
