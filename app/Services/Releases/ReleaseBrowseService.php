@@ -124,6 +124,7 @@ class ReleaseBrowseService
     /**
      * Used for pager on browse page.
      * Optimized to avoid expensive COUNT queries on large tables.
+     * Uses sample-based counting and avoids JOINs whenever possible.
      */
     public function getBrowseCount(array $cat, int $maxAge = -1, array $excludedCats = [], int|string $groupName = ''): int
     {
@@ -157,46 +158,57 @@ class ReleaseBrowseService
             $conditions[] = 'r.categories_id NOT IN (' . implode(',', array_map('intval', $excludedCats)) . ')';
         }
 
+        // Only add group filter if specified - this requires a JOIN
+        $needsGroupJoin = (int) $groupName !== -1;
+        if ($needsGroupJoin) {
+            $conditions[] = sprintf('g.name = %s', escapeString($groupName));
+        }
+
         $whereSql = 'WHERE ' . implode(' AND ', $conditions);
 
         try {
-            // For queries without specific filters (just category or all releases),
-            // use a quick estimation approach: check if we exceed maxResults using
-            // a small LIMIT query first, then only do full count if needed
+            // For queries with maxResults limit, use sample-based counting
             if ($maxResults > 0) {
-                // Quick check: see if there are at least maxResults rows
-                // Using a small sample limit (1000) to quickly determine if we should
+                // Quick check using a small sample (1000 rows) to determine if we should
                 // just return maxResults or do a full count
                 $sampleLimit = min(1000, $maxResults);
-                $sampleQuery = sprintf(
-                    'SELECT r.id FROM releases r %s ORDER BY r.id DESC LIMIT %d',
-                    $whereSql,
-                    $sampleLimit
-                );
+
+                if ($needsGroupJoin) {
+                    // Need JOIN for group filtering
+                    $sampleQuery = sprintf(
+                        'SELECT r.id FROM releases r INNER JOIN usenet_groups g ON g.id = r.groups_id %s ORDER BY r.id DESC LIMIT %d',
+                        $whereSql,
+                        $sampleLimit
+                    );
+                } else {
+                    // No JOIN needed - much faster query on releases table only
+                    $sampleQuery = sprintf(
+                        'SELECT r.id FROM releases r %s ORDER BY r.id DESC LIMIT %d',
+                        $whereSql,
+                        $sampleLimit
+                    );
+                }
+
                 $sampleResult = DB::select($sampleQuery);
                 $sampleCount = count($sampleResult);
 
-                // If we got the full sample, there might be more - check with a larger query
-                // or just assume there are many rows and return maxResults
+                // If we got the full sample, assume there are more rows than maxResults
                 if ($sampleCount >= $sampleLimit) {
-                    // For very large tables, just return maxResults to avoid expensive COUNT
-                    // The UI will show "500,000+" which is fine for pagination
                     Cache::put($cacheKey, $maxResults, now()->addMinutes($cacheExpiry * 2));
                     return $maxResults;
                 }
 
-                // Fewer than sample limit, this is a small result set - get actual count
+                // Fewer than sample limit - this is the actual count
                 $count = $sampleCount;
             } else {
                 // No max limit set, need full count
-                // If we need to filter by group name, we need the JOIN
-                if ((int) $groupName !== -1) {
+                if ($needsGroupJoin) {
                     $query = sprintf(
-                        'SELECT COUNT(r.id) AS count FROM releases r LEFT JOIN usenet_groups g ON g.id = r.groups_id %s AND g.name = %s',
-                        $whereSql,
-                        escapeString($groupName)
+                        'SELECT COUNT(r.id) AS count FROM releases r INNER JOIN usenet_groups g ON g.id = r.groups_id %s',
+                        $whereSql
                     );
                 } else {
+                    // No JOIN needed - simple count on releases table
                     $query = sprintf('SELECT COUNT(r.id) AS count FROM releases r %s', $whereSql);
                 }
                 $result = DB::select($query);
