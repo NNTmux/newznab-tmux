@@ -486,58 +486,97 @@ class ManticoreSearchDriver implements SearchDriverInterface
     private function createIndexIfNotExists(string $index): void
     {
         try {
+            // Use the tables() API which properly handles settings
+            $indices = $this->manticoreSearch->tables();
+
             if ($index === 'releases_rt') {
-                $this->manticoreSearch->table($index)->create([
-                    'name' => ['type' => 'text'],
-                    'searchname' => ['type' => 'text'],
-                    'fromname' => ['type' => 'text'],
-                    'filename' => ['type' => 'text'],
-                    'categories_id' => ['type' => 'integer'],
-                    // External media IDs for efficient searching
-                    'imdbid' => ['type' => 'integer'],
-                    'tmdbid' => ['type' => 'integer'],
-                    'traktid' => ['type' => 'integer'],
-                    'tvdb' => ['type' => 'integer'],
-                    'tvmaze' => ['type' => 'integer'],
-                    'tvrage' => ['type' => 'integer'],
-                    'videos_id' => ['type' => 'integer'],
-                    'movieinfo_id' => ['type' => 'integer'],
+                $indices->create([
+                    'index' => $index,
+                    'body' => [
+                        'settings' => [
+                            'min_prefix_len' => 0,
+                            'min_infix_len' => 2,
+                        ],
+                        'columns' => [
+                            'name' => ['type' => 'text'],
+                            'searchname' => ['type' => 'text'],
+                            'fromname' => ['type' => 'text'],
+                            'filename' => ['type' => 'text'],
+                            'categories_id' => ['type' => 'integer'],
+                            // External media IDs for efficient searching
+                            'imdbid' => ['type' => 'integer'],
+                            'tmdbid' => ['type' => 'integer'],
+                            'traktid' => ['type' => 'integer'],
+                            'tvdb' => ['type' => 'integer'],
+                            'tvmaze' => ['type' => 'integer'],
+                            'tvrage' => ['type' => 'integer'],
+                            'videos_id' => ['type' => 'integer'],
+                            'movieinfo_id' => ['type' => 'integer'],
+                        ],
+                    ],
                 ]);
-                cli()->info('Created releases_rt index with external ID fields');
+                cli()->info('Created releases_rt index with external ID fields and infix search support');
             } elseif ($index === 'predb_rt') {
-                $this->manticoreSearch->table($index)->create([
-                    'title' => ['type' => 'text'],
-                    'filename' => ['type' => 'text'],
-                    'source' => ['type' => 'text'],
+                $indices->create([
+                    'index' => $index,
+                    'body' => [
+                        'settings' => [
+                            'min_prefix_len' => 0,
+                            'min_infix_len' => 2,
+                        ],
+                        'columns' => [
+                            'title' => ['type' => 'text'],
+                            'filename' => ['type' => 'text'],
+                            'source' => ['type' => 'text'],
+                        ],
+                    ],
                 ]);
-                cli()->info('Created predb_rt index');
+                cli()->info('Created predb_rt index with infix search support');
             } elseif ($index === 'movies_rt') {
-                $this->manticoreSearch->table($index)->create([
-                    'imdbid' => ['type' => 'integer'],
-                    'tmdbid' => ['type' => 'integer'],
-                    'traktid' => ['type' => 'integer'],
-                    'title' => ['type' => 'text'],
-                    'year' => ['type' => 'text'],
-                    'genre' => ['type' => 'text'],
-                    'actors' => ['type' => 'text'],
-                    'director' => ['type' => 'text'],
-                    'rating' => ['type' => 'text'],
-                    'plot' => ['type' => 'text'],
+                $indices->create([
+                    'index' => $index,
+                    'body' => [
+                        'settings' => [
+                            'min_prefix_len' => 0,
+                            'min_infix_len' => 2,
+                        ],
+                        'columns' => [
+                            'imdbid' => ['type' => 'integer'],
+                            'tmdbid' => ['type' => 'integer'],
+                            'traktid' => ['type' => 'integer'],
+                            'title' => ['type' => 'text'],
+                            'year' => ['type' => 'text'],
+                            'genre' => ['type' => 'text'],
+                            'actors' => ['type' => 'text'],
+                            'director' => ['type' => 'text'],
+                            'rating' => ['type' => 'text'],
+                            'plot' => ['type' => 'text'],
+                        ],
+                    ],
                 ]);
-                cli()->info('Created movies_rt index');
+                cli()->info('Created movies_rt index with infix search support');
             } elseif ($index === 'tvshows_rt') {
-                $this->manticoreSearch->table($index)->create([
-                    'title' => ['type' => 'text'],
-                    'tvdb' => ['type' => 'integer'],
-                    'trakt' => ['type' => 'integer'],
-                    'tvmaze' => ['type' => 'integer'],
-                    'tvrage' => ['type' => 'integer'],
-                    'imdb' => ['type' => 'integer'],
-                    'tmdb' => ['type' => 'integer'],
-                    'started' => ['type' => 'text'],
-                    'type' => ['type' => 'integer'],
+                $indices->create([
+                    'index' => $index,
+                    'body' => [
+                        'settings' => [
+                            'min_prefix_len' => 0,
+                            'min_infix_len' => 2,
+                        ],
+                        'columns' => [
+                            'title' => ['type' => 'text'],
+                            'tvdb' => ['type' => 'integer'],
+                            'trakt' => ['type' => 'integer'],
+                            'tvmaze' => ['type' => 'integer'],
+                            'tvrage' => ['type' => 'integer'],
+                            'imdb' => ['type' => 'integer'],
+                            'tmdb' => ['type' => 'integer'],
+                            'started' => ['type' => 'text'],
+                            'type' => ['type' => 'integer'],
+                        ],
+                    ],
                 ]);
-                cli()->info('Created tvshows_rt index');
+                cli()->info('Created tvshows_rt index with infix search support');
             }
         } catch (\Throwable $e) {
             cli()->error('Error creating index '.$index.': '.$e->getMessage());
@@ -769,7 +808,19 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
             $results = $query->get();
         } catch (ResponseException $e) {
-            Log::error('ManticoreSearch fuzzySearchIndexes ResponseException: '.$e->getMessage(), [
+            $message = $e->getMessage();
+
+            // Check if fuzzy search failed due to missing min_infix_len
+            // This happens when index was created without proper settings
+            if (str_contains($message, 'min_infix_len')) {
+                Log::warning('ManticoreSearch fuzzySearchIndexes: Fuzzy search unavailable - index missing min_infix_len setting. Please recreate the index with: php artisan nntmux:manticore-create --drop', [
+                    'index' => $index,
+                ]);
+                // Fall back to regular search without fuzzy
+                return $this->searchIndexes($index, '', [], $searchArray);
+            }
+
+            Log::error('ManticoreSearch fuzzySearchIndexes ResponseException: '.$message, [
                 'index' => $index,
                 'searchArray' => $searchArray,
             ]);

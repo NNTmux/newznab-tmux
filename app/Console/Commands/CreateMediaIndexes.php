@@ -181,6 +181,17 @@ class CreateMediaIndexes extends Command
                 $this->warn("Index {$indexName} already exists. Use --drop to recreate.");
                 return true;
             }
+            // Check for data_dir configuration error
+            if (str_contains($e->getMessage(), 'data_dir')) {
+                $this->error("Failed to create index {$indexName}: " . $e->getMessage());
+                $this->newLine();
+                $this->warn('ManticoreSearch requires data_dir to be set in its configuration file.');
+                $this->info('To fix this, edit your ManticoreSearch config file (usually /etc/manticoresearch/manticore.conf):');
+                $this->line('  1. Add or uncomment: data_dir = /var/lib/manticore');
+                $this->line('  2. Ensure the directory exists and is writable by the manticore user');
+                $this->line('  3. Restart ManticoreSearch: sudo systemctl restart manticore');
+                return false;
+            }
             $this->error("Failed to create index {$indexName}: " . $e->getMessage());
             return false;
         } catch (\Throwable $e) {
