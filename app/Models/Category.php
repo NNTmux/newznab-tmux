@@ -310,13 +310,13 @@ class Category extends Model
     {
         $categories = [];
 
-        // if searchType is tv return TV categories
-        if ($searchType === 'tv') {
+        // if searchType is tv return TV categories (only if no specific categories provided)
+        if ($searchType === 'tv' && (empty($cat) || $cat === [-1] || $cat === ['-1'])) {
             $cat = self::TV_GROUP;
         }
 
-        // is searchType is movies return MOVIES categories
-        if ($searchType === 'movies') {
+        // is searchType is movies return MOVIES categories (only if no specific categories provided)
+        if ($searchType === 'movies' && (empty($cat) || $cat === [-1] || $cat === ['-1'])) {
             $cat = self::MOVIES_GROUP;
         }
 

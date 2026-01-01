@@ -729,7 +729,6 @@ class ReleaseSearchService
      */
     public function moviesSearch(int $imDbId = -1, int $tmDbId = -1, int $traktId = -1, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
-        // Early return if searching by name yields no results
         $searchResult = [];
 
         // OPTIMIZATION: If we have external IDs, use the search index to find releases directly
@@ -768,18 +767,16 @@ class ReleaseSearchService
                 $searchResult = $this->performMySQLSearch(['searchname' => $name], $limit);
             }
 
+            // Only return empty if we were specifically searching by name but found nothing
             if (empty($searchResult)) {
                 return collect();
             }
         }
 
-        // If we still have no results (no name and no external IDs found anything), return empty
-        if (empty($searchResult) && empty($externalIds)) {
-            return collect();
-        }
-
+        // Build the base conditions for movie search
+        // Note: we don't have MOVIE_ROOT constant that marks a parent category,
+        // so we'll rely on the category search logic instead
         $conditions = [
-            sprintf('r.categories_id BETWEEN %d AND %d', Category::MOVIE_ROOT, Category::MOVIE_OTHER),
             sprintf('r.passwordstatus %s', $this->showPasswords()),
         ];
 
