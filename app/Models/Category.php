@@ -308,6 +308,13 @@ class Category extends Model
 
     public static function getCategorySearch(array $cat = [], ?string $searchType = null, $builder = false): string|array|null
     {
+        // Generate a cache key based on the input parameters
+        $cacheKey = 'cat_search_' . md5(serialize($cat) . $searchType . ($builder ? '1' : '0'));
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
         $categories = [];
 
         // if searchType is tv return TV categories (only if no specific categories provided)
@@ -334,7 +341,13 @@ class Category extends Model
         foreach ($cat as $category) {
             $categoryInt = (int) $category;
             if (is_numeric($category) && $categoryInt !== -1 && self::isParent($categoryInt)) {
-                $children = RootCategory::find($categoryInt)->categories->pluck('id')->toArray();
+                // Cache child category IDs for parent categories
+                $childCacheKey = 'cat_children_' . $categoryInt;
+                $children = Cache::get($childCacheKey);
+                if ($children === null) {
+                    $children = RootCategory::find($categoryInt)->categories->pluck('id')->toArray();
+                    Cache::put($childCacheKey, $children, now()->addHours(24));
+                }
                 $categories = array_merge($categories, $children);
             } elseif (is_numeric($category) && $categoryInt > 0) {
                 $categories[] = $categoryInt;
@@ -344,18 +357,23 @@ class Category extends Model
         $catCount = count($categories);
 
         if ($builder) {
-            return match ($catCount) {
+            $result = match ($catCount) {
                 0 => null,
                 1 => $categories[0] !== -1 ? $categories : null,
                 default => $categories,
             };
+            Cache::put($cacheKey, $result, now()->addHours(24));
+            return $result;
         }
 
-        return match ($catCount) {
+        $result = match ($catCount) {
             0 => 'AND 1=1',
             1 => $categories[0] !== -1 ? ' AND r.categories_id = '.$categories[0] : '',
             default => ' AND r.categories_id IN ('.implode(', ', $categories).') ',
         };
+
+        Cache::put($cacheKey, $result, now()->addHours(24));
+        return $result;
     }
 
     /**
@@ -382,9 +400,20 @@ class Category extends Model
      */
     public static function isParent($cid): bool
     {
-        $ret = RootCategory::query()->where(['id' => $cid])->first();
+        // Cache the parent category check to avoid repeated DB queries
+        $cacheKey = 'cat_is_parent_' . $cid;
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
 
-        return $ret !== null;
+        $ret = RootCategory::query()->where(['id' => $cid])->first();
+        $isParent = $ret !== null;
+
+        // Cache for a long time since parent categories rarely change
+        Cache::put($cacheKey, $isParent, now()->addHours(24));
+
+        return $isParent;
     }
 
     /**

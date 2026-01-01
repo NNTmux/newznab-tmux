@@ -123,23 +123,94 @@ class ReleaseBrowseService
 
     /**
      * Used for pager on browse page.
+     * Optimized to avoid expensive COUNT queries on large tables.
      */
     public function getBrowseCount(array $cat, int $maxAge = -1, array $excludedCats = [], int|string $groupName = ''): int
     {
-        return $this->getPagerCount(sprintf(
-            'SELECT COUNT(r.id) AS count
-				FROM releases r
-				%s
-				WHERE r.passwordstatus %s
-				%s
-				%s %s %s ',
-            ($groupName !== -1 ? 'LEFT JOIN usenet_groups g ON g.id = r.groups_id' : ''),
-            $this->showPasswords(),
-            ($groupName !== -1 ? sprintf(' AND g.name = %s', escapeString($groupName)) : ''),
-            Category::getCategorySearch($cat),
-            ($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
-            (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : '')
-        ));
+        $maxResults = (int) config('nntmux.max_pager_results', 500000);
+        $cacheExpiry = (int) config('nntmux.cache_expiry_short', 5);
+
+        // Build a unique cache key for this specific query
+        $cacheKey = 'browse_count_' . md5(serialize($cat) . $maxAge . serialize($excludedCats) . $groupName);
+
+        // Check cache first - use longer cache time for count queries since they're expensive
+        $count = Cache::get($cacheKey);
+        if ($count !== null) {
+            return (int) $count;
+        }
+
+        // Build optimized count query - avoid JOINs when possible
+        $conditions = ['r.passwordstatus ' . $this->showPasswords()];
+
+        // Add category conditions
+        $catQuery = Category::getCategorySearch($cat);
+        $catQuery = preg_replace('/^(WHERE|AND)\s+/i', '', trim($catQuery));
+        if (!empty($catQuery) && $catQuery !== '1=1') {
+            $conditions[] = $catQuery;
+        }
+
+        if ($maxAge > 0) {
+            $conditions[] = 'r.postdate > NOW() - INTERVAL ' . $maxAge . ' DAY';
+        }
+
+        if (!empty($excludedCats)) {
+            $conditions[] = 'r.categories_id NOT IN (' . implode(',', array_map('intval', $excludedCats)) . ')';
+        }
+
+        $whereSql = 'WHERE ' . implode(' AND ', $conditions);
+
+        try {
+            // For queries without specific filters (just category or all releases),
+            // use a quick estimation approach: check if we exceed maxResults using
+            // a small LIMIT query first, then only do full count if needed
+            if ($maxResults > 0) {
+                // Quick check: see if there are at least maxResults rows
+                // Using a small sample limit (1000) to quickly determine if we should
+                // just return maxResults or do a full count
+                $sampleLimit = min(1000, $maxResults);
+                $sampleQuery = sprintf(
+                    'SELECT r.id FROM releases r %s ORDER BY r.id DESC LIMIT %d',
+                    $whereSql,
+                    $sampleLimit
+                );
+                $sampleResult = DB::select($sampleQuery);
+                $sampleCount = count($sampleResult);
+
+                // If we got the full sample, there might be more - check with a larger query
+                // or just assume there are many rows and return maxResults
+                if ($sampleCount >= $sampleLimit) {
+                    // For very large tables, just return maxResults to avoid expensive COUNT
+                    // The UI will show "500,000+" which is fine for pagination
+                    Cache::put($cacheKey, $maxResults, now()->addMinutes($cacheExpiry * 2));
+                    return $maxResults;
+                }
+
+                // Fewer than sample limit, this is a small result set - get actual count
+                $count = $sampleCount;
+            } else {
+                // No max limit set, need full count
+                // If we need to filter by group name, we need the JOIN
+                if ((int) $groupName !== -1) {
+                    $query = sprintf(
+                        'SELECT COUNT(r.id) AS count FROM releases r LEFT JOIN usenet_groups g ON g.id = r.groups_id %s AND g.name = %s',
+                        $whereSql,
+                        escapeString($groupName)
+                    );
+                } else {
+                    $query = sprintf('SELECT COUNT(r.id) AS count FROM releases r %s', $whereSql);
+                }
+                $result = DB::select($query);
+                $count = isset($result[0]) ? (int) $result[0]->count : 0;
+            }
+
+            // Cache with longer expiry for count queries
+            Cache::put($cacheKey, $count, now()->addMinutes($cacheExpiry * 2));
+
+            return $count;
+        } catch (\Exception $e) {
+            Log::error('getBrowseCount failed', ['error' => $e->getMessage()]);
+            return 0;
+        }
     }
 
     /**
