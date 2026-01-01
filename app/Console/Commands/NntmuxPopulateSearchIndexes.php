@@ -221,22 +221,22 @@ class NntmuxPopulateSearchIndexes extends Command
             $query,
             function ($item) {
                 return [
-                    'id' => (string) $item->id,
-                    'name' => (string) ($item->name ?: ''),
-                    'searchname' => (string) ($item->searchname ?: ''),
-                    'fromname' => (string) ($item->fromname ?: ''),
-                    'categories_id' => (int) ($item->categories_id ?: 0),
-                    'filename' => (string) ($item->filename ?: ''),
-                    'videos_id' => (int) ($item->videos_id ?: 0),
-                    'movieinfo_id' => (int) ($item->movieinfo_id ?: 0),
+                    'id' => (int) $item->id,
+                    'name' => (string) ($item->name ?? ''),
+                    'searchname' => (string) ($item->searchname ?? ''),
+                    'fromname' => (string) ($item->fromname ?? ''),
+                    'categories_id' => (int) ($item->categories_id ?? 0),
+                    'filename' => (string) ($item->filename ?? ''),
+                    'videos_id' => (int) ($item->videos_id ?? 0),
+                    'movieinfo_id' => (int) ($item->movieinfo_id ?? 0),
                     // Movie external IDs
-                    'imdbid' => (int) ($item->imdbid ?: 0),
-                    'tmdbid' => (int) ($item->tmdbid ?: 0),
-                    'traktid' => (int) ($item->traktid ?: 0),
+                    'imdbid' => (int) ($item->imdbid ?? 0),
+                    'tmdbid' => (int) ($item->tmdbid ?? 0),
+                    'traktid' => (int) ($item->traktid ?? 0),
                     // TV show external IDs (use video_* for TV shows, fallback to movie IDs)
-                    'tvdb' => (int) ($item->tvdb ?: 0),
-                    'tvmaze' => (int) ($item->tvmaze ?: 0),
-                    'tvrage' => (int) ($item->tvrage ?: 0),
+                    'tvdb' => (int) ($item->tvdb ?? 0),
+                    'tvmaze' => (int) ($item->tvmaze ?? 0),
+                    'tvrage' => (int) ($item->tvrage ?? 0),
                 ];
             }
         );
@@ -787,7 +787,14 @@ class NntmuxPopulateSearchIndexes extends Command
 
         while ($attempt < $retries) {
             try {
-                Search::bulkInsertReleases($data);
+                // Use the correct bulk insert method based on index name
+                if ($indexName === 'releases_rt') {
+                    Search::bulkInsertReleases($data);
+                } elseif ($indexName === 'predb_rt') {
+                    Search::bulkInsertPredb($data);
+                } else {
+                    throw new Exception("Unknown index: {$indexName}");
+                }
                 break;
             } catch (Exception $e) {
                 $attempt++;

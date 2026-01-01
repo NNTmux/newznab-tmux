@@ -163,6 +163,14 @@ interface SearchServiceInterface
     public function bulkInsertReleases(array $releases): array;
 
     /**
+     * Bulk insert multiple predb records into the index.
+     *
+     * @param  array  $predbRecords  Array of predb data arrays
+     * @return array Results with 'success' and 'errors' counts
+     */
+    public function bulkInsertPredb(array $predbRecords): array;
+
+    /**
      * Delete a predb record from the index.
      *
      * @param  int  $id  Predb ID

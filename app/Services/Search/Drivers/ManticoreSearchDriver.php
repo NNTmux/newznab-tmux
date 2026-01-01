@@ -287,11 +287,11 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
             $documents[] = [
                 'id' => $release['id'],
-                'name' => $release['name'] ?? '',
-                'searchname' => $release['searchname'] ?? '',
-                'fromname' => $release['fromname'] ?? '',
+                'name' => (string) ($release['name'] ?? ''),
+                'searchname' => (string) ($release['searchname'] ?? ''),
+                'fromname' => (string) ($release['fromname'] ?? ''),
                 'categories_id' => (int) ($release['categories_id'] ?? 0),
-                'filename' => $release['filename'] ?? '',
+                'filename' => (string) ($release['filename'] ?? ''),
                 // External media IDs for efficient searching
                 'imdbid' => (int) ($release['imdbid'] ?? 0),
                 'tmdbid' => (int) ($release['tmdbid'] ?? 0),
@@ -306,11 +306,71 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
         if (! empty($documents)) {
             try {
+                // Log first document for debugging if app.debug is enabled
+                if (config('app.debug') && ! empty($documents[0])) {
+                    Log::debug('ManticoreSearch bulkInsertReleases sample document', [
+                        'first_doc' => $documents[0],
+                        'total_docs' => count($documents),
+                    ]);
+                }
+
                 $this->manticoreSearch->table($this->config['indexes']['releases'])
                     ->replaceDocuments($documents);
                 $success = count($documents);
             } catch (\Throwable $e) {
                 Log::error('ManticoreSearch bulkInsertReleases error: '.$e->getMessage());
+                $errors += count($documents);
+            }
+        }
+
+        return ['success' => $success, 'errors' => $errors];
+    }
+
+    /**
+     * Bulk insert multiple predb records into the index.
+     *
+     * @param  array  $predbRecords  Array of predb data arrays
+     * @return array Results with 'success' and 'errors' counts
+     */
+    public function bulkInsertPredb(array $predbRecords): array
+    {
+        if (empty($predbRecords)) {
+            return ['success' => 0, 'errors' => 0];
+        }
+
+        $success = 0;
+        $errors = 0;
+
+        $documents = [];
+        foreach ($predbRecords as $predb) {
+            if (empty($predb['id'])) {
+                $errors++;
+                continue;
+            }
+
+            $documents[] = [
+                'id' => $predb['id'],
+                'title' => (string) ($predb['title'] ?? ''),
+                'filename' => (string) ($predb['filename'] ?? ''),
+                'source' => (string) ($predb['source'] ?? ''),
+            ];
+        }
+
+        if (! empty($documents)) {
+            try {
+                // Log first document for debugging if app.debug is enabled
+                if (config('app.debug') && ! empty($documents[0])) {
+                    Log::debug('ManticoreSearch bulkInsertPredb sample document', [
+                        'first_doc' => $documents[0],
+                        'total_docs' => count($documents),
+                    ]);
+                }
+
+                $this->manticoreSearch->table($this->config['indexes']['predb'])
+                    ->replaceDocuments($documents);
+                $success = count($documents);
+            } catch (\Throwable $e) {
+                Log::error('ManticoreSearch bulkInsertPredb error: '.$e->getMessage());
                 $errors += count($documents);
             }
         }
@@ -813,7 +873,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
             // Check if fuzzy search failed due to missing min_infix_len
             // This happens when index was created without proper settings
             if (str_contains($message, 'min_infix_len')) {
-                Log::warning('ManticoreSearch fuzzySearchIndexes: Fuzzy search unavailable - index missing min_infix_len setting. Please recreate the index with: php artisan nntmux:manticore-create --drop', [
+                Log::warning('ManticoreSearch fuzzySearchIndexes: Fuzzy search unavailable - index missing min_infix_len setting. Please recreate the index with: php artisan manticore:create-indexes --drop', [
                     'index' => $index,
                 ]);
                 // Fall back to regular search without fuzzy
@@ -967,6 +1027,13 @@ class ManticoreSearchDriver implements SearchDriverInterface
         // Avoid explicit sort for predb_rt to prevent Manticore's "too many sort-by attributes" error
         $avoidSortForIndex = ($rt_index === 'predb_rt');
 
+        if (config('app.debug')) {
+            Log::debug('ManticoreSearch::searchIndexes executing query', [
+                'rt_index' => $rt_index,
+                'searchExpr' => $searchExpr,
+            ]);
+        }
+
         try {
             // Use a fresh Search instance for every query to avoid parameter accumulation across calls
             $query = (new Search($this->manticoreSearch))
@@ -1044,8 +1111,10 @@ class ManticoreSearchDriver implements SearchDriverInterface
             'data' => $resultData,
         ];
 
-        // Cache results for 5 minutes
-        Cache::put($cacheKey, $result, now()->addMinutes($this->config['cache_minutes'] ?? 5));
+        // Only cache non-empty results to avoid caching temporary failures or empty index states
+        if (! empty($resultIds)) {
+            Cache::put($cacheKey, $result, now()->addMinutes($this->config['cache_minutes'] ?? 5));
+        }
 
         return $result;
     }

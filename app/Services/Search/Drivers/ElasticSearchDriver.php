@@ -1080,52 +1080,6 @@ class ElasticSearchDriver implements SearchDriverInterface
     }
 
     /**
-     * Bulk insert multiple releases into the index.
-     *
-     * @param  array  $releases  Array of release data arrays
-     * @return array Results with 'success' and 'errors' counts
-     */
-    public function bulkInsertReleases(array $releases): array
-    {
-        if (empty($releases) || ! $this->isElasticsearchAvailable()) {
-            return ['success' => 0, 'errors' => 0];
-        }
-
-        $params = ['body' => []];
-        $validReleases = 0;
-
-        foreach ($releases as $release) {
-            if (empty($release['id'])) {
-                continue;
-            }
-
-            $params['body'][] = [
-                'index' => [
-                    '_index' => $this->getReleasesIndex(),
-                    '_id' => $release['id'],
-                ],
-            ];
-
-            $document = $this->buildReleaseDocument($release);
-            $params['body'][] = $document['body'];
-            $validReleases++;
-
-            // Send batch when reaching 500 documents
-            if ($validReleases % 500 === 0) {
-                $this->executeBulk($params);
-                $params = ['body' => []];
-            }
-        }
-
-        // Send remaining documents
-        if (! empty($params['body'])) {
-            $this->executeBulk($params);
-        }
-
-        return ['success' => $validReleases, 'errors' => 0];
-    }
-
-    /**
      * Update a release in the index.
      *
      * @param  int|string  $releaseID  Release ID
@@ -1358,6 +1312,143 @@ class ElasticSearchDriver implements SearchDriverInterface
                 'predb_id' => $id,
             ]);
         }
+    }
+
+    /**
+     * Bulk insert multiple releases into the index.
+     *
+     * @param  array  $releases  Array of release data arrays
+     * @return array Results with 'success' and 'errors' counts
+     */
+    public function bulkInsertReleases(array $releases): array
+    {
+        if (empty($releases) || ! $this->isElasticsearchAvailable()) {
+            return ['success' => 0, 'errors' => 0];
+        }
+
+        $success = 0;
+        $errors = 0;
+
+        $params = ['body' => []];
+
+        foreach ($releases as $release) {
+            if (empty($release['id'])) {
+                $errors++;
+                continue;
+            }
+
+            $searchNameDotless = $this->createPlainSearchName($release['searchname'] ?? '');
+
+            $params['body'][] = [
+                'index' => [
+                    '_index' => $this->getReleasesIndex(),
+                    '_id' => $release['id'],
+                ],
+            ];
+
+            $params['body'][] = [
+                'id' => $release['id'],
+                'name' => (string) ($release['name'] ?? ''),
+                'searchname' => (string) ($release['searchname'] ?? ''),
+                'plainsearchname' => $searchNameDotless,
+                'fromname' => (string) ($release['fromname'] ?? ''),
+                'categories_id' => (int) ($release['categories_id'] ?? 0),
+                'filename' => (string) ($release['filename'] ?? ''),
+            ];
+
+            $success++;
+        }
+
+        if (! empty($params['body'])) {
+            try {
+                $client = $this->getClient();
+                $response = $client->bulk($params);
+
+                if (isset($response['errors']) && $response['errors']) {
+                    foreach ($response['items'] as $item) {
+                        if (isset($item['index']['error'])) {
+                            $errors++;
+                            $success--;
+                            if (config('app.debug')) {
+                                Log::error('ElasticSearch bulkInsertReleases error: '.json_encode($item['index']['error']));
+                            }
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::error('ElasticSearch bulkInsertReleases error: '.$e->getMessage());
+                $errors += $success;
+                $success = 0;
+            }
+        }
+
+        return ['success' => $success, 'errors' => $errors];
+    }
+
+    /**
+     * Bulk insert multiple predb records into the index.
+     *
+     * @param  array  $predbRecords  Array of predb data arrays
+     * @return array Results with 'success' and 'errors' counts
+     */
+    public function bulkInsertPredb(array $predbRecords): array
+    {
+        if (empty($predbRecords) || ! $this->isElasticsearchAvailable()) {
+            return ['success' => 0, 'errors' => 0];
+        }
+
+        $success = 0;
+        $errors = 0;
+
+        $params = ['body' => []];
+
+        foreach ($predbRecords as $predb) {
+            if (empty($predb['id'])) {
+                $errors++;
+                continue;
+            }
+
+            $params['body'][] = [
+                'index' => [
+                    '_index' => $this->getPredbIndex(),
+                    '_id' => $predb['id'],
+                ],
+            ];
+
+            $params['body'][] = [
+                'id' => $predb['id'],
+                'title' => (string) ($predb['title'] ?? ''),
+                'filename' => (string) ($predb['filename'] ?? ''),
+                'source' => (string) ($predb['source'] ?? ''),
+            ];
+
+            $success++;
+        }
+
+        if (! empty($params['body'])) {
+            try {
+                $client = $this->getClient();
+                $response = $client->bulk($params);
+
+                if (isset($response['errors']) && $response['errors']) {
+                    foreach ($response['items'] as $item) {
+                        if (isset($item['index']['error'])) {
+                            $errors++;
+                            $success--;
+                            if (config('app.debug')) {
+                                Log::error('ElasticSearch bulkInsertPredb error: '.json_encode($item['index']['error']));
+                            }
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::error('ElasticSearch bulkInsertPredb error: '.$e->getMessage());
+                $errors += $success;
+                $success = 0;
+            }
+        }
+
+        return ['success' => $success, 'errors' => $errors];
     }
 
     /**
