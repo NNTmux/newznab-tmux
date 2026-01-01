@@ -32,6 +32,9 @@ use Illuminate\Support\Facades\Facade;
  * @method static void truncateIndex(array|string $indexes)
  * @method static void optimizeIndex()
  * @method static array bulkInsertReleases(array $releases)
+ * @method static array searchReleasesByExternalId(array $externalIds, int $limit = 1000)
+ * @method static array searchReleasesByCategory(array $categoryIds, int $limit = 1000)
+ * @method static array searchReleasesWithCategoryFilter(string $searchTerm, array $categoryIds = [], int $limit = 1000)
  *
  * @see \App\Services\Search\SearchService
  */

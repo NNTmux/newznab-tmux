@@ -401,6 +401,24 @@ class SearchService extends Manager implements SearchServiceInterface
     {
         return $this->driver()->searchReleasesByExternalId($externalIds, $limit);
     }
+
+    /**
+     * Search releases by category ID using the search index.
+     * This provides a fast way to get release IDs for a specific category without hitting the database.
+     */
+    public function searchReleasesByCategory(array $categoryIds, int $limit = 1000): array
+    {
+        return $this->driver()->searchReleasesByCategory($categoryIds, $limit);
+    }
+
+    /**
+     * Combined search: text search with category filtering.
+     * First searches by text, then filters by category IDs using the search index.
+     */
+    public function searchReleasesWithCategoryFilter(string $searchTerm, array $categoryIds = [], int $limit = 1000): array
+    {
+        return $this->driver()->searchReleasesWithCategoryFilter($searchTerm, $categoryIds, $limit);
+    }
 }
 
 

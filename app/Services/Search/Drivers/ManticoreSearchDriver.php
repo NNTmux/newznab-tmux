@@ -1840,6 +1840,136 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
         return [];
     }
+
+    /**
+     * Search releases by category ID using the search index.
+     * This provides a fast way to get release IDs for a specific category without hitting the database.
+     *
+     * @param  array  $categoryIds  Array of category IDs to filter by
+     * @param  int  $limit  Maximum number of results
+     * @return array Array of release IDs
+     */
+    public function searchReleasesByCategory(array $categoryIds, int $limit = 1000): array
+    {
+        if (empty($categoryIds)) {
+            return [];
+        }
+
+        // Filter out invalid category IDs (-1 means "all categories")
+        $validCategoryIds = array_filter($categoryIds, fn ($id) => $id > 0);
+        if (empty($validCategoryIds)) {
+            return [];
+        }
+
+        $cacheKey = 'manticore:releases:cat:'.md5(serialize($validCategoryIds).':'.$limit);
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        try {
+            $query = (new Search($this->manticoreSearch))
+                ->setTable($this->getReleasesIndex())
+                ->limit(min($limit, 10000));
+
+            // Use IN filter for multiple category IDs
+            if (count($validCategoryIds) === 1) {
+                $query->filter('categories_id', '=', (int) $validCategoryIds[0]);
+            } else {
+                $query->filter('categories_id', 'in', array_map('intval', $validCategoryIds));
+            }
+
+            $results = $query->get();
+
+            $resultIds = [];
+            foreach ($results as $doc) {
+                $resultIds[] = $doc->getId();
+            }
+
+            if (! empty($resultIds)) {
+                Cache::put($cacheKey, $resultIds, now()->addMinutes($this->config['cache_minutes'] ?? 5));
+            }
+
+            return $resultIds;
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch searchReleasesByCategory error: '.$e->getMessage(), [
+                'categoryIds' => $categoryIds,
+            ]);
+        }
+
+        return [];
+    }
+
+    /**
+     * Combined search: text search with category filtering.
+     * First searches by text, then filters by category IDs using the search index.
+     *
+     * @param  string  $searchTerm  Search text
+     * @param  array  $categoryIds  Array of category IDs to filter by (empty for all categories)
+     * @param  int  $limit  Maximum number of results
+     * @return array Array of release IDs
+     */
+    public function searchReleasesWithCategoryFilter(string $searchTerm, array $categoryIds = [], int $limit = 1000): array
+    {
+        if (empty($searchTerm)) {
+            // If no search term, just filter by category
+            return $this->searchReleasesByCategory($categoryIds, $limit);
+        }
+
+        // Filter out invalid category IDs
+        $validCategoryIds = array_filter($categoryIds, fn ($id) => $id > 0);
+
+        $cacheKey = 'manticore:releases:search_cat:'.md5($searchTerm.':'.serialize($validCategoryIds).':'.$limit);
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        try {
+            $escapedSearch = self::escapeString($searchTerm);
+            if (empty($escapedSearch)) {
+                return $this->searchReleasesByCategory($categoryIds, $limit);
+            }
+
+            $searchExpr = '@@relaxed @searchname '.$escapedSearch;
+
+            $query = (new Search($this->manticoreSearch))
+                ->setTable($this->getReleasesIndex())
+                ->search($searchExpr)
+                ->option('ranker', 'sph04')
+                ->stripBadUtf8(true)
+                ->limit(min($limit, 10000));
+
+            // Add category filter if provided
+            if (! empty($validCategoryIds)) {
+                if (count($validCategoryIds) === 1) {
+                    $query->filter('categories_id', '=', (int) $validCategoryIds[0]);
+                } else {
+                    $query->filter('categories_id', 'in', array_map('intval', $validCategoryIds));
+                }
+            }
+
+            $results = $query->get();
+
+            $resultIds = [];
+            foreach ($results as $doc) {
+                $resultIds[] = $doc->getId();
+            }
+
+            if (! empty($resultIds)) {
+                Cache::put($cacheKey, $resultIds, now()->addMinutes($this->config['cache_minutes'] ?? 5));
+            }
+
+            return $resultIds;
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch searchReleasesWithCategoryFilter error: '.$e->getMessage(), [
+                'searchTerm' => $searchTerm,
+                'categoryIds' => $categoryIds,
+            ]);
+        }
+
+        return [];
+    }
 }
 
 

@@ -280,6 +280,27 @@ interface SearchServiceInterface
      * @return array Array of release IDs
      */
     public function searchReleasesByExternalId(array $externalIds, int $limit = 1000): array;
+
+    /**
+     * Search releases by category ID using the search index.
+     * This provides a fast way to get release IDs for a specific category without hitting the database.
+     *
+     * @param  array  $categoryIds  Array of category IDs to filter by
+     * @param  int  $limit  Maximum number of results
+     * @return array Array of release IDs
+     */
+    public function searchReleasesByCategory(array $categoryIds, int $limit = 1000): array;
+
+    /**
+     * Combined search: text search with category filtering.
+     * First searches by text, then filters by category IDs using the search index.
+     *
+     * @param  string  $searchTerm  Search text
+     * @param  array  $categoryIds  Array of category IDs to filter by (empty for all categories)
+     * @param  int  $limit  Maximum number of results
+     * @return array Array of release IDs
+     */
+    public function searchReleasesWithCategoryFilter(string $searchTerm, array $categoryIds = [], int $limit = 1000): array;
 }
 
 

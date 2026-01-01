@@ -2,12 +2,14 @@
 
 namespace App\Services\Releases;
 
+use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Service for browsing and ordering releases on the frontend.
@@ -25,17 +27,37 @@ class ReleaseBrowseService
     }
 
     /**
-     * Used for Browse results.
+     * Used for Browse results with optional search term filtering via search index.
      *
+     * @param  string|null  $searchTerm  Optional search term to filter by (uses search index)
      * @return Collection|mixed
      */
-    public function getBrowseRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [], int|string $groupName = -1, int $minSize = 0): mixed
+    public function getBrowseRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [], int|string $groupName = -1, int $minSize = 0, ?string $searchTerm = null): mixed
     {
         $cacheVersion = $this->getCacheVersion();
         $page = max(1, $page);
         $start = max(0, $start);
 
         $orderBy = $this->getBrowseOrder($orderBy);
+
+        // Use search index filtering when a search term is provided
+        $searchIndexFilter = '';
+        $searchIndexIds = [];
+        if (!empty($searchTerm) && Search::isAvailable()) {
+            $searchResult = Search::searchReleasesWithFuzzy(['searchname' => $searchTerm], $num * 10);
+            $searchIndexIds = $searchResult['ids'] ?? [];
+
+            if (config('app.debug') && ($searchResult['fuzzy'] ?? false)) {
+                Log::debug('getBrowseRange: Using fuzzy search results for browse filtering');
+            }
+
+            if (empty($searchIndexIds)) {
+                // No results from search index, return empty result
+                return [];
+            }
+
+            $searchIndexFilter = sprintf(' AND r.id IN (%s)', implode(',', array_map('intval', $searchIndexIds)));
+        }
 
         $qry = sprintf(
             "SELECT r.id, r.searchname, r.groups_id, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, r.nfostatus, cp.title AS parent_category, c.title AS sub_category, r.group_name,
@@ -52,9 +74,9 @@ class ReleaseBrowseService
 				SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, r.nfostatus, g.name AS group_name, r.movieinfo_id
 				FROM releases r
 				LEFT JOIN usenet_groups g ON g.id = r.groups_id
-				WHERE r.passwordstatus %s
-				%s %s %s %s %s
-				ORDER BY %s %s %s
+				WHERE r.passwordstatus %1\$s
+				%2\$s %3\$s %4\$s %5\$s %6\$s %7\$s
+				ORDER BY %8\$s %9\$s %10\$s
 			) r
 			LEFT JOIN categories c ON c.id = r.categories_id
 			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
@@ -65,13 +87,14 @@ class ReleaseBrowseService
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 			GROUP BY r.id
-			ORDER BY %7\$s %8\$s",
+			ORDER BY %8\$s %9\$s",
             $this->showPasswords(),
             Category::getCategorySearch($cat),
             ($maxAge > 0 ? (' AND postdate > NOW() - INTERVAL '.$maxAge.' DAY ') : ''),
             (\count($excludedCats) ? (' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')') : ''),
             ((int) $groupName !== -1 ? sprintf(' AND g.name = %s ', escapeString($groupName)) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
+            $searchIndexFilter,
             $orderBy[0],
             $orderBy[1],
             ($start === 0 ? ' LIMIT '.$num : ' LIMIT '.$num.' OFFSET '.$start)
@@ -84,8 +107,13 @@ class ReleaseBrowseService
         }
         $sql = DB::select($qry);
         if (\count($sql) > 0) {
-            $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
-            $sql[0]->_totalcount = $sql[0]->_totalrows = $possibleRows;
+            // When using search index, use the ID count for total rows
+            if (!empty($searchIndexIds)) {
+                $sql[0]->_totalcount = $sql[0]->_totalrows = count($searchIndexIds);
+            } else {
+                $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
+                $sql[0]->_totalcount = $sql[0]->_totalrows = $possibleRows;
+            }
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
         Cache::put($cacheKey, $sql, $expiresAt);
@@ -260,6 +288,61 @@ class ReleaseBrowseService
     private function getCacheVersion(): int
     {
         return Cache::get(self::CACHE_VERSION_KEY, 1);
+    }
+
+    /**
+     * Search releases using the search index with category filtering.
+     * This method pre-filters results via the search index before hitting the database,
+     * significantly improving performance for searches with text terms.
+     *
+     * @param  string  $searchTerm  Search term to match
+     * @param  array  $categories  Category IDs to filter by (optional)
+     * @param  int  $limit  Maximum number of results
+     * @return array Array of release IDs matching the search criteria
+     */
+    public function searchByIndexWithCategories(string $searchTerm, array $categories = [], int $limit = 1000): array
+    {
+        if (empty($searchTerm) || !Search::isAvailable()) {
+            return [];
+        }
+
+        $searchResult = Search::searchReleasesWithFuzzy(['searchname' => $searchTerm], $limit);
+        $releaseIds = $searchResult['ids'] ?? [];
+
+        if (empty($releaseIds)) {
+            return [];
+        }
+
+        // If categories are specified, filter the results by querying the database for just the IDs
+        if (!empty($categories) && !in_array(-1, $categories, true)) {
+            $filteredIds = Release::query()
+                ->select('id')
+                ->whereIn('id', $releaseIds)
+                ->whereIn('categories_id', $categories)
+                ->pluck('id')
+                ->toArray();
+
+            return $filteredIds;
+        }
+
+        return $releaseIds;
+    }
+
+    /**
+     * Get releases by external media ID using search index.
+     * Useful for movie/TV browse pages that need to find all releases for a specific movie/show.
+     *
+     * @param  array  $externalIds  Associative array of external IDs (e.g., ['imdbid' => 123456])
+     * @param  int  $limit  Maximum number of results
+     * @return array Array of release IDs
+     */
+    public function getReleasesByExternalId(array $externalIds, int $limit = 100): array
+    {
+        if (empty($externalIds) || !Search::isAvailable()) {
+            return [];
+        }
+
+        return Search::searchReleasesByExternalId($externalIds, $limit);
     }
 
     /**

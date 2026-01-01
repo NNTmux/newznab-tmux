@@ -2491,6 +2491,158 @@ class ElasticSearchDriver implements SearchDriverInterface
 
         return [];
     }
+
+    /**
+     * Search releases by category ID using the search index.
+     * This provides a fast way to get release IDs for a specific category without hitting the database.
+     *
+     * @param  array  $categoryIds  Array of category IDs to filter by
+     * @param  int  $limit  Maximum number of results
+     * @return array Array of release IDs
+     */
+    public function searchReleasesByCategory(array $categoryIds, int $limit = 1000): array
+    {
+        if (empty($categoryIds)) {
+            return [];
+        }
+
+        // Filter out invalid category IDs (-1 means "all categories")
+        $validCategoryIds = array_filter($categoryIds, fn ($id) => $id > 0);
+        if (empty($validCategoryIds)) {
+            return [];
+        }
+
+        $cacheKey = 'es:releases:cat:'.md5(serialize($validCategoryIds).':'.$limit);
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        try {
+            $client = $this->getClient();
+
+            $searchParams = [
+                'index' => $this->getReleasesIndex(),
+                'body' => [
+                    'query' => [
+                        'terms' => [
+                            'categories_id' => array_map('intval', $validCategoryIds),
+                        ],
+                    ],
+                    'size' => min($limit, self::MAX_RESULTS),
+                    '_source' => false,
+                ],
+            ];
+
+            $response = $client->search($searchParams);
+
+            $resultIds = [];
+            if (isset($response['hits']['hits'])) {
+                foreach ($response['hits']['hits'] as $hit) {
+                    $resultIds[] = $hit['_id'];
+                }
+            }
+
+            if (! empty($resultIds)) {
+                Cache::put($cacheKey, $resultIds, now()->addMinutes(self::CACHE_TTL_MINUTES));
+            }
+
+            return $resultIds;
+
+        } catch (\Throwable $e) {
+            Log::error('ElasticSearch searchReleasesByCategory error: '.$e->getMessage(), [
+                'categoryIds' => $categoryIds,
+            ]);
+        }
+
+        return [];
+    }
+
+    /**
+     * Combined search: text search with category filtering.
+     * First searches by text, then filters by category IDs using the search index.
+     *
+     * @param  string  $searchTerm  Search text
+     * @param  array  $categoryIds  Array of category IDs to filter by (empty for all categories)
+     * @param  int  $limit  Maximum number of results
+     * @return array Array of release IDs
+     */
+    public function searchReleasesWithCategoryFilter(string $searchTerm, array $categoryIds = [], int $limit = 1000): array
+    {
+        if (empty($searchTerm)) {
+            // If no search term, just filter by category
+            return $this->searchReleasesByCategory($categoryIds, $limit);
+        }
+
+        // Filter out invalid category IDs
+        $validCategoryIds = array_filter($categoryIds, fn ($id) => $id > 0);
+
+        $cacheKey = 'es:releases:search_cat:'.md5($searchTerm.':'.serialize($validCategoryIds).':'.$limit);
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        try {
+            $client = $this->getClient();
+
+            $query = [
+                'bool' => [
+                    'must' => [
+                        [
+                            'multi_match' => [
+                                'query' => $searchTerm,
+                                'fields' => ['searchname^3', 'name^2', 'filename'],
+                                'type' => 'best_fields',
+                                'fuzziness' => 'AUTO',
+                            ],
+                        ],
+                    ],
+                ],
+            ];
+
+            // Add category filter if provided
+            if (! empty($validCategoryIds)) {
+                $query['bool']['filter'] = [
+                    'terms' => [
+                        'categories_id' => array_map('intval', $validCategoryIds),
+                    ],
+                ];
+            }
+
+            $searchParams = [
+                'index' => $this->getReleasesIndex(),
+                'body' => [
+                    'query' => $query,
+                    'size' => min($limit, self::MAX_RESULTS),
+                    '_source' => false,
+                ],
+            ];
+
+            $response = $client->search($searchParams);
+
+            $resultIds = [];
+            if (isset($response['hits']['hits'])) {
+                foreach ($response['hits']['hits'] as $hit) {
+                    $resultIds[] = $hit['_id'];
+                }
+            }
+
+            if (! empty($resultIds)) {
+                Cache::put($cacheKey, $resultIds, now()->addMinutes(self::CACHE_TTL_MINUTES));
+            }
+
+            return $resultIds;
+
+        } catch (\Throwable $e) {
+            Log::error('ElasticSearch searchReleasesWithCategoryFilter error: '.$e->getMessage(), [
+                'searchTerm' => $searchTerm,
+                'categoryIds' => $categoryIds,
+            ]);
+        }
+
+        return [];
+    }
 }
 
 
