@@ -235,11 +235,10 @@ class UpdateReleasesIndexSchema extends Command
                 return Command::SUCCESS;
             }
 
-            // Add each field using ALTER TABLE
+            // Add each field using the ManticoreSearch PHP client alter method
             foreach ($fieldsToAdd as $field => $type) {
                 try {
-                    $sql = "ALTER TABLE releases_rt ADD COLUMN {$field} {$type}";
-                    $this->client->sql(['body' => ['query' => $sql]]);
+                    $this->client->table('releases_rt')->alter('add', $field, $type);
                     $this->info("Added field: {$field}");
                 } catch (ResponseException $e) {
                     if (str_contains($e->getMessage(), 'already exists')) {
@@ -427,16 +426,13 @@ class UpdateReleasesIndexSchema extends Command
     private function documentHasMediaIds(string $indexName, int $id): bool
     {
         try {
-            $result = $this->client->sql([
-                'body' => [
-                    'query' => "SELECT imdbid, tmdbid, traktid, tvdb, tvmaze, tvrage FROM {$indexName} WHERE id = {$id}"
-                ]
-            ]);
+            $doc = $this->client->table($indexName)->getDocumentById($id);
 
-            $data = $result[0]['data'][0] ?? null;
-            if (!$data) {
+            if (!$doc) {
                 return false;
             }
+
+            $data = $doc->getData();
 
             // Check if any media ID is non-zero
             return ($data['imdbid'] ?? 0) > 0
@@ -462,15 +458,8 @@ class UpdateReleasesIndexSchema extends Command
 
         foreach ($batch as $item) {
             try {
-                // Use UPDATE to modify existing documents
-                $setClause = [];
-                foreach ($item['data'] as $field => $value) {
-                    $setClause[] = "{$field} = {$value}";
-                }
-                $setStr = implode(', ', $setClause);
-
-                $sql = "UPDATE {$indexName} SET {$setStr} WHERE id = {$item['id']}";
-                $this->client->sql(['body' => ['query' => $sql]]);
+                // Use updateDocument to modify existing documents
+                $this->client->table($indexName)->updateDocument($item['data'], $item['id']);
                 $updated++;
             } catch (\Throwable $e) {
                 // If update fails, try replace (document might not exist in index yet)
@@ -498,17 +487,12 @@ class UpdateReleasesIndexSchema extends Command
     {
         // First, try to get the existing document
         try {
-            $result = $this->client->sql([
-                'body' => [
-                    'query' => "SELECT * FROM {$indexName} WHERE id = {$id}"
-                ]
-            ]);
+            $doc = $this->client->table($indexName)->getDocumentById($id);
 
-            $existingDoc = $result[0]['data'][0] ?? null;
-
-            if ($existingDoc) {
+            if ($doc) {
                 // Merge existing data with new media data
-                $document = array_merge($existingDoc, $mediaData);
+                $existingData = $doc->getData();
+                $document = array_merge($existingData, $mediaData);
                 unset($document['id']); // ID is passed separately
 
                 $this->client->table($indexName)->replaceDocument($document, $id);
