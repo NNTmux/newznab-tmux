@@ -155,39 +155,32 @@ class CreateMediaIndexes extends Command
             if ($indexExists) {
                 if ($dropExisting) {
                     $this->warn("Dropping existing index: {$indexName}");
-                    $client->table($indexName)->drop(true);
+                    $client->tables()->drop(['index' => $indexName, 'body' => ['silent' => true]]);
                 } else {
                     $this->info("Index {$indexName} already exists. Use --drop to recreate.");
                     return true;
                 }
             }
 
-            // Create the index using SQL
+            // Create the index using the ManticoreSearch PHP client
             $this->info("Creating index: {$indexName}");
 
-            // Build column definitions for CREATE TABLE
-            $columnDefs = [];
-            foreach ($schema['columns'] as $columnName => $columnDef) {
-                $type = match ($columnDef['type']) {
-                    'text' => 'text',
-                    'string' => 'string',
-                    'integer' => 'int',
-                    default => $columnDef['type'],
-                };
-                $columnDefs[] = "{$columnName} {$type}";
-            }
-
-            $columnsSQL = implode(', ', $columnDefs);
-            $minInfixLen = $schema['settings']['min_infix_len'] ?? 2;
-
-            $sql = "CREATE TABLE {$indexName} ({$columnsSQL}) min_infix_len='{$minInfixLen}'";
-
-            $client->sql(['body' => ['query' => $sql]]);
+            // Use the same format as CreateManticoreIndexes - pass schema directly
+            $response = $client->tables()->create([
+                'index' => $indexName,
+                'body' => $schema,
+            ]);
 
             $this->info("Index {$indexName} created successfully.");
+            $this->line('Response: ' . json_encode($response, JSON_PRETTY_PRINT));
             return true;
 
         } catch (ResponseException $e) {
+            // Check if the error is because the index already exists
+            if (str_contains($e->getMessage(), 'already exists')) {
+                $this->warn("Index {$indexName} already exists. Use --drop to recreate.");
+                return true;
+            }
             $this->error("Failed to create index {$indexName}: " . $e->getMessage());
             return false;
         } catch (\Throwable $e) {
