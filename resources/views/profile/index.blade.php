@@ -113,25 +113,26 @@
                                                 $now = \Carbon\Carbon::now();
                                                 $isExpired = $roleExpiryDate->isPast();
                                                 $daysUntilExpiry = $now->diffInDays($roleExpiryDate, false);
+                                                $expiryDiff = $roleExpiryDate->diffForHumans(['parts' => 2]);
                                             @endphp
                                             <div class="flex items-center">
                                                 <i class="fa fa-calendar-times text-gray-400 mr-2"></i>
                                                 <span class="font-medium">{{ $roleExpiryDate->format('M d, Y') }}</span>
                                                 @if($isExpired)
                                                     <span class="ml-2 px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs rounded">
-                                                        <i class="fa fa-exclamation-circle mr-1"></i>Expired {{ $roleExpiryDate->diffForHumans() }}
+                                                        <i class="fa fa-exclamation-circle mr-1"></i>Expired {{ $expiryDiff }}
                                                     </span>
                                                 @elseif($daysUntilExpiry <= 7)
                                                     <span class="ml-2 px-2 py-1 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 text-xs rounded">
-                                                        <i class="fa fa-clock mr-1"></i>Expires {{ $roleExpiryDate->diffForHumans() }}
+                                                        <i class="fa fa-clock mr-1"></i>Expires {{ $expiryDiff }}
                                                     </span>
                                                 @elseif($daysUntilExpiry <= 30)
                                                     <span class="ml-2 px-2 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-xs rounded">
-                                                        <i class="fa fa-clock mr-1"></i>Expires {{ $roleExpiryDate->diffForHumans() }}
+                                                        <i class="fa fa-clock mr-1"></i>Expires {{ $expiryDiff }}
                                                     </span>
                                                 @else
                                                     <span class="ml-2 px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded">
-                                                        <i class="fa fa-check-circle mr-1"></i>Expires {{ $roleExpiryDate->diffForHumans() }}
+                                                        <i class="fa fa-check-circle mr-1"></i>Expires {{ $expiryDiff }}
                                                     </span>
                                                 @endif
                                             </div>
