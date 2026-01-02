@@ -91,12 +91,13 @@
                                            title="Edit">
                                             <i class="fa fa-edit"></i>
                                         </a>
-                                        <a href="{{ url('admin/release-delete/' . $release->id) }}"
-                                           class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                           title="Delete"
-                                           data-confirm="Are you sure you want to delete this release?">
+                                        <button type="button"
+                                               class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                               data-delete-release="{{ $release->guid }}"
+                                               data-delete-url="{{ url('admin/release-delete/' . $release->guid) }}"
+                                               title="Delete">
                                             <i class="fa fa-trash"></i>
-                                        </a>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>

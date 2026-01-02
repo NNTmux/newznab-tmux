@@ -733,8 +733,8 @@ window.showConfirm = function(options) {
         detailsDiv.classList.add('hidden');
     }
 
-    // Store callback
-    confirmationCallback = config.onConfirm;
+    // Store callback for use when confirm is clicked
+    const storedOnConfirm = config.onConfirm;
 
     // Show modal
     modal.classList.remove('hidden');
@@ -743,8 +743,8 @@ window.showConfirm = function(options) {
     // Return promise for async/await usage
     return new Promise((resolve, reject) => {
         confirmationCallback = function(confirmed) {
-            if (confirmed && config.onConfirm) {
-                config.onConfirm();
+            if (confirmed && storedOnConfirm) {
+                storedOnConfirm();
             }
             resolve(confirmed);
         };
@@ -1172,7 +1172,87 @@ function initRegexManagement() {
             }
             e.preventDefault();
         }
+
+        // Handle release delete buttons
+        if (e.target.hasAttribute('data-delete-release') || e.target.closest('[data-delete-release]')) {
+            const element = e.target.hasAttribute('data-delete-release') ? e.target : e.target.closest('[data-delete-release]');
+            const id = element.getAttribute('data-delete-release');
+            const deleteUrl = element.getAttribute('data-delete-url');
+
+            showConfirm({
+                title: 'Delete Release',
+                message: 'Are you sure you want to delete this release? This action cannot be undone.',
+                type: 'danger',
+                confirmText: 'Delete',
+                onConfirm: function() {
+                    deleteRelease(id, deleteUrl, element);
+                }
+            });
+            e.preventDefault();
+        }
     });
+
+    // Delete release function
+    window.deleteRelease = function(id, deleteUrl, element) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+        if (!csrfToken) {
+            console.error('CSRF token not found');
+            if (typeof showToast === 'function') {
+                showToast('Security token not found. Please refresh the page.', 'error');
+            }
+            return;
+        }
+
+        console.log('Deleting release:', id, 'URL:', deleteUrl);
+
+        if (typeof showToast === 'function') {
+            showToast('Deleting release...', 'info');
+        }
+
+        fetch(deleteUrl, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            console.log('Delete response status:', response.status);
+            if (response.ok) {
+                const row = element.closest('tr');
+                if (row) {
+                    row.style.transition = 'opacity 0.3s';
+                    row.style.opacity = '0';
+                    setTimeout(() => row.remove(), 300);
+                }
+                if (typeof showToast === 'function') {
+                    showToast('Release deleted successfully', 'success');
+                } else {
+                    showMessage('Release deleted successfully', 'success');
+                }
+            } else {
+                return response.text().then(text => {
+                    console.error('Delete failed with status:', response.status, 'Response:', text);
+                    if (typeof showToast === 'function') {
+                        showToast('Error deleting release: ' + response.status, 'error');
+                    } else {
+                        showMessage('Error deleting release', 'error');
+                    }
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting release:', error);
+            if (typeof showToast === 'function') {
+                showToast('Error deleting release: ' + error.message, 'error');
+            } else {
+                showMessage('Error deleting release', 'error');
+            }
+        });
+    };
 }
 
 // Mediainfo and Filelist Modals
