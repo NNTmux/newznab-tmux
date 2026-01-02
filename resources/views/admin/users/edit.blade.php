@@ -416,7 +416,7 @@
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-xs text-gray-600 dark:text-gray-400">Time until activation:</span>
-                                    <span class="text-sm font-semibold text-blue-600 dark:text-blue-400">{{ $pendingStartDate->diffForHumans() }}</span>
+                                    <span class="text-sm font-semibold text-blue-600 dark:text-blue-400">{{ $pendingStartDate->diffForHumans(['parts' => 2]) }}</span>
                                 </div>
                             </div>
 

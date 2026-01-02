@@ -254,7 +254,7 @@
                                             </span>
                                             <span class="text-xs text-gray-500 dark:text-gray-400 flex items-center">
                                                 <i class="fa fa-clock mr-1"></i>{{ $expiryDate->format('g:i A') }}
-                                                <span class="ml-2 italic">({{ $expiryDate->diffForHumans() }})</span>
+                                                <span class="ml-2 italic">({{ $expiryDate->diffForHumans(['parts' => 2]) }})</span>
                                             </span>
                                         </div>
                                     @else
