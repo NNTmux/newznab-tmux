@@ -94,7 +94,7 @@ class ReleaseFileManager
             ->where([
                 'releases_id' => $context->release->id,
                 'name' => $file['name'],
-                'size' => $file['size'],
+                'size' => $file['size'] ?? 0,
             ])
             ->first();
 
@@ -106,8 +106,8 @@ class ReleaseFileManager
         $added = ReleaseFile::addReleaseFiles(
             $context->release->id,
             $file['name'],
-            $file['size'],
-            $file['date'],
+            $file['size'] ?? 0,
+            $file['date'] ?? now(),
             $file['pass'] ?? 0,
             '',
             $file['crc32'] ?? ''
@@ -305,10 +305,10 @@ class ReleaseFileManager
                     if (ReleaseFile::addReleaseFiles(
                         $context->release->id,
                         $file['name'],
-                        $file['size'],
+                        $file['size'] ?? 0,
                         $postDate,
                         0,
-                        $file['hash_16K']
+                        $file['hash_16K'] ?? ''
                     )) {
                         $filesAdded++;
                     }

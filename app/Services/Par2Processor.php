@@ -97,10 +97,10 @@ class Par2Processor
                         if (ReleaseFile::addReleaseFiles(
                             $relID,
                             $file['name'],
-                            $file['size'],
+                            $file['size'] ?? 0,
                             $query['postdate'] !== null ? Carbon::createFromFormat('Y-m-d H:i:s', $query['postdate']) : now(),
                             0,
-                            $file['hash_16K']
+                            $file['hash_16K'] ?? ''
                         )) {
                             $filesAdded++;
                         }
