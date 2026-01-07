@@ -125,4 +125,3 @@ class MovieCollection extends ResourceCollection
         return null;
     }
 }
-

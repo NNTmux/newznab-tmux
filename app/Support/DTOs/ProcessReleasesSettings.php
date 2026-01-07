@@ -49,12 +49,11 @@ final readonly class ProcessReleasesSettings
     /**
      * Create settings from database values.
      *
-     * @param array<string, mixed> $dbSettings
+     * @param  array<string, mixed>  $dbSettings
      */
     public static function fromDatabase(array $dbSettings): self
     {
-        $getInt = static fn(string $key, int $default): int =>
-            ($dbSettings[$key] ?? '') !== '' ? (int) $dbSettings[$key] : $default;
+        $getInt = static fn (string $key, int $default): int => ($dbSettings[$key] ?? '') !== '' ? (int) $dbSettings[$key] : $default;
 
         $completion = min(100, $getInt('completionpercent', self::DEFAULTS['completion']));
 
@@ -72,7 +71,7 @@ final readonly class ProcessReleasesSettings
             miscOtherRetentionHours: $getInt('miscotherretentionhours', self::DEFAULTS['miscOtherRetentionHours']),
             miscHashedRetentionHours: $getInt('mischashedretentionhours', self::DEFAULTS['miscHashedRetentionHours']),
             partRetentionHours: $getInt('partretentionhours', self::DEFAULTS['partRetentionHours']),
-            lastRunTime: !empty($dbSettings['last_run_time']) ? (string) $dbSettings['last_run_time'] : null,
+            lastRunTime: ! empty($dbSettings['last_run_time']) ? (string) $dbSettings['last_run_time'] : null,
         );
     }
 
@@ -108,4 +107,3 @@ final readonly class ProcessReleasesSettings
         return $this->completion > 0;
     }
 }
-

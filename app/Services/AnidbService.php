@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\AnidbInfo;
 use App\Models\AnidbTitle;
 use App\Models\Category;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -242,4 +241,3 @@ class AnidbService
         return $result;
     }
 }
-

@@ -16,6 +16,7 @@ use App\Services\NameFixing\Patterns\GamePatterns;
 class GameNameChecker extends AbstractNameChecker
 {
     protected int $priority = 30;
+
     protected string $name = 'Game';
 
     /**
@@ -92,4 +93,3 @@ class GameNameChecker extends AbstractNameChecker
         return null;
     }
 }
-

@@ -26,9 +26,14 @@ class PcCategorizer extends AbstractCategorizer
 
     public function shouldSkip(ReleaseContext $context): bool
     {
-        if ($context->hasAdultMarkers()) return true;
+        if ($context->hasAdultMarkers()) {
+            return true;
+        }
         // Skip TV shows (season patterns)
-        if (preg_match('/[._ -]S\d{1,3}[._ -]?(E\d|Complete|Full|1080|720|480|2160|WEB|HDTV|BluRay)/i', $context->releaseName)) return true;
+        if (preg_match('/[._ -]S\d{1,3}[._ -]?(E\d|Complete|Full|1080|720|480|2160|WEB|HDTV|BluRay)/i', $context->releaseName)) {
+            return true;
+        }
+
         return false;
     }
 
@@ -110,8 +115,8 @@ class PcCategorizer extends AbstractCategorizer
         // Check for PC game patterns
         // PC_GROUPS must be at the END of the release name (scene naming: Game.Name-GROUP)
         // PC_KEYWORDS can appear anywhere
-        $groupPattern = '/[-.](' . self::PC_GROUPS . ')$/i';
-        $keywordPattern = '/' . self::PC_KEYWORDS . '/i';
+        $groupPattern = '/[-.]('.self::PC_GROUPS.')$/i';
+        $keywordPattern = '/'.self::PC_KEYWORDS.'/i';
 
         if (preg_match($groupPattern, $name) || preg_match($keywordPattern, $name)) {
             return $this->matched(Category::PC_GAMES, 0.9, 'pc_game');
@@ -159,4 +164,3 @@ class PcCategorizer extends AbstractCategorizer
         return null;
     }
 }
-

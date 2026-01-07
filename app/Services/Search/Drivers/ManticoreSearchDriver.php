@@ -758,7 +758,6 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
         $result = $this->fuzzySearchIndexes($this->getReleasesIndex(), $searchArray, $limit);
 
-
         return ! empty($result) ? ($result['id'] ?? []) : [];
     }
 
@@ -855,6 +854,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 Log::warning('ManticoreSearch fuzzySearchIndexes: Fuzzy search unavailable - index missing min_infix_len setting. Please recreate the index with: php artisan manticore:create-indexes --drop', [
                     'index' => $index,
                 ]);
+
                 // Fall back to regular search without fuzzy
                 return $this->searchIndexes($index, '', [], $searchArray);
             }
@@ -1499,6 +1499,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
         foreach ($movies as $movie) {
             if (empty($movie['id'])) {
                 $errors++;
+
                 continue;
             }
 
@@ -1699,6 +1700,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
         foreach ($tvShows as $tvShow) {
             if (empty($tvShow['id'])) {
                 $errors++;
+
                 continue;
             }
 
@@ -1971,5 +1973,3 @@ class ManticoreSearchDriver implements SearchDriverInterface
         return [];
     }
 }
-
-

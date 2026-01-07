@@ -18,16 +18,17 @@ class UsenetDownloadService
     public function __construct(
         private readonly ProcessingConfiguration $config
     ) {
-        $this->nntp = new NNTPService();
+        $this->nntp = new NNTPService;
     }
 
     /**
      * Download binary content from usenet using message IDs.
      *
-     * @param array|string $messageIDs Single or array of message IDs
-     * @param string $groupName Group name for logging
-     * @param int|null $releaseId Release ID for logging
+     * @param  array|string  $messageIDs  Single or array of message IDs
+     * @param  string  $groupName  Group name for logging
+     * @param  int|null  $releaseId  Release ID for logging
      * @return array{success: bool, data: string|null, groupUnavailable: bool, error: string|null}
+     *
      * @throws Exception
      */
     public function downloadByMessageIDs(
@@ -44,6 +45,7 @@ class UsenetDownloadService
 
         if (empty($messageIDs)) {
             $result['error'] = 'No message IDs provided';
+
             return $result;
         }
 
@@ -75,6 +77,7 @@ class UsenetDownloadService
                 ) {
                     $result['groupUnavailable'] = true;
                     $result['error'] = 'Group unavailable: '.$errorMessage;
+
                     return $result;
                 }
             }
@@ -92,11 +95,13 @@ class UsenetDownloadService
             }
 
             $result['error'] = $errorMessage ?? 'Download failed';
+
             return $result;
         }
 
         $result['success'] = true;
         $result['data'] = $binary;
+
         return $result;
     }
 
@@ -147,11 +152,12 @@ class UsenetDownloadService
     /**
      * Download compressed file content (RAR, ZIP, etc.).
      *
-     * @param array $messageIDs Message IDs to download
-     * @param string $groupName Group name for logging
-     * @param int|null $releaseId Release ID for logging
-     * @param string|null $fileTitle File title for logging
+     * @param  array  $messageIDs  Message IDs to download
+     * @param  string  $groupName  Group name for logging
+     * @param  int|null  $releaseId  Release ID for logging
+     * @param  string|null  $fileTitle  File title for logging
      * @return array{success: bool, data: string|null, groupUnavailable: bool, error: string|null}
+     *
      * @throws Exception
      */
     public function downloadCompressedFile(
@@ -200,4 +206,3 @@ class UsenetDownloadService
         return strlen($data) > $minimumBytes;
     }
 }
-

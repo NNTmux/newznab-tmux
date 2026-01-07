@@ -34,7 +34,7 @@ class NameCheckerService
 
     public function __construct()
     {
-        $this->checkers = new Collection();
+        $this->checkers = new Collection;
         $this->registerDefaultCheckers();
     }
 
@@ -43,10 +43,10 @@ class NameCheckerService
      */
     protected function registerDefaultCheckers(): void
     {
-        $this->addChecker(new TvNameChecker());
-        $this->addChecker(new MovieNameChecker());
-        $this->addChecker(new GameNameChecker());
-        $this->addChecker(new AppNameChecker());
+        $this->addChecker(new TvNameChecker);
+        $this->addChecker(new MovieNameChecker);
+        $this->addChecker(new GameNameChecker);
+        $this->addChecker(new AppNameChecker);
     }
 
     /**
@@ -56,14 +56,15 @@ class NameCheckerService
     {
         $this->checkers->push($checker);
         $this->sorted = false;
+
         return $this;
     }
 
     /**
      * Check a release name against all registered checkers.
      *
-     * @param object $release The release object
-     * @param string $textstring The text to check
+     * @param  object  $release  The release object
+     * @param  string  $textstring  The text to check
      * @return NameFixResult|null The first matching result, or null if no match
      */
     public function check(object $release, string $textstring): ?NameFixResult
@@ -85,14 +86,14 @@ class NameCheckerService
      *
      * Useful for debugging or when you want to see all potential matches.
      *
-     * @param object $release The release object
-     * @param string $textstring The text to check
+     * @param  object  $release  The release object
+     * @param  string  $textstring  The text to check
      * @return Collection<int, NameFixResult> All matching results
      */
     public function checkAll(object $release, string $textstring): Collection
     {
         $this->ensureSorted();
-        $results = new Collection();
+        $results = new Collection;
 
         foreach ($this->checkers as $checker) {
             $result = $checker->check($release, $textstring);
@@ -107,9 +108,9 @@ class NameCheckerService
     /**
      * Check using a specific checker by name.
      *
-     * @param string $checkerName The name of the checker to use
-     * @param object $release The release object
-     * @param string $textstring The text to check
+     * @param  string  $checkerName  The name of the checker to use
+     * @param  object  $release  The release object
+     * @param  string  $textstring  The text to check
      * @return NameFixResult|null The result if matched, null otherwise
      */
     public function checkWith(string $checkerName, object $release, string $textstring): ?NameFixResult
@@ -129,6 +130,7 @@ class NameCheckerService
     public function getCheckers(): Collection
     {
         $this->ensureSorted();
+
         return $this->checkers;
     }
 
@@ -149,7 +151,7 @@ class NameCheckerService
      */
     protected function ensureSorted(): void
     {
-        if (!$this->sorted) {
+        if (! $this->sorted) {
             $this->checkers = $this->checkers->sortBy(
                 fn (NameCheckerInterface $checker) => $checker->getPriority()
             )->values();
@@ -157,4 +159,3 @@ class NameCheckerService
         }
     }
 }
-

@@ -452,6 +452,7 @@ final class User extends Authenticatable
 
         return $stackedHistory->map(function ($history) {
             $role = Role::find($history->new_role_id);
+
             return [
                 'role' => $role,
                 'role_name' => $role?->name ?? 'Unknown Role',
@@ -504,7 +505,7 @@ final class User extends Authenticatable
         ?string $createdFrom = '',
         ?string $createdTo = '',
     ): int {
-        return static::query()
+        return self::query()
             ->withTrashed()
             ->excludeSharing()
             ->when($role, fn (Builder $q) => $q->where('roles_id', $role))
@@ -521,7 +522,7 @@ final class User extends Authenticatable
      */
     public static function findByUsername(string $username): ?static
     {
-        return static::whereUsername($username)->first();
+        return self::whereUsername($username)->first();
     }
 
     /**
@@ -1074,6 +1075,7 @@ final class User extends Authenticatable
      * Get paginated user list with filters.
      *
      * @return Collection<int, static>
+     *
      * @throws \Throwable
      */
     public static function getRange(
@@ -1343,8 +1345,6 @@ final class User extends Authenticatable
 
     /**
      * Create a new user.
-     *
-     * @return int|false
      */
     public static function add(
         string $userName,
@@ -1380,6 +1380,7 @@ final class User extends Authenticatable
      * Get excluded category IDs for a user.
      *
      * @return array<int>
+     *
      * @throws \Exception
      */
     public static function getCategoryExclusionById(int $userId): array

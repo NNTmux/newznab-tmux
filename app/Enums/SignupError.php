@@ -37,4 +37,3 @@ enum SignupError: int
         return $this === self::SUCCESS;
     }
 }
-

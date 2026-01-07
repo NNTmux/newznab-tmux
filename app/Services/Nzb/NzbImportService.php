@@ -62,7 +62,7 @@ class NzbImportService
     {
         $this->echoCLI = config('nntmux.echocli');
         $this->blacklistService = new BlacklistService;
-        $this->category = new CategorizationService();
+        $this->category = new CategorizationService;
         $this->nzb = app(NzbService::class);
         $this->releaseCleaner = new ReleaseCleaningService;
         $this->crossPostt = Settings::settingValue('crossposttime') !== '' ? Settings::settingValue('crossposttime') : 2;
@@ -117,7 +117,6 @@ class NzbImportService
         // Loop over the NZB file names only.
         foreach ($nzbFiles as $nzbFilePath) {
             $this->nzbGuid = '';
-
 
             // Check if the file is really there.
             if (File::isFile($nzbFilePath)) {
@@ -460,4 +459,3 @@ class NzbImportService
         }
     }
 }
-

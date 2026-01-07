@@ -45,6 +45,7 @@ class ReprocessTvRelease extends Command
 
         if ($release === null) {
             $this->error("Release with GUID '{$guid}' not found.");
+
             return self::FAILURE;
         }
 
@@ -54,7 +55,7 @@ class ReprocessTvRelease extends Command
             [[
                 $release->id,
                 $release->guid,
-                mb_substr($release->searchname, 0, 60) . (strlen($release->searchname) > 60 ? '...' : ''),
+                mb_substr($release->searchname, 0, 60).(strlen($release->searchname) > 60 ? '...' : ''),
                 $release->videos_id,
                 $release->tv_episodes_id,
                 $release->categories_id,
@@ -81,14 +82,14 @@ class ReprocessTvRelease extends Command
 
             if ($result['matched']) {
                 cli()->primary('Successfully matched!');
-                $this->info('Provider: ' . ($result['provider'] ?? 'Unknown'));
-                $this->info('Video ID: ' . ($result['video_id'] ?? 'N/A'));
-                $this->info('Episode ID: ' . ($result['episode_id'] ?? 'N/A'));
+                $this->info('Provider: '.($result['provider'] ?? 'Unknown'));
+                $this->info('Video ID: '.($result['video_id'] ?? 'N/A'));
+                $this->info('Episode ID: '.($result['episode_id'] ?? 'N/A'));
             } else {
                 cli()->warning('No match found.');
-                $this->info('Status: ' . ($result['status'] ?? 'Unknown'));
+                $this->info('Status: '.($result['status'] ?? 'Unknown'));
                 if (isset($result['provider'])) {
-                    $this->info('Last provider tried: ' . $result['provider']);
+                    $this->info('Last provider tried: '.$result['provider']);
                 }
             }
 
@@ -110,10 +111,11 @@ class ReprocessTvRelease extends Command
             return self::SUCCESS;
         } catch (\Throwable $e) {
             Log::error($e->getTraceAsString());
-            $this->error('Error processing release: ' . $e->getMessage());
+            $this->error('Error processing release: '.$e->getMessage());
             if ($debug) {
                 $this->error($e->getTraceAsString());
             }
+
             return self::FAILURE;
         }
     }

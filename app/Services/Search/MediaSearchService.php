@@ -7,7 +7,6 @@ use App\Models\MovieInfo;
 use App\Models\Release;
 use App\Models\Video;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Service for optimized media searches using search indexes.
@@ -302,4 +301,3 @@ class MediaSearchService
         return $result;
     }
 }
-

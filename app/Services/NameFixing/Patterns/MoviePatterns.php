@@ -133,4 +133,3 @@ final class MoviePatterns
         ];
     }
 }
-

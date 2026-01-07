@@ -16,6 +16,7 @@ use App\Services\NameFixing\Patterns\AppPatterns;
 class AppNameChecker extends AbstractNameChecker
 {
     protected int $priority = 40;
+
     protected string $name = 'App';
 
     /**
@@ -96,4 +97,3 @@ class AppNameChecker extends AbstractNameChecker
         return null;
     }
 }
-

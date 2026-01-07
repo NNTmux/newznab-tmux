@@ -2,9 +2,9 @@
 
 namespace App\Services\TvProcessing\Pipes;
 
+use App\Services\TvProcessing\Providers\TvMazeProvider;
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
-use App\Services\TvProcessing\Providers\TvMazeProvider;
 
 /**
  * Pipe for TVMaze API lookups.
@@ -13,9 +13,11 @@ class TvMazePipe extends AbstractTvProviderPipe
 {
     // Video type and source constants (matching Videos class protected constants)
     private const TYPE_TV = 0;
+
     private const SOURCE_TVMAZE = 4;
 
     protected int $priority = 30;
+
     private ?TvMazeProvider $tvmaze = null;
 
     public function getName(): string
@@ -34,8 +36,9 @@ class TvMazePipe extends AbstractTvProviderPipe
     private function getTvMaze(): TvMazeProvider
     {
         if ($this->tvmaze === null) {
-            $this->tvmaze = new TvMazeProvider();
+            $this->tvmaze = new TvMazeProvider;
         }
+
         return $this->tvmaze;
     }
 
@@ -53,6 +56,7 @@ class TvMazePipe extends AbstractTvProviderPipe
         // Check if we've already failed this title
         if ($this->isInTitleCache($cleanName)) {
             $this->outputSkipped($cleanName);
+
             return TvProcessingResult::skipped('previously failed', $this->getName());
         }
 
@@ -76,6 +80,7 @@ class TvMazePipe extends AbstractTvProviderPipe
                 // Show exists in our DB (likely from another source like TMDB)
                 // Skip TVMaze API search and proceed to episode matching
                 $this->outputFoundInDb($cleanName);
+
                 return $this->processEpisodeForExistingVideo($passable, $tvmaze, $videoId, $parsedInfo);
             }
         }
@@ -108,6 +113,7 @@ class TvMazePipe extends AbstractTvProviderPipe
             // Show not found
             $this->addToTitleCache($cleanName);
             $this->outputNotFound($cleanName);
+
             return TvProcessingResult::notFound($this->getName(), ['title' => $cleanName]);
         }
 
@@ -125,6 +131,7 @@ class TvMazePipe extends AbstractTvProviderPipe
             // Full season release
             $tvmaze->setVideoIdFound($videoId, $context->releaseId, 0);
             $this->outputFullSeason($cleanName);
+
             return TvProcessingResult::matched($videoId, 0, $this->getName(), ['full_season' => true]);
         }
 
@@ -162,6 +169,7 @@ class TvMazePipe extends AbstractTvProviderPipe
                 $episodeNo !== '' ? (int) $episodeNo : null,
                 $hasAirdate ? $parsedInfo['airdate'] : null
             );
+
             return TvProcessingResult::matched($videoId, (int) $episode, $this->getName());
         }
 
@@ -221,6 +229,7 @@ class TvMazePipe extends AbstractTvProviderPipe
             // Full season release
             $tvmaze->setVideoIdFound($videoId, $context->releaseId, 0);
             $this->outputFullSeason($cleanName);
+
             return TvProcessingResult::matched($videoId, 0, $this->getName(), ['full_season' => true]);
         }
 
@@ -235,6 +244,7 @@ class TvMazePipe extends AbstractTvProviderPipe
                 $episodeNo !== '' ? (int) $episodeNo : null,
                 $hasAirdate ? $parsedInfo['airdate'] : null
             );
+
             return TvProcessingResult::matched($videoId, (int) $episode, $this->getName());
         }
 

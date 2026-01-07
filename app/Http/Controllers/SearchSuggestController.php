@@ -170,4 +170,3 @@ class SearchSuggestController extends Controller
         return response()->json($response);
     }
 }
-

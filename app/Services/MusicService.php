@@ -468,8 +468,6 @@ class MusicService
 
     /**
      * Parse artist and album name from release name.
-     *
-     * @return array|false
      */
     public function parseArtist(string $releaseName): array|false
     {
@@ -501,8 +499,6 @@ class MusicService
 
     /**
      * Match browse node ID to genre name.
-     *
-     * @return string|false
      */
     public function matchBrowseNode(string $nodeId): string|false
     {
@@ -608,8 +604,6 @@ class MusicService
 
     /**
      * Fetch music properties from iTunes.
-     *
-     * @return array|false
      */
     protected function fetchItunesMusicProperties(string $title): array|false
     {
@@ -675,4 +669,3 @@ class MusicService
         ];
     }
 }
-

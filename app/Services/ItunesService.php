@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 class ItunesService
 {
     protected const API_URL = 'https://itunes.apple.com/search';
+
     protected const LOOKUP_URL = 'https://itunes.apple.com/lookup';
 
     protected Client $client;
@@ -347,4 +348,3 @@ class ItunesService
         }
     }
 }
-

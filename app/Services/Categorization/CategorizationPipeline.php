@@ -25,10 +25,11 @@ class CategorizationPipeline
     protected Collection $pipes;
 
     protected bool $categorizeForeign;
+
     protected bool $catWebDL;
 
     /**
-     * @param iterable<AbstractCategorizationPipe> $pipes
+     * @param  iterable<AbstractCategorizationPipe>  $pipes
      */
     public function __construct(iterable $pipes = [])
     {
@@ -53,10 +54,10 @@ class CategorizationPipeline
     /**
      * Determine the category for a release using Laravel Pipeline.
      *
-     * @param int|string $groupId The usenet group ID
-     * @param string $releaseName The name of the release
-     * @param string|null $poster The poster name
-     * @param bool $debug Whether to include debug information
+     * @param  int|string  $groupId  The usenet group ID
+     * @param  string  $releaseName  The name of the release
+     * @param  string|null  $poster  The poster name
+     * @param  bool  $debug  Whether to include debug information
      * @return array The categorization result
      */
     public function categorize(
@@ -103,16 +104,15 @@ class CategorizationPipeline
     public static function createDefault(): self
     {
         return new self([
-            new Pipes\GroupNamePipe(),
-            new Pipes\XxxPipe(),
-            new Pipes\TvPipe(),
-            new Pipes\MoviePipe(),
-            new Pipes\BookPipe(),
-            new Pipes\MusicPipe(),
-            new Pipes\PcPipe(),
-            new Pipes\ConsolePipe(),
-            new Pipes\MiscPipe(),
+            new Pipes\GroupNamePipe,
+            new Pipes\XxxPipe,
+            new Pipes\TvPipe,
+            new Pipes\MoviePipe,
+            new Pipes\BookPipe,
+            new Pipes\MusicPipe,
+            new Pipes\PcPipe,
+            new Pipes\ConsolePipe,
+            new Pipes\MiscPipe,
         ]);
     }
 }
-

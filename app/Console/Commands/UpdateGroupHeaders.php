@@ -41,7 +41,7 @@ class UpdateGroupHeaders extends Command
                 return self::FAILURE;
             }
 
-            $binaries = new BinariesService();
+            $binaries = new BinariesService;
             $binaries->setNntp($nntp);
             $binaries->updateGroup($groupMySQL);
 

@@ -99,4 +99,3 @@ final readonly class SteamPriceData
         ];
     }
 }
-

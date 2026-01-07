@@ -39,12 +39,14 @@ class RedisMonitor extends Command
             if ($once) {
                 $stats = $service->getStats();
 
-                if (!$stats['connected']) {
+                if (! $stats['connected']) {
                     $this->error("Cannot connect to Redis at {$stats['host']}:{$stats['port']}");
+
                     return Command::FAILURE;
                 }
 
                 $this->displayStats($stats);
+
                 return Command::SUCCESS;
             }
 
@@ -54,7 +56,8 @@ class RedisMonitor extends Command
             return Command::SUCCESS;
 
         } catch (\Exception $e) {
-            $this->error('Redis Monitor failed: ' . $e->getMessage());
+            $this->error('Redis Monitor failed: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }
@@ -107,9 +110,9 @@ class RedisMonitor extends Command
             ['Metric', 'Value'],
             [
                 ['Commands Processed', number_format($stats['total_commands'])],
-                ['Operations/sec', number_format($stats['ops_per_sec']) . ' ops/s'],
-                ['Network Input', $stats['input_kbps'] . ' KB/s'],
-                ['Network Output', $stats['output_kbps'] . ' KB/s'],
+                ['Operations/sec', number_format($stats['ops_per_sec']).' ops/s'],
+                ['Network Input', $stats['input_kbps'].' KB/s'],
+                ['Network Output', $stats['output_kbps'].' KB/s'],
             ]
         );
 
@@ -121,7 +124,7 @@ class RedisMonitor extends Command
                 ['Total Keys (db0)', number_format($stats['db_keys'])],
                 ['Keyspace Hits', number_format($stats['keyspace_hits'])],
                 ['Keyspace Misses', number_format($stats['keyspace_misses'])],
-                ['Hit Rate', $stats['hit_rate'] . '%'],
+                ['Hit Rate', $stats['hit_rate'].'%'],
                 ['Expired Keys', number_format($stats['expired_keys'])],
                 ['Evicted Keys', number_format($stats['evicted_keys'])],
             ]
@@ -134,13 +137,13 @@ class RedisMonitor extends Command
     protected function formatBytes(int $bytes): string
     {
         if ($bytes >= 1073741824) {
-            return sprintf("%.2f GB", $bytes / 1073741824);
+            return sprintf('%.2f GB', $bytes / 1073741824);
         } elseif ($bytes >= 1048576) {
-            return sprintf("%.2f MB", $bytes / 1048576);
+            return sprintf('%.2f MB', $bytes / 1048576);
         } elseif ($bytes >= 1024) {
-            return sprintf("%.2f KB", $bytes / 1024);
+            return sprintf('%.2f KB', $bytes / 1024);
         }
-        return $bytes . " B";
+
+        return $bytes.' B';
     }
 }
-

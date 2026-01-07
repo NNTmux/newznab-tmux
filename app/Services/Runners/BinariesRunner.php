@@ -142,11 +142,10 @@ class BinariesRunner extends BaseRunner
 
         foreach ($results as $idx => $output) {
             $group = $groupMapping[$idx] ?? '';
-            if (!empty($group)) {
+            if (! empty($group)) {
                 echo $output;
                 cli()->primary('Updated group '.$group);
             }
         }
     }
 }
-

@@ -13,12 +13,12 @@ use App\Models\Release;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\Categorization\CategorizationService;
+use App\Services\NNTP\NNTPService;
 use App\Services\Nzb\NzbService;
 use App\Services\Releases\ReleaseManagementService;
 use App\Support\DTOs\ProcessReleasesSettings;
 use App\Support\DTOs\ReleaseCreationResult;
 use App\Support\DTOs\ReleaseDeleteStats;
-use App\Services\NNTP\NNTPService;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -38,20 +38,33 @@ use Throwable;
 final class ReleaseProcessingService
 {
     private const int BATCH_SIZE = 500;
+
     private const int MAX_RETRIES = 5;
+
     private const int RETRY_BASE_DELAY_US = 20000;
+
     private const int BATCH_PAUSE_US = 10000;
+
     private const int CATEGORIZE_CHUNK_SIZE = 1000;
+
     private const int NZB_CHUNK_SIZE = 100;
 
     private bool $echoCLI;
+
     private readonly ProcessReleasesSettings $settings;
+
     private readonly NzbService $nzb;
+
     private readonly ReleaseCleaningService $releaseCleaning;
+
     private readonly ReleaseManagementService $releaseManagement;
+
     private readonly ReleaseImageService $releaseImage;
+
     private readonly ReleaseCreationService $releaseCreationService;
+
     private readonly CollectionCleanupService $collectionCleanupService;
+
     private readonly ?PostProcessService $postProcessService;
 
     public function __construct(
@@ -66,14 +79,14 @@ final class ReleaseProcessingService
         $this->echoCLI = (bool) config('nntmux.echocli');
 
         $this->nzb = $nzb ?? app(NzbService::class);
-        $this->releaseCleaning = $releaseCleaning ?? new ReleaseCleaningService();
+        $this->releaseCleaning = $releaseCleaning ?? new ReleaseCleaningService;
         $this->releaseManagement = $releaseManagement ?? app(ReleaseManagementService::class);
-        $this->releaseImage = $releaseImage ?? new ReleaseImageService();
+        $this->releaseImage = $releaseImage ?? new ReleaseImageService;
 
         $this->releaseCreationService = $releaseCreationService
             ?? new ReleaseCreationService($this->releaseCleaning);
         $this->collectionCleanupService = $collectionCleanupService
-            ?? new CollectionCleanupService();
+            ?? new CollectionCleanupService;
         $this->postProcessService = $postProcessService;
 
         $this->settings = $this->loadSettings();
@@ -106,9 +119,9 @@ final class ReleaseProcessingService
      */
     private function validateSettings(): void
     {
-        if (!$this->settings->hasValidCompletion()) {
+        if (! $this->settings->hasValidCompletion()) {
             cli()->error(
-                PHP_EOL . 'Invalid completion setting. Value must be between 0 and 100.'
+                PHP_EOL.'Invalid completion setting. Value must be between 0 and 100.'
             );
         }
     }
@@ -163,16 +176,17 @@ final class ReleaseProcessingService
     public function setEchoCLI(bool $echo): self
     {
         $this->echoCLI = $echo;
+
         return $this;
     }
 
     /**
      * Main method for creating releases/NZB files from collections.
      *
-     * @param int $categorize Categorization type (1=name, 2=searchname)
-     * @param int $postProcess Whether to run post-processing (1=yes)
-     * @param string $groupName Optional group name to filter processing
-     * @param NNTPService $nntp NNTP connection for post-processing
+     * @param  int  $categorize  Categorization type (1=name, 2=searchname)
+     * @param  int  $postProcess  Whether to run post-processing (1=yes)
+     * @param  string  $groupName  Optional group name to filter processing
+     * @param  NNTPService  $nntp  NNTP connection for post-processing
      * @return int Total number of releases added
      *
      * @throws Throwable
@@ -187,7 +201,7 @@ final class ReleaseProcessingService
         $overallStartTime = now()->toImmutable();
 
         $this->outputBanner();
-        if (!$this->validateNzbPath()) {
+        if (! $this->validateNzbPath()) {
             return 0;
         }
 
@@ -227,6 +241,7 @@ final class ReleaseProcessingService
      * Run the release creation loop.
      *
      * @return array{releases: int, nzbs: int, dupes: int, iterations: int}
+     *
      * @throws Throwable
      */
     private function runReleaseCreationLoop(
@@ -265,7 +280,7 @@ final class ReleaseProcessingService
     {
         if ($where !== '') {
             DB::update(
-                'UPDATE releases SET categories_id = ?, iscategorized = 0 ' . $where,
+                'UPDATE releases SET categories_id = ?, iscategorized = 0 '.$where,
                 [Category::OTHER_MISC]
             );
         } else {
@@ -283,7 +298,7 @@ final class ReleaseProcessingService
      */
     public function categorizeRelease(string $type, int|string|null $groupId): int
     {
-        $categorizer = new CategorizationService();
+        $categorizer = new CategorizationService;
         $categorized = 0;
 
         $query = Release::query()
@@ -291,7 +306,7 @@ final class ReleaseProcessingService
             ->where('iscategorized', 0)
             ->select(['id', 'fromname', 'groups_id', $type]);
 
-        if (!empty($groupId)) {
+        if (! empty($groupId)) {
             $query->where('groups_id', $groupId);
         }
 
@@ -414,7 +429,7 @@ final class ReleaseProcessingService
             $groupMinSize = (int) ($groupSettings['minsizetoformrelease'] ?? 0);
             $groupMinFiles = (int) ($groupSettings['minfilestoformrelease'] ?? 0);
 
-            if (!$this->hasSizedCollections()) {
+            if (! $this->hasSizedCollections()) {
                 continue;
             }
 
@@ -480,7 +495,7 @@ final class ReleaseProcessingService
             ->where('nzbstatus', '=', NzbService::NZB_NONE)
             ->select(['id', 'guid', 'name', 'categories_id']);
 
-        if (!empty($groupID)) {
+        if (! empty($groupID)) {
             $query->where('releases.groups_id', $groupID);
         }
 
@@ -495,6 +510,7 @@ final class ReleaseProcessingService
                         $this->outputProgress($nzbCount, $total, 'Creating NZBs');
                     }
                 }
+
                 return true;
             });
         }
@@ -540,7 +556,7 @@ final class ReleaseProcessingService
 
         $this->outputSubHeader('Post-Processing Releases');
 
-        $service = $this->postProcessService ?? new PostProcessService();
+        $service = $this->postProcessService ?? new PostProcessService;
         $service->processAll($nntp);
     }
 
@@ -593,7 +609,7 @@ final class ReleaseProcessingService
         $startTime = now()->toImmutable();
         $this->outputSubHeader('Removing Unwanted Releases');
 
-        $stats = new ReleaseDeleteStats();
+        $stats = new ReleaseDeleteStats;
 
         $stats = $this->deleteReleasesOverRetention($stats);
         $stats = $this->deletePasswordedReleases($stats);
@@ -615,10 +631,11 @@ final class ReleaseProcessingService
     {
         $nzbPath = config('nntmux_settings.path_to_nzbs');
 
-        if (!file_exists($nzbPath)) {
+        if (! file_exists($nzbPath)) {
             if ($this->echoCLI) {
                 cli()->error("Bad or missing NZB directory - {$nzbPath}");
             }
+
             return false;
         }
 
@@ -632,6 +649,7 @@ final class ReleaseProcessingService
         }
 
         $groupInfo = UsenetGroup::getByName($groupName);
+
         return $groupInfo !== null ? (string) $groupInfo['id'] : '';
     }
 
@@ -666,6 +684,7 @@ final class ReleaseProcessingService
         }
 
         $groupInfo = UsenetGroup::getByName($groupID);
+
         return $groupInfo !== null ? (int) $groupInfo['id'] : null;
     }
 
@@ -697,7 +716,7 @@ final class ReleaseProcessingService
             }
 
             Collection::query()
-                ->joinSub($collectionsQuery, 'r', static fn($join) => $join->on('collections.id', '=', 'r.id'))
+                ->joinSub($collectionsQuery, 'r', static fn ($join) => $join->on('collections.id', '=', 'r.id'))
                 ->update(['collections.filecheck' => CollectionFileCheckStatus::CompleteCollection->value]);
         }, 10);
     }
@@ -721,7 +740,7 @@ final class ReleaseProcessingService
             }
 
             Collection::query()
-                ->joinSub($collectionsQuery, 'r', static fn($join) => $join->on('collections.id', '=', 'r.id'))
+                ->joinSub($collectionsQuery, 'r', static fn ($join) => $join->on('collections.id', '=', 'r.id'))
                 ->update(['collections.filecheck' => CollectionFileCheckStatus::ZeroPart->value]);
         }, 10);
 
@@ -924,7 +943,7 @@ final class ReleaseProcessingService
                 if ($attempt >= self::MAX_RETRIES) {
                     if ($this->echoCLI) {
                         cli()->error(
-                            'Stuck collections delete failed after retries: ' . $e->getMessage()
+                            'Stuck collections delete failed after retries: '.$e->getMessage()
                         );
                     }
                     break;
@@ -946,7 +965,7 @@ final class ReleaseProcessingService
             ->where('releases.groups_id', $groupId)
             ->join('usenet_groups', 'usenet_groups.id', '=', 'releases.groups_id')
             ->whereRaw(
-                'GREATEST(IFNULL(usenet_groups.minsizetoformrelease, 0), ?) > 0 ' .
+                'GREATEST(IFNULL(usenet_groups.minsizetoformrelease, 0), ?) > 0 '.
                 'AND releases.size < GREATEST(IFNULL(usenet_groups.minsizetoformrelease, 0), ?)',
                 [$this->settings->minSizeToFormRelease, $this->settings->minSizeToFormRelease]
             )
@@ -987,7 +1006,7 @@ final class ReleaseProcessingService
             ->where('releases.groups_id', $groupId)
             ->join('usenet_groups', 'usenet_groups.id', '=', 'releases.groups_id')
             ->whereRaw(
-                'GREATEST(IFNULL(usenet_groups.minfilestoformrelease, 0), ?) > 0 ' .
+                'GREATEST(IFNULL(usenet_groups.minfilestoformrelease, 0), ?) > 0 '.
                 'AND releases.totalpart < GREATEST(IFNULL(usenet_groups.minfilestoformrelease, 0), ?)',
                 [$this->settings->minFilesToFormRelease, $this->settings->minFilesToFormRelease]
             )
@@ -1002,7 +1021,7 @@ final class ReleaseProcessingService
 
     private function deleteReleasesOverRetention(ReleaseDeleteStats $stats): ReleaseDeleteStats
     {
-        if (!$this->settings->hasRetentionCleanup()) {
+        if (! $this->settings->hasRetentionCleanup()) {
             return $stats;
         }
 
@@ -1016,6 +1035,7 @@ final class ReleaseProcessingService
                     $this->deleteSingleRelease($release);
                     $stats = $stats->increment('retention');
                 }
+
                 return true;
             });
 
@@ -1024,7 +1044,7 @@ final class ReleaseProcessingService
 
     private function deletePasswordedReleases(ReleaseDeleteStats $stats): ReleaseDeleteStats
     {
-        if (!$this->settings->deletePasswordedRelease) {
+        if (! $this->settings->deletePasswordedRelease) {
             return $stats;
         }
 
@@ -1041,6 +1061,7 @@ final class ReleaseProcessingService
                     $this->deleteSingleRelease($release);
                     $stats = $stats->increment('password');
                 }
+
                 return true;
             });
 
@@ -1049,7 +1070,7 @@ final class ReleaseProcessingService
 
     private function deleteCrossPostedReleases(ReleaseDeleteStats $stats): ReleaseDeleteStats
     {
-        if (!$this->settings->hasCrossPostDetection()) {
+        if (! $this->settings->hasCrossPostDetection()) {
             return $stats;
         }
 
@@ -1070,7 +1091,7 @@ final class ReleaseProcessingService
 
     private function deleteIncompleteReleases(ReleaseDeleteStats $stats): ReleaseDeleteStats
     {
-        if (!$this->settings->hasCompletionCleanup()) {
+        if (! $this->settings->hasCompletionCleanup()) {
             return $stats;
         }
 
@@ -1083,6 +1104,7 @@ final class ReleaseProcessingService
                     $this->deleteSingleRelease($release);
                     $stats = $stats->increment('completion');
                 }
+
                 return true;
             });
 
@@ -1107,6 +1129,7 @@ final class ReleaseProcessingService
                     $this->deleteSingleRelease($release);
                     $stats = $stats->increment('disabledCategory');
                 }
+
                 return true;
             });
 
@@ -1131,6 +1154,7 @@ final class ReleaseProcessingService
                         $this->deleteSingleRelease($release);
                         $stats = $stats->increment('categoryMinSize');
                     }
+
                     return true;
                 });
         }
@@ -1156,7 +1180,7 @@ final class ReleaseProcessingService
                 ->joinSub(
                     $musicInfoQuery,
                     'mi',
-                    static fn($join) => $join->on('releases.musicinfo_id', '=', 'mi.id')
+                    static fn ($join) => $join->on('releases.musicinfo_id', '=', 'mi.id')
                 )
                 ->select(['releases.id', 'releases.guid'])
                 ->chunkById(self::BATCH_SIZE, function ($releases) use (&$stats): bool {
@@ -1164,6 +1188,7 @@ final class ReleaseProcessingService
                         $this->deleteSingleRelease($release);
                         $stats = $stats->increment('disabledGenre');
                     }
+
                     return true;
                 }, 'releases.id');
         }
@@ -1185,6 +1210,7 @@ final class ReleaseProcessingService
                         $this->deleteSingleRelease($release);
                         $stats = $stats->increment('miscOther');
                     }
+
                     return true;
                 });
         }
@@ -1201,6 +1227,7 @@ final class ReleaseProcessingService
                         $this->deleteSingleRelease($release);
                         $stats = $stats->increment('miscHashed');
                     }
+
                     return true;
                 });
         }
@@ -1223,18 +1250,18 @@ final class ReleaseProcessingService
 
     private function outputBanner(): void
     {
-        if (!$this->echoCLI) {
+        if (! $this->echoCLI) {
             return;
         }
 
         echo PHP_EOL;
         cli()->header('NNTmux Release Processing');
-        cli()->info('Started: ' . now()->format('Y-m-d H:i:s'));
+        cli()->info('Started: '.now()->format('Y-m-d H:i:s'));
     }
 
     private function outputHeader(string $title): void
     {
-        if (!$this->echoCLI) {
+        if (! $this->echoCLI) {
             return;
         }
 
@@ -1245,7 +1272,7 @@ final class ReleaseProcessingService
 
     private function outputSubHeader(string $title): void
     {
-        if (!$this->echoCLI) {
+        if (! $this->echoCLI) {
             return;
         }
 
@@ -1254,7 +1281,7 @@ final class ReleaseProcessingService
 
     private function outputSuccess(string $message): void
     {
-        if (!$this->echoCLI) {
+        if (! $this->echoCLI) {
             return;
         }
 
@@ -1263,7 +1290,7 @@ final class ReleaseProcessingService
 
     private function outputInfo(string $message): void
     {
-        if (!$this->echoCLI) {
+        if (! $this->echoCLI) {
             return;
         }
 
@@ -1272,7 +1299,7 @@ final class ReleaseProcessingService
 
     private function outputStat(string $label, string|int $value, string $suffix = ''): void
     {
-        if (!$this->echoCLI) {
+        if (! $this->echoCLI) {
             return;
         }
 
@@ -1282,7 +1309,7 @@ final class ReleaseProcessingService
 
     private function outputElapsedTime(DateTimeInterface $startTime, string $prefix = 'Time'): void
     {
-        if (!$this->echoCLI) {
+        if (! $this->echoCLI) {
             return;
         }
 
@@ -1316,12 +1343,12 @@ final class ReleaseProcessingService
 
     private function outputProgress(int $current, int $total, string $action): void
     {
-        if (!$this->echoCLI || $total === 0) {
+        if (! $this->echoCLI || $total === 0) {
             return;
         }
 
         $percent = min(100, (int) (($current / $total) * 100));
-        echo "\r      {$action}: " . number_format($current) . '/' . number_format($total) . " ({$percent}%)   ";
+        echo "\r      {$action}: ".number_format($current).'/'.number_format($total)." ({$percent}%)   ";
 
         if ($current >= $total) {
             echo PHP_EOL;
@@ -1335,7 +1362,7 @@ final class ReleaseProcessingService
         int $iterations,
         DateTimeInterface $startTime
     ): void {
-        if (!$this->echoCLI) {
+        if (! $this->echoCLI) {
             return;
         }
 
@@ -1344,18 +1371,18 @@ final class ReleaseProcessingService
         echo PHP_EOL;
         cli()->header('SUMMARY');
         cli()->header('-------');
-        cli()->primary('  Releases added: ' . number_format($releasesAdded));
-        cli()->primary('  NZBs created: ' . number_format($nzbsCreated));
+        cli()->primary('  Releases added: '.number_format($releasesAdded));
+        cli()->primary('  NZBs created: '.number_format($nzbsCreated));
         if ($dupes > 0) {
-            cli()->warning('  Duplicates skipped: ' . number_format($dupes));
+            cli()->warning('  Duplicates skipped: '.number_format($dupes));
         }
-        cli()->info('  Processing cycles: ' . number_format($iterations));
-        cli()->info('  Total time: ' . $this->formatElapsedTime($elapsed));
+        cli()->info('  Processing cycles: '.number_format($iterations));
+        cli()->info('  Total time: '.$this->formatElapsedTime($elapsed));
         echo PHP_EOL;
     }
 
     /**
-     * @param array{minSize: int, maxSize: int, minFiles: int} $stats
+     * @param  array{minSize: int, maxSize: int, minFiles: int}  $stats
      */
     private function outputCollectionDeleteStats(array $stats, DateTimeInterface $startTime): void
     {
@@ -1373,7 +1400,7 @@ final class ReleaseProcessingService
     }
 
     /**
-     * @param array{minSize: int, maxSize: int, minFiles: int} $stats
+     * @param  array{minSize: int, maxSize: int, minFiles: int}  $stats
      */
     private function outputReleaseDeleteByGroupStats(array $stats, DateTimeInterface $startTime): void
     {
@@ -1389,7 +1416,7 @@ final class ReleaseProcessingService
 
     private function outputReleaseDeleteStats(ReleaseDeleteStats $stats, DateTimeInterface $startTime): void
     {
-        if (!$this->echoCLI) {
+        if (! $this->echoCLI) {
             return;
         }
 
@@ -1432,4 +1459,3 @@ final class ReleaseProcessingService
         $this->outputElapsedTime($startTime);
     }
 }
-

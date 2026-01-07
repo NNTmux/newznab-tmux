@@ -34,4 +34,3 @@ enum FileCompletionStatus: int
         return $this === self::Complete;
     }
 }
-

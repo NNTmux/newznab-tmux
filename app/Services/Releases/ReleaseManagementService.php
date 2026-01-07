@@ -14,9 +14,7 @@ use Illuminate\Support\Facades\File;
  */
 class ReleaseManagementService
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * @throws \Exception
@@ -61,7 +59,7 @@ class ReleaseManagementService
         }
 
         // Delete from search index
-        if (!empty($identifiers['i'])) {
+        if (! empty($identifiers['i'])) {
             Search::deleteRelease((int) $identifiers['i']);
         }
 
@@ -174,4 +172,3 @@ class ReleaseManagementService
         return $temp_array;
     }
 }
-

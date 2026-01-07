@@ -142,6 +142,7 @@ interface SearchServiceInterface
      * @return array<array{suggest: string, distance: int, docs: int}>
      */
     public function suggest(string $query, ?string $index = null): array;
+
     /**
      * Truncate/clear an index (remove all documents).
      *
@@ -302,6 +303,3 @@ interface SearchServiceInterface
      */
     public function searchReleasesWithCategoryFilter(string $searchTerm, array $categoryIds = [], int $limit = 1000): array;
 }
-
-
-

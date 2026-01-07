@@ -107,4 +107,3 @@ return new class extends Migration
         return count($indexes) > 0;
     }
 };
-

@@ -42,8 +42,8 @@ class NzbContentsService
         $this->echoOutput = (bool) config('nntmux.echocli');
         $this->nzbService = $nzbService ?? app(NzbService::class);
         $this->parserService = $parserService ?? app(NzbParserService::class);
-        $this->nntp = $nntp ?? new NNTPService();
-        $this->nfo = $nfo ?? new NfoService();
+        $this->nntp = $nntp ?? new NNTPService;
+        $this->nfo = $nfo ?? new NfoService;
         $this->postProcessService = $postProcessService ?? app(PostProcessService::class);
         $this->lookupPar2 = (int) Settings::settingValue('lookuppar2') === 1;
         $this->alternateNntp = (bool) config('nntmux_nntp.use_alternate_nntp_server');
@@ -317,4 +317,3 @@ class NzbContentsService
         return $this->echoOutput;
     }
 }
-

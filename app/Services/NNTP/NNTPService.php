@@ -1390,4 +1390,3 @@ class NNTPService extends \Net_NNTP_Client
         return $this->_compressionSupported;
     }
 }
-

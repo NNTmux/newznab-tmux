@@ -3,9 +3,9 @@
 namespace App\Services\TvProcessing\Pipes;
 
 use App\Services\FanartTvService;
+use App\Services\TvProcessing\Providers\TvdbProvider;
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
-use App\Services\TvProcessing\Providers\TvdbProvider;
 
 /**
  * Pipe for TVDB API lookups.
@@ -16,7 +16,9 @@ class TvdbPipe extends AbstractTvProviderPipe
     private const TYPE_TV = 0;
 
     protected int $priority = 20;
+
     private ?TvdbProvider $tvdb = null;
+
     private ?FanartTvService $fanart = null;
 
     public function getName(): string
@@ -35,8 +37,9 @@ class TvdbPipe extends AbstractTvProviderPipe
     private function getTvdb(): TvdbProvider
     {
         if ($this->tvdb === null) {
-            $this->tvdb = new TvdbProvider();
+            $this->tvdb = new TvdbProvider;
         }
+
         return $this->tvdb;
     }
 
@@ -54,6 +57,7 @@ class TvdbPipe extends AbstractTvProviderPipe
         // Check if we've already failed this title
         if ($this->isInTitleCache($cleanName)) {
             $this->outputSkipped($cleanName);
+
             return TvProcessingResult::skipped('previously failed', $this->getName());
         }
 
@@ -78,6 +82,7 @@ class TvdbPipe extends AbstractTvProviderPipe
                 // Show exists in our DB (likely from another source like TMDB)
                 // Skip TVDB API search and proceed to episode matching
                 $this->outputFoundInDb($cleanName);
+
                 return $this->processEpisodeForExistingVideo($passable, $tvdb, $videoId, $parsedInfo);
             }
         }
@@ -115,6 +120,7 @@ class TvdbPipe extends AbstractTvProviderPipe
             // Show not found
             $this->addToTitleCache($cleanName);
             $this->outputNotFound($cleanName);
+
             return TvProcessingResult::notFound($this->getName(), ['title' => $cleanName]);
         }
 
@@ -134,6 +140,7 @@ class TvdbPipe extends AbstractTvProviderPipe
             // Full season release
             $tvdb->setVideoIdFound($videoId, $context->releaseId, 0);
             $this->outputFullSeason($cleanName);
+
             return TvProcessingResult::matched($videoId, 0, $this->getName(), ['full_season' => true]);
         }
 
@@ -171,6 +178,7 @@ class TvdbPipe extends AbstractTvProviderPipe
                 $episodeNo !== '' ? (int) $episodeNo : null,
                 $hasAirdate ? $parsedInfo['airdate'] : null
             );
+
             return TvProcessingResult::matched($videoId, (int) $episode, $this->getName());
         }
 
@@ -200,7 +208,7 @@ class TvdbPipe extends AbstractTvProviderPipe
     private function fetchFanartPoster(int $videoId, int $siteId): void
     {
         if ($this->fanart === null) {
-            $this->fanart = new FanartTvService();
+            $this->fanart = new FanartTvService;
         }
 
         if (! $this->fanart->isConfigured()) {
@@ -250,6 +258,7 @@ class TvdbPipe extends AbstractTvProviderPipe
             // Full season release
             $tvdb->setVideoIdFound($videoId, $context->releaseId, 0);
             $this->outputFullSeason($cleanName);
+
             return TvProcessingResult::matched($videoId, 0, $this->getName(), ['full_season' => true]);
         }
 
@@ -264,6 +273,7 @@ class TvdbPipe extends AbstractTvProviderPipe
                 $episodeNo !== '' ? (int) $episodeNo : null,
                 $hasAirdate ? $parsedInfo['airdate'] : null
             );
+
             return TvProcessingResult::matched($videoId, (int) $episode, $this->getName());
         }
 

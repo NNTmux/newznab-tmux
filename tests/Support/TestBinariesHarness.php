@@ -22,7 +22,6 @@ class TestBinariesHarness extends BinariesService
 
     private MissedPartHandler $testMissedPartHandler;
 
-
     public function __construct()
     {
         // Create a minimal config that doesn't require database access

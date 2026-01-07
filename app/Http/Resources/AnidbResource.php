@@ -71,4 +71,3 @@ class AnidbResource extends JsonResource
         return null;
     }
 }
-

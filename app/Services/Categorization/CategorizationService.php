@@ -22,10 +22,10 @@ class CategorizationService
     /**
      * Determine category for a release.
      *
-     * @param int|string $groupId The usenet group ID
-     * @param string $releaseName The name of the release
-     * @param string|null $poster The poster name
-     * @param bool $debug Whether to include debug information
+     * @param  int|string  $groupId  The usenet group ID
+     * @param  string  $releaseName  The name of the release
+     * @param  string|null  $poster  The poster name
+     * @param  bool  $debug  Whether to include debug information
      * @return array The categorization result with category ID and optional debug info
      */
     public function determineCategory(
@@ -40,7 +40,7 @@ class CategorizationService
     /**
      * Batch categorize multiple releases.
      *
-     * @param array $releases Array of ['group_id' => x, 'name' => y, 'poster' => z]
+     * @param  array  $releases  Array of ['group_id' => x, 'name' => y, 'poster' => z]
      * @return array Array of categorization results
      */
     public function batchCategorize(array $releases): array
@@ -75,6 +75,7 @@ class CategorizationService
     public function addCategorizer(AbstractCategorizationPipe $pipe): self
     {
         $this->pipeline->addCategorizer($pipe);
+
         return $this;
     }
 
@@ -94,4 +95,3 @@ class CategorizationService
         })->toArray();
     }
 }
-

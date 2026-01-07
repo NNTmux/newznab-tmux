@@ -12,7 +12,9 @@ use Illuminate\Http\Request;
 class SearchController extends BasePageController
 {
     private SearchServiceInterface $searchService;
+
     private ReleaseSearchService $releaseSearchService;
+
     private ReleaseBrowseService $releaseBrowseService;
 
     public function __construct(

@@ -7,8 +7,8 @@ namespace App\Console\Commands;
 use App\Models\Settings;
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\NfoService;
-use App\Services\PostProcessService;
 use App\Services\NNTP\NNTPService;
+use App\Services\PostProcessService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -47,7 +47,7 @@ class PostProcessGuid extends Command
         $guid = $this->argument('guid');
         $renamed = $this->argument('renamed') ?? '';
 
-        if (!$this->isValidChar($guid)) {
+        if (! $this->isValidChar($guid)) {
             $this->error('GUID character must be a-f or 0-9.');
 
             return self::FAILURE;
@@ -89,7 +89,7 @@ class PostProcessGuid extends Command
     private function processNfo(string $guid): void
     {
         $nntp = $this->getNntp();
-        (new NfoService())->processNfoFiles(
+        (new NfoService)->processNfoFiles(
             $nntp,
             '',
             $guid,
@@ -115,7 +115,7 @@ class PostProcessGuid extends Command
      */
     private function getNntp(): NNTPService
     {
-        $nntp = new NNTPService();
+        $nntp = new NNTPService;
 
         $connectResult = config('nntmux_nntp.use_alternate_nntp_server') === true
             ? $nntp->doConnect(false, true)

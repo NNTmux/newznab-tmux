@@ -33,7 +33,7 @@ class SteamServiceTest extends TestCase
             name VARCHAR(255)
         )');
 
-        $this->service = new SteamService();
+        $this->service = new SteamService;
         Cache::flush();
     }
 
@@ -466,4 +466,3 @@ class SteamServiceTest extends TestCase
         $this->assertFalse($result);
     }
 }
-

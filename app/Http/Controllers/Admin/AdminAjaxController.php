@@ -23,7 +23,7 @@ class AdminAjaxController extends BasePageController
             switch ($request->input('action')) {
                 case 'binary_blacklist_delete':
                     $id = (int) $request->input('row_id');
-                    (new BlacklistService())->deleteBlacklist($id);
+                    (new BlacklistService)->deleteBlacklist($id);
                     echo "Blacklist $id deleted.";
                     break;
 

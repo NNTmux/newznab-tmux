@@ -16,11 +16,15 @@ class IafdPipe extends AbstractAdultProviderPipe
     protected int $priority = 12; // High priority - good database
 
     private const BASE_URL = 'https://www.iafd.com';
+
     private const SEARCH_URL = '/results.asp?searchtype=comprehensive&searchstring=';
 
     protected string $directUrl = '';
+
     protected string $title = '';
+
     protected string $response = '';
+
     protected ?array $jsonLdData = null;
 
     public function getName(): string
@@ -48,6 +52,7 @@ class IafdPipe extends AbstractAdultProviderPipe
             if ($cached === false) {
                 return AdultProcessingResult::notFound($this->getName());
             }
+
             return AdultProcessingResult::matched(
                 $cached['title'] ?? $movie,
                 $this->getName(),
@@ -60,6 +65,7 @@ class IafdPipe extends AbstractAdultProviderPipe
         if ($searchResult === false) {
             $this->cacheSearchResult($movie, false);
             $this->outputNotFound();
+
             return AdultProcessingResult::notFound($this->getName());
         }
 
@@ -82,6 +88,7 @@ class IafdPipe extends AbstractAdultProviderPipe
 
         if ($movieInfo === false) {
             $this->cacheSearchResult($movie, false);
+
             return AdultProcessingResult::notFound($this->getName());
         }
 
@@ -103,7 +110,7 @@ class IafdPipe extends AbstractAdultProviderPipe
             return false;
         }
 
-        $searchUrl = self::BASE_URL . self::SEARCH_URL . urlencode($movie);
+        $searchUrl = self::BASE_URL.self::SEARCH_URL.urlencode($movie);
         $response = $this->fetchHtml($searchUrl, $this->cookie);
 
         if ($response === false) {
@@ -139,14 +146,14 @@ class IafdPipe extends AbstractAdultProviderPipe
                 $title = $link->title ?? trim($link->plaintext ?? '');
             }
 
-            if ($link && isset($link->href) && !empty($title)) {
+            if ($link && isset($link->href) && ! empty($title)) {
                 $similarity = $this->calculateSimilarity($movie, $title);
 
                 if ($similarity > $highestSimilarity) {
                     $highestSimilarity = $similarity;
                     $url = $link->href;
-                    if (!str_starts_with($url, 'http')) {
-                        $url = self::BASE_URL . '/' . ltrim($url, '/');
+                    if (! str_starts_with($url, 'http')) {
+                        $url = self::BASE_URL.'/'.ltrim($url, '/');
                     }
                     $bestMatch = [
                         'title' => trim($title),
@@ -168,8 +175,8 @@ class IafdPipe extends AbstractAdultProviderPipe
     {
         $results = [];
 
-        if (!empty($this->directUrl)) {
-            if (!empty($this->title)) {
+        if (! empty($this->directUrl)) {
+            if (! empty($this->title)) {
                 $results['title'] = $this->title;
             }
             $results['directurl'] = $this->directUrl;
@@ -182,27 +189,27 @@ class IafdPipe extends AbstractAdultProviderPipe
 
         // Get all the movie data (HTML fallback)
         $synopsis = $this->extractSynopsis();
-        if (is_array($synopsis) && !empty($synopsis)) {
+        if (is_array($synopsis) && ! empty($synopsis)) {
             $results = array_merge($results, $synopsis);
         }
 
         $productInfo = $this->extractProductInfo(true);
-        if (is_array($productInfo) && !empty($productInfo)) {
+        if (is_array($productInfo) && ! empty($productInfo)) {
             $results = array_merge($results, $productInfo);
         }
 
         $cast = $this->extractCast();
-        if (is_array($cast) && !empty($cast)) {
+        if (is_array($cast) && ! empty($cast)) {
             $results = array_merge($results, $cast);
         }
 
         $genres = $this->extractGenres();
-        if (is_array($genres) && !empty($genres)) {
+        if (is_array($genres) && ! empty($genres)) {
             $results = array_merge($results, $genres);
         }
 
         $covers = $this->extractCovers();
-        if (is_array($covers) && !empty($covers)) {
+        if (is_array($covers) && ! empty($covers)) {
             $results = array_merge($results, $covers);
         }
 
@@ -225,22 +232,22 @@ class IafdPipe extends AbstractAdultProviderPipe
         }
 
         // Standard JSON-LD extraction
-        if (!empty($this->jsonLdData['name'])) {
+        if (! empty($this->jsonLdData['name'])) {
             $results['title'] = $this->jsonLdData['name'];
         }
 
-        if (!empty($this->jsonLdData['description'])) {
+        if (! empty($this->jsonLdData['description'])) {
             $results['synopsis'] = $this->jsonLdData['description'];
         }
 
-        if (!empty($this->jsonLdData['image'])) {
+        if (! empty($this->jsonLdData['image'])) {
             $image = is_array($this->jsonLdData['image']) ? ($this->jsonLdData['image'][0] ?? '') : $this->jsonLdData['image'];
-            if (!empty($image)) {
+            if (! empty($image)) {
                 $results['boxcover'] = $image;
             }
         }
 
-        if (!empty($this->jsonLdData['director'])) {
+        if (! empty($this->jsonLdData['director'])) {
             $director = $this->jsonLdData['director'];
             if (is_array($director)) {
                 $results['director'] = $director['name'] ?? ($director[0]['name'] ?? '');
@@ -249,24 +256,24 @@ class IafdPipe extends AbstractAdultProviderPipe
             }
         }
 
-        if (!empty($this->jsonLdData['actor'])) {
+        if (! empty($this->jsonLdData['actor'])) {
             $actors = $this->jsonLdData['actor'];
             $cast = [];
             if (is_array($actors)) {
                 foreach ($actors as $actor) {
-                    if (is_array($actor) && !empty($actor['name'])) {
+                    if (is_array($actor) && ! empty($actor['name'])) {
                         $cast[] = $actor['name'];
                     } elseif (is_string($actor)) {
                         $cast[] = $actor;
                     }
                 }
             }
-            if (!empty($cast)) {
+            if (! empty($cast)) {
                 $results['cast'] = $cast;
             }
         }
 
-        if (!empty($this->jsonLdData['genre'])) {
+        if (! empty($this->jsonLdData['genre'])) {
             $genres = $this->jsonLdData['genre'];
             if (is_array($genres)) {
                 $results['genres'] = $genres;
@@ -296,14 +303,15 @@ class IafdPipe extends AbstractAdultProviderPipe
             if ($ret) {
                 $coverUrl = $ret->src ?? $ret->content ?? null;
 
-                if (!empty($coverUrl)) {
+                if (! empty($coverUrl)) {
                     if (str_starts_with($coverUrl, '//')) {
-                        $coverUrl = 'https:' . $coverUrl;
-                    } elseif (!str_starts_with($coverUrl, 'http')) {
-                        $coverUrl = self::BASE_URL . '/' . ltrim($coverUrl, '/');
+                        $coverUrl = 'https:'.$coverUrl;
+                    } elseif (! str_starts_with($coverUrl, 'http')) {
+                        $coverUrl = self::BASE_URL.'/'.ltrim($coverUrl, '/');
                     }
 
                     $res['boxcover'] = $coverUrl;
+
                     return $res;
                 }
             }
@@ -328,8 +336,9 @@ class IafdPipe extends AbstractAdultProviderPipe
             $ret = $this->getHtmlParser()->findOne($selector);
             if ($ret) {
                 $text = $ret->plaintext ?? $ret->content ?? '';
-                if (!empty(trim($text))) {
+                if (! empty(trim($text))) {
                     $res['synopsis'] = trim($text);
+
                     return $res;
                 }
             }
@@ -350,7 +359,7 @@ class IafdPipe extends AbstractAdultProviderPipe
             $performers = $castTable->find('a[href*="/person.rme"]');
             foreach ($performers as $performer) {
                 $name = trim($performer->plaintext ?? '');
-                if (!empty($name) && strlen($name) > 2) {
+                if (! empty($name) && strlen($name) > 2) {
                     $cast[] = $name;
                 }
             }
@@ -365,21 +374,21 @@ class IafdPipe extends AbstractAdultProviderPipe
 
             foreach ($selectors as $selector) {
                 $elements = $this->getHtmlParser()->find($selector);
-                if (!empty($elements)) {
+                if (! empty($elements)) {
                     foreach ($elements as $element) {
                         $name = trim($element->plaintext ?? '');
-                        if (!empty($name) && strlen($name) > 2 && !str_contains(strtolower($name), 'director')) {
+                        if (! empty($name) && strlen($name) > 2 && ! str_contains(strtolower($name), 'director')) {
                             $cast[] = $name;
                         }
                     }
-                    if (!empty($cast)) {
+                    if (! empty($cast)) {
                         break;
                     }
                 }
             }
         }
 
-        if (!empty($cast)) {
+        if (! empty($cast)) {
             $res['cast'] = array_unique($cast);
         }
 
@@ -399,20 +408,20 @@ class IafdPipe extends AbstractAdultProviderPipe
 
         foreach ($selectors as $selector) {
             $elements = $this->getHtmlParser()->find($selector);
-            if (!empty($elements)) {
+            if (! empty($elements)) {
                 foreach ($elements as $element) {
                     $text = trim($element->plaintext ?? '');
-                    if (!empty($text) && strlen($text) > 1) {
+                    if (! empty($text) && strlen($text) > 1) {
                         $genres[] = $text;
                     }
                 }
-                if (!empty($genres)) {
+                if (! empty($genres)) {
                     break;
                 }
             }
         }
 
-        if (!empty($genres)) {
+        if (! empty($genres)) {
             $res['genres'] = array_unique($genres);
         }
 
@@ -481,4 +490,3 @@ class IafdPipe extends AbstractAdultProviderPipe
         return $res;
     }
 }
-

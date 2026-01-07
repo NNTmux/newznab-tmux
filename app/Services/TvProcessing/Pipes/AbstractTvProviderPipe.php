@@ -4,7 +4,6 @@ namespace App\Services\TvProcessing\Pipes;
 
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
-use App\Services\TvProcessing\TvReleaseContext;
 use Closure;
 
 /**
@@ -15,12 +14,12 @@ use Closure;
 abstract class AbstractTvProviderPipe
 {
     protected int $priority = 50;
+
     protected bool $echoOutput = true;
+
     protected array $titleCache = [];
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * Handle the TV processing request.
@@ -43,6 +42,7 @@ abstract class AbstractTvProviderPipe
                 TvProcessingResult::skipped('Provider skipped', $this->getName()),
                 $this->getName()
             );
+
             return $next($passable);
         }
 
@@ -92,6 +92,7 @@ abstract class AbstractTvProviderPipe
     public function setEchoOutput(bool $echo): self
     {
         $this->echoOutput = $echo;
+
         return $this;
     }
 
@@ -128,7 +129,7 @@ abstract class AbstractTvProviderPipe
             return $title;
         }
 
-        return mb_substr($title, 0, $maxLength - 3) . '...';
+        return mb_substr($title, 0, $maxLength - 3).'...';
     }
 
     /**
@@ -154,7 +155,7 @@ abstract class AbstractTvProviderPipe
         }
 
         cli()->primaryOver(' ✓ ');
-        cli()->primary('MATCHED (' . $this->getName() . ')');
+        cli()->primary('MATCHED ('.$this->getName().')');
     }
 
     /**
@@ -169,7 +170,7 @@ abstract class AbstractTvProviderPipe
         cli()->primaryOver('    → ');
         cli()->alternateOver($this->truncateTitle($title));
         cli()->primaryOver(' → ');
-        cli()->alternate('Not found in ' . $this->getName());
+        cli()->alternate('Not found in '.$this->getName());
     }
 
     /**
@@ -199,7 +200,7 @@ abstract class AbstractTvProviderPipe
         cli()->primaryOver('    → ');
         cli()->headerOver($this->truncateTitle($title));
         cli()->primaryOver(' → ');
-        cli()->info('Searching ' . $this->getName() . '...');
+        cli()->info('Searching '.$this->getName().'...');
     }
 
     /**
@@ -217,4 +218,3 @@ abstract class AbstractTvProviderPipe
         cli()->info('Found in DB');
     }
 }
-

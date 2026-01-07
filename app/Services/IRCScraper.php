@@ -50,7 +50,6 @@ class IRCScraper extends IRCClient
      */
     protected string|false $_titleIgnoreRegex = false;
 
-
     /**
      * Construct.
      *
@@ -103,7 +102,6 @@ class IRCScraper extends IRCClient
         if (config('irc_settings.scrape_irc_title_ignore') !== '') {
             $this->_titleIgnoreRegex = (string) config('irc_settings.scrape_irc_title_ignore');
         }
-
 
         $this->_groupList = [];
         $this->_silent = $silent;

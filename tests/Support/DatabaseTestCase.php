@@ -3,7 +3,6 @@
 namespace Tests\Support;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Schema;
 
 /**
  * Trait DatabaseTestCase
@@ -31,8 +30,6 @@ trait DatabaseTestCase
 
     /**
      * Define hooks to migrate the database before and after each test.
-     *
-     * @return void
      */
     protected function setUpDatabaseTestCase(): void
     {
@@ -58,4 +55,3 @@ trait DatabaseTestCase
         return $uses;
     }
 }
-

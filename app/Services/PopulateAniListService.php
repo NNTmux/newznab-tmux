@@ -305,7 +305,7 @@ class PopulateAniListService
                 }
 
                 // Throw exception to stop processing
-                throw new \Exception("AniList API rate limit exceeded (429). Paused until " . date('Y-m-d H:i:s', $pausedUntil));
+                throw new \Exception('AniList API rate limit exceeded (429). Paused until '.date('Y-m-d H:i:s', $pausedUntil));
             } else {
                 // Pause period expired, clear it
                 self::$rateLimitPause = null;
@@ -384,7 +384,7 @@ class PopulateAniListService
                     cli()->error('AniList API returned 429 (Too Many Requests). Pausing all API calls for 15 minutes.');
                 }
 
-                throw new \Exception("AniList API rate limit exceeded (429). Paused until " . date('Y-m-d H:i:s', $pauseUntil));
+                throw new \Exception('AniList API rate limit exceeded (429). Paused until '.date('Y-m-d H:i:s', $pauseUntil));
             }
 
             if ($this->echooutput) {
@@ -730,4 +730,3 @@ class PopulateAniListService
         }
     }
 }
-

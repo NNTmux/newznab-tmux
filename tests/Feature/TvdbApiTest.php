@@ -122,4 +122,3 @@ class TvdbApiTest extends TestCase
         }
     }
 }
-

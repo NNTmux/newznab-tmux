@@ -3,8 +3,6 @@
 namespace App\Providers;
 
 use App\Services\Categorization\CategorizationPipeline;
-use App\Services\Categorization\Categorizers;
-use App\Services\Categorization\Contracts\CategorizerInterface;
 use Illuminate\Support\ServiceProvider;
 
 class CategorizationServiceProvider extends ServiceProvider
@@ -31,4 +29,3 @@ class CategorizationServiceProvider extends ServiceProvider
         //
     }
 }
-

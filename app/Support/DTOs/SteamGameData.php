@@ -13,33 +13,33 @@ namespace App\Support\DTOs;
 final readonly class SteamGameData
 {
     /**
-     * @param int $steamId Steam App ID
-     * @param string $title Game title
-     * @param string $type App type (game, dlc, demo, etc.)
-     * @param string|null $description Short description
-     * @param string|null $detailedDescription Full description with HTML
-     * @param string|null $about About the game text
-     * @param string|null $coverUrl Header image URL
-     * @param string|null $backdropUrl Background image URL
-     * @param array<int, array{thumbnail: ?string, full: ?string}> $screenshots Screenshot URLs
-     * @param array<int, array{id: ?int, name: ?string, thumbnail: ?string, webm: ?string, mp4: ?string}> $movies Movie/trailer data
-     * @param string|null $trailerUrl Primary trailer URL
-     * @param string|null $publisher Publisher name(s)
-     * @param array<string> $developers Developer names
-     * @param string|null $releaseDate Release date (Y-m-d format)
-     * @param array<string> $genres Genre names
-     * @param array<string> $categories Category names (multiplayer, etc.)
-     * @param int|null $metacriticScore Metacritic score (0-100)
-     * @param string|null $metacriticUrl Metacritic URL
-     * @param SteamPriceData|null $price Price information
-     * @param array<string> $platforms Supported platforms
-     * @param array<string, array{minimum: ?string, recommended: ?string}> $requirements System requirements
-     * @param array<int> $dlcIds DLC App IDs
-     * @param int|null $achievementCount Total achievements
-     * @param int|null $recommendationCount Total recommendations
-     * @param string|null $website Official website URL
-     * @param string|null $supportUrl Support URL
-     * @param string $storeUrl Steam store URL
+     * @param  int  $steamId  Steam App ID
+     * @param  string  $title  Game title
+     * @param  string  $type  App type (game, dlc, demo, etc.)
+     * @param  string|null  $description  Short description
+     * @param  string|null  $detailedDescription  Full description with HTML
+     * @param  string|null  $about  About the game text
+     * @param  string|null  $coverUrl  Header image URL
+     * @param  string|null  $backdropUrl  Background image URL
+     * @param  array<int, array{thumbnail: ?string, full: ?string}>  $screenshots  Screenshot URLs
+     * @param  array<int, array{id: ?int, name: ?string, thumbnail: ?string, webm: ?string, mp4: ?string}>  $movies  Movie/trailer data
+     * @param  string|null  $trailerUrl  Primary trailer URL
+     * @param  string|null  $publisher  Publisher name(s)
+     * @param  array<string>  $developers  Developer names
+     * @param  string|null  $releaseDate  Release date (Y-m-d format)
+     * @param  array<string>  $genres  Genre names
+     * @param  array<string>  $categories  Category names (multiplayer, etc.)
+     * @param  int|null  $metacriticScore  Metacritic score (0-100)
+     * @param  string|null  $metacriticUrl  Metacritic URL
+     * @param  SteamPriceData|null  $price  Price information
+     * @param  array<string>  $platforms  Supported platforms
+     * @param  array<string, array{minimum: ?string, recommended: ?string}>  $requirements  System requirements
+     * @param  array<int>  $dlcIds  DLC App IDs
+     * @param  int|null  $achievementCount  Total achievements
+     * @param  int|null  $recommendationCount  Total recommendations
+     * @param  string|null  $website  Official website URL
+     * @param  string|null  $supportUrl  Support URL
+     * @param  string  $storeUrl  Steam store URL
      */
     public function __construct(
         public int $steamId,
@@ -78,7 +78,7 @@ final readonly class SteamGameData
     {
         // Parse screenshots
         $screenshots = [];
-        if (!empty($data['screenshots'])) {
+        if (! empty($data['screenshots'])) {
             foreach ($data['screenshots'] as $ss) {
                 $screenshots[] = [
                     'thumbnail' => $ss['path_thumbnail'] ?? null,
@@ -90,7 +90,7 @@ final readonly class SteamGameData
         // Parse movies
         $movies = [];
         $trailerUrl = null;
-        if (!empty($data['movies'])) {
+        if (! empty($data['movies'])) {
             foreach ($data['movies'] as $movie) {
                 $mp4Url = $movie['mp4']['max'] ?? ($movie['mp4']['480'] ?? null);
                 $movies[] = [
@@ -100,7 +100,7 @@ final readonly class SteamGameData
                     'webm' => $movie['webm']['max'] ?? ($movie['webm']['480'] ?? null),
                     'mp4' => $mp4Url,
                 ];
-                if ($trailerUrl === null && !empty($mp4Url)) {
+                if ($trailerUrl === null && ! empty($mp4Url)) {
                     $trailerUrl = $mp4Url;
                 }
             }
@@ -108,9 +108,9 @@ final readonly class SteamGameData
 
         // Parse genres
         $genres = [];
-        if (!empty($data['genres'])) {
+        if (! empty($data['genres'])) {
             foreach ($data['genres'] as $genre) {
-                if (!empty($genre['description'])) {
+                if (! empty($genre['description'])) {
                     $genres[] = $genre['description'];
                 }
             }
@@ -118,9 +118,9 @@ final readonly class SteamGameData
 
         // Parse categories
         $categories = [];
-        if (!empty($data['categories'])) {
+        if (! empty($data['categories'])) {
             foreach ($data['categories'] as $cat) {
-                if (!empty($cat['description'])) {
+                if (! empty($cat['description'])) {
                     $categories[] = $cat['description'];
                 }
             }
@@ -128,7 +128,7 @@ final readonly class SteamGameData
 
         // Parse platforms
         $platforms = [];
-        if (!empty($data['platforms'])) {
+        if (! empty($data['platforms'])) {
             if ($data['platforms']['windows'] ?? false) {
                 $platforms[] = 'Windows';
             }
@@ -142,7 +142,7 @@ final readonly class SteamGameData
 
         // Parse requirements
         $requirements = [];
-        if (!empty($data['pc_requirements']) && !is_array($data['pc_requirements']) === false) {
+        if (! empty($data['pc_requirements']) && ! is_array($data['pc_requirements']) === false) {
             if (is_array($data['pc_requirements'])) {
                 $requirements['pc'] = [
                     'minimum' => $data['pc_requirements']['minimum'] ?? null,
@@ -150,13 +150,13 @@ final readonly class SteamGameData
                 ];
             }
         }
-        if (!empty($data['mac_requirements']) && is_array($data['mac_requirements'])) {
+        if (! empty($data['mac_requirements']) && is_array($data['mac_requirements'])) {
             $requirements['mac'] = [
                 'minimum' => $data['mac_requirements']['minimum'] ?? null,
                 'recommended' => $data['mac_requirements']['recommended'] ?? null,
             ];
         }
-        if (!empty($data['linux_requirements']) && is_array($data['linux_requirements'])) {
+        if (! empty($data['linux_requirements']) && is_array($data['linux_requirements'])) {
             $requirements['linux'] = [
                 'minimum' => $data['linux_requirements']['minimum'] ?? null,
                 'recommended' => $data['linux_requirements']['recommended'] ?? null,
@@ -173,7 +173,7 @@ final readonly class SteamGameData
 
         // Parse release date
         $releaseDate = null;
-        if (!empty($data['release_date']['date'])) {
+        if (! empty($data['release_date']['date'])) {
             try {
                 $releaseDate = \Illuminate\Support\Carbon::parse($data['release_date']['date'])->format('Y-m-d');
             } catch (\Exception $e) {
@@ -183,13 +183,13 @@ final readonly class SteamGameData
 
         // Parse publisher
         $publisher = null;
-        if (!empty($data['publishers'])) {
+        if (! empty($data['publishers'])) {
             $publisher = implode(', ', array_filter(array_map('strval', $data['publishers'])));
         }
 
         // Parse developers
         $developers = [];
-        if (!empty($data['developers'])) {
+        if (! empty($data['developers'])) {
             $developers = array_values(array_filter(array_map('strval', $data['developers'])));
         }
 
@@ -220,7 +220,7 @@ final readonly class SteamGameData
             recommendationCount: $data['recommendations']['total'] ?? null,
             website: $data['website'] ?? null,
             supportUrl: $data['support_info']['url'] ?? null,
-            storeUrl: 'https://store.steampowered.com/app/' . $appId,
+            storeUrl: 'https://store.steampowered.com/app/'.$appId,
         );
     }
 
@@ -236,8 +236,8 @@ final readonly class SteamGameData
             'publisher' => $this->publisher ?? 'Unknown',
             'releasedate' => $this->releaseDate,
             'review' => $this->description ?? 'No description available',
-            'cover' => !empty($this->coverUrl) ? 1 : 0,
-            'backdrop' => !empty($this->backdropUrl) ? 1 : 0,
+            'cover' => ! empty($this->coverUrl) ? 1 : 0,
+            'backdrop' => ! empty($this->backdropUrl) ? 1 : 0,
             'trailer' => $this->trailerUrl ?? '',
             'classused' => 'Steam',
             'esrb' => $this->metacriticScore !== null ? (string) $this->metacriticScore : 'Not Rated',
@@ -285,7 +285,8 @@ final readonly class SteamGameData
     public function hasMultiplayer(): bool
     {
         $multiplayerCategories = ['Multi-player', 'Online Multi-Player', 'Online Co-op', 'Local Multi-Player', 'Local Co-op'];
-        return !empty(array_intersect($multiplayerCategories, $this->categories));
+
+        return ! empty(array_intersect($multiplayerCategories, $this->categories));
     }
 
     /**
@@ -304,4 +305,3 @@ final readonly class SteamGameData
         return implode(', ', $this->genres);
     }
 }
-

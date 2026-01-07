@@ -16,6 +16,7 @@ use App\Services\NameFixing\Patterns\MoviePatterns;
 class MovieNameChecker extends AbstractNameChecker
 {
     protected int $priority = 20;
+
     protected string $name = 'Movie';
 
     /**
@@ -82,6 +83,7 @@ class MovieNameChecker extends AbstractNameChecker
         foreach ($standardPatterns as $patternName => $pattern) {
             if (preg_match($pattern, $textstring, $matches)) {
                 $confidence = $patternName === 'GENERIC' ? 0.70 : 0.85;
+
                 return NameFixResult::fromMatch(
                     newName: $matches[0],
                     method: $this->formatMethod($patternName),
@@ -94,4 +96,3 @@ class MovieNameChecker extends AbstractNameChecker
         return null;
     }
 }
-

@@ -1722,4 +1722,3 @@ class SevenZipPartialParser
         return $largest;
     }
 }
-

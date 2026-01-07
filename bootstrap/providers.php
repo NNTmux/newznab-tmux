@@ -15,5 +15,3 @@ return [
     App\Providers\VoltServiceProvider::class,
     App\Providers\SearchServiceProvider::class,
 ];
-
-

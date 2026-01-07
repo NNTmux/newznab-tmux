@@ -31,7 +31,7 @@ class ApiInformController extends Controller
             ReleaseInform::insertOrIgnore(['relOName' => $releaseObName, 'relPName' => $releasePrName, 'api_token' => $apiToken, 'created_at' => now(), 'updated_at' => now()]);
             $release = Release::whereSearchname($releaseObName)->first();
             if (! empty($release)) {
-                (new ReleaseUpdateService())->updateRelease($release, $releasePrName, 'Release Inform API', true, 'Filenames, ', true, true);
+                (new ReleaseUpdateService)->updateRelease($release, $releasePrName, 'Release Inform API', true, 'Filenames, ', true, true);
             }
 
             return response()->json(['message' => 'Release Information Added!'], 200);

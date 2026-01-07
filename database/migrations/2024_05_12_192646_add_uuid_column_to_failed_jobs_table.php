@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // Skip if table doesn't exist (e.g., fresh SQLite test database)
-        if (!Schema::hasTable('failed_jobs')) {
+        if (! Schema::hasTable('failed_jobs')) {
             return;
         }
 
@@ -31,11 +31,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (!Schema::hasTable('failed_jobs')) {
+        if (! Schema::hasTable('failed_jobs')) {
             return;
         }
 
-        if (!Schema::hasColumn('failed_jobs', 'uuid')) {
+        if (! Schema::hasColumn('failed_jobs', 'uuid')) {
             return;
         }
 

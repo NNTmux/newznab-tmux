@@ -16,6 +16,7 @@ use App\Services\NameFixing\Patterns\TvPatterns;
 class TvNameChecker extends AbstractNameChecker
 {
     protected int $priority = 10;
+
     protected string $name = 'TV';
 
     /**
@@ -102,4 +103,3 @@ class TvNameChecker extends AbstractNameChecker
         return null;
     }
 }
-

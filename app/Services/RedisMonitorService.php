@@ -14,42 +14,65 @@ class RedisMonitorService
 {
     // ANSI color codes
     private const RED = "\033[0;31m";
+
     private const GREEN = "\033[0;32m";
+
     private const YELLOW = "\033[1;33m";
+
     private const BLUE = "\033[0;34m";
+
     private const MAGENTA = "\033[0;35m";
+
     private const CYAN = "\033[0;36m";
+
     private const WHITE = "\033[1;37m";
+
     private const GRAY = "\033[0;90m";
+
     private const BOLD = "\033[1m";
+
     private const DIM = "\033[2m";
+
     private const NC = "\033[0m"; // No Color
 
     // Box drawing characters
-    private const H_LINE = "─";
-    private const V_LINE = "│";
-    private const TL_CORNER = "┌";
-    private const TR_CORNER = "┐";
-    private const BL_CORNER = "└";
-    private const BR_CORNER = "┘";
-    private const T_RIGHT = "├";
-    private const T_LEFT = "┤";
+    private const H_LINE = '─';
+
+    private const V_LINE = '│';
+
+    private const TL_CORNER = '┌';
+
+    private const TR_CORNER = '┐';
+
+    private const BL_CORNER = '└';
+
+    private const BR_CORNER = '┘';
+
+    private const T_RIGHT = '├';
+
+    private const T_LEFT = '┤';
 
     private const CLEAR_EOL = "\033[K";
 
     protected string $host;
+
     protected int $port;
+
     protected int $refreshInterval;
+
     protected ?string $connection;
+
     protected int $termWidth;
+
     protected int $boxWidth;
+
     protected bool $running = true;
 
     /**
      * Create a new RedisMonitorService instance.
      *
-     * @param string|null $connection Redis connection name (from config/database.php)
-     * @param int $refreshInterval Refresh interval in seconds
+     * @param  string|null  $connection  Redis connection name (from config/database.php)
+     * @param  int  $refreshInterval  Refresh interval in seconds
      */
     public function __construct(?string $connection = 'default', int $refreshInterval = 30)
     {
@@ -75,17 +98,16 @@ class RedisMonitorService
         if (function_exists('exec')) {
             $output = [];
             @exec('tput cols 2>/dev/null', $output);
-            if (!empty($output[0]) && is_numeric($output[0])) {
+            if (! empty($output[0]) && is_numeric($output[0])) {
                 $width = (int) $output[0];
             }
         }
+
         return max($width, 60);
     }
 
     /**
      * Get Redis INFO data.
-     *
-     * @return array|null
      */
     public function getRedisInfo(): ?array
     {
@@ -99,7 +121,7 @@ class RedisMonitorService
     /**
      * Start the monitor loop.
      *
-     * @param callable|null $shouldContinue Optional callback to control loop continuation
+     * @param  callable|null  $shouldContinue  Optional callback to control loop continuation
      */
     public function monitor(?callable $shouldContinue = null): void
     {
@@ -143,7 +165,7 @@ class RedisMonitorService
 
         while ($this->running) {
             // Check if we should continue
-            if ($shouldContinue !== null && !$shouldContinue()) {
+            if ($shouldContinue !== null && ! $shouldContinue()) {
                 break;
             }
 
@@ -187,8 +209,6 @@ class RedisMonitorService
 
     /**
      * Get a single snapshot of Redis stats without entering monitor mode.
-     *
-     * @return array
      */
     public function getStats(): array
     {
@@ -207,9 +227,6 @@ class RedisMonitorService
 
     /**
      * Parse Redis INFO into structured data.
-     *
-     * @param array $info
-     * @return array
      */
     protected function parseRedisInfo(array $info): array
     {
@@ -281,8 +298,6 @@ class RedisMonitorService
 
     /**
      * Display the Redis monitor dashboard.
-     *
-     * @param array $info
      */
     protected function displayDashboard(array $info): void
     {
@@ -296,58 +311,58 @@ class RedisMonitorService
         $buffer .= $this->printHeader("🔴 REDIS MONITOR v{$stats['version']} | {$this->host}:{$this->port}");
 
         // Server Status
-        $buffer .= $this->printSection("Server Status");
-        $buffer .= $this->printRow("Status", "● ONLINE", self::GREEN);
-        $buffer .= $this->printRow("Role", $stats['role'], self::MAGENTA);
-        $buffer .= $this->printRow("Uptime", "{$stats['uptime_days']} days (" . $this->formatNumber($stats['uptime_seconds']) . " seconds)", self::WHITE);
-        $buffer .= $this->printRow("Last Updated", $currentTime, self::GRAY);
+        $buffer .= $this->printSection('Server Status');
+        $buffer .= $this->printRow('Status', '● ONLINE', self::GREEN);
+        $buffer .= $this->printRow('Role', $stats['role'], self::MAGENTA);
+        $buffer .= $this->printRow('Uptime', "{$stats['uptime_days']} days (".$this->formatNumber($stats['uptime_seconds']).' seconds)', self::WHITE);
+        $buffer .= $this->printRow('Last Updated', $currentTime, self::GRAY);
 
         // Memory Usage
-        $buffer .= $this->printSection("Memory Usage");
-        $buffer .= $this->printRow("Used Memory", $this->formatBytes($stats['used_memory']), self::CYAN);
-        $buffer .= $this->printRow("Peak Memory", $this->formatBytes($stats['used_memory_peak']), self::YELLOW);
-        $buffer .= $this->printRow("RSS Memory", $this->formatBytes($stats['used_memory_rss']), self::WHITE);
-        $buffer .= $this->printRow("Fragmentation Ratio", (string) $stats['mem_fragmentation_ratio'], self::WHITE);
+        $buffer .= $this->printSection('Memory Usage');
+        $buffer .= $this->printRow('Used Memory', $this->formatBytes($stats['used_memory']), self::CYAN);
+        $buffer .= $this->printRow('Peak Memory', $this->formatBytes($stats['used_memory_peak']), self::YELLOW);
+        $buffer .= $this->printRow('RSS Memory', $this->formatBytes($stats['used_memory_rss']), self::WHITE);
+        $buffer .= $this->printRow('Fragmentation Ratio', (string) $stats['mem_fragmentation_ratio'], self::WHITE);
 
         if ($stats['maxmemory'] > 0) {
-            $buffer .= $this->printMeter("Memory Usage", $stats['used_memory'], $stats['maxmemory']);
+            $buffer .= $this->printMeter('Memory Usage', $stats['used_memory'], $stats['maxmemory']);
         }
 
         // Clients & Connections
-        $buffer .= $this->printSection("Clients & Connections");
-        $buffer .= $this->printRow("Connected Clients", $this->formatNumber($stats['connected_clients']), self::GREEN);
-        $buffer .= $this->printRow("Blocked Clients", $this->formatNumber($stats['blocked_clients']), self::YELLOW);
-        $buffer .= $this->printRow("Total Connections", $this->formatNumber($stats['total_connections']), self::WHITE);
+        $buffer .= $this->printSection('Clients & Connections');
+        $buffer .= $this->printRow('Connected Clients', $this->formatNumber($stats['connected_clients']), self::GREEN);
+        $buffer .= $this->printRow('Blocked Clients', $this->formatNumber($stats['blocked_clients']), self::YELLOW);
+        $buffer .= $this->printRow('Total Connections', $this->formatNumber($stats['total_connections']), self::WHITE);
         if ($stats['connected_slaves'] > 0) {
-            $buffer .= $this->printRow("Connected Slaves", (string) $stats['connected_slaves'], self::MAGENTA);
+            $buffer .= $this->printRow('Connected Slaves', (string) $stats['connected_slaves'], self::MAGENTA);
         }
 
         // Performance Metrics
-        $buffer .= $this->printSection("Performance Metrics");
-        $buffer .= $this->printRow("Commands Processed", $this->formatNumber($stats['total_commands']), self::WHITE);
-        $buffer .= $this->printRow("Operations/sec", $this->formatNumber($stats['ops_per_sec']) . " ops/s", self::GREEN);
-        $buffer .= $this->printRow("Network Input", sprintf("%.2f KB/s", $stats['input_kbps']), self::CYAN);
-        $buffer .= $this->printRow("Network Output", sprintf("%.2f KB/s", $stats['output_kbps']), self::CYAN);
+        $buffer .= $this->printSection('Performance Metrics');
+        $buffer .= $this->printRow('Commands Processed', $this->formatNumber($stats['total_commands']), self::WHITE);
+        $buffer .= $this->printRow('Operations/sec', $this->formatNumber($stats['ops_per_sec']).' ops/s', self::GREEN);
+        $buffer .= $this->printRow('Network Input', sprintf('%.2f KB/s', $stats['input_kbps']), self::CYAN);
+        $buffer .= $this->printRow('Network Output', sprintf('%.2f KB/s', $stats['output_kbps']), self::CYAN);
 
         // Keyspace Statistics
-        $buffer .= $this->printSection("Keyspace Statistics");
-        $buffer .= $this->printRow("Total Keys", $this->formatNumber($stats['db_keys']), self::WHITE);
-        $buffer .= $this->printRow("Keyspace Hits", $this->formatNumber($stats['keyspace_hits']), self::GREEN);
-        $buffer .= $this->printRow("Keyspace Misses", $this->formatNumber($stats['keyspace_misses']), self::RED);
-        $buffer .= $this->printRow("Hit Rate", $stats['hit_rate'] . "%", self::CYAN);
-        $buffer .= $this->printRow("Expired Keys", $this->formatNumber($stats['expired_keys']), self::YELLOW);
-        $buffer .= $this->printRow("Evicted Keys", $this->formatNumber($stats['evicted_keys']), self::RED);
+        $buffer .= $this->printSection('Keyspace Statistics');
+        $buffer .= $this->printRow('Total Keys', $this->formatNumber($stats['db_keys']), self::WHITE);
+        $buffer .= $this->printRow('Keyspace Hits', $this->formatNumber($stats['keyspace_hits']), self::GREEN);
+        $buffer .= $this->printRow('Keyspace Misses', $this->formatNumber($stats['keyspace_misses']), self::RED);
+        $buffer .= $this->printRow('Hit Rate', $stats['hit_rate'].'%', self::CYAN);
+        $buffer .= $this->printRow('Expired Keys', $this->formatNumber($stats['expired_keys']), self::YELLOW);
+        $buffer .= $this->printRow('Evicted Keys', $this->formatNumber($stats['evicted_keys']), self::RED);
 
         // Persistence
-        $buffer .= $this->printSection("Persistence");
-        $buffer .= $this->printRow("Changes Since Save", $this->formatNumber($stats['rdb_changes']), self::WHITE);
+        $buffer .= $this->printSection('Persistence');
+        $buffer .= $this->printRow('Changes Since Save', $this->formatNumber($stats['rdb_changes']), self::WHITE);
         if ($stats['rdb_last_save'] > 0) {
             $lastSave = date('Y-m-d H:i:s', $stats['rdb_last_save']);
-            $buffer .= $this->printRow("Last Save", $lastSave, self::GRAY);
+            $buffer .= $this->printRow('Last Save', $lastSave, self::GRAY);
         }
 
         $buffer .= $this->printFooter();
-        $buffer .= self::DIM . " Press Ctrl+C to exit | Refresh: {$this->refreshInterval}s" . self::NC . self::CLEAR_EOL . "\n";
+        $buffer .= self::DIM." Press Ctrl+C to exit | Refresh: {$this->refreshInterval}s".self::NC.self::CLEAR_EOL."\n";
 
         // Clear any remaining content below
         $buffer .= "\033[J";
@@ -362,12 +377,12 @@ class RedisMonitorService
     protected function displayConnectionError(): void
     {
         $buffer = '';
-        $buffer .= $this->printHeader("⚠ REDIS MONITOR - CONNECTION FAILED");
-        $buffer .= $this->printRow("Status", "● OFFLINE - Cannot connect to Redis", self::RED);
-        $buffer .= $this->printRow("Host", "{$this->host}:{$this->port}", self::YELLOW);
-        $buffer .= $this->printRow("Retrying in", "{$this->refreshInterval} seconds...", self::GRAY);
+        $buffer .= $this->printHeader('⚠ REDIS MONITOR - CONNECTION FAILED');
+        $buffer .= $this->printRow('Status', '● OFFLINE - Cannot connect to Redis', self::RED);
+        $buffer .= $this->printRow('Host', "{$this->host}:{$this->port}", self::YELLOW);
+        $buffer .= $this->printRow('Retrying in', "{$this->refreshInterval} seconds...", self::GRAY);
         $buffer .= $this->printFooter();
-        $buffer .= self::DIM . " Press Ctrl+C to exit | Refresh: {$this->refreshInterval}s" . self::NC . self::CLEAR_EOL . "\n";
+        $buffer .= self::DIM." Press Ctrl+C to exit | Refresh: {$this->refreshInterval}s".self::NC.self::CLEAR_EOL."\n";
         $buffer .= "\033[J";
 
         echo $buffer;
@@ -383,13 +398,13 @@ class RedisMonitorService
         $padding = max(0, (int) (($this->boxWidth - $titleLen - 2) / 2));
         $line = str_repeat(self::H_LINE, $this->boxWidth);
 
-        $buffer = self::CYAN . self::TL_CORNER . $line . self::TR_CORNER . self::NC . self::CLEAR_EOL . "\n";
-        $buffer .= self::CYAN . self::V_LINE . self::NC;
+        $buffer = self::CYAN.self::TL_CORNER.$line.self::TR_CORNER.self::NC.self::CLEAR_EOL."\n";
+        $buffer .= self::CYAN.self::V_LINE.self::NC;
         $buffer .= str_repeat(' ', $padding);
-        $buffer .= self::BOLD . self::WHITE . $title . self::NC;
+        $buffer .= self::BOLD.self::WHITE.$title.self::NC;
         $buffer .= str_repeat(' ', max(0, $this->boxWidth - $padding - $titleLen));
-        $buffer .= self::CYAN . self::V_LINE . self::NC . self::CLEAR_EOL . "\n";
-        $buffer .= self::CYAN . self::T_RIGHT . $line . self::T_LEFT . self::NC . self::CLEAR_EOL . "\n";
+        $buffer .= self::CYAN.self::V_LINE.self::NC.self::CLEAR_EOL."\n";
+        $buffer .= self::CYAN.self::T_RIGHT.$line.self::T_LEFT.self::NC.self::CLEAR_EOL."\n";
 
         return $buffer;
     }
@@ -402,9 +417,9 @@ class RedisMonitorService
         $remainingWidth = $this->boxWidth - mb_strlen($title) - 5;
         $line = str_repeat(self::H_LINE, max(0, $remainingWidth));
 
-        return self::CYAN . self::T_RIGHT . self::H_LINE . self::H_LINE . self::NC . " "
-            . self::YELLOW . self::BOLD . $title . self::NC . " "
-            . self::CYAN . $line . self::T_LEFT . self::NC . self::CLEAR_EOL . "\n";
+        return self::CYAN.self::T_RIGHT.self::H_LINE.self::H_LINE.self::NC.' '
+            .self::YELLOW.self::BOLD.$title.self::NC.' '
+            .self::CYAN.$line.self::T_LEFT.self::NC.self::CLEAR_EOL."\n";
     }
 
     /**
@@ -418,10 +433,10 @@ class RedisMonitorService
         $label = str_pad($label, $labelWidth);
         $value = str_pad(mb_substr($value, 0, $valueWidth), $valueWidth);
 
-        return self::CYAN . self::V_LINE . self::NC . " "
-            . self::DIM . $label . self::NC . " "
-            . $color . $value . self::NC
-            . self::CYAN . self::V_LINE . self::NC . self::CLEAR_EOL . "\n";
+        return self::CYAN.self::V_LINE.self::NC.' '
+            .self::DIM.$label.self::NC.' '
+            .$color.$value.self::NC
+            .self::CYAN.self::V_LINE.self::NC.self::CLEAR_EOL."\n";
     }
 
     /**
@@ -444,17 +459,17 @@ class RedisMonitorService
             $color = self::YELLOW;
         }
 
-        $meter = $color . str_repeat("█", $filled) . self::GRAY . str_repeat("░", $empty) . self::NC;
+        $meter = $color.str_repeat('█', $filled).self::GRAY.str_repeat('░', $empty).self::NC;
 
         $label = str_pad($label, $labelWidth);
-        $percentStr = sprintf("%3d%%", $percentage);
+        $percentStr = sprintf('%3d%%', $percentage);
         $remainingSpace = $this->boxWidth - $labelWidth - $meterWidth - strlen($percentStr) - 4;
 
-        return self::CYAN . self::V_LINE . self::NC . " "
-            . self::DIM . $label . self::NC . " "
-            . $meter . " " . self::WHITE . $percentStr . self::NC
-            . str_repeat(' ', max(0, $remainingSpace))
-            . self::CYAN . self::V_LINE . self::NC . self::CLEAR_EOL . "\n";
+        return self::CYAN.self::V_LINE.self::NC.' '
+            .self::DIM.$label.self::NC.' '
+            .$meter.' '.self::WHITE.$percentStr.self::NC
+            .str_repeat(' ', max(0, $remainingSpace))
+            .self::CYAN.self::V_LINE.self::NC.self::CLEAR_EOL."\n";
     }
 
     /**
@@ -463,7 +478,8 @@ class RedisMonitorService
     protected function printFooter(): string
     {
         $line = str_repeat(self::H_LINE, $this->boxWidth);
-        return self::CYAN . self::BL_CORNER . $line . self::BR_CORNER . self::NC . self::CLEAR_EOL . "\n";
+
+        return self::CYAN.self::BL_CORNER.$line.self::BR_CORNER.self::NC.self::CLEAR_EOL."\n";
     }
 
     /**
@@ -472,13 +488,14 @@ class RedisMonitorService
     protected function formatBytes(int $bytes): string
     {
         if ($bytes >= 1073741824) {
-            return sprintf("%.2f GB", $bytes / 1073741824);
+            return sprintf('%.2f GB', $bytes / 1073741824);
         } elseif ($bytes >= 1048576) {
-            return sprintf("%.2f MB", $bytes / 1048576);
+            return sprintf('%.2f MB', $bytes / 1048576);
         } elseif ($bytes >= 1024) {
-            return sprintf("%.2f KB", $bytes / 1024);
+            return sprintf('%.2f KB', $bytes / 1024);
         }
-        return $bytes . " B";
+
+        return $bytes.' B';
     }
 
     /**
@@ -521,4 +538,3 @@ class RedisMonitorService
         echo "\033[2J\033[H";
     }
 }
-

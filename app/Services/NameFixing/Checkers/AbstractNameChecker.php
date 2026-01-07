@@ -15,6 +15,7 @@ use App\Services\NameFixing\DTO\NameFixResult;
 abstract class AbstractNameChecker implements NameCheckerInterface
 {
     protected int $priority = 50;
+
     protected string $name = 'Abstract';
 
     /**
@@ -71,4 +72,3 @@ abstract class AbstractNameChecker implements NameCheckerInterface
         return str_replace('_', ' ', strtolower($patternName));
     }
 }
-

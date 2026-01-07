@@ -51,17 +51,17 @@ class UpdateBinaries extends Command
             $this->outputBanner();
 
             $nntp = $this->getNntp();
-            $binaries = new BinariesService();
+            $binaries = new BinariesService;
             $binaries->setNntp($nntp);
 
-            if ($groupName && !is_numeric($groupName)) {
+            if ($groupName && ! is_numeric($groupName)) {
                 $this->outputHeader('Updating Single Group');
                 $this->outputInfo("Group: {$groupName}");
-                $this->outputInfo('Max headers: ' . number_format($maxHeaders));
+                $this->outputInfo('Max headers: '.number_format($maxHeaders));
                 $this->updateSingleGroup($binaries, $groupName, $maxHeaders);
             } else {
                 $this->outputHeader('Updating All Groups');
-                $this->outputInfo('Max headers: ' . number_format($maxHeaders));
+                $this->outputInfo('Max headers: '.number_format($maxHeaders));
                 $binaries->updateAllGroups($maxHeaders);
             }
 
@@ -70,7 +70,7 @@ class UpdateBinaries extends Command
             return self::SUCCESS;
         } catch (\Throwable $e) {
             Log::error($e->getMessage());
-            cli()->error('Error: ' . $e->getMessage());
+            cli()->error('Error: '.$e->getMessage());
 
             return self::FAILURE;
         }
@@ -95,7 +95,7 @@ class UpdateBinaries extends Command
      */
     private function getNntp(): NNTPService
     {
-        $nntp = new NNTPService();
+        $nntp = new NNTPService;
 
         $connectResult = $nntp->doConnect();
 
@@ -115,13 +115,13 @@ class UpdateBinaries extends Command
      */
     private function outputBanner(): void
     {
-        if (!$this->echoCLI) {
+        if (! $this->echoCLI) {
             return;
         }
 
         echo PHP_EOL;
         cli()->header('NNTmux Binary Update');
-        cli()->info('Started: ' . now()->format('Y-m-d H:i:s'));
+        cli()->info('Started: '.now()->format('Y-m-d H:i:s'));
     }
 
     /**
@@ -129,7 +129,7 @@ class UpdateBinaries extends Command
      */
     private function outputHeader(string $title): void
     {
-        if (!$this->echoCLI) {
+        if (! $this->echoCLI) {
             return;
         }
 
@@ -143,7 +143,7 @@ class UpdateBinaries extends Command
      */
     private function outputInfo(string $message): void
     {
-        if (!$this->echoCLI) {
+        if (! $this->echoCLI) {
             return;
         }
 
@@ -155,7 +155,7 @@ class UpdateBinaries extends Command
      */
     private function outputSummary(\DateTimeInterface $startTime): void
     {
-        if (!$this->echoCLI) {
+        if (! $this->echoCLI) {
             return;
         }
 

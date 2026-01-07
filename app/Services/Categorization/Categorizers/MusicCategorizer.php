@@ -25,9 +25,14 @@ class MusicCategorizer extends AbstractCategorizer
 
     public function shouldSkip(ReleaseContext $context): bool
     {
-        if ($context->hasAdultMarkers()) return true;
+        if ($context->hasAdultMarkers()) {
+            return true;
+        }
         // Skip TV shows (season patterns)
-        if (preg_match('/[._ -]S\d{1,3}[._ -]?(E\d|Complete|Full|1080|720|480|2160|WEB|HDTV|BluRay)/i', $context->releaseName)) return true;
+        if (preg_match('/[._ -]S\d{1,3}[._ -]?(E\d|Complete|Full|1080|720|480|2160|WEB|HDTV|BluRay)/i', $context->releaseName)) {
+            return true;
+        }
+
         return false;
     }
 
@@ -65,7 +70,7 @@ class MusicCategorizer extends AbstractCategorizer
 
     protected function checkForeign(string $name): bool
     {
-        return (bool) preg_match('/(?:^|[\s\.\-_])(?:' . self::FOREIGN_LANGUAGES . '|' . self::LANGUAGE_CODES . ')(?:$|[\s\.\-_])/i', $name);
+        return (bool) preg_match('/(?:^|[\s\.\-_])(?:'.self::FOREIGN_LANGUAGES.'|'.self::LANGUAGE_CODES.')(?:$|[\s\.\-_])/i', $name);
     }
 
     protected function checkAudiobook(string $name): ?CategorizationResult
@@ -124,6 +129,7 @@ class MusicCategorizer extends AbstractCategorizer
                 if ($categorizeForeign && $this->checkForeign($name)) {
                     return $this->matched(Category::MUSIC_FOREIGN, 0.85, 'music_video_foreign');
                 }
+
                 return $this->matched(Category::MUSIC_VIDEO, 0.9, 'music_video');
             }
         }
@@ -133,6 +139,7 @@ class MusicCategorizer extends AbstractCategorizer
             if ($categorizeForeign && $this->checkForeign($name)) {
                 return $this->matched(Category::MUSIC_FOREIGN, 0.8, 'music_video_foreign');
             }
+
             return $this->matched(Category::MUSIC_VIDEO, 0.8, 'music_video_artist');
         }
 
@@ -149,6 +156,7 @@ class MusicCategorizer extends AbstractCategorizer
                 if ($categorizeForeign && $this->checkForeign($name)) {
                     return $this->matched(Category::MUSIC_FOREIGN, 0.9, 'lossless_foreign');
                 }
+
                 return $this->matched(Category::MUSIC_LOSSLESS, 0.9, 'lossless');
             }
         }
@@ -160,6 +168,7 @@ class MusicCategorizer extends AbstractCategorizer
             if ($categorizeForeign && $this->checkForeign($name)) {
                 return $this->matched(Category::MUSIC_FOREIGN, 0.85, 'flac_foreign');
             }
+
             return $this->matched(Category::MUSIC_LOSSLESS, 0.85, 'flac');
         }
 
@@ -168,6 +177,7 @@ class MusicCategorizer extends AbstractCategorizer
             if ($categorizeForeign && $this->checkForeign($name)) {
                 return $this->matched(Category::MUSIC_FOREIGN, 0.85, 'lossless_format_foreign');
             }
+
             return $this->matched(Category::MUSIC_LOSSLESS, 0.85, 'lossless_format');
         }
 
@@ -185,6 +195,7 @@ class MusicCategorizer extends AbstractCategorizer
                 if ($categorizeForeign && $this->checkForeign($name)) {
                     return $this->matched(Category::MUSIC_FOREIGN, 0.85, 'mp3_foreign');
                 }
+
                 return $this->matched(Category::MUSIC_MP3, 0.85, 'mp3');
             }
         }
@@ -194,6 +205,7 @@ class MusicCategorizer extends AbstractCategorizer
             if ($categorizeForeign && $this->checkForeign($name)) {
                 return $this->matched(Category::MUSIC_FOREIGN, 0.75, 'mp3_scene_foreign');
             }
+
             return $this->matched(Category::MUSIC_MP3, 0.75, 'mp3_scene');
         }
 
@@ -202,6 +214,7 @@ class MusicCategorizer extends AbstractCategorizer
             if ($categorizeForeign && $this->checkForeign($name)) {
                 return $this->matched(Category::MUSIC_FOREIGN, 0.8, 'mp3_bitrate_foreign');
             }
+
             return $this->matched(Category::MUSIC_MP3, 0.8, 'mp3_bitrate');
         }
 
@@ -215,6 +228,7 @@ class MusicCategorizer extends AbstractCategorizer
             if ($categorizeForeign && $this->checkForeign($name)) {
                 return $this->matched(Category::MUSIC_FOREIGN, 0.8, 'music_other_foreign');
             }
+
             return $this->matched(Category::MUSIC_OTHER, 0.8, 'music_other');
         }
 
@@ -224,6 +238,7 @@ class MusicCategorizer extends AbstractCategorizer
             if ($categorizeForeign && $this->checkForeign($name)) {
                 return $this->matched(Category::MUSIC_FOREIGN, 0.75, 'music_album_foreign');
             }
+
             return $this->matched(Category::MUSIC_OTHER, 0.75, 'music_album');
         }
 
@@ -233,10 +248,10 @@ class MusicCategorizer extends AbstractCategorizer
             if ($categorizeForeign && $this->checkForeign($name)) {
                 return $this->matched(Category::MUSIC_FOREIGN, 0.75, 'music_dj_foreign');
             }
+
             return $this->matched(Category::MUSIC_OTHER, 0.75, 'music_dj');
         }
 
         return null;
     }
 }
-

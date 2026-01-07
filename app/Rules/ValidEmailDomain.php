@@ -89,6 +89,7 @@ class ValidEmailDomain implements ValidationRule
     {
         if (empty($value) || ! is_string($value)) {
             $fail('The :attribute must be a valid email address.');
+
             return;
         }
 
@@ -96,6 +97,7 @@ class ValidEmailDomain implements ValidationRule
         $parts = explode('@', $value);
         if (count($parts) !== 2) {
             $fail('The :attribute must be a valid email address.');
+
             return;
         }
 
@@ -105,12 +107,14 @@ class ValidEmailDomain implements ValidationRule
         // Validate local part is not empty
         if (empty($localPart)) {
             $fail('The :attribute must be a valid email address.');
+
             return;
         }
 
         // Validate domain is not empty
         if (empty($domain)) {
             $fail('The :attribute must be a valid email address.');
+
             return;
         }
 
@@ -121,6 +125,7 @@ class ValidEmailDomain implements ValidationRule
                 'domain' => $domain,
             ]);
             $fail('Temporary or disposable email addresses are not allowed.');
+
             return;
         }
 
@@ -131,6 +136,7 @@ class ValidEmailDomain implements ValidationRule
                 'domain' => $domain,
             ]);
             $fail('Temporary or disposable email addresses are not allowed.');
+
             return;
         }
 
@@ -143,6 +149,7 @@ class ValidEmailDomain implements ValidationRule
                     'pattern' => $pattern,
                 ]);
                 $fail('Temporary or disposable email addresses are not allowed.');
+
                 return;
             }
         }
@@ -154,6 +161,7 @@ class ValidEmailDomain implements ValidationRule
                 'domain' => $domain,
             ]);
             $fail('The email domain does not appear to be valid or reachable.');
+
             return;
         }
 
@@ -206,4 +214,3 @@ class ValidEmailDomain implements ValidationRule
         return false;
     }
 }
-

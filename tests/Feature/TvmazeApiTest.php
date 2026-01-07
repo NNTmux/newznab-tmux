@@ -112,4 +112,3 @@ class TvmazeApiTest extends TestCase
         }
     }
 }
-

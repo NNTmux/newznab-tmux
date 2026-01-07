@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services\Binaries;
 
 use App\Services\BlacklistService;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Parses and filters raw NNTP headers.
@@ -164,4 +163,3 @@ final class HeaderParser
         return $result;
     }
 }
-

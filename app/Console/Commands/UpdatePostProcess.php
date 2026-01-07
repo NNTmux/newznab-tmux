@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Services\PostProcessService;
 use App\Services\NNTP\NNTPService;
+use App\Services\PostProcessService;
 use Illuminate\Console\Command;
 
 class UpdatePostProcess extends Command
@@ -59,7 +59,7 @@ class UpdatePostProcess extends Command
     {
         $type = $this->argument('type');
 
-        if (!array_key_exists($type, self::VALID_TYPES)) {
+        if (! array_key_exists($type, self::VALID_TYPES)) {
             $this->error("Invalid type: {$type}");
             $this->showHelp();
 
@@ -131,7 +131,7 @@ class UpdatePostProcess extends Command
      */
     private function getNntp(): NNTPService
     {
-        $nntp = new NNTPService();
+        $nntp = new NNTPService;
 
         $connectResult = config('nntmux_nntp.use_alternate_nntp_server') === true
             ? $nntp->doConnect(false, true)

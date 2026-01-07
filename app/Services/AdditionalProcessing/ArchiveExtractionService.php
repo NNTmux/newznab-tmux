@@ -17,13 +17,14 @@ use Illuminate\Support\Facades\Log;
 class ArchiveExtractionService
 {
     private ArchiveInfo $archiveInfo;
+
     private Par2Info $par2Info;
 
     public function __construct(
         private readonly ProcessingConfiguration $config
     ) {
-        $this->archiveInfo = new ArchiveInfo();
-        $this->par2Info = new Par2Info();
+        $this->archiveInfo = new ArchiveInfo;
+        $this->par2Info = new Par2Info;
 
         // Configure external clients for ArchiveInfo
         if ($this->config->unrarPath) {
@@ -84,6 +85,7 @@ class ArchiveExtractionService
                     'standaloneVideoData' => $compressedData,
                 ];
             }
+
             return $result;
         }
 
@@ -91,6 +93,7 @@ class ArchiveExtractionService
             if ($this->config->debugMode) {
                 Log::debug('ArchiveInfo Error: '.$this->archiveInfo->error);
             }
+
             return $result;
         }
 
@@ -100,6 +103,7 @@ class ArchiveExtractionService
             if ($this->config->debugMode) {
                 Log::warning($e->getTraceAsString());
             }
+
             return $result;
         }
 
@@ -110,6 +114,7 @@ class ArchiveExtractionService
             if ($this->config->debugMode) {
                 Log::debug('ArchiveInfo: Compressed file has a password.');
             }
+
             return [
                 'success' => false,
                 'files' => [],
@@ -189,6 +194,7 @@ class ArchiveExtractionService
         if ($crc === "\x00\x00\x00\x00" || $crc === "\xFF\xFF\xFF\xFF") {
             return false;
         }
+
         return true;
     }
 
@@ -238,7 +244,7 @@ class ArchiveExtractionService
         // Fallback: scan for filenames in raw data
         $scannedNames = $this->scanSevenZipFilenames($compressedData);
         if (! empty($scannedNames)) {
-            $files = array_map(fn($name) => [
+            $files = array_map(fn ($name) => [
                 'name' => $name,
                 'size' => 0,
                 'date' => time(),
@@ -284,15 +290,18 @@ class ArchiveExtractionService
                 // Try plain listing fallback
                 $plainResult = $this->listSevenZipPlain($tmpFile);
                 File::delete($tmpFile);
+
                 return $plainResult;
             }
 
             File::delete($tmpFile);
+
             return $this->parseSevenZipStructuredOutput($stdout);
         } catch (\Throwable $e) {
             if ($this->config->debugMode) {
                 Log::debug('Exception listing 7z: '.$e->getMessage());
             }
+
             return [];
         }
     }
@@ -595,7 +604,7 @@ class ArchiveExtractionService
     /**
      * Check if a file is an NFO or info file.
      *
-     * @param string $filename The filename to check.
+     * @param  string  $filename  The filename to check.
      * @return bool True if it's an NFO-like file.
      */
     public function isNfoFile(string $filename): bool
@@ -630,7 +639,7 @@ class ArchiveExtractionService
     /**
      * Sort files to prioritize NFO files for processing.
      *
-     * @param array $files Array of file info arrays.
+     * @param  array  $files  Array of file info arrays.
      * @return array Sorted array with NFO files first.
      */
     public function sortFilesWithNfoPriority(array $files): array
@@ -694,6 +703,7 @@ class ArchiveExtractionService
                     runCmd($killString.$this->config->unrarPath.'" e -ai -ep -c- -id -inul -kb -or -p- -r -y "'.$fileName.'" "'.$tmpPath.'unrar/"');
                     File::delete($fileName);
                 }
+
                 return 'r';
 
             case ArchiveInfo::TYPE_ZIP:
@@ -703,6 +713,7 @@ class ArchiveExtractionService
                     runCmd($this->config->unzipPath.' -o "'.$fileName.'" -d "'.$tmpPath.'unzip/"');
                     File::delete($fileName);
                 }
+
                 return 'z';
         }
 
@@ -785,6 +796,7 @@ class ArchiveExtractionService
         $process = @proc_open($cmd, $descriptorSpec, $pipes, null, null, ['bypass_shell' => true]);
         if (! is_resource($process)) {
             $exitCode = -1;
+
             return false;
         }
 
@@ -797,4 +809,3 @@ class ArchiveExtractionService
         return $exitCode === 0;
     }
 }
-

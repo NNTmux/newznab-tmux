@@ -154,7 +154,6 @@ Route::middleware('isVerified')->group(function () {
     Route::post('profile/update-theme', [ProfileController::class, 'updateTheme'])->name('profile.update-theme');
     Route::match(['GET', 'POST'], 'search', [SearchController::class, 'search'])->name('search');
 
-
     Route::match(['GET', 'POST'], 'mymovies', [MyMoviesController::class, 'show'])->name('mymovies');
     Route::match(['GET', 'POST'], 'myshows', [MyShowsController::class, 'show'])->name('myshows');
     Route::match(['GET', 'POST'], 'myshows/browse', [MyShowsController::class, 'browse'])->name('myshows.browse');

@@ -29,6 +29,7 @@ class TvProcessingPipeline
     protected Collection $pipes;
 
     protected int $tvqty;
+
     protected bool $echoOutput;
 
     protected array $stats = [
@@ -41,7 +42,7 @@ class TvProcessingPipeline
     ];
 
     /**
-     * @param iterable<AbstractTvProviderPipe> $pipes
+     * @param  iterable<AbstractTvProviderPipe>  $pipes
      */
     public function __construct(iterable $pipes = [], bool $echoOutput = true)
     {
@@ -69,8 +70,8 @@ class TvProcessingPipeline
     /**
      * Process a single release through the pipeline.
      *
-     * @param array|object $release Release data
-     * @param bool $debug Whether to include debug information
+     * @param  array|object  $release  Release data
+     * @param  bool  $debug  Whether to include debug information
      * @return array Processing result
      */
     public function processRelease(array|object $release, bool $debug = false): array
@@ -95,9 +96,9 @@ class TvProcessingPipeline
     /**
      * Process all TV releases matching the criteria.
      *
-     * @param string $groupID Group ID to process
-     * @param string $guidChar GUID character to process
-     * @param int|string|null $processTV Processing setting (0/1/2 or '' to read from settings)
+     * @param  string  $groupID  Group ID to process
+     * @param  string  $guidChar  GUID character to process
+     * @param  int|string|null  $processTV  Processing setting (0/1/2 or '' to read from settings)
      */
     public function process(string $groupID = '', string $guidChar = '', int|string|null $processTV = ''): void
     {
@@ -117,6 +118,7 @@ class TvProcessingPipeline
             if ($this->echoOutput) {
                 cli()->header('No TV releases to process.');
             }
+
             return;
         }
 
@@ -136,8 +138,6 @@ class TvProcessingPipeline
 
     /**
      * Get TV releases that need processing.
-     *
-     * @return Collection
      */
     protected function getTvReleases(string $groupID, string $guidChar, int $processTV): Collection
     {
@@ -274,13 +274,12 @@ class TvProcessingPipeline
     public static function createDefault(bool $echoOutput = true): self
     {
         return new self([
-            new ParseInfoPipe(),
-            new LocalDbPipe(),
-            new TvdbPipe(),
-            new TvMazePipe(),
-            new TmdbPipe(),
-            new TraktPipe(),
+            new ParseInfoPipe,
+            new LocalDbPipe,
+            new TvdbPipe,
+            new TvMazePipe,
+            new TmdbPipe,
+            new TraktPipe,
         ], $echoOutput);
     }
 }
-

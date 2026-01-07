@@ -104,4 +104,3 @@ class OmdbApiTest extends TestCase
         $this->assertObjectHasProperty('Year', $firstResult);
     }
 }
-

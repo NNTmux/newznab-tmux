@@ -50,4 +50,3 @@ class TvReleaseContext
         return (bool) preg_match($pattern, $this->searchName);
     }
 }
-

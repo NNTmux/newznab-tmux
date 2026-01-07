@@ -27,33 +27,33 @@ class AdminUserRoleHistoryController extends BasePageController
             ->orderBy('created_at', 'desc');
 
         // Apply filters
-        if ($request->has('user_id') && !empty($request->input('user_id'))) {
+        if ($request->has('user_id') && ! empty($request->input('user_id'))) {
             $query->where('user_id', $request->input('user_id'));
         }
 
-        if ($request->has('username') && !empty($request->input('username'))) {
+        if ($request->has('username') && ! empty($request->input('username'))) {
             $query->whereHas('user', function ($q) use ($request) {
-                $q->where('username', 'like', '%' . $request->input('username') . '%');
+                $q->where('username', 'like', '%'.$request->input('username').'%');
             });
         }
 
-        if ($request->has('role_id') && !empty($request->input('role_id'))) {
+        if ($request->has('role_id') && ! empty($request->input('role_id'))) {
             $query->where(function ($q) use ($request) {
                 $q->where('old_role_id', $request->input('role_id'))
                     ->orWhere('new_role_id', $request->input('role_id'));
             });
         }
 
-        if ($request->has('change_reason') && !empty($request->input('change_reason'))) {
-            $query->where('change_reason', 'like', '%' . $request->input('change_reason') . '%');
+        if ($request->has('change_reason') && ! empty($request->input('change_reason'))) {
+            $query->where('change_reason', 'like', '%'.$request->input('change_reason').'%');
         }
 
-        if ($request->has('date_from') && !empty($request->input('date_from'))) {
-            $query->where('created_at', '>=', $request->input('date_from') . ' 00:00:00');
+        if ($request->has('date_from') && ! empty($request->input('date_from'))) {
+            $query->where('created_at', '>=', $request->input('date_from').' 00:00:00');
         }
 
-        if ($request->has('date_to') && !empty($request->input('date_to'))) {
-            $query->where('created_at', '<=', $request->input('date_to') . ' 23:59:59');
+        if ($request->has('date_to') && ! empty($request->input('date_to'))) {
+            $query->where('created_at', '<=', $request->input('date_to').' 23:59:59');
         }
 
         // Pagination
@@ -88,7 +88,7 @@ class AdminUserRoleHistoryController extends BasePageController
         $this->setAdminPrefs();
 
         $user = User::findOrFail($userId);
-        $meta_title = $title = 'Role History for ' . $user->username;
+        $meta_title = $title = 'Role History for '.$user->username;
 
         $history = UserRoleHistory::with(['oldRole', 'newRole', 'changedByUser'])
             ->where('user_id', $userId)
@@ -105,4 +105,3 @@ class AdminUserRoleHistoryController extends BasePageController
         return view('admin.user-role-history.show', $this->viewData);
     }
 }
-

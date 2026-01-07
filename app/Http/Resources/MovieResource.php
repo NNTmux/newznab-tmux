@@ -68,4 +68,3 @@ class MovieResource extends JsonResource
         return url('/covers/movies/'.$this->imdbid.'-backdrop.jpg');
     }
 }
-

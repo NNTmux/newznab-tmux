@@ -43,10 +43,10 @@ class ForkingService
         $this->maxRetries = max($this->maxRetries, -8);
 
         // Initialize runners
-        $this->backfillRunner = new BackfillRunner();
-        $this->binariesRunner = new BinariesRunner();
-        $this->releasesRunner = new ReleasesRunner();
-        $this->postProcessRunner = new PostProcessRunner();
+        $this->backfillRunner = new BackfillRunner;
+        $this->binariesRunner = new BinariesRunner;
+        $this->releasesRunner = new ReleasesRunner;
+        $this->postProcessRunner = new PostProcessRunner;
     }
 
     /**
@@ -215,8 +215,8 @@ class ForkingService
 
         if (config('nntmux.echocli')) {
             cli()->header(
-                "Multi-processing for {$taskName} finished in " . (now()->timestamp - $startTime) .
-                ' seconds at ' . now()->toRfc2822String() . '.' . PHP_EOL
+                "Multi-processing for {$taskName} finished in ".(now()->timestamp - $startTime).
+                ' seconds at '.now()->toRfc2822String().'.'.PHP_EOL
             );
         }
     }
@@ -279,8 +279,7 @@ class ForkingService
     protected function log(string $message): void
     {
         if (config('nntmux.echocli')) {
-            echo $message . PHP_EOL;
+            echo $message.PHP_EOL;
         }
     }
 }
-

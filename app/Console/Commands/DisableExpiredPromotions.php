@@ -37,6 +37,7 @@ class DisableExpiredPromotions extends Command
 
         if ($expiredPromotions->isEmpty()) {
             $this->info('No expired promotions found.');
+
             return Command::SUCCESS;
         }
 
@@ -52,4 +53,3 @@ class DisableExpiredPromotions extends Command
         return Command::SUCCESS;
     }
 }
-

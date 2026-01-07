@@ -9,7 +9,6 @@ use App\Models\Release;
 use App\Models\Video;
 use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class NntmuxPopulateSearchIndexes extends Command

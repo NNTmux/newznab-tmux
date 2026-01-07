@@ -36,6 +36,7 @@ class NntmuxPopulateAniDB extends Command
             $palist->populateTable('info');
         } else {
             $this->error('Please specify --info option');
+
             return;
         }
 

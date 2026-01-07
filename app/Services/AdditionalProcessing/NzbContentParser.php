@@ -23,7 +23,7 @@ class NzbContentParser
     /**
      * Parse an NZB file and return its contents as an array of files.
      *
-     * @param string $guid The release GUID to find the NZB for
+     * @param  string  $guid  The release GUID to find the NZB for
      * @return array{contents: array, error: string|null}
      */
     public function parseNzb(string $guid): array
@@ -119,6 +119,7 @@ class NzbContentParser
                 $guidInfo = $guid ? ' for GUID: '.$guid : '';
                 echo 'NZB repair failed'.$guidInfo.' ('.count($errors).' XML errors)'.PHP_EOL;
             }
+
             return null;
         }
 
@@ -251,6 +252,7 @@ class NzbContentParser
             }
             $ids[] = (string) $segments[$i];
         }
+
         return $ids;
     }
 
@@ -262,4 +264,3 @@ class NzbContentParser
         return $this->nzb->nzbPath($guid);
     }
 }
-

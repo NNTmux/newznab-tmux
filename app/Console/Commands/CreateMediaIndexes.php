@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Facades\Search;
 use Illuminate\Console\Command;
 use Manticoresearch\Client;
 use Manticoresearch\Exceptions\ResponseException;
@@ -39,6 +38,7 @@ class CreateMediaIndexes extends Command
             return $this->createElasticsearchIndexes();
         } else {
             $this->error("Unsupported search driver: {$driver}");
+
             return Command::FAILURE;
         }
     }
@@ -61,7 +61,8 @@ class CreateMediaIndexes extends Command
             $client->nodes()->status();
             $this->info('Connected to ManticoreSearch successfully.');
         } catch (\Exception $e) {
-            $this->error('Failed to connect to ManticoreSearch: ' . $e->getMessage());
+            $this->error('Failed to connect to ManticoreSearch: '.$e->getMessage());
+
             return Command::FAILURE;
         }
 
@@ -109,13 +110,14 @@ class CreateMediaIndexes extends Command
         $hasErrors = false;
 
         foreach ($indexes as $indexName => $schema) {
-            if (!$this->createManticoreIndex($client, $indexName, $schema, $dropExisting)) {
+            if (! $this->createManticoreIndex($client, $indexName, $schema, $dropExisting)) {
                 $hasErrors = true;
             }
         }
 
         if ($hasErrors) {
             $this->error('Some errors occurred during index creation.');
+
             return Command::FAILURE;
         }
 
@@ -158,6 +160,7 @@ class CreateMediaIndexes extends Command
                     $client->tables()->drop(['index' => $indexName, 'body' => ['silent' => true]]);
                 } else {
                     $this->info("Index {$indexName} already exists. Use --drop to recreate.");
+
                     return true;
                 }
             }
@@ -172,30 +175,35 @@ class CreateMediaIndexes extends Command
             ]);
 
             $this->info("Index {$indexName} created successfully.");
-            $this->line('Response: ' . json_encode($response, JSON_PRETTY_PRINT));
+            $this->line('Response: '.json_encode($response, JSON_PRETTY_PRINT));
+
             return true;
 
         } catch (ResponseException $e) {
             // Check if the error is because the index already exists
             if (str_contains($e->getMessage(), 'already exists')) {
                 $this->warn("Index {$indexName} already exists. Use --drop to recreate.");
+
                 return true;
             }
             // Check for data_dir configuration error
             if (str_contains($e->getMessage(), 'data_dir')) {
-                $this->error("Failed to create index {$indexName}: " . $e->getMessage());
+                $this->error("Failed to create index {$indexName}: ".$e->getMessage());
                 $this->newLine();
                 $this->warn('ManticoreSearch requires data_dir to be set in its configuration file.');
                 $this->info('To fix this, edit your ManticoreSearch config file (usually /etc/manticoresearch/manticore.conf):');
                 $this->line('  1. Add or uncomment: data_dir = /var/lib/manticore');
                 $this->line('  2. Ensure the directory exists and is writable by the manticore user');
                 $this->line('  3. Restart ManticoreSearch: sudo systemctl restart manticore');
+
                 return false;
             }
-            $this->error("Failed to create index {$indexName}: " . $e->getMessage());
+            $this->error("Failed to create index {$indexName}: ".$e->getMessage());
+
             return false;
         } catch (\Throwable $e) {
-            $this->error("Unexpected error creating index {$indexName}: " . $e->getMessage());
+            $this->error("Unexpected error creating index {$indexName}: ".$e->getMessage());
+
             return false;
         }
     }
@@ -266,7 +274,7 @@ class CreateMediaIndexes extends Command
                 $esClient->indices()->delete(['index' => $moviesIndex]);
             }
 
-            if (!$esClient->indices()->exists(['index' => $moviesIndex])) {
+            if (! $esClient->indices()->exists(['index' => $moviesIndex])) {
                 $this->info("Creating index: {$moviesIndex}");
                 $esClient->indices()->create([
                     'index' => $moviesIndex,
@@ -284,7 +292,7 @@ class CreateMediaIndexes extends Command
                 $esClient->indices()->delete(['index' => $tvshowsIndex]);
             }
 
-            if (!$esClient->indices()->exists(['index' => $tvshowsIndex])) {
+            if (! $esClient->indices()->exists(['index' => $tvshowsIndex])) {
                 $this->info("Creating index: {$tvshowsIndex}");
                 $esClient->indices()->create([
                     'index' => $tvshowsIndex,
@@ -313,9 +321,9 @@ class CreateMediaIndexes extends Command
             return Command::SUCCESS;
 
         } catch (\Throwable $e) {
-            $this->error('Failed to create Elasticsearch indexes: ' . $e->getMessage());
+            $this->error('Failed to create Elasticsearch indexes: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }
 }
-

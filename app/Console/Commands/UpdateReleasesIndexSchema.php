@@ -64,10 +64,11 @@ class UpdateReleasesIndexSchema extends Command
 
         if ($driver !== 'manticore') {
             $this->error("This command currently only supports ManticoreSearch. Current driver: {$driver}");
+
             return Command::FAILURE;
         }
 
-        $this->info("Releases index schema update utility");
+        $this->info('Releases index schema update utility');
         $this->newLine();
 
         // Initialize ManticoreSearch client
@@ -84,7 +85,8 @@ class UpdateReleasesIndexSchema extends Command
             $this->client->nodes()->status();
             $this->info('Connected to ManticoreSearch successfully.');
         } catch (\Exception $e) {
-            $this->error('Failed to connect to ManticoreSearch: ' . $e->getMessage());
+            $this->error('Failed to connect to ManticoreSearch: '.$e->getMessage());
+
             return Command::FAILURE;
         }
 
@@ -104,7 +106,7 @@ class UpdateReleasesIndexSchema extends Command
         }
 
         // If no options specified, show current schema info
-        if (!$this->option('add-fields') && !$this->option('update-media-ids')) {
+        if (! $this->option('add-fields') && ! $this->option('update-media-ids')) {
             $this->showSchemaInfo();
         }
 
@@ -126,6 +128,7 @@ class UpdateReleasesIndexSchema extends Command
             if (empty($columns)) {
                 $this->warn('Index releases_rt does not exist or has no columns.');
                 $this->info('Run `php artisan manticore:create-indexes` to create the index first.');
+
                 return;
             }
 
@@ -135,7 +138,7 @@ class UpdateReleasesIndexSchema extends Command
 
             foreach ($columns as $field => $props) {
                 $type = $props['Type'] ?? 'unknown';
-                $properties = isset($props['Properties']) ? implode(', ', (array)$props['Properties']) : '';
+                $properties = isset($props['Properties']) ? implode(', ', (array) $props['Properties']) : '';
                 $rows[] = [$field, $type, $properties];
                 $existingFields[$field] = strtolower($type);
             }
@@ -146,12 +149,12 @@ class UpdateReleasesIndexSchema extends Command
             // Check for missing fields
             $missingFields = [];
             foreach ($this->expectedFields as $field => $config) {
-                if (!isset($existingFields[$field]) && $field !== 'id') {
+                if (! isset($existingFields[$field]) && $field !== 'id') {
                     $missingFields[] = $field;
                 }
             }
 
-            if (!empty($missingFields)) {
+            if (! empty($missingFields)) {
                 $this->warn('Missing fields that should be added:');
                 foreach ($missingFields as $field) {
                     $this->line("  - {$field} ({$this->expectedFields[$field]['type']})");
@@ -173,7 +176,7 @@ class UpdateReleasesIndexSchema extends Command
             $this->line('  --batch-size=N       Set batch size for updates (default: 5000)');
 
         } catch (\Throwable $e) {
-            $this->error('Failed to describe index: ' . $e->getMessage());
+            $this->error('Failed to describe index: '.$e->getMessage());
             $this->info('The index may not exist. Run `php artisan manticore:create-indexes` first.');
         }
     }
@@ -193,6 +196,7 @@ class UpdateReleasesIndexSchema extends Command
 
             if (empty($columns)) {
                 $this->error('Index releases_rt does not exist. Create it first with: php artisan manticore:create-indexes');
+
                 return Command::FAILURE;
             }
 
@@ -215,13 +219,14 @@ class UpdateReleasesIndexSchema extends Command
 
             $fieldsToAdd = [];
             foreach ($mediaFields as $field => $type) {
-                if (!isset($existingFields[$field]) || $this->option('force')) {
+                if (! isset($existingFields[$field]) || $this->option('force')) {
                     $fieldsToAdd[$field] = $type;
                 }
             }
 
             if (empty($fieldsToAdd)) {
                 $this->info('All media fields already exist in the index.');
+
                 return Command::SUCCESS;
             }
 
@@ -230,8 +235,9 @@ class UpdateReleasesIndexSchema extends Command
                 $this->line("  - {$field} ({$type})");
             }
 
-            if (!$this->confirm('Do you want to proceed with adding these fields?', true)) {
+            if (! $this->confirm('Do you want to proceed with adding these fields?', true)) {
                 $this->info('Operation cancelled.');
+
                 return Command::SUCCESS;
             }
 
@@ -244,7 +250,8 @@ class UpdateReleasesIndexSchema extends Command
                     if (str_contains($e->getMessage(), 'already exists')) {
                         $this->warn("Field {$field} already exists, skipping.");
                     } else {
-                        $this->error("Failed to add field {$field}: " . $e->getMessage());
+                        $this->error("Failed to add field {$field}: ".$e->getMessage());
+
                         return Command::FAILURE;
                     }
                 }
@@ -258,7 +265,8 @@ class UpdateReleasesIndexSchema extends Command
             return Command::SUCCESS;
 
         } catch (\Throwable $e) {
-            $this->error('Failed to update schema: ' . $e->getMessage());
+            $this->error('Failed to update schema: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }
@@ -303,21 +311,21 @@ class UpdateReleasesIndexSchema extends Command
         // Apply filters based on options
         if ($moviesOnly) {
             $query->whereNotNull('releases.movieinfo_id')
-                  ->where('releases.movieinfo_id', '>', 0);
+                ->where('releases.movieinfo_id', '>', 0);
             $this->info('Filtering: Movies only (releases with movieinfo_id)');
         } elseif ($tvOnly) {
             $query->whereNotNull('releases.videos_id')
-                  ->where('releases.videos_id', '>', 0);
+                ->where('releases.videos_id', '>', 0);
             $this->info('Filtering: TV shows only (releases with videos_id)');
         } else {
             // Get releases that have either movie or TV info
             $query->where(function ($q) {
                 $q->where(function ($subq) {
                     $subq->whereNotNull('releases.movieinfo_id')
-                         ->where('releases.movieinfo_id', '>', 0);
+                        ->where('releases.movieinfo_id', '>', 0);
                 })->orWhere(function ($subq) {
                     $subq->whereNotNull('releases.videos_id')
-                         ->where('releases.videos_id', '>', 0);
+                        ->where('releases.videos_id', '>', 0);
                 });
             });
             $this->info('Filtering: Releases with either movie or TV info');
@@ -327,13 +335,15 @@ class UpdateReleasesIndexSchema extends Command
 
         if ($total === 0) {
             $this->warn('No releases found matching the criteria.');
+
             return Command::SUCCESS;
         }
 
         $this->info("Found {$total} releases to update.");
 
-        if (!$this->confirm('Do you want to proceed with the update?', true)) {
+        if (! $this->confirm('Do you want to proceed with the update?', true)) {
             $this->info('Operation cancelled.');
+
             return Command::SUCCESS;
         }
 
@@ -355,15 +365,17 @@ class UpdateReleasesIndexSchema extends Command
                     $mediaData = $this->prepareMediaData($release);
 
                     // Skip if all media IDs are zero and we're not forcing update
-                    $hasMediaIds = array_filter($mediaData, fn($v) => $v > 0);
+                    $hasMediaIds = array_filter($mediaData, fn ($v) => $v > 0);
                     if (empty($hasMediaIds)) {
                         $bar->advance();
+
                         continue;
                     }
 
                     // If missing-only, check if the document already has media IDs
                     if ($missingOnly && $this->documentHasMediaIds($indexName, $release->id)) {
                         $bar->advance();
+
                         continue;
                     }
 
@@ -384,7 +396,7 @@ class UpdateReleasesIndexSchema extends Command
                 }
 
                 // Process remaining batch
-                if (!empty($batch)) {
+                if (! empty($batch)) {
                     $result = $this->processBatch($indexName, $batch);
                     $updated += $result['updated'];
                     $errors += $result['errors'];
@@ -394,7 +406,7 @@ class UpdateReleasesIndexSchema extends Command
         $bar->finish();
         $this->newLine(2);
 
-        $this->info("Update completed!");
+        $this->info('Update completed!');
         $this->line("  - Updated: {$updated}");
         if ($errors > 0) {
             $this->warn("  - Errors: {$errors}");
@@ -428,7 +440,7 @@ class UpdateReleasesIndexSchema extends Command
         try {
             $doc = $this->client->table($indexName)->getDocumentById($id);
 
-            if (!$doc) {
+            if (! $doc) {
                 return false;
             }
 
@@ -470,7 +482,7 @@ class UpdateReleasesIndexSchema extends Command
                     $errors++;
                     if ($errors <= 5) {
                         // Log first few errors
-                        Log::warning("Failed to update release {$item['id']} in search index: " . $e2->getMessage());
+                        Log::warning("Failed to update release {$item['id']} in search index: ".$e2->getMessage());
                     }
                 }
             }

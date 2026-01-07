@@ -22,11 +22,10 @@ class ReleaseSearchService
 
     // RAR/ZIP Password indicator.
     public const PASSWD_NONE = 0;
+
     public const PASSWD_RAR = 1;
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * Function for searching on the site (by subject, searchname or advanced).
@@ -161,6 +160,7 @@ class ReleaseSearchService
                 if (config('app.debug')) {
                     Log::debug('apiSearch: No results from any search engine');
                 }
+
                 return collect();
             }
         }
@@ -911,6 +911,7 @@ class ReleaseSearchService
                     'original' => $searchArr,
                 ]);
             }
+
             return [];
         }
 
@@ -935,7 +936,7 @@ class ReleaseSearchService
         }
 
         // If search returned results, use them
-        if (!empty($result)) {
+        if (! empty($result)) {
             return $result;
         }
 
@@ -960,13 +961,13 @@ class ReleaseSearchService
             $query = Release::query()->select('id');
 
             foreach ($searchFields as $field => $value) {
-                if (!empty($value)) {
+                if (! empty($value)) {
                     // Split search terms and search for each
                     $terms = preg_split('/\s+/', trim($value));
                     foreach ($terms as $term) {
                         $term = trim($term);
                         if (strlen($term) >= 2) {
-                            $query->where($field, 'LIKE', '%' . $term . '%');
+                            $query->where($field, 'LIKE', '%'.$term.'%');
                         }
                     }
                 }
@@ -983,6 +984,7 @@ class ReleaseSearchService
             Log::error('performMySQLSearch: MySQL fallback failed', [
                 'error' => $e->getMessage(),
             ]);
+
             return [];
         }
     }
@@ -1322,4 +1324,3 @@ class ReleaseSearchService
         }
     }
 }
-

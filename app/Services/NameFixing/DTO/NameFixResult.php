@@ -75,4 +75,3 @@ final class NameFixResult
         return "{$this->checkerName}: {$this->method}";
     }
 }
-

@@ -263,4 +263,3 @@ final class CollectionHandler
         return array_keys($this->batchCollectionHashes);
     }
 }
-

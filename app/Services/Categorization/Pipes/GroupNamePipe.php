@@ -12,11 +12,12 @@ use App\Services\Categorization\ReleaseContext;
 class GroupNamePipe extends AbstractCategorizationPipe
 {
     protected int $priority = 5;
+
     private GroupNameCategorizer $categorizer;
 
     public function __construct()
     {
-        $this->categorizer = new GroupNameCategorizer();
+        $this->categorizer = new GroupNameCategorizer;
     }
 
     public function getName(): string
@@ -29,4 +30,3 @@ class GroupNamePipe extends AbstractCategorizationPipe
         return $this->categorizer->categorize($context);
     }
 }
-

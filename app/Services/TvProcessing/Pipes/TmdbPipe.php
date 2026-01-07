@@ -2,9 +2,9 @@
 
 namespace App\Services\TvProcessing\Pipes;
 
+use App\Services\TvProcessing\Providers\TmdbProvider;
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
-use App\Services\TvProcessing\Providers\TmdbProvider;
 
 /**
  * Pipe for TMDB API lookups.
@@ -13,9 +13,11 @@ class TmdbPipe extends AbstractTvProviderPipe
 {
     // Video type and source constants (matching Videos class protected constants)
     private const TYPE_TV = 0;
+
     private const SOURCE_TMDB = 2;
 
     protected int $priority = 40;
+
     private ?TmdbProvider $tmdb = null;
 
     public function getName(): string
@@ -34,8 +36,9 @@ class TmdbPipe extends AbstractTvProviderPipe
     private function getTmdb(): TmdbProvider
     {
         if ($this->tmdb === null) {
-            $this->tmdb = new TmdbProvider();
+            $this->tmdb = new TmdbProvider;
         }
+
         return $this->tmdb;
     }
 
@@ -53,6 +56,7 @@ class TmdbPipe extends AbstractTvProviderPipe
         // Check if we've already failed this title
         if ($this->isInTitleCache($cleanName)) {
             $this->outputSkipped($cleanName);
+
             return TvProcessingResult::skipped('previously failed', $this->getName());
         }
 
@@ -77,6 +81,7 @@ class TmdbPipe extends AbstractTvProviderPipe
                 // Show exists in local DB but without TMDB ID (from another source)
                 // Skip TMDB API search and proceed to episode matching
                 $this->outputFoundInDb($cleanName);
+
                 return $this->processEpisodeForExistingVideo($passable, $tmdb, $videoId, $parsedInfo);
             }
         }
@@ -107,6 +112,7 @@ class TmdbPipe extends AbstractTvProviderPipe
             // Show not found
             $this->addToTitleCache($cleanName);
             $this->outputNotFound($cleanName);
+
             return TvProcessingResult::notFound($this->getName(), ['title' => $cleanName]);
         }
 
@@ -124,6 +130,7 @@ class TmdbPipe extends AbstractTvProviderPipe
             // Full season release
             $tmdb->setVideoIdFound($videoId, $context->releaseId, 0);
             $this->outputFullSeason($cleanName);
+
             return TvProcessingResult::matched($videoId, 0, $this->getName(), ['full_season' => true]);
         }
 
@@ -161,6 +168,7 @@ class TmdbPipe extends AbstractTvProviderPipe
                 $episodeNo !== '' ? (int) $episodeNo : null,
                 $hasAirdate ? $parsedInfo['airdate'] : null
             );
+
             return TvProcessingResult::matched($videoId, (int) $episode, $this->getName());
         }
 
@@ -220,6 +228,7 @@ class TmdbPipe extends AbstractTvProviderPipe
             // Full season release
             $tmdb->setVideoIdFound($videoId, $context->releaseId, 0);
             $this->outputFullSeason($cleanName);
+
             return TvProcessingResult::matched($videoId, 0, $this->getName(), ['full_season' => true]);
         }
 
@@ -234,6 +243,7 @@ class TmdbPipe extends AbstractTvProviderPipe
                 $episodeNo !== '' ? (int) $episodeNo : null,
                 $hasAirdate ? $parsedInfo['airdate'] : null
             );
+
             return TvProcessingResult::matched($videoId, (int) $episode, $this->getName());
         }
 

@@ -88,7 +88,7 @@ class GamesTitleParser
 
         // Remove scene group suffix
         $groupAlternation = implode('|', array_map('preg_quote', self::SCENE_GROUPS));
-        $name = (string) preg_replace('/\s*-\s*(?:' . $groupAlternation . '|[A-Z0-9]{2,})\s*$/i', '', $name);
+        $name = (string) preg_replace('/\s*-\s*(?:'.$groupAlternation.'|[A-Z0-9]{2,})\s*$/i', '', $name);
 
         // Replace separators with spaces
         $name = (string) preg_replace('/[._+]+/', ' ', $name);
@@ -148,14 +148,16 @@ class GamesTitleParser
                     $j++;
                 }
                 $startsWithV = preg_match('/^v\d+$/i', $tok) === 1;
-                if (($startsWithV && $numRun >= 1) || (!$startsWithV && $numRun >= 2)) {
+                if (($startsWithV && $numRun >= 1) || (! $startsWithV && $numRun >= 2)) {
                     // Skip this version run
                     $i = $j;
+
                     continue;
                 }
                 // Not a version run: keep the single number token
                 $filtered[] = $tok;
                 $i++;
+
                 continue;
             }
             $filtered[] = $tok;
@@ -201,7 +203,7 @@ class GamesTitleParser
 
         // Strip scene groups at end
         $groupAlternation = implode('|', array_map('preg_quote', self::SCENE_GROUPS));
-        $t = (string) preg_replace('/\s*-\s*(?:' . $groupAlternation . '|[A-Z0-9]{2,})\s*$/i', '', $t);
+        $t = (string) preg_replace('/\s*-\s*(?:'.$groupAlternation.'|[A-Z0-9]{2,})\s*$/i', '', $t);
 
         // Remove edition tokens and common noise
         $t = (string) preg_replace('/\b(game of the year|goty|definitive edition|deluxe edition|ultimate edition|complete edition|remastered|hd remaster|directors? cut|anniversary edition|update|patch|hotfix|incl(?:uding)? dlcs?|dlcs?|repack|rip|iso|crack(?:fix)?|beta|alpha)\b/i', ' ', $t);

@@ -20,13 +20,13 @@ class AdultProcessingServiceProvider extends ServiceProvider
     public function register(): void
     {
         // Register individual pipes as singletons
-        $this->app->singleton(AebnPipe::class, fn () => new AebnPipe());
-        $this->app->singleton(IafdPipe::class, fn () => new IafdPipe());
-        $this->app->singleton(Data18Pipe::class, fn () => new Data18Pipe());
-        $this->app->singleton(PoppornPipe::class, fn () => new PoppornPipe());
-        $this->app->singleton(AdmPipe::class, fn () => new AdmPipe());
-        $this->app->singleton(AdePipe::class, fn () => new AdePipe());
-        $this->app->singleton(HotmoviesPipe::class, fn () => new HotmoviesPipe());
+        $this->app->singleton(AebnPipe::class, fn () => new AebnPipe);
+        $this->app->singleton(IafdPipe::class, fn () => new IafdPipe);
+        $this->app->singleton(Data18Pipe::class, fn () => new Data18Pipe);
+        $this->app->singleton(PoppornPipe::class, fn () => new PoppornPipe);
+        $this->app->singleton(AdmPipe::class, fn () => new AdmPipe);
+        $this->app->singleton(AdePipe::class, fn () => new AdePipe);
+        $this->app->singleton(HotmoviesPipe::class, fn () => new HotmoviesPipe);
 
         // Register the pipeline with all default pipes
         $this->app->singleton(AdultProcessingPipeline::class, function ($app) {
@@ -50,4 +50,3 @@ class AdultProcessingServiceProvider extends ServiceProvider
         //
     }
 }
-

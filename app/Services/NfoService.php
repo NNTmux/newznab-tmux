@@ -813,6 +813,7 @@ class NfoService
                     if ($index === 0) {
                         // Try both DD/MM and MM/DD formats
                         $year = strlen($matches[3]) === 2 ? '20'.$matches[3] : $matches[3];
+
                         // Assume DD/MM/YYYY format (more common internationally)
                         return sprintf('%04d-%02d-%02d', (int) $year, (int) $matches[2], (int) $matches[1]);
                     } elseif ($index === 1) {
@@ -1457,4 +1458,3 @@ class NfoService
         Cache::forget('nfo_minsizetoprocessnfo');
     }
 }
-

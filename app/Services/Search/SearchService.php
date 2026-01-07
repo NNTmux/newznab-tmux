@@ -49,7 +49,6 @@ class SearchService extends Manager implements SearchServiceInterface
      * Get a driver instance.
      *
      * @param  string|null  $driver
-     * @return SearchDriverInterface
      *
      * @throws InvalidArgumentException
      */
@@ -420,5 +419,3 @@ class SearchService extends Manager implements SearchServiceInterface
         return $this->driver()->searchReleasesWithCategoryFilter($searchTerm, $categoryIds, $limit);
     }
 }
-
-

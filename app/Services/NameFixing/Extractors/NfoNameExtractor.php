@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Services\NameFixing\Extractors;
 
 use App\Services\NameFixing\DTO\NameFixResult;
-use App\Services\NameFixing\Patterns\TvPatterns;
-use App\Services\NameFixing\Patterns\MoviePatterns;
 
 /**
  * Extracts release names from NFO content.
@@ -70,6 +68,7 @@ class NfoNameExtractor
         // FM Radio pattern
         if (preg_match('/(?:\s{2,})(.+?-FM-\d{2}-\d{2})/i', $nfoContent, $result)) {
             $newName = str_replace('-FM-', '-FM-Radio-MP3-', $result[1]);
+
             return NameFixResult::fromMatch($newName, 'Music FM RADIO', 'NFO');
         }
 
@@ -91,7 +90,7 @@ class NfoNameExtractor
         }
 
         // Look for Title (Year) pattern
-        if (!preg_match('/(\w[\-\w`~!@#$%^&*()_+={}|"<>?\[\]\\;\',.\/ ]+\s?\((19|20)\d\d\))/i', $nfoContent, $result)) {
+        if (! preg_match('/(\w[\-\w`~!@#$%^&*()_+={}|"<>?\[\]\\;\',.\/ ]+\s?\((19|20)\d\d\))/i', $nfoContent, $result)) {
             return null;
         }
 
@@ -125,19 +124,21 @@ class NfoNameExtractor
         $result = [];
 
         // Check for known game groups
-        if (!preg_match('/ALiAS|BAT-TEAM|FAiRLiGHT|Game Type|Glamoury|HI2U|iTWINS|JAGUAR|(LARGE|MEDIUM)ISO|MAZE|nERv|PROPHET|PROFiT|PROCYON|RELOADED|REVOLVER|ROGUE|ViTALiTY/i', $nfoContent)) {
+        if (! preg_match('/ALiAS|BAT-TEAM|FAiRLiGHT|Game Type|Glamoury|HI2U|iTWINS|JAGUAR|(LARGE|MEDIUM)ISO|MAZE|nERv|PROPHET|PROFiT|PROCYON|RELOADED|REVOLVER|ROGUE|ViTALiTY/i', $nfoContent)) {
             return null;
         }
 
         // (c) pattern
         if (preg_match('/\w[\w.+&*\/\()\',;: -]+\(c\)[\-\w.\',;& ]+\w/i', $nfoContent, $result)) {
             $releaseName = str_replace(['(c)', '(C)'], '(GAMES) (c)', $result[0]);
+
             return NameFixResult::fromMatch($releaseName, 'PC Games (c)', 'NFO');
         }
 
         // *ISO* pattern
         if (preg_match('/\w[\w.+&*\/()\',;: -]+\*ISO\*/i', $nfoContent, $result)) {
             $releaseName = str_replace('*ISO*', '*ISO* (PC GAMES)', $result[0]);
+
             return NameFixResult::fromMatch($releaseName, 'PC Games *ISO*', 'NFO');
         }
 
@@ -149,7 +150,7 @@ class NfoNameExtractor
      */
     public function checkForIguana(string $nfoContent): ?NameFixResult
     {
-        if (!preg_match('/Supplier.+?IGUANA/i', $nfoContent)) {
+        if (! preg_match('/Supplier.+?IGUANA/i', $nfoContent)) {
             return null;
         }
 
@@ -161,15 +162,15 @@ class NfoNameExtractor
         }
 
         if (preg_match('/\s\[\*\] (English|Dutch|French|German|Spanish)\b/i', $nfoContent, $result)) {
-            $releaseName .= '.' . $result[1];
+            $releaseName .= '.'.$result[1];
         }
 
         if (preg_match('/\s\[\*\] (DT?S [2567][._ -][0-2]( MONO)?)\b/i', $nfoContent, $result)) {
-            $releaseName .= '.' . $result[2];
+            $releaseName .= '.'.$result[2];
         }
 
         if (preg_match('/Format.+(DVD([59R])?|[HX][._ -]?264)\b/i', $nfoContent, $result)) {
-            $releaseName .= '.' . $result[1];
+            $releaseName .= '.'.$result[1];
         }
 
         if (preg_match('/\[(640x.+|1280x.+|1920x.+)\] Resolution\b/i', $nfoContent, $result)) {
@@ -179,11 +180,11 @@ class NfoNameExtractor
                 $result[1] === '1920x.+' => '1080p',
                 default => $result[1],
             };
-            $releaseName .= '.' . $res;
+            $releaseName .= '.'.$res;
         }
 
         if ($releaseName !== '') {
-            return NameFixResult::fromMatch($releaseName . '.IGUANA', 'IGUANA', 'NFO');
+            return NameFixResult::fromMatch($releaseName.'.IGUANA', 'IGUANA', 'NFO');
         }
 
         return null;
@@ -203,8 +204,9 @@ class NfoNameExtractor
                 'ES' => 'SPANISH',
                 default => $result['lang'],
             };
-            $releaseName .= '.' . $lang;
+            $releaseName .= '.'.$lang;
         }
+
         return $releaseName;
     }
 
@@ -223,7 +225,7 @@ class NfoNameExtractor
                 '2160' => '2160p',
                 default => $result['res'],
             };
-            $releaseName .= '.' . $res;
+            $releaseName .= '.'.$res;
         } elseif (preg_match('/(largeur|width).*?(?P<res>(\(?640|688|704|720|1280( \@)?|1 ?920))/i', $nfoContent, $result)) {
             $res = match ($result['res']) {
                 '640', '(640', '688', '704', '720' => '480p',
@@ -232,7 +234,7 @@ class NfoNameExtractor
                 '2160' => '2160p',
                 default => $result['res'],
             };
-            $releaseName .= '.' . $res;
+            $releaseName .= '.'.$res;
         }
 
         return $releaseName;
@@ -255,7 +257,7 @@ class NfoNameExtractor
                 'Ripped ' => 'DVDRIP',
                 default => $result['source'],
             };
-            $releaseName .= '.' . $source;
+            $releaseName .= '.'.$source;
         } elseif (preg_match('/(codec( (name|code))?|(original )?format|res(olution)|video( (codec|format|res))?|tv system|type|writing library).*?\b(?P<video>AVC|AVI|DBrip|DIVX|\(Divx|DVD|[HX][._ -]?264|MPEG-4 Visual|NTSC|PAL|WMV|XVID)\b/i', $nfoContent, $result)) {
             $video = match ($result['video']) {
                 'AVI' => 'DVDRIP',
@@ -266,7 +268,7 @@ class NfoNameExtractor
                 'NTSC', 'PAL' => 'DVD',
                 default => $result['video'],
             };
-            $releaseName .= '.' . $video;
+            $releaseName .= '.'.$video;
         }
 
         return $releaseName;
@@ -296,7 +298,7 @@ class NfoNameExtractor
                 'A_DTS', 'DTS-HD', 'DTSHD' => 'DTS',
                 default => $result['audio'],
             };
-            $releaseName .= '.' . $audio;
+            $releaseName .= '.'.$audio;
         }
 
         return $releaseName;
@@ -341,4 +343,3 @@ class NfoNameExtractor
         return null;
     }
 }
-

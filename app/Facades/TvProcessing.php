@@ -24,4 +24,3 @@ class TvProcessing extends Facade
         return TvProcessingPipeline::class;
     }
 }
-

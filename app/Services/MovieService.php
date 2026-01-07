@@ -69,7 +69,7 @@ class MovieService
         $this->releaseImage = new ReleaseImageService;
         $this->traktcheck = config('nntmux_api.trakttv_api_key');
         if ($this->traktcheck !== null) {
-            $this->traktTv = new TraktProvider();
+            $this->traktTv = new TraktProvider;
         }
         $this->client = new Client;
         $this->fanartapikey = config('nntmux_api.fanarttv_api_key');
@@ -1385,4 +1385,3 @@ class MovieService
         return false;
     }
 }
-

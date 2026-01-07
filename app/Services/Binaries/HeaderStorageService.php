@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\Binaries;
 
-use Illuminate\Support\Facades\Log;
-
 /**
  * Orchestrates the header storage process.
  *
@@ -171,4 +169,3 @@ final class HeaderStorageService
         return $fileCount;
     }
 }
-

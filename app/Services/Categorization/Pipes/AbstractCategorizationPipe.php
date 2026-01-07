@@ -81,4 +81,3 @@ abstract class AbstractCategorizationPipe
         return CategorizationResult::noMatch();
     }
 }
-

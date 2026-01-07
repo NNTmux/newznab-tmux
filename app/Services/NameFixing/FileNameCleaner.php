@@ -62,7 +62,7 @@ class FileNameCleaner
     /**
      * Clean a filename for PreDB matching.
      *
-     * @param string $fileName The filename to clean
+     * @param  string  $fileName  The filename to clean
      * @return string|false The cleaned filename or false if invalid
      */
     public function cleanForMatching(string $fileName): string|false
@@ -108,7 +108,7 @@ class FileNameCleaner
     /**
      * Extract filename from a path.
      *
-     * @param string $path Full path or filename
+     * @param  string  $path  Full path or filename
      * @return string The filename portion
      */
     public function extractFilenameFromPath(string $path): string
@@ -116,13 +116,14 @@ class FileNameCleaner
         if (preg_match('/[\\\\\/]([^\\\\\/]+)$/', $path, $match)) {
             return $match[1];
         }
+
         return $path;
     }
 
     /**
      * Normalize a candidate title.
      *
-     * @param string $title The title to normalize
+     * @param  string  $title  The title to normalize
      * @return string The normalized title
      */
     public function normalizeCandidateTitle(string $title): string
@@ -148,7 +149,7 @@ class FileNameCleaner
     /**
      * Check if a title is plausible for a release.
      *
-     * @param string $title The title to check
+     * @param  string  $title  The title to check
      * @return bool True if the title looks like a valid release name
      */
     public function isPlausibleReleaseTitle(string $title): bool
@@ -191,7 +192,7 @@ class FileNameCleaner
     /**
      * Check if a string looks like a hashed/obfuscated name.
      *
-     * @param string $title The title to check
+     * @param  string  $title  The title to check
      * @return bool True if the title appears to be hashed/obfuscated
      */
     public function looksLikeHashedName(string $title): bool
@@ -222,7 +223,7 @@ class FileNameCleaner
 
             // High transition rate suggests randomness
             if ($transitionRate > 0.35) {
-                if (!preg_match('/\b(movie|film|series|episode|season|show|video|audio|music|album|dvd|bluray|hdtv|webrip|xvid|x264|x265|hevc|aac|mp3|flac|720p|1080p|2160p|4k|complete|proper|repack|dubbed|subbed|english|french|german|spanish|italian|rip|web|hdr|remux|disc|internal|retail)\b/i', $t)) {
+                if (! preg_match('/\b(movie|film|series|episode|season|show|video|audio|music|album|dvd|bluray|hdtv|webrip|xvid|x264|x265|hevc|aac|mp3|flac|720p|1080p|2160p|4k|complete|proper|repack|dubbed|subbed|english|french|german|spanish|italian|rip|web|hdr|remux|disc|internal|retail)\b/i', $t)) {
                     return true;
                 }
             }
@@ -230,7 +231,7 @@ class FileNameCleaner
             // Check for lack of word-like sequences
             $maxConsecutiveLetters = $this->getMaxConsecutiveLetters($coreName);
             if ($coreLen >= 20 && $maxConsecutiveLetters < 5) {
-                if (!preg_match('/^[a-zA-Z]+\d{1,4}$/', $coreName)) {
+                if (! preg_match('/^[a-zA-Z]+\d{1,4}$/', $coreName)) {
                     return true;
                 }
             }
@@ -264,7 +265,7 @@ class FileNameCleaner
 
             if ($prevIsDigit !== $currIsDigit) {
                 $transitions++;
-            } elseif (!$prevIsDigit && !$currIsDigit && $prevIsUpper !== $currIsUpper) {
+            } elseif (! $prevIsDigit && ! $currIsDigit && $prevIsUpper !== $currIsUpper) {
                 $transitions++;
             }
         }
@@ -296,7 +297,7 @@ class FileNameCleaner
     /**
      * Clean filename for title matching against PreDB.
      *
-     * @param string $filename The filename to clean
+     * @param  string  $filename  The filename to clean
      * @return string The cleaned filename
      */
     public function cleanForTitleMatch(string $filename): string
@@ -336,7 +337,7 @@ class FileNameCleaner
     /**
      * Check if a filename looks like a scene release.
      *
-     * @param string $filename The filename to check
+     * @param  string  $filename  The filename to check
      * @return bool True if it appears to be a scene release
      */
     public function looksLikeSceneRelease(string $filename): bool
@@ -344,12 +345,12 @@ class FileNameCleaner
         $baseName = preg_replace('/\.[a-z0-9]{2,4}$/i', '', $filename);
 
         // Check for group suffix
-        if (!preg_match('/\-[A-Za-z0-9]{2,15}$/', $baseName)) {
+        if (! preg_match('/\-[A-Za-z0-9]{2,15}$/', $baseName)) {
             return false;
         }
 
         // Check for word separation
-        if (!preg_match('/[._-]/', $baseName)) {
+        if (! preg_match('/[._-]/', $baseName)) {
             return false;
         }
 
@@ -383,4 +384,3 @@ class FileNameCleaner
         return false;
     }
 }
-

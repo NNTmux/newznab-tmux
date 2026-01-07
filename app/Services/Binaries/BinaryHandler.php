@@ -300,4 +300,3 @@ final class BinaryHandler
         return $rows;
     }
 }
-

@@ -34,7 +34,7 @@ class ManageRoleStacking extends Command
     {
         $action = $this->argument('action');
 
-        return match($action) {
+        return match ($action) {
             'list-pending' => $this->listPendingRoles(),
             'cancel-pending' => $this->cancelPendingRole(),
             'history' => $this->showHistory(),
@@ -49,6 +49,7 @@ class ManageRoleStacking extends Command
     protected function handleUnknownAction(string $action): int
     {
         $this->error("Unknown action: {$action}");
+
         return 1;
     }
 
@@ -63,6 +64,7 @@ class ManageRoleStacking extends Command
 
         if ($users->isEmpty()) {
             $this->info('No users with pending roles found.');
+
             return 0;
         }
 
@@ -99,8 +101,9 @@ class ManageRoleStacking extends Command
     protected function cancelPendingRole(): int
     {
         if ($this->option('all')) {
-            if (!$this->confirm('Are you sure you want to cancel ALL pending roles?')) {
+            if (! $this->confirm('Are you sure you want to cancel ALL pending roles?')) {
                 $this->info('Operation cancelled.');
+
                 return 0;
             }
 
@@ -115,37 +118,43 @@ class ManageRoleStacking extends Command
             }
 
             $this->info("Cancelled pending roles for {$count} users.");
+
             return 0;
         }
 
         $userId = $this->argument('user');
-        if (!$userId) {
+        if (! $userId) {
             $this->error('User ID or username required. Use --all to cancel for all users.');
+
             return 1;
         }
 
         $user = $this->findUser($userId);
-        if (!$user) {
+        if (! $user) {
             return 1;
         }
 
-        if (!$user->hasPendingRole()) {
+        if (! $user->hasPendingRole()) {
             $this->info("User {$user->username} has no pending role.");
+
             return 0;
         }
 
         $pendingRole = $user->getPendingRole();
-        if (!$this->confirm("Cancel pending role '{$pendingRole->name}' for user '{$user->username}'?")) {
+        if (! $this->confirm("Cancel pending role '{$pendingRole->name}' for user '{$user->username}'?")) {
             $this->info('Operation cancelled.');
+
             return 0;
         }
 
         if ($user->cancelPendingRole()) {
             $this->info("Successfully cancelled pending role for user: {$user->username}");
+
             return 0;
         }
 
-        $this->error("Failed to cancel pending role.");
+        $this->error('Failed to cancel pending role.');
+
         return 1;
     }
 
@@ -155,13 +164,14 @@ class ManageRoleStacking extends Command
     protected function showHistory(): int
     {
         $userId = $this->argument('user');
-        if (!$userId) {
+        if (! $userId) {
             $this->error('User ID or username required.');
+
             return 1;
         }
 
         $user = $this->findUser($userId);
-        if (!$user) {
+        if (! $user) {
             return 1;
         }
 
@@ -169,6 +179,7 @@ class ManageRoleStacking extends Command
 
         if ($history->isEmpty()) {
             $this->info("No role change history found for user: {$user->username}");
+
             return 0;
         }
 
@@ -215,8 +226,9 @@ class ManageRoleStacking extends Command
         $this->warn('Normally, this is done automatically by the scheduled task.');
         $this->newLine();
 
-        if (!$this->confirm('Do you want to continue?')) {
+        if (! $this->confirm('Do you want to continue?')) {
             $this->info('Operation cancelled.');
+
             return 0;
         }
 
@@ -228,6 +240,7 @@ class ManageRoleStacking extends Command
 
         if ($users->isEmpty()) {
             $this->info('No pending roles ready for activation.');
+
             return 0;
         }
 
@@ -285,7 +298,7 @@ class ManageRoleStacking extends Command
         }
 
         $this->newLine();
-        $this->info("Activation complete:");
+        $this->info('Activation complete:');
         $this->info("  Successful: {$activated}");
         if ($failed > 0) {
             $this->error("  Failed: {$failed}");
@@ -303,12 +316,12 @@ class ManageRoleStacking extends Command
             ? User::find($identifier)
             : User::where('username', $identifier)->first();
 
-        if (!$user) {
+        if (! $user) {
             $this->error("User not found: {$identifier}");
+
             return null;
         }
 
         return $user;
     }
 }
-

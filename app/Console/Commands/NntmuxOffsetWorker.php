@@ -94,7 +94,7 @@ class NntmuxOffsetWorker extends Command
         if ($engine === 'manticore') {
             $batchData = [];
 
-            $query->chunk($batchSize, function ($items) use ($indexName, $transformer, &$processed, &$errors, &$batchData, $batchSize, $workerId) {
+            $query->chunk($batchSize, function ($items) use ($transformer, &$processed, &$errors, &$batchData, $batchSize, $workerId) {
                 $this->info("Worker {$workerId}: Processing chunk of {$items->count()} items");
 
                 foreach ($items as $item) {

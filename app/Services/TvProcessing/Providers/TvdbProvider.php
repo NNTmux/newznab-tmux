@@ -89,6 +89,7 @@ class TvdbProvider extends AbstractTvProvider
                     }
                     $this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
                     $skipped++;
+
                     continue;
                 }
 
@@ -155,6 +156,7 @@ class TvdbProvider extends AbstractTvProvider
                             cli()->primary('Full Season matched');
                         }
                         $matched++;
+
                         continue;
                     }
 
@@ -458,6 +460,7 @@ class TvdbProvider extends AbstractTvProvider
                         if ($result['tmdb'] === 0 && ! empty($traktIds['tmdb'])) {
                             $result['tmdb'] = (int) $traktIds['tmdb'];
                         }
+
                         return $result;
                     }
                 }
@@ -512,4 +515,3 @@ class TvdbProvider extends AbstractTvProvider
         }
     }
 }
-

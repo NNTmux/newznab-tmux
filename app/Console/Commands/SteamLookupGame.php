@@ -43,6 +43,7 @@ class SteamLookupGame extends Command
 
         if ($appId === null) {
             $this->error('No matching game found.');
+
             return Command::FAILURE;
         }
 
@@ -54,6 +55,7 @@ class SteamLookupGame extends Command
 
             if ($details === false) {
                 $this->error('Could not retrieve game details.');
+
                 return Command::FAILURE;
             }
 
@@ -82,7 +84,7 @@ class SteamLookupGame extends Command
             }
 
             if ($playerCount !== null) {
-                $this->info("Current Players: " . number_format($playerCount));
+                $this->info('Current Players: '.number_format($playerCount));
             }
         }
 
@@ -112,13 +114,13 @@ class SteamLookupGame extends Command
         $this->table(['Property', 'Value'], $basicInfo);
 
         // Scores
-        if (!empty($details['metacritic_score'])) {
+        if (! empty($details['metacritic_score'])) {
             $this->newLine();
             $this->info("Metacritic Score: {$details['metacritic_score']}");
         }
 
         // Price
-        if (!empty($details['price'])) {
+        if (! empty($details['price'])) {
             $price = $details['price'];
             $this->newLine();
             $this->info('Pricing:');
@@ -137,7 +139,7 @@ class SteamLookupGame extends Command
         }
 
         // Description
-        if (!empty($details['description'])) {
+        if (! empty($details['description'])) {
             $this->newLine();
             $this->info('Description:');
             $this->line(wordwrap($details['description'], 80));
@@ -148,34 +150,33 @@ class SteamLookupGame extends Command
         $this->info('Links:');
         $this->line("Store: {$details['directurl']}");
 
-        if (!empty($details['website'])) {
+        if (! empty($details['website'])) {
             $this->line("Website: {$details['website']}");
         }
 
-        if (!empty($details['metacritic_url'])) {
+        if (! empty($details['metacritic_url'])) {
             $this->line("Metacritic: {$details['metacritic_url']}");
         }
 
         // Stats
-        if (!empty($details['achievements']) || !empty($details['recommendations'])) {
+        if (! empty($details['achievements']) || ! empty($details['recommendations'])) {
             $this->newLine();
             $this->info('Stats:');
 
-            if (!empty($details['achievements'])) {
+            if (! empty($details['achievements'])) {
                 $this->line("Achievements: {$details['achievements']}");
             }
 
-            if (!empty($details['recommendations'])) {
-                $this->line("Recommendations: " . number_format($details['recommendations']));
+            if (! empty($details['recommendations'])) {
+                $this->line('Recommendations: '.number_format($details['recommendations']));
             }
         }
 
         // Categories (multiplayer, etc.)
-        if (!empty($details['categories'])) {
+        if (! empty($details['categories'])) {
             $this->newLine();
             $this->info('Features:');
             $this->line(implode(', ', $details['categories']));
         }
     }
 }
-

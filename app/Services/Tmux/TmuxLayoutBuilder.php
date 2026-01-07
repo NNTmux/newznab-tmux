@@ -311,6 +311,7 @@ class TmuxLayoutBuilder
         $socket = @fsockopen('127.0.0.1', $port, $errno, $errstr, 1);
         if ($socket !== false) {
             fclose($socket);
+
             // Redis accessible on localhost - override host to 127.0.0.1
             return ['use_sail' => false, 'override_host' => true, 'host' => '127.0.0.1'];
         }

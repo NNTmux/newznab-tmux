@@ -24,8 +24,11 @@ class AdditionalProcessingOrchestrator
     public const int MAX_COMPRESSED_FILES_TO_CHECK = 10;
 
     private Collection $releases;
+
     private int $totalReleases = 0;
+
     private string $mainTmpPath = '';
+
     private array $triedCompressedMids = [];
 
     public function __construct(
@@ -64,6 +67,7 @@ class AdditionalProcessingOrchestrator
             $release = Release::where('guid', $guid)->first();
             if ($release === null) {
                 $this->output->warning('Release not found for GUID: '.$guid);
+
                 return false;
             }
 
@@ -79,6 +83,7 @@ class AdditionalProcessingOrchestrator
             if ($this->config->debugMode) {
                 Log::error('processSingleGuid failed: '.$e->getMessage());
             }
+
             return false;
         }
     }
@@ -162,6 +167,7 @@ class AdditionalProcessingOrchestrator
                 $context->tmpPath = $this->tempWorkspace->createReleaseTempFolder($this->mainTmpPath, $release->guid);
             } catch (\Throwable $e) {
                 $this->output->warning('Unable to create directory: '.$e->getMessage());
+
                 continue;
             }
 
@@ -170,6 +176,7 @@ class AdditionalProcessingOrchestrator
             if ($nzbResult['error'] !== null) {
                 $this->output->warning($nzbResult['error']);
                 $this->releaseManager->deleteRelease($release);
+
                 continue;
             }
             $context->nzbContents = $nzbResult['contents'];
@@ -493,6 +500,7 @@ class AdditionalProcessingOrchestrator
         if ($result['hasPassword']) {
             $context->releaseHasPassword = true;
             $context->passwordStatus = $result['passwordStatus'];
+
             return false;
         }
 
@@ -622,6 +630,7 @@ class AdditionalProcessingOrchestrator
                     $context,
                     $this->archiveService->getPar2Info()
                 );
+
                 continue;
             }
 
@@ -632,6 +641,7 @@ class AdditionalProcessingOrchestrator
                     if ($this->releaseManager->processNfoFile($filePath, $context, $this->downloadService->getNNTP())) {
                         $this->output->echoNfoFound();
                     }
+
                     continue;
                 }
                 // Alternative NFO filenames (file_id.diz, readme.txt, etc.)
@@ -639,6 +649,7 @@ class AdditionalProcessingOrchestrator
                     if ($this->releaseManager->processNfoFile($filePath, $context, $this->downloadService->getNNTP())) {
                         $this->output->echoNfoFound();
                     }
+
                     continue;
                 }
             }
@@ -662,6 +673,7 @@ class AdditionalProcessingOrchestrator
                     $this->output->echoAudioSampleCreated();
                 }
                 File::delete($audioPath);
+
                 continue;
             }
 
@@ -672,6 +684,7 @@ class AdditionalProcessingOrchestrator
                     $this->output->echoJpgSaved();
                 }
                 File::delete($filePath);
+
                 continue;
             }
 
@@ -680,6 +693,7 @@ class AdditionalProcessingOrchestrator
                 && preg_match('/(.*)'.$this->config->videoFileRegex.'$/i', $filePath)
             ) {
                 $this->mediaService->processVideoFile($filePath, $context, $context->tmpPath);
+
                 continue;
             }
 
@@ -738,4 +752,3 @@ class AdditionalProcessingOrchestrator
         }
     }
 }
-

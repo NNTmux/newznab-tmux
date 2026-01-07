@@ -805,4 +805,3 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         return mb_substr($title, 0, $maxLength - 3).'...';
     }
 }
-

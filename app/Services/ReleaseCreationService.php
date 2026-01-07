@@ -12,7 +12,6 @@ use App\Models\ReleasesGroups;
 use App\Models\UsenetGroup;
 use App\Services\Categorization\CategorizationService;
 use App\Services\Nzb\NzbService;
-use App\Services\ReleaseCleaningService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -26,12 +25,13 @@ class ReleaseCreationService
      * Create releases from complete collections.
      *
      * @return array{added:int,dupes:int}
+     *
      * @throws \Throwable
      */
     public function createReleases(int|string|null $groupID, int $limit, bool $echoCLI): array
     {
         $startTime = now()->toImmutable();
-        $categorize = new CategorizationService();
+        $categorize = new CategorizationService;
         $returnCount = 0;
         $duplicate = 0;
 

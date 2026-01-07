@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Manticoresearch\Client;
 use Manticoresearch\Exceptions\ResponseException;
-use Manticoresearch\Table;
 
 class CreateManticoreIndexes extends Command
 {

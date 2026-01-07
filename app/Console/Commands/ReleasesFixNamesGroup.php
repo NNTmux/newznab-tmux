@@ -9,9 +9,8 @@ use App\Models\Predb;
 use App\Models\Release;
 use App\Services\NameFixing\NameFixingService;
 use App\Services\NfoService;
-use App\Services\Nzb\NzbContentsService;
-use App\Services\PostProcessService;
 use App\Services\NNTP\NNTPService;
+use App\Services\Nzb\NzbContentsService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -110,7 +109,7 @@ class ReleasesFixNamesGroup extends Command
                     $this->nameFixingService->checkName($release, true, 'UID, ', true, true);
                 }
 
-                if (!$this->nameFixingService->getUpdateService()->matched && ! empty($release->mediainfo)) {
+                if (! $this->nameFixingService->getUpdateService()->matched && ! empty($release->mediainfo)) {
                     $this->nameFixingService->checkName($release, true, 'Mediainfo, ', true, true);
                 }
             }
@@ -191,7 +190,7 @@ class ReleasesFixNamesGroup extends Command
                 if (is_array($fileNames)) {
                     $releaseFile = $release;
                     foreach ($fileNames as $fileName) {
-                        if (!$this->nameFixingService->getUpdateService()->matched) {
+                        if (! $this->nameFixingService->getUpdateService()->matched) {
                             $releaseFile->textstring = $fileName;
                             $this->nameFixingService->checkName($releaseFile, true, 'Filenames, ', true, true);
                         }
@@ -211,7 +210,7 @@ class ReleasesFixNamesGroup extends Command
             if ((int) $release->proc_par2 === NameFixingService::PROC_PAR2_NONE) {
                 // Initialize NZB contents if needed
                 if (! isset($nzbcontents)) {
-                    $nntp = new NNTPService();
+                    $nntp = new NNTPService;
                     $compressedHeaders = config('nntmux_nntp.compressed_headers');
 
                     $connectResult = config('nntmux_nntp.use_alternate_nntp_server') === true
@@ -225,7 +224,7 @@ class ReleasesFixNamesGroup extends Command
                         }
                         $this->warn($errorMessage);
                     } else {
-                        $Nfo = new NfoService();
+                        $Nfo = new NfoService;
                         $nzbcontents = app(NzbContentsService::class);
                         $nzbcontents->setNntp($nntp);
                         $nzbcontents->setNfo($Nfo);

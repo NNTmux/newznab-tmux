@@ -6,8 +6,6 @@ namespace App\Services\NameFixing\Extractors;
 
 use App\Services\NameFixing\DTO\NameFixResult;
 use App\Services\NameFixing\FileNameCleaner;
-use App\Services\NameFixing\Patterns\TvPatterns;
-use App\Services\NameFixing\Patterns\MoviePatterns;
 
 /**
  * Extracts release names from file names and paths.
@@ -26,7 +24,7 @@ class FileNameExtractor
 
     public function __construct(?FileNameCleaner $cleaner = null)
     {
-        $this->cleaner = $cleaner ?? new FileNameCleaner();
+        $this->cleaner = $cleaner ?? new FileNameCleaner;
     }
 
     /**
@@ -100,18 +98,21 @@ class FileNameExtractor
         // Movie with year in parentheses - AVI format
         if (preg_match('/.+\\\\(.+\((19|20)\d\d\)\.avi)$/i', $filename, $result)) {
             $newName = str_replace('.avi', ' DVDRip XVID NoGroup', $result[1]);
+
             return NameFixResult::fromMatch($newName, 'Movie (year) avi', 'File');
         }
 
         // Movie with year in parentheses - ISO format
         if (preg_match('/.+\\\\(.+\((19|20)\d\d\)\.iso)$/i', $filename, $result)) {
             $newName = str_replace('.iso', ' DVD NoGroup', $result[1]);
+
             return NameFixResult::fromMatch($newName, 'Movie (year) iso', 'File');
         }
 
         // Movie with year in parentheses - MKV format
         if (preg_match('/.+\\\\(.+\((19|20)\d\d\)\.(mkv|mp4|m4v))$/i', $filename, $result)) {
             $newName = preg_replace('/\.(mkv|mp4|m4v)$/i', ' BDRip x264 NoGroup', $result[1]);
+
             return NameFixResult::fromMatch($newName, 'Movie (year) mkv/mp4', 'File');
         }
 
@@ -132,7 +133,7 @@ class FileNameExtractor
 
         // VIDEOOT releases
         if (preg_match('/^VIDEOOT-[A-Z0-9]+\\\\([\w!.,& ()\[\]\'\`-]{8,}?\b.?)([\-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar|\.7z)?(\d{1,3}\.rev|\.vol.+?|\.mp4)/', $filename, $result)) {
-            return NameFixResult::fromMatch($result[1] . ' XXX DVDRIP XviD-VIDEOOT', 'XXX XviD VIDEOOT', 'File');
+            return NameFixResult::fromMatch($result[1].' XXX DVDRIP XviD-VIDEOOT', 'XXX XviD VIDEOOT', 'File');
         }
 
         // XXX SDPORN
@@ -143,6 +144,7 @@ class FileNameExtractor
         // R&C releases
         if (preg_match('/\w[\-\w.\',;& ]+1080i[._ -]DD5[._ -]1[._ -]MPEG2-R&C(?=\.ts)$/i', $filename, $result)) {
             $newResult = str_replace('MPEG2', 'MPEG2.HDTV', $result[0]);
+
             return NameFixResult::fromMatch($newResult, 'R&C', 'File');
         }
 
@@ -156,6 +158,7 @@ class FileNameExtractor
             $newResult = str_replace('720p', '720p.HDTV.X264', $result[0]);
             $newResult = str_replace('1080p', '1080p.Bluray.X264', $newResult);
             $newResult = str_replace('xvid', 'XVID.DVDrip', $newResult);
+
             return NameFixResult::fromMatch($newResult, 'tvp', 'File');
         }
 
@@ -181,12 +184,12 @@ class FileNameExtractor
 
         // Nintendo 3DS
         if (preg_match('/3DS_\d{4}.+\d{4} - (.+?)\.3ds/i', $filename, $result)) {
-            return NameFixResult::fromMatch('3DS ' . $result[1], '.3ds Nintendo 3DS', 'File');
+            return NameFixResult::fromMatch('3DS '.$result[1], '.3ds Nintendo 3DS', 'File');
         }
 
         // Nintendo Switch
         if (preg_match('/^(.+?)\[[\w]+\]\.(?:nsp|xci|nsz)$/i', $filename, $result)) {
-            return NameFixResult::fromMatch(trim($result[1]) . ' Switch', 'Nintendo Switch', 'File');
+            return NameFixResult::fromMatch(trim($result[1]).' Switch', 'Nintendo Switch', 'File');
         }
 
         // PlayStation/Xbox game releases
@@ -196,7 +199,8 @@ class FileNameExtractor
 
         // EBooks
         if (preg_match('/\w.+?\.(epub|mobi|azw3?|opf|fb2|prc|djvu|cb[rz])/i', $filename, $result)) {
-            $newResult = str_replace('.' . $result[1], ' (' . $result[1] . ')', $result[0]);
+            $newResult = str_replace('.'.$result[1], ' ('.$result[1].')', $result[0]);
+
             return NameFixResult::fromMatch($newResult, 'EBook', 'File');
         }
 
@@ -218,4 +222,3 @@ class FileNameExtractor
         return null;
     }
 }
-

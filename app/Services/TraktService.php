@@ -231,7 +231,7 @@ class TraktService
         }
 
         return match ($idType) {
-            'imdb' => is_numeric($id) ? 'tt' . str_pad((string) $id, 7, '0', STR_PAD_LEFT) : (string) $id,
+            'imdb' => is_numeric($id) ? 'tt'.str_pad((string) $id, 7, '0', STR_PAD_LEFT) : (string) $id,
             'trakt' => (string) $id,
             'tmdb', 'tvdb' => (string) $id,
             default => null,
@@ -584,4 +584,3 @@ class TraktService
         Cache::forget("trakt_movie_{$slug}_full");
     }
 }
-

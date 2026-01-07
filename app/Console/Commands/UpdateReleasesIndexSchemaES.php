@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Facades\Search;
 use App\Models\Release;
 use Elasticsearch;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
@@ -57,12 +56,12 @@ class UpdateReleasesIndexSchemaES extends Command
 
         if ($driver !== 'elasticsearch') {
             $this->warn("Current search driver is '{$driver}'. This command is for ElasticSearch.");
-            if (!$this->confirm('Do you want to continue anyway?', false)) {
+            if (! $this->confirm('Do you want to continue anyway?', false)) {
                 return Command::SUCCESS;
             }
         }
 
-        $this->info("ElasticSearch releases index schema update utility");
+        $this->info('ElasticSearch releases index schema update utility');
         $this->newLine();
 
         // Test connection
@@ -70,7 +69,8 @@ class UpdateReleasesIndexSchemaES extends Command
             $health = Elasticsearch::cluster()->health();
             $this->info("Connected to ElasticSearch. Cluster status: {$health['status']}");
         } catch (\Exception $e) {
-            $this->error('Failed to connect to ElasticSearch: ' . $e->getMessage());
+            $this->error('Failed to connect to ElasticSearch: '.$e->getMessage());
+
             return Command::FAILURE;
         }
 
@@ -98,7 +98,7 @@ class UpdateReleasesIndexSchemaES extends Command
         }
 
         // If no options specified, show current schema info
-        if (!$this->option('add-fields') && !$this->option('update-media-ids') && !$this->option('recreate-index')) {
+        if (! $this->option('add-fields') && ! $this->option('update-media-ids') && ! $this->option('recreate-index')) {
             $this->showSchemaInfo();
         }
 
@@ -116,9 +116,10 @@ class UpdateReleasesIndexSchemaES extends Command
         try {
             $indexName = config('search.drivers.elasticsearch.indexes.releases', 'releases');
 
-            if (!Elasticsearch::indices()->exists(['index' => $indexName])) {
+            if (! Elasticsearch::indices()->exists(['index' => $indexName])) {
                 $this->warn("Index '{$indexName}' does not exist.");
                 $this->info('Run `php artisan nntmux:create-es-indexes` to create the index first.');
+
                 return;
             }
 
@@ -127,6 +128,7 @@ class UpdateReleasesIndexSchemaES extends Command
 
             if (empty($properties)) {
                 $this->warn('Index has no mapped properties.');
+
                 return;
             }
 
@@ -140,7 +142,7 @@ class UpdateReleasesIndexSchemaES extends Command
                 if (isset($config['analyzer'])) {
                     $props[] = "analyzer: {$config['analyzer']}";
                 }
-                if (isset($config['index']) && !$config['index']) {
+                if (isset($config['index']) && ! $config['index']) {
                     $props[] = 'not indexed';
                 }
                 if (isset($config['fields'])) {
@@ -156,12 +158,12 @@ class UpdateReleasesIndexSchemaES extends Command
             // Check for missing media fields
             $missingFields = [];
             foreach ($this->mediaFields as $field => $config) {
-                if (!isset($existingFields[$field])) {
+                if (! isset($existingFields[$field])) {
                     $missingFields[] = $field;
                 }
             }
 
-            if (!empty($missingFields)) {
+            if (! empty($missingFields)) {
                 $this->warn('Missing media fields that should be added:');
                 foreach ($missingFields as $field) {
                     $this->line("  - {$field} ({$this->mediaFields[$field]['type']})");
@@ -184,7 +186,7 @@ class UpdateReleasesIndexSchemaES extends Command
             $this->line('  --batch-size=N       Set batch size for updates (default: 1000)');
 
         } catch (\Throwable $e) {
-            $this->error('Failed to get index mapping: ' . $e->getMessage());
+            $this->error('Failed to get index mapping: '.$e->getMessage());
             $this->info('The index may not exist. Run `php artisan nntmux:create-es-indexes` first.');
         }
     }
@@ -201,8 +203,9 @@ class UpdateReleasesIndexSchemaES extends Command
         try {
             $indexName = config('search.drivers.elasticsearch.indexes.releases', 'releases');
 
-            if (!Elasticsearch::indices()->exists(['index' => $indexName])) {
+            if (! Elasticsearch::indices()->exists(['index' => $indexName])) {
                 $this->error("Index '{$indexName}' does not exist. Create it first with: php artisan nntmux:create-es-indexes");
+
                 return Command::FAILURE;
             }
 
@@ -213,13 +216,14 @@ class UpdateReleasesIndexSchemaES extends Command
             // Find fields to add
             $fieldsToAdd = [];
             foreach ($this->mediaFields as $field => $config) {
-                if (!isset($existingProperties[$field]) || $this->option('force')) {
+                if (! isset($existingProperties[$field]) || $this->option('force')) {
                     $fieldsToAdd[$field] = $config;
                 }
             }
 
             if (empty($fieldsToAdd)) {
                 $this->info('All media fields already exist in the index.');
+
                 return Command::SUCCESS;
             }
 
@@ -228,8 +232,9 @@ class UpdateReleasesIndexSchemaES extends Command
                 $this->line("  - {$field} ({$config['type']})");
             }
 
-            if (!$this->confirm('Do you want to proceed with adding these fields?', true)) {
+            if (! $this->confirm('Do you want to proceed with adding these fields?', true)) {
                 $this->info('Operation cancelled.');
+
                 return Command::SUCCESS;
             }
 
@@ -242,8 +247,8 @@ class UpdateReleasesIndexSchemaES extends Command
             Elasticsearch::indices()->putMapping([
                 'index' => $indexName,
                 'body' => [
-                    'properties' => $newProperties
-                ]
+                    'properties' => $newProperties,
+                ],
             ]);
 
             $this->info('Schema update completed successfully!');
@@ -254,7 +259,8 @@ class UpdateReleasesIndexSchemaES extends Command
             return Command::SUCCESS;
 
         } catch (\Throwable $e) {
-            $this->error('Failed to update schema: ' . $e->getMessage());
+            $this->error('Failed to update schema: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }
@@ -268,10 +274,11 @@ class UpdateReleasesIndexSchemaES extends Command
         $indexName = config('search.drivers.elasticsearch.indexes.releases', 'releases');
 
         $this->warn("WARNING: This will DELETE all data in the '{$indexName}' index and recreate it with the new schema!");
-        $this->warn("You will need to re-populate the index after this operation.");
+        $this->warn('You will need to re-populate the index after this operation.');
 
-        if (!$this->confirm('Are you sure you want to proceed?', false)) {
+        if (! $this->confirm('Are you sure you want to proceed?', false)) {
             $this->info('Operation cancelled.');
+
             return Command::SUCCESS;
         }
 
@@ -380,7 +387,8 @@ class UpdateReleasesIndexSchemaES extends Command
             return Command::SUCCESS;
 
         } catch (\Throwable $e) {
-            $this->error('Failed to recreate index: ' . $e->getMessage());
+            $this->error('Failed to recreate index: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }
@@ -400,8 +408,9 @@ class UpdateReleasesIndexSchemaES extends Command
         $indexName = config('search.drivers.elasticsearch.indexes.releases', 'releases');
 
         // Check if index exists
-        if (!Elasticsearch::indices()->exists(['index' => $indexName])) {
+        if (! Elasticsearch::indices()->exists(['index' => $indexName])) {
             $this->error("Index '{$indexName}' does not exist. Create it first.");
+
             return Command::FAILURE;
         }
 
@@ -429,21 +438,21 @@ class UpdateReleasesIndexSchemaES extends Command
         // Apply filters based on options
         if ($moviesOnly) {
             $query->whereNotNull('releases.movieinfo_id')
-                  ->where('releases.movieinfo_id', '>', 0);
+                ->where('releases.movieinfo_id', '>', 0);
             $this->info('Filtering: Movies only (releases with movieinfo_id)');
         } elseif ($tvOnly) {
             $query->whereNotNull('releases.videos_id')
-                  ->where('releases.videos_id', '>', 0);
+                ->where('releases.videos_id', '>', 0);
             $this->info('Filtering: TV shows only (releases with videos_id)');
         } else {
             // Get releases that have either movie or TV info
             $query->where(function ($q) {
                 $q->where(function ($subq) {
                     $subq->whereNotNull('releases.movieinfo_id')
-                         ->where('releases.movieinfo_id', '>', 0);
+                        ->where('releases.movieinfo_id', '>', 0);
                 })->orWhere(function ($subq) {
                     $subq->whereNotNull('releases.videos_id')
-                         ->where('releases.videos_id', '>', 0);
+                        ->where('releases.videos_id', '>', 0);
                 });
             });
             $this->info('Filtering: Releases with either movie or TV info');
@@ -453,13 +462,15 @@ class UpdateReleasesIndexSchemaES extends Command
 
         if ($total === 0) {
             $this->warn('No releases found matching the criteria.');
+
             return Command::SUCCESS;
         }
 
         $this->info("Found {$total} releases to update.");
 
-        if (!$this->confirm('Do you want to proceed with the update?', true)) {
+        if (! $this->confirm('Do you want to proceed with the update?', true)) {
             $this->info('Operation cancelled.');
+
             return Command::SUCCESS;
         }
 
@@ -481,10 +492,11 @@ class UpdateReleasesIndexSchemaES extends Command
                     $mediaData = $this->prepareMediaData($release);
 
                     // Skip if all media IDs are zero
-                    $hasMediaIds = array_filter($mediaData, fn($v) => $v > 0);
+                    $hasMediaIds = array_filter($mediaData, fn ($v) => $v > 0);
                     if (empty($hasMediaIds)) {
                         $skipped++;
                         $bar->advance();
+
                         continue;
                     }
 
@@ -492,6 +504,7 @@ class UpdateReleasesIndexSchemaES extends Command
                     if ($missingOnly && $this->documentHasMediaIds($indexName, $release->id)) {
                         $skipped++;
                         $bar->advance();
+
                         continue;
                     }
 
@@ -500,7 +513,7 @@ class UpdateReleasesIndexSchemaES extends Command
                         'update' => [
                             '_index' => $indexName,
                             '_id' => $release->id,
-                        ]
+                        ],
                     ];
                     $bulkParams['body'][] = [
                         'doc' => $mediaData,
@@ -511,7 +524,7 @@ class UpdateReleasesIndexSchemaES extends Command
                 }
 
                 // Execute bulk update
-                if (!empty($bulkParams['body'])) {
+                if (! empty($bulkParams['body'])) {
                     try {
                         $response = Elasticsearch::bulk($bulkParams);
 
@@ -520,7 +533,7 @@ class UpdateReleasesIndexSchemaES extends Command
                                 if (isset($item['update']['error'])) {
                                     $errors++;
                                     if ($errors <= 5) {
-                                        Log::warning("Failed to update release in ES: " . json_encode($item['update']['error']));
+                                        Log::warning('Failed to update release in ES: '.json_encode($item['update']['error']));
                                     }
                                 } else {
                                     $updated++;
@@ -532,7 +545,7 @@ class UpdateReleasesIndexSchemaES extends Command
                     } catch (\Throwable $e) {
                         $errors += count($bulkParams['body']) / 2;
                         if ($errors <= 5) {
-                            Log::error("Bulk update failed: " . $e->getMessage());
+                            Log::error('Bulk update failed: '.$e->getMessage());
                         }
                     }
                 }
@@ -541,7 +554,7 @@ class UpdateReleasesIndexSchemaES extends Command
         $bar->finish();
         $this->newLine(2);
 
-        $this->info("Update completed!");
+        $this->info('Update completed!');
         $this->line("  - Updated: {$updated}");
         $this->line("  - Skipped: {$skipped}");
         if ($errors > 0) {
@@ -582,7 +595,7 @@ class UpdateReleasesIndexSchemaES extends Command
             $doc = Elasticsearch::get([
                 'index' => $indexName,
                 'id' => $id,
-                '_source' => ['imdbid', 'tmdbid', 'traktid', 'tvdb', 'tvmaze', 'tvrage']
+                '_source' => ['imdbid', 'tmdbid', 'traktid', 'tvdb', 'tvmaze', 'tvrage'],
             ]);
 
             $source = $doc['_source'] ?? [];
@@ -604,4 +617,3 @@ class UpdateReleasesIndexSchemaES extends Command
         }
     }
 }
-

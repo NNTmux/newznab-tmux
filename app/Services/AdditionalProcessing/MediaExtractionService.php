@@ -8,8 +8,8 @@ use App\Models\Release;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
 use App\Services\Categorization\CategorizationService;
-use App\Services\ReleaseImageService;
 use App\Services\ReleaseExtraService;
+use App\Services\ReleaseImageService;
 use FFMpeg\Coordinate\Dimension;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
@@ -28,7 +28,9 @@ use Mhor\MediaInfo\MediaInfo;
 class MediaExtractionService
 {
     private ?FFMpeg $ffmpeg = null;
+
     private ?FFProbe $ffprobe = null;
+
     private ?MediaInfo $mediaInfo = null;
 
     public function __construct(
@@ -52,6 +54,7 @@ class MediaExtractionService
             if ($this->config->debugMode) {
                 Log::debug($e->getMessage());
             }
+
             return '';
         }
 
@@ -91,6 +94,7 @@ class MediaExtractionService
             if ($this->config->debugMode) {
                 Log::error($e->getTraceAsString());
             }
+
             return false;
         }
 
@@ -147,7 +151,7 @@ class MediaExtractionService
                             TimeCode::fromString($lowestLength),
                             TimeCode::fromSeconds($this->config->ffmpegDuration)
                         );
-                        $format = new Ogg();
+                        $format = new Ogg;
                         $format->setAudioCodec('libvorbis');
                         $clip->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
                         $clip->save($format, $fileName);
@@ -169,7 +173,7 @@ class MediaExtractionService
                         TimeCode::fromSeconds(0),
                         TimeCode::fromSeconds($this->config->ffmpegDuration)
                     );
-                    $format = new Ogg();
+                    $format = new Ogg;
                     $format->setAudioCodec('libvorbis');
                     $clip->filters()->resize(new Dimension(320, -1), ResizeFilter::RESIZEMODE_SCALE_HEIGHT);
                     $clip->save($format, $fileName);
@@ -214,9 +218,11 @@ class MediaExtractionService
             $xmlArray = $this->mediaInfo()->getInfo($fileLocation, true);
             \App\Models\MediaInfo::addData($releaseId, $xmlArray);
             $this->releaseExtra->addFromXml($releaseId, $xmlArray);
+
             return true;
         } catch (\Throwable $e) {
             Log::debug($e->getMessage());
+
             return false;
         }
     }
@@ -236,6 +242,7 @@ class MediaExtractionService
 
         if ($saved === 1) {
             Release::query()->where('guid', $guid)->update(['jpgstatus' => 1]);
+
             return true;
         }
 
@@ -354,7 +361,7 @@ class MediaExtractionService
             try {
                 if ($this->ffprobe()->isValid($fileLocation)) {
                     $audioSample = $this->ffmpeg()->open($fileLocation);
-                    $format = new Vorbis();
+                    $format = new Vorbis;
                     $audioSample->clip(TimeCode::fromSeconds(30), TimeCode::fromSeconds(30));
                     $audioSample->save($format, $tmpPath.$audioFileName);
                 }
@@ -431,6 +438,7 @@ class MediaExtractionService
         if (! File::isFile($filePath)) {
             return false;
         }
+
         return exif_imagetype($filePath) === IMAGETYPE_JPEG;
     }
 
@@ -440,6 +448,7 @@ class MediaExtractionService
             $timeout = $this->config->timeoutSeconds > 0 ? $this->config->timeoutSeconds : 60;
             $this->ffmpeg = FFMpeg::create(['timeout' => $timeout]);
         }
+
         return $this->ffmpeg;
     }
 
@@ -448,18 +457,20 @@ class MediaExtractionService
         if ($this->ffprobe === null) {
             $this->ffprobe = FFProbe::create();
         }
+
         return $this->ffprobe;
     }
 
     private function mediaInfo(): MediaInfo
     {
         if ($this->mediaInfo === null) {
-            $this->mediaInfo = new MediaInfo();
+            $this->mediaInfo = new MediaInfo;
             $this->mediaInfo->setConfig('use_oldxml_mediainfo_output_format', true);
             if ($this->config->mediaInfoPath) {
                 $this->mediaInfo->setConfig('command', $this->config->mediaInfoPath);
             }
         }
+
         return $this->mediaInfo;
     }
 
@@ -468,6 +479,7 @@ class MediaExtractionService
         if ($this->manticore === null) {
             $this->manticore = app(ManticoreSearchService::class);
         }
+
         return $this->manticore;
     }
 
@@ -476,7 +488,7 @@ class MediaExtractionService
         if ($this->elasticsearch === null) {
             $this->elasticsearch = app(ElasticSearchService::class);
         }
+
         return $this->elasticsearch;
     }
 }
-

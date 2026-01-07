@@ -15,11 +15,15 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
     protected int $priority = 50;
 
     private const BASE_URL = 'https://www.hotmovies.com';
+
     private const SEARCH_URL = '/search.php?words=';
+
     private const EXTRA_SEARCH = '&complete=on&search_in=video_title';
 
     protected string $directUrl = '';
+
     protected string $title = '';
+
     protected string $response = '';
 
     public function getName(): string
@@ -45,6 +49,7 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
 
         if ($searchResult === false) {
             $this->outputNotFound();
+
             return AdultProcessingResult::notFound($this->getName());
         }
 
@@ -84,7 +89,7 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
         // Initialize session with age verification
         $this->initializeSession();
 
-        $searchUrl = self::BASE_URL . self::SEARCH_URL . urlencode($movie) . self::EXTRA_SEARCH;
+        $searchUrl = self::BASE_URL.self::SEARCH_URL.urlencode($movie).self::EXTRA_SEARCH;
         $response = $this->fetchHtml($searchUrl, $this->cookie);
 
         if ($response === false) {
@@ -105,7 +110,7 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
 
         foreach ($resultSelectors as $selector) {
             $elements = $this->getHtmlParser()->find($selector);
-            if (!empty($elements)) {
+            if (! empty($elements)) {
                 foreach ($elements as $ret) {
                     $title = $ret->title ?? $ret->plaintext ?? '';
                     $url = $ret->href ?? '';
@@ -120,7 +125,7 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
                         $highestSimilarity = $similarity;
                         $bestMatch = [
                             'title' => trim($title),
-                            'url' => str_starts_with($url, 'http') ? $url : self::BASE_URL . $url,
+                            'url' => str_starts_with($url, 'http') ? $url : self::BASE_URL.$url,
                         ];
                     }
                 }
@@ -143,8 +148,8 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
     {
         $results = [];
 
-        if (!empty($this->directUrl)) {
-            if (!empty($this->title)) {
+        if (! empty($this->directUrl)) {
+            if (! empty($this->title)) {
                 $results['title'] = $this->title;
             }
             $results['directurl'] = $this->directUrl;
@@ -200,7 +205,7 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
             $ret = $this->getHtmlParser()->findOne($selector);
             if ($ret) {
                 $text = $ret->innerText ?? $ret->plaintext ?? $ret->content ?? '';
-                if (!empty(trim($text))) {
+                if (! empty(trim($text))) {
                     $res['synopsis'] = trim($text);
 
                     return $res;
@@ -217,7 +222,7 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
         $studio = false;
         $director = false;
 
-        if (($ret = $this->getHtmlParser()->find('div.page_video_info')) && !empty($ret->find('text'))) {
+        if (($ret = $this->getHtmlParser()->find('div.page_video_info')) && ! empty($ret->find('text'))) {
             $productinfo = [];
 
             foreach ($ret->find('text') as $e) {
@@ -236,12 +241,12 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
 
                 if ($studio === true) {
                     if ((stripos($e, 'Custodian of Records') === false) && stripos($e, 'Description') === false) {
-                        if ($director === true && !empty($e)) {
+                        if ($director === true && ! empty($e)) {
                             $res['director'] = $e;
                             $e = null;
                             $director = false;
                         }
-                        if (!empty($e)) {
+                        if (! empty($e)) {
                             $productinfo[] = $e;
                         }
                     } else {
@@ -285,7 +290,7 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
             }
         }
 
-        if (!empty($cast)) {
+        if (! empty($cast)) {
             $res['cast'] = array_values(array_unique($cast));
         }
 
@@ -353,8 +358,7 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
             usleep(300000); // 300ms delay
 
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::debug('HotMovies session initialization: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::debug('HotMovies session initialization: '.$e->getMessage());
         }
     }
 }
-

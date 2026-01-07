@@ -55,4 +55,3 @@ class BookResource extends JsonResource
         return null;
     }
 }
-

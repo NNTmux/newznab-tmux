@@ -11,13 +11,13 @@ use App\Services\AdditionalProcessing\NzbContentParser;
 use App\Services\AdditionalProcessing\ReleaseFileManager;
 use App\Services\AdditionalProcessing\UsenetDownloadService;
 use App\Services\Categorization\CategorizationService;
-use App\Services\Nzb\NzbParserService;
-use App\Services\Nzb\NzbService;
-use App\Services\ReleaseImageService;
-use App\Services\TempWorkspaceService;
 use App\Services\NameFixing\NameFixingService;
 use App\Services\NfoService;
+use App\Services\Nzb\NzbParserService;
+use App\Services\Nzb\NzbService;
 use App\Services\ReleaseExtraService;
+use App\Services\ReleaseImageService;
+use App\Services\TempWorkspaceService;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -33,23 +33,25 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
     {
         // Configuration is a singleton since it loads settings once
         $this->app->singleton(ProcessingConfiguration::class, function () {
-            return new ProcessingConfiguration();
+            return new ProcessingConfiguration;
         });
 
         // Release extra service for video/audio/subtitle data
         $this->app->singleton(ReleaseExtraService::class, function () {
-            return new ReleaseExtraService();
+            return new ReleaseExtraService;
         });
 
         // Console output service
         $this->app->singleton(ConsoleOutputService::class, function ($app) {
             $config = $app->make(ProcessingConfiguration::class);
+
             return new ConsoleOutputService($config->echoCLI);
         });
 
         // NZB content parser
         $this->app->singleton(NzbContentParser::class, function ($app) {
             $config = $app->make(ProcessingConfiguration::class);
+
             return new NzbContentParser(
                 $app->make(NzbService::class),
                 $app->make(NzbParserService::class),
@@ -77,10 +79,10 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
             return new ReleaseFileManager(
                 $app->make(ProcessingConfiguration::class),
                 $app->make(ReleaseExtraService::class),
-                new ReleaseImageService(),
-                new NfoService(),
+                new ReleaseImageService,
+                new NfoService,
                 $app->make(NzbService::class),
-                new NameFixingService()
+                new NameFixingService
             );
         });
 
@@ -88,15 +90,15 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
         $this->app->singleton(MediaExtractionService::class, function ($app) {
             return new MediaExtractionService(
                 $app->make(ProcessingConfiguration::class),
-                new ReleaseImageService(),
+                new ReleaseImageService,
                 $app->make(ReleaseExtraService::class),
-                new CategorizationService()
+                new CategorizationService
             );
         });
 
         // Temp workspace service (might already be registered elsewhere)
         $this->app->singleton(TempWorkspaceService::class, function () {
-            return new TempWorkspaceService();
+            return new TempWorkspaceService;
         });
 
         // Main orchestrator
@@ -122,4 +124,3 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
         //
     }
 }
-

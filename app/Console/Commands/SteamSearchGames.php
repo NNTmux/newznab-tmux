@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Models\SteamApp;
 use App\Services\SteamService;
 use Illuminate\Console\Command;
 
-use function Laravel\Prompts\progress;
 use function Laravel\Prompts\info;
-use function Laravel\Prompts\warning;
 use function Laravel\Prompts\table;
+use function Laravel\Prompts\warning;
 
 class SteamSearchGames extends Command
 {
@@ -45,16 +43,17 @@ class SteamSearchGames extends Command
 
         if ($results->isEmpty()) {
             warning('No games found matching your query.');
+
             return Command::SUCCESS;
         }
 
         info("Found {$results->count()} result(s):");
 
-        $tableData = $results->map(fn($r) => [
+        $tableData = $results->map(fn ($r) => [
             $r['appid'],
             substr($r['name'], 0, 60),
-            number_format($r['score'], 1) . '%',
-            'https://store.steampowered.com/app/' . $r['appid'],
+            number_format($r['score'], 1).'%',
+            'https://store.steampowered.com/app/'.$r['appid'],
         ])->toArray();
 
         table(
@@ -65,4 +64,3 @@ class SteamSearchGames extends Command
         return Command::SUCCESS;
     }
 }
-

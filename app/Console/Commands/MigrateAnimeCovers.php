@@ -29,30 +29,32 @@ class MigrateAnimeCovers extends Command
         $animeCoverPath = storage_path('covers/anime/');
         $dryRun = $this->option('dry-run');
 
-        if (!is_dir($animeCoverPath)) {
+        if (! is_dir($animeCoverPath)) {
             $this->error("Anime covers directory does not exist: {$animeCoverPath}");
+
             return 1;
         }
 
         $this->info("Scanning anime covers directory: {$animeCoverPath}");
-        
+
         $files = File::files($animeCoverPath);
         $renamed = 0;
         $skipped = 0;
 
         foreach ($files as $file) {
             $filename = $file->getFilename();
-            
+
             // Check if file matches old format: {id}.jpg (where id is numeric)
             if (preg_match('/^(\d+)\.jpg$/', $filename, $matches)) {
                 $anidbid = $matches[1];
                 $newFilename = "{$anidbid}-cover.jpg";
-                $newPath = $animeCoverPath . $newFilename;
+                $newPath = $animeCoverPath.$newFilename;
 
                 // Skip if new format already exists
                 if (file_exists($newPath)) {
                     $this->warn("Skipping {$filename} - {$newFilename} already exists");
                     $skipped++;
+
                     continue;
                 }
 
@@ -72,7 +74,7 @@ class MigrateAnimeCovers extends Command
 
         if ($dryRun) {
             $this->info("\nDry run complete. Would rename {$renamed} file(s), skipped {$skipped}.");
-            $this->info("Run without --dry-run to perform the migration.");
+            $this->info('Run without --dry-run to perform the migration.');
         } else {
             $this->info("\nMigration complete. Renamed {$renamed} file(s), skipped {$skipped}.");
         }
@@ -80,4 +82,3 @@ class MigrateAnimeCovers extends Command
         return 0;
     }
 }
-

@@ -503,6 +503,7 @@ class TvMazeProvider extends AbstractTvProvider
                         if ($result['tmdb'] === 0 && ! empty($traktIds['tmdb'])) {
                             $result['tmdb'] = (int) $traktIds['tmdb'];
                         }
+
                         return $result;
                     }
                 }
@@ -541,4 +542,3 @@ class TvMazeProvider extends AbstractTvProvider
         ];
     }
 }
-

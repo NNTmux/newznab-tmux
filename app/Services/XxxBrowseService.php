@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Category;
-use App\Models\Genre;
 use App\Models\XxxInfo;
 use App\Services\Releases\ReleaseBrowseService;
 use Illuminate\Support\Facades\Cache;
@@ -203,4 +202,3 @@ class XxxBrowseService
         return $ret;
     }
 }
-

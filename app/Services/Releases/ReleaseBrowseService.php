@@ -20,11 +20,10 @@ class ReleaseBrowseService
 
     // RAR/ZIP Password indicator.
     public const PASSWD_NONE = 0; // No password.
+
     public const PASSWD_RAR = 1; // Definitely passworded.
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * Used for Browse results with optional search term filtering via search index.
@@ -43,7 +42,7 @@ class ReleaseBrowseService
         // Use search index filtering when a search term is provided
         $searchIndexFilter = '';
         $searchIndexIds = [];
-        if (!empty($searchTerm) && Search::isAvailable()) {
+        if (! empty($searchTerm) && Search::isAvailable()) {
             $searchResult = Search::searchReleasesWithFuzzy(['searchname' => $searchTerm], $num * 10);
             $searchIndexIds = $searchResult['ids'] ?? [];
 
@@ -108,7 +107,7 @@ class ReleaseBrowseService
         $sql = DB::select($qry);
         if (\count($sql) > 0) {
             // When using search index, use the ID count for total rows
-            if (!empty($searchIndexIds)) {
+            if (! empty($searchIndexIds)) {
                 $sql[0]->_totalcount = $sql[0]->_totalrows = count($searchIndexIds);
             } else {
                 $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
@@ -132,7 +131,7 @@ class ReleaseBrowseService
         $cacheExpiry = (int) config('nntmux.cache_expiry_short', 5);
 
         // Build a unique cache key for this specific query
-        $cacheKey = 'browse_count_' . md5(serialize($cat) . $maxAge . serialize($excludedCats) . $groupName);
+        $cacheKey = 'browse_count_'.md5(serialize($cat).$maxAge.serialize($excludedCats).$groupName);
 
         // Check cache first - use longer cache time for count queries since they're expensive
         $count = Cache::get($cacheKey);
@@ -141,21 +140,21 @@ class ReleaseBrowseService
         }
 
         // Build optimized count query - avoid JOINs when possible
-        $conditions = ['r.passwordstatus ' . $this->showPasswords()];
+        $conditions = ['r.passwordstatus '.$this->showPasswords()];
 
         // Add category conditions
         $catQuery = Category::getCategorySearch($cat);
         $catQuery = preg_replace('/^(WHERE|AND)\s+/i', '', trim($catQuery));
-        if (!empty($catQuery) && $catQuery !== '1=1') {
+        if (! empty($catQuery) && $catQuery !== '1=1') {
             $conditions[] = $catQuery;
         }
 
         if ($maxAge > 0) {
-            $conditions[] = 'r.postdate > NOW() - INTERVAL ' . $maxAge . ' DAY';
+            $conditions[] = 'r.postdate > NOW() - INTERVAL '.$maxAge.' DAY';
         }
 
-        if (!empty($excludedCats)) {
-            $conditions[] = 'r.categories_id NOT IN (' . implode(',', array_map('intval', $excludedCats)) . ')';
+        if (! empty($excludedCats)) {
+            $conditions[] = 'r.categories_id NOT IN ('.implode(',', array_map('intval', $excludedCats)).')';
         }
 
         // Only add group filter if specified - this requires a JOIN
@@ -164,7 +163,7 @@ class ReleaseBrowseService
             $conditions[] = sprintf('g.name = %s', escapeString($groupName));
         }
 
-        $whereSql = 'WHERE ' . implode(' AND ', $conditions);
+        $whereSql = 'WHERE '.implode(' AND ', $conditions);
 
         try {
             // For queries with maxResults limit, use sample-based counting
@@ -195,6 +194,7 @@ class ReleaseBrowseService
                 // If we got the full sample, assume there are more rows than maxResults
                 if ($sampleCount >= $sampleLimit) {
                     Cache::put($cacheKey, $maxResults, now()->addMinutes($cacheExpiry * 2));
+
                     return $maxResults;
                 }
 
@@ -221,6 +221,7 @@ class ReleaseBrowseService
             return $count;
         } catch (\Exception $e) {
             Log::error('getBrowseCount failed', ['error' => $e->getMessage()]);
+
             return 0;
         }
     }
@@ -385,7 +386,7 @@ class ReleaseBrowseService
      */
     public function searchByIndexWithCategories(string $searchTerm, array $categories = [], int $limit = 1000): array
     {
-        if (empty($searchTerm) || !Search::isAvailable()) {
+        if (empty($searchTerm) || ! Search::isAvailable()) {
             return [];
         }
 
@@ -397,7 +398,7 @@ class ReleaseBrowseService
         }
 
         // If categories are specified, filter the results by querying the database for just the IDs
-        if (!empty($categories) && !in_array(-1, $categories, true)) {
+        if (! empty($categories) && ! in_array(-1, $categories, true)) {
             $filteredIds = Release::query()
                 ->select('id')
                 ->whereIn('id', $releaseIds)
@@ -421,7 +422,7 @@ class ReleaseBrowseService
      */
     public function getReleasesByExternalId(array $externalIds, int $limit = 100): array
     {
-        if (empty($externalIds) || !Search::isAvailable()) {
+        if (empty($externalIds) || ! Search::isAvailable()) {
             return [];
         }
 
@@ -574,4 +575,3 @@ class ReleaseBrowseService
         }
     }
 }
-

@@ -27,7 +27,9 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class ApiController extends BasePageController
 {
     private string $type;
+
     private ReleaseSearchService $releaseSearchService;
+
     private ReleaseBrowseService $releaseBrowseService;
 
     public function __construct(
@@ -129,7 +131,6 @@ class ApiController extends BasePageController
                 return showApiError(500, 'Request limit reached ('.$thisRequests.'/'.$maxRequests.')');
             }
         }
-
 
         // Set Query Parameters based on Request objects
         $outputXML = ! ($request->has('o') && $request->input('o') === 'json');

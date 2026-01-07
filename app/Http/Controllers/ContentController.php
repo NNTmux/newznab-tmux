@@ -12,6 +12,7 @@ class ContentController extends BasePageController
      * Display content page(s).
      *
      * @return \Illuminate\Http\JsonResponse|\Illuminate\View\View
+     *
      * @throws \Exception
      */
     public function show(Request $request)

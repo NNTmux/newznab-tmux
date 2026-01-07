@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -357,7 +356,7 @@ class TmdbClient
         if (! empty($imdbId)) {
             // Format IMDB ID with tt prefix if it's numeric
             $imdbFormatted = is_numeric($imdbId)
-                ? 'tt' . str_pad((string) $imdbId, 7, '0', STR_PAD_LEFT)
+                ? 'tt'.str_pad((string) $imdbId, 7, '0', STR_PAD_LEFT)
                 : (string) $imdbId;
 
             $show = $this->findTvByExternalId($imdbFormatted, 'imdb_id');
@@ -397,7 +396,7 @@ class TmdbClient
             $show = $this->findTvByExternalId((string) $id, 'tvdb_id');
         } elseif ($source === 'imdb') {
             $imdbFormatted = is_numeric($id)
-                ? 'tt' . str_pad((string) $id, 7, '0', STR_PAD_LEFT)
+                ? 'tt'.str_pad((string) $id, 7, '0', STR_PAD_LEFT)
                 : (string) $id;
             $show = $this->findTvByExternalId($imdbFormatted, 'imdb_id');
         }
@@ -484,4 +483,3 @@ class TmdbClient
         return $value ?? $default;
     }
 }
-

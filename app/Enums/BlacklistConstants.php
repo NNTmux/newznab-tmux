@@ -25,4 +25,3 @@ final class BlacklistConstants
 
     public const BLACKLIST_FIELD_MESSAGEID = 3;
 }
-

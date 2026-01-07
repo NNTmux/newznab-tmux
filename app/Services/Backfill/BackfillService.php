@@ -371,4 +371,3 @@ final class BackfillService
         $this->log(PHP_EOL."Group {$shortGroupName} processed in {$duration} seconds.");
     }
 }
-

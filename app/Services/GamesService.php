@@ -30,29 +30,44 @@ use Illuminate\Support\Facades\Log;
 class GamesService
 {
     protected const int GAME_MATCH_PERCENTAGE = 85;
+
     protected const int GAME_CACHE_TTL = 86400; // 24 hours
+
     protected const int FAILED_LOOKUP_CACHE_TTL = 3600; // 1 hour
 
     public bool $echoOutput;
+
     public string|int|null $gameQty;
+
     public string $imgSavePath;
+
     public int $matchPercentage;
+
     public bool $maxHitRequest;
+
     public string $renamed;
+
     public string $catWhere;
 
     protected SteamService $steamService;
+
     protected IGDBService $igdbService;
+
     protected GamesTitleParser $titleParser;
+
     protected ReleaseImageService $imageService;
 
     // Processing stats
     protected int $processedCount = 0;
+
     protected int $matchedCount = 0;
+
     protected int $failedCount = 0;
+
     protected int $cachedCount = 0;
 
     protected string $_classUsed = '';
+
     protected $igdbSleep;
 
     /**
@@ -71,11 +86,11 @@ class GamesService
         $this->imageService = $imageService ?? new ReleaseImageService;
 
         $this->gameQty = Settings::settingValue('maxgamesprocessed') !== '' ? (int) Settings::settingValue('maxgamesprocessed') : 150;
-        $this->imgSavePath = config('nntmux_settings.covers_path') . '/games/';
+        $this->imgSavePath = config('nntmux_settings.covers_path').'/games/';
         $this->renamed = (int) Settings::settingValue('lookupgames') === 2 ? 'AND isrenamed = 1' : '';
         $this->matchPercentage = 60;
         $this->maxHitRequest = false;
-        $this->catWhere = 'AND categories_id = ' . Category::PC_GAMES . ' ';
+        $this->catWhere = 'AND categories_id = '.Category::PC_GAMES.' ';
     }
 
     // ========================================
@@ -142,8 +157,8 @@ class GamesService
             ->from('gamesinfo as gi')
             ->join('genres as g', 'gi.genres_id', '=', 'g.id');
 
-        if (!empty($search)) {
-            $query->where('gi.title', 'like', '%' . $search . '%');
+        if (! empty($search)) {
+            $query->where('gi.title', 'like', '%'.$search.'%');
         }
 
         return $query->orderByDesc('created_at')
@@ -178,27 +193,27 @@ class GamesService
         }
         $exccatlist = '';
         if (count($excludedCats) > 0) {
-            $exccatlist = ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')';
+            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')';
         }
         $order = $this->getGamesOrder($orderBy);
         $gamesSql =
             "SELECT SQL_CALC_FOUND_ROWS gi.id, GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id FROM gamesinfo gi LEFT JOIN releases r ON gi.id = r.gamesinfo_id WHERE gi.title != '' AND gi.cover = 1 AND r.passwordstatus "
-            . app(\App\Services\Releases\ReleaseBrowseService::class)->showPasswords() .
-            $browseBy .
-            $catsrch .
-            $maxAge .
-            $exccatlist .
-            ' GROUP BY gi.id ORDER BY ' . ($order[0]) . ' ' . ($order[1]) .
-            ($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start);
+            .app(\App\Services\Releases\ReleaseBrowseService::class)->showPasswords().
+            $browseBy.
+            $catsrch.
+            $maxAge.
+            $exccatlist.
+            ' GROUP BY gi.id ORDER BY '.($order[0]).' '.($order[1]).
+            ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start);
 
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        $gamesCache = Cache::get(md5($gamesSql . $page));
+        $gamesCache = Cache::get(md5($gamesSql.$page));
         if ($gamesCache !== null) {
             $games = $gamesCache;
         } else {
             $data = DB::select($gamesSql);
             $games = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
-            Cache::put(md5($gamesSql . $page), $games, $expiresAt);
+            Cache::put(md5($gamesSql.$page), $games, $expiresAt);
         }
 
         $gameIDs = $releaseIDs = false;
@@ -210,9 +225,9 @@ class GamesService
         }
 
         $returnSql =
-            'SELECT r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, g.name AS group_name, df.failed AS failed, gi.*, YEAR (gi.releasedate) as year, r.gamesinfo_id, rn.releases_id AS nfoid FROM releases r LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id INNER JOIN gamesinfo gi ON gi.id = r.gamesinfo_id WHERE gi.id IN (' . (is_array($gameIDs) ? implode(',', $gameIDs) : -1) . ') AND r.id IN (' . (is_array($releaseIDs) ? implode(',', $releaseIDs) : -1) . ')' . $catsrch . ' GROUP BY gi.id ORDER BY ' . ($order[0]) . ' ' . ($order[1]);
+            'SELECT r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, g.name AS group_name, df.failed AS failed, gi.*, YEAR (gi.releasedate) as year, r.gamesinfo_id, rn.releases_id AS nfoid FROM releases r LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id INNER JOIN gamesinfo gi ON gi.id = r.gamesinfo_id WHERE gi.id IN ('.(is_array($gameIDs) ? implode(',', $gameIDs) : -1).') AND r.id IN ('.(is_array($releaseIDs) ? implode(',', $releaseIDs) : -1).')'.$catsrch.' GROUP BY gi.id ORDER BY '.($order[0]).' '.($order[1]);
 
-        $return = Cache::get(md5($returnSql . $page));
+        $return = Cache::get(md5($returnSql.$page));
         if ($return !== null) {
             return $return;
         }
@@ -220,7 +235,7 @@ class GamesService
         if (count($return) > 0) {
             $return[0]->_totalcount = $games['total'][0]->total ?? 0;
         }
-        Cache::put(md5($returnSql . $page), $return, $expiresAt);
+        Cache::put(md5($returnSql.$page), $return, $expiresAt);
 
         return $return;
     }
@@ -273,12 +288,12 @@ class GamesService
     {
         $browseBy = ' ';
         foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
-            if (!empty($_REQUEST[$bbk])) {
+            if (! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
                 if ($bbk === 'year') {
-                    $browseBy .= ' AND YEAR (gi.releasedate) ' . 'LIKE ' . escapeString('%' . $bbs . '%');
+                    $browseBy .= ' AND YEAR (gi.releasedate) '.'LIKE '.escapeString('%'.$bbs.'%');
                 } else {
-                    $browseBy .= ' AND gi.' . $bbv . ' ' . 'LIKE ' . escapeString('%' . $bbs . '%');
+                    $browseBy .= ' AND gi.'.$bbv.' '.'LIKE '.escapeString('%'.$bbs.'%');
                 }
             }
         }
@@ -334,6 +349,7 @@ class GamesService
         if (Cache::has("game_lookup_failed:{$titleKey}")) {
             Log::debug('GamesService: Skipping previously failed lookup', ['title' => $gameInfo['title']]);
             $this->cachedCount++;
+
             return false;
         }
 
@@ -342,6 +358,7 @@ class GamesService
         if ($cachedResult !== null) {
             Log::debug('GamesService: Using cached lookup result', ['title' => $gameInfo['title']]);
             $this->cachedCount++;
+
             return $this->saveGameInfoFromCache($cachedResult, $gen, $gameInfo);
         }
 
@@ -373,6 +390,7 @@ class GamesService
                         $game = $this->igdbService->buildGameData($igdbGame, $genreName);
                     } else {
                         Cache::put("game_lookup_failed:{$titleKey}", true, self::FAILED_LOOKUP_CACHE_TTL);
+
                         return false;
                     }
                 }
@@ -386,6 +404,7 @@ class GamesService
 
         if (empty($game)) {
             Cache::put("game_lookup_failed:{$titleKey}", true, self::FAILED_LOOKUP_CACHE_TTL);
+
             return false;
         }
 
@@ -400,32 +419,32 @@ class GamesService
     {
         $game = [];
 
-        if (!empty($steamResults['cover'])) {
+        if (! empty($steamResults['cover'])) {
             $game['coverurl'] = (string) $steamResults['cover'];
         }
 
-        if (!empty($steamResults['backdrop'])) {
+        if (! empty($steamResults['backdrop'])) {
             $game['backdropurl'] = (string) $steamResults['backdrop'];
         }
 
         $game['title'] = (string) $steamResults['title'];
         $game['asin'] = $steamResults['steamid'];
         $game['url'] = (string) $steamResults['directurl'];
-        $game['publisher'] = !empty($steamResults['publisher']) ? (string) $steamResults['publisher'] : 'Unknown';
-        $game['esrb'] = !empty($steamResults['rating']) ? (string) $steamResults['rating'] : 'Not Rated';
+        $game['publisher'] = ! empty($steamResults['publisher']) ? (string) $steamResults['publisher'] : 'Unknown';
+        $game['esrb'] = ! empty($steamResults['rating']) ? (string) $steamResults['rating'] : 'Not Rated';
 
-        if (!empty($steamResults['releasedate'])) {
+        if (! empty($steamResults['releasedate'])) {
             $dateReleased = strtotime($steamResults['releasedate']) === false ? '' : $steamResults['releasedate'];
             $game['releasedate'] = ($steamResults['releasedate'] === '' || strtotime($steamResults['releasedate']) === false)
                 ? null
                 : Carbon::createFromFormat('M j, Y', Carbon::parse($dateReleased)->toFormattedDateString())->format('Y-m-d');
         }
 
-        if (!empty($steamResults['description'])) {
+        if (! empty($steamResults['description'])) {
             $game['review'] = (string) $steamResults['description'];
         }
 
-        if (!empty($steamResults['genres'])) {
+        if (! empty($steamResults['genres'])) {
             $genreName = $this->igdbService->matchGenre($steamResults['genres']);
         }
 
@@ -443,16 +462,16 @@ class GamesService
         // Prepare database values
         $game['cover'] = isset($game['coverurl']) ? 1 : 0;
         $game['backdrop'] = isset($game['backdropurl']) ? 1 : 0;
-        if (!isset($game['trailer'])) {
+        if (! isset($game['trailer'])) {
             $game['trailer'] = 0;
         }
         if (empty($game['title'])) {
             $game['title'] = $gameInfo['title'];
         }
-        if (!isset($game['releasedate'])) {
+        if (! isset($game['releasedate'])) {
             $game['releasedate'] = '';
         }
-        if (!isset($game['review'])) {
+        if (! isset($game['review'])) {
             $game['review'] = 'No Review';
         }
         $game['classused'] = $this->_classUsed;
@@ -472,7 +491,7 @@ class GamesService
 
         $gamesId = false;
 
-        if (!empty($game['asin'])) {
+        if (! empty($game['asin'])) {
             try {
                 DB::beginTransaction();
 
@@ -529,18 +548,19 @@ class GamesService
                 DB::rollBack();
                 Log::error('GamesService: Database error saving game', [
                     'title' => $game['title'],
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]);
+
                 return false;
             }
         }
 
-        if (!empty($gamesId)) {
+        if (! empty($gamesId)) {
             if ($this->echoOutput) {
-                cli()->header('Added/updated game: ') .
-                cli()->alternateOver('   Title:    ') .
-                cli()->primary($game['title']) .
-                cli()->alternateOver('   Source:   ') .
+                cli()->header('Added/updated game: ').
+                cli()->alternateOver('   Title:    ').
+                cli()->primary($game['title']).
+                cli()->alternateOver('   Source:   ').
                 cli()->primary($this->_classUsed);
             }
 
@@ -551,11 +571,11 @@ class GamesService
 
             // Save backdrop image
             if ($game['backdrop'] === 1 && isset($game['backdropurl'])) {
-                $game['backdrop'] = $this->imageService->saveImage($gamesId . '-backdrop', $game['backdropurl'], $this->imgSavePath, 1920, 1024);
+                $game['backdrop'] = $this->imageService->saveImage($gamesId.'-backdrop', $game['backdropurl'], $this->imgSavePath, 1920, 1024);
             }
         } elseif ($this->echoOutput) {
-            cli()->headerOver('Nothing to update: ') .
-            cli()->primary($game['title'] . ' (PC)');
+            cli()->headerOver('Nothing to update: ').
+            cli()->primary($game['title'].' (PC)');
         }
 
         return $gamesId !== false ? $gamesId : false;
@@ -577,7 +597,7 @@ class GamesService
 
         $game['gamesgenreID'] = $genreKey;
 
-        if (!empty($game['asin'])) {
+        if (! empty($game['asin'])) {
             $check = GamesInfo::query()->where('asin', $game['asin'])->first();
             if ($check !== null) {
                 return $check['id'];
@@ -622,7 +642,7 @@ class GamesService
 
         if ($res->count() > 0) {
             if ($this->echoOutput) {
-                cli()->header('Processing ' . $res->count() . ' games release(s).');
+                cli()->header('Processing '.$res->count().' games release(s).');
             }
 
             Log::info('GamesService: Starting processing', ['count' => $res->count()]);
@@ -637,7 +657,7 @@ class GamesService
 
                 if ($gameInfo !== false) {
                     if ($this->echoOutput) {
-                        cli()->info('Looking up: ' . $gameInfo['title'] . ' (PC)');
+                        cli()->info('Looking up: '.$gameInfo['title'].' (PC)');
                     }
 
                     // Check for existing games entry
@@ -743,7 +763,7 @@ class GamesService
                 } catch (\Exception $e) {
                     Log::error('GamesService: Failed to update release', [
                         'release_id' => $releaseId,
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
                 }
             }

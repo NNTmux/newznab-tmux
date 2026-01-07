@@ -85,14 +85,14 @@ class MiscCategorizer extends AbstractCategorizer
     {
         // Dataset/dump patterns that aren't media
         if (preg_match('/\b(sql|csv|dump|backup|dataset|collection)\b/i', $name) &&
-            !preg_match('/\b(movie|tv|show|audio|video|book|game)\b/i', $name)) {
+            ! preg_match('/\b(movie|tv|show|audio|video|book|game)\b/i', $name)) {
             return $this->matched(Category::OTHER_MISC, 0.6, 'dataset');
         }
 
         // Data leaks/dumps (be careful with these)
         if (preg_match('/\b(leak|breach|data|database)\b/i', $name) &&
             preg_match('/\b(dump|export|backup)\b/i', $name) &&
-            !preg_match('/\b(movie|tv|show|audio|video|book|game)\b/i', $name)) {
+            ! preg_match('/\b(movie|tv|show|audio|video|book|game)\b/i', $name)) {
             return $this->matched(Category::OTHER_MISC, 0.6, 'data_dump');
         }
 
@@ -109,8 +109,8 @@ class MiscCategorizer extends AbstractCategorizer
         // Mixed-case alphanumeric strings without separators (common obfuscation pattern)
         // These look like random strings: e.g., "AA7Jl2toE8Q53yNZmQ5R6G"
         if (preg_match('/^[a-zA-Z0-9]{15,}$/', $name) &&
-            !preg_match('/\b(19|20)\d{2}\b/', $name) &&
-            !preg_match('/^[A-Z][a-z]+([A-Z][a-z]+)+$/', $name)) { // Exclude CamelCase words
+            ! preg_match('/\b(19|20)\d{2}\b/', $name) &&
+            ! preg_match('/^[A-Z][a-z]+([A-Z][a-z]+)+$/', $name)) { // Exclude CamelCase words
             return $this->matched(Category::OTHER_HASHED, 0.7, 'obfuscated_mixed_alphanumeric');
         }
 
@@ -121,8 +121,8 @@ class MiscCategorizer extends AbstractCategorizer
             $filename = $matches[1];
             // Ensure the filename looks random (not a real title)
             // Real titles would have words/structure, obfuscated ones are random chars
-            if (!preg_match('/[._ -]/', $filename) && // No separators
-                !preg_match('/\b(19|20)\d{2}\b/', $filename) && // No year
+            if (! preg_match('/[._ -]/', $filename) && // No separators
+                ! preg_match('/\b(19|20)\d{2}\b/', $filename) && // No year
                 $this->looksLikeRandomString($filename)) { // Additional entropy check
                 return $this->matched(Category::OTHER_HASHED, 0.85, 'obfuscated_usenet_filename');
             }
@@ -130,7 +130,7 @@ class MiscCategorizer extends AbstractCategorizer
 
         // Only punctuation and numbers with no clear structure
         if (preg_match('/^[^a-zA-Z]*[A-Z0-9\._\-]{5,}[^a-zA-Z]*$/', $name) &&
-            !preg_match('/\.(mkv|avi|mp4|mp3|flac|pdf|epub|exe|iso)$/i', $name)) {
+            ! preg_match('/\.(mkv|avi|mp4|mp3|flac|pdf|epub|exe|iso)$/i', $name)) {
             return $this->matched(Category::OTHER_MISC, 0.5, 'obfuscated_pattern');
         }
 
@@ -158,7 +158,7 @@ class MiscCategorizer extends AbstractCategorizer
             $prevIsDigit = ctype_digit($str[$i - 1]);
             $currIsDigit = ctype_digit($str[$i]);
 
-            if (($prevIsUpper !== $currIsUpper && !$prevIsDigit && !$currIsDigit) ||
+            if (($prevIsUpper !== $currIsUpper && ! $prevIsDigit && ! $currIsDigit) ||
                 ($prevIsDigit !== $currIsDigit)) {
                 $transitions++;
             }
@@ -176,7 +176,7 @@ class MiscCategorizer extends AbstractCategorizer
         $hasWordPattern = preg_match('/[bcdfghjklmnpqrstvwxyz]{1,2}[aeiou][bcdfghjklmnpqrstvwxyz]{1,2}[aeiou]/i', $str);
 
         // If transition ratio is high and no word patterns, likely random
-        if ($transitionRatio > 0.3 && !$hasWordPattern) {
+        if ($transitionRatio > 0.3 && ! $hasWordPattern) {
             return true;
         }
 

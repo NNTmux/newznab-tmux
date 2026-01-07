@@ -6,9 +6,7 @@ use Symfony\Component\Process\Process;
 
 abstract class BaseRunner
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     protected function buildDnrCommand(string $args): string
     {
@@ -164,7 +162,7 @@ abstract class BaseRunner
      * @param  array<string|int, callable>  $tasks  Array of callables keyed by identifier
      * @param  int  $maxProcesses  Maximum concurrent processes
      * @param  int|null  $timeout  Timeout in seconds (null = use config default)
-     * @return array<string|int, mixed>  Results keyed by the same identifiers as $tasks
+     * @return array<string|int, mixed> Results keyed by the same identifiers as $tasks
      */
     protected function runParallelProcesses(array $tasks, int $maxProcesses, ?int $timeout = null): array
     {
@@ -174,7 +172,7 @@ abstract class BaseRunner
         $running = [];
         $queue = $tasks;
 
-        $startNext = function () use (&$queue, &$running, $timeout): ?string {
+        $startNext = function () use (&$queue, &$running): ?string {
             if (empty($queue)) {
                 return null;
             }
@@ -198,10 +196,11 @@ abstract class BaseRunner
                 try {
                     $results[$key] = $callable();
                 } catch (\Throwable $e) {
-                    \Log::error("Task {$key} failed: " . $e->getMessage());
+                    \Log::error("Task {$key} failed: ".$e->getMessage());
                     $results[$key] = '';
                 }
             }
+
             return $results;
         }
 
@@ -227,7 +226,7 @@ abstract class BaseRunner
                 try {
                     $results[$key] = $callable();
                 } catch (\Throwable $e) {
-                    \Log::error("Task {$key} failed: " . $e->getMessage());
+                    \Log::error("Task {$key} failed: ".$e->getMessage());
                     $results[$key] = '';
                 }
             }
@@ -242,7 +241,7 @@ abstract class BaseRunner
      * @param  array<string|int, string>  $commands  Array of shell commands keyed by identifier
      * @param  int  $maxProcesses  Maximum concurrent processes
      * @param  int|null  $timeout  Timeout in seconds (null = use config default)
-     * @return array<string|int, string>  Command outputs keyed by the same identifiers
+     * @return array<string|int, string> Command outputs keyed by the same identifiers
      */
     protected function runParallelCommands(array $commands, int $maxProcesses, ?int $timeout = null): array
     {
@@ -267,14 +266,14 @@ abstract class BaseRunner
         };
 
         // Prime initial processes
-        for ($i = 0; $i < $maxProcesses && !empty($queue); $i++) {
+        for ($i = 0; $i < $maxProcesses && ! empty($queue); $i++) {
             $startNext();
         }
 
         // Event loop
-        while (!empty($running)) {
+        while (! empty($running)) {
             foreach ($running as $key => $proc) {
-                if (!$proc->isRunning()) {
+                if (! $proc->isRunning()) {
                     $results[$key] = $proc->getOutput();
                     // Output errors if any
                     $err = $proc->getErrorOutput();
@@ -283,7 +282,7 @@ abstract class BaseRunner
                     }
                     unset($running[$key]);
                     // Start next from queue if available
-                    if (!empty($queue)) {
+                    if (! empty($queue)) {
                         $startNext();
                     }
                 }
@@ -357,4 +356,3 @@ abstract class BaseRunner
         }
     }
 }
-

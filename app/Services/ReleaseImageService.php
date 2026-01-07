@@ -206,4 +206,3 @@ class ReleaseImageService
         File::delete([$this->audSavePath.$guid.'.ogg', $this->imgSavePath.$thumb, $this->jpgSavePath.$thumb, $this->vidSavePath.$guid.'.ogv']);
     }
 }
-

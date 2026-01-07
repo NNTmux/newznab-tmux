@@ -24,4 +24,3 @@ interface SearchDriverInterface extends SearchServiceInterface
      */
     public static function escapeString(string $string): string;
 }
-

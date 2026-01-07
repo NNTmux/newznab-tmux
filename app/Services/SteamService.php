@@ -27,23 +27,32 @@ class SteamService
 {
     // Steam API endpoints
     protected const string STEAM_API_BASE = 'https://api.steampowered.com';
+
     protected const string STEAM_STORE_BASE = 'https://store.steampowered.com/api';
+
     protected const string STEAM_STORE_URL = 'https://store.steampowered.com/app/';
+
     protected const string STEAM_CDN_BASE = 'https://cdn.akamai.steamstatic.com/steam/apps';
 
     // Rate limiting
     protected const string RATE_LIMIT_KEY = 'steam_api_rate_limit';
+
     protected const int REQUESTS_PER_MINUTE = 200; // Steam allows ~200 requests per 5 minutes
+
     protected const int DECAY_SECONDS = 60;
 
     // Cache TTLs
     protected const int APP_DETAILS_CACHE_TTL = 86400; // 24 hours
+
     protected const int APP_LIST_CACHE_TTL = 604800; // 7 days
+
     protected const int SEARCH_CACHE_TTL = 3600; // 1 hour
+
     protected const int FAILED_LOOKUP_CACHE_TTL = 1800; // 30 minutes
 
     // Matching configuration
     protected const int MATCH_THRESHOLD = 85;
+
     protected const int RELAXED_MATCH_THRESHOLD = 75;
 
     // Scene/release group noise patterns
@@ -82,21 +91,24 @@ class SteamService
         $cleanTitle = $this->cleanTitle($title);
         if (empty($cleanTitle)) {
             Log::debug('SteamService: Empty title after cleaning', ['original' => $title]);
+
             return null;
         }
 
         // Check failed lookup cache
-        $cacheKey = 'steam_search_failed:' . md5(mb_strtolower($cleanTitle));
+        $cacheKey = 'steam_search_failed:'.md5(mb_strtolower($cleanTitle));
         if (Cache::has($cacheKey)) {
             Log::debug('SteamService: Skipping previously failed search', ['title' => $cleanTitle]);
+
             return null;
         }
 
         // Check successful search cache
-        $successCacheKey = 'steam_search:' . md5(mb_strtolower($cleanTitle));
+        $successCacheKey = 'steam_search:'.md5(mb_strtolower($cleanTitle));
         $cached = Cache::get($successCacheKey);
         if ($cached !== null) {
             Log::debug('SteamService: Using cached search result', ['title' => $cleanTitle, 'appid' => $cached]);
+
             return (int) $cached;
         }
 
@@ -195,19 +207,20 @@ class SteamService
 
         try {
             $response = $this->makeRequest(
-                self::STEAM_API_BASE . '/ISteamUserStats/GetNumberOfCurrentPlayers/v1/',
+                self::STEAM_API_BASE.'/ISteamUserStats/GetNumberOfCurrentPlayers/v1/',
                 ['appid' => $appId]
             );
 
             if ($response && isset($response['response']['player_count'])) {
                 $count = (int) $response['response']['player_count'];
                 Cache::put($cacheKey, $count, 300); // 5 minute cache
+
                 return $count;
             }
         } catch (\Exception $e) {
             Log::warning('SteamService: Failed to get player count', [
                 'appid' => $appId,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
         }
 
@@ -227,7 +240,7 @@ class SteamService
 
         try {
             $response = Http::timeout(10)
-                ->get(self::STEAM_STORE_BASE . '/appreviews/' . $appId, [
+                ->get(self::STEAM_STORE_BASE.'/appreviews/'.$appId, [
                     'json' => 1,
                     'language' => 'all',
                     'purchase_type' => 'all',
@@ -244,12 +257,13 @@ class SteamService
                 ];
 
                 Cache::put($cacheKey, $summary, 3600); // 1 hour cache
+
                 return $summary;
             }
         } catch (\Exception $e) {
             Log::warning('SteamService: Failed to get reviews', [
                 'appid' => $appId,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
         }
 
@@ -297,6 +311,7 @@ class SteamService
             $appList = $this->getFullAppList();
             if (empty($appList)) {
                 Log::error('SteamService: Failed to retrieve app list from Steam');
+
                 return $stats;
             }
 
@@ -316,13 +331,15 @@ class SteamService
                 foreach ($chunk as $app) {
                     $processed++;
 
-                    if (empty($app['name']) || !isset($app['appid'])) {
+                    if (empty($app['name']) || ! isset($app['appid'])) {
                         $stats['skipped']++;
+
                         continue;
                     }
 
                     if (in_array($app['appid'], $existingApps, true)) {
                         $stats['skipped']++;
+
                         continue;
                     }
 
@@ -332,13 +349,13 @@ class SteamService
                     ];
                 }
 
-                if (!empty($toInsert)) {
+                if (! empty($toInsert)) {
                     try {
                         SteamApp::query()->insert($toInsert);
                         $stats['inserted'] += count($toInsert);
                     } catch (\Exception $e) {
                         Log::warning('SteamService: Batch insert failed, trying individual inserts', [
-                            'error' => $e->getMessage()
+                            'error' => $e->getMessage(),
                         ]);
 
                         foreach ($toInsert as $app) {
@@ -379,12 +396,13 @@ class SteamService
 
         try {
             $response = Http::timeout(60)
-                ->get(self::STEAM_API_BASE . '/ISteamApps/GetAppList/v2/')
+                ->get(self::STEAM_API_BASE.'/ISteamApps/GetAppList/v2/')
                 ->json();
 
             if ($response && isset($response['applist']['apps'])) {
                 $apps = $response['applist']['apps'];
                 Cache::put($cacheKey, $apps, self::APP_LIST_CACHE_TTL);
+
                 return $apps;
             }
         } catch (\Exception $e) {
@@ -409,7 +427,7 @@ class SteamService
         $matches = $this->findMatches($cleanTitle, $limit * 2); // Get more to filter
 
         return collect($matches)
-            ->filter(fn($m) => $m['score'] >= self::RELAXED_MATCH_THRESHOLD)
+            ->filter(fn ($m) => $m['score'] >= self::RELAXED_MATCH_THRESHOLD)
             ->sortByDesc('score')
             ->take($limit)
             ->values();
@@ -519,7 +537,7 @@ class SteamService
         }
 
         // Sort by score descending
-        usort($matches, fn($a, $b) => $b['score'] <=> $a['score']);
+        usort($matches, fn ($a, $b) => $b['score'] <=> $a['score']);
 
         return array_slice($matches, 0, $limit);
     }
@@ -535,7 +553,7 @@ class SteamService
             function () use ($appId) {
                 try {
                     $response = Http::timeout(15)
-                        ->get(self::STEAM_STORE_BASE . '/appdetails', [
+                        ->get(self::STEAM_STORE_BASE.'/appdetails', [
                             'appids' => $appId,
                             'cc' => 'us',
                             'l' => 'english',
@@ -548,7 +566,7 @@ class SteamService
                 } catch (\Exception $e) {
                     Log::warning('SteamService: Failed to fetch app details', [
                         'appid' => $appId,
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
                 }
 
@@ -568,7 +586,7 @@ class SteamService
     {
         // Extract screenshots
         $screenshots = [];
-        if (!empty($data['screenshots'])) {
+        if (! empty($data['screenshots'])) {
             foreach ($data['screenshots'] as $ss) {
                 $screenshots[] = [
                     'thumbnail' => $ss['path_thumbnail'] ?? null,
@@ -580,7 +598,7 @@ class SteamService
         // Extract movies/trailers
         $movies = [];
         $trailerUrl = null;
-        if (!empty($data['movies'])) {
+        if (! empty($data['movies'])) {
             foreach ($data['movies'] as $movie) {
                 $movieData = [
                     'id' => $movie['id'] ?? null,
@@ -591,7 +609,7 @@ class SteamService
                 ];
                 $movies[] = $movieData;
 
-                if ($trailerUrl === null && !empty($movieData['mp4'])) {
+                if ($trailerUrl === null && ! empty($movieData['mp4'])) {
                     $trailerUrl = $movieData['mp4'];
                 }
             }
@@ -599,7 +617,7 @@ class SteamService
 
         // Extract genres
         $genres = [];
-        if (!empty($data['genres'])) {
+        if (! empty($data['genres'])) {
             foreach ($data['genres'] as $genre) {
                 $genres[] = $genre['description'] ?? '';
             }
@@ -607,7 +625,7 @@ class SteamService
 
         // Extract categories (multiplayer, co-op, etc.)
         $categories = [];
-        if (!empty($data['categories'])) {
+        if (! empty($data['categories'])) {
             foreach ($data['categories'] as $cat) {
                 $categories[] = $cat['description'] ?? '';
             }
@@ -635,7 +653,7 @@ class SteamService
 
         // Extract platforms
         $platforms = [];
-        if (!empty($data['platforms'])) {
+        if (! empty($data['platforms'])) {
             if ($data['platforms']['windows'] ?? false) {
                 $platforms[] = 'Windows';
             }
@@ -649,19 +667,19 @@ class SteamService
 
         // Extract requirements
         $requirements = [];
-        if (!empty($data['pc_requirements'])) {
+        if (! empty($data['pc_requirements'])) {
             $requirements['pc'] = [
                 'minimum' => $data['pc_requirements']['minimum'] ?? null,
                 'recommended' => $data['pc_requirements']['recommended'] ?? null,
             ];
         }
-        if (!empty($data['mac_requirements'])) {
+        if (! empty($data['mac_requirements'])) {
             $requirements['mac'] = [
                 'minimum' => $data['mac_requirements']['minimum'] ?? null,
                 'recommended' => $data['mac_requirements']['recommended'] ?? null,
             ];
         }
-        if (!empty($data['linux_requirements'])) {
+        if (! empty($data['linux_requirements'])) {
             $requirements['linux'] = [
                 'minimum' => $data['linux_requirements']['minimum'] ?? null,
                 'recommended' => $data['linux_requirements']['recommended'] ?? null,
@@ -670,7 +688,7 @@ class SteamService
 
         // Extract release date
         $releaseDate = null;
-        if (!empty($data['release_date']['date'])) {
+        if (! empty($data['release_date']['date'])) {
             try {
                 $releaseDate = Carbon::parse($data['release_date']['date'])->format('Y-m-d');
             } catch (\Exception $e) {
@@ -680,13 +698,13 @@ class SteamService
 
         // Build publisher string
         $publisher = null;
-        if (!empty($data['publishers'])) {
+        if (! empty($data['publishers'])) {
             $publisher = implode(', ', array_filter(array_map('strval', $data['publishers'])));
         }
 
         // Build developers array
         $developers = [];
-        if (!empty($data['developers'])) {
+        if (! empty($data['developers'])) {
             $developers = array_filter(array_map('strval', $data['developers']));
         }
 
@@ -720,7 +738,7 @@ class SteamService
             'website' => $data['website'] ?? null,
             'support_url' => $data['support_info']['url'] ?? null,
             'legal_notice' => $data['legal_notice'] ?? null,
-            'directurl' => self::STEAM_STORE_URL . $appId,
+            'directurl' => self::STEAM_STORE_URL.$appId,
         ];
     }
 
@@ -730,6 +748,7 @@ class SteamService
     protected function isGameType(array $data): bool
     {
         $type = $data['type'] ?? '';
+
         return in_array($type, ['game', 'demo'], true);
     }
 
@@ -751,8 +770,9 @@ class SteamService
                 } catch (\Exception $e) {
                     Log::warning('SteamService: API request failed', [
                         'url' => $url,
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
+
                     return null;
                 }
             },
@@ -784,7 +804,7 @@ class SteamService
         $title = (string) preg_replace('/\[[^\]]*\]|\([^)]*\)|\{[^}]*\}/u', ' ', $title);
 
         // Remove scene groups at end
-        $groupPattern = '/\s*[-_]\s*(' . implode('|', array_map('preg_quote', self::SCENE_GROUPS)) . ')\s*$/i';
+        $groupPattern = '/\s*[-_]\s*('.implode('|', array_map('preg_quote', self::SCENE_GROUPS)).')\s*$/i';
         $title = (string) preg_replace($groupPattern, '', $title);
 
         // Remove edition tags (multi-word patterns first)
@@ -805,12 +825,12 @@ class SteamService
             if (stripos($tag, 'EDITION') !== false) {
                 continue;
             }
-            $title = (string) preg_replace('/\b' . preg_quote($tag, '/') . '\b/i', ' ', $title);
+            $title = (string) preg_replace('/\b'.preg_quote($tag, '/').'\b/i', ' ', $title);
         }
 
         // Remove release tags
         foreach (self::RELEASE_TAGS as $tag) {
-            $title = (string) preg_replace('/\b' . preg_quote($tag, '/') . '\d*\b/i', ' ', $title);
+            $title = (string) preg_replace('/\b'.preg_quote($tag, '/').'\d*\b/i', ' ', $title);
         }
 
         // Remove DLCs tag (common in scene releases)
@@ -874,7 +894,7 @@ class SteamService
                 continue;
             }
             $lower = mb_strtolower($v);
-            if (!isset($seen[$lower])) {
+            if (! isset($seen[$lower])) {
                 $seen[$lower] = true;
                 $unique[] = $v;
             }
@@ -903,7 +923,7 @@ class SteamService
             array_map('strtolower', self::RELEASE_TAGS),
             ['pc', 'win', 'windows', 'x86', 'x64', 'x32']
         );
-        $noisePattern = '/\b(' . implode('|', array_map(fn($w) => preg_quote($w, '/'), $noise)) . ')\b/u';
+        $noisePattern = '/\b('.implode('|', array_map(fn ($w) => preg_quote($w, '/'), $noise)).')\b/u';
         $s = (string) preg_replace($noisePattern, ' ', $s);
 
         // Remove non-alphanumeric
@@ -936,8 +956,9 @@ class SteamService
 
         // Remove remaining individual edition tags
         foreach (self::EDITION_TAGS as $tag) {
-            $title = (string) preg_replace('/\s*[-_]?\s*' . preg_quote($tag, '/') . '\s*/i', ' ', $title);
+            $title = (string) preg_replace('/\s*[-_]?\s*'.preg_quote($tag, '/').'\s*/i', ' ', $title);
         }
+
         return trim(preg_replace('/\s+/', ' ', $title) ?? '');
     }
 
@@ -1012,6 +1033,7 @@ class SteamService
             $seen[$p] = true;
             $out[] = $p;
         }
+
         return $out;
     }
 
@@ -1029,7 +1051,7 @@ class SteamService
 
         // Don't replace standalone 'i' as it's too common in titles
         foreach ($map as $roman => $arabic) {
-            $s = (string) preg_replace('/\b' . $roman . '\b/ui', $arabic, $s);
+            $s = (string) preg_replace('/\b'.$roman.'\b/ui', $arabic, $s);
         }
 
         return $s;
@@ -1044,7 +1066,7 @@ class SteamService
         $pattern = preg_replace('/\s+/', '%', $normalized);
         $pattern = trim($pattern ?? '');
 
-        return $pattern === '' ? '%' : '%' . $pattern . '%';
+        return $pattern === '' ? '%' : '%'.$pattern.'%';
     }
 
     /**
@@ -1057,4 +1079,3 @@ class SteamService
         Log::info('SteamService: Cache clear requested');
     }
 }
-

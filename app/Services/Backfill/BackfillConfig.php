@@ -48,4 +48,3 @@ final readonly class BackfillConfig
         return $value !== '' ? (int) $value : $default;
     }
 }
-

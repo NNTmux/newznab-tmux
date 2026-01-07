@@ -135,18 +135,18 @@ class Genre extends Model
         $typeSql = ! empty($type) ? ' AND g.type = '.intval($type) : '';
 
         $sql = sprintf(
-            "SELECT g.*
+            'SELECT g.*
             FROM genres g
-            INNER JOIN (SELECT DISTINCT genres_id FROM musicinfo) x ON x.genres_id = g.id WHERE 1=1 %1\$s
+            INNER JOIN (SELECT DISTINCT genres_id FROM musicinfo) x ON x.genres_id = g.id WHERE 1=1 %1$s
             UNION
             SELECT g.*
             FROM genres g
-            INNER JOIN (SELECT DISTINCT genres_id FROM consoleinfo) x ON x.genres_id = g.id WHERE 1=1 %1\$s
+            INNER JOIN (SELECT DISTINCT genres_id FROM consoleinfo) x ON x.genres_id = g.id WHERE 1=1 %1$s
             UNION
             SELECT g.*
             FROM genres g
-            INNER JOIN (SELECT DISTINCT genres_id FROM gamesinfo) x ON x.genres_id = g.id WHERE 1=1 %1\$s
-            ORDER BY title",
+            INNER JOIN (SELECT DISTINCT genres_id FROM gamesinfo) x ON x.genres_id = g.id WHERE 1=1 %1$s
+            ORDER BY title',
             $typeSql
         );
 

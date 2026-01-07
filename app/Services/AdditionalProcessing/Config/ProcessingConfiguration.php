@@ -1,6 +1,9 @@
 <?php
+
 namespace App\Services\AdditionalProcessing\Config;
+
 use App\Models\Settings;
+
 /**
  * Configuration DTO for additional post-processing.
  * Centralizes all settings loading from database and config files.
@@ -8,45 +11,84 @@ use App\Models\Settings;
 final readonly class ProcessingConfiguration
 {
     public bool $echoCLI;
+
     public bool|string $innerFileBlacklist;
+
     public int $maxNestedLevels;
+
     public bool $extractUsingRarInfo;
+
     public bool $fetchLastFiles;
+
     public string|false $unrarPath;
+
     public string|false $unzipPath;
+
     public string|false $sevenZipPath;
+
     public string|false $timeoutPath;
+
     public int $timeoutSeconds;
+
     public int $queryLimit;
+
     public int $segmentsToDownload;
+
     public int $maximumRarSegments;
+
     public int $maximumRarPasswordChecks;
+
     public int $maxSizeGB;
+
     public int $minSizeMB;
+
     public bool $alternateNNTP;
+
     public int $ffmpegDuration;
+
     public bool $addPAR2Files;
+
     public bool $processVideo;
+
     public bool $processThumbnails;
+
     public bool $processAudioSample;
+
     public bool $processJPGSample;
+
     public bool $processMediaInfo;
+
     public bool $processAudioInfo;
+
     public bool $processPasswords;
+
     public string $audioSavePath;
+
     public string $tmpUnrarPath;
+
     public bool $debugMode;
+
     public bool $searchEnabled;
+
     public string $searchDriver;
+
     public bool $renameMusicMediaInfo;
+
     public bool $renamePar2;
+
     public string|false $ffmpegPath;
+
     public string|false $mediaInfoPath;
+
     // Regex patterns
     public string $audioFileRegex;
+
     public string $ignoreBookRegex;
+
     public string $supportFileRegex;
+
     public string $videoFileRegex;
+
     public function __construct()
     {
         $this->echoCLI = (bool) config('nntmux.echocli');
@@ -100,6 +142,7 @@ final readonly class ProcessingConfiguration
         $this->supportFileRegex = '\\.(?:vol\\d{1,3}\\+\\d{1,3}|par2|srs|sfv|nzb)';
         $this->videoFileRegex = '\\.(AVI|F4V|IFO|M1V|M2V|M4V|MKV|MOV|MP4|MPEG|MPG|MPGV|MPV|OGV|QT|RM|RMVB|TS|VOB|WMV)';
     }
+
     /**
      * Build the kill string for timeout command wrapper.
      */
@@ -108,6 +151,7 @@ final readonly class ProcessingConfiguration
         if ($this->timeoutPath && $this->timeoutSeconds > 0) {
             return '"'.$this->timeoutPath.'" --foreground --signal=KILL '.$this->timeoutSeconds.' "';
         }
+
         return '"';
     }
 }

@@ -8,9 +8,13 @@ namespace App\Services\TvProcessing;
 class TvProcessingPassable
 {
     public TvReleaseContext $context;
+
     public TvProcessingResult $result;
+
     public bool $debug;
+
     public array $providerResults = [];
+
     public ?array $parsedInfo = null;
 
     public function __construct(TvReleaseContext $context, bool $debug = false)
@@ -99,4 +103,3 @@ class TvProcessingPassable
         return $returnValue;
     }
 }
-

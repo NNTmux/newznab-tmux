@@ -341,4 +341,3 @@ class PostProcessRunner extends BaseRunner
         $this->runPostProcess($queue, $maxProcesses, 'books', 'books postprocessing');
     }
 }
-

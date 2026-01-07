@@ -667,6 +667,7 @@ class TmuxTaskRunner
 
     /**
      * Legacy method for backward compatibility - now just calls runTvTask
+     *
      * @deprecated Use runTvTask() instead
      */
     protected function runNonAmazonTask(array $runVar): bool

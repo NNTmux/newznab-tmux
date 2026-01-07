@@ -9,10 +9,8 @@ use Closure;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\FileCookieJar;
-use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -31,8 +29,11 @@ use voku\helper\HtmlDomParser;
 abstract class AbstractAdultProviderPipe
 {
     protected int $priority = 50;
+
     protected bool $echoOutput = true;
+
     protected ?HtmlDomParser $html = null;
+
     protected ?string $cookie = null;
 
     /**
@@ -96,8 +97,9 @@ abstract class AbstractAdultProviderPipe
     protected function getHtmlParser(): HtmlDomParser
     {
         if ($this->html === null) {
-            $this->html = new HtmlDomParser();
+            $this->html = new HtmlDomParser;
         }
+
         return $this->html;
     }
 
@@ -120,6 +122,7 @@ abstract class AbstractAdultProviderPipe
                 AdultProcessingResult::skipped('Provider skipped', $this->getName()),
                 $this->getName()
             );
+
             return $next($passable);
         }
 
@@ -164,7 +167,7 @@ abstract class AbstractAdultProviderPipe
         if (isset(self::$lastRequestTime[$providerName])) {
             $elapsed = $now - self::$lastRequestTime[$providerName];
             if ($elapsed < $this->rateLimitDelay) {
-                usleep((int)(($this->rateLimitDelay - $elapsed) * 1000));
+                usleep((int) (($this->rateLimitDelay - $elapsed) * 1000));
             }
         }
 
@@ -225,6 +228,7 @@ abstract class AbstractAdultProviderPipe
     public function setEchoOutput(bool $echo): self
     {
         $this->echoOutput = $echo;
+
         return $this;
     }
 
@@ -233,17 +237,18 @@ abstract class AbstractAdultProviderPipe
      */
     protected function getCachedSearch(string $movie): array|false|null
     {
-        if (!$this->useCache) {
+        if (! $this->useCache) {
             return null;
         }
 
-        $cacheKey = 'adult_search_' . $this->getName() . '_' . md5(strtolower($movie));
+        $cacheKey = 'adult_search_'.$this->getName().'_'.md5(strtolower($movie));
         $cached = Cache::get($cacheKey);
 
         if ($cached !== null) {
             if ($this->echoOutput) {
-                cli()->info('Using cached result for: ' . $movie);
+                cli()->info('Using cached result for: '.$movie);
             }
+
             return $cached;
         }
 
@@ -255,11 +260,11 @@ abstract class AbstractAdultProviderPipe
      */
     protected function cacheSearchResult(string $movie, array|false $result): void
     {
-        if (!$this->useCache) {
+        if (! $this->useCache) {
             return;
         }
 
-        $cacheKey = 'adult_search_' . $this->getName() . '_' . md5(strtolower($movie));
+        $cacheKey = 'adult_search_'.$this->getName().'_'.md5(strtolower($movie));
         Cache::put($cacheKey, $result, now()->addMinutes($this->cacheDuration));
     }
 
@@ -301,25 +306,27 @@ abstract class AbstractAdultProviderPipe
                 if (empty($finalUrl)) {
                     // Use the effective URI if available
                     $effectiveUri = $response->getHeader('X-Guzzle-Redirect-History');
-                    if (!empty($effectiveUri)) {
+                    if (! empty($effectiveUri)) {
                         $finalUrl = end($effectiveUri);
                     }
                 }
 
                 // Check for common error pages
                 if ($this->isErrorPage($body)) {
-                    Log::warning('Received error page from ' . $this->getName() . ': ' . $url);
+                    Log::warning('Received error page from '.$this->getName().': '.$url);
                     if ($attempt < $this->maxRetries) {
                         usleep($this->retryDelay * 1000);
+
                         continue;
                     }
+
                     return false;
                 }
 
                 // Check for age verification requirement
                 if ($this->requiresAgeVerification($body)) {
                     // If we haven't tried age verification yet, refresh cookies and retry
-                    if (!$ageVerificationAttempted) {
+                    if (! $ageVerificationAttempted) {
                         $ageVerificationAttempted = true;
 
                         // Refresh cookies using the manager
@@ -329,7 +336,8 @@ abstract class AbstractAdultProviderPipe
                         $this->httpClient = null;
                         $this->cookieJar = null;
 
-                        Log::info('Refreshed age verification cookies for ' . $this->getName() . ', retrying...');
+                        Log::info('Refreshed age verification cookies for '.$this->getName().', retrying...');
+
                         continue;
                     }
 
@@ -343,7 +351,7 @@ abstract class AbstractAdultProviderPipe
 
             } catch (ConnectException $e) {
                 $lastException = $e;
-                Log::warning('Connection failed for ' . $this->getName() . ' (attempt ' . $attempt . '): ' . $e->getMessage());
+                Log::warning('Connection failed for '.$this->getName().' (attempt '.$attempt.'): '.$e->getMessage());
 
                 if ($attempt < $this->maxRetries) {
                     usleep($this->retryDelay * 1000 * $attempt); // Exponential backoff
@@ -354,11 +362,12 @@ abstract class AbstractAdultProviderPipe
 
                 // Don't retry on 4xx client errors (except 429 rate limit)
                 if ($statusCode >= 400 && $statusCode < 500 && $statusCode !== 429) {
-                    Log::error('HTTP ' . $statusCode . ' for ' . $this->getName() . ': ' . $url);
+                    Log::error('HTTP '.$statusCode.' for '.$this->getName().': '.$url);
+
                     return false;
                 }
 
-                Log::warning('Request failed for ' . $this->getName() . ' (attempt ' . $attempt . '): ' . $e->getMessage());
+                Log::warning('Request failed for '.$this->getName().' (attempt '.$attempt.'): '.$e->getMessage());
 
                 if ($attempt < $this->maxRetries) {
                     // Longer delay for rate limit errors
@@ -367,7 +376,7 @@ abstract class AbstractAdultProviderPipe
                 }
             } catch (\Exception $e) {
                 $lastException = $e;
-                Log::error('Unexpected error for ' . $this->getName() . ': ' . $e->getMessage());
+                Log::error('Unexpected error for '.$this->getName().': '.$e->getMessage());
 
                 if ($attempt < $this->maxRetries) {
                     usleep($this->retryDelay * 1000);
@@ -376,7 +385,7 @@ abstract class AbstractAdultProviderPipe
         }
 
         if ($lastException) {
-            Log::error('All retry attempts failed for ' . $this->getName() . ': ' . $lastException->getMessage());
+            Log::error('All retry attempts failed for '.$this->getName().': '.$lastException->getMessage());
         }
 
         return false;
@@ -462,7 +471,7 @@ abstract class AbstractAdultProviderPipe
 
         foreach ($contentIndicators as $pattern) {
             // Note: Using # as delimiter to avoid issues with / in patterns like </title>
-            if (preg_match('#' . $pattern . '#is', $html)) {
+            if (preg_match('#'.$pattern.'#is', $html)) {
                 return false; // This is a content page, not an age verification page
             }
         }
@@ -521,7 +530,7 @@ abstract class AbstractAdultProviderPipe
         // Re-initialize cookies from the manager and retry
         if ($this->cookieJar) {
             // The manager already handles setting cookies, but let's ensure they're fresh
-            Log::info('Attempting to handle age verification for ' . $this->getName() . ' with domain: ' . $domain);
+            Log::info('Attempting to handle age verification for '.$this->getName().' with domain: '.$domain);
         }
 
         // Try to find and submit age verification form
@@ -541,10 +550,10 @@ abstract class AbstractAdultProviderPipe
                 // Try to submit the form with age confirmation
                 $postData = $this->extractAgeVerificationFormData($form);
 
-                if (!empty($postData)) {
+                if (! empty($postData)) {
                     $submitUrl = $action;
-                    if (!str_starts_with($submitUrl, 'http')) {
-                        $submitUrl = $this->getBaseUrl() . '/' . ltrim($submitUrl, '/');
+                    if (! str_starts_with($submitUrl, 'http')) {
+                        $submitUrl = $this->getBaseUrl().'/'.ltrim($submitUrl, '/');
                     }
 
                     // Submit the age verification
@@ -557,11 +566,11 @@ abstract class AbstractAdultProviderPipe
                         $body = $response->getBody()->getContents();
 
                         // Check if we still get age verification after submit
-                        if (!$this->requiresAgeVerification($body)) {
+                        if (! $this->requiresAgeVerification($body)) {
                             return $body;
                         }
                     } catch (\Exception $e) {
-                        Log::warning('Age verification submission failed for ' . $this->getName() . ': ' . $e->getMessage());
+                        Log::warning('Age verification submission failed for '.$this->getName().': '.$e->getMessage());
                     }
                 }
             }
@@ -571,10 +580,10 @@ abstract class AbstractAdultProviderPipe
         if (preg_match('/onclick\s*=\s*["\'].*?(enter|agree|confirm|over18|adult).*?["\']/i', $html) ||
             preg_match('/<a[^>]*href\s*=\s*["\']([^"\']*)["\'][^>]*>(Enter|I am over 18|Agree|Enter Site|I Agree)/i', $html, $matches)) {
             // Try to follow the link or simulate the click
-            if (!empty($matches[1])) {
+            if (! empty($matches[1])) {
                 $enterUrl = $matches[1];
-                if (!str_starts_with($enterUrl, 'http')) {
-                    $enterUrl = $this->getBaseUrl() . '/' . ltrim($enterUrl, '/');
+                if (! str_starts_with($enterUrl, 'http')) {
+                    $enterUrl = $this->getBaseUrl().'/'.ltrim($enterUrl, '/');
                 }
 
                 try {
@@ -583,11 +592,11 @@ abstract class AbstractAdultProviderPipe
                     ]);
                     $body = $response->getBody()->getContents();
 
-                    if (!$this->requiresAgeVerification($body)) {
+                    if (! $this->requiresAgeVerification($body)) {
                         return $body;
                     }
                 } catch (\Exception $e) {
-                    Log::warning('Age verification link follow failed for ' . $this->getName() . ': ' . $e->getMessage());
+                    Log::warning('Age verification link follow failed for '.$this->getName().': '.$e->getMessage());
                 }
             }
         }
@@ -600,15 +609,16 @@ abstract class AbstractAdultProviderPipe
             ]);
             $body = $response->getBody()->getContents();
 
-            if (!$this->requiresAgeVerification($body)) {
+            if (! $this->requiresAgeVerification($body)) {
                 return $body;
             }
         } catch (\Exception $e) {
-            Log::warning('Age verification retry failed for ' . $this->getName() . ': ' . $e->getMessage());
+            Log::warning('Age verification retry failed for '.$this->getName().': '.$e->getMessage());
         }
 
         // If we couldn't handle age verification, log and return false
-        Log::warning('Could not handle age verification for ' . $this->getName() . ': ' . $url);
+        Log::warning('Could not handle age verification for '.$this->getName().': '.$url);
+
         return false;
     }
 
@@ -642,7 +652,7 @@ abstract class AbstractAdultProviderPipe
                     break;
                 case 'submit':
                     // Include submit button value if it has a name
-                    if (!empty($value)) {
+                    if (! empty($value)) {
                         $data[$name] = $value;
                     }
                     break;
@@ -679,8 +689,9 @@ abstract class AbstractAdultProviderPipe
     protected function getAgeVerificationManager(): AgeVerificationManager
     {
         if ($this->ageVerificationManager === null) {
-            $this->ageVerificationManager = new AgeVerificationManager();
+            $this->ageVerificationManager = new AgeVerificationManager;
         }
+
         return $this->ageVerificationManager;
     }
 
@@ -856,7 +867,7 @@ abstract class AbstractAdultProviderPipe
         ];
 
         foreach ($metaTags as $property => $key) {
-            $meta = $this->getHtmlParser()->findOne('meta[property="' . $property . '"]');
+            $meta = $this->getHtmlParser()->findOne('meta[property="'.$property.'"]');
             if ($meta && isset($meta->content)) {
                 $og[$key] = trim($meta->content);
             }
@@ -865,4 +876,3 @@ abstract class AbstractAdultProviderPipe
         return $og;
     }
 }
-

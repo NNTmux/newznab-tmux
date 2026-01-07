@@ -243,27 +243,27 @@ class NzbParserService
         }
 
         // Enhanced exclusion: check if it's NOT likely another common file type
-        $excludedExtensions = '/\.(?:' .
+        $excludedExtensions = '/\.(?:'.
             // Executables
-            'exe|com|bat|cmd|scr|dll|msi|pkg|deb|rpm|apk|ipa|app|' .
+            'exe|com|bat|cmd|scr|dll|msi|pkg|deb|rpm|apk|ipa|app|'.
             // Archives
-            'zip|rar|[rst]\d{2}|7z|ace|tar|gz|bz2|xz|lzma|cab|iso|bin|cue|img|mdf|nrg|dmg|vhd|' .
+            'zip|rar|[rst]\d{2}|7z|ace|tar|gz|bz2|xz|lzma|cab|iso|bin|cue|img|mdf|nrg|dmg|vhd|'.
             // Audio
-            'mp3|flac|ogg|aac|wav|wma|m4a|opus|ape|wv|mpc|' .
+            'mp3|flac|ogg|aac|wav|wma|m4a|opus|ape|wv|mpc|'.
             // Video
-            'avi|mkv|mp4|mov|wmv|mpg|mpeg|ts|vob|m2ts|webm|flv|ogv|divx|xvid|' .
+            'avi|mkv|mp4|mov|wmv|mpg|mpeg|ts|vob|m2ts|webm|flv|ogv|divx|xvid|'.
             // Images
-            'jpg|jpeg|png|gif|bmp|tif|tiff|psd|webp|svg|ico|raw|cr2|nef|' .
+            'jpg|jpeg|png|gif|bmp|tif|tiff|psd|webp|svg|ico|raw|cr2|nef|'.
             // Documents
-            'pdf|doc|docx|xls|xlsx|ppt|pptx|odt|ods|odp|rtf|epub|mobi|azw|' .
+            'pdf|doc|docx|xls|xlsx|ppt|pptx|odt|ods|odp|rtf|epub|mobi|azw|'.
             // Code
-            'html|htm|css|js|php|py|java|c|cpp|h|cs|sql|json|xml|yml|yaml|' .
+            'html|htm|css|js|php|py|java|c|cpp|h|cs|sql|json|xml|yml|yaml|'.
             // Data
-            'db|dbf|mdb|accdb|sqlite|csv|' .
+            'db|dbf|mdb|accdb|sqlite|csv|'.
             // Verification
-            'par2?|sfv|md5|sha1|sha256|sha512|crc|' .
+            'par2?|sfv|md5|sha1|sha256|sha512|crc|'.
             // Misc
-            'url|lnk|cfg|ini|inf|sys|tmp|bak|log|srt|sub|idx|ass|ssa|vtt' .
+            'url|lnk|cfg|ini|inf|sys|tmp|bak|log|srt|sub|idx|ass|ssa|vtt'.
             ')\b/i';
 
         if (preg_match($excludedExtensions, $subject)) {
@@ -307,4 +307,3 @@ class NzbParserService
         return 0;
     }
 }
-

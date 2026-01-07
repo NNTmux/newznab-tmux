@@ -2,9 +2,9 @@
 
 namespace App\Services\TvProcessing\Pipes;
 
+use App\Services\TvProcessing\Providers\LocalDbProvider;
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
-use App\Services\TvProcessing\Providers\LocalDbProvider;
 
 /**
  * Pipe for local database lookups.
@@ -16,6 +16,7 @@ class LocalDbPipe extends AbstractTvProviderPipe
     private const TYPE_TV = 0;
 
     protected int $priority = 10;
+
     private ?LocalDbProvider $localDb = null;
 
     public function getName(): string
@@ -34,8 +35,9 @@ class LocalDbPipe extends AbstractTvProviderPipe
     private function getLocalDb(): LocalDbProvider
     {
         if ($this->localDb === null) {
-            $this->localDb = new LocalDbProvider();
+            $this->localDb = new LocalDbProvider;
         }
+
         return $this->localDb;
     }
 
@@ -62,6 +64,7 @@ class LocalDbPipe extends AbstractTvProviderPipe
 
         if ($videoId === 0 || $videoId === false) {
             $this->outputNotFound($cleanName);
+
             return TvProcessingResult::notFound($this->getName(), ['title' => $cleanName]);
         }
 

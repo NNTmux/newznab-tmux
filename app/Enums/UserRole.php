@@ -41,4 +41,3 @@ enum UserRole: int
         return in_array($this, [self::ADMIN, self::MODERATOR], true);
     }
 }
-

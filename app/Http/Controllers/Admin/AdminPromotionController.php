@@ -146,7 +146,7 @@ class AdminPromotionController extends BasePageController
     public function toggle(int $id): RedirectResponse
     {
         $promotion = RolePromotion::findOrFail($id);
-        $promotion->update(['is_active' => !$promotion->is_active]);
+        $promotion->update(['is_active' => ! $promotion->is_active]);
 
         $status = $promotion->is_active ? 'activated' : 'deactivated';
 
@@ -206,11 +206,11 @@ class AdminPromotionController extends BasePageController
             'active_promotions' => $promotions->where('is_active', true)->count(),
             'total_applications' => $promotions->sum('statistics_count'),
             'unique_users' => RolePromotionStat::query()
-                ->when($startDate, fn($q) => $q->whereBetween('applied_at', [$startDate, $endDate]))
+                ->when($startDate, fn ($q) => $q->whereBetween('applied_at', [$startDate, $endDate]))
                 ->distinct('user_id')
                 ->count('user_id'),
             'total_days_added' => RolePromotionStat::query()
-                ->when($startDate, fn($q) => $q->whereBetween('applied_at', [$startDate, $endDate]))
+                ->when($startDate, fn ($q) => $q->whereBetween('applied_at', [$startDate, $endDate]))
                 ->sum('days_added'),
         ];
 
@@ -219,7 +219,7 @@ class AdminPromotionController extends BasePageController
 
         // Get recent activity
         $recentActivity = RolePromotionStat::with(['user', 'promotion', 'role'])
-            ->when($startDate, fn($q) => $q->whereBetween('applied_at', [$startDate, $endDate]))
+            ->when($startDate, fn ($q) => $q->whereBetween('applied_at', [$startDate, $endDate]))
             ->latest('applied_at')
             ->limit(10)
             ->get();
@@ -227,7 +227,7 @@ class AdminPromotionController extends BasePageController
         // Get statistics by role
         $statsByRole = RolePromotionStat::query()
             ->selectRaw('role_id, COUNT(*) as total_upgrades, SUM(days_added) as total_days, COUNT(DISTINCT user_id) as unique_users')
-            ->when($startDate, fn($q) => $q->whereBetween('applied_at', [$startDate, $endDate]))
+            ->when($startDate, fn ($q) => $q->whereBetween('applied_at', [$startDate, $endDate]))
             ->groupBy('role_id')
             ->with('role')
             ->get();
@@ -284,14 +284,14 @@ class AdminPromotionController extends BasePageController
 
         // Get applications with users
         $applications = RolePromotionStat::forPromotion($id)
-            ->when($startDate, fn($q) => $q->whereBetween('applied_at', [$startDate, $endDate]))
+            ->when($startDate, fn ($q) => $q->whereBetween('applied_at', [$startDate, $endDate]))
             ->with(['user', 'role'])
             ->latest('applied_at')
             ->paginate(20);
 
         // Get daily statistics for chart
         $dailyStats = RolePromotionStat::forPromotion($id)
-            ->when($startDate, fn($q) => $q->whereBetween('applied_at', [$startDate, $endDate]))
+            ->when($startDate, fn ($q) => $q->whereBetween('applied_at', [$startDate, $endDate]))
             ->selectRaw('DATE(applied_at) as date, COUNT(*) as count, SUM(days_added) as days')
             ->groupBy('date')
             ->orderBy('date')
@@ -309,4 +309,3 @@ class AdminPromotionController extends BasePageController
         ]);
     }
 }
-

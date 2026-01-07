@@ -16,11 +16,11 @@ class ProcessingServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(PostProcessService::class, function ($app) {
-            return new PostProcessService();
+            return new PostProcessService;
         });
 
         $this->app->singleton(ReleaseProcessingService::class, function ($app) {
-            return new ReleaseProcessingService();
+            return new ReleaseProcessingService;
         });
     }
 
@@ -32,4 +32,3 @@ class ProcessingServiceProvider extends ServiceProvider
         //
     }
 }
-

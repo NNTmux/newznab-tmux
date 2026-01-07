@@ -48,7 +48,7 @@ class MovieCategorizer extends AbstractCategorizer
         $name = $context->releaseName;
 
         // Check if it looks like movie content
-        if (!$this->looksLikeMovie($name)) {
+        if (! $this->looksLikeMovie($name)) {
             return $this->noMatch();
         }
 
@@ -162,7 +162,7 @@ class MovieCategorizer extends AbstractCategorizer
     protected function checkBluRay(string $name): ?CategorizationResult
     {
         if (preg_match('/bluray-|[._ -]bd?[._ -]?(25|50)|blu-ray|Bluray\s-\sUntouched|[._ -]untouched[._ -]/i', $name) &&
-            !preg_match('/SecretUsenet\.com$/i', $name)) {
+            ! preg_match('/SecretUsenet\.com$/i', $name)) {
             return $this->matched(Category::MOVIE_BLURAY, 0.9, 'bluray');
         }
 
@@ -193,7 +193,7 @@ class MovieCategorizer extends AbstractCategorizer
             return $this->matched(Category::MOVIE_HD, 0.85, 'hd');
         }
 
-        if (!$catWebDL && preg_match('/web[._ -]dl|web-?rip/i', $name)) {
+        if (! $catWebDL && preg_match('/web[._ -]dl|web-?rip/i', $name)) {
             return $this->matched(Category::MOVIE_HD, 0.8, 'hd_webdl_fallback');
         }
 
@@ -218,4 +218,3 @@ class MovieCategorizer extends AbstractCategorizer
         return null;
     }
 }
-

@@ -15,10 +15,13 @@ class AdmPipe extends AbstractAdultProviderPipe
     protected int $priority = 30;
 
     private const BASE_URL = 'https://www.adultdvdmarketplace.com';
+
     private const SEARCH_URL = '/xcart/adult_dvd/advanced_search.php?sort_by=relev&title=';
 
     protected string $directUrl = '';
+
     protected string $title = '';
+
     protected string $response = '';
 
     public function getName(): string
@@ -44,6 +47,7 @@ class AdmPipe extends AbstractAdultProviderPipe
 
         if ($searchResult === false) {
             $this->outputNotFound();
+
             return AdultProcessingResult::notFound($this->getName());
         }
 
@@ -80,7 +84,7 @@ class AdmPipe extends AbstractAdultProviderPipe
             return false;
         }
 
-        $searchUrl = self::BASE_URL . self::SEARCH_URL . urlencode($movie);
+        $searchUrl = self::BASE_URL.self::SEARCH_URL.urlencode($movie);
         $response = $this->fetchHtml($searchUrl, $this->cookie);
 
         if ($response === false) {
@@ -98,7 +102,7 @@ class AdmPipe extends AbstractAdultProviderPipe
         $highestSimilarity = 0;
 
         foreach ($check as $ret) {
-            if (!isset($ret->alt) || !isset($ret->src)) {
+            if (! isset($ret->alt) || ! isset($ret->src)) {
                 continue;
             }
 
@@ -119,7 +123,7 @@ class AdmPipe extends AbstractAdultProviderPipe
         if ($bestMatch !== null && $highestSimilarity >= $this->minimumSimilarity) {
             return [
                 'title' => $bestMatch['title'],
-                'url' => self::BASE_URL . '/dvd_view_' . $bestMatch['sku'] . '.html',
+                'url' => self::BASE_URL.'/dvd_view_'.$bestMatch['sku'].'.html',
             ];
         }
 
@@ -130,8 +134,8 @@ class AdmPipe extends AbstractAdultProviderPipe
     {
         $results = [];
 
-        if (!empty($this->directUrl)) {
-            if (!empty($this->title)) {
+        if (! empty($this->directUrl)) {
+            if (! empty($this->title)) {
                 $results['title'] = $this->title;
             }
             $results['directurl'] = $this->directUrl;
@@ -180,7 +184,7 @@ class AdmPipe extends AbstractAdultProviderPipe
             if (isset($ret->href) && preg_match('/images\/.*[\d]+\.jpg$/i', $ret->href, $hits)) {
                 $res['boxcover'] = str_starts_with($hits[0], 'http')
                     ? $hits[0]
-                    : $baseUrl . $hits[0];
+                    : $baseUrl.$hits[0];
                 $res['backcover'] = str_ireplace('/front/', '/back/', $res['boxcover']);
 
                 return $res;
@@ -192,7 +196,7 @@ class AdmPipe extends AbstractAdultProviderPipe
             if (isset($ret->src) && preg_match('/images\/.*[\d]+\.jpg$/i', $ret->src, $hits)) {
                 $res['boxcover'] = str_starts_with($hits[0], 'http')
                     ? $hits[0]
-                    : $baseUrl . $hits[0];
+                    : $baseUrl.$hits[0];
 
                 return $res;
             }
@@ -210,8 +214,9 @@ class AdmPipe extends AbstractAdultProviderPipe
         foreach ($this->getHtmlParser()->find('h3') as $heading) {
             if (trim($heading->plaintext) === 'Description') {
                 $nextElement = $heading->next_sibling();
-                if ($nextElement && !empty(trim($nextElement->plaintext))) {
+                if ($nextElement && ! empty(trim($nextElement->plaintext))) {
                     $res['synopsis'] = trim($nextElement->plaintext);
+
                     return $res;
                 }
             }
@@ -219,7 +224,7 @@ class AdmPipe extends AbstractAdultProviderPipe
 
         // Fallback: Try meta description
         $meta = $this->getHtmlParser()->findOne('meta[name="description"]');
-        if ($meta && isset($meta->content) && !empty(trim($meta->content))) {
+        if ($meta && isset($meta->content) && ! empty(trim($meta->content))) {
             $res['synopsis'] = trim($meta->content);
         }
 
@@ -290,4 +295,3 @@ class AdmPipe extends AbstractAdultProviderPipe
         return $res;
     }
 }
-

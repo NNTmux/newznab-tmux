@@ -10,8 +10,8 @@ use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\Backfill\BackfillService;
 use App\Services\Binaries\BinariesService;
 use App\Services\NfoService;
-use App\Services\ReleaseProcessingService;
 use App\Services\NNTP\NNTPService;
+use App\Services\ReleaseProcessingService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -44,7 +44,7 @@ class UpdatePerGroup extends Command
     {
         $groupId = $this->argument('groupId');
 
-        if (!is_numeric($groupId)) {
+        if (! is_numeric($groupId)) {
             $this->error('Group ID must be numeric.');
 
             return self::FAILURE;
@@ -65,7 +65,7 @@ class UpdatePerGroup extends Command
 
             // Update the group for new binaries
             $this->info("Updating binaries for group: {$groupMySQL['name']}");
-            (new BinariesService())->updateGroup($groupMySQL);
+            (new BinariesService)->updateGroup($groupMySQL);
 
             // BackFill the group with 20k articles
             $this->info("Backfilling group: {$groupMySQL['name']}");
@@ -80,7 +80,7 @@ class UpdatePerGroup extends Command
             app(AdditionalProcessingOrchestrator::class)->start($groupId);
 
             $this->info("Processing NFO files for group: {$groupMySQL['name']}");
-            (new NfoService())->processNfoFiles(
+            (new NfoService)->processNfoFiles(
                 $nntp,
                 $groupId,
                 '',
@@ -127,7 +127,7 @@ class UpdatePerGroup extends Command
      */
     private function getNntp(): NNTPService
     {
-        $nntp = new NNTPService();
+        $nntp = new NNTPService;
 
         $useAlternate = config('nntmux_nntp.use_alternate_nntp_server') === true;
         $connectResult = $useAlternate

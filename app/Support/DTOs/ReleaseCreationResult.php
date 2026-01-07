@@ -33,7 +33,7 @@ final readonly class ReleaseCreationResult
     /**
      * Create from array.
      *
-     * @param array{added?: int, dupes?: int} $data
+     * @param  array{added?: int, dupes?: int}  $data
      */
     public static function fromArray(array $data): self
     {
@@ -56,4 +56,3 @@ final readonly class ReleaseCreationResult
         ];
     }
 }
-

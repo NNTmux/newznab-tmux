@@ -66,7 +66,7 @@ class RecategorizeReleases extends Command
 
         $count = $countQuery->count();
 
-        $cat = new CategorizationService();
+        $cat = new CategorizationService;
         $results = $countQuery->select(['id', 'searchname', 'fromname', 'groups_id', 'categories_id'])->get();
         $bar = $this->output->createProgressBar($count);
         $bar->start();

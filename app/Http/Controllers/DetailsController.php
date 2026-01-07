@@ -13,15 +13,15 @@ use App\Models\Settings;
 use App\Models\UserDownload;
 use App\Models\Video;
 use App\Models\XxxInfo;
-use App\Services\MovieService;
-use App\Services\Releases\ReleaseSearchService;
-use App\Services\BookService;
 use App\Services\AnidbService;
-use App\Services\XxxBrowseService;
-use App\Services\GamesService;
+use App\Services\BookService;
 use App\Services\ConsoleService;
+use App\Services\GamesService;
+use App\Services\MovieService;
 use App\Services\MusicService;
 use App\Services\ReleaseExtraService;
+use App\Services\Releases\ReleaseSearchService;
+use App\Services\XxxBrowseService;
 use Illuminate\Http\Request;
 
 class DetailsController extends BasePageController
@@ -141,7 +141,7 @@ class DetailsController extends BasePageController
                 $AniDBAPIArray = (new AnidbService)->getAnimeInfo($data['anidbid']);
 
                 // If we have anilist_id but missing details, fetch from AniList
-                if ($AniDBAPIArray && !empty($AniDBAPIArray->anilist_id)) {
+                if ($AniDBAPIArray && ! empty($AniDBAPIArray->anilist_id)) {
                     $anilistId = is_object($AniDBAPIArray) ? $AniDBAPIArray->anilist_id : ($AniDBAPIArray['anilist_id'] ?? null);
                     if ($anilistId && (empty($AniDBAPIArray->country) && empty($AniDBAPIArray->media_type))) {
                         // Fetch fresh data from AniList if country/media_type is missing

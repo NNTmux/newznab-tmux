@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use App\Services\NNTP\NNTPService;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
-use App\Services\NNTP\NNTPService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -425,7 +425,7 @@ class UsenetGroup extends Model
         if (preg_match('/^\s*$/m', $groupList)) {
             $ret = 'No group list provided.';
         } else {
-            $nntp = new NNTPService();
+            $nntp = new NNTPService;
             if ($nntp->doConnect() !== true) {
                 return 'Problem connecting to usenet.';
             }

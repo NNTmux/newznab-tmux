@@ -182,4 +182,3 @@ class YencServiceTest extends TestCase
         $this->assertTrue(\App\Facades\Yenc::enabled());
     }
 }
-

@@ -20,12 +20,19 @@ class FilePrioritizer
      * Priority levels (lower = higher priority).
      */
     private const PRIORITY_SRR = 1;
+
     private const PRIORITY_MAIN_RAR = 2;
+
     private const PRIORITY_FIRST_PART_RAR = 3;
+
     private const PRIORITY_VIDEO = 4;
+
     private const PRIORITY_NFO = 5;
+
     private const PRIORITY_OTHER_RAR = 6;
+
     private const PRIORITY_SAMPLE = 100;
+
     private const PRIORITY_OTHER = 50;
 
     /**
@@ -39,7 +46,7 @@ class FilePrioritizer
      * 5. NFO files
      * 6. Other files
      *
-     * @param array $files Array of filenames
+     * @param  array  $files  Array of filenames
      * @return array Sorted array of filenames
      */
     public function prioritizeForMatching(array $files): array
@@ -63,7 +70,7 @@ class FilePrioritizer
      * Similar to prioritizeForMatching but with slightly different priorities
      * optimized for PreDB filename lookups.
      *
-     * @param array $files Array of filenames
+     * @param  array  $files  Array of filenames
      * @return array Sorted array of filenames
      */
     public function prioritizeForPreDb(array $files): array
@@ -83,7 +90,7 @@ class FilePrioritizer
     /**
      * Categorize files into groups by type.
      *
-     * @param array $files Array of filenames
+     * @param  array  $files  Array of filenames
      * @return array Categorized files
      */
     protected function categorizeFiles(array $files): array
@@ -131,7 +138,7 @@ class FilePrioritizer
     /**
      * Get priority value for a filename based on CRC matching.
      *
-     * @param string $filename The filename to check
+     * @param  string  $filename  The filename to check
      * @return int Priority value (lower = higher priority)
      */
     public function getCrcPriority(string $filename): int
@@ -187,7 +194,7 @@ class FilePrioritizer
     protected function isMainRar(string $lowerFilename): bool
     {
         return preg_match('/\.rar$/i', $lowerFilename) &&
-               !preg_match('/\.part\d+\.rar$/i', $lowerFilename);
+               ! preg_match('/\.part\d+\.rar$/i', $lowerFilename);
     }
 
     /**
@@ -204,6 +211,7 @@ class FilePrioritizer
     protected function isVideoFile(string $lowerFilename): bool
     {
         $extension = pathinfo($lowerFilename, PATHINFO_EXTENSION);
+
         return in_array($extension, self::VIDEO_EXTENSIONS, true);
     }
 
@@ -221,7 +229,7 @@ class FilePrioritizer
      * Analyzes multiple RAR files from a release to determine the most likely
      * release name by finding common patterns.
      *
-     * @param array $rarFiles Array of RAR filenames
+     * @param  array  $rarFiles  Array of RAR filenames
      * @return string|null The most likely release name or null
      */
     public function findReleaseNameFromRarFiles(array $rarFiles): ?string
@@ -287,4 +295,3 @@ class FilePrioritizer
         return null;
     }
 }
-

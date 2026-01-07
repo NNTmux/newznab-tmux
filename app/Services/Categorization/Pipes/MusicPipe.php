@@ -12,11 +12,12 @@ use App\Services\Categorization\ReleaseContext;
 class MusicPipe extends AbstractCategorizationPipe
 {
     protected int $priority = 40;
+
     private MusicCategorizer $categorizer;
 
     public function __construct()
     {
-        $this->categorizer = new MusicCategorizer();
+        $this->categorizer = new MusicCategorizer;
     }
 
     public function getName(): string
@@ -34,4 +35,3 @@ class MusicPipe extends AbstractCategorizationPipe
         return $this->categorizer->categorize($context);
     }
 }
-

@@ -100,4 +100,3 @@ class GenreService
         // Clear other genre caches by pattern if needed
     }
 }
-

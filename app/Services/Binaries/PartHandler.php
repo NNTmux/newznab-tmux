@@ -154,4 +154,3 @@ final class PartHandler
         return ! empty($this->parts);
     }
 }
-

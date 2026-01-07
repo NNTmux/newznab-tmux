@@ -15,10 +15,13 @@ class AdePipe extends AbstractAdultProviderPipe
     protected int $priority = 40;
 
     private const BASE_URL = 'https://www.adultdvdempire.com';
+
     private const SEARCH_URL = '/dvd/search?q=';
 
     protected string $directUrl = '';
+
     protected string $title = '';
+
     protected string $response = '';
 
     public function getName(): string
@@ -44,6 +47,7 @@ class AdePipe extends AbstractAdultProviderPipe
 
         if ($searchResult === false) {
             $this->outputNotFound();
+
             return AdultProcessingResult::notFound($this->getName());
         }
 
@@ -83,7 +87,7 @@ class AdePipe extends AbstractAdultProviderPipe
         // Initialize session with age verification cookies
         $this->initializeSession();
 
-        $searchUrl = self::BASE_URL . self::SEARCH_URL . rawurlencode($movie);
+        $searchUrl = self::BASE_URL.self::SEARCH_URL.rawurlencode($movie);
         $response = $this->fetchHtml($searchUrl, $this->cookie);
 
         if ($response === false) {
@@ -104,7 +108,7 @@ class AdePipe extends AbstractAdultProviderPipe
 
         foreach ($resultSelectors as $selector) {
             $res = $this->getHtmlParser()->find($selector);
-            if (!empty($res)) {
+            if (! empty($res)) {
                 foreach ($res as $ret) {
                     $title = $ret->title ?? $ret->getAttribute('title') ?? trim($ret->plaintext);
                     $url = trim($ret->href ?? '');
@@ -119,7 +123,7 @@ class AdePipe extends AbstractAdultProviderPipe
                         $highestSimilarity = $similarity;
                         $bestMatch = [
                             'title' => trim($title),
-                            'url' => str_starts_with($url, 'http') ? $url : self::BASE_URL . $url,
+                            'url' => str_starts_with($url, 'http') ? $url : self::BASE_URL.$url,
                         ];
                     }
                 }
@@ -142,8 +146,8 @@ class AdePipe extends AbstractAdultProviderPipe
     {
         $results = [];
 
-        if (!empty($this->directUrl)) {
-            if (!empty($this->title)) {
+        if (! empty($this->directUrl)) {
+            if (! empty($this->title)) {
                 $results['title'] = $this->title;
             }
             $results['directurl'] = $this->directUrl;
@@ -196,7 +200,7 @@ class AdePipe extends AbstractAdultProviderPipe
 
         if ($trailersResponse !== false) {
             if (preg_match("/([\"|'])(?P<swf>[^\"']+.swf)([\"|'])/i", $trailersResponse, $hits)) {
-                $res['trailers']['url'] = self::BASE_URL . trim(trim($hits['swf']), '"');
+                $res['trailers']['url'] = self::BASE_URL.trim(trim($hits['swf']), '"');
 
                 if (preg_match('#(?:streamID:\s\")(?P<streamid>[0-9A-Z]+)(?:\")#', $trailersResponse, $hits)) {
                     $res['trailers']['streamid'] = trim($hits['streamid']);
@@ -251,7 +255,7 @@ class AdePipe extends AbstractAdultProviderPipe
 
         foreach ($selectors as $selector => $property) {
             $meta = $this->getHtmlParser()->findOne($selector);
-            if ($meta && isset($meta->$property) && $meta->$property !== false && !empty(trim($meta->$property))) {
+            if ($meta && isset($meta->$property) && $meta->$property !== false && ! empty(trim($meta->$property))) {
                 $res['synopsis'] = trim($meta->$property);
 
                 return $res;
@@ -275,14 +279,14 @@ class AdePipe extends AbstractAdultProviderPipe
 
         foreach ($selectors as $selector) {
             $elements = $this->getHtmlParser()->find($selector);
-            if (!empty($elements)) {
+            if (! empty($elements)) {
                 foreach ($elements as $a) {
-                    if ($a->plaintext !== false && !empty(trim($a->plaintext))) {
+                    if ($a->plaintext !== false && ! empty(trim($a->plaintext))) {
                         $cast[] = trim($a->plaintext);
                     }
                 }
 
-                if (!empty($cast)) {
+                if (! empty($cast)) {
                     break;
                 }
             }
@@ -308,14 +312,14 @@ class AdePipe extends AbstractAdultProviderPipe
 
         foreach ($selectors as $selector) {
             $elements = $this->getHtmlParser()->find($selector);
-            if (!empty($elements)) {
+            if (! empty($elements)) {
                 foreach ($elements as $a) {
-                    if ($a->plaintext !== false && !empty(trim($a->plaintext))) {
+                    if ($a->plaintext !== false && ! empty(trim($a->plaintext))) {
                         $genres[] = trim($a->plaintext);
                     }
                 }
 
-                if (!empty($genres)) {
+                if (! empty($genres)) {
                     break;
                 }
             }
@@ -332,7 +336,7 @@ class AdePipe extends AbstractAdultProviderPipe
         $dofeature = null;
 
         $tmpResponse = str_ireplace('Section ProductInfo', 'spdinfo', $this->response);
-        $tmpHtml = new \voku\helper\HtmlDomParser();
+        $tmpHtml = new \voku\helper\HtmlDomParser;
         $tmpHtml->loadHtml($tmpResponse);
 
         if ($ret = $tmpHtml->findOne('div[class=spdinfo]')) {
@@ -361,7 +365,7 @@ class AdePipe extends AbstractAdultProviderPipe
             array_shift($productinfo);
             $res['productinfo'] = array_chunk($productinfo, 2, false);
 
-            if (!empty($extrasData)) {
+            if (! empty($extrasData)) {
                 $res['extras'] = $extrasData;
             }
         }
@@ -387,8 +391,7 @@ class AdePipe extends AbstractAdultProviderPipe
             usleep(300000); // 300ms delay
 
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::debug('ADE session initialization: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::debug('ADE session initialization: '.$e->getMessage());
         }
     }
 }
-

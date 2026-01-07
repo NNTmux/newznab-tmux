@@ -32,6 +32,7 @@ class ProcessAdultMovies extends Command
     {
         if ((int) Settings::settingValue('lookupxxx') !== 1) {
             $this->error('Adult movie lookup is disabled in settings. Enable "lookupxxx" to use this command.');
+
             return Command::FAILURE;
         }
 
@@ -54,12 +55,12 @@ class ProcessAdultMovies extends Command
                 $this->line("Title: {$title_display}");
                 $this->line("Synopsis: {$synopsis_display}...");
 
-                if (!empty($result['movieData']['boxcover'])) {
+                if (! empty($result['movieData']['boxcover'])) {
                     $cover_url = $result['movieData']['boxcover'];
                     $this->line("Cover: {$cover_url}");
                 }
 
-                if ($debug && !empty($result['debug'])) {
+                if ($debug && ! empty($result['debug'])) {
                     $this->newLine();
                     $this->line('Debug Info:');
                     $this->line(json_encode($result['debug'], JSON_PRETTY_PRINT));
@@ -67,7 +68,7 @@ class ProcessAdultMovies extends Command
             } else {
                 $this->warn("No match found for: {$title}");
 
-                if ($debug && !empty($result['debug'])) {
+                if ($debug && ! empty($result['debug'])) {
                     $this->newLine();
                     $this->line('Debug Info:');
                     $this->line(json_encode($result['debug'], JSON_PRETTY_PRINT));
@@ -97,7 +98,7 @@ class ProcessAdultMovies extends Command
                 ]
             );
 
-            if (!empty($stats['providers'])) {
+            if (! empty($stats['providers'])) {
                 $this->newLine();
                 $this->info('Provider Statistics:');
                 $providerData = [];
@@ -111,4 +112,3 @@ class ProcessAdultMovies extends Command
         return Command::SUCCESS;
     }
 }
-

@@ -115,4 +115,3 @@ class FanarttvApiTest extends TestCase
         $this->assertNull($movieData);
     }
 }
-

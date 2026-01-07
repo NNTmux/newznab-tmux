@@ -17,6 +17,7 @@ class SteamServiceTest extends TestCase
     private function getInstance(): SteamService
     {
         $ref = new ReflectionClass(SteamService::class);
+
         return $ref->newInstanceWithoutConstructor();
     }
 
@@ -25,6 +26,7 @@ class SteamServiceTest extends TestCase
         $ref = new ReflectionClass($obj);
         $m = $ref->getMethod($method);
         $m->setAccessible(true);
+
         return $m->invokeArgs($obj, $args);
     }
 
@@ -227,7 +229,7 @@ class SteamServiceTest extends TestCase
         // These should normalize to the same thing
         $score = $this->invokeMethod($service, 'scoreTitle', [
             'The Witcher 3: Wild Hunt',
-            'The.Witcher.III.Wild.Hunt.GOTY-CODEX'
+            'The.Witcher.III.Wild.Hunt.GOTY-CODEX',
         ]);
 
         // With roman numeral conversion and normalization, these should be very similar
@@ -354,4 +356,3 @@ class SteamServiceTest extends TestCase
         }
     }
 }
-

@@ -14,11 +14,12 @@ use App\Services\Categorization\ReleaseContext;
 class MiscPipe extends AbstractCategorizationPipe
 {
     protected int $priority = 1; // Run first to catch hashes early
+
     private MiscCategorizer $categorizer;
 
     public function __construct()
     {
-        $this->categorizer = new MiscCategorizer();
+        $this->categorizer = new MiscCategorizer;
     }
 
     public function getName(): string
@@ -31,4 +32,3 @@ class MiscPipe extends AbstractCategorizationPipe
         return $this->categorizer->categorize($context);
     }
 }
-

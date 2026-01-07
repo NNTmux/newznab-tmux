@@ -28,26 +28,42 @@ class ReleaseUpdateService
 
     // Constants for name fixing status
     public const PROC_NFO_NONE = 0;
+
     public const PROC_NFO_DONE = 1;
+
     public const PROC_FILES_NONE = 0;
+
     public const PROC_FILES_DONE = 1;
+
     public const PROC_PAR2_NONE = 0;
+
     public const PROC_PAR2_DONE = 1;
+
     public const PROC_UID_NONE = 0;
+
     public const PROC_UID_DONE = 1;
+
     public const PROC_HASH16K_NONE = 0;
+
     public const PROC_HASH16K_DONE = 1;
+
     public const PROC_SRR_NONE = 0;
+
     public const PROC_SRR_DONE = 1;
+
     public const PROC_CRC_NONE = 0;
+
     public const PROC_CRC_DONE = 1;
 
     // Constants for overall rename status
     public const IS_RENAMED_NONE = 0;
+
     public const IS_RENAMED_DONE = 1;
 
     protected CategorizationService $category;
+
     protected FileNameCleaner $fileNameCleaner;
+
     protected bool $echoOutput;
 
     /**
@@ -79,22 +95,23 @@ class ReleaseUpdateService
         ?CategorizationService $category = null,
         ?FileNameCleaner $fileNameCleaner = null
     ) {
-        $this->category = $category ?? new CategorizationService();
-        $this->fileNameCleaner = $fileNameCleaner ?? new FileNameCleaner();
+        $this->category = $category ?? new CategorizationService;
+        $this->fileNameCleaner = $fileNameCleaner ?? new FileNameCleaner;
         $this->echoOutput = config('nntmux.echocli');
     }
 
     /**
      * Update the release with the new information.
      *
-     * @param object|array $release The release to update
-     * @param string $name The new name
-     * @param string $method The method that found the name
-     * @param bool $echo Whether to actually update the database
-     * @param string $type The type string for logging
-     * @param bool $nameStatus Whether to update status columns
-     * @param bool $show Whether to show output
-     * @param int|null $preId PreDB ID if matched
+     * @param  object|array  $release  The release to update
+     * @param  string  $name  The new name
+     * @param  string  $method  The method that found the name
+     * @param  bool  $echo  Whether to actually update the database
+     * @param  string  $type  The type string for logging
+     * @param  bool  $nameStatus  Whether to update status columns
+     * @param  bool  $show  Whether to show output
+     * @param  int|null  $preId  PreDB ID if matched
+     *
      * @throws \Exception
      */
     public function updateRelease(
@@ -113,21 +130,22 @@ class ReleaseUpdateService
         }
 
         // If $release does not have a releases_id, we should add it.
-        if (!isset($release->releases_id)) {
+        if (! isset($release->releases_id)) {
             $release->releases_id = $release->id;
         }
 
         if ($this->relid !== $release->releases_id) {
-            $newName = (new ReleaseCleaningService())->fixerCleaner($name);
+            $newName = (new ReleaseCleaningService)->fixerCleaner($name);
             // Normalize and sanity-check candidate for non-trusted sources
             $newName = $this->fileNameCleaner->normalizeCandidateTitle($newName);
 
             // Determine if the source is trusted enough to bypass plausibility checks
             $trustedSource = $this->isTrustedSource($type, $method, $preId);
 
-            if (!$trustedSource && !$this->fileNameCleaner->isPlausibleReleaseTitle($newName)) {
+            if (! $trustedSource && ! $this->fileNameCleaner->isPlausibleReleaseTitle($newName)) {
                 // Skip low-quality rename candidates for untrusted sources
                 $this->done = true;
+
                 return;
             }
 
@@ -138,7 +156,7 @@ class ReleaseUpdateService
                 $determinedCategory = $this->category->determineCategory(
                     $release->groups_id,
                     $newName,
-                    !empty($release->fromname) ? $release->fromname : ''
+                    ! empty($release->fromname) ? $release->fromname : ''
                 );
 
                 if ($type === 'PAR2, ') {
@@ -173,8 +191,8 @@ class ReleaseUpdateService
      */
     protected function isTrustedSource(string $type, string $method, int $preId): bool
     {
-        return (
-            (!empty($preId) && $preId > 0) ||
+        return
+            (! empty($preId) && $preId > 0) ||
             str_starts_with($type, 'PreDB') ||
             str_starts_with($type, 'PreDb') ||
             $type === 'UID, ' ||
@@ -184,8 +202,7 @@ class ReleaseUpdateService
             stripos($method, 'Title Match') !== false ||
             stripos($method, 'file matched source') !== false ||
             stripos($method, 'PreDb') !== false ||
-            stripos($method, 'preDB') !== false
-        );
+            stripos($method, 'preDB') !== false;
     }
 
     /**
@@ -210,21 +227,21 @@ class ReleaseUpdateService
 
         cli()->primary('Release Information:');
 
-        echo '  ' . cli()->headerOver('New name:   ') . cli()->primary(substr($newName, 0, 100)) . PHP_EOL;
-        echo '  ' . cli()->headerOver('Old name:   ') . cli()->primary(substr((string) $release->searchname, 0, 100)) . PHP_EOL;
-        echo '  ' . cli()->headerOver('Use name:   ') . cli()->primary(substr((string) $release->name, 0, 100)) . PHP_EOL;
+        echo '  '.cli()->headerOver('New name:   ').cli()->primary(substr($newName, 0, 100)).PHP_EOL;
+        echo '  '.cli()->headerOver('Old name:   ').cli()->primary(substr((string) $release->searchname, 0, 100)).PHP_EOL;
+        echo '  '.cli()->headerOver('Use name:   ').cli()->primary(substr((string) $release->name, 0, 100)).PHP_EOL;
         echo PHP_EOL;
 
-        echo '  ' . cli()->headerOver('New cat:    ') . cli()->primary($newCatName) . PHP_EOL;
-        echo '  ' . cli()->headerOver('Old cat:    ') . cli()->primary($oldCatName) . PHP_EOL;
-        echo '  ' . cli()->headerOver('Group:      ') . cli()->primary($groupName) . PHP_EOL;
+        echo '  '.cli()->headerOver('New cat:    ').cli()->primary($newCatName).PHP_EOL;
+        echo '  '.cli()->headerOver('Old cat:    ').cli()->primary($oldCatName).PHP_EOL;
+        echo '  '.cli()->headerOver('Group:      ').cli()->primary($groupName).PHP_EOL;
         echo PHP_EOL;
 
-        echo '  ' . cli()->headerOver('Method:     ') . cli()->primary($type . $method) . PHP_EOL;
-        echo '  ' . cli()->headerOver('Release ID: ') . cli()->primary((string) $release->releases_id) . PHP_EOL;
+        echo '  '.cli()->headerOver('Method:     ').cli()->primary($type.$method).PHP_EOL;
+        echo '  '.cli()->headerOver('Release ID: ').cli()->primary((string) $release->releases_id).PHP_EOL;
 
-        if (!empty($release->filename)) {
-            echo '  ' . cli()->headerOver('Filename:   ') . cli()->primary(substr((string) $release->filename, 0, 100)) . PHP_EOL;
+        if (! empty($release->filename)) {
+            echo '  '.cli()->headerOver('Filename:   ').cli()->primary(substr((string) $release->filename, 0, 100)).PHP_EOL;
         }
 
         if ($type !== 'PAR2, ') {
@@ -259,7 +276,7 @@ class ReleaseUpdateService
                 'categories_id' => $determinedCategory['categories_id'],
             ];
 
-            if (!empty($status)) {
+            if (! empty($status)) {
                 foreach ($status as $key => $stat) {
                     $updateColumns = Arr::add($updateColumns, $key, $stat);
                 }
@@ -325,7 +342,7 @@ class ReleaseUpdateService
      */
     public function checkPreDbMatch(object $release, string $textstring): ?array
     {
-        if (preg_match_all(self::PREDB_REGEX, $textstring, $hits) && !preg_match('/Source\s\:/i', $textstring)) {
+        if (preg_match_all(self::PREDB_REGEX, $textstring, $hits) && ! preg_match('/Source\s\:/i', $textstring)) {
             foreach ($hits as $hit) {
                 foreach ($hit as $val) {
                     $title = Predb::query()->where('title', trim($val))->select(['title', 'id'])->first();
@@ -335,6 +352,7 @@ class ReleaseUpdateService
                 }
             }
         }
+
         return null;
     }
 
@@ -367,4 +385,3 @@ class ReleaseUpdateService
         ];
     }
 }
-

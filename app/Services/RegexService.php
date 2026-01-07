@@ -353,4 +353,3 @@ class RegexService
         return $group_regex ? ('WHERE group_regex LIKE '.escapeString('%'.$group_regex.'%')) : '';
     }
 }
-

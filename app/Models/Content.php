@@ -44,15 +44,19 @@ class Content extends Model
 {
     // Content type constants
     public const TYPE_USEFUL = 1;
+
     public const TYPE_INDEX = 3;
 
     // Status constants
     public const STATUS_ENABLED = 1;
+
     public const STATUS_DISABLED = 0;
 
     // Role constants (aligned with User roles)
     public const ROLE_EVERYONE = 0;
+
     public const ROLE_LOGGED_IN = 1;
+
     public const ROLE_ADMIN = 2;
 
     /**

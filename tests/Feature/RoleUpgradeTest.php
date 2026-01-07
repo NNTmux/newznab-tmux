@@ -1,16 +1,22 @@
 <?php
+
 namespace Tests\Feature;
+
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
+
 final class RoleUpgradeTest extends TestCase
 {
     private User $user;
+
     private Role $userRole;
+
     private Role $supporterRole;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -157,13 +163,14 @@ final class RoleUpgradeTest extends TestCase
             created_at DATETIME NULL
         )');
     }
+
     /**
      * Helper to create a test user without factory.
      */
     private function createTestUser(int $roleId, ?string $roleChangeDate = null): User
     {
         // Use forceCreate to bypass hashed cast
-        $user = new User();
+        $user = new User;
         $user->username = 'testuser_'.Str::random(8);
         $user->email = Str::random(8).'@test.com';
         $user->roles_id = $roleId;
@@ -184,6 +191,7 @@ final class RoleUpgradeTest extends TestCase
 
         return User::where('email', $user->email)->first();
     }
+
     /**
      * Test that updating a user role to Supporter with addYears=2 correctly applies 2 years.
      * This test catches the bug where addYears parameter is not properly passed to updateUserRole.
@@ -217,6 +225,7 @@ final class RoleUpgradeTest extends TestCase
         );
         Carbon::setTestNow();
     }
+
     /**
      * Test that when addYears is null, the role's default addyears is used.
      */
@@ -308,7 +317,7 @@ final class RoleUpgradeTest extends TestCase
             $this->assertNotEquals(
                 $oneYearFromNow->toDateString(),
                 $actualExpiryDate->toDateString(),
-                "Expiry date should NOT be just 1 year from now. The addYears=2 parameter should have been applied."
+                'Expiry date should NOT be just 1 year from now. The addYears=2 parameter should have been applied.'
             );
         }
 
@@ -414,6 +423,7 @@ final class RoleUpgradeTest extends TestCase
 
         Carbon::setTestNow();
     }
+
     /**
      * Test that addYears=2 produces different result than addYears=1.
      * This is a regression test to ensure the addYears parameter is actually being used.
@@ -454,6 +464,7 @@ final class RoleUpgradeTest extends TestCase
         );
         Carbon::setTestNow();
     }
+
     /**
      * Test BtcPay webhook flow simulation - parsing item_description and applying addYears.
      * This tests the exact flow from BtcPaymentController.
@@ -489,6 +500,7 @@ final class RoleUpgradeTest extends TestCase
             );
         }
     }
+
     /**
      * Test full BtcPay simulation - from item description to role update.
      * This simulates what happens when a user pays for "Supporter 2" subscription.
@@ -592,7 +604,7 @@ final class RoleUpgradeTest extends TestCase
         $this->assertEquals(
             $extendedExpiryDate->toDateString(),
             $pendingStartDate->toDateString(),
-            "BUG: Role stacking should use the extended expiry date (2025-12-01), not the original (2025-07-01). " .
+            'BUG: Role stacking should use the extended expiry date (2025-12-01), not the original (2025-07-01). '.
             "The pending_role_start_date was {$pendingStartDate->toDateString()}."
         );
 
@@ -663,7 +675,7 @@ final class RoleUpgradeTest extends TestCase
         $this->assertEquals(
             $currentExpiryDate->toDateString(),
             $pendingStartDate->toDateString(),
-            "Role stacking should use the newer expiry date (2026-01-01) when currentExpiryDate > oldExpiryDate. " .
+            'Role stacking should use the newer expiry date (2026-01-01) when currentExpiryDate > oldExpiryDate. '.
             "Got {$pendingStartDate->toDateString()} instead."
         );
 

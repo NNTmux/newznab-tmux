@@ -972,6 +972,7 @@ if (! function_exists('isValidNewznabNzb')) {
 
         if ($xml === false) {
             libxml_clear_errors();
+
             return false;
         }
 
@@ -1271,4 +1272,3 @@ if (! function_exists('cli')) {
         return $instance;
     }
 }
-

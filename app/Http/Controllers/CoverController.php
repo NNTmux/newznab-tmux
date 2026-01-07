@@ -51,12 +51,12 @@ class CoverController extends Controller
                     abort(404);
                 }
             }
-            
+
             // For anime, try the requested filename first, then fall back to old format (without -cover)
             $filePath = storage_path("covers/{$type}/{$filename}");
-            
+
             // If file doesn't exist and filename ends with -cover.jpg, try old format
-            if (!file_exists($filePath) && preg_match('/^(\d+)-cover\.jpg$/', $filename, $matches)) {
+            if (! file_exists($filePath) && preg_match('/^(\d+)-cover\.jpg$/', $filename, $matches)) {
                 $oldFormatPath = storage_path("covers/{$type}/{$matches[1]}.jpg");
                 if (file_exists($oldFormatPath)) {
                     $filePath = $oldFormatPath;

@@ -26,4 +26,3 @@ class Yenc extends Facade
         return \App\Services\YencService::class;
     }
 }
-

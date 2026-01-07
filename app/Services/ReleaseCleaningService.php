@@ -440,4 +440,3 @@ class ReleaseCleaningService
         return trim(mb_convert_encoding(preg_replace('/[^(\x20-\x7F)]*/', '', $cleanerName), 'UTF-8', mb_list_encodings()));
     }
 }
-

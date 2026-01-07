@@ -19,7 +19,7 @@ class ItunesServiceIntegrationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->itunes = new ItunesService();
+        $this->itunes = new ItunesService;
     }
 
     // ==========================================
@@ -51,7 +51,7 @@ class ItunesServiceIntegrationTest extends TestCase
 
         fwrite(STDERR, "\n[EBOOK] Found: {$book['name']} by {$book['author']}\n");
         fwrite(STDERR, "  Genre: {$book['genre']}\n");
-        fwrite(STDERR, "  Cover: " . (!empty($book['cover']) ? 'Yes' : 'No') . "\n");
+        fwrite(STDERR, '  Cover: '.(! empty($book['cover']) ? 'Yes' : 'No')."\n");
     }
 
     /**
@@ -197,7 +197,7 @@ class ItunesServiceIntegrationTest extends TestCase
             fwrite(STDERR, "Genre: {$album['genre']}\n");
             fwrite(STDERR, "Release: {$album['release_date']}\n");
             fwrite(STDERR, "Tracks: {$album['track_count']}\n");
-            fwrite(STDERR, "Cover: " . substr($album['cover'], 0, 60) . "...\n");
+            fwrite(STDERR, 'Cover: '.substr($album['cover'], 0, 60)."...\n");
         }
 
         // Book
@@ -209,9 +209,9 @@ class ItunesServiceIntegrationTest extends TestCase
             fwrite(STDERR, "Author: {$book['author']}\n");
             fwrite(STDERR, "Genre: {$book['genre']}\n");
             fwrite(STDERR, "Release: {$book['release_date']}\n");
-            fwrite(STDERR, "Description: " . substr($book['description'] ?? '', 0, 100) . "...\n");
-            if (!empty($book['cover'])) {
-                fwrite(STDERR, "Cover: " . substr($book['cover'], 0, 60) . "...\n");
+            fwrite(STDERR, 'Description: '.substr($book['description'] ?? '', 0, 100)."...\n");
+            if (! empty($book['cover'])) {
+                fwrite(STDERR, 'Cover: '.substr($book['cover'], 0, 60)."...\n");
             }
         }
 
@@ -222,4 +222,3 @@ class ItunesServiceIntegrationTest extends TestCase
         $this->assertTrue(true);
     }
 }
-

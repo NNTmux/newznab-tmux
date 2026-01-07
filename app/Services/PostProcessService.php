@@ -8,7 +8,6 @@ use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\NameFixing\NameFixingService;
 use App\Services\NNTP\NNTPService;
 use dariusiii\rarinfo\Par2Info;
-use Illuminate\Contracts\Foundation\Application;
 
 /**
  * Orchestrates post-processing of releases.
@@ -23,22 +22,35 @@ use Illuminate\Contracts\Foundation\Application;
 final class PostProcessService
 {
     private readonly bool $echoOutput;
+
     private readonly bool $alternateNNTP;
+
     private readonly bool $addPar2;
 
     private readonly NameFixingService $nameFixingService;
+
     private readonly Par2Info $par2Info;
+
     private readonly NfoService $nfo;
 
     private readonly Par2Processor $par2Processor;
+
     private readonly TvProcessor $tvProcessor;
+
     private readonly NfoProcessor $nfoProcessor;
+
     private readonly MoviesProcessor $moviesProcessor;
+
     private readonly MusicProcessor $musicProcessor;
+
     private readonly BooksProcessor $booksProcessor;
+
     private readonly ConsolesProcessor $consolesProcessor;
+
     private readonly GamesProcessor $gamesProcessor;
+
     private readonly AnimeProcessor $animeProcessor;
+
     private readonly XXXProcessor $xxxProcessor;
 
     public function __construct(
@@ -61,9 +73,9 @@ final class PostProcessService
         $this->alternateNNTP = (bool) config('nntmux_nntp.use_alternate_nntp_server');
 
         // Core dependencies
-        $this->nameFixingService = $nameFixingService ?? new NameFixingService();
-        $this->par2Info = $par2Info ?? new Par2Info();
-        $this->nfo = $nfo ?? new NfoService();
+        $this->nameFixingService = $nameFixingService ?? new NameFixingService;
+        $this->par2Info = $par2Info ?? new Par2Info;
+        $this->nfo = $nfo ?? new NfoService;
 
         // Processors
         $this->par2Processor = $par2Processor ?? new Par2Processor(
@@ -105,8 +117,8 @@ final class PostProcessService
     /**
      * Process anime releases using AniDB.
      *
-     * @param string $groupID Optional group ID filter
-     * @param string $guidChar Optional GUID character filter
+     * @param  string  $groupID  Optional group ID filter
+     * @param  string  $guidChar  Optional GUID character filter
      *
      * @throws \Exception
      */
@@ -118,8 +130,8 @@ final class PostProcessService
     /**
      * Process book releases using Amazon.
      *
-     * @param string $groupID Optional group ID filter
-     * @param string $guidChar Optional GUID character filter
+     * @param  string  $groupID  Optional group ID filter
+     * @param  string  $guidChar  Optional GUID character filter
      *
      * @throws \Exception
      */
@@ -151,9 +163,9 @@ final class PostProcessService
     /**
      * Process movie releases using IMDB/TMDB.
      *
-     * @param string $groupID Optional group ID filter
-     * @param string $guidChar Optional GUID character filter
-     * @param int|string|null $processMovies Processing mode (0=skip, 1=all, 2=renamed only, ''=check setting)
+     * @param  string  $groupID  Optional group ID filter
+     * @param  string  $guidChar  Optional GUID character filter
+     * @param  int|string|null  $processMovies  Processing mode (0=skip, 1=all, 2=renamed only, ''=check setting)
      *
      * @throws \Exception
      */
@@ -178,9 +190,9 @@ final class PostProcessService
     /**
      * Process NFO files for releases.
      *
-     * @param NNTPService $nntp NNTP connection for downloading NFOs
-     * @param string $groupID Optional group ID filter
-     * @param string $guidChar Optional GUID character filter
+     * @param  NNTPService  $nntp  NNTP connection for downloading NFOs
+     * @param  string  $groupID  Optional group ID filter
+     * @param  string  $guidChar  Optional GUID character filter
      *
      * @throws \Exception
      */
@@ -192,10 +204,10 @@ final class PostProcessService
     /**
      * Process TV releases.
      *
-     * @param string $groupID Optional group ID filter
-     * @param string $guidChar Optional GUID character filter
-     * @param int|string|null $processTV Processing mode (0=skip, 1=all, 2=renamed only, ''=check setting)
-     * @param string $mode Processing mode ('pipeline' or 'parallel')
+     * @param  string  $groupID  Optional group ID filter
+     * @param  string  $guidChar  Optional GUID character filter
+     * @param  int|string|null  $processTV  Processing mode (0=skip, 1=all, 2=renamed only, ''=check setting)
+     * @param  string  $mode  Processing mode ('pipeline' or 'parallel')
      *
      * @throws \Exception
      */
@@ -206,7 +218,7 @@ final class PostProcessService
         string $mode = 'pipeline'
     ): void {
         if ($guidChar === '') {
-            $forkingService = new ForkingService();
+            $forkingService = new ForkingService;
             $processTV = is_numeric($processTV)
                 ? $processTV
                 : \App\Models\Settings::settingValue('lookuptv');
@@ -231,8 +243,8 @@ final class PostProcessService
     /**
      * Process additional release data (RAR/ZIP contents, samples, media info).
      *
-     * @param int|string $groupID Optional group ID filter
-     * @param string $guidChar Optional GUID character filter
+     * @param  int|string  $groupID  Optional group ID filter
+     * @param  string  $guidChar  Optional GUID character filter
      *
      * @throws \Exception
      */
@@ -244,11 +256,11 @@ final class PostProcessService
     /**
      * Attempt to get a better name from a PAR2 file and re-categorize.
      *
-     * @param string $messageID Message ID from NZB
-     * @param int $relID Release ID
-     * @param int $groupID Group ID
-     * @param NNTPService $nntp NNTP connection
-     * @param int $show Display mode (0=apply, 1=show only)
+     * @param  string  $messageID  Message ID from NZB
+     * @param  int  $relID  Release ID
+     * @param  int  $groupID  Group ID
+     * @param  NNTPService  $nntp  NNTP connection
+     * @param  int  $show  Display mode (0=apply, 1=show only)
      *
      * @throws \Exception
      */
@@ -262,4 +274,3 @@ final class PostProcessService
         return $this->par2Processor->parseFromMessage($messageID, $relID, $groupID, $nntp, $show);
     }
 }
-

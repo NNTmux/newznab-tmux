@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-
 /**
  * Basic IRC client for fetching IRCScraper.
  *
@@ -229,11 +228,10 @@ class IRCClient
     /**
      * Log in to a IRC server.
      *
-     * @param string $nickName The nick name - visible in the channel.
-     * @param string $userName The user name - visible in the host name.
-     * @param string $realName The real name - visible in the WhoIs.
-     * @param string|null $password The password - some servers require a password.
-     * @return bool
+     * @param  string  $nickName  The nick name - visible in the channel.
+     * @param  string  $userName  The user name - visible in the host name.
+     * @param  string  $realName  The real name - visible in the WhoIs.
+     * @param  string|null  $password  The password - some servers require a password.
      */
     public function login(string $nickName, string $userName, string $realName, ?string $password = null): bool
     {
@@ -623,4 +621,3 @@ class IRCClient
         return is_string($result) ? $result : $text;
     }
 }
-

@@ -10,7 +10,6 @@ use App\Models\Settings;
 use App\Services\Nzb\NzbService;
 use App\Services\Releases\ReleaseManagementService;
 use Exception;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -20,33 +19,59 @@ class ReleaseRemoverService
 {
     // Crap removal types
     private const string TYPE_BLACKLIST = 'blacklist';
+
     private const string TYPE_BLFILES = 'blfiles';
+
     private const string TYPE_EXECUTABLE = 'executable';
+
     private const string TYPE_GIBBERISH = 'gibberish';
+
     private const string TYPE_HASHED = 'hashed';
+
     private const string TYPE_INSTALLBIN = 'installbin';
+
     private const string TYPE_PASSWORDED = 'passworded';
+
     private const string TYPE_PASSWORDURL = 'passwordurl';
+
     private const string TYPE_SAMPLE = 'sample';
+
     private const string TYPE_SCR = 'scr';
+
     private const string TYPE_SHORT = 'short';
+
     private const string TYPE_SIZE = 'size';
+
     private const string TYPE_NZB = 'nzb';
+
     private const string TYPE_CODEC = 'codec';
+
     private const string TYPE_WMV_ALL = 'wmv_all';
 
     protected string $blacklistID = '';
+
     protected string $crapTime = '';
+
     protected bool $delete = false;
+
     protected int $deletedCount = 0;
+
     protected bool $echoCLI;
+
     protected string $error = '';
+
     protected bool $ignoreUserCheck = false;
+
     protected string $method = '';
+
     protected string $query = '';
+
     protected ReleaseManagementService $releaseManagement;
+
     protected array $result = [];
+
     private NzbService $nzb;
+
     private ReleaseImageService $releaseImage;
 
     /**
@@ -480,7 +505,6 @@ class ReleaseRemoverService
             $this->crapTime
         ));
     }
-
 
     /**
      * Remove releases that are just a single nzb file.
@@ -1171,4 +1195,3 @@ class ReleaseRemoverService
         return '';
     }
 }
-

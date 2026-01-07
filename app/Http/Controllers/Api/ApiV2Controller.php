@@ -25,7 +25,9 @@ use Illuminate\Support\Facades\DB;
 class ApiV2Controller extends BasePageController
 {
     private ApiController $api;
+
     private ReleaseSearchService $releaseSearchService;
+
     private ReleaseBrowseService $releaseBrowseService;
 
     public function __construct(
@@ -113,7 +115,7 @@ class ApiV2Controller extends BasePageController
         // Create cache key for movie search results
         $searchCacheKey = 'api_movie_search:'.md5(serialize([
             $imdbId, $tmdbId, $traktId, $offset, $limit, $searchName,
-            $categoryID, $maxAge, $minSize, $catExclusions
+            $categoryID, $maxAge, $minSize, $catExclusions,
         ]));
 
         // Cache search results for 10 minutes
@@ -139,6 +141,7 @@ class ApiV2Controller extends BasePageController
         $userStatsCacheKey = 'api_user_stats:'.$user->id;
         $userStats = Cache::remember($userStatsCacheKey, 60, function () use ($user) {
             $oneDayAgo = now()->subDay()->toDateTimeString();
+
             return DB::selectOne('
                 SELECT
                     (SELECT COUNT(*) FROM user_requests WHERE users_id = ? AND timestamp > ?) as api_count,

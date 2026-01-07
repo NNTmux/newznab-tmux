@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-
 /**
  * Cleans names for collections/imports/namefixer.
  *
@@ -87,9 +86,10 @@ class CollectionsCleaningService
      * Attempts to extract a clean collection name from a Usenet subject line.
      * First tries database regexes, then falls back to generic cleaning patterns.
      *
-     * @param string $subject The raw subject line to clean
-     * @param string $groupName The newsgroup name (optional, used for context-specific cleaning)
+     * @param  string  $subject  The raw subject line to clean
+     * @param  string  $groupName  The newsgroup name (optional, used for context-specific cleaning)
      * @return array Returns ['id' => regex_id, 'name' => cleaned_name]
+     *
      * @throws \Exception
      */
     public function collectionsCleaner(string $subject, string $groupName = ''): array
@@ -204,7 +204,7 @@ class CollectionsCleaningService
     /**
      * Enhance short or generic subjects by extracting additional information.
      *
-     * @param string $cleanSubject The cleaned subject that is too short
+     * @param  string  $cleanSubject  The cleaned subject that is too short
      * @return string Enhanced subject string
      */
     protected function enhanceShortSubject(string $cleanSubject): string
@@ -251,7 +251,7 @@ class CollectionsCleaningService
     /**
      * Normalize a string by collapsing multiple spaces and encoding to UTF-8.
      *
-     * @param string $subject The subject to normalize
+     * @param  string  $subject  The subject to normalize
      * @return string Normalized and UTF-8 encoded string
      */
     protected function normalizeString(string $subject): string

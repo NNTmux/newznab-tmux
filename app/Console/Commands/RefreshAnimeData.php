@@ -89,6 +89,7 @@ class RefreshAnimeData extends Command
 
         if ($totalCount === 0) {
             $this->warn('No anime releases found to process.');
+
             return self::SUCCESS;
         }
 
@@ -120,7 +121,7 @@ class RefreshAnimeData extends Command
         foreach ($chunks as $chunk) {
             foreach ($chunk as $release) {
                 $searchname = $release->searchname ?? '';
-                $progressBar->setMessage("Processing: " . substr($searchname, 0, 50) . "...");
+                $progressBar->setMessage('Processing: '.substr($searchname, 0, 50).'...');
 
                 try {
                     // Extract clean title from searchname
@@ -139,6 +140,7 @@ class RefreshAnimeData extends Command
                         }
                         $processed++;
                         $progressBar->advance();
+
                         continue;
                     }
 
@@ -160,6 +162,7 @@ class RefreshAnimeData extends Command
                                 $skipped++;
                                 $processed++;
                                 $progressBar->advance();
+
                                 continue;
                             }
                         }
@@ -187,12 +190,13 @@ class RefreshAnimeData extends Command
                         ];
                         if ($this->getOutput()->isVerbose()) {
                             $this->newLine();
-                            $this->warn("No AniList match found for:");
+                            $this->warn('No AniList match found for:');
                             $this->line("  Searchname: {$searchname}");
                             $this->line("  Cleaned title: {$cleanTitle}");
                         }
                         $processed++;
                         $progressBar->advance();
+
                         continue;
                     }
 
@@ -208,12 +212,13 @@ class RefreshAnimeData extends Command
                         ];
                         if ($this->getOutput()->isVerbose()) {
                             $this->newLine();
-                            $this->warn("AniList search returned result but no ID for:");
+                            $this->warn('AniList search returned result but no ID for:');
                             $this->line("  Searchname: {$searchname}");
                             $this->line("  Cleaned title: {$cleanTitle}");
                         }
                         $processed++;
                         $progressBar->advance();
+
                         continue;
                     }
 
@@ -261,17 +266,17 @@ class RefreshAnimeData extends Command
                         );
 
                         // Show failed searchnames if any
-                        if (!empty($failedSearchnames)) {
+                        if (! empty($failedSearchnames)) {
                             $this->newLine();
-                            $this->warn("Failed searchnames (before rate limit error):");
-                            $this->line("Showing up to 10 examples:");
+                            $this->warn('Failed searchnames (before rate limit error):');
+                            $this->line('Showing up to 10 examples:');
                             $examples = array_slice($failedSearchnames, 0, 10);
                             foreach ($examples as $item) {
                                 $cleanedTitle = $item['cleaned_title'] ?? '(extraction failed)';
                                 $this->line("  - {$item['searchname']} -> {$cleanedTitle} ({$item['reason']})");
                             }
                             if (count($failedSearchnames) > 10) {
-                                $this->line("  ... and " . (count($failedSearchnames) - 10) . " more.");
+                                $this->line('  ... and '.(count($failedSearchnames) - 10).' more.');
                             }
                         }
 
@@ -281,7 +286,7 @@ class RefreshAnimeData extends Command
                     $failed++;
                     if ($this->getOutput()->isVerbose()) {
                         $this->newLine();
-                        $this->error("Error processing release ID {$release->id}: " . $e->getMessage());
+                        $this->error("Error processing release ID {$release->id}: ".$e->getMessage());
                     }
                 }
 
@@ -308,7 +313,7 @@ class RefreshAnimeData extends Command
         );
 
         // Show failed searchnames if any
-        if (!empty($failedSearchnames) && $notFound > 0) {
+        if (! empty($failedSearchnames) && $notFound > 0) {
             $this->newLine();
             $this->warn("Failed to fetch data for {$notFound} release(s):");
             $this->newLine();
@@ -319,8 +324,8 @@ class RefreshAnimeData extends Command
             foreach ($examples as $item) {
                 $cleanedTitle = $item['cleaned_title'] ?? '(extraction failed)';
                 $rows[] = [
-                    substr($item['searchname'], 0, 60) . (strlen($item['searchname']) > 60 ? '...' : ''),
-                    substr($cleanedTitle, 0, 40) . (strlen($cleanedTitle) > 40 ? '...' : ''),
+                    substr($item['searchname'], 0, 60).(strlen($item['searchname']) > 60 ? '...' : ''),
+                    substr($cleanedTitle, 0, 40).(strlen($cleanedTitle) > 40 ? '...' : ''),
                     $item['reason'],
                 ];
             }
@@ -331,7 +336,7 @@ class RefreshAnimeData extends Command
             );
 
             if (count($failedSearchnames) > 20) {
-                $this->line("... and " . (count($failedSearchnames) - 20) . " more. Use --verbose to see all.");
+                $this->line('... and '.(count($failedSearchnames) - 20).' more. Use --verbose to see all.');
             }
         }
 
@@ -428,7 +433,7 @@ class RefreshAnimeData extends Command
         if (preg_match('/Ã[^\s]/u', $text)) {
             // Try ISO-8859-1 -> UTF-8 conversion (common double-encoding fix)
             $converted = @mb_convert_encoding($text, 'UTF-8', 'ISO-8859-1');
-            if ($converted !== false && !preg_match('/Ã[^\s]/u', $converted)) {
+            if ($converted !== false && ! preg_match('/Ã[^\s]/u', $converted)) {
                 $text = $converted;
             }
         }
@@ -530,7 +535,7 @@ class RefreshAnimeData extends Command
                 if ($waitTime > 0 && $waitTime <= 60) {
                     if ($this->getOutput()->isVerbose()) {
                         $this->newLine();
-                        $this->warn("Rate limit reached ({$requestCount}/" . self::RATE_LIMIT_PER_MINUTE . "). Waiting {$waitTime} seconds...");
+                        $this->warn("Rate limit reached ({$requestCount}/".self::RATE_LIMIT_PER_MINUTE."). Waiting {$waitTime} seconds...");
                     }
                     sleep($waitTime);
 
@@ -565,4 +570,3 @@ class RefreshAnimeData extends Command
         $this->requestTimestamps[] = $now;
     }
 }
-

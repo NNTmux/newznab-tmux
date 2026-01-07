@@ -11,8 +11,11 @@ use App\Services\Categorization\ReleaseContext;
 class CategorizationPassable
 {
     public ReleaseContext $context;
+
     public CategorizationResult $bestResult;
+
     public bool $debug;
+
     public array $allResults = [];
 
     public function __construct(ReleaseContext $context, bool $debug = false)
@@ -70,4 +73,3 @@ class CategorizationPassable
         return $returnValue;
     }
 }
-

@@ -24,11 +24,14 @@ class IGDBService
 {
     // Rate limiting constants
     protected const string RATE_LIMIT_KEY = 'igdb_api_rate_limit';
+
     protected const int REQUESTS_PER_MINUTE = 4;
+
     protected const int DECAY_SECONDS = 60;
 
     // Cache TTLs
     protected const int GAME_CACHE_TTL = 86400; // 24 hours
+
     protected const int FAILED_LOOKUP_CACHE_TTL = 3600; // 1 hour
 
     // Matching configuration
@@ -51,15 +54,16 @@ class IGDBService
      */
     public function search(string $title): ?Game
     {
-        if (!$this->isConfigured() || empty($title)) {
+        if (! $this->isConfigured() || empty($title)) {
             return null;
         }
 
-        $cacheKey = 'igdb_search:' . md5(mb_strtolower($title));
+        $cacheKey = 'igdb_search:'.md5(mb_strtolower($title));
 
         // Check failed lookup cache
         if (Cache::has("igdb_search_failed:{$cacheKey}")) {
             Log::debug('IGDBService: Skipping previously failed search', ['title' => $title]);
+
             return null;
         }
 
@@ -67,6 +71,7 @@ class IGDBService
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             Log::debug('IGDBService: Using cached search result', ['title' => $title]);
+
             return $cached instanceof Game ? $cached : null;
         }
 
@@ -121,6 +126,7 @@ class IGDBService
         $game = $this->searchExact($title);
         if ($game !== null) {
             Log::debug('IGDBService: Exact match found', ['title' => $title, 'matched' => $game->name]);
+
             return $game;
         }
 
@@ -128,6 +134,7 @@ class IGDBService
         $game = $this->searchFuzzy($title);
         if ($game !== null) {
             Log::debug('IGDBService: Fuzzy match found', ['title' => $title, 'matched' => $game->name]);
+
             return $game;
         }
 
@@ -137,6 +144,7 @@ class IGDBService
             $game = $this->searchFuzzy($cleanTitle);
             if ($game !== null) {
                 Log::debug('IGDBService: Clean title match found', ['title' => $title, 'matched' => $game->name]);
+
                 return $game;
             }
         }
@@ -147,6 +155,7 @@ class IGDBService
             $game = $this->searchFuzzy($baseTitle);
             if ($game !== null) {
                 Log::debug('IGDBService: Base title match found', ['title' => $title, 'matched' => $game->name]);
+
                 return $game;
             }
         }
@@ -176,6 +185,7 @@ class IGDBService
             return $result instanceof Game ? $result : null;
         } catch (\Exception $e) {
             Log::warning('IGDBService: Exact search error', ['error' => $e->getMessage()]);
+
             return null;
         }
     }
@@ -208,6 +218,7 @@ class IGDBService
             return $this->findBestMatch($results, $title);
         } catch (\Exception $e) {
             Log::warning('IGDBService: Fuzzy search error', ['error' => $e->getMessage()]);
+
             return null;
         }
     }
@@ -277,7 +288,7 @@ class IGDBService
             Log::debug('IGDBService: Best match selected', [
                 'query' => $title,
                 'matched' => $bestMatch->name,
-                'score' => $bestScore
+                'score' => $bestScore,
             ]);
         }
 
@@ -292,7 +303,7 @@ class IGDBService
         // Extract publishers and developers
         $publishers = [];
         $developers = [];
-        if (!empty($game->involved_companies)) {
+        if (! empty($game->involved_companies)) {
             $involvedCompanies = $game->involved_companies;
             if ($involvedCompanies instanceof \Illuminate\Support\Collection) {
                 $involvedCompanies = $involvedCompanies->toArray();
@@ -335,7 +346,7 @@ class IGDBService
         $releaseDate = $this->getReleaseDate($game);
 
         // Get game URL
-        $gameUrl = $game->url ?? ('https://www.igdb.com/games/' . ($game->slug ?? $game->id));
+        $gameUrl = $game->url ?? ('https://www.igdb.com/games/'.($game->slug ?? $game->id));
 
         // Build review text
         $review = $this->buildReview($game, $developers);
@@ -343,14 +354,14 @@ class IGDBService
         Log::info('IGDBService: Game data built', [
             'title' => $game->name,
             'id' => $game->id,
-            'has_cover' => !empty($coverUrl),
-            'has_backdrop' => !empty($backdropUrl),
+            'has_cover' => ! empty($coverUrl),
+            'has_backdrop' => ! empty($backdropUrl),
             'genres' => $genres,
         ]);
 
         return [
             'title' => $game->name,
-            'asin' => 'igdb-' . $game->id,
+            'asin' => 'igdb-'.$game->id,
             'review' => $review,
             'coverurl' => $coverUrl,
             'releasedate' => $releaseDate,
@@ -358,8 +369,8 @@ class IGDBService
             'url' => $gameUrl,
             'backdropurl' => $backdropUrl,
             'trailer' => $trailerUrl,
-            'publisher' => !empty($publishers) ? implode(', ', array_slice($publishers, 0, 3)) : 'Unknown',
-            'developer' => !empty($developers) ? implode(', ', array_slice($developers, 0, 3)) : '',
+            'publisher' => ! empty($publishers) ? implode(', ', array_slice($publishers, 0, 3)) : 'Unknown',
+            'developer' => ! empty($developers) ? implode(', ', array_slice($developers, 0, 3)) : '',
             'genres' => $genres,
         ];
     }
@@ -370,7 +381,7 @@ class IGDBService
     protected function extractGenres(Game $game): array
     {
         $genres = [];
-        if (!empty($game->genres)) {
+        if (! empty($game->genres)) {
             $gameGenres = $game->genres;
             if ($gameGenres instanceof \Illuminate\Support\Collection) {
                 $gameGenres = $gameGenres->toArray();
@@ -381,7 +392,7 @@ class IGDBService
         }
 
         // Fall back to themes if no genres
-        if (empty($genres) && !empty($game->themes)) {
+        if (empty($genres) && ! empty($game->themes)) {
             $gameThemes = $game->themes;
             if ($gameThemes instanceof \Illuminate\Support\Collection) {
                 $gameThemes = $gameThemes->toArray();
@@ -412,16 +423,17 @@ class IGDBService
             ];
         }
 
-        if (!empty($imageData['image_id'])) {
-            return 'https://images.igdb.com/igdb/image/upload/t_' . $size . '/' . $imageData['image_id'] . '.jpg';
+        if (! empty($imageData['image_id'])) {
+            return 'https://images.igdb.com/igdb/image/upload/t_'.$size.'/'.$imageData['image_id'].'.jpg';
         }
 
-        if (!empty($imageData['url'])) {
+        if (! empty($imageData['url'])) {
             $url = $imageData['url'];
             if (strpos($url, '//') === 0) {
-                $url = 'https:' . $url;
+                $url = 'https:'.$url;
             }
-            return preg_replace('/t_[a-z0-9_]+/', 't_' . $size, $url);
+
+            return preg_replace('/t_[a-z0-9_]+/', 't_'.$size, $url);
         }
 
         return '';
@@ -432,18 +444,19 @@ class IGDBService
      */
     protected function getBackdropUrl(Game $game): string
     {
-        if (!empty($game->artworks)) {
+        if (! empty($game->artworks)) {
             $artworks = $game->artworks;
             $firstArtwork = ($artworks instanceof \Illuminate\Support\Collection) ? $artworks->first() : ($artworks[0] ?? null);
             $url = $this->getImageUrl($firstArtwork, '1080p');
-            if (!empty($url)) {
+            if (! empty($url)) {
                 return $url;
             }
         }
 
-        if (!empty($game->screenshots)) {
+        if (! empty($game->screenshots)) {
             $screenshots = $game->screenshots;
             $firstScreenshot = ($screenshots instanceof \Illuminate\Support\Collection) ? $screenshots->first() : ($screenshots[0] ?? null);
+
             return $this->getImageUrl($firstScreenshot, '1080p');
         }
 
@@ -455,7 +468,7 @@ class IGDBService
      */
     protected function getTrailerUrl(Game $game): string
     {
-        if (!empty($game->videos)) {
+        if (! empty($game->videos)) {
             $videos = $game->videos;
             if ($videos instanceof \Illuminate\Support\Collection) {
                 $videos = $videos->toArray();
@@ -463,7 +476,7 @@ class IGDBService
             foreach ($videos as $video) {
                 $videoId = is_array($video) ? ($video['video_id'] ?? null) : ($video->video_id ?? null);
                 if ($videoId) {
-                    return 'https://www.youtube.com/watch?v=' . $videoId;
+                    return 'https://www.youtube.com/watch?v='.$videoId;
                 }
             }
         }
@@ -527,7 +540,7 @@ class IGDBService
      */
     protected function getReleaseDate(Game $game): string
     {
-        if (!empty($game->release_dates)) {
+        if (! empty($game->release_dates)) {
             foreach ($game->release_dates as $release) {
                 if (isset($release['platform']) && $release['platform'] === 6 && isset($release['date'])) {
                     return Carbon::createFromTimestamp($release['date'])->format('Y-m-d');
@@ -561,20 +574,20 @@ class IGDBService
         }
 
         $additionalInfo = [];
-        if (!empty($developers)) {
-            $additionalInfo[] = 'Developer: ' . implode(', ', array_slice($developers, 0, 3));
+        if (! empty($developers)) {
+            $additionalInfo[] = 'Developer: '.implode(', ', array_slice($developers, 0, 3));
         }
-        if (!empty($game->game_modes)) {
+        if (! empty($game->game_modes)) {
             $gameModes = $game->game_modes;
             if ($gameModes instanceof \Illuminate\Support\Collection) {
-                $modes = $gameModes->map(fn($m) => is_array($m) ? ($m['name'] ?? '') : ($m->name ?? ''))->toArray();
+                $modes = $gameModes->map(fn ($m) => is_array($m) ? ($m['name'] ?? '') : ($m->name ?? ''))->toArray();
             } else {
-                $modes = array_map(fn($m) => $m['name'] ?? '', $gameModes);
+                $modes = array_map(fn ($m) => $m['name'] ?? '', $gameModes);
             }
-            $additionalInfo[] = 'Modes: ' . implode(', ', array_filter($modes));
+            $additionalInfo[] = 'Modes: '.implode(', ', array_filter($modes));
         }
-        if (!empty($additionalInfo) && !empty($review)) {
-            $review .= "\n\n" . implode("\n", $additionalInfo);
+        if (! empty($additionalInfo) && ! empty($review)) {
+            $review .= "\n\n".implode("\n", $additionalInfo);
         }
 
         return $review;
@@ -653,7 +666,7 @@ class IGDBService
                     break;
                 }
             }
-            if (empty($genreName) && !empty($tmpGenre[0])) {
+            if (empty($genreName) && ! empty($tmpGenre[0])) {
                 $genreName = trim($tmpGenre[0]);
             }
         } else {

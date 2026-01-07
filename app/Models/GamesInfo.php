@@ -25,7 +25,6 @@ use Laravel\Scout\Searchable;
  * @property string $classused
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
- *
  * @property-read Genre|null $genre
  * @property-read \Illuminate\Database\Eloquent\Collection|Release[] $releases
  *
@@ -113,11 +112,12 @@ class GamesInfo extends Model
      */
     public function getCoverPath(): ?string
     {
-        if (!$this->cover) {
+        if (! $this->cover) {
             return null;
         }
 
-        $path = config('nntmux_settings.covers_path') . '/games/' . $this->id . '.jpg';
+        $path = config('nntmux_settings.covers_path').'/games/'.$this->id.'.jpg';
+
         return file_exists($path) ? $path : null;
     }
 
@@ -126,11 +126,12 @@ class GamesInfo extends Model
      */
     public function getBackdropPath(): ?string
     {
-        if (!$this->backdrop) {
+        if (! $this->backdrop) {
             return null;
         }
 
-        $path = config('nntmux_settings.covers_path') . '/games/' . $this->id . '-backdrop.jpg';
+        $path = config('nntmux_settings.covers_path').'/games/'.$this->id.'-backdrop.jpg';
+
         return file_exists($path) ? $path : null;
     }
 }

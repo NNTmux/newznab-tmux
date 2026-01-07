@@ -2,9 +2,9 @@
 
 namespace App\Services\TvProcessing\Pipes;
 
+use App\Services\TvProcessing\Providers\LocalDbProvider;
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
-use App\Services\TvProcessing\Providers\LocalDbProvider;
 use Closure;
 
 /**
@@ -14,6 +14,7 @@ use Closure;
 class ParseInfoPipe extends AbstractTvProviderPipe
 {
     protected int $priority = 1;
+
     private ?LocalDbProvider $localDb = null;
 
     public function getName(): string
@@ -32,8 +33,9 @@ class ParseInfoPipe extends AbstractTvProviderPipe
     private function getLocalDb(): LocalDbProvider
     {
         if ($this->localDb === null) {
-            $this->localDb = new LocalDbProvider();
+            $this->localDb = new LocalDbProvider;
         }
+
         return $this->localDb;
     }
 

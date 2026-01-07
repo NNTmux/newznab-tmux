@@ -7,7 +7,6 @@ use App\Models\Predb;
 use App\Models\Release;
 use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Process;
 
 class NntmuxOffsetPopulate extends Command

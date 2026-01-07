@@ -6,16 +6,16 @@ use App\Models\MediaInfo as MediaInfoModel;
 use App\Models\Predb;
 use App\Models\Release;
 use App\Models\ReleaseFile;
-use App\Services\Nzb\NzbService;
-use App\Services\ReleaseImageService;
-use App\Services\Releases\ReleaseBrowseService;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
 use App\Services\NameFixing\NameFixingService;
 use App\Services\NameFixing\ReleaseUpdateService;
 use App\Services\NfoService;
 use App\Services\NNTP\NNTPService;
+use App\Services\Nzb\NzbService;
 use App\Services\ReleaseExtraService;
+use App\Services\ReleaseImageService;
+use App\Services\Releases\ReleaseBrowseService;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
@@ -27,7 +27,6 @@ use Illuminate\Support\Facades\Log;
  */
 class ReleaseFileManager
 {
-
     public function __construct(
         private readonly ProcessingConfiguration $config,
         private readonly ReleaseExtraService $releaseExtra,
@@ -39,6 +38,7 @@ class ReleaseFileManager
 
     /**
      * Add file information to the database.
+     *
      * @throws \Exception
      */
     public function addFileInfo(
@@ -50,6 +50,7 @@ class ReleaseFileManager
             if ($this->config->debugMode) {
                 Log::debug("Error: {$file['error']} (in: {$file['source']})");
             }
+
             return false;
         }
 
@@ -61,6 +62,7 @@ class ReleaseFileManager
         if (isset($file['pass']) && $file['pass'] === true) {
             $context->releaseHasPassword = true;
             $context->passwordStatus = ReleaseBrowseService::PASSWD_RAR;
+
             return false;
         }
 
@@ -70,6 +72,7 @@ class ReleaseFileManager
         ) {
             $context->releaseHasPassword = true;
             $context->passwordStatus = ReleaseBrowseService::PASSWD_RAR;
+
             return false;
         }
 
@@ -357,6 +360,7 @@ class ReleaseFileManager
                 && $this->nfo->addAlternateNfo($data, $context->release, $nntp)
             ) {
                 $context->releaseHasNoNFO = false;
+
                 return true;
             }
         } catch (FileNotFoundException $e) {
@@ -369,7 +373,7 @@ class ReleaseFileManager
     /**
      * Check if a filename looks like an NFO file.
      *
-     * @param string $filename The filename to check.
+     * @param  string  $filename  The filename to check.
      * @return bool True if the filename matches NFO patterns.
      */
     public function isNfoFilename(string $filename): bool
@@ -404,7 +408,7 @@ class ReleaseFileManager
      * NFO files often use CP437 (DOS) encoding for ASCII art.
      * This method attempts to detect and convert various encodings.
      *
-     * @param string $data Raw NFO data.
+     * @param  string  $data  Raw NFO data.
      * @return string UTF-8 encoded NFO data.
      */
     protected function normalizeNfoEncoding(string $data): string
@@ -470,7 +474,7 @@ class ReleaseFileManager
             $candidate = $this->normalizeCandidateTitle($candidate);
 
             if ($this->isPlausibleReleaseTitle($candidate)) {
-                (new ReleaseUpdateService())->updateRelease(
+                (new ReleaseUpdateService)->updateRelease(
                     $context->release,
                     $candidate,
                     'RarInfo FileName Match',
@@ -496,7 +500,7 @@ class ReleaseFileManager
                 $candidate = $this->normalizeCandidateTitle($candidate);
 
                 if ($this->isPlausibleReleaseTitle($candidate)) {
-                    (new ReleaseUpdateService())->updateRelease(
+                    (new ReleaseUpdateService)->updateRelease(
                         $context->release,
                         $candidate,
                         'RarInfo FileName Match',
@@ -544,6 +548,7 @@ class ReleaseFileManager
         $t = preg_replace('/\.(par2?|nfo|sfv|nzb|rar|zip|r\d{2,3}|pkg|exe|msi|jpe?g|png|gif|bmp)$/i', '', $t) ?? $t;
         $t = preg_replace('/[.\-_ ](?:part|vol|r)\d+(?:\+\d+)?$/i', '', $t) ?? $t;
         $t = preg_replace('/[\s_]+/', ' ', $t) ?? $t;
+
         return trim($t, " .-_\t\r\n");
     }
 
@@ -579,4 +584,3 @@ class ReleaseFileManager
         return $hasGroupSuffix || ($hasTV && $hasQuality) || ($hasYear && ($hasQuality || $hasTV)) || $hasXXX;
     }
 }
-

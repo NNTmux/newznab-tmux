@@ -29,4 +29,3 @@ class BookCollection extends ResourceCollection
         ];
     }
 }
-

@@ -53,4 +53,3 @@ final readonly class BinariesConfig
         return $value !== '' ? (int) $value : $default;
     }
 }
-

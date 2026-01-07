@@ -41,7 +41,7 @@ class SearchServiceProvider extends ServiceProvider
 
         // Register the MediaSearchService for optimized movie/TV searches
         $this->app->singleton(MediaSearchService::class, function (Application $app) {
-            return new MediaSearchService();
+            return new MediaSearchService;
         });
 
         // Register individual drivers as singletons for direct access
@@ -72,4 +72,3 @@ class SearchServiceProvider extends ServiceProvider
         //
     }
 }
-

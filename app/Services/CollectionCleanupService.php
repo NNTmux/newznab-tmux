@@ -9,8 +9,7 @@ use Illuminate\Support\Str;
 
 class CollectionCleanupService
 {
-    public function __construct()
-    {}
+    public function __construct() {}
 
     /**
      * Deletes finished/old collections, cleans orphans, and removes collections missed after NZB creation.

@@ -25,14 +25,14 @@ class XXXProcessor
     /**
      * Process a single movie title and return the result.
      *
-     * @param string $movie Movie title to look up
-     * @param bool $debug Whether to include debug information
+     * @param  string  $movie  Movie title to look up
+     * @param  bool  $debug  Whether to include debug information
      * @return array Processing result
      */
     public function lookupMovie(string $movie, bool $debug = false): array
     {
         $pipeline = new AdultProcessingPipeline([], $this->echooutput);
+
         return $pipeline->processMovie($movie, $debug);
     }
 }
-

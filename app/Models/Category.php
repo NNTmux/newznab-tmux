@@ -309,7 +309,7 @@ class Category extends Model
     public static function getCategorySearch(array $cat = [], ?string $searchType = null, $builder = false): string|array|null
     {
         // Generate a cache key based on the input parameters
-        $cacheKey = 'cat_search_' . md5(serialize($cat) . $searchType . ($builder ? '1' : '0'));
+        $cacheKey = 'cat_search_'.md5(serialize($cat).$searchType.($builder ? '1' : '0'));
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
@@ -342,7 +342,7 @@ class Category extends Model
             $categoryInt = (int) $category;
             if (is_numeric($category) && $categoryInt !== -1 && self::isParent($categoryInt)) {
                 // Cache child category IDs for parent categories
-                $childCacheKey = 'cat_children_' . $categoryInt;
+                $childCacheKey = 'cat_children_'.$categoryInt;
                 $children = Cache::get($childCacheKey);
                 if ($children === null) {
                     $children = RootCategory::find($categoryInt)->categories->pluck('id')->toArray();
@@ -363,6 +363,7 @@ class Category extends Model
                 default => $categories,
             };
             Cache::put($cacheKey, $result, now()->addHours(24));
+
             return $result;
         }
 
@@ -373,6 +374,7 @@ class Category extends Model
         };
 
         Cache::put($cacheKey, $result, now()->addHours(24));
+
         return $result;
     }
 
@@ -401,7 +403,7 @@ class Category extends Model
     public static function isParent($cid): bool
     {
         // Cache the parent category check to avoid repeated DB queries
-        $cacheKey = 'cat_is_parent_' . $cid;
+        $cacheKey = 'cat_is_parent_'.$cid;
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;

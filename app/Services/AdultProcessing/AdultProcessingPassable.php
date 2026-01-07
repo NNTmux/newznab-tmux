@@ -8,9 +8,13 @@ namespace App\Services\AdultProcessing;
 class AdultProcessingPassable
 {
     public AdultReleaseContext $context;
+
     public AdultProcessingResult $result;
+
     public bool $debug;
+
     public array $providerResults = [];
+
     public ?string $cookie = null;
 
     public function __construct(AdultReleaseContext $context, bool $debug = false, ?string $cookie = null)
@@ -88,4 +92,3 @@ class AdultProcessingPassable
         return $returnValue;
     }
 }
-

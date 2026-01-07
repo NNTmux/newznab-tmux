@@ -8,9 +8,13 @@ namespace App\Services\TvProcessing;
 class TvProcessingResult
 {
     public const STATUS_MATCHED = 'matched';
+
     public const STATUS_NOT_FOUND = 'not_found';
+
     public const STATUS_PARSE_FAILED = 'parse_failed';
+
     public const STATUS_SKIPPED = 'skipped';
+
     public const STATUS_PENDING = 'pending';
 
     public function __construct(
@@ -94,4 +98,3 @@ class TvProcessingResult
         return ! $this->isMatched();
     }
 }
-

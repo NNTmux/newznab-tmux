@@ -12,7 +12,7 @@ class ValidEmailDomainTest extends TestCase
      */
     public function test_rejects_disposable_email_domains(): void
     {
-        $rule = new ValidEmailDomain();
+        $rule = new ValidEmailDomain;
 
         $disposableEmails = [
             'test@guerrillamail.com',
@@ -25,7 +25,7 @@ class ValidEmailDomainTest extends TestCase
 
         foreach ($disposableEmails as $email) {
             $failed = false;
-            $rule->validate('email', $email, function($message) use (&$failed) {
+            $rule->validate('email', $email, function ($message) use (&$failed) {
                 $failed = true;
             });
 
@@ -38,7 +38,7 @@ class ValidEmailDomainTest extends TestCase
      */
     public function test_accepts_legitimate_email_domains(): void
     {
-        $rule = new ValidEmailDomain();
+        $rule = new ValidEmailDomain;
 
         $legitimateEmails = [
             'test@gmail.com',
@@ -49,7 +49,7 @@ class ValidEmailDomainTest extends TestCase
 
         foreach ($legitimateEmails as $email) {
             $failed = false;
-            $rule->validate('email', $email, function($message) use (&$failed) {
+            $rule->validate('email', $email, function ($message) use (&$failed) {
                 $failed = true;
             });
 
@@ -62,7 +62,7 @@ class ValidEmailDomainTest extends TestCase
      */
     public function test_rejects_emails_with_suspicious_patterns(): void
     {
-        $rule = new ValidEmailDomain();
+        $rule = new ValidEmailDomain;
 
         $suspiciousEmails = [
             'test@tempdomainexample.com',
@@ -72,7 +72,7 @@ class ValidEmailDomainTest extends TestCase
 
         foreach ($suspiciousEmails as $email) {
             $failed = false;
-            $rule->validate('email', $email, function($message) use (&$failed) {
+            $rule->validate('email', $email, function ($message) use (&$failed) {
                 $failed = true;
             });
 
@@ -85,7 +85,7 @@ class ValidEmailDomainTest extends TestCase
      */
     public function test_rejects_emails_with_invalid_domains(): void
     {
-        $rule = new ValidEmailDomain();
+        $rule = new ValidEmailDomain;
 
         $invalidEmails = [
             'test@nonexistentdomain12345xyz.com',
@@ -94,7 +94,7 @@ class ValidEmailDomainTest extends TestCase
 
         foreach ($invalidEmails as $email) {
             $failed = false;
-            $rule->validate('email', $email, function($message) use (&$failed) {
+            $rule->validate('email', $email, function ($message) use (&$failed) {
                 $failed = true;
             });
 
@@ -109,7 +109,7 @@ class ValidEmailDomainTest extends TestCase
      */
     public function test_rejects_malformed_emails(): void
     {
-        $rule = new ValidEmailDomain();
+        $rule = new ValidEmailDomain;
 
         $malformedEmails = [
             'notanemail',
@@ -119,7 +119,7 @@ class ValidEmailDomainTest extends TestCase
 
         foreach ($malformedEmails as $email) {
             $failed = false;
-            $rule->validate('email', $email, function($message) use (&$failed) {
+            $rule->validate('email', $email, function ($message) use (&$failed) {
                 $failed = true;
             });
 
@@ -127,4 +127,3 @@ class ValidEmailDomainTest extends TestCase
         }
     }
 }
-

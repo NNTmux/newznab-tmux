@@ -12,11 +12,12 @@ use App\Services\Categorization\ReleaseContext;
 class MoviePipe extends AbstractCategorizationPipe
 {
     protected int $priority = 25;
+
     private MovieCategorizer $categorizer;
 
     public function __construct()
     {
-        $this->categorizer = new MovieCategorizer();
+        $this->categorizer = new MovieCategorizer;
     }
 
     public function getName(): string
@@ -34,4 +35,3 @@ class MoviePipe extends AbstractCategorizationPipe
         return $this->categorizer->categorize($context);
     }
 }
-

@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
 use App\Models\Content;
-use App\Models\User;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class AdminContentController extends BasePageController
@@ -36,6 +34,7 @@ class AdminContentController extends BasePageController
      * Show form to create or edit content.
      *
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
+     *
      * @throws \Exception
      */
     public function create(Request $request)
@@ -90,13 +89,13 @@ class AdminContentController extends BasePageController
 
         $contenttypelist = [
             Content::TYPE_USEFUL => 'Useful Link',
-            Content::TYPE_INDEX => 'Homepage'
+            Content::TYPE_INDEX => 'Homepage',
         ];
 
         $rolelist = [
             Content::ROLE_EVERYONE => 'Everyone',
             Content::ROLE_LOGGED_IN => 'Logged in Users',
-            Content::ROLE_ADMIN => 'Admins'
+            Content::ROLE_ADMIN => 'Admins',
         ];
 
         $this->viewData = array_merge($this->viewData, [
@@ -132,14 +131,14 @@ class AdminContentController extends BasePageController
                 return response()->json([
                     'success' => true,
                     'status' => $newStatus,
-                    'message' => $newStatus === Content::STATUS_ENABLED ? 'Content enabled' : 'Content disabled'
+                    'message' => $newStatus === Content::STATUS_ENABLED ? 'Content enabled' : 'Content disabled',
                 ]);
             }
         }
 
         return response()->json([
             'success' => false,
-            'message' => 'Content not found'
+            'message' => 'Content not found',
         ], 404);
     }
 
@@ -158,7 +157,7 @@ class AdminContentController extends BasePageController
                 if ($request->wantsJson() || $request->ajax()) {
                     return response()->json([
                         'success' => true,
-                        'message' => 'Content deleted successfully'
+                        'message' => 'Content deleted successfully',
                     ]);
                 }
 
@@ -169,12 +168,13 @@ class AdminContentController extends BasePageController
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Content not found'
+                    'message' => 'Content not found',
                 ], 404);
             }
         }
 
         $referrer = $request->server('HTTP_REFERER');
+
         return redirect()->to($referrer)->with('error', 'Invalid request');
     }
 
@@ -248,17 +248,17 @@ class AdminContentController extends BasePageController
 
             // Check if URL is external (has protocol or is a domain pattern)
             $hasProtocol = str_starts_with($url, 'http://') || str_starts_with($url, 'https://');
-            $isDomain = !str_starts_with($url, '/') && preg_match('/^[a-zA-Z0-9][a-zA-Z0-9-]*\.[a-zA-Z]{2,}/', $url);
+            $isDomain = ! str_starts_with($url, '/') && preg_match('/^[a-zA-Z0-9][a-zA-Z0-9-]*\.[a-zA-Z]{2,}/', $url);
 
             // Only normalize internal URLs (those starting with / or root)
-            if (!$hasProtocol && !$isDomain) {
+            if (! $hasProtocol && ! $isDomain) {
                 // Ensure internal URL starts with /
-                if ($url !== '/' && !str_starts_with($url, '/')) {
-                    $data['url'] = '/' . $url;
+                if ($url !== '/' && ! str_starts_with($url, '/')) {
+                    $data['url'] = '/'.$url;
                 }
 
                 // Ensure internal URL ends with /
-                if (!str_ends_with($data['url'], '/')) {
+                if (! str_ends_with($data['url'], '/')) {
                     $data['url'] .= '/';
                 }
             }

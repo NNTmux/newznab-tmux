@@ -29,7 +29,6 @@ class ReleaseExtraService
      * Get video data as array.
      *
      * @param  int  $id  Release ID
-     * @return array|false
      */
     public function getVideo(int $id): false|array
     {
@@ -46,7 +45,6 @@ class ReleaseExtraService
      * Get audio data for a release.
      *
      * @param  int  $id  Release ID
-     * @return array|false
      */
     public function getAudio(int $id): false|array
     {
@@ -339,4 +337,3 @@ class ReleaseExtraService
         }
     }
 }
-

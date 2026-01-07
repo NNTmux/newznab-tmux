@@ -127,4 +127,3 @@ class UserRoleHistory extends Model
             ->get();
     }
 }
-

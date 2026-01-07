@@ -12,11 +12,12 @@ use App\Services\Categorization\ReleaseContext;
 class TvPipe extends AbstractCategorizationPipe
 {
     protected int $priority = 20;
+
     private TvCategorizer $categorizer;
 
     public function __construct()
     {
-        $this->categorizer = new TvCategorizer();
+        $this->categorizer = new TvCategorizer;
     }
 
     public function getName(): string
@@ -34,4 +35,3 @@ class TvPipe extends AbstractCategorizationPipe
         return $this->categorizer->categorize($context);
     }
 }
-

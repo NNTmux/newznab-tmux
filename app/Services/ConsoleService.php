@@ -67,7 +67,7 @@ class ConsoleService
         $this->asstag = Settings::settingValue('amazonassociatetag');
         $this->gameQty = (Settings::settingValue('maxgamesprocessed') !== '') ? (int) Settings::settingValue('maxgamesprocessed') : 150;
         $this->sleepTime = (Settings::settingValue('amazonsleep') !== '') ? (int) Settings::settingValue('amazonsleep') : 1000;
-        $this->imgSavePath = config('nntmux_settings.covers_path') . '/console/';
+        $this->imgSavePath = config('nntmux_settings.covers_path').'/console/';
         $this->renamed = (int) Settings::settingValue('lookupgames') === 2;
 
         $this->failCache = [];
@@ -103,11 +103,11 @@ class ConsoleService
         foreach (explode(' ', $title) as $word) {
             $word = trim(rtrim(trim($word), '-'));
             if ($word !== '' && $word !== '-') {
-                $word = '+' . $word;
+                $word = '+'.$word;
                 $searchWords .= sprintf('%s ', $word);
             }
         }
-        $searchWords = trim($searchWords . '+' . $platform);
+        $searchWords = trim($searchWords.'+'.$platform);
 
         return ConsoleInfo::search($searchWords)->first() ?? false;
     }
@@ -133,7 +133,7 @@ class ConsoleService
         }
         $exccatlist = '';
         if (\count($excludedCats) > 0) {
-            $exccatlist = ' AND r.categories_id NOT IN (' . implode(',', $excludedCats) . ')';
+            $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')';
         }
         $order = $this->getConsoleOrder($orderBy);
         $calcSql = sprintf(
@@ -155,17 +155,17 @@ class ConsoleService
             $exccatlist,
             $order[0],
             $order[1],
-            ($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
+            ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
         );
 
-        $cached = Cache::get(md5($calcSql . $page));
+        $cached = Cache::get(md5($calcSql.$page));
         if ($cached !== null) {
             $consoles = $cached;
         } else {
             $data = DB::select($calcSql);
             $consoles = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
             $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-            Cache::put(md5($calcSql . $page), $consoles, $expiresAt);
+            Cache::put(md5($calcSql.$page), $consoles, $expiresAt);
         }
 
         $consoleIDs = $releaseIDs = false;
@@ -203,7 +203,7 @@ class ConsoleService
             $order[1]
         );
 
-        $return = Cache::get(md5($sql . $page));
+        $return = Cache::get(md5($sql.$page));
         if ($return !== null) {
             return $return;
         }
@@ -214,7 +214,7 @@ class ConsoleService
         }
 
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
-        Cache::put(md5($sql . $page), $return, $expiresAt);
+        Cache::put(md5($sql.$page), $return, $expiresAt);
 
         return $return;
     }
@@ -277,7 +277,7 @@ class ConsoleService
         foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
             if (! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
-                $browseBy .= ' AND con.' . $bbv . ' LIKE ' . escapeString('%' . $bbs . '%');
+                $browseBy .= ' AND con.'.$bbv.' LIKE '.escapeString('%'.$bbs.'%');
             }
         }
 
@@ -351,12 +351,12 @@ class ConsoleService
             $consoleId = $this->updateConsoleTable($igdb);
 
             if ($this->echoOutput && $consoleId !== -2) {
-                cli()->header('Added/updated game: ') .
-                    cli()->alternateOver('   Title:    ') .
-                    cli()->primary($igdb['title']) .
-                    cli()->alternateOver('   Platform: ') .
-                    cli()->primary($igdb['platform']) .
-                    cli()->alternateOver('   Genre: ') .
+                cli()->header('Added/updated game: ').
+                    cli()->alternateOver('   Title:    ').
+                    cli()->primary($igdb['title']).
+                    cli()->alternateOver('   Platform: ').
+                    cli()->primary($igdb['platform']).
+                    cli()->alternateOver('   Genre: ').
                     cli()->primary($igdb['consolegenre']);
             }
         }
@@ -435,9 +435,9 @@ class ConsoleService
                             'title' => $game->name,
                             'asin' => $game->id,
                             'review' => $game->summary ?? '',
-                            'coverurl' => ! empty($game->cover->url) ? 'https:' . $game->cover->url : '',
+                            'coverurl' => ! empty($game->cover->url) ? 'https:'.$game->cover->url : '',
                             'releasedate' => ! empty($game->first_release_date) ? $game->first_release_date->format('Y-m-d') : now()->format('Y-m-d'),
-                            'esrb' => ! empty($game->aggregated_rating) ? round($game->aggregated_rating) . '%' : 'Not Rated',
+                            'esrb' => ! empty($game->aggregated_rating) ? round($game->aggregated_rating).'%' : 'Not Rated',
                             'url' => $game->url ?? '',
                             'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
                             'platform' => $platform ?? '',
@@ -460,7 +460,7 @@ class ConsoleService
                     $this->igdbSleep = now()->endOfMonth();
                 }
             } catch (\Exception $e) {
-                cli()->error('Error fetching IGDB properties: ' . $e->getMessage());
+                cli()->error('Error fetching IGDB properties: '.$e->getMessage());
 
                 return false;
             }
@@ -494,7 +494,7 @@ class ConsoleService
         $releaseCount = $res->count();
         if ($res instanceof \Traversable && $releaseCount > 0) {
             if ($this->echoOutput) {
-                cli()->header('Processing ' . $releaseCount . ' console release(s).');
+                cli()->header('Processing '.$releaseCount.' console release(s).');
             }
 
             foreach ($res as $arr) {
@@ -505,13 +505,13 @@ class ConsoleService
 
                 if ($gameInfo !== false) {
                     if ($this->echoOutput) {
-                        cli()->info('Looking up: ' . $gameInfo['title'] . ' (' . $gameInfo['platform'] . ')');
+                        cli()->info('Looking up: '.$gameInfo['title'].' ('.$gameInfo['platform'].')');
                     }
 
                     // Check for existing console entry.
                     $gameCheck = $this->getConsoleInfoByName($gameInfo['title'], $gameInfo['platform']);
 
-                    if ($gameCheck === false && \in_array($gameInfo['title'] . $gameInfo['platform'], $this->failCache, false)) {
+                    if ($gameCheck === false && \in_array($gameInfo['title'].$gameInfo['platform'], $this->failCache, false)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echoOutput) {
                             cli()->info('Cached previous failure. Skipping.');
@@ -522,11 +522,11 @@ class ConsoleService
                         $usedAmazon = true;
                         if ($gameId === null) {
                             $gameId = -2;
-                            $this->failCache[] = $gameInfo['title'] . $gameInfo['platform'];
+                            $this->failCache[] = $gameInfo['title'].$gameInfo['platform'];
                         }
                     } else {
                         if ($this->echoOutput) {
-                            cli()->headerOver('Found Local: ') .
+                            cli()->headerOver('Found Local: ').
                                 cli()->primary("{$gameInfo['title']} - {$gameInfo['platform']}");
                         }
                         $gameId = $gameCheck['id'] ?? -2;
@@ -555,8 +555,6 @@ class ConsoleService
 
     /**
      * Parse release title for game info.
-     *
-     * @return array|false
      */
     public function parseTitle(string $releaseName): array|false
     {
@@ -681,8 +679,6 @@ class ConsoleService
 
     /**
      * Match browse node to genre name.
-     *
-     * @return bool|string
      */
     public function matchBrowseNode(string $nodeName): bool|string
     {
@@ -770,7 +766,6 @@ class ConsoleService
     /**
      * Get or create genre key.
      *
-     * @return false|int|string
      *
      * @throws \Exception
      */
@@ -799,4 +794,3 @@ class ConsoleService
         return $gen->loadGenres((string) GenreService::CONSOLE_TYPE);
     }
 }
-

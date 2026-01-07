@@ -10,7 +10,6 @@
  * Original location: misc/update/tmux/bin/groupfixrelnames.php
  * New location: app/Services/Tmux/Scripts/groupfixrelnames.php
  */
-
 if (! isset($argv[1])) {
     fwrite(STDERR, "This script is not intended to be run manually, it is called from Multiprocessing.\n");
     exit(1);

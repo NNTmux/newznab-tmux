@@ -15,10 +15,13 @@ class PoppornPipe extends AbstractAdultProviderPipe
     protected int $priority = 20;
 
     private const BASE_URL = 'https://www.popporn.com';
+
     private const SEARCH_ENDPOINT = '/search?q=';
 
     protected string $directUrl = '';
+
     protected string $title = '';
+
     protected string $response = '';
 
     public function getName(): string
@@ -44,6 +47,7 @@ class PoppornPipe extends AbstractAdultProviderPipe
 
         if ($searchResult === false) {
             $this->outputNotFound();
+
             return AdultProcessingResult::notFound($this->getName());
         }
 
@@ -83,7 +87,7 @@ class PoppornPipe extends AbstractAdultProviderPipe
         // First, establish a session by visiting the AgeConfirmation endpoint to set cookies
         $this->acceptAgeVerification();
 
-        $searchUrl = self::BASE_URL . self::SEARCH_ENDPOINT . urlencode($movie);
+        $searchUrl = self::BASE_URL.self::SEARCH_ENDPOINT.urlencode($movie);
         $response = $this->fetchHtml($searchUrl, $this->cookie);
 
         if (empty($response)) {
@@ -105,19 +109,19 @@ class PoppornPipe extends AbstractAdultProviderPipe
         foreach ($resultSelectors as $selector) {
             $results = $this->getHtmlParser()->find($selector);
 
-            if (!empty($results)) {
+            if (! empty($results)) {
                 foreach ($results as $result) {
                     $title = $result->title ?? $result->plaintext;
                     $url = $result->href;
 
-                    if (!empty($title)) {
+                    if (! empty($title)) {
                         $similarity = $this->calculateSimilarity($movie, $title);
 
                         if ($similarity > $highestSimilarity) {
                             $highestSimilarity = $similarity;
                             $bestMatch = [
                                 'title' => trim($title),
-                                'url' => str_starts_with($url, 'http') ? $url : self::BASE_URL . $url,
+                                'url' => str_starts_with($url, 'http') ? $url : self::BASE_URL.$url,
                             ];
                         }
                     }
@@ -138,8 +142,8 @@ class PoppornPipe extends AbstractAdultProviderPipe
     {
         $results = [];
 
-        if (!empty($this->directUrl)) {
-            if (!empty($this->title)) {
+        if (! empty($this->directUrl)) {
+            if (! empty($this->title)) {
                 $results['title'] = $this->title;
             }
             $results['directurl'] = $this->directUrl;
@@ -233,6 +237,7 @@ class PoppornPipe extends AbstractAdultProviderPipe
         // Method 1: Try structured data
         if (preg_match('/"description":\s*"(.*?)"/is', $this->response, $match)) {
             $res['synopsis'] = trim(html_entity_decode(str_replace('\\u', '\\u', $match[1])));
+
             return $res;
         }
 
@@ -255,8 +260,9 @@ class PoppornPipe extends AbstractAdultProviderPipe
                     }
                 }
 
-                if (!empty($text)) {
+                if (! empty($text)) {
                     $res['synopsis'] = trim($text);
+
                     return $res;
                 }
             }
@@ -272,8 +278,9 @@ class PoppornPipe extends AbstractAdultProviderPipe
         // Method 1: Try structured data
         if (preg_match('/"contentUrl":\s*"(.*?)"/is', $this->response, $match)) {
             $url = trim($match[1]);
-            if (!empty($url)) {
+            if (! empty($url)) {
                 $res['trailers']['url'] = $url;
+
                 return $res;
             }
         }
@@ -287,8 +294,9 @@ class PoppornPipe extends AbstractAdultProviderPipe
 
         foreach ($videoSelectors as $selector) {
             $ret = $this->getHtmlParser()->findOne($selector);
-            if ($ret && isset($ret->src) && !empty(trim($ret->src))) {
+            if ($ret && isset($ret->src) && ! empty(trim($ret->src))) {
                 $res['trailers']['url'] = trim($ret->src);
+
                 return $res;
             }
         }
@@ -330,7 +338,7 @@ class PoppornPipe extends AbstractAdultProviderPipe
 
                     if ($country === true) {
                         if (stripos($e, 'addthis_config') === false) {
-                            if (!empty($e)) {
+                            if (! empty($e)) {
                                 $rawInfo[] = $e;
                             }
                         } else {
@@ -339,7 +347,7 @@ class PoppornPipe extends AbstractAdultProviderPipe
                     }
                 }
 
-                if (!empty($rawInfo)) {
+                if (! empty($rawInfo)) {
                     $productInfo = array_chunk($rawInfo, 2, false);
                     break;
                 }
@@ -366,15 +374,16 @@ class PoppornPipe extends AbstractAdultProviderPipe
                         $text = trim($e->plaintext);
                         if ($text === 'Features:') {
                             $features = true;
+
                             continue;
                         }
 
-                        if ($features === true && !empty($text)) {
+                        if ($features === true && ! empty($text)) {
                             $extrasData[] = $text;
                         }
                     }
 
-                    if (!empty($extrasData)) {
+                    if (! empty($extrasData)) {
                         $res['extras'] = $extrasData;
                         break;
                     }
@@ -412,7 +421,7 @@ class PoppornPipe extends AbstractAdultProviderPipe
 
             foreach ($castSelectors as $selector) {
                 $elements = $this->getHtmlParser()->find($selector);
-                if (!empty($elements)) {
+                if (! empty($elements)) {
                     foreach ($elements as $element) {
                         $cast[] = trim($element->plaintext);
                     }
@@ -450,7 +459,7 @@ class PoppornPipe extends AbstractAdultProviderPipe
 
             foreach ($selectors as $selector) {
                 $elements = $this->getHtmlParser()->find($selector);
-                if (!empty($elements)) {
+                if (! empty($elements)) {
                     foreach ($elements as $e) {
                         $genres[] = trim($e->plaintext);
                     }
@@ -480,7 +489,7 @@ class PoppornPipe extends AbstractAdultProviderPipe
 
             // First, make a request that disables redirects to see where we're being sent
             try {
-                $response = $client->get(self::BASE_URL . '/', [
+                $response = $client->get(self::BASE_URL.'/', [
                     'headers' => $this->getDefaultHeaders(),
                     'allow_redirects' => false,
                     'http_errors' => false,
@@ -495,8 +504,8 @@ class PoppornPipe extends AbstractAdultProviderPipe
                     if (stripos($location, 'AgeConfirmation') !== false) {
                         // The redirect URL includes ?url2= parameter, we need to visit it
                         $ageConfirmUrl = $location;
-                        if (!str_starts_with($ageConfirmUrl, 'http')) {
-                            $ageConfirmUrl = self::BASE_URL . $ageConfirmUrl;
+                        if (! str_starts_with($ageConfirmUrl, 'http')) {
+                            $ageConfirmUrl = self::BASE_URL.$ageConfirmUrl;
                         }
 
                         // Visit the age confirmation page
@@ -506,7 +515,7 @@ class PoppornPipe extends AbstractAdultProviderPipe
                             'http_errors' => false,
                         ]);
 
-                        \Illuminate\Support\Facades\Log::debug('PopPorn age confirmation visited: ' . $ageConfirmUrl);
+                        \Illuminate\Support\Facades\Log::debug('PopPorn age confirmation visited: '.$ageConfirmUrl);
                     }
                 }
             } catch (\Exception $e) {
@@ -518,8 +527,7 @@ class PoppornPipe extends AbstractAdultProviderPipe
 
         } catch (\Exception $e) {
             // Log but don't fail - we'll try the search anyway
-            \Illuminate\Support\Facades\Log::debug('PopPorn age verification setup: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::debug('PopPorn age verification setup: '.$e->getMessage());
         }
     }
 }
-

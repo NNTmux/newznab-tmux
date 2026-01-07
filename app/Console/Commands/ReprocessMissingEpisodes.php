@@ -67,6 +67,7 @@ class ReprocessMissingEpisodes extends Command
 
         if ($totalCount === 0) {
             $this->info('No TV releases with missing episode matches found.');
+
             return self::SUCCESS;
         }
 
@@ -91,7 +92,7 @@ class ReprocessMissingEpisodes extends Command
                 $rows = $sample->map(fn ($release) => [
                     $release->id,
                     $release->videos_id,
-                    mb_substr($release->searchname, 0, 55) . (strlen($release->searchname) > 55 ? '...' : ''),
+                    mb_substr($release->searchname, 0, 55).(strlen($release->searchname) > 55 ? '...' : ''),
                 ])->toArray();
                 $this->table(['ID', 'Video ID', 'Search Name'], $rows);
             }
@@ -134,9 +135,9 @@ class ReprocessMissingEpisodes extends Command
                         if ($debug) {
                             $this->newLine();
                             cli()->primary("Episode matched: {$release->searchname}");
-                            $this->info('  Provider: ' . ($result['provider'] ?? 'Unknown'));
-                            $this->info('  Video ID: ' . ($result['video_id'] ?? 'N/A'));
-                            $this->info('  Episode ID: ' . ($result['episode_id'] ?? 'N/A'));
+                            $this->info('  Provider: '.($result['provider'] ?? 'Unknown'));
+                            $this->info('  Video ID: '.($result['video_id'] ?? 'N/A'));
+                            $this->info('  Episode ID: '.($result['episode_id'] ?? 'N/A'));
                         }
                     } else {
                         $failed++;
@@ -147,10 +148,10 @@ class ReprocessMissingEpisodes extends Command
                     }
                 } catch (\Throwable $e) {
                     $failed++;
-                    Log::error("Error processing release {$release->guid}: " . $e->getMessage());
+                    Log::error("Error processing release {$release->guid}: ".$e->getMessage());
                     if ($debug) {
                         $this->newLine();
-                        $this->error("Error processing {$release->searchname}: " . $e->getMessage());
+                        $this->error("Error processing {$release->searchname}: ".$e->getMessage());
                     }
                 }
 
@@ -167,8 +168,9 @@ class ReprocessMissingEpisodes extends Command
         } catch (\Throwable $e) {
             $bar->finish();
             $this->newLine();
-            $this->error('Fatal error during processing: ' . $e->getMessage());
-            Log::error('Fatal error in tv:reprocess-missing-episodes: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            $this->error('Fatal error during processing: '.$e->getMessage());
+            Log::error('Fatal error in tv:reprocess-missing-episodes: '.$e->getMessage()."\n".$e->getTraceAsString());
+
             return self::FAILURE;
         }
 
@@ -182,11 +184,10 @@ class ReprocessMissingEpisodes extends Command
                 number_format($processed),
                 number_format($matched),
                 number_format($failed),
-                $processed > 0 ? round(($matched / $processed) * 100, 2) . '%' : '0%',
+                $processed > 0 ? round(($matched / $processed) * 100, 2).'%' : '0%',
             ]]
         );
 
         return self::SUCCESS;
     }
 }
-

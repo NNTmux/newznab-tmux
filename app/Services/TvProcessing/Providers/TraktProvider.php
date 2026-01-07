@@ -40,7 +40,7 @@ class TraktProvider extends AbstractTvProvider
     public function __construct()
     {
         parent::__construct();
-        $this->client = new TraktService();
+        $this->client = new TraktService;
     }
 
     /**
@@ -423,7 +423,7 @@ class TraktProvider extends AbstractTvProvider
     protected function lookupTvMazeId(int $tvdbId, int|string $imdbId): int
     {
         try {
-            $tvmazeClient = new \DariusIII\TVMaze\TVMaze();
+            $tvmazeClient = new \DariusIII\TVMaze\TVMaze;
 
             // Try TVDB ID first
             if ($tvdbId > 0) {
@@ -435,7 +435,7 @@ class TraktProvider extends AbstractTvProvider
 
             // Try IMDB ID as fallback
             if (! empty($imdbId) && $imdbId > 0) {
-                $imdbFormatted = 'tt' . str_pad((string) $imdbId, 7, '0', STR_PAD_LEFT);
+                $imdbFormatted = 'tt'.str_pad((string) $imdbId, 7, '0', STR_PAD_LEFT);
                 $result = $tvmazeClient->getShowBySiteID('imdb', $imdbFormatted);
                 if ($result !== null && isset($result->id)) {
                     return (int) $result->id;

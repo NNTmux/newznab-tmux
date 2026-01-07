@@ -11,7 +11,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Jrean\UserVerification\Facades\UserVerification;
 use Spatie\Permission\Models\Role;
-use Stevebauman\Location\Facades\Location;
 
 class AdminUserController extends BasePageController
 {
@@ -212,7 +211,7 @@ class AdminUserController extends BasePageController
                         User::updateUserRole(
                             $editedUser->id,
                             (int) $request->input('role'), // Cast to integer
-                            !$adminManuallySetExpiry, // Only apply promotions if admin didn't set custom expiry
+                            ! $adminManuallySetExpiry, // Only apply promotions if admin didn't set custom expiry
                             $stackRole, // Stack role if requested
                             $changedBy,
                             $originalRoleChangeDate, // Pass original expiry for history

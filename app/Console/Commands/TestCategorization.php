@@ -17,18 +17,20 @@ class TestCategorization extends Command
 
     public function handle(): int
     {
-        $service = new CategorizationService();
+        $service = new CategorizationService;
 
         if ($this->option('list-categorizers')) {
             $this->listCategorizers($service);
+
             return 0;
         }
 
         $releaseName = $this->option('release');
 
-        if (!$releaseName) {
+        if (! $releaseName) {
             // Test with sample releases
             $this->testSampleReleases($service);
+
             return 0;
         }
 
@@ -65,7 +67,7 @@ class TestCategorization extends Command
 
         if (isset($result['debug'])) {
             $this->info("Matched By: {$result['debug']['matched_by']}");
-            $this->info("Confidence: " . ($result['debug']['final_confidence'] ?? 'N/A'));
+            $this->info('Confidence: '.($result['debug']['final_confidence'] ?? 'N/A'));
         }
     }
 
@@ -126,7 +128,7 @@ class TestCategorization extends Command
         foreach ($samples as $sample) {
             $comparison = $service->compare(0, $sample);
             $results[] = [
-                substr($sample, 0, 50) . (strlen($sample) > 50 ? '...' : ''),
+                substr($sample, 0, 50).(strlen($sample) > 50 ? '...' : ''),
                 $comparison['pipeline']['category_name'],
                 $comparison['legacy']['category_name'],
                 $comparison['match'] ? '✓' : '✗',
@@ -139,4 +141,3 @@ class TestCategorization extends Command
         );
     }
 }
-

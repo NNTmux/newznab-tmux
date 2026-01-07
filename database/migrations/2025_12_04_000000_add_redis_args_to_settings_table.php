@@ -29,4 +29,3 @@ return new class extends Migration
         DB::table('settings')->where('name', 'redis_args')->delete();
     }
 };
-

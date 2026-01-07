@@ -17,8 +17,8 @@ interface NameCheckerInterface
     /**
      * Check a release for name patterns.
      *
-     * @param object $release The release object to check
-     * @param string $textstring The text content to analyze
+     * @param  object  $release  The release object to check
+     * @param  string  $textstring  The text content to analyze
      * @return NameFixResult|null Returns result if a match is found, null otherwise
      */
     public function check(object $release, string $textstring): ?NameFixResult;
@@ -33,4 +33,3 @@ interface NameCheckerInterface
      */
     public function getName(): string;
 }
-

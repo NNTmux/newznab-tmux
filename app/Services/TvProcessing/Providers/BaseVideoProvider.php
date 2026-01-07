@@ -342,4 +342,3 @@ abstract class BaseVideoProvider
         return $return->isEmpty() ? false : $return;
     }
 }
-

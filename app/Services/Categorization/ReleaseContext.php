@@ -70,4 +70,3 @@ class ReleaseContext
         return false;
     }
 }
-

@@ -12,11 +12,12 @@ use App\Services\Categorization\ReleaseContext;
 class BookPipe extends AbstractCategorizationPipe
 {
     protected int $priority = 45;
+
     private BookCategorizer $categorizer;
 
     public function __construct()
     {
-        $this->categorizer = new BookCategorizer();
+        $this->categorizer = new BookCategorizer;
     }
 
     public function getName(): string

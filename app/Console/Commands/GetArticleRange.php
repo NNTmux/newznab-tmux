@@ -61,7 +61,7 @@ class GetArticleRange extends Command
                 return self::FAILURE;
             }
 
-            $binaries = new BinariesService();
+            $binaries = new BinariesService;
             $binaries->setNntp($nntp);
             $return = $binaries->scan(
                 $groupMySQL,

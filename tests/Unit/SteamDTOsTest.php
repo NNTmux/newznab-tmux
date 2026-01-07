@@ -303,4 +303,3 @@ class SteamDTOsTest extends TestCase
         // The readonly keyword ensures immutability at compile time
     }
 }
-

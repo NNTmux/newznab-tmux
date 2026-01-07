@@ -322,4 +322,3 @@ class FanartTvService
         return Cache::forget('fanarttv_tv_'.$tvdbId);
     }
 }
-

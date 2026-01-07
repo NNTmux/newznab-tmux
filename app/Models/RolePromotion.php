@@ -68,6 +68,7 @@ class RolePromotion extends Model
     public function scopeValid($query)
     {
         $now = Carbon::now();
+
         return $query->where('is_active', true)
             ->where(function ($q) use ($now) {
                 $q->whereNull('end_date')
@@ -85,6 +86,7 @@ class RolePromotion extends Model
     public static function getCustomRoles()
     {
         $systemRoles = ['Admin', 'User', 'Moderator', 'Disabled', 'Friend'];
+
         return Role::whereNotIn('name', $systemRoles)->get();
     }
 
@@ -93,7 +95,7 @@ class RolePromotion extends Model
      */
     public function isCurrentlyActive(): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
 
@@ -243,4 +245,3 @@ class RolePromotion extends Model
         ];
     }
 }
-

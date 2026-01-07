@@ -531,7 +531,7 @@ class BookService
      */
     public function fetchItunesBookProperties(string $bookInfo)
     {
-        $itunes = new ItunesService();
+        $itunes = new ItunesService;
         $iTunesBook = $itunes->findEbook($bookInfo);
 
         if ($iTunesBook === null) {
@@ -567,4 +567,3 @@ class BookService
         return $book;
     }
 }
-

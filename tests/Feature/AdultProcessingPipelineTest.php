@@ -12,7 +12,6 @@ use App\Services\AdultProcessing\Pipes\AdmPipe;
 use App\Services\AdultProcessing\Pipes\AebnPipe;
 use App\Services\AdultProcessing\Pipes\HotmoviesPipe;
 use App\Services\AdultProcessing\Pipes\PoppornPipe;
-use Closure;
 use Tests\TestCase;
 
 class AdultProcessingPipelineTest extends TestCase
@@ -22,7 +21,7 @@ class AdultProcessingPipelineTest extends TestCase
      */
     public function test_pipeline_can_be_instantiated(): void
     {
-        $pipeline = new AdultProcessingPipeline();
+        $pipeline = new AdultProcessingPipeline;
 
         $this->assertInstanceOf(AdultProcessingPipeline::class, $pipeline);
         $this->assertCount(5, $pipeline->getPipes());
@@ -33,7 +32,7 @@ class AdultProcessingPipelineTest extends TestCase
      */
     public function test_pipes_are_ordered_by_priority(): void
     {
-        $pipeline = new AdultProcessingPipeline();
+        $pipeline = new AdultProcessingPipeline;
         $pipes = $pipeline->getPipes()->values();
 
         // AEBN should be first (priority 10)
@@ -58,7 +57,8 @@ class AdultProcessingPipelineTest extends TestCase
         $this->assertCount(5, $pipeline->getPipes()); // Default pipes
 
         // Create a custom pipe with high priority
-        $customPipe = new class extends AbstractAdultProviderPipe {
+        $customPipe = new class extends AbstractAdultProviderPipe
+        {
             protected int $priority = 5;
 
             public function getName(): string
@@ -187,27 +187,27 @@ class AdultProcessingPipelineTest extends TestCase
      */
     public function test_pipe_names_and_priorities(): void
     {
-        $aebn = new AebnPipe();
+        $aebn = new AebnPipe;
         $this->assertEquals('aebn', $aebn->getName());
         $this->assertEquals('Adult Entertainment Broadcast Network', $aebn->getDisplayName());
         $this->assertEquals(10, $aebn->getPriority());
 
-        $popporn = new PoppornPipe();
+        $popporn = new PoppornPipe;
         $this->assertEquals('pop', $popporn->getName());
         $this->assertEquals('PopPorn', $popporn->getDisplayName());
         $this->assertEquals(20, $popporn->getPriority());
 
-        $adm = new AdmPipe();
+        $adm = new AdmPipe;
         $this->assertEquals('adm', $adm->getName());
         $this->assertEquals('Adult DVD Marketplace', $adm->getDisplayName());
         $this->assertEquals(30, $adm->getPriority());
 
-        $ade = new AdePipe();
+        $ade = new AdePipe;
         $this->assertEquals('ade', $ade->getName());
         $this->assertEquals('Adult DVD Empire', $ade->getDisplayName());
         $this->assertEquals(40, $ade->getPriority());
 
-        $hotmovies = new HotmoviesPipe();
+        $hotmovies = new HotmoviesPipe;
         $this->assertEquals('hotm', $hotmovies->getName());
         $this->assertEquals('HotMovies', $hotmovies->getDisplayName());
         $this->assertEquals(50, $hotmovies->getPriority());
@@ -246,7 +246,7 @@ class AdultProcessingPipelineTest extends TestCase
      */
     public function test_pipe_echo_output_can_be_disabled(): void
     {
-        $pipe = new AebnPipe();
+        $pipe = new AebnPipe;
         $pipe->setEchoOutput(false);
 
         // This should not throw any exceptions
@@ -258,7 +258,8 @@ class AdultProcessingPipelineTest extends TestCase
      */
     public function test_title_similarity_calculation(): void
     {
-        $pipe = new class extends AbstractAdultProviderPipe {
+        $pipe = new class extends AbstractAdultProviderPipe
+        {
             public function getName(): string
             {
                 return 'test';
@@ -308,4 +309,3 @@ class AdultProcessingPipelineTest extends TestCase
         $this->assertLessThan(50, $similarity);
     }
 }
-

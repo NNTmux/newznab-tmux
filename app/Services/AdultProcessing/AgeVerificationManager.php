@@ -111,7 +111,7 @@ class AgeVerificationManager
             $this->cookieJars[$domain] = new FileCookieJar($cookieFile, true);
 
             // If cookie file is new or empty, set age verification cookies
-            if (!file_exists($cookieFile) || filesize($cookieFile) < 10) {
+            if (! file_exists($cookieFile) || filesize($cookieFile) < 10) {
                 $this->setAgeVerificationCookies($domain, $this->cookieJars[$domain]);
             }
         }
@@ -383,4 +383,3 @@ class AgeVerificationManager
         return $this->cookieDir;
     }
 }
-

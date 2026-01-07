@@ -19,4 +19,3 @@ class Categorization extends Facade
         return CategorizationPipeline::class;
     }
 }
-

@@ -523,4 +523,3 @@ class TmuxOutput extends Tmux
         $this->_colourMasks[5] = cli()->ansiString('%-16.16s %25.25s %25.25s', 'yellow').PHP_EOL;
     }
 }
-

@@ -1149,7 +1149,6 @@ class ElasticSearchDriver implements SearchDriverInterface
         }
     }
 
-
     /**
      * Insert a predb record into the index.
      *
@@ -1334,6 +1333,7 @@ class ElasticSearchDriver implements SearchDriverInterface
         foreach ($releases as $release) {
             if (empty($release['id'])) {
                 $errors++;
+
                 continue;
             }
 
@@ -1405,6 +1405,7 @@ class ElasticSearchDriver implements SearchDriverInterface
         foreach ($predbRecords as $predb) {
             if (empty($predb['id'])) {
                 $errors++;
+
                 continue;
             }
 
@@ -1494,6 +1495,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                 // Check if index exists
                 if (! $client->indices()->exists(['index' => $index])) {
                     Log::info("ElasticSearch truncateIndex: index {$index} does not exist, skipping");
+
                     continue;
                 }
 
@@ -1981,6 +1983,7 @@ class ElasticSearchDriver implements SearchDriverInterface
         foreach ($movies as $movie) {
             if (empty($movie['id'])) {
                 $errors++;
+
                 continue;
             }
 
@@ -2262,6 +2265,7 @@ class ElasticSearchDriver implements SearchDriverInterface
         foreach ($tvShows as $tvShow) {
             if (empty($tvShow['id'])) {
                 $errors++;
+
                 continue;
             }
 
@@ -2644,5 +2648,3 @@ class ElasticSearchDriver implements SearchDriverInterface
         return [];
     }
 }
-
-

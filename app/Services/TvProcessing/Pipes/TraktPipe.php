@@ -2,9 +2,9 @@
 
 namespace App\Services\TvProcessing\Pipes;
 
+use App\Services\TvProcessing\Providers\TraktProvider;
 use App\Services\TvProcessing\TvProcessingPassable;
 use App\Services\TvProcessing\TvProcessingResult;
-use App\Services\TvProcessing\Providers\TraktProvider;
 
 /**
  * Pipe for Trakt.tv API lookups.
@@ -13,9 +13,11 @@ class TraktPipe extends AbstractTvProviderPipe
 {
     // Video type and source constants (matching Videos class protected constants)
     private const TYPE_TV = 0;
+
     private const SOURCE_TRAKT = 5;
 
     protected int $priority = 50;
+
     private ?TraktProvider $trakt = null;
 
     public function getName(): string
@@ -34,8 +36,9 @@ class TraktPipe extends AbstractTvProviderPipe
     private function getTrakt(): TraktProvider
     {
         if ($this->trakt === null) {
-            $this->trakt = new TraktProvider();
+            $this->trakt = new TraktProvider;
         }
+
         return $this->trakt;
     }
 
@@ -53,6 +56,7 @@ class TraktPipe extends AbstractTvProviderPipe
         // Check if we've already failed this title
         if ($this->isInTitleCache($cleanName)) {
             $this->outputSkipped($cleanName);
+
             return TvProcessingResult::skipped('previously failed', $this->getName());
         }
 
@@ -76,6 +80,7 @@ class TraktPipe extends AbstractTvProviderPipe
                 // Show exists in our DB (likely from another source like TMDB)
                 // Skip Trakt API search and proceed to episode matching
                 $this->outputFoundInDb($cleanName);
+
                 return $this->processEpisodeForExistingVideo($passable, $trakt, $videoId, $parsedInfo);
             }
         }
@@ -104,6 +109,7 @@ class TraktPipe extends AbstractTvProviderPipe
             // Show not found
             $this->addToTitleCache($cleanName);
             $this->outputNotFound($cleanName);
+
             return TvProcessingResult::notFound($this->getName(), ['title' => $cleanName]);
         }
 
@@ -116,6 +122,7 @@ class TraktPipe extends AbstractTvProviderPipe
             // Full season release
             $trakt->setVideoIdFound($videoId, $context->releaseId, 0);
             $this->outputFullSeason($cleanName);
+
             return TvProcessingResult::matched($videoId, 0, $this->getName(), ['full_season' => true]);
         }
 
@@ -153,6 +160,7 @@ class TraktPipe extends AbstractTvProviderPipe
                 $episodeNo !== '' ? (int) $episodeNo : null,
                 $hasAirdate ? $parsedInfo['airdate'] : null
             );
+
             return TvProcessingResult::matched($videoId, (int) $episode, $this->getName());
         }
 
@@ -212,6 +220,7 @@ class TraktPipe extends AbstractTvProviderPipe
             // Full season release
             $trakt->setVideoIdFound($videoId, $context->releaseId, 0);
             $this->outputFullSeason($cleanName);
+
             return TvProcessingResult::matched($videoId, 0, $this->getName(), ['full_season' => true]);
         }
 
@@ -226,6 +235,7 @@ class TraktPipe extends AbstractTvProviderPipe
                 $episodeNo !== '' ? (int) $episodeNo : null,
                 $hasAirdate ? $parsedInfo['airdate'] : null
             );
+
             return TvProcessingResult::matched($videoId, (int) $episode, $this->getName());
         }
 
