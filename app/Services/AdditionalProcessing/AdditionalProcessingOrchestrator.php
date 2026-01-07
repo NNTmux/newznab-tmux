@@ -206,7 +206,7 @@ class AdditionalProcessingOrchestrator
             // Process message ID downloads
             if ($this->config->processPasswords || $this->config->processThumbnails
                 || $this->config->processMediaInfo || $this->config->processAudioInfo
-                || $this->config->processVideo
+                || $this->config->processVideo || $this->config->processJPGSample
             ) {
                 $this->processMessageIDDownloads($context);
 
