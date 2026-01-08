@@ -2246,6 +2246,30 @@ function initDropdownMenus() {
         }
     });
 
+    // Handle nested submenus (e.g., Foreign languages dropdown)
+    const submenuContainers = document.querySelectorAll('.submenu-container');
+    submenuContainers.forEach(function(container) {
+        const submenu = container.querySelector('.submenu');
+        if (!submenu) return;
+
+        let submenuCloseTimeout;
+
+        container.addEventListener('mouseenter', function() {
+            clearTimeout(submenuCloseTimeout);
+            submenu.style.display = 'block';
+        });
+
+        container.addEventListener('mouseleave', function() {
+            submenuCloseTimeout = setTimeout(function() {
+                submenu.style.display = 'none';
+            }, 200);
+        });
+
+        submenu.addEventListener('mouseenter', function() {
+            clearTimeout(submenuCloseTimeout);
+        });
+    });
+
     // Mobile menu toggle
     const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
     if (mobileMenuToggle) {
