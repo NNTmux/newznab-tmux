@@ -67,7 +67,39 @@
                                     <a href="{{ route('mymovies') }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">My Movies</a>
                                     <div class="border-t border-gray-700 dark:border-gray-600"></div>
                                     @foreach($parentcat['categories'] as $subcat)
-                                        @if(auth()->check() && auth()->user()->movieview == "1")
+                                        @if($subcat['id'] == App\Models\Category::MOVIE_FOREIGN)
+                                            <div class="relative submenu-container">
+                                                @if(auth()->check() && auth()->user()->movieview == "1")
+                                                    <a href="{{ url('/' . $parentcat['title'] . '/' . $subcat['title']) }}" class="submenu-toggle flex items-center justify-between px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">
+                                                        <span>{{ $subcat['title'] }}</span>
+                                                        <i class="fas fa-chevron-right text-xs"></i>
+                                                    </a>
+                                                @else
+                                                    <a href="{{ url('/browse/' . $parentcat['title'] . '/' . $subcat['title']) }}" class="submenu-toggle flex items-center justify-between px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">
+                                                        <span>{{ $subcat['title'] }}</span>
+                                                        <i class="fas fa-chevron-right text-xs"></i>
+                                                    </a>
+                                                @endif
+                                                <div class="submenu absolute left-full top-0 w-40 bg-gray-900 dark:bg-gray-950 rounded-md shadow-lg z-50 ml-0.5" style="display: none;">
+                                                    @if(auth()->check() && auth()->user()->movieview == "1")
+                                                        <a href="{{ url('/' . $parentcat['title'] . '/' . $subcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">All Foreign</a>
+                                                    @else
+                                                        <a href="{{ url('/browse/' . $parentcat['title'] . '/' . $subcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">All Foreign</a>
+                                                    @endif
+                                                    <div class="border-t border-gray-700 dark:border-gray-600"></div>
+                                                    <a href="{{ route('search', ['search' => 'German|Deutsch|DE|GER', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">German</a>
+                                                    <a href="{{ route('search', ['search' => 'French|Francais|FR|FRENCH|VOSTFR|TRUEFRENCH', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">French</a>
+                                                    <a href="{{ route('search', ['search' => 'Spanish|Espanol|ES|ESP|SPANISH|Latino', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">Spanish</a>
+                                                    <a href="{{ route('search', ['search' => 'Italian|Italiano|IT|ITA', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">Italian</a>
+                                                    <a href="{{ route('search', ['search' => 'Dutch|NL|Flemish|Nederlands|DUTCH', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">Dutch</a>
+                                                    <a href="{{ route('search', ['search' => 'Japanese|JP|JPN|JAP', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">Japanese</a>
+                                                    <a href="{{ route('search', ['search' => 'Korean|KR|KOR|K-Drama', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">Korean</a>
+                                                    <a href="{{ route('search', ['search' => 'Chinese|Mandarin|Cantonese|CH|CHN|C-Drama', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">Chinese</a>
+                                                    <a href="{{ route('search', ['search' => 'Russian|RU|RUS', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">Russian</a>
+                                                    <a href="{{ route('search', ['search' => 'Portuguese|PT|POR|Portugues|Brazilian', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">Portuguese</a>
+                                                </div>
+                                            </div>
+                                        @elseif(auth()->check() && auth()->user()->movieview == "1")
                                             <a href="{{ url('/' . $parentcat['title'] . '/' . $subcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">{{ $subcat['title'] }}</a>
                                         @else
                                             <a href="{{ url('/browse/' . $parentcat['title'] . '/' . $subcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">{{ $subcat['title'] }}</a>
