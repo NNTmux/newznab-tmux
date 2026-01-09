@@ -343,14 +343,19 @@ class TmuxMonitorService
             $this->runVar['counts']['diff'][$key] = number_format($value - $startValue);
         }
 
-        // Calculate percentages for category counts (as % of total releases)
-        $totalReleases = $this->runVar['counts']['now']['releases'] ?? 1;
+        // Calculate percentages for category counts (as % of total categorized releases)
         $categoryKeys = ['tv', 'movies', 'audio', 'books', 'console', 'pc', 'xxx', 'misc'];
+
+        // Sum all category counts to get the true total
+        $totalCategorized = 0;
+        foreach ($categoryKeys as $key) {
+            $totalCategorized += $this->runVar['counts']['now'][$key] ?? 0;
+        }
 
         foreach ($categoryKeys as $key) {
             $value = $this->runVar['counts']['now'][$key] ?? 0;
-            $this->runVar['counts']['percent'][$key] = $totalReleases > 0
-                ? sprintf('%02d', floor(($value / $totalReleases) * 100))
+            $this->runVar['counts']['percent'][$key] = $totalCategorized > 0
+                ? sprintf('%02d', floor(($value / $totalCategorized) * 100))
                 : 0;
         }
 
