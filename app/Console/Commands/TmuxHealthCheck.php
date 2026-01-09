@@ -51,7 +51,6 @@ class TmuxHealthCheck extends Command
                     $this->warn("⚠️  Tmux session '{$this->sessionName}' does not exist.");
                 }
 
-
                 return Command::FAILURE;
             }
 
