@@ -3,6 +3,7 @@
 namespace App\Services\AdditionalProcessing;
 
 use App\Models\Release;
+use App\Models\ReleaseFile;
 use App\Models\UsenetGroup;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
@@ -228,6 +229,11 @@ class AdditionalProcessingOrchestrator
                     if (! $context->releaseHasPassword) {
                         $this->processExtractedFiles($context);
                     }
+                }
+
+                // If still no JPG sample, try to fetch JPG from release_files entries
+                if (! $context->foundJPGSample && $this->config->processJPGSample) {
+                    $this->processJpgFromReleaseFiles($context);
                 }
             }
 
@@ -562,7 +568,169 @@ class AdditionalProcessingOrchestrator
             $this->releaseManager->updateSearchIndex($context->release->id);
         }
 
+        // Try to extract and process JPG files from the archive file list for sample/preview
+        if (! $context->foundJPGSample && $this->config->processJPGSample) {
+            $this->processJpgFromArchiveFileList($compressedData, $result['files'], $context);
+        }
+
         return $context->totalFileInfo > 0;
+    }
+
+    /**
+     * Find and process JPG files from archive file list to create sample/preview.
+     */
+    private function processJpgFromArchiveFileList(
+        string $compressedData,
+        array $files,
+        ReleaseProcessingContext $context
+    ): void {
+        // Find JPG files in the archive file list
+        $jpgFiles = [];
+        foreach ($files as $file) {
+            $name = $file['name'] ?? '';
+            if (preg_match('/\.jpe?g$/i', $name)) {
+                $jpgFiles[] = $file;
+            }
+        }
+
+        if (empty($jpgFiles)) {
+            return;
+        }
+
+        // Sort by size (prefer larger images, likely better quality) - limit to first 3
+        usort($jpgFiles, fn ($a, $b) => ($b['size'] ?? 0) <=> ($a['size'] ?? 0));
+        $jpgFiles = array_slice($jpgFiles, 0, 3);
+
+        foreach ($jpgFiles as $jpgFile) {
+            $jpgFilename = $jpgFile['name'];
+
+            // Try to extract this specific JPG from the archive
+            $jpgData = $this->archiveService->extractSpecificFile(
+                $compressedData,
+                $jpgFilename,
+                $context->tmpPath
+            );
+
+            if ($jpgData === null || empty($jpgData)) {
+                continue;
+            }
+
+            // Save to temp file and validate it's actually a JPEG
+            $tempJpgPath = $context->tmpPath.'extracted_'.uniqid('', true).'.jpg';
+            File::put($tempJpgPath, $jpgData);
+
+            if ($this->mediaService->isJpegData($tempJpgPath)) {
+                if ($this->mediaService->getJPGSample($tempJpgPath, $context->release->guid)) {
+                    $context->foundJPGSample = true;
+                    $this->output->echoJpgSaved();
+                    File::delete($tempJpgPath);
+                    break;
+                }
+            }
+
+            File::delete($tempJpgPath);
+        }
+    }
+
+    /**
+     * Process JPG files from existing release_files entries.
+     * This fetches the archive from NZB and extracts JPG files that were previously listed.
+     */
+    private function processJpgFromReleaseFiles(ReleaseProcessingContext $context): void
+    {
+        // Get JPG files from release_files table for this release
+        $jpgFiles = ReleaseFile::where('releases_id', $context->release->id)
+            ->where(function ($query) {
+                $query->where('name', 'like', '%.jpg')
+                    ->orWhere('name', 'like', '%.jpeg');
+            })
+            ->orderByDesc('size')
+            ->limit(3)
+            ->get();
+
+        if ($jpgFiles->isEmpty()) {
+            return;
+        }
+
+        // We need to download a compressed file from the NZB to extract the JPG
+        if (empty($context->nzbContents)) {
+            return;
+        }
+
+        // Find compressed files in NZB
+        foreach ($context->nzbContents as $nzbFile) {
+            if ($context->foundJPGSample) {
+                break;
+            }
+
+            $title = $nzbFile['title'] ?? '';
+            if (! preg_match(
+                '/(\\.(part0*1|rar|zip|7z))(\\s*\\.rar)*($|[ ")]|-])|"[a-f0-9]{32}\\.[1-9]\\d{1,2}".*\\(\\d+\\/\\d{2,}\\)$/i',
+                $title
+            )) {
+                continue;
+            }
+
+            // Get message IDs for first few segments
+            $segments = $nzbFile['segments'] ?? [];
+            if (empty($segments)) {
+                continue;
+            }
+
+            $messageIDs = [];
+            $segCount = min(count($segments), $this->config->maximumRarSegments);
+            for ($i = 0; $i < $segCount; $i++) {
+                $messageIDs[] = (string) $segments[$i];
+            }
+
+            if (empty($messageIDs)) {
+                continue;
+            }
+
+            // Download the compressed file
+            $result = $this->downloadService->downloadCompressedFile(
+                $messageIDs,
+                $context->releaseGroupName,
+                $context->release->id,
+                $title
+            );
+
+            if (! $result['success'] || empty($result['data'])) {
+                continue;
+            }
+
+            // Try to extract each JPG file from the archive
+            foreach ($jpgFiles as $jpgFile) {
+                if ($context->foundJPGSample) {
+                    break;
+                }
+
+                $jpgData = $this->archiveService->extractSpecificFile(
+                    $result['data'],
+                    $jpgFile->name,
+                    $context->tmpPath
+                );
+
+                if ($jpgData === null || empty($jpgData)) {
+                    continue;
+                }
+
+                // Save to temp file and validate
+                $tempJpgPath = $context->tmpPath.'release_file_'.uniqid('', true).'.jpg';
+                File::put($tempJpgPath, $jpgData);
+
+                if ($this->mediaService->isJpegData($tempJpgPath)) {
+                    if ($this->mediaService->getJPGSample($tempJpgPath, $context->release->guid)) {
+                        $context->foundJPGSample = true;
+                        $this->output->echoJpgSaved();
+                        File::delete($tempJpgPath);
+                        break 2; // Exit both loops
+                    }
+                }
+
+                File::delete($tempJpgPath);
+            }
+        }
     }
 
     /**
