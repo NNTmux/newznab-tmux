@@ -98,6 +98,10 @@ class LoginController extends Controller
                 }
 
                 if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
+                    // Regenerate session ID to prevent session fixation attacks
+                    // This ensures no session data from a previous user can leak
+                    $request->session()->regenerate();
+
                     $userIp = config('nntmux:settings.store_user_ip') ? ($request->ip() ?? $request->getClientIp()) : '';
                     event(new UserLoggedIn($user, $userIp));
 
