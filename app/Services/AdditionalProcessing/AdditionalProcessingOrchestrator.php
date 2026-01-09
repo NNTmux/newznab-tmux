@@ -577,78 +577,80 @@ class AdditionalProcessingOrchestrator
     }
 
     /**
-     * Find and process JPG files from archive file list to create sample/preview.
+     * Find and process JPG/PNG files from archive file list to create sample/preview.
      */
     private function processJpgFromArchiveFileList(
         string $compressedData,
         array $files,
         ReleaseProcessingContext $context
     ): void {
-        // Find JPG files in the archive file list
-        $jpgFiles = [];
+        // Find image files (JPG/PNG) in the archive file list
+        $imageFiles = [];
         foreach ($files as $file) {
             $name = $file['name'] ?? '';
-            if (preg_match('/\.jpe?g$/i', $name)) {
-                $jpgFiles[] = $file;
+            if (preg_match('/\.(jpe?g|png)$/i', $name)) {
+                $imageFiles[] = $file;
             }
         }
 
-        if (empty($jpgFiles)) {
+        if (empty($imageFiles)) {
             return;
         }
 
         // Sort by size (prefer larger images, likely better quality) - limit to first 3
-        usort($jpgFiles, fn ($a, $b) => ($b['size'] ?? 0) <=> ($a['size'] ?? 0));
-        $jpgFiles = array_slice($jpgFiles, 0, 3);
+        usort($imageFiles, fn ($a, $b) => ($b['size'] ?? 0) <=> ($a['size'] ?? 0));
+        $imageFiles = array_slice($imageFiles, 0, 3);
 
-        foreach ($jpgFiles as $jpgFile) {
-            $jpgFilename = $jpgFile['name'];
+        foreach ($imageFiles as $imageFile) {
+            $imageFilename = $imageFile['name'];
 
-            // Try to extract this specific JPG from the archive
-            $jpgData = $this->archiveService->extractSpecificFile(
+            // Try to extract this specific image from the archive
+            $imageData = $this->archiveService->extractSpecificFile(
                 $compressedData,
-                $jpgFilename,
+                $imageFilename,
                 $context->tmpPath
             );
 
-            if ($jpgData === null || empty($jpgData)) {
+            if ($imageData === null || empty($imageData)) {
                 continue;
             }
 
-            // Save to temp file and validate it's actually a JPEG
-            $tempJpgPath = $context->tmpPath.'extracted_'.uniqid('', true).'.jpg';
-            File::put($tempJpgPath, $jpgData);
+            // Save to temp file and validate it's actually a valid image
+            $ext = strtolower(pathinfo($imageFilename, PATHINFO_EXTENSION));
+            $tempImagePath = $context->tmpPath.'extracted_'.uniqid('', true).'.'.$ext;
+            File::put($tempImagePath, $imageData);
 
-            if ($this->mediaService->isJpegData($tempJpgPath)) {
-                if ($this->mediaService->getJPGSample($tempJpgPath, $context->release->guid)) {
+            if ($this->mediaService->isValidImage($tempImagePath)) {
+                if ($this->mediaService->getJPGSample($tempImagePath, $context->release->guid)) {
                     $context->foundJPGSample = true;
                     $this->output->echoJpgSaved();
-                    File::delete($tempJpgPath);
+                    File::delete($tempImagePath);
                     break;
                 }
             }
 
-            File::delete($tempJpgPath);
+            File::delete($tempImagePath);
         }
     }
 
     /**
-     * Process JPG files from existing release_files entries.
-     * This fetches the archive from NZB and extracts JPG files that were previously listed.
+     * Process JPG/PNG files from existing release_files entries.
+     * This fetches the archive from NZB and extracts image files that were previously listed.
      */
     private function processJpgFromReleaseFiles(ReleaseProcessingContext $context): void
     {
-        // Get JPG files from release_files table for this release
-        $jpgFiles = ReleaseFile::where('releases_id', $context->release->id)
+        // Get JPG/PNG files from release_files table for this release
+        $imageFiles = ReleaseFile::where('releases_id', $context->release->id)
             ->where(function ($query) {
                 $query->where('name', 'like', '%.jpg')
-                    ->orWhere('name', 'like', '%.jpeg');
+                    ->orWhere('name', 'like', '%.jpeg')
+                    ->orWhere('name', 'like', '%.png');
             })
             ->orderByDesc('size')
             ->limit(3)
             ->get();
 
-        if ($jpgFiles->isEmpty()) {
+        if ($imageFiles->isEmpty()) {
             return;
         }
 
@@ -699,36 +701,37 @@ class AdditionalProcessingOrchestrator
                 continue;
             }
 
-            // Try to extract each JPG file from the archive
-            foreach ($jpgFiles as $jpgFile) {
+            // Try to extract each image file from the archive
+            foreach ($imageFiles as $imageFile) {
                 if ($context->foundJPGSample) {
                     break;
                 }
 
-                $jpgData = $this->archiveService->extractSpecificFile(
+                $imageData = $this->archiveService->extractSpecificFile(
                     $result['data'],
-                    $jpgFile->name,
+                    $imageFile->name,
                     $context->tmpPath
                 );
 
-                if ($jpgData === null || empty($jpgData)) {
+                if ($imageData === null || empty($imageData)) {
                     continue;
                 }
 
                 // Save to temp file and validate
-                $tempJpgPath = $context->tmpPath.'release_file_'.uniqid('', true).'.jpg';
-                File::put($tempJpgPath, $jpgData);
+                $ext = strtolower(pathinfo($imageFile->name, PATHINFO_EXTENSION));
+                $tempImagePath = $context->tmpPath.'release_file_'.uniqid('', true).'.'.$ext;
+                File::put($tempImagePath, $imageData);
 
-                if ($this->mediaService->isJpegData($tempJpgPath)) {
-                    if ($this->mediaService->getJPGSample($tempJpgPath, $context->release->guid)) {
+                if ($this->mediaService->isValidImage($tempImagePath)) {
+                    if ($this->mediaService->getJPGSample($tempImagePath, $context->release->guid)) {
                         $context->foundJPGSample = true;
                         $this->output->echoJpgSaved();
-                        File::delete($tempJpgPath);
+                        File::delete($tempImagePath);
                         break 2; // Exit both loops
                     }
                 }
 
-                File::delete($tempJpgPath);
+                File::delete($tempImagePath);
             }
         }
     }
@@ -845,8 +848,8 @@ class AdditionalProcessingOrchestrator
                 continue;
             }
 
-            // JPG files
-            if (! $context->foundJPGSample && preg_match('/\.jpe?g$/i', $filePath)) {
+            // JPG/PNG image files
+            if (! $context->foundJPGSample && preg_match('/\.(jpe?g|png)$/i', $filePath)) {
                 if ($this->mediaService->getJPGSample($filePath, $context->release->guid)) {
                     $context->foundJPGSample = true;
                     $this->output->echoJpgSaved();
@@ -871,7 +874,7 @@ class AdditionalProcessingOrchestrator
                 continue;
             }
 
-            if (! $context->foundJPGSample && preg_match('/^JPE?G/i', $output)) {
+            if (! $context->foundJPGSample && preg_match('/^JPE?G|^PNG/i', $output)) {
                 if ($this->mediaService->getJPGSample($filePath, $context->release->guid)) {
                     $context->foundJPGSample = true;
                     $this->output->echoJpgSaved();

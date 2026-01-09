@@ -442,6 +442,20 @@ class MediaExtractionService
         return exif_imagetype($filePath) === IMAGETYPE_JPEG;
     }
 
+    /**
+     * Check if file is a valid image (JPEG or PNG).
+     */
+    public function isValidImage(string $filePath): bool
+    {
+        if (! File::isFile($filePath)) {
+            return false;
+        }
+
+        $type = @exif_imagetype($filePath);
+
+        return $type === IMAGETYPE_JPEG || $type === IMAGETYPE_PNG;
+    }
+
     private function ffmpeg(): FFMpeg
     {
         if ($this->ffmpeg === null) {
