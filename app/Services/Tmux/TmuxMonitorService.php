@@ -337,16 +337,46 @@ class TmuxMonitorService
             $this->runVar['counts']['start'] = $this->runVar['counts']['now'];
         }
 
-        // Calculate diffs and percentages
-        $totalReleases = $this->runVar['counts']['now']['releases'] ?? 1;
-
+        // Calculate diffs
         foreach ($this->runVar['counts']['now'] as $key => $value) {
             $startValue = $this->runVar['counts']['start'][$key] ?? 0;
             $this->runVar['counts']['diff'][$key] = number_format($value - $startValue);
+        }
+
+        // Calculate percentages for category counts (as % of total releases)
+        $totalReleases = $this->runVar['counts']['now']['releases'] ?? 1;
+        $categoryKeys = ['tv', 'movies', 'audio', 'books', 'console', 'pc', 'xxx', 'misc'];
+
+        foreach ($categoryKeys as $key) {
+            $value = $this->runVar['counts']['now'][$key] ?? 0;
             $this->runVar['counts']['percent'][$key] = $totalReleases > 0
                 ? sprintf('%02d', floor(($value / $totalReleases) * 100))
                 : 0;
         }
+
+        // Calculate percentages for PP Lists (matched / total for each type)
+        // NFO: nfo / (nfo + processnfo) * 100
+        $nfoMatched = $this->runVar['counts']['now']['nfo'] ?? 0;
+        $nfoUnmatched = $this->runVar['counts']['now']['processnfo'] ?? 0;
+        $nfoTotal = $nfoMatched + $nfoUnmatched;
+        $this->runVar['counts']['percent']['nfo'] = $nfoTotal > 0
+            ? sprintf('%02d', floor(($nfoMatched / $nfoTotal) * 100))
+            : 0;
+
+        // PreDB: predb_matched / predb * 100
+        $predbMatched = $this->runVar['counts']['now']['predb_matched'] ?? 0;
+        $predbTotal = $this->runVar['counts']['now']['predb'] ?? 1;
+        $this->runVar['counts']['percent']['predb_matched'] = $predbTotal > 0
+            ? sprintf('%02d', floor(($predbMatched / $predbTotal) * 100))
+            : 0;
+
+        // Renames: renamed / (renamed + processrenames) * 100
+        $renamed = $this->runVar['counts']['now']['renamed'] ?? 0;
+        $processrenames = $this->runVar['counts']['now']['processrenames'] ?? 0;
+        $renameTotal = $renamed + $processrenames;
+        $this->runVar['counts']['percent']['renamed'] = $renameTotal > 0
+            ? sprintf('%02d', floor(($renamed / $renameTotal) * 100))
+            : 0;
     }
 
     /**
