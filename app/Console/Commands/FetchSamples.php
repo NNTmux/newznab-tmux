@@ -98,7 +98,8 @@ class FetchSamples extends Command
 
         $query = clone $baseQuery;
 
-        $query->chunkById($chunkSize, function ($releases) use (&$processed, &$failed, &$remaining, $bar, $showOutput) {
+        // Use chunkByIdDesc to process newest releases first
+        $query->chunkByIdDesc($chunkSize, function ($releases) use (&$processed, &$failed, &$remaining, $bar, $showOutput) {
             foreach ($releases as $release) {
                 if ($remaining <= 0) {
                     return false; // stop chunking
