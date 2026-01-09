@@ -49,3 +49,5 @@ if (config('nntmux.purge_inactive_users') === true) {
     Schedule::job(new RemoveInactiveAccounts)->daily();
     Schedule::job(new PurgeDeletedAccounts)->daily();
 }
+// Check tmux health and auto-restart if monitor pane is dead
+Schedule::command('tmux:health-check --auto-restart')->everyThirtyMinutes()->withoutOverlapping();
