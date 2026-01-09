@@ -49,6 +49,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\TrustedDevice2FAMiddleware::class, // Add our new trusted device middleware
             \App\Http\Middleware\ContentSecurityPolicy::class, // Add CSP middleware for security
             \App\Http\Middleware\SetUserTimezone::class, // Set user timezone
+            \App\Http\Middleware\NoCacheForAuthenticatedUsers::class, // Prevent Cloudflare/CDN caching of authenticated pages
         ]);
 
         $middleware->throttleApi('60,1');
