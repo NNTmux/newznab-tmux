@@ -282,8 +282,8 @@ class NzbImportService
                 // Add all the found groups to an array.
                 $groupArr[] = $group;
 
-                // Check if this NZB is blacklisted.
-                if ($this->blacklistService->isBlackListed($msg, $group)) {
+                // Check if this NZB is blacklisted (only if group is valid).
+                if ($group !== false && $this->blacklistService->isBlackListed($msg, $group)) {
                     $isBlackListed = true;
                     break;
                 }
