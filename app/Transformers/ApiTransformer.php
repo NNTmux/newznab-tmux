@@ -47,11 +47,6 @@ class ApiTransformer extends TransformerAbstract
 
     /**
      * Get a value from the release object, handling both Eloquent models and stdClass objects.
-     *
-     * @param  Release|\stdClass  $release
-     * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     protected function getValue(Release|\stdClass $release, string $key, mixed $default = null): mixed
     {
