@@ -108,17 +108,26 @@
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                         @foreach($results as $result)
+                            @php
+                                // Extract first values from comma-separated grouped fields
+                                $guid = isset($result->grp_release_guid) ? explode(',', $result->grp_release_guid)[0] : null;
+                                $searchname = isset($result->grp_release_name) ? explode('#', $result->grp_release_name)[0] : ($result->title ?? '');
+                                $postdate = isset($result->grp_release_postdate) ? explode(',', $result->grp_release_postdate)[0] : null;
+                                $size = isset($result->grp_release_size) ? explode(',', $result->grp_release_size)[0] : 0;
+                                $failedCounts = isset($result->grp_release_failed) ? array_filter(explode(',', $result->grp_release_failed)) : [];
+                                $totalFailed = array_sum($failedCounts);
+                            @endphp
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                 <td class="px-4 py-3">
                                     <div class="flex items-start">
                                         <div class="flex-1 min-w-0">
-                                            <a href="{{ url('/details/' . $result->guid) }}"
+                                            <a href="{{ url('/details/' . $guid) }}"
                                                class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium break-words">
-                                                {{ $result->searchname }}
+                                                {{ $searchname }}
                                             </a>
-                                            @if(!empty($result->failed) && $result->failed > 0)
+                                            @if($totalFailed > 0)
                                                 <span class="ml-2 px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs rounded"
-                                                      title="{{ $result->failed }} user(s) reported download failure">
+                                                      title="{{ $totalFailed }} user(s) reported download failure">
                                                     <i class="fa fa-exclamation-triangle mr-1"></i>Failed
                                                 </span>
                                             @endif
@@ -146,24 +155,29 @@
                                     </div>
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 hidden md:table-cell">
-                                    {{ $result->category_name ?? 'XXX' }}
+                                    @php
+                                        $categoryName = isset($result->grp_release_catname) ? explode(',', $result->grp_release_catname)[0] : 'XXX';
+                                    @endphp
+                                    {{ $categoryName }}
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 hidden lg:table-cell whitespace-nowrap">
-                                    {{ date('M d, Y', strtotime($result->postdate)) }}
-                                    <div class="text-xs text-gray-500">{{ date('H:i', strtotime($result->postdate)) }}</div>
+                                    @if($postdate)
+                                        {{ date('M d, Y', strtotime($postdate)) }}
+                                        <div class="text-xs text-gray-500">{{ date('H:i', strtotime($postdate)) }}</div>
+                                    @endif
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 hidden xl:table-cell whitespace-nowrap">
-                                    {{ $result->size_formatted ?? number_format($result->size / 1073741824, 2) . ' GB' }}
+                                    {{ number_format($size / 1073741824, 2) }} GB
                                 </td>
                                 <td class="px-4 py-3">
                                     <div class="flex items-center justify-center gap-2">
-                                        <a href="{{ url('/getnzb?id=' . $result->guid) }}"
+                                        <a href="{{ url('/getnzb?id=' . $guid) }}"
                                            class="inline-flex items-center px-3 py-1.5 bg-green-600 dark:bg-green-700 text-white text-xs rounded hover:bg-green-700 dark:hover:bg-green-800"
                                            title="Download NZB">
                                             <i class="fa fa-download mr-1"></i>
                                             <span class="hidden sm:inline">Download</span>
                                         </a>
-                                        <a href="{{ url('/details/' . $result->guid) }}"
+                                        <a href="{{ url('/details/' . $guid) }}"
                                            class="inline-flex items-center px-3 py-1.5 bg-blue-600 dark:bg-blue-700 text-white text-xs rounded hover:bg-blue-700 dark:hover:bg-blue-800"
                                            title="View Details">
                                             <i class="fa fa-info-circle mr-1"></i>
