@@ -25,18 +25,20 @@ class ApiTransformer extends TransformerAbstract
     /**
      * Transform a release into an API response array.
      *
-     * @param  Release  $release  The release to transform
+     * @param  Release|\stdClass  $release  The release to transform (can be Eloquent model or stdClass from raw query)
      * @return array The transformed release data
      */
-    public function transform(Release $release): array
+    public function transform(Release|\stdClass $release): array
     {
         $data = $this->getBaseData($release);
 
-        if (\in_array($release->categories_id, Category::MOVIES_GROUP, false)) {
+        $categoriesId = $this->getValue($release, 'categories_id');
+
+        if (\in_array($categoriesId, Category::MOVIES_GROUP, false)) {
             return array_merge($data, $this->getMovieSpecificData($release));
         }
 
-        if (\in_array($release->categories_id, Category::TV_GROUP, false)) {
+        if (\in_array($categoriesId, Category::TV_GROUP, false)) {
             return array_merge($data, $this->getTvSpecificData($release));
         }
 
@@ -44,54 +46,71 @@ class ApiTransformer extends TransformerAbstract
     }
 
     /**
+     * Get a value from the release object, handling both Eloquent models and stdClass objects.
+     *
+     * @param  Release|\stdClass  $release
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    protected function getValue(Release|\stdClass $release, string $key, mixed $default = null): mixed
+    {
+        if ($release instanceof Release) {
+            return $release->{$key} ?? $default;
+        }
+
+        return $release->{$key} ?? $default;
+    }
+
+    /**
      * Get base data common to all releases.
      */
-    protected function getBaseData(Release $release): array
+    protected function getBaseData(Release|\stdClass $release): array
     {
         return [
-            'title' => $release->searchname,
-            'details' => $this->getDetailsUrl($release->guid),
-            'url' => $this->getDownloadUrl($release->guid),
-            'category' => $release->categories_id,
-            'category_name' => $release->category_name,
-            'added' => Carbon::parse($release->adddate)->toRssString(),
-            'size' => $release->size,
-            'files' => $release->totalpart,
-            'grabs' => $this->nullIfZero($release->grabs),
-            'comments' => $this->nullIfZero($release->comments),
-            'password' => $release->passwordstatus,
-            'usenetdate' => Carbon::parse($release->postdate)->toRssString(),
+            'title' => $this->getValue($release, 'searchname'),
+            'details' => $this->getDetailsUrl($this->getValue($release, 'guid')),
+            'url' => $this->getDownloadUrl($this->getValue($release, 'guid')),
+            'category' => $this->getValue($release, 'categories_id'),
+            'category_name' => $this->getValue($release, 'category_name'),
+            'added' => Carbon::parse($this->getValue($release, 'adddate'))->toRssString(),
+            'size' => $this->getValue($release, 'size'),
+            'files' => $this->getValue($release, 'totalpart'),
+            'grabs' => $this->nullIfZero($this->getValue($release, 'grabs')),
+            'comments' => $this->nullIfZero($this->getValue($release, 'comments')),
+            'password' => $this->getValue($release, 'passwordstatus'),
+            'usenetdate' => Carbon::parse($this->getValue($release, 'postdate'))->toRssString(),
         ];
     }
 
     /**
      * Get movie-specific data fields.
      */
-    protected function getMovieSpecificData(Release $release): array
+    protected function getMovieSpecificData(Release|\stdClass $release): array
     {
         return [
-            'imdbid' => $this->nullIfZero($release->imdbid),
-            'tmdbid' => $this->nullIfZero($release->tmdbid),
-            'traktid' => $this->nullIfZero($release->traktid),
+            'imdbid' => $this->nullIfZero($this->getValue($release, 'imdbid')),
+            'tmdbid' => $this->nullIfZero($this->getValue($release, 'tmdbid')),
+            'traktid' => $this->nullIfZero($this->getValue($release, 'traktid')),
         ];
     }
 
     /**
      * Get TV-specific data fields.
      */
-    protected function getTvSpecificData(Release $release): array
+    protected function getTvSpecificData(Release|\stdClass $release): array
     {
         return [
-            'episode_title' => $release->title ?? $this->null(),
-            'season' => $release->series ?? $this->null(),
-            'episode' => $release->episode ?? $this->null(),
-            'tvairdate' => $release->firstaired ?? $this->null(),
-            'tvdbid' => $this->nullIfZero($release->tvdb),
-            'traktid' => $this->nullIfZero($release->trakt),
-            'tvrageid' => $this->nullIfZero($release->tvrage),
-            'tvmazeid' => $this->nullIfZero($release->tvmaze),
-            'imdbid' => $this->nullIfZero($release->imdb),
-            'tmdbid' => $this->nullIfZero($release->tmdb),
+            'episode_title' => $this->getValue($release, 'title') ?? $this->null(),
+            'season' => $this->getValue($release, 'series') ?? $this->null(),
+            'episode' => $this->getValue($release, 'episode') ?? $this->null(),
+            'tvairdate' => $this->getValue($release, 'firstaired') ?? $this->null(),
+            'tvdbid' => $this->nullIfZero($this->getValue($release, 'tvdb')),
+            'traktid' => $this->nullIfZero($this->getValue($release, 'trakt')),
+            'tvrageid' => $this->nullIfZero($this->getValue($release, 'tvrage')),
+            'tvmazeid' => $this->nullIfZero($this->getValue($release, 'tvmaze')),
+            'imdbid' => $this->nullIfZero($this->getValue($release, 'imdb')),
+            'tmdbid' => $this->nullIfZero($this->getValue($release, 'tmdb')),
         ];
     }
 
