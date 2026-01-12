@@ -40,7 +40,7 @@
                 <div class="lg:col-span-1">
                     <!-- Avatar -->
                     <div class="flex justify-center mb-6">
-                        <img src="{{ Gravatar::get($user->email, ['size' => 120, 'default' => 'mp']) }}"
+                        <img src="{{ !empty($user->email) && filter_var($user->email, FILTER_VALIDATE_EMAIL) ? Gravatar::get($user->email, ['size' => 120, 'default' => 'mp']) : 'https://www.gravatar.com/avatar/?d=mp&s=120' }}"
                              alt="{{ $user->username }}"
                              class="w-30 h-30 rounded-full border-4 border-gray-200 dark:border-gray-700 shadow-lg">
                     </div>
