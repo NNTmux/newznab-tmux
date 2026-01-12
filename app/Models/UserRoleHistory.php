@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Carbon;
 
 /**
  * App\Models\UserRoleHistory
@@ -86,9 +86,9 @@ class UserRoleHistory extends Model
         int $userId,
         ?int $oldRoleId,
         int $newRoleId,
-        ?Carbon $oldExpiryDate,
-        ?Carbon $newExpiryDate,
-        Carbon $effectiveDate,
+        ?CarbonInterface $oldExpiryDate,
+        ?CarbonInterface $newExpiryDate,
+        CarbonInterface $effectiveDate,
         bool $isStacked = false,
         ?string $changeReason = null,
         ?int $changedBy = null
