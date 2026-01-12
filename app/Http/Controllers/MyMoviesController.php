@@ -193,11 +193,11 @@ class MyMoviesController extends BasePageController
                 $movies = UserMovie::getMovies($this->userdata->id);
                 $results = [];
                 foreach ($movies as $moviek => $movie) {
-                    $showcats = explode('|', $movie['categories']);
+                    $showcats = explode('|', $movie['categories'] ?? '');
                     if (\is_array($showcats) && \count($showcats) > 0) {
                         $catarr = [];
                         foreach ($showcats as $scat) {
-                            if (! empty($scat)) {
+                            if (! empty($scat) && isset($categories[$scat])) {
                                 $catarr[] = $categories[$scat];
                             }
                         }
