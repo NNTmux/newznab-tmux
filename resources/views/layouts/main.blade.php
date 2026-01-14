@@ -54,11 +54,11 @@
         })();
     </script>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 dark:bg-gray-900 font-sans antialiased transition-colors duration-200">
-    <div class="min-h-screen flex">
+<body class="bg-gray-50 dark:bg-gray-900 font-sans antialiased transition-colors duration-200">
+    <div class="h-screen flex">
         <!-- Sidebar -->
         @auth
-            <aside id="sidebar" class="hidden md:flex md:flex-col w-64 bg-gray-900 dark:bg-gray-950 text-white transition-all duration-300">
+            <aside id="sidebar" class="hidden md:flex md:flex-col w-64 bg-gray-900 dark:bg-gray-950 text-white flex-shrink-0 h-full overflow-y-auto">
                 <div class="flex items-center justify-between p-4 border-b border-gray-800 dark:border-gray-700">
                     <a href="{{ $site['home_link'] ?? url('/') }}" class="flex items-center space-x-3">
                         <img src="{{ asset('assets/images/logo.svg') }}" alt="{{ config('app.name') }} Logo" class="w-12 h-12" aria-hidden="true">
@@ -73,15 +73,15 @@
         @endauth
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col">
+        <div class="flex-1 flex flex-col h-full overflow-hidden">
             <!-- Top Navigation -->
             @auth
-                <header class="bg-gray-800 dark:bg-gray-950 text-white shadow-lg">
+                <header class="bg-gray-800 dark:bg-gray-950 text-white shadow-lg flex-shrink-0 z-10">
                     @include('partials.header-menu')
                 </header>
             @endauth
 
-            <!-- Page Content -->
+            <!-- Page Content - This is the scrollable area -->
             <main class="flex-1 overflow-y-auto">
                 <div class="container mx-auto px-4 py-6">
                     @if(session('success'))
@@ -109,8 +109,8 @@
                 </div>
             </main>
 
-            <!-- Footer -->
-            <footer class="mt-auto">
+            <!-- Footer - Fixed at bottom -->
+            <footer class="flex-shrink-0">
                 @include('partials.footer')
             </footer>
         </div>

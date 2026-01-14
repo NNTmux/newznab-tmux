@@ -9,6 +9,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fixed layout - ensure html and body have proper height constraints */
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
 /* Dark Mode Text Readability Fixes */
 @layer base {
     /* Ensure dark backgrounds have light text */
