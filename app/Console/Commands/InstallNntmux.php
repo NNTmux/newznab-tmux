@@ -60,6 +60,9 @@ class InstallNntmux extends Command
             }
         }
 
+        // Ask for database type and configure accordingly
+        $this->configureDatabaseDriver($yesMode);
+
         $this->info('Migrating tables and seeding them with initial data');
         if (config('app.env') !== 'production') {
             $this->call('migrate:fresh', ['--seed' => true]);
@@ -84,6 +87,97 @@ class InstallNntmux extends Command
 
         $this->error('NNTmux installation failed. Fix reported problems and try again');
 
+    }
+
+    /**
+     * Ask user for database type and configure the driver and schema accordingly.
+     */
+    private function configureDatabaseDriver(bool $yesMode): void
+    {
+        $currentDriver = config('database.default', 'mysql');
+
+        if ($yesMode) {
+            $this->info("Using current database driver: {$currentDriver}");
+            $dbType = $currentDriver;
+        } else {
+            $dbType = $this->choice(
+                'Which database are you using?',
+                ['mariadb', 'mysql'],
+                $currentDriver === 'mariadb' ? 0 : 1
+            );
+        }
+
+        $this->info("Configuring database driver for: {$dbType}");
+
+        // Update .env file with the selected database driver
+        $this->updateEnvFile('DB_CONNECTION', $dbType);
+
+        // Handle schema file - ensure the correct schema file exists for the selected driver
+        $this->ensureSchemaFileExists($dbType);
+
+        // Clear config cache to ensure the new driver is used
+        $this->call('config:clear');
+
+        // Reload the configuration
+        config(['database.default' => $dbType]);
+    }
+
+    /**
+     * Update a value in the .env file.
+     */
+    private function updateEnvFile(string $key, string $value): void
+    {
+        $envPath = base_path('.env');
+
+        if (! File::exists($envPath)) {
+            $this->error('.env file not found!');
+
+            return;
+        }
+
+        $envContent = File::get($envPath);
+
+        // Check if the key exists in the .env file
+        if (preg_match("/^{$key}=.*/m", $envContent)) {
+            // Replace the existing value
+            $envContent = preg_replace("/^{$key}=.*/m", "{$key}={$value}", $envContent);
+        } else {
+            // Add the key if it doesn't exist
+            $envContent .= "\n{$key}={$value}";
+        }
+
+        File::put($envPath, $envContent);
+        $this->info("Updated .env: {$key}={$value}");
+    }
+
+    /**
+     * Ensure the schema file exists for the selected database driver.
+     * Laravel looks for {connection}-schema.sql in database/schema/
+     */
+    private function ensureSchemaFileExists(string $dbType): void
+    {
+        $schemaDir = database_path('schema');
+        $targetSchema = "{$schemaDir}/{$dbType}-schema.sql";
+        $mariadbSchema = "{$schemaDir}/mariadb-schema.sql";
+
+        // If the target schema already exists, we're good
+        if (File::exists($targetSchema)) {
+            $this->info("Schema file exists: {$dbType}-schema.sql");
+
+            return;
+        }
+
+        // For MySQL, we can use the MariaDB schema as they are compatible
+        if ($dbType === 'mysql' && File::exists($mariadbSchema)) {
+            $this->info('Creating MySQL schema file from MariaDB schema (they are compatible)...');
+            File::copy($mariadbSchema, $targetSchema);
+            $this->info("Created: {$dbType}-schema.sql");
+
+            return;
+        }
+
+        $this->warn("Schema file not found: {$dbType}-schema.sql");
+        $this->warn('The migration will create tables from scratch.');
     }
 
     /**
