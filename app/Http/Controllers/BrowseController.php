@@ -84,21 +84,39 @@ class BrowseController extends BasePageController
             $catname = 'All';
         } elseif ($category !== -1 && $grp === -1) {
             $catname = $id;
+
+            // Determine the root category ID - either from the category's root_categories_id
+            // or the category itself if it IS a root category
+            $rootCategoryId = null;
             $cdata = Category::find($category);
             if ($cdata !== null) {
-                if ($cdata->root_categories_id === Category::GAME_ROOT) {
-                    $covgroup = 'console';
-                } elseif ($cdata->root_categories_id === Category::MOVIE_ROOT) {
-                    $covgroup = 'movies';
-                } elseif ($cdata->root_categories_id === Category::PC_ROOT) {
-                    $covgroup = 'games';
-                } elseif ($cdata->root_categories_id === Category::MUSIC_ROOT) {
-                    $covgroup = 'music';
-                } elseif ($cdata->root_categories_id === Category::BOOKS_ROOT) {
-                    $covgroup = 'books';
-                } elseif ($cdata->root_categories_id === Category::TV_ROOT) {
-                    $shows = true;
-                }
+                $rootCategoryId = $cdata->root_categories_id ?? $category;
+            } else {
+                // Category not found in categories table, might be a root category
+                // Check if it matches a known root category ID
+                $rootCategoryId = $category;
+            }
+
+            // Also check RootCategory table for parent categories (when $id is 'All')
+            if ($id === 'All' && $parentId !== null) {
+                $rootCategoryId = $parentId;
+            }
+
+            // Set covgroup based on root category
+            if ($rootCategoryId === Category::GAME_ROOT) {
+                $covgroup = 'console';
+            } elseif ($rootCategoryId === Category::MOVIE_ROOT) {
+                $covgroup = 'movies';
+            } elseif ($rootCategoryId === Category::PC_ROOT) {
+                $covgroup = 'games';
+            } elseif ($rootCategoryId === Category::MUSIC_ROOT) {
+                $covgroup = 'music';
+            } elseif ($rootCategoryId === Category::BOOKS_ROOT) {
+                $covgroup = 'books';
+            } elseif ($rootCategoryId === Category::XXX_ROOT) {
+                $covgroup = 'xxx';
+            } elseif ($rootCategoryId === Category::TV_ROOT) {
+                $shows = true;
             }
         } else {
             $catname = $grp;

@@ -93,11 +93,20 @@
         <!-- Results -->
         @if(count($results) > 0)
             <div class="mb-4 flex justify-between items-center">
-                <h2 class="text-xl font-semibold text-gray-800">
-                    <i class="fa fa-gamepad mr-2 text-blue-600"></i>
-                    {{ $catname ?? 'All' }} Games
-                </h2>
-                <span class="text-sm text-gray-600">
+                <div class="flex items-center gap-4">
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                        <i class="fa fa-gamepad mr-2 text-blue-600"></i>
+                        {{ $catname ?? 'All' }} Games
+                    </h2>
+                    <x-view-toggle
+                        current-view="covers"
+                        covgroup="games"
+                        :category="$catname ?? 'All'"
+                        parentcat="PC"
+                        :shows="false"
+                    />
+                </div>
+                <span class="text-sm text-gray-600 dark:text-gray-400">
                     {{ $results->total() }} results found
                 </span>
             </div>

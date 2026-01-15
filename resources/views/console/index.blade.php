@@ -42,10 +42,13 @@
                 <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                     <!-- Left Section -->
                     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                        <div class="text-sm">
-                            <span class="text-gray-600">View: <strong>Covers</strong> |
-                            <a href="{{ url('/browse/Console/' . ($categorytitle ?? '')) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800">List</a></span>
-                        </div>
+                        <x-view-toggle
+                            current-view="covers"
+                            covgroup="console"
+                            :category="$categorytitle ?? 'All'"
+                            parentcat="Console"
+                            :shows="false"
+                        />
 
                         <div class="flex items-center gap-2">
                             <small class="text-gray-600">With Selected:</small>

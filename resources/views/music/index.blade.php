@@ -90,10 +90,19 @@
         <!-- Results -->
         @if(count($results) > 0)
             <div class="mb-4 flex justify-between items-center">
-                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                    <i class="fa fa-music mr-2 text-blue-600 dark:text-blue-400"></i>
-                    {{ $catname ?? 'All' }} Albums
-                </h2>
+                <div class="flex items-center gap-4">
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                        <i class="fa fa-music mr-2 text-blue-600 dark:text-blue-400"></i>
+                        {{ $catname ?? 'All' }} Albums
+                    </h2>
+                    <x-view-toggle
+                        current-view="covers"
+                        covgroup="music"
+                        :category="$categorytitle ?? 'All'"
+                        parentcat="Audio"
+                        :shows="false"
+                    />
+                </div>
                 <span class="text-sm text-gray-600 dark:text-gray-400">
                     {{ $results->total() }} results found
                 </span>
