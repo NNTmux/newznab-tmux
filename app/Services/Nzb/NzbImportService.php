@@ -320,7 +320,7 @@ class NzbImportService
             asort($binary_names);
             foreach ($nzbXML->file as $file) {
                 if ($file['subject'] === $binary_names[0]) {
-                    $this->nzbGuid = md5($file->segments->segment);
+                    $this->nzbGuid = md5((string) $file->segments->segment);
                     break;
                 }
             }
