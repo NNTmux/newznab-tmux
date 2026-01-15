@@ -119,7 +119,8 @@
         "nunomaduro/collision": "^8.6",
         "php-coveralls/php-coveralls": "^2.4",
         "phpunit/phpunit": "^12.1.0",
-        "rector/rector": "^2.0"
+        "rector/rector": "^2.0",
+        "nexxai/laravel-cfcache": "^1.0"
     },
     "suggest": {
         "ext-gd": "to use GD library based image processing.",
