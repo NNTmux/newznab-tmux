@@ -15,7 +15,7 @@
         'movies' => 'Movies',
         'console' => 'Console',
         'games' => 'Games',
-        'music' => 'Music',
+        'music' => 'Audio',
         'books' => 'Books',
         'xxx' => 'XXX',
     ];
