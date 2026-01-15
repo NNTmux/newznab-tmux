@@ -27,7 +27,7 @@
                         <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
                         <select id="category"
                                 name="t"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <option value="">All Categories</option>
                             @foreach($catlist ?? [] as $cat)
                                 <option value="{{ $cat['id'] }}" {{ ($category ?? '') == $cat['id'] ? 'selected' : '' }}>
@@ -45,7 +45,7 @@
                                name="title"
                                value="{{ $title ?? '' }}"
                                placeholder="Search by title"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                     </div>
 
                     <!-- Genre Filter -->
@@ -53,7 +53,7 @@
                         <label for="genre" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Genre</label>
                         <select id="genre"
                                 name="genre"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <option value="">All Genres</option>
                             @foreach($genres ?? [] as $g)
                                 <option value="{{ $g->id }}" {{ ($genre ?? '') == $g->id ? 'selected' : '' }}>
@@ -68,7 +68,7 @@
                         <label for="year" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Year</label>
                         <select id="year"
                                 name="year"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <option value="">All Years</option>
                             @foreach($years ?? [] as $y)
                                 <option value="{{ $y }}" {{ ($year ?? '') == $y ? 'selected' : '' }}>
@@ -111,58 +111,164 @@
                 </span>
             </div>
 
-            <!-- Games Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 mb-6">
+            <!-- Games Grid - Card Layout with Multiple Releases -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
                 @foreach($results as $result)
-                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200">
-                        <a href="{{ url('/details/' . $result->guid) }}" class="block relative">
-                            @if(!empty($result->cover))
-                                <img src="{{ url('/covers/games/' . $result->cover) }}"
-                                     alt="{{ $result->title ?? $result->searchname }}"
-                                     class="w-full h-48 object-cover"
-                                     data-fallback-src="{{ url('/images/no-cover.png') }}">
-                            @else
-                                <div class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                    <i class="fa fa-gamepad text-4xl text-gray-400"></i>
-                                </div>
-                            @endif
-                            @if(!empty($result->failed) && $result->failed > 0)
-                                <div class="absolute top-2 right-2">
-                                    <span class="px-2 py-1 bg-red-600 dark:bg-red-700 text-white text-xs rounded-full shadow-lg" title="{{ $result->failed }} user(s) reported download failure">
-                                        <i class="fa fa-exclamation-triangle mr-1"></i>Failed
-                                    </span>
-                                </div>
-                            @endif
-                            <div class="p-3">
-                                <h3 class="font-semibold text-sm text-gray-800 dark:text-gray-200 break-words break-all" title="{{ $result->title ?? $result->searchname }}">
-                                    {{ $result->title ?? $result->searchname }}
-                                </h3>
-                                @if(!empty($result->publisher))
-                                    <p class="text-xs text-gray-600 dark:text-gray-400 truncate" title="{{ $result->publisher }}">
-                                        {{ $result->publisher }}
-                                    </p>
-                                @endif
-                                @if(!empty($result->releasedate))
-                                    <p class="text-xs text-gray-500 mt-1">{{ date('Y', strtotime($result->releasedate)) }}</p>
-                                @elseif(!empty($result->year))
-                                    <p class="text-xs text-gray-500 mt-1">{{ $result->year }}</p>
-                                @endif
-                                @if(!empty($result->platform))
-                                    <p class="text-xs text-blue-600 dark:text-blue-400 mt-1 truncate">{{ $result->platform }}</p>
+                    @php
+                        // Extract grouped release data
+                        $releaseGuids = isset($result->grp_release_guid) ? explode(',', $result->grp_release_guid) : [];
+                        $releaseNames = isset($result->grp_release_name) ? explode('#', $result->grp_release_name) : [];
+                        $releaseSizes = isset($result->grp_release_size) ? explode(',', $result->grp_release_size) : [];
+                        $releasePostDates = isset($result->grp_release_postdate) ? explode(',', $result->grp_release_postdate) : [];
+                        $releaseAddDates = isset($result->grp_release_adddate) ? explode(',', $result->grp_release_adddate) : [];
+                        $releaseGrabs = isset($result->grp_release_grabs) ? explode(',', $result->grp_release_grabs) : [];
+                        $releaseNfoIds = isset($result->grp_release_nfoid) ? explode(',', $result->grp_release_nfoid) : [];
+                        $releaseHasPreview = isset($result->grp_haspreview) ? explode(',', $result->grp_haspreview) : [];
+                        $releaseCategories = isset($result->grp_release_catname) ? explode(',', $result->grp_release_catname) : [];
+                        $failedCounts = isset($result->grp_release_failed) ? array_filter(explode(',', $result->grp_release_failed)) : [];
+                        $totalFailed = array_sum($failedCounts);
+
+                        // Limit to maximum 2 releases displayed
+                        $maxReleases = 2;
+                        $totalReleases = count($releaseGuids);
+                        $releaseGuids = array_slice($releaseGuids, 0, $maxReleases);
+                        $releaseNames = array_slice($releaseNames, 0, $maxReleases);
+                        $releaseSizes = array_slice($releaseSizes, 0, $maxReleases);
+                        $releasePostDates = array_slice($releasePostDates, 0, $maxReleases);
+                        $releaseAddDates = array_slice($releaseAddDates, 0, $maxReleases);
+                        $releaseGrabs = array_slice($releaseGrabs, 0, $maxReleases);
+                        $releaseNfoIds = array_slice($releaseNfoIds, 0, $maxReleases);
+                        $releaseHasPreview = array_slice($releaseHasPreview, 0, $maxReleases);
+                        $releaseCategories = array_slice($releaseCategories, 0, $maxReleases);
+
+                        $guid = $releaseGuids[0] ?? null;
+                    @endphp
+
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+                        <div class="flex flex-row">
+                            <!-- Game Cover -->
+                            <div class="flex-shrink-0">
+                                @if($guid)
+                                    <a href="{{ url('/details/' . $guid) }}" class="block">
+                                        @if(!empty($result->cover))
+                                            <img src="{{ url('/covers/games/' . $result->cover) }}"
+                                                 alt="{{ $result->title ?? $result->searchname }}"
+                                                 class="w-32 h-48 object-cover"
+                                                 onerror="this.onerror=null;this.src='{{ url('/images/no-cover.png') }}';">
+                                        @else
+                                            <div class="w-32 h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                                <i class="fas fa-gamepad text-gray-400 text-2xl"></i>
+                                            </div>
+                                        @endif
+                                    </a>
+                                @else
+                                    <div class="w-32 h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                        <i class="fas fa-gamepad text-gray-400 text-2xl"></i>
+                                    </div>
                                 @endif
                             </div>
-                        </a>
-                        <div class="px-3 pb-3 flex gap-1">
-                            <a href="{{ url('/getnzb?id=' . $result->guid) }}"
-                               class="flex-1 px-2 py-1 bg-green-600 dark:bg-green-700 text-white text-xs rounded hover:bg-green-700 dark:hover:bg-green-800 text-center"
-                               title="Download NZB">
-                                <i class="fa fa-download"></i>
-                            </a>
-                            <a href="{{ url('/details/' . $result->guid) }}"
-                               class="flex-1 px-2 py-1 bg-blue-600 dark:bg-blue-700 text-white text-xs rounded hover:bg-blue-700 dark:hover:bg-blue-800 text-center"
-                               title="View Details">
-                                <i class="fa fa-info-circle"></i>
-                            </a>
+
+                            <!-- Game Details -->
+                            <div class="flex-1 p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex-1">
+                                        <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">{{ $result->title ?? $result->searchname }}</h3>
+
+                                        @if($totalFailed > 0)
+                                            <div class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 border border-red-200 mt-1">
+                                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                                <span>{{ $totalFailed }} failed report{{ $totalFailed > 1 ? 's' : '' }}</span>
+                                            </div>
+                                        @endif
+
+                                        <div class="flex items-center gap-4 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                            @if(!empty($result->releasedate))
+                                                <span><i class="fas fa-calendar mr-1"></i> {{ date('Y', strtotime($result->releasedate)) }}</span>
+                                            @elseif(!empty($result->year))
+                                                <span><i class="fas fa-calendar mr-1"></i> {{ $result->year }}</span>
+                                            @endif
+                                            @if(!empty($result->platform))
+                                                <span><i class="fas fa-desktop mr-1"></i> {{ $result->platform }}</span>
+                                            @endif
+                                        </div>
+
+                                        <div class="text-xs text-gray-600 dark:text-gray-400 mt-2 space-y-1">
+                                            @if(!empty($result->publisher))
+                                                <div><strong>Publisher:</strong> {{ $result->publisher }}</div>
+                                            @endif
+                                            @if(!empty($result->genre))
+                                                <div><strong>Genre:</strong> {{ $result->genre }}</div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Release Information -->
+                                @if(!empty($releaseGuids[0]))
+                                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                        <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                            Available Releases
+                                            @if($totalReleases > $maxReleases)
+                                                <span class="text-xs font-normal text-gray-500">(Showing {{ $maxReleases }} of {{ $totalReleases }})</span>
+                                            @endif
+                                        </h4>
+                                        <div class="space-y-2">
+                                            @foreach($releaseNames as $index => $releaseName)
+                                                @if($releaseName && isset($releaseGuids[$index]))
+                                                    <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-2 border border-gray-200 dark:border-gray-700">
+                                                        <div class="space-y-2">
+                                                            <!-- Release Name -->
+                                                            <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="text-sm text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 font-medium block break-all" title="{{ $releaseName }}">
+                                                                {{ $releaseName }}
+                                                            </a>
+
+                                                            <!-- Info Badges -->
+                                                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                @if(isset($releaseSizes[$index]))
+                                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                                                                        <i class="fas fa-hdd mr-1"></i>{{ number_format($releaseSizes[$index] / 1073741824, 2) }} GB
+                                                                    </span>
+                                                                @endif
+                                                                @if(isset($releasePostDates[$index]))
+                                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                                                                        <i class="fas fa-calendar-alt mr-1"></i>{{ date('M d, Y H:i', strtotime($releasePostDates[$index])) }}
+                                                                    </span>
+                                                                @endif
+                                                                @if(isset($releaseCategories[$index]) && !empty($releaseCategories[$index]))
+                                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                                                        <i class="fas fa-folder mr-1"></i>{{ $releaseCategories[$index] }}
+                                                                    </span>
+                                                                @endif
+                                                                @if(isset($releaseNfoIds[$index]) && !empty($releaseNfoIds[$index]))
+                                                                    <button type="button"
+                                                                            class="nfo-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-200 dark:hover:bg-yellow-800 transition cursor-pointer"
+                                                                            data-guid="{{ $releaseGuids[$index] }}"
+                                                                            title="View NFO file">
+                                                                        <i class="fas fa-file-alt mr-1"></i> NFO
+                                                                    </button>
+                                                                @endif
+                                                            </div>
+
+                                                            <!-- Action Buttons -->
+                                                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                <a href="{{ url('/getnzb/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-600 dark:bg-green-700 text-white hover:bg-green-700 dark:hover:bg-green-800 transition">
+                                                                    <i class="fas fa-download mr-1"></i> Download
+                                                                </a>
+                                                                <button class="add-to-cart inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-800 transition" data-guid="{{ $releaseGuids[$index] }}">
+                                                                    <i class="fas fa-shopping-cart mr-1"></i> Cart
+                                                                </button>
+                                                                <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-600 dark:bg-gray-700 text-white hover:bg-gray-700 dark:hover:bg-gray-800 transition">
+                                                                    <i class="fas fa-info-circle mr-1"></i> Details
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 @endforeach
@@ -174,8 +280,8 @@
             </div>
         @else
             <!-- No Results -->
-            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-8 text-center">
-                <i class="fa fa-gamepad text-yellow-600 text-5xl mb-4"></i>
+            <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-8 text-center">
+                <i class="fa fa-gamepad text-yellow-600 dark:text-yellow-500 text-5xl mb-4"></i>
                 <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">No games found</h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-4">Try adjusting your search filters or browse all games.</p>
                 <a href="{{ url('/Games') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
@@ -185,5 +291,8 @@
         @endif
     </div>
 </div>
+
+<!-- NFO Modal -->
+@include('partials.nfo-modal')
 @endsection
 

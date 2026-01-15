@@ -168,18 +168,34 @@ class ConsoleService
             Cache::put(md5($calcSql.$page), $consoles, $expiresAt);
         }
 
-        $consoleIDs = $releaseIDs = false;
+        $consoleIDs = $releaseIDs = [];
         if (\is_array($consoles['result'])) {
             foreach ($consoles['result'] as $console => $id) {
-                $consoleIDs = [$id->id];
-                $releaseIDs = [$id->grp_release_id];
+                $consoleIDs[] = $id->id;
+                $releaseIDs[] = $id->grp_release_id;
             }
         }
 
         $sql = sprintf(
-            '
+            "
                 SELECT
-                    r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, rn.releases_id, g.name AS group_name, df.failed AS failed,
+                    GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
+                    GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') AS grp_rarinnerfilecount,
+                    GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
+                    GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
+                    GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
+                    GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
+                    GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
+                    GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
+                    GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
+                    GROUP_CONCAT(r.adddate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_adddate,
+                    GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
+                    GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
+                    GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
+                    GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
+                    GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
+                    GROUP_CONCAT(cp.title, ' > ', c.title ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_catname,
+                    GROUP_CONCAT(r.fromname ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_fromname,
                 con.*,
                 r.consoleinfo_id,
                 g.name AS group_name,
@@ -189,15 +205,17 @@ class ConsoleService
                 LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id
                 LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
                 LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
+                LEFT OUTER JOIN categories c ON c.id = r.categories_id
+                LEFT OUTER JOIN root_categories cp ON cp.id = c.root_categories_id
                 INNER JOIN consoleinfo con ON con.id = r.consoleinfo_id
                 INNER JOIN genres ON con.genres_id = genres.id
                 WHERE con.id IN (%s)
                 AND r.id IN (%s)
                 %s
                 GROUP BY con.id
-                ORDER BY %s %s',
-            (\is_array($consoleIDs) ? implode(',', $consoleIDs) : -1),
-            (\is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
+                ORDER BY %s %s",
+            (! empty($consoleIDs) ? implode(',', $consoleIDs) : -1),
+            (! empty($releaseIDs) ? implode(',', $releaseIDs) : -1),
             $catsrch,
             $order[0],
             $order[1]
