@@ -14,9 +14,15 @@ use Illuminate\Support\Facades\Hash;
 
 class PasswordSecurityController extends Controller
 {
-    public function show2faForm(Request $request): Application|View|Factory|\Illuminate\Contracts\Foundation\Application
+    public function show2faForm(Request $request): Application|View|Factory|\Illuminate\Contracts\Foundation\Application|RedirectResponse
     {
         $user = $request->user();
+
+        if (! $user) {
+            return redirect()->route('login')
+                ->with('message', 'Please log in to access 2FA settings.')
+                ->with('message_type', 'danger');
+        }
 
         $google2fa_url = '';
         if ($user->passwordSecurity()->exists()) {
@@ -43,6 +49,12 @@ class PasswordSecurityController extends Controller
     {
         $user = $request->user();
 
+        if (! $user) {
+            return redirect()->route('login')
+                ->with('message', 'Please log in to access 2FA settings.')
+                ->with('message_type', 'danger');
+        }
+
         // Add the secret key to the registration data
         PasswordSecurity::create(
             [
@@ -68,6 +80,13 @@ class PasswordSecurityController extends Controller
     public function enable2fa(Request $request): RedirectResponse
     {
         $user = $request->user();
+
+        if (! $user) {
+            return redirect()->route('login')
+                ->with('message', 'Please log in to access 2FA settings.')
+                ->with('message_type', 'danger');
+        }
+
         $secret = $request->input('verify-code');
         $valid = \Google2FA::verifyKey($user->passwordSecurity->google2fa_secret, $secret);
         if ($valid) {
@@ -86,6 +105,12 @@ class PasswordSecurityController extends Controller
     {
         $user = $request->user();
 
+        if (! $user) {
+            return redirect()->route('login')
+                ->with('message', 'Please log in to access 2FA settings.')
+                ->with('message_type', 'danger');
+        }
+
         // Only allow canceling if 2FA is not yet enabled
         if ($user->passwordSecurity()->exists() && ! $user->passwordSecurity->google2fa_enable) {
             $user->passwordSecurity()->delete();
@@ -98,13 +123,20 @@ class PasswordSecurityController extends Controller
 
     public function disable2fa(Disable2faPasswordSecurityRequest $request): \Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
-        if (! (Hash::check($request->get('current-password'), $request->user()->password))) {
+        $user = $request->user();
+
+        if (! $user) {
+            return redirect()->route('login')
+                ->with('message', 'Please log in to access 2FA settings.')
+                ->with('message_type', 'danger');
+        }
+
+        if (! (Hash::check($request->get('current-password'), $user->password))) {
             // Password doesn't match - always redirect to profile page with error
             return redirect()->to('profileedit#security')->with('error_2fa', 'Your password does not match with your account password. Please try again.');
         }
 
         $validatedData = $request->validated();
-        $user = $request->user();
 
         // Delete the password security record entirely to fully disable 2FA
         if ($user->passwordSecurity) {
@@ -252,15 +284,22 @@ class PasswordSecurityController extends Controller
      */
     public function profileDisable2fa(Request $request): RedirectResponse
     {
+        $user = $request->user();
+
+        if (! $user) {
+            return redirect()->route('login')
+                ->with('message', 'Please log in to access 2FA settings.')
+                ->with('message_type', 'danger');
+        }
+
         $request->validate([
             'current-password' => 'required',
         ]);
 
-        if (! (Hash::check($request->get('current-password'), $request->user()->password))) {
+        if (! (Hash::check($request->get('current-password'), $user->password))) {
             return redirect()->to('profileedit#security')->with('error_2fa', 'Your password does not match with your account password. Please try again.');
         }
 
-        $user = $request->user();
         if ($user->passwordSecurity) {
             $user->passwordSecurity->google2fa_enable = 0;
             $user->passwordSecurity->save();
@@ -272,9 +311,15 @@ class PasswordSecurityController extends Controller
     /**
      * Show the 2FA enable form on a dedicated page
      */
-    public function showEnable2faForm(Request $request): Application|View|Factory|\Illuminate\Contracts\Foundation\Application
+    public function showEnable2faForm(Request $request): Application|View|Factory|\Illuminate\Contracts\Foundation\Application|RedirectResponse
     {
         $user = $request->user();
+
+        if (! $user) {
+            return redirect()->route('login')
+                ->with('message', 'Please log in to access 2FA settings.')
+                ->with('message_type', 'danger');
+        }
 
         $google2fa_url = '';
         if ($user->passwordSecurity()->exists()) {
@@ -296,9 +341,15 @@ class PasswordSecurityController extends Controller
     /**
      * Show the 2FA disable form on a dedicated page
      */
-    public function showDisable2faForm(Request $request): Application|View|Factory|\Illuminate\Contracts\Foundation\Application
+    public function showDisable2faForm(Request $request): Application|View|Factory|\Illuminate\Contracts\Foundation\Application|RedirectResponse
     {
         $user = $request->user();
+
+        if (! $user) {
+            return redirect()->route('login')
+                ->with('message', 'Please log in to access 2FA settings.')
+                ->with('message_type', 'danger');
+        }
 
         $google2fa_url = '';
         if ($user->passwordSecurity()->exists()) {
