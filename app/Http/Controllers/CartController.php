@@ -15,7 +15,8 @@ class CartController extends BasePageController
      */
     public function index()
     {
-        $results = UsersRelease::getCart(Auth::id());
+        $results = UsersRelease::getCart(Auth::id())
+            ->filter(fn ($item) => $item->release !== null);
 
         $this->viewData = array_merge($this->viewData, [
             'results' => $results,
