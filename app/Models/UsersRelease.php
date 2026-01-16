@@ -75,7 +75,11 @@ class UsersRelease extends Model
      */
     public static function getCart($uid)
     {
-        return self::query()->with('release')->where(['users_id' => $uid])->get();
+        return self::query()
+            ->with('release')
+            ->whereHas('release')
+            ->where(['users_id' => $uid])
+            ->get();
     }
 
     /**

@@ -63,6 +63,7 @@
                         </thead>
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
                             @foreach($results as $result)
+                                @continue(!$result->release)
                                 <tr id="guid{{ $result->release->guid }}" class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                     <td class="px-4 py-3">
                                         <input id="chk{{ substr($result->release->guid, 0, 7) }}"
