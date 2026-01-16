@@ -74,11 +74,20 @@
         <!-- Results -->
         @if(count($results) > 0)
             <div class="mb-4 flex justify-between items-center">
-                <h2 class="text-xl font-semibold text-gray-800">
-                    <i class="fa fa-book mr-2 text-blue-600"></i>
-                    {{ $catname ?? 'All' }} Books
-                </h2>
-                <span class="text-sm text-gray-600">
+                <div class="flex items-center gap-4">
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                        <i class="fa fa-book mr-2 text-blue-600"></i>
+                        {{ $catname ?? 'All' }} Books
+                    </h2>
+                    <x-view-toggle
+                        current-view="covers"
+                        covgroup="books"
+                        :category="$categorytitle ?? 'All'"
+                        parentcat="Books"
+                        :shows="false"
+                    />
+                </div>
+                <span class="text-sm text-gray-600 dark:text-gray-400">
                     {{ $results->total() }} results found
                 </span>
             </div>

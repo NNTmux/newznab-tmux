@@ -216,16 +216,51 @@ class GamesService
             Cache::put(md5($gamesSql.$page), $games, $expiresAt);
         }
 
-        $gameIDs = $releaseIDs = false;
+        $gameIDs = $releaseIDs = [];
         if (is_array($games['result'])) {
             foreach ($games['result'] as $game => $id) {
-                $gameIDs = [$id->id];
-                $releaseIDs = [$id->grp_release_id];
+                $gameIDs[] = $id->id;
+                $releaseIDs[] = $id->grp_release_id;
             }
         }
 
-        $returnSql =
-            'SELECT r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, g.name AS group_name, df.failed AS failed, gi.*, YEAR (gi.releasedate) as year, r.gamesinfo_id, rn.releases_id AS nfoid FROM releases r LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id INNER JOIN gamesinfo gi ON gi.id = r.gamesinfo_id WHERE gi.id IN ('.(is_array($gameIDs) ? implode(',', $gameIDs) : -1).') AND r.id IN ('.(is_array($releaseIDs) ? implode(',', $releaseIDs) : -1).')'.$catsrch.' GROUP BY gi.id ORDER BY '.($order[0]).' '.($order[1]);
+        $returnSql = sprintf(
+            "SELECT
+                GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
+                GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') AS grp_rarinnerfilecount,
+                GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
+                GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
+                GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
+                GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
+                GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
+                GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
+                GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
+                GROUP_CONCAT(r.adddate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_adddate,
+                GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
+                GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
+                GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
+                GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
+                GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
+                GROUP_CONCAT(cp.title, ' > ', c.title ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_catname,
+                gi.*, YEAR(gi.releasedate) as year, r.gamesinfo_id, rn.releases_id AS nfoid, g.name AS group_name
+            FROM releases r
+            LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id
+            LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
+            LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
+            LEFT OUTER JOIN categories c ON c.id = r.categories_id
+            LEFT OUTER JOIN root_categories cp ON cp.id = c.root_categories_id
+            INNER JOIN gamesinfo gi ON gi.id = r.gamesinfo_id
+            WHERE gi.id IN (%s)
+            AND r.id IN (%s)
+            %s
+            GROUP BY gi.id
+            ORDER BY %s %s",
+            (! empty($gameIDs) ? implode(',', $gameIDs) : -1),
+            (! empty($releaseIDs) ? implode(',', $releaseIDs) : -1),
+            $catsrch,
+            $order[0],
+            $order[1]
+        );
 
         $return = Cache::get(md5($returnSql.$page));
         if ($return !== null) {

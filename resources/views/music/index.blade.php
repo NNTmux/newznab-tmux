@@ -90,63 +90,178 @@
         <!-- Results -->
         @if(count($results) > 0)
             <div class="mb-4 flex justify-between items-center">
-                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                    <i class="fa fa-music mr-2 text-blue-600 dark:text-blue-400"></i>
-                    {{ $catname ?? 'All' }} Albums
-                </h2>
+                <div class="flex items-center gap-4">
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                        <i class="fa fa-music mr-2 text-blue-600 dark:text-blue-400"></i>
+                        {{ $catname ?? 'All' }} Albums
+                    </h2>
+                    <x-view-toggle
+                        current-view="covers"
+                        covgroup="music"
+                        :category="$categorytitle ?? 'All'"
+                        parentcat="Audio"
+                        :shows="false"
+                    />
+                </div>
                 <span class="text-sm text-gray-600 dark:text-gray-400">
                     {{ $results->total() }} results found
                 </span>
             </div>
 
-            <!-- Album Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 mb-6">
+            <!-- Album Grid - Card Layout with Multiple Releases -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
                 @foreach($resultsadd as $result)
-                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200">
-                        <a href="{{ url('/details/' . $result->guid) }}" class="block relative">
-                            @if(!empty($result->cover))
-                                <img src="{{ url('/covers/music/' . $result->cover) }}"
-                                     alt="{{ $result->artist ?? '' }} - {{ $result->title ?? '' }}"
-                                     class="w-full h-48 object-cover"
-                                     data-fallback-src="{{ url('/images/no-cover.png') }}">
-                            @else
-                                <div class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                    <i class="fa fa-music text-4xl text-gray-400"></i>
-                                </div>
-                            @endif
-                            @if(!empty($result->failed) && $result->failed > 0)
-                                <div class="absolute top-2 right-2">
-                                    <span class="px-2 py-1 bg-red-600 dark:bg-red-700 text-white text-xs rounded-full shadow-lg" title="{{ $result->failed }} user(s) reported download failure">
-                                        <i class="fa fa-exclamation-triangle mr-1"></i>Failed
-                                    </span>
-                                </div>
-                            @endif
-                            <div class="p-3">
-                                <h3 class="font-semibold text-sm text-gray-800 dark:text-gray-200 break-words break-all" title="{{ $result->title ?? $result->searchname }}">
-                                    {{ $result->title ?? $result->searchname }}
-                                </h3>
-                                <p class="text-xs text-gray-600 dark:text-gray-400 truncate" title="{{ $result->artist ?? '' }}">
-                                    {{ $result->artist ?? 'Unknown Artist' }}
-                                </p>
-                                @if(!empty($result->year))
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ $result->year }}</p>
-                                @endif
-                                @if(!empty($result->genre))
-                                    <p class="text-xs text-blue-600 dark:text-blue-400 mt-1 truncate">{{ $result->genre }}</p>
+                    @php
+                        // Extract grouped release data
+                        $releaseGuids = isset($result->grp_release_guid) ? explode(',', $result->grp_release_guid) : [];
+                        $releaseNames = isset($result->grp_release_name) ? explode('#', $result->grp_release_name) : [];
+                        $releaseSizes = isset($result->grp_release_size) ? explode(',', $result->grp_release_size) : [];
+                        $releasePostDates = isset($result->grp_release_postdate) ? explode(',', $result->grp_release_postdate) : [];
+                        $releaseAddDates = isset($result->grp_release_adddate) ? explode(',', $result->grp_release_adddate) : [];
+                        $releaseGrabs = isset($result->grp_release_grabs) ? explode(',', $result->grp_release_grabs) : [];
+                        $releaseNfoIds = isset($result->grp_release_nfoid) ? explode(',', $result->grp_release_nfoid) : [];
+                        $releaseHasPreview = isset($result->grp_haspreview) ? explode(',', $result->grp_haspreview) : [];
+                        $releaseCategories = isset($result->grp_release_catname) ? explode(',', $result->grp_release_catname) : [];
+                        $failedCounts = isset($result->grp_release_failed) ? array_filter(explode(',', $result->grp_release_failed)) : [];
+                        $totalFailed = array_sum($failedCounts);
+
+                        // Limit to maximum 2 releases displayed
+                        $maxReleases = 2;
+                        $totalReleases = count($releaseGuids);
+                        $releaseGuids = array_slice($releaseGuids, 0, $maxReleases);
+                        $releaseNames = array_slice($releaseNames, 0, $maxReleases);
+                        $releaseSizes = array_slice($releaseSizes, 0, $maxReleases);
+                        $releasePostDates = array_slice($releasePostDates, 0, $maxReleases);
+                        $releaseAddDates = array_slice($releaseAddDates, 0, $maxReleases);
+                        $releaseGrabs = array_slice($releaseGrabs, 0, $maxReleases);
+                        $releaseNfoIds = array_slice($releaseNfoIds, 0, $maxReleases);
+                        $releaseHasPreview = array_slice($releaseHasPreview, 0, $maxReleases);
+                        $releaseCategories = array_slice($releaseCategories, 0, $maxReleases);
+
+                        $guid = $releaseGuids[0] ?? null;
+                    @endphp
+
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+                        <div class="flex flex-row">
+                            <!-- Album Cover -->
+                            <div class="flex-shrink-0">
+                                @if($guid)
+                                    <a href="{{ url('/details/' . $guid) }}" class="block">
+                                        @if(!empty($result->cover))
+                                            <img src="{{ url('/covers/music/' . $result->cover) }}"
+                                                 alt="{{ $result->artist ?? '' }} - {{ $result->title ?? '' }}"
+                                                 class="w-32 h-48 object-cover"
+                                                 onerror="this.onerror=null;this.src='{{ url('/images/no-cover.png') }}';">
+                                        @else
+                                            <div class="w-32 h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                                <i class="fas fa-music text-gray-400 text-2xl"></i>
+                                            </div>
+                                        @endif
+                                    </a>
+                                @else
+                                    <div class="w-32 h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                        <i class="fas fa-music text-gray-400 text-2xl"></i>
+                                    </div>
                                 @endif
                             </div>
-                        </a>
-                        <div class="px-3 pb-3 flex gap-1">
-                            <a href="{{ url('/getnzb?id=' . $result->guid) }}"
-                               class="flex-1 px-2 py-1 bg-green-600 dark:bg-green-700 text-white text-xs rounded hover:bg-green-700 dark:hover:bg-green-800 text-center"
-                               title="Download NZB">
-                                <i class="fa fa-download"></i>
-                            </a>
-                            <a href="{{ url('/details/' . $result->guid) }}"
-                               class="flex-1 px-2 py-1 bg-blue-600 dark:bg-blue-700 text-white text-xs rounded hover:bg-blue-700 dark:hover:bg-blue-800 text-center"
-                               title="View Details">
-                                <i class="fa fa-info-circle"></i>
-                            </a>
+
+                            <!-- Album Details -->
+                            <div class="flex-1 p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex-1">
+                                        <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">{{ $result->title ?? 'Unknown Album' }}</h3>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ $result->artist ?? 'Unknown Artist' }}</p>
+
+                                        @if($totalFailed > 0)
+                                            <div class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 border border-red-200 mt-1">
+                                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                                <span>{{ $totalFailed }} failed report{{ $totalFailed > 1 ? 's' : '' }}</span>
+                                            </div>
+                                        @endif
+
+                                        <div class="flex items-center gap-4 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                            @if(!empty($result->year))
+                                                <span><i class="fas fa-calendar mr-1"></i> {{ $result->year }}</span>
+                                            @endif
+                                            @if(!empty($result->genre))
+                                                <span><i class="fas fa-tag mr-1"></i> {{ $result->genre }}</span>
+                                            @endif
+                                        </div>
+
+                                        @if(!empty($result->label))
+                                            <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                                <strong>Label:</strong> {{ $result->label }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- Release Information -->
+                                @if(!empty($releaseGuids[0]))
+                                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                        <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                            Available Releases
+                                            @if($totalReleases > $maxReleases)
+                                                <span class="text-xs font-normal text-gray-500">(Showing {{ $maxReleases }} of {{ $totalReleases }})</span>
+                                            @endif
+                                        </h4>
+                                        <div class="space-y-2">
+                                            @foreach($releaseNames as $index => $releaseName)
+                                                @if($releaseName && isset($releaseGuids[$index]))
+                                                    <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-2 border border-gray-200 dark:border-gray-700">
+                                                        <div class="space-y-2">
+                                                            <!-- Release Name -->
+                                                            <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="text-sm text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 font-medium block break-all" title="{{ $releaseName }}">
+                                                                {{ $releaseName }}
+                                                            </a>
+
+                                                            <!-- Info Badges -->
+                                                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                @if(isset($releaseSizes[$index]))
+                                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                                                                        <i class="fas fa-hdd mr-1"></i>{{ number_format($releaseSizes[$index] / 1073741824, 2) }} GB
+                                                                    </span>
+                                                                @endif
+                                                                @if(isset($releasePostDates[$index]))
+                                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                                                                        <i class="fas fa-calendar-alt mr-1"></i>{{ date('M d, Y H:i', strtotime($releasePostDates[$index])) }}
+                                                                    </span>
+                                                                @endif
+                                                                @if(isset($releaseCategories[$index]) && !empty($releaseCategories[$index]))
+                                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                                                        <i class="fas fa-folder mr-1"></i>{{ $releaseCategories[$index] }}
+                                                                    </span>
+                                                                @endif
+                                                                @if(isset($releaseNfoIds[$index]) && !empty($releaseNfoIds[$index]))
+                                                                    <button type="button"
+                                                                            class="nfo-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-200 dark:hover:bg-yellow-800 transition cursor-pointer"
+                                                                            data-guid="{{ $releaseGuids[$index] }}"
+                                                                            title="View NFO file">
+                                                                        <i class="fas fa-file-alt mr-1"></i> NFO
+                                                                    </button>
+                                                                @endif
+                                                            </div>
+
+                                                            <!-- Action Buttons -->
+                                                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                <a href="{{ url('/getnzb/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-600 dark:bg-green-700 text-white hover:bg-green-700 dark:hover:bg-green-800 transition">
+                                                                    <i class="fas fa-download mr-1"></i> Download
+                                                                </a>
+                                                                <button class="add-to-cart inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-800 transition" data-guid="{{ $releaseGuids[$index] }}">
+                                                                    <i class="fas fa-shopping-cart mr-1"></i> Cart
+                                                                </button>
+                                                                <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-600 dark:bg-gray-700 text-white hover:bg-gray-700 dark:hover:bg-gray-800 transition">
+                                                                    <i class="fas fa-info-circle mr-1"></i> Details
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 @endforeach
@@ -169,5 +284,8 @@
         @endif
     </div>
 </div>
+
+<!-- NFO Modal -->
+@include('partials.nfo-modal')
 @endsection
 

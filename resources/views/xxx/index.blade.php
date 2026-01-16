@@ -85,110 +85,200 @@
         <!-- Results -->
         @if(count($results) > 0)
             <div class="mb-4 flex justify-between items-center">
-                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                    <i class="fa fa-film mr-2 text-blue-600"></i>
-                    {{ $catname ?? 'All' }} XXX
-                </h2>
+                <div class="flex items-center gap-4">
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                        <i class="fa fa-film mr-2 text-blue-600"></i>
+                        {{ $catname ?? 'All' }} XXX
+                    </h2>
+                    <x-view-toggle
+                        current-view="covers"
+                        covgroup="xxx"
+                        :category="$categorytitle ?? 'All'"
+                        parentcat="XXX"
+                        :shows="false"
+                    />
+                </div>
                 <span class="text-sm text-gray-600 dark:text-gray-400">
                     {{ $results->total() }} results found
                 </span>
             </div>
 
-            <!-- XXX List Table -->
-            <div class="overflow-x-auto">
-                <table class="w-full border-collapse">
-                    <thead>
-                        <tr class="bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">Category</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider hidden lg:table-cell">Posted</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider hidden xl:table-cell">Size</th>
-                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        @foreach($results as $result)
-                            @php
-                                // Extract first values from comma-separated grouped fields
-                                $guid = isset($result->grp_release_guid) ? explode(',', $result->grp_release_guid)[0] : null;
-                                $searchname = isset($result->grp_release_name) ? explode('#', $result->grp_release_name)[0] : ($result->title ?? '');
-                                $postdate = isset($result->grp_release_postdate) ? explode(',', $result->grp_release_postdate)[0] : null;
-                                $size = isset($result->grp_release_size) ? explode(',', $result->grp_release_size)[0] : 0;
-                                $failedCounts = isset($result->grp_release_failed) ? array_filter(explode(',', $result->grp_release_failed)) : [];
-                                $totalFailed = array_sum($failedCounts);
-                            @endphp
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                <td class="px-4 py-3">
-                                    <div class="flex items-start">
-                                        <div class="flex-1 min-w-0">
-                                            <a href="{{ url('/details/' . $guid) }}"
-                                               class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium break-words">
-                                                {{ $searchname }}
-                                            </a>
-                                            @if($totalFailed > 0)
-                                                <span class="ml-2 px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs rounded"
-                                                      title="{{ $totalFailed }} user(s) reported download failure">
-                                                    <i class="fa fa-exclamation-triangle mr-1"></i>Failed
-                                                </span>
-                                            @endif
-                                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                @if(!empty($result->genre))
-                                                    <span class="mr-3">
-                                                        <i class="fa fa-tag mr-1"></i>
-                                                        {!! makeFieldLinks((array) $result, 'genre', 'xxx') !!}
-                                                    </span>
-                                                @endif
-                                                @if(!empty($result->actors))
-                                                    <span class="mr-3">
-                                                        <i class="fa fa-users mr-1"></i>
-                                                        {!! makeFieldLinks((array) $result, 'actors', 'xxx') !!}
-                                                    </span>
-                                                @endif
-                                                @if(!empty($result->director))
-                                                    <span>
-                                                        <i class="fa fa-user-circle mr-1"></i>
-                                                        {!! makeFieldLinks((array) $result, 'director', 'xxx') !!}
-                                                    </span>
-                                                @endif
+            <!-- XXX Grid - Card Layout with Multiple Releases -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                @foreach($results as $result)
+                    @php
+                        // Extract grouped release data
+                        $releaseGuids = isset($result->grp_release_guid) ? explode(',', $result->grp_release_guid) : [];
+                        $releaseNames = isset($result->grp_release_name) ? explode('#', $result->grp_release_name) : [];
+                        $releaseSizes = isset($result->grp_release_size) ? explode(',', $result->grp_release_size) : [];
+                        $releasePostDates = isset($result->grp_release_postdate) ? explode(',', $result->grp_release_postdate) : [];
+                        $releaseGrabs = isset($result->grp_release_grabs) ? explode(',', $result->grp_release_grabs) : [];
+                        $releaseComments = isset($result->grp_release_comments) ? explode(',', $result->grp_release_comments) : [];
+                        $releaseNfoIds = isset($result->grp_release_nfoid) ? explode(',', $result->grp_release_nfoid) : [];
+                        $releaseHasPreview = isset($result->grp_haspreview) ? explode(',', $result->grp_haspreview) : [];
+                        $releaseCategories = isset($result->grp_release_catname) ? explode(',', $result->grp_release_catname) : [];
+                        $failedCounts = isset($result->grp_release_failed) ? array_filter(explode(',', $result->grp_release_failed)) : [];
+                        $totalFailed = array_sum($failedCounts);
+
+                        // Limit to maximum 2 releases displayed
+                        $maxReleases = 2;
+                        $totalReleases = count($releaseGuids);
+                        $releaseGuids = array_slice($releaseGuids, 0, $maxReleases);
+                        $releaseNames = array_slice($releaseNames, 0, $maxReleases);
+                        $releaseSizes = array_slice($releaseSizes, 0, $maxReleases);
+                        $releasePostDates = array_slice($releasePostDates, 0, $maxReleases);
+                        $releaseGrabs = array_slice($releaseGrabs, 0, $maxReleases);
+                        $releaseComments = array_slice($releaseComments, 0, $maxReleases);
+                        $releaseNfoIds = array_slice($releaseNfoIds, 0, $maxReleases);
+                        $releaseHasPreview = array_slice($releaseHasPreview, 0, $maxReleases);
+                        $releaseCategories = array_slice($releaseCategories, 0, $maxReleases);
+
+                        $guid = $releaseGuids[0] ?? null;
+                    @endphp
+
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+                        <div class="flex flex-row">
+                            <!-- Cover Image -->
+                            <div class="flex-shrink-0">
+                                @if($guid)
+                                    <a href="{{ url('/details/' . $guid) }}" class="block">
+                                        @if(isset($result->cover) && $result->cover == 1)
+                                            <img src="{{ url('/covers/xxx/' . $result->id . '-cover.jpg') }}"
+                                                 alt="{{ $result->title }}"
+                                                 class="w-32 h-48 object-cover"
+                                                 onerror="this.onerror=null;this.src='{{ url('/images/no-cover.png') }}';">
+                                        @else
+                                            <div class="w-32 h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                                <i class="fas fa-film text-gray-400 text-2xl"></i>
                                             </div>
+                                        @endif
+                                    </a>
+                                @else
+                                    <div class="w-32 h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                        <i class="fas fa-film text-gray-400 text-2xl"></i>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Content Details -->
+                            <div class="flex-1 p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex-1">
+                                        <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">{{ $result->title }}</h3>
+
+                                        @if($totalFailed > 0)
+                                            <div class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 border border-red-200 mt-1">
+                                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                                <span>{{ $totalFailed }} failed report{{ $totalFailed > 1 ? 's' : '' }}</span>
+                                            </div>
+                                        @endif
+
+                                        <div class="text-xs text-gray-600 dark:text-gray-400 mt-2 space-y-1">
+                                            @if(!empty($result->genre))
+                                                <div>
+                                                    <strong>Genre:</strong> {!! makeFieldLinks((array) $result, 'genre', 'xxx') !!}
+                                                </div>
+                                            @endif
+                                            @if(!empty($result->actors))
+                                                <div>
+                                                    <strong>Actors:</strong> {!! makeFieldLinks((array) $result, 'actors', 'xxx') !!}
+                                                </div>
+                                            @endif
+                                            @if(!empty($result->director))
+                                                <div>
+                                                    <strong>Director:</strong> {!! makeFieldLinks((array) $result, 'director', 'xxx') !!}
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        @if(isset($result->plot) && $result->plot)
+                                            <p class="text-gray-700 dark:text-gray-300 text-sm mt-2 line-clamp-2">{{ $result->plot }}</p>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- Release Information -->
+                                @if(!empty($releaseGuids[0]))
+                                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                        <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                            Available Releases
+                                            @if($totalReleases > $maxReleases)
+                                                <span class="text-xs font-normal text-gray-500">(Showing {{ $maxReleases }} of {{ $totalReleases }})</span>
+                                            @endif
+                                        </h4>
+                                        <div class="space-y-2">
+                                            @foreach($releaseNames as $index => $releaseName)
+                                                @if($releaseName && isset($releaseGuids[$index]))
+                                                    <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-2 border border-gray-200 dark:border-gray-700">
+                                                        <div class="space-y-2">
+                                                            <!-- Release Name -->
+                                                            <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="text-sm text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 font-medium block break-all" title="{{ $releaseName }}">
+                                                                {{ $releaseName }}
+                                                            </a>
+
+                                                            <!-- Info Badges -->
+                                                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                @if(isset($releaseSizes[$index]))
+                                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                                                                        <i class="fas fa-hdd mr-1"></i>{{ number_format($releaseSizes[$index] / 1073741824, 2) }} GB
+                                                                    </span>
+                                                                @endif
+                                                                @if(isset($releasePostDates[$index]))
+                                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                                                                        <i class="fas fa-calendar-alt mr-1"></i>{{ date('M d, Y H:i', strtotime($releasePostDates[$index])) }}
+                                                                    </span>
+                                                                @endif
+                                                                @if(isset($releaseCategories[$index]) && !empty($releaseCategories[$index]))
+                                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                                                        <i class="fas fa-folder mr-1"></i>{{ $releaseCategories[$index] }}
+                                                                    </span>
+                                                                @endif
+                                                                @if(isset($releaseGrabs[$index]) && $releaseGrabs[$index] > 0)
+                                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                                                        <i class="fas fa-download mr-1"></i>{{ $releaseGrabs[$index] }} grabs
+                                                                    </span>
+                                                                @endif
+                                                                @if(isset($releaseNfoIds[$index]) && !empty($releaseNfoIds[$index]))
+                                                                    <button type="button"
+                                                                            class="nfo-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-200 dark:hover:bg-yellow-800 transition cursor-pointer"
+                                                                            data-guid="{{ $releaseGuids[$index] }}"
+                                                                            title="View NFO file">
+                                                                        <i class="fas fa-file-alt mr-1"></i> NFO
+                                                                    </button>
+                                                                @endif
+                                                                @if(isset($releaseHasPreview[$index]) && $releaseHasPreview[$index] == 1)
+                                                                    <button type="button"
+                                                                            class="preview-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 hover:bg-purple-200 dark:hover:bg-purple-800 transition cursor-pointer"
+                                                                            data-guid="{{ $releaseGuids[$index] }}"
+                                                                            title="View preview image">
+                                                                        <i class="fas fa-image mr-1"></i> Preview
+                                                                    </button>
+                                                                @endif
+                                                            </div>
+
+                                                            <!-- Action Buttons -->
+                                                            <div class="flex flex-wrap items-center gap-1.5">
+                                                                <a href="{{ url('/getnzb/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-600 dark:bg-green-700 text-white hover:bg-green-700 dark:hover:bg-green-800 transition">
+                                                                    <i class="fas fa-download mr-1"></i> Download
+                                                                </a>
+                                                                <button class="add-to-cart inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-800 transition" data-guid="{{ $releaseGuids[$index] }}">
+                                                                    <i class="fas fa-shopping-cart mr-1"></i> Cart
+                                                                </button>
+                                                                <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-600 dark:bg-gray-700 text-white hover:bg-gray-700 dark:hover:bg-gray-800 transition">
+                                                                    <i class="fas fa-info-circle mr-1"></i> Details
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            @endforeach
                                         </div>
                                     </div>
-                                </td>
-                                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 hidden md:table-cell">
-                                    @php
-                                        $categoryName = isset($result->grp_release_catname) ? explode(',', $result->grp_release_catname)[0] : 'XXX';
-                                    @endphp
-                                    {{ $categoryName }}
-                                </td>
-                                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 hidden lg:table-cell whitespace-nowrap">
-                                    @if($postdate)
-                                        {{ date('M d, Y', strtotime($postdate)) }}
-                                        <div class="text-xs text-gray-500">{{ date('H:i', strtotime($postdate)) }}</div>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 hidden xl:table-cell whitespace-nowrap">
-                                    {{ number_format($size / 1073741824, 2) }} GB
-                                </td>
-                                <td class="px-4 py-3">
-                                    <div class="flex items-center justify-center gap-2">
-                                        <a href="{{ url('/getnzb?id=' . $guid) }}"
-                                           class="inline-flex items-center px-3 py-1.5 bg-green-600 dark:bg-green-700 text-white text-xs rounded hover:bg-green-700 dark:hover:bg-green-800"
-                                           title="Download NZB">
-                                            <i class="fa fa-download mr-1"></i>
-                                            <span class="hidden sm:inline">Download</span>
-                                        </a>
-                                        <a href="{{ url('/details/' . $guid) }}"
-                                           class="inline-flex items-center px-3 py-1.5 bg-blue-600 dark:bg-blue-700 text-white text-xs rounded hover:bg-blue-700 dark:hover:bg-blue-800"
-                                           title="View Details">
-                                            <i class="fa fa-info-circle mr-1"></i>
-                                            <span class="hidden sm:inline">Details</span>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
             </div>
 
             <!-- Pagination -->
@@ -206,6 +296,25 @@
                 </a>
             </div>
         @endif
+    </div>
+</div>
+
+<!-- NFO Modal -->
+@include('partials.nfo-modal')
+
+<!-- Preview Modal -->
+<div id="previewModal" class="hidden fixed inset-0 bg-black bg-opacity-75 items-center justify-center p-4 z-50">
+    <div class="relative max-w-4xl w-full">
+        <button type="button" data-close-preview-modal class="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl font-bold z-10">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="text-center mb-2">
+            <h3 id="previewTitle" class="text-white text-lg font-semibold"></h3>
+        </div>
+        <img id="previewImage" src="" alt="Preview" class="max-w-full max-h-[90vh] mx-auto rounded-lg shadow-2xl">
+        <div class="text-center mt-4">
+            <p id="previewError" class="text-red-400 hidden"></p>
+        </div>
     </div>
 </div>
 @endsection

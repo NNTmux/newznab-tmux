@@ -24,7 +24,16 @@
     <!-- Movies Filter Section -->
     <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Filter Movies</h2>
+            <div class="flex items-center gap-4">
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">Filter Movies</h2>
+                <x-view-toggle
+                    current-view="covers"
+                    covgroup="movies"
+                    category="All"
+                    parentcat="Movies"
+                    :shows="false"
+                />
+            </div>
             <div class="flex gap-2">
                 <!-- Layout Toggle Button -->
                 <button id="layoutToggle" class="inline-flex items-center px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-800 transition shadow-md" title="Toggle layout">

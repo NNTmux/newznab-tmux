@@ -56,13 +56,14 @@
                             </div>
                         @endif
 
-                        @if(isset($covgroup) && $covgroup != '')
-                            <div class="flex items-center gap-2 text-sm">
-                                <span class="text-gray-600 dark:text-gray-400 dark:text-gray-400">View:</span>
-                                <a href="{{ url('/' . $covgroup . '/' . $category) }}" class="text-blue-600 dark:text-blue-400 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 dark:hover:text-blue-300">Covers</a>
-                                <span class="text-gray-400 dark:text-gray-500">|</span>
-                                <span class="font-semibold text-gray-800 dark:text-gray-200 dark:text-gray-200">List</span>
-                            </div>
+                        @if(isset($covgroup) && $covgroup != '' || isset($shows) && $shows)
+                            <x-view-toggle
+                                current-view="list"
+                                :covgroup="$covgroup ?? null"
+                                :category="$category ?? null"
+                                :parentcat="$parentcat ?? null"
+                                :shows="$shows ?? false"
+                            />
                         @endif
 
                         <div class="flex flex-wrap items-center gap-2">
@@ -136,8 +137,15 @@
                                 </td>
                                 <td class="px-3 py-4">
                                     <div class="flex items-start">
-                                        @if($result->cover ?? false)
-                                            <img src="{{ $result->cover }}" class="w-12 h-16 object-cover rounded mr-3" alt="Cover">
+                                        @php
+                                            $showThumbnails = request()->query('thumbs', '0') === '1';
+                                            $coverUrl = ($result->cover ?? false) ? $result->cover : ($showThumbnails ? getReleaseCover($result) : null);
+                                            $hasValidCover = $coverUrl && !str_contains($coverUrl, 'no-cover.png');
+                                        @endphp
+                                        @if($hasValidCover)
+                                            <a href="{{ url('/details/' . $result->guid) }}" class="flex-shrink-0">
+                                                <img src="{{ $coverUrl }}" class="w-12 h-16 object-cover rounded mr-3 shadow-sm hover:shadow-md transition" alt="Cover" loading="lazy">
+                                            </a>
                                         @endif
                                         <div class="flex-1">
                                             <div class="flex items-center gap-2 flex-wrap">
