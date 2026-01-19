@@ -601,7 +601,7 @@ class GamesService
 
             // Save cover image
             if ($game['cover'] === 1 && isset($game['coverurl'])) {
-                $game['cover'] = $this->imageService->saveImage($gamesId, $game['coverurl'], $this->imgSavePath, 250, 250);
+                $game['cover'] = $this->imageService->saveImage((string) $gamesId, $game['coverurl'], $this->imgSavePath, 250, 250);
             }
 
             // Save backdrop image
