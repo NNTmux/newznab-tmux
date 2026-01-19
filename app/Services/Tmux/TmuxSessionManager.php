@@ -52,8 +52,11 @@ class TmuxSessionManager
 
         $configOption = file_exists($this->configFile) ? "-f {$this->configFile}" : '';
 
+        // Escape single quotes in the window name for shell
+        $escapedWindowName = str_replace("'", "'\\''", $windowName);
+
         $result = Process::timeout(30)->run(
-            "tmux {$configOption} new-session -d -s {$this->sessionName} -n {$windowName} 'printf \"\\033]2;{$windowName}\\033\"'"
+            "tmux {$configOption} new-session -d -s {$this->sessionName} -n '{$escapedWindowName}' 'printf \"\\033]2;{$escapedWindowName}\\033\"'"
         );
 
         return $result->successful();

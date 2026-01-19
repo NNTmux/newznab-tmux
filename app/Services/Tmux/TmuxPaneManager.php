@@ -21,8 +21,11 @@ class TmuxPaneManager
      */
     public function createWindow(int $index, string $name): bool
     {
+        // Escape single quotes in the name for shell
+        $escapedName = str_replace("'", "'\\''", $name);
+
         $result = Process::timeout(10)->run(
-            "tmux new-window -t {$this->sessionName}:{$index} -n {$name} 'printf \"\\033]2;{$name}\\033\"'"
+            "tmux new-window -t {$this->sessionName}:{$index} -n '{$escapedName}' 'printf \"\\033]2;{$escapedName}\\033\"'"
         );
 
         return $result->successful();
@@ -33,7 +36,9 @@ class TmuxPaneManager
      */
     public function splitHorizontal(string $target, string $percentage, string $title = ''): bool
     {
-        $titleCmd = $title ? "printf \"\\033]2;{$title}\\033\"" : '';
+        // Escape single quotes in the title for shell
+        $escapedTitle = str_replace("'", "'\\''", $title);
+        $titleCmd = $title ? "printf \"\\033]2;{$escapedTitle}\\033\"" : '';
 
         $result = Process::timeout(10)->run(
             "tmux splitw -t {$this->sessionName}:{$target} -h -l {$percentage} '{$titleCmd}'"
@@ -47,7 +52,9 @@ class TmuxPaneManager
      */
     public function splitVertical(string $target, string $percentage, string $title = ''): bool
     {
-        $titleCmd = $title ? "printf \"\\033]2;{$title}\\033\"" : '';
+        // Escape single quotes in the title for shell
+        $escapedTitle = str_replace("'", "'\\''", $title);
+        $titleCmd = $title ? "printf \"\\033]2;{$escapedTitle}\\033\"" : '';
 
         $result = Process::timeout(10)->run(
             "tmux splitw -t {$this->sessionName}:{$target} -v -l {$percentage} '{$titleCmd}'"
@@ -129,8 +136,11 @@ class TmuxPaneManager
      */
     public function setPaneTitle(string $target, string $title): bool
     {
+        // Escape single quotes in the title for shell
+        $escapedTitle = str_replace("'", "'\\''", $title);
+
         $result = Process::timeout(5)->run(
-            "tmux select-pane -t {$this->sessionName}:{$target} -T '{$title}'"
+            "tmux select-pane -t {$this->sessionName}:{$target} -T '{$escapedTitle}'"
         );
 
         return $result->successful();

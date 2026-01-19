@@ -6,6 +6,8 @@ use App\Models\Settings;
 
 /**
  * Service for building tmux window layouts based on sequential mode
+ *
+ * Uses Nerd Font icons for pane names to provide a modern visual experience.
  */
 class TmuxLayoutBuilder
 {
@@ -15,11 +17,56 @@ class TmuxLayoutBuilder
 
     protected string $sessionName;
 
+    /**
+     * Pane name icons mapping - uses Nerd Font symbols
+     * Requires a Nerd Font to display properly (FiraCode NF, JetBrains Mono NF, etc.)
+     */
+    protected array $paneIcons = [
+        // Core processing
+        'Monitor' => '󰍹 Monitor',
+        'update_binaries' => ' Binaries',
+        'backfill' => '󰑓 Backfill',
+        'update_releases' => ' Releases',
+        'sequential' => '󰒿 Sequential',
+
+        // Utilities
+        'fixReleaseNames' => '󰯃 Fix Names',
+        'removeCrapReleases' => '󰆴 Remove Crap',
+
+        // Postprocessing
+        'postprocessing_additional' => ' Additional',
+        'postprocessing_tv' => '󰟴 TV/Anime',
+        'postprocessing_amazon' => ' Amazon',
+        'postprocessing_movies' => ' Movies',
+        'postprocessing_xxx' => '󰞋 XXX',
+
+        // IRC
+        'scrapeIRC' => '󰻞 IRC Scraper',
+
+        // Monitoring tools
+        'htop' => ' htop',
+        'nmon' => '󰨇 nmon',
+        'vnstat' => '󰛳 vnstat',
+        'tcptrack' => '󱘖 tcptrack',
+        'bwm-ng' => '󰾆 bwm-ng',
+        'mytop' => ' mytop',
+        'redis' => ' Redis',
+        'bash' => ' Console',
+    ];
+
     public function __construct(TmuxSessionManager $sessionManager)
     {
         $this->sessionManager = $sessionManager;
         $this->sessionName = $sessionManager->getSessionName();
         $this->paneManager = new TmuxPaneManager($this->sessionName);
+    }
+
+    /**
+     * Get the display name with icon for a pane
+     */
+    protected function getPaneDisplayName(string $name): string
+    {
+        return $this->paneIcons[$name] ?? $name;
     }
 
     /**
@@ -40,43 +87,43 @@ class TmuxLayoutBuilder
     protected function buildFullLayout(): bool
     {
         // Window 0: Monitor + Binaries + Backfill + Releases
-        if (! $this->sessionManager->createSession('Monitor')) {
+        if (! $this->sessionManager->createSession($this->getPaneDisplayName('Monitor'))) {
             return false;
         }
 
         // Select pane 0.0, then split for binaries (right side, 67%)
         $this->paneManager->selectPane('0.0');
-        $this->paneManager->splitHorizontal('0', '67%', 'update_binaries');
+        $this->paneManager->splitHorizontal('0', '67%', $this->getPaneDisplayName('update_binaries'));
 
         // Select pane 0.1 (binaries), then split for backfill (bottom, 67%)
         $this->paneManager->selectPane('0.1');
-        $this->paneManager->splitVertical('0', '67%', 'backfill');
+        $this->paneManager->splitVertical('0', '67%', $this->getPaneDisplayName('backfill'));
 
         // Split again for releases (bottom, 50%)
-        $this->paneManager->splitVertical('0', '50%', 'update_releases');
+        $this->paneManager->splitVertical('0', '50%', $this->getPaneDisplayName('update_releases'));
 
         // Window 1: Fix names + Remove crap
-        $this->paneManager->createWindow(1, 'utils');
-        $this->paneManager->setPaneTitle('1.0', 'fixReleaseNames');
+        $this->paneManager->createWindow(1, ' Utils');
+        $this->paneManager->setPaneTitle('1.0', $this->getPaneDisplayName('fixReleaseNames'));
         $this->paneManager->selectPane('1.0');
-        $this->paneManager->splitHorizontal('1', '50%', 'removeCrapReleases');
+        $this->paneManager->splitHorizontal('1', '50%', $this->getPaneDisplayName('removeCrapReleases'));
 
         // Window 2: Postprocessing (Left: Additional + TV + Amazon, Right: Movies + XXX)
-        $this->paneManager->createWindow(2, 'post');
-        $this->paneManager->setPaneTitle('2.0', 'postprocessing_additional');
+        $this->paneManager->createWindow(2, ' Post');
+        $this->paneManager->setPaneTitle('2.0', $this->getPaneDisplayName('postprocessing_additional'));
 
         // Split horizontally to create left and right halves (don't set title yet)
         $this->paneManager->splitHorizontal('2', '50%', '');
 
         // Left side (2.0): split vertically for TV and Amazon
         $this->paneManager->selectPane('2.0');
-        $this->paneManager->splitVertical('2', '67%', 'postprocessing_tv');
-        $this->paneManager->splitVertical('2', '50%', 'postprocessing_amazon');
+        $this->paneManager->splitVertical('2', '67%', $this->getPaneDisplayName('postprocessing_tv'));
+        $this->paneManager->splitVertical('2', '50%', $this->getPaneDisplayName('postprocessing_amazon'));
 
         // Right side: After left splits, right side is now 2.3
         $this->paneManager->selectPane('2.3');
-        $this->paneManager->setPaneTitle('2.3', 'postprocessing_movies');
-        $this->paneManager->splitVertical('2', '50%', 'postprocessing_xxx');
+        $this->paneManager->setPaneTitle('2.3', $this->getPaneDisplayName('postprocessing_movies'));
+        $this->paneManager->splitVertical('2', '50%', $this->getPaneDisplayName('postprocessing_xxx'));
 
         // Window 3: IRC Scraper
         $this->createIRCScraperWindow();
@@ -93,36 +140,36 @@ class TmuxLayoutBuilder
     protected function buildBasicLayout(): bool
     {
         // Window 0: Monitor + Releases
-        if (! $this->sessionManager->createSession('Monitor')) {
+        if (! $this->sessionManager->createSession($this->getPaneDisplayName('Monitor'))) {
             return false;
         }
 
         // Select pane 0.0, then split for releases
         $this->paneManager->selectPane('0.0');
-        $this->paneManager->splitHorizontal('0', '67%', 'update_releases');
+        $this->paneManager->splitHorizontal('0', '67%', $this->getPaneDisplayName('update_releases'));
 
         // Window 1: Utils (Fix names + Remove crap)
-        $this->paneManager->createWindow(1, 'utils');
-        $this->paneManager->setPaneTitle('1.0', 'fixReleaseNames');
+        $this->paneManager->createWindow(1, ' Utils');
+        $this->paneManager->setPaneTitle('1.0', $this->getPaneDisplayName('fixReleaseNames'));
         $this->paneManager->selectPane('1.0');
-        $this->paneManager->splitHorizontal('1', '50%', 'removeCrapReleases');
+        $this->paneManager->splitHorizontal('1', '50%', $this->getPaneDisplayName('removeCrapReleases'));
 
         // Window 2: Postprocessing (Left: Additional + TV + Amazon, Right: Movies + XXX)
-        $this->paneManager->createWindow(2, 'post');
-        $this->paneManager->setPaneTitle('2.0', 'postprocessing_additional');
+        $this->paneManager->createWindow(2, ' Post');
+        $this->paneManager->setPaneTitle('2.0', $this->getPaneDisplayName('postprocessing_additional'));
 
         // Split horizontally to create left and right halves (don't set title yet)
         $this->paneManager->splitHorizontal('2', '50%', '');
 
         // Left side (2.0): split vertically for TV and Amazon
         $this->paneManager->selectPane('2.0');
-        $this->paneManager->splitVertical('2', '67%', 'postprocessing_tv');
-        $this->paneManager->splitVertical('2', '50%', 'postprocessing_amazon');
+        $this->paneManager->splitVertical('2', '67%', $this->getPaneDisplayName('postprocessing_tv'));
+        $this->paneManager->splitVertical('2', '50%', $this->getPaneDisplayName('postprocessing_amazon'));
 
         // Right side: After left splits, right side is now 2.3
         $this->paneManager->selectPane('2.3');
-        $this->paneManager->setPaneTitle('2.3', 'postprocessing_movies');
-        $this->paneManager->splitVertical('2', '50%', 'postprocessing_xxx');
+        $this->paneManager->setPaneTitle('2.3', $this->getPaneDisplayName('postprocessing_movies'));
+        $this->paneManager->splitVertical('2', '50%', $this->getPaneDisplayName('postprocessing_xxx'));
 
         // Window 3: IRC Scraper
         $this->createIRCScraperWindow();
@@ -138,19 +185,19 @@ class TmuxLayoutBuilder
     protected function buildStrippedLayout(): bool
     {
         // Window 0: Monitor + Sequential
-        if (! $this->sessionManager->createSession('Monitor')) {
+        if (! $this->sessionManager->createSession($this->getPaneDisplayName('Monitor'))) {
             return false;
         }
 
         // Select pane 0.0, then split for sequential
         $this->paneManager->selectPane('0.0');
-        $this->paneManager->splitHorizontal('0', '67%', 'sequential');
+        $this->paneManager->splitHorizontal('0', '67%', $this->getPaneDisplayName('sequential'));
 
         // Window 1: Amazon postprocessing
-        $this->paneManager->createWindow(1, 'utils');
-        $this->paneManager->setPaneTitle('1.0', 'fixReleaseNames');
+        $this->paneManager->createWindow(1, ' Utils');
+        $this->paneManager->setPaneTitle('1.0', $this->getPaneDisplayName('fixReleaseNames'));
         $this->paneManager->selectPane('1.0');
-        $this->paneManager->splitHorizontal('1', '50%', 'postprocessing_amazon');
+        $this->paneManager->splitHorizontal('1', '50%', $this->getPaneDisplayName('postprocessing_amazon'));
 
         // Window 2: IRC Scraper
         $this->createIRCScraperWindow();
@@ -165,8 +212,8 @@ class TmuxLayoutBuilder
      */
     protected function createIRCScraperWindow(): bool
     {
-        $this->paneManager->createWindow(3, 'IRCScraper');
-        $this->paneManager->setPaneTitle('3.0', 'scrapeIRC');
+        $this->paneManager->createWindow(3, '󰻞 IRC');
+        $this->paneManager->setPaneTitle('3.0', $this->getPaneDisplayName('scrapeIRC'));
 
         return true;
     }
@@ -190,14 +237,14 @@ class TmuxLayoutBuilder
 
         // htop
         if ((int) Settings::settingValue('htop') === 1 && $this->commandExists('htop')) {
-            $this->paneManager->createWindow($windowIndex, 'htop');
+            $this->paneManager->createWindow($windowIndex, $this->getPaneDisplayName('htop'));
             $this->paneManager->respawnPane("{$windowIndex}.0", 'htop');
             $windowIndex++;
         }
 
         // nmon
         if ((int) Settings::settingValue('nmon') === 1 && $this->commandExists('nmon')) {
-            $this->paneManager->createWindow($windowIndex, 'nmon');
+            $this->paneManager->createWindow($windowIndex, $this->getPaneDisplayName('nmon'));
             $this->paneManager->respawnPane("{$windowIndex}.0", 'nmon -t');
             $windowIndex++;
         }
@@ -205,7 +252,7 @@ class TmuxLayoutBuilder
         // vnstat
         if ((int) Settings::settingValue('vnstat') === 1 && $this->commandExists('vnstat')) {
             $vnstatArgs = Settings::settingValue('vnstat_args') ?? '';
-            $this->paneManager->createWindow($windowIndex, 'vnstat');
+            $this->paneManager->createWindow($windowIndex, $this->getPaneDisplayName('vnstat'));
             $this->paneManager->respawnPane("{$windowIndex}.0", "watch -n10 'vnstat {$vnstatArgs}'");
             $windowIndex++;
         }
@@ -213,21 +260,21 @@ class TmuxLayoutBuilder
         // tcptrack
         if ((int) Settings::settingValue('tcptrack') === 1 && $this->commandExists('tcptrack')) {
             $tcptrackArgs = Settings::settingValue('tcptrack_args') ?? '';
-            $this->paneManager->createWindow($windowIndex, 'tcptrack');
+            $this->paneManager->createWindow($windowIndex, $this->getPaneDisplayName('tcptrack'));
             $this->paneManager->respawnPane("{$windowIndex}.0", "tcptrack {$tcptrackArgs}");
             $windowIndex++;
         }
 
         // bwm-ng
         if ((int) Settings::settingValue('bwmng') === 1 && $this->commandExists('bwm-ng')) {
-            $this->paneManager->createWindow($windowIndex, 'bwm-ng');
+            $this->paneManager->createWindow($windowIndex, $this->getPaneDisplayName('bwm-ng'));
             $this->paneManager->respawnPane("{$windowIndex}.0", 'bwm-ng');
             $windowIndex++;
         }
 
         // mytop
         if ((int) Settings::settingValue('mytop') === 1 && $this->commandExists('mytop')) {
-            $this->paneManager->createWindow($windowIndex, 'mytop');
+            $this->paneManager->createWindow($windowIndex, $this->getPaneDisplayName('mytop'));
             $this->paneManager->respawnPane("{$windowIndex}.0", 'mytop -u');
             $windowIndex++;
         }
@@ -237,7 +284,7 @@ class TmuxLayoutBuilder
             $redisArgs = Settings::settingValue('redis_args') ?? '';
             $refreshInterval = 30;
 
-            $this->paneManager->createWindow($windowIndex, 'redis');
+            $this->paneManager->createWindow($windowIndex, $this->getPaneDisplayName('redis'));
 
             // Check if custom args provided for simple redis-cli output
             if (! empty($redisArgs) && $redisArgs !== 'NULL' && $this->commandExists('redis-cli')) {
@@ -268,7 +315,7 @@ class TmuxLayoutBuilder
 
         // bash console
         if ((int) Settings::settingValue('console') === 1) {
-            $this->paneManager->createWindow($windowIndex, 'bash');
+            $this->paneManager->createWindow($windowIndex, $this->getPaneDisplayName('bash'));
             $this->paneManager->respawnPane("{$windowIndex}.0", 'bash -i');
         }
     }
