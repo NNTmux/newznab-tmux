@@ -25,7 +25,7 @@ cd /tmp/tmux
 
 git fetch --all --tags --prune
 
-git checkout 3.6
+git checkout 3.6a
 
 sh autogen.sh
 
