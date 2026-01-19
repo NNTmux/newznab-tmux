@@ -768,7 +768,7 @@ class ConsoleService
                 $con['title'],
                 isset($con['asin']) ? (string) $con['asin'] : null,
                 $con['url'],
-                $con['salesrank'],
+                isset($con['salesrank']) && $con['salesrank'] !== '' ? (int) $con['salesrank'] : null,
                 $con['platform'],
                 $con['publisher'],
                 $con['releasedate'] ?? null,
