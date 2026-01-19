@@ -559,7 +559,7 @@ class ConsoleService
                 // Sleep to not flood amazon.
                 $diff = floor((now()->timestamp - $startTime) * 1000000);
                 if ($this->sleepTime * 1000 - $diff > 0 && $usedAmazon === true) {
-                    usleep($this->sleepTime * 1000 - $diff);
+                    usleep((int) ($this->sleepTime * 1000 - $diff));
                 }
             }
         } elseif ($this->echoOutput) {
