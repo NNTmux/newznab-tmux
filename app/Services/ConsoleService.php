@@ -451,7 +451,7 @@ class ConsoleService
 
                         return [
                             'title' => $game->name,
-                            'asin' => $game->id,
+                            'asin' => (string) $game->id,
                             'review' => $game->summary ?? '',
                             'coverurl' => ! empty($game->cover->url) ? 'https:'.$game->cover->url : '',
                             'releasedate' => ! empty($game->first_release_date) ? $game->first_release_date->format('Y-m-d') : now()->format('Y-m-d'),
@@ -733,13 +733,14 @@ class ConsoleService
      */
     protected function updateConsoleTable(array $con = []): int
     {
-        $check = ConsoleInfo::query()->where('asin', $con['asin'])->first();
+        $asin = isset($con['asin']) ? (string) $con['asin'] : null;
+        $check = ConsoleInfo::query()->where('asin', $asin)->first();
 
         if ($check === null) {
             $consoleId = ConsoleInfo::query()
                 ->insertGetId([
                     'title' => $con['title'],
-                    'asin' => $con['asin'],
+                    'asin' => $asin,
                     'url' => $con['url'],
                     'salesrank' => $con['salesrank'],
                     'platform' => $con['platform'],
@@ -765,7 +766,7 @@ class ConsoleService
             $this->update(
                 $consoleId,
                 $con['title'],
-                $con['asin'],
+                isset($con['asin']) ? (string) $con['asin'] : null,
                 $con['url'],
                 $con['salesrank'],
                 $con['platform'],
