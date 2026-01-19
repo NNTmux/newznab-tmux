@@ -69,7 +69,7 @@
         "laravel/tinker": "^2.10.1",
         "laravel/ui": "^4.6",
         "leventcz/laravel-top": "^1.2",
-        "livewire/livewire": "^3.6",
+        "livewire/livewire": "^4.0",
         "livewire/volt": "^1.6",
         "mailerlite/laravel-elasticsearch": "^11.2",
         "manticoresoftware/manticoresearch-php": "^4.0.0",
