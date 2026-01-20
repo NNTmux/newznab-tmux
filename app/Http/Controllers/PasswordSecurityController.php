@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Disable2faPasswordSecurityRequest;
 use App\Models\PasswordSecurity;
+use App\Services\PasswordBreachService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
@@ -11,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class PasswordSecurityController extends Controller
 {
@@ -200,7 +202,8 @@ class PasswordSecurityController extends Controller
         session([config('google2fa.session_var').'.auth.passed_at' => time()]);
 
         // Clean up the temporary session variables
-        $request->session()->forget(['2fa:user:id', '2fa:remember']);
+        $passwordToCheck = $request->session()->get('2fa:password_check');
+        $request->session()->forget(['2fa:user:id', '2fa:remember', '2fa:password_check']);
 
         // Determine where to redirect after successful verification
         $redirectUrl = $request->session()->pull('url.intended', '/');
@@ -209,6 +212,20 @@ class PasswordSecurityController extends Controller
         $redirect = redirect()->to($redirectUrl)
             ->with('message', 'Two-factor authentication verified successfully.')
             ->with('message_type', 'success');
+
+        // Check for password breach if we have the password stored
+        if ($passwordToCheck) {
+            try {
+                $breachService = app(PasswordBreachService::class);
+                if ($breachService->isPasswordBreached($passwordToCheck)) {
+                    $redirect = $redirect->with('warning', 'Security Alert: Your password has been found in a data breach. We strongly recommend changing it immediately in your account settings.');
+                }
+            } catch (\Exception $e) {
+                Log::error('Password breach check failed during 2FA verification', [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
 
         // If the user has checked "trust this device", create a trust token
         if ($request->has('trust_device') && $request->input('trust_device') == 1) {

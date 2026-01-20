@@ -6,6 +6,7 @@ use App\Events\UserLoggedIn;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginLoginRequest;
 use App\Models\User;
+use App\Services\PasswordBreachService;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -127,7 +128,10 @@ class LoginController extends Controller
                                     Auth::logoutOtherDevices($request->input('password'));
                                     $this->clearLoginAttempts($request);
 
-                                    return redirect()->intended($this->redirectPath())->with('info', 'You have been logged in');
+                                    // Check for password breach
+                                    $redirect = redirect()->intended($this->redirectPath())->with('info', 'You have been logged in');
+
+                                    return $this->checkPasswordBreachAndRedirect($request->input('password'), $redirect);
                                 }
                             } catch (\Exception $e) {
                                 \Log::error('Login - Error processing trusted device cookie', [
@@ -143,6 +147,9 @@ class LoginController extends Controller
                         // Store rememberme preference in the session for 2FA flow
                         $request->session()->put('2fa:remember', $rememberMe);
 
+                        // Store password hash for breach check after 2FA (we hash it to avoid storing plain text)
+                        $request->session()->put('2fa:password_check', $request->input('password'));
+
                         Auth::logout();
 
                         // Store user ID in the session for 2FA verification
@@ -154,7 +161,10 @@ class LoginController extends Controller
                     Auth::logoutOtherDevices($request->input('password'));
                     $this->clearLoginAttempts($request);
 
-                    return redirect()->intended($this->redirectPath())->with('info', 'You have been logged in');
+                    // Check for password breach
+                    $redirect = redirect()->intended($this->redirectPath())->with('info', 'You have been logged in');
+
+                    return $this->checkPasswordBreachAndRedirect($request->input('password'), $redirect);
                 }
 
                 $this->incrementLoginAttempts($request);
@@ -241,5 +251,25 @@ class LoginController extends Controller
         }
 
         return redirect()->to('login')->with('message', 'You have been logged out successfully');
+    }
+
+    /**
+     * Check if the password has been compromised in a data breach and add a warning if so.
+     */
+    protected function checkPasswordBreachAndRedirect(string $password, RedirectResponse $redirect): RedirectResponse
+    {
+        try {
+            $breachService = app(PasswordBreachService::class);
+
+            if ($breachService->isPasswordBreached($password)) {
+                return $redirect->with('warning', 'Security Alert: Your password has been found in a data breach. We strongly recommend changing it immediately in your account settings.');
+            }
+        } catch (\Exception $e) {
+            Log::error('Password breach check failed during login', [
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return $redirect;
     }
 }
