@@ -317,7 +317,7 @@
                                     </option>
                                 @endforeach
                             </select>
-                            <p class="mt-1 text-sm text-gray-500">Whether to attempt to lookup TvRage ids on the web.</p>
+                            <p class="mt-1 text-sm text-gray-500">Whether to attempt to lookup TV related ids on the web.</p>
                         </div>
 
                         <div>
@@ -826,11 +826,11 @@
 
                         <div>
                             <label for="maxrageprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-tv mr-1"></i>Maximum TVRage Per Run
+                                <i class="fa fa-tv mr-1"></i>Maximum TV Per Run
                             </label>
                             <input type="text" id="maxrageprocessed" name="maxrageprocessed" value="{{ $site['maxrageprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                            <p class="mt-1 text-sm text-gray-500">The maximum amount of TV shows to process with TVRage per run. This does not use an NNTP connection or query Amazon.</p>
+                            <p class="mt-1 text-sm text-gray-500">The maximum amount of TV shows to processper run.</p>
                         </div>
 
                         <div>
@@ -839,7 +839,7 @@
                             </label>
                             <input type="text" id="maximdbprocessed" name="maximdbprocessed" value="{{ $site['maximdbprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                            <p class="mt-1 text-sm text-gray-500">The maximum amount of movies to process with IMDB per run. This does not use an NNTP connection or query Amazon.</p>
+                            <p class="mt-1 text-sm text-gray-500">The maximum amount of movies to process with IMDB per run.</p>
                         </div>
 
                         <div>
@@ -848,7 +848,7 @@
                             </label>
                             <input type="text" id="maxanidbprocessed" name="maxanidbprocessed" value="{{ $site['maxanidbprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                            <p class="mt-1 text-sm text-gray-500">The maximum amount of anime to process with anidb per run. This does not use an NNTP connection or query Amazon.</p>
+                            <p class="mt-1 text-sm text-gray-500">The maximum amount of anime to process with anidb per run.</p>
                         </div>
 
                         <div>
@@ -884,7 +884,7 @@
                             </label>
                             <input type="text" id="maxxxxprocessed" name="maxxxxprocessed" value="{{ $site['maxxxxprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                            <p class="mt-1 text-sm text-gray-500">The maximum amount of XXX to process per run. This does not use an NNTP connection or query Amazon.</p>
+                            <p class="mt-1 text-sm text-gray-500">The maximum amount of XXX to process per run.</p>
                         </div>
 
                         <div>
