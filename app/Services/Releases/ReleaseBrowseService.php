@@ -252,6 +252,7 @@ class ReleaseBrowseService
             'size' => 'size',
             'files' => 'totalpart',
             'stats' => 'grabs',
+            'added' => 'adddate',
             default => 'postdate',
         };
 
@@ -272,6 +273,8 @@ class ReleaseBrowseService
             'cat_desc',
             'posted_asc',
             'posted_desc',
+            'added_asc',
+            'added_desc',
             'size_asc',
             'size_desc',
             'files_asc',

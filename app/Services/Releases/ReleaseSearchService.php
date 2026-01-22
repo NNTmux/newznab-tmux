@@ -1167,6 +1167,7 @@ class ReleaseSearchService
             'size' => 'size',
             'files' => 'totalpart',
             'stats' => 'grabs',
+            'added' => 'adddate',
             default => 'postdate',
         };
 

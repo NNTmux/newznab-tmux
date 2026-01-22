@@ -93,16 +93,7 @@
 
                     <!-- Right Section - Sort Options -->
                     <div class="flex items-center justify-end">
-                        <div class="flex items-center gap-2">
-                            <label class="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-400">Sort by:</label>
-                            <select class="border border-gray-300 dark:border-gray-600 dark:border-gray-600 bg-white dark:bg-gray-800 dark:bg-gray-800 text-gray-900 dark:text-gray-100 dark:text-gray-100 rounded px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400" data-redirect-on-change>
-                                <option value="{{ $orderbyposted ?? '#' }}" {{ request('ob') == 'posted_desc' ? 'selected' : '' }}>Posted</option>
-                                <option value="{{ $orderbyname ?? '#' }}" {{ request('ob') == 'name_asc' ? 'selected' : '' }}>Name</option>
-                                <option value="{{ $orderbysize ?? '#' }}" {{ request('ob') == 'size_desc' ? 'selected' : '' }}>Size</option>
-                                <option value="{{ $orderbyfiles ?? '#' }}" {{ request('ob') == 'files_desc' ? 'selected' : '' }}>Files</option>
-                                <option value="{{ $orderbystats ?? '#' }}" {{ request('ob') == 'stats_desc' ? 'selected' : '' }}>Stats</option>
-                            </select>
-                        </div>
+                        <x-sort-dropdown />
                     </div>
                 </div>
             </div>

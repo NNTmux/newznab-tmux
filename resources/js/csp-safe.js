@@ -5667,3 +5667,63 @@ function initAutocompleteInput(inputId, dropdownId, formId, itemClass) {
     }
 }
 
+// ============================================================================
+// Sort Dropdown Component
+// ============================================================================
+
+/**
+ * Initialize sort dropdown functionality
+ * Handles the custom dropdown for sorting releases on browse/search pages
+ */
+function initSortDropdowns() {
+    document.querySelectorAll('.sort-dropdown').forEach(function(dropdown) {
+        var toggle = dropdown.querySelector('.sort-dropdown-toggle');
+        var menu = dropdown.querySelector('.sort-dropdown-menu');
+        var chevron = dropdown.querySelector('.sort-dropdown-chevron');
+
+        if (!toggle || !menu) return;
+
+        // Skip if already initialized
+        if (toggle.hasAttribute('data-sort-initialized')) return;
+        toggle.setAttribute('data-sort-initialized', 'true');
+
+        toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var isOpen = !menu.classList.contains('hidden');
+
+            // Close all other dropdowns first
+            document.querySelectorAll('.sort-dropdown-menu').forEach(function(m) {
+                m.classList.add('hidden');
+            });
+            document.querySelectorAll('.sort-dropdown-chevron').forEach(function(c) {
+                c.classList.remove('rotate-180');
+            });
+
+            if (!isOpen) {
+                menu.classList.remove('hidden');
+                if (chevron) chevron.classList.add('rotate-180');
+            }
+        });
+    });
+
+    // Close dropdowns when clicking outside (single global listener)
+    if (!window._sortDropdownOutsideListenerAdded) {
+        window._sortDropdownOutsideListenerAdded = true;
+        document.addEventListener('click', function(e) {
+            var isInsideDropdown = e.target.closest('.sort-dropdown');
+            if (!isInsideDropdown) {
+                document.querySelectorAll('.sort-dropdown-menu').forEach(function(m) {
+                    m.classList.add('hidden');
+                });
+                document.querySelectorAll('.sort-dropdown-chevron').forEach(function(c) {
+                    c.classList.remove('rotate-180');
+                });
+            }
+        });
+    }
+}
+
+// Initialize sort dropdowns on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', initSortDropdowns);
+
