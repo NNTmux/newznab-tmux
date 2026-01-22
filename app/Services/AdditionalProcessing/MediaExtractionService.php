@@ -8,7 +8,6 @@ use App\Models\Release;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
 use App\Services\Categorization\CategorizationService;
-use App\Services\NameFixing\ReleaseUpdateService;
 use App\Services\ReleaseExtraService;
 use App\Services\ReleaseImageService;
 use FFMpeg\Coordinate\Dimension;
@@ -476,5 +475,4 @@ class MediaExtractionService
 
         return $this->mediaInfo;
     }
-
 }
