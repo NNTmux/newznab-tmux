@@ -8,6 +8,7 @@ use App\Models\Release;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
 use App\Services\Categorization\CategorizationService;
+use App\Services\NameFixing\ReleaseUpdateService;
 use App\Services\ReleaseExtraService;
 use App\Services\ReleaseImageService;
 use FFMpeg\Coordinate\Dimension;
@@ -328,18 +329,6 @@ class MediaExtractionService
                                 ]);
 
                                 Search::updateRelease($context->release->id);
-
-                                if ($this->config->echoCLI) {
-                                    NameFixer::echoChangedReleaseName([
-                                        'new_name' => $newTitle,
-                                        'old_name' => $rQuery->searchname,
-                                        'new_category' => $newCat,
-                                        'old_category' => $rQuery->categories_id,
-                                        'group' => $rQuery->groups_id,
-                                        'releases_id' => $context->release->id,
-                                        'method' => 'MediaExtractionService->getAudioInfo',
-                                    ]);
-                                }
                             }
 
                             $this->releaseExtra->addFromXml($context->release->id, $xmlArray);
@@ -488,21 +477,4 @@ class MediaExtractionService
         return $this->mediaInfo;
     }
 
-    private function manticore(): ManticoreSearchService
-    {
-        if ($this->manticore === null) {
-            $this->manticore = app(ManticoreSearchService::class);
-        }
-
-        return $this->manticore;
-    }
-
-    private function elasticsearch(): ElasticSearchService
-    {
-        if ($this->elasticsearch === null) {
-            $this->elasticsearch = app(ElasticSearchService::class);
-        }
-
-        return $this->elasticsearch;
-    }
 }
