@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e144a6d2fbb180229a0b84c26984175e",
+    "content-hash": "aeca6389cceec522f01cbfb9365f74d2",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -655,20 +655,20 @@
         },
         {
             "name": "dariusiii/rarinfo",
-            "version": "v2.7.6",
+            "version": "v3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/rarinfo.git",
-                "reference": "048380650b56ff9a9e76bb5c599ccd300902fa47"
+                "reference": "b9bfaae12bbcadcca518660f8f93b52deb8427e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/048380650b56ff9a9e76bb5c599ccd300902fa47",
-                "reference": "048380650b56ff9a9e76bb5c599ccd300902fa47",
+                "url": "https://api.github.com/repos/DariusIII/rarinfo/zipball/b9bfaae12bbcadcca518660f8f93b52deb8427e8",
+                "reference": "b9bfaae12bbcadcca518660f8f93b52deb8427e8",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.2.0"
+                "php": ">=7.2.0 <8.6.0"
             },
             "type": "library",
             "autoload": {
@@ -700,9 +700,9 @@
             "description": "PHP archive reader helper class",
             "support": {
                 "issues": "https://github.com/DariusIII/rarinfo/issues",
-                "source": "https://github.com/DariusIII/rarinfo/tree/v2.7.6"
+                "source": "https://github.com/DariusIII/rarinfo/tree/v3.0"
             },
-            "time": "2019-12-18T10:21:35+00:00"
+            "time": "2026-01-22T11:54:15+00:00"
         },
         {
             "name": "dariusiii/tv-maze-php-api",
