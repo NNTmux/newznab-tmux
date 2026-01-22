@@ -76,7 +76,17 @@
 
                     <!-- Bulk Actions -->
                     <div class="flex justify-end items-center">
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 items-center">
+                            <!-- Selection Counter -->
+                            <span id="selection-counter" class="hidden text-sm text-gray-600 dark:text-gray-400 mr-2">
+                                <span id="selected-count">0</span> selected
+                            </span>
+                            <button type="button"
+                                    id="reset-selected-btn"
+                                    data-action="show-reset-selected-modal"
+                                    class="hidden px-3 py-2 bg-orange-600 dark:bg-orange-700 text-white text-sm rounded-lg hover:bg-orange-700 dark:hover:bg-orange-600">
+                                <i class="fa fa-refresh mr-1"></i> Reset Selected
+                            </button>
                             <button type="button"
                                     data-action="show-reset-modal"
                                     class="px-3 py-2 bg-yellow-600 text-white text-sm rounded-lg hover:bg-yellow-700">
@@ -97,6 +107,13 @@
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead class="bg-gray-50 dark:bg-gray-900">
                         <tr>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-12">
+                                <input type="checkbox"
+                                       id="select-all-groups"
+                                       data-action="select-all-groups"
+                                       class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-700"
+                                       title="Select all groups on this page">
+                            </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Group</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">First Post</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Last Post</th>
@@ -112,7 +129,13 @@
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                         @foreach($grouplist as $group)
-                            <tr id="grouprow-{{ $group->id }}" class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <tr id="grouprow-{{ $group->id }}" class="hover:bg-gray-50 dark:hover:bg-gray-700 group-row">
+                                <td class="px-4 py-4 text-center">
+                                    <input type="checkbox"
+                                           class="group-checkbox form-checkbox h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-700"
+                                           data-group-id="{{ $group->id }}"
+                                           data-group-name="{{ $group->name }}">
+                                </td>
                                 <td class="px-6 py-4">
                                     <a href="{{ url('/admin/group-edit?id=' . $group->id) }}" class="font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
                                         {{ str_replace('alt.binaries', 'a.b', $group->name) }}
@@ -305,6 +328,34 @@
                         data-action="purge-all"
                         class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700">
                     Purge All
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reset Selected Modal -->
+<div id="resetSelectedModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Confirm Reset Selected Groups</h3>
+            <p class="text-sm text-orange-600 dark:text-orange-400 mb-2">
+                <i class="fa fa-exclamation-triangle mr-2"></i>Are you sure you want to reset <span id="reset-selected-count">0</span> selected group(s)?
+            </p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                This will reset the article pointers for the selected groups back to their current state.
+            </p>
+            <div id="reset-selected-list" class="max-h-32 overflow-y-auto mb-4 text-xs text-gray-500 dark:text-gray-400"></div>
+            <div class="flex justify-end gap-3">
+                <button type="button"
+                        data-action="hide-reset-selected-modal"
+                        class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
+                    Cancel
+                </button>
+                <button type="button"
+                        data-action="reset-selected"
+                        class="px-4 py-2 bg-orange-600 dark:bg-orange-700 text-white rounded-lg hover:bg-orange-700">
+                    Reset Selected
                 </button>
             </div>
         </div>

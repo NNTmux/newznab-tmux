@@ -71,6 +71,23 @@ class AdminAjaxController extends BasePageController
 
                     return response()->json(['success' => true, 'message' => "Group $id reset successfully"]);
 
+                case 'reset_selected_groups':
+                    $groupIds = json_decode($request->input('group_ids', '[]'), true);
+                    if (empty($groupIds) || ! is_array($groupIds)) {
+                        return response()->json(['success' => false, 'message' => 'No groups specified'], 400);
+                    }
+
+                    $count = 0;
+                    foreach ($groupIds as $id) {
+                        UsenetGroup::reset((int) $id);
+                        $count++;
+                    }
+
+                    return response()->json([
+                        'success' => true,
+                        'message' => "$count group(s) reset successfully",
+                    ]);
+
                 case 'group_edit_delete_single':
                 case 'delete_group':
                     $id = (int) $request->input('group_id');

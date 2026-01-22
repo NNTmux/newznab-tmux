@@ -450,6 +450,15 @@ function initEventDelegation() {
                 case 'hide-purge-modal':
                     hidePurgeAllModal();
                     break;
+                case 'show-reset-selected-modal':
+                    showResetSelectedModal();
+                    break;
+                case 'hide-reset-selected-modal':
+                    hideResetSelectedModal();
+                    break;
+                case 'select-all-groups':
+                    toggleSelectAllGroups(actionTarget);
+                    break;
                 case 'toggle-group-status':
                     ajax_group_status(groupId, status);
                     break;
@@ -470,6 +479,9 @@ function initEventDelegation() {
                     break;
                 case 'purge-all':
                     ajax_group_purge_all();
+                    break;
+                case 'reset-selected':
+                    ajax_group_reset_selected();
                     break;
             }
         }
@@ -3600,120 +3612,138 @@ function initAdminGroups() {
 
     // Reset group
     window.ajax_group_reset = function(id) {
-        if (!confirm('Are you sure you want to reset this group? This will reset the article pointers back to the current state.')) {
-            return;
-        }
-
-        fetch(ajaxUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRF-TOKEN': csrfToken,
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: new URLSearchParams({
-                action: 'reset_group',
-                group_id: id
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                if (typeof showToast === 'function') {
-                    showToast(data.message || 'Group reset successfully', 'success');
-                }
-            } else {
-                if (typeof showToast === 'function') {
-                    showToast(data.message || 'Error resetting group', 'error');
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            if (typeof showToast === 'function') {
-                showToast('Error resetting group', 'error');
+        showConfirm({
+            title: 'Reset Group',
+            message: 'Are you sure you want to reset this group?',
+            details: 'This will reset the article pointers back to the current state.',
+            type: 'warning',
+            confirmText: 'Reset',
+            cancelText: 'Cancel',
+            onConfirm: function() {
+                fetch(ajaxUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: new URLSearchParams({
+                        action: 'reset_group',
+                        group_id: id
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (typeof showToast === 'function') {
+                            showToast(data.message || 'Group reset successfully', 'success');
+                        }
+                    } else {
+                        if (typeof showToast === 'function') {
+                            showToast(data.message || 'Error resetting group', 'error');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (typeof showToast === 'function') {
+                        showToast('Error resetting group', 'error');
+                    }
+                });
             }
         });
     };
 
     // Delete group
     window.confirmGroupDelete = function(id) {
-        if (!confirm('Are you sure you want to delete this group? This action cannot be undone.')) {
-            return;
-        }
-
-        fetch(ajaxUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRF-TOKEN': csrfToken,
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: new URLSearchParams({
-                action: 'delete_group',
-                group_id: id
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const row = document.getElementById('grouprow-' + id);
-                if (row) {
-                    row.style.transition = 'opacity 0.3s';
-                    row.style.opacity = '0';
-                    setTimeout(() => row.remove(), 300);
-                }
-                if (typeof showToast === 'function') {
-                    showToast(data.message || 'Group deleted successfully', 'success');
-                }
-            } else {
-                if (typeof showToast === 'function') {
-                    showToast(data.message || 'Error deleting group', 'error');
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            if (typeof showToast === 'function') {
-                showToast('Error deleting group', 'error');
+        showConfirm({
+            title: 'Delete Group',
+            message: 'Are you sure you want to delete this group?',
+            details: 'This action cannot be undone.',
+            type: 'danger',
+            confirmText: 'Delete',
+            cancelText: 'Cancel',
+            onConfirm: function() {
+                fetch(ajaxUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: new URLSearchParams({
+                        action: 'delete_group',
+                        group_id: id
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const row = document.getElementById('grouprow-' + id);
+                        if (row) {
+                            row.style.transition = 'opacity 0.3s';
+                            row.style.opacity = '0';
+                            setTimeout(() => row.remove(), 300);
+                        }
+                        if (typeof showToast === 'function') {
+                            showToast(data.message || 'Group deleted successfully', 'success');
+                        }
+                    } else {
+                        if (typeof showToast === 'function') {
+                            showToast(data.message || 'Error deleting group', 'error');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (typeof showToast === 'function') {
+                        showToast('Error deleting group', 'error');
+                    }
+                });
             }
         });
     };
 
     // Purge group
     window.confirmGroupPurge = function(id) {
-        if (!confirm('Are you sure you want to purge this group? This will delete all releases and binaries for this group. This action cannot be undone!')) {
-            return;
-        }
-
-        fetch(ajaxUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRF-TOKEN': csrfToken,
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: new URLSearchParams({
-                action: 'purge_group',
-                group_id: id
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                if (typeof showToast === 'function') {
-                    showToast(data.message || 'Group purged successfully', 'success');
-                }
-            } else {
-                if (typeof showToast === 'function') {
-                    showToast(data.message || 'Error purging group', 'error');
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            if (typeof showToast === 'function') {
-                showToast('Error purging group', 'error');
+        showConfirm({
+            title: 'Purge Group',
+            message: 'Are you sure you want to purge this group?',
+            details: 'This will delete all releases and binaries for this group. This action cannot be undone!',
+            type: 'danger',
+            confirmText: 'Purge',
+            cancelText: 'Cancel',
+            onConfirm: function() {
+                fetch(ajaxUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: new URLSearchParams({
+                        action: 'purge_group',
+                        group_id: id
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (typeof showToast === 'function') {
+                            showToast(data.message || 'Group purged successfully', 'success');
+                        }
+                    } else {
+                        if (typeof showToast === 'function') {
+                            showToast(data.message || 'Error purging group', 'error');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (typeof showToast === 'function') {
+                        showToast('Error purging group', 'error');
+                    }
+                });
             }
         });
     };
@@ -3816,6 +3846,160 @@ function initAdminGroups() {
             modal.classList.add('hidden');
         }
     };
+
+    // Reset Selected Modal helpers
+    window.showResetSelectedModal = function() {
+        const modal = document.getElementById('resetSelectedModal');
+        const countSpan = document.getElementById('reset-selected-count');
+        const listDiv = document.getElementById('reset-selected-list');
+
+        if (modal) {
+            const selectedGroups = getSelectedGroups();
+            if (selectedGroups.length === 0) {
+                if (typeof showToast === 'function') {
+                    showToast('No groups selected', 'warning');
+                }
+                return;
+            }
+
+            if (countSpan) {
+                countSpan.textContent = selectedGroups.length;
+            }
+
+            if (listDiv) {
+                listDiv.innerHTML = selectedGroups.map(g =>
+                    `<div class="py-1 border-b border-gray-200 dark:border-gray-700 last:border-0">${escapeHtml(g.name)}</div>`
+                ).join('');
+            }
+
+            modal.classList.remove('hidden');
+        }
+    };
+
+    window.hideResetSelectedModal = function() {
+        const modal = document.getElementById('resetSelectedModal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    };
+
+    // Get selected groups
+    window.getSelectedGroups = function() {
+        const checkboxes = document.querySelectorAll('.group-checkbox:checked');
+        const groups = [];
+        checkboxes.forEach(cb => {
+            groups.push({
+                id: cb.dataset.groupId,
+                name: cb.dataset.groupName
+            });
+        });
+        return groups;
+    };
+
+    // Toggle select all groups
+    window.toggleSelectAllGroups = function(checkbox) {
+        const isChecked = checkbox.checked;
+        const groupCheckboxes = document.querySelectorAll('.group-checkbox');
+        groupCheckboxes.forEach(cb => {
+            cb.checked = isChecked;
+        });
+        updateSelectionUI();
+    };
+
+    // Update selection UI (counter, button visibility)
+    window.updateSelectionUI = function() {
+        const selectedGroups = getSelectedGroups();
+        const count = selectedGroups.length;
+        const counter = document.getElementById('selection-counter');
+        const countSpan = document.getElementById('selected-count');
+        const resetSelectedBtn = document.getElementById('reset-selected-btn');
+        const selectAllCheckbox = document.getElementById('select-all-groups');
+        const allCheckboxes = document.querySelectorAll('.group-checkbox');
+
+        if (counter && countSpan) {
+            if (count > 0) {
+                counter.classList.remove('hidden');
+                countSpan.textContent = count;
+            } else {
+                counter.classList.add('hidden');
+            }
+        }
+
+        if (resetSelectedBtn) {
+            if (count > 0) {
+                resetSelectedBtn.classList.remove('hidden');
+            } else {
+                resetSelectedBtn.classList.add('hidden');
+            }
+        }
+
+        // Update select-all checkbox state
+        if (selectAllCheckbox && allCheckboxes.length > 0) {
+            const allChecked = Array.from(allCheckboxes).every(cb => cb.checked);
+            const someChecked = Array.from(allCheckboxes).some(cb => cb.checked);
+            selectAllCheckbox.checked = allChecked;
+            selectAllCheckbox.indeterminate = someChecked && !allChecked;
+        }
+    };
+
+    // Reset selected groups
+    window.ajax_group_reset_selected = function() {
+        hideResetSelectedModal();
+
+        const selectedGroups = getSelectedGroups();
+        if (selectedGroups.length === 0) {
+            if (typeof showToast === 'function') {
+                showToast('No groups selected', 'warning');
+            }
+            return;
+        }
+
+        const groupIds = selectedGroups.map(g => g.id);
+
+        fetch(ajaxUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: new URLSearchParams({
+                action: 'reset_selected_groups',
+                group_ids: JSON.stringify(groupIds)
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (typeof showToast === 'function') {
+                    showToast(data.message || `${selectedGroups.length} group(s) reset successfully`, 'success');
+                }
+                // Clear selection
+                document.querySelectorAll('.group-checkbox:checked').forEach(cb => {
+                    cb.checked = false;
+                });
+                document.getElementById('select-all-groups').checked = false;
+                updateSelectionUI();
+            } else {
+                if (typeof showToast === 'function') {
+                    showToast(data.message || 'Error resetting selected groups', 'error');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            if (typeof showToast === 'function') {
+                showToast('Error resetting selected groups', 'error');
+            }
+        });
+    };
+
+    // Initialize checkbox change listeners
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('group-checkbox')) {
+            updateSelectionUI();
+        }
+    });
 }
 
 // TinyMCE Initialization for Admin Content Pages

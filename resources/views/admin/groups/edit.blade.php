@@ -227,12 +227,20 @@
         </form>
 
         <!-- Footer -->
-        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900" data-ajax-url="{{ url('/admin/ajax') }}" data-csrf-token="{{ csrf_token() }}">
             <div class="flex justify-between">
-                <a href="{{ url('/admin/group-list') }}"
-                        class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
-                    <i class="fa fa-times mr-2"></i>Cancel
-                </a>
+                <div class="flex gap-2">
+                    <a href="{{ url('/admin/group-list') }}"
+                            class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
+                        <i class="fa fa-times mr-2"></i>Cancel
+                    </a>
+                    <button type="button"
+                            data-action="reset-group"
+                            data-group-id="{{ $group['id'] ?? '' }}"
+                            class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700">
+                        <i class="fa fa-refresh mr-2"></i>Reset Group
+                    </button>
+                </div>
                 <button type="submit"
                         form="groupForm"
                         class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600">
