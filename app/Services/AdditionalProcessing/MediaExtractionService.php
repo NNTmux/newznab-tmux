@@ -8,6 +8,7 @@ use App\Models\Release;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
 use App\Services\Categorization\CategorizationService;
+use App\Services\NameFixing\ReleaseUpdateService;
 use App\Services\ReleaseExtraService;
 use App\Services\ReleaseImageService;
 use FFMpeg\Coordinate\Dimension;
@@ -328,6 +329,17 @@ class MediaExtractionService
                                 ]);
 
                                 Search::updateRelease($context->release->id);
+
+                                if ($this->config->echoCLI) {
+                                    $releaseInfo = (object) [
+                                        'groups_id' => $rQuery->groups_id, 'categories_id' => $rQuery->categories_id,
+                                        'searchname' => $rQuery->searchname, 'name' => $rQuery->searchname,
+                                        'releases_id' => $context->release->id, 'filename' => '',
+                                    ];
+                                    (new ReleaseUpdateService)->echoReleaseInfo($releaseInfo, $newTitle,
+                                        is_array($newCat) ? $newCat : ['categories_id' => $newCat], '',
+                                        'MediaExtractionService->getAudioInfo');
+                                }
                             }
 
                             $this->releaseExtra->addFromXml($context->release->id, $xmlArray);
@@ -475,4 +487,5 @@ class MediaExtractionService
 
         return $this->mediaInfo;
     }
+
 }
