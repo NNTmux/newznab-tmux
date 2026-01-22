@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\Category;
 use App\Models\Release;
 use App\Services\Releases\ReleaseBrowseService;
+use App\Services\Releases\ReleaseSearchService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -15,15 +16,14 @@ use Illuminate\Support\Facades\DB;
  */
 class RSS extends ApiController
 {
-    public ReleaseBrowseService $releaseBrowseService;
-
     /**
      * @throws \Exception
      */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->releaseBrowseService = app(ReleaseBrowseService::class);
+    public function __construct(
+        ReleaseSearchService $releaseSearchService,
+        ReleaseBrowseService $releaseBrowseService
+    ) {
+        parent::__construct($releaseSearchService, $releaseBrowseService);
     }
 
     /**
@@ -105,7 +105,7 @@ class RSS extends ApiController
             ($airDate > -1 ? sprintf(' AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY)', $airDate) : ''),
             Category::TV_ROOT,
             Category::TV_OTHER,
-            $this->releases->showPasswords(),
+            $this->releaseBrowseService->showPasswords(),
             ! empty($limit) ? sprintf(' LIMIT %d OFFSET 0', min($limit, 100)) : ''
         );
 
@@ -133,7 +133,7 @@ class RSS extends ApiController
             (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
             Category::MOVIE_ROOT,
             Category::MOVIE_OTHER,
-            $this->releases->showPasswords(),
+            $this->releaseBrowseService->showPasswords(),
             ! empty($limit) ? sprintf(' LIMIT %d OFFSET 0', min($limit, 100)) : ''
         );
 
@@ -205,7 +205,7 @@ class RSS extends ApiController
                 WHERE rn <= 5
                 ORDER BY FIELD(imdbid, '%s'), postdate DESC",
                 implode("','", $topMovies->toArray()),
-                $this->releases->showPasswords(),
+                $this->releaseBrowseService->showPasswords(),
                 implode("','", $topMovies->toArray())
             );
 
@@ -272,7 +272,7 @@ class RSS extends ApiController
                 WHERE rn <= 5
                 ORDER BY FIELD(videos_id, %s), postdate DESC",
                 implode(',', $topShows->toArray()),
-                $this->releases->showPasswords(),
+                $this->releaseBrowseService->showPasswords(),
                 implode(',', $topShows->toArray())
             );
 

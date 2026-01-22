@@ -21,7 +21,7 @@ class RssController extends BasePageController
      */
     public function myMoviesRss(Request $request)
     {
-        $rss = new RSS(['Settings' => $this->settings]);
+        $rss = app(RSS::class);
         $offset = 0;
 
         $user = $this->userCheck($request);
@@ -46,7 +46,7 @@ class RssController extends BasePageController
      */
     public function myShowsRss(Request $request)
     {
-        $rss = new RSS;
+        $rss = app(RSS::class);
         $offset = 0;
         $user = $this->userCheck($request);
         if (is_object($user)) {
@@ -67,7 +67,7 @@ class RssController extends BasePageController
      */
     public function fullFeedRss(Request $request)
     {
-        $rss = new RSS;
+        $rss = app(RSS::class);
         $offset = 0;
         $user = $this->userCheck($request);
         if (is_object($user)) {
@@ -92,7 +92,7 @@ class RssController extends BasePageController
      */
     public function showRssDesc()
     {
-        $rss = new RSS;
+        $rss = app(RSS::class);
 
         $firstShow = $rss->getFirstInstance('videos_id', 'releases', 'id');
         $firstAni = $rss->getFirstInstance('anidbid', 'releases', 'id');
@@ -121,7 +121,7 @@ class RssController extends BasePageController
      */
     public function cartRss(Request $request)
     {
-        $rss = new RSS;
+        $rss = app(RSS::class);
         $offset = 0;
         $user = $this->userCheck($request);
         if (is_object($user)) {
@@ -147,7 +147,7 @@ class RssController extends BasePageController
      */
     public function categoryFeedRss(Request $request)
     {
-        $rss = new RSS;
+        $rss = app(RSS::class);
         $offset = 0;
         if ($request->missing('id')) {
             return response()->json(['error' => 'Category ID is missing'], '403');
@@ -177,7 +177,7 @@ class RssController extends BasePageController
      */
     public function trendingMoviesRss(Request $request)
     {
-        $rss = new RSS;
+        $rss = app(RSS::class);
         $offset = 0;
         $user = $this->userCheck($request);
         if (is_object($user)) {
@@ -195,7 +195,7 @@ class RssController extends BasePageController
      */
     public function trendingShowsRss(Request $request)
     {
-        $rss = new RSS;
+        $rss = app(RSS::class);
         $offset = 0;
         $user = $this->userCheck($request);
         if (is_object($user)) {

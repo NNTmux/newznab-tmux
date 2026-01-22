@@ -28,9 +28,9 @@ class ApiController extends BasePageController
 {
     private string $type;
 
-    private ReleaseSearchService $releaseSearchService;
+    protected ReleaseSearchService $releaseSearchService;
 
-    private ReleaseBrowseService $releaseBrowseService;
+    protected ReleaseBrowseService $releaseBrowseService;
 
     public function __construct(
         ReleaseSearchService $releaseSearchService,
