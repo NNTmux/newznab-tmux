@@ -17,6 +17,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Jrean\UserVerification\Facades\UserVerification;
+use PragmaRX\Google2FALaravel\Facade as Google2FA;
 
 class ProfileController extends BasePageController
 {
@@ -116,7 +117,7 @@ class ProfileController extends BasePageController
         // Generate 2FA QR code URL if 2FA is set up but not enabled
         $google2fa_url = '';
         if ($this->userdata->passwordSecurity()->exists() && ! $this->userdata->passwordSecurity->google2fa_enable) {
-            $google2fa_url = \Google2FA::getQRCodeInline(
+            $google2fa_url = Google2FA::getQRCodeInline(
                 config('app.name'),
                 $this->userdata->email,
                 $this->userdata->passwordSecurity->google2fa_secret

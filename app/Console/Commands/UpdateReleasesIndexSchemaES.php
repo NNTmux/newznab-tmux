@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Facades\Elasticsearch;
 use App\Models\Release;
-use Elasticsearch;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;

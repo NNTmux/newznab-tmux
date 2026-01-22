@@ -250,7 +250,7 @@ class NntmuxOffsetPopulate extends Command
                 // Wait a moment for ElasticSearch to refresh
                 sleep(2);
 
-                $stats = \Elasticsearch::indices()->stats(['index' => $index]);
+                $stats = Elasticsearch::indices()->stats(['index' => $index]);
                 $actualCount = $stats['indices'][$index]['total']['docs']['count'] ?? 0;
 
                 $this->info('Expected: '.number_format($expectedTotal).' records');
@@ -281,18 +281,18 @@ class NntmuxOffsetPopulate extends Command
         } else {
             // For ElasticSearch, just clear the data instead of recreating the index
             try {
-                $exists = \Elasticsearch::indices()->exists(['index' => $index]);
+                $exists = Elasticsearch::indices()->exists(['index' => $index]);
 
                 if ($exists) {
                     // Get current document count
-                    $stats = \Elasticsearch::indices()->stats(['index' => $index]);
+                    $stats = Elasticsearch::indices()->stats(['index' => $index]);
                     $currentCount = $stats['indices'][$index]['total']['docs']['count'] ?? 0;
 
                     if ($currentCount > 0) {
                         $this->info("ElasticSearch index '{$index}' exists with {$currentCount} documents. Clearing data...");
 
                         // Delete all documents but keep the index structure
-                        \Elasticsearch::deleteByQuery([
+                        Elasticsearch::deleteByQuery([
                             'index' => $index,
                             'body' => [
                                 'query' => ['match_all' => (object) []],
@@ -300,7 +300,7 @@ class NntmuxOffsetPopulate extends Command
                         ]);
 
                         // Force refresh to ensure deletions are visible
-                        \Elasticsearch::indices()->refresh(['index' => $index]);
+                        Elasticsearch::indices()->refresh(['index' => $index]);
                         $this->info("Cleared all documents from ElasticSearch index: {$index}");
                     } else {
                         $this->info("ElasticSearch index '{$index}' exists but is already empty");
@@ -315,7 +315,7 @@ class NntmuxOffsetPopulate extends Command
 
                 // Fallback: delete and recreate
                 try {
-                    \Elasticsearch::indices()->delete(['index' => $index]);
+                    Elasticsearch::indices()->delete(['index' => $index]);
                 } catch (Exception $e) {
                     // Index might not exist, that's okay
                 }
@@ -346,7 +346,7 @@ class NntmuxOffsetPopulate extends Command
             ],
         ];
 
-        \Elasticsearch::indices()->create($settings);
+        Elasticsearch::indices()->create($settings);
         $this->info("Created optimized ElasticSearch index: {$indexName}");
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Services\Runners;
 
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\Process\Process;
 
 abstract class BaseRunner
@@ -110,7 +111,7 @@ abstract class BaseRunner
             default:
                 // Log unrecognized command and return empty string
                 if (config('app.debug')) {
-                    \Log::warning('Unrecognized multiprocessing command: '.$args);
+                    Log::warning('Unrecognized multiprocessing command: '.$args);
                 }
 
                 return '';
@@ -196,7 +197,7 @@ abstract class BaseRunner
                 try {
                     $results[$key] = $callable();
                 } catch (\Throwable $e) {
-                    \Log::error("Task {$key} failed: ".$e->getMessage());
+                    Log::error("Task {$key} failed: ".$e->getMessage());
                     $results[$key] = '';
                 }
             }
@@ -226,7 +227,7 @@ abstract class BaseRunner
                 try {
                     $results[$key] = $callable();
                 } catch (\Throwable $e) {
-                    \Log::error("Task {$key} failed: ".$e->getMessage());
+                    Log::error("Task {$key} failed: ".$e->getMessage());
                     $results[$key] = '';
                 }
             }

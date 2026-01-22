@@ -4,6 +4,7 @@ namespace App\Listeners;
 
 use App\Events\UserLoggedIn;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class UpdateUserLoggedIn
 {
@@ -30,7 +31,7 @@ class UpdateUserLoggedIn
         );
 
         // Log the user login event
-        \Log::channel('user_login')->info('User logged in', [
+        Log::channel('user_login')->info('User logged in', [
             'user_id' => $event->user->id,
             'username' => $event->user->username,
             'ip' => $event->ip,

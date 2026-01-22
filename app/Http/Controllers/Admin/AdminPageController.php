@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BasePageController;
 use App\Services\SystemMetricsService;
 use App\Services\UserStatsService;
+use Illuminate\Support\Facades\Log;
 
 class AdminPageController extends BasePageController
 {
@@ -254,7 +255,7 @@ class AdminPageController extends BasePageController
                 }
             }
         } catch (\Exception $e) {
-            \Log::warning('Could not get CPU usage: '.$e->getMessage());
+            Log::warning('Could not get CPU usage: '.$e->getMessage());
         }
 
         return 0;
@@ -349,7 +350,7 @@ class AdminPageController extends BasePageController
                 }
             }
         } catch (\Exception $e) {
-            \Log::warning('Could not get CPU info: '.$e->getMessage());
+            Log::warning('Could not get CPU info: '.$e->getMessage());
         }
 
         return $info;
@@ -388,7 +389,7 @@ class AdminPageController extends BasePageController
                 }
             }
         } catch (\Exception $e) {
-            \Log::warning('Could not get load average: '.$e->getMessage());
+            Log::warning('Could not get load average: '.$e->getMessage());
         }
 
         return $loadAvg;
@@ -438,7 +439,7 @@ class AdminPageController extends BasePageController
                 }
             }
         } catch (\Exception $e) {
-            \Log::warning('Could not get RAM usage: '.$e->getMessage());
+            Log::warning('Could not get RAM usage: '.$e->getMessage());
         }
 
         return [

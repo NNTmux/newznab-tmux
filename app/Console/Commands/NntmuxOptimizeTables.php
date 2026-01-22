@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class NntmuxOptimizeTables extends Command
 {
@@ -40,7 +41,7 @@ class NntmuxOptimizeTables extends Command
      */
     private function optimizeAllTables(): void
     {
-        $tables = \DB::select('SHOW TABLES');
+        $tables = DB::select('SHOW TABLES');
         foreach ($tables as $table) {
             $this->optimizeTable($table->Tables_in_nntmux);
         }
@@ -63,11 +64,11 @@ class NntmuxOptimizeTables extends Command
     private function tableCheck($table): void
     {
         $this->info('Checking table: '.$table);
-        $tableCheck = \DB::select('CHECK TABLE '.$table);
+        $tableCheck = DB::select('CHECK TABLE '.$table);
         if ($tableCheck[0]->Msg_text !== 'OK') {
             $this->error('Table '.$table.' is corrupted. Please repair it.');
             $this->info('Optimizing table: '.$table);
-            \DB::select('OPTIMIZE TABLE '.$table);
+            DB::select('OPTIMIZE TABLE '.$table);
         } else {
             $this->info('Table '.$table.' is ok. Optimization is not needed.');
         }

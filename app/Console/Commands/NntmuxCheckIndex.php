@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Facades\Elasticsearch;
 use Exception;
 use Illuminate\Console\Command;
 
@@ -63,7 +64,7 @@ class NntmuxCheckIndex extends Command
     {
         try {
             // Check if index exists
-            $exists = \Elasticsearch::indices()->exists(['index' => $index]);
+            $exists = Elasticsearch::indices()->exists(['index' => $index]);
 
             if (! $exists) {
                 $this->error("ElasticSearch index '{$index}' does not exist.");
@@ -74,7 +75,7 @@ class NntmuxCheckIndex extends Command
             $this->info("ElasticSearch index '{$index}' exists.");
 
             // Get index stats
-            $stats = \Elasticsearch::indices()->stats(['index' => $index]);
+            $stats = Elasticsearch::indices()->stats(['index' => $index]);
             $docCount = $stats['indices'][$index]['total']['docs']['count'] ?? 0;
             $storeSize = $stats['indices'][$index]['total']['store']['size_in_bytes'] ?? 0;
 
@@ -83,7 +84,7 @@ class NntmuxCheckIndex extends Command
 
             // Get a sample document
             if ($docCount > 0) {
-                $sample = \Elasticsearch::search([
+                $sample = Elasticsearch::search([
                     'index' => $index,
                     'size' => 1,
                     'body' => [

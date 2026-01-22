@@ -12,8 +12,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use sspat\ESQuerySanitizer\Sanitizer;
+use STS\ZipStream\Facades\Zip as ZipStream;
 use Symfony\Component\Process\Process;
-use Zip as ZipStream;
 
 if (! function_exists('getRawHtml')) {
     /**

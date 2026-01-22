@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
@@ -63,10 +64,10 @@ class UpdatePerformanceHelper
     public static function clearAllCaches(): array
     {
         $cacheOperations = [
-            'config' => fn () => \Artisan::call('config:clear'),
-            'route' => fn () => \Artisan::call('route:clear'),
-            'view' => fn () => \Artisan::call('view:clear'),
-            'cache' => fn () => \Artisan::call('cache:clear'),
+            'config' => fn () => Artisan::call('config:clear'),
+            'route' => fn () => Artisan::call('route:clear'),
+            'view' => fn () => Artisan::call('view:clear'),
+            'cache' => fn () => Artisan::call('cache:clear'),
             'opcache' => fn () => function_exists('opcache_reset') ? opcache_reset() : true,
         ];
 

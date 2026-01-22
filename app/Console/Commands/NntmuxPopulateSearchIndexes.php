@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Facades\Elasticsearch;
 use App\Facades\Search;
 use App\Models\MovieInfo;
 use App\Models\Predb;
@@ -827,7 +828,7 @@ class NntmuxPopulateSearchIndexes extends Command
 
         while ($attempt < $retries) {
             try {
-                $response = \Elasticsearch::bulk($data);
+                $response = Elasticsearch::bulk($data);
 
                 // Check for errors in bulk response
                 if (isset($response['errors']) && $response['errors']) {

@@ -32,13 +32,13 @@ class NntmuxESReindex extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         passthru('php '.app()->/* @scrutinizer ignore-call */ path().'/../misc/elasticsearch/create_es_indexes.php');
         passthru('php '.app()->/* @scrutinizer ignore-call */ path().'/../misc/elasticsearch/populate_es_indexes.php releases');
         passthru('php '.app()->/* @scrutinizer ignore-call */ path().'/../misc/elasticsearch/populate_es_indexes.php predb');
+
+        return self::SUCCESS;
     }
 }

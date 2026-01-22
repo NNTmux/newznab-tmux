@@ -1363,7 +1363,7 @@ class NameFixingService
                         $counted++;
                     }
                     if ($show === false) {
-                        cli()->info('Renamed Releases: ['.number_format($counted).'] '.(new ColorCLI)->percentString(++$counter, $total));
+                        cli()->info('Renamed Releases: ['.number_format($counted).'] '.cli()->percentString(++$counter, $total));
                     }
                 }
                 cli()->info(PHP_EOL.'Renamed '.number_format($counted).' releases in '.now()->diffInSeconds($timeStart, true).' seconds.');

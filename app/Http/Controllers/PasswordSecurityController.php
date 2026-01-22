@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use PragmaRX\Google2FALaravel\Facade as Google2FA;
 
 class PasswordSecurityController extends Controller
 {
@@ -28,7 +29,7 @@ class PasswordSecurityController extends Controller
 
         $google2fa_url = '';
         if ($user->passwordSecurity()->exists()) {
-            $google2fa_url = \Google2FA::getQRCodeInline(
+            $google2fa_url = Google2FA::getQRCodeInline(
                 config('app.name'),
                 $user->email,
                 $user->passwordSecurity->google2fa_secret
@@ -62,7 +63,7 @@ class PasswordSecurityController extends Controller
             [
                 'user_id' => $user->id,
                 'google2fa_enable' => 0,
-                'google2fa_secret' => \Google2FA::generateSecretKey(),
+                'google2fa_secret' => Google2FA::generateSecretKey(),
             ]
         );
 
@@ -90,7 +91,7 @@ class PasswordSecurityController extends Controller
         }
 
         $secret = $request->input('verify-code');
-        $valid = \Google2FA::verifyKey($user->passwordSecurity->google2fa_secret, $secret);
+        $valid = Google2FA::verifyKey($user->passwordSecurity->google2fa_secret, $secret);
         if ($valid) {
             $user->passwordSecurity->google2fa_enable = 1;
             $user->passwordSecurity->save();
@@ -178,7 +179,7 @@ class PasswordSecurityController extends Controller
         }
 
         // Verify the OTP code
-        $valid = \Google2FA::verifyKey(
+        $valid = Google2FA::verifyKey(
             $user->passwordSecurity->google2fa_secret,
             $request->input('one_time_password')
         );
@@ -340,7 +341,7 @@ class PasswordSecurityController extends Controller
 
         $google2fa_url = '';
         if ($user->passwordSecurity()->exists()) {
-            $google2fa_url = \Google2FA::getQRCodeInline(
+            $google2fa_url = Google2FA::getQRCodeInline(
                 config('app.name'),
                 $user->email,
                 $user->passwordSecurity->google2fa_secret
@@ -370,7 +371,7 @@ class PasswordSecurityController extends Controller
 
         $google2fa_url = '';
         if ($user->passwordSecurity()->exists()) {
-            $google2fa_url = \Google2FA::getQRCodeInline(
+            $google2fa_url = Google2FA::getQRCodeInline(
                 config('app.name'),
                 $user->email,
                 $user->passwordSecurity->google2fa_secret

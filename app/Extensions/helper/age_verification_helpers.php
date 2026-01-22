@@ -10,6 +10,7 @@
 use App\Services\AdultProcessing\AgeVerificationManager;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Facades\Log;
 
 if (! function_exists('getRawHtmlWithAgeVerification')) {
     /**
@@ -82,13 +83,13 @@ if (! function_exists('getRawHtmlWithAgeVerification')) {
 
             } catch (RequestException $e) {
                 if (config('app.debug') === true) {
-                    \Log::error('getRawHtmlWithAgeVerification: '.$e->getMessage());
+                    Log::error('getRawHtmlWithAgeVerification: '.$e->getMessage());
                 }
 
                 return false;
             } catch (\Exception $e) {
                 if (config('app.debug') === true) {
-                    \Log::error('getRawHtmlWithAgeVerification: '.$e->getMessage());
+                    Log::error('getRawHtmlWithAgeVerification: '.$e->getMessage());
                 }
 
                 return false;

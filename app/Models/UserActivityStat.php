@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class UserActivityStat extends Model
 {
@@ -153,13 +154,13 @@ class UserActivityStat extends Model
             ->count();
 
         // Store in hourly stats table
-        \DB::table('user_activity_stats_hourly')->updateOrInsert(
+        DB::table('user_activity_stats_hourly')->updateOrInsert(
             ['stat_hour' => $statHour],
             [
                 'downloads_count' => $downloadsCount,
                 'api_hits_count' => $apiHitsCount,
                 'updated_at' => now(),
-                'created_at' => \DB::raw('COALESCE(created_at, NOW())'),
+                'created_at' => DB::raw('COALESCE(created_at, NOW())'),
             ]
         );
     }
@@ -171,7 +172,7 @@ class UserActivityStat extends Model
     {
         $startHour = Carbon::now()->subHours($hours - 1)->startOfHour()->format('Y-m-d H:00:00');
 
-        $stats = \DB::table('user_activity_stats_hourly')
+        $stats = DB::table('user_activity_stats_hourly')
             ->select('stat_hour', 'downloads_count')
             ->where('stat_hour', '>=', $startHour)
             ->orderBy('stat_hour', 'asc')
@@ -213,7 +214,7 @@ class UserActivityStat extends Model
     {
         $startHour = Carbon::now()->subHours($hours - 1)->startOfHour()->format('Y-m-d H:00:00');
 
-        $stats = \DB::table('user_activity_stats_hourly')
+        $stats = DB::table('user_activity_stats_hourly')
             ->select('stat_hour', 'api_hits_count')
             ->where('stat_hour', '>=', $startHour)
             ->orderBy('stat_hour', 'asc')
@@ -255,7 +256,7 @@ class UserActivityStat extends Model
     {
         $cutoffHour = Carbon::now()->subDays($keepDays)->startOfHour()->format('Y-m-d H:00:00');
 
-        return \DB::table('user_activity_stats_hourly')
+        return DB::table('user_activity_stats_hourly')
             ->where('stat_hour', '<', $cutoffHour)
             ->delete();
     }

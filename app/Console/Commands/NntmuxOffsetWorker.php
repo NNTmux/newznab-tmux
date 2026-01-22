@@ -276,7 +276,7 @@ class NntmuxOffsetWorker extends Command
 
         while ($attempt < $retries) {
             try {
-                $response = \Elasticsearch::bulk($data);
+                $response = Elasticsearch::bulk($data);
 
                 if (isset($response['errors']) && $response['errors']) {
                     $errorCount = 0;

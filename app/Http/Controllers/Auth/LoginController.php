@@ -134,7 +134,7 @@ class LoginController extends Controller
                                     return $this->checkPasswordBreachAndRedirect($request->input('password'), $redirect);
                                 }
                             } catch (\Exception $e) {
-                                \Log::error('Login - Error processing trusted device cookie', [
+                                Log::error('Login - Error processing trusted device cookie', [
                                     'error' => $e->getMessage(),
                                 ]);
                             }
@@ -213,7 +213,7 @@ class LoginController extends Controller
                     $remainingSeconds = max(0, $cookieData['expires_at'] - time());
                     $remainingMinutes = (int) ceil($remainingSeconds / 60);
 
-                    \Log::info('Logout - Cookie Expiration', [
+                    Log::info('Logout - Cookie Expiration', [
                         'expires_at' => $cookieData['expires_at'],
                         'current_time' => time(),
                         'remaining_seconds' => $remainingSeconds,
@@ -238,13 +238,13 @@ class LoginController extends Controller
                         // Queue the cookie to be sent with the response
                         cookie()->queue($cookie);
                     } else {
-                        \Log::warning('Logout - Cookie Already Expired');
+                        Log::warning('Logout - Cookie Already Expired');
                     }
                 } else {
-                    \Log::warning('Logout - Cookie Missing Expiration Data');
+                    Log::warning('Logout - Cookie Missing Expiration Data');
                 }
             } catch (\Exception $e) {
-                \Log::error('Logout - Error Processing Cookie', [
+                Log::error('Logout - Error Processing Cookie', [
                     'error' => $e->getMessage(),
                 ]);
             }

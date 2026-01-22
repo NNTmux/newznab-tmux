@@ -21,9 +21,11 @@ return [
     'timezone' => env('APP_TIMEZONE', 'UTC'),
 
     'aliases' => Facade::defaultAliases()->merge([
+        'Elasticsearch' => App\Facades\Elasticsearch::class,
+        'Google2FA' => PragmaRX\Google2FALaravel\Facade::class,
+        'Gravatar' => Creativeorange\Gravatar\Facades\Gravatar::class,
         'RedisManager' => Illuminate\Support\Facades\Redis::class,
         'UserVerification' => Jrean\UserVerification\Facades\UserVerification::class,
-        'Gravatar' => Creativeorange\Gravatar\Facades\Gravatar::class,
         'Yenc' => App\Facades\Yenc::class,
     ])->toArray(),
 

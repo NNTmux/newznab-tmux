@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Services\MovieService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 
 class FetchMovieByImdb extends Command
 {
@@ -39,10 +40,10 @@ class FetchMovieByImdb extends Command
         $this->info('Force fetching movie data for IMDb id: tt'.$imdbId.' ...');
 
         // Clear all caches for this movie to force fresh data retrieval
-        \Cache::forget('tmdb_movie_'.md5('tt'.$imdbId));
-        \Cache::forget('trakt_movie_'.md5($imdbId));
-        \Cache::forget('imdb_movie_'.md5($imdbId));
-        \Cache::forget('omdb_movie_'.md5($imdbId));
+        Cache::forget('tmdb_movie_'.md5('tt'.$imdbId));
+        Cache::forget('trakt_movie_'.md5($imdbId));
+        Cache::forget('imdb_movie_'.md5($imdbId));
+        Cache::forget('omdb_movie_'.md5($imdbId));
 
         $ok = $movie->updateMovieInfo($imdbId);
 

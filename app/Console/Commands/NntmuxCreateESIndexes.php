@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Elasticsearch;
+use App\Facades\Elasticsearch;
 use Illuminate\Console\Command;
 
 class NntmuxCreateESIndexes extends Command

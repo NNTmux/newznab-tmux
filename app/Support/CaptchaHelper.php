@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Services\TurnstileService;
+use Illuminate\Support\Facades\Log;
 
 class CaptchaHelper
 {
@@ -24,7 +25,7 @@ class CaptchaHelper
 
         // If both are configured as enabled, log a warning and use the configured provider
         if ($recaptchaEnabled && $turnstileEnabled) {
-            \Log::warning('Both reCAPTCHA and Turnstile are enabled. Only one can be active at a time. Using provider: '.$provider);
+            Log::warning('Both reCAPTCHA and Turnstile are enabled. Only one can be active at a time. Using provider: '.$provider);
         }
 
         if ($provider === 'turnstile') {

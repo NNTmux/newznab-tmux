@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class TurnstileService
 {
@@ -28,7 +29,7 @@ class TurnstileService
 
             return isset($result['success']) && $result['success'] === true;
         } catch (\Exception $e) {
-            \Log::error('Turnstile verification failed: '.$e->getMessage());
+            Log::error('Turnstile verification failed: '.$e->getMessage());
 
             return false;
         }

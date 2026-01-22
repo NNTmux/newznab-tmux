@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Facades\Elasticsearch;
 use App\Facades\Search;
 use App\Models\UsenetGroup;
 use Illuminate\Console\Command;
@@ -91,8 +92,8 @@ class NntmuxResetDb extends Command
             unset($value);
 
             if (config('search.default') === 'elasticsearch') {
-                if (\Elasticsearch::indices()->exists(['index' => 'releases'])) {
-                    \Elasticsearch::indices()->delete(['index' => 'releases']);
+                if (Elasticsearch::indices()->exists(['index' => 'releases'])) {
+                    Elasticsearch::indices()->delete(['index' => 'releases']);
                 }
                 $releases_index = [
                     'index' => 'releases',
@@ -133,10 +134,10 @@ class NntmuxResetDb extends Command
                     ],
                 ];
 
-                \Elasticsearch::indices()->create($releases_index);
+                Elasticsearch::indices()->create($releases_index);
 
-                if (\Elasticsearch::indices()->exists(['index' => 'predb'])) {
-                    \Elasticsearch::indices()->delete(['index' => 'predb']);
+                if (Elasticsearch::indices()->exists(['index' => 'predb'])) {
+                    Elasticsearch::indices()->delete(['index' => 'predb']);
                 }
                 $predb_index = [
                     'index' => 'predb',
@@ -167,11 +168,11 @@ class NntmuxResetDb extends Command
 
                 ];
 
-                \Elasticsearch::indices()->create($predb_index);
+                Elasticsearch::indices()->create($predb_index);
 
                 // Delete and recreate movies index
-                if (\Elasticsearch::indices()->exists(['index' => 'movies'])) {
-                    \Elasticsearch::indices()->delete(['index' => 'movies']);
+                if (Elasticsearch::indices()->exists(['index' => 'movies'])) {
+                    Elasticsearch::indices()->delete(['index' => 'movies']);
                 }
                 $movies_index = [
                     'index' => 'movies',
@@ -208,11 +209,11 @@ class NntmuxResetDb extends Command
                     ],
                 ];
 
-                \Elasticsearch::indices()->create($movies_index);
+                Elasticsearch::indices()->create($movies_index);
 
                 // Delete and recreate tvshows index
-                if (\Elasticsearch::indices()->exists(['index' => 'tvshows'])) {
-                    \Elasticsearch::indices()->delete(['index' => 'tvshows']);
+                if (Elasticsearch::indices()->exists(['index' => 'tvshows'])) {
+                    Elasticsearch::indices()->delete(['index' => 'tvshows']);
                 }
                 $tvshows_index = [
                     'index' => 'tvshows',
@@ -248,7 +249,7 @@ class NntmuxResetDb extends Command
                     ],
                 ];
 
-                \Elasticsearch::indices()->create($tvshows_index);
+                Elasticsearch::indices()->create($tvshows_index);
 
                 $this->info('All done! ElasticSearch indexes are deleted and recreated.');
             } else {

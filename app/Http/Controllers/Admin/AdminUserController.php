@@ -9,6 +9,7 @@ use App\Models\UserDownload;
 use App\Models\UserRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Jrean\UserVerification\Facades\UserVerification;
 use Spatie\Permission\Models\Role;
 
@@ -162,7 +163,7 @@ class AdminUserController extends BasePageController
                         ? $editedUser->rolechangedate->toDateTimeString()
                         : null;
 
-                    \Log::info('AdminUserController - Before updates', [
+                    Log::info('AdminUserController - Before updates', [
                         'user_id' => $editedUser->id,
                         'originalRoleChangeDate' => $originalRoleChangeDate,
                         'current_roles_id' => $editedUser->roles_id,
@@ -191,7 +192,7 @@ class AdminUserController extends BasePageController
                         }
                         $editedUser->refresh();
 
-                        \Log::info('AdminUserController - After expiry update', [
+                        Log::info('AdminUserController - After expiry update', [
                             'user_id' => $editedUser->id,
                             'new_rolechangedate' => $editedUser->rolechangedate,
                             'adminManuallySetExpiry' => $adminManuallySetExpiry,
@@ -201,7 +202,7 @@ class AdminUserController extends BasePageController
                     // If role is changing, handle it with stacking logic
                     // Pass the original expiry so history records the correct old_expiry_date
                     if ($roleChanged && $request->input('role') !== null) {
-                        \Log::info('AdminUserController - About to call updateUserRole', [
+                        Log::info('AdminUserController - About to call updateUserRole', [
                             'user_id' => $editedUser->id,
                             'new_role' => (int) $request->input('role'),
                             'originalRoleChangeDate_passed' => $originalRoleChangeDate,
