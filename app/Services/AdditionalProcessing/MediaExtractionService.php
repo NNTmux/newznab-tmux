@@ -487,5 +487,4 @@ class MediaExtractionService
 
         return $this->mediaInfo;
     }
-
 }
