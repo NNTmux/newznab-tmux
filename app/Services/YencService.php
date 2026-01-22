@@ -163,13 +163,13 @@ class YencService
     {
         if (preg_match('/^(=yBegin.*=yEnd[^$]*)$/ims', $text, $input)) {
             // Extract the encoded data, removing headers and line breaks
-            $input = preg_replace('/(^=yBegin.*\r\n)/im', '', $input[1], 1);
-            $input = preg_replace('/(^=yPart.*\r\n)/im', '', $input, 1);
-            $input = preg_replace('/(^=yEnd.*)/im', '', $input, 1);
-            $input = str_replace(["\r\n", "\r", "\n"], '', trim($input));
+            $encoded = preg_replace('/(^=yBegin.*\r\n)/im', '', $input[1], 1) ?? '';
+            $encoded = preg_replace('/(^=yPart.*\r\n)/im', '', $encoded, 1) ?? '';
+            $encoded = preg_replace('/(^=yEnd.*)/im', '', $encoded, 1) ?? '';
+            $encoded = str_replace(["\r\n", "\r", "\n"], '', trim($encoded));
 
             // Use the fast decode method
-            $text = $this->fastDecode($input);
+            $text = $this->fastDecode($encoded);
         }
 
         return $text;
