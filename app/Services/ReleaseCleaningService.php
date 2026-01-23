@@ -394,7 +394,10 @@ class ReleaseCleaningService
             $hit
         )
         ) {
-            return $hit['title'];
+            return [
+                'cleansubject' => $hit['title'],
+                'properlynamed' => false,
+            ];
         }
 
         return [
