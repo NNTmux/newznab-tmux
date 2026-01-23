@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // Use raw SQL to ensure exact column type matching with existing tables
-        DB::statement("
+        DB::statement('
             CREATE TABLE `user_excluded_categories` (
                 `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `users_id` int(10) unsigned NOT NULL,
@@ -25,7 +25,7 @@ return new class extends Migration
                 CONSTRAINT `FK_uec_users` FOREIGN KEY (`users_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
                 CONSTRAINT `FK_uec_categories` FOREIGN KEY (`categories_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-        ");
+        ');
     }
 
     /**
