@@ -333,7 +333,7 @@ class ApiController extends BasePageController
                 break;
                 //
                 // nzb add request
-                // curl -X POST -F "file=@./The.File.nzb" "https://www.tabula-rasa.pw/api/V1/api?t=nzbadd&apikey=xxx"
+                // curl -X POST -F "file=@./The.File.nzb" "site_url/api/V1/api?t=nzbadd&apikey=xxx"
                 //
             case 'nzbAdd':
                 if (! User::canPost($uid)) {
