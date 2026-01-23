@@ -238,6 +238,36 @@
                 </div>
             </div>
 
+            <!-- Excluded Subcategories -->
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">Exclude Subcategories</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    Select specific subcategories you don't want to see in browse, search, API, and RSS results.
+                    These will be hidden even if you have access to the parent category.
+                </p>
+                <div class="space-y-4 max-h-96 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                    @foreach($categoriesWithSubs as $rootCategory)
+                        <div class="mb-4">
+                            <h4 class="font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
+                                <i class="fas fa-folder mr-2 text-gray-400"></i>{{ $rootCategory->title }}
+                            </h4>
+                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 ml-6">
+                                @foreach($rootCategory->categories as $subcategory)
+                                    <label class="flex items-center text-sm">
+                                        <input type="checkbox"
+                                               name="excluded_categories[]"
+                                               value="{{ $subcategory->id }}"
+                                               {{ in_array($subcategory->id, $userExcludedCategories ?? []) ? 'checked' : '' }}
+                                               class="rounded border-gray-300 dark:border-gray-600 text-red-600 dark:text-red-400 focus:ring-red-500 mr-2">
+                                        <span class="text-gray-600 dark:text-gray-400">{{ $subcategory->title }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
             <!-- Actions -->
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6 flex items-center justify-between">
                 <a href="{{ route('profile') }}" class="px-6 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 transition">

@@ -240,6 +240,11 @@ final class User extends Authenticatable
         return $this->hasOne(PasswordSecurity::class);
     }
 
+    public function excludedCategories(): HasMany
+    {
+        return $this->hasMany(UserExcludedCategory::class, 'users_id');
+    }
+
     // ===== Backward Compatibility Aliases =====
 
     public function request(): HasMany
@@ -1379,6 +1384,9 @@ final class User extends Authenticatable
     /**
      * Get excluded category IDs for a user.
      *
+     * This includes both permission-based exclusions (entire root categories)
+     * and user-selected subcategory exclusions from user_excluded_categories table.
+     *
      * @return array<int>
      *
      * @throws \Exception
@@ -1409,9 +1417,45 @@ final class User extends Authenticatable
             }
         }
 
-        return Category::whereIn('root_categories_id', $excludedRoots)
+        // Get all subcategories that belong to excluded root categories
+        $permissionExclusions = Category::whereIn('root_categories_id', $excludedRoots)
             ->pluck('id')
             ->toArray();
+
+        // Get user's custom excluded subcategories from pivot table
+        $userExclusions = $user->excludedCategories()
+            ->pluck('categories_id')
+            ->toArray();
+
+        // Filter out user exclusions that belong to already excluded root categories
+        // to avoid duplicates
+        $filteredUserExclusions = array_filter($userExclusions, function ($categoryId) use ($excludedRoots) {
+            $category = Category::find($categoryId);
+
+            return $category && ! in_array($category->root_categories_id, $excludedRoots);
+        });
+
+        // Merge permission-based exclusions with user-selected subcategory exclusions
+        return array_unique(array_merge($permissionExclusions, $filteredUserExclusions));
+    }
+
+    /**
+     * Sync user's excluded subcategories.
+     *
+     * @param  array<int>  $categoryIds  Array of category IDs to exclude
+     */
+    public function syncExcludedCategories(array $categoryIds): void
+    {
+        // Delete existing exclusions
+        $this->excludedCategories()->delete();
+
+        // Insert new exclusions
+        foreach ($categoryIds as $categoryId) {
+            UserExcludedCategory::create([
+                'users_id' => $this->id,
+                'categories_id' => (int) $categoryId,
+            ]);
+        }
     }
 
     /**

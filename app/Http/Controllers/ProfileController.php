@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\SendAccountDeletedEmail;
 use App\Models\ReleaseComment;
+use App\Models\RootCategory;
 use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UserRequest;
@@ -174,6 +175,15 @@ class ProfileController extends BasePageController
                         }
                     }
 
+                    // Update excluded subcategories
+                    $excludedCategories = $request->input('excluded_categories', []);
+                    // Ensure all values are integers
+                    $excludedCategories = array_map('intval', array_filter($excludedCategories, 'is_numeric'));
+                    $this->userdata->syncExcludedCategories($excludedCategories);
+
+                    // Clear the category exclusions cache for this user
+                    \Illuminate\Support\Facades\Cache::forget('user_category_exclusions_'.$userid);
+
                     // Handle Console permission
                     if ($request->has('viewconsole')) {
                         if (! $this->userdata->hasDirectPermission('view console')) {
@@ -295,6 +305,7 @@ class ProfileController extends BasePageController
             'error' => $errorStr,
             'user' => $this->userdata,
             'userexccat' => User::getCategoryExclusionById($userid),
+            'userExcludedCategories' => $this->userdata->excludedCategories()->pluck('categories_id')->toArray(),
             'success_2fa' => $success_2fa,
             'error_2fa' => $error_2fa,
             'google2fa_url' => $google2fa_url,
@@ -303,6 +314,9 @@ class ProfileController extends BasePageController
             'publicview' => false,
             'privileged' => $this->userdata->hasRole('Admin') || $this->userdata->hasRole('Moderator'),
             'userinvitedby' => ($this->userdata->invitedby && $this->userdata->invitedby !== '') ? User::find($this->userdata->invitedby) : null,
+            'categoriesWithSubs' => RootCategory::with(['categories' => function ($query) {
+                $query->where('status', 1)->orderBy('title');
+            }])->where('status', 1)->orderBy('title')->get(),
             'meta_title' => 'Edit User Profile',
             'meta_keywords' => 'edit,profile,user,details',
             'meta_description' => 'Edit User Profile for '.$this->userdata->username,
