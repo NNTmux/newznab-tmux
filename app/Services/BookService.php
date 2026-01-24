@@ -144,7 +144,7 @@ class BookService
         $sql = sprintf(
             '
 			SELECT
-				r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, df.failed AS failed,
+				r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, df.failed AS failed_count,
 			boo.*,
 			r.bookinfo_id,
 			g.name AS group_name,

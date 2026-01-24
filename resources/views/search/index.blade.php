@@ -210,10 +210,10 @@
                                     <div class="flex-1">
                                         <div class="flex items-center gap-2 flex-wrap">
                                             <a href="{{ url('/details/' . $result->guid) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium break-words break-all">{{ $result->searchname }}</a>
-                                            @if(!empty($result->failed) && $result->failed > 0)
+                                            @if(!empty($result->failed_count) && $result->failed_count > 0)
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                                                      title="{{ $result->failed }} user(s) reported download failure">
-                                                    <i class="fas fa-exclamation-triangle mr-1"></i> Failed ({{ $result->failed }})
+                                                      title="{{ $result->failed_count }} user(s) reported download failure">
+                                                    <i class="fas fa-exclamation-triangle mr-1"></i> Failed ({{ $result->failed_count }})
                                                 </span>
                                             @endif
                                             @if(isset($result->haspreview) && $result->haspreview == 1)
@@ -341,10 +341,10 @@
                                     <a href="{{ url('/details/' . $result->guid) }}" class="text-lg font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 break-words break-all">
                                         {{ $result->searchname }}
                                     </a>
-                                    @if(!empty($result->failed) && $result->failed > 0)
+                                    @if(!empty($result->failed_count) && $result->failed_count > 0)
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                                              title="{{ $result->failed }} user(s) reported download failure">
-                                            <i class="fas fa-exclamation-triangle mr-1"></i> Failed ({{ $result->failed }})
+                                              title="{{ $result->failed_count }} user(s) reported download failure">
+                                            <i class="fas fa-exclamation-triangle mr-1"></i> Failed ({{ $result->failed_count }})
                                         </span>
                                     @endif
                                     @if(isset($result->haspreview) && $result->haspreview == 1)

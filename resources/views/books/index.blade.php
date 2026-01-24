@@ -107,9 +107,9 @@
                                     <i class="fa fa-book text-4xl text-gray-400"></i>
                                 </div>
                             @endif
-                            @if(!empty($result->failed) && $result->failed > 0)
+                            @if(!empty($result->failed_count) && $result->failed_count > 0)
                                 <div class="absolute top-2 right-2">
-                                    <span class="px-2 py-1 bg-red-600 dark:bg-red-700 text-white text-xs rounded-full shadow-lg" title="{{ $result->failed }} user(s) reported download failure">
+                                    <span class="px-2 py-1 bg-red-600 dark:bg-red-700 text-white text-xs rounded-full shadow-lg" title="{{ $result->failed_count }} user(s) reported download failure">
                                         <i class="fa fa-exclamation-triangle mr-1"></i>Failed
                                     </span>
                                 </div>

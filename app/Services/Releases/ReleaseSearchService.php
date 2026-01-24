@@ -1120,7 +1120,7 @@ class ReleaseSearchService
                     r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,
                     cp.title AS parent_category, c.title AS sub_category,
                     CONCAT(cp.title, ' > ', c.title) AS category_name,
-                    df.failed AS failed,
+                    df.failed AS failed_count,
                     g.name AS group_name,
                     rn.releases_id AS nfoid,
                     re.releases_id AS reid,
