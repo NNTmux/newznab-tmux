@@ -5937,21 +5937,21 @@
         },
         {
             "name": "pear/net_nntp",
-            "version": "2.0.2",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/Net_NNTP.git",
-                "reference": "c3670da79bbf0215704f76757ae7d0106c852b54"
+                "reference": "7c5811b3935dd4b52de4434aef7ec0d78846ec48"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/Net_NNTP/zipball/c3670da79bbf0215704f76757ae7d0106c852b54",
-                "reference": "c3670da79bbf0215704f76757ae7d0106c852b54",
+                "url": "https://api.github.com/repos/DariusIII/Net_NNTP/zipball/7c5811b3935dd4b52de4434aef7ec0d78846ec48",
+                "reference": "7c5811b3935dd4b52de4434aef7ec0d78846ec48",
                 "shasum": ""
             },
             "require": {
                 "pear/pear": "^1.4.5",
-                "php": ">=8.2"
+                "php": ">=8.5"
             },
             "require-dev": {
                 "phpunit/phpunit": "*"
@@ -5981,7 +5981,7 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Net_NNTP",
                 "source": "https://github.com/pear/Net_NNTP"
             },
-            "time": "2026-01-26T12:01:09+00:00"
+            "time": "2026-01-26T12:14:18+00:00"
         },
         {
             "name": "pear/pear",
