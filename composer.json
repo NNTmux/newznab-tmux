@@ -97,7 +97,7 @@
         "stechstudio/laravel-zipstream": "^5.4",
         "stevebauman/location": "^7.5",
         "symfony/http-client": "^7.0",
-        "symfony/postmark-mailer": "^7.0",
+        "symfony/postmark-mailer": "^8.0",
         "symfony/process": "^7.0",
         "vlucas/phpdotenv": "^5.6",
         "voku/simple_html_dom": "^4.8",
