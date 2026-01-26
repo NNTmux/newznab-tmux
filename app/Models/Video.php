@@ -134,32 +134,62 @@ class Video extends Model
      */
     public static function getSeriesList($uid, string $letter = '', string $showname = ''): array
     {
-        if (($letter !== '') && $letter === '0-9') {
-            $letter = '[0-9]';
-        }
+        $params = [
+            'uid' => $uid,
+            'tv_root' => Category::TV_ROOT,
+            'tv_other' => Category::TV_OTHER,
+            'now' => now()->toDateTimeString(),
+        ];
 
-        $qry = self::query()
-            ->select(['videos.*', 'tve.firstaired as prevdate', 'tve.title as previnfo', 'tvi.publisher', 'us.id as userseriesid'])
-            ->join('tv_info as tvi', 'videos.id', '=', 'tvi.videos_id')
-            ->join('tv_episodes as tve', 'videos.id', '=', 'tve.videos_id')
-            ->leftJoin('user_series as us', function ($join) use ($uid) {
-                $join->on('videos.id', '=', 'us.videos_id')->where('us.users_id', '=', $uid);
-            })
-            ->whereBetween('r.categories_id', [Category::TV_ROOT, Category::TV_OTHER])
-            ->where('tve.firstaired', '<', now())
-            ->leftJoin('releases as r', 'r.videos_id', '=', 'videos.id')
-            ->orderBy('videos.title')
-            ->orderByDesc('tve.firstaired')
-            ->groupBy(['videos.id']);
-
+        $letterCondition = '';
         if ($letter !== '') {
-            $qry->whereRaw('videos.title REGEXP ?', ['^'.$letter]);
+            if ($letter === '0-9' || $letter === '[0-9]') {
+                $letterCondition = "AND videos.title REGEXP '^[0-9]'";
+            } else {
+                $letterCondition = 'AND videos.title LIKE :letter';
+                $params['letter'] = $letter.'%';
+            }
         }
 
+        $shownameCondition = '';
         if ($showname !== '') {
-            $qry->where('videos.title', 'like', '%'.$showname.'%');
+            $shownameCondition = 'AND videos.title LIKE :showname';
+            $params['showname'] = '%'.$showname.'%';
         }
 
-        return $qry->get()->toArray();
+        $sql = "
+            SELECT
+                videos.*,
+                tve.firstaired AS prevdate,
+                tve.title AS previnfo,
+                tvi.publisher,
+                us.id AS userseriesid
+            FROM videos
+            INNER JOIN tv_info AS tvi ON videos.id = tvi.videos_id
+            INNER JOIN (
+                SELECT videos_id, MAX(firstaired) AS max_firstaired
+                FROM tv_episodes
+                WHERE firstaired < :now
+                GROUP BY videos_id
+            ) AS latest_ep ON videos.id = latest_ep.videos_id
+            INNER JOIN tv_episodes AS tve
+                ON videos.id = tve.videos_id
+                AND tve.firstaired = latest_ep.max_firstaired
+            LEFT JOIN user_series AS us
+                ON videos.id = us.videos_id
+                AND us.users_id = :uid
+            WHERE EXISTS (
+                SELECT 1
+                FROM releases AS r
+                WHERE r.videos_id = videos.id
+                AND r.categories_id BETWEEN :tv_root AND :tv_other
+            )
+            {$letterCondition}
+            {$shownameCondition}
+            GROUP BY videos.id
+            ORDER BY videos.title ASC
+        ";
+
+        return \Illuminate\Support\Facades\DB::select($sql, $params);
     }
 }
