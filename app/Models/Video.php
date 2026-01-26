@@ -190,6 +190,9 @@ class Video extends Model
             ORDER BY videos.title ASC
         ";
 
-        return \Illuminate\Support\Facades\DB::select($sql, $params);
+        $results = \Illuminate\Support\Facades\DB::select($sql, $params);
+
+        // Convert stdClass objects to arrays for backward compatibility
+        return array_map(fn ($row) => (array) $row, $results);
     }
 }
