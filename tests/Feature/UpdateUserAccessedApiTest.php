@@ -4,69 +4,43 @@ namespace Tests\Feature;
 
 use App\Events\UserAccessedApi;
 use App\Listeners\UpdateUserAccessedApi;
-use App\Models\User;
-use Illuminate\Support\Facades\DB;
-use Mockery;
+use stdClass;
 use Tests\TestCase;
 
 final class UpdateUserAccessedApiTest extends TestCase
 {
     public function test_event_has_ip_property(): void
     {
-        $user = Mockery::mock(User::class);
+        // Use a simple stdClass as the event just stores the user reference
+        $user = new stdClass;
         $user->id = 1;
-
         $event = new UserAccessedApi($user, '192.168.1.100');
-
         $this->assertEquals('192.168.1.100', $event->ip);
         $this->assertSame($user, $event->user);
     }
 
     public function test_event_ip_is_null_when_not_provided(): void
     {
-        $user = Mockery::mock(User::class);
+        $user = new stdClass;
         $user->id = 1;
-
         $event = new UserAccessedApi($user);
-
         $this->assertNull($event->ip);
     }
 
-    public function test_listener_includes_host_in_update_when_ip_provided(): void
+    public function test_listener_is_properly_structured(): void
     {
-        // Skip if we don't have a test database configured
-        if (! $this->canConnectToDatabase()) {
-            $this->markTestSkipped('No database connection available for this test.');
-        }
-
-        // Create a mock user to check that update is called with correct data
-        $user = Mockery::mock(User::class);
-        $user->id = 999;
-
-        // We can't easily test the actual database update without full migration,
-        // so we test that the event and listener are properly structured
-        $event = new UserAccessedApi($user, '192.168.1.100');
+        // Test that the listener class exists and is properly structured
         $listener = new UpdateUserAccessedApi;
-
-        // The listener should run without throwing an exception about missing IP
         $this->assertInstanceOf(UpdateUserAccessedApi::class, $listener);
-        $this->assertEquals('192.168.1.100', $event->ip);
+        $this->assertTrue(method_exists($listener, 'handle'));
     }
 
-    private function canConnectToDatabase(): bool
+    public function test_event_stores_user_and_ip_correctly(): void
     {
-        try {
-            DB::connection()->getPdo();
-
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    protected function tearDown(): void
-    {
-        Mockery::close();
-        parent::tearDown();
+        $user = new stdClass;
+        $user->id = 999;
+        $event = new UserAccessedApi($user, '10.0.0.1');
+        $this->assertEquals(999, $event->user->id);
+        $this->assertEquals('10.0.0.1', $event->ip);
     }
 }

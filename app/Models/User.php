@@ -25,7 +25,9 @@ use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
@@ -395,6 +397,90 @@ final class User extends Authenticatable
                 ? (int) now()->diffInDays($this->rolechangedate, false)
                 : null,
         );
+    }
+
+    /**
+     * Get country code from IP address lookup.
+     * Uses ip-api.com with caching to minimize API calls.
+     */
+    protected function countryCode(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): ?string => $this->getCountryFromIp()['countryCode'] ?? null,
+        );
+    }
+
+    /**
+     * Get country name from IP address lookup.
+     * Uses ip-api.com with caching to minimize API calls.
+     */
+    protected function countryName(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): ?string => $this->getCountryFromIp()['country'] ?? null,
+        );
+    }
+
+    /**
+     * Lookup country information from IP address using ip-api.com.
+     *
+     * @return array{country: string|null, countryCode: string|null}
+     */
+    protected function getCountryFromIp(): array
+    {
+        $ip = $this->host;
+
+        if (empty($ip)) {
+            return ['country' => null, 'countryCode' => null];
+        }
+
+        // Skip private/local IPs
+        if (! filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+            return ['country' => null, 'countryCode' => null];
+        }
+
+        $cacheKey = 'ip_country_lookup_'.md5($ip);
+
+        return Cache::remember($cacheKey, 86400, function () use ($ip) {
+            return $this->fetchCountryFromApi($ip);
+        });
+    }
+
+    /**
+     * Fetch country info from ip-api.com.
+     *
+     * @return array{country: string|null, countryCode: string|null}
+     */
+    protected function fetchCountryFromApi(string $ip): array
+    {
+        try {
+            $response = Http::timeout(3)
+                ->retry(2, 100)
+                ->get("https://ip-api.com/json/{$ip}", [
+                    'fields' => 'status,country,countryCode',
+                ]);
+
+            if (! $response->successful()) {
+                Log::debug('Country lookup failed', ['ip' => $ip, 'status' => $response->status()]);
+
+                return ['country' => null, 'countryCode' => null];
+            }
+
+            $data = $response->json();
+
+            if (($data['status'] ?? '') !== 'success') {
+                return ['country' => null, 'countryCode' => null];
+            }
+
+            return [
+                'country' => $data['country'] ?? null,
+                'countryCode' => $data['countryCode'] ?? null,
+            ];
+        } catch (\Exception $e) {
+            Log::debug('Country lookup exception', ['ip' => $ip, 'error' => $e->getMessage()]);
+
+            return ['country' => null, 'countryCode' => null];
+        }
     }
 
     // ===== Pending Role Methods =====
