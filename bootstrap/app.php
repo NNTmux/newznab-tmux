@@ -37,6 +37,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append([
             \Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::class,
             \App\Http\Middleware\ForceJsonOnAPI::class,
+            \App\Http\Middleware\BlockAbusiveServices::class, // Block AIOStreams, Oracle Cloud, UsenetStreamer, Cloudflare WARP
         ]);
 
         $middleware->replace(
