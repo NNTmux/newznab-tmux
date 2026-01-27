@@ -456,7 +456,7 @@ final class User extends Authenticatable
         try {
             $response = Http::timeout(3)
                 ->retry(2, 100)
-                ->get("https://ip-api.com/json/{$ip}", [
+                ->get("http://ip-api.com/json/{$ip}", [
                     'fields' => 'status,country,countryCode',
                 ]);
 
