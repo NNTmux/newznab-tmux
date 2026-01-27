@@ -422,6 +422,36 @@ final class User extends Authenticatable
     }
 
     /**
+     * Get country flag emoji from country code.
+     * Converts 2-letter country code to Unicode regional indicator symbols.
+     */
+    protected function countryFlag(): Attribute
+    {
+        return Attribute::make(
+            get: function (): ?string {
+                $countryCode = $this->getCountryFromIp()['countryCode'] ?? null;
+
+                if (empty($countryCode) || strlen($countryCode) !== 2) {
+                    return null;
+                }
+
+                // Convert country code to regional indicator symbols (flag emoji)
+                // Each letter is converted to its regional indicator equivalent
+                // A = 🇦 (U+1F1E6), B = 🇧 (U+1F1E7), etc.
+                $countryCode = strtoupper($countryCode);
+                $flag = '';
+
+                for ($i = 0; $i < 2; $i++) {
+                    $char = ord($countryCode[$i]) - ord('A') + 0x1F1E6;
+                    $flag .= mb_chr($char, 'UTF-8');
+                }
+
+                return $flag;
+            },
+        );
+    }
+
+    /**
      * Lookup country information from IP address using ip-api.com.
      *
      * @return array{country: string|null, countryCode: string|null}

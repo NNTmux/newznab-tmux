@@ -101,4 +101,31 @@ final class UserCountryLookupTest extends TestCase
         // Clean up
         Cache::forget('ip_country_lookup_'.md5($ip));
     }
+
+    public function test_country_flag_returns_emoji_flag(): void
+    {
+        // Set up a cache entry for US
+        $ip = '8.8.4.4';
+        $cacheKey = 'ip_country_lookup_'.md5($ip);
+
+        Cache::put($cacheKey, [
+            'country' => 'United States',
+            'countryCode' => 'US',
+        ], 86400);
+
+        $user = new User;
+        $user->host = $ip;
+
+        $this->assertEquals('🇺🇸', $user->country_flag);
+
+        Cache::forget($cacheKey);
+    }
+
+    public function test_country_flag_returns_null_for_no_host(): void
+    {
+        $user = new User;
+        $user->host = null;
+
+        $this->assertNull($user->country_flag);
+    }
 }

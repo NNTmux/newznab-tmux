@@ -266,7 +266,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $user->host ?? 'N/A' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                     @if(!empty($user->country_code))
-                                        <span title="{{ $user->country_name }}">{{ $user->country_code }}</span>
+                                        <span title="{{ $user->country_name }}">{{ $user->country_flag }} {{ $user->country_code }}</span>
                                     @else
                                         N/A
                                     @endif
