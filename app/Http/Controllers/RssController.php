@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserAccessedApi;
 use App\Http\Controllers\Api\RSS;
 use App\Models\Category;
 use App\Models\User;
@@ -241,6 +242,7 @@ class RssController extends BasePageController
             return response()->json(['error' => 'You have reached your daily limit for API requests!'], 403);
         } else {
             UserRequest::addApiRequest($rssToken, $request->getRequestUri());
+            event(new UserAccessedApi($res, $request->ip()));
         }
         $params =
             [

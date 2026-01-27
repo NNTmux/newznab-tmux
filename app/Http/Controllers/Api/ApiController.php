@@ -124,7 +124,7 @@ class ApiController extends BasePageController
 
         // Record user access to the api, if its been called by a user (i.e. capabilities request do not require a user to be logged in or key provided).
         if ($uid !== '') {
-            event(new UserAccessedApi($res));
+            event(new UserAccessedApi($res, $request->ip()));
             $thisRequests = UserRequest::getApiRequests($uid);
             $grabs = UserDownload::getDownloadRequests($uid);
             if ($thisRequests > $maxRequests) {

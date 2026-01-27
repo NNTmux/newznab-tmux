@@ -22,6 +22,12 @@ class UpdateUserAccessedApi
      */
     public function handle(UserAccessedApi $event): void
     {
-        User::find($event->user->id)->update(['apiaccess' => now()]);
+        $updateData = ['apiaccess' => now()];
+
+        if ($event->ip !== null) {
+            $updateData['host'] = $event->ip;
+        }
+
+        User::find($event->user->id)->update($updateData);
     }
 }

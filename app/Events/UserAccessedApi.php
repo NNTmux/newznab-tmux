@@ -15,11 +15,14 @@ class UserAccessedApi
      */
     public $user;
 
+    public ?string $ip;
+
     /**
      * Create a new event instance.
      */
-    public function __construct($user)
+    public function __construct($user, ?string $ip = null)
     {
         $this->user = $user;
+        $this->ip = $ip;
     }
 }

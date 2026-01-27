@@ -98,7 +98,7 @@ class ApiV2Controller extends BasePageController
 
         // Queue API request logging asynchronously (non-blocking)
         UserRequest::addApiRequest($apiToken, $request->getRequestUri());
-        event(new UserAccessedApi($user));
+        event(new UserAccessedApi($user, $request->ip()));
 
         // Get request parameters efficiently
         $imdbId = (int) $request->input('imdbid', -1);
@@ -182,7 +182,7 @@ class ApiV2Controller extends BasePageController
         $maxAge = $this->api->maxAge($request);
         $groupName = $this->api->group($request);
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
-        event(new UserAccessedApi($user));
+        event(new UserAccessedApi($user, $request->ip()));
         $categoryID = $this->api->categoryID($request);
         $limit = $this->api->limit($request);
 
@@ -257,7 +257,7 @@ class ApiV2Controller extends BasePageController
         $this->api->verifyEmptyParameter($request, 'ep');
         $maxAge = $this->api->maxAge($request);
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
-        event(new UserAccessedApi($user));
+        event(new UserAccessedApi($user, $request->ip()));
 
         $siteIdArr = [
             'id' => $request->input('vid') ?? null,
@@ -320,7 +320,7 @@ class ApiV2Controller extends BasePageController
         if ($user === null) {
             return response()->json(['error' => 'Invalid API Token'], 403);
         }
-        event(new UserAccessedApi($user));
+        event(new UserAccessedApi($user, $request->ip()));
         UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
         $relData = Release::checkGuidForApi($request->input('id'));
         if ($relData) {
@@ -344,7 +344,7 @@ class ApiV2Controller extends BasePageController
         if ($user === null) {
             return response()->json(['error' => 'Invalid API Token'], 403);
         }
-        event(new UserAccessedApi($user));
+        event(new UserAccessedApi($user, $request->ip()));
         $relData = Release::getByGuid($request->input('id'));
 
         $relData = fractal($relData, new DetailsTransformer($user));
