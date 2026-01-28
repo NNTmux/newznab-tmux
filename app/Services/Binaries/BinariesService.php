@@ -443,7 +443,9 @@ class BinariesService
             return time();
         }
 
-        return strtotime($date);
+        $timestamp = strtotime($date);
+
+        return $timestamp !== false ? $timestamp : time();
     }
 
     /**
@@ -618,9 +620,10 @@ class BinariesService
             // New group - update first record
             if ($groupMySQL['first_record_postdate'] === null && (int) $groupMySQL['first_record'] === 0) {
                 $groupMySQL['first_record'] = $scanSummary['firstArticleNumber'];
-                $groupMySQL['first_record_postdate'] = isset($scanSummary['firstArticleDate'])
+                $firstArticleTimestamp = isset($scanSummary['firstArticleDate'])
                     ? strtotime($scanSummary['firstArticleDate'])
                     : $this->postdate($groupMySQL['first_record'], $groupNNTP);
+                $groupMySQL['first_record_postdate'] = $firstArticleTimestamp !== false ? $firstArticleTimestamp : time();
 
                 UsenetGroup::query()->where('id', $groupMySQL['id'])->update([
                     'first_record' => $scanSummary['firstArticleNumber'],
@@ -628,9 +631,10 @@ class BinariesService
                 ]);
             }
 
-            $lastArticleDate = isset($scanSummary['lastArticleDate'])
+            $lastArticleTimestamp = isset($scanSummary['lastArticleDate'])
                 ? strtotime($scanSummary['lastArticleDate'])
                 : $this->postdate($scanSummary['lastArticleNumber'], $groupNNTP);
+            $lastArticleDate = $lastArticleTimestamp !== false ? $lastArticleTimestamp : time();
 
             UsenetGroup::query()->where('id', $groupMySQL['id'])->update([
                 'last_record' => $scanSummary['lastArticleNumber'],
