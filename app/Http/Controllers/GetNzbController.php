@@ -329,8 +329,18 @@ class GetNzbController extends BasePageController
      */
     private function streamModifiedNzbContent(string $nzbPath, int $uid): void
     {
-        $fileHandle = gzopen($nzbPath, 'rb');
+        if (! File::exists($nzbPath)) {
+            Log::warning('NZB file not found during streaming', ['path' => $nzbPath]);
+            echo '<?xml version="1.0" encoding="UTF-8"?><error>NZB file not found</error>';
+
+            return;
+        }
+
+        $fileHandle = @gzopen($nzbPath, 'rb');
         if ($fileHandle === false) {
+            Log::warning('Failed to open NZB file for streaming', ['path' => $nzbPath]);
+            echo '<?xml version="1.0" encoding="UTF-8"?><error>Failed to read NZB file</error>';
+
             return;
         }
 
