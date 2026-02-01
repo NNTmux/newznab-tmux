@@ -148,6 +148,24 @@
                                             <h3 class="text-xl font-bold text-gray-900">{{ $result->title }}</h3>
                                         @endif
 
+                                        @if(!empty($result->grp_release_reports))
+                                            @php
+                                                $reportCounts = array_filter(explode(',', $result->grp_release_reports));
+                                                $totalReports = array_sum($reportCounts);
+                                                $reportReasonsRaw = !empty($result->grp_release_report_reasons)
+                                                    ? implode(',', array_unique(array_filter(preg_split('/[|,]/', $result->grp_release_report_reasons))))
+                                                    : '';
+                                                $reportReasons = \App\Models\ReleaseReport::reasonKeysToLabels($reportReasonsRaw);
+                                            @endphp
+                                            @if($totalReports > 0)
+                                                <div class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 border border-orange-200 dark:border-orange-800 mt-1"
+                                                     title="Reported: {{ $reportReasons }}">
+                                                    <i class="fas fa-flag mr-1"></i>
+                                                    <span>{{ $totalReports }} report{{ $totalReports > 1 ? 's' : '' }}</span>
+                                                </div>
+                                            @endif
+                                        @endif
+
                                         @if(!empty($result->grp_release_failed))
                                             @php
                                                 $failedCounts = array_filter(explode(',', $result->grp_release_failed));
@@ -227,6 +245,7 @@
                                         $releaseNames = isset($result->grp_release_name) ? explode('#', $result->grp_release_name) : [];
                                         $releaseSizes = isset($result->grp_release_size) ? explode(',', $result->grp_release_size) : [];
                                         $releaseGuids = isset($result->grp_release_guid) ? explode(',', $result->grp_release_guid) : [];
+                                        $releaseIds = isset($result->grp_release_id) ? explode(',', $result->grp_release_id) : [];
                                         $releasePostDates = isset($result->grp_release_postdate) ? explode(',', $result->grp_release_postdate) : [];
                                         $releaseAddDates = isset($result->grp_release_adddate) ? explode(',', $result->grp_release_adddate) : [];
                                         $releaseHasPreview = isset($result->grp_haspreview) ? explode(',', $result->grp_haspreview) : [];
@@ -240,6 +259,7 @@
                                         $releaseNames = array_slice($releaseNames, 0, $maxReleases);
                                         $releaseSizes = array_slice($releaseSizes, 0, $maxReleases);
                                         $releaseGuids = array_slice($releaseGuids, 0, $maxReleases);
+                                        $releaseIds = array_slice($releaseIds, 0, $maxReleases);
                                         $releasePostDates = array_slice($releasePostDates, 0, $maxReleases);
                                         $releaseAddDates = array_slice($releaseAddDates, 0, $maxReleases);
                                         $releaseHasPreview = array_slice($releaseHasPreview, 0, $maxReleases);
@@ -327,6 +347,9 @@
                                                                     <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-600 dark:bg-gray-700 text-white hover:bg-gray-700 dark:hover:bg-gray-800 transition">
                                                                         <i class="fas fa-info-circle mr-1"></i> Details
                                                                     </a>
+                                                                    @if(isset($releaseIds[$index]))
+                                                                        <x-report-button :release-id="(int)$releaseIds[$index]" variant="icon" />
+                                                                    @endif
                                                                 </div>
                                                             </div>
                                                         </div>

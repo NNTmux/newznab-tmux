@@ -67,6 +67,9 @@
         </button>
         <div id="releases-menu" class="hidden mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/release-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">Release List</a>
+            <a href="{{ url('/admin/release-reports') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">
+                <i class="fas fa-flag text-red-500 mr-1"></i> Release Reports
+            </a>
             <a href="{{ url('/admin/failrel-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">Failed Releases</a>
             <a href="{{ url('/admin/category-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">Categories</a>
         </div>

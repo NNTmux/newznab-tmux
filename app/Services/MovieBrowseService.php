@@ -77,11 +77,14 @@ class MovieBrowseService
             ."GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_comments, "
             ."GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_grabs, "
             ."GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_failed, "
+            ."GROUP_CONCAT(rr.report_count ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_reports, "
+            ."GROUP_CONCAT(rr.report_reasons ORDER BY r.postdate DESC SEPARATOR '|' ) AS grp_release_report_reasons, "
             ."GROUP_CONCAT(cp.title, ' > ', c.title ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_catname, "
             .'m.*, g.name AS group_name, rn.releases_id AS nfoid FROM releases r '
             .'LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id '
             .'LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id '
             .'LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id '
+            .'LEFT OUTER JOIN (SELECT releases_id, COUNT(*) AS report_count, GROUP_CONCAT(DISTINCT reason SEPARATOR \', \') AS report_reasons FROM release_reports WHERE status IN (\'pending\', \'reviewed\') GROUP BY releases_id) rr ON rr.releases_id = r.id '
             .'LEFT OUTER JOIN categories c ON c.id = r.categories_id '
             .'LEFT OUTER JOIN root_categories cp ON cp.id = c.root_categories_id '
             .'INNER JOIN movieinfo m ON m.imdbid = r.imdbid '

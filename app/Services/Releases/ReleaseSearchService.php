@@ -1121,6 +1121,8 @@ class ReleaseSearchService
                     cp.title AS parent_category, c.title AS sub_category,
                     CONCAT(cp.title, ' > ', c.title) AS category_name,
                     df.failed AS failed_count,
+                    rr.report_count AS report_count,
+                    rr.report_reasons AS report_reasons,
                     g.name AS group_name,
                     rn.releases_id AS nfoid,
                     re.releases_id AS reid,
@@ -1136,6 +1138,7 @@ class ReleaseSearchService
             LEFT JOIN categories c ON c.id = r.categories_id
             LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
             LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
+            LEFT OUTER JOIN (SELECT releases_id, COUNT(*) AS report_count, GROUP_CONCAT(DISTINCT reason SEPARATOR ', ') AS report_reasons FROM release_reports WHERE status IN ('pending', 'reviewed') GROUP BY releases_id) rr ON rr.releases_id = r.id
             %s",
             $whereSql
         );

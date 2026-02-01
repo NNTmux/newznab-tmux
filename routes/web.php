@@ -154,6 +154,11 @@ Route::middleware('isVerified')->group(function () {
     Route::post('profile/update-theme', [ProfileController::class, 'updateTheme'])->name('profile.update-theme');
     Route::match(['GET', 'POST'], 'search', [SearchController::class, 'search'])->name('search');
 
+    // Release Report routes
+    Route::post('release-report', [\App\Http\Controllers\ReleaseReportController::class, 'store'])->name('release-report.store');
+    Route::get('release-report/reasons', [\App\Http\Controllers\ReleaseReportController::class, 'getReasons'])->name('release-report.reasons');
+    Route::get('release-report/check', [\App\Http\Controllers\ReleaseReportController::class, 'checkReported'])->name('release-report.check');
+
     Route::match(['GET', 'POST'], 'mymovies', [MyMoviesController::class, 'show'])->name('mymovies');
     Route::match(['GET', 'POST'], 'myshows', [MyShowsController::class, 'show'])->name('myshows');
     Route::match(['GET', 'POST'], 'myshows/browse', [MyShowsController::class, 'browse'])->name('myshows.browse');
@@ -236,6 +241,14 @@ Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
     Route::match(['GET', 'POST'], 'tmux-edit', [AdminTmuxController::class, 'edit'])->name('admin.tmux-edit');
     Route::get('release-list', [AdminReleasesController::class, 'index'])->name('admin.release-list');
     Route::post('release-delete/{id}', [AdminReleasesController::class, 'destroy'])->name('admin.release-delete');
+
+    // Release Reports Management
+    Route::get('release-reports', [\App\Http\Controllers\Admin\AdminReleaseReportController::class, 'index'])->name('admin.release-reports');
+    Route::post('release-reports/{id}/status', [\App\Http\Controllers\Admin\AdminReleaseReportController::class, 'updateStatus'])->name('admin.release-reports.update-status');
+    Route::post('release-reports/{id}/delete-release', [\App\Http\Controllers\Admin\AdminReleaseReportController::class, 'deleteRelease'])->name('admin.release-reports.delete-release');
+    Route::post('release-reports/{id}/dismiss', [\App\Http\Controllers\Admin\AdminReleaseReportController::class, 'dismiss'])->name('admin.release-reports.dismiss');
+    Route::post('release-reports/bulk', [\App\Http\Controllers\Admin\AdminReleaseReportController::class, 'bulkAction'])->name('admin.release-reports.bulk');
+
     Route::get('show-list', [AdminShowsController::class, 'index'])->name('admin.show-list');
     Route::match(['GET', 'POST'], 'show-edit', [AdminShowsController::class, 'edit'])->name('admin.show-edit');
     Route::get('show-remove/{id}', [AdminShowsController::class, 'destroy'])->name('admin.show-remove');

@@ -9,6 +9,7 @@ use App\Models\ReleaseComment;
 use App\Models\ReleaseFile;
 use App\Models\ReleaseNfo;
 use App\Models\ReleaseRegex;
+use App\Models\ReleaseReport;
 use App\Models\Settings;
 use App\Models\UserDownload;
 use App\Models\Video;
@@ -74,6 +75,11 @@ class DetailsController extends BasePageController
             $comments = ReleaseComment::getComments($data['id']);
             $similars = $this->releaseSearchService->searchSimilar($data['id'], $data['searchname'], $this->userdata->categoryexclusions);
             $failed = DnzbFailure::getFailedCount($data['id']);
+            $reportData = ReleaseReport::where('releases_id', $data['id'])
+                ->whereIn('status', ['pending', 'reviewed'])
+                ->get();
+            $reportCount = $reportData->count();
+            $reportReasons = ReleaseReport::reasonKeysToLabels($reportData->pluck('reason')->unique()->implode(', '));
             $downloadedBy = UserDownload::query()->with('user')->where('releases_id', $data['id'])->get(['users_id']);
 
             $showInfo = '';
@@ -183,6 +189,8 @@ class DetailsController extends BasePageController
                 'similars' => $similars !== false ? $similars : [],
                 'privateprofiles' => config('nntmux_settings.private_profiles'),
                 'failed' => $failed,
+                'reportCount' => $reportCount,
+                'reportReasons' => $reportReasons,
                 'regex' => $releaseRegex,
                 'downloadedby' => $downloadedBy,
                 'meta_title' => 'View NZB',

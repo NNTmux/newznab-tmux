@@ -210,6 +210,12 @@
                                     <div class="flex-1">
                                         <div class="flex items-center gap-2 flex-wrap">
                                             <a href="{{ url('/details/' . $result->guid) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium break-words break-all">{{ $result->searchname }}</a>
+                                            @if(!empty($result->report_count) && $result->report_count > 0)
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200"
+                                                      title="Reported: {{ \App\Models\ReleaseReport::reasonKeysToLabels($result->report_reasons ?? '') }}">
+                                                    <i class="fas fa-flag mr-1"></i> Reported ({{ $result->report_count }})
+                                                </span>
+                                            @endif
                                             @if(!empty($result->failed_count) && $result->failed_count > 0)
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
                                                       title="{{ $result->failed_count }} user(s) reported download failure">
@@ -322,6 +328,7 @@
                                                 <i class="fa fa-film"></i>
                                             </a>
                                         @endif
+                                        <x-report-button :release-id="$result->id" variant="icon" />
                                     </div>
                                 </td>
                             </tr>
@@ -341,6 +348,12 @@
                                     <a href="{{ url('/details/' . $result->guid) }}" class="text-lg font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 break-words break-all">
                                         {{ $result->searchname }}
                                     </a>
+                                    @if(!empty($result->report_count) && $result->report_count > 0)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200"
+                                              title="Reported: {{ \App\Models\ReleaseReport::reasonKeysToLabels($result->report_reasons ?? '') }}">
+                                            <i class="fas fa-flag mr-1"></i> Reported ({{ $result->report_count }})
+                                        </span>
+                                    @endif
                                     @if(!empty($result->failed_count) && $result->failed_count > 0)
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
                                               title="{{ $result->failed_count }} user(s) reported download failure">
@@ -429,6 +442,7 @@
                                             <i class="fa fa-film"></i>
                                         </a>
                                     @endif
+                                    <x-report-button :release-id="$result->id" variant="icon" />
                                 </div>
                             </div>
                         </div>

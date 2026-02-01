@@ -76,6 +76,11 @@ class Release extends Model
         return $this->hasMany(ReleaseComment::class, 'releases_id');
     }
 
+    public function reports(): HasMany
+    {
+        return $this->hasMany(ReleaseReport::class, 'releases_id');
+    }
+
     public function releaseGroup(): HasMany
     {
         return $this->hasMany(ReleasesGroups::class, 'releases_id');

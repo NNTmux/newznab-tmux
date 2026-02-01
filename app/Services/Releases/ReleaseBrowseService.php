@@ -63,6 +63,8 @@ class ReleaseBrowseService
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				CONCAT(cp.id, ',', c.id) AS category_ids,
                             df.failed AS failed_count,
+                            rr.report_count AS report_count,
+                            rr.report_reasons AS report_reasons,
 				rn.releases_id AS nfoid,
 				re.releases_id AS reid,
 				v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
@@ -85,6 +87,7 @@ class ReleaseBrowseService
 			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
+			LEFT OUTER JOIN (SELECT releases_id, COUNT(*) AS report_count, GROUP_CONCAT(DISTINCT reason SEPARATOR ', ') AS report_reasons FROM release_reports WHERE status IN ('pending', 'reviewed') GROUP BY releases_id) rr ON rr.releases_id = r.id
 			GROUP BY r.id
 			ORDER BY %8\$s %9\$s",
             $this->showPasswords(),

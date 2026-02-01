@@ -30,12 +30,21 @@
                     <div class="flex-1">
                         <div class="mb-3">
                             <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2 break-words break-all">{{ $release->searchname }}</h2>
-                            @if(!empty($failed) && $failed > 0)
-                                <div class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-red-100 text-red-800 border border-red-200">
-                                    <i class="fas fa-exclamation-triangle mr-2"></i>
-                                    <span>{{ $failed }} user{{ $failed > 1 ? 's' : '' }} reported download failure</span>
-                                </div>
-                            @endif
+                            <div class="flex flex-wrap gap-2">
+                                @if(!empty($reportCount) && $reportCount > 0)
+                                    <div class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 border border-orange-200 dark:border-orange-800"
+                                         title="Reported: {{ $reportReasons ?? 'Unknown' }}">
+                                        <i class="fas fa-flag mr-2"></i>
+                                        <span>{{ $reportCount }} report{{ $reportCount > 1 ? 's' : '' }}: {{ $reportReasons ?? 'Unknown' }}</span>
+                                    </div>
+                                @endif
+                                @if(!empty($failed) && $failed > 0)
+                                    <div class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-red-100 text-red-800 border border-red-200">
+                                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                                        <span>{{ $failed }} user{{ $failed > 1 ? 's' : '' }} reported download failure</span>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                         <div class="flex flex-wrap gap-2">
                             <a href="{{ url('/getnzb/' . $release->guid) }}" class="download-nzb px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition inline-flex items-center">
@@ -49,6 +58,7 @@
                                     <i class="fas fa-file-alt mr-2"></i> View NFO
                                 </button>
                             @endif
+                            <x-report-button :release-id="$release->id" variant="button" />
                             @auth
                                 @if(auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Moderator'))
                                     <a href="{{ route('admin.release-edit', ['id' => $release->guid]) }}" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition inline-flex items-center" title="Edit Release">
