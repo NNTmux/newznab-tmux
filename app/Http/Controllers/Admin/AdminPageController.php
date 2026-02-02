@@ -129,6 +129,11 @@ class AdminPageController extends BasePageController
             return \App\Models\DnzbFailure::count();
         });
 
+        // Cache reported releases count for 5 minutes
+        $reportedCount = \Illuminate\Support\Facades\Cache::remember('admin_stats_reported_count', 300, function () {
+            return \App\Models\ReleaseReport::where('status', 'pending')->count();
+        });
+
         // Today's counts can be cached for 1 minute since they change frequently
         $releasesToday = \Illuminate\Support\Facades\Cache::remember('admin_stats_releases_today_'.$today, 60, function () use ($today) {
             return \App\Models\Release::whereRaw('DATE(adddate) = ?', [$today])->count();
@@ -146,6 +151,7 @@ class AdminPageController extends BasePageController
             'groups' => $groupsCount,
             'active_groups' => $activeGroupsCount,
             'failed' => $failedCount,
+            'reported' => $reportedCount,
             'disk_free' => $this->getDiskSpace(),
         ];
     }

@@ -9,7 +9,7 @@
     </div>
 
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <!-- Total Releases -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between">
@@ -78,6 +78,24 @@
             <div class="mt-4">
                 <a href="{{ url('/admin/failrel-list') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
                     View failed releases <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Reported Releases -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Reported Releases</p>
+                    <p class="text-3xl font-bold text-gray-800 dark:text-gray-200">{{ number_format($stats['reported'] ?? 0) }}</p>
+                </div>
+                <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-flag text-2xl text-orange-600 dark:text-orange-400"></i>
+                </div>
+            </div>
+            <div class="mt-4">
+                <a href="{{ url('/admin/release-reports') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                    View reports <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
         </div>
