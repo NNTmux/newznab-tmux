@@ -6,6 +6,8 @@ use App\Facades\Search;
 use App\Models\MovieInfo;
 use App\Models\Release;
 use App\Models\Video;
+use App\Services\Nzb\NzbService;
+use App\Services\ReleaseImageService;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -58,6 +60,39 @@ class ReleaseObserver
 
         if ($changed) {
             $this->syncToSearchIndex($release);
+        }
+    }
+
+    /**
+     * Handle the Release "deleting" event.
+     *
+     * When a release is about to be deleted, remove the NZB file and associated images from disk.
+     * This runs before the model is deleted so we still have access to the guid.
+     */
+    public function deleting(Release $release): void
+    {
+        // Delete NZB file
+        try {
+            $nzbService = app(NzbService::class);
+            $nzbService->deleteNzb($release->guid);
+        } catch (\Throwable $e) {
+            Log::error('ReleaseObserver: Failed to delete NZB file', [
+                'release_id' => $release->id,
+                'guid' => $release->guid,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // Delete associated images (previews, thumbnails, video samples)
+        try {
+            $releaseImageService = app(ReleaseImageService::class);
+            $releaseImageService->delete($release->guid);
+        } catch (\Throwable $e) {
+            Log::error('ReleaseObserver: Failed to delete release images', [
+                'release_id' => $release->id,
+                'guid' => $release->guid,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 
