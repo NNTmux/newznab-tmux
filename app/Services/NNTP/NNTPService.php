@@ -182,6 +182,17 @@ class NNTPService extends \Net_NNTP_Client
     }
 
     /**
+     * Check if a value is a Net_NNTP_Error instance.
+     *
+     * @param  mixed  $data  The value to check
+     * @return bool True if $data is a Net_NNTP_Error instance
+     */
+    public static function isError(mixed $data): bool
+    {
+        return \Net_NNTP_Error::isError($data);
+    }
+
+    /**
      * Destruct.
      * Close the NNTP connection if still connected.
      */
