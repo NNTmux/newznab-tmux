@@ -143,6 +143,13 @@ Route::middleware('isVerified')->group(function () {
         Route::match(['GET', 'POST'], 'Console/{id?}', [ConsoleController::class, 'show'])->name('Console');
         Route::match(['GET', 'POST'], 'XXX/{id?}', [AdultController::class, 'show'])->name('XXX');
         Route::match(['GET', 'POST'], 'Books/{id?}', [BooksController::class, 'index'])->name('Books');
+        // TV-related routes
+        Route::match(['GET', 'POST'], 'series/{id?}', [SeriesController::class, 'index'])->name('series');
+        Route::match(['GET', 'POST'], 'trending-tv', [SeriesController::class, 'showTrending'])->name('trending-tv');
+        Route::match(['GET', 'POST'], 'myshows', [MyShowsController::class, 'show'])->name('myshows');
+        Route::match(['GET', 'POST'], 'myshows/browse', [MyShowsController::class, 'browse'])->name('myshows.browse');
+        // Movies-related routes
+        Route::match(['GET', 'POST'], 'mymovies', [MyMoviesController::class, 'show'])->name('mymovies');
     });
 
     Route::match(['GET', 'POST'], 'nfo/{id?}', [NfoController::class, 'showNfo'])->name('nfo');
@@ -159,12 +166,7 @@ Route::middleware('isVerified')->group(function () {
     Route::get('release-report/reasons', [\App\Http\Controllers\ReleaseReportController::class, 'getReasons'])->name('release-report.reasons');
     Route::get('release-report/check', [\App\Http\Controllers\ReleaseReportController::class, 'checkReported'])->name('release-report.check');
 
-    Route::match(['GET', 'POST'], 'mymovies', [MyMoviesController::class, 'show'])->name('mymovies');
-    Route::match(['GET', 'POST'], 'myshows', [MyShowsController::class, 'show'])->name('myshows');
-    Route::match(['GET', 'POST'], 'myshows/browse', [MyShowsController::class, 'browse'])->name('myshows.browse');
     Route::get('api/release/{guid}/filelist', [\App\Http\Controllers\Api\FileListApiController::class, 'getFileList'])->name('api.filelist');
-    Route::match(['GET', 'POST'], 'series/{id?}', [SeriesController::class, 'index'])->name('series');
-    Route::match(['GET', 'POST'], 'trending-tv', [SeriesController::class, 'showTrending'])->name('trending-tv');
     Route::match(['GET', 'POST'], 'ajax_profile', [AjaxController::class, 'profile'])->name('ajax_profile');
     Route::match(['GET', 'POST'], '2fa', [PasswordSecurityController::class, 'show2faForm'])->name('2fa');
     Route::get('2fa/enable', [PasswordSecurityController::class, 'showEnable2faForm'])->name('2fa.enable');
