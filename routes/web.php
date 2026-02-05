@@ -249,6 +249,7 @@ Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
     Route::post('release-reports/{id}/status', [\App\Http\Controllers\Admin\AdminReleaseReportController::class, 'updateStatus'])->name('admin.release-reports.update-status');
     Route::post('release-reports/{id}/delete-release', [\App\Http\Controllers\Admin\AdminReleaseReportController::class, 'deleteRelease'])->name('admin.release-reports.delete-release');
     Route::post('release-reports/{id}/dismiss', [\App\Http\Controllers\Admin\AdminReleaseReportController::class, 'dismiss'])->name('admin.release-reports.dismiss');
+    Route::post('release-reports/{id}/revert', [\App\Http\Controllers\Admin\AdminReleaseReportController::class, 'revert'])->name('admin.release-reports.revert');
     Route::post('release-reports/bulk', [\App\Http\Controllers\Admin\AdminReleaseReportController::class, 'bulkAction'])->name('admin.release-reports.bulk');
 
     Route::get('show-list', [AdminShowsController::class, 'index'])->name('admin.show-list');

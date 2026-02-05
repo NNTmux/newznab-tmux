@@ -87,7 +87,7 @@ class ReleaseBrowseService
 			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
 			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-			LEFT OUTER JOIN (SELECT releases_id, COUNT(*) AS report_count, GROUP_CONCAT(DISTINCT reason SEPARATOR ', ') AS report_reasons FROM release_reports WHERE status IN ('pending', 'reviewed') GROUP BY releases_id) rr ON rr.releases_id = r.id
+			LEFT OUTER JOIN (SELECT releases_id, COUNT(*) AS report_count, GROUP_CONCAT(DISTINCT reason SEPARATOR ', ') AS report_reasons FROM release_reports WHERE status IN ('pending', 'reviewed', 'resolved') GROUP BY releases_id) rr ON rr.releases_id = r.id
 			GROUP BY r.id
 			ORDER BY %8\$s %9\$s",
             $this->showPasswords(),

@@ -76,7 +76,7 @@ class DetailsController extends BasePageController
             $similars = $this->releaseSearchService->searchSimilar($data['id'], $data['searchname'], $this->userdata->categoryexclusions);
             $failed = DnzbFailure::getFailedCount($data['id']);
             $reportData = ReleaseReport::where('releases_id', $data['id'])
-                ->whereIn('status', ['pending', 'reviewed'])
+                ->whereIn('status', ['pending', 'reviewed', 'resolved'])
                 ->get();
             $reportCount = $reportData->count();
             $reportReasons = ReleaseReport::reasonKeysToLabels($reportData->pluck('reason')->unique()->implode(', '));

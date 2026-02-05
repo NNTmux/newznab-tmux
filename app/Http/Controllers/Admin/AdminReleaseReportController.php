@@ -97,12 +97,32 @@ class AdminReleaseReportController extends BasePageController
     }
 
     /**
+     * Revert a resolved or dismissed report back to reviewed status.
+     */
+    public function revert(int $id): RedirectResponse
+    {
+        $report = ReleaseReport::findOrFail($id);
+
+        if (! in_array($report->status, ['resolved', 'dismissed'])) {
+            return redirect()->back()->with('error', 'Only resolved or dismissed reports can be reverted.');
+        }
+
+        $report->update([
+            'status' => 'reviewed',
+            'reviewed_by' => Auth::id(),
+            'reviewed_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Report reverted to reviewed status successfully.');
+    }
+
+    /**
      * Bulk update report statuses.
      */
     public function bulkAction(Request $request): RedirectResponse
     {
         $request->validate([
-            'action' => 'required|in:dismiss,resolve,reviewed,delete',
+            'action' => 'required|in:dismiss,resolve,reviewed,delete,revert',
             'report_ids' => 'required|array',
             'report_ids.*' => 'integer',
         ]);
@@ -145,6 +165,12 @@ class AdminReleaseReportController extends BasePageController
                     'reviewed_by' => Auth::id(),
                     'reviewed_at' => now(),
                 ]);
+            } elseif ($action === 'revert' && in_array($report->status, ['resolved', 'dismissed'])) {
+                $report->update([
+                    'status' => 'reviewed',
+                    'reviewed_by' => Auth::id(),
+                    'reviewed_at' => now(),
+                ]);
             }
 
             $count++;
@@ -155,6 +181,7 @@ class AdminReleaseReportController extends BasePageController
             'dismiss' => 'dismissed',
             'resolve' => 'resolved',
             'reviewed' => 'marked as reviewed',
+            'revert' => 'reverted to reviewed',
             default => 'processed',
         };
 

@@ -84,7 +84,7 @@ class MovieBrowseService
             .'LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id '
             .'LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id '
             .'LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id '
-            .'LEFT OUTER JOIN (SELECT releases_id, COUNT(*) AS report_count, GROUP_CONCAT(DISTINCT reason SEPARATOR \', \') AS report_reasons FROM release_reports WHERE status IN (\'pending\', \'reviewed\') GROUP BY releases_id) rr ON rr.releases_id = r.id '
+            .'LEFT OUTER JOIN (SELECT releases_id, COUNT(*) AS report_count, GROUP_CONCAT(DISTINCT reason SEPARATOR \', \') AS report_reasons FROM release_reports WHERE status IN (\'pending\', \'reviewed\', \'resolved\') GROUP BY releases_id) rr ON rr.releases_id = r.id '
             .'LEFT OUTER JOIN categories c ON c.id = r.categories_id '
             .'LEFT OUTER JOIN root_categories cp ON cp.id = c.root_categories_id '
             .'INNER JOIN movieinfo m ON m.imdbid = r.imdbid '

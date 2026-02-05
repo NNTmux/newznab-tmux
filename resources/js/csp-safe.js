@@ -5906,7 +5906,7 @@ document.addEventListener('contentLoaded', initReleaseReportButtons);
 
 /**
  * Initialize admin release reports page functionality
- * Handles description modal, select all, and bulk actions
+ * Handles description modal, revert confirmation modal, select all, and bulk actions
  */
 function initAdminReleaseReports() {
     // Report Description Modal
@@ -5917,6 +5917,57 @@ function initAdminReleaseReports() {
     var descReporter = document.getElementById('reportDescReporter');
     var descCloseButtons = document.querySelectorAll('.report-desc-modal-close');
     var descBackdrop = document.querySelector('.report-desc-modal-backdrop');
+
+    // Revert Confirmation Modal
+    var revertModal = document.getElementById('revertConfirmModal');
+    var revertButtons = document.querySelectorAll('.revert-report-btn');
+    var revertForm = document.getElementById('revertConfirmForm');
+    var revertStatusSpan = document.getElementById('revertReportStatus');
+    var revertCloseButtons = document.querySelectorAll('.revert-modal-close');
+    var revertBackdrop = document.querySelector('.revert-modal-backdrop');
+
+    // Open revert confirmation modal
+    revertButtons.forEach(function(btn) {
+        if (btn.hasAttribute('data-revert-initialized')) return;
+        btn.setAttribute('data-revert-initialized', 'true');
+
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var actionUrl = this.getAttribute('data-action-url');
+            var status = this.getAttribute('data-report-status');
+
+            if (revertForm) revertForm.setAttribute('action', actionUrl);
+            if (revertStatusSpan) revertStatusSpan.textContent = status;
+
+            if (revertModal) revertModal.classList.remove('hidden');
+        });
+    });
+
+    // Close revert modal
+    function closeRevertModal() {
+        if (revertModal) revertModal.classList.add('hidden');
+    }
+
+    revertCloseButtons.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            closeRevertModal();
+        });
+    });
+
+    if (revertBackdrop) {
+        revertBackdrop.addEventListener('click', closeRevertModal);
+    }
+
+    // Close revert modal on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeRevertModal();
+            closeDescModal();
+        }
+    });
 
     // Open description modal
     descButtons.forEach(function(btn) {

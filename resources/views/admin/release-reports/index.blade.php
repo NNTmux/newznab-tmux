@@ -75,6 +75,7 @@
                         <option value="reviewed">Mark as Reviewed</option>
                         <option value="resolve">Mark as Resolved</option>
                         <option value="dismiss">Dismiss Selected</option>
+                        <option value="revert">Revert to Reviewed</option>
                         <option value="delete">Delete Releases & Resolve</option>
                     </select>
                     <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
@@ -237,6 +238,17 @@
                                                 </form>
                                             @elseif(!$report->release)
                                                 <span class="text-xs text-gray-500 dark:text-gray-400">Release already deleted</span>
+                                            @elseif(in_array($report->status, ['resolved', 'dismissed']))
+                                                <!-- Revert Button for resolved/dismissed reports -->
+                                                <button type="button"
+                                                        class="revert-report-btn px-3 py-1.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition text-sm inline-flex items-center"
+                                                        data-report-id="{{ $report->id }}"
+                                                        data-report-status="{{ $report->status }}"
+                                                        data-action-url="{{ route('admin.release-reports.revert', $report->id) }}"
+                                                        title="Revert to Reviewed for further action">
+                                                    <i class="fas fa-undo mr-1"></i> Revert
+                                                </button>
+                                                <span class="text-xs text-gray-500 dark:text-gray-400">{{ ucfirst($report->status) }}</span>
                                             @else
                                                 <span class="text-xs text-gray-500 dark:text-gray-400">{{ ucfirst($report->status) }}</span>
                                             @endif
@@ -316,6 +328,47 @@
                     Close
                 </button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Revert Confirmation Modal -->
+<div id="revertConfirmModal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+        <!-- Backdrop -->
+        <div class="revert-modal-backdrop fixed inset-0 transition-opacity bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-75"></div>
+
+        <!-- Modal Content -->
+        <div class="relative inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-lg">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    <i class="fas fa-undo text-orange-500 mr-2"></i>Confirm Revert
+                </h3>
+                <button type="button" class="revert-modal-close text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="mb-6">
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                    Are you sure you want to revert this <span id="revertReportStatus" class="font-semibold text-orange-600 dark:text-orange-400"></span> report back to <span class="font-semibold text-blue-600 dark:text-blue-400">Reviewed</span> status?
+                </p>
+                <p class="text-sm text-gray-500 dark:text-gray-500">
+                    This will allow further action to be taken on the report if an issue was found with the release.
+                </p>
+            </div>
+
+            <form id="revertConfirmForm" method="POST" action="">
+                @csrf
+                <div class="flex justify-end gap-3">
+                    <button type="button" class="revert-modal-close px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition">
+                        <i class="fas fa-undo mr-1"></i> Revert to Reviewed
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
