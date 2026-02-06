@@ -151,8 +151,17 @@
                                 </div>
                             </div>
                         @else
+                            @php
+                                $desktopIconMap = [
+                                    App\Models\Category::MUSIC_ROOT => 'fa-music',
+                                    App\Models\Category::BOOKS_ROOT => 'fa-book',
+                                    App\Models\Category::XXX_ROOT => 'fa-ban',
+                                ];
+                                $desktopIcon = $desktopIconMap[$parentcat['id']] ?? 'fa-folder';
+                            @endphp
                             <div class="relative dropdown-container flex-shrink-0">
                                 <button class="dropdown-toggle flex items-center px-3 py-2 text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-700 dark:hover:bg-gray-800 rounded-lg transition text-sm whitespace-nowrap">
+                                    <i class="fa {{ $desktopIcon }} mr-1.5"></i>
                                     <span>{{ $parentcat['title'] }}</span>
                                     <i class="fas fa-chevron-down ml-1 text-xs"></i>
                                 </button>
