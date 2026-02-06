@@ -11,7 +11,7 @@
     @if($variant === 'icon')
         <button type="button"
                 data-report-release-id="{{ $releaseId }}"
-                class="report-trigger px-2 py-1 bg-gray-200 dark:bg-gray-700 text-red-500 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900 hover:text-red-600 dark:hover:text-red-300 transition text-sm"
+                class="report-trigger px-2 py-0.5 bg-gray-200 dark:bg-gray-700 text-red-500 dark:text-red-400 rounded hover:bg-red-100 dark:hover:bg-red-900 hover:text-red-600 dark:hover:text-red-300 transition text-xs"
                 title="Report this release">
             <i class="fas fa-flag"></i>
         </button>
