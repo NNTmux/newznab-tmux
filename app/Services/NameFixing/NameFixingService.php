@@ -910,17 +910,26 @@ class NameFixingService
             cli()->alternate(PHP_EOL.number_format($stats['checked']).' files processed.'.PHP_EOL);
         }
 
-        // Show active counter on the same line (overwrites previous)
+        // Show progress at meaningful intervals to reduce tmux pane clutter
         if ($show === true) {
             $percent = $this->_totalReleases > 0
                 ? round(($stats['checked'] / $this->_totalReleases) * 100, 1)
                 : 0;
 
-            // Use carriage return to overwrite the same line
-            echo "\rRenamed: ".number_format($stats['fixed']).
-                 ' | Processed: '.number_format($stats['checked']).
-                 '/'.number_format($this->_totalReleases).
-                 ' ('.$percent.'%)    ';
+            // Calculate progress interval - show update every 10% or at completion
+            $progressInterval = max(1, (int) ($this->_totalReleases / 10));
+            $isLastItem = $stats['checked'] === $this->_totalReleases;
+            $isIntervalPoint = $stats['checked'] % $progressInterval === 0;
+
+            // Only output at intervals or completion to keep tmux pane clean
+            if ($isIntervalPoint || $isLastItem) {
+                cli()->comment(
+                    'Renamed: '.number_format($stats['fixed']).
+                    ' | Processed: '.number_format($stats['checked']).
+                    '/'.number_format($this->_totalReleases).
+                    ' ('.$percent.'%)'
+                );
+            }
         }
     }
 
