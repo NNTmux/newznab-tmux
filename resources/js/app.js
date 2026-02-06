@@ -35,6 +35,7 @@ import './csp-safe.js';
     }
 })();
 
-// Import FontAwesome
-import '@fortawesome/fontawesome-free/js/all.min.js';
+// FontAwesome icons loaded via CSS webfonts in app.css
+// Do NOT import the JS bundle (all.min.js) — it adds ~1.4MB to the build
+// and duplicates what the CSS webfont approach already provides.
 
