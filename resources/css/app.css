@@ -1,5 +1,7 @@
-/* Tailwind CSS v4 */
-@import "tailwindcss";
+/* Tailwind CSS v4 — disable auto-detection, scan only what matters */
+@import "tailwindcss" source(none);
+@source "../views";
+@source "../js";
 
 /* Tailwind v4 plugins */
 @plugin "@tailwindcss/forms";
