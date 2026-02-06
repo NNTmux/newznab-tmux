@@ -923,7 +923,7 @@ class NameFixingService
 
             // Only output at intervals or completion to keep tmux pane clean
             if ($isIntervalPoint || $isLastItem) {
-                cli()->comment(
+                cli()->info(
                     'Renamed: '.number_format($stats['fixed']).
                     ' | Processed: '.number_format($stats['checked']).
                     '/'.number_format($this->_totalReleases).
