@@ -58,7 +58,6 @@
                                     <i class="fas fa-file-alt mr-2"></i> View NFO
                                 </button>
                             @endif
-                            <x-report-button :release-id="$release->id" variant="button" />
                             @auth
                                 @if(auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Moderator'))
                                     <a href="{{ route('admin.release-edit', ['id' => $release->guid]) }}" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition inline-flex items-center" title="Edit Release">
@@ -66,6 +65,7 @@
                                     </a>
                                 @endif
                             @endauth
+                            <x-report-button :release-id="$release->id" variant="button-lg" />
                         </div>
                     </div>
                 </div>

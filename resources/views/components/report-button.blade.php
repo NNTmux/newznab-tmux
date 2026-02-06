@@ -2,7 +2,7 @@
     'releaseId' => null,
     'releaseGuid' => null,
     'size' => 'sm', // sm, md, lg
-    'variant' => 'icon', // icon, button, text
+    'variant' => 'icon', // icon, button, button-lg, text
 ])
 
 @auth
@@ -14,6 +14,14 @@
                 class="report-trigger text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition p-1"
                 title="Report this release">
             <i class="fas fa-flag"></i>
+        </button>
+    @elseif($variant === 'button-lg')
+        <button type="button"
+                data-report-release-id="{{ $releaseId }}"
+                class="report-trigger px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition inline-flex items-center"
+                title="Report this release">
+            <i class="fas fa-flag mr-2"></i>
+            <span class="report-label">Report</span>
         </button>
     @elseif($variant === 'button')
         <button type="button"
