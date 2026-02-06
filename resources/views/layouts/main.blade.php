@@ -58,7 +58,7 @@
     <div class="h-screen flex">
         <!-- Sidebar -->
         @auth
-            <aside id="sidebar" class="hidden md:flex md:flex-col w-64 bg-gray-900 dark:bg-gray-950 text-white flex-shrink-0 h-full overflow-y-auto">
+            <aside id="sidebar" class="hidden md:flex md:flex-col w-64 bg-gray-900 dark:bg-gray-950 text-white flex-shrink-0 h-full overflow-y-auto rounded-r-xl">
                 <div class="flex items-center justify-between p-4 border-b border-gray-800 dark:border-gray-700">
                     <a href="{{ $site['home_link'] ?? url('/') }}" class="flex items-center space-x-3">
                         <img src="{{ asset('assets/images/logo.svg') }}" alt="{{ config('app.name') }} Logo" class="w-12 h-12" aria-hidden="true">
@@ -76,14 +76,14 @@
         <div class="flex-1 flex flex-col h-full overflow-hidden">
             <!-- Top Navigation -->
             @auth
-                <header class="bg-gray-800 dark:bg-gray-950 text-white shadow-lg flex-shrink-0 z-10">
+                <header class="bg-gray-800 dark:bg-gray-950 text-white shadow-lg flex-shrink-0 z-10 rounded-b-xl">
                     @include('partials.header-menu')
                 </header>
             @endauth
 
             <!-- Page Content - This is the scrollable area -->
             <main class="flex-1 overflow-y-auto">
-                <div class="container mx-auto px-4 py-6">
+                <div class="container mx-auto px-4 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
                     @if(session('success'))
                         <div class="mb-4 p-4 bg-green-100 dark:bg-green-900 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-200 rounded-lg">
                             {{ session('success') }}
@@ -110,19 +110,19 @@
             </main>
 
             <!-- Footer - Fixed at bottom -->
-            <footer class="flex-shrink-0">
+            <footer class="flex-shrink-0 rounded-t-xl">
                 @include('partials.footer')
             </footer>
         </div>
     </div>
 
     <!-- Mobile Sidebar Toggle -->
-    <button id="mobile-sidebar-toggle" class="md:hidden fixed bottom-20 right-4 z-50 bg-blue-600 dark:bg-blue-700 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-all touch-target" aria-label="Toggle Sidebar">
+    <button id="mobile-sidebar-toggle" class="md:hidden fixed z-50 bg-blue-600 dark:bg-blue-700 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-all touch-target bottom-[max(5rem,calc(env(safe-area-inset-bottom)+4rem))] right-[max(1rem,env(safe-area-inset-right))]" aria-label="Toggle Sidebar">
         <i class="fas fa-bars text-lg"></i>
     </button>
 
     <!-- Theme Toggle -->
-    <button id="theme-toggle" class="fixed bottom-4 left-4 z-50 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-full shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-200 flex items-center gap-2 touch-target"
+    <button id="theme-toggle" class="fixed z-50 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-full shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-200 flex items-center gap-2 touch-target bottom-[max(1rem,env(safe-area-inset-bottom))] left-[max(1rem,env(safe-area-inset-left))]"
             title="{{ ucfirst(auth()->check() ? (auth()->user()->theme_preference ?? 'light') : 'light') }} Mode">
         <i id="theme-icon" class="fas
             @if(auth()->check())

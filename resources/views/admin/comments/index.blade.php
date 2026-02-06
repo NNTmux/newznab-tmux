@@ -27,7 +27,7 @@
         </div>
     @endif
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
@@ -147,7 +147,7 @@
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div id="deleteModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50 transition-opacity">
+<div id="deleteModal" class="fixed inset-0 bg-gray-900/50 hidden items-center justify-center z-50 transition-opacity">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between">

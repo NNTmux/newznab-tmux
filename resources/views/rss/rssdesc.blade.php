@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6 dark:bg-gray-800">
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm mb-6 dark:bg-gray-800">
     <div class="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-lg dark:bg-gray-700 dark:border-gray-600">
         <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
             <i class="fa fa-rss mr-2 text-orange-500 dark:text-orange-400"></i>{{ $title }}
@@ -16,7 +16,7 @@
         @if($loggedin ?? false)
             <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6 border border-gray-200 dark:border-gray-700 dark:bg-gray-700 dark:border-gray-600">
                 <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
-                    <i class="fa fa-key mr-2 text-gray-600 dark:text-gray-400 dark:text-gray-400"></i>Your API Token
+                    <i class="fa fa-key mr-2 text-gray-600 dark:text-gray-400"></i>Your API Token
                 </h4>
                 <div class="flex rounded-md shadow-sm">
                     <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white" value="api_token={{ $userdata->api_token }}" readonly id="apiTokenInput">
@@ -28,7 +28,7 @@
         @endif
 
         <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
-            <i class="fa fa-cog mr-2 text-gray-600 dark:text-gray-400 dark:text-gray-400"></i>RSS Configuration Options
+            <i class="fa fa-cog mr-2 text-gray-600 dark:text-gray-400"></i>RSS Configuration Options
         </h4>
         <div class="overflow-x-auto mb-6">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -42,27 +42,27 @@
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                     <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700">
                         <td class="px-6 py-4"><code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">api_token</code></td>
-                        <td class="px-6 py-4 text-gray-700 dark:text-gray-300 dark:text-gray-300">Add this to your feed URL to allow NZB downloads without logging in</td>
+                        <td class="px-6 py-4 text-gray-700 dark:text-gray-300">Add this to your feed URL to allow NZB downloads without logging in</td>
                         <td class="px-6 py-4"><code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">&amp;api_token={{ $userdata->api_token ?? 'YOUR_TOKEN' }}</code></td>
                     </tr>
                     <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700">
                         <td class="px-6 py-4"><code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">del=1</code></td>
-                        <td class="px-6 py-4 text-gray-700 dark:text-gray-300 dark:text-gray-300">Remove NZB from your cart after download</td>
+                        <td class="px-6 py-4 text-gray-700 dark:text-gray-300">Remove NZB from your cart after download</td>
                         <td class="px-6 py-4"><code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">&amp;del=1</code></td>
                     </tr>
                     <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700">
                         <td class="px-6 py-4"><code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">dl=1</code></td>
-                        <td class="px-6 py-4 text-gray-700 dark:text-gray-300 dark:text-gray-300">Change the default link to download an NZB</td>
+                        <td class="px-6 py-4 text-gray-700 dark:text-gray-300">Change the default link to download an NZB</td>
                         <td class="px-6 py-4"><code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">&amp;dl=1</code></td>
                     </tr>
                     <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700">
                         <td class="px-6 py-4"><code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">num=50</code></td>
-                        <td class="px-6 py-4 text-gray-700 dark:text-gray-300 dark:text-gray-300">Change the number of results returned (default: 25, max: 100)</td>
+                        <td class="px-6 py-4 text-gray-700 dark:text-gray-300">Change the number of results returned (default: 25, max: 100)</td>
                         <td class="px-6 py-4"><code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">&amp;num=50</code></td>
                     </tr>
                     <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700">
                         <td class="px-6 py-4"><code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">airdate=20</code></td>
-                        <td class="px-6 py-4 text-gray-700 dark:text-gray-300 dark:text-gray-300">Return TV shows only aired in the last x days (default: all)</td>
+                        <td class="px-6 py-4 text-gray-700 dark:text-gray-300">Return TV shows only aired in the last x days (default: all)</td>
                         <td class="px-6 py-4"><code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">&amp;airdate=20</code></td>
                     </tr>
                 </tbody>
@@ -83,7 +83,7 @@
         </div>
 
         <h4 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
-            <i class="fa fa-list mr-2 text-gray-600 dark:text-gray-400 dark:text-gray-400"></i>Available Feeds
+            <i class="fa fa-list mr-2 text-gray-600 dark:text-gray-400"></i>Available Feeds
         </h4>
 
         <!-- General Feeds -->

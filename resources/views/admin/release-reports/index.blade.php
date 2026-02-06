@@ -27,7 +27,7 @@
         </div>
     @endif
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
@@ -295,7 +295,7 @@
 <div id="reportDescriptionModal" class="fixed inset-0 z-50 overflow-y-auto hidden">
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
         <!-- Backdrop -->
-        <div class="report-desc-modal-backdrop fixed inset-0 transition-opacity bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-75"></div>
+        <div class="report-desc-modal-backdrop fixed inset-0 transition-opacity bg-gray-500/75 dark:bg-gray-900/75"></div>
 
         <!-- Modal Content -->
         <div class="relative inline-block w-full max-w-lg p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-lg">
@@ -336,7 +336,7 @@
 <div id="revertConfirmModal" class="fixed inset-0 z-50 overflow-y-auto hidden">
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
         <!-- Backdrop -->
-        <div class="revert-modal-backdrop fixed inset-0 transition-opacity bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-75"></div>
+        <div class="revert-modal-backdrop fixed inset-0 transition-opacity bg-gray-500/75 dark:bg-gray-900/75"></div>
 
         <!-- Modal Content -->
         <div class="relative inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-lg">

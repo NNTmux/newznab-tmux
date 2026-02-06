@@ -1,4 +1,4 @@
-<footer class="bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 transition-colors duration-200">
+<footer class="bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 transition-colors duration-200 rounded-t-xl">
     <div class="container mx-auto px-4 py-3">
         <div class="flex flex-wrap items-center justify-between gap-2 text-sm">
             <!-- Copyright -->

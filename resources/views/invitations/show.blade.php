@@ -16,7 +16,7 @@
         </ol>
     </nav>
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:bg-gray-800">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:bg-gray-800">
         <div class="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-lg dark:bg-gray-700 dark:border-gray-600">
             <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                 <i class="fa fa-envelope-open mr-2"></i>Invitation to Join {{ $site['title'] }}
@@ -45,28 +45,28 @@
                         </div>
                         <div class="p-4">
                             <div class="grid grid-cols-5 gap-3 mb-3">
-                                <div class="col-span-2 text-gray-600 dark:text-gray-400 dark:text-gray-400">
+                                <div class="col-span-2 text-gray-600 dark:text-gray-400">
                                     <i class="fa fa-user mr-1"></i>Invited by:
                                 </div>
-                                <div class="col-span-3 font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100">
+                                <div class="col-span-3 font-medium text-gray-900 dark:text-gray-100">
                                     {{ $preview['inviter_name'] ?? 'Anonymous' }}
                                 </div>
                             </div>
                             <div class="grid grid-cols-5 gap-3 mb-3">
-                                <div class="col-span-2 text-gray-600 dark:text-gray-400 dark:text-gray-400">
+                                <div class="col-span-2 text-gray-600 dark:text-gray-400">
                                     <i class="fa fa-envelope mr-1"></i>Email:
                                 </div>
-                                <div class="col-span-3 font-medium text-gray-900 dark:text-gray-100 dark:text-gray-100">
+                                <div class="col-span-3 font-medium text-gray-900 dark:text-gray-100">
                                     {{ $preview['email'] ?? 'N/A' }}
                                 </div>
                             </div>
                             <div class="grid grid-cols-5 gap-3 mb-3">
-                                <div class="col-span-2 text-gray-600 dark:text-gray-400 dark:text-gray-400">
+                                <div class="col-span-2 text-gray-600 dark:text-gray-400">
                                     <i class="fa fa-clock-o mr-1"></i>Expires:
                                 </div>
                                 <div class="col-span-3">
                                     @isset($preview['expires_at'])
-                                        <span class="text-gray-900 dark:text-gray-100 dark:text-gray-100">{{ date('M j, Y H:i', $preview['expires_at']) }}</span>
+                                        <span class="text-gray-900 dark:text-gray-100">{{ date('M j, Y H:i', $preview['expires_at']) }}</span>
                                         @if($preview['expires_at'] < time())
                                             <br><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 mt-1 dark:bg-red-900 dark:text-red-200">
                                                 <i class="fa fa-times mr-1"></i>Expired
@@ -87,7 +87,7 @@
                             </div>
                             @if(isset($preview['metadata']['role']) && isset($preview['role_name']))
                                 <div class="grid grid-cols-5 gap-3">
-                                    <div class="col-span-2 text-gray-600 dark:text-gray-400 dark:text-gray-400">
+                                    <div class="col-span-2 text-gray-600 dark:text-gray-400">
                                         <i class="fa fa-user-tag mr-1"></i>Assigned Role:
                                     </div>
                                     <div class="col-span-3 font-medium">
@@ -106,8 +106,8 @@
                             </h6>
                         </div>
                         <div class="p-4">
-                            <p class="mb-3 text-gray-700 dark:text-gray-300 dark:text-gray-300">To accept this invitation and create your account:</p>
-                            <ol class="list-decimal list-inside mb-0 space-y-2 text-gray-700 dark:text-gray-300 dark:text-gray-300">
+                            <p class="mb-3 text-gray-700 dark:text-gray-300">To accept this invitation and create your account:</p>
+                            <ol class="list-decimal list-inside mb-0 space-y-2 text-gray-700 dark:text-gray-300">
                                 <li>Click the "Accept Invitation" button below</li>
                                 <li>Fill out the registration form with your details</li>
                                 <li>Verify your email address when prompted</li>

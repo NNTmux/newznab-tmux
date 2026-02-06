@@ -34,7 +34,7 @@
 </div>
 
 <div class="px-4 py-3">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-4 dark:bg-gray-800">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm mb-4 dark:bg-gray-800">
         <div class="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-lg flex justify-between items-center dark:bg-gray-700 dark:border-gray-600">
             <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                 <i class="fa fa-envelope mr-2"></i>My Invitations
@@ -85,7 +85,7 @@
             </div>
 
             <!-- Filter Tabs -->
-            <div class="border-b border-gray-200 dark:border-gray-700 dark:border-gray-700 mb-4">
+            <div class="border-b border-gray-200 dark:border-gray-700 mb-4">
                 <nav class="flex flex-wrap -mb-px" aria-label="Tabs">
                     <a href="{{ url('/invitations') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ empty($status) ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
                         <i class="fa fa-list mr-1"></i>All
@@ -138,7 +138,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <i class="fa fa-envelope text-gray-400 mr-2"></i>
-                                        <span class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">{{ $invitation['email'] }}</span>
+                                        <span class="text-sm text-gray-900 dark:text-gray-100">{{ $invitation['email'] }}</span>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -163,14 +163,14 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <i class="fa fa-calendar text-gray-400 mr-2"></i>
-                                        <span class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">{{ date('M j, Y', $invitation['created_at']) }}</span>
+                                        <span class="text-sm text-gray-900 dark:text-gray-100">{{ date('M j, Y', $invitation['created_at']) }}</span>
                                         <small class="text-xs text-gray-500 ml-1 dark:text-gray-400">{{ date('H:i', $invitation['created_at']) }}</small>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <i class="fa fa-clock-o text-gray-400 mr-2"></i>
-                                        <span class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">{{ date('M j, Y', $invitation['expires_at']) }}</span>
+                                        <span class="text-sm text-gray-900 dark:text-gray-100">{{ date('M j, Y', $invitation['expires_at']) }}</span>
                                         <small class="text-xs text-gray-500 ml-1 dark:text-gray-400">{{ date('H:i', $invitation['expires_at']) }}</small>
                                     </div>
                                 </td>
@@ -178,7 +178,7 @@
                                     @if(isset($invitation['used_by_user']))
                                         <div class="flex items-center">
                                             <i class="fa fa-user text-gray-400 mr-2"></i>
-                                            <span class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">{{ $invitation['used_by_user']['username'] ?? $invitation['used_by_user']['email'] }}</span>
+                                            <span class="text-sm text-gray-900 dark:text-gray-100">{{ $invitation['used_by_user']['username'] ?? $invitation['used_by_user']['email'] }}</span>
                                         </div>
                                     @else
                                         <span class="text-gray-500 dark:text-gray-400">-</span>
@@ -188,7 +188,7 @@
                                     @if($invitation['used_at'])
                                         <div class="flex items-center">
                                             <i class="fa fa-check text-gray-400 mr-2"></i>
-                                            <span class="text-sm text-gray-900 dark:text-gray-100 dark:text-gray-100">{{ date('M j, Y', $invitation['used_at']) }}</span>
+                                            <span class="text-sm text-gray-900 dark:text-gray-100">{{ date('M j, Y', $invitation['used_at']) }}</span>
                                             <small class="text-xs text-gray-500 ml-1 dark:text-gray-400">{{ date('H:i', $invitation['used_at']) }}</small>
                                         </div>
                                     @else

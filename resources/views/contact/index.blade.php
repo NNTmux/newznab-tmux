@@ -3,7 +3,7 @@
 
 @section('content')
 <div class="w-full contact-page-container mx-auto">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm mb-6">
         <div class="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-lg">
             <h4 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-0">Contact Us</h4>
             <nav class="mt-2" aria-label="breadcrumb">

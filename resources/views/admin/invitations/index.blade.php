@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
@@ -220,7 +220,7 @@
 
     <!-- Top Inviters Section -->
     @if(count($topInviters) > 0)
-    <div class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+    <div class="mt-8 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
                 <i class="fas fa-trophy mr-2"></i>Top Inviters

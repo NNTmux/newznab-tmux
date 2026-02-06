@@ -12,7 +12,7 @@
     </ol>
 </nav>
 
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
         <!-- Profile Header -->
         <div class="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
             <h1 class="text-xl font-semibold text-gray-800">

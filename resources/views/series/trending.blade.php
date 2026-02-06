@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
     <!-- Breadcrumb -->
     <div class="px-6 py-4 border-b border-gray-200">
         <nav class="flex" aria-label="Breadcrumb">
@@ -42,7 +42,7 @@
                         <i class="fas fa-rss mr-2"></i> RSS Feed
                     </a>
                 @endif
-                <a href="{{ route('series') }}" class="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg transition">
+                <a href="{{ route('series') }}" class="inline-flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition">
                     <i class="fas fa-tv mr-2"></i> Browse All TV Shows
                 </a>
             </div>

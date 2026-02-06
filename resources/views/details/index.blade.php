@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Release Details</h1>
         <nav class="text-sm text-gray-600">
@@ -1134,7 +1134,7 @@
         </button>
         <div class="text-center">
             <h3 id="imageModalTitle" class="text-white text-xl font-semibold mb-4 drop-shadow-lg"></h3>
-            <img id="imageModalImage" src="" alt="Image" class="max-w-full max-h-[85vh] mx-auto rounded-lg shadow-2xl">
+            <img id="imageModalImage" src="" alt="Image" class="max-w-full max-h-[85vh] mx-auto rounded-2xl shadow-2xl">
         </div>
     </div>
 </div>

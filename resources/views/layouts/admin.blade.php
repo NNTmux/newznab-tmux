@@ -19,7 +19,7 @@
 <body class="bg-gray-100 dark:bg-gray-900 font-sans antialiased transition-colors duration-200">
     <div class="h-screen flex">
         <!-- Admin Sidebar -->
-        <aside class="hidden md:flex md:flex-col w-64 bg-gray-900 dark:bg-gray-950 text-white flex-shrink-0 h-full overflow-y-auto">
+        <aside class="hidden md:flex md:flex-col w-64 bg-gray-900 dark:bg-gray-950 text-white flex-shrink-0 h-full overflow-y-auto rounded-r-xl">
             <div class="flex items-center justify-between p-4 border-b border-gray-800 dark:border-gray-700">
                 <a href="{{ route('admin.index') }}" class="flex items-center space-x-2">
                     <i class="fas fa-cog text-2xl text-blue-500 dark:text-blue-400"></i>
@@ -35,7 +35,7 @@
         <!-- Main Content -->
         <div class="flex-1 flex flex-col h-full overflow-hidden">
             <!-- Top Bar -->
-            <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+            <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 flex-shrink-0 rounded-b-xl">
                 <div class="flex items-center justify-between px-6 py-4">
                     <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">{{ $page_title ?? 'Admin Dashboard' }}</h1>
                     <div class="flex items-center space-x-4">
@@ -72,7 +72,7 @@
             </main>
 
             <!-- Admin Footer - Fixed at bottom -->
-            <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
+            <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex-shrink-0 rounded-t-xl">
                 <div class="px-6 py-3">
                     <div class="flex flex-wrap items-center justify-between gap-2 text-sm text-gray-600 dark:text-gray-400">
                         <p>&copy; {{ now()->year }} <a href="https://github.com/NNTmux/newznab-tmux" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition">NNTmux</a> Admin Panel</p>
@@ -84,7 +84,7 @@
     </div>
 
     <!-- Theme Toggle -->
-    <button id="theme-toggle" class="fixed bottom-4 left-4 z-50 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-full shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-200 flex items-center gap-2 touch-target"
+    <button id="theme-toggle" class="fixed z-50 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-full shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-200 flex items-center gap-2 touch-target bottom-[max(1rem,env(safe-area-inset-bottom))] left-[max(1rem,env(safe-area-inset-left))]"
             title="{{ ucfirst(auth()->check() ? (auth()->user()->theme_preference ?? 'light') : 'light') }} Mode">
         <i id="theme-icon" class="fas
             @if(auth()->check())

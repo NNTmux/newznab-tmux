@@ -1,13 +1,23 @@
+/* Tailwind CSS v4 */
+@import "tailwindcss";
+
+/* Tailwind v4 plugins */
+@plugin "@tailwindcss/forms";
+
+/* Dark mode: class-based strategy (replaces darkMode: 'class' in tailwind.config.js) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Theme customization (replaces theme.extend in tailwind.config.js) */
+@theme {
+    --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --radius-card: 0.75rem;
+}
+
 /* Import FontAwesome */
 @import '@fortawesome/fontawesome-free/css/all.min.css';
 
-
 /* Import custom CSP-safe styles */
 @import './csp-safe.css';
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 /* Fixed layout - ensure html and body have proper height constraints */
 html, body {
@@ -68,9 +78,14 @@ html, body {
     }
 }
 
+/* Page-level card container (rounded-xl, shadow) */
+.card {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 transition-colors duration-200;
+}
+
 /* Custom styles for proper spacing and button alignment */
 .btn {
-    @apply inline-flex items-center justify-center px-4 py-2 border rounded-md font-semibold text-sm transition-colors duration-150;
+    @apply inline-flex items-center justify-center px-4 py-2 border rounded-lg font-semibold text-sm transition-colors duration-150;
 }
 
 .btn i {
@@ -127,237 +142,293 @@ html, body {
 }
 
 .table-actions .btn {
-    @apply flex-shrink-0;
+    @apply shrink-0;
 }
 
 /* Mobile Responsive Improvements */
-@layer utilities {
-    /* Mobile-friendly tables */
-    @media (max-width: 768px) {
-        .table-responsive {
-            @apply overflow-x-auto -mx-4 px-4;
-        }
-
-        .table-responsive table {
-            @apply min-w-max;
-        }
-
-        /* Card-style table rows for mobile */
-        .table-mobile-cards tbody tr {
-            @apply block border border-gray-200 dark:border-gray-700 rounded-lg mb-4 p-4;
-        }
-
-        .table-mobile-cards tbody td {
-            @apply block text-left;
-            padding-left: 50% !important;
-            position: relative;
-        }
-
-        .table-mobile-cards tbody td::before {
-            content: attr(data-label);
-            position: absolute;
-            left: 1rem;
-            font-weight: 600;
-            @apply text-gray-700 dark:text-gray-300;
-        }
-
-        .table-mobile-cards thead {
-            @apply hidden;
-        }
-
-        /* Stack buttons vertically on mobile */
-        .btn-group {
-            @apply flex-col space-x-0 space-y-2;
-        }
-
-        /* Full width buttons on mobile */
-        .btn-mobile-full {
-            @apply w-full justify-center;
-        }
-
-        /* Mobile search forms */
-        .search-form-mobile {
-            @apply flex-col space-y-2;
-        }
-
-        .search-form-mobile select,
-        .search-form-mobile input {
-            @apply w-full rounded;
-        }
-
-        /* Reduce padding on small screens */
-        .container {
-            @apply px-2;
-        }
-
-        /* Stack navigation items */
-        .nav-mobile-stack {
-            @apply flex-col space-x-0 space-y-2;
-        }
-
-        /* Hide non-essential columns on mobile */
-        .hide-mobile {
-            @apply hidden;
-        }
-
-        /* Smaller text on mobile */
-        .text-mobile-sm {
-            @apply text-xs;
-        }
-
-        /* Mobile dropdown menus should be full width */
-        .dropdown-menu {
-            @apply left-0 right-0 w-auto mx-2;
-        }
-
-        /* Mobile modal adjustments */
-        .modal-content {
-            @apply mx-2 max-h-[90vh] overflow-y-auto;
-        }
-
-        /* Smaller font sizes for headings on mobile */
-        h1 {
-            @apply text-2xl;
-        }
-
-        h2 {
-            @apply text-xl;
-        }
-
-        h3 {
-            @apply text-lg;
-        }
-
-        /* Mobile grid adjustments */
-        .grid-mobile-1 {
-            @apply grid-cols-1;
-        }
-
-        /* Touch-friendly sizing */
-        .touch-target {
-            min-height: 44px;
-            min-width: 44px;
-        }
+/* Mobile-friendly tables */
+@media (max-width: 768px) {
+    .table-responsive {
+        overflow-x: auto;
+        margin-left: -1rem;
+        margin-right: -1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 
-    /* Small mobile devices */
-    @media (max-width: 480px) {
-        /* Even smaller text on very small screens */
-        body {
-            @apply text-sm;
-        }
-
-        .btn {
-            @apply text-xs px-3 py-2;
-        }
-
-        /* Stack form fields */
-        .form-grid {
-            @apply grid-cols-1 gap-2;
-        }
-
-        /* Compact headers */
-        .page-header {
-            @apply text-xl py-2;
-        }
-
-        /* Reduce card padding */
-        .card-mobile-compact {
-            @apply p-3;
-        }
+    .table-responsive table {
+        min-width: max-content;
     }
 
-    /* Tablet improvements */
-    @media (min-width: 768px) and (max-width: 1024px) {
-        /* 2-column layout on tablets where appropriate */
-        .tablet-cols-2 {
-            @apply grid-cols-2;
-        }
-
-        /* Tablet-optimized navigation */
-        .nav-tablet {
-            @apply space-x-2;
-        }
+    /* Card-style table rows for mobile */
+    .table-mobile-cards tbody tr {
+        display: block;
+        border: 1px solid rgb(229 231 235);
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+        padding: 1rem;
     }
 
-    /* Landscape mobile optimization */
-    @media (max-height: 600px) and (orientation: landscape) {
-        /* Reduce vertical padding in landscape */
-        .py-6 {
-            @apply py-2;
-        }
+    .dark .table-mobile-cards tbody tr {
+        border-color: rgb(55 65 81);
+    }
 
-        /* Compact modals in landscape */
-        .modal-content {
-            max-height: 85vh;
-        }
+    .table-mobile-cards tbody td {
+        display: block;
+        text-align: left;
+        padding-left: 50% !important;
+        position: relative;
+    }
 
-        /* Smaller fixed buttons */
-        #mobile-sidebar-toggle,
-        #theme-toggle {
-            @apply p-2 text-sm;
-        }
+    .table-mobile-cards tbody td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 1rem;
+        font-weight: 600;
+        color: rgb(55 65 81);
+    }
+
+    .dark .table-mobile-cards tbody td::before {
+        color: rgb(209 213 219);
+    }
+
+    .table-mobile-cards thead {
+        display: none;
+    }
+
+    /* Stack buttons vertically on mobile */
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+        row-gap: 0.5rem;
+        column-gap: 0;
+    }
+
+    /* Full width buttons on mobile */
+    .btn-mobile-full {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Mobile search forms */
+    .search-form-mobile {
+        flex-direction: column;
+        row-gap: 0.5rem;
+    }
+
+    .search-form-mobile select,
+    .search-form-mobile input {
+        width: 100%;
+        border-radius: 0.25rem;
+    }
+
+    /* Reduce padding on small screens */
+    .container {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    /* Stack navigation items */
+    .nav-mobile-stack {
+        flex-direction: column;
+        row-gap: 0.5rem;
+        column-gap: 0;
+    }
+
+    /* Hide non-essential columns on mobile */
+    .hide-mobile {
+        display: none;
+    }
+
+    /* Smaller text on mobile */
+    .text-mobile-sm {
+        font-size: 0.75rem;
+        line-height: 1rem;
+    }
+
+    /* Mobile dropdown menus should be full width */
+    .dropdown-menu {
+        left: 0;
+        right: 0;
+        width: auto;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+    }
+
+    /* Mobile modal adjustments */
+    .modal-content {
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    /* Smaller font sizes for headings on mobile */
+    h1 {
+        font-size: 1.5rem;
+        line-height: 2rem;
+    }
+
+    h2 {
+        font-size: 1.25rem;
+        line-height: 1.75rem;
+    }
+
+    h3 {
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+    }
+
+    /* Mobile grid adjustments */
+    .grid-mobile-1 {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    /* Touch-friendly sizing */
+    .touch-target {
+        min-height: 44px;
+        min-width: 44px;
     }
 
     /* Mobile-optimized badges and labels */
-    @media (max-width: 768px) {
-        .badge {
-            @apply text-xs px-2 py-1;
-        }
+    .badge {
+        font-size: 0.75rem;
+        line-height: 1rem;
+        padding: 0.25rem 0.5rem;
+    }
 
-        /* Improve readability of release titles */
-        .release-title {
-            @apply text-sm leading-tight;
-        }
+    /* Improve readability of release titles */
+    .release-title {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+    }
 
-        /* Stack action buttons in cards */
-        .card-actions {
-            @apply flex-col space-y-2 space-x-0;
-        }
+    /* Stack action buttons in cards */
+    .card-actions {
+        flex-direction: column;
+        row-gap: 0.5rem;
+        column-gap: 0;
+    }
 
-        /* Make pagination more compact */
-        .pagination {
-            @apply text-sm;
-        }
+    /* Make pagination more compact */
+    .pagination {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+    }
 
-        .pagination .page-link {
-            @apply px-2 py-1 min-w-[2rem];
-        }
+    .pagination .page-link {
+        padding: 0.25rem 0.5rem;
+        min-width: 2rem;
+    }
 
-        /* Optimize data tables for mobile */
-        table.dataTable {
-            font-size: 0.875rem;
-        }
+    /* Optimize data tables for mobile */
+    table.dataTable {
+        font-size: 0.875rem;
+    }
 
-        table.dataTable td,
-        table.dataTable th {
-            padding: 0.5rem 0.25rem;
-        }
+    table.dataTable td,
+    table.dataTable th {
+        padding: 0.5rem 0.25rem;
+    }
 
-        /* Improve form labels */
-        label {
-            @apply text-sm font-medium;
-        }
+    /* Improve form labels */
+    label {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        font-weight: 500;
+    }
 
-        /* Better spacing for form groups */
-        .form-group {
-            @apply mb-3;
-        }
+    /* Better spacing for form groups */
+    .form-group {
+        margin-bottom: 0.75rem;
+    }
 
-        /* Mobile-friendly alerts */
-        .alert {
-            @apply text-sm px-3 py-2;
-        }
+    /* Mobile-friendly alerts */
+    .alert {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        padding: 0.5rem 0.75rem;
+    }
 
-        /* Compact breadcrumbs */
-        .breadcrumb {
-            @apply text-xs;
-        }
+    /* Compact breadcrumbs */
+    .breadcrumb {
+        font-size: 0.75rem;
+        line-height: 1rem;
+    }
 
-        /* Stack filter options vertically */
-        .filter-options {
-            @apply flex-col space-y-2;
-        }
+    /* Stack filter options vertically */
+    .filter-options {
+        flex-direction: column;
+        row-gap: 0.5rem;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    /* Even smaller text on very small screens */
+    body {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+    }
+
+    .btn {
+        font-size: 0.75rem;
+        line-height: 1rem;
+        padding: 0.5rem 0.75rem;
+    }
+
+    /* Stack form fields */
+    .form-grid {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+        gap: 0.5rem;
+    }
+
+    /* Compact headers */
+    .page-header {
+        font-size: 1.25rem;
+        line-height: 1.75rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    /* Reduce card padding */
+    .card-mobile-compact {
+        padding: 0.75rem;
+    }
+}
+
+/* Tablet improvements */
+@media (min-width: 768px) and (max-width: 1024px) {
+    /* 2-column layout on tablets where appropriate */
+    .tablet-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* Tablet-optimized navigation */
+    .nav-tablet {
+        column-gap: 0.5rem;
+    }
+}
+
+/* Landscape mobile optimization */
+@media (max-height: 600px) and (orientation: landscape) {
+    /* Reduce vertical padding in landscape */
+    .py-6 {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    /* Compact modals in landscape */
+    .modal-content {
+        max-height: 85vh;
+    }
+
+    /* Smaller fixed buttons */
+    #mobile-sidebar-toggle,
+    #theme-toggle {
+        padding: 0.5rem;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
     }
 }
 

@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
     @if($front)
         <!-- Front Page Content -->
         <div class="px-6 py-8">

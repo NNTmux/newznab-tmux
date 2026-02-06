@@ -21,7 +21,7 @@
             <div class="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-300 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
                 <div class="bg-gradient-to-r from-blue-400 to-blue-500 px-6 py-4">
                     <div class="flex items-center space-x-3">
-                        <div class="flex items-center justify-center w-10 h-10 bg-blue-700 bg-opacity-40 rounded-lg">
+                        <div class="flex items-center justify-center w-10 h-10 bg-blue-700/40 rounded-lg">
                             <i class="fa fa-trophy text-blue-100 text-lg"></i>
                         </div>
                         <h2 class="text-xl font-bold text-white">Top Grabbers</h2>
@@ -57,7 +57,7 @@
             <div class="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-300 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
                 <div class="bg-gradient-to-r from-green-400 to-green-500 px-6 py-4">
                     <div class="flex items-center space-x-3">
-                        <div class="flex items-center justify-center w-10 h-10 bg-green-700 bg-opacity-40 rounded-lg">
+                        <div class="flex items-center justify-center w-10 h-10 bg-green-700/40 rounded-lg">
                             <i class="fa fa-clock text-green-100 text-lg"></i>
                         </div>
                         <h2 class="text-xl font-bold text-white">Recently Added</h2>
@@ -68,7 +68,7 @@
                         @foreach($recent as $item)
                             <div class="flex items-center justify-between p-4 bg-white dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200 border border-gray-200 dark:border-transparent">
                                 <div class="flex items-center space-x-3">
-                                    <div class="flex items-center justify-center w-8 h-8 bg-green-400 dark:bg-green-600 rounded-lg shadow-sm">
+                                    <div class="flex items-center justify-center w-8 h-8 bg-green-400 dark:bg-green-600 rounded-xl shadow-sm">
                                         <i class="fa fa-folder text-white text-sm"></i>
                                     </div>
                                     <p class="font-semibold text-gray-700 dark:text-gray-100">{{ $item['category'] }}</p>
@@ -88,7 +88,7 @@
             <div class="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-300 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
                 <div class="bg-gradient-to-r from-indigo-400 to-indigo-500 px-6 py-4">
                     <div class="flex items-center space-x-3">
-                        <div class="flex items-center justify-center w-10 h-10 bg-indigo-700 bg-opacity-40 rounded-lg">
+                        <div class="flex items-center justify-center w-10 h-10 bg-indigo-700/40 rounded-lg">
                             <i class="fa fa-calendar text-indigo-100 text-lg"></i>
                         </div>
                         <h2 class="text-xl font-bold text-white">User Signups by Month</h2>
@@ -99,7 +99,7 @@
                         @foreach($usersbymonth as $month)
                             <div class="flex items-center justify-between p-4 bg-white dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200 border border-gray-200 dark:border-transparent">
                                 <div class="flex items-center space-x-3">
-                                    <div class="flex items-center justify-center w-8 h-8 bg-indigo-400 dark:bg-indigo-600 rounded-lg shadow-sm">
+                                    <div class="flex items-center justify-center w-8 h-8 bg-indigo-400 dark:bg-indigo-600 rounded-xl shadow-sm">
                                         <i class="fa fa-users text-white text-sm"></i>
                                     </div>
                                     <p class="font-semibold text-gray-700 dark:text-gray-100">{{ $month['month'] }}</p>
@@ -119,7 +119,7 @@
             <div class="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-300 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
                 <div class="bg-gradient-to-r from-pink-400 to-pink-500 px-6 py-4">
                     <div class="flex items-center space-x-3">
-                        <div class="flex items-center justify-center w-10 h-10 bg-pink-700 bg-opacity-40 rounded-lg">
+                        <div class="flex items-center justify-center w-10 h-10 bg-pink-700/40 rounded-lg">
                             <i class="fa fa-user-shield text-pink-100 text-lg"></i>
                         </div>
                         <h2 class="text-xl font-bold text-white">Users by Role</h2>
@@ -130,7 +130,7 @@
                         @foreach($usersbyrole as $role)
                             <div class="flex items-center justify-between p-4 bg-white dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200 border border-gray-200 dark:border-transparent">
                                 <div class="flex items-center space-x-3">
-                                    <div class="flex items-center justify-center w-8 h-8 bg-pink-400 dark:bg-pink-600 rounded-lg shadow-sm">
+                                    <div class="flex items-center justify-center w-8 h-8 bg-pink-400 dark:bg-pink-600 rounded-xl shadow-sm">
                                         <i class="fa fa-shield-alt text-white text-sm"></i>
                                     </div>
                                     <p class="font-semibold text-gray-700 dark:text-gray-100 capitalize">{{ $role['role'] }}</p>

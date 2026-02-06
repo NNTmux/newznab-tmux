@@ -1,6 +1,6 @@
 <!-- Reusable Confirmation Modal -->
-<div id="confirmationModal" class="fixed inset-0 bg-gray-900 dark:bg-black bg-opacity-50 dark:bg-opacity-70 hidden items-center justify-center z-50 transition-opacity">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
+<div id="confirmationModal" class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 hidden items-center justify-center z-50 transition-opacity">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full mx-4 transform transition-all">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center" id="confirmationModalTitle">

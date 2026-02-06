@@ -70,7 +70,7 @@
 </div>
 
 <div class="max-w-4xl mx-auto px-4 py-3">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:bg-gray-800">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:bg-gray-800">
         <div class="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-lg flex justify-between items-center dark:bg-gray-700 dark:border-gray-600">
             <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                 <i class="fa fa-paper-plane mr-2"></i>Send New Invitation
@@ -136,7 +136,7 @@
                             </div>
 
                             <div class="mb-6">
-                                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2">
+                                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     <i class="fa fa-envelope mr-1"></i>Email Address <span class="text-red-600">*</span>
                                 </label>
                                 <input type="email"
@@ -155,7 +155,7 @@
                             </div>
 
                             <div class="mb-6">
-                                <label for="expiry_days" class="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2">
+                                <label for="expiry_days" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     <i class="fa fa-clock-o mr-1"></i>Expiry Period
                                 </label>
                                 <select class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white @error('expiry_days') border-red-500 @enderror"
@@ -177,7 +177,7 @@
 
                             @if(isset($user_roles) && !empty($user_roles))
                                 <div class="mb-6">
-                                    <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-2">
+                                    <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                         <i class="fa fa-user-tag mr-1"></i>Default Role <small class="text-gray-500 dark:text-gray-400">(Optional)</small>
                                     </label>
                                     <select class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white @error('role') border-red-500 @enderror"

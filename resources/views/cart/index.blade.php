@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
     <!-- Breadcrumb -->
     <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <nav aria-label="breadcrumb">
@@ -31,7 +31,7 @@
 
         @if(count($results) > 0)
             <!-- Cart Items -->
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm">
                 <div class="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                     <h5 class="text-lg font-semibold text-gray-800 dark:text-gray-200">My Download Basket</h5>
                     <div class="flex items-center gap-2">

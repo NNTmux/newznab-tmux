@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
     <!-- Breadcrumb -->
     <div class="px-6 py-4 border-b border-gray-200">
         <nav aria-label="breadcrumb">
@@ -22,7 +22,7 @@
             </div>
         @else
             <!-- Series Info Card -->
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm mb-4">
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm mb-4">
                 <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                     <h5 class="text-xl font-bold text-gray-800 dark:text-white">
                         <i class="fa fa-tv mr-2 text-indigo-600 dark:text-indigo-400"></i>{{ $seriestitles ?? '' }}
@@ -200,7 +200,7 @@
             <!-- Episodes by Season - Tabbed Interface -->
             @if(!empty($seasons))
                 <form id="nzb_multi_operations_form" method="get">
-                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm">
                     <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                         <div class="flex items-center justify-between">
                             <h5 class="text-lg font-semibold text-gray-800 dark:text-white">

@@ -4,7 +4,7 @@
     @extends('layouts.main')
 
     @section('content')
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
         <div class="mb-6">
             <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">NFO File</h1>
             <nav class="text-sm text-gray-600 dark:text-gray-400">

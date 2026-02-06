@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
     <div class="mb-6">
         <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2">Search Releases</h1>
         <p class="text-gray-600">Find exactly what you're looking for</p>
@@ -151,14 +151,14 @@
                     <div class="flex flex-wrap items-center gap-2">
                         <small class="text-gray-600 dark:text-gray-400">With Selected:</small>
                         <div class="flex gap-1">
-                            <button type="button" class="nzb_multi_operations_download px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 transition text-sm" title="Download NZBs">
+                            <button type="button" class="nzb_multi_operations_download px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition text-sm" title="Download NZBs">
                                 <i class="fa fa-cloud-download"></i>
                             </button>
-                            <button type="button" class="nzb_multi_operations_cart px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800 transition text-sm" title="Send to Download Basket">
+                            <button type="button" class="nzb_multi_operations_cart px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition text-sm" title="Send to Download Basket">
                                 <i class="fa fa-shopping-basket"></i>
                             </button>
                             @if(auth()->check() && auth()->user()->hasRole('Admin'))
-                                <button type="button" class="nzb_multi_operations_delete px-3 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 transition text-sm" title="Delete">
+                                <button type="button" class="nzb_multi_operations_delete px-3 py-1 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition text-sm" title="Delete">
                                     <i class="fa fa-trash"></i>
                                 </button>
                             @endif
@@ -312,18 +312,18 @@
                                 </td>
                                 <td class="px-3 py-4 whitespace-nowrap">
                                     <div class="flex items-center gap-1 flex-wrap">
-                                        <a href="{{ url('/getnzb/' . $result->guid) }}" class="download-nzb px-2 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 transition text-sm" title="Download NZB">
+                                        <a href="{{ url('/getnzb/' . $result->guid) }}" class="download-nzb px-2 py-1 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition text-sm" title="Download NZB">
                                             <i class="fa fa-download"></i>
                                         </a>
-                                        <a href="{{ url('/details/' . $result->guid) }}" class="px-2 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800 transition text-sm" title="View Details">
+                                        <a href="{{ url('/details/' . $result->guid) }}" class="px-2 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition text-sm" title="View Details">
                                             <i class="fa fa-info"></i>
                                         </a>
-                                        <a href="#" class="add-to-cart px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition text-sm" data-guid="{{ $result->guid }}" title="Add to Cart">
+                                        <a href="#" class="add-to-cart px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition text-sm" data-guid="{{ $result->guid }}" title="Add to Cart">
                                             <i class="icon_cart fa fa-shopping-basket"></i>
                                         </a>
                                         @if(!empty($result->imdbid) && $result->imdbid != '0' && $result->imdbid != 0 && $result->imdbid != '0000000')
                                             <a href="{{ url('/mymovies?id=add&imdb=' . $result->imdbid) }}"
-                                               class="px-2 py-1 bg-purple-600 dark:bg-purple-700 text-white rounded hover:bg-purple-700 dark:hover:bg-purple-800 transition text-sm"
+                                               class="px-2 py-1 bg-purple-600 dark:bg-purple-700 text-white rounded-lg hover:bg-purple-700 dark:hover:bg-purple-800 transition text-sm"
                                                title="Add to My Movies">
                                                 <i class="fa fa-film"></i>
                                             </a>
@@ -340,7 +340,7 @@
             <!-- Mobile Card View (visible on mobile only) -->
             <div class="md:hidden space-y-3">
                 @foreach($results as $result)
-                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition">
+                    <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:shadow-md transition">
                         <div class="flex items-start gap-3">
                             <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700 mt-1" name="release[]" value="{{ $result->guid }}">
                             <div class="flex-1">
@@ -420,24 +420,24 @@
                                 </div>
                                 <div class="mt-3 flex gap-1 flex-wrap">
                                     <a href="{{ url('/getnzb/' . $result->guid) }}"
-                                       class="download-nzb px-2 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 transition text-sm"
+                                       class="download-nzb px-2 py-1 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition text-sm"
                                        title="Download NZB">
                                         <i class="fa fa-download"></i>
                                     </a>
                                     <a href="{{ url('/details/' . $result->guid) }}"
-                                       class="px-2 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800 transition text-sm"
+                                       class="px-2 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition text-sm"
                                        title="View Details">
                                         <i class="fa fa-info"></i>
                                     </a>
                                     <a href="#"
-                                       class="add-to-cart px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition text-sm"
+                                       class="add-to-cart px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition text-sm"
                                        data-guid="{{ $result->guid }}"
                                        title="Add to Cart">
                                         <i class="icon_cart fa fa-shopping-basket"></i>
                                     </a>
                                     @if(!empty($result->imdbid) && $result->imdbid != '0' && $result->imdbid != 0 && $result->imdbid != '0000000')
                                         <a href="{{ url('/mymovies?id=add&imdb=' . $result->imdbid) }}"
-                                           class="px-2 py-1 bg-purple-600 dark:bg-purple-700 text-white rounded hover:bg-purple-700 dark:hover:bg-purple-800 transition text-sm"
+                                           class="px-2 py-1 bg-purple-600 dark:bg-purple-700 text-white rounded-lg hover:bg-purple-700 dark:hover:bg-purple-800 transition text-sm"
                                            title="Add to My Movies">
                                             <i class="fa fa-film"></i>
                                         </a>
@@ -472,7 +472,7 @@
     @endif
 
     <!-- Preview/Sample Image Modal -->
-    <div id="previewModal" class="hidden fixed inset-0 bg-black bg-opacity-75 items-center justify-center p-4 preview-modal-hidden">
+    <div id="previewModal" class="hidden fixed inset-0 bg-black/75 items-center justify-center p-4 preview-modal-hidden">
         <div class="relative max-w-4xl w-full">
             <button type="button" data-close-preview-modal class="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl font-bold z-10">
                 <i class="fas fa-times"></i>
@@ -488,8 +488,8 @@
     </div>
 
     <!-- MediaInfo Modal -->
-    <div id="mediainfoModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 modal-hidden modal-z-index">
-        <div class="relative max-w-4xl w-full bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-h-[90vh] overflow-hidden">
+    <div id="mediainfoModal" class="fixed inset-0 bg-black/75 flex items-center justify-center p-4 modal-hidden modal-z-index">
+        <div class="relative max-w-4xl w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-h-[90vh] overflow-hidden">
             <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center">
                     <i class="fas fa-info-circle mr-2 text-blue-600 dark:text-blue-400"></i> Media Information
@@ -508,8 +508,8 @@
     </div>
 
     <!-- File List Modal -->
-    <div id="filelistModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 modal-hidden modal-z-index">
-        <div class="relative max-w-4xl w-full bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-h-[90vh] overflow-hidden">
+    <div id="filelistModal" class="fixed inset-0 bg-black/75 flex items-center justify-center p-4 modal-hidden modal-z-index">
+        <div class="relative max-w-4xl w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-h-[90vh] overflow-hidden">
             <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center">
                     <i class="fas fa-file-archive mr-2 text-green-600 dark:text-green-400"></i> File List

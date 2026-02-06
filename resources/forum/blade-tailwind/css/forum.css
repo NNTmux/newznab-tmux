@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
     .forum {
@@ -42,14 +42,15 @@
     }
 
     .dark ::-webkit-scrollbar-track {
-        @apply bg-gray-800;
+        background-color: rgb(31 41 55); /* gray-800 */
     }
 
     .dark ::-webkit-scrollbar-thumb {
-        @apply bg-gray-600 rounded;
+        background-color: rgb(75 85 99); /* gray-600 */
+        border-radius: 0.25rem;
     }
 
     .dark ::-webkit-scrollbar-thumb:hover {
-        @apply bg-gray-500;
+        background-color: rgb(107 114 128); /* gray-500 */
     }
 }

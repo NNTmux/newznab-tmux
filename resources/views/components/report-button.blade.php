@@ -11,7 +11,7 @@
     @if($variant === 'icon')
         <button type="button"
                 data-report-release-id="{{ $releaseId }}"
-                class="report-trigger text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition p-1"
+                class="report-trigger px-2 py-1 bg-gray-200 dark:bg-gray-700 text-red-500 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900 hover:text-red-600 dark:hover:text-red-300 transition text-sm"
                 title="Report this release">
             <i class="fas fa-flag"></i>
         </button>
@@ -26,7 +26,7 @@
     @elseif($variant === 'button')
         <button type="button"
                 data-report-release-id="{{ $releaseId }}"
-                class="report-trigger px-3 py-1.5 text-{{ $size }} bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-red-100 dark:hover:bg-red-900 hover:text-red-700 dark:hover:text-red-300 transition inline-flex items-center">
+                class="report-trigger px-3 py-1.5 text-{{ $size }} bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-red-100 dark:hover:bg-red-900 hover:text-red-700 dark:hover:text-red-300 transition inline-flex items-center">
             <i class="fas fa-flag mr-1.5"></i>
             <span class="report-label">Report</span>
         </button>
@@ -43,10 +43,10 @@
     <div class="report-modal fixed inset-0 z-50 overflow-y-auto hidden" data-release-id="{{ $releaseId }}">
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
             <!-- Backdrop -->
-            <div class="report-modal-backdrop fixed inset-0 transition-opacity bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-75"></div>
+            <div class="report-modal-backdrop fixed inset-0 transition-opacity bg-gray-500/75 dark:bg-gray-900/75"></div>
 
             <!-- Modal Content -->
-            <div class="relative inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-lg">
+            <div class="relative inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
                         <i class="fas fa-flag text-red-500 mr-2"></i>Report Release

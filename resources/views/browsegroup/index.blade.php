@@ -22,7 +22,7 @@
 {!! $site['adbrowse'] ?? '' !!}
 
 <!-- Search Filter -->
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
     <div class="p-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
         <form method="get" action="{{ url('/browsegroup') }}">
             <div class="flex flex-col md:flex-row gap-3 items-stretch md:items-center">
@@ -56,7 +56,7 @@
 </div>
 
 @if(isset($results) && count($results) > 0)
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <!-- Header -->
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex flex-col md:flex-row md:justify-between md:items-center gap-3">
             <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Browse Groups</h5>
