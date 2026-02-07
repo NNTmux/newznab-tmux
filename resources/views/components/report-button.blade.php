@@ -11,7 +11,7 @@
     @if($variant === 'icon')
         <button type="button"
                 data-report-release-id="{{ $releaseId }}"
-                class="report-trigger px-2 py-0.5 bg-gray-200 dark:bg-gray-700 text-red-500 dark:text-red-400 rounded hover:bg-red-100 dark:hover:bg-red-900 hover:text-red-600 dark:hover:text-red-300 transition text-xs"
+                class="report-trigger text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 transition text-sm"
                 title="Report this release">
             <i class="fas fa-flag"></i>
         </button>
@@ -41,12 +41,14 @@
 
     <!-- Report Modal -->
     <div class="report-modal fixed inset-0 z-50 overflow-y-auto hidden" data-release-id="{{ $releaseId }}">
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-            <!-- Backdrop -->
-            <div class="report-modal-backdrop fixed inset-0 transition-opacity bg-gray-500/75 dark:bg-gray-900/75"></div>
+        <!-- Backdrop -->
+        <div class="report-modal-backdrop fixed inset-0 transition-opacity bg-gray-500/75 dark:bg-gray-900/75"></div>
 
-            <!-- Modal Content -->
-            <div class="relative inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl">
+        <!-- Modal Content Container -->
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                <!-- Modal Content -->
+                <div class="relative w-full max-w-md p-6 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-2xl">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
                         <i class="fas fa-flag text-red-500 mr-2"></i>Report Release
@@ -113,6 +115,7 @@
                         </button>
                     </div>
                 </form>
+                </div>
             </div>
         </div>
     </div>

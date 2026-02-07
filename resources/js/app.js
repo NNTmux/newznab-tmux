@@ -1,19 +1,19 @@
 import './bootstrap';
 
-// Import CSP-safe styles and scripts
+// Import CSP-safe styles
 import '../css/csp-safe.css';
-import './csp-safe.js';
+
+// Import Alpine.js CSP-safe components (replaces old csp-safe.js modules)
+import './alpine/index.js';
 
 // Theme initialization - optimized to prevent flash of unstyled content
 (function() {
     'use strict';
-    // Use requestAnimationFrame for better performance
     const applyTheme = function() {
         const metaTheme = document.querySelector('meta[name="theme-preference"]');
         const themePreference = metaTheme?.content || 'light';
 
         if (themePreference === 'system') {
-            // Use OS preference with proper media query listener
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             if (mediaQuery.matches) {
                 document.documentElement.classList.add('dark');
@@ -38,4 +38,3 @@ import './csp-safe.js';
 // FontAwesome icons loaded via CSS webfonts in app.css
 // Do NOT import the JS bundle (all.min.js) — it adds ~1.4MB to the build
 // and duplicates what the CSS webfont approach already provides.
-

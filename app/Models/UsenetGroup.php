@@ -396,16 +396,16 @@ class UsenetGroup extends Model
             $res->where('groups_id', $id);
         }
 
-        $res->get();
+        $releases = $res->get();
 
         $releaseManagement = app(\App\Services\Releases\ReleaseManagementService::class);
         $nzb = app(NzbService::class);
         $releaseImage = new ReleaseImageService;
-        foreach ($res as $row) {
+        foreach ($releases as $row) {
             $releaseManagement->deleteSingleWithService(
                 [
-                    'g' => $row['guid'],
-                    'i' => $row['id'],
+                    'g' => $row->guid,
+                    'i' => $row->id,
                 ],
                 $nzb,
                 $releaseImage

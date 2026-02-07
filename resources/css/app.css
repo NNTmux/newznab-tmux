@@ -21,6 +21,11 @@
 /* Import custom CSP-safe styles */
 @import './csp-safe.css';
 
+/* Alpine.js x-cloak - hide elements until Alpine initializes */
+[x-cloak] {
+    display: none !important;
+}
+
 /* Fixed layout - ensure html and body have proper height constraints */
 html, body {
     height: 100%;

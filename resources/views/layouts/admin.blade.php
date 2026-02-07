@@ -15,6 +15,9 @@
 
     <!-- Dark Mode - Set via meta tag for CSP compliance -->
     <meta name="theme-preference" content="{{ auth()->check() ? (auth()->user()->theme_preference ?? 'light') : 'light' }}">
+
+    <!-- TinyMCE API Key -->
+    <meta name="tinymce-api-key" content="{{ config('tinymce.api_key', 'no-api-key') }}">
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 font-sans antialiased transition-colors duration-200">
     <div class="h-screen flex">
@@ -108,19 +111,16 @@
         </span>
     </button>
 
-    <!-- Toast Notification Container -->
-    <div id="toast-container">
-        <!-- Toast notifications will be dynamically inserted here -->
-    </div>
-
     <!-- Confirmation Modal -->
     @include('partials.confirmation-modal')
 
-    <!-- Scripts -->
-    <!-- Toast Notifications (must load before other scripts) -->
+    <!-- Toast Notifications (Alpine.js CSP Safe) -->
     @include('partials.toast-notifications')
 
     @stack('scripts')
+
+    <!-- TinyMCE Script - loaded with nonce for CSP compliance -->
+    @stack('tinymce')
 
     <script nonce="{{ csp_nonce() }}">
         // Display flash messages as toast notifications

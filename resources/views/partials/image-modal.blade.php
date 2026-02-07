@@ -1,9 +1,9 @@
-<!-- NFO Modal - Alpine.js CSP Safe -->
-<div x-data="nfoModal"
+<!-- Image Modal - Alpine.js CSP Safe -->
+<div x-data="imageModal"
      x-show="open"
      x-cloak
      class="fixed inset-0 z-50 overflow-y-auto"
-     aria-labelledby="nfo-modal-title"
+     aria-labelledby="image-modal-title"
      role="dialog"
      aria-modal="true"
      x-transition:enter="transition ease-out duration-200"
@@ -30,30 +30,20 @@
                  x-transition:leave-end="opacity-0 scale-95">
             <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100" id="nfo-modal-title">
-                        <i class="fas fa-file-alt mr-2 text-yellow-600 dark:text-yellow-400"></i>NFO File
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100" id="image-modal-title" x-text="imageTitle">
+                        Image Preview
                     </h3>
                     <button type="button" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300" @click="close()">
                         <i class="fas fa-times text-xl"></i>
                     </button>
                 </div>
 
-                <!-- Loading state -->
-                <div x-show="loading" class="flex items-center justify-center py-8">
-                    <i class="fas fa-spinner fa-spin text-2xl mr-2 text-yellow-600 dark:text-yellow-400"></i>
-                    <span class="text-gray-600 dark:text-gray-400">Loading NFO...</span>
+                <!-- Image -->
+                <div class="flex justify-center">
+                    <img x-bind:src="imageUrl"
+                         x-bind:alt="imageTitle"
+                         class="max-w-full max-h-[70vh] rounded-lg shadow-lg">
                 </div>
-
-                <!-- Error state -->
-                <div x-show="error && !loading" class="text-center py-8">
-                    <i class="fas fa-exclamation-circle text-3xl text-red-600 dark:text-red-400"></i>
-                    <p class="text-red-600 dark:text-red-400 mt-2">Failed to load NFO file</p>
-                </div>
-
-                <!-- Content -->
-                <div x-show="!loading && !error"
-                     class="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto font-mono text-sm whitespace-pre nfo-content max-h-96 overflow-y-auto"
-                     x-text="content"></div>
             </div>
             <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button type="button"
@@ -66,5 +56,4 @@
         </div>
     </div>
 </div>
-
 

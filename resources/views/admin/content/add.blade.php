@@ -1,5 +1,35 @@
 @extends('layouts.admin')
 
+@push('tinymce')
+<script src="https://cdn.tiny.cloud/1/{{ config('tinymce.api_key', 'no-api-key') }}/tinymce/7/tinymce.min.js" referrerpolicy="origin" nonce="{{ csp_nonce() }}"></script>
+<script nonce="{{ csp_nonce() }}">
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof tinymce !== 'undefined') {
+        var dark = document.documentElement.classList.contains('dark');
+        tinymce.init({
+            selector: '#body',
+            height: 500,
+            menubar: true,
+            skin: dark ? 'oxide-dark' : 'oxide',
+            content_css: dark ? 'dark' : 'default',
+            plugins: ['advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen', 'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons'],
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table emoticons | removeformat code fullscreen | help',
+            toolbar_mode: 'sliding',
+            content_style: 'body{font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6}',
+            branding: false,
+            promotion: false,
+            resize: true,
+            valid_elements: '*[*]',
+            extended_valid_elements: '*[*]',
+            setup: function(editor) {
+                editor.on('change blur keyup', function() { editor.save(); });
+            }
+        });
+    }
+});
+</script>
+@endpush
+
 @section('content')
 <div class="container mx-auto px-4 py-6">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">

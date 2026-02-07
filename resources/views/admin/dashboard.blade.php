@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-6">
+<div x-data="adminDashboard" class="space-y-6" id="adminDashboard">
     <!-- Welcome Section -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
         <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Admin Dashboard</h2>
@@ -469,7 +469,7 @@
                     <i class="fas fa-sync-alt"></i> Auto-refreshes every 20 minutes
                 </span>
             </h3>
-            <div class="space-y-3" id="recent-activity-container" data-refresh-url="{{ route('admin.api.user-activity.recent') }}">
+            <div x-data="recentActivity" class="space-y-3" id="recent-activity-container" data-refresh-url="{{ route('admin.api.user-activity.recent') }}">
                 @if(isset($recent_activity) && count($recent_activity) > 0)
                     @foreach($recent_activity as $activity)
                         <div class="flex items-start activity-item rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">

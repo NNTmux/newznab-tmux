@@ -146,16 +146,25 @@
         </span>
     </button>
 
-    <!-- Toast Notification Container -->
-    <div id="toast-container">
-        <!-- Toast notifications will be dynamically inserted here -->
-    </div>
-
     <!-- Confirmation Modal -->
     @include('partials.confirmation-modal')
 
-    <!-- Scripts -->
-    <!-- Toast Notifications (must load before other scripts) -->
+    <!-- File List Modal -->
+    @include('partials.filelist-modal')
+
+    <!-- NFO Modal -->
+    @include('partials.nfo-modal')
+
+    <!-- Preview/Sample Image Modal -->
+    @include('partials.preview-modal')
+
+    <!-- Media Info Modal -->
+    @include('partials.mediainfo-modal')
+
+    <!-- Image Modal -->
+    @include('partials.image-modal')
+
+    <!-- Toast Notifications (Alpine.js CSP Safe) -->
     @include('partials.toast-notifications')
 
     @stack('scripts')
