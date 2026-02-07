@@ -18,6 +18,9 @@
 
     <!-- TinyMCE API Key -->
     <meta name="tinymce-api-key" content="{{ config('tinymce.api_key', 'no-api-key') }}">
+
+    <!-- CSP Nonce for dynamic script loading -->
+    <meta name="csp-nonce" content="{{ csp_nonce() }}">
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 font-sans antialiased transition-colors duration-200">
     <div class="h-screen flex">

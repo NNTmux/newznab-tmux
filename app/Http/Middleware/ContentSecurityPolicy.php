@@ -36,7 +36,7 @@ class ContentSecurityPolicy
         // Build CSP directives for non-Turnstile pages
         $directives = [
             "default-src 'self'",
-            "script-src 'self' 'nonce-{$nonce}' https://challenges.cloudflare.com https://cdn.tiny.cloud https://cdn.jsdelivr.net/ https://static.cloudflareinsights.com/ https://cdnjs.cloudflare.com/ https://unpkg.com/ https://cdn.tailwindcss.com/ https://code.jquery.com https://apis.google.com https://www.google.com https://www.gstatic.com https://ajax.cloudflare.com blob:",
+            "script-src 'self' 'nonce-{$nonce}' 'unsafe-eval' https://challenges.cloudflare.com https://cdn.tiny.cloud https://cdn.jsdelivr.net/ https://static.cloudflareinsights.com/ https://cdnjs.cloudflare.com/ https://unpkg.com/ https://cdn.tailwindcss.com/ https://code.jquery.com https://apis.google.com https://www.google.com https://www.gstatic.com https://ajax.cloudflare.com blob:",
             "script-src-elem 'self' 'nonce-{$nonce}' https://challenges.cloudflare.com https://cdn.tiny.cloud https://cdn.jsdelivr.net/ https://static.cloudflareinsights.com/ https://cdnjs.cloudflare.com/ https://unpkg.com/ https://cdn.tailwindcss.com/ https://code.jquery.com https://apis.google.com https://www.google.com https://www.gstatic.com https://ajax.cloudflare.com",
             "script-src-attr 'none'",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net/ https://cdnjs.cloudflare.com/ https://cdn.tiny.cloud",
@@ -44,8 +44,8 @@ class ContentSecurityPolicy
             "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com/ https://cdn.tiny.cloud data:",
             "img-src 'self' data: https: blob:",
             "connect-src 'self' https://www.google.com https://cdn.tiny.cloud https://sp.tinymce.com",
-            "frame-src 'self' https://www.google.com https://www.gstatic.com https://challenges.cloudflare.com data: blob:",
-            "child-src 'self' https://www.google.com https://challenges.cloudflare.com blob:",
+            "frame-src 'self' https://www.google.com https://www.gstatic.com https://challenges.cloudflare.com https://cdn.tiny.cloud data: blob:",
+            "child-src 'self' https://www.google.com https://challenges.cloudflare.com https://cdn.tiny.cloud blob:",
             "worker-src 'self' blob:",
             "object-src 'none'",
             "base-uri 'self'",

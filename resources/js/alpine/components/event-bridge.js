@@ -1195,6 +1195,11 @@ document.querySelectorAll('.progress-bar').forEach(bar => {
             const script = document.createElement('script');
             script.src = 'https://cdn.tiny.cloud/1/' + apiKey + '/tinymce/7/tinymce.min.js';
             script.referrerPolicy = 'origin';
+            // Add CSP nonce for Content Security Policy compliance
+            const nonceMeta = document.querySelector('meta[name="csp-nonce"]');
+            if (nonceMeta) {
+                script.nonce = nonceMeta.content;
+            }
             script.onload = doInit;
             script.onerror = function() { console.error('Failed to load TinyMCE'); };
             document.head.appendChild(script);

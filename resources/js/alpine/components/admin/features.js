@@ -29,6 +29,11 @@ Alpine.data('tinyMceEditor', () => ({
         const script = document.createElement('script');
         script.src = 'https://cdn.tiny.cloud/1/' + apiKey + '/tinymce/8/tinymce.min.js';
         script.referrerPolicy = 'origin';
+        // Add CSP nonce for Content Security Policy compliance
+        const nonceMeta = document.querySelector('meta[name="csp-nonce"]');
+        if (nonceMeta) {
+            script.nonce = nonceMeta.content;
+        }
         script.onload = () => this._doInit();
         script.onerror = () => {
             document.querySelectorAll('#body, .tinymce-editor').forEach(ta => {

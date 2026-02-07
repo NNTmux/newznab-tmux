@@ -15,6 +15,8 @@
 
     <!-- Theme Preference - Set via meta tag for CSP compliance -->
     <meta name="theme-preference" content="{{ auth()->check() ? (auth()->user()->theme_preference ?? 'light') : 'light' }}">
+    <!-- CSP Nonce for dynamic script loading -->
+    <meta name="csp-nonce" content="{{ csp_nonce() }}">
     @auth
         <meta name="user-authenticated" content="true">
         <meta name="update-theme-url" content="{{ route('profile.update-theme') }}">
