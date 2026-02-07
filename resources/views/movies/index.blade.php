@@ -279,8 +279,8 @@
                                             <div class="space-y-2">
                                                 @foreach($releaseNames as $index => $releaseName)
                                                     @if($releaseName && isset($releaseGuids[$index]))
-                                                        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-2 border border-gray-200">
-                                                            <div class="release-card-container {{ ($movie_layout ?? 2) == 1 ? 'flex flex-row items-start justify-between gap-3' : 'space-y-2' }}">
+                                                        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-2 border border-gray-200 dark:border-gray-700">
+                                                            <div class="release-card-container {{ ($movie_layout ?? 2) == 1 ? 'flex flex-row items-start justify-between gap-3' : 'flex flex-col space-y-2' }}">
                                                                 <div class="release-info-wrapper {{ ($movie_layout ?? 2) == 1 ? 'flex-1 min-w-0' : '' }}">
                                                                     <!-- Release Name -->
                                                                     <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="text-sm text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 font-medium block break-all" title="{{ $releaseName }}">
@@ -337,7 +337,7 @@
                                                                 </div>
 
                                                                 <!-- Action Buttons -->
-                                                                <div class="release-actions flex {{ ($movie_layout ?? 2) == 1 ? 'flex-shrink-0 flex-row items-center' : 'flex-wrap items-center' }} gap-1.5">
+                                                                <div class="release-actions flex flex-wrap items-center gap-1.5 {{ ($movie_layout ?? 2) == 1 ? 'flex-shrink-0' : 'mt-2' }}">
                                                                     <a href="{{ url('/getnzb/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-600 dark:bg-green-700 text-white hover:bg-green-700 dark:hover:bg-green-800 transition">
                                                                         <i class="fas fa-download mr-1"></i> Download
                                                                     </a>
