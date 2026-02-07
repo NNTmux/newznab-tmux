@@ -19,30 +19,35 @@ function formatFileSize(bytes) {
 Alpine.data('filelistModal', () => ({
     open: false,
     loading: false,
-    html: '',
+
+    _setContent(html) {
+        if (this.$refs.content) {
+            this.$refs.content.innerHTML = html;
+        }
+    },
 
     show(guid) {
         this.open = true;
         this.loading = true;
-        this.html = '';
+        this._setContent('');
 
         fetch('/api/release/' + guid + '/filelist')
             .then(r => { if (!r.ok) throw new Error('Failed to load file list'); return r.json(); })
             .then(data => {
                 if (!data.files || data.files.length === 0) {
-                    this.html = '<p class="text-center text-gray-500 dark:text-gray-400 py-8">No files available</p>';
+                    this._setContent('<p class="text-center text-gray-500 dark:text-gray-400 py-8">No files available</p>');
                 } else {
-                    this.html = this._buildHtml(data);
+                    this._setContent(this._buildHtml(data));
                 }
                 this.loading = false;
             })
             .catch(err => {
-                this.html = '<div class="text-center py-8"><i class="fas fa-exclamation-circle text-3xl text-red-600"></i><p class="text-red-600 mt-2">' + escapeHtml(err.message) + '</p></div>';
+                this._setContent('<div class="text-center py-8"><i class="fas fa-exclamation-circle text-3xl text-red-600"></i><p class="text-red-600 mt-2">' + escapeHtml(err.message) + '</p></div>');
                 this.loading = false;
             });
     },
 
-    close() { this.open = false; this.html = ''; },
+    close() { this.open = false; this._setContent(''); },
 
     _buildHtml(data) {
         let html = '<div class="space-y-4">';

@@ -46,7 +46,7 @@
 
                 <!-- Content -->
                 <div x-show="!loading"
-                     x-html="html"
+                     x-ref="content"
                      class="max-h-96 overflow-y-auto"></div>
             </div>
             <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
