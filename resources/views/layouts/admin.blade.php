@@ -122,8 +122,6 @@
 
     @stack('scripts')
 
-    <!-- TinyMCE Script - loaded with nonce for CSP compliance -->
-    @stack('tinymce')
 
     <script nonce="{{ csp_nonce() }}">
         // Display flash messages as toast notifications
