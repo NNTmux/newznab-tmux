@@ -32,10 +32,12 @@ Alpine.data('moviesLayout', () => ({
     _applyLayout() {
         const grid = document.getElementById('moviesGrid');
         if (!grid) return;
-        const images = grid.querySelectorAll('img[alt], .bg-gray-200.dark\\:bg-gray-700');
+        // Select movie poster images and placeholder divs (both direct children and inside anchor tags)
+        const images = grid.querySelectorAll('.flex-shrink-0 img, .flex-shrink-0 div.bg-gray-200');
         const containers = grid.querySelectorAll('.release-card-container');
 
         if (this.layout === 1) {
+            // Single column layout
             grid.classList.remove('lg:grid-cols-2');
             grid.classList.add('grid-cols-1');
             images.forEach(img => { img.classList.remove('w-32', 'h-48'); img.classList.add('w-48', 'h-72'); });
@@ -48,8 +50,8 @@ Alpine.data('moviesLayout', () => ({
                 if (acts) { acts.classList.remove('flex-wrap'); acts.classList.add('flex-shrink-0', 'flex-row', 'items-center'); }
             });
         } else {
-            grid.classList.remove('grid-cols-1');
-            grid.classList.add('lg:grid-cols-2');
+            // Two column layout (grid-cols-1 on mobile, lg:grid-cols-2 on large screens)
+            grid.classList.add('grid-cols-1', 'lg:grid-cols-2');
             images.forEach(img => { img.classList.remove('w-48', 'h-72'); img.classList.add('w-32', 'h-48'); });
             containers.forEach(c => {
                 c.classList.add('space-y-2');
