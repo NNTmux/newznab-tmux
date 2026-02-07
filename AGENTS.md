@@ -91,10 +91,10 @@ Requires `.env` keys: TMDB, TVDB, TVMaze, Trakt, OMDB (TV/Movies); IGDB, GiantBo
 
 ## Frontend
 
-Blade + TailwindCSS + Vite bundling. Run `npm run build` after changes.
+Blade + TailwindCSS v4 + Vite bundling. Run `npm run build` after changes.
 
 - **Livewire 3**: Used only in the forum package
-- **JavaScript**: All interaction code in main codebase goes in `resources/js/csp-safe.js`
+- **Alpine.js**: CSP-safe build used for all interactivity in `resources/js/csp-safe.js`
 - **CSS**: All styles go in `resources/css/csp-safe.css`
 
-This structure ensures Content Security Policy (CSP) compliance by keeping scripts and styles in external files.
+This structure ensures Content Security Policy (CSP) compliance by using Alpine.js CSP-safe build and keeping scripts and styles in external files.
