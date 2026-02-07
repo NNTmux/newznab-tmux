@@ -576,17 +576,18 @@ if (! function_exists('formatBytes')) {
 if (! function_exists('csp_nonce')) {
     /**
      * Generate a CSP nonce for inline scripts
-     * This should be stored in the request and reused across the request lifecycle
+     * Uses the Laravel container to ensure the nonce is truly unique per request,
+     * avoiding issues with static variables in PHP-FPM environments.
      */
     function csp_nonce(): string
     {
-        static $nonce = null;
-
-        if ($nonce === null) {
-            $nonce = base64_encode(random_bytes(16));
+        // Use Laravel's container to store the nonce per-request
+        // This ensures the same nonce is used in both the CSP header and Blade templates
+        if (! app()->bound('csp_nonce')) {
+            app()->instance('csp_nonce', base64_encode(random_bytes(16)));
         }
 
-        return $nonce;
+        return app('csp_nonce');
     }
 }
 
