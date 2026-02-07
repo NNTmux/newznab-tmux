@@ -5,10 +5,16 @@ import Alpine from '@alpinejs/csp';
 
 Alpine.data('moviesLayout', () => ({
     layout: 2,
+    mediaQuery: null,
 
     init() {
         const grid = document.getElementById('moviesGrid');
         if (grid) this.layout = parseInt(grid.dataset.userLayout) || 2;
+
+        // Set up media query listener for responsive behavior
+        this.mediaQuery = window.matchMedia('(min-width: 1024px)');
+        this.mediaQuery.addEventListener('change', () => this._applyLayout());
+
         this._applyLayout();
     },
 
@@ -32,34 +38,38 @@ Alpine.data('moviesLayout', () => ({
     _applyLayout() {
         const grid = document.getElementById('moviesGrid');
         if (!grid) return;
-        // Select movie poster images and placeholder divs (both direct children and inside anchor tags)
-        const images = grid.querySelectorAll('.flex-shrink-0 img, .flex-shrink-0 div.bg-gray-200');
+
+        // On mobile (< 1024px), always show 1 column; on larger screens, use user preference
+        const isLargeScreen = this.mediaQuery && this.mediaQuery.matches;
+        const effectiveLayout = isLargeScreen ? this.layout : 1;
+
+        // Select movie poster images and placeholder divs
+        const images = grid.querySelectorAll('.flex-shrink-0 img, .flex-shrink-0 > a > div, .flex-shrink-0 > div');
         const containers = grid.querySelectorAll('.release-card-container');
 
-        if (this.layout === 1) {
+        if (effectiveLayout === 1) {
             // Single column layout
-            grid.classList.remove('lg:grid-cols-2');
-            grid.classList.add('grid-cols-1');
+            grid.style.gridTemplateColumns = 'repeat(1, minmax(0, 1fr))';
             images.forEach(img => { img.classList.remove('w-32', 'h-48'); img.classList.add('w-48', 'h-72'); });
             containers.forEach(c => {
-                c.classList.remove('space-y-2');
+                c.classList.remove('flex-col', 'space-y-2');
                 c.classList.add('flex', 'flex-row', 'items-start', 'justify-between', 'gap-3');
                 const info = c.querySelector('.release-info-wrapper');
                 if (info) info.classList.add('flex-1', 'min-w-0');
                 const acts = c.querySelector('.release-actions');
-                if (acts) { acts.classList.remove('flex-wrap'); acts.classList.add('flex-shrink-0', 'flex-row', 'items-center'); }
+                if (acts) { acts.classList.remove('flex-wrap', 'mt-2'); acts.classList.add('flex-shrink-0', 'flex-row', 'items-center'); }
             });
         } else {
-            // Two column layout (grid-cols-1 on mobile, lg:grid-cols-2 on large screens)
-            grid.classList.add('grid-cols-1', 'lg:grid-cols-2');
+            // Two column layout
+            grid.style.gridTemplateColumns = 'repeat(2, minmax(0, 1fr))';
             images.forEach(img => { img.classList.remove('w-48', 'h-72'); img.classList.add('w-32', 'h-48'); });
             containers.forEach(c => {
-                c.classList.add('space-y-2');
-                c.classList.remove('flex', 'flex-row', 'items-start', 'justify-between', 'gap-3');
+                c.classList.add('flex', 'flex-col', 'space-y-2');
+                c.classList.remove('flex-row', 'items-start', 'justify-between', 'gap-3');
                 const info = c.querySelector('.release-info-wrapper');
                 if (info) info.classList.remove('flex-1', 'min-w-0');
                 const acts = c.querySelector('.release-actions');
-                if (acts) { acts.classList.add('flex-wrap', 'items-center'); acts.classList.remove('flex-shrink-0', 'flex-row'); }
+                if (acts) { acts.classList.add('flex-wrap', 'items-center', 'mt-2'); acts.classList.remove('flex-shrink-0', 'flex-row'); }
             });
         }
     }

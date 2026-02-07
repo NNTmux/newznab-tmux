@@ -105,7 +105,7 @@
                 </div>
             </div>
 
-            <div id="moviesGrid" class="grid {{ ($movie_layout ?? 2) == 1 ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2' }} gap-4" data-user-layout="{{ $movie_layout ?? 2 }}">
+            <div id="moviesGrid" class="grid gap-4" style="grid-template-columns: repeat({{ ($movie_layout ?? 2) == 1 ? '1' : '2' }}, minmax(0, 1fr));" data-user-layout="{{ $movie_layout ?? 2 }}">
                 @foreach($results as $result)
                     @php
                         // Get the first GUID from the comma-separated list
