@@ -38,7 +38,7 @@ class ContentSecurityPolicy
             "default-src 'self'",
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://cdn.tiny.cloud https://cdn.jsdelivr.net/ https://static.cloudflareinsights.com/ https://cdnjs.cloudflare.com/ https://unpkg.com/ https://cdn.tailwindcss.com/ https://code.jquery.com https://apis.google.com https://www.google.com https://www.gstatic.com https://ajax.cloudflare.com blob:",
             "script-src-elem 'self' 'unsafe-inline' https://challenges.cloudflare.com https://cdn.tiny.cloud https://cdn.jsdelivr.net/ https://static.cloudflareinsights.com/ https://cdnjs.cloudflare.com/ https://unpkg.com/ https://cdn.tailwindcss.com/ https://code.jquery.com https://apis.google.com https://www.google.com https://www.gstatic.com https://ajax.cloudflare.com",
-            "script-src-attr 'none'",
+            "script-src-attr 'unsafe-inline'",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net/ https://cdnjs.cloudflare.com/ https://cdn.tiny.cloud",
             "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net/ https://cdnjs.cloudflare.com/ https://cdn.tiny.cloud",
             "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com/ https://cdn.tiny.cloud data:",
