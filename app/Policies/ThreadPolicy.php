@@ -24,6 +24,12 @@ class ThreadPolicy extends \TeamTeaTime\Forum\Policies\ThreadPolicy
         return $user->hasRole('Admin') || (! $thread->locked);
     }
 
+    public function replyWithoutApproval($user, Thread $thread): bool
+    {
+        // Admins can reply to unapproved threads; otherwise only thread author
+        return $user->hasRole('Admin') || ($user->getKey() === $thread->author_id);
+    }
+
     public function delete($user, Thread $thread): bool
     {
         // Admins can delete any thread; users can delete their own
