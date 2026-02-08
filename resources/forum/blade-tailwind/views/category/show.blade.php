@@ -67,7 +67,7 @@
 
                 @if (count($selectableThreadIds) > 0)
                     @can ('manageThreads', $category)
-                            <div class="fixed bottom-0 right-0 m-2" style="z-index: 1000;" v-if="state.selectedThreads.length">
+                            <div class="fixed bottom-0 right-0 m-2" style="z-index: 1000; display: none;" :style="{ display: state.selectedThreads.length ? 'block' : 'none' }">
                                 <div class="bg-white shadow-sm rounded-md min-w-96 max-w-full">
                                     <div class="border-b text-center py-4 px-6">
                                         {{ trans('forum::general.with_selection') }}

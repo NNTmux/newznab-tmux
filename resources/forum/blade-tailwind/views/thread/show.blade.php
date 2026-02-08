@@ -121,7 +121,7 @@
         @endforeach
 
         @if ((count($posts) > 1 || $posts->currentPage() > 1) && (Gate::allows('deletePosts', $thread) || Gate::allows('restorePosts', $thread)) && count($selectablePosts) > 0)
-                <div class="fixed bottom-0 right-0 m-2" style="z-index: 1000;" v-if="state.selectedPosts.length">
+                <div class="fixed bottom-0 right-0 m-2" style="z-index: 1000; display: none;" :style="{ display: state.selectedPosts.length ? 'block' : 'none' }">
                     <div class="bg-white shadow-sm rounded-md min-w-96 max-w-full">
                         <div class="border-b text-center py-4 px-6">
                             {{ trans('forum::general.with_selection') }}

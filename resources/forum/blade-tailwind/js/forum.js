@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
     {
         modalClose.addEventListener('click', event =>
         {
-            event.preventDefault
+            event.preventDefault();
 
             setTimeout(function()
             {
