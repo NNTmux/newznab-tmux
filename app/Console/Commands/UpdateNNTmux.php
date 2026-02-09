@@ -214,26 +214,20 @@ class UpdateNNTmux extends Command
      */
     private function performNpmOperations(): void
     {
-        // Check if package.json has changed
-        $packageLockExists = File::exists(base_path('package-lock.json'));
-        $shouldInstall = ! $packageLockExists || $this->option('force');
+        $this->info('📦 Installing npm packages...');
 
-        if ($shouldInstall) {
-            $this->info('📦 Installing npm packages...');
+        $process = Process::timeout(600)
+            ->path(base_path())
+            ->run('npm ci --silent');
 
+        if (! $process->successful()) {
+            // Fallback to npm install if ci fails
             $process = Process::timeout(600)
                 ->path(base_path())
-                ->run('npm ci --silent');
+                ->run('npm install --silent');
 
             if (! $process->successful()) {
-                // Fallback to npm install if ci fails
-                $process = Process::timeout(600)
-                    ->path(base_path())
-                    ->run('npm install --silent');
-
-                if (! $process->successful()) {
-                    throw new \Exception('NPM install failed: '.$process->errorOutput());
-                }
+                throw new \Exception('NPM install failed: '.$process->errorOutput());
             }
         }
 
