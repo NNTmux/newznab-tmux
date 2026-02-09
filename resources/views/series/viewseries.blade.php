@@ -200,7 +200,7 @@
             <!-- Episodes by Season - Tabbed Interface -->
             @if(!empty($seasons))
                 <form id="nzb_multi_operations_form" method="get">
-                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm">
+                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm" x-data="seasonSwitcher">
                     <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                         <div class="flex items-center justify-between">
                             <h5 class="text-lg font-semibold text-gray-800 dark:text-white">
@@ -235,10 +235,12 @@
                         <nav class="flex flex-wrap -mb-px px-4" aria-label="Tabs">
                             @foreach($seasons as $seasonNumber => $episodes)
                                 <button type="button"
-                                        class="season-tab whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-200 {{ $loop->first ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300' }}"
+                                        class="season-tab whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-200"
+                                        :class="activeSeason === '{{ $seasonNumber }}' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300'"
                                         data-season="{{ $seasonNumber }}">
                                     Season {{ $seasonNumber }}
-                                    <span class="ml-2 px-2 py-0.5 rounded-full text-xs {{ $loop->first ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 dark:bg-gray-800 text-gray-600' }}">
+                                    <span class="ml-2 px-2 py-0.5 rounded-full text-xs"
+                                          :class="activeSeason === '{{ $seasonNumber }}' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 dark:bg-gray-800 text-gray-600'">
                                         {{ count($episodes) }}
                                     </span>
                                 </button>
@@ -249,7 +251,7 @@
                     <!-- Season Content -->
                     <div class="p-4">
                         @foreach($seasons as $seasonNumber => $episodes)
-                            <div class="season-content {{ $loop->first ? '' : 'hidden' }}" data-season="{{ $seasonNumber }}">
+                            <div class="season-content" data-season="{{ $seasonNumber }}" x-show="activeSeason === '{{ $seasonNumber }}'">
                                 @foreach($episodes as $episodeNumber => $releases)
                                     <div class="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
                                         <h6 class="font-semibold text-gray-700 dark:text-gray-300 mb-2">
