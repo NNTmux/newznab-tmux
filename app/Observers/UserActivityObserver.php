@@ -59,6 +59,31 @@ class UserActivityObserver
     }
 
     /**
+     * Handle the User "deleting" event (before soft delete).
+     * Sets the deleted_by field to track who deleted the account.
+     */
+    public function deleting(User $user): void
+    {
+        $deletedBy = auth()->user()?->username ?? 'System';
+
+        // Check if user is deleting their own account
+        if (auth()->check() && auth()->id() === $user->id) {
+            $deletedBy = 'Self';
+        }
+
+        // Update the deleted_by field directly in the database
+        // We use a direct query to avoid triggering update events
+        User::withoutEvents(function () use ($user, $deletedBy) {
+            User::withTrashed()
+                ->where('id', $user->id)
+                ->update(['deleted_by' => $deletedBy]);
+        });
+
+        // Store the deleted_by value on the model for the deleted event
+        $user->deleted_by = $deletedBy;
+    }
+
+    /**
      * Handle the User "deleted" event (soft delete).
      */
     public function deleted(User $user): void
@@ -72,7 +97,7 @@ class UserActivityObserver
                 'description' => "User deleted: {$user->username}",
                 'metadata' => [
                     'email' => $user->email,
-                    'deleted_by' => auth()->user()?->username ?? 'System',
+                    'deleted_by' => $user->deleted_by ?? 'System',
                 ],
             ]);
         }
@@ -83,6 +108,11 @@ class UserActivityObserver
      */
     public function restored(User $user): void
     {
+        // Clear the deleted_by field when user is restored
+        User::withoutEvents(function () use ($user) {
+            User::where('id', $user->id)->update(['deleted_by' => null]);
+        });
+
         UserActivity::create([
             'user_id' => $user->id,
             'username' => $user->username,
@@ -99,6 +129,13 @@ class UserActivityObserver
      */
     public function forceDeleted(User $user): void
     {
+        $deletedBy = auth()->user()?->username ?? 'System';
+
+        // Check if user is deleting their own account
+        if (auth()->check() && auth()->id() === $user->id) {
+            $deletedBy = 'Self';
+        }
+
         // Log permanent deletion
         UserActivity::create([
             'user_id' => null, // User no longer exists
@@ -107,7 +144,7 @@ class UserActivityObserver
             'description' => "User permanently deleted: {$user->username}",
             'metadata' => [
                 'email' => $user->email,
-                'deleted_by' => auth()->user()?->username ?? 'System',
+                'deleted_by' => $deletedBy,
                 'permanent' => true,
             ],
         ]);

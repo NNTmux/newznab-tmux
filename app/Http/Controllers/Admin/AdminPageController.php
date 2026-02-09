@@ -69,6 +69,7 @@ class AdminPageController extends BasePageController
                     'icon_color' => 'text-'.$activity->color_class.'-600 dark:text-'.$activity->color_class.'-400',
                     'created_at' => $activity->created_at,
                     'username' => $activity->username,
+                    'metadata' => $activity->metadata,
                 ];
             })->toArray();
         });
@@ -92,6 +93,7 @@ class AdminPageController extends BasePageController
                     'icon_color' => $activity->icon_color,
                     'created_at' => $activity->created_at->diffForHumans(),
                     'username' => $activity->username,
+                    'metadata' => $activity->metadata,
                 ];
             }, $activities),
         ]);

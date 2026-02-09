@@ -477,7 +477,14 @@
                                 <i class="fas fa-{{ $activity->icon }} {{ $activity->icon_color }} text-sm"></i>
                             </div>
                             <div class="flex-1">
-                                <p class="text-sm text-gray-800 dark:text-gray-200">{{ $activity->message }}</p>
+                                <p class="text-sm text-gray-800 dark:text-gray-200">
+                                    {{ $activity->message }}
+                                    @if($activity->type === 'deleted' && isset($activity->metadata['deleted_by']))
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                                            (by {{ $activity->metadata['deleted_by'] }}{{ isset($activity->metadata['permanent']) ? ', permanent' : '' }})
+                                        </span>
+                                    @endif
+                                </p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ $activity->created_at->diffForHumans() }}</p>
                             </div>
                         </div>

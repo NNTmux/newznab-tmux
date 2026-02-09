@@ -160,6 +160,7 @@
                                         @endif
                                     </a>
                                 </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Deleted By</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
@@ -195,6 +196,23 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                         {{ $user->deleted_at ? $user->deleted_at->format('Y-m-d H:i') : 'N/A' }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @if($user->deleted_by === 'Self')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                                <i class="fa fa-user mr-1"></i>Self
+                                            </span>
+                                        @elseif($user->deleted_by === 'System')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                                                <i class="fa fa-robot mr-1"></i>System
+                                            </span>
+                                        @elseif($user->deleted_by)
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200" title="Deleted by admin: {{ $user->deleted_by }}">
+                                                <i class="fa fa-user-shield mr-1"></i>{{ $user->deleted_by }}
+                                            </span>
+                                        @else
+                                            <span class="text-gray-400 dark:text-gray-500">N/A</span>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex gap-2">
