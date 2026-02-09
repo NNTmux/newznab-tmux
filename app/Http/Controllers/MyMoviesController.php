@@ -122,7 +122,7 @@ class MyMoviesController extends BasePageController
                 $this->viewData['type'] = 'edit';
                 $this->viewData['cat_ids'] = array_keys($categories);
                 $this->viewData['cat_names'] = $categories;
-                $this->viewData['cat_selected'] = explode('|', $movie['categories']);
+                $this->viewData['cat_selected'] = ! empty($movie['categories']) ? explode('|', $movie['categories']) : [];
                 $this->viewData['imdbid'] = $imdbid;
                 $this->viewData['movie'] = $movie;
                 $this->viewData['content'] = view('mymovies.add', $this->viewData)->render();

@@ -106,9 +106,16 @@
                                                title="Edit Categories">
                                                 <i class="fa fa-edit mr-1.5"></i>Edit
                                             </a>
-                                            <a class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 shadow hover:shadow-md transition-all duration-200 text-sm font-medium confirm_action"
+                                            <a class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 shadow hover:shadow-md transition-all duration-200 text-sm font-medium"
                                                href="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}"
-                                               title="Remove from My Movies">
+                                               title="Remove from My Movies"
+                                               x-data="confirmLink"
+                                               data-url="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}"
+                                               data-title="Remove Movie"
+                                               data-message="Are you sure you want to remove this movie from your watchlist?"
+                                               data-confirm-text="Remove"
+                                               data-type="danger"
+                                               x-on:click.prevent="navigate">
                                                 <i class="fa fa-trash mr-1.5"></i>Delete
                                             </a>
                                         </div>
@@ -212,9 +219,16 @@
                                    title="Edit">
                                     <i class="fa fa-edit"></i>
                                 </a>
-                                <a class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 text-sm font-medium shadow confirm_action"
+                                <a class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 text-sm font-medium shadow"
                                    href="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}"
-                                   title="Remove">
+                                   title="Remove"
+                                   x-data="confirmLink"
+                                   data-url="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}"
+                                   data-title="Remove Movie"
+                                   data-message="Are you sure you want to remove this movie from your watchlist?"
+                                   data-confirm-text="Remove"
+                                   data-type="danger"
+                                   x-on:click.prevent="navigate">
                                     <i class="fa fa-trash"></i>
                                 </a>
                             </div>
@@ -242,17 +256,4 @@
         </div>
     @endif
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Confirm before removing movies
-    document.querySelectorAll('.confirm_action').forEach(element => {
-        element.addEventListener('click', function(e) {
-            if (!confirm('Are you sure you want to remove this movie from your watchlist?')) {
-                e.preventDefault();
-            }
-        });
-    });
-});
-</script>
 

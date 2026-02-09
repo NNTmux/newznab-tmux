@@ -63,7 +63,10 @@
                                         <a href="{{ url('admin/role-delete?id=' . $role->id) }}"
                                            class="text-red-600 hover:text-red-900"
                                            title="Delete"
-                                           onclick="return confirm('Are you sure you want to delete role \'{{ $role->name }}\'?')">
+                                           x-data="confirmLink"
+                                           data-url="{{ url('admin/role-delete?id=' . $role->id) }}"
+                                           data-message="Are you sure you want to delete role '{{ $role->name }}'?"
+                                           x-on:click.prevent="navigate">
                                             <i class="fa fa-trash"></i>
                                         </a>
                                     </div>

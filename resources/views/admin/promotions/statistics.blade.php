@@ -19,10 +19,10 @@
 
     <!-- Date Range Filter -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-6">
-        <form method="GET" action="{{ route('admin.promotions.statistics') }}" class="flex flex-wrap gap-4 items-end">
+        <form method="GET" action="{{ route('admin.promotions.statistics') }}" class="flex flex-wrap gap-4 items-end" x-data="{ showCustom: {{ $selectedPeriod === 'custom' ? 'true' : 'false' }} }" x-ref="periodForm">
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quick Select</label>
-                <select name="period" class="form-select rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" onchange="this.form.submit()">
+                <select name="period" class="form-select rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" x-on:change="if($event.target.value === 'custom') { showCustom = true } else { showCustom = false; $refs.periodForm.submit() }">
                     <option value="7days" {{ $selectedPeriod === '7days' ? 'selected' : '' }}>Last 7 Days</option>
                     <option value="30days" {{ $selectedPeriod === '30days' ? 'selected' : '' }}>Last 30 Days</option>
                     <option value="90days" {{ $selectedPeriod === '90days' ? 'selected' : '' }}>Last 90 Days</option>
@@ -31,7 +31,7 @@
                     <option value="custom" {{ $selectedPeriod === 'custom' ? 'selected' : '' }}>Custom Range</option>
                 </select>
             </div>
-            <div id="customDateRange" style="display: {{ $selectedPeriod === 'custom' ? 'flex' : 'none' }};" class="flex gap-4">
+            <div x-show="showCustom" x-cloak class="flex gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Start Date</label>
                     <input type="date" name="start_date" value="{{ $startDate ? $startDate->format('Y-m-d') : '' }}" class="form-input rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
@@ -298,17 +298,5 @@
         </div>
     </div>
 </div>
-
-<script>
-document.querySelector('select[name="period"]').addEventListener('change', function() {
-    const customRange = document.getElementById('customDateRange');
-    if (this.value === 'custom') {
-        customRange.style.display = 'flex';
-    } else {
-        customRange.style.display = 'none';
-        this.form.submit();
-    }
-});
-</script>
 @endsection
 

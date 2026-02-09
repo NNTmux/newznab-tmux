@@ -141,9 +141,16 @@
                                             <i class="fa fa-edit mr-1.5"></i>
                                             <span class="hidden xl:inline">Edit</span>
                                         </a>
-                                        <a class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 shadow hover:shadow-md transition-all duration-200 text-sm font-medium confirm_action"
+                                        <a class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 shadow hover:shadow-md transition-all duration-200 text-sm font-medium"
                                            href="{{ url("/myshows?action=delete&id={$show['videos_id']}") }}"
-                                           title="Remove from My Shows">
+                                           title="Remove from My Shows"
+                                           x-data="confirmLink"
+                                           data-url="{{ url("/myshows?action=delete&id={$show['videos_id']}") }}"
+                                           data-title="Remove Show"
+                                           data-message="Are you sure you want to remove this show from your list?"
+                                           data-confirm-text="Remove"
+                                           data-type="danger"
+                                           x-on:click.prevent="navigate">
                                             <i class="fa fa-trash mr-1.5"></i>
                                             <span class="hidden xl:inline">Delete</span>
                                         </a>
@@ -194,9 +201,16 @@
                                    title="Edit">
                                     <i class="fa fa-edit"></i>
                                 </a>
-                                <a class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 text-sm font-medium shadow confirm_action"
+                                <a class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 text-sm font-medium shadow"
                                    href="{{ url("/myshows?action=delete&id={$show['videos_id']}") }}"
-                                   title="Remove">
+                                   title="Remove"
+                                   x-data="confirmLink"
+                                   data-url="{{ url("/myshows?action=delete&id={$show['videos_id']}") }}"
+                                   data-title="Remove Show"
+                                   data-message="Are you sure you want to remove this show from your list?"
+                                   data-confirm-text="Remove"
+                                   data-type="danger"
+                                   x-on:click.prevent="navigate">
                                     <i class="fa fa-trash"></i>
                                 </a>
                             </div>
@@ -224,17 +238,4 @@
         </div>
     @endif
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Confirm before removing shows
-    document.querySelectorAll('.confirm_action').forEach(element => {
-        element.addEventListener('click', function(e) {
-            if (!confirm('Are you sure you want to remove this show from your list?')) {
-                e.preventDefault();
-            }
-        });
-    });
-});
-</script>
 

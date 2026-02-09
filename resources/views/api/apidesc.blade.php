@@ -16,10 +16,10 @@
                 <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                     <i class="fa fa-key mr-2 text-gray-600 dark:text-gray-400"></i>Your API Credentials
                 </h4>
-                <div class="flex rounded-md shadow-sm">
+                <div class="flex rounded-md shadow-sm" x-data="copyToClipboard()">
                     <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white" value="apikey={{ $userdata->api_token }}" readonly id="apikeyInput">
-                    <button class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" id="copyApiKey" title="Copy to clipboard">
-                        <i class="fa fa-copy"></i>
+                    <button class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" x-on:click="copy('apikeyInput')" title="Copy to clipboard" x-bind:class="copied ? 'text-green-600' : ''">
+                        <i class="fa" x-bind:class="copied ? 'fa-check' : 'fa-copy'"></i>
                     </button>
                 </div>
             </div>
@@ -203,24 +203,4 @@
         </div>
     </div>
 </div>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const copyBtn = document.getElementById('copyApiKey');
-    if (copyBtn) {
-        copyBtn.addEventListener('click', function() {
-            const apiKeyInput = document.getElementById('apikeyInput');
-            apiKeyInput.select();
-            apiKeyInput.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(apiKeyInput.value);
-            const originalText = copyBtn.innerHTML;
-            copyBtn.innerHTML = '<i class="fa fa-check"></i>';
-            copyBtn.classList.add('text-green-600');
-            setTimeout(function() {
-                copyBtn.innerHTML = originalText;
-                copyBtn.classList.remove('text-green-600');
-            }, 2000);
-        });
-    }
-});
-</script>
 @endsection

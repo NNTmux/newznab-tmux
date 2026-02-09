@@ -302,15 +302,16 @@
                             <p class="text-green-700 dark:text-green-300 text-sm mb-4">Your account is protected with an additional layer of security. You'll need your authenticator app to log in.</p>
 
                             <!-- Collapsible Disable Form -->
-                            <div class="space-y-3">
-                                <button id="toggle-disable-2fa-btn"
+                            <div class="space-y-3" x-data="{ show2faForm: false }">
+                                <button x-show="!show2faForm"
+                                        x-on:click="show2faForm = true"
                                         type="button"
                                         class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition">
                                     <i class="fas fa-times-circle mr-2"></i>Disable 2FA
                                 </button>
 
-                                <div id="disable-2fa-form-container"
-                                     style="display: none;"
+                                <div x-show="show2faForm"
+                                     x-cloak
                                      class="bg-white dark:bg-gray-800 border border-red-200 dark:border-red-700 rounded-lg p-4 mt-3">
                                     <div class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg">
                                         <div class="flex items-start">
@@ -344,7 +345,7 @@
                                                     class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition">
                                                 <i class="fas fa-check mr-2"></i>Confirm Disable
                                             </button>
-                                            <button id="cancel-disable-2fa-btn"
+                                            <button x-on:click="show2faForm = false"
                                                     type="button"
                                                     class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition">
                                                 <i class="fas fa-times mr-2"></i>Cancel
@@ -443,27 +444,3 @@
 </div>
 @endsection
 
-@push('scripts')
-<script>
-    // 2FA disable form toggle
-    document.addEventListener('DOMContentLoaded', function() {
-        const toggleBtn = document.getElementById('toggle-disable-2fa-btn');
-        const cancelBtn = document.getElementById('cancel-disable-2fa-btn');
-        const formContainer = document.getElementById('disable-2fa-form-container');
-
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', function() {
-                formContainer.style.display = 'block';
-                toggleBtn.style.display = 'none';
-            });
-        }
-
-        if (cancelBtn) {
-            cancelBtn.addEventListener('click', function() {
-                formContainer.style.display = 'none';
-                toggleBtn.style.display = 'inline-block';
-            });
-        }
-    });
-</script>
-@endpush

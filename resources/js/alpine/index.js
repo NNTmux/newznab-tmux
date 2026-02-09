@@ -36,6 +36,8 @@ import './components/search-autocomplete.js';
 import './components/quality-filter.js';
 import './components/content-toggle.js';
 import './components/movies-layout.js';
+import './components/movies-page.js';
+import './components/confirm-link.js';
 
 // --- Page-specific components ---
 import './components/release-report.js';

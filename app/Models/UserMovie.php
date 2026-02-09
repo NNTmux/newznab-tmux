@@ -75,11 +75,12 @@ class UserMovie extends Model
 
     public static function getMovie($uid, $imdbid): array
     {
-        return self::query()
+        $result = self::query()
             ->where(['user_movies.users_id' => $uid, 'user_movies.imdbid' => $imdbid])
             ->leftJoin('movieinfo as mi', 'mi.imdbid', '=', 'user_movies.imdbid')
-            ->get(['user_movies.*', 'mi.title'])
-            ->toArray();
+            ->first(['user_movies.*', 'mi.title']);
+
+        return $result ? $result->toArray() : [];
     }
 
     public static function delMovieForUser($uid)
