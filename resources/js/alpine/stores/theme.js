@@ -45,6 +45,27 @@ Alpine.store('theme', {
         // Update meta tag
         const meta = document.querySelector('meta[name="theme-preference"]');
         if (meta) meta.content = this.current;
+
+        // Update UI elements (icon, label, title)
+        this._updateUI();
+    },
+
+    /** Update theme toggle button UI */
+    _updateUI() {
+        const icon = document.getElementById('theme-icon');
+        const label = document.getElementById('theme-label');
+        const toggle = document.getElementById('theme-toggle');
+
+        if (icon) {
+            icon.classList.remove('fa-sun', 'fa-moon', 'fa-desktop');
+            icon.classList.add(this.icon());
+        }
+        if (label) {
+            label.textContent = this.label();
+        }
+        if (toggle) {
+            toggle.title = this.title();
+        }
     },
 
     icon() {
