@@ -205,13 +205,27 @@ document.addEventListener('click', function(e) {
     if (confirmDelete) {
         e.preventDefault();
         e.stopPropagation();
-        const form = confirmDelete.closest('form');
-        showConfirm({
-            message: 'Are you sure you want to delete this item?',
-            type: 'danger',
-            confirmText: 'Delete',
-            onConfirm: function() { if (form) form.submit(); else if (confirmDelete.href) window.location.href = confirmDelete.href; }
-        });
+        // For anchor tags, always use href navigation; for other elements, check for parent form
+        const isAnchor = confirmDelete.tagName === 'A';
+        const form = isAnchor ? null : confirmDelete.closest('form');
+        const doAction = function() {
+            if (isAnchor && confirmDelete.href) {
+                window.location.href = confirmDelete.href;
+            } else if (form) {
+                form.submit();
+            }
+        };
+        const message = 'Are you sure you want to delete this item?';
+        if (typeof window.showConfirm === 'function') {
+            window.showConfirm({
+                message: message,
+                type: 'danger',
+                confirmText: 'Delete',
+                onConfirm: doAction
+            });
+        } else if (confirm(message)) {
+            doAction();
+        }
         return;
     }
 
@@ -221,13 +235,26 @@ document.addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
         const message = confirmAction.getAttribute('data-confirm');
-        const form = confirmAction.closest('form');
-        showConfirm({
-            message: message,
-            type: 'danger',
-            confirmText: 'Confirm',
-            onConfirm: function() { if (form) form.submit(); else if (confirmAction.href) window.location.href = confirmAction.href; }
-        });
+        // For anchor tags, always use href navigation; for other elements, check for parent form
+        const isAnchor = confirmAction.tagName === 'A';
+        const form = isAnchor ? null : confirmAction.closest('form');
+        const doAction = function() {
+            if (isAnchor && confirmAction.href) {
+                window.location.href = confirmAction.href;
+            } else if (form) {
+                form.submit();
+            }
+        };
+        if (typeof window.showConfirm === 'function') {
+            window.showConfirm({
+                message: message,
+                type: 'danger',
+                confirmText: 'Confirm',
+                onConfirm: doAction
+            });
+        } else if (confirm(message)) {
+            doAction();
+        }
         return;
     }
 
