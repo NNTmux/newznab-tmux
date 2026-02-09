@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm" x-data="moviesPage">
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm" x-data="moviesPage" data-movie-layout="{{ $movie_layout ?? 2 }}">
     {{-- Breadcrumb --}}
     <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <nav class="flex" aria-label="Breadcrumb">
@@ -171,52 +171,3 @@
 @include('partials.nfo-modal')
 @endsection
 
-@push('scripts')
-<script nonce="{{ csp_nonce() }}">
-document.addEventListener('alpine:init', () => {
-    Alpine.data('moviesPage', () => ({
-        layout: {{ $movie_layout ?? 2 }},
-        isUpdating: false,
-
-        get layoutLabel() {
-            return this.layout === 1 ? '1 Column' : '2 Columns';
-        },
-
-        get layoutIcon() {
-            return this.layout === 1 ? 'fas fa-th-list' : 'fas fa-th-large';
-        },
-
-        toggleLayout() {
-            if (this.isUpdating) return;
-            this.isUpdating = true;
-
-            const newLayout = this.layout === 1 ? 2 : 1;
-            const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-
-            if (csrf) {
-                fetch('/movies/update-layout', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrf,
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ layout: newLayout })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        // Reload page to apply new layout
-                        window.location.reload();
-                    } else {
-                        this.isUpdating = false;
-                    }
-                })
-                .catch(() => {
-                    this.isUpdating = false;
-                });
-            }
-        }
-    }));
-});
-</script>
-@endpush
