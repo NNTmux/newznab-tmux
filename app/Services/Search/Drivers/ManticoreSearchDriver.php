@@ -394,6 +394,10 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
     /**
      * Escapes characters that are treated as special operators by the query language parser.
+     *
+     * This method escapes ALL special characters, including search operators.
+     * Use prepareUserSearchQuery() instead for user-facing search queries
+     * where operators like negation (!) should be preserved.
      */
     public static function escapeString(string $string): string
     {
@@ -410,6 +414,150 @@ class ManticoreSearchDriver implements SearchDriverInterface
         $string = rtrim($string, '-!');
 
         return trim($string);
+    }
+
+    /**
+     * Prepares a user search query for ManticoreSearch, preserving search operators.
+     *
+     * Unlike escapeString() which escapes ALL special characters, this method
+     * recognizes and preserves user-facing search operators:
+     *
+     * - Negation: !word or -word (excludes results containing "word")
+     * - Phrase search: "exact phrase"
+     * - Negated phrase: !"exact phrase" or -"exact phrase"
+     * - OR operator: word1 | word2
+     * - Wildcards: word*, *word, *word*
+     * - Grouping: (word1 | word2) -word3
+     *
+     * Characters that are not useful as user operators are still escaped:
+     * \, @, ~, &, /, $, =, ', [, ]
+     */
+    public static function prepareUserSearchQuery(string $query): string
+    {
+        $query = trim($query);
+        if ($query === '' || $query === '*') {
+            return '';
+        }
+
+        // Tokenize while preserving quoted phrases intact
+        // Matches: optional negation prefix (! or -) + "quoted strings", OR non-whitespace sequences
+        preg_match_all('/[-!]?"[^"]*"|\S+/', $query, $matches);
+        $tokens = $matches[0] ?? [];
+
+        if (empty($tokens)) {
+            return '';
+        }
+
+        // Characters that should always be escaped (not meaningful as user-facing search operators)
+        // Includes " for unmatched quotes that appear in non-quoted tokens
+        $escapeFrom = ['\\', '@', '~', '&', '/', '$', '=', "'", '[', ']', '"'];
+        $escapeTo = ['\\\\', '\@', '\~', '\&', '\/', '\$', '\=', "\'", '\[', '\]', '\"'];
+
+        $processed = [];
+        foreach ($tokens as $token) {
+            // Preserve OR operator
+            if ($token === '|') {
+                $processed[] = '|';
+
+                continue;
+            }
+
+            // Extract leading/trailing parentheses for grouping: (word) or ((word))
+            $leadingParens = '';
+            $trailingParens = '';
+            while (str_starts_with($token, '(')) {
+                $leadingParens .= '(';
+                $token = substr($token, 1);
+            }
+            while (str_ends_with($token, ')') && ! str_starts_with($token, '"')) {
+                $trailingParens = ')'.$trailingParens;
+                $token = substr($token, 0, -1);
+            }
+
+            if ($token === '') {
+                // Only parens, no word content
+                if ($leadingParens !== '' || $trailingParens !== '') {
+                    $processed[] = $leadingParens.$trailingParens;
+                }
+
+                continue;
+            }
+
+            // Detect negation prefix (! or -) at the start of a word
+            $negation = '';
+            if (strlen($token) > 1 && ($token[0] === '!' || $token[0] === '-')) {
+                $negation = $token[0];
+                $token = substr($token, 1);
+            }
+
+            // Handle quoted phrases: "exact phrase" (possibly with negation prefix)
+            if (str_starts_with($token, '"') && str_ends_with($token, '"') && strlen($token) > 1) {
+                $inner = substr($token, 1, -1);
+                $inner = str_replace($escapeFrom, $escapeTo, $inner);
+                // Escape ! and - inside phrases (they're literal text, not operators)
+                $inner = str_replace(['!', '-'], ['\!', '\-'], $inner);
+                $processed[] = $leadingParens.$negation.'"'.$inner.'"'.$trailingParens;
+
+                continue;
+            }
+
+            // Detect wildcard prefix/suffix on non-quoted tokens
+            $wildcardPrefix = '';
+            $wildcardSuffix = '';
+            if (str_starts_with($token, '*')) {
+                $wildcardPrefix = '*';
+                $token = ltrim($token, '*');
+            }
+            if (str_ends_with($token, '*')) {
+                $wildcardSuffix = '*';
+                $token = rtrim($token, '*');
+            }
+
+            // Escape non-operator special characters within the word
+            $token = str_replace($escapeFrom, $escapeTo, $token);
+
+            // Escape ! and - that appear INSIDE a word (not at the start as operators)
+            // e.g., "spider-man" → "spider\-man", but "-circus" keeps the leading -
+            $token = str_replace(['!', '-'], ['\!', '\-'], $token);
+
+            if ($token !== '' || $wildcardPrefix !== '' || $wildcardSuffix !== '') {
+                $processed[] = $leadingParens.$negation.$wildcardPrefix.$token.$wildcardSuffix.$trailingParens;
+            }
+        }
+
+        $result = implode(' ', $processed);
+
+        return trim($result);
+    }
+
+    /**
+     * Check if a search query contains negation operators (! or - prefix on words).
+     *
+     * Used to prevent fuzzy fallback from reversing the user's negation intent.
+     * For example, if the user searches "!harry", fuzzy should not strip the !
+     * and return "harry" results.
+     */
+    public static function queryHasNegation(array|string $phrases): bool
+    {
+        $values = [];
+        if (is_string($phrases)) {
+            $values[] = $phrases;
+        } elseif (is_array($phrases)) {
+            foreach ($phrases as $value) {
+                if (is_string($value) && $value !== '' && $value !== '-1') {
+                    $values[] = $value;
+                }
+            }
+        }
+
+        foreach ($values as $value) {
+            // Check if any token starts with ! or - (negation operator)
+            if (preg_match('/(?:^|\s)[!-]\S/', $value)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function updateRelease(int|string $releaseID): void
@@ -711,6 +859,22 @@ class ManticoreSearchDriver implements SearchDriverInterface
             }
         }
 
+        // Skip fuzzy fallback when the query contains negation operators (! or -).
+        // Fuzzy search strips all special characters, which would reverse the user's
+        // intent: "!harry" would become "harry" and return exactly what they wanted to exclude.
+        if (self::queryHasNegation($phrases)) {
+            if (config('app.debug')) {
+                Log::debug('ManticoreSearch::searchReleasesWithFuzzy skipping fuzzy - query contains negation operators', [
+                    'phrases' => $phrases,
+                ]);
+            }
+
+            return [
+                'ids' => [],
+                'fuzzy' => false,
+            ];
+        }
+
         // If exact search returned nothing (or forcing fuzzy) and fuzzy is enabled, try fuzzy search
         if ($this->isFuzzyEnabled()) {
             $fuzzyResults = $this->fuzzySearchReleases($phrases, $limit);
@@ -959,14 +1123,15 @@ class ManticoreSearchDriver implements SearchDriverInterface
         }
 
         // Build query string once so we can retry if needed
+        // Use prepareUserSearchQuery() to preserve search operators (!, -, "", |, *)
         $searchExpr = null;
         if (! empty($searchArray)) {
             $terms = [];
             foreach ($searchArray as $key => $value) {
                 if (! empty($value)) {
-                    $escapedValue = self::escapeString($value);
-                    if (! empty($escapedValue)) {
-                        $terms[] = '@@relaxed @'.$key.' '.$escapedValue;
+                    $preparedValue = self::prepareUserSearchQuery($value);
+                    if (! empty($preparedValue)) {
+                        $terms[] = '@@relaxed @'.$key.' '.$preparedValue;
                     }
                 }
             }
@@ -980,10 +1145,10 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 return [];
             }
         } elseif (! empty($searchString)) {
-            $escapedSearch = self::escapeString($searchString);
-            if (empty($escapedSearch)) {
+            $preparedSearch = self::prepareUserSearchQuery($searchString);
+            if (empty($preparedSearch)) {
                 if (config('app.debug')) {
-                    Log::debug('ManticoreSearch::searchIndexes escapedSearch is empty');
+                    Log::debug('ManticoreSearch::searchIndexes preparedSearch is empty');
                 }
 
                 return [];
@@ -998,7 +1163,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 }
             }
 
-            $searchExpr = '@@relaxed '.$searchColumns.' '.$escapedSearch;
+            $searchExpr = '@@relaxed '.$searchColumns.' '.$preparedSearch;
         } else {
             return [];
         }
@@ -1263,6 +1428,13 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
         $query = trim($query);
         if (empty($query)) {
+            return [];
+        }
+
+        // Don't suggest spelling corrections for queries with negation operators.
+        // Suggesting "harry" for "!harry" would be misleading since the user
+        // intentionally wants to exclude that term.
+        if (self::queryHasNegation($query)) {
             return [];
         }
 
@@ -1928,12 +2100,12 @@ class ManticoreSearchDriver implements SearchDriverInterface
         }
 
         try {
-            $escapedSearch = self::escapeString($searchTerm);
-            if (empty($escapedSearch)) {
+            $preparedSearch = self::prepareUserSearchQuery($searchTerm);
+            if (empty($preparedSearch)) {
                 return $this->searchReleasesByCategory($categoryIds, $limit);
             }
 
-            $searchExpr = '@@relaxed @searchname '.$escapedSearch;
+            $searchExpr = '@@relaxed @searchname '.$preparedSearch;
 
             $query = (new Search($this->manticoreSearch))
                 ->setTable($this->getReleasesIndex())
