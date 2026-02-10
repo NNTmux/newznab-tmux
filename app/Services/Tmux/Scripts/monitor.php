@@ -12,7 +12,7 @@
 $artisan = dirname(__DIR__, 4).'/artisan';
 
 // Pass any arguments to the artisan command
-$args = array_slice($argv, 1);
+$args = array_slice($argv ?? [], 1);
 $argString = implode(' ', array_map('escapeshellarg', $args));
 
 passthru("php {$artisan} tmux:monitor {$argString}", $exitCode);

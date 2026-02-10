@@ -32,9 +32,6 @@ class AnidbTitle extends Model
      */
     protected $primaryKey = 'anidbid';
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
@@ -48,7 +45,7 @@ class AnidbTitle extends Model
     public $timestamps = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 

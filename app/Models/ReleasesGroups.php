@@ -56,18 +56,14 @@ class ReleasesGroups extends Model
      */
     public $timestamps = false;
 
-    /**
-     * @var bool
-     */
+    /** @phpstan-ignore property.defaultValue */
     public $dateFormat = false;
 
-    /**
-     * @var array
-     */
+    /** @phpstan-ignore property.defaultValue */
     protected $primaryKey = ['releases_id', 'groups_id'];
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 

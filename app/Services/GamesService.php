@@ -170,7 +170,7 @@ class GamesService
      */
     public function getCount(): int
     {
-        return GamesInfo::query()->count(['id']) ?? 0;
+        return GamesInfo::query()->count('id') ?? 0;
     }
 
     /**
@@ -470,7 +470,7 @@ class GamesService
 
         if (! empty($steamResults['releasedate'])) {
             $dateReleased = strtotime($steamResults['releasedate']) === false ? '' : $steamResults['releasedate'];
-            $game['releasedate'] = ($steamResults['releasedate'] === '' || strtotime($steamResults['releasedate']) === false)
+            $game['releasedate'] = (strtotime($steamResults['releasedate']) === false)
                 ? null
                 : Carbon::createFromFormat('M j, Y', Carbon::parse($dateReleased)->toFormattedDateString())->format('Y-m-d');
         }
@@ -703,10 +703,6 @@ class GamesService
                         if ($gameId === false) {
                             $gameId = -2;
                             $this->failedCount++;
-
-                            if ($this->maxHitRequest === true) {
-                                $gameId = 0;
-                            }
                         }
                     } else {
                         $gameId = $gameCheck['id'];

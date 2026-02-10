@@ -59,7 +59,7 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
         // Fetch the movie details page
         $this->response = $this->fetchHtml($this->directUrl, $this->cookie);
 
-        if ($this->response === false) {
+        if ($this->response === false) { // @phpstan-ignore identical.alwaysFalse
             return AdultProcessingResult::failed('Failed to fetch movie details page', $this->getName());
         }
 
@@ -156,30 +156,11 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
         }
 
         // Get all the movie data
-        $synopsis = $this->extractSynopsis();
-        if (is_array($synopsis)) {
-            $results = array_merge($results, $synopsis);
-        }
-
-        $productInfo = $this->extractProductInfo(true);
-        if (is_array($productInfo)) {
-            $results = array_merge($results, $productInfo);
-        }
-
-        $cast = $this->extractCast();
-        if (is_array($cast)) {
-            $results = array_merge($results, $cast);
-        }
-
-        $genres = $this->extractGenres();
-        if (is_array($genres)) {
-            $results = array_merge($results, $genres);
-        }
-
-        $covers = $this->extractCovers();
-        if (is_array($covers)) {
-            $results = array_merge($results, $covers);
-        }
+        $results = array_merge($results, $this->extractSynopsis());
+        $results = array_merge($results, $this->extractProductInfo(true));
+        $results = array_merge($results, $this->extractCast());
+        $results = array_merge($results, $this->extractGenres());
+        $results = array_merge($results, $this->extractCovers());
 
         if (empty($results)) {
             return false;
@@ -203,7 +184,7 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
 
         foreach ($selectors as $selector) {
             $ret = $this->getHtmlParser()->findOne($selector);
-            if ($ret) {
+            if ($ret) { // @phpstan-ignore if.alwaysTrue
                 $text = $ret->innerText ?? $ret->plaintext ?? $ret->content ?? '';
                 if (! empty(trim($text))) {
                     $res['synopsis'] = trim($text);
@@ -255,9 +236,7 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
                 }
             }
 
-            if (is_array($productinfo)) {
-                $res['productinfo'] = array_chunk($productinfo, 2, false);
-            }
+            $res['productinfo'] = array_chunk($productinfo, 2, false);
         }
 
         return $res;
@@ -269,9 +248,9 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
         $cast = [];
 
         // Prefer scoped search within stars container to avoid unrelated links
-        if ($container = $this->getHtmlParser()->findOne('.stars')) {
+        if ($container = $this->getHtmlParser()->findOne('.stars')) { // @phpstan-ignore if.alwaysTrue
             foreach ($container->find('a[title]') as $e) {
-                $name = trim($e->title);
+                $name = trim($e->title); // @phpstan-ignore property.notFound
                 $name = preg_replace('/\((.*)\)/', '', $name);
                 $name = trim($name);
                 if ($name !== '') {
@@ -302,9 +281,9 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
         $res = [];
         $genres = [];
 
-        if ($ret = $this->getHtmlParser()->findOne('div.categories')) {
+        if ($ret = $this->getHtmlParser()->findOne('div.categories')) { // @phpstan-ignore if.alwaysTrue
             foreach ($ret->find('a') as $e) {
-                if (str_contains($e->title, ' -> ')) {
+                if (str_contains($e->title, ' -> ')) { // @phpstan-ignore property.notFound
                     $e = explode(' -> ', $e->plaintext);
                     $genres[] = trim($e[1]);
                 }
@@ -329,7 +308,7 @@ class HotmoviesPipe extends AbstractAdultProviderPipe
 
         foreach ($selectors as $selector) {
             $ret = $this->getHtmlParser()->findOne($selector);
-            if ($ret && isset($ret->src)) {
+            if ($ret && isset($ret->src)) { // @phpstan-ignore booleanAnd.leftAlwaysTrue
                 $res['boxcover'] = trim($ret->src);
                 $res['backcover'] = str_ireplace(['.cover', 'front'], ['.back', 'back'], trim($ret->src));
 

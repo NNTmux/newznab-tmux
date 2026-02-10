@@ -30,13 +30,10 @@ use Illuminate\Database\Eloquent\Model;
 class UserMovie extends Model
 {
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**

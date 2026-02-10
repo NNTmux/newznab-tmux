@@ -6,6 +6,7 @@ use App\Models\Settings;
 
 class BooksProcessor
 {
+    /** @phpstan-ignore property.onlyWritten */
     private bool $echooutput;
 
     public function __construct(bool $echooutput)

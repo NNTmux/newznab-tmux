@@ -75,7 +75,7 @@ class IafdPipe extends AbstractAdultProviderPipe
         // Fetch the movie details page
         $this->response = $this->fetchHtml($this->directUrl, $this->cookie);
 
-        if ($this->response === false) {
+        if ($this->response === false) { // @phpstan-ignore identical.alwaysFalse
             return AdultProcessingResult::failed('Failed to fetch movie details page', $this->getName());
         }
 
@@ -189,27 +189,27 @@ class IafdPipe extends AbstractAdultProviderPipe
 
         // Get all the movie data (HTML fallback)
         $synopsis = $this->extractSynopsis();
-        if (is_array($synopsis) && ! empty($synopsis)) {
+        if (! empty($synopsis)) {
             $results = array_merge($results, $synopsis);
         }
 
         $productInfo = $this->extractProductInfo(true);
-        if (is_array($productInfo) && ! empty($productInfo)) {
+        if (! empty($productInfo)) {
             $results = array_merge($results, $productInfo);
         }
 
         $cast = $this->extractCast();
-        if (is_array($cast) && ! empty($cast)) {
+        if (! empty($cast)) {
             $results = array_merge($results, $cast);
         }
 
         $genres = $this->extractGenres();
-        if (is_array($genres) && ! empty($genres)) {
+        if (! empty($genres)) {
             $results = array_merge($results, $genres);
         }
 
         $covers = $this->extractCovers();
-        if (is_array($covers) && ! empty($covers)) {
+        if (! empty($covers)) {
             $results = array_merge($results, $covers);
         }
 
@@ -300,7 +300,7 @@ class IafdPipe extends AbstractAdultProviderPipe
 
         foreach ($selectors as $selector) {
             $ret = $this->getHtmlParser()->findOne($selector);
-            if ($ret) {
+            if ($ret) { // @phpstan-ignore if.alwaysTrue
                 $coverUrl = $ret->src ?? $ret->content ?? null;
 
                 if (! empty($coverUrl)) {
@@ -334,7 +334,7 @@ class IafdPipe extends AbstractAdultProviderPipe
 
         foreach ($selectors as $selector) {
             $ret = $this->getHtmlParser()->findOne($selector);
-            if ($ret) {
+            if ($ret) { // @phpstan-ignore if.alwaysTrue
                 $text = $ret->plaintext ?? $ret->content ?? '';
                 if (! empty(trim($text))) {
                     $res['synopsis'] = trim($text);
@@ -355,7 +355,7 @@ class IafdPipe extends AbstractAdultProviderPipe
         // IAFD has a specific cast table structure
         $castTable = $this->getHtmlParser()->findOne('table#perfcast, div#perfcast');
 
-        if ($castTable) {
+        if ($castTable) { // @phpstan-ignore if.alwaysTrue
             $performers = $castTable->find('a[href*="/person.rme"]');
             foreach ($performers as $performer) {
                 $name = trim($performer->plaintext ?? '');
@@ -434,13 +434,13 @@ class IafdPipe extends AbstractAdultProviderPipe
 
         // Look for studio
         $studio = $this->getHtmlParser()->findOne('a[href*="/studio.rme"]');
-        if ($studio) {
+        if ($studio) { // @phpstan-ignore if.alwaysTrue
             $res['studio'] = trim($studio->plaintext ?? '');
         }
 
         // Look for distributor
         $distributor = $this->getHtmlParser()->findOne('a[href*="/distrib.rme"]');
-        if ($distributor) {
+        if ($distributor) { // @phpstan-ignore if.alwaysTrue
             $res['distributor'] = trim($distributor->plaintext ?? '');
         }
 
@@ -457,7 +457,7 @@ class IafdPipe extends AbstractAdultProviderPipe
 
         foreach ($directorSelectors as $selector) {
             $director = $this->getHtmlParser()->findOne($selector);
-            if ($director) {
+            if ($director) { // @phpstan-ignore if.alwaysTrue
                 $res['director'] = trim($director->plaintext ?? '');
                 break;
             }
@@ -475,7 +475,7 @@ class IafdPipe extends AbstractAdultProviderPipe
             }
             if (stripos($text, 'Studio:') !== false) {
                 $parts = explode(':', $text, 2);
-                if (count($parts) === 2 && empty($res['studio'] ?? '')) {
+                if (count($parts) === 2 && empty($res['studio'])) {
                     $res['studio'] = trim($parts[1]);
                 }
             }

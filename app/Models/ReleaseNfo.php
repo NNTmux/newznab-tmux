@@ -28,15 +28,12 @@ class ReleaseNfo extends Model
      */
     public $timestamps = false;
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     protected $primaryKey = 'releases_id';
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 

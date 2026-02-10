@@ -40,7 +40,7 @@ class Invitation extends Model
     public const DEFAULT_INVITE_EXPIRY_DAYS = 7;
 
     /**
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'token',
@@ -54,7 +54,7 @@ class Invitation extends Model
     ];
 
     /**
-     * @var array
+     * @var array<string, string>
      */
     protected $casts = [
         'expires_at' => 'datetime',
@@ -102,7 +102,7 @@ class Invitation extends Model
      */
     public function scopeValid(Builder $query): Builder
     {
-        return $query->active()
+        return $query->active() // @phpstan-ignore method.notFound
             ->where('expires_at', '>', now())
             ->whereNull('used_at');
     }

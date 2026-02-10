@@ -159,7 +159,7 @@ class LocalDbProvider extends AbstractTvProvider
 
     public function getPoster(int $videoId): int
     {
-        return (new ReleaseImageService)->saveImage($videoId, '', $this->imgSavePath, '', '', parent::TYPE_TV);
+        return (new ReleaseImageService)->saveImage((string) $videoId, '', $this->imgSavePath, 0, 0, (bool) parent::TYPE_TV);
     }
 
     public function getShowInfo(string $name): bool|array

@@ -116,7 +116,7 @@ class NntmuxResetPostProcessing extends Command
 
             foreach ($normalized as $adjusted) {
                 // skip 'all' since handled above
-                if ($adjusted === 'all') {
+                if ($adjusted === 'all') { // @phpstan-ignore identical.alwaysFalse
                     continue;
                 }
                 $this->info('Resetting postprocessing for '.$adjusted.' category');

@@ -221,7 +221,7 @@ class NzbImportService
      *
      * @throws \Exception
      */
-    protected function scanNZBFile(&$nzbXML, $nzbFileName = ''): bool
+    protected function scanNZBFile(&$nzbXML, $nzbFileName = '', $source = ''): bool
     {
         $binary_names = [];
         $totalFiles = $totalSize = $groupID = 0;

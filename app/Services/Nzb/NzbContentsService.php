@@ -190,7 +190,7 @@ class NzbContentsService
         Release::query()->where('id', $relID)->update(['completion' => $completion]);
 
         // If NFO check was requested, return the found message ID (prioritizing explicit)
-        if ($nfoCheck && $nfoMessageId !== null && isset($nfoMessageId['id']) && \strlen($nfoMessageId['id']) > 1) {
+        if ($nfoCheck && $nfoMessageId !== null && \strlen($nfoMessageId['id']) > 1) {
             return $nfoMessageId;
         }
 

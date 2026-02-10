@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $hosthash
  * @property string $timestamp
  * @property int $releases_id FK to releases.id
+ * @property int|null $count Computed count from aggregate queries
  * @property-read Release $release
  * @property-read User $user
  *
@@ -30,9 +31,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class UserDownload extends Model
 {
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
@@ -41,7 +39,7 @@ class UserDownload extends Model
     public $timestamps = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 
@@ -104,7 +102,7 @@ class UserDownload extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Collection<int, self>
      */
     public static function getDownloadRequestsForUser($userID)
     {

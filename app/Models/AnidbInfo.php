@@ -60,9 +60,6 @@ class AnidbInfo extends Model
      */
     protected $primaryKey = 'anidbid';
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
@@ -76,7 +73,7 @@ class AnidbInfo extends Model
     public $timestamps = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 

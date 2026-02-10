@@ -510,7 +510,7 @@ class UpdateReleasesIndexSchema extends Command
                 $this->client->table($indexName)->replaceDocument($document, $id);
             } else {
                 // Document doesn't exist in index, we need full data from database
-                $release = Release::with(['movieinfo', 'video'])->find($id);
+                $release = Release::with(['video'])->find($id);
                 if ($release) {
                     Search::insertRelease([
                         'id' => $release->id,

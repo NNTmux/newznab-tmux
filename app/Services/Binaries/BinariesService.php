@@ -165,7 +165,7 @@ class BinariesService
 
         $endTime = now()->diffInSeconds($allTime, true);
         $this->log(
-            'Updating completed in '.$endTime.Str::plural(' second', $endTime),
+            'Updating completed in '.$endTime.Str::plural(' second', (int) $endTime),
             __FUNCTION__,
             'primary'
         );
@@ -238,7 +238,7 @@ class BinariesService
         if ($this->config->echoCli) {
             $endGroup = now()->diffInSeconds($startGroup, true);
             cli()->primary(
-                PHP_EOL.'Group '.$groupMySQL['name'].' processed in '.$endGroup.Str::plural(' second', $endGroup)
+                PHP_EOL.'Group '.$groupMySQL['name'].' processed in '.$endGroup.Str::plural(' second', (int) $endGroup)
             );
         }
     }

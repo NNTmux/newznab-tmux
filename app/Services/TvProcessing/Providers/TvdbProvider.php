@@ -312,7 +312,7 @@ class TvdbProvider extends AbstractTvProvider
         $hasCover = 0;
 
         if (! empty($this->posterUrl)) {
-            $hasCover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);
+            $hasCover = $ri->saveImage((string) $videoId, $this->posterUrl, $this->imgSavePath);
             if ($hasCover === 1) {
                 $this->setCoverFound($videoId);
             }

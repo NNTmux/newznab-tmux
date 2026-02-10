@@ -145,8 +145,8 @@ class TmuxTaskRunner
      */
     protected function getRandomColor(): int
     {
-        $start = (int) Settings::settingValue('colors_start') ?? 0;
-        $end = (int) Settings::settingValue('colors_end') ?? 255;
+        $start = (int) Settings::settingValue('colors_start');
+        $end = (int) Settings::settingValue('colors_end');
         $exclude = Settings::settingValue('colors_exc') ?? '';
 
         if (empty($exclude)) {
@@ -430,7 +430,7 @@ class TmuxTaskRunner
             $selectedTypes = $runVar['settings']['fix_crap'] ?? '';
 
             // Convert numeric 0 or empty values to empty string
-            if (empty($selectedTypes) || $selectedTypes === 0 || $selectedTypes === '0') {
+            if (empty($selectedTypes)) {
                 return $this->disablePane($pane, 'Remove Crap', 'no crap types selected');
             }
 
@@ -438,7 +438,7 @@ class TmuxTaskRunner
 
             // Trim whitespace and filter out empty values and '0'
             $types = array_map('trim', $types);
-            $types = array_filter($types, fn ($type) => ! empty($type) && $type !== '0');
+            $types = array_filter($types, fn ($type) => ! empty($type));
 
             // Re-index array to ensure sequential keys
             $types = array_values($types);

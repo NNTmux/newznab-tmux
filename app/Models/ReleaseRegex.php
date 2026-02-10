@@ -23,9 +23,6 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ReleaseRegex extends Model
 {
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
@@ -39,7 +36,7 @@ class ReleaseRegex extends Model
     public $timestamps = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 }

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
  * @property string $hosthash
  * @property string $request
  * @property string $timestamp
+ * @property int|null $count Computed count from aggregate queries
  * @property-read User $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserRequest whereHosthash($value)
@@ -33,10 +34,6 @@ class UserRequest extends Model
     /**
      * @var string
      */
-
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
@@ -45,7 +42,7 @@ class UserRequest extends Model
     public $timestamps = false;
 
     /**
-     * @var array
+     * @var list<string>
      */
     protected $fillable = ['id', 'users_id', 'request', 'hosthash', 'timestamp'];
 

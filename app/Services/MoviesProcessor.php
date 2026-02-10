@@ -7,6 +7,7 @@ use GuzzleHttp\Exception\GuzzleException;
 
 class MoviesProcessor
 {
+    /** @phpstan-ignore property.onlyWritten */
     private bool $echooutput;
 
     public function __construct(bool $echooutput)

@@ -453,13 +453,13 @@ class NfoService
     /**
      * Add an NFO from alternate sources. ex.: PreDB, rar, zip, etc...
      *
-     * @param  string  $nfo  The nfo.
+     * @param  bool|string  $nfo  The nfo.
      * @param  NNTPService  $nntp  Instance of class NNTPService.
      * @return bool True on success, False on failure.
      *
      * @throws \Exception
      */
-    public function addAlternateNfo(string &$nfo, $release, NNTPService $nntp): bool
+    public function addAlternateNfo(bool|string &$nfo, $release, NNTPService $nntp): bool
     {
         if ($release->id > 0 && $this->isNFO($nfo, $release->guid)) {
             $check = ReleaseNfo::whereReleasesId($release->id)->first(['releases_id']);

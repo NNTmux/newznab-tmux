@@ -60,7 +60,7 @@ class TmdbClient
 
         try {
             $response = Http::timeout($this->timeout)
-                ->retry($this->retryTimes, $this->retryDelay, function (\Exception $exception, $request) {
+                ->retry($this->retryTimes, $this->retryDelay, function (\Throwable $exception, \Illuminate\Http\Client\PendingRequest $request, ?string $key = null) {
                     // Don't retry on 404 errors - resource simply doesn't exist
                     if ($exception instanceof \Illuminate\Http\Client\RequestException) {
                         return $exception->response->status() !== 404;

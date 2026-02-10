@@ -15,7 +15,7 @@ class ThreadPolicy extends \TeamTeaTime\Forum\Policies\ThreadPolicy
     public function rename($user, Thread $thread): bool
     {
         // Admins can rename any thread; users can rename their own
-        return $user->hasRole('Admin') || ($user->getKey() === $thread->author_id);
+        return $user->hasRole('Admin') || ($user->getKey() === $thread->author_id); // @phpstan-ignore property.notFound
     }
 
     public function reply($user, Thread $thread): bool
@@ -27,19 +27,19 @@ class ThreadPolicy extends \TeamTeaTime\Forum\Policies\ThreadPolicy
     public function replyWithoutApproval($user, Thread $thread): bool
     {
         // Admins can reply to unapproved threads; otherwise only thread author
-        return $user->hasRole('Admin') || ($user->getKey() === $thread->author_id);
+        return $user->hasRole('Admin') || ($user->getKey() === $thread->author_id); // @phpstan-ignore property.notFound
     }
 
     public function delete($user, Thread $thread): bool
     {
         // Admins can delete any thread; users can delete their own
-        return $user->hasRole('Admin') || ($user->getKey() === $thread->author_id);
+        return $user->hasRole('Admin') || ($user->getKey() === $thread->author_id); // @phpstan-ignore property.notFound
     }
 
     public function restore($user, Thread $thread): bool
     {
         // Admins can restore any thread; users can restore their own
-        return $user->hasRole('Admin') || ($user->getKey() === $thread->author_id);
+        return $user->hasRole('Admin') || ($user->getKey() === $thread->author_id); // @phpstan-ignore property.notFound
     }
 
     public function deletePosts($user, Thread $thread): bool

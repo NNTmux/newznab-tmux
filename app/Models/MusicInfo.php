@@ -24,6 +24,7 @@ use Laravel\Scout\Searchable;
  * @property bool $cover
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
+ * @property int|null $_totalcount Computed total count from aggregate queries
  * @property-read Genre|null $genre
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MusicInfo whereArtist($value)
@@ -57,9 +58,6 @@ class MusicInfo extends Model
      */
     protected $table = 'musicinfo';
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
@@ -68,7 +66,7 @@ class MusicInfo extends Model
     public $timestamps = true;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 

@@ -12,8 +12,8 @@ use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\Password as PasswordFacade;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Jrean\UserVerification\Traits\VerifiesUsers;
@@ -62,7 +62,7 @@ class RegisterController extends Controller
             'roles_id' => $data['roles_id'],
             'notes' => $data['notes'],
             'invites' => $data['defaultinvites'],
-            'api_token' => md5(PasswordFacade::getRepository()->createNewToken()),
+            'api_token' => md5(Str::random(40)),
         ]);
 
         $role = Role::query()->where('id', '=', $data['roles_id'])->first();
@@ -164,10 +164,6 @@ class RegisterController extends Controller
 
                 // Get the default user role.
                 $userDefault = Role::query()->where('isdefault', '=', 1)->first();
-
-                if (! empty($error)) {
-                    return $this->showRegistrationForm($request, $error);
-                }
 
                 // Check invitation validity using custom system
                 $invitationValid = $this->isInvitationValid($inviteCode, $email);

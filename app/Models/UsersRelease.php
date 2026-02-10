@@ -30,13 +30,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class UsersRelease extends Model
 {
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = ['id'];
 
@@ -71,7 +68,7 @@ class UsersRelease extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getCart($uid)
     {

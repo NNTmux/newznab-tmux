@@ -27,7 +27,7 @@ class BrowseController extends BasePageController
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
 
-        $rslt = $this->releaseBrowseService->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), $orderBy, -1, $this->userdata->categoryexclusions, -1);
+        $rslt = $this->releaseBrowseService->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), $orderBy, -1, (array) $this->userdata->categoryexclusions, -1);
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
         // Build order by URLs
@@ -75,14 +75,14 @@ class BrowseController extends BasePageController
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
 
-        $rslt = $this->releaseBrowseService->getBrowseRange($page, $catarray, $offset, config('nntmux.items_per_page'), $orderBy, -1, $this->userdata->categoryexclusions, $grp);
+        $rslt = $this->releaseBrowseService->getBrowseRange($page, $catarray, $offset, config('nntmux.items_per_page'), $orderBy, -1, (array) $this->userdata->categoryexclusions, $grp);
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
         $covgroup = '';
         $shows = false;
-        if ($category === -1 && $grp === -1) {
+        if ($category === -1) {
             $catname = 'All';
-        } elseif ($category !== -1 && $grp === -1) {
+        } else {
             $catname = $id;
 
             // Determine the root category ID - either from the category's root_categories_id
@@ -118,8 +118,6 @@ class BrowseController extends BasePageController
             } elseif ($rootCategoryId === Category::TV_ROOT) {
                 $shows = true;
             }
-        } else {
-            $catname = $grp;
         }
 
         // Build order by URLs
@@ -166,7 +164,7 @@ class BrowseController extends BasePageController
             $group = $request->input('g');
             $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
             $offset = ($page - 1) * config('nntmux.items_per_page');
-            $rslt = $this->releaseBrowseService->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), '', -1, $this->userdata->categoryexclusions, $group);
+            $rslt = $this->releaseBrowseService->getBrowseRange($page, [-1], $offset, config('nntmux.items_per_page'), '', -1, (array) $this->userdata->categoryexclusions, $group);
             $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
             $this->viewData = array_merge($this->viewData, [

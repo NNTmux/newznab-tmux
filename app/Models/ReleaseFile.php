@@ -38,13 +38,10 @@ use Illuminate\Support\Facades\Log;
  */
 class ReleaseFile extends Model
 {
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 
@@ -62,7 +59,7 @@ class ReleaseFile extends Model
      * Get releasefiles row by id.
      *
      *
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getReleaseFiles($id)
     {
@@ -70,7 +67,7 @@ class ReleaseFile extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getByGuid($guid)
     {

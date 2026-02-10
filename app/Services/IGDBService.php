@@ -14,6 +14,9 @@ use MarcReichel\IGDBLaravel\Models\Game;
 /**
  * IGDBService - IGDB (Internet Game Database) API integration.
  *
+ * Note: MarcReichel\IGDBLaravel\Models\Game and Company use dynamic properties
+ * (name, id, etc.) that PHPStan cannot resolve.
+ *
  * Features:
  * - Rate limiting and caching
  * - Multiple search strategies for better matching
@@ -79,7 +82,7 @@ class IGDBService
 
         if ($game !== null) {
             Cache::put($cacheKey, $game, self::GAME_CACHE_TTL);
-            Log::info('IGDBService: Found match', ['title' => $title, 'matched' => $game->name]);
+            Log::info('IGDBService: Found match', ['title' => $title, 'matched' => $game->name]); // @phpstan-ignore property.notFound
         } else {
             Cache::put("igdb_search_failed:{$cacheKey}", true, self::FAILED_LOOKUP_CACHE_TTL);
             Log::debug('IGDBService: No match found', ['title' => $title]);
@@ -125,7 +128,7 @@ class IGDBService
         // Strategy 1: Exact name search with PC platform filter
         $game = $this->searchExact($title);
         if ($game !== null) {
-            Log::debug('IGDBService: Exact match found', ['title' => $title, 'matched' => $game->name]);
+            Log::debug('IGDBService: Exact match found', ['title' => $title, 'matched' => $game->name]); // @phpstan-ignore property.notFound
 
             return $game;
         }
@@ -133,7 +136,7 @@ class IGDBService
         // Strategy 2: Fuzzy search using IGDB's search endpoint
         $game = $this->searchFuzzy($title);
         if ($game !== null) {
-            Log::debug('IGDBService: Fuzzy match found', ['title' => $title, 'matched' => $game->name]);
+            Log::debug('IGDBService: Fuzzy match found', ['title' => $title, 'matched' => $game->name]); // @phpstan-ignore property.notFound
 
             return $game;
         }
@@ -143,7 +146,7 @@ class IGDBService
         if ($cleanTitle !== $title && $cleanTitle !== '') {
             $game = $this->searchFuzzy($cleanTitle);
             if ($game !== null) {
-                Log::debug('IGDBService: Clean title match found', ['title' => $title, 'matched' => $game->name]);
+                Log::debug('IGDBService: Clean title match found', ['title' => $title, 'matched' => $game->name]); // @phpstan-ignore property.notFound
 
                 return $game;
             }
@@ -154,7 +157,7 @@ class IGDBService
         if ($baseTitle !== $title && $baseTitle !== $cleanTitle && $baseTitle !== '') {
             $game = $this->searchFuzzy($baseTitle);
             if ($game !== null) {
-                Log::debug('IGDBService: Base title match found', ['title' => $title, 'matched' => $game->name]);
+                Log::debug('IGDBService: Base title match found', ['title' => $title, 'matched' => $game->name]); // @phpstan-ignore property.notFound
 
                 return $game;
             }
@@ -316,13 +319,13 @@ class IGDBService
                 if ($isPublisher === true && $companyId) {
                     $companyData = Company::find($companyId);
                     if ($companyData) {
-                        $publishers[] = $companyData->name;
+                        $publishers[] = $companyData->name; // @phpstan-ignore property.notFound
                     }
                 }
                 if ($isDeveloper === true && $companyId) {
                     $companyData = Company::find($companyId);
                     if ($companyData) {
-                        $developers[] = $companyData->name;
+                        $developers[] = $companyData->name; // @phpstan-ignore property.notFound
                     }
                 }
             }
@@ -346,22 +349,22 @@ class IGDBService
         $releaseDate = $this->getReleaseDate($game);
 
         // Get game URL
-        $gameUrl = $game->url ?? ('https://www.igdb.com/games/'.($game->slug ?? $game->id));
+        $gameUrl = $game->url ?? ('https://www.igdb.com/games/'.($game->slug ?? $game->id)); // @phpstan-ignore property.notFound
 
         // Build review text
         $review = $this->buildReview($game, $developers);
 
         Log::info('IGDBService: Game data built', [
-            'title' => $game->name,
-            'id' => $game->id,
+            'title' => $game->name, // @phpstan-ignore property.notFound
+            'id' => $game->id, // @phpstan-ignore property.notFound
             'has_cover' => ! empty($coverUrl),
             'has_backdrop' => ! empty($backdropUrl),
             'genres' => $genres,
         ]);
 
         return [
-            'title' => $game->name,
-            'asin' => 'igdb-'.$game->id,
+            'title' => $game->name, // @phpstan-ignore property.notFound
+            'asin' => 'igdb-'.$game->id, // @phpstan-ignore property.notFound
             'review' => $review,
             'coverurl' => $coverUrl,
             'releasedate' => $releaseDate,
@@ -658,19 +661,15 @@ class IGDBService
         $genreName = '';
         $a = str_replace('-', ' ', $genre);
         $tmpGenre = explode(',', $a);
-        if (is_array($tmpGenre)) {
-            foreach ($tmpGenre as $tg) {
-                $genreMatch = $this->isKnownGenre(ucwords(trim($tg)));
-                if ($genreMatch !== false) {
-                    $genreName = (string) $genreMatch;
-                    break;
-                }
+        foreach ($tmpGenre as $tg) {
+            $genreMatch = $this->isKnownGenre(ucwords(trim($tg)));
+            if ($genreMatch !== false) {
+                $genreName = (string) $genreMatch;
+                break;
             }
             if (empty($genreName) && ! empty($tmpGenre[0])) {
                 $genreName = trim($tmpGenre[0]);
             }
-        } else {
-            $genreName = $genre;
         }
 
         return $genreName;

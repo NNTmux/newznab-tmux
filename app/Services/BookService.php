@@ -49,7 +49,7 @@ class BookService
         $this->sleeptime = Settings::settingValue('amazonsleep') !== '' ? (int) Settings::settingValue('amazonsleep') : 1000;
         $this->imgSavePath = storage_path('covers/book/');
 
-        $this->bookreqids = Category::BOOKS_EBOOK;
+        $this->bookreqids = (string) Category::BOOKS_EBOOK;
         $this->renamed = (int) Settings::settingValue('lookupbooks') === 2 ? 'AND isrenamed = 1' : '';
 
         $this->failCache = [];
@@ -159,8 +159,8 @@ class BookService
 			%s
 			GROUP BY boo.id
 			ORDER BY %s %s',
-            \is_array($bookIDs) && ! empty($bookIDs) ? implode(',', $bookIDs) : -1,
-            \is_array($releaseIDs) && ! empty($releaseIDs) ? implode(',', $releaseIDs) : -1,
+            ! empty($bookIDs) ? implode(',', $bookIDs) : -1,
+            ! empty($releaseIDs) ? implode(',', $releaseIDs) : -1,
             $catsrch,
             $order[0],
             $order[1]
@@ -368,7 +368,7 @@ class BookService
                 // Sleep to not flood amazon.
                 $diff = floor((now()->timestamp - $startTime) * 1000000);
                 if ($this->sleeptime * 1000 - $diff > 0 && $usedAmazon === true) {
-                    usleep($this->sleeptime * 1000 - $diff);
+                    usleep((int) ($this->sleeptime * 1000 - $diff));
                 }
             }
         } elseif ($this->echooutput) {
@@ -445,12 +445,8 @@ class BookService
 
         $book = false;
         if ($bookInfo !== '') {
-            if (! $book) {
-                cli()->info('Fetching data from iTunes for '.$bookInfo);
-                $book = $this->fetchItunesBookProperties($bookInfo);
-            } elseif ($amazdata !== null) {
-                $book = $amazdata;
-            }
+            cli()->info('Fetching data from iTunes for '.$bookInfo);
+            $book = $this->fetchItunesBookProperties($bookInfo);
         }
 
         if (empty($book)) {
@@ -479,9 +475,7 @@ class BookService
                 ]
             );
         } else {
-            if ($check !== null) {
-                $bookId = $check['id'];
-            }
+            $bookId = $check['id'];
             BookInfo::query()->where('id', $bookId)->update(
                 [
                     'title' => $book['title'],

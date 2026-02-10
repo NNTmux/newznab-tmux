@@ -94,7 +94,7 @@ class SeriesController extends BasePageController
                     if ((empty($r->series) || (int) $r->series === 0 || empty($r->episode) || (int) $r->episode === 0) && ! empty($r->searchname)) {
                         $matched = false;
 
-                        if (! $matched && preg_match('/\bS(\d{1,2})E(\d{1,3})\b/i', $r->searchname, $m)) {
+                        if (preg_match('/\bS(\d{1,2})E(\d{1,3})\b/i', $r->searchname, $m)) {
                             if (empty($r->series) || (int) $r->series === 0) {
                                 $r->series = (int) $m[1];
                             }

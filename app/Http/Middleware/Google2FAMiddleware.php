@@ -44,6 +44,7 @@ class Google2FAMiddleware
         }
 
         // Continue with normal 2FA flow if we reach this point
+        /** @var Google2FAAuthenticator $authenticator */
         $authenticator = app(Google2FAAuthenticator::class)->boot($request);
 
         if ($authenticator->isAuthenticated()) {

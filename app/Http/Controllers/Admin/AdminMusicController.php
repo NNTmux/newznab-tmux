@@ -21,7 +21,7 @@ class AdminMusicController extends BasePageController
         $search = $request->input('musicsearch', '');
 
         if (! empty($search)) {
-            $musicList = getRange('musicinfo', $search);
+            $musicList = getRange('musicinfo');
             $lastSearch = $search;
         } else {
             $musicList = getRange('musicinfo');

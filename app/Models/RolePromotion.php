@@ -15,8 +15,8 @@ use Spatie\Permission\Models\Role;
  * @property string|null $description
  * @property array $applicable_roles
  * @property int $additional_days
- * @property string|null $start_date
- * @property string|null $end_date
+ * @property \Carbon\Carbon|null $start_date
+ * @property \Carbon\Carbon|null $end_date
  * @property bool $is_active
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
@@ -212,9 +212,12 @@ class RolePromotion extends Model
             ->get()
             ->groupBy('role_id')
             ->map(function ($stats, $roleId) {
+                /** @var \App\Models\RolePromotionStat|null $firstStat */
+                $firstStat = $stats->first();
+
                 return [
                     'role_id' => $roleId,
-                    'role_name' => $stats->first()->role?->name,
+                    'role_name' => $firstStat?->role?->name,
                     'total_upgrades' => $stats->count(),
                     'total_days_added' => $stats->sum('days_added'),
                     'unique_users' => $stats->unique('user_id')->count(),
@@ -229,6 +232,7 @@ class RolePromotion extends Model
      */
     public function getStatisticsForPeriod(Carbon $startDate, Carbon $endDate): array
     {
+        /** @phpstan-ignore method.notFound */
         $stats = $this->statistics()
             ->appliedBetween($startDate, $endDate)
             ->get();

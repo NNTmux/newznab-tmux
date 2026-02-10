@@ -45,13 +45,10 @@ class Forumpost extends Model
      */
     protected $table = 'forumpost';
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 
@@ -103,7 +100,7 @@ class Forumpost extends Model
      * Get forum posts for a parent category.
      *
      *
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getPosts($parent)
     {
@@ -188,7 +185,7 @@ class Forumpost extends Model
      * Get range of posts for user.
      *
      *
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getForUserRange($uid, $start, $num)
     {

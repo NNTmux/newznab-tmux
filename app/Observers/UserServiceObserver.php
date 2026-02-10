@@ -6,7 +6,7 @@ use App\Jobs\SendNewRegisteredAccountMail;
 use App\Jobs\SendWelcomeEmail;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Jrean\UserVerification\Facades\UserVerification;
 use Spatie\Permission\Models\Role;
 
@@ -26,7 +26,7 @@ class UserServiceObserver
         $user->syncRoles([$roleName]);
         $user->update(
             [
-                'api_token' => md5(Password::getRepository()->createNewToken()),
+                'api_token' => md5(Str::random(40)),
                 'rate_limit' => $rateLimit,
             ]
         );

@@ -55,13 +55,10 @@ class ConsoleInfo extends Model
      */
     protected $table = 'consoleinfo';
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 

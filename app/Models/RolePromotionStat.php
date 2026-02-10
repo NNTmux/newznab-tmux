@@ -127,7 +127,7 @@ class RolePromotionStat extends Model
             'promotions' => $stats->groupBy('role_promotion_id')->map(function ($group) {
                 return [
                     'promotion_id' => $group->first()->role_promotion_id,
-                    'promotion_name' => $group->first()->promotion?->name,
+                    'promotion_name' => $group->first()->promotion->name,
                     'times_applied' => $group->count(),
                     'total_days' => $group->sum('days_added'),
                 ];

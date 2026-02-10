@@ -676,15 +676,11 @@ class AdultProcessingPipeline
      */
     protected function insertGenre(string $genre): int|string
     {
-        if ($genre !== null) {
-            return Genre::query()->insertGetId([
-                'title' => $genre,
-                'type' => Category::XXX_ROOT,
-                'disabled' => 0,
-            ]);
-        }
-
-        return '';
+        return Genre::query()->insertGetId([
+            'title' => $genre,
+            'type' => Category::XXX_ROOT,
+            'disabled' => 0,
+        ]);
     }
 
     /**

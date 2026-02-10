@@ -80,7 +80,7 @@ class TraktService
 
         try {
             $response = Http::timeout($this->timeout)
-                ->retry($this->retryTimes, $this->retryDelay, function (\Exception $exception, $request) {
+                ->retry($this->retryTimes, $this->retryDelay, function (\Throwable $exception, \Illuminate\Http\Client\PendingRequest $request, ?string $key = null) {
                     // Don't retry on 404 errors - resource simply doesn't exist
                     if ($exception instanceof \Illuminate\Http\Client\RequestException) {
                         return $exception->response->status() !== 404;
@@ -232,9 +232,7 @@ class TraktService
 
         return match ($idType) {
             'imdb' => is_numeric($id) ? 'tt'.str_pad((string) $id, 7, '0', STR_PAD_LEFT) : (string) $id,
-            'trakt' => (string) $id,
-            'tmdb', 'tvdb' => (string) $id,
-            default => null,
+            'trakt', 'tmdb', 'tvdb' => (string) $id,
         };
     }
 
@@ -277,7 +275,7 @@ class TraktService
         // Use the search endpoint to find the show by external ID
         $results = $this->searchById($id, $idType, 'show');
 
-        if (empty($results) || ! is_array($results)) {
+        if (empty($results)) {
             return null;
         }
 

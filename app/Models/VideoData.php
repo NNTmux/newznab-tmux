@@ -49,9 +49,6 @@ class VideoData extends Model
      */
     public $timestamps = false;
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
@@ -65,7 +62,7 @@ class VideoData extends Model
     protected $primaryKey = 'releases_id';
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 }

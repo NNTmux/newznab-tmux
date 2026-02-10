@@ -13,7 +13,6 @@ use App\Services\NameFixing\ReleaseUpdateService;
 use App\Services\NfoService;
 use App\Services\NNTP\NNTPService;
 use App\Services\Nzb\NzbService;
-use App\Services\ReleaseExtraService;
 use App\Services\ReleaseImageService;
 use App\Services\Releases\ReleaseBrowseService;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -29,7 +28,6 @@ class ReleaseFileManager
 {
     public function __construct(
         private readonly ProcessingConfiguration $config,
-        private readonly ReleaseExtraService $releaseExtra,
         private readonly ReleaseImageService $releaseImage,
         private readonly NfoService $nfo,
         private readonly NzbService $nzb,
@@ -218,7 +216,7 @@ class ReleaseFileManager
                     $this->releaseImage->vidSavePath.$guid.'.ogv',
                 ];
                 foreach ($files as $file) {
-                    if ($file && File::exists($file)) {
+                    if (File::exists($file)) {
                         File::delete($file);
                     }
                 }
@@ -249,7 +247,7 @@ class ReleaseFileManager
                 Release::where('id', $id)->delete();
             } catch (\Throwable) {
             }
-        } catch (\Throwable) {
+        } catch (\Throwable) { // @phpstan-ignore catch.neverThrown
             // Last resort: swallow any exception
         }
     }

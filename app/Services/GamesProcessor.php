@@ -6,6 +6,7 @@ use App\Models\Settings;
 
 class GamesProcessor
 {
+    /** @phpstan-ignore property.onlyWritten */
     private bool $echooutput;
 
     private GamesService $gamesService;

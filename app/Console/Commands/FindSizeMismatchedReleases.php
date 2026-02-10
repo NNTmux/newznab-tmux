@@ -54,7 +54,7 @@ class FindSizeMismatchedReleases extends Command
         $query->orderBy($shouldRename ? 'releases.id' : 'diff_percent', $shouldRename ? 'asc' : 'desc');
 
         if ($limit > 0) {
-            $query->limit($limit);
+            $query->limit((int) $limit);
         }
 
         $mismatches = $query->get();
@@ -107,20 +107,18 @@ class FindSizeMismatchedReleases extends Command
     {
         if (preg_match(ReleaseUpdateService::PREDB_REGEX, $this->stripDomainFromString($release->name), $matches)) {
             $newName = $matches[1];
-            if ($newName) {
-                $nameFixingService->getUpdateService()->updateRelease(
-                    release: $release,
-                    name: $newName,
-                    method: 'size-mismatch / season pack',
-                    echo: true,
-                    type: '',
-                    nameStatus: true,
-                    show: true,
-                    preId: 0
-                );
+            $nameFixingService->getUpdateService()->updateRelease(
+                release: $release,
+                name: $newName,
+                method: 'size-mismatch / season pack',
+                echo: true,
+                type: '',
+                nameStatus: true,
+                show: true,
+                preId: 0
+            );
 
-                return $newName;
-            }
+            return $newName;
         }
 
         return null;

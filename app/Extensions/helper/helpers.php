@@ -81,7 +81,7 @@ if (! function_exists('getRawHtml')) {
         $cookieJar = new CookieJar;
         $client = new Client(['headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246']]);
         if ($cookie !== false && $cookie !== null && $cookie !== '') {
-            $cookie = $cookieJar->setCookie(SetCookie::fromString($cookie));
+            $cookie = $cookieJar->setCookie(SetCookie::fromString((string) $cookie));
             $client = new Client(['cookies' => $cookie, 'headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246']]);
         }
         try {
@@ -209,9 +209,9 @@ if (! function_exists('human_filesize')) {
     function human_filesize($bytes, $decimals = 0): string
     {
         $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-        $factor = floor((\strlen($bytes) - 1) / 3);
+        $factor = (int) floor((\strlen((string) $bytes) - 1) / 3);
 
-        return round(sprintf("%.{$decimals}f", $bytes / (1024 ** $factor)), $decimals).@$size[$factor];
+        return round((float) sprintf("%.{$decimals}f", $bytes / (1024 ** $factor)), $decimals).@$size[$factor];
     }
 }
 
@@ -223,9 +223,9 @@ if (! function_exists('bcdechex')) {
     {
         $hex = '';
         do {
-            $last = bcmod($dec, 16);
-            $hex = dechex($last).$hex;
-            $dec = bcdiv(bcsub($dec, $last), 16);
+            $last = bcmod($dec, '16');
+            $hex = dechex((int) $last).$hex;
+            $dec = bcdiv(bcsub($dec, $last), '16');
         } while ($dec > 0);
 
         return $hex;
@@ -712,7 +712,7 @@ if (! function_exists('unzipGzipFile')) {
     function unzipGzipFile(string $filePath)
     {
         $string = '';
-        $gzFile = @gzopen($filePath, 'rb', 0);
+        $gzFile = @gzopen($filePath, 'rb', false);
         if ($gzFile) {
             while (! gzeof($gzFile)) {
                 $temp = gzread($gzFile, 1024);
@@ -937,7 +937,7 @@ if (! function_exists('showApiError')) {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".
             '<error code="'.$errorCode.'" description="'.$errorText."\"/>\n";
 
-        return response($response)->header('Content-type', 'text/xml')->header('Content-Length', strlen($response))->header('X-NNTmux', 'API ERROR ['.$errorCode.'] '.$errorText)->header('HTTP/1.1', $errorHeader);
+        return response($response)->header('Content-type', 'text/xml')->header('Content-Length', (string) strlen($response))->header('X-NNTmux', 'API ERROR ['.$errorCode.'] '.$errorText)->header('HTTP/1.1', $errorHeader);
     }
 }
 
@@ -1219,7 +1219,7 @@ if (! function_exists('cli')) {
                 public function percentString(int $cur, int $total): string
                 {
                     $percent = 100 * $cur / $total;
-                    $formatString = '% '.\strlen($total).'d/%d (% 2d%%)';
+                    $formatString = '% '.\strlen((string) $total).'d/%d (% 2d%%)';
 
                     return sprintf($formatString, $cur, $total, $percent);
                 }
@@ -1228,7 +1228,7 @@ if (! function_exists('cli')) {
                 {
                     $percent1 = 100 * ($first - 1) / $total;
                     $percent2 = 100 * $last / $total;
-                    $formatString = '% '.\strlen($total).'d-% '.\strlen($total).'d/%d (% 2d%%-% 3d%%)';
+                    $formatString = '% '.\strlen((string) $total).'d-% '.\strlen((string) $total).'d/%d (% 2d%%-% 3d%%)';
 
                     return sprintf($formatString, $first, $last, $total, $percent1, $percent2);
                 }

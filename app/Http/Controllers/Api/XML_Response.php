@@ -101,25 +101,19 @@ class XML_Response
 
     public function returnXML(): bool|string
     {
-        if ($this->xml) {
-            switch ($this->type) {
-                case 'caps':
-                    return $this->returnCaps();
-                    break;
-                case 'api':
-                    $this->namespace = 'newznab';
+        switch ($this->type) {
+            case 'caps':
+                return $this->returnCaps();
+            case 'api':
+                $this->namespace = 'newznab';
 
-                    return $this->returnApiXml();
-                    break;
-                case 'rss':
-                    $this->namespace = 'nntmux';
+                return $this->returnApiXml();
+            case 'rss':
+                $this->namespace = 'nntmux';
 
-                    return $this->returnApiRssXml();
-                    break;
-                case 'reg':
-                    return $this->returnReg();
-                    break;
-            }
+                return $this->returnApiRssXml();
+            case 'reg':
+                return $this->returnReg();
         }
 
         return false;
@@ -451,7 +445,7 @@ class XML_Response
                 $this->writeZedAttr('anidbid', $this->release->anidbid);
             }
             if (isset($this->release->predb_id) && $this->release->predb_id > 0) {
-                $this->writeZedAttr('prematch', 1);
+                $this->writeZedAttr('prematch', '1');
             }
             if (isset($this->release->nfostatus) && (int) $this->release->nfostatus === 1) {
                 $this->writeZedAttr(

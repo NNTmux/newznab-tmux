@@ -50,9 +50,6 @@ use Illuminate\Support\Facades\DB;
  */
 class UsenetGroup extends Model
 {
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
@@ -61,7 +58,7 @@ class UsenetGroup extends Model
     public $timestamps = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 
@@ -124,7 +121,7 @@ class UsenetGroup extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getActive()
     {
@@ -135,7 +132,7 @@ class UsenetGroup extends Model
      * Get active backfill groups ordered by name ascending.
      *
      *
-     * @return array|\Illuminate\Database\Eloquent\Collection|static[]
+     * @return array|\Illuminate\Database\Eloquent\Collection
      */
     public static function getActiveBackfill($order)
     {
@@ -143,10 +140,8 @@ class UsenetGroup extends Model
             case '':
             case 'normal':
                 return self::query()->where('backfill', '=', 1)->where('last_record', '<>', 0)->orderBy('name')->get();
-                break;
             case 'date':
                 return self::query()->where('backfill', '=', 1)->where('last_record', '<>', 0)->orderByDesc('first_record_postdate')->get();
-                break;
             default:
                 return [];
         }
@@ -156,7 +151,7 @@ class UsenetGroup extends Model
      * Get all active group IDs.
      *
      *
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getActiveIDs()
     {
@@ -219,7 +214,7 @@ class UsenetGroup extends Model
             $res->where('active', $active);
         }
 
-        return $res === null ? 0 : $res->count(['id']);
+        return $res === null ? 0 : $res->count('id');
     }
 
     public static function getGroupsRange(string $groupname = '', $active = null): LengthAwarePaginator
@@ -322,7 +317,7 @@ class UsenetGroup extends Model
      *
      * @throws \Exception
      */
-    public static function reset($id): bool
+    public static function reset($id): int
     {
         // Remove rows from part repair.
         MissedPart::query()->where('groups_id', $id)->delete();
@@ -344,7 +339,7 @@ class UsenetGroup extends Model
     /**
      * Reset all groups.
      */
-    public static function resetall(): bool
+    public static function resetall(): int
     {
         // Disable foreign key checks to allow truncating tables with foreign key constraints
         DB::statement('SET FOREIGN_KEY_CHECKS=0');

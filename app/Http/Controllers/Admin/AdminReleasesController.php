@@ -69,7 +69,6 @@ class AdminReleasesController extends BasePageController
                 $release = Release::getByGuid($request->input('guid'));
 
                 return redirect('details/'.$release['guid'])->with('success', 'Release updated successfully');
-                break;
 
             case 'view':
             default:

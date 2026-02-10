@@ -31,9 +31,6 @@ class ReleaseUnique extends Model
      */
     public $timestamps = false;
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
@@ -42,7 +39,7 @@ class ReleaseUnique extends Model
     public $incrementing = false;
 
     /**
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'releases_id',

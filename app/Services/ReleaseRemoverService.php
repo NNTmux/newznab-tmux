@@ -302,7 +302,7 @@ class ReleaseRemoverService
      *
      * @throws Exception
      */
-    private function executeSimpleRemoval(string $method, string $query): bool|string
+    private function executeSimpleRemoval(string $method, string $query): bool
     {
         $this->method = $method;
         $this->query = $query;
@@ -602,7 +602,7 @@ class ReleaseRemoverService
     /**
      * Perform search using configured search engine.
      */
-    private function performSearch(string $regexMatch): array|string
+    private function performSearch(string $regexMatch): array
     {
         return \App\Facades\Search::searchReleases($regexMatch, 100);
     }

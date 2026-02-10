@@ -2,6 +2,7 @@
 
 namespace App\Services\Categorization;
 
+use App\Models\Category;
 use App\Services\Categorization\Pipes\AbstractCategorizationPipe;
 
 /**
@@ -77,6 +78,55 @@ class CategorizationService
         $this->pipeline->addCategorizer($pipe);
 
         return $this;
+    }
+
+    /**
+     * Compare pipeline categorization against the legacy Blacklight\Categorize class.
+     *
+     * Returns an array with 'pipeline', 'legacy', and 'match' keys so callers
+     * can verify the new pipeline produces the same results as the old categorizer.
+     *
+     * @param  int|string  $groupId  The usenet group ID
+     * @param  string  $releaseName  The name of the release
+     * @return array{pipeline: array{category_id: int, category_name: string}, legacy: array{category_id: int, category_name: string}, match: bool}
+     */
+    public function compare(int|string $groupId, string $releaseName): array
+    {
+        // Run the new pipeline categorization
+        $pipelineResult = $this->determineCategory($groupId, $releaseName);
+        $pipelineCategoryId = $pipelineResult['categories_id'];
+        $pipelineCategory = Category::find($pipelineCategoryId);
+        $pipelineCategoryName = $pipelineCategory ? $pipelineCategory->title : 'Unknown';
+
+        // Attempt legacy categorization if the class still exists
+        $legacyCategoryId = Category::OTHER_MISC;
+        $legacyCategoryName = 'Unknown';
+
+        if (class_exists(\Blacklight\Categorize::class)) {
+            try {
+                $legacy = new \Blacklight\Categorize;
+                /** @var int $legacyCategoryId */
+                $legacyCategoryId = (int) $legacy->determineCategory($groupId, $releaseName);
+                $legacyCategory = Category::find($legacyCategoryId);
+                $legacyCategoryName = $legacyCategory ? $legacyCategory->title : 'Unknown';
+            } catch (\Throwable) {
+                $legacyCategoryName = 'Legacy error';
+            }
+        } else {
+            $legacyCategoryName = 'Legacy unavailable';
+        }
+
+        return [
+            'pipeline' => [
+                'category_id' => $pipelineCategoryId,
+                'category_name' => $pipelineCategoryName,
+            ],
+            'legacy' => [
+                'category_id' => $legacyCategoryId,
+                'category_name' => $legacyCategoryName,
+            ],
+            'match' => $pipelineCategoryId === $legacyCategoryId,
+        ];
     }
 
     /**

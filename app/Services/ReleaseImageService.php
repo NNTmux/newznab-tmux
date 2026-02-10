@@ -78,7 +78,7 @@ class ReleaseImageService
             $imageData = @file_get_contents($imgLoc, false, $context);
 
             // Check HTTP response headers if available
-            if (isset($http_response_header) && ! empty($http_response_header)) {
+            if (! empty($http_response_header)) {
                 $statusLine = $http_response_header[0] ?? '';
                 if (preg_match('/HTTP\/\d\.\d\s+(\d+)/', $statusLine, $matches)) {
                     $httpCode = (int) $matches[1];
@@ -93,7 +93,7 @@ class ReleaseImageService
 
             if ($imageData === false) {
                 $error = error_get_last();
-                $errorMsg = $error !== null && isset($error['message']) ? $error['message'] : 'Unknown error fetching image';
+                $errorMsg = $error !== null ? $error['message'] : 'Unknown error fetching image';
                 Log::debug('Failed to fetch image from '.$imgLoc.': '.$errorMsg);
                 cli()->notice('Failed to fetch image from '.$imgLoc.': '.$errorMsg);
 

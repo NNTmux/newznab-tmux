@@ -85,7 +85,7 @@ final class PostProcessService
             $this->alternateNNTP
         );
         $this->tvProcessor = $tvProcessor ?? new TvProcessor($this->echoOutput);
-        $this->nfoProcessor = $nfoProcessor ?? new NfoProcessor($this->nfo, $this->echoOutput);
+        $this->nfoProcessor = $nfoProcessor ?? new NfoProcessor($this->nfo);
         $this->moviesProcessor = $moviesProcessor ?? new MoviesProcessor($this->echoOutput);
         $this->musicProcessor = $musicProcessor ?? new MusicProcessor($this->echoOutput);
         $this->booksProcessor = $booksProcessor ?? new BooksProcessor($this->echoOutput);
@@ -100,7 +100,7 @@ final class PostProcessService
      *
      * @throws \Exception
      */
-    public function processAll(NNTP $nntp): void
+    public function processAll(NNTPService $nntp): void
     {
         $this->processAdditional();
         $this->processNfos($nntp);

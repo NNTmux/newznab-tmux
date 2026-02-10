@@ -172,7 +172,7 @@ class AdminInvitationController extends BasePageController
     public function cancel(Request $request): RedirectResponse
     {
         try {
-            $id = $request->route('id');
+            $id = (int) $request->route('id');
             $this->invitationService->cancelInvitation($id);
 
             return redirect()->back()->with('success', 'Invitation cancelled successfully');
@@ -187,7 +187,7 @@ class AdminInvitationController extends BasePageController
     public function resend(Request $request): RedirectResponse
     {
         try {
-            $id = $request->route('id');
+            $id = (int) $request->route('id');
             $this->invitationService->resendInvitation($id);
 
             return redirect()->back()->with('success', 'Invitation resent successfully');

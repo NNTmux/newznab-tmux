@@ -47,6 +47,7 @@ class NntmuxPopulateSearchIndexes extends Command
 
     private const DEFAULT_CHUNK_SIZE = 50000;
 
+    /** @phpstan-ignore classConstant.unused */
     private const DEFAULT_PARALLEL_PROCESSES = 4;
 
     private const DEFAULT_BATCH_SIZE = 5000;

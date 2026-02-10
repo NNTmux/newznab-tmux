@@ -87,8 +87,9 @@ class MediaExtractionService
 
         try {
             if ($this->ffprobe()->isValid($fileLocation)) {
-                $this->ffmpeg()->open($fileLocation)
-                    ->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time))
+                /** @var \FFMpeg\Media\Video $video */
+                $video = $this->ffmpeg()->open($fileLocation);
+                $video->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time))
                     ->save($fileName);
             }
         } catch (\Throwable $e) {
@@ -138,7 +139,7 @@ class MediaExtractionService
                 } else {
                     $lowestLength = ($numbers[1] - $this->config->ffmpegDuration);
                     $end = '.'.$numbers[2];
-                    $lowestLength = match (strlen($lowestLength)) {
+                    $lowestLength = match (strlen((string) $lowestLength)) {
                         1 => '00:00:0'.$lowestLength.$end,
                         2 => '00:00:'.$lowestLength.$end,
                         default => '00:00:60.00',
@@ -147,6 +148,7 @@ class MediaExtractionService
 
                 try {
                     if ($this->ffprobe()->isValid($fileLocation)) {
+                        /** @var \FFMpeg\Media\Video $video */
                         $video = $this->ffmpeg()->open($fileLocation);
                         $clip = $video->clip(
                             TimeCode::fromString($lowestLength),
@@ -169,6 +171,7 @@ class MediaExtractionService
         if (! $newMethod) {
             try {
                 if ($this->ffprobe()->isValid($fileLocation)) {
+                    /** @var \FFMpeg\Media\Video $video */
                     $video = $this->ffmpeg()->open($fileLocation);
                     $clip = $video->clip(
                         TimeCode::fromSeconds(0),
@@ -285,7 +288,7 @@ class MediaExtractionService
                 Category::MOVIE_OTHER,
                 Category::TV_OTHER
             ),
-            $rQuery->categories_id
+            (string) $rQuery->categories_id
         )) {
             return $result;
         }
@@ -298,55 +301,53 @@ class MediaExtractionService
         if (! $result['audioInfo']) {
             try {
                 $xmlArray = $this->mediaInfo()->getInfo($fileLocation, false);
-                if ($xmlArray !== null) {
-                    foreach ($xmlArray->getAudios() as $track) {
-                        if ($track->get('album') !== null && $track->get('performer') !== null) {
-                            if ((int) $context->release->predb_id === 0 && $this->config->renameMusicMediaInfo) {
-                                $ext = strtoupper($fileExtension);
+                foreach ($xmlArray->getAudios() as $track) {
+                    if ($track->get('album') !== null && $track->get('performer') !== null) {
+                        if ((int) $context->release->predb_id === 0 && $this->config->renameMusicMediaInfo) {
+                            $ext = strtoupper($fileExtension);
 
-                                $newName = $track->get('performer')->getFullName().' - '.$track->get('album')->getFullName();
-                                if (! empty($track->get('recorded_date'))
-                                    && preg_match('/(?:19|20)\d\d/', $track->get('recorded_date')->getFullname, $Year)
-                                ) {
-                                    $newName .= ' ('.$Year[0].') '.$ext;
-                                } else {
-                                    $newName .= ' '.$ext;
-                                }
-
-                                $newCat = match ($ext) {
-                                    'MP3' => Category::MUSIC_MP3,
-                                    'FLAC' => Category::MUSIC_LOSSLESS,
-                                    default => $this->categorize->determineCategory($rQuery->groups_id, $newName, $rQuery->fromname),
-                                };
-
-                                $newTitle = escapeString(substr($newName, 0, 255));
-                                Release::whereId($context->release->id)->update([
-                                    'searchname' => $newTitle,
-                                    'categories_id' => is_array($newCat) ? $newCat['categories_id'] : $newCat,
-                                    'iscategorized' => 1,
-                                    'isrenamed' => 1,
-                                    'proc_pp' => 1,
-                                ]);
-
-                                Search::updateRelease($context->release->id);
-
-                                if ($this->config->echoCLI) {
-                                    $releaseInfo = (object) [
-                                        'groups_id' => $rQuery->groups_id, 'categories_id' => $rQuery->categories_id,
-                                        'searchname' => $rQuery->searchname, 'name' => $rQuery->searchname,
-                                        'releases_id' => $context->release->id, 'filename' => '',
-                                    ];
-                                    (new ReleaseUpdateService)->echoReleaseInfo($releaseInfo, $newTitle,
-                                        is_array($newCat) ? $newCat : ['categories_id' => $newCat], '',
-                                        'MediaExtractionService->getAudioInfo');
-                                }
+                            $newName = $track->get('performer')->getFullName().' - '.$track->get('album')->getFullName();
+                            if (! empty($track->get('recorded_date'))
+                                && preg_match('/(?:19|20)\d\d/', $track->get('recorded_date')->getFullname, $Year)
+                            ) {
+                                $newName .= ' ('.$Year[0].') '.$ext;
+                            } else {
+                                $newName .= ' '.$ext;
                             }
 
-                            $this->releaseExtra->addFromXml($context->release->id, $xmlArray);
-                            $result['audioInfo'] = true;
-                            $context->foundAudioInfo = true;
-                            break;
+                            $newCat = match ($ext) {
+                                'MP3' => Category::MUSIC_MP3,
+                                'FLAC' => Category::MUSIC_LOSSLESS,
+                                default => $this->categorize->determineCategory($rQuery->groups_id, $newName, $rQuery->fromname),
+                            };
+
+                            $newTitle = escapeString(substr($newName, 0, 255));
+                            Release::whereId($context->release->id)->update([
+                                'searchname' => $newTitle,
+                                'categories_id' => is_array($newCat) ? $newCat['categories_id'] : $newCat,
+                                'iscategorized' => 1,
+                                'isrenamed' => 1,
+                                'proc_pp' => 1,
+                            ]);
+
+                            Search::updateRelease($context->release->id);
+
+                            if ($this->config->echoCLI) {
+                                $releaseInfo = (object) [
+                                    'groups_id' => $rQuery->groups_id, 'categories_id' => $rQuery->categories_id,
+                                    'searchname' => $rQuery->searchname, 'name' => $rQuery->searchname,
+                                    'releases_id' => $context->release->id, 'filename' => '',
+                                ];
+                                (new ReleaseUpdateService)->echoReleaseInfo($releaseInfo, $newTitle,
+                                    is_array($newCat) ? $newCat : ['categories_id' => $newCat], '',
+                                    'MediaExtractionService->getAudioInfo');
+                            }
                         }
+
+                        $this->releaseExtra->addFromXml($context->release->id, $xmlArray);
+                        $result['audioInfo'] = true;
+                        $context->foundAudioInfo = true;
+                        break;
                     }
                 }
             } catch (\Throwable $e) {
@@ -362,7 +363,7 @@ class MediaExtractionService
                 if ($this->ffprobe()->isValid($fileLocation)) {
                     $audioSample = $this->ffmpeg()->open($fileLocation);
                     $format = new Vorbis;
-                    $audioSample->clip(TimeCode::fromSeconds(30), TimeCode::fromSeconds(30));
+                    $audioSample->clip(TimeCode::fromSeconds(30), TimeCode::fromSeconds(30)); // @phpstan-ignore method.notFound
                     $audioSample->save($format, $tmpPath.$audioFileName);
                 }
             } catch (\Throwable $e) {

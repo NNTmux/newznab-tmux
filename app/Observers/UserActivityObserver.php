@@ -49,7 +49,7 @@ class UserActivityObserver
                     'new_role_id' => $newRoleId,
                     'old_role_name' => $oldRoleName,
                     'new_role_name' => $newRoleName,
-                    'updated_by' => auth()->user()?->username ?? 'System',
+                    'updated_by' => auth()->user()?->username ?? 'System', // @phpstan-ignore nullsafe.neverNull
                 ],
             ]);
 
@@ -64,7 +64,7 @@ class UserActivityObserver
      */
     public function deleting(User $user): void
     {
-        $deletedBy = auth()->user()?->username ?? 'System';
+        $deletedBy = auth()->user()?->username ?? 'System'; // @phpstan-ignore nullsafe.neverNull
 
         // Check if user is deleting their own account
         if (auth()->check() && auth()->id() === $user->id) {
@@ -119,7 +119,7 @@ class UserActivityObserver
             'activity_type' => 'registered',
             'description' => "User restored: {$user->username}",
             'metadata' => [
-                'restored_by' => auth()->user()?->username ?? 'System',
+                'restored_by' => auth()->user()?->username ?? 'System', // @phpstan-ignore nullsafe.neverNull
             ],
         ]);
     }
@@ -129,7 +129,7 @@ class UserActivityObserver
      */
     public function forceDeleted(User $user): void
     {
-        $deletedBy = auth()->user()?->username ?? 'System';
+        $deletedBy = auth()->user()?->username ?? 'System'; // @phpstan-ignore nullsafe.neverNull
 
         // Check if user is deleting their own account
         if (auth()->check() && auth()->id() === $user->id) {

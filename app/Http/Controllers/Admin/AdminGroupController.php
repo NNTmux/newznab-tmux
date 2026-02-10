@@ -77,7 +77,6 @@ class AdminGroupController extends BasePageController
                 }
 
                 return redirect()->to('admin/group-list');
-                break;
 
             case 'view':
             default:

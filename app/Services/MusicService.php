@@ -356,11 +356,11 @@ class MusicService
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-            $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
+            $mus['cover'] = $ri->saveImage((string) $musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
             MusicInfo::query()->where('id', $musicId)->update(['cover' => $mus['cover']]);
         } else {
             $musicId = $check['id'];
-            $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
+            $mus['cover'] = $ri->saveImage((string) $musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
             MusicInfo::query()->where('id', $musicId)->update([
                 'title' => $mus['title'],
                 'asin' => $mus['asin'],
@@ -470,7 +470,7 @@ class MusicService
                 $sleeptime = $this->sleeptime / 1000;
                 $diff = now()->diffInSeconds($startTime, true);
                 if ($sleeptime - $diff > 0 && $usedAmazon === true) {
-                    sleep($sleeptime - $diff);
+                    sleep((int) ($sleeptime - $diff));
                 }
             }
 

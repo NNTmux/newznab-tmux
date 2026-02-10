@@ -122,7 +122,7 @@ final class BackfillService
     public function safeBackfill(int|string $articles = ''): void
     {
         $group = UsenetGroup::query()
-            ->whereBetween('first_record_postdate', [Carbon::createFromDate($this->config->safeBackFillDate), now()])
+            ->whereBetween('first_record_postdate', [Carbon::createFromDate((int) $this->config->safeBackFillDate), now()])
             ->where('backfill', '=', 1)
             ->select(['name'])
             ->orderBy('name')

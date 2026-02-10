@@ -39,6 +39,8 @@ class AnimeProcessor
      * Simple cache of looked up titles -> anilist_id to reduce repeat queries within one run.
      *
      * @var array<string,int>
+     *
+     * @phpstan-ignore property.onlyWritten
      */
     private array $anilistIdCache = [];
 
@@ -314,7 +316,7 @@ class AnimeProcessor
         // Not found locally, search AniList API
         try {
             $searchResults = $this->palist->searchAnime($searchName, 1);
-            if ($searchResults && ! empty($searchResults)) {
+            if ($searchResults) {
                 $anilistData = $searchResults[0];
                 $anilistId = $anilistData['id'] ?? null;
 
@@ -395,7 +397,7 @@ class AnimeProcessor
                     // Search AniList for this title
                     try {
                         $searchResults = $this->palist->searchAnime($title, 1);
-                        if ($searchResults && ! empty($searchResults)) {
+                        if ($searchResults) {
                             $anilistId = $searchResults[0]['id'] ?? null;
                         }
                     } catch (\Exception $e) {

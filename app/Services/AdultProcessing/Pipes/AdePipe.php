@@ -57,7 +57,7 @@ class AdePipe extends AbstractAdultProviderPipe
         // Fetch the movie details page
         $this->response = $this->fetchHtml($this->directUrl, $this->cookie);
 
-        if ($this->response === false) {
+        if ($this->response === false) { // @phpstan-ignore identical.alwaysFalse
             return AdultProcessingResult::failed('Failed to fetch movie details page', $this->getName());
         }
 
@@ -154,35 +154,12 @@ class AdePipe extends AbstractAdultProviderPipe
         }
 
         // Get all the movie data
-        $synopsis = $this->extractSynopsis();
-        if (is_array($synopsis)) {
-            $results = array_merge($results, $synopsis);
-        }
-
-        $productInfo = $this->extractProductInfo(true);
-        if (is_array($productInfo)) {
-            $results = array_merge($results, $productInfo);
-        }
-
-        $cast = $this->extractCast();
-        if (is_array($cast)) {
-            $results = array_merge($results, $cast);
-        }
-
-        $genres = $this->extractGenres();
-        if (is_array($genres)) {
-            $results = array_merge($results, $genres);
-        }
-
-        $covers = $this->extractCovers();
-        if (is_array($covers)) {
-            $results = array_merge($results, $covers);
-        }
-
-        $trailers = $this->extractTrailers();
-        if (is_array($trailers)) {
-            $results = array_merge($results, $trailers);
-        }
+        $results = array_merge($results, $this->extractSynopsis());
+        $results = array_merge($results, $this->extractProductInfo(true));
+        $results = array_merge($results, $this->extractCast());
+        $results = array_merge($results, $this->extractGenres());
+        $results = array_merge($results, $this->extractCovers());
+        $results = array_merge($results, $this->extractTrailers());
 
         if (empty($results)) {
             return false;
@@ -229,7 +206,7 @@ class AdePipe extends AbstractAdultProviderPipe
 
         foreach ($selectors as $selector) {
             $ret = $this->getHtmlParser()->findOne($selector);
-            if ($ret && isset($ret->src)) {
+            if ($ret && isset($ret->src)) { // @phpstan-ignore booleanAnd.leftAlwaysTrue
                 // Get high-resolution covers
                 $res['boxcover'] = preg_replace('/[ms]\.jpg$/', 'h.jpg', $ret->src);
                 $res['backcover'] = preg_replace('/[ms]\.jpg$/', 'bh.jpg', $ret->src);
@@ -255,7 +232,7 @@ class AdePipe extends AbstractAdultProviderPipe
 
         foreach ($selectors as $selector => $property) {
             $meta = $this->getHtmlParser()->findOne($selector);
-            if ($meta && isset($meta->$property) && $meta->$property !== false && ! empty(trim($meta->$property))) {
+            if ($meta && isset($meta->$property) && $meta->$property !== false && ! empty(trim($meta->$property))) { // @phpstan-ignore booleanAnd.leftAlwaysTrue
                 $res['synopsis'] = trim($meta->$property);
 
                 return $res;
@@ -339,7 +316,7 @@ class AdePipe extends AbstractAdultProviderPipe
         $tmpHtml = new \voku\helper\HtmlDomParser;
         $tmpHtml->loadHtml($tmpResponse);
 
-        if ($ret = $tmpHtml->findOne('div[class=spdinfo]')) {
+        if ($ret = $tmpHtml->findOne('div[class=spdinfo]')) { // @phpstan-ignore if.alwaysTrue
             $productinfo = [];
             $extrasData = [];
 

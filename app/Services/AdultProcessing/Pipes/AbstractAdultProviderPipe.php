@@ -868,7 +868,7 @@ abstract class AbstractAdultProviderPipe
 
         foreach ($metaTags as $property => $key) {
             $meta = $this->getHtmlParser()->findOne('meta[property="'.$property.'"]');
-            if ($meta && isset($meta->content)) {
+            if ($meta && isset($meta->content)) { // @phpstan-ignore booleanAnd.leftAlwaysTrue
                 $og[$key] = trim($meta->content);
             }
         }

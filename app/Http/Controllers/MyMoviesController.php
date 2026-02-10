@@ -7,24 +7,19 @@ use App\Models\Settings;
 use App\Models\UserMovie;
 use App\Services\MovieBrowseService;
 use App\Services\MovieService;
-use App\Services\Releases\ReleaseBrowseService;
 use Illuminate\Http\Request;
 
 class MyMoviesController extends BasePageController
 {
-    private ReleaseBrowseService $releaseBrowseService;
-
     private MovieService $movieService;
 
     private MovieBrowseService $movieBrowseService;
 
     public function __construct(
-        ReleaseBrowseService $releaseBrowseService,
         MovieService $movieService,
         MovieBrowseService $movieBrowseService
     ) {
         parent::__construct();
-        $this->releaseBrowseService = $releaseBrowseService;
         $this->movieService = $movieService;
         $this->movieBrowseService = $movieBrowseService;
     }
@@ -141,10 +136,11 @@ class MyMoviesController extends BasePageController
                 $offset = ($page - 1) * config('nntmux.items_per_cover_page');
 
                 $movies = UserMovie::getMovies($this->userdata->id);
+                /** @var array<string, string> $categories */
                 $categories = $movie = [];
                 foreach ($movies as $moviek => $movie) {
                     $showcats = explode('|', $movie['categories']);
-                    if (\is_array($showcats) && \count($showcats) > 0) {
+                    if (\count($showcats) > 0) {
                         $catarr = [];
                         foreach ($showcats as $scat) {
                             if (! empty($scat)) {
@@ -161,7 +157,7 @@ class MyMoviesController extends BasePageController
 
                 $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
 
-                $results = $this->movieBrowseService->getMovieRange($page, [], $offset, config('nntmux.items_per_cover_page'), $ordering, -1, $this->userdata->categoryexclusions);
+                $results = $this->movieBrowseService->getMovieRange($page, [], $offset, config('nntmux.items_per_cover_page'), $ordering, -1, (array) $this->userdata->categoryexclusions);
 
                 $this->viewData['covgroup'] = '';
 
@@ -172,7 +168,9 @@ class MyMoviesController extends BasePageController
                 $this->viewData['lastvisit'] = $this->userdata->lastlogin;
                 $this->viewData['results'] = $results;
                 $this->viewData['movies'] = true;
-                $this->viewData['content'] = view('browse', $this->viewData)->render();
+                /** @var view-string $browseView */
+                $browseView = 'browse';
+                $this->viewData['content'] = view($browseView, $this->viewData)->render();
                 $this->viewData = array_merge($this->viewData, compact('title', 'meta_title', 'meta_keywords', 'meta_description'));
 
                 return $this->pagerender();
@@ -194,7 +192,7 @@ class MyMoviesController extends BasePageController
                 $results = [];
                 foreach ($movies as $moviek => $movie) {
                     $showcats = explode('|', $movie['categories'] ?? '');
-                    if (\is_array($showcats) && \count($showcats) > 0) {
+                    if (\count($showcats) > 0) {
                         $catarr = [];
                         foreach ($showcats as $scat) {
                             if (! empty($scat) && isset($categories[$scat])) {

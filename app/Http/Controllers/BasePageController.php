@@ -101,7 +101,7 @@ class BasePageController extends Controller
     /**
      * Show 404 page.
      *
-     * @param  null  $message
+     * @param  string|null  $message
      */
     public function show404($message = null): View
     {

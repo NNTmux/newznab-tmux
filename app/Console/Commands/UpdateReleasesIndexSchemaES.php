@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Facades\Elasticsearch;
 use App\Models\Release;
-use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -608,9 +607,6 @@ class UpdateReleasesIndexSchemaES extends Command
                 || ($source['tvmaze'] ?? 0) > 0
                 || ($source['tvrage'] ?? 0) > 0;
 
-        } catch (Missing404Exception $e) {
-            // Document doesn't exist
-            return false;
         } catch (\Throwable $e) {
             // Other error, assume no media IDs
             return false;

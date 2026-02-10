@@ -426,7 +426,7 @@ class AdditionalProcessingOrchestrator
             if ($failed >= $this->config->maximumRarPasswordChecks) {
                 break;
             }
-            if ($context->releaseHasPassword || $context->groupUnavailable) {
+            if ($context->releaseHasPassword || $context->groupUnavailable) { // @phpstan-ignore booleanOr.rightAlwaysFalse
                 break;
             }
 
@@ -479,7 +479,7 @@ class AdditionalProcessingOrchestrator
                 $downloaded++;
 
                 $processed = $this->processCompressedData($result['data'], $context, $reverse);
-                if ($processed || $context->releaseHasPassword) {
+                if ($processed || $context->releaseHasPassword) { // @phpstan-ignore booleanOr.rightAlwaysFalse
                     break;
                 }
             } else {
@@ -703,10 +703,6 @@ class AdditionalProcessingOrchestrator
 
             // Try to extract each image file from the archive
             foreach ($imageFiles as $imageFile) {
-                if ($context->foundJPGSample) {
-                    break;
-                }
-
                 $imageData = $this->archiveService->extractSpecificFile(
                     $result['data'],
                     $imageFile->name,

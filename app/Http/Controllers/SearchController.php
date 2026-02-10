@@ -56,15 +56,15 @@ class SearchController extends BasePageController
             $searchString = [];
             switch (true) {
                 case $request->filled('subject'):
-                    $searchString['searchname'] = (string) $request->input('subject') ?? [];
+                    $searchString['searchname'] = (string) $request->input('subject');
                     $subject = $searchString['searchname'];
                     break;
                 case $request->filled('id'):
-                    $searchString['searchname'] = (string) $request->input('id') ?? [];
+                    $searchString['searchname'] = (string) $request->input('id');
                     $id = $searchString['searchname'];
                     break;
                 case $request->filled('search'):
-                    $searchString['searchname'] = (string) $request->input('search') ?? [];
+                    $searchString['searchname'] = (string) $request->input('search');
                     $search = $searchString['searchname'];
                     break;
                 default:
@@ -153,7 +153,7 @@ class SearchController extends BasePageController
 
         // Get spell correction suggestions if we have a search query but few/no results
         $spellSuggestion = null;
-        $searchQuery = $search ?: ($searchVars['searchadvr'] ?? '');
+        $searchQuery = $search ?: $searchVars['searchadvr'];
         if (! empty($searchQuery) && $this->searchService->isSuggestEnabled()) {
             // Get suggestions from search service
             $suggestions = $this->searchService->suggest($searchQuery);

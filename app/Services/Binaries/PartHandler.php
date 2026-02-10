@@ -23,6 +23,7 @@ final class PartHandler
 
     private int $chunkSize;
 
+    /** @phpstan-ignore property.onlyWritten */
     private bool $addToPartRepair;
 
     public function __construct(int $chunkSize = 5000, bool $addToPartRepair = true)

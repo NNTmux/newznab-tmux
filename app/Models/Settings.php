@@ -73,9 +73,6 @@ class Settings extends Model
      */
     protected $keyType = 'string';
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
@@ -89,7 +86,7 @@ class Settings extends Model
     public $incrementing = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 

@@ -139,7 +139,7 @@ class MyShowsController extends BasePageController
                     foreach ($shows as $showk => $show) {
                         $catArr = [];
                         $showcats = explode('|', $show['categories'] ?? '');
-                        if (\is_array($showcats) && ! empty($showcats)) {
+                        if (! empty($showcats)) {
                             foreach ($showcats as $scat) {
                                 if (! empty($scat) && isset($categories[$scat])) {
                                     $catArr[] = $categories[$scat];
@@ -182,7 +182,7 @@ class MyShowsController extends BasePageController
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
         $browseCount = $shows ? $shows->count() : 0;
 
-        $rslt = $this->releaseBrowseService->getShowsRange($shows ?? [], $offset, config('nntmux.items_per_page'), $orderby, -1, $this->userdata->categoryexclusions);
+        $rslt = $this->releaseBrowseService->getShowsRange($shows ?? [], $offset, config('nntmux.items_per_page'), $orderby, -1, (array) $this->userdata->categoryexclusions);
         $results = $this->paginate($rslt ?? [], $browseCount, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
         $this->viewData['covgroup'] = '';

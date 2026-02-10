@@ -59,8 +59,8 @@ class MovieBrowseService
                 $releaseIDs[] = $id->grp_release_id;
             }
         }
-        $inMovieIds = (is_array($movieIDs) && ! empty($movieIDs)) ? implode(',', $movieIDs) : -1;
-        $inReleaseIds = (is_array($releaseIDs) && ! empty($releaseIDs)) ? implode(',', $releaseIDs) : -1;
+        $inMovieIds = ! empty($movieIDs) ? implode(',', $movieIDs) : -1;
+        $inReleaseIds = ! empty($releaseIDs) ? implode(',', $releaseIDs) : -1;
         $sql = 'SELECT '
             ."GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_release_id, "
             ."GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',' ) AS grp_rarinnerfilecount, "

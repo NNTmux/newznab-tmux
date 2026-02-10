@@ -186,7 +186,7 @@ class GetNzbController extends BasePageController
     /**
      * Handle zip download of multiple releases
      *
-     * @return JsonResponse|ZipStream|StreamedResponse
+     * @return JsonResponse|ZipStream|StreamedResponse|\STS\ZipStream\Builder
      *
      * @throws Exception
      */
@@ -207,7 +207,7 @@ class GetNzbController extends BasePageController
         }
 
         $zip = getStreamingZip($guids);
-        if ($zip === '') {
+        if ($zip === '') { // @phpstan-ignore identical.alwaysFalse
             return response()->json(['message' => 'Unable to create .zip file'], 404);
         }
 
@@ -358,12 +358,12 @@ class GetNzbController extends BasePageController
             $buffer .= $chunk;
 
             // Check if this is the last chunk
-            if (gzeof($fileHandle)) {
+            if (gzeof($fileHandle)) { // @phpstan-ignore if.alwaysFalse
                 $lastChunk = true;
             }
 
             // Process buffer
-            if ($lastChunk) {
+            if ($lastChunk) { // @phpstan-ignore if.alwaysFalse
                 // On last chunk, modify poster attributes
                 $buffer = preg_replace('/file poster="/', 'file poster="'.$uid.'-', $buffer);
                 echo $buffer;

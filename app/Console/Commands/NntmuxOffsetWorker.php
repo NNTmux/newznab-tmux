@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Facades\Elasticsearch;
 use App\Facades\Search;
 use App\Models\Predb;
 use App\Models\Release;
@@ -42,7 +43,7 @@ class NntmuxOffsetWorker extends Command
      */
     public function handle(): int
     {
-        $workerId = $this->option('worker-id');
+        $workerId = (int) $this->option('worker-id');
         $offset = (int) $this->option('offset');
         $limit = (int) $this->option('limit');
 

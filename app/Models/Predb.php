@@ -76,13 +76,10 @@ class Predb extends Model
      */
     public $timestamps = false;
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 
@@ -210,7 +207,7 @@ class Predb extends Model
      * Get all PRE's for a release.
      *
      *
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getForRelease($preID)
     {

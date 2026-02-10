@@ -79,7 +79,7 @@ class AebnPipe extends AbstractAdultProviderPipe
         // Fetch the movie details page
         $this->response = $this->fetchHtml($this->directUrl, $this->cookie);
 
-        if ($this->response === false) {
+        if ($this->response === false) { // @phpstan-ignore identical.alwaysFalse
             return AdultProcessingResult::failed('Failed to fetch movie details page', $this->getName());
         }
 
@@ -138,7 +138,7 @@ class AebnPipe extends AbstractAdultProviderPipe
         $movies = [];
         foreach ($containerSelectors as $containerSelector) {
             $movies = $this->getHtmlParser()->find($containerSelector);
-            if (! empty($movies) && count($movies) > 0) {
+            if (! empty($movies) && (is_countable($movies) ? count($movies) > 0 : true)) {
                 break;
             }
         }
@@ -205,32 +205,32 @@ class AebnPipe extends AbstractAdultProviderPipe
 
         // Get all the movie data (HTML fallback)
         $synopsis = $this->extractSynopsis();
-        if (is_array($synopsis) && ! empty($synopsis)) {
+        if (! empty($synopsis)) {
             $results = array_merge($results, $synopsis);
         }
 
         $productInfo = $this->extractProductInfo(true);
-        if (is_array($productInfo) && ! empty($productInfo)) {
+        if (! empty($productInfo)) {
             $results = array_merge($results, $productInfo);
         }
 
         $cast = $this->extractCast();
-        if (is_array($cast) && ! empty($cast)) {
+        if (! empty($cast)) {
             $results = array_merge($results, $cast);
         }
 
         $genres = $this->extractGenres();
-        if (is_array($genres) && ! empty($genres)) {
+        if (! empty($genres)) {
             $results = array_merge($results, $genres);
         }
 
         $covers = $this->extractCovers();
-        if (is_array($covers) && ! empty($covers)) {
+        if (! empty($covers)) {
             $results = array_merge($results, $covers);
         }
 
         $trailers = $this->extractTrailers();
-        if (is_array($trailers) && ! empty($trailers)) {
+        if (! empty($trailers)) {
             $results = array_merge($results, $trailers);
         }
 
@@ -358,7 +358,7 @@ class AebnPipe extends AbstractAdultProviderPipe
 
         foreach ($selectors as $selector) {
             $ret = $this->getHtmlParser()->findOne($selector);
-            if ($ret) {
+            if ($ret) { // @phpstan-ignore if.alwaysTrue
                 $coverUrl = $ret->src ?? $ret->content ?? null;
 
                 if (! empty($coverUrl)) {
@@ -447,7 +447,7 @@ class AebnPipe extends AbstractAdultProviderPipe
         // Fallback: try detailsLink div
         if (empty($cast)) {
             $ret = $this->getHtmlParser()->findOne('div.detailsLink');
-            if ($ret && ! ($ret instanceof \voku\helper\SimpleHtmlDomNodeBlank)) {
+            if ($ret && ! ($ret instanceof \voku\helper\SimpleHtmlDomNodeBlank)) { // @phpstan-ignore booleanAnd.leftAlwaysTrue
                 foreach ($ret->find('span') as $star) {
                     $text = $star->plaintext ?? '';
                     if (str_contains($text, '/More/') && str_contains($text, '/Stars/')) {
@@ -527,7 +527,7 @@ class AebnPipe extends AbstractAdultProviderPipe
 
         foreach ($selectors as $selector) {
             $ret = $this->getHtmlParser()->findOne($selector);
-            if ($ret) {
+            if ($ret) { // @phpstan-ignore if.alwaysTrue
                 $text = $ret->plaintext ?? $ret->content ?? '';
                 if (! empty(trim($text))) {
                     $text = trim($text);

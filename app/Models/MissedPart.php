@@ -25,13 +25,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class MissedPart extends Model
 {
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 }

@@ -32,7 +32,7 @@ class AdminBlacklistController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|void
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Contracts\View\View|void
      *
      * @throws \Exception
      */
@@ -63,7 +63,6 @@ class AdminBlacklistController extends BasePageController
                 }
 
                 return redirect()->to('admin/binaryblacklist-list');
-                break;
 
             case 'addtest':
                 if ($request->has('regex') && $request->has('groupname')) {

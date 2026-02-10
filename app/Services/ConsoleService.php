@@ -350,7 +350,6 @@ class ConsoleService
     /**
      * Update console info from IGDB.
      *
-     * @return int|mixed
      *
      * @throws \Exception
      */
@@ -460,7 +459,7 @@ class ConsoleService
                             'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
                             'platform' => $platform ?? '',
                             'consolegenre' => ! empty($genres) ? implode(',', $genres) : 'Unknown',
-                            'consolegenreid' => $genreKey ?? '',
+                            'consolegenreid' => $genreKey,
                             'salesrank' => '',
                         ];
                     }
@@ -538,8 +537,7 @@ class ConsoleService
                     } elseif ($gameCheck === false) {
                         $gameId = $this->updateConsoleInfo($gameInfo);
                         $usedAmazon = true;
-                        if ($gameId === null) {
-                            $gameId = -2;
+                        if ($gameId === self::CONS_NTFND) {
                             $this->failCache[] = $gameInfo['title'].$gameInfo['platform'];
                         }
                     } else {
@@ -728,8 +726,6 @@ class ConsoleService
 
     /**
      * Update or create console info in the database.
-     *
-     * @return int|mixed
      */
     protected function updateConsoleTable(array $con = []): int
     {

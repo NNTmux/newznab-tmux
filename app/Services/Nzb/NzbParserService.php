@@ -294,7 +294,7 @@ class NzbParserService
     {
         // Improve artificial parts calculation robustness (e.g., "[15/20]", "(15/20)")
         if (preg_match('/(?:[(\[])?(\d+)[\/)\\]](\d+)[)\]]?$/', $subject, $parts)) {
-            if (isset($parts[2]) && (int) $parts[2] > 0) {
+            if ((int) $parts[2] > 0) {
                 return (int) $parts[2];
             }
         }

@@ -63,7 +63,7 @@ class IRCClient
     /**
      * Stream socket client.
      *
-     * @var resource
+     * @var resource|null
      */
     protected $_socket = null;
 
@@ -326,7 +326,7 @@ class IRCClient
      */
     public function readIncoming(): void
     {
-        while (true) {
+        while (true) { // @phpstan-ignore while.alwaysTrue
             $this->_readSocket();
 
             // If the server pings us, return it a pong.

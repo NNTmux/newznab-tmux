@@ -58,13 +58,10 @@ class BookInfo extends Model
      */
     protected $table = 'bookinfo';
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 

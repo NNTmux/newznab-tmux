@@ -19,6 +19,7 @@ class RedisMonitorService
 
     private const YELLOW = "\033[1;33m";
 
+    /** @phpstan-ignore classConstant.unused */
     private const BLUE = "\033[0;34m";
 
     private const MAGENTA = "\033[0;35m";

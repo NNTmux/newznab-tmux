@@ -56,9 +56,9 @@ class ContentController extends BasePageController
             $content = $this->getFrontPageContent()->all();
             $index = $this->getIndexContent();
             $isFront = true;
-            $meta_title = $index?->title ?? 'Contents page';
-            $meta_keywords = $index?->metakeywords ?? 'contents';
-            $meta_description = $index?->metadescription ?? 'This is the contents page.';
+            $meta_title = $index->title ?? 'Contents page';
+            $meta_keywords = $index->metakeywords ?? 'contents';
+            $meta_description = $index->metadescription ?? 'This is the contents page.';
         }
 
         if (empty($content)) {

@@ -308,7 +308,7 @@ class TmdbProvider extends AbstractTvProvider
             }
         }
 
-        if ($highest !== null && is_array($highest)) {
+        if ($highest !== null) {
             $showId = TmdbClient::getInt($highest, 'id');
             if ($showId === 0) {
                 return false;
@@ -355,7 +355,7 @@ class TmdbProvider extends AbstractTvProvider
 
         // Try to get the Poster
         if (! empty($this->posterUrl)) {
-            $hascover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);
+            $hascover = $ri->saveImage((string) $videoId, $this->posterUrl, $this->imgSavePath);
 
             // Mark it retrieved if we saved an image
             if ($hascover === 1) {

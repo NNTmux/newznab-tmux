@@ -78,7 +78,6 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
         $this->app->singleton(ReleaseFileManager::class, function ($app) {
             return new ReleaseFileManager(
                 $app->make(ProcessingConfiguration::class),
-                $app->make(ReleaseExtraService::class),
                 new ReleaseImageService,
                 new NfoService,
                 $app->make(NzbService::class),

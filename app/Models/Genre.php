@@ -33,9 +33,6 @@ use Illuminate\Support\Facades\DB;
  */
 class Genre extends Model
 {
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
@@ -44,7 +41,7 @@ class Genre extends Model
     public $timestamps = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 

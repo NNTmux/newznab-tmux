@@ -696,7 +696,7 @@ class PopulateAniListService
 
                 if ($title) {
                     $searchResults = $this->searchAnime($title, 1);
-                    if ($searchResults && ! empty($searchResults)) {
+                    if ($searchResults) {
                         $anilistData = $searchResults[0];
                         $this->insertAniListInfo($anidb->anidbid, $anilistData);
                         // Rate limiting is handled in makeGraphQLRequest

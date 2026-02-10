@@ -247,7 +247,7 @@ class ReleaseSearchService
     /**
      * Search for TV shows via API.
      *
-     * @return array|\Illuminate\Cache\|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|mixed
+     * @return array|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|mixed
      */
     public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
@@ -577,7 +577,7 @@ class ReleaseSearchService
                     } elseif (! empty($series) && empty($episode)) {
                         $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
                     }
-                    if ($show[0]->video > 0) {
+                    if ((int) ($show[0]->video ?? 0) > 0) {
                         $showSql .= ' AND r.videos_id = '.$show[0]->video;
                     }
                 } else {
@@ -1150,7 +1150,7 @@ class ReleaseSearchService
     public function showPasswords(): string
     {
         $show = (int) Settings::settingValue('showpasswordedrelease');
-        $setting = $show ?? 0;
+        $setting = $show;
 
         return match ($setting) {
             1 => '<= '.self::PASSWD_RAR,

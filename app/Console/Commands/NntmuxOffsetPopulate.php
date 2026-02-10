@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Facades\Elasticsearch;
 use App\Facades\Search;
 use App\Models\Predb;
 use App\Models\Release;
@@ -76,7 +77,7 @@ class NntmuxOffsetPopulate extends Command
             return Command::SUCCESS;
         }
 
-        $parallelProcesses = $this->option('parallel');
+        $parallelProcesses = (int) $this->option('parallel');
         $recordsPerProcess = ceil($total / $parallelProcesses);
 
         $this->info(sprintf(

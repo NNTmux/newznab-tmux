@@ -34,14 +34,15 @@ class GamesController extends BasePageController
         $ordering = $games->getGamesOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
         $offset = ($page - 1) * config('nntmux.items_per_cover_page');
-        $rslt = $games->getGamesRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, '', $this->userdata->categoryexclusions);
-        $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
+        $rslt = $games->getGamesRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, '', (array) $this->userdata->categoryexclusions);
+        $results = $this->paginate($rslt, $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
 
         $genres = $gen->getGenres((string) GenreService::GAME_TYPE, true);
         $tmpgnr = [];
         foreach ($genres as $gn) {
+            /** @var \App\Models\Genre $gn */
             $tmpgnr[$gn->id] = $gn->title;
         }
 

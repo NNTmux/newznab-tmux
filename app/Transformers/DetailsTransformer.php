@@ -52,7 +52,7 @@ class DetailsTransformer extends TransformerAbstract
             $data['traktid'] = $release->trakt;
             $data['tvrageid'] = $release->tvrage;
             $data['tvmazeid'] = $release->tvmaze;
-            $data['imdbid'] = $release->imdb;
+            $data['imdbid'] = $release->imdb; // @phpstan-ignore property.notFound
             $data['tmdbid'] = $release->tmdb;
         }
 

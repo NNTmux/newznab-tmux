@@ -52,7 +52,7 @@ class NzbService
     public function __construct()
     {
         $nzbSplitLevel = (int) Settings::settingValue('nzbsplitlevel');
-        $this->nzbSplitLevel = $nzbSplitLevel ?? 1;
+        $this->nzbSplitLevel = $nzbSplitLevel;
         $this->siteNzbPath = config('nntmux_settings.path_to_nzbs');
         if (! Str::endsWith($this->siteNzbPath, '/')) {
             $this->siteNzbPath .= '/';
@@ -100,7 +100,7 @@ class NzbService
         $XMLWriter->startElement('head');
         $XMLWriter->startElement('meta');
         $XMLWriter->writeAttribute('type', 'category');
-        $XMLWriter->text(! empty($release->category->parent) ? $release->category->parent->title.' >'.$release->category->title : 'Other > Misc');
+        $XMLWriter->text(! empty($release->category->parent) ? $release->category->parent->title.' >'.$release->category->title : 'Other > Misc'); // @phpstan-ignore property.notFound
         $XMLWriter->endElement();
         $XMLWriter->startElement('meta');
         $XMLWriter->writeAttribute('type', 'name');
@@ -214,7 +214,7 @@ class NzbService
 
         $nzbPath = $this->siteNzbPath.$nzbPath;
 
-        if ($createIfNotExist && ! File::isDirectory($nzbPath) && ! File::makeDirectory($nzbPath, 0777, true) && ! File::isDirectory($nzbPath)) {
+        if ($createIfNotExist && ! File::isDirectory($nzbPath) && ! File::makeDirectory($nzbPath, 0777, true) && ! File::isDirectory($nzbPath)) { // @phpstan-ignore booleanNot.alwaysTrue
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $nzbPath));
         }
 

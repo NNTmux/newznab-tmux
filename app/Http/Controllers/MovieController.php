@@ -46,7 +46,7 @@ class MovieController extends BasePageController
             $orderby = '';
         }
 
-        $rslt = $this->movieBrowseService->getMovieRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, $this->userdata->categoryexclusions);
+        $rslt = $this->movieBrowseService->getMovieRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, (array) $this->userdata->categoryexclusions);
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
         $movies = $results->map(function ($result) {
@@ -112,7 +112,7 @@ class MovieController extends BasePageController
         }
 
         // Get all releases for this movie
-        $rslt = $this->movieBrowseService->getMovieRange(1, [], 0, 1000, '', -1, $this->userdata->categoryexclusions);
+        $rslt = $this->movieBrowseService->getMovieRange(1, [], 0, 1000, '', -1, (array) $this->userdata->categoryexclusions);
 
         // Filter to only this movie's IMDB ID
         $movieData = collect($rslt)->firstWhere('imdbid', $imdbid);
@@ -121,17 +121,8 @@ class MovieController extends BasePageController
             return redirect()->route('Movies')->with('error', 'No releases found for this movie');
         }
 
-        // Process movie data - ensure we handle both objects and arrays
-        if (is_object($movieInfo)) {
-            // If it's an Eloquent model, use toArray()
-            if (method_exists($movieInfo, 'toArray')) {
-                $movieArray = $movieInfo->toArray();
-            } else {
-                $movieArray = get_object_vars($movieInfo);
-            }
-        } else {
-            $movieArray = $movieInfo;
-        }
+        // Convert Eloquent model to array
+        $movieArray = $movieInfo->toArray();
 
         // Ensure we have at least the basic fields
         if (empty($movieArray['title'])) {

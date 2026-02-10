@@ -55,7 +55,7 @@ class ProfileController extends BasePageController
             }
         }
 
-        if ($this->userdata === null) {
+        if ($this->userdata === null) { // @phpstan-ignore identical.alwaysFalse
             return $this->show404('No such user!');
         }
 
@@ -77,7 +77,7 @@ class ProfileController extends BasePageController
             'downloadlist' => UserDownload::getDownloadRequestsForUser($userID),
             'apirequests' => UserRequest::getApiRequests($userID),
             'grabstoday' => UserDownload::getDownloadRequests($userID),
-            'userinvitedby' => ($this->userdata->invitedby && $this->userdata->invitedby !== '') ? User::find($this->userdata->invitedby) : null,
+            'userinvitedby' => $this->userdata->invitedby ? User::find($this->userdata->invitedby) : null,
             'user' => $this->userdata,
             'privateprofiles' => $privateProfiles,
             'publicview' => $publicView,
@@ -97,7 +97,7 @@ class ProfileController extends BasePageController
     }
 
     /**
-     * @return Factory|\Illuminate\View\View|View
+     * @return Factory|\Illuminate\View\View|View|RedirectResponse
      *
      * @throws \Exception
      */
@@ -107,9 +107,6 @@ class ProfileController extends BasePageController
         $action = $request->input('action') ?? 'view';
 
         $userid = $this->userdata->id;
-        if (! $this->userdata) {
-            $this->show404('No such user!');
-        }
 
         $errorStr = '';
         $success_2fa = $request->session()->get('success');
@@ -313,7 +310,7 @@ class ProfileController extends BasePageController
             'yesno_names' => ['Yes', 'No'],
             'publicview' => false,
             'privileged' => $this->userdata->hasRole('Admin') || $this->userdata->hasRole('Moderator'),
-            'userinvitedby' => ($this->userdata->invitedby && $this->userdata->invitedby !== '') ? User::find($this->userdata->invitedby) : null,
+            'userinvitedby' => $this->userdata->invitedby ? User::find($this->userdata->invitedby) : null,
             'categoriesWithSubs' => RootCategory::with(['categories' => function ($query) {
                 $query->where('status', 1)->orderBy('title');
             }])->where('status', 1)->orderBy('title')->get(),

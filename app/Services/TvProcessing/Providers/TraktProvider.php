@@ -312,12 +312,12 @@ class TraktProvider extends AbstractTvProvider
 
         if ($this->posterUrl !== '') {
             // Try to get the Poster
-            $hasCover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);
+            $hasCover = $ri->saveImage((string) $videoId, $this->posterUrl, $this->imgSavePath);
         }
 
         // Couldn't get poster, try fan art instead
         if ($hasCover !== 1 && $this->fanartUrl !== '') {
-            $hasCover = $ri->saveImage($videoId, $this->fanartUrl, $this->imgSavePath);
+            $hasCover = $ri->saveImage((string) $videoId, $this->fanartUrl, $this->imgSavePath);
         }
 
         // Mark it retrieved if we saved an image
@@ -347,30 +347,28 @@ class TraktProvider extends AbstractTvProvider
 
         sleep(1);
 
-        if (\is_array($response)) {
-            foreach ($response as $show) {
-                if (! is_bool($show)) {
-                    // Check for exact title match first and then terminate if found
-                    if ($show['show']['title'] === $name) {
-                        $highest = $show;
-                        break;
-                    }
+        foreach ($response as $show) {
+            if (! is_bool($show)) {
+                // Check for exact title match first and then terminate if found
+                if ($show['show']['title'] === $name) {
+                    $highest = $show;
+                    break;
+                }
 
-                    // Check each show title for similarity and then find the highest similar value
-                    $matchPercent = $this->checkMatch($show['show']['title'], $name, self::MATCH_PROBABILITY);
+                // Check each show title for similarity and then find the highest similar value
+                $matchPercent = $this->checkMatch($show['show']['title'], $name, self::MATCH_PROBABILITY);
 
-                    // If new match has a higher percentage, set as new matched title
-                    if ($matchPercent > $highestMatch) {
-                        $highestMatch = $matchPercent;
-                        $highest = $show;
-                    }
+                // If new match has a higher percentage, set as new matched title
+                if ($matchPercent > $highestMatch) {
+                    $highestMatch = $matchPercent;
+                    $highest = $show;
                 }
             }
-            if ($highest !== null) {
-                $fullShow = $this->client->getShowSummary($highest['show']['ids']['trakt']);
-                if ($this->checkRequiredAttr($fullShow, 'traktS')) {
-                    $return = $this->formatShowInfo($fullShow);
-                }
+        }
+        if ($highest !== null) {
+            $fullShow = $this->client->getShowSummary($highest['show']['ids']['trakt']);
+            if ($this->checkRequiredAttr($fullShow, 'traktS')) {
+                $return = $this->formatShowInfo($fullShow);
             }
         }
 

@@ -172,7 +172,7 @@ class RefreshAnimeData extends Command
                     $this->enforceRateLimit();
                     $searchResults = $populateAniList->searchAnime($cleanTitle, 1);
 
-                    if (! $searchResults || empty($searchResults)) {
+                    if (! $searchResults) {
                         // Try with spaces replaced for broader matching
                         $altTitle = preg_replace('/\s+/', ' ', $cleanTitle);
                         if ($altTitle !== $cleanTitle) {
@@ -181,7 +181,7 @@ class RefreshAnimeData extends Command
                         }
                     }
 
-                    if (! $searchResults || empty($searchResults)) {
+                    if (! $searchResults) {
                         $notFound++;
                         $failedSearchnames[] = [
                             'searchname' => $searchname,

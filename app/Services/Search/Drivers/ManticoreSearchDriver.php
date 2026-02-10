@@ -442,7 +442,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
         // Tokenize while preserving quoted phrases intact
         // Matches: optional negation prefix (! or -) + "quoted strings", OR non-whitespace sequences
         preg_match_all('/[-!]?"[^"]*"|\S+/', $query, $matches);
-        $tokens = $matches[0] ?? [];
+        $tokens = $matches[0];
 
         if (empty($tokens)) {
             return '';
@@ -815,7 +815,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
         if (is_string($phrases)) {
             // Simple string search - search in searchname field
             $searchArray = ['searchname' => $phrases];
-        } elseif (is_array($phrases)) {
+        } else {
             // Check if it's an associative array (has string keys like 'searchname')
             $isAssociative = count(array_filter(array_keys($phrases), 'is_string')) > 0;
 
@@ -826,8 +826,6 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 // Indexed array - combine values and search in searchname
                 $searchArray = ['searchname' => implode(' ', $phrases)];
             }
-        } else {
-            return [];
         }
 
         $result = $this->searchIndexes($this->getReleasesIndex(), '', [], $searchArray);
@@ -909,15 +907,13 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
         if (is_string($phrases)) {
             $searchArray = ['searchname' => $phrases];
-        } elseif (is_array($phrases)) {
+        } else {
             $isAssociative = count(array_filter(array_keys($phrases), 'is_string')) > 0;
             if ($isAssociative) {
                 $searchArray = $phrases;
             } else {
                 $searchArray = ['searchname' => implode(' ', $phrases)];
             }
-        } else {
-            return [];
         }
 
         $result = $this->fuzzySearchIndexes($this->getReleasesIndex(), $searchArray, $limit);

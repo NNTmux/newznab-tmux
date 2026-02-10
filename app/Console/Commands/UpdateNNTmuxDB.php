@@ -192,6 +192,8 @@ class UpdateNNTmuxDB extends Command
 
     /**
      * Optimize database tables with proper driver detection
+     *
+     * @phpstan-ignore method.unused
      */
     private function optimizeDatabase(string $dbType): void
     {

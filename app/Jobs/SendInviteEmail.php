@@ -16,8 +16,6 @@ class SendInviteEmail implements ShouldQueue
 
     private $email;
 
-    private $userId;
-
     private $url;
 
     /**

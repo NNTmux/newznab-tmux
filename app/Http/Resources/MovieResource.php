@@ -7,6 +7,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * Movie API Resource for transforming movie data.
+ *
+ * @mixin \App\Models\MovieInfo
  */
 class MovieResource extends JsonResource
 {

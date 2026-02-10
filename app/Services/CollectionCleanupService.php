@@ -76,7 +76,7 @@ class CollectionCleanupService
             $elapsed = now()->diffInSeconds($startTime, true);
             cli()->primary(
                 'Finished deleting '.$batchDeleted.' old collections/binaries/parts in '.
-                $elapsed.Str::plural(' second', $elapsed),
+                $elapsed.Str::plural(' second', (int) $elapsed),
                 true
             );
         }
@@ -105,7 +105,7 @@ class CollectionCleanupService
             $totalTime = now()->diffInSeconds($startTime);
 
             if ($echoCLI) {
-                cli()->primary('Finished deleting '.$deleted.' orphaned collections in '.$totalTime.Str::plural(' second', $totalTime), true);
+                cli()->primary('Finished deleting '.$deleted.' orphaned collections in '.$totalTime.Str::plural(' second', (int) $totalTime), true);
             }
         }
 
@@ -130,8 +130,8 @@ class CollectionCleanupService
 
         if ($echoCLI) {
             cli()->primary(
-                'Finished deleting '.$deleted.' collections missed after NZB creation in '.($totalTime).Str::plural(' second', $totalTime).
-                PHP_EOL.'Removed '.number_format($deletedCount).' parts/binaries/collection rows in '.$totalTime.Str::plural(' second', $totalTime),
+                'Finished deleting '.$deleted.' collections missed after NZB creation in '.($totalTime).Str::plural(' second', (int) $totalTime).
+                PHP_EOL.'Removed '.number_format($deletedCount).' parts/binaries/collection rows in '.$totalTime.Str::plural(' second', (int) $totalTime),
                 true
             );
         }

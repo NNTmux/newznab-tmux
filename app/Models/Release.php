@@ -12,13 +12,42 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Properties from computed columns, joins, and subqueries.
+ *
+ * @property int|null $relsize From join/computed column
+ * @property int|null $_totalrows From subquery count
+ * @property string|null $textstring From join
+ * @property string|null $episodes From join
+ * @property string|null $category_name From join
+ * @property int|null $tvrage From join
+ * @property int|null $tvmaze From join
+ * @property int|null $tvdb From join
+ * @property int|null $trakt From join
+ * @property int|null $tmdb From join
+ * @property int|null $preid From join
+ * @property string|null $firstaired From join
+ * @property string|null $title From join
+ * @property string|null $summary From join
+ * @property string|null $sub_category From join
+ * @property float|null $size_diff Computed column
+ * @property string|null $showtitle From join
+ * @property string|null $se_complete From join
+ * @property int|null $files_total_size Computed column
+ * @property string|null $group_name From join (group relationship)
+ * @property string|null $image From join (video.tvInfo relationship)
+ * @property string|null $parent_category From join (category.parent relationship)
+ * @property string|null $category_ids Computed from category relationship
+ * @property string|null $group_names Computed from releaseGroup relationship
+ * @property float|null $release_size Computed column (size in GiB)
+ * @property float|null $diff_percent Computed column (difference percentage)
+ * @property int|null $releases_id From raw query alias
+ * @property int|null $_totalcount From subquery count
+ */
 class Release extends Model
 {
     use HasFactory;
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
@@ -27,7 +56,7 @@ class Release extends Model
     public $timestamps = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 
@@ -204,7 +233,7 @@ class Release extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getTopDownloads()
     {
@@ -229,7 +258,7 @@ class Release extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getTopComments()
     {
@@ -352,9 +381,9 @@ class Release extends Model
             $release->parent_category = $release->category->parent->title ?? null;
             $release->sub_category = $release->category->title ?? null;
             $release->category_name = $release->parent_category.' > '.$release->sub_category;
-            $release->category_ids = $release->category ? ($release->category->parentid.','.$release->category->id) : '';
+            $release->category_ids = $release->category ? ($release->category->parentid.','.$release->category->id) : ''; // @phpstan-ignore property.notFound, property.notFound
             $release->group_names = $release->releaseGroup->map(function ($relGroup) {
-                return $relGroup->group ? $relGroup->group->name : null;
+                return $relGroup->group ? $relGroup->group->name : null; // @phpstan-ignore property.notFound
             })->implode(',');
         });
 

@@ -58,13 +58,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ReleaseComment extends Model
 {
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     public function release(): BelongsTo
@@ -95,7 +92,7 @@ class ReleaseComment extends Model
 
     public static function getCommentCount(): int
     {
-        return self::query()->count(['id']);
+        return self::query()->count('id');
     }
 
     /**
@@ -162,7 +159,7 @@ class ReleaseComment extends Model
      */
     public static function updateReleaseCommentCount($gid): void
     {
-        $commentCount = self::query()->where('gid', '=', 'releases.gid')->where('isvisible', '=', 1)->count(['id']);
+        $commentCount = self::query()->where('gid', '=', 'releases.gid')->where('isvisible', '=', 1)->count('id');
         Release::query()->where('gid', $gid)->update(['comments' => $commentCount]);
     }
 
@@ -171,7 +168,7 @@ class ReleaseComment extends Model
      */
     public static function getCommentCountForUser($uid): int
     {
-        $res = self::query()->where(['users_id' => $uid, 'isvisible' => 1])->count(['id']);
+        $res = self::query()->where(['users_id' => $uid, 'isvisible' => 1])->count('id');
 
         return $res;
     }

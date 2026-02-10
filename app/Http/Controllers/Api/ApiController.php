@@ -17,6 +17,7 @@ use App\Services\Releases\ReleaseSearchService;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
@@ -42,7 +43,7 @@ class ApiController extends BasePageController
     }
 
     /**
-     * @return Application|\Illuminate\Foundation\Application|RedirectResponse|Redirector|StreamedResponse|void
+     * @return Application|\Illuminate\Foundation\Application|RedirectResponse|Redirector|Response|StreamedResponse|void
      *
      * @throws \Throwable
      */
@@ -97,7 +98,7 @@ class ApiController extends BasePageController
 
         // Page is accessible only by the apikey
 
-        if ($function !== 'c' && $function !== 'r') {
+        if ($function !== 'c' && $function !== 'r') { // @phpstan-ignore notIdentical.alwaysTrue
             if ($request->missing('apikey') || ($request->has('apikey') && empty($request->input('apikey')))) {
                 return showApiError(200, 'Missing parameter (apikey)');
             }
@@ -314,7 +315,7 @@ class ApiController extends BasePageController
                 UserRequest::addApiRequest($apiKey, $request->getRequestUri());
                 $rel = Release::query()->where('guid', $request->input('id'))->first(['id', 'searchname']);
 
-                if ($rel && $rel->isNotEmpty()) {
+                if ($rel) {
                     $data = ReleaseNfo::getReleaseNfo($rel->id);
                     if (! empty($data)) {
                         if ($request->has('o') && $request->input('o') === 'file') {
@@ -392,6 +393,8 @@ class ApiController extends BasePageController
     }
 
     /**
+     * @return Response|void
+     *
      * @throws \Exception
      */
     public function output($data, array $params, bool $xml, int $offset, string $type = '')
@@ -464,7 +467,7 @@ class ApiController extends BasePageController
     }
 
     /**
-     * @return Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Foundation\Application|\Illuminate\Http\Response|int
+     * @return Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Foundation\Application|Response|int
      */
     public function maxAge(Request $request)
     {
@@ -547,6 +550,8 @@ class ApiController extends BasePageController
 
     /**
      * Check if a parameter is empty.
+     *
+     * @return Response|void
      */
     public function verifyEmptyParameter(Request $request, string $parameter)
     {

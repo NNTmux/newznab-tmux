@@ -35,7 +35,7 @@ class ArchiveExtractionService
     /**
      * Process compressed data and extract file information.
      *
-     * @return array{success: bool, files: array, hasPassword: bool, passwordStatus: int}
+     * @return array{success: bool, files: array, hasPassword: bool, passwordStatus: int, archiveMarker?: string, dataSummary?: array, standaloneVideoType?: string, standaloneVideoData?: string}
      */
     public function processCompressedData(
         string $compressedData,
@@ -757,7 +757,7 @@ class ArchiveExtractionService
             }
         }
         // MP4/MOV
-        if ($len >= 12 && substr($data, 4, 4) === 'ftyp') {
+        if (substr($data, 4, 4) === 'ftyp') {
             $brands = ['isom', 'iso2', 'avc1', 'mp41', 'mp42', 'dash', 'MSNV', 'qt  ', 'M4V ', 'M4P ', 'M4B ', 'M4A '];
             if (in_array(substr($data, 8, 4), $brands, true)) {
                 return 'mp4';
@@ -987,6 +987,10 @@ class ArchiveExtractionService
 
     /**
      * Execute a command with output capture.
+     *
+     * @param-out int $exitCode
+     * @param-out string|null $stdout
+     * @param-out string|null $stderr
      */
     private function execCommand(array $cmd, ?int &$exitCode, ?string &$stdout, ?string &$stderr): bool
     {
@@ -1002,9 +1006,9 @@ class ArchiveExtractionService
             return false;
         }
 
-        $stdout = stream_get_contents($pipes[1]);
+        $stdout = stream_get_contents($pipes[1]) ?: null;
         fclose($pipes[1]);
-        $stderr = stream_get_contents($pipes[2]);
+        $stderr = stream_get_contents($pipes[2]) ?: null;
         fclose($pipes[2]);
         $exitCode = proc_close($process);
 

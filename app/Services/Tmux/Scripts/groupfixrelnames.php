@@ -23,7 +23,7 @@ $artisan = dirname(__DIR__, 4).'/artisan';
 
 switch ($type) {
     case 'standard':
-        if ($guidChar === null || $maxPerRun === null || ! is_numeric($maxPerRun)) {
+        if ($guidChar === '' || $maxPerRun === '' || ! is_numeric($maxPerRun)) {
             fwrite(STDERR, "Invalid arguments for standard type\n");
             exit(1);
         }
@@ -32,7 +32,7 @@ switch ($type) {
         break;
 
     case 'predbft':
-        if (! isset($maxPerRun) || ! is_numeric($maxPerRun) || ! isset($thread) || ! is_numeric($thread)) {
+        if (! is_numeric($maxPerRun) || ! is_numeric($thread)) {
             fwrite(STDERR, "Invalid arguments for predbft type\n");
             exit(1);
         }

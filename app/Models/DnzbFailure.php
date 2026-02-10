@@ -29,10 +29,6 @@ class DnzbFailure extends Model
     /**
      * @var string
      */
-
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
@@ -46,7 +42,7 @@ class DnzbFailure extends Model
     public $incrementing = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 

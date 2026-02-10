@@ -29,9 +29,6 @@ class SteamApp extends Model
      */
     public $incrementing = false;
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
@@ -40,7 +37,7 @@ class SteamApp extends Model
     public $timestamps = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 

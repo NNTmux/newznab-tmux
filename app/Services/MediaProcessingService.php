@@ -121,8 +121,9 @@ class MediaProcessingService
         $time = $this->getVideoTime($fileLocation);
         if ($this->ffprobe->isValid($fileLocation)) {
             try {
-                $this->ffmpeg->open($fileLocation)
-                    ->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time))
+                /** @var \FFMpeg\Media\Video $video */
+                $video = $this->ffmpeg->open($fileLocation);
+                $video->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time))
                     ->save($fileName);
             } catch (\Throwable $e) {
                 if (config('app.debug') === true) {
@@ -175,6 +176,7 @@ class MediaProcessingService
                 }
                 if ($this->ffprobe->isValid($fileLocation)) {
                     try {
+                        /** @var \FFMpeg\Media\Video $video */
                         $video = $this->ffmpeg->open($fileLocation);
                         $videoSample = $video->clip(TimeCode::fromString($lowestLength), TimeCode::fromSeconds($durationSeconds));
                         $format = new Ogg;
@@ -191,6 +193,7 @@ class MediaProcessingService
         }
         if (! $newMethod && $this->ffprobe->isValid($fileLocation)) {
             try {
+                /** @var \FFMpeg\Media\Video $video */
                 $video = $this->ffmpeg->open($fileLocation);
                 $videoSample = $video->clip(TimeCode::fromSeconds(0), TimeCode::fromSeconds($durationSeconds));
                 $format = new Ogg;
@@ -255,37 +258,35 @@ class MediaProcessingService
             if ($processAudioInfo) {
                 try {
                     $xmlArray = $this->mediaInfo->getInfo($fileLocation, false);
-                    if ($xmlArray !== null) {
-                        foreach ($xmlArray->getAudios() as $track) {
-                            if ($track->get('album') !== null && $track->get('performer') !== null) {
-                                if ((int) $release->predb_id === 0 && config('nntmux.rename_music_mediainfo')) {
-                                    $ext = strtoupper($fileExtension);
-                                    if (! empty($track->get('recorded_date')) && preg_match('/(?:19|20)\d\d/', $track->get('recorded_date')->getFullname(), $Year)) {
-                                        $newName = $track->get('performer')->getFullName().' - '.$track->get('album')->getFullName().' ('.$Year[0].') '.$ext;
-                                    } else {
-                                        $newName = $track->get('performer')->getFullName().' - '.$track->get('album')->getFullName().' '.$ext;
-                                    }
-                                    if ($ext === 'MP3') {
-                                        $newCat = Category::MUSIC_MP3;
-                                    } elseif ($ext === 'FLAC') {
-                                        $newCat = Category::MUSIC_LOSSLESS;
-                                    } else {
-                                        $newCat = $this->categorize->determineCategory($release->groups_id, $newName, $release->fromname);
-                                    }
-                                    $newTitle = escapeString(substr($newName, 0, 255));
-                                    Release::whereId($release->id)->update([
-                                        'searchname' => $newTitle,
-                                        'categories_id' => $newCat['categories_id'] ?? $release->categories_id,
-                                        'iscategorized' => 1,
-                                        'isrenamed' => 1,
-                                        'proc_pp' => 1,
-                                    ]);
-                                    Search::updateRelease($release->id);
+                    foreach ($xmlArray->getAudios() as $track) {
+                        if ($track->get('album') !== null && $track->get('performer') !== null) {
+                            if ((int) $release->predb_id === 0 && config('nntmux.rename_music_mediainfo')) {
+                                $ext = strtoupper($fileExtension);
+                                if (! empty($track->get('recorded_date')) && preg_match('/(?:19|20)\d\d/', $track->get('recorded_date')->getFullname(), $Year)) {
+                                    $newName = $track->get('performer')->getFullName().' - '.$track->get('album')->getFullName().' ('.$Year[0].') '.$ext;
+                                } else {
+                                    $newName = $track->get('performer')->getFullName().' - '.$track->get('album')->getFullName().' '.$ext;
                                 }
-                                $this->releaseExtra->addFromXml($release->id, $xmlArray);
-                                $retVal = true;
-                                break;
+                                if ($ext === 'MP3') {
+                                    $newCat = Category::MUSIC_MP3;
+                                } elseif ($ext === 'FLAC') {
+                                    $newCat = Category::MUSIC_LOSSLESS;
+                                } else {
+                                    $newCat = $this->categorize->determineCategory($release->groups_id, $newName, $release->fromname);
+                                }
+                                $newTitle = escapeString(substr($newName, 0, 255));
+                                Release::whereId($release->id)->update([
+                                    'searchname' => $newTitle,
+                                    'categories_id' => $newCat['categories_id'] ?? $release->categories_id,
+                                    'iscategorized' => 1,
+                                    'isrenamed' => 1,
+                                    'proc_pp' => 1,
+                                ]);
+                                Search::updateRelease($release->id);
                             }
+                            $this->releaseExtra->addFromXml($release->id, $xmlArray);
+                            $retVal = true;
+                            break;
                         }
                     }
                 } catch (\Throwable $e) {
@@ -299,7 +300,7 @@ class MediaProcessingService
                     try {
                         $audioSample = $this->ffmpeg->open($fileLocation);
                         $format = new Vorbis;
-                        $audioSample->clip(TimeCode::fromSeconds(30), TimeCode::fromSeconds(30));
+                        $audioSample->clip(TimeCode::fromSeconds(30), TimeCode::fromSeconds(30)); // @phpstan-ignore method.notFound
                         $audioSample->save($format, $audioSavePath.$audioFileName);
                     } catch (\Throwable $e) {
                         if (config('app.debug') === true) {

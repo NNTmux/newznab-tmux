@@ -151,7 +151,7 @@ class RssController extends BasePageController
         $rss = app(RSS::class);
         $offset = 0;
         if ($request->missing('id')) {
-            return response()->json(['error' => 'Category ID is missing'], '403');
+            return response()->json(['error' => 'Category ID is missing'], 403);
         }
 
         $user = $this->userCheck($request);

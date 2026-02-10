@@ -9,10 +9,9 @@ class NfoProcessor
 {
     private NfoService $nfo;
 
-    public function __construct(NfoService $nfo, bool $echooutput)
+    public function __construct(NfoService $nfo)
     {
         $this->nfo = $nfo;
-        // echooutput kept for signature parity
     }
 
     /**
@@ -25,8 +24,8 @@ class NfoProcessor
                 $nntp,
                 $groupID,
                 $guidChar,
-                (int) Settings::settingValue('lookupimdb'),
-                (int) Settings::settingValue('lookuptv')
+                (bool) Settings::settingValue('lookupimdb'),
+                (bool) Settings::settingValue('lookuptv')
             );
         }
     }

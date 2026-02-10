@@ -143,6 +143,7 @@ class NameFixingService
             cli()->info(number_format($total).' releases to process.');
 
             foreach ($releases as $rel) {
+                /** @var Release $rel */
                 $releaseRow = Release::fromQuery(
                     sprintf(
                         'SELECT nfo.releases_id AS nfoid, rel.groups_id, rel.fromname, rel.categories_id, rel.name, rel.searchname,
@@ -237,6 +238,7 @@ class NameFixingService
             // Group files by release
             $releaseFiles = [];
             foreach ($releases as $release) {
+                /** @var Release $release */
                 $releaseId = $release->releases_id;
                 if (! isset($releaseFiles[$releaseId])) {
                     $releaseFiles[$releaseId] = [
@@ -255,6 +257,7 @@ class NameFixingService
                 $prioritizedFiles = $this->filePrioritizer->prioritizeForMatching($data['files']);
 
                 foreach ($prioritizedFiles as $filename) {
+                    /** @var Release $release */
                     $release = clone $data['release'];
                     $release->textstring = $filename;
 
@@ -404,6 +407,7 @@ class NameFixingService
             // Group by release
             $releasesCrc = [];
             foreach ($releases as $release) {
+                /** @var Release $release */
                 $releaseId = $release->releases_id;
                 if (! isset($releasesCrc[$releaseId])) {
                     $releasesCrc[$releaseId] = [
@@ -424,6 +428,7 @@ class NameFixingService
                 ksort($data['crcs']);
                 foreach ($data['crcs'] as $crcs) {
                     foreach ($crcs as $crc) {
+                        /** @var Release $release */
                         $release = clone $data['release'];
                         $release->textstring = $crc;
 
@@ -661,6 +666,7 @@ class NameFixingService
         );
 
         foreach ($result as $res) {
+            /** @var Release $res */
             $floor = round(($res->relsize - $release->relsize) / $res->relsize * 100, 1);
             if ($floor >= -5 && $floor <= 5) {
                 $this->updateService->updateRelease(
@@ -708,6 +714,7 @@ class NameFixingService
         ));
 
         foreach ($result as $res) {
+            /** @var Release $res */
             $floor = round(($res->relsize - $release->relsize) / $res->relsize * 100, 1);
             if ($floor >= -10 && $floor <= 10) {
                 $this->updateService->updateRelease(
@@ -747,6 +754,7 @@ class NameFixingService
         ));
 
         foreach ($result as $res) {
+            /** @var Release $res */
             $floor = round(($res->relsize - $release->relsize) / $res->relsize * 100, 1);
             if ($floor >= -5 && $floor <= 5) {
                 $this->updateService->updateRelease(
@@ -986,6 +994,7 @@ class NameFixingService
             $nzbContentsService = app(\App\Services\Nzb\NzbContentsService::class);
 
             foreach ($releases as $release) {
+                /** @var Release $release */
                 if ($nzbContentsService->checkPar2($release->guid, $release->releases_id, $release->groups_id, (int) $nameStatus, (int) $show)) {
                     $this->updateService->fixed++;
                 }

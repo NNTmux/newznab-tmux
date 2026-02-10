@@ -182,7 +182,7 @@ Route::middleware('isVerified')->group(function () {
     Route::post('profile-security/disable-2fa', [ProfileSecurityController::class, 'disable2fa'])->name('profile.security.disable2fa');
 });
 
-Route::middleware('role:Admin', '2fa')->prefix('admin')->group(function () {
+Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::get('index', [AdminPageController::class, 'index'])->name('admin.index');
 
     // System Metrics API endpoints
@@ -303,7 +303,7 @@ Route::prefix('invitations')->name('invitations.')->group(function () {
 Route::get('/invitation/{token}', [InvitationController::class, 'show'])->name('invitation.show');
 
 // Admin invitation management routes
-Route::middleware('role:Admin', '2fa')->prefix('admin/invitations')->name('admin.invitations.')->group(function () {
+Route::middleware(['role:Admin', '2fa'])->prefix('admin/invitations')->name('admin.invitations.')->group(function () {
     Route::get('/', [App\Http\Controllers\Admin\AdminInvitationController::class, 'index'])->name('index');
     Route::get('/{id}', [App\Http\Controllers\Admin\AdminInvitationController::class, 'show'])->name('show');
     Route::post('/{id}/resend', [App\Http\Controllers\Admin\AdminInvitationController::class, 'resend'])->name('resend');

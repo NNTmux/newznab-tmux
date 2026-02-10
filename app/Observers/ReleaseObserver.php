@@ -137,13 +137,13 @@ class ReleaseObserver
                 'categories_id' => $release->categories_id ?? 0,
                 'filename' => '', // Not available from model
                 // Movie external IDs
-                'imdbid' => $release->imdbid ?? ($movieInfo?->imdbid ?? 0),
-                'tmdbid' => $movieInfo?->tmdbid ?? 0,
-                'traktid' => $movieInfo?->traktid ?? 0,
+                'imdbid' => $release->imdbid ?? ($movieInfo?->imdbid ?? 0), // @phpstan-ignore nullsafe.neverNull
+                'tmdbid' => $movieInfo?->tmdbid ?? 0, // @phpstan-ignore nullsafe.neverNull
+                'traktid' => $movieInfo?->traktid ?? 0, // @phpstan-ignore nullsafe.neverNull
                 // TV show external IDs
-                'tvdb' => $video?->tvdb ?? 0,
-                'tvmaze' => $video?->tvmaze ?? 0,
-                'tvrage' => $video?->tvrage ?? 0,
+                'tvdb' => $video?->tvdb ?? 0, // @phpstan-ignore nullsafe.neverNull
+                'tvmaze' => $video?->tvmaze ?? 0, // @phpstan-ignore nullsafe.neverNull
+                'tvrage' => $video?->tvrage ?? 0, // @phpstan-ignore nullsafe.neverNull
                 'videos_id' => $release->videos_id ?? 0,
                 'movieinfo_id' => $release->movieinfo_id ?? 0,
             ];

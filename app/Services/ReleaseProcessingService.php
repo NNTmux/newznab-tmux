@@ -1050,11 +1050,11 @@ final class ReleaseProcessingService
 
         Release::query()
             ->select(['id', 'guid'])
-            ->where('passwordstatus', '=', Releases::PASSWD_RAR)
+            ->where('passwordstatus', '=', \App\Services\Releases\ReleaseBrowseService::PASSWD_RAR)
             ->orWhereIn('id', function ($query): void {
                 $query->select('releases_id')
                     ->from('release_files')
-                    ->where('passworded', '=', Releases::PASSWD_RAR);
+                    ->where('passworded', '=', \App\Services\Releases\ReleaseBrowseService::PASSWD_RAR);
             })
             ->chunkById(self::BATCH_SIZE, function ($releases) use (&$stats): bool {
                 foreach ($releases as $release) {
@@ -1146,7 +1146,7 @@ final class ReleaseProcessingService
         foreach ($categories as $category) {
             Release::query()
                 ->where('categories_id', (int) $category->id)
-                ->where('size', '<', (int) $category->minsize)
+                ->where('size', '<', (int) $category->minsize) // @phpstan-ignore property.notFound
                 ->select(['id', 'guid'])
                 ->limit(1000)
                 ->chunkById(self::BATCH_SIZE, function ($releases) use (&$stats): bool {
@@ -1167,13 +1167,13 @@ final class ReleaseProcessingService
         $genres = new GenreService;
         $genreList = $genres->getDisabledIDs();
 
-        if ($genreList === null || $genreList->isEmpty()) {
+        if ($genreList->isEmpty()) {
             return $stats;
         }
 
         foreach ($genreList as $genre) {
             $musicInfoQuery = MusicInfo::query()
-                ->where('genre_id', (int) $genre->id)
+                ->where('genre_id', (int) $genre->id) // @phpstan-ignore property.notFound
                 ->select(['id']);
 
             Release::query()
@@ -1279,6 +1279,7 @@ final class ReleaseProcessingService
         cli()->notice("  {$title}");
     }
 
+    /** @phpstan-ignore method.unused */
     private function outputSuccess(string $message): void
     {
         if (! $this->echoCLI) {

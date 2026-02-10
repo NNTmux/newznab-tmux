@@ -75,6 +75,7 @@ class ManageRoleStacking extends Command
         $rows = [];
 
         foreach ($users as $user) {
+            /** @var Role|null $currentRole */
             $currentRole = $user->roles->first();
             $pendingRole = $user->getPendingRole();
             $activationDate = Carbon::parse($user->pending_role_start_date);
@@ -252,6 +253,7 @@ class ManageRoleStacking extends Command
 
         foreach ($users as $user) {
             $pendingRole = $user->getPendingRole();
+            /** @var Role|null $oldRole */
             $oldRole = $user->roles->first();
 
             try {

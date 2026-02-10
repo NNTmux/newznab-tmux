@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
  * @property bool $disablepreview
  * @property int $minsizetoformrelease
  * @property int $maxsizetoformrelease
+ * @property int|null $count Computed count from aggregate queries
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Category[] $children
  * @property-read Category|null $parent
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $releases
@@ -261,13 +262,10 @@ class Category extends Model
      */
     public $timestamps = false;
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 
@@ -282,7 +280,7 @@ class Category extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getRecentlyAdded()
     {
@@ -419,7 +417,7 @@ class Category extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getFlat()
     {
@@ -449,7 +447,7 @@ class Category extends Model
     /**
      * Get names of enabled parent categories.
      *
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getEnabledParentNames()
     {
@@ -460,7 +458,7 @@ class Category extends Model
      * Returns category ID's for site disabled categories.
      *
      *
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getDisabledIDs()
     {
@@ -472,7 +470,7 @@ class Category extends Model
     /**
      * Get multiple categories.
      *
-     * @return bool|\Illuminate\Database\Eloquent\Collection|static[]
+     * @return bool|\Illuminate\Database\Eloquent\Collection
      */
     public static function getByIds($ids)
     {
@@ -577,16 +575,14 @@ class Category extends Model
             $temp_array[-1] = '--Please Select--';
         }
         foreach ($categories as $category) {
+            /** @var Category $category */
             $temp_array[$category->id] = $category->parent->title.' > '.$category->title;
         }
 
         return $temp_array;
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
-     */
-    public static function getCategories(bool $activeOnly = false, array $excludedCats = []): \Illuminate\Database\Eloquent\Collection|array
+    public static function getCategories(bool $activeOnly = false, array $excludedCats = []): \Illuminate\Database\Eloquent\Collection
     {
         $sql = self::query()
             ->with('parent')

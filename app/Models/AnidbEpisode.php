@@ -31,9 +31,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class AnidbEpisode extends Model
 {
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
@@ -52,7 +49,7 @@ class AnidbEpisode extends Model
     public $timestamps = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 

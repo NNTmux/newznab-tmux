@@ -61,7 +61,9 @@ class AdminReleaseReportController extends BasePageController
         $report = ReleaseReport::with('release')->findOrFail($id);
 
         if ($report->release) {
-            $releaseName = $report->release->searchname;
+            /** @var \App\Models\Release $release */
+            $release = $report->release;
+            $releaseName = $release->searchname;
             $releaseId = $report->releases_id;
 
             // Delete the release

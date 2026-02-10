@@ -41,7 +41,7 @@ class NNTPService extends \Net_NNTP_Client
      */
     protected string $_currentGroup = '';
 
-    protected string $_currentPort = 'NNTP_PORT';
+    protected string|int $_currentPort = 'NNTP_PORT';
 
     /**
      * Address of the current NNTP server.
@@ -87,6 +87,8 @@ class NNTPService extends \Net_NNTP_Client
 
     /**
      * @var resource|null
+     *
+     * @phpstan-ignore property.phpDocType
      */
     protected $_socket = null;
 
@@ -259,7 +261,7 @@ class NNTPService extends \Net_NNTP_Client
 
             // If we are not connected, try to connect.
             if (! $connected) {
-                $ret = $this->connect($this->_currentServer, $sslEnabled, $this->_currentPort, 5, $socketTimeout);
+                $ret = $this->connect($this->_currentServer, $sslEnabled, (int) $this->_currentPort, 5, $socketTimeout);
             }
             // Check if we got an error while connecting.
             $cErr = self::isError($ret);
@@ -526,7 +528,7 @@ class NNTPService extends \Net_NNTP_Client
             $parts = explode("\t", $header);
 
             // Make sure it's not empty.
-            if ($parts === false || empty($parts)) {
+            if (empty($parts)) {
                 continue;
             }
 
@@ -636,9 +638,7 @@ class NNTPService extends \Net_NNTP_Client
                         $newBody = $nntp->_getMessage($groupName, $wanted);
                         // Check if we got an error.
                         if ($nntp->isError($newBody)) {
-                            if ($aConnected) {
-                                $nntp->doQuit();
-                            }
+                            $nntp->doQuit();
                             // If we got some data, return it.
                             if ($body !== '') {
                                 return $body;
@@ -732,9 +732,7 @@ class NNTPService extends \Net_NNTP_Client
                 if ($aConnected === true) {
                     $altMsg = $alt->_getMessageByMessageID($id);
                     if ($alt->isError($altMsg)) {
-                        if ($aConnected) {
-                            $alt->doQuit();
-                        }
+                        $alt->doQuit();
 
                         return $body !== '' ? $body : $altMsg; // return what we have or error
                     }

@@ -373,7 +373,7 @@ class TvMazeProvider extends AbstractTvProvider
 
         // Try to get the Poster
         if (! empty($this->posterUrl)) {
-            $hasCover = $ri->saveImage($videoId, $this->posterUrl, $this->imgSavePath);
+            $hasCover = $ri->saveImage((string) $videoId, $this->posterUrl, $this->imgSavePath);
 
             // Mark it retrieved if we saved an image
             if ($hasCover === 1) {

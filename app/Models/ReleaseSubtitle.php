@@ -34,13 +34,10 @@ class ReleaseSubtitle extends Model
      */
     public $timestamps = false;
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'id',

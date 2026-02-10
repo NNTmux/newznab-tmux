@@ -22,6 +22,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $filesize
  * @property int|null $releases_id
  * @property string $noise
+ * @property string|null $udate Computed Unix timestamp from raw query
+ * @property string|null $gname Computed group name from join
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Collection whereAdded($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Collection whereCollectionRegexesId($value)

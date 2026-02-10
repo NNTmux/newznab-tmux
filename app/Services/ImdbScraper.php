@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use voku\helper\HtmlDomParser;
@@ -49,7 +48,7 @@ class ImdbScraper
             }
 
             $titleNode = $dom->findOne('h1');
-            $title = trim($titleNode?->text() ?? '');
+            $title = trim($titleNode->text() ?? '');
             if ($title === '') {
                 Cache::put($cacheKey, false, now()->addHours(6));
 
@@ -164,7 +163,7 @@ class ImdbScraper
             Cache::put($cacheKey, $data, now()->addDays(7));
 
             return $data;
-        } catch (GuzzleException|\Throwable $e) {
+        } catch (\Throwable $e) {
             Log::debug('IMDb fetch error tt'.$id.': '.$e->getMessage());
             Cache::put($cacheKey, false, now()->addHours(6));
 
@@ -215,7 +214,7 @@ class ImdbScraper
             Cache::put($cacheKey, $results, now()->addHours(12));
 
             return $results;
-        } catch (GuzzleException|\Throwable $e) {
+        } catch (\Throwable $e) {
             Log::debug('IMDb search error '.$query.': '.$e->getMessage());
             Cache::put($cacheKey, [], now()->addHours(6));
 

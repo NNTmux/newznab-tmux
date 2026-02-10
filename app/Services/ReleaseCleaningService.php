@@ -15,11 +15,13 @@ class ReleaseCleaningService
     /**
      * Used for matching endings in article subjects.
      */
+    /** @phpstan-ignore classConstant.unused */
     private const string REGEX_END = '[ -]{0,3}yEnc$/u';
 
     /**
      * Used for matching file extension endings in article subjects.
      */
+    /** @phpstan-ignore classConstant.unused */
     private const string REGEX_FILE_EXTENSIONS = '([\-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar|\.7z)?(\d{1,3}\.rev"|\.vol.+?"|\.[A-Za-z0-9]{2,4}"|")';
 
     /**
@@ -27,6 +29,7 @@ class ReleaseCleaningService
      *
      * @example ' - 365.15 KB - '
      */
+    /** @phpstan-ignore classConstant.unused */
     private const string REGEX_SUBJECT_SIZE = '[ -]{0,3}\d+([.,]\d+)? [kKmMgG][bB][ -]{0,3}';
 
     public string $e0;

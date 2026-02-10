@@ -50,7 +50,7 @@ class SearchService extends Manager implements SearchServiceInterface
      *
      * @param  string|null  $driver
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function driver($driver = null): SearchDriverInterface
     {

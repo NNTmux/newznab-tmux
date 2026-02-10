@@ -59,18 +59,15 @@ class GamesInfo extends Model
      */
     protected $table = 'gamesinfo';
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 
     /**
-     * @var array
+     * @var array<string, string>
      */
     protected $casts = [
         'cover' => 'boolean',

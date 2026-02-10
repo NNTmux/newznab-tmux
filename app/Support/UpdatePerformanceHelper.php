@@ -46,12 +46,12 @@ class UpdatePerformanceHelper
 
         // Wait for all processes to complete
         foreach ($processes as $key => $process) {
-            $process->wait();
+            $result = $process->wait();
             $results[$key] = [
-                'successful' => $process->successful(),
-                'output' => $process->output(),
-                'errorOutput' => $process->errorOutput(),
-                'exitCode' => $process->exitCode(),
+                'successful' => $result->successful(),
+                'output' => $result->output(),
+                'errorOutput' => $result->errorOutput(),
+                'exitCode' => $result->exitCode(),
             ];
         }
 

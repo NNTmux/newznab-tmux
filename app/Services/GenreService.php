@@ -39,6 +39,7 @@ class GenreService
         $genres = $this->getGenres($type);
         $genresArray = [];
         foreach ($genres as $genre) {
+            /** @var \App\Models\Genre $genre */
             $genresArray[$genre->id] = strtolower($genre->title);
         }
 

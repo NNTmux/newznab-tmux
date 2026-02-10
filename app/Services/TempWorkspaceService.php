@@ -25,7 +25,7 @@ class TempWorkspaceService
         }
 
         if (! File::isDirectory($basePath)) {
-            if (! File::makeDirectory($basePath, 0777, true, true) && ! File::isDirectory($basePath)) {
+            if (! File::makeDirectory($basePath, 0777, true, true) && ! File::isDirectory($basePath)) { // @phpstan-ignore booleanNot.alwaysTrue
                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $basePath));
             }
         }
@@ -40,9 +40,9 @@ class TempWorkspaceService
     {
         $tmpPath = rtrim($mainTmpPath, '/\\').'/'.$guid.'/';
         if (! File::isDirectory($tmpPath)) {
-            if (! File::makeDirectory($tmpPath, 0777, true, false) && ! File::isDirectory($tmpPath)) {
+            if (! File::makeDirectory($tmpPath, 0777, true, false) && ! File::isDirectory($tmpPath)) { // @phpstan-ignore booleanNot.alwaysTrue
                 // Try again once in case of transient FS issues
-                if (! File::makeDirectory($tmpPath, 0777, true, false) && ! File::isDirectory($tmpPath)) {
+                if (! File::makeDirectory($tmpPath, 0777, true, false) && ! File::isDirectory($tmpPath)) { // @phpstan-ignore booleanNot.alwaysTrue, booleanNot.alwaysTrue, booleanAnd.alwaysTrue
                     throw new \RuntimeException('Unable to create directory: '.$tmpPath);
                 }
             }

@@ -235,12 +235,12 @@ class RegexService
             $rows->limit($queryLimit);
         }
 
-        $rows->get();
+        $results = $rows->get();
 
         $data = [];
-        if ($rows !== null) {
+        if ($results->isNotEmpty()) {
             $limit = 1;
-            foreach ($rows as $row) {
+            foreach ($results as $row) {
                 $hit = $this->_matchRegex($regex, $row['name']);
                 if ($hit) {
                     $data[$row['id']] = [

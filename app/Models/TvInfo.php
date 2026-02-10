@@ -38,7 +38,7 @@ class TvInfo extends Model
     public $incrementing = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 
@@ -47,9 +47,6 @@ class TvInfo extends Model
      */
     public $timestamps = false;
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**

@@ -23,7 +23,7 @@ Route::prefix('v2')->group(function () {
     Route::get('capabilities', [ApiV2Controller::class, 'capabilities']);
 });
 
-Route::prefix('v2')->middleware('auth:api', 'throttle:rate_limit,1')->group(function () {
+Route::prefix('v2')->middleware(['auth:api', 'throttle:rate_limit,1'])->group(function () {
     Route::get('movies', [ApiV2Controller::class, 'movie']);
     Route::get('search', [ApiV2Controller::class, 'apiSearch']);
     Route::get('tv', [ApiV2Controller::class, 'tv']);
@@ -46,7 +46,7 @@ Route::get('release/{id}/mediainfo', function ($id) {
     return response()->json([
         'video' => $video ?: null,
         'audio' => $audio ?: null,
-        'subs' => $subs ? $subs->subs : null,
+        'subs' => $subs ? $subs->subs : null, // @phpstan-ignore property.notFound
     ]);
 });
 

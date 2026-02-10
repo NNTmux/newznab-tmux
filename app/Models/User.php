@@ -83,6 +83,16 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $verification_token
  * @property string|null $timezone
  * @property bool $can_post
+ * @property array<int>|string|null $categoryexclusions Computed from join/subquery for category exclusion lists
+ * @property string|null $sort_date Computed column for date sorting
+ * @property string|null $role_name Computed from join with roles table
+ * @property int|null $num Computed count value
+ * @property string|null $mth Computed month value
+ * @property bool|null $is_role_expired Computed via Attribute accessor
+ * @property int|null $days_until_expiry Computed via Attribute accessor
+ * @property int|null $count Computed count from aggregate queries
+ * @property int|null $daily_api_count Computed daily API request count
+ * @property int|null $daily_download_count Computed daily download count
  * @property-read Collection<int, ReleaseComment> $comments
  * @property-read Collection<int, UserDownload> $downloads
  * @property-read Collection<int, DnzbFailure> $failedReleases
@@ -557,8 +567,8 @@ final class User extends Authenticatable
      * @return \Illuminate\Support\Collection<int, array{
      *     role: Role|null,
      *     role_name: string,
-     *     start_date: Carbon,
-     *     end_date: Carbon,
+     *     start_date: string,
+     *     end_date: string|null,
      *     is_current_pending: bool
      * }>
      */
@@ -571,12 +581,12 @@ final class User extends Authenticatable
             ->orderBy('effective_date', 'asc')
             ->get();
 
-        return $stackedHistory->map(function ($history) {
+        return $stackedHistory->map(function ($history) { // @phpstan-ignore return.type
             $role = Role::find($history->new_role_id);
 
             return [
                 'role' => $role,
-                'role_name' => $role?->name ?? 'Unknown Role',
+                'role_name' => $role?->name ?? 'Unknown Role', // @phpstan-ignore nullsafe.neverNull
                 'start_date' => $history->effective_date,
                 'end_date' => $history->new_expiry_date,
                 'is_current_pending' => $this->pending_roles_id === $history->new_role_id
@@ -751,7 +761,7 @@ final class User extends Authenticatable
             'consoleview' => $consoleview,
             'bookview' => $bookview,
             'style' => $style,
-            'rate_limit' => $roleModel?->rate_limit ?? 60,
+            'rate_limit' => $roleModel?->rate_limit ?? 60, // @phpstan-ignore nullsafe.neverNull
             ...($email ? ['email' => trim($email)] : []),
         ]);
 
@@ -1324,7 +1334,7 @@ final class User extends Authenticatable
     public static function updateRssKey(int $uid): int
     {
         static::find($uid)?->update([
-            'api_token' => md5(Password::getRepository()->createNewToken()),
+            'api_token' => md5(Password::getRepository()->createNewToken()), // @phpstan-ignore method.notFound
         ]);
 
         return SignupError::SUCCESS->value;
@@ -1399,7 +1409,7 @@ final class User extends Authenticatable
         bool $forceInviteMode = false,
         int $role = UserRole::USER->value,
         bool $validate = true,
-    ): bool|int|string {
+    ): int|string {
         $userData = [
             'username' => trim($userName),
             'password' => trim($password),
@@ -1476,7 +1486,7 @@ final class User extends Authenticatable
         string $host = '',
         int $invites = Invitation::DEFAULT_INVITES,
         int $invitedBy = 0,
-    ): int|false {
+    ): int {
         $hashedPassword = Hash::make($password);
 
         $storeIps = config('nntmux:settings.store_user_ip') === true ? $host : '';

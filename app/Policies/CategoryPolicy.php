@@ -67,6 +67,7 @@ class CategoryPolicy extends \TeamTeaTime\Forum\Policies\CategoryPolicy
 
     public function edit(User $user, Category $category): bool
     {
+        /** @var \App\Models\User $user */
         return $user->hasRole('Admin');
     }
 }

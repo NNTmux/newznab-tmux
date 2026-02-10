@@ -32,13 +32,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class UserSerie extends Model
 {
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     public function user(): BelongsTo
@@ -70,7 +67,7 @@ class UserSerie extends Model
      * Get all the user's "my shows".
      *
      *
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getShows($userId)
     {

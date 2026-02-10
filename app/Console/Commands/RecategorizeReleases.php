@@ -39,7 +39,7 @@ class RecategorizeReleases extends Command
         if ($this->option('misc')) {
             $countQuery->whereIn('categories_id', Category::OTHERS_GROUP);
         } elseif ($this->option('all')) {
-            if ($this->confirm('This will reset categorization on all releases and re-categorize them all from scratch. Are you sure? (y/n)', 'n')) {
+            if ($this->confirm('This will reset categorization on all releases and re-categorize them all from scratch. Are you sure? (y/n)', false)) {
                 Release::query()->where('iscategorized', 1)->update([
                     'iscategorized' => 0,
                 ]);
@@ -91,14 +91,15 @@ class RecategorizeReleases extends Command
                         'categories_id' => $catId['categories_id'],
                     ]);
 
+                    /** @var Category|null $newCatName */
                     $newCatName = Category::query()->where('id', $catId['categories_id'])->first();
 
                     $this->line('');
                     $this->output->writeln('<fg=yellow>ID       :</> '.$result->id);
                     $this->output->writeln('<fg=green>Release  :</> '.$result->searchname);
-                    $this->output->writeln('<fg=cyan>Group    :</> '.$result->group->name);
-                    $oldCategoryTitle = $result->category?->parent ? ($result->category->parent->title.' -> '.$result->category->title) : ($result->category?->title ?? 'N/A');
-                    $newCategoryTitle = $newCatName?->parent ? ($newCatName->parent->title.' -> '.$newCatName->title) : ($newCatName?->title ?? 'N/A');
+                    $this->output->writeln('<fg=cyan>Group    :</> '.$result->group->name); // @phpstan-ignore property.notFound
+                    $oldCategoryTitle = $result->category?->parent ? ($result->category->parent->title.' -> '.$result->category->title) : ($result->category?->title ?? 'N/A'); // @phpstan-ignore property.notFound, property.notFound, property.notFound, nullsafe.neverNull
+                    $newCategoryTitle = $newCatName?->parent ? ($newCatName->parent->title.' -> '.$newCatName->title) : ($newCatName?->title ?? 'N/A'); // @phpstan-ignore nullsafe.neverNull
                     $this->output->writeln('<fg=white>Category :</> '.$oldCategoryTitle.' <fg=yellow>→</> <fg=magenta>'.$newCategoryTitle.'</>');
                     $this->line('');
                 }

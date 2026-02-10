@@ -76,7 +76,7 @@ class Par2Processor
 
         // Get the file list from Par2Info.
         $files = $this->par2Info->getFileList();
-        if ($files !== false && \count($files) > 0) {
+        if (\count($files) > 0) {
             $filesAdded = 0;
 
             // Loop through the files.
@@ -112,7 +112,7 @@ class Par2Processor
                 // Try to get a new name.
                 if ($foundName === false) {
                     $query['textstring'] = $file['name'];
-                    if ($this->nameFixingService->checkName($query, true, 'PAR2, ', true, $show)) {
+                    if ($this->nameFixingService->checkName($query, true, 'PAR2, ', true, (bool) $show)) {
                         $foundName = true;
                     }
                 }

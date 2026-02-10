@@ -293,9 +293,9 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     /**
      * @throws \Throwable
      */
-    public function delete(int $id): mixed
+    public function delete(int $id): void
     {
-        return DB::transaction(function () use ($id) {
+        DB::transaction(function () use ($id) {
             DB::delete(
                 sprintf(
                     '
@@ -371,7 +371,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     public function countEpsByVideoID(int $videoId): bool
     {
         $count = TvEpisode::query()
-            ->where('videos_id', $videoId)->count(['id']);
+            ->where('videos_id', $videoId)->count('id');
 
         return $count !== null && $count > 0;
     }

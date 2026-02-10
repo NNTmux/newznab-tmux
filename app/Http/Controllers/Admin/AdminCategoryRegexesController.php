@@ -107,6 +107,7 @@ class AdminCategoryRegexesController extends BasePageController
         $category_names = [];
         foreach ($categories_db as $category_db) {
             $category_ids[] = $category_db->id;
+            /** @phpstan-ignore property.notFound */
             $category_names[] = $category_db->parent_title.' '.$category_db->title.': '.$category_db->id;
         }
 

@@ -57,7 +57,7 @@ class AdmPipe extends AbstractAdultProviderPipe
         // Fetch the movie details page
         $this->response = $this->fetchHtml($this->directUrl, $this->cookie);
 
-        if ($this->response === false) {
+        if ($this->response === false) { // @phpstan-ignore identical.alwaysFalse
             return AdultProcessingResult::failed('Failed to fetch movie details page', $this->getName());
         }
 
@@ -142,30 +142,11 @@ class AdmPipe extends AbstractAdultProviderPipe
         }
 
         // Get all the movie data
-        $synopsis = $this->extractSynopsis();
-        if (is_array($synopsis)) {
-            $results = array_merge($results, $synopsis);
-        }
-
-        $productInfo = $this->extractProductInfo(true);
-        if (is_array($productInfo)) {
-            $results = array_merge($results, $productInfo);
-        }
-
-        $cast = $this->extractCast();
-        if (is_array($cast)) {
-            $results = array_merge($results, $cast);
-        }
-
-        $genres = $this->extractGenres();
-        if (is_array($genres)) {
-            $results = array_merge($results, $genres);
-        }
-
-        $covers = $this->extractCovers();
-        if (is_array($covers)) {
-            $results = array_merge($results, $covers);
-        }
+        $results = array_merge($results, $this->extractSynopsis());
+        $results = array_merge($results, $this->extractProductInfo(true));
+        $results = array_merge($results, $this->extractCast());
+        $results = array_merge($results, $this->extractGenres());
+        $results = array_merge($results, $this->extractCovers());
 
         if (empty($results)) {
             return false;
@@ -180,7 +161,7 @@ class AdmPipe extends AbstractAdultProviderPipe
         $baseUrl = 'https://www.adultdvdmarketplace.com/';
 
         // Try fancybox link first
-        if ($ret = $this->getHtmlParser()->findOne('a[rel=fancybox-button]')) {
+        if ($ret = $this->getHtmlParser()->findOne('a[rel=fancybox-button]')) { // @phpstan-ignore if.alwaysTrue
             if (isset($ret->href) && preg_match('/images\/.*[\d]+\.jpg$/i', $ret->href, $hits)) {
                 $res['boxcover'] = str_starts_with($hits[0], 'http')
                     ? $hits[0]
@@ -192,7 +173,7 @@ class AdmPipe extends AbstractAdultProviderPipe
         }
 
         // Try license image
-        if ($ret = $this->getHtmlParser()->findOne('img[rel=license]')) {
+        if ($ret = $this->getHtmlParser()->findOne('img[rel=license]')) { // @phpstan-ignore if.alwaysTrue
             if (isset($ret->src) && preg_match('/images\/.*[\d]+\.jpg$/i', $ret->src, $hits)) {
                 $res['boxcover'] = str_starts_with($hits[0], 'http')
                     ? $hits[0]
@@ -224,7 +205,7 @@ class AdmPipe extends AbstractAdultProviderPipe
 
         // Fallback: Try meta description
         $meta = $this->getHtmlParser()->findOne('meta[name="description"]');
-        if ($meta && isset($meta->content) && ! empty(trim($meta->content))) {
+        if ($meta && isset($meta->content) && ! empty(trim($meta->content))) { // @phpstan-ignore booleanAnd.leftAlwaysTrue
             $res['synopsis'] = trim($meta->content);
         }
 
@@ -261,7 +242,7 @@ class AdmPipe extends AbstractAdultProviderPipe
             if (trim($heading->plaintext) === 'Cast') {
                 $next = $heading->nextSibling();
                 while ($next) {
-                    if ($next->nodeName === 'h3') {
+                    if ($next->nodeName === 'h3') { // @phpstan-ignore property.notFound
                         break;
                     }
                     if (isset($next->href) && preg_match('/search_performerid/', $next->href)) {

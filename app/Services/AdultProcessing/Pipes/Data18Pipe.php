@@ -75,7 +75,7 @@ class Data18Pipe extends AbstractAdultProviderPipe
         // Fetch the movie details page
         $this->response = $this->fetchHtml($this->directUrl, $this->cookie);
 
-        if ($this->response === false) {
+        if ($this->response === false) { // @phpstan-ignore identical.alwaysFalse
             return AdultProcessingResult::failed('Failed to fetch movie details page', $this->getName());
         }
 
@@ -199,27 +199,27 @@ class Data18Pipe extends AbstractAdultProviderPipe
 
         // Get all the movie data (HTML fallback)
         $synopsis = $this->extractSynopsis();
-        if (is_array($synopsis) && ! empty($synopsis)) {
+        if (! empty($synopsis)) {
             $results = array_merge($results, $synopsis);
         }
 
         $productInfo = $this->extractProductInfo(true);
-        if (is_array($productInfo) && ! empty($productInfo)) {
+        if (! empty($productInfo)) {
             $results = array_merge($results, $productInfo);
         }
 
         $cast = $this->extractCast();
-        if (is_array($cast) && ! empty($cast)) {
+        if (! empty($cast)) {
             $results = array_merge($results, $cast);
         }
 
         $genres = $this->extractGenres();
-        if (is_array($genres) && ! empty($genres)) {
+        if (! empty($genres)) {
             $results = array_merge($results, $genres);
         }
 
         $covers = $this->extractCovers();
-        if (is_array($covers) && ! empty($covers)) {
+        if (! empty($covers)) {
             $results = array_merge($results, $covers);
         }
 
@@ -321,7 +321,7 @@ class Data18Pipe extends AbstractAdultProviderPipe
 
         foreach ($selectors as $selector) {
             $ret = $this->getHtmlParser()->findOne($selector);
-            if ($ret) {
+            if ($ret) { // @phpstan-ignore if.alwaysTrue
                 $coverUrl = $ret->src ?? $ret->content ?? null;
 
                 if (! empty($coverUrl)) {
@@ -363,7 +363,7 @@ class Data18Pipe extends AbstractAdultProviderPipe
 
         foreach ($selectors as $selector) {
             $ret = $this->getHtmlParser()->findOne($selector);
-            if ($ret) {
+            if ($ret) { // @phpstan-ignore if.alwaysTrue
                 $text = $ret->plaintext ?? $ret->content ?? '';
                 if (! empty(trim($text))) {
                     $res['synopsis'] = trim($text);
@@ -459,7 +459,7 @@ class Data18Pipe extends AbstractAdultProviderPipe
 
         foreach ($studioSelectors as $selector) {
             $studio = $this->getHtmlParser()->findOne($selector);
-            if ($studio) {
+            if ($studio) { // @phpstan-ignore if.alwaysTrue
                 $res['studio'] = trim($studio->plaintext ?? '');
                 break;
             }
@@ -474,7 +474,7 @@ class Data18Pipe extends AbstractAdultProviderPipe
 
         foreach ($dateSelectors as $selector) {
             $date = $this->getHtmlParser()->findOne($selector);
-            if ($date) {
+            if ($date) { // @phpstan-ignore if.alwaysTrue
                 $res['releasedate'] = $date->datetime ?? trim($date->plaintext ?? '');
                 break;
             }
@@ -488,7 +488,7 @@ class Data18Pipe extends AbstractAdultProviderPipe
 
         foreach ($directorSelectors as $selector) {
             $director = $this->getHtmlParser()->findOne($selector);
-            if ($director) {
+            if ($director) { // @phpstan-ignore if.alwaysTrue
                 $res['director'] = trim($director->plaintext ?? '');
                 break;
             }

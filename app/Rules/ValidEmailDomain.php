@@ -198,6 +198,8 @@ class ValidEmailDomain implements ValidationRule
     /**
      * Check for suspicious plus addressing patterns
      * Some users abuse plus addressing to create multiple accounts
+     *
+     * @phpstan-ignore method.unused
      */
     private function hasSuspiciousPlusAddressing(string $email): bool
     {

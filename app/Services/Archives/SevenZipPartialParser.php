@@ -103,12 +103,15 @@ class SevenZipPartialParser
 
     private const K_WIN_ATTRIBUTES = 0x15;
 
+    /** @phpstan-ignore classConstant.unused */
     private const K_COMMENT = 0x16;
 
     private const K_ENCODED_HEADER = 0x17;
 
+    /** @phpstan-ignore classConstant.unused */
     private const K_START_POS = 0x18;
 
+    /** @phpstan-ignore classConstant.unused */
     private const K_DUMMY = 0x19;
 
     // Compression method IDs
@@ -120,8 +123,10 @@ class SevenZipPartialParser
 
     private const METHOD_PPMD = "\x03\x04\x01";
 
+    /** @phpstan-ignore classConstant.unused */
     private const METHOD_BCJ = "\x03\x03\x01\x03";
 
+    /** @phpstan-ignore classConstant.unused */
     private const METHOD_BCJ2 = "\x03\x03\x01\x1B";
 
     private const METHOD_DEFLATE = "\x04\x01\x08";
@@ -131,14 +136,18 @@ class SevenZipPartialParser
     private const METHOD_AES = "\x06\xF1\x07\x01";
 
     // Windows file attributes
+    /** @phpstan-ignore classConstant.unused */
     private const FILE_ATTRIBUTE_READONLY = 0x01;
 
+    /** @phpstan-ignore classConstant.unused */
     private const FILE_ATTRIBUTE_HIDDEN = 0x02;
 
+    /** @phpstan-ignore classConstant.unused */
     private const FILE_ATTRIBUTE_SYSTEM = 0x04;
 
     private const FILE_ATTRIBUTE_DIRECTORY = 0x10;
 
+    /** @phpstan-ignore classConstant.unused */
     private const FILE_ATTRIBUTE_ARCHIVE = 0x20;
 
     public function __construct(string $data)
@@ -1562,6 +1571,8 @@ class SevenZipPartialParser
 
     /**
      * Reads a 7z variable-length integer at offset, returns value via reference.
+     *
+     * @param-out int $value
      */
     private function readVIntAt(int $offset, ?int &$value, ?int &$newOffset, int $limit): bool
     {

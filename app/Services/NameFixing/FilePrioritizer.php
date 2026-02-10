@@ -19,6 +19,7 @@ class FilePrioritizer
     /**
      * Priority levels (lower = higher priority).
      */
+    /** @phpstan-ignore classConstant.unused */
     private const PRIORITY_SRR = 1;
 
     private const PRIORITY_MAIN_RAR = 2;

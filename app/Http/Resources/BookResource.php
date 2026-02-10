@@ -7,6 +7,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * Book API Resource for transforming book data.
+ *
+ * @mixin \App\Models\BookInfo
  */
 class BookResource extends JsonResource
 {

@@ -64,13 +64,10 @@ class MovieInfo extends Model
      */
     protected $table = 'movieinfo';
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = ['id'];
 

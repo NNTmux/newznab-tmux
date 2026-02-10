@@ -70,9 +70,9 @@ class UpdatePostProcess extends Command
             $nntp = self::VALID_TYPES[$type] ? $this->getNntp() : null;
 
             match ($type) {
-                'all' => $this->postProcessService->processAll($nntp),
+                'all' => $this->postProcessService->processAll($nntp ?? $this->getNntp()),
                 'amazon' => $this->processAmazon(),
-                'nfo' => $this->postProcessService->processNfos($nntp),
+                'nfo' => $this->postProcessService->processNfos($nntp ?? $this->getNntp()),
                 'movies' => $this->postProcessService->processMovies(),
                 'music' => $this->postProcessService->processMusic(),
                 'console' => $this->postProcessService->processConsoles(),
@@ -82,7 +82,6 @@ class UpdatePostProcess extends Command
                 'tv' => $this->postProcessService->processTv(),
                 'xxx' => $this->postProcessService->processXXX(),
                 'additional' => $this->postProcessService->processAdditional(),
-                default => throw new \Exception("Unhandled type: {$type}"),
             };
 
             return self::SUCCESS;

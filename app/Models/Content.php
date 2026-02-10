@@ -69,18 +69,15 @@ class Content extends Model
      */
     public $timestamps = false;
 
-    /**
-     * @var bool
-     */
     protected $dateFormat = false;
 
     /**
-     * @var array
+     * @var array<string>
      */
     protected $guarded = [];
 
     /**
-     * @var array
+     * @var array<string, string>
      */
     protected $casts = [
         'contenttype' => 'integer',
@@ -127,7 +124,7 @@ class Content extends Model
      */
     public function scopeFrontPage(Builder $query): Builder
     {
-        return $query->active()
+        return $query->active() // @phpstan-ignore method.notFound
             ->ofType(self::TYPE_INDEX)
             ->orderByRaw('ordinal ASC, COALESCE(ordinal, 1000000), id');
     }

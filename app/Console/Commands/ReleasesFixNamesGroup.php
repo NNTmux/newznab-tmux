@@ -187,13 +187,11 @@ class ReleasesFixNamesGroup extends Command
                 $this->nameFixingService->reset();
                 $fileNames = explode('|', $release->filestring);
 
-                if (is_array($fileNames)) {
-                    $releaseFile = $release;
-                    foreach ($fileNames as $fileName) {
-                        if (! $this->nameFixingService->getUpdateService()->matched) {
-                            $releaseFile->textstring = $fileName;
-                            $this->nameFixingService->checkName($releaseFile, true, 'Filenames, ', true, true);
-                        }
+                $releaseFile = $release;
+                foreach ($fileNames as $fileName) {
+                    if (! $this->nameFixingService->getUpdateService()->matched) {
+                        $releaseFile->textstring = $fileName;
+                        $this->nameFixingService->checkName($releaseFile, true, 'Filenames, ', true, true);
                     }
                 }
             }

@@ -635,7 +635,7 @@ class ElasticSearchDriver implements SearchDriverInterface
         // Normalize the input to a search string
         if (is_string($phrases)) {
             $searchString = $phrases;
-        } elseif (is_array($phrases)) {
+        } else {
             // Check if it's an associative array (has string keys like 'searchname')
             $isAssociative = count(array_filter(array_keys($phrases), 'is_string')) > 0;
 
@@ -646,8 +646,6 @@ class ElasticSearchDriver implements SearchDriverInterface
                 // Indexed array - combine values
                 $searchString = implode(' ', $phrases);
             }
-        } else {
-            return [];
         }
 
         $result = $this->indexSearch($searchString, $limit);
@@ -714,15 +712,13 @@ class ElasticSearchDriver implements SearchDriverInterface
         // Normalize the input to a search string
         if (is_string($phrases)) {
             $searchString = $phrases;
-        } elseif (is_array($phrases)) {
+        } else {
             $isAssociative = count(array_filter(array_keys($phrases), 'is_string')) > 0;
             if ($isAssociative) {
                 $searchString = implode(' ', array_values($phrases));
             } else {
                 $searchString = implode(' ', $phrases);
             }
-        } else {
-            return [];
         }
 
         $keywords = $this->sanitizeSearchTerms($searchString);
@@ -1127,7 +1123,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                         'plainsearchname' => $searchNameDotless,
                         'fromname' => $release->fromname,
                         'categories_id' => $release->categories_id,
-                        'filename' => $release->filename,
+                        'filename' => $release->filename, // @phpstan-ignore property.notFound
                     ],
                     'doc_as_upsert' => true,
                 ],

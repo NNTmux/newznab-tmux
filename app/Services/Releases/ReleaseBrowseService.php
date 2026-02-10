@@ -235,7 +235,7 @@ class ReleaseBrowseService
     public function showPasswords(): string
     {
         $show = (int) Settings::settingValue('showpasswordedrelease');
-        $setting = $show ?? 0;
+        $setting = $show;
 
         return match ($setting) {
             1 => '<= '.self::PASSWD_RAR,
@@ -288,7 +288,7 @@ class ReleaseBrowseService
     }
 
     /**
-     * @return \Illuminate\Cache\|\Illuminate\Database\Eloquent\Collection|mixed
+     * @return \Illuminate\Database\Eloquent\Collection|mixed
      */
     public function getShowsRange($userShows, $offset, $limit, $orderBy, int $maxAge = -1, array $excludedCats = [])
     {
