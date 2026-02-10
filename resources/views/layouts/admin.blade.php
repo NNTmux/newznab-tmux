@@ -122,31 +122,16 @@
 
     @stack('scripts')
 
-
-    <script nonce="{{ csp_nonce() }}">
-        // Display flash messages as toast notifications
-        @if(session('success'))
-            window.showToast('{{ session('success') }}', 'success');
-        @endif
-
-        @if(session('error'))
-            @if(is_array(session('error')))
-                @foreach(session('error') as $error)
-                    window.showToast('{{ $error }}', 'error');
-                @endforeach
-            @else
-                window.showToast('{{ session('error') }}', 'error');
-            @endif
-        @endif
-
-        @if(session('warning'))
-            window.showToast('{{ session('warning') }}', 'warning');
-        @endif
-
-        @if(session('info'))
-            window.showToast('{{ session('info') }}', 'info');
-        @endif
-    </script>
+    <!-- Flash Messages Data (read by Alpine toast store on init) -->
+    <div id="flash-messages-data"
+         data-messages="{{ json_encode([
+             'success' => session('success'),
+             'error' => session('error'),
+             'warning' => session('warning'),
+             'info' => session('info')
+         ]) }}"
+         style="display: none;">
+    </div>
 
     <!-- Meta tags for theme management (CSP-safe) -->
     @auth

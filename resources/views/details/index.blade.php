@@ -604,7 +604,7 @@
                                             <img src="{{ asset('assets/images/flags/' . strtolower($anidbCountry) . '.png') }}"
                                                  alt="{{ $countryName }}"
                                                  class="w-4 h-3 mr-1"
-                                                 onerror="this.style.display='none'">
+                                                 data-hide-on-error="true">
                                         @endif
                                         {{ $countryName }}
                                     </span>

@@ -29,3 +29,24 @@ Alpine.data('themeRadio', () => ({
         this.$nextTick(() => { this._updating = false; });
     }
 }));
+
+// Document-level delegation for #theme-toggle button without x-data
+(function() {
+    var themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle && !themeToggle.closest('[x-data]')) {
+        themeToggle.addEventListener('click', function() {
+            Alpine.store('theme').cycle();
+        });
+    }
+
+    // Theme radio buttons on profile edit
+    document.querySelectorAll('input[name="theme_preference"]').forEach(function(radio) {
+        if (radio.closest('[x-data]')) return;
+        if (radio.dataset.themeListenerAttached === 'true') return;
+        radio.dataset.themeListenerAttached = 'true';
+        radio.addEventListener('change', function() {
+            if (window._updatingThemeUI) return;
+            Alpine.store('theme').set(this.value);
+        });
+    });
+})();

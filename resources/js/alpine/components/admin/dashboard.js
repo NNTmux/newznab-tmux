@@ -3,6 +3,7 @@
  * Alpine.data('recentActivity') - Auto-refreshing recent activity
  */
 import Alpine from '@alpinejs/csp';
+import Chart from 'chart.js/auto';
 
 function escapeHtml(text) {
     const div = document.createElement('div');
@@ -12,17 +13,7 @@ function escapeHtml(text) {
 
 Alpine.data('adminDashboard', () => ({
     init() {
-        this._waitForChartJs();
-    },
-
-    _waitForChartJs() {
-        if (typeof Chart !== 'undefined') { this._initCharts(); return; }
-        let attempts = 0;
-        const check = setInterval(() => {
-            attempts++;
-            if (typeof Chart !== 'undefined') { clearInterval(check); this._initCharts(); }
-            else if (attempts >= 30) { clearInterval(check); console.warn('Chart.js not loaded'); }
-        }, 100);
+        this._initCharts();
     },
 
     _initCharts() {

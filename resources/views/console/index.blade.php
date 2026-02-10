@@ -121,7 +121,7 @@
                                             <img class="w-32 h-48 object-cover"
                                                  src="{{ getReleaseCover($result) }}"
                                                  alt="{{ $result->title }}"
-                                                 onerror="this.onerror=null;this.src='{{ url('/images/no-cover.png') }}';">
+                                                 data-fallback-src="{{ url('/images/no-cover.png') }}">
                                             @if($totalFailed > 0)
                                                 <div class="absolute top-2 right-2">
                                                     <span class="px-2 py-1 bg-red-600 dark:bg-red-700 text-white text-xs rounded-full">

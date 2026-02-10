@@ -40,5 +40,18 @@ Alpine.data('previewModal', () => ({
         const self = this;
         window.showPreviewImage = function(guid, type) { self.show(guid, type); };
         window.closePreviewModal = function() { self.close(); };
+
+        // Document-level click delegation for preview/sample triggers
+        document.addEventListener('click', function(e) {
+            const preview = e.target.closest('.preview-badge');
+            if (preview) { e.preventDefault(); self.show(preview.dataset.guid, 'preview'); return; }
+            const sample = e.target.closest('.sample-badge');
+            if (sample) { e.preventDefault(); self.show(sample.dataset.guid, 'sample'); return; }
+            if (e.target.closest('[data-close-preview-modal]')) { e.preventDefault(); self.close(); }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && self.open) self.close();
+        });
     }
 }));

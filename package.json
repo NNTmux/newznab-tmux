@@ -23,6 +23,7 @@
         "@fortawesome/fontawesome-free": "^7.1.0",
         "@melloware/coloris": "^0.25.0",
         "@simonwep/pickr": "^1.9.1",
+        "chart.js": "^4.5.1",
         "date-fns": "^4.1.0",
         "feather-icons": "^4.29.2",
         "laravel-echo": "^2.3.0",

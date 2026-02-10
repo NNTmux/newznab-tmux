@@ -75,5 +75,60 @@ Alpine.data('confirmModal', () => ({
         window.showConfirm = function(options) { return self.show(options); };
         window.closeConfirmationModal = function() { self.cancel(); };
         window.confirmConfirmationModal = function() { self.confirm(); };
+
+        // Document-level delegation for data-confirm, data-confirm-delete, data-logout
+        document.addEventListener('click', function(e) {
+            // Close/confirm buttons
+            if (e.target.closest('[data-close-confirmation-modal]')) { e.preventDefault(); self.cancel(); return; }
+            if (e.target.closest('[data-confirm-confirmation-modal]')) { e.preventDefault(); self.confirm(); return; }
+
+            // Logout
+            var logoutEl = e.target.closest('[data-logout]');
+            if (logoutEl) {
+                e.preventDefault();
+                var form = document.getElementById('logout-form') || document.getElementById('sidebar-logout-form');
+                if (form) form.submit();
+                return;
+            }
+
+            // data-confirm-delete
+            var deleteEl = e.target.closest('[data-confirm-delete]');
+            if (deleteEl) {
+                e.preventDefault();
+                e.stopPropagation();
+                var isAnchor = deleteEl.tagName === 'A';
+                var form = isAnchor ? null : deleteEl.closest('form');
+                self.show({
+                    message: 'Are you sure you want to delete this item?',
+                    type: 'danger',
+                    confirmText: 'Delete',
+                    onConfirm: function() {
+                        if (isAnchor && deleteEl.href) window.location.href = deleteEl.href;
+                        else if (form) form.submit();
+                    }
+                });
+                return;
+            }
+
+            // data-confirm
+            var confirmEl = e.target.closest('[data-confirm]');
+            if (confirmEl) {
+                e.preventDefault();
+                e.stopPropagation();
+                var message = confirmEl.getAttribute('data-confirm');
+                var isAnchor = confirmEl.tagName === 'A';
+                var form = isAnchor ? null : confirmEl.closest('form');
+                self.show({
+                    message: message,
+                    type: 'danger',
+                    confirmText: 'Confirm',
+                    onConfirm: function() {
+                        if (isAnchor && confirmEl.href) window.location.href = confirmEl.href;
+                        else if (form) form.submit();
+                    }
+                });
+                return;
+            }
+        });
     }
 }));

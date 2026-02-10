@@ -104,5 +104,16 @@ Alpine.data('mediainfoModal', () => ({
         window.showMediainfo = function(id) { self.show(id); };
         window.closeMediainfoModal = function() { self.close(); };
         window.formatFileSize = formatFileSize;
+
+        // Document-level click delegation for mediainfo triggers
+        document.addEventListener('click', function(e) {
+            const badge = e.target.closest('.mediainfo-badge');
+            if (badge) { e.preventDefault(); self.show(badge.dataset.releaseId); return; }
+            if (e.target.closest('[data-close-mediainfo-modal]')) { e.preventDefault(); self.close(); }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && self.open) self.close();
+        });
     }
 }));

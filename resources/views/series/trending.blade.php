@@ -68,7 +68,7 @@
                             <div class="flex-shrink-0 relative">
                                 <a href="{{ route('series', ['id' => $show->id]) }}" class="block">
                                     @if($show->image)
-                                        <img src="{{ url('/covers/tvshows/' . $show->id . '.jpg') }}" alt="{{ $show->title }}" class="w-full md:w-64 h-96 object-cover" onerror="this.onerror=null; this.src='{{ url('/covers/tvshows/no-cover.jpg') }}'">
+                                        <img src="{{ url('/covers/tvshows/' . $show->id . '.jpg') }}" alt="{{ $show->title }}" class="w-full md:w-64 h-96 object-cover" data-fallback-src="{{ url('/covers/tvshows/no-cover.jpg') }}">
                                     @else
                                         <div class="w-full md:w-64 h-96 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
                                             <i class="fas fa-tv text-gray-400 text-5xl"></i>

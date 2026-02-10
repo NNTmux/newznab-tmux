@@ -521,8 +521,4 @@
 </div>
 @endsection
 
-@push('scripts')
-@if(isset($userStats))
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-@endif
-@endpush
+{{-- Chart.js is bundled via Vite (imported in resources/js/alpine/components/admin/dashboard.js) --}}

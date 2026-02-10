@@ -151,7 +151,7 @@
                                             <img src="{{ url('/covers/music/' . $result->cover) }}"
                                                  alt="{{ $result->artist ?? '' }} - {{ $result->title ?? '' }}"
                                                  class="w-32 h-48 object-cover"
-                                                 onerror="this.onerror=null;this.src='{{ url('/images/no-cover.png') }}';">
+                                                 data-fallback-src="{{ url('/images/no-cover.png') }}">
                                         @else
                                             <div class="w-32 h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
                                                 <i class="fas fa-music text-gray-400 text-2xl"></i>

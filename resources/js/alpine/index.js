@@ -50,11 +50,6 @@ import './components/admin/dashboard.js';
 import './components/admin/groups.js';
 import './components/admin/features.js';
 
-// --- Event bridge for existing Blade templates ---
-// Provides document-level event delegation for CSS-class-based hooks
-// until Blade templates are updated with x-data directives
-import './components/event-bridge.js';
-
 // --- Shared utility (backward compat) ---
 window.escapeHtml = function(text) {
     const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };

@@ -40,9 +40,23 @@ Alpine.data('nfoModal', () => ({
     },
 
     init() {
-        // Backward compat
+        // Backward compat global functions
         const self = this;
         window.openNfoModal = function(guid) { self.openNfo(guid); };
         window.closeNfoModal = function() { self.close(); };
+
+        // Document-level click delegation for NFO triggers
+        document.addEventListener('click', function(e) {
+            const nfoAttr = e.target.closest('[data-open-nfo]');
+            if (nfoAttr) { e.preventDefault(); self.openNfo(nfoAttr.getAttribute('data-open-nfo')); return; }
+            const nfoBadge = e.target.closest('.nfo-badge');
+            if (nfoBadge) { e.preventDefault(); self.openNfo(nfoBadge.dataset.guid); return; }
+            if (e.target.closest('[data-close-nfo-modal]')) { e.preventDefault(); self.close(); }
+        });
+
+        // Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && self.open) self.close();
+        });
     }
 }));

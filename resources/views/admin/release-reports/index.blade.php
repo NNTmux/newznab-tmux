@@ -184,7 +184,13 @@
                                         <div class="flex items-center gap-2 flex-wrap">
                                             @if($report->release && in_array($report->status, ['pending', 'reviewed']))
                                                 <!-- Delete Release Button -->
-                                                <form method="POST" action="{{ route('admin.release-reports.delete-release', $report->id) }}" class="inline" onsubmit="return confirm('Are you sure you want to DELETE this release? This action cannot be undone.');">
+                                                <form method="POST" action="{{ route('admin.release-reports.delete-release', $report->id) }}" class="inline"
+                                                      x-data="confirmForm"
+                                                      data-message="Are you sure you want to DELETE this release? This action cannot be undone."
+                                                      data-title="Delete Release"
+                                                      data-type="danger"
+                                                      data-confirm-text="Delete"
+                                                      @submit.prevent="submit()">
                                                     @csrf
                                                     <button type="submit"
                                                             class="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm inline-flex items-center"

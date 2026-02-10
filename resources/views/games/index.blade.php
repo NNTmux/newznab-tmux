@@ -154,7 +154,7 @@
                                             <img src="{{ url('/covers/games/' . $result->cover) }}"
                                                  alt="{{ $result->title ?? $result->searchname }}"
                                                  class="w-32 h-48 object-cover"
-                                                 onerror="this.onerror=null;this.src='{{ url('/images/no-cover.png') }}';">
+                                                 data-fallback-src="{{ url('/images/no-cover.png') }}">
                                         @else
                                             <div class="w-32 h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
                                                 <i class="fas fa-gamepad text-gray-400 text-2xl"></i>

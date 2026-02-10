@@ -77,5 +77,16 @@ Alpine.data('filelistModal', () => ({
         const self = this;
         window.showFilelist = function(guid) { self.show(guid); };
         window.closeFilelistModal = function() { self.close(); };
+
+        // Document-level click delegation for filelist triggers
+        document.addEventListener('click', function(e) {
+            const badge = e.target.closest('.filelist-badge');
+            if (badge) { e.preventDefault(); self.show(badge.dataset.guid); return; }
+            if (e.target.closest('[data-close-filelist-modal]')) { e.preventDefault(); self.close(); }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && self.open) self.close();
+        });
     }
 }));
