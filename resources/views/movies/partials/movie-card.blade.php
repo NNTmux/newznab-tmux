@@ -180,7 +180,7 @@
                 @endif
                 @if(isset($result->actors) && $result->actors)
                     <div>
-                        <strong class="text-gray-700 dark:text-gray-300">Actors:</strong> {!! Str::limit($result->actors, 100) !!}
+                        <strong class="text-gray-700 dark:text-gray-300">Actors:</strong> {!! $result->actors !!}
                     </div>
                 @endif
             </div>
