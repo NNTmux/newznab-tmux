@@ -373,7 +373,7 @@
                             </ol>
 
                             <div class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4 flex justify-center">
-                                <img src="{{ $google2fa_url }}" alt="2FA QR Code">
+                                {!! $google2fa_url !!}
                             </div>
 
                             <p class="text-xs text-blue-600 dark:text-blue-400 mb-4">

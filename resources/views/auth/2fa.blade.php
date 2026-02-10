@@ -43,7 +43,7 @@
                             </form>
                         @elseif(!$data['user']->passwordSecurity->google2fa_enable)
                             <strong>1. Scan this barcode with your Google Authenticator App:</strong><br/>
-                            <img src="{{$data['google2fa_url'] }}" alt="">
+                            {!! $data['google2fa_url'] !!}
                             <br/><br/>
                             <strong>2.Enter the pin the code to Enable 2FA</strong><br/><br/>
                             <form class="form-horizontal" method="POST" action="{{ route('enable2fa') }}">
