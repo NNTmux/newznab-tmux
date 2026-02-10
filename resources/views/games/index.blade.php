@@ -292,7 +292,6 @@
     </div>
 </div>
 
-<!-- NFO Modal -->
-@include('partials.nfo-modal')
+{{-- NFO modal is included globally via layouts.main --}}
 @endsection
 

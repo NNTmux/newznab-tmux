@@ -329,64 +329,7 @@
         </div>
     @endif
 
-    <!-- Preview/Sample Image Modal -->
-    <div id="previewModal" class="hidden fixed inset-0 bg-black/75 items-center justify-center p-4 preview-modal-hidden">
-        <div class="relative max-w-4xl w-full">
-            <button type="button" data-close-preview-modal class="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl font-bold z-10">
-                <i class="fas fa-times"></i>
-            </button>
-            <div class="text-center mb-2">
-                <h3 id="previewTitle" class="text-white text-lg font-semibold"></h3>
-            </div>
-            <img id="previewImage" src="" alt="Preview" class="max-w-full max-h-[90vh] mx-auto rounded-lg shadow-2xl">
-            <div class="text-center mt-4">
-                <p id="previewError" class="text-red-400 hidden"></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- MediaInfo Modal -->
-    <div id="mediainfoModal" class="fixed inset-0 bg-black/75 flex items-center justify-center p-4 modal-hidden modal-z-index">
-        <div class="relative max-w-4xl w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-h-[90vh] overflow-hidden">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center">
-                    <i class="fas fa-info-circle mr-2 text-blue-600 dark:text-blue-400"></i> Media Information
-                </h3>
-                <button type="button" data-close-mediainfo-modal class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 text-2xl font-bold">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div id="mediainfoContent" class="p-6 overflow-y-auto modal-content-scroll">
-                <div class="text-center py-8">
-                    <i class="fas fa-spinner fa-spin text-3xl text-blue-600 dark:text-blue-400"></i>
-                    <p class="text-gray-600 dark:text-gray-400 mt-2">Loading media information...</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- File List Modal -->
-    <div id="filelistModal" class="fixed inset-0 bg-black/75 flex items-center justify-center p-4 modal-hidden modal-z-index">
-        <div class="relative max-w-4xl w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-h-[90vh] overflow-hidden">
-            <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center">
-                    <i class="fas fa-file-archive mr-2 text-green-600 dark:text-green-400"></i> File List
-                </h3>
-                <button type="button" data-close-filelist-modal class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 text-2xl font-bold">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div id="filelistContent" class="p-6 overflow-y-auto modal-content-scroll">
-                <div class="text-center py-8">
-                    <i class="fas fa-spinner fa-spin text-3xl text-green-600 dark:text-green-400"></i>
-                    <p class="text-gray-600 dark:text-gray-400 mt-2">Loading file list...</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- NFO Modal -->
-    @include('partials.nfo-modal')
+    {{-- All modals (preview, mediainfo, filelist, NFO) are included globally via layouts.main --}}
 </div>
 @endsection
 

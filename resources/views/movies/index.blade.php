@@ -164,10 +164,6 @@
     @endif
 </div>
 
-{{-- Preview/Sample Image Modal - CSP Safe Alpine.js --}}
-@include('partials.preview-modal')
-
-{{-- NFO Modal - CSP Safe Alpine.js --}}
-@include('partials.nfo-modal')
+{{-- NFO, preview, and other modals are included globally via layouts.main --}}
 @endsection
 

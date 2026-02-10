@@ -299,23 +299,6 @@
     </div>
 </div>
 
-<!-- NFO Modal -->
-@include('partials.nfo-modal')
-
-<!-- Preview Modal -->
-<div id="previewModal" class="hidden fixed inset-0 bg-black/75 items-center justify-center p-4 z-50">
-    <div class="relative max-w-4xl w-full">
-        <button type="button" data-close-preview-modal class="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl font-bold z-10">
-            <i class="fas fa-times"></i>
-        </button>
-        <div class="text-center mb-2">
-            <h3 id="previewTitle" class="text-white text-lg font-semibold"></h3>
-        </div>
-        <img id="previewImage" src="" alt="Preview" class="max-w-full max-h-[90vh] mx-auto rounded-2xl shadow-2xl">
-        <div class="text-center mt-4">
-            <p id="previewError" class="text-red-400 hidden"></p>
-        </div>
-    </div>
-</div>
+{{-- All modals (NFO, preview, etc.) are included globally via layouts.main --}}
 @endsection
 
