@@ -14,6 +14,7 @@ import './stores/cart.js';
 
 // --- Core UI components ---
 import './components/theme-toggle.js';
+import './components/back-to-top.js';
 import './components/dropdown.js';
 import './components/sidebar-toggle.js';
 import './components/admin-submenu.js';

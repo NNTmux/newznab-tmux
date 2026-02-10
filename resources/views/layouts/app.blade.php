@@ -20,7 +20,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
-<div id="app" class="h-screen overflow-y-auto">
+<div id="app" class="h-screen overflow-y-auto" data-scroll-container>
     <nav class="navbar navbar-expand-md navbar-light bg-white dark:bg-gray-800 shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="{{ url('/') }}">
@@ -78,5 +78,7 @@
         @yield('content')
     </main>
 </div>
+
+@include('partials.back-to-top')
 </body>
 </html>

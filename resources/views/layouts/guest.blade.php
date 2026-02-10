@@ -35,6 +35,8 @@
 <body class="font-sans antialiased pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]">
     @yield('content')
 
+    @include('partials.back-to-top')
+
     <!-- Scripts -->
     @stack('scripts')
 </body>

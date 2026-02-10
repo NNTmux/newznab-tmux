@@ -57,7 +57,7 @@
             @endauth
 
             <!-- Page Content - This is the scrollable area -->
-            <main class="flex-1 overflow-y-auto">
+            <main class="flex-1 overflow-y-auto" data-scroll-container>
                 <div class="container mx-auto px-4 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
                     @if(session('success'))
                         <div class="mb-4 p-4 bg-green-100 dark:bg-green-900 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-200 rounded-lg">
@@ -95,6 +95,9 @@
     <button id="mobile-sidebar-toggle" class="md:hidden fixed z-50 bg-blue-600 dark:bg-blue-700 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-all touch-target bottom-[max(5rem,calc(env(safe-area-inset-bottom)+4rem))] right-[max(1rem,env(safe-area-inset-right))]" aria-label="Toggle Sidebar">
         <i class="fas fa-bars text-lg"></i>
     </button>
+
+    <!-- Back to Top -->
+    @include('partials.back-to-top')
 
     <!-- Theme Toggle -->
     <button id="theme-toggle" class="fixed z-50 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-full shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-200 flex items-center gap-2 touch-target bottom-[max(1rem,env(safe-area-inset-bottom))] left-[max(1rem,env(safe-area-inset-left))]"

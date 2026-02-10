@@ -109,6 +109,8 @@
         @yield('content')
     </div>
 
+    @include('partials.back-to-top-forum')
+
     <script>
     new Vue({
         el: '.v-navbar',

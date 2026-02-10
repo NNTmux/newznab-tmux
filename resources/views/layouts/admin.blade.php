@@ -64,7 +64,7 @@
             </header>
 
             <!-- Page Content - Scrollable Area -->
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto p-6" data-scroll-container>
                 @if(session('success'))
                     <div class="mb-4 p-4 bg-green-50 dark:bg-green-900 border-l-4 border-green-500 dark:border-green-600 text-green-800 dark:text-green-200 rounded">
                         <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
@@ -91,6 +91,9 @@
             </footer>
         </div>
     </div>
+
+    <!-- Back to Top -->
+    @include('partials.back-to-top')
 
     <!-- Theme Toggle -->
     <button id="theme-toggle" class="fixed z-50 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-full shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-200 flex items-center gap-2 touch-target bottom-[max(1rem,env(safe-area-inset-bottom))] left-[max(1rem,env(safe-area-inset-left))]"
