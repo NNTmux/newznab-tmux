@@ -1,0 +1,15 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 5
+    paths:
+        - app
+        - routes
+    treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        # Laravel models use $dateFormat = false to disable date formatting,
+        # but the parent Model class declares it as string|null
+        -
+            identifier: property.defaultValue
+            message: '#dateFormat#'
