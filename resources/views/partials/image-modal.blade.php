@@ -19,9 +19,9 @@
          @click="close()"></div>
 
     <!-- Modal panel container -->
-    <div class="fixed inset-0 z-10 overflow-y-auto">
-        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-            <div class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-4xl"
+    <div class="fixed inset-0 z-10 overflow-y-auto" @click.self="close()">
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0" @click.self="close()">
+            <div class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-6xl"
                  x-transition:enter="transition ease-out duration-200"
                  x-transition:enter-start="opacity-0 scale-95"
                  x-transition:enter-end="opacity-100 scale-100"
@@ -42,7 +42,7 @@
                 <div class="flex justify-center">
                     <img x-bind:src="imageUrl"
                          x-bind:alt="imageTitle"
-                         class="max-w-full max-h-[70vh] rounded-lg shadow-lg">
+                         class="max-w-full max-h-[85vh] rounded-lg shadow-lg">
                 </div>
             </div>
             <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
