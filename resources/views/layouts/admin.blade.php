@@ -5,13 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    {{-- Apply dark mode BEFORE any CSS loads to prevent white flash --}}
+    @include('partials.theme-init')
+
     <title>{{ $meta_title ?? 'Admin' }} - {{ config('app.name') }}</title>
 
     <meta name="description" content="{{ $meta_description ?? 'Admin panel' }}">
-
-    <!-- Styles -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @stack('styles')
 
     <!-- Dark Mode - Set via meta tag for CSP compliance -->
     <meta name="theme-preference" content="{{ auth()->check() ? (auth()->user()->theme_preference ?? 'light') : 'light' }}">
@@ -21,6 +20,10 @@
 
     <!-- CSP Nonce for dynamic script loading -->
     <meta name="csp-nonce" content="{{ csp_nonce() }}">
+
+    <!-- Styles -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('styles')
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 font-sans antialiased transition-colors duration-200">
     <div class="h-screen flex">

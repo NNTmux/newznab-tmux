@@ -7,6 +7,9 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    {{-- Apply dark mode BEFORE any CSS loads to prevent white flash --}}
+    @include('partials.theme-init')
+
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Fonts -->

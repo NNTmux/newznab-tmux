@@ -8,6 +8,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    {{-- Apply dark mode BEFORE any CSS loads to prevent white flash --}}
+    @include('partials.theme-init')
+
     <title>{{ $meta_title ?? config('app.name') }}@if(isset($meta_title) && $meta_title != '' && $site['metatitle'] != '') - @endif{{ $site['metatitle'] ?? '' }}</title>
 
     <meta name="keywords" content="{{ $meta_keywords ?? '' }}">
@@ -25,36 +28,6 @@
     <!-- Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
-
-    <!-- Dark Mode Script (must use nonce to prevent flash) -->
-    <script nonce="{{ csp_nonce() }}">
-        // Initialize theme before page renders to prevent flash
-        (function() {
-            @auth
-                // Use user's database preference when authenticated
-                const userThemePreference = '{{ auth()->user()->theme_preference ?? 'light' }}';
-
-                if (userThemePreference === 'system') {
-                    // Use OS preference
-                    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                        document.documentElement.classList.add('dark');
-                    }
-                } else if (userThemePreference === 'dark') {
-                    document.documentElement.classList.add('dark');
-                }
-            @else
-                // Fallback to localStorage for non-authenticated users
-                const theme = localStorage.getItem('theme') || 'light';
-                if (theme === 'system') {
-                    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                        document.documentElement.classList.add('dark');
-                    }
-                } else if (theme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                }
-            @endauth
-        })();
-    </script>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 font-sans antialiased transition-colors duration-200">
     <div class="h-screen flex">
