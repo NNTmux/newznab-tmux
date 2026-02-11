@@ -1,0 +1,9 @@
+{
+    "agents": [
+        "phpstorm-copilot"
+    ],
+    "editors": [
+        "phpstorm-copilot"
+    ],
+    "guidelines": true
+}
