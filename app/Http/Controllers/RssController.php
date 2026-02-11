@@ -175,11 +175,6 @@ class RssController extends BasePageController
         $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
 
         return null;
-
-        return null;
-
-        return null;
-
     }
 
     /**
@@ -200,7 +195,6 @@ class RssController extends BasePageController
         $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
 
         return null;
-
     }
 
     /**
@@ -221,7 +215,6 @@ class RssController extends BasePageController
         $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
 
         return null;
-
     }
 
     /**

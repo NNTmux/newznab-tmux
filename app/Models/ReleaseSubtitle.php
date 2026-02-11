@@ -26,10 +26,6 @@ use Illuminate\Database\Eloquent\Model;
 class ReleaseSubtitle extends Model
 {
     /**
-     * @var string
-     */
-
-    /**
      * @var bool
      */
     public $timestamps = false;

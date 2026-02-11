@@ -12,22 +12,13 @@ use Illuminate\Support\Facades\Log;
  */
 final class PartHandler
 {
-    /** @var array Pending parts to insert */
-    /**
-     * @var array<string, mixed>
-     */
+    /** @var array<string, mixed> Pending parts to insert */
     private array $parts = [];
 
-    /** @var array Part numbers successfully inserted */
-    /**
-     * @var array<string, mixed>
-     */
+    /** @var array<string, mixed> Part numbers successfully inserted */
     private array $insertedPartNumbers = [];
 
-    /** @var array Part numbers that failed to insert */
-    /**
-     * @var array<string, mixed>
-     */
+    /** @var array<string, mixed> Part numbers that failed to insert */
     private array $failedPartNumbers = [];
 
     private int $chunkSize;

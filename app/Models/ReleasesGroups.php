@@ -43,10 +43,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ReleasesGroups extends Model
 {
     /**
-     * @var string
-     */
-
-    /**
      * @var bool
      */
     public $incrementing = false;

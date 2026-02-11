@@ -129,6 +129,5 @@ class AdminAjaxController extends BasePageController
         }
 
         return null;
-
     }
 }

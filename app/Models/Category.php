@@ -254,10 +254,6 @@ class Category extends Model
         ];
 
     /**
-     * @var string
-     */
-
-    /**
      * @var bool
      */
     public $timestamps = false;
