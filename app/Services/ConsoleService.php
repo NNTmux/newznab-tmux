@@ -124,11 +124,10 @@ class ConsoleService
      *
      * @param  array<string, mixed>  $cat
      * @param  array<string, mixed>  $excludedCats
-     * @return array<string, mixed>
      *
      * @throws \Exception
      */
-    public function getConsoleRange(int $page, array $cat, int $start, int $num, string $orderBy, array $excludedCats = []): array
+    public function getConsoleRange(int $page, array $cat, int $start, int $num, string $orderBy, array $excludedCats = []): mixed
     {
         $page = max(1, $page);
         $start = max(0, $start);
@@ -143,105 +142,100 @@ class ConsoleService
             $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')';
         }
         $order = $this->getConsoleOrder($orderBy);
-        $calcSql = sprintf(
-            "
-                SELECT SQL_CALC_FOUND_ROWS
-                    con.id,
-                    GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
-                FROM consoleinfo con
-                LEFT JOIN releases r ON con.id = r.consoleinfo_id
-                WHERE con.title != ''
-                AND con.cover = 1
-                AND r.passwordstatus %s
-                %s %s %s
-                GROUP BY con.id
-                ORDER BY %s %s %s",
-            app(Releases\ReleaseBrowseService::class)->showPasswords(),
-            $browseBy,
-            $catsrch,
-            $exccatlist,
-            $order[0], // @phpstan-ignore offsetAccess.notFound
-            $order[1], // @phpstan-ignore offsetAccess.notFound
-            ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-        );
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        $showPasswords = app(Releases\ReleaseBrowseService::class)->showPasswords();
 
-        $cached = Cache::get(md5($calcSql.$page));
+        $baseWhere = "con.title != '' AND con.cover = 1 "
+            ."AND r.passwordstatus {$showPasswords} "
+            .$browseBy.' '
+            .$catsrch.' '
+            .$exccatlist;
+
+        $cacheKey = md5('console_range_'.$baseWhere.$order[0].$order[1].$start.$num.$page); // @phpstan-ignore offsetAccess.notFound
+
+        $cached = Cache::get($cacheKey);
         if ($cached !== null) {
-            $consoles = $cached;
-        } else {
-            $data = DB::select($calcSql);
-            $consoles = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
-            $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-            Cache::put(md5($calcSql.$page), $consoles, $expiresAt);
+            return $cached;
         }
 
-        $consoleIDs = $releaseIDs = [];
-        if (\is_array($consoles['result'])) {
-            foreach ($consoles['result'] as $console => $id) {
-                $consoleIDs[] = $id->id;
-                $releaseIDs[] = $id->grp_release_id;
-            }
+        // Step 1: Count total distinct consoles matching filters
+        $countSql = 'SELECT COUNT(DISTINCT con.id) AS total '
+            .'FROM consoleinfo con '
+            .'INNER JOIN releases r ON con.id = r.consoleinfo_id '
+            .'WHERE '.$baseWhere;
+
+        $totalResult = DB::select($countSql);
+        $totalCount = $totalResult[0]->total ?? 0;
+
+        if ($totalCount === 0) {
+            return collect();
         }
 
-        $sql = sprintf(
-            "
-                SELECT
-                    GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
-                    GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') AS grp_rarinnerfilecount,
-                    GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
-                    GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
-                    GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
-                    GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
-                    GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
-                    GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
-                    GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
-                    GROUP_CONCAT(r.adddate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_adddate,
-                    GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
-                    GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
-                    GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
-                    GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-                    GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
-                    GROUP_CONCAT(cp.title, ' > ', c.title ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_catname,
-                    GROUP_CONCAT(r.fromname ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_fromname,
-                con.*,
-                r.consoleinfo_id,
-                g.name AS group_name,
-                genres.title AS genre,
-                rn.releases_id AS nfoid
-                FROM releases r
-                LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id
-                LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-                LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-                LEFT OUTER JOIN categories c ON c.id = r.categories_id
-                LEFT OUTER JOIN root_categories cp ON cp.id = c.root_categories_id
-                INNER JOIN consoleinfo con ON con.id = r.consoleinfo_id
-                INNER JOIN genres ON con.genres_id = genres.id
-                WHERE con.id IN (%s)
-                AND r.id IN (%s)
-                %s
-                GROUP BY con.id
-                ORDER BY %s %s",
-            (! empty($consoleIDs) ? implode(',', $consoleIDs) : -1),
-            (! empty($releaseIDs) ? implode(',', $releaseIDs) : -1),
-            $catsrch,
-            $order[0], // @phpstan-ignore offsetAccess.notFound
-            $order[1] // @phpstan-ignore offsetAccess.notFound
-        );
+        // Step 2: Get paginated console entity list with only needed columns
+        $consoleSql = 'SELECT con.id, con.title, con.cover, con.publisher, con.releasedate, con.review, con.url, '
+            .'con.genres_id, genres.title AS genre, '
+            .'MAX(r.postdate) AS latest_postdate, '
+            .'COUNT(r.id) AS total_releases '
+            .'FROM consoleinfo con '
+            .'INNER JOIN releases r ON con.id = r.consoleinfo_id '
+            .'LEFT JOIN genres ON con.genres_id = genres.id '
+            .'WHERE '.$baseWhere.' '
+            .'GROUP BY con.id, con.title, con.cover, con.publisher, con.releasedate, con.review, con.url, con.genres_id, genres.title '
+            ."ORDER BY {$order[0]} {$order[1]} " // @phpstan-ignore offsetAccess.notFound
+            ."LIMIT {$num} OFFSET {$start}";
 
-        $return = Cache::get(md5($sql.$page));
-        if ($return !== null) {
-            return $return;
+        $consoles = ConsoleInfo::fromQuery($consoleSql);
+
+        if ($consoles->isEmpty()) {
+            return collect();
         }
 
-        $return = DB::select($sql);
-        if (\count($return) > 0) {
-            $return[0]->_totalcount = $consoles['total'][0]->total ?? 0;
+        // Build list of console IDs for release query
+        $consoleIds = $consoles->pluck('id')->toArray();
+        $inConsoleIds = implode(',', array_map('intval', $consoleIds));
+
+        // Step 3: Get top 2 releases per console using ROW_NUMBER()
+        $releasesSql = 'SELECT ranked.id, ranked.consoleinfo_id, ranked.guid, ranked.searchname, '
+            .'ranked.size, ranked.postdate, ranked.adddate, ranked.haspreview, ranked.grabs, '
+            .'ranked.comments, ranked.totalpart, ranked.group_name, ranked.nfoid, ranked.failed_count '
+            .'FROM ( '
+            .'SELECT r.id, r.consoleinfo_id, r.guid, r.searchname, r.size, r.postdate, r.adddate, '
+            .'r.haspreview, r.grabs, r.comments, r.totalpart, g.name AS group_name, '
+            .'rn.releases_id AS nfoid, df.failed AS failed_count, '
+            .'ROW_NUMBER() OVER (PARTITION BY r.consoleinfo_id ORDER BY r.postdate DESC) AS rn '
+            .'FROM releases r '
+            .'LEFT JOIN usenet_groups g ON g.id = r.groups_id '
+            .'LEFT JOIN release_nfos rn ON rn.releases_id = r.id '
+            .'LEFT JOIN dnzb_failures df ON df.release_id = r.id '
+            ."WHERE r.consoleinfo_id IN ({$inConsoleIds}) "
+            ."AND r.passwordstatus {$showPasswords} "
+            .$catsrch.' '
+            .$exccatlist
+            .') ranked '
+            .'WHERE ranked.rn <= 2 '
+            .'ORDER BY ranked.consoleinfo_id, ranked.postdate DESC';
+
+        $releases = DB::select($releasesSql);
+
+        // Group releases by consoleinfo_id for fast lookup
+        $releasesByConsole = [];
+        foreach ($releases as $release) {
+            $releasesByConsole[$release->consoleinfo_id][] = $release;
         }
 
-        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
-        Cache::put(md5($sql.$page), $return, $expiresAt);
+        // Attach releases to each console entity
+        foreach ($consoles as $console) {
+            $console->releases = $releasesByConsole[$console->id] ?? []; // @phpstan-ignore assign.propertyReadOnly
+        }
 
-        return $return;
+        // Set total count on first item
+        if ($consoles->isNotEmpty()) {
+            $consoles[0]->_totalcount = $totalCount; // @phpstan-ignore property.notFound
+        }
+
+        Cache::put($cacheKey, $consoles, $expiresAt);
+
+        return $consoles;
     }
 
     /**

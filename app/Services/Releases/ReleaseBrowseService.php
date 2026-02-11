@@ -26,13 +26,41 @@ class ReleaseBrowseService
     public function __construct() {}
 
     /**
-     * Used for Browse results with optional search term filtering via search index.
+     * Used for Browse results on the web frontend with optional search term filtering via search index.
+     * Selects only columns needed by the browse/search Blade views.
      *
      * @param  string|null  $searchTerm  Optional search term to filter by (uses search index)
      * @param  array<string, mixed>  $excludedCats
      * @return Collection|mixed
      */
     public function getBrowseRange(mixed $page, mixed $cat, mixed $start, mixed $num, mixed $orderBy, int $maxAge = -1, array $excludedCats = [], int|string $groupName = -1, int $minSize = 0, ?string $searchTerm = null): mixed
+    {
+        return $this->executeBrowseQuery('browse', $page, $cat, $start, $num, $orderBy, $maxAge, $excludedCats, $groupName, $minSize, $searchTerm);
+    }
+
+    /**
+     * Used for API results. Selects additional columns needed by ApiTransformer
+     * (movie IDs, TV episode info, external IDs).
+     *
+     * @param  string|null  $searchTerm  Optional search term to filter by (uses search index)
+     * @param  array<string, mixed>  $excludedCats
+     * @return Collection|mixed
+     */
+    public function getBrowseRangeForApi(mixed $page, mixed $cat, mixed $start, mixed $num, mixed $orderBy, int $maxAge = -1, array $excludedCats = [], int|string $groupName = -1, int $minSize = 0, ?string $searchTerm = null): mixed
+    {
+        return $this->executeBrowseQuery('api', $page, $cat, $start, $num, $orderBy, $maxAge, $excludedCats, $groupName, $minSize, $searchTerm);
+    }
+
+    /**
+     * Shared implementation for browse and API range queries.
+     * Builds different SELECT/JOIN clauses depending on the purpose.
+     *
+     * @param  string  $purpose  'browse' for web views, 'api' for API responses
+     * @param  string|null  $searchTerm  Optional search term to filter by (uses search index)
+     * @param  array<string, mixed>  $excludedCats
+     * @return Collection|mixed
+     */
+    private function executeBrowseQuery(string $purpose, mixed $page, mixed $cat, mixed $start, mixed $num, mixed $orderBy, int $maxAge = -1, array $excludedCats = [], int|string $groupName = -1, int $minSize = 0, ?string $searchTerm = null): mixed
     {
         $cacheVersion = $this->getCacheVersion();
         $page = max(1, $page);
@@ -59,36 +87,54 @@ class ReleaseBrowseService
             $searchIndexFilter = sprintf(' AND r.id IN (%s)', implode(',', array_map('intval', $searchIndexIds)));
         }
 
-        $qry = sprintf(
-            "SELECT r.id, r.searchname, r.groups_id, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, r.nfostatus, cp.title AS parent_category, c.title AS sub_category, r.group_name,
+        // Build SELECT and JOINs based on purpose
+        if ($purpose === 'api') {
+            // API needs category-specific fields for ApiTransformer
+            $outerSelect = "SELECT r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.haspreview, r.nfostatus, r.group_name,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				CONCAT(cp.id, ',', c.id) AS category_ids,
-                            df.failed AS failed_count,
-                            rr.report_count AS report_count,
-                            rr.report_reasons AS report_reasons,
 				rn.releases_id AS nfoid,
-				re.releases_id AS reid,
 				v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
 				m.imdbid, m.tmdbid, m.traktid,
-				tve.title, tve.firstaired
+				tve.title, tve.series, tve.episode, tve.firstaired";
+            $outerJoins = 'LEFT JOIN categories c ON c.id = r.categories_id
+			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
+			LEFT OUTER JOIN videos v ON r.videos_id = v.id
+			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
+			LEFT OUTER JOIN movieinfo m ON m.id = r.movieinfo_id
+			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id';
+            $innerSelect = 'SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.nfostatus, g.name AS group_name, r.movieinfo_id';
+        } else {
+            // Browse only needs columns used in browse/index.blade.php and search/index.blade.php
+            $outerSelect = "SELECT r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.grabs, r.comments, r.adddate, r.videos_id, r.haspreview, r.jpgstatus, r.nfostatus, r.group_name,
+				CONCAT(cp.title, ' > ', c.title) AS category_name,
+				df.failed AS failed_count,
+				rr.report_count AS report_count,
+				rr.report_reasons AS report_reasons,
+				rn.releases_id AS nfoid,
+				re.releases_id AS reid,
+				m.imdbid";
+            $outerJoins = "LEFT JOIN categories c ON c.id = r.categories_id
+			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
+			LEFT OUTER JOIN movieinfo m ON m.id = r.movieinfo_id
+			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
+			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
+			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
+			LEFT OUTER JOIN (SELECT releases_id, COUNT(*) AS report_count, GROUP_CONCAT(DISTINCT reason SEPARATOR ', ') AS report_reasons FROM release_reports WHERE status IN ('pending', 'reviewed', 'resolved') GROUP BY releases_id) rr ON rr.releases_id = r.id";
+            $innerSelect = 'SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.haspreview, r.jpgstatus, r.nfostatus, g.name AS group_name, r.movieinfo_id';
+        }
+
+        $qry = $outerSelect.sprintf(
+            "
 			FROM
 			(
-				SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus, r.nfostatus, g.name AS group_name, r.movieinfo_id
+				{$innerSelect}
 				FROM releases r
 				LEFT JOIN usenet_groups g ON g.id = r.groups_id
 				WHERE r.passwordstatus %1\$s
 				%2\$s %3\$s %4\$s %5\$s %6\$s %7\$s
 				ORDER BY %8\$s %9\$s %10\$s
 			) r
-			LEFT JOIN categories c ON c.id = r.categories_id
-			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
-			LEFT OUTER JOIN videos v ON r.videos_id = v.id
-			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
-			LEFT OUTER JOIN movieinfo m ON m.id = r.movieinfo_id
-			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
-			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-			LEFT OUTER JOIN (SELECT releases_id, COUNT(*) AS report_count, GROUP_CONCAT(DISTINCT reason SEPARATOR ', ') AS report_reasons FROM release_reports WHERE status IN ('pending', 'reviewed', 'resolved') GROUP BY releases_id) rr ON rr.releases_id = r.id
+			{$outerJoins}
 			GROUP BY r.id
 			ORDER BY %8\$s %9\$s",
             $this->showPasswords(),

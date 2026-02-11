@@ -95,9 +95,8 @@ class BookService
      *
      * @param  array<string, mixed>  $cat
      * @param  array<string, mixed>  $excludedCats
-     * @return array<string, mixed>
      */
-    public function getBookRange(int $page, array $cat, int $start, int $num, string $orderBy, array $excludedCats = []): array
+    public function getBookRange(int $page, array $cat, int $start, int $num, string $orderBy, array $excludedCats = []): mixed
     {
         $page = max(1, $page);
         $start = max(0, $start);
@@ -112,77 +111,98 @@ class BookService
             $exccatlist = ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')';
         }
         $order = $this->getBookOrder($orderBy);
-        $booksql = sprintf(
-            "
-				SELECT SQL_CALC_FOUND_ROWS boo.id,
-					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
-				FROM bookinfo boo
-				LEFT JOIN releases r ON boo.id = r.bookinfo_id
-				WHERE boo.cover = 1
-				AND boo.title != ''
-				AND r.passwordstatus %s
-				%s %s %s
-				GROUP BY boo.id
-				ORDER BY %s %s %s",
-            app(\App\Services\Releases\ReleaseBrowseService::class)->showPasswords(),
-            $browseby,
-            $catsrch,
-            $exccatlist,
-            $order[0], // @phpstan-ignore offsetAccess.notFound
-            $order[1], // @phpstan-ignore offsetAccess.notFound
-            ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-        );
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        $booksCache = Cache::get(md5($booksql.$page));
-        if ($booksCache !== null) {
-            $books = $booksCache;
-        } else {
-            $data = DB::select($booksql);
-            $books = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
-            Cache::put(md5($booksql.$page), $books, $expiresAt);
-        }
-        $bookIDs = $releaseIDs = [];
-        if (\is_array($books['result'])) {
-            foreach ($books['result'] as $book => $id) {
-                $bookIDs[] = $id->id;
-                $releaseIDs[] = $id->grp_release_id;
-            }
-        }
-        $sql = sprintf(
-            '
-			SELECT
-				r.id, r.rarinnerfilecount, r.grabs, r.comments, r.totalpart, r.size, r.postdate, r.searchname, r.haspreview, r.passwordstatus, r.guid, df.failed AS failed_count,
-			boo.*,
-			r.bookinfo_id,
-			g.name AS group_name,
-			rn.releases_id AS nfoid
-			FROM releases r
-			LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id
-			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-			INNER JOIN bookinfo boo ON boo.id = r.bookinfo_id
-			WHERE boo.id IN (%s)
-			AND r.id IN (%s)
-			%s
-			GROUP BY boo.id
-			ORDER BY %s %s',
-            ! empty($bookIDs) ? implode(',', $bookIDs) : -1,
-            ! empty($releaseIDs) ? implode(',', $releaseIDs) : -1,
-            $catsrch,
-            $order[0], // @phpstan-ignore offsetAccess.notFound
-            $order[1] // @phpstan-ignore offsetAccess.notFound
-        );
-        $return = Cache::get(md5($sql.$page));
-        if ($return !== null) {
-            return $return;
-        }
-        $return = DB::select($sql);
-        if (\count($return) > 0) {
-            $return[0]->_totalcount = $books['total'][0]->total ?? 0;
-        }
-        Cache::put(md5($sql.$page), $return, $expiresAt);
+        $showPasswords = app(\App\Services\Releases\ReleaseBrowseService::class)->showPasswords();
 
-        return $return;
+        $baseWhere = "boo.cover = 1 AND boo.title != '' "
+            ."AND r.passwordstatus {$showPasswords} "
+            .$browseby.' '
+            .$catsrch.' '
+            .$exccatlist;
+
+        $cacheKey = md5('book_range_'.$baseWhere.$order[0].$order[1].$start.$num.$page); // @phpstan-ignore offsetAccess.notFound
+
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        // Step 1: Count total distinct books matching filters
+        $countSql = 'SELECT COUNT(DISTINCT boo.id) AS total '
+            .'FROM bookinfo boo '
+            .'INNER JOIN releases r ON boo.id = r.bookinfo_id '
+            .'WHERE '.$baseWhere;
+
+        $totalResult = DB::select($countSql);
+        $totalCount = $totalResult[0]->total ?? 0;
+
+        if ($totalCount === 0) {
+            return collect();
+        }
+
+        // Step 2: Get paginated book entity list with only needed columns
+        $bookSql = 'SELECT boo.id, boo.title, boo.author, boo.cover, boo.publisher, boo.publishdate, boo.review, boo.url, '
+            .'MAX(r.postdate) AS latest_postdate, '
+            .'COUNT(r.id) AS total_releases '
+            .'FROM bookinfo boo '
+            .'INNER JOIN releases r ON boo.id = r.bookinfo_id '
+            .'WHERE '.$baseWhere.' '
+            .'GROUP BY boo.id, boo.title, boo.author, boo.cover, boo.publisher, boo.publishdate, boo.review, boo.url '
+            ."ORDER BY {$order[0]} {$order[1]} " // @phpstan-ignore offsetAccess.notFound
+            ."LIMIT {$num} OFFSET {$start}";
+
+        $books = BookInfo::fromQuery($bookSql);
+
+        if ($books->isEmpty()) {
+            return collect();
+        }
+
+        // Build list of book IDs for release query
+        $bookIds = $books->pluck('id')->toArray();
+        $inBookIds = implode(',', array_map('intval', $bookIds));
+
+        // Step 3: Get top 2 releases per book using ROW_NUMBER()
+        $releasesSql = 'SELECT ranked.id, ranked.bookinfo_id, ranked.guid, ranked.searchname, '
+            .'ranked.size, ranked.postdate, ranked.adddate, ranked.haspreview, ranked.grabs, '
+            .'ranked.comments, ranked.totalpart, ranked.group_name, ranked.nfoid, ranked.failed_count '
+            .'FROM ( '
+            .'SELECT r.id, r.bookinfo_id, r.guid, r.searchname, r.size, r.postdate, r.adddate, '
+            .'r.haspreview, r.grabs, r.comments, r.totalpart, g.name AS group_name, '
+            .'rn.releases_id AS nfoid, df.failed AS failed_count, '
+            .'ROW_NUMBER() OVER (PARTITION BY r.bookinfo_id ORDER BY r.postdate DESC) AS rn '
+            .'FROM releases r '
+            .'LEFT JOIN usenet_groups g ON g.id = r.groups_id '
+            .'LEFT JOIN release_nfos rn ON rn.releases_id = r.id '
+            .'LEFT JOIN dnzb_failures df ON df.release_id = r.id '
+            ."WHERE r.bookinfo_id IN ({$inBookIds}) "
+            ."AND r.passwordstatus {$showPasswords} "
+            .$catsrch.' '
+            .$exccatlist
+            .') ranked '
+            .'WHERE ranked.rn <= 2 '
+            .'ORDER BY ranked.bookinfo_id, ranked.postdate DESC';
+
+        $releases = DB::select($releasesSql);
+
+        // Group releases by bookinfo_id for fast lookup
+        $releasesByBook = [];
+        foreach ($releases as $release) {
+            $releasesByBook[$release->bookinfo_id][] = $release;
+        }
+
+        // Attach releases to each book entity
+        foreach ($books as $book) {
+            $book->releases = $releasesByBook[$book->id] ?? []; // @phpstan-ignore assign.propertyReadOnly
+        }
+
+        // Set total count on first item
+        if ($books->isNotEmpty()) {
+            $books[0]->_totalcount = $totalCount; // @phpstan-ignore property.notFound
+        }
+
+        Cache::put($cacheKey, $books, $expiresAt);
+
+        return $books;
     }
 
     /**

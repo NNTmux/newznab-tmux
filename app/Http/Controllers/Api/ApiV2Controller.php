@@ -198,7 +198,7 @@ class ApiV2Controller extends BasePageController
                 $minSize
             );
         } else {
-            $relData = $this->releaseBrowseService->getBrowseRange(
+            $relData = $this->releaseBrowseService->getBrowseRangeForApi(
                 1,
                 $categoryID,
                 $offset,

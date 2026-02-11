@@ -111,102 +111,98 @@ class MusicService
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
 
         $releaseBrowseService = new ReleaseBrowseService;
-        $passwordClause = $releaseBrowseService->showPasswords();
+        $showPasswords = $releaseBrowseService->showPasswords();
 
-        $musicSql = sprintf(
-            "
-            SELECT SQL_CALC_FOUND_ROWS
-                m.id,
-                GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
-            FROM musicinfo m
-            LEFT JOIN releases r ON r.musicinfo_id = m.id
-            WHERE m.title != ''
-            AND m.cover = 1
-            AND r.passwordstatus %s
-            %s %s %s
-            GROUP BY m.id
-            ORDER BY %s %s %s",
-            $passwordClause,
-            $browseby,
-            $catsrch,
-            $exccatlist,
-            $order[0], // @phpstan-ignore offsetAccess.notFound
-            $order[1], // @phpstan-ignore offsetAccess.notFound
-            ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-        );
+        $baseWhere = "m.title != '' AND m.cover = 1 "
+            ."AND r.passwordstatus {$showPasswords} "
+            .$browseby.' '
+            .$catsrch.' '
+            .$exccatlist;
 
-        $musicCache = Cache::get(md5($musicSql.$page));
-        if ($musicCache !== null) {
-            $music = $musicCache;
-        } else {
-            $data = DB::select($musicSql);
-            $music = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
-            Cache::put(md5($musicSql.$page), $music, $expiresAt);
+        $cacheKey = md5('music_range_'.$baseWhere.$order[0].$order[1].$start.$num.$page); // @phpstan-ignore offsetAccess.notFound
+
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
         }
 
-        $musicIDs = $releaseIDs = [];
-        if (\is_array($music['result'])) {
-            foreach ($music['result'] as $mus => $id) {
-                $musicIDs[] = $id->id;
-                $releaseIDs[] = $id->grp_release_id;
-            }
-        }
+        // Step 1: Count total distinct music entities matching filters
+        $countSql = 'SELECT COUNT(DISTINCT m.id) AS total '
+            .'FROM musicinfo m '
+            .'INNER JOIN releases r ON r.musicinfo_id = m.id '
+            .'WHERE '.$baseWhere;
 
-        if (empty($musicIDs) && empty($releaseIDs)) {
+        $totalResult = DB::select($countSql);
+        $totalCount = $totalResult[0]->total ?? 0;
+
+        if ($totalCount === 0) {
             return collect();
         }
 
-        $sql = sprintf(
-            "
-            SELECT
-                GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
-                GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') AS grp_rarinnerfilecount,
-                GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
-                GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
-                GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
-                GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
-                GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
-                GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
-                GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
-                GROUP_CONCAT(r.adddate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_adddate,
-                GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
-                GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
-                GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
-                GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-                GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
-                GROUP_CONCAT(cp.title, ' > ', c.title ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_catname,
-                m.*,
-                g.name AS group_name,
-                rn.releases_id AS nfoid
-            FROM releases r
-            LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id
-            LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-            LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-            LEFT OUTER JOIN categories c ON c.id = r.categories_id
-            LEFT OUTER JOIN root_categories cp ON cp.id = c.root_categories_id
-            INNER JOIN musicinfo m ON m.id = r.musicinfo_id
-            %s %s %s
-            GROUP BY m.id
-            ORDER BY %s %s",
-            ! empty($musicIDs) ? 'WHERE m.id IN ('.implode(',', $musicIDs).')' : 'AND 1=1',
-            (! empty($releaseIDs)) ? 'AND r.id in ('.implode(',', $releaseIDs).')' : '',
-            $catsrch,
-            $order[0], // @phpstan-ignore offsetAccess.notFound
-            $order[1] // @phpstan-ignore offsetAccess.notFound
-        );
+        // Step 2: Get paginated music entity list with only needed columns
+        $musicSql = 'SELECT m.id, m.title, m.artist, m.cover, m.publisher, m.releasedate, m.review, m.url, m.year, '
+            .'m.genres_id, '
+            .'MAX(r.postdate) AS latest_postdate, '
+            .'COUNT(r.id) AS total_releases '
+            .'FROM musicinfo m '
+            .'INNER JOIN releases r ON r.musicinfo_id = m.id '
+            .'WHERE '.$baseWhere.' '
+            .'GROUP BY m.id, m.title, m.artist, m.cover, m.publisher, m.releasedate, m.review, m.url, m.year, m.genres_id '
+            ."ORDER BY {$order[0]} {$order[1]} " // @phpstan-ignore offsetAccess.notFound
+            ."LIMIT {$num} OFFSET {$start}";
 
-        $return = Cache::get(md5($sql.$page));
-        if ($return !== null) {
-            return $return;
+        $musicEntities = MusicInfo::fromQuery($musicSql);
+
+        if ($musicEntities->isEmpty()) {
+            return collect();
         }
 
-        $return = MusicInfo::fromQuery($sql);
-        if ($return->isNotEmpty()) {
-            $return[0]->_totalcount = $music['total'][0]->total ?? 0;
-        }
-        Cache::put(md5($sql.$page), $return, $expiresAt);
+        // Build list of music IDs for release query
+        $musicIds = $musicEntities->pluck('id')->toArray();
+        $inMusicIds = implode(',', array_map('intval', $musicIds));
 
-        return $return;
+        // Step 3: Get top 2 releases per music entity using ROW_NUMBER()
+        $releasesSql = 'SELECT ranked.id, ranked.musicinfo_id, ranked.guid, ranked.searchname, '
+            .'ranked.size, ranked.postdate, ranked.adddate, ranked.haspreview, ranked.grabs, '
+            .'ranked.comments, ranked.totalpart, ranked.group_name, ranked.nfoid, ranked.failed_count '
+            .'FROM ( '
+            .'SELECT r.id, r.musicinfo_id, r.guid, r.searchname, r.size, r.postdate, r.adddate, '
+            .'r.haspreview, r.grabs, r.comments, r.totalpart, g.name AS group_name, '
+            .'rn.releases_id AS nfoid, df.failed AS failed_count, '
+            .'ROW_NUMBER() OVER (PARTITION BY r.musicinfo_id ORDER BY r.postdate DESC) AS rn '
+            .'FROM releases r '
+            .'LEFT JOIN usenet_groups g ON g.id = r.groups_id '
+            .'LEFT JOIN release_nfos rn ON rn.releases_id = r.id '
+            .'LEFT JOIN dnzb_failures df ON df.release_id = r.id '
+            ."WHERE r.musicinfo_id IN ({$inMusicIds}) "
+            ."AND r.passwordstatus {$showPasswords} "
+            .$catsrch.' '
+            .$exccatlist
+            .') ranked '
+            .'WHERE ranked.rn <= 2 '
+            .'ORDER BY ranked.musicinfo_id, ranked.postdate DESC';
+
+        $releases = DB::select($releasesSql);
+
+        // Group releases by musicinfo_id for fast lookup
+        $releasesByMusic = [];
+        foreach ($releases as $release) {
+            $releasesByMusic[$release->musicinfo_id][] = $release;
+        }
+
+        // Attach releases to each music entity
+        foreach ($musicEntities as $musicItem) {
+            $musicItem->releases = $releasesByMusic[$musicItem->id] ?? []; // @phpstan-ignore property.notFound
+        }
+
+        // Set total count on first item
+        if ($musicEntities->isNotEmpty()) {
+            $musicEntities[0]->_totalcount = $totalCount; // @phpstan-ignore property.notFound, assign.propertyReadOnly
+        }
+
+        Cache::put($cacheKey, $musicEntities, $expiresAt);
+
+        return $musicEntities;
     }
 
     /**

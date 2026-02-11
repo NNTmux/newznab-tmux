@@ -95,11 +95,17 @@
             <!-- Books Grid -->
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 mb-6">
                 @foreach($resultsadd as $result)
+                    @php
+                        $releases = $result->releases ?? [];
+                        $firstRelease = !empty($releases) ? $releases[0] : null;
+                        $guid = $firstRelease->guid ?? null;
+                        $totalFailed = collect($releases)->sum(fn($r) => (int)($r->failed_count ?? 0));
+                    @endphp
                     <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200">
-                        <a href="{{ url('/details/' . $result->guid) }}" class="block relative">
+                        <a href="{{ $guid ? url('/details/' . $guid) : '#' }}" class="block relative">
                             @if(!empty($result->cover))
                                 <img src="{{ url('/covers/book/' . $result->cover) }}"
-                                     alt="{{ $result->title ?? $result->searchname }}"
+                                     alt="{{ $result->title }}"
                                      class="w-full h-64 object-cover"
                                      data-fallback-src="{{ url('/images/no-cover.png') }}">
                             @else
@@ -107,16 +113,16 @@
                                     <i class="fa fa-book text-4xl text-gray-400"></i>
                                 </div>
                             @endif
-                            @if(!empty($result->failed_count) && $result->failed_count > 0)
+                            @if($totalFailed > 0)
                                 <div class="absolute top-2 right-2">
-                                    <span class="px-2 py-1 bg-red-600 dark:bg-red-700 text-white text-xs rounded-full shadow-lg" title="{{ $result->failed_count }} user(s) reported download failure">
+                                    <span class="px-2 py-1 bg-red-600 dark:bg-red-700 text-white text-xs rounded-full shadow-lg" title="{{ $totalFailed }} user(s) reported download failure">
                                         <i class="fa fa-exclamation-triangle mr-1"></i>Failed
                                     </span>
                                 </div>
                             @endif
                             <div class="p-3">
-                                <h3 class="font-semibold text-sm text-gray-800 dark:text-gray-200 line-clamp-2 mb-1 break-words break-all" title="{{ $result->title ?? $result->searchname }}">
-                                    {{ $result->title ?? $result->searchname }}
+                                <h3 class="font-semibold text-sm text-gray-800 dark:text-gray-200 line-clamp-2 mb-1 break-words break-all" title="{{ $result->title }}">
+                                    {{ $result->title }}
                                 </h3>
                                 @if(!empty($result->author))
                                     <p class="text-xs text-gray-600 dark:text-gray-400 truncate mb-1" title="{{ $result->author }}">
@@ -126,23 +132,22 @@
                                 @if(!empty($result->publishdate))
                                     <p class="text-xs text-gray-500">{{ date('Y', strtotime($result->publishdate)) }}</p>
                                 @endif
-                                @if(!empty($result->overview))
-                                    <p class="text-xs text-gray-500 mt-2 line-clamp-3">{{ $result->overview }}</p>
-                                @endif
                             </div>
                         </a>
-                        <div class="px-3 pb-3 flex gap-1">
-                            <a href="{{ url('/getnzb?id=' . $result->guid) }}"
-                               class="flex-1 px-2 py-1 bg-green-600 dark:bg-green-700 text-white text-xs rounded hover:bg-green-700 dark:hover:bg-green-800 text-center"
-                               title="Download NZB">
-                                <i class="fa fa-download"></i>
-                            </a>
-                            <a href="{{ url('/details/' . $result->guid) }}"
-                               class="flex-1 px-2 py-1 bg-blue-600 dark:bg-blue-700 text-white text-xs rounded hover:bg-blue-700 dark:hover:bg-blue-800 text-center"
-                               title="View Details">
-                                <i class="fa fa-info-circle"></i>
-                            </a>
-                        </div>
+                        @if($guid)
+                            <div class="px-3 pb-3 flex gap-1">
+                                <a href="{{ url('/getnzb?id=' . $guid) }}"
+                                   class="flex-1 px-2 py-1 bg-green-600 dark:bg-green-700 text-white text-xs rounded hover:bg-green-700 dark:hover:bg-green-800 text-center"
+                                   title="Download NZB">
+                                    <i class="fa fa-download"></i>
+                                </a>
+                                <a href="{{ url('/details/' . $guid) }}"
+                                   class="flex-1 px-2 py-1 bg-blue-600 dark:bg-blue-700 text-white text-xs rounded hover:bg-blue-700 dark:hover:bg-blue-800 text-center"
+                                   title="View Details">
+                                    <i class="fa fa-info-circle"></i>
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 @endforeach
             </div>

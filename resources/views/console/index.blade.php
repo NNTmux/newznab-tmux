@@ -67,10 +67,6 @@
                         </div>
                     </div>
 
-                    <!-- Pagination -->
-                    <div class="w-full lg:w-auto">
-                        {{ $results->onEachSide(5)->links() }}
-                    </div>
                 </div>
             </div>
 
@@ -79,37 +75,12 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     @foreach($resultsadd as $result)
                         @php
-                            // Extract grouped release data
-                            $releaseGuids = isset($result->grp_release_guid) ? explode(',', $result->grp_release_guid) : [];
-                            $releaseNames = isset($result->grp_release_name) ? explode('#', $result->grp_release_name) : [];
-                            $releaseSizes = isset($result->grp_release_size) ? explode(',', $result->grp_release_size) : [];
-                            $releasePostDates = isset($result->grp_release_postdate) ? explode(',', $result->grp_release_postdate) : [];
-                            $releaseAddDates = isset($result->grp_release_adddate) ? explode(',', $result->grp_release_adddate) : [];
-                            $releaseGrabs = isset($result->grp_release_grabs) ? explode(',', $result->grp_release_grabs) : [];
-                            $releaseComments = isset($result->grp_release_comments) ? explode(',', $result->grp_release_comments) : [];
-                            $releaseNfoIds = isset($result->grp_release_nfoid) ? explode(',', $result->grp_release_nfoid) : [];
-                            $releaseHasPreview = isset($result->grp_haspreview) ? explode(',', $result->grp_haspreview) : [];
-                            $releaseCategories = isset($result->grp_release_catname) ? explode(',', $result->grp_release_catname) : [];
-                            $releaseFromNames = isset($result->grp_release_fromname) ? explode(',', $result->grp_release_fromname) : [];
-                            $failedCounts = isset($result->grp_release_failed) ? array_filter(explode(',', $result->grp_release_failed)) : [];
-                            $totalFailed = array_sum($failedCounts);
-
-                            // Limit to maximum 2 releases displayed
+                            $releases = $result->releases ?? [];
+                            $totalReleases = $result->total_releases ?? count($releases);
                             $maxReleases = 2;
-                            $totalReleases = count($releaseGuids);
-                            $releaseGuids = array_slice($releaseGuids, 0, $maxReleases);
-                            $releaseNames = array_slice($releaseNames, 0, $maxReleases);
-                            $releaseSizes = array_slice($releaseSizes, 0, $maxReleases);
-                            $releasePostDates = array_slice($releasePostDates, 0, $maxReleases);
-                            $releaseAddDates = array_slice($releaseAddDates, 0, $maxReleases);
-                            $releaseGrabs = array_slice($releaseGrabs, 0, $maxReleases);
-                            $releaseComments = array_slice($releaseComments, 0, $maxReleases);
-                            $releaseNfoIds = array_slice($releaseNfoIds, 0, $maxReleases);
-                            $releaseHasPreview = array_slice($releaseHasPreview, 0, $maxReleases);
-                            $releaseCategories = array_slice($releaseCategories, 0, $maxReleases);
-                            $releaseFromNames = array_slice($releaseFromNames, 0, $maxReleases);
-
-                            $guid = $releaseGuids[0] ?? null;
+                            $displayReleases = array_slice($releases, 0, $maxReleases);
+                            $guid = !empty($displayReleases) ? $displayReleases[0]->guid : null;
+                            $totalFailed = collect($releases)->sum(fn($r) => (int)($r->failed_count ?? 0));
                         @endphp
 
                         <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
@@ -182,7 +153,7 @@
                                     </div>
 
                                     <!-- Release Information -->
-                                    @if(!empty($releaseGuids[0]))
+                                    @if(!empty($displayReleases))
                                         <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                                             <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                                 Available Releases
@@ -191,67 +162,67 @@
                                                 @endif
                                             </h4>
                                             <div class="space-y-2">
-                                                @foreach($releaseNames as $index => $releaseName)
-                                                    @if($releaseName && isset($releaseGuids[$index]))
+                                                @foreach($displayReleases as $release)
+                                                    @if($release->searchname)
                                                         <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-2 border border-gray-200 dark:border-gray-700">
                                                             <div class="space-y-2">
                                                                 <div class="flex items-start justify-between gap-2">
                                                                     <!-- Release Name -->
-                                                                    <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="text-sm text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 font-medium block break-all flex-1" title="{{ $releaseName }}">
-                                                                        {{ $releaseName }}
+                                                                    <a href="{{ url('/details/' . $release->guid) }}" class="text-sm text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 font-medium block break-all flex-1" title="{{ $release->searchname }}">
+                                                                        {{ $release->searchname }}
                                                                     </a>
                                                                     <label class="inline-flex items-center flex-shrink-0">
-                                                                        <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600" value="{{ $releaseGuids[$index] }}" id="chksingle"/>
+                                                                        <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600" value="{{ $release->guid }}" id="chksingle"/>
                                                                     </label>
                                                                 </div>
 
                                                                 <!-- Info Badges -->
                                                                 <div class="flex flex-wrap items-center gap-1.5">
-                                                                    @if(isset($releaseSizes[$index]))
+                                                                    @if(isset($release->size))
                                                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-                                                                            <i class="fas fa-hdd mr-1"></i>{{ number_format($releaseSizes[$index] / 1073741824, 2) }} GB
+                                                                            <i class="fas fa-hdd mr-1"></i>{{ number_format($release->size / 1073741824, 2) }} GB
                                                                         </span>
                                                                     @endif
-                                                                    @if(isset($releasePostDates[$index]))
+                                                                    @if(isset($release->postdate))
                                                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-                                                                            <i class="fas fa-calendar-alt mr-1"></i>{{ date('M d, Y H:i', strtotime($releasePostDates[$index])) }}
+                                                                            <i class="fas fa-calendar-alt mr-1"></i>{{ date('M d, Y H:i', strtotime($release->postdate)) }}
                                                                         </span>
                                                                     @endif
-                                                                    @if(isset($releaseAddDates[$index]))
+                                                                    @if(isset($release->adddate))
                                                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-                                                                            <i class="fas fa-plus-circle mr-1"></i>{{ userDateDiffForHumans($releaseAddDates[$index]) }}
+                                                                            <i class="fas fa-plus-circle mr-1"></i>{{ userDateDiffForHumans($release->adddate) }}
                                                                         </span>
                                                                     @endif
-                                                                    @if(isset($releaseNfoIds[$index]) && !empty($releaseNfoIds[$index]))
+                                                                    @if(isset($release->nfoid) && !empty($release->nfoid))
                                                                         <button type="button"
                                                                                 class="nfo-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-200 dark:hover:bg-yellow-800 transition cursor-pointer"
-                                                                                data-guid="{{ $releaseGuids[$index] }}"
+                                                                                data-guid="{{ $release->guid }}"
                                                                                 title="View NFO file">
                                                                             <i class="fas fa-file-alt mr-1"></i> NFO
                                                                         </button>
                                                                     @endif
-                                                                    @if(isset($releaseFromNames[$index]) && !empty($releaseFromNames[$index]))
+                                                                    @if(isset($release->group_name) && !empty($release->group_name))
                                                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200" title="Poster/Uploader">
-                                                                            <i class="fas fa-user mr-1"></i> {{ $releaseFromNames[$index] }}
+                                                                            <i class="fas fa-user mr-1"></i> {{ $release->group_name }}
                                                                         </span>
                                                                     @endif
                                                                 </div>
 
                                                                 <!-- Action Buttons -->
                                                                 <div class="flex flex-wrap items-center gap-1.5">
-                                                                    <a href="{{ url('/getnzb/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-600 dark:bg-green-700 text-white hover:bg-green-700 dark:hover:bg-green-800 transition">
+                                                                    <a href="{{ url('/getnzb/' . $release->guid) }}" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-600 dark:bg-green-700 text-white hover:bg-green-700 dark:hover:bg-green-800 transition">
                                                                         <i class="fas fa-download mr-1"></i> Download
-                                                                        @if(isset($releaseGrabs[$index]) && $releaseGrabs[$index] > 0)
-                                                                            <span class="ml-1 px-1 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-xs rounded">{{ $releaseGrabs[$index] }}</span>
+                                                                        @if(isset($release->grabs) && $release->grabs > 0)
+                                                                            <span class="ml-1 px-1 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-xs rounded">{{ $release->grabs }}</span>
                                                                         @endif
                                                                     </a>
-                                                                    <button class="add-to-cart inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-800 transition" data-guid="{{ $releaseGuids[$index] }}">
+                                                                    <button class="add-to-cart inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-800 transition" data-guid="{{ $release->guid }}">
                                                                         <i class="fas fa-shopping-cart mr-1"></i> Cart
                                                                     </button>
-                                                                    <a href="{{ url('/details/' . $releaseGuids[$index]) }}" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-600 dark:bg-gray-700 text-white hover:bg-gray-700 dark:hover:bg-gray-800 transition">
+                                                                    <a href="{{ url('/details/' . $release->guid) }}" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-600 dark:bg-gray-700 text-white hover:bg-gray-700 dark:hover:bg-gray-800 transition">
                                                                         <i class="fas fa-info-circle mr-1"></i> Details
-                                                                        @if(isset($releaseComments[$index]) && $releaseComments[$index] > 0)
-                                                                            <span class="ml-1 px-1 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-xs rounded">{{ $releaseComments[$index] }}</span>
+                                                                        @if(isset($release->comments) && $release->comments > 0)
+                                                                            <span class="ml-1 px-1 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-xs rounded">{{ $release->comments }}</span>
                                                                         @endif
                                                                     </a>
                                                                 </div>
@@ -269,38 +240,9 @@
                 </div>
             </div>
 
-            <!-- Footer -->
+            <!-- Pagination -->
             <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-                    <!-- Left Section -->
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                        <div class="text-sm text-gray-600 dark:text-gray-400">
-                            <span>View: <strong>Covers</strong> |
-                            <a href="{{ url('/browse/Console/' . ($categorytitle ?? '')) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800">List</a></span>
-                        </div>
-
-                        <div class="flex items-center gap-2">
-                            <small class="text-gray-600 dark:text-gray-400">With Selected:</small>
-                            <div class="flex gap-1">
-                                <button type="button" class="nzb_multi_operations_download px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 transition text-sm" title="Download NZBs">
-                                    <i class="fa fa-cloud-download"></i>
-                                </button>
-                                <button type="button" class="nzb_multi_operations_cart px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800 transition text-sm" title="Send to Download Basket">
-                                    <i class="fa fa-shopping-basket"></i>
-                                </button>
-                                @if(isset($isadmin) && $isadmin)
-                                    <button type="button" class="nzb_multi_operations_edit px-3 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition text-sm">Edit</button>
-                                    <button type="button" class="nzb_multi_operations_delete px-3 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 transition text-sm">Delete</button>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Pagination -->
-                    <div class="w-full lg:w-auto">
-                        {{ $results->onEachSide(5)->links() }}
-                    </div>
-                </div>
+                {{ $results->links() }}
             </div>
         </form>
     @else

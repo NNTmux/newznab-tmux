@@ -159,32 +159,20 @@ class ApiController extends BasePageController
                 UserRequest::addApiRequest($apiKey, $request->getRequestUri());
                 $categoryID = $this->categoryID($request);
                 $limit = $this->limit($request);
-                $searchArr = [
-                    'searchname' => $request->input('q') ?? -1,
-                    'name' => -1,
-                    'fromname' => -1,
-                    'filename' => -1,
-                ];
 
                 if ($request->has('q')) {
-                    $relData = $this->releaseSearchService->search(
-                        $searchArr,
+                    $relData = $this->releaseSearchService->apiSearch(
+                        $request->input('q'),
                         $groupName,
-                        -1,
-                        -1,
-                        -1,
-                        -1,
                         $offset,
                         $limit,
-                        '',
                         $maxAge,
                         $catExclusions,
-                        'basic',
                         $categoryID,
                         $minSize
                     );
                 } else {
-                    $relData = $this->releaseBrowseService->getBrowseRange(
+                    $relData = $this->releaseBrowseService->getBrowseRangeForApi(
                         1,
                         $categoryID,
                         $offset,

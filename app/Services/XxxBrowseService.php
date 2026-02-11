@@ -23,11 +23,15 @@ class XxxBrowseService
     /**
      * Get XXX releases with covers for xxx browse page.
      *
+     * Uses three separate queries instead of GROUP_CONCAT:
+     * 1. COUNT query for total results (replaces SQL_CALC_FOUND_ROWS)
+     * 2. Paginated XXX entity list with only needed columns
+     * 3. Top 2 releases per XXX entity using ROW_NUMBER() window function
+     *
      * @param  array<string, mixed>  $cat
      * @param  array<string, mixed>  $excludedCats
-     * @return array<string, mixed>
      */
-    public function getXXXRange(int $page, array $cat, int $start, int $num, string $orderBy, int $maxAge = -1, array $excludedCats = []): array
+    public function getXXXRange(int $page, array $cat, int $start, int $num, string $orderBy, int $maxAge = -1, array $excludedCats = []): mixed
     {
         $page = max(1, $page);
         $start = max(0, $start);
@@ -38,104 +42,103 @@ class XxxBrowseService
         }
         $order = $this->getXXXOrder($orderBy);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        $xxxmoviesSql =
-            sprintf(
-                "
-				SELECT SQL_CALC_FOUND_ROWS
-					xxx.id,
-					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
-				FROM xxxinfo xxx
-				LEFT JOIN releases r ON xxx.id = r.xxxinfo_id
-				WHERE xxx.title != ''
-				AND r.passwordstatus %s
-				%s %s %s %s
-				GROUP BY xxx.id
-				ORDER BY %s %s %s",
-                $this->showPasswords,
-                $this->getBrowseBy(),
-                $catSrch,
-                (
-                    $maxAge > 0
-                        ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
-                        : ''
-                ),
-                (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-                $order[0], // @phpstan-ignore offsetAccess.notFound
-                $order[1], // @phpstan-ignore offsetAccess.notFound
-                ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
-            );
-        $xxxmoviesCache = Cache::get(md5($xxxmoviesSql.$page));
-        if ($xxxmoviesCache !== null) {
-            $xxxmovies = $xxxmoviesCache;
-        } else {
-            $data = DB::select($xxxmoviesSql);
-            $xxxmovies = ['total' => DB::select('SELECT FOUND_ROWS() AS total'), 'result' => $data];
-            Cache::put(md5($xxxmoviesSql.$page), $xxxmovies, $expiresAt);
-        }
-        $xxxIDs = [];
-        if (\is_array($xxxmovies['result'])) {
-            foreach ($xxxmovies['result'] as $xxx => $id) {
-                $xxxIDs[] = $id->id;
-            }
-        }
-        $sql = sprintf(
-            "
-			SELECT
-				GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
-				GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') AS grp_rarinnerfilecount,
-				GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
-				GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
-				GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
-				GROUP_CONCAT(rn.releases_id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
-				GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
-				GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
-				GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
-				GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
-				GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
-				GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
-				GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-				GROUP_CONCAT(df.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
-				GROUP_CONCAT(cp.title, ' > ', c.title ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_catname,
-			xxx.*, UNCOMPRESS(xxx.plot) AS plot,
-			g.name AS group_name,
-			rn.releases_id AS nfoid
-			FROM releases r
-			LEFT OUTER JOIN usenet_groups g ON g.id = r.groups_id
-			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
-			LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-			LEFT OUTER JOIN categories c ON c.id = r.categories_id
-			LEFT OUTER JOIN root_categories cp ON cp.id = c.root_categories_id
-			INNER JOIN xxxinfo xxx ON xxx.id = r.xxxinfo_id
-			WHERE xxx.id IN (%s)
-			AND xxx.title != ''
-			AND r.passwordstatus %s
-			%s %s %s %s
-			GROUP BY xxx.id
-			ORDER BY %s %s",
-            (! empty($xxxIDs) ? implode(',', $xxxIDs) : -1),
-            $this->showPasswords,
-            $this->getBrowseBy(),
-            $catSrch,
-            (
-                $maxAge > 0
-                    ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.'DAY '
-                    : ''
-            ),
-            (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-            $order[0], // @phpstan-ignore offsetAccess.notFound
-            $order[1] // @phpstan-ignore offsetAccess.notFound
-        );
-        $return = Cache::get(md5($sql.$page));
-        if ($return !== null) {
-            return $return;
-        }
-        $return = DB::select($sql);
-        if (\count($return) > 0) {
-            $return[0]->_totalcount = $xxxmovies['total'][0]->total ?? 0;
-        }
-        Cache::put(md5($sql.$page), $return, $expiresAt);
 
-        return $return;
+        $browseBy = $this->getBrowseBy();
+        $whereAge = $maxAge > 0 ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ' : '';
+        $whereExcluded = \count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : '';
+
+        $baseWhere = "xxx.title != '' "
+            ."AND r.passwordstatus {$this->showPasswords} "
+            .$browseBy.' '
+            .$catSrch.' '
+            .$whereAge
+            .$whereExcluded;
+
+        $cacheKey = md5('xxx_range_'.$baseWhere.$order[0].$order[1].$start.$num.$page); // @phpstan-ignore offsetAccess.notFound
+
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        // Step 1: Count total distinct XXX entities matching filters
+        $countSql = 'SELECT COUNT(DISTINCT xxx.id) AS total '
+            .'FROM xxxinfo xxx '
+            .'INNER JOIN releases r ON xxx.id = r.xxxinfo_id '
+            .'WHERE '.$baseWhere;
+
+        $totalResult = DB::select($countSql);
+        $totalCount = $totalResult[0]->total ?? 0;
+
+        if ($totalCount === 0) {
+            return collect();
+        }
+
+        // Step 2: Get paginated XXX entity list with only needed columns
+        $xxxSql = 'SELECT xxx.id, xxx.title, xxx.tagline, xxx.cover, xxx.genre, xxx.director, xxx.actors, '
+            .'UNCOMPRESS(xxx.plot) AS plot, '
+            .'MAX(r.postdate) AS latest_postdate, '
+            .'COUNT(r.id) AS total_releases '
+            .'FROM xxxinfo xxx '
+            .'INNER JOIN releases r ON xxx.id = r.xxxinfo_id '
+            .'WHERE '.$baseWhere.' '
+            .'GROUP BY xxx.id, xxx.title, xxx.tagline, xxx.cover, xxx.genre, xxx.director, xxx.actors, xxx.plot '
+            ."ORDER BY {$order[0]} {$order[1]} " // @phpstan-ignore offsetAccess.notFound
+            ."LIMIT {$num} OFFSET {$start}";
+
+        $xxxEntities = XxxInfo::fromQuery($xxxSql);
+
+        if ($xxxEntities->isEmpty()) {
+            return collect();
+        }
+
+        // Build list of XXX IDs for release query
+        $xxxIds = $xxxEntities->pluck('id')->toArray();
+        $inXxxIds = implode(',', array_map('intval', $xxxIds));
+
+        // Step 3: Get top 2 releases per XXX entity using ROW_NUMBER()
+        $releasesSql = 'SELECT ranked.id, ranked.xxxinfo_id, ranked.guid, ranked.searchname, '
+            .'ranked.size, ranked.postdate, ranked.adddate, ranked.haspreview, ranked.grabs, '
+            .'ranked.comments, ranked.totalpart, ranked.group_name, ranked.nfoid, ranked.failed_count '
+            .'FROM ( '
+            .'SELECT r.id, r.xxxinfo_id, r.guid, r.searchname, r.size, r.postdate, r.adddate, '
+            .'r.haspreview, r.grabs, r.comments, r.totalpart, g.name AS group_name, '
+            .'rn.releases_id AS nfoid, df.failed AS failed_count, '
+            .'ROW_NUMBER() OVER (PARTITION BY r.xxxinfo_id ORDER BY r.postdate DESC) AS rn '
+            .'FROM releases r '
+            .'LEFT JOIN usenet_groups g ON g.id = r.groups_id '
+            .'LEFT JOIN release_nfos rn ON rn.releases_id = r.id '
+            .'LEFT JOIN dnzb_failures df ON df.release_id = r.id '
+            ."WHERE r.xxxinfo_id IN ({$inXxxIds}) "
+            ."AND r.passwordstatus {$this->showPasswords} "
+            .$catSrch.' '
+            .$whereAge
+            .$whereExcluded
+            .') ranked '
+            .'WHERE ranked.rn <= 2 '
+            .'ORDER BY ranked.xxxinfo_id, ranked.postdate DESC';
+
+        $releases = DB::select($releasesSql);
+
+        // Group releases by xxxinfo_id for fast lookup
+        $releasesByXxx = [];
+        foreach ($releases as $release) {
+            $releasesByXxx[$release->xxxinfo_id][] = $release;
+        }
+
+        // Attach releases to each XXX entity
+        foreach ($xxxEntities as $xxx) {
+            $xxx->releases = $releasesByXxx[$xxx->id] ?? []; // @phpstan-ignore assign.propertyReadOnly
+        }
+
+        // Set total count on first item (matches existing pattern used by controllers)
+        if ($xxxEntities->isNotEmpty()) {
+            $xxxEntities[0]->_totalcount = $totalCount; // @phpstan-ignore property.notFound
+        }
+
+        Cache::put($cacheKey, $xxxEntities, $expiresAt);
+
+        return $xxxEntities;
     }
 
     /**

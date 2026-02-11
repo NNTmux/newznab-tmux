@@ -1144,15 +1144,15 @@ class ReleaseSearchService
     }
 
     /**
-     * Build base SQL for search query
+     * Build base SQL for web search query.
+     * Selects only columns needed by search/index.blade.php and browse/index.blade.php views.
      */
     private function buildSearchBaseSql(string $whereSql): string
     {
         return sprintf(
-            "SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size,
-                    r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate,
-                    r.videos_id, r.tv_episodes_id, r.haspreview, r.jpgstatus,
-                    cp.title AS parent_category, c.title AS sub_category,
+            "SELECT r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size,
+                    r.totalpart, r.fromname, r.grabs, r.comments, r.adddate,
+                    r.videos_id, r.haspreview, r.jpgstatus, r.nfostatus,
                     CONCAT(cp.title, ' > ', c.title) AS category_name,
                     df.failed AS failed_count,
                     rr.report_count AS report_count,
@@ -1160,13 +1160,10 @@ class ReleaseSearchService
                     g.name AS group_name,
                     rn.releases_id AS nfoid,
                     re.releases_id AS reid,
-                    cp.id AS categoryparentid,
-                    v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
-                    tve.firstaired
+                    m.imdbid
             FROM releases r
             LEFT OUTER JOIN video_data re ON re.releases_id = r.id
-            LEFT OUTER JOIN videos v ON r.videos_id = v.id
-            LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
+            LEFT OUTER JOIN movieinfo m ON m.id = r.movieinfo_id
             LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
             LEFT JOIN usenet_groups g ON g.id = r.groups_id
             LEFT JOIN categories c ON c.id = r.categories_id
