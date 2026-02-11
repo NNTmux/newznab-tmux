@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -70,6 +71,14 @@ class MovieInfo extends Model
      * @var array<string>
      */
     protected $guarded = ['id'];
+
+    /**
+     * Get the releases associated with this movie.
+     */
+    public function releases(): HasMany // @phpstan-ignore missingType.generics
+    {
+        return $this->hasMany(Release::class, 'imdbid', 'imdbid');
+    }
 
     public static function getAll(string $search = ''): mixed
     {

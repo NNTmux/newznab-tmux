@@ -191,48 +191,43 @@
 
                     <div class="space-y-3" id="releases-container">
                         @foreach($releases as $release)
-                            <div class="release-item bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition" data-release-name="{{ strtolower($release['name']) }}">
+                            <div class="release-item bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition" data-release-name="{{ strtolower($release->searchname) }}">
                                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                                     <div class="flex-1 min-w-0">
-                                        <a href="{{ url('/details/' . $release['guid']) }}" class="text-base text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:text-blue-400 font-medium block truncate" title="{{ $release['name'] }}">
-                                            {{ $release['name'] }}
+                                        <a href="{{ url('/details/' . $release->guid) }}" class="text-base text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:text-blue-400 font-medium block truncate" title="{{ $release->searchname }}">
+                                            {{ $release->searchname }}
                                         </a>
                                         <div class="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500">
                                             <span>
-                                                <i class="fas fa-hdd mr-1"></i>{{ number_format($release['size'] / 1073741824, 2) }} GB
+                                                <i class="fas fa-hdd mr-1"></i>{{ number_format($release->size / 1073741824, 2) }} GB
                                             </span>
-                                            @if($release['postdate'])
+                                            @if($release->postdate)
                                                 <span>
-                                                    <i class="fas fa-calendar-alt mr-1"></i>Posted: {{ userDate($release['postdate'], 'M d, Y H:i') }}
+                                                    <i class="fas fa-calendar-alt mr-1"></i>Posted: {{ userDate($release->postdate, 'M d, Y H:i') }}
                                                 </span>
                                             @endif
                                         </div>
                                         <div class="flex flex-wrap gap-2 mt-2 text-xs">
-                                            @if(!empty($release['group_name']))
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                                                    <i class="fas fa-users mr-1"></i> {{ $release['group_name'] }}
-                                                </span>
-                                            @endif
-                                            @if($release['postdate'])
+                                            @if($release->postdate)
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                                    <i class="fas fa-calendar-alt mr-1"></i>Posted: {{ \Carbon\Carbon::parse($release['postdate'])->format('M d, Y H:i') }}
+                                                    <i class="fas fa-calendar-alt mr-1"></i>Posted: {{ \Carbon\Carbon::parse($release->postdate)->format('M d, Y H:i') }}
                                                 </span>
                                             @endif
-                                            @if(!empty($release['fromname']))
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 font-mono">
-                                                    <i class="fas fa-user mr-1"></i>{{ $release['fromname'] }}
+                                            @if($release->adddate)
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                                    <i class="fas fa-plus-circle mr-1"></i>Added: {{ userDateDiffForHumans($release->adddate) }}
                                                 </span>
                                             @endif
                                         </div>
                                     </div>
                                     <div class="flex gap-2 flex-shrink-0">
-                                        <a href="{{ url('/getnzb/' . $release['guid']) }}" class="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-700 text-white text-sm font-medium rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition">
+                                        <a href="{{ url('/getnzb/' . $release->guid) }}" class="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-700 text-white text-sm font-medium rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition">
                                             <i class="fas fa-download mr-2"></i> Download
                                         </a>
-                                        <button class="add-to-cart inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white text-sm font-medium rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition" data-guid="{{ $release['guid'] }}">
+                                        <button class="add-to-cart inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white text-sm font-medium rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition" data-guid="{{ $release->guid }}">
                                             <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
                                         </button>
-                                        <a href="{{ url('/details/' . $release['guid']) }}" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition">
+                                        <a href="{{ url('/details/' . $release->guid) }}" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition">
                                             <i class="fas fa-info-circle mr-2"></i> Details
                                         </a>
                                     </div>

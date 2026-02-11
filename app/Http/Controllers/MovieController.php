@@ -47,16 +47,16 @@ class MovieController extends BasePageController
         }
 
         $rslt = $this->movieBrowseService->getMovieRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, (array) $this->userdata->categoryexclusions);
-        $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
+        $totalCount = $rslt->isNotEmpty() ? ($rslt[0]->_totalcount ?? 0) : 0;
+        $results = $this->paginate($rslt ?? [], $totalCount, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
         $movies = $results->map(function ($result) {
-            $result['genre'] = makeFieldLinks($result, 'genre', 'movies');
-            $result['actors'] = makeFieldLinks($result, 'actors', 'movies');
-            $result['director'] = makeFieldLinks($result, 'director', 'movies');
-            $result['languages'] = explode(', ', $result['language']);
+            $result->genre = makeFieldLinks($result, 'genre', 'movies');
+            $result->actors = makeFieldLinks($result, 'actors', 'movies');
+            $result->director = makeFieldLinks($result, 'director', 'movies');
 
             // Add cover image URL using helper function
-            $result['cover'] = getReleaseCover($result);
+            $result->cover = getReleaseCover($result);
 
             return $result;
         });
@@ -111,17 +111,6 @@ class MovieController extends BasePageController
             return redirect()->route('Movies')->with('error', 'Movie not found');
         }
 
-        // Get all releases for this movie
-        $rslt = $this->movieBrowseService->getMovieRange(1, [], 0, 1000, '', -1, (array) $this->userdata->categoryexclusions);
-
-        // Filter to only this movie's IMDB ID
-        /** @phpstan-ignore argument.templateType */
-        $movieData = collect($rslt)->firstWhere('imdbid', $imdbid);
-
-        if (! $movieData) {
-            return redirect()->route('Movies')->with('error', 'No releases found for this movie');
-        }
-
         // Convert Eloquent model to array
         $movieArray = $movieInfo->toArray();
 
@@ -147,25 +136,8 @@ class MovieController extends BasePageController
         // Add cover image URL using helper function
         $movieArray['cover'] = getReleaseCover($movieArray);
 
-        // Process all releases
-        $releaseNames = isset($movieData->grp_release_name) ? explode('#', $movieData->grp_release_name) : [];
-        $releaseSizes = isset($movieData->grp_release_size) ? explode(',', $movieData->grp_release_size) : [];
-        $releaseGuids = isset($movieData->grp_release_guid) ? explode(',', $movieData->grp_release_guid) : [];
-        $releasePostDates = isset($movieData->grp_release_postdate) ? explode(',', $movieData->grp_release_postdate) : [];
-        $releaseAddDates = isset($movieData->grp_release_adddate) ? explode(',', $movieData->grp_release_adddate) : [];
-
-        $releases = [];
-        foreach ($releaseNames as $index => $releaseName) {
-            if ($releaseName && isset($releaseGuids[$index])) {
-                $releases[] = [
-                    'name' => $releaseName,
-                    'guid' => $releaseGuids[$index],
-                    'size' => $releaseSizes[$index] ?? 0,
-                    'postdate' => $releasePostDates[$index] ?? null,
-                    'adddate' => $releaseAddDates[$index] ?? null,
-                ];
-            }
-        }
+        // Get all releases for this movie directly (no limit)
+        $releases = $this->movieBrowseService->getMovieReleases($imdbid, (array) $this->userdata->categoryexclusions);
 
         $this->viewData = array_merge($this->viewData, [
             'movie' => $movieArray,
