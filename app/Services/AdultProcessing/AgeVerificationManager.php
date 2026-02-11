@@ -25,11 +25,15 @@ class AgeVerificationManager
 
     /**
      * Cookie jar instances per site
+     *
+     * @var array<string, mixed>
      */
     private array $cookieJars = [];
 
     /**
      * Site-specific age verification configurations
+     *
+     * @var array<string, mixed>
      */
     private array $siteConfigs = [
         'adultdvdempire.com' => [
@@ -121,6 +125,8 @@ class AgeVerificationManager
 
     /**
      * Make HTTP request with automatic age verification handling
+     *
+     * @param  array<string, mixed>  $options
      */
     public function makeRequest(string $url, array $options = []): string|false
     {
@@ -315,6 +321,8 @@ class AgeVerificationManager
 
     /**
      * Get list of domains with stored cookies
+     *
+     * @return array<string, mixed>
      */
     public function getStoredDomains(): array
     {
@@ -332,6 +340,8 @@ class AgeVerificationManager
 
     /**
      * Check if cookies exist for a domain
+     *
+     * @return list<string>
      */
     public function hasCookies(string $domain): bool
     {
@@ -342,6 +352,8 @@ class AgeVerificationManager
 
     /**
      * Get cookie statistics
+     *
+     * @return array<string, mixed>
      */
     public function getCookieStats(): array
     {

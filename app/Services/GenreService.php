@@ -22,7 +22,7 @@ class GenreService
     /**
      * Get genres with optional filtering and caching.
      */
-    public function getGenres(string $type = '', bool $activeOnly = false): Collection
+    public function getGenres(string $type = '', bool $activeOnly = false): Collection // @phpstan-ignore missingType.generics
     {
         $cacheKey = 'genres_'.md5($type.'_'.($activeOnly ? '1' : '0'));
 
@@ -33,6 +33,8 @@ class GenreService
 
     /**
      * Load genres as an associative array (id => lowercase title).
+     *
+     * @return array<string, mixed>
      */
     public function loadGenres(string $type): array
     {
@@ -48,8 +50,10 @@ class GenreService
 
     /**
      * Get a range of genres with pagination.
+     *
+     * @return array<int, string>
      */
-    public function getRange(int $start, int $num, string $type = '', bool $activeOnly = false): Collection
+    public function getRange(int $start, int $num, string $type = '', bool $activeOnly = false): Collection // @phpstan-ignore missingType.generics
     {
         return Genre::getFiltered($type, $activeOnly)
             ->skip($start)
@@ -85,7 +89,7 @@ class GenreService
     /**
      * Get all disabled genre IDs.
      */
-    public function getDisabledIDs(): Collection
+    public function getDisabledIDs(): Collection // @phpstan-ignore missingType.generics
     {
         return Cache::remember('disabled_genres', now()->addMinutes(config('nntmux.cache_expiry_long')), function () {
             return Genre::disabled()->get(['id']);

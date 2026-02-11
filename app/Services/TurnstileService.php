@@ -37,6 +37,8 @@ class TurnstileService
 
     /**
      * Get the Turnstile HTML widget
+     *
+     * @param  array<string, mixed>  $attributes
      */
     public static function display(array $attributes = []): string
     {

@@ -37,17 +37,23 @@ class UsersRelease extends Model
      */
     protected $guarded = ['id'];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'users_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Release, $this>
+     */
     public function release(): BelongsTo
     {
         return $this->belongsTo(Release::class, 'releases_id');
     }
 
-    public static function delCartForUser($uid): void
+    public static function delCartForUser(mixed $uid): void
     {
         self::query()->where('users_id', $uid)->delete();
     }
@@ -55,7 +61,7 @@ class UsersRelease extends Model
     /**
      * @return int|\Illuminate\Database\Eloquent\Builder
      */
-    public static function addCart($uid, $releaseid)
+    public static function addCart(mixed $uid, mixed $releaseid) // @phpstan-ignore missingType.generics
     {
         return self::query()->insertGetId(
             [
@@ -67,10 +73,7 @@ class UsersRelease extends Model
         );
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public static function getCart($uid)
+    public static function getCart(mixed $uid): mixed
     {
         return self::query()
             ->with('release')
@@ -82,7 +85,7 @@ class UsersRelease extends Model
     /**
      * @return bool|mixed
      */
-    public static function delCartByGuid($guids, $userID)
+    public static function delCartByGuid(mixed $guids, mixed $userID)
     {
         if (! \is_array($guids)) {
             return false;
@@ -99,7 +102,7 @@ class UsersRelease extends Model
         return self::query()->whereIn('releases_id', $del)->where('users_id', $userID)->delete() === 1;
     }
 
-    public static function delCartByUserAndRelease($guid, $uid): void
+    public static function delCartByUserAndRelease(mixed $guid, mixed $uid): void
     {
         $rel = Release::query()->where('guid', $guid)->first(['id']);
         if ($rel) {
@@ -107,7 +110,7 @@ class UsersRelease extends Model
         }
     }
 
-    public static function delCartForRelease($rid): void
+    public static function delCartForRelease(mixed $rid): void
     {
         self::query()->where('releases_id', $rid)->delete();
     }

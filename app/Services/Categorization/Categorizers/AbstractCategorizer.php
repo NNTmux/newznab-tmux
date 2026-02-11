@@ -20,6 +20,9 @@ abstract class AbstractCategorizer implements CategorizerInterface
         return false;
     }
 
+    /**
+     * @param  array<string, mixed>  $debug
+     */
     protected function matched(int $categoryId, float $confidence, string $matchedBy, array $debug = []): CategorizationResult
     {
         return new CategorizationResult($categoryId, $confidence, $matchedBy, $debug);

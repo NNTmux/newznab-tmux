@@ -23,7 +23,7 @@ class SeriesController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(Request $request, string $id = '')
+    public function index(Request $request, string $id = ''): mixed
     {
 
         if ($id && ctype_digit($id)) {
@@ -40,7 +40,7 @@ class SeriesController extends BasePageController
             $page = max($page, 1);
             $offset = $seriesLimit > 0 ? ($page - 1) * $seriesLimit : 0;
 
-            $rel = $this->releaseSearchService->tvSearch(['id' => $id], '', '', '', $offset, $seriesLimit, '', $catarray, -1);
+            $rel = $this->releaseSearchService->tvSearch(['id' => $id], '', '', '', $offset, $seriesLimit, '', $catarray, -1); // @phpstan-ignore argument.type
 
             $show = Video::getByVideoID($id);
 
@@ -60,6 +60,7 @@ class SeriesController extends BasePageController
 
                 // Hydrate missing season/episode numbers if tv_episodes_id is set but series/episode missing or zero.
                 $episodeMeta = collect();
+                /** @phpstan-ignore argument.templateType */
                 $episodeIds = collect($rel)->pluck('tv_episodes_id')->filter(fn ($v) => $v > 0)->unique()->values();
                 if ($episodeIds->isNotEmpty()) {
                     $episodeMeta = TvEpisode::whereIn('id', $episodeIds)->get()->keyBy('id');
@@ -303,7 +304,7 @@ class SeriesController extends BasePageController
      *
      * @throws \Exception
      */
-    public function showTrending(Request $request)
+    public function showTrending(Request $request): mixed
     {
         // Cache key for trending TV shows (48 hours)
         $cacheKey = 'trending_tv_top_15_48h';

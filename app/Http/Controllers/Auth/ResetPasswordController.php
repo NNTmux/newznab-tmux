@@ -41,7 +41,7 @@ class ResetPasswordController extends Controller
     /**
      * @throws \Exception
      */
-    public function reset(Request $request)
+    public function reset(Request $request): mixed
     {
         if ($request->missing('guid')) {
             return redirect()->route('password.request')->withErrors(['error' => 'No reset code provided.']);
@@ -69,7 +69,7 @@ class ResetPasswordController extends Controller
             ->with('message_type', 'success');
     }
 
-    public function showResetForm(Request $request, $token = null)
+    public function showResetForm(Request $request, mixed $token = null): mixed
     {
         return view('auth.passwords.reset')->with([
             'token' => $token,

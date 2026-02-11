@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
-    use HasFactory;
+    use HasFactory; // @phpstan-ignore missingType.generics
 
     protected $guarded = [];
 }

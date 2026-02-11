@@ -44,17 +44,35 @@ class ReleaseProcessingContext
     // NZB state
     public bool $nzbHasCompressedFile = false;
 
+    /**
+     * @var array<string, mixed>
+     */
     public array $nzbContents = [];
 
     // Message IDs for downloading
+    /**
+     * @var array<string, mixed>
+     */
     public array $sampleMessageIDs = [];
 
+    /**
+     * @var array<string, mixed>
+     */
     public array $jpgMessageIDs = [];
 
+    /**
+     * @var array<string, mixed>
+     */
     public string|array $mediaInfoMessageIDs = [];
 
+    /**
+     * @var array<string, mixed>
+     */
     public string|array $audioInfoMessageIDs = [];
 
+    /**
+     * @var array<string, mixed>
+     */
     public array $rarFileMessageIDs = [];
 
     public string $audioInfoExtension = '';

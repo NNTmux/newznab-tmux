@@ -13,6 +13,8 @@ class UserStatsService
 {
     /**
      * Get user statistics by role
+     *
+     * @return array<string, mixed>
      */
     public function getUsersByRole(): array
     {
@@ -35,6 +37,8 @@ class UserStatsService
      * Get downloads per day for the last N days
      * Uses aggregated stats from user_activity_stats table for dates older than 2 days
      * Uses live data from user_downloads table for recent days
+     *
+     * @return array<string, mixed>
      */
     public function getDownloadsPerDay(int $days = 7): array
     {
@@ -97,6 +101,8 @@ class UserStatsService
     /**
      * Get downloads per hour for the last N hours
      * Uses aggregated hourly stats from user_activity_stats_hourly table
+     *
+     * @return list<array<string, int|string|null>>
      */
     public function getDownloadsPerHour(int $hours = 168): array
     {
@@ -106,6 +112,8 @@ class UserStatsService
 
     /**
      * Get downloads per minute for the last N minutes
+     *
+     * @return array<string, mixed>
      */
     public function getDownloadsPerMinute(int $minutes = 60): array
     {
@@ -140,6 +148,8 @@ class UserStatsService
      * Get API hits per day for the last N days
      * Uses aggregated stats from user_activity_stats table for dates older than 2 days
      * Uses live data from user_requests table for recent days
+     *
+     * @return list<array<string, int|string|null>>
      */
     public function getApiHitsPerDay(int $days = 7): array
     {
@@ -202,6 +212,8 @@ class UserStatsService
     /**
      * Get API hits per hour for the last N hours
      * Uses aggregated hourly stats from user_activity_stats_hourly table
+     *
+     * @return list<array<string, int|string|null>>
      */
     public function getApiHitsPerHour(int $hours = 168): array
     {
@@ -211,6 +223,8 @@ class UserStatsService
 
     /**
      * Get API hits per minute for the last N minutes
+     *
+     * @return array<string, mixed>
      */
     public function getApiHitsPerMinute(int $minutes = 60): array
     {
@@ -245,6 +259,8 @@ class UserStatsService
     /**
      * Get summary statistics
      * Uses aggregated stats for weekly totals where possible
+     *
+     * @return list<array<string, int|string|null>>
      */
     public function getSummaryStats(): array
     {
@@ -282,6 +298,8 @@ class UserStatsService
 
     /**
      * Get top downloaders
+     *
+     * @return array{total_users: int<0, max>, downloads_today: int<0, max>, downloads_week: float|int, api_hits_today: int<0, max>, api_hits_week: float|int}
      */
     public function getTopDownloaders(int $limit = 5): array
     {

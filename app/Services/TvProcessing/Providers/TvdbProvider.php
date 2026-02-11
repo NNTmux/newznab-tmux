@@ -58,7 +58,7 @@ class TvdbProvider extends AbstractTvProvider
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
      */
-    public function processSite($groupID, $guidChar, $process, bool $local = false): void
+    public function processSite(mixed $groupID, mixed $guidChar, mixed $process, bool $local = false): void
     {
         $res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TVDB);
 
@@ -243,12 +243,14 @@ class TvdbProvider extends AbstractTvProvider
         }
     }
 
-    public function getBanner($videoID, $siteId): bool
+    public function getBanner(mixed $videoID, mixed $siteId): bool
     {
         return false;
     }
 
     /**
+     * @return array<string, mixed>
+     *
      * @throws UnauthorizedException
      * @throws ParseException
      * @throws ExceptionInterface
@@ -322,6 +324,8 @@ class TvdbProvider extends AbstractTvProvider
     }
 
     /**
+     * @return array<string, mixed>
+     *
      * @throws ParseException
      * @throws UnauthorizedException
      * @throws ExceptionInterface
@@ -374,10 +378,12 @@ class TvdbProvider extends AbstractTvProvider
     }
 
     /**
+     * @return array<string, mixed>
+     *
      * @throws ExceptionInterface
      * @throws ParseException
      */
-    public function formatShowInfo($show): array
+    public function formatShowInfo(mixed $show): array
     {
         try {
             $poster = $this->client->series()->artworks($show->tvdb_id);
@@ -432,7 +438,7 @@ class TvdbProvider extends AbstractTvProvider
      *
      * @param  int  $tvdbId  TVDB show ID
      * @param  int|string  $imdbId  IMDB ID (numeric, without 'tt' prefix)
-     * @return array ['tmdb' => int, 'trakt' => int]
+     * @return array<string, mixed> ['tmdb' => int, 'trakt' => int]
      */
     protected function lookupExternalIds(int $tvdbId, int|string $imdbId): array
     {
@@ -483,7 +489,10 @@ class TvdbProvider extends AbstractTvProvider
         return $result;
     }
 
-    public function formatEpisodeInfo($episode): array
+    /**
+     * @return array<string, mixed>
+     */
+    public function formatEpisodeInfo(mixed $episode): array
     {
         return [
             'title' => (string) $episode->name,

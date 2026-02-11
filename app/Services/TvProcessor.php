@@ -24,6 +24,9 @@ class TvProcessor
      */
     private array $providers;
 
+    /**
+     * @var array<string, mixed>
+     */
     private array $stats = [
         'mode' => self::MODE_PIPELINE,
         'totalDuration' => 0.0,
@@ -60,6 +63,8 @@ class TvProcessor
 
     /**
      * Retrieve statistics from the most recent run.
+     *
+     * @return array<string, mixed>
      */
     public function getStats(): array
     {
@@ -171,8 +176,10 @@ class TvProcessor
 
     /**
      * Get the provider pipeline in order of preference.
+     *
+     * @return array<int, array<string, (Closure)|int|string>>
      */
-    private function buildProviderPipeline(): array
+    private function buildProviderPipeline(): array // @phpstan-ignore class.notFound
     {
         return [
             ['name' => 'Local DB', 'factory' => static fn () => new LocalDbProvider, 'status' => 0],
@@ -186,6 +193,7 @@ class TvProcessor
     /**
      * Determine whether a provider has pending work and return a preview release.
      *
+     * @param  array<string, mixed>  $provider
      * @return array{release: Release, total: int}|null
      */
     private function getPendingWorkForProvider(array $provider, string $groupID, string $guidChar, int $processTV): ?array

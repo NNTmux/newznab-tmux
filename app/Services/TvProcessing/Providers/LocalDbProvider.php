@@ -14,7 +14,7 @@ class LocalDbProvider extends AbstractTvProvider
      * Main processing director function for local database lookups.
      * Attempts to match releases against existing video data in the database.
      */
-    public function processSite($groupID, $guidChar, $process, bool $local = false): void
+    public function processSite(mixed $groupID, mixed $guidChar, mixed $process, bool $local = false): void
     {
         // Get releases that need processing
         $res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TVDB);
@@ -152,6 +152,9 @@ class LocalDbProvider extends AbstractTvProvider
         return false;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode): array|bool
     {
         return false;
@@ -162,17 +165,26 @@ class LocalDbProvider extends AbstractTvProvider
         return (new ReleaseImageService)->saveImage((string) $videoId, '', $this->imgSavePath, 0, 0, (bool) parent::TYPE_TV);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getShowInfo(string $name): bool|array
     {
         return false;
     }
 
-    public function formatShowInfo($show): array
+    /**
+     * @return array<string, mixed>
+     */
+    public function formatShowInfo(mixed $show): array
     {
         return [];
     }
 
-    public function formatEpisodeInfo($episode): array
+    /**
+     * @return array<string, mixed>
+     */
+    public function formatEpisodeInfo(mixed $episode): array
     {
         return [];
     }

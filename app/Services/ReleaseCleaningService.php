@@ -63,7 +63,7 @@ class ReleaseCleaningService
     }
 
     /**
-     * @return array|false|string
+     * @return array<string, mixed>|false|string
      *
      * @throws \Exception
      */
@@ -170,6 +170,9 @@ class ReleaseCleaningService
         return $this->generic();
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function teevee(): array
     {
         // [140022]-[04] - [01/40] - "140022-04.nfo" yEnc
@@ -188,7 +191,7 @@ class ReleaseCleaningService
     }
 
     /**
-     * @return array|string
+     * @return array<string, mixed>|string
      */
     public function generic_town()
     {
@@ -388,6 +391,9 @@ class ReleaseCleaningService
 
     // Run at the end because this can be dangerous. In the future it's better to make these per group. There should not be numbers after yEnc because we remove them as well before inserting (even when importing).
 
+    /**
+     * @return array<string, mixed>
+     */
     public function generic(): array
     {
         // This regex gets almost all of the predb release names also keep in mind that not every subject ends with yEnc, some are truncated, because of the 255 character limit and some have extra charaters tacked onto the end, like (5/10).

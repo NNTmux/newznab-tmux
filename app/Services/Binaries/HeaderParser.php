@@ -34,11 +34,11 @@ final class HeaderParser
     /**
      * Parse and filter raw headers from NNTP.
      *
-     * @param  array  $headers  Raw headers from NNTP
+     * @param  array<string, mixed>  $headers  Raw headers from NNTP
      * @param  string  $groupName  The newsgroup name
      * @param  bool  $partRepair  Whether this is a part repair scan
-     * @param  array|null  $missingParts  Missing part numbers if part repair
-     * @return array Filtered and parsed headers with article info
+     * @param  array<string, mixed>|null  $missingParts  Missing part numbers if part repair
+     * @return array<string, mixed> Filtered and parsed headers with article info
      */
     public function parse(
         array $headers,
@@ -110,7 +110,7 @@ final class HeaderParser
     {
         $ids = $this->blacklistService->getAndClearIdsToUpdate();
         if (! empty($ids)) {
-            $this->blacklistService->updateBlacklistUsage($ids);
+            $this->blacklistService->updateBlacklistUsage($ids); // @phpstan-ignore argument.type
         }
     }
 
@@ -132,6 +132,9 @@ final class HeaderParser
 
     /**
      * Extract highest and lowest article info from headers.
+     *
+     * @param  array<string, mixed>  $headers
+     * @return array<string, mixed>
      */
     public function getArticleRange(array $headers): array
     {

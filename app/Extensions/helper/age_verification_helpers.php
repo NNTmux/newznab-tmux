@@ -19,7 +19,7 @@ if (! function_exists('getRawHtmlWithAgeVerification')) {
      * @param  string  $url  URL to fetch
      * @param  string|false  $cookie  Optional cookie string (legacy support)
      * @param  string|null  $postData  Optional POST data
-     * @return string|array|false
+     * @return string|array<string, mixed>|false
      */
     function getRawHtmlWithAgeVerification($url, $cookie = false, $postData = null)
     {
@@ -106,7 +106,7 @@ if (! function_exists('initializeAdultSiteCookies')) {
      * Initialize age verification cookies for all adult sites
      * Run this once during application setup
      *
-     * @return array Statistics about initialized cookies
+     * @return array<string, mixed> Statistics about initialized cookies
      */
     function initializeAdultSiteCookies(): array
     {
@@ -156,7 +156,7 @@ if (! function_exists('getAdultSiteCookieStats')) {
     /**
      * Get statistics about stored adult site cookies
      *
-     * @return array Cookie statistics
+     * @return array<string, mixed> Cookie statistics
      */
     function getAdultSiteCookieStats(): array
     {

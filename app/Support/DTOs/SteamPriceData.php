@@ -19,6 +19,8 @@ final readonly class SteamPriceData
 
     /**
      * Create from Steam API price_overview response.
+     *
+     * @param  array<string, mixed>  $data
      */
     public static function fromApiResponse(array $data): self
     {
@@ -87,6 +89,8 @@ final readonly class SteamPriceData
 
     /**
      * Convert to array.
+     *
+     * @return array<string, mixed>
      */
     public function toArray(): array
     {

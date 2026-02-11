@@ -14,19 +14,16 @@ class SendInviteEmail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $email;
+    private string $email;
 
-    private $url;
+    private string $url;
 
-    /**
-     * @var \App\Models\User
-     */
-    private $user;
+    private \App\Models\User $user;
 
     /**
      * SendInviteEmail constructor.
      */
-    public function __construct($email, $user, $url)
+    public function __construct(string $email, \App\Models\User $user, string $url)
     {
         $this->email = $email;
         $this->user = $user;

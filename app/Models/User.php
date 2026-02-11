@@ -118,7 +118,7 @@ use Spatie\Permission\Traits\HasRoles;
  */
 final class User extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory; // @phpstan-ignore missingType.generics
     use HasRoles;
     use Notifiable;
     use SoftDeletes;
@@ -197,61 +197,97 @@ final class User extends Authenticatable
 
     // ===== Relationships =====
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Spatie\Permission\Models\Role, $this>
+     */
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class, 'roles_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserRequest, $this>
+     */
     public function requests(): HasMany
     {
         return $this->hasMany(UserRequest::class, 'users_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserDownload, $this>
+     */
     public function downloads(): HasMany
     {
         return $this->hasMany(UserDownload::class, 'users_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UsersRelease, $this>
+     */
     public function releases(): HasMany
     {
         return $this->hasMany(UsersRelease::class, 'users_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserSerie, $this>
+     */
     public function series(): HasMany
     {
         return $this->hasMany(UserSerie::class, 'users_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Invitation, $this>
+     */
     public function invitations(): HasMany
     {
         return $this->hasMany(Invitation::class, 'invited_by');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\DnzbFailure, $this>
+     */
     public function failedReleases(): HasMany
     {
         return $this->hasMany(DnzbFailure::class, 'users_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ReleaseComment, $this>
+     */
     public function comments(): HasMany
     {
         return $this->hasMany(ReleaseComment::class, 'users_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\RolePromotionStat, $this>
+     */
     public function promotionStats(): HasMany
     {
         return $this->hasMany(RolePromotionStat::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserRoleHistory, $this>
+     */
     public function roleHistory(): HasMany
     {
         return $this->hasMany(UserRoleHistory::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\PasswordSecurity, $this>
+     */
     public function passwordSecurity(): HasOne
     {
         return $this->hasOne(PasswordSecurity::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserExcludedCategory, $this>
+     */
     public function excludedCategories(): HasMany
     {
         return $this->hasMany(UserExcludedCategory::class, 'users_id');
@@ -259,32 +295,32 @@ final class User extends Authenticatable
 
     // ===== Backward Compatibility Aliases =====
 
-    public function request(): HasMany
+    public function request(): HasMany // @phpstan-ignore missingType.generics
     {
         return $this->requests();
     }
 
-    public function download(): HasMany
+    public function download(): HasMany // @phpstan-ignore missingType.generics
     {
         return $this->downloads();
     }
 
-    public function release(): HasMany
+    public function release(): HasMany // @phpstan-ignore missingType.generics
     {
         return $this->releases();
     }
 
-    public function invitation(): HasMany
+    public function invitation(): HasMany // @phpstan-ignore missingType.generics
     {
         return $this->invitations();
     }
 
-    public function failedRelease(): HasMany
+    public function failedRelease(): HasMany // @phpstan-ignore missingType.generics
     {
         return $this->failedReleases();
     }
 
-    public function comment(): HasMany
+    public function comment(): HasMany // @phpstan-ignore missingType.generics
     {
         return $this->comments();
     }
@@ -294,7 +330,7 @@ final class User extends Authenticatable
     /**
      * Scope to get active (non-disabled) users.
      */
-    public function scopeActive(Builder $query): Builder
+    public function scopeActive(Builder $query): Builder // @phpstan-ignore missingType.generics
     {
         return $query->where('roles_id', '!=', UserRole::DISABLED->value);
     }
@@ -302,7 +338,7 @@ final class User extends Authenticatable
     /**
      * Scope to get verified users.
      */
-    public function scopeVerified(Builder $query): Builder
+    public function scopeVerified(Builder $query): Builder // @phpstan-ignore missingType.generics
     {
         return $query->where('verified', true);
     }
@@ -310,7 +346,7 @@ final class User extends Authenticatable
     /**
      * Scope to filter users by role.
      */
-    public function scopeWithRole(Builder $query, int|string $role): Builder
+    public function scopeWithRole(Builder $query, int|string $role): Builder // @phpstan-ignore missingType.generics
     {
         if (is_numeric($role)) {
             return $query->where('roles_id', (int) $role);
@@ -322,7 +358,7 @@ final class User extends Authenticatable
     /**
      * Scope to get users with roles expiring within specified days.
      */
-    public function scopeExpiringSoon(Builder $query, int $days = 7): Builder
+    public function scopeExpiringSoon(Builder $query, int $days = 7): Builder // @phpstan-ignore missingType.generics
     {
         return $query->whereNotNull('rolechangedate')
             ->whereBetween('rolechangedate', [now(), now()->addDays($days)]);
@@ -331,7 +367,7 @@ final class User extends Authenticatable
     /**
      * Scope to get users with expired roles.
      */
-    public function scopeExpired(Builder $query): Builder
+    public function scopeExpired(Builder $query): Builder // @phpstan-ignore missingType.generics
     {
         return $query->whereNotNull('rolechangedate')
             ->where('rolechangedate', '<', now());
@@ -340,7 +376,7 @@ final class User extends Authenticatable
     /**
      * Scope to exclude sharing email.
      */
-    public function scopeExcludeSharing(Builder $query): Builder
+    public function scopeExcludeSharing(Builder $query): Builder // @phpstan-ignore missingType.generics
     {
         return $query->where('email', '!=', 'sharing@nZEDb.com');
     }
@@ -350,7 +386,7 @@ final class User extends Authenticatable
     /**
      * Get the user's full name.
      */
-    protected function fullName(): Attribute
+    protected function fullName(): Attribute // @phpstan-ignore missingType.generics
     {
         return Attribute::make(
             get: fn (): string => trim("{$this->firstname} {$this->lastname}") ?: $this->username,
@@ -360,7 +396,7 @@ final class User extends Authenticatable
     /**
      * Get the user's timezone or default.
      */
-    protected function effectiveTimezone(): Attribute
+    protected function effectiveTimezone(): Attribute // @phpstan-ignore missingType.generics
     {
         return Attribute::make(
             get: fn (): string => $this->timezone ?? 'UTC',
@@ -370,7 +406,7 @@ final class User extends Authenticatable
     /**
      * Check if user has admin privileges.
      */
-    protected function isAdmin(): Attribute
+    protected function isAdmin(): Attribute // @phpstan-ignore missingType.generics
     {
         return Attribute::make(
             get: fn (): bool => $this->roles_id === UserRole::ADMIN->value,
@@ -380,7 +416,7 @@ final class User extends Authenticatable
     /**
      * Check if user is disabled.
      */
-    protected function isDisabled(): Attribute
+    protected function isDisabled(): Attribute // @phpstan-ignore missingType.generics
     {
         return Attribute::make(
             get: fn (): bool => $this->roles_id === UserRole::DISABLED->value,
@@ -390,7 +426,7 @@ final class User extends Authenticatable
     /**
      * Check if role is expired.
      */
-    protected function isRoleExpired(): Attribute
+    protected function isRoleExpired(): Attribute // @phpstan-ignore missingType.generics
     {
         return Attribute::make(
             get: fn (): bool => $this->rolechangedate?->isPast() ?? false,
@@ -400,7 +436,7 @@ final class User extends Authenticatable
     /**
      * Get days until role expires.
      */
-    protected function daysUntilExpiry(): Attribute
+    protected function daysUntilExpiry(): Attribute // @phpstan-ignore missingType.generics
     {
         return Attribute::make(
             get: fn (): ?int => $this->rolechangedate
@@ -413,7 +449,7 @@ final class User extends Authenticatable
      * Get country code from IP address lookup.
      * Uses ip-api.com with caching to minimize API calls.
      */
-    protected function countryCode(): Attribute
+    protected function countryCode(): Attribute // @phpstan-ignore missingType.generics
     {
         return Attribute::make(
             get: fn (): ?string => $this->getCountryFromIp()['countryCode'] ?? null,
@@ -424,7 +460,7 @@ final class User extends Authenticatable
      * Get country name from IP address lookup.
      * Uses ip-api.com with caching to minimize API calls.
      */
-    protected function countryName(): Attribute
+    protected function countryName(): Attribute // @phpstan-ignore missingType.generics
     {
         return Attribute::make(
             get: fn (): ?string => $this->getCountryFromIp()['country'] ?? null,
@@ -435,7 +471,7 @@ final class User extends Authenticatable
      * Get country flag emoji from country code.
      * Converts 2-letter country code to Unicode regional indicator symbols.
      */
-    protected function countryFlag(): Attribute
+    protected function countryFlag(): Attribute // @phpstan-ignore missingType.generics
     {
         return Attribute::make(
             get: function (): ?string {
@@ -1104,7 +1140,7 @@ final class User extends Authenticatable
             $days = $now->diffInDays($period, true);
 
             foreach ($users as $user) {
-                SendAccountWillExpireEmail::dispatch($user, $days)->onQueue('emails');
+                SendAccountWillExpireEmail::dispatch($user, $days)->onQueue('emails'); // @phpstan-ignore argument.type
             }
         }
     }
@@ -1586,6 +1622,8 @@ final class User extends Authenticatable
 
     /**
      * Get excluded categories for API request.
+     *
+     * @return array<string, mixed>
      *
      * @throws \Exception
      */

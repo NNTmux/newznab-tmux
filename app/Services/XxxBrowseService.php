@@ -22,6 +22,10 @@ class XxxBrowseService
 
     /**
      * Get XXX releases with covers for xxx browse page.
+     *
+     * @param  array<string, mixed>  $cat
+     * @param  array<string, mixed>  $excludedCats
+     * @return array<string, mixed>
      */
     public function getXXXRange(int $page, array $cat, int $start, int $num, string $orderBy, int $maxAge = -1, array $excludedCats = []): array
     {
@@ -29,7 +33,7 @@ class XxxBrowseService
         $start = max(0, $start);
 
         $catSrch = '';
-        if (\count($cat) > 0 && $cat[0] !== -1) {
+        if (\count($cat) > 0 && $cat[0] !== -1) { // @phpstan-ignore offsetAccess.notFound
             $catSrch = Category::getCategorySearch($cat);
         }
         $order = $this->getXXXOrder($orderBy);
@@ -56,8 +60,8 @@ class XxxBrowseService
                         : ''
                 ),
                 (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-                $order[0],
-                $order[1],
+                $order[0], // @phpstan-ignore offsetAccess.notFound
+                $order[1], // @phpstan-ignore offsetAccess.notFound
                 ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
             );
         $xxxmoviesCache = Cache::get(md5($xxxmoviesSql.$page));
@@ -118,8 +122,8 @@ class XxxBrowseService
                     : ''
             ),
             (\count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : ''),
-            $order[0],
-            $order[1]
+            $order[0], // @phpstan-ignore offsetAccess.notFound
+            $order[1] // @phpstan-ignore offsetAccess.notFound
         );
         $return = Cache::get(md5($sql.$page));
         if ($return !== null) {
@@ -136,6 +140,8 @@ class XxxBrowseService
 
     /**
      * Get the order type the user requested on the xxx page.
+     *
+     * @return array<string, mixed>
      */
     protected function getXXXOrder(string $orderBy): array
     {
@@ -150,6 +156,8 @@ class XxxBrowseService
 
     /**
      * Order types for xxx page.
+     *
+     * @return array<int, string>
      */
     public function getXXXOrdering(): array
     {

@@ -109,6 +109,8 @@ class RedisMonitorService
 
     /**
      * Get Redis INFO data.
+     *
+     * @return array<string, mixed>
      */
     public function getRedisInfo(): ?array
     {
@@ -210,6 +212,8 @@ class RedisMonitorService
 
     /**
      * Get a single snapshot of Redis stats without entering monitor mode.
+     *
+     * @return array<string, mixed>
      */
     public function getStats(): array
     {
@@ -228,6 +232,9 @@ class RedisMonitorService
 
     /**
      * Parse Redis INFO into structured data.
+     *
+     * @param  array<string, mixed>  $info
+     * @return array<string, mixed>
      */
     protected function parseRedisInfo(array $info): array
     {
@@ -299,6 +306,8 @@ class RedisMonitorService
 
     /**
      * Display the Redis monitor dashboard.
+     *
+     * @param  array<string, mixed>  $info
      */
     protected function displayDashboard(array $info): void
     {

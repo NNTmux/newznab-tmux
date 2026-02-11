@@ -46,6 +46,9 @@ class SteamApp extends Model
         return 'ix_name_ft';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toSearchableArray(): array
     {
         return [

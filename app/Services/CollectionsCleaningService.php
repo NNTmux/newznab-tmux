@@ -88,7 +88,7 @@ class CollectionsCleaningService
      *
      * @param  string  $subject  The raw subject line to clean
      * @param  string  $groupName  The newsgroup name (optional, used for context-specific cleaning)
-     * @return array Returns ['id' => regex_id, 'name' => cleaned_name]
+     * @return array<string, mixed> Returns ['id' => regex_id, 'name' => cleaned_name]
      *
      * @throws \Exception
      */
@@ -115,7 +115,7 @@ class CollectionsCleaningService
      *
      * If no regexes matched on collectionsCleaner, this method applies generic cleaning patterns.
      *
-     * @return array Returns ['id' => match_type, 'name' => cleaned_name]
+     * @return array<string, mixed> Returns ['id' => match_type, 'name' => cleaned_name]
      */
     protected function generic(): array
     {
@@ -139,7 +139,7 @@ class CollectionsCleaningService
     /**
      * Clean non-music group subjects.
      *
-     * @return array Returns ['id' => match_type, 'name' => cleaned_name]
+     * @return array<string, mixed> Returns ['id' => match_type, 'name' => cleaned_name]
      */
     protected function cleanGenericSubject(): array
     {
@@ -170,7 +170,7 @@ class CollectionsCleaningService
     /**
      * Clean music group subjects with generic patterns.
      *
-     * @return array Returns ['id' => match_type, 'name' => cleaned_name]
+     * @return array<string, mixed> Returns ['id' => match_type, 'name' => cleaned_name]
      */
     protected function cleanMusicSubject(): array
     {

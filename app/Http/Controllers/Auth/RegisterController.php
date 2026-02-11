@@ -52,6 +52,9 @@ class RegisterController extends Controller
         $this->middleware('guest', ['except' => ['getVerification', 'getVerificationError']]);
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     protected function create(array $data): User
     {
         $user = User::create([
@@ -243,7 +246,7 @@ class RegisterController extends Controller
         return $this->showRegistrationForm($request, $error, $showRegister);
     }
 
-    public function showRegistrationForm(Request $request, string $error = '', int $showRegister = 0)
+    public function showRegistrationForm(Request $request, string $error = '', int $showRegister = 0): mixed
     {
         $inviteCode = '';
         if ($request->has('invitecode')) {

@@ -87,6 +87,9 @@ class GetArticleRange extends Command
 
     /**
      * Update group records based on mode.
+     *
+     * @param  array<string, mixed>  $groupMySQL
+     * @param  array<string, mixed>  $return
      */
     private function updateGroupRecords(string $mode, array $groupMySQL, array $return): void
     {

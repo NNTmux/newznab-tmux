@@ -475,7 +475,7 @@ class NNTPService extends \Net_NNTP_Client
      *                         All newer than article number: "679871775-"
      *                         All older than article number: "-679871775"
      *                         Message-ID:                    "<part1of1.uS*yYxQvtAYt$5t&wmE%UejhjkCKXBJ!@example.local>"
-     * @return array|string|NNTPService Multi-dimensional Array of headers on success, PEAR object on failure.
+     * @return array<string, mixed>|string|NNTPService Multi-dimensional Array of headers on success, PEAR object on failure.
      *
      * @throws \Exception
      */
@@ -559,7 +559,7 @@ class NNTPService extends \Net_NNTP_Client
      * Returns a list of valid groups (that the client is permitted to select) and associated information.
      *
      * @param  mixed  $wildMat  (optional) http://tools.ietf.org/html/rfc3977#section-4
-     * @return array|string Pear error on failure, array with groups on success.
+     * @return array<string, mixed>|string Pear error on failure, array with groups on success.
      *
      * @throws \Exception
      */
@@ -909,8 +909,8 @@ class NNTPService extends \Net_NNTP_Client
      * of their _getTextResponse function since it is incompatible at decoding
      * headers when XFeature GZip compression is enabled server side.
      *
-     * @return \App\Services\NNTP\NNTPService|array|string Our overridden function when compression is enabled.
-     *                                                     parent  Parent function when no compression.
+     * @return \App\Services\NNTP\NNTPService|array<string, mixed>|string Our overridden function when compression is enabled.
+     *                                                                    parent  Parent function when no compression.
      */
     public function _getTextResponse(): NNTPService|array|string
     {
@@ -933,9 +933,9 @@ class NNTPService extends \Net_NNTP_Client
      * Have we failed to decompress the data, was there a
      * problem downloading the data, etc..
      *
-     * @return array|string On success : (array)  The headers.
-     *                      On failure : (object) PEAR_Error.
-     *                      On decompress failure: (string) error message
+     * @return array<string, mixed>|string On success : (array)  The headers.
+     *                                     On failure : (object) PEAR_Error.
+     *                                     On decompress failure: (string) error message
      */
     protected function &_getXFeatureTextResponse(): array|string
     {
@@ -981,7 +981,7 @@ class NNTPService extends \Net_NNTP_Client
                         // Split the string of headers into an array of individual headers, then return it.
                         $deComp = explode("\r\n", trim($deComp));
 
-                        return $deComp;
+                        return $deComp; // @phpstan-ignore return.type
                     }
                     $message = 'Decompression of OVER headers failed.';
 

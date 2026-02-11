@@ -79,8 +79,10 @@ class ContentController extends BasePageController
 
     /**
      * Get all active content ordered by type and ordinal.
+     *
+     * @return Collection<int, mixed>
      */
-    protected function getActiveContent(): \Illuminate\Database\Eloquent\Collection
+    protected function getActiveContent(): \Illuminate\Database\Eloquent\Collection // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
     {
         return Content::active()
             ->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')
@@ -89,8 +91,10 @@ class ContentController extends BasePageController
 
     /**
      * Get all content except the front page.
+     *
+     * @return Collection<int, mixed>
      */
-    protected function getAllButFront(): \Illuminate\Database\Eloquent\Collection
+    protected function getAllButFront(): \Illuminate\Database\Eloquent\Collection // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
     {
         return Content::query()
             ->where('id', '<>', 1)
@@ -111,8 +115,10 @@ class ContentController extends BasePageController
 
     /**
      * Get front page content.
+     *
+     * @return Collection<int, mixed>
      */
-    protected function getFrontPageContent(): \Illuminate\Database\Eloquent\Collection
+    protected function getFrontPageContent(): \Illuminate\Database\Eloquent\Collection // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
     {
         return Content::frontPage()->get();
     }

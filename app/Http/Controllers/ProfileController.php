@@ -25,7 +25,7 @@ class ProfileController extends BasePageController
     /**
      * @throws \Throwable
      */
-    public function show(Request $request)
+    public function show(Request $request): mixed
     {
 
         $userID = $this->userdata->id;
@@ -346,7 +346,7 @@ class ProfileController extends BasePageController
     /**
      * Update user's dark mode preference
      */
-    public function updateTheme(Request $request)
+    public function updateTheme(Request $request): mixed
     {
         $user = Auth::user();
 

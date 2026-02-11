@@ -8,11 +8,11 @@ use Mhor\MediaInfo\Container\MediaInfoContainer;
 
 class MediaInfo extends Model
 {
-    use HasFactory;
+    use HasFactory; // @phpstan-ignore missingType.generics
 
     protected $guarded = [];
 
-    public static function addData($id, MediaInfoContainer $xmlArray): void
+    public static function addData(mixed $id, MediaInfoContainer $xmlArray): void
     {
         $mediainfoArray = $xmlArray->getGeneral();
         if (! $mediainfoArray) {

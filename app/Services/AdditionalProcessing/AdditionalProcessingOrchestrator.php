@@ -24,12 +24,18 @@ class AdditionalProcessingOrchestrator
 {
     public const int MAX_COMPRESSED_FILES_TO_CHECK = 10;
 
+    /**
+     * @var Collection<int, mixed>
+     */
     private Collection $releases;
 
     private int $totalReleases = 0;
 
     private string $mainTmpPath = '';
 
+    /**
+     * @var array<string, mixed>
+     */
     private array $triedCompressedMids = [];
 
     public function __construct(
@@ -462,7 +468,7 @@ class AdditionalProcessingOrchestrator
 
             // Download
             $result = $this->downloadService->downloadCompressedFile(
-                $messageIDs,
+                $messageIDs, // @phpstan-ignore argument.type
                 $context->releaseGroupName,
                 $context->release->id,
                 $title
@@ -578,6 +584,8 @@ class AdditionalProcessingOrchestrator
 
     /**
      * Find and process JPG/PNG files from archive file list to create sample/preview.
+     *
+     * @param  array<string, mixed>  $files
      */
     private function processJpgFromArchiveFileList(
         string $compressedData,
@@ -691,7 +699,7 @@ class AdditionalProcessingOrchestrator
 
             // Download the compressed file
             $result = $this->downloadService->downloadCompressedFile(
-                $messageIDs,
+                $messageIDs, // @phpstan-ignore argument.type
                 $context->releaseGroupName,
                 $context->release->id,
                 $title

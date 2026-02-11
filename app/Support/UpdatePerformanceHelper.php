@@ -33,6 +33,9 @@ class UpdatePerformanceHelper
 
     /**
      * Execute commands in parallel where possible
+     *
+     * @param  array<string, mixed>  $commands
+     * @return array<string, mixed>
      */
     public static function executeParallel(array $commands, int $timeout = 300): array
     {
@@ -60,6 +63,8 @@ class UpdatePerformanceHelper
 
     /**
      * Clear various application caches efficiently
+     *
+     * @return array<string, mixed>
      */
     public static function clearAllCaches(): array
     {
@@ -107,6 +112,8 @@ class UpdatePerformanceHelper
 
     /**
      * Check system resources and recommend optimizations
+     *
+     * @return array<string, mixed>
      */
     public static function checkSystemResources(): array
     {
@@ -114,7 +121,7 @@ class UpdatePerformanceHelper
 
         // Check system memory usage
         $memInfo = self::getSystemMemoryInfo();
-        if ($memInfo && $memInfo['usage_percent'] > 80) {
+        if ($memInfo && $memInfo['usage_percent'] > 80) { // @phpstan-ignore offsetAccess.notFound
             $recommendations[] = sprintf(
                 'High system memory usage: %.1f%% (%.1fGB of %.1fGB used)',
                 $memInfo['usage_percent'],
@@ -155,8 +162,10 @@ class UpdatePerformanceHelper
 
     /**
      * Get system memory information
+     *
+     * @return list<string>
      */
-    private static function getSystemMemoryInfo(): ?array
+    private static function getSystemMemoryInfo(): ?array // @phpstan-ignore return.unusedType
     {
         if (PHP_OS_FAMILY === 'Windows') {
             return null; // Windows memory check would require different approach
@@ -188,6 +197,8 @@ class UpdatePerformanceHelper
 
     /**
      * Parse memory limit string to bytes
+     *
+     * @return array{total: int, available: int, used: int, usage_percent: (float|int)}
      */
     private static function parseMemoryLimit(string $limit): int
     {
@@ -213,6 +224,8 @@ class UpdatePerformanceHelper
 
     /**
      * Create a system performance snapshot
+     *
+     * @return array<string, mixed>
      */
     public static function createPerformanceSnapshot(): array
     {

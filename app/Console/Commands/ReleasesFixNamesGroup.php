@@ -325,7 +325,7 @@ class ReleasesFixNamesGroup extends Command
     /**
      * Fetch releases for processing
      */
-    protected function fetchReleases(string $guidChar, int $maxPerRun)
+    protected function fetchReleases(string $guidChar, int $maxPerRun): mixed
     {
         return Release::fromQuery(sprintf("
             SELECT

@@ -78,6 +78,9 @@ class PoppornPipe extends AbstractAdultProviderPipe
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function search(string $movie): array|false
     {
         if (empty($movie)) {
@@ -138,6 +141,9 @@ class PoppornPipe extends AbstractAdultProviderPipe
         return false;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function getMovieInfo(): array|false
     {
         $results = [];
@@ -164,6 +170,9 @@ class PoppornPipe extends AbstractAdultProviderPipe
         return $results;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractCovers(): array
     {
         $res = [];
@@ -207,6 +216,9 @@ class PoppornPipe extends AbstractAdultProviderPipe
         return $res; // @phpstan-ignore deadCode.unreachable
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractSynopsis(): array
     {
         $res = [];
@@ -248,6 +260,9 @@ class PoppornPipe extends AbstractAdultProviderPipe
         return $res;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractTrailers(): array
     {
         $res = [];
@@ -281,6 +296,9 @@ class PoppornPipe extends AbstractAdultProviderPipe
         return $res;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractProductInfo(bool $extras = false): array
     {
         $res = [];
@@ -371,6 +389,9 @@ class PoppornPipe extends AbstractAdultProviderPipe
         return $res;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractCast(): array
     {
         $res = [];
@@ -413,6 +434,9 @@ class PoppornPipe extends AbstractAdultProviderPipe
         return $res;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractGenres(): array
     {
         $res = [];

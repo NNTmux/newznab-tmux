@@ -13,7 +13,7 @@ class AdminGameController extends BasePageController
     /**
      * Display a listing of games
      */
-    public function index(Request $request)
+    public function index(Request $request): mixed
     {
         $game = new GamesService;
 
@@ -36,7 +36,7 @@ class AdminGameController extends BasePageController
     /**
      * Show the form for editing a game
      */
-    public function edit(Request $request)
+    public function edit(Request $request): mixed
     {
         $games = new GamesService;
         $gen = new GenreService;

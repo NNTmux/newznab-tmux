@@ -38,6 +38,9 @@ class UserSerie extends Model
 
     protected $dateFormat = false;
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'users_id');
@@ -47,9 +50,10 @@ class UserSerie extends Model
      * When a user wants to add a show to "my shows" insert it into the user series table.
      *
      *
+     * @param  array<string, mixed>  $catID
      * @return int|\Illuminate\Database\Eloquent\Builder
      */
-    public static function addShow($userId, $videoId, array $catID = [])
+    public static function addShow(mixed $userId, mixed $videoId, array $catID = []) // @phpstan-ignore missingType.generics
     {
         return self::query()
             ->insertGetId(
@@ -65,11 +69,8 @@ class UserSerie extends Model
 
     /**
      * Get all the user's "my shows".
-     *
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public static function getShows($userId)
+    public static function getShows(mixed $userId): mixed
     {
         return self::query()
             ->where('user_series.users_id', $userId)
@@ -82,7 +83,7 @@ class UserSerie extends Model
     /**
      * Delete a tv show from the user's "my shows".
      */
-    public static function delShow($users_id, $videos_id): void
+    public static function delShow(mixed $users_id, mixed $videos_id): void
     {
         self::query()->where(compact('users_id', 'videos_id'))->delete();
     }
@@ -93,7 +94,7 @@ class UserSerie extends Model
      *
      * @return Model|null|static
      */
-    public static function getShow($userId, $videoId)
+    public static function getShow(mixed $userId, mixed $videoId)
     {
         return self::query()
             ->where(['user_series.users_id' => $userId, 'user_series.videos_id' => $videoId])
@@ -104,7 +105,7 @@ class UserSerie extends Model
     /**
      * Delete all shows from the user's "my shows".
      */
-    public static function delShowForUser($userId): void
+    public static function delShowForUser(mixed $userId): void
     {
         self::query()->where('users_id', $userId)->delete();
     }
@@ -112,7 +113,7 @@ class UserSerie extends Model
     /**
      * Delete TV shows from all user's "my shows" that match a TV id.
      */
-    public static function delShowForSeries($videoId): void
+    public static function delShowForSeries(mixed $videoId): void
     {
         self::query()->where('videos_id', $videoId)->delete();
     }
@@ -120,9 +121,9 @@ class UserSerie extends Model
     /**
      * Update a TV show category ID for a user's "my show" TV show.
      *
-     * @param  array  $catID  List of category ID's.
+     * @param  array<string, mixed>  $catID  List of category ID's.
      */
-    public static function updateShow($users_id, $videos_id, array $catID = []): void
+    public static function updateShow(mixed $users_id, mixed $videos_id, array $catID = []): void
     {
         self::query()->where(compact('users_id', 'videos_id'))->update(['categories' => ! empty($catID) ? implode('|', $catID) : 'NULL']);
     }

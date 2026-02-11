@@ -49,11 +49,17 @@ class TvEpisode extends Model
      */
     public $timestamps = false;
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Video, $this>
+     */
     public function video(): BelongsTo
     {
         return $this->belongsTo(Video::class, 'videos_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Release, $this>
+     */
     public function release(): HasMany
     {
         return $this->hasMany(Release::class, 'tv_episodes_id');

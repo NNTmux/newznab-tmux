@@ -18,7 +18,7 @@ class AdminUserController extends BasePageController
     /**
      * @throws \Throwable
      */
-    public function index(Request $request)
+    public function index(Request $request): mixed
     {
         $this->setAdminPrefs();
 

@@ -70,6 +70,9 @@ class BookInfo extends Model
         return 'ix_bookinfo_author_title_ft';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toSearchableArray(): array
     {
         return [
@@ -80,6 +83,8 @@ class BookInfo extends Model
 
     /**
      * Get the releases associated with this book.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Release, $this>
      */
     public function releases(): HasMany
     {

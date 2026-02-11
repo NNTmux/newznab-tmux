@@ -186,7 +186,7 @@ class LoginController extends Controller
         return redirect()->to('login');
     }
 
-    public function showLoginForm()
+    public function showLoginForm(): mixed
     {
         return view('auth.login');
     }

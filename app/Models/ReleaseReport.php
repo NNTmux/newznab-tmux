@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ReleaseReport extends Model
 {
-    use HasFactory;
+    use HasFactory; // @phpstan-ignore missingType.generics
 
     /**
      * The table associated with the model.
@@ -72,6 +72,8 @@ class ReleaseReport extends Model
 
     /**
      * Get the release that was reported.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Release, $this>
      */
     public function release(): BelongsTo
     {
@@ -80,6 +82,8 @@ class ReleaseReport extends Model
 
     /**
      * Get the user who reported the release.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
      */
     public function user(): BelongsTo
     {
@@ -88,6 +92,8 @@ class ReleaseReport extends Model
 
     /**
      * Get the admin who reviewed the report.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
      */
     public function reviewer(): BelongsTo
     {
@@ -97,7 +103,7 @@ class ReleaseReport extends Model
     /**
      * Get a paginated list of reports with optional filters.
      */
-    public static function getReportsRange(
+    public static function getReportsRange(// @phpstan-ignore missingType.generics
         ?string $status = null,
         int $perPage = 50
     ): LengthAwarePaginator {
@@ -114,6 +120,8 @@ class ReleaseReport extends Model
 
     /**
      * Get report count by status.
+     *
+     * @return array<string, mixed>
      */
     public static function getCountByStatus(): array
     {

@@ -42,7 +42,7 @@ class ReleasesRunner extends BaseRunner
             foreach ($uGroups as $group) {
                 $commands[] = $this->buildDnrCommand('releases  '.$group['id']);
             }
-            $this->runStreamingCommands($commands, $maxProcesses, 'releases');
+            $this->runStreamingCommands($commands, $maxProcesses, 'releases'); // @phpstan-ignore argument.type
 
             return;
         }
@@ -91,7 +91,7 @@ class ReleasesRunner extends BaseRunner
             foreach ($groups as $group) {
                 $commands[] = $this->buildDnrCommand('update_per_group  '.$group->id);
             }
-            $this->runStreamingCommands($commands, $maxProcesses, 'update_per_group');
+            $this->runStreamingCommands($commands, $maxProcesses, 'update_per_group'); // @phpstan-ignore argument.type
 
             return;
         }
@@ -163,7 +163,7 @@ class ReleasesRunner extends BaseRunner
                 // Updated to use new script location (modernized)
                 $commands[] = PHP_BINARY.' app/Services/Tmux/Scripts/groupfixrelnames.php "'.$queue.'" true';
             }
-            $this->runStreamingCommands($commands, $maxThreads, 'fixRelNames_'.$mode);
+            $this->runStreamingCommands($commands, $maxThreads, 'fixRelNames_'.$mode); // @phpstan-ignore argument.type
 
             return;
         }

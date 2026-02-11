@@ -13,10 +13,9 @@ class CartController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function index(): mixed
     {
         $results = UsersRelease::getCart(Auth::id())
-            /** @phpstan-ignore property.notFound */
             ->filter(fn ($item) => $item->release !== null);
 
         $this->viewData = array_merge($this->viewData, [
@@ -65,6 +64,8 @@ class CartController extends BasePageController
     }
 
     /**
+     * @param  array<string, mixed>  $id
+     *
      * @throws \Exception
      */
     public function destroy(array|string $id): RedirectResponse

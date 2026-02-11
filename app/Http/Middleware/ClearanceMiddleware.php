@@ -145,7 +145,7 @@ class ClearanceMiddleware
      *
      * @return string|null The blocked category name, or null if allowed
      */
-    protected function checkMainCategoryPermission($user, string $parentCategoryName): ?string
+    protected function checkMainCategoryPermission(mixed $user, string $parentCategoryName): ?string
     {
         $categoryPermissions = [
             'movies' => 'view movies',
@@ -184,7 +184,7 @@ class ClearanceMiddleware
      *
      * @return string|null The blocked subcategory name, or null if allowed
      */
-    protected function checkSubcategoryExclusion($user, string $parentCategoryName, string $subcategoryName): ?string
+    protected function checkSubcategoryExclusion(mixed $user, string $parentCategoryName, string $subcategoryName): ?string
     {
         // Get the root category ID
         $rootCategory = RootCategory::query()

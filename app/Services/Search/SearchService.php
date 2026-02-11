@@ -111,6 +111,8 @@ class SearchService extends Manager implements SearchServiceInterface
 
     /**
      * Get fuzzy search configuration.
+     *
+     * @return array<string, mixed>
      */
     public function getFuzzyConfig(): array
     {
@@ -135,6 +137,8 @@ class SearchService extends Manager implements SearchServiceInterface
 
     /**
      * Insert a release into the search index.
+     *
+     * @param  array<string, mixed>  $parameters
      */
     public function insertRelease(array $parameters): void
     {
@@ -159,6 +163,8 @@ class SearchService extends Manager implements SearchServiceInterface
 
     /**
      * Insert a predb record into the search index.
+     *
+     * @param  array<string, mixed>  $parameters
      */
     public function insertPredb(array $parameters): void
     {
@@ -167,6 +173,8 @@ class SearchService extends Manager implements SearchServiceInterface
 
     /**
      * Update a predb record in the search index.
+     *
+     * @param  array<string, mixed>  $parameters
      */
     public function updatePreDb(array $parameters): void
     {
@@ -175,6 +183,9 @@ class SearchService extends Manager implements SearchServiceInterface
 
     /**
      * Search the releases index.
+     *
+     * @param  array<string, mixed>  $phrases
+     * @return array<string, mixed>
      */
     public function searchReleases(array|string $phrases, int $limit = 1000): array
     {
@@ -186,6 +197,9 @@ class SearchService extends Manager implements SearchServiceInterface
      *
      * If exact search returns no results and fuzzy is enabled, this method
      * will automatically try a fuzzy search as a fallback.
+     *
+     * @param  array<string, mixed>  $phrases
+     * @return array<string, mixed>
      */
     public function searchReleasesWithFuzzy(array|string $phrases, int $limit = 1000, bool $forceFuzzy = false): array
     {
@@ -194,6 +208,9 @@ class SearchService extends Manager implements SearchServiceInterface
 
     /**
      * Perform fuzzy search on releases index.
+     *
+     * @param  array<string, mixed>  $phrases
+     * @return array<string, mixed>
      */
     public function fuzzySearchReleases(array|string $phrases, int $limit = 1000): array
     {
@@ -202,6 +219,9 @@ class SearchService extends Manager implements SearchServiceInterface
 
     /**
      * Search the predb index.
+     *
+     * @param  array<string, mixed>  $searchTerm
+     * @return array<string, mixed>
      */
     public function searchPredb(array|string $searchTerm): array
     {
@@ -227,7 +247,7 @@ class SearchService extends Manager implements SearchServiceInterface
     /**
      * Truncate/clear an index (remove all documents).
      *
-     * @param  array|string  $indexes  Index name(s) to truncate
+     * @param  array<string, mixed>|string  $indexes  Index name(s) to truncate
      */
     public function truncateIndex(array|string $indexes): void
     {
@@ -245,8 +265,8 @@ class SearchService extends Manager implements SearchServiceInterface
     /**
      * Bulk insert multiple releases into the index.
      *
-     * @param  array  $releases  Array of release data arrays
-     * @return array Results with 'success' and 'errors' counts
+     * @param  array<string, mixed>  $releases  Array of release data arrays
+     * @return array<string, mixed> Results with 'success' and 'errors' counts
      */
     public function bulkInsertReleases(array $releases): array
     {
@@ -256,8 +276,8 @@ class SearchService extends Manager implements SearchServiceInterface
     /**
      * Bulk insert multiple predb records into the index.
      *
-     * @param  array  $predbRecords  Array of predb data arrays
-     * @return array Results with 'success' and 'errors' counts
+     * @param  array<string, mixed>  $predbRecords  Array of predb data arrays
+     * @return array<string, mixed> Results with 'success' and 'errors' counts
      */
     public function bulkInsertPredb(array $predbRecords): array
     {
@@ -292,6 +312,8 @@ class SearchService extends Manager implements SearchServiceInterface
 
     /**
      * Insert a movie into the movies search index.
+     *
+     * @param  array<string, mixed>  $parameters
      */
     public function insertMovie(array $parameters): void
     {
@@ -317,8 +339,8 @@ class SearchService extends Manager implements SearchServiceInterface
     /**
      * Bulk insert multiple movies into the index.
      *
-     * @param  array  $movies  Array of movie data arrays
-     * @return array Results with 'success' and 'errors' counts
+     * @param  array<string, mixed>  $movies  Array of movie data arrays
+     * @return array<string, mixed> Results with 'success' and 'errors' counts
      */
     public function bulkInsertMovies(array $movies): array
     {
@@ -327,6 +349,9 @@ class SearchService extends Manager implements SearchServiceInterface
 
     /**
      * Search the movies index.
+     *
+     * @param  array<string, mixed>  $searchTerm
+     * @return array<string, mixed>
      */
     public function searchMovies(array|string $searchTerm, int $limit = 1000): array
     {
@@ -335,6 +360,8 @@ class SearchService extends Manager implements SearchServiceInterface
 
     /**
      * Search movies by external ID (IMDB, TMDB, Trakt).
+     *
+     * @return array<string, mixed>
      */
     public function searchMovieByExternalId(string $field, int|string $value): ?array
     {
@@ -343,6 +370,8 @@ class SearchService extends Manager implements SearchServiceInterface
 
     /**
      * Insert a TV show into the tvshows search index.
+     *
+     * @param  array<string, mixed>  $parameters
      */
     public function insertTvShow(array $parameters): void
     {
@@ -368,8 +397,8 @@ class SearchService extends Manager implements SearchServiceInterface
     /**
      * Bulk insert multiple TV shows into the index.
      *
-     * @param  array  $tvShows  Array of TV show data arrays
-     * @return array Results with 'success' and 'errors' counts
+     * @param  array<string, mixed>  $tvShows  Array of TV show data arrays
+     * @return array<string, mixed> Results with 'success' and 'errors' counts
      */
     public function bulkInsertTvShows(array $tvShows): array
     {
@@ -378,6 +407,9 @@ class SearchService extends Manager implements SearchServiceInterface
 
     /**
      * Search the TV shows index.
+     *
+     * @param  array<string, mixed>  $searchTerm
+     * @return array<string, mixed>
      */
     public function searchTvShows(array|string $searchTerm, int $limit = 1000): array
     {
@@ -386,6 +418,8 @@ class SearchService extends Manager implements SearchServiceInterface
 
     /**
      * Search TV shows by external ID (TVDB, Trakt, TVMaze, TVRage, IMDB, TMDB).
+     *
+     * @return array<string, mixed>
      */
     public function searchTvShowByExternalId(string $field, int|string $value): ?array
     {
@@ -395,6 +429,9 @@ class SearchService extends Manager implements SearchServiceInterface
     /**
      * Search releases by external media IDs.
      * Used to find releases associated with a specific movie or TV show.
+     *
+     * @param  array<string, mixed>  $externalIds
+     * @return array<string, mixed>
      */
     public function searchReleasesByExternalId(array $externalIds, int $limit = 1000): array
     {
@@ -404,6 +441,9 @@ class SearchService extends Manager implements SearchServiceInterface
     /**
      * Search releases by category ID using the search index.
      * This provides a fast way to get release IDs for a specific category without hitting the database.
+     *
+     * @param  array<string, mixed>  $categoryIds
+     * @return array<string, mixed>
      */
     public function searchReleasesByCategory(array $categoryIds, int $limit = 1000): array
     {
@@ -413,6 +453,9 @@ class SearchService extends Manager implements SearchServiceInterface
     /**
      * Combined search: text search with category filtering.
      * First searches by text, then filters by category IDs using the search index.
+     *
+     * @param  array<string, mixed>  $categoryIds
+     * @return array<string, mixed>
      */
     public function searchReleasesWithCategoryFilter(string $searchTerm, array $categoryIds = [], int $limit = 1000): array
     {

@@ -78,6 +78,8 @@ class GamesInfo extends Model
 
     /**
      * Get the genre for this game.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Genre, $this>
      */
     public function genre(): BelongsTo
     {
@@ -86,6 +88,8 @@ class GamesInfo extends Model
 
     /**
      * Get the releases for this game.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Release, $this>
      */
     public function releases(): HasMany
     {
@@ -97,6 +101,9 @@ class GamesInfo extends Model
         return 'ix_title_ft';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toSearchableArray(): array
     {
         return [

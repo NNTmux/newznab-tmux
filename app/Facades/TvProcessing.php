@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @see \App\Services\TvProcessing\TvProcessingPipeline
  */
-class TvProcessing extends Facade
+class TvProcessing extends Facade // @phpstan-ignore missingType.iterableValue, missingType.generics
 {
     /**
      * Get the registered name of the component.

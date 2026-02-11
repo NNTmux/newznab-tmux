@@ -14,7 +14,7 @@ class FindSizeMismatchedReleases extends Command
 
     protected $description = 'Find releases where size differs significantly from release_files total. Use --direction=bigger|smaller|any';
 
-    public function handle()
+    public function handle(): void
     {
         $threshold = $this->option('threshold'); // Percentage difference threshold
         $limit = $this->option('limit');
@@ -124,7 +124,7 @@ class FindSizeMismatchedReleases extends Command
         return null;
     }
 
-    private function outputReleaseIdsAsCsv($mismatches): void
+    private function outputReleaseIdsAsCsv(mixed $mismatches): void
     {
         $releaseIds = $mismatches->pluck('id')->join(',');
         $this->line("\nRelease IDs in CSV format:");

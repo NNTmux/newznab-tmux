@@ -34,7 +34,7 @@ class AdultProcessingPipeline
     /**
      * @var Collection<AbstractAdultProviderPipe>
      */
-    protected Collection $pipes;
+    protected Collection $pipes; // @phpstan-ignore missingType.generics
 
     protected int $movieQty;
 
@@ -50,6 +50,8 @@ class AdultProcessingPipeline
 
     /**
      * Processing statistics.
+     *
+     * @var array<string, mixed>
      */
     protected array $stats = [
         'processed' => 0,
@@ -65,6 +67,7 @@ class AdultProcessingPipeline
      */
     public function __construct(iterable $pipes = [], bool $echoOutput = true)
     {
+        /** @phpstan-ignore argument.templateType */
         $this->pipes = collect($pipes);
 
         if ($this->pipes->isEmpty()) {
@@ -104,6 +107,8 @@ class AdultProcessingPipeline
 
     /**
      * Get the default pipes in priority order.
+     *
+     * @return Collection<int, mixed>
      */
     protected function getDefaultPipes(): Collection
     {
@@ -134,7 +139,7 @@ class AdultProcessingPipeline
      *
      * @param  string  $movie  Movie title to search for
      * @param  bool  $debug  Whether to include debug information
-     * @return array Processing result
+     * @return array<string, mixed> Processing result
      */
     public function processMovie(string $movie, bool $debug = false): array
     {
@@ -158,10 +163,10 @@ class AdultProcessingPipeline
     /**
      * Process a single release through the pipeline.
      *
-     * @param  array|object  $release  Release data
+     * @param  array<string, mixed>|object  $release  Release data
      * @param  string  $cleanTitle  Cleaned movie title
      * @param  bool  $debug  Whether to include debug information
-     * @return array Processing result
+     * @return array<string, mixed> Processing result
      */
     public function processRelease(array|object $release, string $cleanTitle, bool $debug = false): array
     {
@@ -216,7 +221,7 @@ class AdultProcessingPipeline
                 if ($this->echoOutput) {
                     cli()->info('Processing batch '.($batchIndex + 1).' of '.count($batches));
                 }
-                $this->processBatch($batch);
+                $this->processBatch($batch); // @phpstan-ignore argument.type
             }
         } catch (\Throwable $e) {
             Log::error('processXXXReleases failed: '.$e->getMessage(), [
@@ -244,6 +249,8 @@ class AdultProcessingPipeline
      * Note: Due to serialization limitations with DOMDocument and HtmlDomParser,
      * we process releases sequentially within the batch but can process multiple
      * batches concurrently using async tasks that create fresh instances.
+     *
+     * @param  array<string, mixed>  $batch
      */
     protected function processBatch(array $batch): void
     {
@@ -334,6 +341,9 @@ class AdultProcessingPipeline
     /**
      * Process a release in a child process with fresh instances.
      * This is a static method to avoid serializing $this.
+     *
+     * @param  array<string, mixed>  $releaseData
+     * @return array<string, mixed>
      */
     protected static function processReleaseInChildProcess(
         array $releaseData,
@@ -389,6 +399,7 @@ class AdultProcessingPipeline
     /**
      * Process a single release item.
      *
+     * @param  array<string, mixed>  $release
      * @return int XXX info ID or error code
      */
     protected function processReleaseItem(array $release): int
@@ -467,6 +478,7 @@ class AdultProcessingPipeline
     /**
      * Update XXX information from pipeline results.
      *
+     * @param  array<string, mixed>  $release
      * @return int|false XXX info ID or false on failure
      */
     public function updateXXXInfo(string $movie, ?array $release = null): int|false
@@ -594,8 +606,10 @@ class AdultProcessingPipeline
 
     /**
      * Get releases to process.
+     *
+     * @return Collection<int, mixed>
      */
-    protected function getReleasesToProcess(): \Illuminate\Database\Eloquent\Collection
+    protected function getReleasesToProcess(): \Illuminate\Database\Eloquent\Collection // @phpstan-ignore missingType.generics, return.phpDocType
     {
         return Release::query()
             ->where(['xxxinfo_id' => 0])
@@ -627,6 +641,8 @@ class AdultProcessingPipeline
 
     /**
      * Check if XXX info already exists in database.
+     *
+     * @return array<string, mixed>
      */
     protected function checkXXXInfoExists(string $releaseName): ?array
     {
@@ -645,6 +661,8 @@ class AdultProcessingPipeline
 
     /**
      * Get Genre ID from genre names.
+     *
+     * @param  array<string, mixed>  $arr
      */
     protected function getGenreID(array|string $arr): string
     {
@@ -754,6 +772,8 @@ class AdultProcessingPipeline
 
     /**
      * Get processing statistics.
+     *
+     * @return array<string, mixed>
      */
     public function getStats(): array
     {
@@ -762,6 +782,8 @@ class AdultProcessingPipeline
 
     /**
      * Get all registered pipes.
+     *
+     * @return Collection<int, mixed>
      */
     public function getPipes(): Collection
     {

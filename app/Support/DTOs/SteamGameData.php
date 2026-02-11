@@ -73,6 +73,8 @@ final readonly class SteamGameData
 
     /**
      * Create from Steam API response array.
+     *
+     * @param  array<string, mixed>  $data
      */
     public static function fromApiResponse(array $data, int $appId): self
     {
@@ -226,6 +228,8 @@ final readonly class SteamGameData
 
     /**
      * Convert to array format compatible with existing GamesInfo model.
+     *
+     * @return array<string, mixed>
      */
     public function toGamesInfoArray(): array
     {

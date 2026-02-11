@@ -80,6 +80,8 @@ class AnidbService
 
     /**
      * Retrieves a list of Anime titles, optionally filtered by starting character and title.
+     *
+     * @return array<string, mixed>
      */
     public function getAnimeList(string $letter = '', string $animeTitle = ''): array
     {
@@ -118,7 +120,7 @@ class AnidbService
     /**
      * Retrieves a range of Anime titles for site display.
      */
-    public function getAnimeRange(string $animeTitle = ''): LengthAwarePaginator
+    public function getAnimeRange(string $animeTitle = ''): LengthAwarePaginator // @phpstan-ignore missingType.generics
     {
         $query = AnidbTitle::query()
             ->where('at.lang', '=', 'en');

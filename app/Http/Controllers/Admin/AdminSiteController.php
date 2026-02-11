@@ -139,7 +139,7 @@ class AdminSiteController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function stats()
+    public function stats(): mixed
     {
 
         $meta_title = $title = 'Site Stats';

@@ -20,6 +20,8 @@ class TmuxLayoutBuilder
     /**
      * Pane name icons mapping - uses Nerd Font symbols
      * Requires a Nerd Font to display properly (FiraCode NF, JetBrains Mono NF, etc.)
+     *
+     * @var array<string, mixed>
      */
     protected array $paneIcons = [
         // Core processing
@@ -338,6 +340,8 @@ class TmuxLayoutBuilder
      * - 'use_sail' => bool - whether to use sail to run inside Docker
      * - 'override_host' => bool - whether to override REDIS_HOST env var
      * - 'host' => string - the host to use (only relevant if override_host is true)
+     *
+     * @return array<string, mixed>
      */
     protected function resolveRedisConnection(string $host, int $port): array
     {

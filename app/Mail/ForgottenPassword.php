@@ -10,24 +10,18 @@ class ForgottenPassword extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $user;
+    public mixed $user;
 
-    public $resetLink;
+    public string $resetLink;
 
-    /**
-     * @var mixed
-     */
-    private $siteEmail;
+    private mixed $siteEmail;
 
-    /**
-     * @var mixed
-     */
-    private $siteTitle;
+    private mixed $siteTitle;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($resetLink)
+    public function __construct(string $resetLink)
     {
         $this->resetLink = $resetLink;
         $this->siteEmail = config('mail.from.address');

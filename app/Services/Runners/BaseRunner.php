@@ -297,6 +297,8 @@ abstract class BaseRunner
     /**
      * Run multiple shell commands concurrently and stream their output in real-time.
      * Uses Symfony Process start() with a small event loop to enforce max concurrency.
+     *
+     * @param  array<string, mixed>  $commands
      */
     protected function runStreamingCommands(array $commands, int $maxProcesses, string $desc): void
     {

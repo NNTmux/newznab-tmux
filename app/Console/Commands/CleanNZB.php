@@ -48,7 +48,7 @@ class CleanNZB extends Command
         }
     }
 
-    private function GetNZBsWithNoDatabaseEntry($delete = false)
+    private function GetNZBsWithNoDatabaseEntry(mixed $delete = false): void
     {
         $this->info('Getting list of NZB files on disk to check if they exist in database');
         $releases = new Release;
@@ -76,7 +76,7 @@ class CleanNZB extends Command
         $this->info("Checked: $checked / Deleted: $deleted");
     }
 
-    private function GetReleasesWithNoNZBOnDisk($delete = false)
+    private function GetReleasesWithNoNZBOnDisk(mixed $delete = false): void
     {
         // Setup
         $nzb = app(NzbService::class);

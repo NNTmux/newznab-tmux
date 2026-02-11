@@ -15,52 +15,52 @@ class CategoryPolicy extends \TeamTeaTime\Forum\Policies\CategoryPolicy
         //
     }
 
-    public function manageThreads($user, Category $category): bool
+    public function manageThreads(mixed $user, Category $category): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function deleteThreads($user, Category $category): bool
+    public function deleteThreads(mixed $user, Category $category): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function restoreThreads($user, Category $category): bool
+    public function restoreThreads(mixed $user, Category $category): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function enableThreads($user, Category $category): bool
+    public function enableThreads(mixed $user, Category $category): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function moveThreadsFrom($user, Category $category): bool
+    public function moveThreadsFrom(mixed $user, Category $category): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function moveThreadsTo($user, Category $category): bool
+    public function moveThreadsTo(mixed $user, Category $category): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function lockThreads($user, Category $category): bool
+    public function lockThreads(mixed $user, Category $category): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function pinThreads($user, Category $category): bool
+    public function pinThreads(mixed $user, Category $category): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function view($user, Category $category): bool
+    public function view(mixed $user, Category $category): bool
     {
         return $user->hasAnyRole(['Admin', 'Moderator']);
     }
 
-    public function delete($user, Category $category): bool
+    public function delete(mixed $user, Category $category): bool
     {
         return $user->hasRole('Admin');
     }

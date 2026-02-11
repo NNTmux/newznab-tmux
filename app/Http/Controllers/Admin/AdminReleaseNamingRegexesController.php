@@ -12,7 +12,7 @@ class AdminReleaseNamingRegexesController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(Request $request)
+    public function index(Request $request): mixed
     {
         $this->setAdminPrefs();
         $regexes = new RegexService('release_naming_regexes');
@@ -108,7 +108,7 @@ class AdminReleaseNamingRegexesController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function testRegex(Request $request)
+    public function testRegex(Request $request): mixed
     {
         $this->setAdminPrefs();
         $meta_title = $title = 'Release Naming Regex Test';

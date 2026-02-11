@@ -394,6 +394,8 @@ class MediaExtractionService
 
     /**
      * Process a video file for sample, video clip, and media info.
+     *
+     * @return array<string, mixed>
      */
     public function processVideoFile(
         string $fileLocation,

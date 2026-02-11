@@ -13,7 +13,7 @@ class AdminAjaxController extends BasePageController
     /**
      * @throws \Throwable
      */
-    public function ajaxAction(Request $request)
+    public function ajaxAction(Request $request): mixed
     {
         if ($request->missing('action')) {
             return response()->json(['success' => false, 'message' => 'No action specified'], 400);
@@ -127,5 +127,8 @@ class AdminAjaxController extends BasePageController
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
+
+        return null;
+
     }
 }

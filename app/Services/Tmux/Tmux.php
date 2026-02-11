@@ -19,7 +19,7 @@ class Tmux
      */
     public \Closure|\PDO $pdo;
 
-    public $tmux_session;
+    public mixed $tmux_session;
 
     /**
      * Tmux constructor.
@@ -32,7 +32,7 @@ class Tmux
     /**
      * @return mixed
      */
-    public function getConnectionsInfo($constants)
+    public function getConnectionsInfo(mixed $constants)
     {
         $runVar['connections']['port_a'] = $runVar['connections']['host_a'] = $runVar['connections']['ip_a'] = false;
         $runVar['connections']['port'] = config('nntmux_nntp.port');
@@ -47,7 +47,7 @@ class Tmux
         return $runVar['connections'];
     }
 
-    public function getUSPConnections(string $which, $connections): mixed
+    public function getUSPConnections(string $which, mixed $connections): mixed
     {
         switch ($which) {
             case 'alternate':
@@ -96,7 +96,10 @@ class Tmux
         return $runVar['conncounts'];
     }
 
-    public function getListOfPanes($constants): array
+    /**
+     * @return array<string, mixed>
+     */
+    public function getListOfPanes(mixed $constants): array
     {
         $panes = ['zero' => '', 'one' => '', 'two' => ''];
         switch ($constants['sequential']) {
@@ -120,6 +123,9 @@ class Tmux
         return $panes;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getConstantSettings(): array
     {
         $settings = [
@@ -142,6 +148,9 @@ class Tmux
         return $constants;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getMonitorSettings(): array
     {
         $settingsMap = [
@@ -202,7 +211,7 @@ class Tmux
             ->toArray();
     }
 
-    public function updateItem($setting, $value): int
+    public function updateItem(mixed $setting, mixed $value): int
     {
         return Settings::query()->where('name', '=', $setting)->update(['value' => $value]);
     }
@@ -239,7 +248,7 @@ class Tmux
         return round($bytes, 2).' '.$types[$index];
     }
 
-    public function writelog($pane): ?string
+    public function writelog(mixed $pane): ?string
     {
         $path = storage_path('logs');
         $getDate = now()->format('Y_m_d');
@@ -254,7 +263,7 @@ class Tmux
     /**
      * @throws \Exception
      */
-    public function get_color($colors_start, $colors_end, $colors_exc): int
+    public function get_color(mixed $colors_start, mixed $colors_end, mixed $colors_exc): int
     {
         // Handle null values with sensible defaults
         $colors_start = $colors_start ?? 0;
@@ -276,7 +285,7 @@ class Tmux
         return $number;
     }
 
-    public function relativeTime($_time): string
+    public function relativeTime(mixed $_time): string
     {
         return Carbon::createFromTimestamp($_time, date_default_timezone_get())->ago();
     }
@@ -284,7 +293,7 @@ class Tmux
     /**
      * @throws \Exception
      */
-    public function proc_query($qry, $bookreqids, string $db_name, ?string $ppmax = '', ?string $ppmin = ''): bool|string
+    public function proc_query(mixed $qry, mixed $bookreqids, string $db_name, ?string $ppmax = '', ?string $ppmin = ''): bool|string
     {
         // Convert null to empty string for backward compatibility
         $ppmax = $ppmax ?? '';
@@ -430,6 +439,9 @@ class Tmux
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function cbpmTableQuery(): array
     {
         return DB::select(

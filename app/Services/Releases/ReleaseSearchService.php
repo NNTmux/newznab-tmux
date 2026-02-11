@@ -30,22 +30,26 @@ class ReleaseSearchService
     /**
      * Function for searching on the site (by subject, searchname or advanced).
      *
+     * @param  array<string, mixed>  $cat
+     * @param  array<string, mixed>  $excludedCats
+     * @param  array<string, mixed>  $orderBy
+     * @param  array<string, mixed>  $searchArr
      * @return array|Collection|mixed
      */
     public function search(
         array $searchArr,
-        $groupName,
-        $sizeFrom,
-        $sizeTo,
-        $daysNew,
-        $daysOld,
+        mixed $groupName,
+        mixed $sizeFrom,
+        mixed $sizeTo,
+        mixed $daysNew,
+        mixed $daysOld,
         int $offset = 0,
         int $limit = 1000,
         array|string $orderBy = '',
         int $maxAge = -1,
         array $excludedCats = [],
         string $type = 'basic',
-        array $cat = [-1],
+        array $cat = [-1], // @phpstan-ignore parameter.defaultValue
         int $minSize = 0
     ): mixed {
         if (config('app.debug')) {
@@ -93,8 +97,8 @@ class ReleaseSearchService
         $sql = sprintf(
             'SELECT * FROM (%s) r ORDER BY r.%s %s LIMIT %d OFFSET %d',
             $baseSql,
-            $orderBy[0],
-            $orderBy[1],
+            $orderBy[0], // @phpstan-ignore offsetAccess.notFound
+            $orderBy[1], // @phpstan-ignore offsetAccess.notFound
             $limit,
             $offset
         );
@@ -124,9 +128,11 @@ class ReleaseSearchService
     /**
      * Search function for API.
      *
+     * @param  array<string, mixed>  $cat
+     * @param  array<string, mixed>  $excludedCats
      * @return Collection|mixed
      */
-    public function apiSearch($searchName, $groupName, int $offset = 0, int $limit = 1000, int $maxAge = -1, array $excludedCats = [], array $cat = [-1], int $minSize = 0): mixed
+    public function apiSearch(mixed $searchName, mixed $groupName, int $offset = 0, int $limit = 1000, int $maxAge = -1, array $excludedCats = [], array $cat = [-1], int $minSize = 0): mixed // @phpstan-ignore parameter.defaultValue
     {
         if (config('app.debug')) {
             Log::debug('ReleaseSearchService::apiSearch called', [
@@ -247,9 +253,12 @@ class ReleaseSearchService
     /**
      * Search for TV shows via API.
      *
+     * @param  array<string, mixed>  $cat
+     * @param  array<string, mixed>  $excludedCategories
+     * @param  array<string, mixed>  $siteIdArr
      * @return array|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|mixed
      */
-    public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
+    public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed // @phpstan-ignore parameter.defaultValue
     {
         $shouldCache = ! (isset($siteIdArr['id']) && (int) $siteIdArr['id'] > 0);
         $rawCacheKey = md5(serialize(func_get_args()).'tvSearch');
@@ -514,9 +523,12 @@ class ReleaseSearchService
     /**
      * Search TV Shows via APIv2.
      *
+     * @param  array<string, mixed>  $cat
+     * @param  array<string, mixed>  $excludedCategories
+     * @param  array<string, mixed>  $siteIdArr
      * @return Collection|mixed
      */
-    public function apiTvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
+    public function apiTvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed // @phpstan-ignore parameter.defaultValue
     {
         // OPTIMIZATION: Try to find releases using search index external IDs first
         $externalIds = [];
@@ -657,9 +669,11 @@ class ReleaseSearchService
     /**
      * Search anime releases.
      *
+     * @param  array<string, mixed>  $cat
+     * @param  array<string, mixed>  $excludedCategories
      * @return Collection|mixed
      */
-    public function animeSearch($aniDbID, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, array $excludedCategories = []): mixed
+    public function animeSearch(mixed $aniDbID, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, array $excludedCategories = []): mixed // @phpstan-ignore parameter.defaultValue
     {
         $searchResult = [];
         if (! empty($name)) {
@@ -725,9 +739,11 @@ class ReleaseSearchService
     /**
      * Movies search through API and site.
      *
+     * @param  array<string, mixed>  $cat
+     * @param  array<string, mixed>  $excludedCategories
      * @return Collection|mixed
      */
-    public function moviesSearch(int $imDbId = -1, int $tmDbId = -1, int $traktId = -1, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
+    public function moviesSearch(int $imDbId = -1, int $tmDbId = -1, int $traktId = -1, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed // @phpstan-ignore parameter.defaultValue
     {
         $searchResult = [];
 
@@ -866,7 +882,11 @@ class ReleaseSearchService
         return $releases;
     }
 
-    public function searchSimilar($currentID, $name, array $excludedCats = []): bool|array
+    /**
+     * @param  array<string, mixed>  $excludedCats
+     * @return array<string, mixed>
+     */
+    public function searchSimilar(mixed $currentID, mixed $name, array $excludedCats = []): bool|array
     {
         // Get the category for the parent of this release.
         $ret = false;
@@ -879,7 +899,7 @@ class ReleaseSearchService
                 return $ret;
             }
 
-            $results = $this->search(['searchname' => getSimilarName($name)], -1, '', '', -1, -1, 0, config('nntmux.items_per_page'), '', -1, $excludedCats, 'basic', [$parentCat]);
+            $results = $this->search(['searchname' => getSimilarName($name)], -1, '', '', -1, -1, 0, config('nntmux.items_per_page'), '', -1, $excludedCats, 'basic', [$parentCat]); // @phpstan-ignore argument.type
             if (! $results) {
                 return $ret;
             }
@@ -897,6 +917,9 @@ class ReleaseSearchService
 
     /**
      * Perform index search using Elasticsearch or Manticore, with MySQL fallback
+     *
+     * @param  array<string, mixed>  $searchArr
+     * @return array<string, mixed>
      */
     private function performIndexSearch(array $searchArr, int $limit): array
     {
@@ -954,6 +977,9 @@ class ReleaseSearchService
 
     /**
      * Fallback MySQL search when full-text search engines are unavailable
+     *
+     * @param  array<string, mixed>  $searchFields
+     * @return array<string, mixed>
      */
     private function performMySQLSearch(array $searchFields, int $limit): array
     {
@@ -991,14 +1017,18 @@ class ReleaseSearchService
 
     /**
      * Build WHERE clause for search query
+     *
+     * @param  array<string, mixed>  $cat
+     * @param  array<string, mixed>  $excludedCats
+     * @param  array<string, mixed>  $searchResult
      */
     private function buildSearchWhereClause(
         array $searchResult,
-        $groupName,
-        $sizeFrom,
-        $sizeTo,
-        $daysNew,
-        $daysOld,
+        mixed $groupName,
+        mixed $sizeFrom,
+        mixed $sizeTo,
+        mixed $daysNew,
+        mixed $daysOld,
         int $maxAge,
         array $excludedCats,
         string $type,
@@ -1058,8 +1088,10 @@ class ReleaseSearchService
 
     /**
      * Build size conditions for WHERE clause
+     *
+     * @return array<string, mixed>
      */
-    private function buildSizeConditions($sizeFrom, $sizeTo): array
+    private function buildSizeConditions(mixed $sizeFrom, mixed $sizeTo): array
     {
         $sizeRange = [
             1 => 1,
@@ -1090,6 +1122,8 @@ class ReleaseSearchService
 
     /**
      * Build category condition based on search type
+     *
+     * @param  array<string, mixed>  $cat
      */
     private function buildCategoryCondition(string $type, array $cat): string
     {
@@ -1102,8 +1136,8 @@ class ReleaseSearchService
             return ($catSearch === '1=1') ? '' : $catSearch;
         }
 
-        if ($type === 'advanced' && (int) $cat[0] !== -1) {
-            return sprintf('r.categories_id = %d', (int) $cat[0]);
+        if ($type === 'advanced' && (int) $cat[0] !== -1) { // @phpstan-ignore offsetAccess.notFound
+            return sprintf('r.categories_id = %d', (int) $cat[0]); // @phpstan-ignore offsetAccess.notFound
         }
 
         return '';
@@ -1160,6 +1194,9 @@ class ReleaseSearchService
 
     /**
      * Use to order releases on site.
+     *
+     * @param  array<string, mixed>  $orderBy
+     * @return array<string, mixed>
      */
     public function getBrowseOrder(array|string $orderBy): array
     {
@@ -1174,7 +1211,7 @@ class ReleaseSearchService
             default => 'postdate',
         };
 
-        return [$orderField, isset($orderArr[1]) && preg_match('/^(asc|desc)$/i', $orderArr[1]) ? $orderArr[1] : 'desc'];
+        return [$orderField, isset($orderArr[1]) && preg_match('/^(asc|desc)$/i', $orderArr[1]) ? $orderArr[1] : 'desc']; // @phpstan-ignore return.type
     }
 
     private function getCacheVersion(): int

@@ -219,6 +219,7 @@ class ApiController extends BasePageController
                     'trakt' => $request->input('traktid') ?? '0',
                     'tvrage' => $request->input('rid') ?? '0',
                     'tvmaze' => $request->input('tvmazeid') ?? '0',
+                    /** @phpstan-ignore argument.templateType */
                     'imdb' => Str::replace('tt', '', $request->input('imdbid')) ?? '0',
                     'tmdb' => $request->input('tmdbid') ?? '0',
                 ];
@@ -393,11 +394,12 @@ class ApiController extends BasePageController
     }
 
     /**
+     * @param  array<string, mixed>  $params
      * @return Response|void
      *
      * @throws \Exception
      */
-    public function output($data, array $params, bool $xml, int $offset, string $type = '')
+    public function output(mixed $data, array $params, bool $xml, int $offset, string $type = '')
     {
         $this->type = $type;
         $options = [
@@ -430,6 +432,8 @@ class ApiController extends BasePageController
     /**
      * Collect and return various capability information for usage in API.
      *
+     *
+     * @return array<string, mixed>
      *
      * @throws \Exception
      */
@@ -487,6 +491,8 @@ class ApiController extends BasePageController
 
     /**
      * Verify cat parameter.
+     *
+     * @return array<string, mixed>
      */
     public function categoryID(Request $request): array
     {
@@ -506,6 +512,8 @@ class ApiController extends BasePageController
     /**
      * Verify groupName parameter.
      *
+     *
+     * @return list<int|string>
      *
      * @throws \Exception
      */
@@ -560,7 +568,7 @@ class ApiController extends BasePageController
         }
     }
 
-    public function addCoverURL(&$releases, callable $getCoverURL): void
+    public function addCoverURL(mixed &$releases, callable $getCoverURL): void
     {
         if ($releases && \count($releases)) {
             foreach ($releases as $key => $release) {

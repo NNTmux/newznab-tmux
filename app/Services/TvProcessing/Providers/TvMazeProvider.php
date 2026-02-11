@@ -39,7 +39,7 @@ class TvMazeProvider extends AbstractTvProvider
     /**
      * Fetch banner from site.
      */
-    public function getBanner($videoID, $siteId): bool
+    public function getBanner(mixed $videoID, mixed $siteId): bool
     {
         return false;
     }
@@ -48,7 +48,7 @@ class TvMazeProvider extends AbstractTvProvider
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
      */
-    public function processSite($groupID, $guidChar, $process, bool $local = false): void
+    public function processSite(mixed $groupID, mixed $guidChar, mixed $process, bool $local = false): void
     {
         $res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TVMAZE);
 
@@ -250,9 +250,9 @@ class TvMazeProvider extends AbstractTvProvider
      * Calls the API to lookup the TvMaze info for a given TVDB or TVRage ID
      * Returns a formatted array of show data or false if no match.
      *
-     * @return array|false
+     * @return array<string, mixed>|false
      */
-    protected function getShowInfoBySiteID($site, $siteId)
+    protected function getShowInfoBySiteID(mixed $site, mixed $siteId)
     {
         $return = $response = false;
 
@@ -271,6 +271,8 @@ class TvMazeProvider extends AbstractTvProvider
     /**
      * Calls the API to perform initial show name match to TVDB title
      * Returns a formatted array of show data or false if no match.
+     *
+     * @return array<string, mixed>
      */
     public function getShowInfo(string $name): array|bool
     {
@@ -305,6 +307,9 @@ class TvMazeProvider extends AbstractTvProvider
 
     /**
      * Attempts to find the best matching show by title or aliases.
+     *
+     * @param  array<string, mixed>  $shows
+     * @return array<string, mixed>
      */
     private function matchShowInfo(array $shows, string $cleanName): false|array
     {
@@ -384,6 +389,9 @@ class TvMazeProvider extends AbstractTvProvider
         return $hasCover;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode, string $airDate = '', int $videoId = 0): array|bool
     {
         $return = $response = false;
@@ -424,8 +432,10 @@ class TvMazeProvider extends AbstractTvProvider
     /**
      * Assigns API show response values to a formatted array for insertion
      * Returns the formatted array.
+     *
+     * @return array<string, mixed>
      */
-    public function formatShowInfo($show): array
+    public function formatShowInfo(mixed $show): array
     {
         $this->posterUrl = (string) ($show->mediumImage ?? '');
 
@@ -465,7 +475,7 @@ class TvMazeProvider extends AbstractTvProvider
      *
      * @param  int  $tvdbId  TVDB show ID
      * @param  int|string  $imdbId  IMDB ID (numeric, without 'tt' prefix)
-     * @return array ['tmdb' => int, 'trakt' => int]
+     * @return array<string, mixed> ['tmdb' => int, 'trakt' => int]
      */
     protected function lookupExternalIds(int $tvdbId, int|string $imdbId): array
     {
@@ -529,8 +539,10 @@ class TvMazeProvider extends AbstractTvProvider
     /**
      * Assigns API episode response values to a formatted array for insertion
      * Returns the formatted array.
+     *
+     * @return array<string, mixed>
      */
-    public function formatEpisodeInfo($episode): array
+    public function formatEpisodeInfo(mixed $episode): array
     {
         return [
             'title' => (string) $episode->name,

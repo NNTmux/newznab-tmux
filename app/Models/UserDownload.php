@@ -43,11 +43,17 @@ class UserDownload extends Model
      */
     protected $guarded = [];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'users_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Release, $this>
+     */
     public function release(): BelongsTo
     {
         return $this->belongsTo(Release::class, 'releases_id');
@@ -71,7 +77,7 @@ class UserDownload extends Model
     /**
      * Get hourly download counts for the last 24 hours.
      *
-     * @return array Array of hourly counts indexed by hour
+     * @return array<string, mixed> Array of hourly counts indexed by hour
      *
      * @throws \Exception
      */
@@ -104,7 +110,7 @@ class UserDownload extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Collection<int, self>
      */
-    public static function getDownloadRequestsForUser($userID)
+    public static function getDownloadRequestsForUser(mixed $userID)
     {
         return self::whereUsersId($userID)->with('release')->orderByDesc('timestamp')->get();
     }
@@ -115,7 +121,7 @@ class UserDownload extends Model
      *
      * @return int|\Illuminate\Database\Eloquent\Builder
      */
-    public static function addDownloadRequest($userID, $releaseID)
+    public static function addDownloadRequest(mixed $userID, mixed $releaseID) // @phpstan-ignore missingType.generics
     {
         return self::query()
             ->insertGetId(
@@ -140,7 +146,7 @@ class UserDownload extends Model
     /**
      * @throws \Exception
      */
-    public static function delDownloadRequests($userID): void
+    public static function delDownloadRequests(mixed $userID): void
     {
         self::whereUsersId($userID)->delete();
     }

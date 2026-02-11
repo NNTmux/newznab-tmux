@@ -304,6 +304,8 @@ class UpdateNNTmux extends Command
 
     /**
      * Parse environment file into key-value pairs
+     *
+     * @return array<string, mixed>
      */
     private function parseEnvFile(string $path): array
     {
@@ -329,6 +331,8 @@ class UpdateNNTmux extends Command
 
     /**
      * Add missing environment variables to .env file
+     *
+     * @param  array<string, mixed>  $missingKeys
      */
     private function addMissingEnvVars(string $envPath, array $missingKeys): void
     {

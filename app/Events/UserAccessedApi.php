@@ -20,7 +20,7 @@ class UserAccessedApi
     /**
      * Create a new event instance.
      */
-    public function __construct($user, ?string $ip = null)
+    public function __construct(mixed $user, ?string $ip = null)
     {
         $this->user = $user;
         $this->ip = $ip;

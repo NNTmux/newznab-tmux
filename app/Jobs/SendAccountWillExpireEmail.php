@@ -14,16 +14,14 @@ class SendAccountWillExpireEmail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $days;
+    private int $days;
 
-    private $user;
+    private \App\Models\User $user;
 
     /**
      * Create a new job instance.
-     *
-     * @return void
      */
-    public function __construct($user, $days)
+    public function __construct(\App\Models\User $user, int $days)
     {
         $this->user = $user;
         $this->days = $days;

@@ -22,7 +22,7 @@ class TmdbProvider extends AbstractTvProvider
     /**
      * Fetch banner from site.
      */
-    public function getBanner($videoId, $siteId): bool
+    public function getBanner(mixed $videoId, mixed $siteId): bool
     {
         return false;
     }
@@ -31,7 +31,7 @@ class TmdbProvider extends AbstractTvProvider
      * Main processing director function for TMDB
      * Calls work query function and initiates processing.
      */
-    public function processSite($groupID, $guidChar, $process, bool $local = false): void
+    public function processSite(mixed $groupID, mixed $guidChar, mixed $process, bool $local = false): void
     {
         $res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TMDB);
 
@@ -250,7 +250,7 @@ class TmdbProvider extends AbstractTvProvider
      * Calls the API to perform initial show name match to TMDB title
      * Returns a formatted array of show data or false if no match.
      *
-     * @return array|false
+     * @return array<string, mixed>|false
      */
     public function getShowInfo(string $name): bool|array
     {
@@ -274,7 +274,8 @@ class TmdbProvider extends AbstractTvProvider
     }
 
     /**
-     * @return array|false
+     * @param  array<string, mixed>  $shows
+     * @return array<string, mixed>|false
      */
     private function matchShowInfo(array $shows, string $cleanName): bool|array
     {
@@ -332,7 +333,7 @@ class TmdbProvider extends AbstractTvProvider
 
             // Use available network info if present
             $networks = TmdbClient::getArray($highest, 'networks');
-            $highest['network'] = ! empty($networks[0]['name']) ? $networks[0]['name'] : '';
+            $highest['network'] = ! empty($networks[0]['name']) ? $networks[0]['name'] : ''; // @phpstan-ignore offsetAccess.notFound
 
             $highest['external_ids'] = $showExternalIds;
 
@@ -370,7 +371,7 @@ class TmdbProvider extends AbstractTvProvider
      * Get all external IDs for a video from the database.
      *
      * @param  int  $videoId  The local video ID
-     * @return array Array of external IDs: ['tmdb' => X, 'tvdb' => Y, 'imdb' => Z]
+     * @return array<string, mixed> Array of external IDs: ['tmdb' => X, 'tvdb' => Y, 'imdb' => Z]
      */
     protected function getAllSiteIdsFromVideoID(int $videoId): array
     {
@@ -393,7 +394,7 @@ class TmdbProvider extends AbstractTvProvider
      * Gets the specific episode info for the parsed release after match
      * Returns a formatted array of episode data or false if no match.
      *
-     * @return array|false
+     * @return array<string, mixed>|false
      */
     public function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode, string $airdate = '', int $videoId = 0): bool|array
     {
@@ -475,8 +476,10 @@ class TmdbProvider extends AbstractTvProvider
     /**
      * Assigns API show response values to a formatted array for insertion
      * Returns the formatted array.
+     *
+     * @return array<string, mixed>
      */
-    public function formatShowInfo($show): array
+    public function formatShowInfo(mixed $show): array
     {
         if (! is_array($show)) {
             return [];
@@ -511,7 +514,7 @@ class TmdbProvider extends AbstractTvProvider
             'summary' => TmdbClient::getString($show, 'overview'),
             'started' => TmdbClient::getString($show, 'first_air_date'),
             'publisher' => TmdbClient::getString($show, 'network'),
-            'country' => ! empty($originCountry[0]) ? $originCountry[0] : '',
+            'country' => ! empty($originCountry[0]) ? $originCountry[0] : '', // @phpstan-ignore offsetAccess.notFound
             'source' => parent::SOURCE_TMDB,
             'imdb' => $imdbId,
             'tvdb' => TmdbClient::getInt($externalIds, 'tvdb_id'),
@@ -575,8 +578,10 @@ class TmdbProvider extends AbstractTvProvider
     /**
      * Assigns API episode response values to a formatted array for insertion
      * Returns the formatted array.
+     *
+     * @return array<string, mixed>
      */
-    public function formatEpisodeInfo($episode): array
+    public function formatEpisodeInfo(mixed $episode): array
     {
         if (! is_array($episode)) {
             return [];

@@ -13,7 +13,7 @@ class AdminMusicController extends BasePageController
     /**
      * Display a listing of music
      */
-    public function index(Request $request)
+    public function index(Request $request): mixed
     {
         $meta_title = $title = 'Music List';
 
@@ -34,7 +34,7 @@ class AdminMusicController extends BasePageController
     /**
      * Show the form for editing music
      */
-    public function edit(Request $request)
+    public function edit(Request $request): mixed
     {
         $music = new MusicService;
         $gen = new GenreService;

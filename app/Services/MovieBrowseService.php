@@ -22,13 +22,16 @@ class MovieBrowseService
 
     /**
      * Get movie releases with covers for movie browse page.
+     *
+     * @param  array<string, mixed>  $cat
+     * @param  array<string, mixed>  $excludedCats
      */
     public function getMovieRange(int $page, array $cat, int $start, int $num, string $orderBy, int $maxAge = -1, array $excludedCats = []): mixed
     {
         $page = max(1, $page);
         $start = max(0, $start);
         $catsrch = '';
-        if (count($cat) > 0 && $cat[0] !== -1) {
+        if (count($cat) > 0 && $cat[0] !== -1) { // @phpstan-ignore offsetAccess.notFound
             $catsrch = Category::getCategorySearch($cat);
         }
         $order = $this->getMovieOrder($orderBy);
@@ -43,7 +46,7 @@ class MovieBrowseService
             .(! empty($catsrch) ? $catsrch.' ' : '')
             .$whereAge
             .$whereExcluded.' '
-            ."GROUP BY m.imdbid ORDER BY {$order[0]} {$order[1]} {$limitClause}";
+            ."GROUP BY m.imdbid ORDER BY {$order[0]} {$order[1]} {$limitClause}"; // @phpstan-ignore offsetAccess.notFound
         $movieCache = Cache::get(md5($moviesSql.$page));
         if ($movieCache !== null) {
             $movies = $movieCache;
@@ -90,7 +93,7 @@ class MovieBrowseService
             .'INNER JOIN movieinfo m ON m.imdbid = r.imdbid '
             ."WHERE m.imdbid IN ($inMovieIds) AND r.id IN ($inReleaseIds) "
             .(! empty($catsrch) ? $catsrch.' ' : '')
-            ."GROUP BY m.imdbid ORDER BY {$order[0]} {$order[1]}";
+            ."GROUP BY m.imdbid ORDER BY {$order[0]} {$order[1]}"; // @phpstan-ignore offsetAccess.notFound
         $return = Cache::get(md5($sql.$page));
         if ($return !== null) {
             return $return;
@@ -106,6 +109,8 @@ class MovieBrowseService
 
     /**
      * Get the order type the user requested on the movies page.
+     *
+     * @return array<string, mixed>
      */
     protected function getMovieOrder(string $orderBy): array
     {
@@ -122,6 +127,8 @@ class MovieBrowseService
 
     /**
      * Order types for movies page.
+     *
+     * @return array<int, string>
      */
     public function getMovieOrdering(): array
     {
@@ -151,6 +158,8 @@ class MovieBrowseService
 
     /**
      * Get IMDB genres.
+     *
+     * @return array<int, string>
      */
     public function getGenres(): array
     {

@@ -12,11 +12,11 @@ use Illuminate\Support\Facades\Process;
  */
 class TmuxOutput extends Tmux
 {
-    protected $_colourMasks;
+    protected mixed $_colourMasks;
 
-    private $runVar;
+    private mixed $runVar;
 
-    private $tmpMasks;
+    private mixed $tmpMasks;
 
     /**
      * TmuxOutput constructor.
@@ -30,7 +30,7 @@ class TmuxOutput extends Tmux
         $this->_setColourMasks();
     }
 
-    public function updateMonitorPane(&$runVar): void
+    public function updateMonitorPane(mixed &$runVar): void
     {
         $this->runVar = $runVar;
         $this->tmpMasks = $this->_getFormatMasks(config('nntmux_nntp.compressed_headers'));
@@ -90,7 +90,10 @@ class TmuxOutput extends Tmux
         return $buffer;
     }
 
-    protected function _getFormatMasks($compressed): array
+    /**
+     * @return array<int, mixed>
+     */
+    protected function _getFormatMasks(mixed $compressed): array
     {
         $index = ($compressed === true ? '2.1' : '2.0');
 

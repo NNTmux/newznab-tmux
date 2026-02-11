@@ -13,8 +13,14 @@ class TvProcessingPassable
 
     public bool $debug;
 
+    /**
+     * @var array<string, mixed>
+     */
     public array $providerResults = [];
 
+    /**
+     * @var array<string, mixed>
+     */
     public ?array $parsedInfo = null;
 
     public function __construct(TvReleaseContext $context, bool $debug = false)
@@ -54,6 +60,8 @@ class TvProcessingPassable
 
     /**
      * Set the parsed release info.
+     *
+     * @param  array<string, mixed>  $info
      */
     public function setParsedInfo(?array $info): void
     {
@@ -62,6 +70,8 @@ class TvProcessingPassable
 
     /**
      * Get the parsed release info.
+     *
+     * @return array<string, mixed>
      */
     public function getParsedInfo(): ?array
     {
@@ -80,6 +90,8 @@ class TvProcessingPassable
 
     /**
      * Build the final result array.
+     *
+     * @return array<string, mixed>
      */
     public function toArray(): array
     {

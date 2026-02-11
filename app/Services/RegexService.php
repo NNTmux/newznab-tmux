@@ -31,6 +31,8 @@ class RegexService
 
     /**
      * Cache of regex and their TTL.
+     *
+     * @var array<string, mixed>
      */
     protected array $_regexCache = [];
 
@@ -51,6 +53,8 @@ class RegexService
 
     /**
      * Add a new regex.
+     *
+     * @param  array<string, mixed>  $data
      */
     public function addRegex(array $data): bool
     {
@@ -71,6 +75,8 @@ class RegexService
 
     /**
      * Update a regex with new info.
+     *
+     * @param  array<string, mixed>  $data
      */
     public function updateRegex(array $data): bool
     {
@@ -93,6 +99,8 @@ class RegexService
 
     /**
      * Get a single regex using its id.
+     *
+     * @return array<string, mixed>
      */
     public function getRegexByID(int $id): array
     {
@@ -158,6 +166,8 @@ class RegexService
      *
      * Requires table per group to be on.
      *
+     * @return array<string, mixed>
+     *
      * @throws \Exception
      */
     public function testCollectionRegex(string $groupName, string $regex, int $limit): array
@@ -220,9 +230,11 @@ class RegexService
     /**
      * Test release naming regex against releases.
      *
+     * @return array<string, mixed>
+     *
      * @throws \Exception
      */
-    public function testReleaseNamingRegex($groupName, $regex, $displayLimit, $queryLimit): array
+    public function testReleaseNamingRegex(mixed $groupName, mixed $regex, mixed $displayLimit, mixed $queryLimit): array
     {
         $groupID = UsenetGroup::getIDByName($groupName);
 

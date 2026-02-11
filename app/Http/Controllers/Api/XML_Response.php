@@ -76,6 +76,8 @@ class XML_Response
 
     /**
      * XMLReturn constructor.
+     *
+     * @param  array<string, mixed>  $options
      */
     public function __construct(array $options = [])
     {
@@ -203,7 +205,7 @@ class XML_Response
     /**
      * Starts a new element, loops through the attribute data and ends the element.
      *
-     * @param  array  $element  An array with the name of the element and the attribute data
+     * @param  array<string, mixed>  $element  An array with the name of the element and the attribute data
      */
     protected function addNode(array $element): void
     {
@@ -217,7 +219,7 @@ class XML_Response
     /**
      * Starts a new element, loops through the attribute data and ends the element.
      *
-     * @param  array  $element  An array with the name of the element and the attribute data
+     * @param  array<string, mixed>  $element  An array with the name of the element and the attribute data
      */
     protected function addNodes(array $element): void
     {
@@ -593,7 +595,7 @@ class XML_Response
     {
         $movieCol = ['rating', 'plot', 'year', 'genre', 'director', 'actors'];
 
-        $cData = $this->buildCdata($movieCol);
+        $cData = $this->buildCdata($movieCol); // @phpstan-ignore argument.type
 
         $this->cdata .=
             "\t<li>Imdb Info:
@@ -614,7 +616,7 @@ class XML_Response
 
         $musicCol = ['mu_artist', 'mu_genre', 'mu_publisher', 'mu_releasedate', 'mu_review'];
 
-        $cData = $this->buildCdata($musicCol);
+        $cData = $this->buildCdata($musicCol); // @phpstan-ignore argument.type
 
         if ($this->release->mu_url !== '') {
             $cDataUrl = "<li>Amazon: <a href=\"{$this->release->mu_url}\">{$this->release->mu_title}</a></li>";
@@ -651,7 +653,7 @@ class XML_Response
     {
         $gamesCol = ['co_genre', 'co_publisher', 'year', 'co_review'];
 
-        $cData = $this->buildCdata($gamesCol);
+        $cData = $this->buildCdata($gamesCol); // @phpstan-ignore argument.type
 
         $this->cdata .= "
 		<li>Console Info:
@@ -665,7 +667,7 @@ class XML_Response
     /**
      * Accepts an array of values to loop through to build cData from the release info.
      *
-     * @param  array  $columns  The columns in the release we need to insert
+     * @param  array<string, mixed>  $columns  The columns in the release we need to insert
      * @return string The HTML format cData
      */
     protected function buildCdata(array $columns): string

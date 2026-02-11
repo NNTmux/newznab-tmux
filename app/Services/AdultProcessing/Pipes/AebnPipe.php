@@ -25,10 +25,16 @@ class AebnPipe extends AbstractAdultProviderPipe
 
     protected string $title = '';
 
+    /**
+     * @var array<string, mixed>
+     */
     protected array $res = [];
 
     protected string $response = '';
 
+    /**
+     * @var array<string, mixed>
+     */
     protected ?array $jsonLdData = null;
 
     public function getName(): string
@@ -108,6 +114,9 @@ class AebnPipe extends AbstractAdultProviderPipe
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function search(string $movie): array|false
     {
         if (empty($movie)) {
@@ -187,6 +196,9 @@ class AebnPipe extends AbstractAdultProviderPipe
         return false;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function getMovieInfo(): array|false
     {
         $results = [];
@@ -243,6 +255,8 @@ class AebnPipe extends AbstractAdultProviderPipe
 
     /**
      * Extract data from JSON-LD structured data.
+     *
+     * @return array<string, mixed>
      */
     protected function extractFromJsonLd(): array
     {
@@ -317,6 +331,9 @@ class AebnPipe extends AbstractAdultProviderPipe
         return $results;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractTrailers(): array
     {
         $res = [];
@@ -341,6 +358,9 @@ class AebnPipe extends AbstractAdultProviderPipe
         return $res;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractCovers(): array
     {
         $res = [];
@@ -379,6 +399,9 @@ class AebnPipe extends AbstractAdultProviderPipe
         return $res;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractGenres(): array
     {
         $res = [];
@@ -415,6 +438,9 @@ class AebnPipe extends AbstractAdultProviderPipe
         return $res;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractCast(): array
     {
         $res = [];
@@ -464,6 +490,9 @@ class AebnPipe extends AbstractAdultProviderPipe
         return $res;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractProductInfo(bool $extras = false): array
     {
         $res = [];
@@ -509,6 +538,9 @@ class AebnPipe extends AbstractAdultProviderPipe
         return $res;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractSynopsis(): array
     {
         $res = [];

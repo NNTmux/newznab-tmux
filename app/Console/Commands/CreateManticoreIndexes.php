@@ -154,6 +154,8 @@ class CreateManticoreIndexes extends Command
 
     /**
      * Create a single index with error handling.
+     *
+     * @param  array<string, mixed>  $schema
      */
     protected function createIndex(string $indexName, array $schema, bool $dropExisting): bool
     {

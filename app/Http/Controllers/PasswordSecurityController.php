@@ -273,7 +273,7 @@ class PasswordSecurityController extends Controller
      * Display the 2FA verification form for a user who has already authenticated with username/password
      * but needs to enter their 2FA code.
      */
-    public function getVerify2fa(Request $request)
+    public function getVerify2fa(Request $request): mixed
     {
         // Check if user ID is stored in the session
         if (! $request->session()->has('2fa:user:id')) {

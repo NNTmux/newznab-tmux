@@ -81,6 +81,8 @@ class IRCClient
      * );.
      *
      * @note   Used with the processChannelMessages() function.
+     *
+     * @var array<string, mixed>
      */
     protected array $_channelData = [];
 
@@ -106,6 +108,8 @@ class IRCClient
 
     /**
      * List of channels and passwords to join.
+     *
+     * @var array<string, mixed>
      */
     protected array $_channels;
 
@@ -144,7 +148,7 @@ class IRCClient
      *
      * @param  int  $timeout  Seconds.
      */
-    public function setSocketTimeout(int $timeout)
+    public function setSocketTimeout(int $timeout): void
     {
         $this->_socket_timeout = $timeout;
     }
@@ -154,7 +158,7 @@ class IRCClient
      *
      * @param  int  $timeout  Seconds.
      */
-    public function setConnectionTimeout(int $timeout)
+    public function setConnectionTimeout(int $timeout): void
     {
         $this->_remote_connection_timeout = $timeout;
     }
@@ -162,7 +166,7 @@ class IRCClient
     /**
      * Amount of times to retry before giving up when connecting.
      */
-    public function setConnectionRetries(int $retries)
+    public function setConnectionRetries(int $retries): void
     {
         $this->_reconnectRetries = $retries;
     }
@@ -172,7 +176,7 @@ class IRCClient
      *
      * @param  int  $delay  Seconds.
      */
-    public function setReConnectDelay(int $delay)
+    public function setReConnectDelay(int $delay): void
     {
         $this->_reconnectDelay = $delay;
     }
@@ -368,8 +372,8 @@ class IRCClient
     /**
      * Join a channel or multiple channels.
      *
-     * @param  array  $channels  Array of channels with their passwords (null if the channel doesn't need a password).
-     *                           array( '#exampleChannel' => 'thePassword', '#exampleChan2' => null );
+     * @param  array<string, mixed>  $channels  Array of channels with their passwords (null if the channel doesn't need a password).
+     *                                          array( '#exampleChannel' => 'thePassword', '#exampleChan2' => null );
      */
     public function joinChannels(array $channels = []): bool
     {
@@ -394,7 +398,7 @@ class IRCClient
      * Implementation.
      * Extended classes will use this function to parse the messages in the channel using $this->_channelData.
      */
-    protected function processChannelMessages() {}
+    protected function processChannelMessages(): void {}
 
     /**
      * Join a channel.

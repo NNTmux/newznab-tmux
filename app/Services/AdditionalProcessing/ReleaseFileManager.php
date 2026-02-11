@@ -37,6 +37,8 @@ class ReleaseFileManager
     /**
      * Add file information to the database.
      *
+     * @param  array<string, mixed>  $file
+     *
      * @throws \Exception
      */
     public function addFileInfo(
@@ -448,6 +450,8 @@ class ReleaseFileManager
 
     /**
      * Handle release name extraction from RAR file content.
+     *
+     * @param  array<string, mixed>  $dataSummary
      */
     public function processReleaseNameFromRar(
         array $dataSummary,

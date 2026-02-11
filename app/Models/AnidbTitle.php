@@ -49,6 +49,9 @@ class AnidbTitle extends Model
      */
     protected $guarded = [];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AnidbInfo, $this>
+     */
     public function info(): HasMany
     {
         return $this->hasMany(AnidbInfo::class, 'anidbid');

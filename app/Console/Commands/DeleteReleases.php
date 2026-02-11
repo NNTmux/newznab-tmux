@@ -174,6 +174,8 @@ class DeleteReleases extends Command
 
     /**
      * Perform a dry run to show what releases would be deleted.
+     *
+     * @param  array<string, mixed>  $criteria
      */
     protected function performDryRun(array $criteria): int
     {
@@ -234,6 +236,8 @@ class DeleteReleases extends Command
 
     /**
      * Build the SQL query from criteria array.
+     *
+     * @param  array<string, mixed>  $criteria
      */
     protected function buildQueryFromCriteria(array $criteria): ?string
     {
@@ -396,6 +400,8 @@ class DeleteReleases extends Command
 
     /**
      * Build criteria array from simple command options.
+     *
+     * @return array<string, mixed>
      */
     protected function buildCriteriaFromOptions(): array
     {

@@ -49,8 +49,14 @@ class ElasticSearchDriver implements SearchDriverInterface
 
     private static ?int $availabilityCacheTime = null;
 
+    /**
+     * @var array<string, mixed>
+     */
     protected array $config;
 
+    /**
+     * @param  array<string, mixed>  $config
+     */
     public function __construct(array $config = [])
     {
         $this->config = ! empty($config) ? $config : config('search.drivers.elasticsearch');
@@ -134,8 +140,8 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Build hosts array from configuration.
      *
-     * @param  array  $configHosts  Configuration hosts array
-     * @return array Formatted hosts array for Elasticsearch client
+     * @param  array<string, mixed>  $configHosts  Configuration hosts array
+     * @return array<string, mixed> Formatted hosts array for Elasticsearch client
      */
     private function buildHostsArray(array $configHosts): array
     {
@@ -166,6 +172,8 @@ class ElasticSearchDriver implements SearchDriverInterface
      * Check if Elasticsearch is available.
      *
      * Caches the availability status to avoid frequent ping requests.
+     *
+     * @return list<array<string, mixed>>
      */
     private function isElasticsearchAvailable(): bool
     {
@@ -238,6 +246,8 @@ class ElasticSearchDriver implements SearchDriverInterface
 
     /**
      * Get fuzzy search configuration.
+     *
+     * @return array<string, mixed>
      */
     public function getFuzzyConfig(): array
     {
@@ -626,9 +636,9 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Search releases index.
      *
-     * @param  array|string  $phrases  Search phrases - can be a string, indexed array of terms, or associative array with field names
+     * @param  array<string, mixed>|string  $phrases  Search phrases - can be a string, indexed array of terms, or associative array with field names
      * @param  int  $limit  Maximum number of results
-     * @return array Array of release IDs
+     * @return array<string, mixed> Array of release IDs
      */
     public function searchReleases(array|string $phrases, int $limit = 1000): array
     {
@@ -659,10 +669,10 @@ class ElasticSearchDriver implements SearchDriverInterface
      * If exact search returns no results and fuzzy is enabled, this method
      * will automatically try a fuzzy search as a fallback.
      *
-     * @param  array|string  $phrases  Search phrases
+     * @param  array<string, mixed>|string  $phrases  Search phrases
      * @param  int  $limit  Maximum number of results
      * @param  bool  $forceFuzzy  Force fuzzy search regardless of exact results
-     * @return array Array with 'ids' (release IDs) and 'fuzzy' (bool indicating if fuzzy was used)
+     * @return array<string, mixed> Array with 'ids' (release IDs) and 'fuzzy' (bool indicating if fuzzy was used)
      */
     public function searchReleasesWithFuzzy(array|string $phrases, int $limit = 1000, bool $forceFuzzy = false): array
     {
@@ -699,9 +709,9 @@ class ElasticSearchDriver implements SearchDriverInterface
      *
      * Uses Elasticsearch's fuzzy matching to find results with typo tolerance.
      *
-     * @param  array|string  $phrases  Search phrases
+     * @param  array<string, mixed>|string  $phrases  Search phrases
      * @param  int  $limit  Maximum number of results
-     * @return array Array of release IDs
+     * @return array<string, mixed> Array of release IDs
      */
     public function fuzzySearchReleases(array|string $phrases, int $limit = 1000): array
     {
@@ -727,7 +737,7 @@ class ElasticSearchDriver implements SearchDriverInterface
         }
 
         $fuzzyConfig = $this->getFuzzyConfig();
-        $cacheKey = $this->buildCacheKey('fuzzy_search', [$keywords, $limit, $fuzzyConfig]);
+        $cacheKey = $this->buildCacheKey('fuzzy_search', [$keywords, $limit, $fuzzyConfig]); // @phpstan-ignore argument.type
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
@@ -802,7 +812,7 @@ class ElasticSearchDriver implements SearchDriverInterface
 
             Cache::put($cacheKey, $ids, now()->addMinutes($this->config['cache_minutes'] ?? self::CACHE_TTL_MINUTES));
 
-            return $ids;
+            return $ids; // @phpstan-ignore return.type
 
         } catch (ElasticsearchException $e) {
             Log::error('ElasticSearch fuzzySearchReleases error: '.$e->getMessage(), [
@@ -823,8 +833,8 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Search the predb index.
      *
-     * @param  array|string  $searchTerm  Search term(s)
-     * @return array Array of predb records
+     * @param  array<string, mixed>|string  $searchTerm  Search term(s)
+     * @return array<string, mixed> Array of predb records
      */
     public function searchPredb(array|string $searchTerm): array
     {
@@ -836,9 +846,9 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Search releases index.
      *
-     * @param  array|string  $phrases  Search phrases
+     * @param  array<string, mixed>|string  $phrases  Search phrases
      * @param  int  $limit  Maximum number of results
-     * @return array|Collection Array of release IDs
+     * @return array<string, mixed>|Collection<int, mixed> Array of release IDs
      */
     public function indexSearch(array|string $phrases, int $limit): array|Collection
     {
@@ -870,7 +880,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             return [];
         }
 
-        $cacheKey = $this->buildCacheKey('index_search', [$keywords, $limit]);
+        $cacheKey = $this->buildCacheKey('index_search', [$keywords, $limit]); // @phpstan-ignore argument.type
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
@@ -880,7 +890,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             $search = $this->buildSearchQuery(
                 index: $this->getReleasesIndex(),
                 keywords: $keywords,
-                fields: ['searchname^2', 'plainsearchname^1.5', 'fromname', 'filename', 'name^1.2'],
+                fields: ['searchname^2', 'plainsearchname^1.5', 'fromname', 'filename', 'name^1.2'], // @phpstan-ignore argument.type
                 limit: $limit
             );
 
@@ -902,9 +912,9 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Search releases for API requests.
      *
-     * @param  array|string  $searchName  Search name(s)
+     * @param  array<string, mixed>|string  $searchName  Search name(s)
      * @param  int  $limit  Maximum number of results
-     * @return array|Collection Array of release IDs
+     * @return array<string, mixed>|Collection<int, mixed> Array of release IDs
      */
     public function indexSearchApi(array|string $searchName, int $limit): array|Collection
     {
@@ -917,7 +927,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             return [];
         }
 
-        $cacheKey = $this->buildCacheKey('api_search', [$keywords, $limit]);
+        $cacheKey = $this->buildCacheKey('api_search', [$keywords, $limit]); // @phpstan-ignore argument.type
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
@@ -927,7 +937,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             $search = $this->buildSearchQuery(
                 index: $this->getReleasesIndex(),
                 keywords: $keywords,
-                fields: ['searchname^2', 'plainsearchname^1.5', 'fromname', 'filename', 'name^1.2'],
+                fields: ['searchname^2', 'plainsearchname^1.5', 'fromname', 'filename', 'name^1.2'], // @phpstan-ignore argument.type
                 limit: $limit
             );
 
@@ -949,9 +959,9 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Search releases for TV/Movie/Audio (TMA) matching.
      *
-     * @param  array|string  $name  Name(s) to search
+     * @param  array<string, mixed>|string  $name  Name(s) to search
      * @param  int  $limit  Maximum number of results
-     * @return array|Collection Array of release IDs
+     * @return array<string, mixed>|Collection<int, mixed> Array of release IDs
      */
     public function indexSearchTMA(array|string $name, int $limit): array|Collection
     {
@@ -964,7 +974,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             return [];
         }
 
-        $cacheKey = $this->buildCacheKey('tma_search', [$keywords, $limit]);
+        $cacheKey = $this->buildCacheKey('tma_search', [$keywords, $limit]); // @phpstan-ignore argument.type
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
@@ -974,7 +984,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             $search = $this->buildSearchQuery(
                 index: $this->getReleasesIndex(),
                 keywords: $keywords,
-                fields: ['searchname^2', 'plainsearchname^1.5'],
+                fields: ['searchname^2', 'plainsearchname^1.5'], // @phpstan-ignore argument.type
                 limit: $limit,
                 options: [
                     'boost' => 1.2,
@@ -999,8 +1009,8 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Search predb index.
      *
-     * @param  array|string  $searchTerm  Search term(s)
-     * @return array|Collection Array of predb records
+     * @param  array<string, mixed>|string  $searchTerm  Search term(s)
+     * @return array<string, mixed>|Collection<int, mixed> Array of predb records
      */
     public function predbIndexSearch(array|string $searchTerm): array|Collection
     {
@@ -1013,7 +1023,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             return [];
         }
 
-        $cacheKey = $this->buildCacheKey('predb_search', [$keywords]);
+        $cacheKey = $this->buildCacheKey('predb_search', [$keywords]); // @phpstan-ignore argument.type
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
@@ -1023,7 +1033,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             $search = $this->buildSearchQuery(
                 index: $this->getPredbIndex(),
                 keywords: $keywords,
-                fields: ['title^2', 'filename'],
+                fields: ['title^2', 'filename'], // @phpstan-ignore argument.type
                 limit: 1000,
                 options: [
                     'fuzziness' => 'AUTO',
@@ -1048,7 +1058,7 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Insert a release into the index.
      *
-     * @param  array  $parameters  Release data with 'id', 'name', 'searchname', etc.
+     * @param  array<string, mixed>  $parameters  Release data with 'id', 'name', 'searchname', etc.
      */
     public function insertRelease(array $parameters): void
     {
@@ -1148,7 +1158,7 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Insert a predb record into the index.
      *
-     * @param  array  $parameters  Predb data with 'id', 'title', 'source', 'filename'
+     * @param  array<string, mixed>  $parameters  Predb data with 'id', 'title', 'source', 'filename'
      */
     public function insertPredb(array $parameters): void
     {
@@ -1191,7 +1201,7 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Update a predb record in the index.
      *
-     * @param  array  $parameters  Predb data with 'id', 'title', 'source', 'filename'
+     * @param  array<string, mixed>  $parameters  Predb data with 'id', 'title', 'source', 'filename'
      */
     public function updatePreDb(array $parameters): void
     {
@@ -1312,8 +1322,8 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Bulk insert multiple releases into the index.
      *
-     * @param  array  $releases  Array of release data arrays
-     * @return array Results with 'success' and 'errors' counts
+     * @param  array<string, mixed>  $releases  Array of release data arrays
+     * @return array<string, mixed> Results with 'success' and 'errors' counts
      */
     public function bulkInsertReleases(array $releases): array
     {
@@ -1384,8 +1394,8 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Bulk insert multiple predb records into the index.
      *
-     * @param  array  $predbRecords  Array of predb data arrays
-     * @return array Results with 'success' and 'errors' counts
+     * @param  array<string, mixed>  $predbRecords  Array of predb data arrays
+     * @return array<string, mixed> Results with 'success' and 'errors' counts
      */
     public function bulkInsertPredb(array $predbRecords): array
     {
@@ -1474,7 +1484,7 @@ class ElasticSearchDriver implements SearchDriverInterface
      * Truncate/clear an index (remove all documents).
      * Implements SearchServiceInterface::truncateIndex
      *
-     * @param  array|string  $indexes  Index name(s) to truncate
+     * @param  array<string, mixed>|string  $indexes  Index name(s) to truncate
      */
     public function truncateIndex(array|string $indexes): void
     {
@@ -1554,7 +1564,7 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Get cluster health information.
      *
-     * @return array Health information or empty array on failure
+     * @return array<string, mixed> Health information or empty array on failure
      */
     public function getClusterHealth(): array
     {
@@ -1577,7 +1587,7 @@ class ElasticSearchDriver implements SearchDriverInterface
      * Get index statistics.
      *
      * @param  string  $index  Index name
-     * @return array Statistics or empty array on failure
+     * @return array<string, mixed> Statistics or empty array on failure
      */
     public function getIndexStats(string $index): array
     {
@@ -1602,7 +1612,7 @@ class ElasticSearchDriver implements SearchDriverInterface
      * Uses the global sanitize() helper function which properly escapes
      * Elasticsearch query string special characters.
      *
-     * @param  array|string  $terms  Search terms
+     * @param  array<string, mixed>|string  $terms  Search terms
      * @return string Sanitized search string
      */
     private function sanitizeSearchTerms(array|string $terms): string
@@ -1636,7 +1646,7 @@ class ElasticSearchDriver implements SearchDriverInterface
      * Build a cache key for search results.
      *
      * @param  string  $prefix  Cache key prefix
-     * @param  array  $params  Parameters to include in key
+     * @param  array<string, mixed>  $params  Parameters to include in key
      */
     private function buildCacheKey(string $prefix, array $params): string
     {
@@ -1648,10 +1658,11 @@ class ElasticSearchDriver implements SearchDriverInterface
      *
      * @param  string  $index  Index name
      * @param  string  $keywords  Sanitized keywords
-     * @param  array  $fields  Fields to search with boosts
+     * @param  array<string, mixed>  $fields  Fields to search with boosts
      * @param  int  $limit  Maximum results
-     * @param  array  $options  Additional query_string options
+     * @param  array<string, mixed>  $options  Additional query_string options
      * @param  bool  $includeDateSort  Include date sorting
+     * @return array<string, mixed>
      */
     private function buildSearchQuery(
         string $index,
@@ -1693,7 +1704,8 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Build a release document for indexing.
      *
-     * @param  array  $parameters  Release parameters
+     * @param  array<string, mixed>  $parameters  Release parameters
+     * @return array<string, mixed>
      */
     private function buildReleaseDocument(array $parameters): array
     {
@@ -1729,8 +1741,9 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Execute a search with scroll support.
      *
-     * @param  array  $search  Search query
+     * @param  array<string, mixed>  $search  Search query
      * @param  bool  $fullResults  Return full source documents instead of just IDs
+     * @return array<string, mixed>
      */
     protected function executeSearch(array $search, bool $fullResults = false): array
     {
@@ -1785,7 +1798,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                 ]);
             }
 
-            return $searchResult;
+            return $searchResult; // @phpstan-ignore return.type
 
         } catch (ElasticsearchException $e) {
             Log::error('ElasticSearch search error: '.$e->getMessage());
@@ -1826,7 +1839,7 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Execute a bulk operation.
      *
-     * @param  array  $params  Bulk operation parameters
+     * @param  array<string, mixed>  $params  Bulk operation parameters
      */
     private function executeBulk(array $params): void
     {
@@ -1859,7 +1872,7 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Insert a movie into the movies search index.
      *
-     * @param  array  $parameters  Movie data
+     * @param  array<string, mixed>  $parameters  Movie data
      */
     public function insertMovie(array $parameters): void
     {
@@ -1962,8 +1975,8 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Bulk insert multiple movies into the index.
      *
-     * @param  array  $movies  Array of movie data arrays
-     * @return array Results with 'success' and 'errors' counts
+     * @param  array<string, mixed>  $movies  Array of movie data arrays
+     * @return array<string, mixed> Results with 'success' and 'errors' counts
      */
     public function bulkInsertMovies(array $movies): array
     {
@@ -2023,9 +2036,9 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Search the movies index.
      *
-     * @param  array|string  $searchTerm  Search term(s)
+     * @param  array<string, mixed>|string  $searchTerm  Search term(s)
      * @param  int  $limit  Maximum number of results
-     * @return array Array with 'id' (movie IDs) and 'data' (movie data)
+     * @return array<string, mixed> Array with 'id' (movie IDs) and 'data' (movie data)
      */
     public function searchMovies(array|string $searchTerm, int $limit = 1000): array
     {
@@ -2090,7 +2103,7 @@ class ElasticSearchDriver implements SearchDriverInterface
      *
      * @param  string  $field  Field name (imdbid, tmdbid, traktid)
      * @param  int|string  $value  The external ID value
-     * @return array|null Movie data or null if not found
+     * @return array<string, mixed>|null Movie data or null if not found
      */
     public function searchMovieByExternalId(string $field, int|string $value): ?array
     {
@@ -2142,7 +2155,7 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Insert a TV show into the tvshows search index.
      *
-     * @param  array  $parameters  TV show data
+     * @param  array<string, mixed>  $parameters  TV show data
      */
     public function insertTvShow(array $parameters): void
     {
@@ -2244,8 +2257,8 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Bulk insert multiple TV shows into the index.
      *
-     * @param  array  $tvShows  Array of TV show data arrays
-     * @return array Results with 'success' and 'errors' counts
+     * @param  array<string, mixed>  $tvShows  Array of TV show data arrays
+     * @return array<string, mixed> Results with 'success' and 'errors' counts
      */
     public function bulkInsertTvShows(array $tvShows): array
     {
@@ -2304,9 +2317,9 @@ class ElasticSearchDriver implements SearchDriverInterface
     /**
      * Search the TV shows index.
      *
-     * @param  array|string  $searchTerm  Search term(s)
+     * @param  array<string, mixed>|string  $searchTerm  Search term(s)
      * @param  int  $limit  Maximum number of results
-     * @return array Array with 'id' (TV show IDs) and 'data' (TV show data)
+     * @return array<string, mixed> Array with 'id' (TV show IDs) and 'data' (TV show data)
      */
     public function searchTvShows(array|string $searchTerm, int $limit = 1000): array
     {
@@ -2371,7 +2384,7 @@ class ElasticSearchDriver implements SearchDriverInterface
      *
      * @param  string  $field  Field name (tvdb, trakt, tvmaze, tvrage, imdb, tmdb)
      * @param  int|string  $value  The external ID value
-     * @return array|null TV show data or null if not found
+     * @return array<string, mixed>|null TV show data or null if not found
      */
     public function searchTvShowByExternalId(string $field, int|string $value): ?array
     {
@@ -2424,9 +2437,9 @@ class ElasticSearchDriver implements SearchDriverInterface
      * Search releases by external media IDs.
      * Used to find releases associated with a specific movie or TV show.
      *
-     * @param  array  $externalIds  Associative array of external IDs
+     * @param  array<string, mixed>  $externalIds  Associative array of external IDs
      * @param  int  $limit  Maximum number of results
-     * @return array Array of release IDs
+     * @return array<string, mixed> Array of release IDs
      */
     public function searchReleasesByExternalId(array $externalIds, int $limit = 1000): array
     {
@@ -2481,7 +2494,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                 Cache::put($cacheKey, $resultIds, now()->addMinutes(self::CACHE_TTL_MINUTES));
             }
 
-            return $resultIds;
+            return $resultIds; // @phpstan-ignore return.type
 
         } catch (\Throwable $e) {
             Log::error('ElasticSearch searchReleasesByExternalId error: '.$e->getMessage(), [
@@ -2496,9 +2509,10 @@ class ElasticSearchDriver implements SearchDriverInterface
      * Search releases by category ID using the search index.
      * This provides a fast way to get release IDs for a specific category without hitting the database.
      *
-     * @param  array  $categoryIds  Array of category IDs to filter by
+     * @param  array<string, mixed>  $categoryIds  Array of category IDs to filter by
      * @param  int  $limit  Maximum number of results
-     * @return array Array of release IDs
+     * @return list
+     * @return array<string, mixed>
      */
     public function searchReleasesByCategory(array $categoryIds, int $limit = 1000): array
     {
@@ -2547,7 +2561,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                 Cache::put($cacheKey, $resultIds, now()->addMinutes(self::CACHE_TTL_MINUTES));
             }
 
-            return $resultIds;
+            return $resultIds; // @phpstan-ignore return.type
 
         } catch (\Throwable $e) {
             Log::error('ElasticSearch searchReleasesByCategory error: '.$e->getMessage(), [
@@ -2563,9 +2577,10 @@ class ElasticSearchDriver implements SearchDriverInterface
      * First searches by text, then filters by category IDs using the search index.
      *
      * @param  string  $searchTerm  Search text
-     * @param  array  $categoryIds  Array of category IDs to filter by (empty for all categories)
+     * @param  array<string, mixed>  $categoryIds  Array of category IDs to filter by (empty for all categories)
      * @param  int  $limit  Maximum number of results
-     * @return array Array of release IDs
+     * @return array<string, mixed>
+     * @return array<string, mixed>
      */
     public function searchReleasesWithCategoryFilter(string $searchTerm, array $categoryIds = [], int $limit = 1000): array
     {

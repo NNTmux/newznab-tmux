@@ -48,7 +48,7 @@ class DetailsController extends BasePageController
         $this->releaseExtraService = $releaseExtraService;
     }
 
-    public function show(Request $request, string $guid)
+    public function show(Request $request, string $guid): mixed
     {
         $data = Release::getByGuid($guid);
         $releaseRegex = '';

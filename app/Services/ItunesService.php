@@ -61,6 +61,8 @@ class ItunesService
 
     /**
      * Search for music albums.
+     *
+     * @return array<string, mixed>
      */
     public function searchAlbums(string $term): ?array
     {
@@ -69,6 +71,8 @@ class ItunesService
 
     /**
      * Search for music tracks.
+     *
+     * @return array<string, mixed>
      */
     public function searchTracks(string $term): ?array
     {
@@ -77,6 +81,8 @@ class ItunesService
 
     /**
      * Search for artists.
+     *
+     * @return array<string, mixed>
      */
     public function searchArtists(string $term): ?array
     {
@@ -85,6 +91,8 @@ class ItunesService
 
     /**
      * Search for ebooks.
+     *
+     * @return array<string, mixed>
      */
     public function searchEbooks(string $term): ?array
     {
@@ -93,6 +101,8 @@ class ItunesService
 
     /**
      * Search for audiobooks.
+     *
+     * @return array<string, mixed>
      */
     public function searchAudiobooks(string $term): ?array
     {
@@ -101,6 +111,8 @@ class ItunesService
 
     /**
      * Lookup by iTunes ID.
+     *
+     * @return array<string, mixed>
      */
     public function lookupById(int $id): ?array
     {
@@ -144,6 +156,8 @@ class ItunesService
 
     /**
      * Lookup artist by ID.
+     *
+     * @return array<string, mixed>
      */
     public function lookupArtist(int $artistId): ?array
     {
@@ -153,7 +167,7 @@ class ItunesService
     /**
      * Get the first album result for a search term.
      *
-     * @return array|null Normalized album data or null
+     * @return array<string, mixed>|null Normalized album data or null
      */
     public function findAlbum(string $term): ?array
     {
@@ -163,13 +177,13 @@ class ItunesService
             return null;
         }
 
-        return $this->normalizeAlbumResult($results[0]);
+        return $this->normalizeAlbumResult($results[0]); // @phpstan-ignore offsetAccess.notFound
     }
 
     /**
      * Get the first track result for a search term.
      *
-     * @return array|null Normalized track data or null
+     * @return array<string, mixed>|null Normalized track data or null
      */
     public function findTrack(string $term): ?array
     {
@@ -179,13 +193,13 @@ class ItunesService
             return null;
         }
 
-        return $this->normalizeTrackResult($results[0]);
+        return $this->normalizeTrackResult($results[0]); // @phpstan-ignore offsetAccess.notFound
     }
 
     /**
      * Get the first ebook result for a search term.
      *
-     * @return array|null Normalized ebook data or null
+     * @return array<string, mixed>|null Normalized ebook data or null
      */
     public function findEbook(string $term): ?array
     {
@@ -195,11 +209,13 @@ class ItunesService
             return null;
         }
 
-        return $this->normalizeEbookResult($results[0]);
+        return $this->normalizeEbookResult($results[0]); // @phpstan-ignore offsetAccess.notFound
     }
 
     /**
      * Perform a search request to iTunes API.
+     *
+     * @return array<string, mixed>
      */
     protected function search(string $term, string $entity, string $media): ?array
     {
@@ -252,6 +268,9 @@ class ItunesService
 
     /**
      * Normalize album result to consistent format.
+     *
+     * @param  array<string, mixed>  $result
+     * @return array<string, mixed>
      */
     protected function normalizeAlbumResult(array $result): array
     {
@@ -275,6 +294,9 @@ class ItunesService
 
     /**
      * Normalize track result to consistent format.
+     *
+     * @param  array<string, mixed>  $result
+     * @return array<string, mixed>
      */
     protected function normalizeTrackResult(array $result): array
     {
@@ -300,6 +322,9 @@ class ItunesService
 
     /**
      * Normalize ebook result to consistent format.
+     *
+     * @param  array<string, mixed>  $result
+     * @return array<string, mixed>
      */
     protected function normalizeEbookResult(array $result): array
     {

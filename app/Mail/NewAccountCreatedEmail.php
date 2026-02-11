@@ -30,7 +30,7 @@ class NewAccountCreatedEmail extends Mailable
      *
      * @return void
      */
-    public function __construct($user)
+    public function __construct(mixed $user)
     {
         $this->user = $user;
         $this->siteEmail = config('mail.from.address');

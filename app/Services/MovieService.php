@@ -138,6 +138,8 @@ class MovieService
 
     /**
      * Parse trakt info, insert into DB.
+     *
+     * @param  array<string, mixed>  $data
      */
     public function parseTraktTv(array &$data): mixed
     {
@@ -191,6 +193,8 @@ class MovieService
 
     /**
      * Get array of column keys, for inserting / updating.
+     *
+     * @return array<int, string>
      */
     public function getColumnKeys(): array
     {
@@ -202,6 +206,13 @@ class MovieService
 
     /**
      * Choose the first non-empty variable from up to five inputs.
+     *
+     * @param  array<string, mixed>  $variable1
+     * @param  array<string, mixed>  $variable2
+     * @param  array<string, mixed>  $variable3
+     * @param  array<string, mixed>  $variable4
+     * @param  array<string, mixed>  $variable5
+     * @return array<string, mixed>
      */
     protected function setVariables(string|array $variable1, string|array $variable2, string|array $variable3, string|array $variable4, string|array $variable5 = ''): array|string
     {
@@ -226,6 +237,8 @@ class MovieService
 
     /**
      * Update movie on movie-edit page.
+     *
+     * @param  array<string, mixed>  $values
      */
     public function update(array $values): bool
     {
@@ -475,6 +488,8 @@ class MovieService
 
     /**
      * Fetch FanArt.tv backdrop / cover / title.
+     *
+     * @return array<string, mixed>
      */
     protected function fetchFanartTVProperties(string $imdbId): false|array
     {
@@ -501,6 +516,8 @@ class MovieService
 
     /**
      * Fetch movie information from TMDB using an IMDB ID.
+     *
+     * @return array<string, mixed>
      */
     public function fetchTMDBProperties(string $imdbId, bool $text = false): array|false
     {
@@ -520,7 +537,7 @@ class MovieService
                 return false;
             }
 
-            $tmdbLookup = $tmdbClient->getMovie($lookupId, ['credits']);
+            $tmdbLookup = $tmdbClient->getMovie($lookupId, ['credits']); // @phpstan-ignore argument.type
 
             if ($tmdbLookup === null || empty($tmdbLookup)) {
                 Cache::put($cacheKey, false, $expiresAt);
@@ -643,6 +660,8 @@ class MovieService
 
     /**
      * Fetch movie information from IMDB.
+     *
+     * @return array<string, mixed>
      */
     public function fetchIMDBProperties(string $imdbId): array|false
     {
@@ -691,6 +710,8 @@ class MovieService
 
     /**
      * Fetch movie information from Trakt.tv using IMDB ID.
+     *
+     * @return array<string, mixed>
      *
      * @throws GuzzleException
      */
@@ -766,6 +787,8 @@ class MovieService
 
     /**
      * Fetch movie information from OMDB API using IMDB ID.
+     *
+     * @return array<string, mixed>
      */
     public function fetchOmdbAPIProperties(string $imdbId): array|false
     {
@@ -1293,6 +1316,8 @@ class MovieService
 
     /**
      * Get IMDB genres.
+     *
+     * @return array<int, string>
      */
     public function getGenres(): array
     {

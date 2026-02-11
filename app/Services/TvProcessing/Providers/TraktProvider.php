@@ -17,7 +17,7 @@ class TraktProvider extends AbstractTvProvider
 
     public TraktService $client;
 
-    public $time;
+    public int $time;
 
     /**
      * @string URL for show poster art
@@ -47,7 +47,7 @@ class TraktProvider extends AbstractTvProvider
      * Main processing director function for scrapers
      * Calls work query function and initiates processing.
      */
-    public function processSite($groupID, $guidChar, int $process, bool $local = false): void
+    public function processSite(mixed $groupID, mixed $guidChar, int $process, bool $local = false): void
     {
         $res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TRAKT);
 
@@ -232,7 +232,7 @@ class TraktProvider extends AbstractTvProvider
     /**
      * Fetch banner from site.
      */
-    public function getBanner($videoID, $siteId): bool
+    public function getBanner(mixed $videoID, mixed $siteId): bool
     {
         return false;
     }
@@ -241,7 +241,7 @@ class TraktProvider extends AbstractTvProvider
      * Get all external IDs for a video from the database.
      *
      * @param  int  $videoId  The local video ID
-     * @return array Array of external IDs: ['trakt' => X, 'tmdb' => Y, 'tvdb' => Z, 'imdb' => W]
+     * @return array<string, mixed> Array of external IDs: ['trakt' => X, 'tmdb' => Y, 'tvdb' => Z, 'imdb' => W]
      */
     protected function getAllSiteIdsFromVideoID(int $videoId): array
     {
@@ -268,7 +268,7 @@ class TraktProvider extends AbstractTvProvider
      * @param  int|string  $series  The season number
      * @param  int|string  $episode  The episode number
      * @param  int  $videoId  Optional video ID to fetch all external IDs for fallback
-     * @return array|bool Episode data or false on failure
+     * @return array<string, mixed>|bool Episode data or false on failure
      */
     public function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode, int $videoId = 0): array|bool
     {
@@ -331,7 +331,7 @@ class TraktProvider extends AbstractTvProvider
     /**
      * Get show information from Trakt by name.
      *
-     * @return array|false
+     * @return array<string, mixed>|false
      */
     public function getShowInfo(string $name): array|bool
     {
@@ -378,8 +378,10 @@ class TraktProvider extends AbstractTvProvider
     /**
      * Assigns API show response values to a formatted array for insertion
      * Returns the formatted array.
+     *
+     * @return array<string, mixed>
      */
-    public function formatShowInfo($show): array
+    public function formatShowInfo(mixed $show): array
     {
         preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show['ids']['imdb'], $imdb);
         $this->posterUrl = $show['images']['poster']['thumb'] ?? '';
@@ -449,8 +451,10 @@ class TraktProvider extends AbstractTvProvider
     /**
      * Assigns API episode response values to a formatted array for insertion
      * Returns the formatted array.
+     *
+     * @return array<string, mixed>
      */
-    public function formatEpisodeInfo($episode): array
+    public function formatEpisodeInfo(mixed $episode): array
     {
         return [
             'title' => (string) $episode['title'],

@@ -33,7 +33,7 @@ use Illuminate\Support\Str;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation unused()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation used()
  */
-class Invitation extends Model
+class Invitation extends Model // @phpstan-ignore missingType.iterableValue
 {
     public const DEFAULT_INVITES = 1;
 
@@ -64,9 +64,9 @@ class Invitation extends Model
     ];
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
-    protected $dates = [
+    protected $dates = [ // @phpstan-ignore property.defaultValue
         'expires_at',
         'used_at',
         'created_at',
@@ -75,6 +75,8 @@ class Invitation extends Model
 
     /**
      * Get the user who created this invitation
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
      */
     public function invitedBy(): BelongsTo
     {
@@ -83,6 +85,8 @@ class Invitation extends Model
 
     /**
      * Get the user who used this invitation
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
      */
     public function usedBy(): BelongsTo
     {
@@ -92,7 +96,7 @@ class Invitation extends Model
     /**
      * Scope to get only active invitations
      */
-    public function scopeActive(Builder $query): Builder
+    public function scopeActive(Builder $query): Builder // @phpstan-ignore missingType.generics
     {
         return $query->where('is_active', true);
     }
@@ -100,7 +104,7 @@ class Invitation extends Model
     /**
      * Scope to get valid (active and not expired) invitations
      */
-    public function scopeValid(Builder $query): Builder
+    public function scopeValid(Builder $query): Builder // @phpstan-ignore missingType.generics
     {
         return $query->active() // @phpstan-ignore method.notFound
             ->where('expires_at', '>', now())
@@ -110,7 +114,7 @@ class Invitation extends Model
     /**
      * Scope to get expired invitations
      */
-    public function scopeExpired(Builder $query): Builder
+    public function scopeExpired(Builder $query): Builder // @phpstan-ignore missingType.generics
     {
         return $query->where('expires_at', '<=', now());
     }
@@ -118,7 +122,7 @@ class Invitation extends Model
     /**
      * Scope to get unused invitations
      */
-    public function scopeUnused(Builder $query): Builder
+    public function scopeUnused(Builder $query): Builder // @phpstan-ignore missingType.generics
     {
         return $query->whereNull('used_at');
     }
@@ -126,7 +130,7 @@ class Invitation extends Model
     /**
      * Scope to get used invitations
      */
-    public function scopeUsed(Builder $query): Builder
+    public function scopeUsed(Builder $query): Builder // @phpstan-ignore missingType.generics
     {
         return $query->whereNotNull('used_at');
     }
@@ -181,6 +185,8 @@ class Invitation extends Model
 
     /**
      * Create a new invitation
+     *
+     * @param  array<string, mixed>  $metadata
      */
     public static function createInvitation(
         string $email,
@@ -270,6 +276,8 @@ class Invitation extends Model
 
     /**
      * Get invitation statistics
+     *
+     * @return array<string, mixed>
      */
     public static function getStats(): array
     {

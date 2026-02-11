@@ -73,6 +73,8 @@ abstract class AbstractAdultProviderPipe
 
     /**
      * Last request timestamp for rate limiting.
+     *
+     * @var array<string, mixed>
      */
     protected static array $lastRequestTime = [];
 
@@ -205,12 +207,14 @@ abstract class AbstractAdultProviderPipe
     /**
      * Search for a movie on this provider.
      *
-     * @return array|false Returns array with 'title' and 'url' keys on success, false on failure
+     * @return array<string, mixed>|false Returns array with 'title' and 'url' keys on success, false on failure
      */
     abstract protected function search(string $movie): array|false;
 
     /**
      * Get all movie information from the provider.
+     *
+     * @return array<string, mixed>
      */
     abstract protected function getMovieInfo(): array|false;
 
@@ -234,6 +238,8 @@ abstract class AbstractAdultProviderPipe
 
     /**
      * Get cached search result if available.
+     *
+     * @return array<string, mixed>
      */
     protected function getCachedSearch(string $movie): array|false|null
     {
@@ -257,6 +263,8 @@ abstract class AbstractAdultProviderPipe
 
     /**
      * Cache a search result.
+     *
+     * @param  array<string, mixed>  $result
      */
     protected function cacheSearchResult(string $movie, array|false $result): void
     {
@@ -270,6 +278,8 @@ abstract class AbstractAdultProviderPipe
 
     /**
      * Fetch raw HTML from a URL with retry support.
+     *
+     * @param  array<string, mixed>  $postData
      */
     protected function fetchHtml(string $url, ?string $cookie = null, ?array $postData = null): string|false
     {
@@ -393,6 +403,8 @@ abstract class AbstractAdultProviderPipe
 
     /**
      * Get default HTTP headers.
+     *
+     * @return array<string, mixed>
      */
     protected function getDefaultHeaders(): array
     {
@@ -624,8 +636,10 @@ abstract class AbstractAdultProviderPipe
 
     /**
      * Extract form data for age verification submission.
+     *
+     * @return array<string, mixed>
      */
-    protected function extractAgeVerificationFormData($form): array
+    protected function extractAgeVerificationFormData(mixed $form): array
     {
         $data = [];
 
@@ -773,32 +787,49 @@ abstract class AbstractAdultProviderPipe
 
     /**
      * Extract movie information from the loaded HTML.
+     *
+     * @return array<string, mixed>
      */
     protected function extractCovers(): array
     {
         return [];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractSynopsis(): array
     {
         return [];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractCast(): array
     {
         return [];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractGenres(): array
     {
         return [];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractProductInfo(bool $extras = false): array
     {
         return [];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractTrailers(): array
     {
         return [];
@@ -830,6 +861,8 @@ abstract class AbstractAdultProviderPipe
 
     /**
      * Parse JSON-LD structured data from HTML.
+     *
+     * @return array<string, mixed>
      */
     protected function extractJsonLd(string $html): ?array
     {
@@ -853,6 +886,8 @@ abstract class AbstractAdultProviderPipe
 
     /**
      * Extract Open Graph meta data from HTML.
+     *
+     * @return array<string, mixed>
      */
     protected function extractOpenGraph(string $html): array
     {

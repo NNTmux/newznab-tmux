@@ -139,6 +139,8 @@ final class GamePatterns
 
     /**
      * Get all patterns in priority order.
+     *
+     * @return array<string, mixed>
      */
     public static function getAllPatterns(): array
     {
@@ -157,6 +159,8 @@ final class GamePatterns
 
     /**
      * Get console patterns only.
+     *
+     * @return array<string, mixed>
      */
     public static function getConsolePatterns(): array
     {
@@ -169,6 +173,8 @@ final class GamePatterns
 
     /**
      * Get PC game patterns only.
+     *
+     * @return array<string, mixed>
      */
     public static function getPCPatterns(): array
     {

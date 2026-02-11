@@ -206,13 +206,13 @@ class GetNzbController extends BasePageController
             return showApiError(501);
         }
 
-        $zip = getStreamingZip($guids);
+        $zip = getStreamingZip($guids); // @phpstan-ignore argument.type
         if ($zip === '') { // @phpstan-ignore identical.alwaysFalse
             return response()->json(['message' => 'Unable to create .zip file'], 404);
         }
 
         // Update statistics
-        $this->updateZipDownloadStatistics($request, $uid, $guids);
+        $this->updateZipDownloadStatistics($request, $uid, $guids); // @phpstan-ignore argument.type
 
         Log::channel('zipped')->info("User {$userName} downloaded zipped files from site with IP: {$request->ip()}");
 
@@ -221,6 +221,8 @@ class GetNzbController extends BasePageController
 
     /**
      * Update statistics for zip downloads
+     *
+     * @param  array<string, mixed>  $guids
      */
     private function updateZipDownloadStatistics(Request $request, int $uid, array $guids): void
     {

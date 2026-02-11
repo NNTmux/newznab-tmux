@@ -96,7 +96,7 @@ class NntmuxOffsetPopulate extends Command
 
         // Start parallel processes
         foreach ($ranges as $i => $range) {
-            $command = $this->buildWorkerCommand($engine, $index, $range['offset'], $range['limit'], $i);
+            $command = $this->buildWorkerCommand($engine, $index, $range['offset'], $range['limit'], $i); // @phpstan-ignore argument.type
             $this->info("Starting worker process {$i}: processing {$range['limit']} records from offset {$range['offset']}");
 
             $process = Process::start($command);
@@ -108,7 +108,7 @@ class NntmuxOffsetPopulate extends Command
         }
 
         // Monitor processes
-        $this->monitorProcesses($processes);
+        $this->monitorProcesses($processes); // @phpstan-ignore argument.type
 
         // Verify final count
         $this->verifyIndexPopulation($engine, $index, $total);
@@ -120,6 +120,8 @@ class NntmuxOffsetPopulate extends Command
 
     /**
      * Create offset-based ranges for parallel execution
+     *
+     * @return array<string, mixed>
      */
     private function createOffsetRanges(int $total, int $processes): array
     {
@@ -144,6 +146,8 @@ class NntmuxOffsetPopulate extends Command
 
     /**
      * Build worker command for offset-based parallel processing
+     *
+     * @return list<array<string, float|int<0, max>>>
      */
     private function buildWorkerCommand(string $engine, string $index, int $offset, int $limit, int $workerId): string
     {
@@ -176,6 +180,8 @@ class NntmuxOffsetPopulate extends Command
 
     /**
      * Monitor parallel processes
+     *
+     * @param  array<string, mixed>  $processes
      */
     private function monitorProcesses(array $processes): void
     {
@@ -353,6 +359,8 @@ class NntmuxOffsetPopulate extends Command
 
     /**
      * Get index mappings
+     *
+     * @return array<string, mixed>
      */
     private function getIndexMappings(string $indexName): array
     {

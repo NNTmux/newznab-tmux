@@ -67,6 +67,8 @@ abstract class AbstractCategorizationPipe
 
     /**
      * Create a successful categorization result.
+     *
+     * @param  array<string, mixed>  $debug
      */
     protected function matched(int $categoryId, float $confidence, string $matchedBy, array $debug = []): CategorizationResult
     {

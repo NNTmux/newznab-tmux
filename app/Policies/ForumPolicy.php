@@ -12,72 +12,72 @@ class ForumPolicy extends \TeamTeaTime\Forum\Policies\ForumPolicy
         //
     }
 
-    public function createCategories($user): bool
+    public function createCategories(mixed $user): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function manageCategories($user): bool
+    public function manageCategories(mixed $user): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function moveCategories($user): bool
+    public function moveCategories(mixed $user): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function renameCategories($user): bool
+    public function renameCategories(mixed $user): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function viewTrashedThreads($user): bool
+    public function viewTrashedThreads(mixed $user): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function viewTrashedPosts($user): bool
+    public function viewTrashedPosts(mixed $user): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function deleteCategories($user): bool
+    public function deleteCategories(mixed $user): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function deletePosts($user): bool
+    public function deletePosts(mixed $user): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function deleteThreads($user): bool
+    public function deleteThreads(mixed $user): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function restorePosts($user): bool
+    public function restorePosts(mixed $user): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function restoreThreads($user): bool
+    public function restoreThreads(mixed $user): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function purgePosts($user): bool
+    public function purgePosts(mixed $user): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function purgeThreads($user): bool
+    public function purgeThreads(mixed $user): bool
     {
         return $user->hasRole('Admin');
     }
 
-    public function deleteThrashedPosts($user): bool
+    public function deleteThrashedPosts(mixed $user): bool
     {
         return $user->hasRole('Admin');
     }

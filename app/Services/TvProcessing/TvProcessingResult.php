@@ -17,6 +17,9 @@ class TvProcessingResult
 
     public const STATUS_PENDING = 'pending';
 
+    /**
+     * @param  array<string, mixed>  $debug
+     */
     public function __construct(
         public readonly string $status,
         public readonly ?int $videoId = null,
@@ -27,6 +30,8 @@ class TvProcessingResult
 
     /**
      * Create a successful match result.
+     *
+     * @param  array<string, mixed>  $debug
      */
     public static function matched(int $videoId, int $episodeId, string $providerName, array $debug = []): self
     {
@@ -41,6 +46,8 @@ class TvProcessingResult
 
     /**
      * Create a not found result.
+     *
+     * @param  array<string, mixed>  $debug
      */
     public static function notFound(?string $providerName = null, array $debug = []): self
     {
@@ -53,6 +60,8 @@ class TvProcessingResult
 
     /**
      * Create a parse failed result.
+     *
+     * @param  array<string, mixed>  $debug
      */
     public static function parseFailed(array $debug = []): self
     {

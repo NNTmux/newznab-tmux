@@ -64,6 +64,8 @@ class RedisMonitor extends Command
 
     /**
      * Display stats in table format (for --once mode).
+     *
+     * @param  array<string, mixed>  $stats
      */
     protected function displayStats(array $stats): void
     {

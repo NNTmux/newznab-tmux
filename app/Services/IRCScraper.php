@@ -20,16 +20,22 @@ class IRCScraper extends IRCClient
 
     /**
      * Array of current pre info.
+     *
+     * @var array<string, mixed>
      */
     protected array $_curPre;
 
     /**
      * List of groups and their id's.
+     *
+     * @var array<string, mixed>
      */
     protected array $_groupList;
 
     /**
      * Array of ignored channels.
+     *
+     * @var array<string, mixed>
      */
     protected array $_ignoredChannels;
 
@@ -38,7 +44,7 @@ class IRCScraper extends IRCClient
      */
     protected bool $_nuked;
 
-    protected $_oldPre;
+    protected mixed $_oldPre;
 
     /**
      * Run this in silent mode (no text output).

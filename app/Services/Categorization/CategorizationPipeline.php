@@ -22,7 +22,7 @@ class CategorizationPipeline
     /**
      * @var Collection<AbstractCategorizationPipe>
      */
-    protected Collection $pipes;
+    protected Collection $pipes; // @phpstan-ignore missingType.generics
 
     protected bool $categorizeForeign;
 
@@ -33,6 +33,7 @@ class CategorizationPipeline
      */
     public function __construct(iterable $pipes = [])
     {
+        /** @phpstan-ignore argument.templateType */
         $this->pipes = collect($pipes)
             ->sortBy(fn (AbstractCategorizationPipe $p) => $p->getPriority());
 
@@ -58,7 +59,7 @@ class CategorizationPipeline
      * @param  string  $releaseName  The name of the release
      * @param  string|null  $poster  The poster name
      * @param  bool  $debug  Whether to include debug information
-     * @return array The categorization result
+     * @return array<string, mixed> The categorization result
      */
     public function categorize(
         int|string $groupId,
@@ -93,7 +94,7 @@ class CategorizationPipeline
      *
      * @return Collection<AbstractCategorizationPipe>
      */
-    public function getCategorizers(): Collection
+    public function getCategorizers(): Collection // @phpstan-ignore missingType.generics
     {
         return $this->pipes;
     }

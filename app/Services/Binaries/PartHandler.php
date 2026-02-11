@@ -13,12 +13,21 @@ use Illuminate\Support\Facades\Log;
 final class PartHandler
 {
     /** @var array Pending parts to insert */
+    /**
+     * @var array<string, mixed>
+     */
     private array $parts = [];
 
     /** @var array Part numbers successfully inserted */
+    /**
+     * @var array<string, mixed>
+     */
     private array $insertedPartNumbers = [];
 
     /** @var array Part numbers that failed to insert */
+    /**
+     * @var array<string, mixed>
+     */
     private array $failedPartNumbers = [];
 
     private int $chunkSize;
@@ -53,6 +62,7 @@ final class PartHandler
     /**
      * Add a part to the pending insert queue.
      *
+     * @param  array<string, mixed>  $header
      * @return bool True if chunk was flushed successfully (or not needed), false on flush failure
      */
     public function addPart(int $binaryId, array $header): bool
@@ -99,6 +109,9 @@ final class PartHandler
         return $success;
     }
 
+    /**
+     * @param  array<string, mixed>  $parts
+     */
     private function insertChunk(array $parts): bool
     {
         $placeholders = [];
@@ -133,6 +146,8 @@ final class PartHandler
 
     /**
      * Get numbers of successfully inserted parts.
+     *
+     * @return array<string, mixed>
      */
     public function getInsertedNumbers(): array
     {
@@ -141,6 +156,8 @@ final class PartHandler
 
     /**
      * Get numbers of failed part inserts.
+     *
+     * @return array<string, mixed>
      */
     public function getFailedNumbers(): array
     {

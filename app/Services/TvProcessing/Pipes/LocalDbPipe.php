@@ -132,6 +132,8 @@ class LocalDbPipe extends AbstractTvProviderPipe
 
     /**
      * Check if parsed info has valid episode numbers.
+     *
+     * @param  array<string, mixed>  $parsedInfo
      */
     private function hasEpisodeNumbers(array $parsedInfo): bool
     {

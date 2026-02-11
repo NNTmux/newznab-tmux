@@ -13,7 +13,7 @@ class AdminUserRoleHistoryController extends BasePageController
     /**
      * Display user role history list
      */
-    public function index(Request $request)
+    public function index(Request $request): mixed
     {
         $this->setAdminPrefs();
 
@@ -83,7 +83,7 @@ class AdminUserRoleHistoryController extends BasePageController
     /**
      * Display role history for a specific user
      */
-    public function show(Request $request, int $userId)
+    public function show(Request $request, int $userId): mixed
     {
         $this->setAdminPrefs();
 

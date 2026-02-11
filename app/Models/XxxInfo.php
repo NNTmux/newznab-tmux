@@ -64,6 +64,8 @@ class XxxInfo extends Model
 
     /**
      * Get releases associated with this XXX info.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Release, $this>
      */
     public function releases(): HasMany
     {
@@ -121,6 +123,8 @@ class XxxInfo extends Model
 
     /**
      * Get all genres for search-filter.tpl.
+     *
+     * @return array<string, mixed>
      */
     public static function getAllGenres(bool $activeOnly = false): array
     {
@@ -144,6 +148,9 @@ class XxxInfo extends Model
 
     /**
      * Get a specific genre.
+     *
+     * @return list
+     * @return array<string, mixed>
      */
     public static function getGenres(bool $activeOnly = false, ?int $gid = null): mixed
     {
@@ -165,7 +172,7 @@ class XxxInfo extends Model
     /**
      * Get Genre id's of the title.
      *
-     * @param  array|string  $arr  - Array or String
+     * @param  array<string, mixed>|string  $arr  - Array or String
      * @return string - If array .. 1,2,3,4 if string .. 1
      */
     public static function getGenreID(array|string $arr): string

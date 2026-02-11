@@ -46,11 +46,17 @@ class DnzbFailure extends Model
      */
     protected $guarded = [];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Release, $this>
+     */
     public function release(): BelongsTo
     {
         return $this->belongsTo(Release::class, 'release_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'users_id');
@@ -62,7 +68,7 @@ class DnzbFailure extends Model
      *
      * @return bool|mixed
      */
-    public static function getFailedCount($relId)
+    public static function getFailedCount(mixed $relId)
     {
         $result = self::query()->where('release_id', $relId)->value('failed');
         if (! empty($result)) {

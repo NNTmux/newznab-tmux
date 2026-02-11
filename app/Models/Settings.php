@@ -90,7 +90,10 @@ class Settings extends Model
      */
     protected $guarded = [];
 
-    protected static $settingsCollection;
+    /**
+     * @var Collection<int, mixed>
+     */
+    protected static ?\Illuminate\Support\Collection $settingsCollection = null; // @phpstan-ignore generics.notGeneric, property.phpDocType, missingType.generics
 
     /**
      * Get the value attribute and convert empty strings to null and numeric strings to numbers.
@@ -124,6 +127,8 @@ class Settings extends Model
     /**
      * Return a simple key-value array of all settings.
      *
+     * @return array<string, mixed>
+     *
      * @throws \RuntimeException
      */
     public static function toTree(bool $excludeUnsectioned = true): array
@@ -139,7 +144,7 @@ class Settings extends Model
         return $results;
     }
 
-    public static function settingValue($setting): mixed
+    public static function settingValue(mixed $setting): mixed
     {
         $value = self::query()->where('name', $setting)->value('value');
 
@@ -178,6 +183,9 @@ class Settings extends Model
         return $value;
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public static function settingsUpdate(array $data = []): void
     {
         foreach ($data as $key => $value) {

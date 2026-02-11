@@ -10,7 +10,7 @@ class AdminFailedReleasesController extends BasePageController
     /**
      * Display a listing of failed releases
      */
-    public function index()
+    public function index(): mixed
     {
         $meta_title = $title = 'Failed Releases List';
         $releaselist = Release::getFailedRange();

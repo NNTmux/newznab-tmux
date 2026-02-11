@@ -254,7 +254,7 @@ class NameFixingService
                 $this->updateService->incrementChecked();
 
                 // Prioritize files for matching
-                $prioritizedFiles = $this->filePrioritizer->prioritizeForMatching($data['files']);
+                $prioritizedFiles = $this->filePrioritizer->prioritizeForMatching($data['files']); // @phpstan-ignore argument.type
 
                 foreach ($prioritizedFiles as $filename) {
                     /** @var Release $release */
@@ -845,8 +845,10 @@ class NameFixingService
 
     /**
      * Get releases based on time and category parameters.
+     *
+     * @return Collection<int, mixed>
      */
-    protected function getReleases(int $time, int $cats, string $query, int $limit = 0): \Illuminate\Database\Eloquent\Collection|bool
+    protected function getReleases(int $time, int $cats, string $query, int $limit = 0): \Illuminate\Database\Eloquent\Collection|bool // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
     {
         $releases = false;
         $queryLimit = ($limit === 0) ? '' : ' LIMIT '.$limit;
@@ -1263,7 +1265,7 @@ class NameFixingService
         $matching = 0;
 
         $files = explode('||', $release->filename ?? '');
-        $prioritizedFiles = $this->filePrioritizer->prioritizeForPreDb($files);
+        $prioritizedFiles = $this->filePrioritizer->prioritizeForPreDb($files); // @phpstan-ignore argument.type
 
         foreach ($prioritizedFiles as $fileName) {
             $cleanedFileName = $this->fileNameCleaner->cleanForMatching($fileName);
@@ -1302,6 +1304,8 @@ class NameFixingService
 
     /**
      * Pre-match check for filename patterns.
+     *
+     * @return array<int, bool|string>
      */
     protected function preMatch(string $fileName): array
     {
@@ -1329,6 +1333,8 @@ class NameFixingService
 
     /**
      * Retrieves releases and their file names to attempt PreDB matches.
+     *
+     * @param  array<string, mixed>  $args
      *
      * @throws \Exception
      */

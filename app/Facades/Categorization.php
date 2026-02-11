@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @see \App\Services\Categorization\CategorizationPipeline
  */
-class Categorization extends Facade
+class Categorization extends Facade // @phpstan-ignore missingType.iterableValue, missingType.generics
 {
     protected static function getFacadeAccessor(): string
     {

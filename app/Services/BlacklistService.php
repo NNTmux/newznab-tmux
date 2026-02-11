@@ -10,20 +10,32 @@ class BlacklistService
 {
     /**
      * Cache of lists per group name.
+     *
+     * @var array<string, mixed>
      */
     private array $blackList = [];
 
+    /**
+     * @var array<string, mixed>
+     */
     private array $whiteList = [];
 
+    /**
+     * @var array<string, mixed>
+     */
     private array $listsFound = [];
 
     /**
      * Track blacklist IDs to update last_activity for.
+     *
+     * @var array<string, mixed>
      */
     private array $idsToUpdate = [];
 
     /**
      * Check if an article (OVER header) is blacklisted for the given group.
+     *
+     * @param  array<string, mixed>  $msg
      */
     public function isBlackListed(array $msg, string $groupName): bool
     {
@@ -68,6 +80,8 @@ class BlacklistService
 
     /**
      * Get and reset collected blacklist IDs that matched during checks.
+     *
+     * @return list<mixed>
      */
     public function getAndClearIdsToUpdate(): array
     {
@@ -79,6 +93,8 @@ class BlacklistService
 
     /**
      * Update last_activity timestamp for given blacklist IDs.
+     *
+     * @param  array<string, mixed>  $ids
      */
     public function updateBlacklistUsage(array $ids): void
     {
@@ -90,6 +106,8 @@ class BlacklistService
 
     /**
      * Query blacklists from DB.
+     *
+     * @return array<string, mixed>
      */
     public function getBlacklist(bool $activeOnly = true, int|string $opType = -1, string $groupName = '', bool $groupRegex = false): array
     {
@@ -116,7 +134,7 @@ class BlacklistService
         return DB::select($sql);
     }
 
-    public function getBlacklistByID(int $id)
+    public function getBlacklistByID(int $id): mixed
     {
         return BinaryBlacklist::query()->where('id', $id)->first();
     }
@@ -126,6 +144,9 @@ class BlacklistService
         BinaryBlacklist::query()->where('id', $id)->delete();
     }
 
+    /**
+     * @param  array<string, mixed>  $blacklistArray
+     */
     public function updateBlacklist(array $blacklistArray): void
     {
         BinaryBlacklist::query()->where('id', $blacklistArray['id'])->update(
@@ -140,6 +161,9 @@ class BlacklistService
         );
     }
 
+    /**
+     * @param  array<string, mixed>  $blacklistArray
+     */
     public function addBlacklist(array $blacklistArray): void
     {
         BinaryBlacklist::query()->insert(

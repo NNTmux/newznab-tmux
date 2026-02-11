@@ -48,26 +48,23 @@ class ReleaseFile extends Model
      */
     protected $primaryKey = 'releases_id';
 
-    public function release(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    /**
+     * @return BelongsTo<mixed>
+     */
+    public function release(): \Illuminate\Database\Eloquent\Relations\BelongsTo // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
     {
         return $this->belongsTo(Release::class, 'releases_id');
     }
 
     /**
      * Get releasefiles row by id.
-     *
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public static function getReleaseFiles($id)
+    public static function getReleaseFiles(mixed $id): mixed
     {
         return self::query()->where('releases_id', $id)->orderBy('name')->get();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public static function getByGuid($guid)
+    public static function getByGuid(mixed $guid): mixed
     {
         return self::query()
             ->join('releases', 'releases.id', '=', 'release_files.releases_id')
@@ -82,7 +79,7 @@ class ReleaseFile extends Model
      *
      * @throws \Exception
      */
-    public static function addReleaseFiles($id, $name, $size, $createdTime, $hasPassword, string $hash = '', string $crc = ''): int
+    public static function addReleaseFiles(mixed $id, mixed $name, mixed $size, mixed $createdTime, mixed $hasPassword, string $hash = '', string $crc = ''): int
     {
         // Check if we already have this data in table
         $duplicateCheck = self::query()->where('releases_id', $id)->where('name', $name)->first();

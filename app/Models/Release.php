@@ -46,7 +46,7 @@ use Illuminate\Support\Facades\DB;
  */
 class Release extends Model
 {
-    use HasFactory;
+    use HasFactory; // @phpstan-ignore missingType.generics
 
     protected $dateFormat = false;
 
@@ -60,71 +60,113 @@ class Release extends Model
      */
     protected $guarded = [];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\UsenetGroup, $this>
+     */
     public function group(): BelongsTo
     {
         return $this->belongsTo(UsenetGroup::class, 'groups_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserDownload, $this>
+     */
     public function download(): HasMany
     {
         return $this->hasMany(UserDownload::class, 'releases_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UsersRelease, $this>
+     */
     public function userRelease(): HasMany
     {
         return $this->hasMany(UsersRelease::class, 'releases_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ReleaseFile, $this>
+     */
     public function file(): HasMany
     {
         return $this->hasMany(ReleaseFile::class, 'releases_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Category, $this>
+     */
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'categories_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Predb, $this>
+     */
     public function predb(): BelongsTo
     {
         return $this->belongsTo(Predb::class, 'predb_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\DnzbFailure, $this>
+     */
     public function failed(): HasMany
     {
         return $this->hasMany(DnzbFailure::class, 'release_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\ReleaseNfo, $this>
+     */
     public function nfo(): HasOne
     {
         return $this->hasOne(ReleaseNfo::class, 'releases_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ReleaseComment, $this>
+     */
     public function comment(): HasMany
     {
         return $this->hasMany(ReleaseComment::class, 'releases_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ReleaseReport, $this>
+     */
     public function reports(): HasMany
     {
         return $this->hasMany(ReleaseReport::class, 'releases_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ReleasesGroups, $this>
+     */
     public function releaseGroup(): HasMany
     {
         return $this->hasMany(ReleasesGroups::class, 'releases_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Video, $this>
+     */
     public function video(): BelongsTo
     {
         return $this->belongsTo(Video::class, 'videos_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\VideoData, $this>
+     */
     public function videoData(): HasOne
     {
         return $this->hasOne(VideoData::class, 'releases_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\TvEpisode, $this>
+     */
     public function episode(): BelongsTo
     {
         return $this->belongsTo(TvEpisode::class, 'tv_episodes_id');
@@ -133,7 +175,7 @@ class Release extends Model
     /**
      * Insert a single release returning the ID on success or false on failure.
      *
-     * @param  array  $parameters  Insert parameters, must be escaped if string.
+     * @param  array<string, mixed>  $parameters  Insert parameters, must be escaped if string.
      * @return bool|int
      *
      * @throws \Exception
@@ -174,7 +216,7 @@ class Release extends Model
     /**
      * @throws \Exception
      */
-    public static function updateRelease($id, $name, $searchName, $fromName, $categoryId, $parts, $grabs, $size, $postedDate, $addedDate, $videoId, $episodeId, $imDbId, $aniDbId): void
+    public static function updateRelease(mixed $id, mixed $name, mixed $searchName, mixed $fromName, mixed $categoryId, mixed $parts, mixed $grabs, mixed $size, mixed $postedDate, mixed $addedDate, mixed $videoId, mixed $episodeId, mixed $imDbId, mixed $aniDbId): void
     {
         $movieInfoId = null;
         if (! empty($imDbId)) {
@@ -216,25 +258,22 @@ class Release extends Model
     /**
      * @return Model|null|static
      */
-    public static function getCatByRelId($id)
+    public static function getCatByRelId(mixed $id)
     {
         return self::whereId($id)->first(['categories_id']);
     }
 
-    public static function removeVideoIdFromReleases($videoId): int
+    public static function removeVideoIdFromReleases(mixed $videoId): int
     {
         return self::whereVideosId($videoId)->update(['videos_id' => 0, 'tv_episodes_id' => 0]);
     }
 
-    public static function removeAnidbIdFromReleases($anidbID): int
+    public static function removeAnidbIdFromReleases(mixed $anidbID): int
     {
         return self::whereAnidbid($anidbID)->update(['anidbid' => -1]);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public static function getTopDownloads()
+    public static function getTopDownloads(): mixed
     {
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
         $releases = Cache::get(md5('topDownloads'));
@@ -256,10 +295,7 @@ class Release extends Model
         return $releases;
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public static function getTopComments()
+    public static function getTopComments(): mixed
     {
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
         $releases = Cache::get(md5('topComments'));
@@ -345,7 +381,7 @@ class Release extends Model
         return $releases;
     }
 
-    public static function getByGuid($guid)
+    public static function getByGuid(mixed $guid): mixed
     {
         $query = self::with([
             'group:id,name',
@@ -380,9 +416,10 @@ class Release extends Model
             $release->parent_category = $release->category->parent->title ?? null;
             $release->sub_category = $release->category->title ?? null;
             $release->category_name = $release->parent_category.' > '.$release->sub_category;
-            $release->category_ids = $release->category ? ($release->category->parentid.','.$release->category->id) : ''; // @phpstan-ignore property.notFound, property.notFound
+            $release->category_ids = $release->category ? ($release->category->parentid.','.$release->category->id) : '';
+
             $release->group_names = $release->releaseGroup->map(function ($relGroup) {
-                return $relGroup->group ? $relGroup->group->name : null; // @phpstan-ignore property.notFound
+                return $relGroup->group ? $relGroup->group->name : null;
             })->implode(',');
         });
 
@@ -392,7 +429,7 @@ class Release extends Model
     /**
      * Get a range of releases. used in admin manage list.
      */
-    public static function getFailedRange(): LengthAwarePaginator
+    public static function getFailedRange(): LengthAwarePaginator // @phpstan-ignore missingType.generics
     {
         $failedList = self::query()
             ->select(['name', 'searchname', 'size', 'guid', 'totalpart', 'postdate', 'adddate', 'grabs', 'cp.title as parent_category', 'c.title as sub_category', DB::raw("CONCAT(cp.title, ' > ', c.title) AS category_name")])
@@ -431,7 +468,7 @@ class Release extends Model
         return false;
     }
 
-    public static function checkGuidForApi($guid): bool
+    public static function checkGuidForApi(mixed $guid): bool
     {
         $check = self::whereGuid($guid)->first();
 

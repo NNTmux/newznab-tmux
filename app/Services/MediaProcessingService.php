@@ -241,6 +241,9 @@ class MediaProcessingService
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function addAudioInfoAndSample(
         Release $release,
         string $fileLocation,

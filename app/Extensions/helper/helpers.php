@@ -20,7 +20,7 @@ if (! function_exists('getRawHtml')) {
      * @param  bool  $cookie
      * @return bool|mixed|string
      */
-    function getRawHtml($url, $cookie = false, $postData = null)
+    function getRawHtml(mixed $url, $cookie = false, mixed $postData = null)
     {
         // Check if this is an adult site that needs age verification
         $adultSites = [
@@ -112,7 +112,7 @@ if (! function_exists('makeFieldLinks')) {
      *
      * @throws Exception
      */
-    function makeFieldLinks($data, $field, $type)
+    function makeFieldLinks(mixed $data, mixed $field, mixed $type)
     {
         $tmpArr = explode(', ', $data[$field]);
         $newArr = [];
@@ -139,6 +139,7 @@ if (! function_exists('makeFieldLinks')) {
 if (! function_exists('getUserBrowseOrder')) {
     /**
      * @param  string  $orderBy
+     * @return array<string, mixed>
      */
     function getUserBrowseOrder($orderBy): array
     {
@@ -163,6 +164,9 @@ if (! function_exists('getUserBrowseOrder')) {
 }
 
 if (! function_exists('getUserBrowseOrdering')) {
+    /**
+     * @return array<int, string>
+     */
     function getUserBrowseOrdering(): array
     {
         return [
@@ -206,7 +210,7 @@ if (! function_exists('human_filesize')) {
     /**
      * @param  int  $decimals
      */
-    function human_filesize($bytes, $decimals = 0): string
+    function human_filesize(mixed $bytes, $decimals = 0): string
     {
         $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $factor = (int) floor((\strlen((string) $bytes) - 1) / 3);
@@ -219,7 +223,7 @@ if (! function_exists('bcdechex')) {
     /**
      * @return string
      */
-    function bcdechex($dec)
+    function bcdechex(mixed $dec)
     {
         $hex = '';
         do {
@@ -262,7 +266,7 @@ if (! function_exists('runCmd')) {
 
 if (! function_exists('escapeString')) {
 
-    function escapeString($string): string
+    function escapeString(mixed $string): string
     {
         return DB::connection()->getPdo()->quote($string);
     }
@@ -270,7 +274,7 @@ if (! function_exists('escapeString')) {
 
 if (! function_exists('realDuration')) {
 
-    function realDuration($milliseconds): string
+    function realDuration(mixed $milliseconds): string
     {
         $time = round($milliseconds / 1000);
 
@@ -282,7 +286,7 @@ if (! function_exists('is_it_json')) {
     /**
      * @throws JsonException
      */
-    function is_it_json($isIt): bool
+    function is_it_json(mixed $isIt): bool
     {
         if (is_array($isIt)) {
             return false;
@@ -295,6 +299,8 @@ if (! function_exists('is_it_json')) {
 
 if (! function_exists('getStreamingZip')) {
     /**
+     * @param  array<string, mixed>  $guids
+     *
      * @throws Exception
      */
     function getStreamingZip(array $guids = []): STS\ZipStream\Builder
@@ -461,7 +467,7 @@ if (! function_exists('getReleaseCover')) {
     /**
      * Get the cover image URL for a release based on its type and ID
      *
-     * @param  object|array  $release  The release object or array
+     * @param  object|array<string, mixed>  $release  The release object or array
      * @return string The cover image URL or placeholder if no cover exists
      */
     function getReleaseCover($release): string
@@ -524,6 +530,10 @@ if (! function_exists('getReleaseCover')) {
 }
 
 if (! function_exists('sanitize')) {
+    /**
+     * @param  array<string, mixed>  $doNotSanitize
+     * @param  array<string, mixed>  $phrases
+     */
     function sanitize(array|string $phrases, array $doNotSanitize = []): string
     {
         if (! is_array($phrases)) {
@@ -658,7 +668,7 @@ if (! function_exists('getAvailableTimezones')) {
     /**
      * Get a list of available timezones grouped by region
      *
-     * @return array Array of timezones grouped by region
+     * @return array<string, mixed> Array of timezones grouped by region
      */
     function getAvailableTimezones(): array
     {
@@ -737,7 +747,7 @@ if (! function_exists('streamSslContextOptions')) {
      * when connecting to a tls or ssl connection when using stream functions (fopen/file_get_contents/etc).
      *
      * @param  bool  $forceIgnore  Force ignoring of verification (useful for self-signed certs in development).
-     * @return array Stream context options for SSL/TLS connections
+     * @return array<string, mixed> Stream context options for SSL/TLS connections
      */
     function streamSslContextOptions(bool $forceIgnore = false): array
     {
@@ -775,6 +785,9 @@ if (! function_exists('streamSslContextOptions')) {
 }
 
 if (! function_exists('getCoverURL')) {
+    /**
+     * @param  array<string, mixed>  $options
+     */
     function getCoverURL(array $options = []): string
     {
         $defaults = [
@@ -845,7 +858,7 @@ if (! function_exists('imdb_trailers')) {
     /**
      * Fetches an embeddable video to a IMDB trailer from http://www.traileraddict.com.
      */
-    function imdb_trailers($imdbID): string
+    function imdb_trailers(mixed $imdbID): string
     {
         $xml = getRawHtml('https://api.traileraddict.com/?imdb='.$imdbID);
         if ($xml !== false && preg_match('#(v\.traileraddict\.com/\d+)#i', $xml, $html)) {
@@ -857,7 +870,7 @@ if (! function_exists('imdb_trailers')) {
 }
 
 if (! function_exists('showApiError')) {
-    function showApiError(int $errorCode = 900, string $errorText = '')
+    function showApiError(int $errorCode = 900, string $errorText = ''): mixed
     {
         $errorHeader = 'HTTP 1.1 400 Bad Request';
         if ($errorText === '') {
@@ -942,7 +955,7 @@ if (! function_exists('showApiError')) {
 }
 
 if (! function_exists('getRange')) {
-    function getRange($tableName): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    function getRange(mixed $tableName): \Illuminate\Contracts\Pagination\LengthAwarePaginator // @phpstan-ignore missingType.generics
     {
         $range = \Illuminate\Support\Facades\DB::table($tableName);
         if ($tableName === 'xxxinfo') {

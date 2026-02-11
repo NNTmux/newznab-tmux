@@ -37,9 +37,10 @@ class UserMovie extends Model
     protected $dateFormat = false;
 
     /**
+     * @param  array<string, mixed>  $catID
      * @return int|\Illuminate\Database\Eloquent\Builder
      */
-    public static function addMovie($uid, $imdbid, array $catID = [])
+    public static function addMovie(mixed $uid, mixed $imdbid, array $catID = []) // @phpstan-ignore missingType.generics
     {
         return self::query()
             ->insertGetId(
@@ -52,7 +53,10 @@ class UserMovie extends Model
             );
     }
 
-    public static function getMovies($uid): array
+    /**
+     * @return array<string, mixed>
+     */
+    public static function getMovies(mixed $uid): array
     {
         return self::query()
             ->where('users_id', $uid)
@@ -65,12 +69,15 @@ class UserMovie extends Model
     /**
      * @return mixed
      */
-    public static function delMovie($uid, $imdbid)
+    public static function delMovie(mixed $uid, mixed $imdbid)
     {
         return self::query()->where(['users_id' => $uid, 'imdbid' => $imdbid])->delete();
     }
 
-    public static function getMovie($uid, $imdbid): array
+    /**
+     * @return array<string, mixed>
+     */
+    public static function getMovie(mixed $uid, mixed $imdbid): array
     {
         $result = self::query()
             ->where(['user_movies.users_id' => $uid, 'user_movies.imdbid' => $imdbid])
@@ -80,12 +87,15 @@ class UserMovie extends Model
         return $result ? $result->toArray() : [];
     }
 
-    public static function delMovieForUser($uid)
+    public static function delMovieForUser(mixed $uid): void
     {
         self::query()->where('users_id', $uid)->delete();
     }
 
-    public static function updateMovie($uid, $imdbid, array $catID = [])
+    /**
+     * @param  array<string, mixed>  $catID
+     */
+    public static function updateMovie(mixed $uid, mixed $imdbid, array $catID = []): void
     {
         self::query()
             ->where(['users_id' => $uid, 'imdbid' => $imdbid])

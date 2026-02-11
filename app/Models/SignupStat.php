@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SignupStat extends Model
 {
-    use HasFactory;
+    use HasFactory; // @phpstan-ignore missingType.generics
 
     protected $guarded = [];
 
@@ -29,6 +29,9 @@ class SignupStat extends Model
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public static function getUsersByMonth(): array
     {
         return self::query()

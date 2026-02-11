@@ -45,8 +45,8 @@ class TmdbClient
      * Make a GET request to the TMDB API
      *
      * @param  string  $endpoint  The API endpoint
-     * @param  array  $params  Additional query parameters
-     * @return array|null Response data or null on failure
+     * @param  array<string, mixed>  $params  Additional query parameters
+     * @return array<string, mixed>|null Response data or null on failure
      */
     protected function get(string $endpoint, array $params = []): ?array
     {
@@ -130,7 +130,7 @@ class TmdbClient
      * @param  string  $query  The search query
      * @param  int  $page  Page number for pagination
      * @param  string|null  $year  Filter by release year
-     * @return array|null Search results or null on failure
+     * @return array<string, mixed>|null Search results or null on failure
      */
     public function searchMovies(string $query, int $page = 1, ?string $year = null): ?array
     {
@@ -151,8 +151,8 @@ class TmdbClient
      * Get movie details by TMDB ID or IMDB ID
      *
      * @param  int|string  $id  The TMDB ID or IMDB ID (with 'tt' prefix)
-     * @param  array  $appendToResponse  Additional data to append (e.g., ['credits', 'external_ids'])
-     * @return array|null Movie data or null on failure
+     * @param  array<string, mixed>  $appendToResponse  Additional data to append (e.g., ['credits', 'external_ids'])
+     * @return array<string, mixed>|null Movie data or null on failure
      */
     public function getMovie(int|string $id, array $appendToResponse = []): ?array
     {
@@ -169,7 +169,7 @@ class TmdbClient
      * Get movie credits (cast and crew)
      *
      * @param  int  $movieId  The TMDB movie ID
-     * @return array|null Credits data or null on failure
+     * @return array<string, mixed>|null Credits data or null on failure
      */
     public function getMovieCredits(int $movieId): ?array
     {
@@ -180,7 +180,7 @@ class TmdbClient
      * Get movie external IDs (IMDB, etc.)
      *
      * @param  int  $movieId  The TMDB movie ID
-     * @return array|null External IDs or null on failure
+     * @return array<string, mixed>|null External IDs or null on failure
      */
     public function getMovieExternalIds(int $movieId): ?array
     {
@@ -197,7 +197,7 @@ class TmdbClient
      * @param  string  $query  The search query
      * @param  int  $page  Page number for pagination
      * @param  int|null  $firstAirDateYear  Filter by first air date year
-     * @return array|null Search results or null on failure
+     * @return array<string, mixed>|null Search results or null on failure
      */
     public function searchTv(string $query, int $page = 1, ?int $firstAirDateYear = null): ?array
     {
@@ -218,8 +218,8 @@ class TmdbClient
      * Get TV show details by ID
      *
      * @param  int|string  $id  The TMDB TV show ID
-     * @param  array  $appendToResponse  Additional data to append
-     * @return array|null TV show data or null on failure
+     * @param  array<string, mixed>  $appendToResponse  Additional data to append
+     * @return array<string, mixed>|null TV show data or null on failure
      */
     public function getTvShow(int|string $id, array $appendToResponse = []): ?array
     {
@@ -236,7 +236,7 @@ class TmdbClient
      * Get TV show external IDs (IMDB, TVDB, etc.)
      *
      * @param  int  $tvId  The TMDB TV show ID
-     * @return array|null External IDs or null on failure
+     * @return array<string, mixed>|null External IDs or null on failure
      */
     public function getTvExternalIds(int $tvId): ?array
     {
@@ -247,7 +247,7 @@ class TmdbClient
      * Get TV show alternative titles
      *
      * @param  int  $tvId  The TMDB TV show ID
-     * @return array|null Alternative titles or null on failure
+     * @return array<string, mixed>|null Alternative titles or null on failure
      */
     public function getTvAlternativeTitles(int $tvId): ?array
     {
@@ -259,7 +259,7 @@ class TmdbClient
      *
      * @param  int  $tvId  The TMDB TV show ID
      * @param  int  $seasonNumber  The season number
-     * @return array|null Season data or null on failure
+     * @return array<string, mixed>|null Season data or null on failure
      */
     public function getTvSeason(int $tvId, int $seasonNumber): ?array
     {
@@ -277,7 +277,7 @@ class TmdbClient
      * @param  int  $tvId  The TMDB TV show ID
      * @param  int  $seasonNumber  The season number
      * @param  int  $episodeNumber  The episode number
-     * @return array|null Episode data or null on failure
+     * @return array<string, mixed>|null Episode data or null on failure
      */
     public function getTvEpisode(int $tvId, int $seasonNumber, int $episodeNumber): ?array
     {
@@ -294,7 +294,7 @@ class TmdbClient
      *
      * @param  string  $externalId  The external ID value
      * @param  string  $source  The source: 'imdb_id', 'tvdb_id', 'tvrage_id'
-     * @return array|null The TMDB TV show data or null if not found
+     * @return array<string, mixed>|null The TMDB TV show data or null if not found
      */
     public function findTvByExternalId(string $externalId, string $source = 'tvdb_id'): ?array
     {
@@ -323,10 +323,10 @@ class TmdbClient
      * Get TV episode with fallback using multiple external IDs.
      * Tries TMDB ID first, then looks up by TVDB or IMDB if needed.
      *
-     * @param  array  $ids  Array of IDs: ['tmdb' => X, 'tvdb' => Y, 'imdb' => Z]
+     * @param  array<string, mixed>  $ids  Array of IDs: ['tmdb' => X, 'tvdb' => Y, 'imdb' => Z]
      * @param  int  $seasonNumber  The season number
      * @param  int  $episodeNumber  The episode number
-     * @return array|null Episode data or null on failure
+     * @return array<string, mixed>|null Episode data or null on failure
      */
     public function getTvEpisodeWithFallback(array $ids, int $seasonNumber, int $episodeNumber): ?array
     {
@@ -377,7 +377,7 @@ class TmdbClient
      *
      * @param  int|string  $id  The external ID
      * @param  string  $source  The ID source: 'tmdb', 'tvdb', 'imdb'
-     * @return array|null Array with all IDs: ['tmdb' => X, 'imdb' => Y, 'tvdb' => Z] or null
+     * @return array<string, mixed>|null Array with all IDs: ['tmdb' => X, 'imdb' => Y, 'tvdb' => Z] or null
      */
     public function lookupTvShowIds(int|string $id, string $source = 'tmdb'): ?array
     {
@@ -435,6 +435,8 @@ class TmdbClient
 
     /**
      * Safely get a string value from an array
+     *
+     * @param  array<string, mixed>  $data
      */
     public static function getString(array $data, string $key, string $default = ''): string
     {
@@ -443,6 +445,8 @@ class TmdbClient
 
     /**
      * Safely get an integer value from an array
+     *
+     * @param  array<string, mixed>  $data
      */
     public static function getInt(array $data, string $key, int $default = 0): int
     {
@@ -451,6 +455,8 @@ class TmdbClient
 
     /**
      * Safely get a float value from an array
+     *
+     * @param  array<string, mixed>  $data
      */
     public static function getFloat(array $data, string $key, float $default = 0.0): float
     {
@@ -459,6 +465,10 @@ class TmdbClient
 
     /**
      * Safely get an array value from an array
+     *
+     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $default
+     * @return array<string, mixed>
      */
     public static function getArray(array $data, string $key, array $default = []): array
     {
@@ -467,6 +477,8 @@ class TmdbClient
 
     /**
      * Safely get a nested value from an array using dot notation
+     *
+     * @param  array<string, mixed>  $data
      */
     public static function getNested(array $data, string $path, mixed $default = null): mixed
     {

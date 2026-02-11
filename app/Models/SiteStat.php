@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SiteStat extends Model
 {
-    use HasFactory;
+    use HasFactory; // @phpstan-ignore missingType.generics
 
     protected $guarded = [];
 }

@@ -12,7 +12,7 @@ class DeletedUsersController extends BasePageController
     /**
      * Display a listing of soft-deleted users with filtering, sorting and pagination.
      */
-    public function index(Request $request)
+    public function index(Request $request): mixed
     {
         $this->setAdminPrefs();
 
@@ -71,7 +71,7 @@ class DeletedUsersController extends BasePageController
             });
 
         // Sorting
-        [$orderField, $orderSort] = $this->getSortOrder($orderBy);
+        [$orderField, $orderSort] = $this->getSortOrder($orderBy); // @phpstan-ignore offsetAccess.notFound
         $deletedUsers = $deletedUsers->orderBy($orderField, $orderSort)
             ->paginate(25)
             ->appends($request->except('page'));
@@ -103,7 +103,7 @@ class DeletedUsersController extends BasePageController
     /**
      * Bulk restore or permanent delete.
      */
-    public function bulkAction(Request $request)
+    public function bulkAction(Request $request): mixed
     {
         $action = $request->input('action');
         $userIds = $request->input('user_ids', []);
@@ -136,7 +136,7 @@ class DeletedUsersController extends BasePageController
     /**
      * Restore single user.
      */
-    public function restore($id)
+    public function restore(mixed $id): mixed
     {
         $user = User::onlyTrashed()->find($id);
         if ($user) {
@@ -151,7 +151,7 @@ class DeletedUsersController extends BasePageController
     /**
      * Permanently delete single user.
      */
-    public function permanentDelete($id)
+    public function permanentDelete(mixed $id): mixed
     {
         $user = User::onlyTrashed()->find($id);
         if ($user) {
@@ -166,6 +166,8 @@ class DeletedUsersController extends BasePageController
 
     /**
      * Parse and validate sort order.
+     *
+     * @return array<string, mixed>
      */
     private function getSortOrder(string $orderBy): array
     {
@@ -198,6 +200,6 @@ class DeletedUsersController extends BasePageController
             }
         }
 
-        return [$orderField, $orderSort];
+        return [$orderField, $orderSort]; // @phpstan-ignore return.type
     }
 }

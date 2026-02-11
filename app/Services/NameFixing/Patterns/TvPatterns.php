@@ -124,6 +124,8 @@ final class TvPatterns
 
     /**
      * Get streaming service patterns only.
+     *
+     * @return array<string, mixed>
      */
     public static function getStreamingPatterns(): array
     {
@@ -135,6 +137,8 @@ final class TvPatterns
 
     /**
      * Get standard TV patterns.
+     *
+     * @return array<string, mixed>
      */
     public static function getStandardPatterns(): array
     {

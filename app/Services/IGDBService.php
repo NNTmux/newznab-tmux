@@ -94,20 +94,21 @@ class IGDBService
     /**
      * Get complete game details from a Game object.
      *
-     * @return array{
-     *     title: string,
-     *     asin: string,
-     *     review: string,
-     *     coverurl: string,
-     *     releasedate: string,
-     *     esrb: string,
-     *     url: string,
-     *     backdropurl: string,
-     *     trailer: string,
-     *     publisher: string,
-     *     developer: string,
-     *     genres: array,
-     * }|false
+     * @return array<string, mixed>
+     *                              title: string,
+     *                              asin: string,
+     *                              review: string,
+     *                              coverurl: string,
+     *                              releasedate: string,
+     *                              esrb: string,
+     *                              url: string,
+     *                              backdropurl: string,
+     *                              trailer: string,
+     *                              publisher: string,
+     *                              developer: string,
+     *                              genres: array,
+     *                              }|false
+     * @return array<string, mixed>
      */
     public function getGameDetails(Game $game): array|false
     {
@@ -228,6 +229,8 @@ class IGDBService
 
     /**
      * Get relations to load with IGDB queries.
+     *
+     * @return array<string, mixed>
      */
     protected function getGameRelations(): array
     {
@@ -251,7 +254,7 @@ class IGDBService
     /**
      * Find the best matching game from results.
      */
-    protected function findBestMatch($results, string $title): ?Game
+    protected function findBestMatch(mixed $results, string $title): ?Game
     {
         $bestMatch = null;
         $bestScore = 0;
@@ -300,6 +303,8 @@ class IGDBService
 
     /**
      * Build game data array from IGDB Game model.
+     *
+     * @return array<string, mixed>
      */
     public function buildGameData(Game $game, string &$genreName): array
     {
@@ -352,7 +357,7 @@ class IGDBService
         $gameUrl = $game->url ?? ('https://www.igdb.com/games/'.($game->slug ?? $game->id)); // @phpstan-ignore property.notFound
 
         // Build review text
-        $review = $this->buildReview($game, $developers);
+        $review = $this->buildReview($game, $developers); // @phpstan-ignore argument.type
 
         Log::info('IGDBService: Game data built', [
             'title' => $game->name, // @phpstan-ignore property.notFound
@@ -380,6 +385,8 @@ class IGDBService
 
     /**
      * Extract genres from game data.
+     *
+     * @return array<string, mixed>
      */
     protected function extractGenres(Game $game): array
     {
@@ -410,6 +417,9 @@ class IGDBService
 
     /**
      * Get properly formatted IGDB image URL.
+     *
+     * @param  array<string, mixed>  $imageData
+     * @return array<int<0, max>, mixed>
      */
     public function getImageUrl(array|object|null $imageData, string $size = 'cover_big'): string
     {
@@ -568,6 +578,8 @@ class IGDBService
 
     /**
      * Build review/summary text.
+     *
+     * @param  array<string, mixed>  $developers
      */
     protected function buildReview(Game $game, array $developers): string
     {

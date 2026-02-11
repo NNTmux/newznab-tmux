@@ -9,18 +9,20 @@ use League\Fractal\TransformerAbstract;
 
 class DetailsTransformer extends TransformerAbstract
 {
-    protected $user;
+    protected \App\Models\User $user;
 
     /**
      * DetailsTransformer constructor.
      */
-    public function __construct($user)
+    public function __construct(\App\Models\User $user)
     {
         $this->user = $user;
     }
 
     /**
      * Transform a release into a details array.
+     *
+     * @return array<string, mixed>
      */
     public function transform(Release $release): array
     {

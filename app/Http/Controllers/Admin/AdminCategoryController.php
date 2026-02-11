@@ -12,7 +12,7 @@ class AdminCategoryController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function index(): mixed
     {
         $this->setAdminPrefs();
         $meta_title = $title = 'Category List';

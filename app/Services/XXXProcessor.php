@@ -27,7 +27,7 @@ class XXXProcessor
      *
      * @param  string  $movie  Movie title to look up
      * @param  bool  $debug  Whether to include debug information
-     * @return array Processing result
+     * @return array<string, mixed> Processing result
      */
     public function lookupMovie(string $movie, bool $debug = false): array
     {

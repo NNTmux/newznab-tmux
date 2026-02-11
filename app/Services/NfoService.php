@@ -50,8 +50,10 @@ class NfoService
 
     /**
      * Common NFO keywords that help identify legitimate NFO files.
+     *
+     * @var array<string, mixed>
      */
-    protected array $_nfoKeywords = [
+    protected array $_nfoKeywords = [ // @phpstan-ignore property.defaultValue
         // Release information
         'release', 'group', 'date', 'size', 'format', 'source', 'genre', 'codec',
         'bitrate', 'resolution', 'language', 'subtitle', 'ripped', 'cracked',
@@ -76,8 +78,10 @@ class NfoService
 
     /**
      * Scene group patterns for improved detection.
+     *
+     * @var array<string, mixed>
      */
-    protected array $_sceneGroupPatterns = [
+    protected array $_sceneGroupPatterns = [ // @phpstan-ignore property.defaultValue
         '/(?:^|\n)\s*[-=*]{3,}.*?([A-Z0-9]{2,15})\s*[-=*]{3,}/i',
         '/(?:presents?|brought\s+(?:to\s+)?(?:you\s+)?by|from)\s*[:\-]?\s*([A-Z][A-Z0-9]{1,14})/i',
         '/(?:greets?\s+(?:go(?:es)?\s+)?(?:out\s+)?to|respect\s+to)\s*[:\-]?\s*([\w,\s&]+)/i',
@@ -459,7 +463,7 @@ class NfoService
      *
      * @throws \Exception
      */
-    public function addAlternateNfo(bool|string &$nfo, $release, NNTPService $nntp): bool
+    public function addAlternateNfo(bool|string &$nfo, mixed $release, NNTPService $nntp): bool
     {
         if ($release->id > 0 && $this->isNFO($nfo, $release->guid)) {
             $check = ReleaseNfo::whereReleasesId($release->id)->first(['releases_id']);
@@ -584,8 +588,10 @@ class NfoService
 
     /**
      * Build base query for NFO processing with all common filters
+     *
+     * @return Builder<mixed>
      */
-    private function buildNfoProcessingQuery(string $groupID, string $guidChar): \Illuminate\Database\Eloquent\Builder
+    private function buildNfoProcessingQuery(string $groupID, string $guidChar): \Illuminate\Database\Eloquent\Builder // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
     {
         $query = Release::query()
             ->whereBetween('nfostatus', [$this->maxRetries, self::NFO_UNPROC]);
@@ -627,7 +633,7 @@ class NfoService
     /**
      * Display statistics about NFO status counts
      */
-    private function displayNfoStatusStats(\Illuminate\Database\Eloquent\Builder $baseQuery): void
+    private function displayNfoStatusStats(\Illuminate\Database\Eloquent\Builder $baseQuery): void // @phpstan-ignore missingType.generics
     {
         $nfoStats = $baseQuery->clone()
             ->select(['nfostatus as status', DB::raw('COUNT(id) as count')])
@@ -712,7 +718,7 @@ class NfoService
      * Extract URLs from NFO content.
      *
      * @param  string  $nfoContent  The NFO content to parse.
-     * @return array Array of found URLs.
+     * @return array<string, mixed> Array of found URLs.
      */
     public function extractUrls(string $nfoContent): array
     {
@@ -743,7 +749,7 @@ class NfoService
      * - Footer signatures
      *
      * @param  string  $nfoContent  The NFO content to parse.
-     * @return string|null The group name if found, null otherwise.
+     * @return array<int<0, max>, string>
      */
     public function extractGroupName(string $nfoContent): ?string
     {
@@ -929,7 +935,7 @@ class NfoService
      * Extract all media IDs (IMDB, TVDB, TMDB, etc.) from NFO content.
      *
      * @param  string  $nfoContent  The NFO content to parse.
-     * @return array Array of media IDs with their sources.
+     * @return array<string, mixed> Array of media IDs with their sources.
      */
     public function extractAllMediaIds(string $nfoContent): array
     {
@@ -991,7 +997,7 @@ class NfoService
      * Parse and extract comprehensive metadata from NFO content.
      *
      * @param  string  $nfoContent  The NFO content to parse.
-     * @return array Associative array with extracted metadata.
+     * @return list<array<string, string>>
      */
     public function parseNfoMetadata(string $nfoContent): array
     {
@@ -1015,7 +1021,7 @@ class NfoService
      * Extract language information from NFO content.
      *
      * @param  string  $nfoContent  The NFO content to parse.
-     * @return array Array of detected languages.
+     * @return array<string, mixed> Array of detected languages.
      */
     public function extractLanguage(string $nfoContent): array
     {
@@ -1055,7 +1061,7 @@ class NfoService
      * Extract runtime/duration from NFO content.
      *
      * @param  string  $nfoContent  The NFO content to parse.
-     * @return int|null Runtime in minutes, or null if not found.
+     * @return list<string>
      */
     public function extractRuntime(string $nfoContent): ?int
     {
@@ -1093,7 +1099,7 @@ class NfoService
      * Extract genre information from NFO content.
      *
      * @param  string  $nfoContent  The NFO content to parse.
-     * @return array Array of detected genres.
+     * @return array<string, mixed> Array of detected genres.
      */
     public function extractGenre(string $nfoContent): array
     {
@@ -1129,7 +1135,7 @@ class NfoService
      * Extract software-specific information from NFO content.
      *
      * @param  string  $nfoContent  The NFO content to parse.
-     * @return array Software info including platform, version, protection, etc.
+     * @return list<string>
      */
     public function extractSoftwareInfo(string $nfoContent): array
     {

@@ -51,11 +51,14 @@ class ConsoleService
 
     public bool $renamed;
 
+    /**
+     * @var array<string, mixed>
+     */
     public array $failCache;
 
     protected ReleaseImageService $imageService;
 
-    protected $igdbSleep;
+    protected mixed $igdbSleep;
 
     public function __construct(?ReleaseImageService $imageService = null)
     {
@@ -119,6 +122,10 @@ class ConsoleService
     /**
      * Get console games range with pagination.
      *
+     * @param  array<string, mixed>  $cat
+     * @param  array<string, mixed>  $excludedCats
+     * @return array<string, mixed>
+     *
      * @throws \Exception
      */
     public function getConsoleRange(int $page, array $cat, int $start, int $num, string $orderBy, array $excludedCats = []): array
@@ -128,7 +135,7 @@ class ConsoleService
 
         $browseBy = $this->getBrowseBy();
         $catsrch = '';
-        if (\count($cat) > 0 && (int) $cat[0] !== -1) {
+        if (\count($cat) > 0 && (int) $cat[0] !== -1) { // @phpstan-ignore offsetAccess.notFound
             $catsrch = Category::getCategorySearch($cat);
         }
         $exccatlist = '';
@@ -153,8 +160,8 @@ class ConsoleService
             $browseBy,
             $catsrch,
             $exccatlist,
-            $order[0],
-            $order[1],
+            $order[0], // @phpstan-ignore offsetAccess.notFound
+            $order[1], // @phpstan-ignore offsetAccess.notFound
             ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
         );
 
@@ -217,8 +224,8 @@ class ConsoleService
             (! empty($consoleIDs) ? implode(',', $consoleIDs) : -1),
             (! empty($releaseIDs) ? implode(',', $releaseIDs) : -1),
             $catsrch,
-            $order[0],
-            $order[1]
+            $order[0], // @phpstan-ignore offsetAccess.notFound
+            $order[1] // @phpstan-ignore offsetAccess.notFound
         );
 
         $return = Cache::get(md5($sql.$page));
@@ -239,6 +246,8 @@ class ConsoleService
 
     /**
      * Get console order array.
+     *
+     * @return array<string, mixed>
      */
     public function getConsoleOrder(string $orderBy): array
     {
@@ -263,6 +272,8 @@ class ConsoleService
 
     /**
      * Get console ordering options.
+     *
+     * @return array<int, string>
      */
     public function getConsoleOrdering(): array
     {
@@ -280,6 +291,8 @@ class ConsoleService
 
     /**
      * Get browse by options.
+     *
+     * @return array<string, mixed>
      */
     public function getBrowseByOptions(): array
     {
@@ -351,6 +364,8 @@ class ConsoleService
      * Update console info from IGDB.
      *
      *
+     * @param  array<string, mixed>  $gameInfo
+     *
      * @throws \Exception
      */
     public function updateConsoleInfo(array $gameInfo): int
@@ -383,6 +398,8 @@ class ConsoleService
 
     /**
      * Fetch IGDB properties for a game.
+     *
+     * @return array<string, mixed>
      *
      * @throws \Exception
      */
@@ -571,6 +588,8 @@ class ConsoleService
 
     /**
      * Parse release title for game info.
+     *
+     * @return array<string, mixed>
      */
     public function parseTitle(string $releaseName): array|false
     {
@@ -726,6 +745,8 @@ class ConsoleService
 
     /**
      * Update or create console info in the database.
+     *
+     * @param  array<string, mixed>  $con
      */
     protected function updateConsoleTable(array $con = []): int
     {
@@ -799,6 +820,8 @@ class ConsoleService
 
     /**
      * Load genres from database.
+     *
+     * @return array<string, mixed>
      *
      * @throws \Exception
      */

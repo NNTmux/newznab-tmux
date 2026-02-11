@@ -16,6 +16,9 @@ class CategorizationPassable
 
     public bool $debug;
 
+    /**
+     * @var array<string, mixed>
+     */
     public array $allResults = [];
 
     public function __construct(ReleaseContext $context, bool $debug = false)
@@ -53,6 +56,8 @@ class CategorizationPassable
 
     /**
      * Build the final result array.
+     *
+     * @return array<string, mixed>
      */
     public function toArray(): array
     {

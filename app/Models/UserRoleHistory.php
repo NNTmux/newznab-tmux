@@ -49,6 +49,8 @@ class UserRoleHistory extends Model
 
     /**
      * Get the user this history belongs to
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
      */
     public function user(): BelongsTo
     {
@@ -57,6 +59,8 @@ class UserRoleHistory extends Model
 
     /**
      * Get the admin who made this change
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
      */
     public function changedByUser(): BelongsTo
     {
@@ -66,7 +70,7 @@ class UserRoleHistory extends Model
     /**
      * Get the old role
      */
-    public function oldRole(): BelongsTo
+    public function oldRole(): BelongsTo // @phpstan-ignore missingType.generics
     {
         return $this->belongsTo(\Spatie\Permission\Models\Role::class, 'old_role_id');
     }
@@ -74,7 +78,7 @@ class UserRoleHistory extends Model
     /**
      * Get the new role
      */
-    public function newRole(): BelongsTo
+    public function newRole(): BelongsTo // @phpstan-ignore missingType.generics
     {
         return $this->belongsTo(\Spatie\Permission\Models\Role::class, 'new_role_id');
     }
@@ -109,7 +113,7 @@ class UserRoleHistory extends Model
     /**
      * Get role history for a user
      */
-    public static function getUserHistory(int $userId)
+    public static function getUserHistory(int $userId): mixed
     {
         return static::where('user_id', $userId)
             ->orderBy('effective_date', 'desc')
@@ -119,7 +123,7 @@ class UserRoleHistory extends Model
     /**
      * Get stacked role changes for a user
      */
-    public static function getUserStackedChanges(int $userId)
+    public static function getUserStackedChanges(int $userId): mixed
     {
         return static::where('user_id', $userId)
             ->where('is_stacked', true)

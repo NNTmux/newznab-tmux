@@ -15,17 +15,14 @@ class SendPasswordForgottenEmail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $resetLink;
+    private string $resetLink;
 
-    /**
-     * @var User
-     */
-    private $user;
+    private User $user;
 
     /**
      * Create a new job instance.
      */
-    public function __construct(User $user, $resetLink)
+    public function __construct(User $user, string $resetLink)
     {
         $this->user = $user;
         $this->resetLink = $resetLink;

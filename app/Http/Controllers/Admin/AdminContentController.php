@@ -13,7 +13,7 @@ class AdminContentController extends BasePageController
      *
      * @throws \Exception
      */
-    public function index()
+    public function index(): mixed
     {
         $this->setAdminPrefs();
 
@@ -116,7 +116,7 @@ class AdminContentController extends BasePageController
     /**
      * Toggle content status (enable/disable).
      */
-    public function toggleStatus(Request $request)
+    public function toggleStatus(Request $request): mixed
     {
         if ($request->has('id')) {
             $content = Content::query()->find($request->input('id'));
@@ -145,7 +145,7 @@ class AdminContentController extends BasePageController
     /**
      * Delete content by ID.
      */
-    public function destroy(Request $request)
+    public function destroy(Request $request): mixed
     {
         if ($request->has('id')) {
             $content = Content::query()->find($request->input('id'));
@@ -180,6 +180,8 @@ class AdminContentController extends BasePageController
 
     /**
      * Add new content.
+     *
+     * @param  array<string, mixed>  $data
      */
     protected function addContent(array $data): int
     {
@@ -208,6 +210,8 @@ class AdminContentController extends BasePageController
 
     /**
      * Update existing content.
+     *
+     * @param  array<string, mixed>  $data
      */
     protected function updateContent(array $data): int
     {
@@ -240,6 +244,9 @@ class AdminContentController extends BasePageController
 
     /**
      * Normalize content URL to ensure proper formatting.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
      */
     protected function normalizeContentUrl(array $data): array
     {

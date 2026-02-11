@@ -11,6 +11,8 @@ class ArchiveProcessingService
     /**
      * Analyze compressed data (RAR/ZIP/etc.).
      * Returns an array with: ok(bool), error(?string), summary(?array), is_encrypted(bool)
+     *
+     * @return array<string, mixed>
      */
     public function analyze(string $compressedData): array
     {
@@ -29,6 +31,8 @@ class ArchiveProcessingService
 
     /**
      * Get file list from currently analyzed archive.
+     *
+     * @return array<string, mixed>
      */
     public function getFileList(): array
     {

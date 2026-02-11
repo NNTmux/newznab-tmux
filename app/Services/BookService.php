@@ -33,6 +33,9 @@ class BookService
 
     public string $renamed;
 
+    /**
+     * @var array<string, mixed>
+     */
     public array $failCache;
 
     /**
@@ -89,6 +92,10 @@ class BookService
 
     /**
      * Get book range with pagination.
+     *
+     * @param  array<string, mixed>  $cat
+     * @param  array<string, mixed>  $excludedCats
+     * @return array<string, mixed>
      */
     public function getBookRange(int $page, array $cat, int $start, int $num, string $orderBy, array $excludedCats = []): array
     {
@@ -97,7 +104,7 @@ class BookService
 
         $browseby = $this->getBrowseBy();
         $catsrch = '';
-        if (\count($cat) > 0 && $cat[0] !== -1) {
+        if (\count($cat) > 0 && $cat[0] !== -1) { // @phpstan-ignore offsetAccess.notFound
             $catsrch = Category::getCategorySearch($cat);
         }
         $exccatlist = '';
@@ -121,8 +128,8 @@ class BookService
             $browseby,
             $catsrch,
             $exccatlist,
-            $order[0],
-            $order[1],
+            $order[0], // @phpstan-ignore offsetAccess.notFound
+            $order[1], // @phpstan-ignore offsetAccess.notFound
             ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
         );
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -162,8 +169,8 @@ class BookService
             ! empty($bookIDs) ? implode(',', $bookIDs) : -1,
             ! empty($releaseIDs) ? implode(',', $releaseIDs) : -1,
             $catsrch,
-            $order[0],
-            $order[1]
+            $order[0], // @phpstan-ignore offsetAccess.notFound
+            $order[1] // @phpstan-ignore offsetAccess.notFound
         );
         $return = Cache::get(md5($sql.$page));
         if ($return !== null) {
@@ -180,6 +187,8 @@ class BookService
 
     /**
      * Get book order array.
+     *
+     * @return array<string, mixed>
      */
     public function getBookOrder(string $orderBy): array
     {
@@ -201,6 +210,8 @@ class BookService
 
     /**
      * Get book ordering options.
+     *
+     * @return array<int, string>
      */
     public function getBookOrdering(): array
     {
@@ -224,6 +235,8 @@ class BookService
 
     /**
      * Get browse by options.
+     *
+     * @return array<string, mixed>
      */
     public function getBrowseByOptions(): array
     {
@@ -256,7 +269,7 @@ class BookService
         ?string $url,
         ?string $author,
         ?string $publisher,
-        $publishdate,
+        mixed $publishdate,
         int $cover
     ): bool {
         return BookInfo::query()->where('id', $id)->update([
@@ -313,7 +326,7 @@ class BookService
      *
      * @throws \Exception
      */
-    protected function processBookReleasesHelper($res, $categoryID): void
+    protected function processBookReleasesHelper(mixed $res, mixed $categoryID): void
     {
         if ($res->count() > 0) {
             if ($this->echooutput) {
@@ -381,7 +394,7 @@ class BookService
      *
      * @return bool|string
      */
-    public function parseTitle($release_name, $releaseID, $releasetype)
+    public function parseTitle(mixed $release_name, mixed $releaseID, mixed $releasetype)
     {
         $a = preg_replace('/\d{1,2} \d{1,2} \d{2,4}|(19|20)\d\d|anybody got .+?[a-z]\? |[ ._-](Novel|TIA)([ ._-]|$)|([ \.])HQ([-\. ])|[\(\)\.\-_ ](AVI|AZW3?|DOC|EPUB|LIT|MOBI|NFO|RETAIL|(si)?PDF|RTF|TXT)[\)\]\.\-_ ](?![a-z0-9])|compleet|DAGSTiDNiNGEN|DiRFiX|\+ extra|r?e ?Books?([\.\-_ ]English|ers)?|azw3?|ePu([bp])s?|html|mobi|^NEW[\.\-_ ]|PDF([\.\-_ ]English)?|Please post more|Post description|Proper|Repack(fix)?|[\.\-_ ](Chinese|English|French|German|Italian|Retail|Scan|Swedish)|^R4 |Repost|Skytwohigh|TIA!+|TruePDF|V413HAV|(would someone )?please (re)?post.+? "|with the authors name right/i', '', $release_name);
         $b = preg_replace('/^(As Req |conversion |eq |Das neue Abenteuer \d+|Fixed version( ignore previous post)?|Full |Per Req As Found|(\s+)?R4 |REQ |revised |version |\d+(\s+)?$)|(COMPLETE|INTERNAL|RELOADED| (AZW3|eB|docx|ENG?|exe|FR|Fix|gnv64|MU|NIV|R\d\s+\d{1,2} \d{1,2}|R\d|Req|TTL|UC|v(\s+)?\d))(\s+)?$/i', '', $a);
@@ -437,7 +450,7 @@ class BookService
      *
      * @throws \Exception
      */
-    public function updateBookInfo(string $bookInfo = '', $amazdata = null)
+    public function updateBookInfo(string $bookInfo = '', mixed $amazdata = null)
     {
         $ri = new ReleaseImageService;
 
@@ -521,7 +534,7 @@ class BookService
     /**
      * Fetch book properties from iTunes.
      *
-     * @return array|bool
+     * @return array<string, mixed>|bool
      */
     public function fetchItunesBookProperties(string $bookInfo)
     {

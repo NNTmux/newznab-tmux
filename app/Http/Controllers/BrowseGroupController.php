@@ -10,7 +10,7 @@ class BrowseGroupController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function show(Request $request)
+    public function show(Request $request): mixed
     {
         // Get the search term from the request
         $search = $request->get('search', '') ?? '';

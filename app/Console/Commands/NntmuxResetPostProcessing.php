@@ -9,9 +9,9 @@ use Illuminate\Console\Command;
 class NntmuxResetPostProcessing extends Command
 {
     /**
-     * @var array
+     * @var array<string, mixed>
      */
-    private static $allowedCategories = [
+    private static $allowedCategories = [ // @phpstan-ignore property.defaultValue
         'music',
         'console',
         'movie',
@@ -96,7 +96,7 @@ class NntmuxResetPostProcessing extends Command
                 $this->info('No releases to reset');
             }
         } else {
-            $normalized = $this->normalizeCategories($raw);
+            $normalized = $this->normalizeCategories($raw); // @phpstan-ignore argument.type
 
             // Validate
             $invalid = $this->invalidCategories($normalized);
@@ -154,6 +154,9 @@ class NntmuxResetPostProcessing extends Command
      * Normalize raw category options into a unique, lowercased list.
      * Handles comma-separated values, repeated options, casing, simple plurals,
      * and values provided as key=value (e.g. category=tv or the single-dash typo -category=tv).
+     *
+     * @param  array<string, mixed>  $raw
+     * @return array<string, mixed>
      */
     private function normalizeCategories(array $raw): array
     {
@@ -190,6 +193,9 @@ class NntmuxResetPostProcessing extends Command
     /**
      * Return invalid categories from a normalized list.
      * Keeps 'all' as a special allowed token.
+     *
+     * @param  array<string, mixed>  $normalized
+     * @return array<int, string>
      */
     private function invalidCategories(array $normalized): array
     {

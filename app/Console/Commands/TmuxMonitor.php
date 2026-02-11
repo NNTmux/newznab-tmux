@@ -142,6 +142,8 @@ class TmuxMonitor extends Command
 
     /**
      * Run tasks in appropriate panes
+     *
+     * @param  array<string, mixed>  $runVar
      */
     private function runPaneTasks(array $runVar): void
     {
@@ -165,6 +167,8 @@ class TmuxMonitor extends Command
 
     /**
      * Run IRC scraper
+     *
+     * @param  array<string, mixed>  $runVar
      */
     private function runIRCScraper(array $runVar): void
     {
@@ -175,6 +179,8 @@ class TmuxMonitor extends Command
 
     /**
      * Run full non-sequential tasks
+     *
+     * @param  array<string, mixed>  $runVar
      */
     private function runFullTasks(array $runVar): void
     {
@@ -193,6 +199,8 @@ class TmuxMonitor extends Command
 
     /**
      * Run basic sequential tasks
+     *
+     * @param  array<string, mixed>  $runVar
      */
     private function runBasicTasks(array $runVar): void
     {
@@ -205,6 +213,8 @@ class TmuxMonitor extends Command
 
     /**
      * Run stripped sequential tasks
+     *
+     * @param  array<string, mixed>  $runVar
      */
     private function runSequentialTasks(array $runVar): void
     {
@@ -214,6 +224,8 @@ class TmuxMonitor extends Command
 
     /**
      * Run post-processing tasks (common to most modes)
+     *
+     * @param  array<string, mixed>  $runVar
      */
     private function runPostProcessingTasks(array $runVar): void
     {

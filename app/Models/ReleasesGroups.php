@@ -67,11 +67,17 @@ class ReleasesGroups extends Model
      */
     protected $guarded = [];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Release, $this>
+     */
     public function release(): BelongsTo
     {
         return $this->belongsTo(Release::class, 'releases_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\UsenetGroup, $this>
+     */
     public function group(): BelongsTo
     {
         return $this->belongsTo(UsenetGroup::class, 'groups_id');

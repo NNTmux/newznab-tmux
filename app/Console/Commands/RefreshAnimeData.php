@@ -200,7 +200,7 @@ class RefreshAnimeData extends Command
                         continue;
                     }
 
-                    $anilistData = $searchResults[0];
+                    $anilistData = $searchResults[0]; // @phpstan-ignore offsetAccess.notFound
                     $anilistId = $anilistData['id'] ?? null;
 
                     if (! $anilistId) {

@@ -29,6 +29,7 @@ class ReleaseExtraService
      * Get video data as array.
      *
      * @param  int  $id  Release ID
+     * @return array<string, mixed>
      */
     public function getVideo(int $id): false|array
     {
@@ -45,6 +46,7 @@ class ReleaseExtraService
      * Get audio data for a release.
      *
      * @param  int  $id  Release ID
+     * @return array<string, mixed>
      */
     public function getAudio(int $id): false|array
     {
@@ -78,7 +80,7 @@ class ReleaseExtraService
      * @param  string  $guid  Release GUID
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|null
      */
-    public function getByGuid(string $guid)
+    public function getByGuid(string $guid) // @phpstan-ignore missingType.generics
     {
         return VideoData::query()
             ->where('r.guid', $guid)

@@ -25,8 +25,8 @@ class MediaSearchService
     /**
      * Find movie by any external ID and return cached movie data from index.
      *
-     * @param  array  $externalIds  Array with keys like 'imdbid', 'tmdbid', 'traktid'
-     * @return array|null Movie data from search index
+     * @param  array<string, mixed>  $externalIds  Array with keys like 'imdbid', 'tmdbid', 'traktid'
+     * @return array<string, mixed>|null Movie data from search index
      */
     public function findMovie(array $externalIds): ?array
     {
@@ -45,8 +45,8 @@ class MediaSearchService
     /**
      * Find TV show by any external ID and return cached show data from index.
      *
-     * @param  array  $externalIds  Array with keys like 'tvdb', 'trakt', 'tvmaze', 'tvrage', 'imdb', 'tmdb'
-     * @return array|null TV show data from search index
+     * @param  array<string, mixed>  $externalIds  Array with keys like 'tvdb', 'trakt', 'tvmaze', 'tvrage', 'imdb', 'tmdb'
+     * @return array<string, mixed>|null TV show data from search index
      */
     public function findTvShow(array $externalIds): ?array
     {
@@ -70,7 +70,7 @@ class MediaSearchService
      *
      * @param  string  $title  Movie title to search
      * @param  int  $limit  Maximum results
-     * @return array Array of release IDs
+     * @return array<string, mixed> Array of release IDs
      */
     public function searchMovieReleases(string $title, int $limit = 1000): array
     {
@@ -128,7 +128,7 @@ class MediaSearchService
      *
      * @param  string  $title  TV show title to search
      * @param  int  $limit  Maximum results
-     * @return array Array of release IDs
+     * @return array<string, mixed> Array of release IDs
      */
     public function searchTvShowReleases(string $title, int $limit = 1000): array
     {
@@ -186,7 +186,7 @@ class MediaSearchService
      *
      * @param  int|string  $imdbId  IMDB ID (without 'tt' prefix)
      * @param  int  $limit  Maximum results
-     * @return array Array of release IDs
+     * @return array<string, mixed> Array of release IDs
      */
     public function getReleasesByImdbId(int|string $imdbId, int $limit = 1000): array
     {
@@ -198,7 +198,7 @@ class MediaSearchService
      *
      * @param  int|string  $tmdbId  TMDB ID
      * @param  int  $limit  Maximum results
-     * @return array Array of release IDs
+     * @return array<string, mixed> Array of release IDs
      */
     public function getReleasesByTmdbId(int|string $tmdbId, int $limit = 1000): array
     {
@@ -210,7 +210,7 @@ class MediaSearchService
      *
      * @param  int|string  $tvdbId  TVDB ID
      * @param  int  $limit  Maximum results
-     * @return array Array of release IDs
+     * @return array<string, mixed> Array of release IDs
      */
     public function getReleasesByTvdbId(int|string $tvdbId, int $limit = 1000): array
     {
@@ -222,7 +222,7 @@ class MediaSearchService
      *
      * @param  int|string  $traktId  Trakt ID
      * @param  int  $limit  Maximum results
-     * @return array Array of release IDs
+     * @return array<string, mixed> Array of release IDs
      */
     public function getReleasesByTraktId(int|string $traktId, int $limit = 1000): array
     {
@@ -233,10 +233,10 @@ class MediaSearchService
      * Combined search: search by title and optionally by external IDs.
      *
      * @param  string  $title  Media title
-     * @param  array  $externalIds  Optional external IDs to narrow search
+     * @param  array<string, mixed>  $externalIds  Optional external IDs to narrow search
      * @param  string  $type  'movie' or 'tv'
      * @param  int  $limit  Maximum results
-     * @return array Array of release IDs
+     * @return array<string, mixed> Array of release IDs
      */
     public function searchMedia(string $title, array $externalIds = [], string $type = 'movie', int $limit = 1000): array
     {
@@ -257,7 +257,7 @@ class MediaSearchService
      * Get movie info from the search index (faster than DB query).
      *
      * @param  int  $movieInfoId  MovieInfo ID
-     * @return array|null Movie data or null
+     * @return array<string, mixed>|null Movie data or null
      */
     public function getMovieFromIndex(int $movieInfoId): ?array
     {
@@ -281,7 +281,7 @@ class MediaSearchService
      * Get TV show info from the search index (faster than DB query).
      *
      * @param  int  $videoId  Video/TV show ID
-     * @return array|null TV show data or null
+     * @return array<string, mixed>|null TV show data or null
      */
     public function getTvShowFromIndex(int $videoId): ?array
     {

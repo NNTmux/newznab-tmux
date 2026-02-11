@@ -25,6 +25,9 @@ class Data18Pipe extends AbstractAdultProviderPipe
 
     protected string $response = '';
 
+    /**
+     * @var array<string, mixed>
+     */
     protected ?array $jsonLdData = null;
 
     public function getName(): string
@@ -104,6 +107,9 @@ class Data18Pipe extends AbstractAdultProviderPipe
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function search(string $movie): array|false
     {
         if (empty($movie)) {
@@ -181,6 +187,9 @@ class Data18Pipe extends AbstractAdultProviderPipe
         return false;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function getMovieInfo(): array|false
     {
         $results = [];
@@ -232,6 +241,8 @@ class Data18Pipe extends AbstractAdultProviderPipe
 
     /**
      * Extract data from JSON-LD structured data.
+     *
+     * @return array<string, mixed>
      */
     protected function extractFromJsonLd(): array
     {
@@ -305,6 +316,9 @@ class Data18Pipe extends AbstractAdultProviderPipe
         return $results;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractCovers(): array
     {
         $res = [];
@@ -347,6 +361,9 @@ class Data18Pipe extends AbstractAdultProviderPipe
         return $res;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractSynopsis(): array
     {
         $res = [];
@@ -376,6 +393,9 @@ class Data18Pipe extends AbstractAdultProviderPipe
         return $res;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractCast(): array
     {
         $res = [];
@@ -411,6 +431,9 @@ class Data18Pipe extends AbstractAdultProviderPipe
         return $res;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractGenres(): array
     {
         $res = [];
@@ -446,6 +469,9 @@ class Data18Pipe extends AbstractAdultProviderPipe
         return $res;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function extractProductInfo(bool $extras = false): array
     {
         $res = [];

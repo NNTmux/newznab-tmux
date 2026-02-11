@@ -52,7 +52,7 @@ class MatchPrefiles extends Command
 
         try {
             $nameFixingService = new NameFixingService;
-            $nameFixingService->getPreFileNames($argv);
+            $nameFixingService->getPreFileNames($argv); // @phpstan-ignore argument.type
 
             return 0;
         } catch (Exception $e) {

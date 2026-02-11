@@ -48,7 +48,7 @@ class FanartTvService
      * Make a GET request to the Fanart.TV API.
      *
      * @param  string  $endpoint  The API endpoint
-     * @return array|null Response data or null on failure
+     * @return array<string, mixed>|null Response data or null on failure
      */
     protected function get(string $endpoint): ?array
     {
@@ -110,7 +110,7 @@ class FanartTvService
      * Get fan art for a movie by IMDB ID.
      *
      * @param  string  $imdbId  IMDB ID (with or without 'tt' prefix)
-     * @return array|null Movie art data or null on failure
+     * @return array<string, mixed>|null Movie art data or null on failure
      */
     public function getMovieFanArt(string $imdbId): ?array
     {
@@ -128,7 +128,7 @@ class FanartTvService
      * Get fan art for a TV show by TVDB ID.
      *
      * @param  int|string  $tvdbId  TVDB ID
-     * @return array|null TV show art data or null on failure
+     * @return array<string, mixed>|null TV show art data or null on failure
      */
     public function getTvFanArt(int|string $tvdbId): ?array
     {
@@ -143,7 +143,7 @@ class FanartTvService
      * Get fan art for music by MusicBrainz ID.
      *
      * @param  string  $mbId  MusicBrainz ID
-     * @return array|null Music art data or null on failure
+     * @return array<string, mixed>|null Music art data or null on failure
      */
     public function getMusicFanArt(string $mbId): ?array
     {
@@ -158,7 +158,7 @@ class FanartTvService
      * Extract movie properties from Fanart.TV response.
      *
      * @param  string  $imdbId  IMDB ID (with or without 'tt' prefix)
-     * @return array|null Array with 'cover', 'backdrop', 'banner', 'title' keys or null on failure
+     * @return array<string, mixed>|null Array with 'cover', 'backdrop', 'banner', 'title' keys or null on failure
      */
     public function getMovieProperties(string $imdbId): ?array
     {
@@ -201,7 +201,7 @@ class FanartTvService
      * Extract TV show properties from Fanart.TV response.
      *
      * @param  int|string  $tvdbId  TVDB ID
-     * @return array|null Array with 'poster', 'banner', 'background', 'title' keys or null on failure
+     * @return array<string, mixed>|null Array with 'poster', 'banner', 'background', 'title' keys or null on failure
      */
     public function getTvProperties(int|string $tvdbId): ?array
     {
@@ -215,6 +215,7 @@ class FanartTvService
 
         // Get poster (sort by likes)
         if (! empty($art['tvposter'])) {
+            /** @phpstan-ignore argument.templateType */
             $best = collect($art['tvposter'])->sortByDesc('likes')->first();
             if (! empty($best['url'])) {
                 $result['poster'] = $best['url'];
@@ -223,6 +224,7 @@ class FanartTvService
 
         // Get banner (sort by likes)
         if (! empty($art['tvbanner'])) {
+            /** @phpstan-ignore argument.templateType */
             $best = collect($art['tvbanner'])->sortByDesc('likes')->first();
             if (! empty($best['url'])) {
                 $result['banner'] = $best['url'];
@@ -231,6 +233,7 @@ class FanartTvService
 
         // Get background (sort by likes)
         if (! empty($art['showbackground'])) {
+            /** @phpstan-ignore argument.templateType */
             $best = collect($art['showbackground'])->sortByDesc('likes')->first();
             if (! empty($best['url'])) {
                 $result['background'] = $best['url'];
@@ -239,6 +242,7 @@ class FanartTvService
 
         // Get HD clearlogo (sort by likes)
         if (! empty($art['hdtvlogo'])) {
+            /** @phpstan-ignore argument.templateType */
             $best = collect($art['hdtvlogo'])->sortByDesc('likes')->first();
             if (! empty($best['url'])) {
                 $result['logo'] = $best['url'];
@@ -268,6 +272,7 @@ class FanartTvService
             return null;
         }
 
+        /** @phpstan-ignore argument.templateType */
         $best = collect($art['tvposter'])->sortByDesc('likes')->first();
 
         return $best['url'] ?? null;
@@ -287,6 +292,7 @@ class FanartTvService
             return null;
         }
 
+        /** @phpstan-ignore argument.templateType */
         $best = collect($art['movieposter'])->sortByDesc('likes')->first();
 
         return $best['url'] ?? null;

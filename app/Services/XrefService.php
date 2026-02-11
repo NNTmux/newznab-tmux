@@ -13,6 +13,8 @@ class XrefService
 
     /**
      * Extracts valid Xref tokens from a space-separated Xref string.
+     *
+     * @return array<string, mixed>
      */
     public function extractTokens(?string $xref): array
     {
@@ -31,6 +33,8 @@ class XrefService
 
     /**
      * Returns tokens that appear in $headerXref but not in $existingXref.
+     *
+     * @return list<string>
      */
     public function diffNewTokens(?string $existingXref, ?string $headerXref): array
     {

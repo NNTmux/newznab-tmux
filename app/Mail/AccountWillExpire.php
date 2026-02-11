@@ -10,26 +10,18 @@ class AccountWillExpire extends Mailable
 {
     use Queueable, SerializesModels;
 
-    private $days;
+    private int $days;
 
-    private $user;
+    private \App\Models\User $user;
 
-    /**
-     * @var mixed
-     */
-    private $siteEmail;
+    private mixed $siteEmail;
 
-    /**
-     * @var mixed
-     */
-    private $siteTitle;
+    private mixed $siteTitle;
 
     /**
      * Create a new message instance.
-     *
-     * @return void
      */
-    public function __construct($user, $days)
+    public function __construct(\App\Models\User $user, int $days)
     {
         $this->user = $user;
         $this->days = $days;

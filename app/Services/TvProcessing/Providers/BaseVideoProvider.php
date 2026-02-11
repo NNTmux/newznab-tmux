@@ -43,12 +43,12 @@ abstract class BaseVideoProvider
     public bool $echooutput;
 
     /**
-     * @var array sites	The sites that we have an ID columns for in our video table.
+     * @var array<string, mixed> sites	The sites that we have an ID columns for in our video table.
      */
-    private static $sites = ['imdb', 'tmdb', 'trakt', 'tvdb', 'tvmaze', 'tvrage'];
+    private static $sites = ['imdb', 'tmdb', 'trakt', 'tvdb', 'tvmaze', 'tvrage']; // @phpstan-ignore property.defaultValue
 
     /**
-     * @var array Temp Array of cached failed lookups
+     * @var array<string, mixed> Temp Array of cached failed lookups
      */
     public array $titleCache;
 
@@ -112,7 +112,7 @@ abstract class BaseVideoProvider
         return false;
     }
 
-    public function getByTitle(string $title, int $type, int $source = 0)
+    public function getByTitle(string $title, int $type, int $source = 0): mixed
     {
         // Check if we already have an entry for this show.
         $res = $this->getTitleExact($title, $type, $source);
@@ -224,7 +224,7 @@ abstract class BaseVideoProvider
     /**
      * @return int|mixed
      */
-    public function getTitleLoose($title, $type, int $source = 0): mixed
+    public function getTitleLoose(mixed $title, mixed $type, int $source = 0): mixed
     {
         $return = 0;
 
@@ -293,8 +293,10 @@ abstract class BaseVideoProvider
 
     /**
      * Inserts aliases for videos.
+     *
+     * @param  array<string, mixed>  $aliases
      */
-    public function addAliases($videoId, array $aliases = []): void
+    public function addAliases(mixed $videoId, array $aliases = []): void
     {
         if (! empty($aliases) && $videoId > 0) {
             foreach ($aliases as $key => $title) {

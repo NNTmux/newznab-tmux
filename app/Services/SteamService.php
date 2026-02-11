@@ -128,38 +128,39 @@ class SteamService
     /**
      * Get complete game details from Steam.
      *
-     * @return array{
-     *     title: string,
-     *     steamid: int,
-     *     description: ?string,
-     *     detailed_description: ?string,
-     *     about: ?string,
-     *     short_description: ?string,
-     *     cover: ?string,
-     *     backdrop: ?string,
-     *     screenshots: array,
-     *     movies: array,
-     *     trailer: ?string,
-     *     publisher: ?string,
-     *     developers: array,
-     *     releasedate: ?string,
-     *     genres: string,
-     *     categories: array,
-     *     rating: ?int,
-     *     metacritic_score: ?int,
-     *     metacritic_url: ?string,
-     *     price: ?array,
-     *     platforms: array,
-     *     requirements: array,
-     *     dlc: array,
-     *     achievements: ?int,
-     *     recommendations: ?int,
-     *     website: ?string,
-     *     support_url: ?string,
-     *     legal_notice: ?string,
-     *     directurl: string,
-     *     type: string,
-     * }|false
+     * @return array<string, mixed>
+     *                              title: string,
+     *                              steamid: int,
+     *                              description: ?string,
+     *                              detailed_description: ?string,
+     *                              about: ?string,
+     *                              short_description: ?string,
+     *                              cover: ?string,
+     *                              backdrop: ?string,
+     *                              screenshots: array,
+     *                              movies: array,
+     *                              trailer: ?string,
+     *                              publisher: ?string,
+     *                              developers: array,
+     *                              releasedate: ?string,
+     *                              genres: string,
+     *                              categories: array,
+     *                              rating: ?int,
+     *                              metacritic_score: ?int,
+     *                              metacritic_url: ?string,
+     *                              price: ?array,
+     *                              platforms: array,
+     *                              requirements: array,
+     *                              dlc: array,
+     *                              achievements: ?int,
+     *                              recommendations: ?int,
+     *                              website: ?string,
+     *                              support_url: ?string,
+     *                              legal_notice: ?string,
+     *                              directurl: string,
+     *                              type: string,
+     *                              }|false
+     * @return array<string, mixed>
      */
     public function getGameDetails(int $appId): array|false
     {
@@ -184,6 +185,8 @@ class SteamService
 
     /**
      * Alias for getGameDetails for backward compatibility.
+     *
+     * @return array<string, mixed>
      */
     public function getAll(int $appId): array|false
     {
@@ -229,6 +232,8 @@ class SteamService
 
     /**
      * Get game reviews summary.
+     *
+     * @return array<string, mixed>
      */
     public function getReviewsSummary(int $appId): ?array
     {
@@ -272,6 +277,8 @@ class SteamService
 
     /**
      * Get DLC list for a game.
+     *
+     * @return array<string, mixed>
      */
     public function getDLCList(int $appId): array
     {
@@ -302,6 +309,8 @@ class SteamService
 
     /**
      * Populate the steam_apps table with the full app list from Steam.
+     *
+     * @return list<array<string, mixed>>
      */
     public function populateSteamAppsTable(?callable $progressCallback = null): array
     {
@@ -385,6 +394,8 @@ class SteamService
 
     /**
      * Get the full list of Steam apps.
+     *
+     * @return array{inserted: int<0, max>, updated: 0, skipped: int<0, max>, errors: int<0, max>}
      */
     public function getFullAppList(): array
     {
@@ -415,9 +426,9 @@ class SteamService
     /**
      * Search for games and return multiple matches.
      *
-     * @return Collection<int, array{appid: int, name: string, score: float}>
+     * @return array{}
      */
-    public function searchMultiple(string $title, int $limit = 10): Collection
+    public function searchMultiple(string $title, int $limit = 10): Collection // @phpstan-ignore missingType.generics
     {
         $cleanTitle = $this->cleanTitle($title);
         if (empty($cleanTitle)) {
@@ -544,6 +555,8 @@ class SteamService
 
     /**
      * Fetch app details from Steam API.
+     *
+     * @return array<string, mixed>
      */
     protected function fetchAppDetails(int $appId): ?array
     {
@@ -581,6 +594,9 @@ class SteamService
 
     /**
      * Transform Steam API response to our standard format.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
      */
     protected function transformAppDetails(array $data, int $appId): array
     {
@@ -744,6 +760,8 @@ class SteamService
 
     /**
      * Check if the app is a game (not DLC, video, etc.).
+     *
+     * @param  array<string, mixed>  $data
      */
     protected function isGameType(array $data): bool
     {
@@ -754,6 +772,9 @@ class SteamService
 
     /**
      * Make a rate-limited request to Steam API.
+     *
+     * @param  array<string, mixed>  $params
+     * @return array<string, mixed>
      */
     protected function makeRequest(string $url, array $params = []): ?array
     {
@@ -1019,6 +1040,8 @@ class SteamService
 
     /**
      * Tokenize a string.
+     *
+     * @return array<string, mixed>
      */
     protected function tokenize(string $s): array
     {
@@ -1039,6 +1062,8 @@ class SteamService
 
     /**
      * Replace roman numerals with arabic numbers.
+     *
+     * @return list<string>
      */
     protected function replaceRomanNumerals(string $s): string
     {

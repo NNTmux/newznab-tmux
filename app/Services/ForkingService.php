@@ -51,6 +51,8 @@ class ForkingService
 
     /**
      * Process backfill for all groups with backfill enabled.
+     *
+     * @param  array<string, mixed>  $options
      */
     public function backfill(array $options = []): void
     {
@@ -175,6 +177,8 @@ class ForkingService
      * Generic work type processor for backwards compatibility.
      *
      * @deprecated Use specific methods instead (e.g., backfill(), binaries(), etc.)
+     *
+     * @param  array<string, mixed>  $options
      */
     public function processWorkType(string $type, array $options = []): void
     {

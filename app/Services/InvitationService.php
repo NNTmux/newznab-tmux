@@ -13,6 +13,8 @@ class InvitationService
 {
     /**
      * Create and send an invitation
+     *
+     * @param  array<string, mixed>  $metadata
      */
     public function createAndSendInvitation(
         string $email,
@@ -108,6 +110,8 @@ class InvitationService
 
     /**
      * Accept an invitation (use it for registration)
+     *
+     * @param  array<string, mixed>  $userData
      */
     public function acceptInvitation(string $token, array $userData): User
     {
@@ -139,6 +143,8 @@ class InvitationService
 
     /**
      * Get invitation statistics for a user
+     *
+     * @return array<string, mixed>
      */
     public function getUserInvitationStats(int $userId): array
     {
@@ -153,7 +159,7 @@ class InvitationService
     /**
      * Get all invitations for a user
      */
-    public function getUserInvitations(int $userId, ?string $status = null)
+    public function getUserInvitations(int $userId, ?string $status = null): mixed
     {
         $query = Invitation::where('invited_by', $userId)
             ->with(['usedBy'])
@@ -192,6 +198,8 @@ class InvitationService
 
     /**
      * Get invitation by token for preview
+     *
+     * @return array<string, mixed>
      */
     public function getInvitationPreview(string $token): ?array
     {
@@ -214,6 +222,8 @@ class InvitationService
 
     /**
      * Get detailed invitation information for a user (for debugging)
+     *
+     * @return array<string, mixed>
      */
     public function getUserInvitationDetails(int $userId): array
     {

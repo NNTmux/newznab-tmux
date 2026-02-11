@@ -114,6 +114,8 @@ final class AppPatterns
 
     /**
      * Get all patterns in priority order.
+     *
+     * @return array<string, mixed>
      */
     public static function getAllPatterns(): array
     {
@@ -130,6 +132,8 @@ final class AppPatterns
 
     /**
      * Get platform-specific patterns.
+     *
+     * @return array<string, mixed>
      */
     public static function getPlatformPatterns(): array
     {
@@ -142,6 +146,8 @@ final class AppPatterns
 
     /**
      * Get vendor-specific patterns.
+     *
+     * @return array<string, mixed>
      */
     public static function getVendorPatterns(): array
     {

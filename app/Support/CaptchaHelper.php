@@ -48,6 +48,8 @@ class CaptchaHelper
 
     /**
      * Display the captcha widget
+     *
+     * @param  array<string, mixed>  $attributes
      */
     public static function display(array $attributes = []): string
     {
@@ -100,6 +102,8 @@ class CaptchaHelper
 
     /**
      * Get validation rules for captcha
+     *
+     * @return array<string, mixed>
      */
     public static function getValidationRules(): array
     {

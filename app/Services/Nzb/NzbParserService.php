@@ -15,10 +15,10 @@ class NzbParserService
      * file extensions, file sizes, file completion, group names, # of parts).
      *
      * @param  string  $nzb  The NZB contents in a string.
-     * @param  array  $options  Optional settings:
-     *                          - 'no-file-key': Use numeric keys instead of subject (default: true)
-     *                          - 'strip-count': Strip file/part count from subject for sorting (default: false)
-     * @return array $result Empty if not an NZB or the contents of the NZB.
+     * @param  array<string, mixed>  $options  Optional settings:
+     *                                         - 'no-file-key': Use numeric keys instead of subject (default: true)
+     *                                         - 'strip-count': Strip file/part count from subject for sorting (default: false)
+     * @return array<string, mixed> $result Empty if not an NZB or the contents of the NZB.
      */
     public function parseNzbFileList(string $nzb, array $options = []): array
     {
@@ -186,7 +186,7 @@ class NzbParserService
      * Check if a subject indicates an NFO file.
      *
      * @param  string  $subject  The file subject
-     * @return array|false Returns array with detection info or false if not an NFO
+     * @return array<string, mixed>|false Returns array with detection info or false if not an NFO
      */
     public function detectNfoFile(string $subject): array|false
     {
@@ -208,7 +208,7 @@ class NzbParserService
      *
      * @param  string  $subject  The file subject
      * @param  int  $segmentCount  The number of segments in the file
-     * @return array|false Returns array with detection info or false if not a hidden NFO
+     * @return array<string, mixed>|false Returns array with detection info or false if not a hidden NFO
      */
     public function detectHiddenNfoFile(string $subject, int $segmentCount): array|false
     {

@@ -83,11 +83,17 @@ class Predb extends Model
      */
     protected $guarded = [];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PredbHash, $this>
+     */
     public function hash(): HasMany
     {
         return $this->hasMany(PredbHash::class, 'predb_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Release, $this>
+     */
     public function release(): HasMany
     {
         return $this->hasMany(Release::class, 'predb_id');
@@ -145,7 +151,7 @@ class Predb extends Model
     /**
      * Try to match a single release to a PreDB title when the release is created.
      *
-     * @return array|false Array with title/id from PreDB if found, false if not found.
+     * @return array<string, mixed>|false Array with title/id from PreDB if found, false if not found.
      */
     public static function matchPre(string $cleanerName)
     {
@@ -205,11 +211,8 @@ class Predb extends Model
 
     /**
      * Get all PRE's for a release.
-     *
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public static function getForRelease($preID)
+    public static function getForRelease(mixed $preID): mixed
     {
         return self::query()->where('id', $preID)->get();
     }
@@ -220,7 +223,7 @@ class Predb extends Model
      *
      * @return Model|null|static
      */
-    public static function getOne($preID)
+    public static function getOne(mixed $preID)
     {
         return self::query()->where('id', $preID)->first();
     }
@@ -230,6 +233,9 @@ class Predb extends Model
         return 'ft_predb_filename';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toSearchableArray(): array
     {
         return [

@@ -12,7 +12,7 @@ class GamesController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function show(Request $request)
+    public function show(Request $request): mixed
     {
         $games = new GamesService;
         $gen = new GenreService;

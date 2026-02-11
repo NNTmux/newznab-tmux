@@ -65,8 +65,8 @@ final class BackfillService
         $startTime = now();
 
         foreach ($groups as $index => $group) {
-            $this->logGroupProgress($groupName, $index + 1, $groupCount);
-            $this->backfillGroup($group->toArray(), $groupCount - $index - 1, $articles);
+            $this->logGroupProgress($groupName, $index + 1, $groupCount); // @phpstan-ignore binaryOp.invalid
+            $this->backfillGroup($group->toArray(), $groupCount - $index - 1, $articles); // @phpstan-ignore binaryOp.invalid
         }
 
         $this->logBackfillComplete($startTime);
@@ -75,7 +75,7 @@ final class BackfillService
     /**
      * Backfill a single group.
      *
-     * @param  array  $groupArr  Group data array
+     * @param  array<string, mixed>  $groupArr  Group data array
      * @param  int  $remainingGroups  Number of groups remaining after this one
      * @param  int|string  $articles  Number of articles to backfill, or empty for date-based
      *
@@ -141,6 +141,8 @@ final class BackfillService
 
     /**
      * Get groups to backfill based on criteria.
+     *
+     * @return array<string, mixed>
      */
     private function getGroupsToBackfill(string $groupName, string $type): array
     {
@@ -175,6 +177,8 @@ final class BackfillService
 
     /**
      * Validate that group is in a valid state for backfilling.
+     *
+     * @param  array<string, mixed>  $groupArr
      */
     private function validateGroupState(array $groupArr, string $shortGroupName): bool
     {
@@ -192,6 +196,8 @@ final class BackfillService
 
     /**
      * Select NNTP group and return server data.
+     *
+     * @return array<string, mixed>
      */
     private function selectNntpGroup(string $groupName): ?array
     {
@@ -209,6 +215,9 @@ final class BackfillService
 
     /**
      * Calculate target post number based on articles count or date.
+     *
+     * @param  array<string, mixed>  $groupArr
+     * @param  array<string, mixed>  $serverData
      */
     private function calculateTargetPost(array $groupArr, int|string $articles, array $serverData): int
     {
@@ -224,6 +233,9 @@ final class BackfillService
 
     /**
      * Validate that target post is achievable.
+     *
+     * @param  array<string, mixed>  $groupArr
+     * @param  array<string, mixed>  $serverData
      */
     private function validateTargetPost(array $groupArr, int $targetPost, array $serverData, string $shortGroupName): bool
     {
@@ -247,6 +259,8 @@ final class BackfillService
 
     /**
      * Process backfill in chunks.
+     *
+     * @param  array<string, mixed>  $groupArr
      */
     private function processBackfillChunks(array $groupArr, int $targetPost, int $remainingGroups, string $shortGroupName): void
     {
@@ -274,6 +288,9 @@ final class BackfillService
 
     /**
      * Update group record with new first_record and postdate.
+     *
+     * @param  array<string, mixed>  $groupArr
+     * @param  array<string, mixed>  $scanResult
      */
     private function updateGroupRecord(array $groupArr, int $first, ?array $scanResult): void
     {
@@ -335,6 +352,9 @@ final class BackfillService
 
     /**
      * Log group info before processing.
+     *
+     * @param  array<string, mixed>  $groupArr
+     * @param  array<string, mixed>  $serverData
      */
     private function logGroupInfo(array $groupArr, array $serverData, int $targetPost, string $shortGroupName): void
     {

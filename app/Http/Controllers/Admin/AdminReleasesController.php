@@ -21,7 +21,7 @@ class AdminReleasesController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(Request $request)
+    public function index(Request $request): mixed
     {
         $this->setAdminPrefs();
 
@@ -91,7 +91,7 @@ class AdminReleasesController extends BasePageController
         ]);
     }
 
-    public function destroy($id)
+    public function destroy(mixed $id): mixed
     {
         try {
             if ($id) {

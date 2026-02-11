@@ -13,7 +13,10 @@ use Illuminate\View\View;
 
 class BasePageController extends Controller
 {
-    public \Illuminate\Support\Collection $settings;
+    /**
+     * @var Collection<int, mixed>
+     */
+    public \Illuminate\Support\Collection $settings; // @phpstan-ignore property.phpDocType, class.notFound, missingType.generics
 
     public string $title = '';
 
@@ -39,6 +42,8 @@ class BasePageController extends Controller
 
     /**
      * View data array for Blade templates
+     *
+     * @var array<string, mixed>
      */
     protected array $viewData = [];
 
@@ -85,7 +90,10 @@ class BasePageController extends Controller
         });
     }
 
-    public function paginate($query, $totalCount, $items, $page, $path, $reqQuery): LengthAwarePaginator
+    /**
+     * @return LengthAwarePaginator<int, mixed>
+     */
+    public function paginate(mixed $query, mixed $totalCount, mixed $items, mixed $page, mixed $path, mixed $reqQuery): LengthAwarePaginator
     {
         return new LengthAwarePaginator($query, $totalCount, $items, $page, ['path' => $path, 'query' => $reqQuery]);
     }

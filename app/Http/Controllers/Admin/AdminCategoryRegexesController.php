@@ -12,7 +12,7 @@ class AdminCategoryRegexesController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(Request $request)
+    public function index(Request $request): mixed
     {
         $this->setAdminPrefs();
         $regexes = new RegexService('category_regexes');

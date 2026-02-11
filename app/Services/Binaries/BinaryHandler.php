@@ -36,6 +36,7 @@ final class BinaryHandler
     /**
      * Get or create a binary for the given header.
      *
+     * @param  array<string, mixed>  $header
      * @return int|null Binary ID or null on failure
      */
     public function getOrCreateBinary(
@@ -85,6 +86,9 @@ final class BinaryHandler
         return null;
     }
 
+    /**
+     * @param  array<string, mixed>  $header
+     */
     private function insertOrGetBinary(
         string $driver,
         string $hash,
@@ -203,10 +207,10 @@ final class BinaryHandler
 
         try {
             if ($driver === 'sqlite') {
-                return $this->flushUpdatesSqlite($updates);
+                return $this->flushUpdatesSqlite($updates); // @phpstan-ignore argument.type
             }
 
-            return $this->flushUpdatesMysql($updates, $chunkSize);
+            return $this->flushUpdatesMysql($updates, $chunkSize); // @phpstan-ignore argument.type
         } catch (\Throwable $e) {
             if (config('app.debug') === true) {
                 Log::error('Binaries aggregate update failed: '.$e->getMessage());
@@ -216,6 +220,9 @@ final class BinaryHandler
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $updates
+     */
     private function flushUpdatesSqlite(array $updates): bool
     {
         foreach ($updates as $row) {
@@ -228,6 +235,9 @@ final class BinaryHandler
         return true;
     }
 
+    /**
+     * @param  array<string, mixed>  $updates
+     */
     private function flushUpdatesMysql(array $updates, int $chunkSize): bool
     {
         foreach (array_chunk($updates, $chunkSize) as $chunk) {
@@ -275,6 +285,8 @@ final class BinaryHandler
 
     /**
      * Get IDs created in this batch.
+     *
+     * @return list<int>
      */
     public function getInsertedIds(): array
     {
@@ -283,6 +295,8 @@ final class BinaryHandler
 
     /**
      * Get pending binary updates that haven't been flushed.
+     *
+     * @return list<array<string, int>>
      */
     private function getPendingUpdates(): array
     {

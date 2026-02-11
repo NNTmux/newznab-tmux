@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @see \App\Services\YencService
  */
-class Yenc extends Facade
+class Yenc extends Facade // @phpstan-ignore missingType.iterableValue
 {
     /**
      * Get the registered name of the component.

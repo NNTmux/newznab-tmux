@@ -959,6 +959,9 @@ final class ReleaseProcessingService
     // Release Deletion Methods
     // ========================================================================
 
+    /**
+     * @param  array<string, mixed>  $stats
+     */
     private function deleteReleasesUnderMinSize(int|string $groupId, array &$stats): void
     {
         $releases = Release::query()
@@ -978,6 +981,9 @@ final class ReleaseProcessingService
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $stats
+     */
     private function deleteReleasesOverMaxSize(int|string $groupId, array &$stats): void
     {
         if ($this->settings->maxSizeToFormRelease <= 0) {
@@ -996,6 +1002,9 @@ final class ReleaseProcessingService
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $stats
+     */
     private function deleteReleasesUnderMinFiles(int|string $groupId, array &$stats): void
     {
         if ($this->settings->minFilesToFormRelease <= 0) {

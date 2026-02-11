@@ -43,6 +43,8 @@ class RolePromotionStat extends Model
 
     /**
      * Get the user that received the promotion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
      */
     public function user(): BelongsTo
     {
@@ -51,6 +53,8 @@ class RolePromotionStat extends Model
 
     /**
      * Get the promotion that was applied
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\RolePromotion, $this>
      */
     public function promotion(): BelongsTo
     {
@@ -60,7 +64,7 @@ class RolePromotionStat extends Model
     /**
      * Get the role that was upgraded
      */
-    public function role(): BelongsTo
+    public function role(): BelongsTo // @phpstan-ignore missingType.generics
     {
         return $this->belongsTo(\Spatie\Permission\Models\Role::class);
     }
@@ -68,7 +72,7 @@ class RolePromotionStat extends Model
     /**
      * Scope to get stats for a specific promotion
      */
-    public function scopeForPromotion($query, int $promotionId)
+    public function scopeForPromotion(mixed $query, int $promotionId): mixed
     {
         return $query->where('role_promotion_id', $promotionId);
     }
@@ -76,7 +80,7 @@ class RolePromotionStat extends Model
     /**
      * Scope to get stats for a specific user
      */
-    public function scopeForUser($query, int $userId)
+    public function scopeForUser(mixed $query, int $userId): mixed
     {
         return $query->where('user_id', $userId);
     }
@@ -84,7 +88,7 @@ class RolePromotionStat extends Model
     /**
      * Scope to get stats for a specific role
      */
-    public function scopeForRole($query, int $roleId)
+    public function scopeForRole(mixed $query, int $roleId): mixed
     {
         return $query->where('role_id', $roleId);
     }
@@ -92,13 +96,15 @@ class RolePromotionStat extends Model
     /**
      * Scope to get stats within a date range
      */
-    public function scopeAppliedBetween($query, $startDate, $endDate)
+    public function scopeAppliedBetween(mixed $query, mixed $startDate, mixed $endDate): mixed
     {
         return $query->whereBetween('applied_at', [$startDate, $endDate]);
     }
 
     /**
      * Get statistics summary for a promotion
+     *
+     * @return array<string, mixed>
      */
     public static function getPromotionSummary(int $promotionId): array
     {
@@ -116,6 +122,8 @@ class RolePromotionStat extends Model
 
     /**
      * Get statistics summary for a user
+     *
+     * @return array<string, mixed>
      */
     public static function getUserSummary(int $userId): array
     {

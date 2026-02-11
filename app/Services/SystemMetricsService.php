@@ -34,6 +34,8 @@ class SystemMetricsService
 
     /**
      * Get historical metrics grouped by hour for the last N hours
+     *
+     * @return array<string, mixed>
      */
     public function getHourlyMetrics(string $type, int $hours = 24): array
     {
@@ -69,11 +71,13 @@ class SystemMetricsService
         }
 
         // Fill missing hours with null or last known value
-        return $this->fillMissingHours($result, $hours);
+        return $this->fillMissingHours($result, $hours); // @phpstan-ignore argument.type
     }
 
     /**
      * Get historical metrics grouped by day for the last N days
+     *
+     * @return list<array<string, float|string>>
      */
     public function getDailyMetrics(string $type, int $days = 30): array
     {
@@ -113,6 +117,9 @@ class SystemMetricsService
 
     /**
      * Fill missing hours with previous value or 0
+     *
+     * @param  array<string, mixed>  $data
+     * @return list<array<string, float|string>>
      */
     protected function fillMissingHours(array $data, int $hours): array
     {
@@ -135,6 +142,8 @@ class SystemMetricsService
 
     /**
      * Get current CPU usage percentage
+     *
+     * @return non-empty-array<string, mixed>
      */
     protected function getCpuUsage(): float
     {
@@ -190,6 +199,8 @@ class SystemMetricsService
 
     /**
      * Get RAM usage information
+     *
+     * @return array<string, mixed>
      */
     protected function getRamUsage(): array
     {

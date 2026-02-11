@@ -20,7 +20,7 @@ class BrowseController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(Request $request)
+    public function index(Request $request): mixed
     {
         $ordering = $this->releaseBrowseService->getBrowseOrdering();
         $orderBy = $request->has('ob') && ! empty($request->input('ob')) ? $request->input('ob') : '';
@@ -52,7 +52,7 @@ class BrowseController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function show(Request $request, string $parentCategory, string $id = 'All')
+    public function show(Request $request, string $parentCategory, string $id = 'All'): mixed
     {
 
         $parentId = RootCategory::query()->where('title', $parentCategory)->value('id');
@@ -158,7 +158,7 @@ class BrowseController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function group(Request $request)
+    public function group(Request $request): mixed
     {
         if ($request->has('g')) {
             $group = $request->input('g');

@@ -10,16 +10,16 @@ class AccountExpired extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $user;
+    public \App\Models\User $user;
 
-    private $siteEmail;
+    private mixed $siteEmail;
 
-    private $siteTitle;
+    private mixed $siteTitle;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($user)
+    public function __construct(\App\Models\User $user)
     {
         $this->user = $user;
         $this->siteEmail = config('mail.from.address');

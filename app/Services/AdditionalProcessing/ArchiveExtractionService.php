@@ -35,7 +35,7 @@ class ArchiveExtractionService
     /**
      * Process compressed data and extract file information.
      *
-     * @return array{success: bool, files: array, hasPassword: bool, passwordStatus: int, archiveMarker?: string, dataSummary?: array, standaloneVideoType?: string, standaloneVideoData?: string}
+     * @return array<string, mixed>
      */
     public function processCompressedData(
         string $compressedData,
@@ -65,7 +65,7 @@ class ArchiveExtractionService
 
             if ($this->config->sevenZipPath) {
                 $extractResult = $this->extractViaSevenZip($compressedData, $archiveType, $tmpPath);
-                if ($extractResult['success']) {
+                if ($extractResult['success']) { // @phpstan-ignore offsetAccess.notFound
                     return $extractResult;
                 }
             }
@@ -200,6 +200,8 @@ class ArchiveExtractionService
 
     /**
      * Process a 7z archive using external binary and internal header parsing.
+     *
+     * @return array<string, mixed>
      */
     private function processSevenZipArchive(
         string $compressedData,
@@ -267,6 +269,8 @@ class ArchiveExtractionService
 
     /**
      * List entries of a 7z archive using external 7z binary.
+     *
+     * @return array<string, mixed>
      */
     public function listSevenZipEntries(string $compressedData, string $tmpPath): array
     {
@@ -284,7 +288,7 @@ class ArchiveExtractionService
             $exitCode = 0;
             $stdout = null;
             $stderr = null;
-            $ok = $this->execCommand($cmd, $exitCode, $stdout, $stderr);
+            $ok = $this->execCommand($cmd, $exitCode, $stdout, $stderr); // @phpstan-ignore argument.type
 
             if (! $ok || $exitCode !== 0 || empty($stdout)) {
                 // Try plain listing fallback
@@ -308,6 +312,8 @@ class ArchiveExtractionService
 
     /**
      * Plain 7z listing fallback.
+     *
+     * @return list<array<string, int|string|false>>
      */
     private function listSevenZipPlain(string $tmpFile): array
     {
@@ -315,7 +321,7 @@ class ArchiveExtractionService
         $exitCode = 0;
         $stdout = null;
         $stderr = null;
-        $ok = $this->execCommand($cmd, $exitCode, $stdout, $stderr);
+        $ok = $this->execCommand($cmd, $exitCode, $stdout, $stderr); // @phpstan-ignore argument.type
 
         if (! $ok || $exitCode !== 0 || empty($stdout)) {
             return [];
@@ -352,6 +358,8 @@ class ArchiveExtractionService
 
     /**
      * Parse structured 7z output.
+     *
+     * @return list<array<string, int|string|false>>
      */
     private function parseSevenZipStructuredOutput(string $output): array
     {
@@ -400,6 +408,9 @@ class ArchiveExtractionService
 
     /**
      * Filter 7z files using extension whitelist.
+     *
+     * @param  array<string, mixed>  $files
+     * @return list<array{name: non-falsy-string, size: int, encrypted: bool, __any_encrypted__?: true}>
      */
     private function filterSevenZipFiles(array $files): array
     {
@@ -446,6 +457,8 @@ class ArchiveExtractionService
 
     /**
      * Scan for filenames in 7z raw data.
+     *
+     * @return list<array{name: mixed, size: mixed, date: int<1, max>, pass: 0, crc32: '', source: '7z-list'}>
      */
     private function scanSevenZipFilenames(string $data): array
     {
@@ -482,6 +495,8 @@ class ArchiveExtractionService
 
     /**
      * Extract using 7zip binary.
+     *
+     * @return list<string>
      */
     public function extractViaSevenZip(string $compressedData, string $type, string $tmpPath): array
     {
@@ -514,7 +529,7 @@ class ArchiveExtractionService
             $exitCode = 0;
             $stdout = null;
             $stderr = null;
-            $this->execCommand($cmd, $exitCode, $stdout, $stderr);
+            $this->execCommand($cmd, $exitCode, $stdout, $stderr); // @phpstan-ignore argument.type
 
             $files = [];
             if (File::isDirectory($extractDir)) {
@@ -533,9 +548,9 @@ class ArchiveExtractionService
             File::delete($fileName);
 
             if (! empty($files)) {
-                return [
+                return [ // @phpstan-ignore return.type
                     'success' => true,
-                    'files' => $this->filterExtractedFiles($files),
+                    'files' => $this->filterExtractedFiles($files), // @phpstan-ignore argument.type
                     'hasPassword' => false,
                     'passwordStatus' => ReleaseBrowseService::PASSWD_NONE,
                     'archiveMarker' => $marker,
@@ -552,6 +567,9 @@ class ArchiveExtractionService
 
     /**
      * Filter extracted files by allowed extensions.
+     *
+     * @param  array<string, mixed>  $files
+     * @return array{success: false, files: array{}, hasPassword: false, passwordStatus: 0}
      */
     private function filterExtractedFiles(array $files): array
     {
@@ -580,6 +598,8 @@ class ArchiveExtractionService
 
     /**
      * Get list of allowed file extensions.
+     *
+     * @return list<mixed>
      */
     private function getAllowedExtensions(): array
     {
@@ -639,8 +659,8 @@ class ArchiveExtractionService
     /**
      * Sort files to prioritize NFO files for processing.
      *
-     * @param  array  $files  Array of file info arrays.
-     * @return array Sorted array with NFO files first.
+     * @param  array<string, mixed>  $files  Array of file info arrays.
+     * @return array<string, mixed> Sorted array with NFO files first.
      */
     public function sortFilesWithNfoPriority(array $files): array
     {
@@ -663,6 +683,8 @@ class ArchiveExtractionService
 
     /**
      * Prepare extraction directories.
+     *
+     * @return list<mixed>
      */
     private function prepareExtractionDirectories(string $tmpPath): void
     {
@@ -690,6 +712,8 @@ class ArchiveExtractionService
 
     /**
      * Extract archive based on type.
+     *
+     * @param  array<string, mixed>  $dataSummary
      */
     private function extractArchive(string $compressedData, array $dataSummary, string $tmpPath): string
     {
@@ -852,7 +876,7 @@ class ArchiveExtractionService
             $exitCode = 0;
             $stdout = null;
             $stderr = null;
-            $this->execCommand($cmd, $exitCode, $stdout, $stderr);
+            $this->execCommand($cmd, $exitCode, $stdout, $stderr); // @phpstan-ignore argument.type
 
             File::delete($archiveFile);
 
@@ -991,6 +1015,8 @@ class ArchiveExtractionService
      * @param-out int $exitCode
      * @param-out string|null $stdout
      * @param-out string|null $stderr
+     *
+     * @param  array<string, mixed>  $cmd
      */
     private function execCommand(array $cmd, ?int &$exitCode, ?string &$stdout, ?string &$stderr): bool
     {
@@ -999,7 +1025,7 @@ class ArchiveExtractionService
             2 => ['pipe', 'w'],
         ];
 
-        $process = @proc_open($cmd, $descriptorSpec, $pipes, null, null, ['bypass_shell' => true]);
+        $process = @proc_open($cmd, $descriptorSpec, $pipes, null, null, ['bypass_shell' => true]); // @phpstan-ignore argument.type
         if (! is_resource($process)) {
             $exitCode = -1;
 

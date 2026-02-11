@@ -12,6 +12,9 @@ namespace App\Services\NameFixing\DTO;
  */
 final class NameFixResult
 {
+    /**
+     * @param  array<string, mixed>  $metadata
+     */
     public function __construct(
         public readonly string $newName,
         public readonly string $method,

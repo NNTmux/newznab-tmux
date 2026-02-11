@@ -24,7 +24,7 @@ class MyMoviesController extends BasePageController
         $this->movieBrowseService = $movieBrowseService;
     }
 
-    public function show(Request $request)
+    public function show(Request $request): mixed
     {
         $action = $request->input('id') ?? '';
         $imdbid = $request->input('imdb') ?? '';

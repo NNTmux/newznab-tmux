@@ -35,6 +35,8 @@ class UpdateReleasesIndexSchema extends Command
 
     /**
      * The expected schema fields for releases_rt
+     *
+     * @var array<string, mixed>
      */
     private array $expectedFields = [
         'name' => ['type' => 'text'],
@@ -386,7 +388,7 @@ class UpdateReleasesIndexSchema extends Command
 
                     // Process batch when it reaches the threshold
                     if (count($batch) >= 1000) {
-                        $result = $this->processBatch($indexName, $batch);
+                        $result = $this->processBatch($indexName, $batch); // @phpstan-ignore argument.type
                         $updated += $result['updated'];
                         $errors += $result['errors'];
                         $batch = [];
@@ -397,7 +399,7 @@ class UpdateReleasesIndexSchema extends Command
 
                 // Process remaining batch
                 if (! empty($batch)) {
-                    $result = $this->processBatch($indexName, $batch);
+                    $result = $this->processBatch($indexName, $batch); // @phpstan-ignore argument.type
                     $updated += $result['updated'];
                     $errors += $result['errors'];
                 }
@@ -417,8 +419,10 @@ class UpdateReleasesIndexSchema extends Command
 
     /**
      * Prepare media data for a release
+     *
+     * @return array<string, mixed>
      */
-    private function prepareMediaData($release): array
+    private function prepareMediaData(mixed $release): array
     {
         return [
             'imdbid' => (int) ($release->imdbid ?: 0),
@@ -462,6 +466,9 @@ class UpdateReleasesIndexSchema extends Command
 
     /**
      * Process a batch of updates
+     *
+     * @param  array<string, mixed>  $batch
+     * @return array<string, mixed>
      */
     private function processBatch(string $indexName, array $batch): array
     {
@@ -494,6 +501,8 @@ class UpdateReleasesIndexSchema extends Command
     /**
      * Insert or replace a document in the index
      * This is used as a fallback when UPDATE fails
+     *
+     * @param  array<string, mixed>  $mediaData
      */
     private function insertOrReplaceDocument(string $indexName, int $id, array $mediaData): void
     {

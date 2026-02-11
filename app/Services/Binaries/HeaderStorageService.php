@@ -41,10 +41,10 @@ final class HeaderStorageService
     /**
      * Store parsed headers to the database.
      *
-     * @param  array  $headers  Parsed headers with 'matches' already populated
-     * @param  array  $groupMySQL  Group info from database
+     * @param  array<string, mixed>  $headers  Parsed headers with 'matches' already populated
+     * @param  array<string, mixed>  $groupMySQL  Group info from database
      * @param  bool  $addToPartRepair  Whether to track failed inserts
-     * @return array Article numbers that failed to insert
+     * @return array<string, mixed> Article numbers that failed to insert
      */
     public function store(array $headers, array $groupMySQL, bool $addToPartRepair = true): array
     {
@@ -110,6 +110,10 @@ final class HeaderStorageService
         ));
     }
 
+    /**
+     * @param  array<string, mixed>  $groupMySQL
+     * @param  array<string, mixed>  $header
+     */
     private function processHeader(array $header, array $groupMySQL, HeaderStorageTransaction $transaction): bool
     {
         // Get file count from subject
@@ -160,6 +164,9 @@ final class HeaderStorageService
         return true;
     }
 
+    /**
+     * @return array<int, int|string>
+     */
     private function getFileCount(string $subject): array
     {
         if (! preg_match('/[[(\s](\d{1,5})(\/|[\s_]of[\s_]|-)(\d{1,5})[])[\s$:]/i', $subject, $fileCount)) {

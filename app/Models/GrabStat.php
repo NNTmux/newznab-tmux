@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class GrabStat extends Model
 {
-    use HasFactory;
+    use HasFactory; // @phpstan-ignore missingType.generics
 
     protected $guarded = [];
 
@@ -20,6 +20,9 @@ class GrabStat extends Model
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public static function getTopGrabbers(): array
     {
         return self::query()->select(['username', 'grabs'])->orderByDesc('grabs')->limit(10)->get()->toArray();

@@ -141,6 +141,8 @@ class CreateMediaIndexes extends Command
 
     /**
      * Create a single Manticore index.
+     *
+     * @param  array<string, mixed>  $schema
      */
     private function createManticoreIndex(Client $client, string $indexName, array $schema, bool $dropExisting): bool
     {

@@ -269,20 +269,23 @@ class Category extends Model
      */
     protected $guarded = [];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Release, $this>
+     */
     public function releases(): HasMany
     {
         return $this->hasMany(Release::class, 'categories_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\RootCategory, $this>
+     */
     public function parent(): BelongsTo
     {
         return $this->belongsTo(RootCategory::class, 'root_categories_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public static function getRecentlyAdded()
+    public static function getRecentlyAdded(): mixed
     {
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
         $result = Cache::get(md5('RecentlyAdded'));
@@ -304,7 +307,11 @@ class Category extends Model
         return $result;
     }
 
-    public static function getCategorySearch(array $cat = [], ?string $searchType = null, $builder = false): string|array|null
+    /**
+     * @param  array<string, mixed>  $cat
+     * @return array<string, mixed>
+     */
+    public static function getCategorySearch(array $cat = [], ?string $searchType = null, mixed $builder = false): string|array|null
     {
         // Generate a cache key based on the input parameters
         $cacheKey = 'cat_search_'.md5(serialize($cat).$searchType.($builder ? '1' : '0'));
@@ -390,7 +397,7 @@ class Category extends Model
     /**
      * @return mixed
      */
-    public static function getCategoryValue($category)
+    public static function getCategoryValue(mixed $category)
     {
         return \constant('self::'.$category);
     }
@@ -398,7 +405,7 @@ class Category extends Model
     /**
      * Check if category is parent.
      */
-    public static function isParent($cid): bool
+    public static function isParent(mixed $cid): bool
     {
         // Cache the parent category check to avoid repeated DB queries
         $cacheKey = 'cat_is_parent_'.$cid;
@@ -416,10 +423,7 @@ class Category extends Model
         return $isParent;
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public static function getFlat()
+    public static function getFlat(): mixed
     {
         return self::query()->get();
     }
@@ -430,7 +434,7 @@ class Category extends Model
      *
      * @return mixed
      */
-    public static function getChildren($categoryId)
+    public static function getChildren(mixed $categoryId)
     {
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
         $result = Cache::get(md5($categoryId));
@@ -446,21 +450,16 @@ class Category extends Model
 
     /**
      * Get names of enabled parent categories.
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public static function getEnabledParentNames()
+    public static function getEnabledParentNames(): mixed
     {
         return RootCategory::query()->where('status', '=', 1)->get(['title']);
     }
 
     /**
      * Returns category ID's for site disabled categories.
-     *
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public static function getDisabledIDs()
+    public static function getDisabledIDs(): mixed
     {
         return self::query()
             ->where('status', '=', 2)
@@ -469,10 +468,8 @@ class Category extends Model
 
     /**
      * Get multiple categories.
-     *
-     * @return bool|\Illuminate\Database\Eloquent\Collection
      */
-    public static function getByIds($ids)
+    public static function getByIds(mixed $ids): mixed
     {
         if (\count($ids) > 0) {
             $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
@@ -493,7 +490,7 @@ class Category extends Model
     /**
      * Return the parent and category name from the supplied categoryID.
      */
-    public static function getNameByID($categoryId): string
+    public static function getNameByID(mixed $categoryId): string
     {
         $cat = self::query()->where('id', $categoryId)->first();
 
@@ -503,7 +500,7 @@ class Category extends Model
     /**
      * @return bool|mixed
      */
-    public static function getIdByName($title, $parent)
+    public static function getIdByName(mixed $title, mixed $parent)
     {
         $cat = self::query()->where('title', $title)->with('parent.'.$parent)->first(['id']);
 
@@ -513,7 +510,7 @@ class Category extends Model
     /**
      * Update a category.
      */
-    public static function updateCategory($id, $status, $desc, $disablepreview, $minsize, $maxsize): int
+    public static function updateCategory(mixed $id, mixed $status, mixed $desc, mixed $disablepreview, mixed $minsize, mixed $maxsize): int
     {
         return self::query()->where('id', $id)->update(
             [
@@ -526,6 +523,10 @@ class Category extends Model
         );
     }
 
+    /**
+     * @param  array<string, mixed>  $excludedCats
+     * @return array<string, mixed>
+     */
     public static function getForMenu(array $excludedCats = []): array
     {
         $categoriesResult = [];
@@ -546,9 +547,9 @@ class Category extends Model
     }
 
     /**
-     * @return mixed
+     * @return list<mixed>
      */
-    public static function getForApi()
+    public static function getForApi(): mixed
     {
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
         $result = Cache::get(md5('ForApi'));
@@ -565,6 +566,8 @@ class Category extends Model
 
     /**
      * Return a list of categories for use in a dropdown.
+     *
+     * @return array<int, string>
      */
     public static function getForSelect(bool $blnIncludeNoneSelected = true): array
     {
@@ -582,7 +585,11 @@ class Category extends Model
         return $temp_array;
     }
 
-    public static function getCategories(bool $activeOnly = false, array $excludedCats = []): \Illuminate\Database\Eloquent\Collection
+    /**
+     * @param  array<string, mixed>  $excludedCats
+     * @return array<int, string>
+     */
+    public static function getCategories(bool $activeOnly = false, array $excludedCats = []): \Illuminate\Database\Eloquent\Collection // @phpstan-ignore missingType.generics
     {
         $sql = self::query()
             ->with('parent')

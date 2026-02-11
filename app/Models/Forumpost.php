@@ -52,7 +52,7 @@ class Forumpost extends Model
      */
     protected $guarded = [];
 
-    public static function add($parentId, $userid, $subject, $message, int $locked = 0, int $sticky = 0, int $replies = 0): int
+    public static function add(mixed $parentId, mixed $userid, mixed $subject, mixed $message, int $locked = 0, int $sticky = 0, int $replies = 0): int
     {
         if ($message === '') {
             return -1;
@@ -87,7 +87,7 @@ class Forumpost extends Model
      *
      * @return Model|null|static
      */
-    public static function getParent($parent)
+    public static function getParent(mixed $parent)
     {
         return self::query()
             ->where('forumpost.id', $parent)
@@ -98,11 +98,8 @@ class Forumpost extends Model
 
     /**
      * Get forum posts for a parent category.
-     *
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public static function getPosts($parent)
+    public static function getPosts(mixed $parent): mixed
     {
         return self::query()
             ->where('forumpost.id', $parent)
@@ -121,7 +118,7 @@ class Forumpost extends Model
      *
      * @return Model|null|static
      */
-    public static function getPost($id)
+    public static function getPost(mixed $id)
     {
         return self::query()->where('id', $id)->first();
     }
@@ -132,7 +129,7 @@ class Forumpost extends Model
      *
      * @param  $start
      */
-    public static function getBrowseRange(): LengthAwarePaginator
+    public static function getBrowseRange(): LengthAwarePaginator // @phpstan-ignore missingType.generics
     {
         return self::query()
             ->where('forumpost.parentid', '=', 0)
@@ -146,7 +143,7 @@ class Forumpost extends Model
     /**
      * Delete parent category from forum.
      */
-    public static function deleteParent($parent): void
+    public static function deleteParent(mixed $parent): void
     {
         self::query()->where('id', $parent)->orWhere('parentid', $parent)->delete();
     }
@@ -154,7 +151,7 @@ class Forumpost extends Model
     /**
      * Delete post from forum.
      */
-    public static function deletePost($id): void
+    public static function deletePost(mixed $id): void
     {
         $post = self::getPost($id);
         if ($post) {
@@ -169,12 +166,12 @@ class Forumpost extends Model
     /**
      * Delete user from forum.
      */
-    public static function deleteUser($id): void
+    public static function deleteUser(mixed $id): void
     {
         self::query()->where('users_id', $id)->delete();
     }
 
-    public static function getCountForUser($uid): int
+    public static function getCountForUser(mixed $uid): int
     {
         $res = self::query()->where('users_id', $uid)->count('id');
 
@@ -183,11 +180,8 @@ class Forumpost extends Model
 
     /**
      * Get range of posts for user.
-     *
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public static function getForUserRange($uid, $start, $num)
+    public static function getForUserRange(mixed $uid, mixed $start, mixed $num): mixed
     {
         $range = self::query()
             ->where('forumpost.users_id', $uid)
@@ -204,7 +198,7 @@ class Forumpost extends Model
     /**
      * Edit forum post for user.
      */
-    public static function editPost($id, $message, $uid): void
+    public static function editPost(mixed $id, mixed $message, mixed $uid): void
     {
         $post = self::getPost($id);
         if ($post) {
@@ -215,7 +209,7 @@ class Forumpost extends Model
     /**
      * Lock forum topic.
      */
-    public static function lockUnlockTopic($id, $lock): void
+    public static function lockUnlockTopic(mixed $id, mixed $lock): void
     {
         self::query()->where('id', $id)->orWhere('parentid', $id)->update(['locked' => $lock]);
     }

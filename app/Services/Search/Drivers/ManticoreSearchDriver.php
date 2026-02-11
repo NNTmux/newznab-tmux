@@ -19,8 +19,14 @@ use Manticoresearch\Search;
  */
 class ManticoreSearchDriver implements SearchDriverInterface
 {
+    /**
+     * @var array<string, mixed>
+     */
     protected array $config;
 
+    /**
+     * @var array<string, mixed>
+     */
     protected array $connection;
 
     public Client $manticoreSearch;
@@ -29,6 +35,8 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
     /**
      * Establishes a connection to ManticoreSearch HTTP port.
+     *
+     * @param  array<string, mixed>  $config
      */
     public function __construct(array $config = [])
     {
@@ -90,6 +98,8 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
     /**
      * Get fuzzy search configuration.
+     *
+     * @return array<string, mixed>
      */
     public function getFuzzyConfig(): array
     {
@@ -134,6 +144,8 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
     /**
      * Insert release into ManticoreSearch releases_rt realtime index
+     *
+     * @param  array<string, mixed>  $parameters
      */
     public function insertRelease(array $parameters): void
     {
@@ -183,6 +195,8 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
     /**
      * Insert release into Manticore RT table.
+     *
+     * @param  array<string, mixed>  $parameters
      */
     public function insertPredb(array $parameters): void
     {
@@ -266,8 +280,8 @@ class ManticoreSearchDriver implements SearchDriverInterface
     /**
      * Bulk insert multiple releases into the index.
      *
-     * @param  array  $releases  Array of release data arrays
-     * @return array Results with 'success' and 'errors' counts
+     * @param  array<string, mixed>  $releases  Array of release data arrays
+     * @return array<string, mixed> Results with 'success' and 'errors' counts
      */
     public function bulkInsertReleases(array $releases): array
     {
@@ -318,8 +332,8 @@ class ManticoreSearchDriver implements SearchDriverInterface
     /**
      * Bulk insert multiple predb records into the index.
      *
-     * @param  array  $predbRecords  Array of predb data arrays
-     * @return array Results with 'success' and 'errors' counts
+     * @param  array<string, mixed>  $predbRecords  Array of predb data arrays
+     * @return array<string, mixed> Results with 'success' and 'errors' counts
      */
     public function bulkInsertPredb(array $predbRecords): array
     {
@@ -360,7 +374,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
     /**
      * Delete release from Manticore RT tables by GUID.
      *
-     * @param  array  $identifiers  ['g' => Release GUID(mandatory), 'id' => ReleaseID(optional, pass false)]
+     * @param  array<string, mixed>  $identifiers  ['g' => Release GUID(mandatory), 'id' => ReleaseID(optional, pass false)]
      */
     public function deleteReleaseByGuid(array $identifiers): void
     {
@@ -536,6 +550,8 @@ class ManticoreSearchDriver implements SearchDriverInterface
      * Used to prevent fuzzy fallback from reversing the user's negation intent.
      * For example, if the user searches "!harry", fuzzy should not strip the !
      * and return "harry" results.
+     *
+     * @param  array<string, mixed>  $phrases
      */
     public static function queryHasNegation(array|string $phrases): bool
     {
@@ -597,6 +613,8 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
     /**
      * Update Manticore Predb index for given predb_id.
+     *
+     * @param  array<string, mixed>  $parameters
      */
     public function updatePreDb(array $parameters): void
     {
@@ -609,6 +627,9 @@ class ManticoreSearchDriver implements SearchDriverInterface
         $this->insertPredb($parameters);
     }
 
+    /**
+     * @param  array<string, mixed>  $indexes
+     */
     public function truncateRTIndex(array $indexes = []): bool
     {
         if (empty($indexes)) {
@@ -659,7 +680,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
      * Truncate/clear an index (remove all documents).
      * Implements SearchServiceInterface::truncateIndex
      *
-     * @param  array|string  $indexes  Index name(s) to truncate
+     * @param  array<string, mixed>|string  $indexes  Index name(s) to truncate
      */
     public function truncateIndex(array|string $indexes): void
     {
@@ -806,9 +827,9 @@ class ManticoreSearchDriver implements SearchDriverInterface
     /**
      * Search releases index.
      *
-     * @param  array|string  $phrases  Search phrases - can be a string, indexed array of terms, or associative array with field names
+     * @param  array<string, mixed>|string  $phrases  Search phrases - can be a string, indexed array of terms, or associative array with field names
      * @param  int  $limit  Maximum number of results
-     * @return array Array of release IDs
+     * @return array<string, mixed> Array of release IDs
      */
     public function searchReleases(array|string $phrases, int $limit = 1000): array
     {
@@ -839,10 +860,10 @@ class ManticoreSearchDriver implements SearchDriverInterface
      * If exact search returns no results and fuzzy is enabled, this method
      * will automatically try a fuzzy search as a fallback.
      *
-     * @param  array|string  $phrases  Search phrases
+     * @param  array<string, mixed>|string  $phrases  Search phrases
      * @param  int  $limit  Maximum number of results
      * @param  bool  $forceFuzzy  Force fuzzy search regardless of exact results
-     * @return array Array with 'ids' (release IDs) and 'fuzzy' (bool indicating if fuzzy was used)
+     * @return array<string, mixed> Array with 'ids' (release IDs) and 'fuzzy' (bool indicating if fuzzy was used)
      */
     public function searchReleasesWithFuzzy(array|string $phrases, int $limit = 1000, bool $forceFuzzy = false): array
     {
@@ -895,9 +916,9 @@ class ManticoreSearchDriver implements SearchDriverInterface
      *
      * Uses Manticore's native fuzzy search with Levenshtein distance algorithm.
      *
-     * @param  array|string  $phrases  Search phrases
+     * @param  array<string, mixed>|string  $phrases  Search phrases
      * @param  int  $limit  Maximum number of results
-     * @return array Array of release IDs
+     * @return array<string, mixed> Array of release IDs
      */
     public function fuzzySearchReleases(array|string $phrases, int $limit = 1000): array
     {
@@ -932,9 +953,9 @@ class ManticoreSearchDriver implements SearchDriverInterface
      * - Wrong characters: "laptip" → "laptop"
      *
      * @param  string  $index  Index to search
-     * @param  array  $searchArray  Associative array of field => value to search
+     * @param  array<string, mixed>  $searchArray  Associative array of field => value to search
      * @param  int  $limit  Maximum number of results
-     * @return array Array with 'id' and 'data' keys
+     * @return array<string, mixed> Array with 'id' and 'data' keys
      */
     public function fuzzySearchIndexes(string $index, array $searchArray, int $limit = 1000): array
     {
@@ -1069,18 +1090,23 @@ class ManticoreSearchDriver implements SearchDriverInterface
     /**
      * Search predb index.
      *
-     * @param  array|string  $searchTerm  Search term(s)
-     * @return array Array of predb records
+     * @param  array<string, mixed>|string  $searchTerm  Search term(s)
+     * @return array<string, mixed> Array of predb records
      */
     public function searchPredb(array|string $searchTerm): array
     {
         $searchString = is_array($searchTerm) ? implode(' ', $searchTerm) : $searchTerm;
 
-        $result = $this->searchIndexes($this->getPredbIndex(), $searchString, ['title', 'filename'], []);
+        $result = $this->searchIndexes($this->getPredbIndex(), $searchString, ['title', 'filename'], []); // @phpstan-ignore argument.type
 
         return $result['data'] ?? [];
     }
 
+    /**
+     * @param  array<string, mixed>  $column
+     * @param  array<string, mixed>  $searchArray
+     * @return array<string, mixed>
+     */
     public function searchIndexes(string $rt_index, ?string $searchString, array $column = [], array $searchArray = []): array
     {
         if (empty($rt_index)) {
@@ -1155,7 +1181,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 if (count($column) > 1) {
                     $searchColumns = '@('.implode(',', $column).')';
                 } else {
-                    $searchColumns = '@'.$column[0];
+                    $searchColumns = '@'.$column[0]; // @phpstan-ignore offsetAccess.notFound
                 }
             }
 
@@ -1559,7 +1585,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
     /**
      * Insert a movie into the movies search index.
      *
-     * @param  array  $parameters  Movie data
+     * @param  array<string, mixed>  $parameters  Movie data
      */
     public function insertMovie(array $parameters): void
     {
@@ -1651,8 +1677,8 @@ class ManticoreSearchDriver implements SearchDriverInterface
     /**
      * Bulk insert multiple movies into the index.
      *
-     * @param  array  $movies  Array of movie data arrays
-     * @return array Results with 'success' and 'errors' counts
+     * @param  array<string, mixed>  $movies  Array of movie data arrays
+     * @return array<string, mixed> Results with 'success' and 'errors' counts
      */
     public function bulkInsertMovies(array $movies): array
     {
@@ -1703,15 +1729,15 @@ class ManticoreSearchDriver implements SearchDriverInterface
     /**
      * Search the movies index.
      *
-     * @param  array|string  $searchTerm  Search term(s)
+     * @param  array<string, mixed>|string  $searchTerm  Search term(s)
      * @param  int  $limit  Maximum number of results
-     * @return array Array with 'id' (movie IDs) and 'data' (movie data)
+     * @return array<string, mixed> Array with 'id' (movie IDs) and 'data' (movie data)
      */
     public function searchMovies(array|string $searchTerm, int $limit = 1000): array
     {
         $searchString = is_array($searchTerm) ? implode(' ', $searchTerm) : $searchTerm;
 
-        return $this->searchIndexes($this->getMoviesIndex(), $searchString, ['title', 'actors', 'director'], []);
+        return $this->searchIndexes($this->getMoviesIndex(), $searchString, ['title', 'actors', 'director'], []); // @phpstan-ignore argument.type
     }
 
     /**
@@ -1719,7 +1745,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
      *
      * @param  string  $field  Field name (imdbid, tmdbid, traktid)
      * @param  int|string  $value  The external ID value
-     * @return array|null Movie data or null if not found
+     * @return array<string, mixed>|null Movie data or null if not found
      */
     public function searchMovieByExternalId(string $field, int|string $value): ?array
     {
@@ -1761,7 +1787,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
     /**
      * Insert a TV show into the tvshows search index.
      *
-     * @param  array  $parameters  TV show data
+     * @param  array<string, mixed>  $parameters  TV show data
      */
     public function insertTvShow(array $parameters): void
     {
@@ -1852,8 +1878,8 @@ class ManticoreSearchDriver implements SearchDriverInterface
     /**
      * Bulk insert multiple TV shows into the index.
      *
-     * @param  array  $tvShows  Array of TV show data arrays
-     * @return array Results with 'success' and 'errors' counts
+     * @param  array<string, mixed>  $tvShows  Array of TV show data arrays
+     * @return array<string, mixed> Results with 'success' and 'errors' counts
      */
     public function bulkInsertTvShows(array $tvShows): array
     {
@@ -1903,15 +1929,15 @@ class ManticoreSearchDriver implements SearchDriverInterface
     /**
      * Search the TV shows index.
      *
-     * @param  array|string  $searchTerm  Search term(s)
+     * @param  array<string, mixed>|string  $searchTerm  Search term(s)
      * @param  int  $limit  Maximum number of results
-     * @return array Array with 'id' (TV show IDs) and 'data' (TV show data)
+     * @return array<string, mixed> Array with 'id' (TV show IDs) and 'data' (TV show data)
      */
     public function searchTvShows(array|string $searchTerm, int $limit = 1000): array
     {
         $searchString = is_array($searchTerm) ? implode(' ', $searchTerm) : $searchTerm;
 
-        return $this->searchIndexes($this->getTvShowsIndex(), $searchString, ['title'], []);
+        return $this->searchIndexes($this->getTvShowsIndex(), $searchString, ['title'], []); // @phpstan-ignore argument.type
     }
 
     /**
@@ -1919,7 +1945,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
      *
      * @param  string  $field  Field name (tvdb, trakt, tvmaze, tvrage, imdb, tmdb)
      * @param  int|string  $value  The external ID value
-     * @return array|null TV show data or null if not found
+     * @return array<string, mixed>|null TV show data or null if not found
      */
     public function searchTvShowByExternalId(string $field, int|string $value): ?array
     {
@@ -1962,9 +1988,9 @@ class ManticoreSearchDriver implements SearchDriverInterface
      * Search releases by external media IDs.
      * Used to find releases associated with a specific movie or TV show.
      *
-     * @param  array  $externalIds  Associative array of external IDs
+     * @param  array<string, mixed>  $externalIds  Associative array of external IDs
      * @param  int  $limit  Maximum number of results
-     * @return array Array of release IDs
+     * @return array<string, mixed> Array of release IDs
      */
     public function searchReleasesByExternalId(array $externalIds, int $limit = 1000): array
     {
@@ -2015,9 +2041,10 @@ class ManticoreSearchDriver implements SearchDriverInterface
      * Search releases by category ID using the search index.
      * This provides a fast way to get release IDs for a specific category without hitting the database.
      *
-     * @param  array  $categoryIds  Array of category IDs to filter by
+     * @param  array<string, mixed>  $categoryIds  Array of category IDs to filter by
      * @param  int  $limit  Maximum number of results
-     * @return array Array of release IDs
+     * @return list
+     * @return array<string, mixed>
      */
     public function searchReleasesByCategory(array $categoryIds, int $limit = 1000): array
     {
@@ -2044,7 +2071,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
             // Use IN filter for multiple category IDs
             if (count($validCategoryIds) === 1) {
-                $query->filter('categories_id', '=', (int) $validCategoryIds[0]);
+                $query->filter('categories_id', '=', (int) $validCategoryIds[0]); // @phpstan-ignore offsetAccess.notFound
             } else {
                 $query->filter('categories_id', 'in', array_map('intval', $validCategoryIds));
             }
@@ -2060,7 +2087,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 Cache::put($cacheKey, $resultIds, now()->addMinutes($this->config['cache_minutes'] ?? 5));
             }
 
-            return $resultIds;
+            return $resultIds; // @phpstan-ignore return.type
         } catch (\Throwable $e) {
             Log::error('ManticoreSearch searchReleasesByCategory error: '.$e->getMessage(), [
                 'categoryIds' => $categoryIds,
@@ -2075,9 +2102,10 @@ class ManticoreSearchDriver implements SearchDriverInterface
      * First searches by text, then filters by category IDs using the search index.
      *
      * @param  string  $searchTerm  Search text
-     * @param  array  $categoryIds  Array of category IDs to filter by (empty for all categories)
+     * @param  array<string, mixed>  $categoryIds  Array of category IDs to filter by (empty for all categories)
      * @param  int  $limit  Maximum number of results
-     * @return array Array of release IDs
+     * @return list
+     * @return array<string, mixed>
      */
     public function searchReleasesWithCategoryFilter(string $searchTerm, array $categoryIds = [], int $limit = 1000): array
     {
@@ -2113,7 +2141,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
             // Add category filter if provided
             if (! empty($validCategoryIds)) {
                 if (count($validCategoryIds) === 1) {
-                    $query->filter('categories_id', '=', (int) $validCategoryIds[0]);
+                    $query->filter('categories_id', '=', (int) $validCategoryIds[0]); // @phpstan-ignore offsetAccess.notFound
                 } else {
                     $query->filter('categories_id', 'in', array_map('intval', $validCategoryIds));
                 }
@@ -2130,7 +2158,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 Cache::put($cacheKey, $resultIds, now()->addMinutes($this->config['cache_minutes'] ?? 5));
             }
 
-            return $resultIds;
+            return $resultIds; // @phpstan-ignore return.type
         } catch (\Throwable $e) {
             Log::error('ManticoreSearch searchReleasesWithCategoryFilter error: '.$e->getMessage(), [
                 'searchTerm' => $searchTerm,

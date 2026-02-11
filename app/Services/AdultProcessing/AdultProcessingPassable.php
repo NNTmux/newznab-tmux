@@ -13,6 +13,9 @@ class AdultProcessingPassable
 
     public bool $debug;
 
+    /**
+     * @var array<string, mixed>
+     */
     public array $providerResults = [];
 
     public ?string $cookie = null;
@@ -70,6 +73,8 @@ class AdultProcessingPassable
 
     /**
      * Build the final result array.
+     *
+     * @return array<string, mixed>
      */
     public function toArray(): array
     {

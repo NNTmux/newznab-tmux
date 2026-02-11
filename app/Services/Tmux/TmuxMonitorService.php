@@ -15,6 +15,9 @@ class TmuxMonitorService
 {
     protected Tmux $tmux;
 
+    /**
+     * @var array<string, mixed>
+     */
     protected array $runVar = [];
 
     protected int $iterations = 1;
@@ -28,6 +31,8 @@ class TmuxMonitorService
 
     /**
      * Initialize monitor with default values
+     *
+     * @return array<string, mixed>
      */
     public function initializeMonitor(): array
     {
@@ -72,6 +77,8 @@ class TmuxMonitorService
 
     /**
      * Initialize all timers
+     *
+     * @return array<string, mixed>
      */
     protected function initializeTimers(): array
     {
@@ -109,6 +116,8 @@ class TmuxMonitorService
 
     /**
      * Collect current statistics
+     *
+     * @return array<string, mixed>
      */
     public function collectStatistics(): array
     {
@@ -461,6 +470,8 @@ class TmuxMonitorService
 
     /**
      * Get current run variables
+     *
+     * @return array<string, mixed>
      */
     public function getRunVar(): array
     {

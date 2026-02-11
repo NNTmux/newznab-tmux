@@ -49,6 +49,7 @@ final class CollectionHandler
     /**
      * Get or create a collection for the given header.
      *
+     * @param  array<string, mixed>  $header
      * @return int|null Collection ID or null on failure
      */
     public function getOrCreateCollection(
@@ -116,6 +117,9 @@ final class CollectionHandler
         return null;
     }
 
+    /**
+     * @param  array<string, mixed>  $headerTokens
+     */
     private function insertOrGetCollection(
         string $driver,
         string $subject,
@@ -157,6 +161,9 @@ final class CollectionHandler
         );
     }
 
+    /**
+     * @param  array<string, mixed>  $headerTokens
+     */
     private function insertCollectionSqlite(
         string $subject,
         string $fromName,
@@ -193,6 +200,9 @@ final class CollectionHandler
         return (int) (Collection::whereCollectionhash($collectionHash)->value('id') ?? 0);
     }
 
+    /**
+     * @param  array<string, mixed>  $headerTokens
+     */
     private function insertCollectionMysql(
         string $subject,
         string $fromName,
@@ -241,6 +251,8 @@ final class CollectionHandler
 
     /**
      * Get IDs created in this batch.
+     *
+     * @return list<int>
      */
     public function getInsertedIds(): array
     {
@@ -249,6 +261,8 @@ final class CollectionHandler
 
     /**
      * Get all collection IDs processed this batch.
+     *
+     * @return list<int>
      */
     public function getAllIds(): array
     {
@@ -257,6 +271,8 @@ final class CollectionHandler
 
     /**
      * Get all collection hashes processed this batch.
+     *
+     * @return list<string>
      */
     public function getBatchHashes(): array
     {

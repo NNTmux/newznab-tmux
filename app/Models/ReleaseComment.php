@@ -64,11 +64,17 @@ class ReleaseComment extends Model
 
     protected $dateFormat = false;
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Release, $this>
+     */
     public function release(): BelongsTo
     {
         return $this->belongsTo(Release::class, 'releases_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'users_id');
@@ -80,12 +86,15 @@ class ReleaseComment extends Model
      *
      * @return Model|null|static
      */
-    public static function getCommentById($id)
+    public static function getCommentById(mixed $id)
     {
         return self::query()->where('id', $id)->first();
     }
 
-    public static function getComments($id): array
+    /**
+     * @return array<string, mixed>
+     */
+    public static function getComments(mixed $id): array
     {
         return self::query()->where('releases_id', $id)->orderByDesc('created_at')->get()->toArray();
     }
@@ -98,7 +107,7 @@ class ReleaseComment extends Model
     /**
      * Delete single comment on the site.
      */
-    public static function deleteComment($id): void
+    public static function deleteComment(mixed $id): void
     {
         $res = self::getCommentById($id);
         if ($res) {
@@ -114,7 +123,7 @@ class ReleaseComment extends Model
      *
      * @throws \Exception
      */
-    public static function addComment($id, $gid, $text, $userid, $host): int
+    public static function addComment(mixed $id, mixed $gid, mixed $text, mixed $userid, mixed $host): int
     {
         if (config('nntmux:settings.store_user_ip') === false) {
             $host = '';
@@ -144,7 +153,7 @@ class ReleaseComment extends Model
     /**
      * Get release_comments rows by limit.
      */
-    public static function getCommentsRange(): LengthAwarePaginator
+    public static function getCommentsRange(): LengthAwarePaginator // @phpstan-ignore missingType.generics
     {
         $range = self::query()
             ->select(['release_comments.*', 'releases.guid'])
@@ -157,7 +166,7 @@ class ReleaseComment extends Model
     /**
      * Update the denormalised count of comments for a release.
      */
-    public static function updateReleaseCommentCount($gid): void
+    public static function updateReleaseCommentCount(mixed $gid): void
     {
         $commentCount = self::query()->where('gid', '=', 'releases.gid')->where('isvisible', '=', 1)->count('id');
         Release::query()->where('gid', $gid)->update(['comments' => $commentCount]);
@@ -166,14 +175,14 @@ class ReleaseComment extends Model
     /**
      * Get a count of all comments for a user.
      */
-    public static function getCommentCountForUser($uid): int
+    public static function getCommentCountForUser(mixed $uid): int
     {
         $res = self::query()->where(['users_id' => $uid, 'isvisible' => 1])->count('id');
 
         return $res;
     }
 
-    public static function getCommentsForUserRange($uid): LengthAwarePaginator
+    public static function getCommentsForUserRange(mixed $uid): LengthAwarePaginator // @phpstan-ignore missingType.generics
     {
         return self::query()
             ->select(['release_comments.*', 'r.guid', 'r.searchname', 'u.username'])

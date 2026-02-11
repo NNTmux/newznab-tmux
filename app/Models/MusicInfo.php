@@ -70,6 +70,9 @@ class MusicInfo extends Model
      */
     protected $guarded = [];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Genre, $this>
+     */
     public function genre(): BelongsTo
     {
         return $this->belongsTo(Genre::class, 'genres_id');
@@ -80,6 +83,9 @@ class MusicInfo extends Model
         return 'ix_musicinfo_artist_title_ft';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toSearchableArray(): array
     {
         return [

@@ -27,7 +27,7 @@ class CategorizationService
      * @param  string  $releaseName  The name of the release
      * @param  string|null  $poster  The poster name
      * @param  bool  $debug  Whether to include debug information
-     * @return array The categorization result with category ID and optional debug info
+     * @return array<string, mixed> The categorization result with category ID and optional debug info
      */
     public function determineCategory(
         int|string $groupId,
@@ -41,8 +41,8 @@ class CategorizationService
     /**
      * Batch categorize multiple releases.
      *
-     * @param  array  $releases  Array of ['group_id' => x, 'name' => y, 'poster' => z]
-     * @return array Array of categorization results
+     * @param  array<string, mixed>  $releases  Array of ['group_id' => x, 'name' => y, 'poster' => z]
+     * @return array<string, mixed> Array of categorization results
      */
     public function batchCategorize(array $releases): array
     {
@@ -64,6 +64,8 @@ class CategorizationService
 
     /**
      * Get the underlying pipeline.
+     *
+     * @return list<array<string, mixed>>
      */
     public function getPipeline(): CategorizationPipeline
     {
@@ -131,6 +133,8 @@ class CategorizationService
 
     /**
      * Get statistics about categorizer usage.
+     *
+     * @return array<string, mixed>
      */
     public function getCategorizerStats(): array
     {

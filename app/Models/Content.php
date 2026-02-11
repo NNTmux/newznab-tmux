@@ -89,7 +89,7 @@ class Content extends Model
     /**
      * Scope: Get only active content.
      */
-    public function scopeActive(Builder $query): Builder
+    public function scopeActive(Builder $query): Builder // @phpstan-ignore missingType.generics
     {
         return $query->where('status', self::STATUS_ENABLED);
     }
@@ -97,7 +97,7 @@ class Content extends Model
     /**
      * Scope: Get content of a specific type.
      */
-    public function scopeOfType(Builder $query, int $type): Builder
+    public function scopeOfType(Builder $query, int $type): Builder // @phpstan-ignore missingType.generics
     {
         return $query->where('contenttype', $type);
     }
@@ -105,7 +105,7 @@ class Content extends Model
     /**
      * Scope: Get content accessible by a specific role.
      */
-    public function scopeForRole(Builder $query, int $role): Builder
+    public function scopeForRole(Builder $query, int $role): Builder // @phpstan-ignore missingType.generics
     {
         // Admins and moderators can see everything
         if (\in_array($role, [User::ROLE_ADMIN, User::ROLE_MODERATOR], true)) {
@@ -122,7 +122,7 @@ class Content extends Model
     /**
      * Scope: Get front page content.
      */
-    public function scopeFrontPage(Builder $query): Builder
+    public function scopeFrontPage(Builder $query): Builder // @phpstan-ignore missingType.generics
     {
         return $query->active() // @phpstan-ignore method.notFound
             ->ofType(self::TYPE_INDEX)

@@ -12,7 +12,7 @@ class AdminCollectionRegexesController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(Request $request)
+    public function index(Request $request): mixed
     {
         $this->setAdminPrefs();
         $regexes = new RegexService('collection_regexes');
@@ -101,7 +101,7 @@ class AdminCollectionRegexesController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function testRegex(Request $request)
+    public function testRegex(Request $request): mixed
     {
         $this->setAdminPrefs();
         $meta_title = $title = 'Collections Regex Test';

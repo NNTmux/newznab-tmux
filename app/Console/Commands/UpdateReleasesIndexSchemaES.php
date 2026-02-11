@@ -34,6 +34,8 @@ class UpdateReleasesIndexSchemaES extends Command
 
     /**
      * The media fields that should exist in the releases index
+     *
+     * @var array<string, mixed>
      */
     private array $mediaFields = [
         'imdbid' => ['type' => 'integer'],
@@ -570,8 +572,10 @@ class UpdateReleasesIndexSchemaES extends Command
 
     /**
      * Prepare media data for a release
+     *
+     * @return array<string, mixed>
      */
-    private function prepareMediaData($release): array
+    private function prepareMediaData(mixed $release): array
     {
         return [
             'imdbid' => (int) ($release->imdbid ?: 0),

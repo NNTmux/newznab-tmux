@@ -29,7 +29,7 @@ class CollectStats extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         $this->info('Collecting site stats...');
         GrabStat::insertTopGrabbers();

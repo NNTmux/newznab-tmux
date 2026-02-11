@@ -24,7 +24,7 @@ class NzbContentParser
      * Parse an NZB file and return its contents as an array of files.
      *
      * @param  string  $guid  The release GUID to find the NZB for
-     * @return array{contents: array, error: string|null}
+     * @return array{contents: array<string, mixed>, error: string|null}
      */
     public function parseNzb(string $guid): array
     {
@@ -144,15 +144,16 @@ class NzbContentParser
     /**
      * Process NZB contents to extract message IDs for different file types.
      *
-     * @return array{
-     *     hasCompressedFile: bool,
-     *     sampleMessageIDs: array,
-     *     jpgMessageIDs: array,
-     *     mediaInfoMessageID: string,
-     *     audioInfoMessageID: string,
-     *     audioInfoExtension: string,
-     *     bookFileCount: int
-     * }
+     * @param  array<string, mixed>  $nzbContents
+     * @return array<string, mixed>
+     *                              hasCompressedFile: bool,
+     *                              sampleMessageIDs: array,
+     *                              jpgMessageIDs: array,
+     *                              mediaInfoMessageID: string,
+     *                              audioInfoMessageID: string,
+     *                              audioInfoExtension: string,
+     *                              bookFileCount: int
+     *                              }
      */
     public function extractMessageIDs(
         array $nzbContents,
@@ -241,6 +242,9 @@ class NzbContentParser
 
     /**
      * Extract segment message IDs up to a limit.
+     *
+     * @param  array<string, mixed>  $segments
+     * @return array<string, mixed>
      */
     private function extractSegments(array $segments, int $limit): array
     {
@@ -250,7 +254,7 @@ class NzbContentParser
             if ($i > $segCount) {
                 break;
             }
-            $ids[] = (string) $segments[$i];
+            $ids[] = (string) $segments[$i]; // @phpstan-ignore offsetAccess.notFound
         }
 
         return $ids;
@@ -258,6 +262,8 @@ class NzbContentParser
 
     /**
      * Get the NZB path for a GUID.
+     *
+     * @return list<string>
      */
     public function getNzbPath(string $guid): string|false
     {

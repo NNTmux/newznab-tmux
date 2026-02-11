@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Log;
 
 class PostProcessRunner extends BaseRunner
 {
+    /**
+     * @param  array<string, mixed>  $releases
+     */
     private function runPostProcess(array $releases, int $maxProcesses, string $type, string $desc): void
     {
         if (empty($releases)) {
@@ -27,7 +30,7 @@ class PostProcessRunner extends BaseRunner
                 // Use postprocess:guid command which accepts the GUID character
                 $commands[] = PHP_BINARY.' artisan postprocess:guid '.$type.' '.$char;
             }
-            $this->runStreamingCommands($commands, $maxProcesses, $desc);
+            $this->runStreamingCommands($commands, $maxProcesses, $desc); // @phpstan-ignore argument.type
 
             return;
         }
@@ -198,6 +201,8 @@ class PostProcessRunner extends BaseRunner
     /**
      * Run pipelined TV post-processing across multiple GUID buckets in parallel.
      * Each parallel process runs the full provider pipeline sequentially.
+     *
+     * @param  array<string, mixed>  $releases
      */
     private function runPostProcessTvPipeline(array $releases, int $maxProcesses, string $desc, bool $renamedOnly): void
     {
@@ -216,7 +221,7 @@ class PostProcessRunner extends BaseRunner
                 // Use the pipelined TV command
                 $commands[] = PHP_BINARY.' artisan postprocess:tv-pipeline '.$char.($renamed ? ' '.$renamed : '').' --mode=pipeline';
             }
-            $this->runStreamingCommands($commands, $maxProcesses, $desc);
+            $this->runStreamingCommands($commands, $maxProcesses, $desc); // @phpstan-ignore argument.type
 
             return;
         }

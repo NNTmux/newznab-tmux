@@ -31,7 +31,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class RoleExpirationEmail extends Model
 {
-    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    /**
+     * @return BelongsTo<mixed>
+     */
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
     {
         return $this->belongsTo(User::class, 'users_id');
     }

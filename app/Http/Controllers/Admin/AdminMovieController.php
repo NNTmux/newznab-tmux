@@ -21,7 +21,7 @@ class AdminMovieController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(Request $request)
+    public function index(Request $request): mixed
     {
         $lastSearch = $request->input('moviesearch', '');
 

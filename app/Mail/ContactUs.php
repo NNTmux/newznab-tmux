@@ -19,7 +19,7 @@ class ContactUs extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct($mailTo, $mailFrom, $mailBody)
+    public function __construct(mixed $mailTo, mixed $mailFrom, mixed $mailBody)
     {
         $this->mailTo = $mailTo;
         $this->mailFrom = $mailFrom;

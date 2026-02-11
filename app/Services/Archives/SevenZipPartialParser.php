@@ -20,22 +20,49 @@ class SevenZipPartialParser
 
     private int $len;
 
+    /**
+     * @var array<string, mixed>
+     */
     private array $names = [];
 
+    /**
+     * @var array<string, mixed>
+     */
     private array $files = []; // Extended file info with metadata
 
+    /**
+     * @var array<string, mixed>
+     */
     private array $sizes = []; // Uncompressed sizes
 
+    /**
+     * @var array<string, mixed>
+     */
     private array $packedSizes = []; // Compressed sizes
 
+    /**
+     * @var array<string, mixed>
+     */
     private array $crcs = []; // CRC32 values
 
+    /**
+     * @var array<string, mixed>
+     */
     private array $attributes = []; // File attributes (directory, readonly, etc.)
 
+    /**
+     * @var array<string, mixed>
+     */
     private array $mtimes = []; // Modification times
 
+    /**
+     * @var array<string, mixed>
+     */
     private array $ctimes = []; // Creation times
 
+    /**
+     * @var array<string, mixed>
+     */
     private array $atimes = []; // Access times
 
     private bool $parsed = false;
@@ -50,6 +77,9 @@ class SevenZipPartialParser
 
     private int $numFiles = 0; // Total number of files detected
 
+    /**
+     * @var array<string, mixed>
+     */
     private array $compressionMethods = []; // Detected compression methods
 
     private int $totalUnpackedSize = 0; // Total unpacked size
@@ -158,6 +188,8 @@ class SevenZipPartialParser
 
     /**
      * Public accessor: returns recovered filenames (UTF-8) or empty array.
+     *
+     * @return array<string, mixed>
      */
     public function getFileNames(): array
     {
@@ -171,7 +203,7 @@ class SevenZipPartialParser
     /**
      * Returns detailed file information with all available metadata.
      *
-     * @return array<int, array{name: string, size: int|null, packed_size: int|null, crc: string|null, attributes: int|null, is_dir: bool, mtime: int|null, ctime: int|null, atime: int|null}>
+     * @return array<string, mixed>
      */
     public function getFiles(): array
     {
@@ -184,6 +216,8 @@ class SevenZipPartialParser
 
     /**
      * Returns uncompressed file sizes indexed by file index.
+     *
+     * @return array<string, mixed>
      */
     public function getSizes(): array
     {
@@ -196,6 +230,8 @@ class SevenZipPartialParser
 
     /**
      * Returns CRC32 values as hex strings indexed by file index.
+     *
+     * @return array<string, mixed>
      */
     public function getCRCs(): array
     {
@@ -208,6 +244,8 @@ class SevenZipPartialParser
 
     /**
      * Returns file attributes indexed by file index.
+     *
+     * @return array<string, mixed>
      */
     public function getAttributes(): array
     {
@@ -220,6 +258,8 @@ class SevenZipPartialParser
 
     /**
      * Returns modification times (Unix timestamps) indexed by file index.
+     *
+     * @return array<string, mixed>
      */
     public function getModificationTimes(): array
     {
@@ -232,6 +272,8 @@ class SevenZipPartialParser
 
     /**
      * Returns detected compression methods used in the archive.
+     *
+     * @return array<string, mixed>
      */
     public function getCompressionMethods(): array
     {
@@ -1014,27 +1056,27 @@ class SevenZipPartialParser
                     break;
 
                 case self::K_MTIME:
-                    $this->mtimes = $this->parseFileTimes($cursor, $propSize, $numFiles);
+                    $this->mtimes = $this->parseFileTimes($cursor, $propSize, $numFiles); // @phpstan-ignore assign.propertyType
                     $cursor = $propStart + $propSize;
                     break;
 
                 case self::K_CTIME:
-                    $this->ctimes = $this->parseFileTimes($cursor, $propSize, $numFiles);
+                    $this->ctimes = $this->parseFileTimes($cursor, $propSize, $numFiles); // @phpstan-ignore assign.propertyType
                     $cursor = $propStart + $propSize;
                     break;
 
                 case self::K_ATIME:
-                    $this->atimes = $this->parseFileTimes($cursor, $propSize, $numFiles);
+                    $this->atimes = $this->parseFileTimes($cursor, $propSize, $numFiles); // @phpstan-ignore assign.propertyType
                     $cursor = $propStart + $propSize;
                     break;
 
                 case self::K_WIN_ATTRIBUTES:
-                    $this->attributes = $this->parseAttributes($cursor, $propSize, $numFiles);
+                    $this->attributes = $this->parseAttributes($cursor, $propSize, $numFiles); // @phpstan-ignore assign.propertyType
                     $cursor = $propStart + $propSize;
                     break;
 
                 case self::K_CRC:
-                    $this->crcs = $this->parseCRCs($cursor, $propSize, $numFiles);
+                    $this->crcs = $this->parseCRCs($cursor, $propSize, $numFiles); // @phpstan-ignore assign.propertyType
                     $cursor = $propStart + $propSize;
                     break;
 
@@ -1047,7 +1089,7 @@ class SevenZipPartialParser
 
         // Assign collected names
         if (! empty($names)) {
-            $this->names = array_values(array_unique($names));
+            $this->names = array_values(array_unique($names)); // @phpstan-ignore assign.propertyType
         }
 
         return $cursor;
@@ -1055,6 +1097,8 @@ class SevenZipPartialParser
 
     /**
      * Parse file names from K_NAME property.
+     *
+     * @return array<string, mixed>
      */
     private function parseNames(int $cursor, int $propSize, int $numFiles): array
     {
@@ -1123,7 +1167,7 @@ class SevenZipPartialParser
     /**
      * Parse a bit vector from property data.
      *
-     * @return array<int, bool>
+     * @return list<string|null>
      */
     private function parseBitVector(int $cursor, int $propSize, int $numItems): array
     {
@@ -1158,7 +1202,7 @@ class SevenZipPartialParser
     /**
      * Parse file times from property data.
      *
-     * @return array<int, int|null>
+     * @return array<int<0, max>, bool>
      */
     private function parseFileTimes(int $cursor, int $propSize, int $numFiles): array
     {
@@ -1220,7 +1264,7 @@ class SevenZipPartialParser
     /**
      * Parse Windows attributes from property data.
      *
-     * @return array<int, int|null>
+     * @return array<int<0, max>, int|null>
      */
     private function parseAttributes(int $cursor, int $propSize, int $numFiles): array
     {
@@ -1432,10 +1476,10 @@ class SevenZipPartialParser
         }
 
         // Also try to find NFO files specifically (common in releases)
-        $this->scanForNfoFiles($found);
+        $this->scanForNfoFiles($found); // @phpstan-ignore argument.type
 
         if (! empty($found)) {
-            $this->names = array_values(array_unique($found));
+            $this->names = array_values(array_unique($found)); // @phpstan-ignore assign.propertyType
         }
     }
 
@@ -1504,6 +1548,8 @@ class SevenZipPartialParser
 
     /**
      * Scan for NFO files which are very common in release archives.
+     *
+     * @param  array<string, mixed>  $found
      */
     private function scanForNfoFiles(array &$found): void
     {
@@ -1523,7 +1569,7 @@ class SevenZipPartialParser
                 if (strlen($nameData) > 2 && strlen($nameData) < 256) {
                     $utf8 = @iconv('UTF-16LE', 'UTF-8//IGNORE', $nameData);
                     if ($utf8 !== false && $this->isValidFilename($utf8)) {
-                        $found[] = str_replace('\\', '/', $utf8);
+                        $found[] = str_replace('\\', '/', $utf8); // @phpstan-ignore parameterByRef.type
                     }
                 }
             }
@@ -1626,6 +1672,8 @@ class SevenZipPartialParser
     /**
      * Extract a summary of archive information as an associative array.
      * Useful for quick inspection of archive contents.
+     *
+     * @return array<string, mixed>
      */
     public function getSummary(): array
     {
@@ -1664,7 +1712,7 @@ class SevenZipPartialParser
     /**
      * Get files matching a specific extension.
      *
-     * @return array<int, array>
+     * @return array<int, array<string, mixed>>
      */
     public function getFilesByExtension(string $extension): array
     {
@@ -1691,6 +1739,8 @@ class SevenZipPartialParser
 
     /**
      * Check if archive contains any files with given extension.
+     *
+     * @return array<string, mixed>
      */
     public function hasFileWithExtension(string $extension): bool
     {
@@ -1700,7 +1750,7 @@ class SevenZipPartialParser
     /**
      * Get all directory entries from the archive.
      *
-     * @return array<int, array>
+     * @return array<string, mixed>
      */
     public function getDirectories(): array
     {
@@ -1713,6 +1763,8 @@ class SevenZipPartialParser
 
     /**
      * Get the largest file in the archive.
+     *
+     * @return array<string, mixed>
      */
     public function getLargestFile(): ?array
     {

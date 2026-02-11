@@ -14,16 +14,16 @@ class SendContactUsEmail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $email;
+    private string $email;
 
-    private $mailTo;
+    private string $mailTo;
 
-    private $mailBody;
+    private string $mailBody;
 
     /**
      * SendContactUsEmail constructor.
      */
-    public function __construct($email, $mailTo, $mailBody)
+    public function __construct(string $email, string $mailTo, string $mailBody)
     {
         $this->email = $email;
         $this->mailTo = $mailTo;

@@ -13,7 +13,7 @@ class CategorizationResult
      * @param  int  $categoryId  The determined category ID
      * @param  float  $confidence  Confidence level (0.0 to 1.0)
      * @param  string  $matchedBy  Description of what matched
-     * @param  array  $debug  Additional debug information
+     * @param  array<string, mixed>  $debug  Additional debug information
      */
     public function __construct(
         public readonly int $categoryId = Category::OTHER_MISC,
@@ -58,6 +58,8 @@ class CategorizationResult
 
     /**
      * Create a result with debug info merged.
+     *
+     * @param  array<string, mixed>  $additionalDebug
      */
     public function withDebug(array $additionalDebug): self
     {

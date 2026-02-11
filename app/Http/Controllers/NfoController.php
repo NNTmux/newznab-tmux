@@ -11,7 +11,7 @@ class NfoController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function showNfo(Request $request, string $id = '')
+    public function showNfo(Request $request, string $id = ''): mixed
     {
         if ($id) {
             $rel = Release::getByGuid($id);

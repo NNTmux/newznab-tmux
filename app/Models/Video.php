@@ -61,21 +61,33 @@ class Video extends Model
      */
     public $timestamps = false;
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\VideoAlias, $this>
+     */
     public function alias(): HasMany
     {
         return $this->hasMany(VideoAlias::class, 'videos_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Release, $this>
+     */
     public function release(): HasMany
     {
         return $this->hasMany(Release::class, 'videos_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\TvEpisode, $this>
+     */
     public function episode(): HasMany
     {
         return $this->hasMany(TvEpisode::class, 'videos_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\TvInfo, $this>
+     */
     public function tvInfo(): HasOne
     {
         return $this->hasOne(TvInfo::class, 'videos_id');
@@ -87,7 +99,7 @@ class Video extends Model
      *
      * @return Model|null|static
      */
-    public static function getByVideoID($id)
+    public static function getByVideoID(mixed $id)
     {
         return self::query()
             ->select(['videos.*', 'tv_info.summary', 'tv_info.publisher', 'tv_info.image'])
@@ -99,7 +111,7 @@ class Video extends Model
     /**
      * Retrieves a range of all shows for the show-edit admin list.
      */
-    public static function getRange(string $showname = ''): LengthAwarePaginator
+    public static function getRange(string $showname = ''): LengthAwarePaginator // @phpstan-ignore missingType.generics
     {
         $sql = self::query()
             ->select(['videos.*', 'tv_info.summary', 'tv_info.publisher', 'tv_info.image'])
@@ -128,8 +140,10 @@ class Video extends Model
 
     /**
      * Retrieves and returns a list of shows with eligible releases.
+     *
+     * @return array<string, mixed>
      */
-    public static function getSeriesList($uid, string $letter = '', string $showname = ''): array
+    public static function getSeriesList(mixed $uid, string $letter = '', string $showname = ''): array
     {
         $params = [
             'uid' => $uid,

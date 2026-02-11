@@ -17,6 +17,10 @@ class AdultProcessingResult
 
     public const STATUS_PENDING = 'pending';
 
+    /**
+     * @param  array<string, mixed>  $debug
+     * @param  array<string, mixed>  $movieData
+     */
     public function __construct(
         public readonly string $status,
         public readonly ?string $title = null,
@@ -27,6 +31,9 @@ class AdultProcessingResult
 
     /**
      * Create a successful match result.
+     *
+     * @param  array<string, mixed>  $debug
+     * @param  array<string, mixed>  $movieData
      */
     public static function matched(
         string $title,
@@ -45,6 +52,8 @@ class AdultProcessingResult
 
     /**
      * Create a not found result.
+     *
+     * @param  array<string, mixed>  $debug
      */
     public static function notFound(?string $providerName = null, array $debug = []): self
     {

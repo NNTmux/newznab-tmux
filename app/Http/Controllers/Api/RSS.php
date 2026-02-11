@@ -6,7 +6,6 @@ use App\Models\Category;
 use App\Models\Release;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\Releases\ReleaseSearchService;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -29,7 +28,7 @@ class RSS extends ApiController
     /**
      * @return Release[]|Collection|mixed
      */
-    public function getRss($cat, $videosId, $aniDbID, int $userID = 0, int $airDate = -1, int $limit = 100, int $offset = 0)
+    public function getRss(mixed $cat, mixed $videosId, mixed $aniDbID, int $userID = 0, int $airDate = -1, int $limit = 100, int $offset = 0)
     {
         $catSearch = $cartSearch = '';
         $catLimit = 'AND r.categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER;
@@ -93,9 +92,9 @@ class RSS extends ApiController
     }
 
     /**
-     * @return Builder|Collection
+     * @param  array<string, mixed>  $excludedCats
      */
-    public function getShowsRss(int $limit, int $userID = 0, array $excludedCats = [], int $airDate = -1)
+    public function getShowsRss(int $limit, int $userID = 0, array $excludedCats = [], int $airDate = -1): mixed
     {
         $sql = sprintf(
 
@@ -122,6 +121,7 @@ class RSS extends ApiController
     }
 
     /**
+     * @param  array<string, mixed>  $excludedCats
      * @return Release[]|Collection|mixed
      */
     public function getMyMoviesRss(int $limit, int $userID = 0, array $excludedCats = [])
@@ -152,7 +152,7 @@ class RSS extends ApiController
     /**
      * Get trending movies RSS (top 15 most downloaded in last 48 hours)
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, mixed>
      */
     public function getTrendingMoviesRss()
     {
@@ -216,7 +216,7 @@ class RSS extends ApiController
     /**
      * Get trending TV shows RSS (top 15 most downloaded in last 48 hours)
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection<int, mixed>
      */
     public function getTrendingShowsRss()
     {

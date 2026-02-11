@@ -17,6 +17,8 @@ class ReleaseManagementService
     public function __construct() {}
 
     /**
+     * @param  array<string, mixed>  $list
+     *
      * @throws \Exception
      */
     public function deleteMultiple(int|array|string $list): void
@@ -34,8 +36,8 @@ class ReleaseManagementService
     /**
      * Deletes a single release by GUID, and all the corresponding files.
      *
-     * @param  array  $identifiers  ['g' => Release GUID(mandatory), 'id => ReleaseID(optional, pass
-     *                              false)]
+     * @param  array<string, mixed>  $identifiers  ['g' => Release GUID(mandatory), 'id => ReleaseID(optional, pass
+     *                                             false)]
      *
      * @throws \Exception
      */
@@ -70,7 +72,7 @@ class ReleaseManagementService
     /**
      * Alias for deleteSingle for backwards compatibility.
      *
-     * @param  array  $identifiers  ['g' => Release GUID(mandatory), 'i => ReleaseID(optional, pass false)]
+     * @param  array<string, mixed>  $identifiers  ['g' => Release GUID(mandatory), 'i => ReleaseID(optional, pass false)]
      *
      * @throws \Exception
      */
@@ -82,7 +84,7 @@ class ReleaseManagementService
     /**
      * @return bool|int
      */
-    public function updateMulti($guids, $category, $grabs, $videoId, $episodeId, $anidbId, $imdbId)
+    public function updateMulti(mixed $guids, mixed $category, mixed $grabs, mixed $videoId, mixed $episodeId, mixed $anidbId, mixed $imdbId)
     {
         if (! \is_array($guids) || \count($guids) < 1) {
             return false;
@@ -101,9 +103,9 @@ class ReleaseManagementService
     }
 
     /**
-     * @return Release[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection
+     * @return Release[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection<int, mixed>|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection<int, mixed>
      */
-    public function getForExport(string $postFrom = '', string $postTo = '', string $groupID = '')
+    public function getForExport(string $postFrom = '', string $postTo = '', string $groupID = '') // @phpstan-ignore missingType.generics
     {
         $query = Release::query()
             ->select(['r.searchname', 'r.guid', 'g.name as gname', DB::raw("CONCAT(cp.title,'_',c.title) AS catName")])
@@ -153,6 +155,9 @@ class ReleaseManagementService
         return $row === null ? '01/01/2014' : $row['postdate'];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getReleasedGroupsForSelect(bool $blnIncludeAll = true): array
     {
         $groups = Release::query()

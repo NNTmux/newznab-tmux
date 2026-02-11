@@ -9,6 +9,8 @@ class CategoryTransformer extends TransformerAbstract
 {
     /**
      * Transform a root category into an array.
+     *
+     * @return array<string, mixed>
      */
     public function transform(RootCategory $category): array
     {

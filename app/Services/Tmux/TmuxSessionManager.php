@@ -94,6 +94,8 @@ class TmuxSessionManager
 
     /**
      * List all panes in the session
+     *
+     * @return array<string, mixed>
      */
     public function listPanes(): array
     {

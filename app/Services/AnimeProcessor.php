@@ -119,6 +119,8 @@ class AnimeProcessor
      * Extracts anime title from release searchname.
      * Returns ['title' => string] on success else empty array.
      * Note: AniList doesn't support episode lookups, so we only extract the title.
+     *
+     * @return array<string, mixed>
      */
     private function extractTitleEpisode(string $cleanName = ''): array
     {
@@ -317,7 +319,7 @@ class AnimeProcessor
         try {
             $searchResults = $this->palist->searchAnime($searchName, 1);
             if ($searchResults) {
-                $anilistData = $searchResults[0];
+                $anilistData = $searchResults[0]; // @phpstan-ignore offsetAccess.notFound
                 $anilistId = $anilistData['id'] ?? null;
 
                 if ($anilistId) {
@@ -361,7 +363,7 @@ class AnimeProcessor
      *
      * @throws \Exception
      */
-    private function matchAnimeRelease($release): bool
+    private function matchAnimeRelease(mixed $release): bool
     {
         $matched = false;
         $type = 'Local';

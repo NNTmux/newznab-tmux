@@ -11,7 +11,7 @@ class AdminRoleController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function index(): mixed
     {
         $this->setAdminPrefs();
 
@@ -32,7 +32,7 @@ class AdminRoleController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function create(Request $request)
+    public function create(Request $request): mixed
     {
         $this->setAdminPrefs();
 
@@ -114,7 +114,7 @@ class AdminRoleController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function edit(Request $request)
+    public function edit(Request $request): mixed
     {
         $this->setAdminPrefs();
 

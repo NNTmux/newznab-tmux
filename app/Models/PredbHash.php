@@ -45,6 +45,9 @@ class PredbHash extends Model
      */
     protected $primaryKey = 'hash';
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Predb, $this>
+     */
     public function predb(): BelongsTo
     {
         return $this->belongsTo(Predb::class, 'predb_id');

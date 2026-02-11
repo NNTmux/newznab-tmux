@@ -32,7 +32,7 @@ class NntmuxOptimizeTables extends Command
         if (empty($table) || $table[0] === 'all') {
             $this->optimizeAllTables();
         } else {
-            $this->optimizeTable($table);
+            $this->optimizeTable($table); // @phpstan-ignore argument.type
         }
     }
 
@@ -49,6 +49,8 @@ class NntmuxOptimizeTables extends Command
 
     /**
      * Optimize a single table.
+     *
+     * @param  array<string, mixed>  $tables
      */
     private function optimizeTable(array|string $tables): void
     {
@@ -61,7 +63,7 @@ class NntmuxOptimizeTables extends Command
         }
     }
 
-    private function tableCheck($table): void
+    private function tableCheck(mixed $table): void
     {
         $this->info('Checking table: '.$table);
         $tableCheck = DB::select('CHECK TABLE '.$table);

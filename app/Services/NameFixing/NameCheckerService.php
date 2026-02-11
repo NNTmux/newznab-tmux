@@ -136,6 +136,8 @@ class NameCheckerService
 
     /**
      * Get checker statistics.
+     *
+     * @return array<string, mixed>
      */
     public function getStats(): array
     {

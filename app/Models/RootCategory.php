@@ -31,7 +31,10 @@ class RootCategory extends Model
 {
     protected $guarded = [];
 
-    public function categories(): \Illuminate\Database\Eloquent\Relations\HasMany
+    /**
+     * @return HasMany<mixed>
+     */
+    public function categories(): \Illuminate\Database\Eloquent\Relations\HasMany // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
     {
         return $this->hasMany(Category::class, 'root_categories_id');
     }

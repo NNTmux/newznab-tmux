@@ -103,7 +103,7 @@ class ReleaseUpdateService
     /**
      * Update the release with the new information.
      *
-     * @param  object|array  $release  The release to update
+     * @param  object|array<string, mixed>  $release  The release to update
      * @param  string  $name  The new name
      * @param  string  $method  The method that found the name
      * @param  bool  $echo  Whether to actually update the database
@@ -207,6 +207,8 @@ class ReleaseUpdateService
 
     /**
      * Echo release information to CLI.
+     *
+     * @param  array<string, mixed>  $determinedCategory
      */
     public function echoReleaseInfo(
         object $release,
@@ -251,6 +253,8 @@ class ReleaseUpdateService
 
     /**
      * Perform the actual database update.
+     *
+     * @param  array<string, mixed>  $determinedCategory
      */
     protected function performDatabaseUpdate(
         object $release,
@@ -309,6 +313,8 @@ class ReleaseUpdateService
 
     /**
      * Get the status columns to update for a given type.
+     *
+     * @return array<string, mixed>
      */
     protected function getStatusColumnsForType(string $type): array
     {
@@ -338,6 +344,8 @@ class ReleaseUpdateService
 
     /**
      * Check if a release matches a PreDB entry.
+     *
+     * @return array<string, mixed>
      */
     public function checkPreDbMatch(object $release, string $textstring): ?array
     {
@@ -373,6 +381,8 @@ class ReleaseUpdateService
 
     /**
      * Get the current statistics.
+     *
+     * @return array<string, mixed>
      */
     public function getStats(): array
     {

@@ -28,7 +28,7 @@ class AccountDeleted extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct($user)
+    public function __construct(mixed $user)
     {
         $this->user = $user;
         $this->siteEmail = config('mail.from.address');

@@ -10,7 +10,7 @@ class ContactUsController extends BasePageController
     /**
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function contact(ContactContactURequest $request)
+    public function contact(ContactContactURequest $request): mixed
     {
 
         $msg = '';

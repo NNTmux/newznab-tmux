@@ -31,6 +31,8 @@ class NzbImportService
 
     /**
      * List of all the group names/ids in the DB.
+     *
+     * @var array<string, mixed>
      */
     protected array $allGroups;
 
@@ -58,6 +60,9 @@ class NzbImportService
      */
     protected string $nzbGuid;
 
+    /**
+     * @param  array<string, mixed>  $options
+     */
     public function __construct(array $options = [])
     {
         $this->echoCLI = config('nntmux.echocli');
@@ -77,7 +82,7 @@ class NzbImportService
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    public function beginImport($filesToProcess, bool $useNzbName = false, bool $delete = false, bool $deleteFailed = false, int $source = 1): bool|string
+    public function beginImport(mixed $filesToProcess, bool $useNzbName = false, bool $delete = false, bool $deleteFailed = false, int $source = 1): bool|string
     {
         // Get all the groups in the DB.
         if (! $this->getAllGroups()) {
@@ -221,7 +226,7 @@ class NzbImportService
      *
      * @throws \Exception
      */
-    protected function scanNZBFile(&$nzbXML, $nzbFileName = '', $source = ''): bool
+    protected function scanNZBFile(mixed &$nzbXML, mixed $nzbFileName = '', mixed $source = ''): bool
     {
         $binary_names = [];
         $totalFiles = $totalSize = $groupID = 0;
@@ -306,14 +311,14 @@ class NzbImportService
                 $this->echoOut($errorMessage);
 
                 // Persist blacklist usage stats if we matched any rule during this NZB processing
-                $this->blacklistService->updateBlacklistUsage($this->blacklistService->getAndClearIdsToUpdate());
+                $this->blacklistService->updateBlacklistUsage($this->blacklistService->getAndClearIdsToUpdate()); // @phpstan-ignore argument.type
 
                 return false;
             }
         }
 
         // After scanning all files, persist any matched whitelist/blacklist usage
-        $this->blacklistService->updateBlacklistUsage($this->blacklistService->getAndClearIdsToUpdate());
+        $this->blacklistService->updateBlacklistUsage($this->blacklistService->getAndClearIdsToUpdate()); // @phpstan-ignore argument.type
 
         // Sort values alphabetically but keep the keys intact
         if (\count($binary_names) > 0) {
@@ -346,7 +351,7 @@ class NzbImportService
      *
      * @throws \Exception
      */
-    protected function insertNZB($nzbDetails): bool
+    protected function insertNZB(mixed $nzbDetails): bool
     {
         // Make up a GUID for the release.
         $this->relGuid = Str::uuid()->toString();

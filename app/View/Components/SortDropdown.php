@@ -15,6 +15,8 @@ class SortDropdown extends Component
 
     /**
      * Available sort options.
+     *
+     * @var array<string, array{label: string, icon: string}>
      */
     public array $sortOptions;
 
@@ -25,6 +27,8 @@ class SortDropdown extends Component
 
     /**
      * Query parameters to preserve.
+     *
+     * @var array<string, mixed>
      */
     public array $queryParams;
 
@@ -40,11 +44,16 @@ class SortDropdown extends Component
 
     /**
      * Pre-computed sort URLs.
+     *
+     * @var array<string, string>
      */
     public array $sortUrls;
 
     /**
      * Create a new component instance.
+     *
+     * @param  array<string, array{label: string, icon: string}>|null  $options
+     * @param  array<string, mixed>|null  $queryParams
      */
     public function __construct(
         ?string $currentSort = null,

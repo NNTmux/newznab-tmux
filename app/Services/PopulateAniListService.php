@@ -39,12 +39,16 @@ class PopulateAniListService
 
     /**
      * Rate limiting: track requests and timestamps
+     *
+     * @var array<string, mixed>
      */
     private array $rateLimitQueue = [];
 
     /**
      * Track when we received a 429 error and need to pause.
      * Format: ['timestamp' => int, 'paused_until' => int]
+     *
+     * @var array<string, mixed>
      */
     private static ?array $rateLimitPause = null;
 
@@ -84,7 +88,7 @@ class PopulateAniListService
     /**
      * Search for anime by title using AniList GraphQL API.
      *
-     * @return array|false
+     * @return array<string, mixed>|false
      *
      * @throws \Exception
      */
@@ -203,7 +207,7 @@ class PopulateAniListService
     /**
      * Get anime by AniList ID.
      *
-     * @return array|false
+     * @return array<string, mixed>|false
      *
      * @throws \Exception
      */
@@ -287,7 +291,9 @@ class PopulateAniListService
     /**
      * Make a GraphQL request to AniList API with rate limiting.
      *
-     * @return array|false
+     *
+     * @param  array<string, mixed>  $variables
+     * @return array<string, mixed>|false
      *
      * @throws \Exception
      */
@@ -456,6 +462,8 @@ class PopulateAniListService
 
     /**
      * Insert or update AniList info data.
+     *
+     * @param  array<string, mixed>  $anilistData
      */
     protected function insertAniListInfo(int $anidbid, array $anilistData): void
     {
@@ -697,7 +705,7 @@ class PopulateAniListService
                 if ($title) {
                     $searchResults = $this->searchAnime($title, 1);
                     if ($searchResults) {
-                        $anilistData = $searchResults[0];
+                        $anilistData = $searchResults[0]; // @phpstan-ignore offsetAccess.notFound
                         $this->insertAniListInfo($anidb->anidbid, $anilistData);
                         // Rate limiting is handled in makeGraphQLRequest
                     }

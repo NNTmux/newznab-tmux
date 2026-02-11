@@ -125,6 +125,8 @@ class AdminInvitationController extends BasePageController
 
     /**
      * Get overall invitation statistics with caching
+     *
+     * @return array<string, mixed>
      */
     private function getOverallStats(): array
     {
@@ -149,6 +151,8 @@ class AdminInvitationController extends BasePageController
 
     /**
      * Get top inviters statistics with caching
+     *
+     * @return array<string, mixed>
      */
     private function getTopInviters(int $limit = 10): array
     {

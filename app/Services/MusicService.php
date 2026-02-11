@@ -36,6 +36,8 @@ class MusicService
 
     /**
      * Store names of failed lookup items.
+     *
+     * @var array<string, mixed>
      */
     public array $failCache;
 
@@ -87,6 +89,9 @@ class MusicService
 
     /**
      * Get paginated music range for browsing.
+     *
+     * @param  array<string, mixed>  $cat
+     * @param  array<string, mixed>  $excludedCats
      */
     public function getMusicRange(int $page, array $cat, int $start, int $num, string $orderBy, array $excludedCats = []): mixed
     {
@@ -95,7 +100,7 @@ class MusicService
 
         $browseby = $this->getBrowseBy();
         $catsrch = '';
-        if (\count($cat) > 0 && (int) $cat[0] !== -1) {
+        if (\count($cat) > 0 && (int) $cat[0] !== -1) { // @phpstan-ignore offsetAccess.notFound
             $catsrch = Category::getCategorySearch($cat);
         }
         $exccatlist = '';
@@ -125,8 +130,8 @@ class MusicService
             $browseby,
             $catsrch,
             $exccatlist,
-            $order[0],
-            $order[1],
+            $order[0], // @phpstan-ignore offsetAccess.notFound
+            $order[1], // @phpstan-ignore offsetAccess.notFound
             ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start)
         );
 
@@ -186,8 +191,8 @@ class MusicService
             ! empty($musicIDs) ? 'WHERE m.id IN ('.implode(',', $musicIDs).')' : 'AND 1=1',
             (! empty($releaseIDs)) ? 'AND r.id in ('.implode(',', $releaseIDs).')' : '',
             $catsrch,
-            $order[0],
-            $order[1]
+            $order[0], // @phpstan-ignore offsetAccess.notFound
+            $order[1] // @phpstan-ignore offsetAccess.notFound
         );
 
         $return = Cache::get(md5($sql.$page));
@@ -206,6 +211,8 @@ class MusicService
 
     /**
      * Parse order by parameter and return order field and direction.
+     *
+     * @return array<string, mixed>
      */
     public function getMusicOrder(string $orderBy): array
     {
@@ -244,6 +251,8 @@ class MusicService
 
     /**
      * Get available ordering options.
+     *
+     * @return array<int, string>
      */
     public function getMusicOrdering(): array
     {
@@ -260,6 +269,8 @@ class MusicService
 
     /**
      * Get browse by options.
+     *
+     * @return array<string, mixed>
      */
     public function getBrowseByOptions(): array
     {
@@ -320,6 +331,8 @@ class MusicService
 
     /**
      * Update or create music info from external data.
+     *
+     * @param  array<string, mixed>  $amazdata
      *
      * @throws \Exception
      */
@@ -484,6 +497,8 @@ class MusicService
 
     /**
      * Parse artist and album name from release name.
+     *
+     * @return array<string, mixed>
      */
     public function parseArtist(string $releaseName): array|false
     {
@@ -620,6 +635,8 @@ class MusicService
 
     /**
      * Fetch music properties from iTunes.
+     *
+     * @return array<string, mixed>
      */
     protected function fetchItunesMusicProperties(string $title): array|false
     {

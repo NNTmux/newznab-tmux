@@ -23,7 +23,7 @@ class MovieController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function showMovies(Request $request, string $id = '')
+    public function showMovies(Request $request, string $id = ''): mixed
     {
         $moviecats = Category::getChildren(Category::MOVIE_ROOT)->map(function ($mcat) {
             return ['id' => $mcat->id, 'title' => $mcat->title];
@@ -102,7 +102,7 @@ class MovieController extends BasePageController
      *
      * @throws \Exception
      */
-    public function showMovie(Request $request, string $imdbid)
+    public function showMovie(Request $request, string $imdbid): mixed
     {
         // Get movie info
         $movieInfo = $this->movieService->getMovieInfo($imdbid);
@@ -115,6 +115,7 @@ class MovieController extends BasePageController
         $rslt = $this->movieBrowseService->getMovieRange(1, [], 0, 1000, '', -1, (array) $this->userdata->categoryexclusions);
 
         // Filter to only this movie's IMDB ID
+        /** @phpstan-ignore argument.templateType */
         $movieData = collect($rslt)->firstWhere('imdbid', $imdbid);
 
         if (! $movieData) {
@@ -219,7 +220,7 @@ class MovieController extends BasePageController
      *
      * @throws \Exception
      */
-    public function showTrending(Request $request)
+    public function showTrending(Request $request): mixed
     {
 
         // Cache key for trending movies (48 hours)
@@ -284,7 +285,7 @@ class MovieController extends BasePageController
     /**
      * Update user's movie layout preference
      */
-    public function updateLayout(Request $request)
+    public function updateLayout(Request $request): mixed
     {
         $request->validate([
             'layout' => 'required|integer|in:1,2',

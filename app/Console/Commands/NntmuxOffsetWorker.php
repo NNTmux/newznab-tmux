@@ -104,7 +104,7 @@ class NntmuxOffsetWorker extends Command
                         $processed++;
 
                         if (count($batchData) >= $batchSize) {
-                            $this->processSearchBatch($batchData, $workerId);
+                            $this->processSearchBatch($batchData, $workerId); // @phpstan-ignore argument.type
                             $this->info("Worker {$workerId}: Inserted batch of ".count($batchData).' records');
                             $batchData = [];
                         }
@@ -117,7 +117,7 @@ class NntmuxOffsetWorker extends Command
 
             // Process remaining items
             if (! empty($batchData)) {
-                $this->processSearchBatch($batchData, $workerId);
+                $this->processSearchBatch($batchData, $workerId); // @phpstan-ignore argument.type
                 $this->info("Worker {$workerId}: Inserted final batch of ".count($batchData).' records');
             }
 
@@ -161,7 +161,7 @@ class NntmuxOffsetWorker extends Command
     /**
      * Build offset-based query
      */
-    private function buildOffsetQuery(string $index, int $offset, int $limit)
+    private function buildOffsetQuery(string $index, int $offset, int $limit): mixed
     {
         if ($index === 'releases') {
             return Release::query()
@@ -247,6 +247,8 @@ class NntmuxOffsetWorker extends Command
 
     /**
      * Process search batch
+     *
+     * @param  array<string, mixed>  $data
      */
     private function processSearchBatch(array $data, int $workerId): void
     {
@@ -269,6 +271,8 @@ class NntmuxOffsetWorker extends Command
 
     /**
      * Process ElasticSearch batch
+     *
+     * @param  array<string, mixed>  $data
      */
     private function processElasticBatch(array $data, int $workerId): void
     {

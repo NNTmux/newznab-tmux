@@ -67,6 +67,9 @@ class ConsoleInfo extends Model
         return 'ix_consoleinfo_title_platform_ft';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toSearchableArray(): array
     {
         return [
@@ -81,6 +84,8 @@ class ConsoleInfo extends Model
 
     /**
      * Get the genre for the console info.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Genre, $this>
      */
     public function genre(): BelongsTo
     {
@@ -89,6 +94,8 @@ class ConsoleInfo extends Model
 
     /**
      * Get the releases for the console info.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Release, $this>
      */
     public function releases(): HasMany
     {
@@ -102,7 +109,7 @@ class ConsoleInfo extends Model
     /**
      * Scope a query to only include consoles with covers.
      */
-    public function scopeWithCover($query)
+    public function scopeWithCover(mixed $query): mixed
     {
         return $query->where('cover', 1);
     }
@@ -110,7 +117,7 @@ class ConsoleInfo extends Model
     /**
      * Scope a query to only include consoles for a specific platform.
      */
-    public function scopeForPlatform($query, string $platform)
+    public function scopeForPlatform(mixed $query, string $platform): mixed
     {
         return $query->where('platform', $platform);
     }

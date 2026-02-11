@@ -19,7 +19,7 @@ class MyShowsController extends BasePageController
         $this->releaseBrowseService = $releaseBrowseService;
     }
 
-    public function show(Request $request)
+    public function show(Request $request): mixed
     {
         $action = $request->input('action') ?? '';
         $videoId = $request->input('id') ?? '';
@@ -167,7 +167,7 @@ class MyShowsController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function browse(Request $request)
+    public function browse(Request $request): mixed
     {
         $title = 'Browse My Shows';
         $meta_title = 'My Shows';

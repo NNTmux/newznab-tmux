@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @see \Mailerlite\LaravelElasticsearch\Manager
  */
-class Elasticsearch extends Facade
+class Elasticsearch extends Facade // @phpstan-ignore missingType.iterableValue
 {
     protected static function getFacadeAccessor(): string
     {

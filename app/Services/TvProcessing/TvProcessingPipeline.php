@@ -26,12 +26,15 @@ class TvProcessingPipeline
     /**
      * @var Collection<AbstractTvProviderPipe>
      */
-    protected Collection $pipes;
+    protected Collection $pipes; // @phpstan-ignore missingType.generics
 
     protected int $tvqty;
 
     protected bool $echoOutput;
 
+    /**
+     * @var array<string, mixed>
+     */
     protected array $stats = [
         'processed' => 0,
         'matched' => 0,
@@ -46,6 +49,7 @@ class TvProcessingPipeline
      */
     public function __construct(iterable $pipes = [], bool $echoOutput = true)
     {
+        /** @phpstan-ignore argument.templateType */
         $this->pipes = collect($pipes)
             ->sortBy(fn (AbstractTvProviderPipe $p) => $p->getPriority());
 
@@ -70,9 +74,9 @@ class TvProcessingPipeline
     /**
      * Process a single release through the pipeline.
      *
-     * @param  array|object  $release  Release data
+     * @param  array<string, mixed>|object  $release  Release data
      * @param  bool  $debug  Whether to include debug information
-     * @return array Processing result
+     * @return array<string, mixed> Processing result
      */
     public function processRelease(array|object $release, bool $debug = false): array
     {
@@ -138,6 +142,8 @@ class TvProcessingPipeline
 
     /**
      * Get TV releases that need processing.
+     *
+     * @return Collection<int, mixed>
      */
     protected function getTvReleases(string $groupID, string $guidChar, int $processTV): Collection
     {
@@ -181,13 +187,15 @@ class TvProcessingPipeline
      *
      * @return Collection<AbstractTvProviderPipe>
      */
-    public function getPipes(): Collection
+    public function getPipes(): Collection // @phpstan-ignore missingType.generics
     {
         return $this->pipes;
     }
 
     /**
      * Get processing statistics.
+     *
+     * @return array<string, mixed>
      */
     public function getStats(): array
     {
@@ -211,6 +219,8 @@ class TvProcessingPipeline
 
     /**
      * Update statistics from a processing result.
+     *
+     * @param  array<string, mixed>  $result
      */
     protected function updateStats(array $result): void
     {

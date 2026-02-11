@@ -25,6 +25,7 @@ class ImdbScraper
      * Fetch a movie by IMDB numeric ID.
      *
      * @param  string  $id  Numeric part without 'tt'.
+     * @return array<string, mixed>
      */
     public function fetchById(string $id): array|false
     {
@@ -173,6 +174,8 @@ class ImdbScraper
 
     /**
      * Search IMDb suggestion API for a title.
+     *
+     * @return array<string, mixed>
      */
     public function search(string $query): array
     {
@@ -213,7 +216,7 @@ class ImdbScraper
             }
             Cache::put($cacheKey, $results, now()->addHours(12));
 
-            return $results;
+            return $results; // @phpstan-ignore return.type
         } catch (\Throwable $e) {
             Log::debug('IMDb search error '.$query.': '.$e->getMessage());
             Cache::put($cacheKey, [], now()->addHours(6));

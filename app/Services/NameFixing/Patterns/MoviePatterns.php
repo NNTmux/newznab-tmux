@@ -103,6 +103,8 @@ final class MoviePatterns
 
     /**
      * Get all patterns in priority order.
+     *
+     * @return array<string, mixed>
      */
     public static function getAllPatterns(): array
     {
@@ -123,6 +125,8 @@ final class MoviePatterns
 
     /**
      * Get 4K/UHD patterns only.
+     *
+     * @return array<string, mixed>
      */
     public static function get4KPatterns(): array
     {

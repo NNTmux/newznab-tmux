@@ -37,6 +37,9 @@ class ReleaseNfo extends Model
      */
     protected $guarded = [];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Release, $this>
+     */
     public function release(): BelongsTo
     {
         return $this->belongsTo(Release::class, 'releases_id');
@@ -45,7 +48,7 @@ class ReleaseNfo extends Model
     /**
      * @return Model|null|static
      */
-    public static function getReleaseNfo($id, bool $getNfoString = true)
+    public static function getReleaseNfo(mixed $id, bool $getNfoString = true)
     {
         $nfo = self::query()->where('releases_id', $id)->whereNotNull('nfo')->select(['releases_id']);
         if ($getNfoString === true) {

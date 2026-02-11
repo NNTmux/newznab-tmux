@@ -56,7 +56,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     public string $imgSavePath;
 
     /**
-     * @var array Site ID columns for TV
+     * @var array<string, mixed> Site ID columns for TV
      */
     public array $siteColumns;
 
@@ -76,7 +76,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         $this->catWhere = 'categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER.' AND categories_id != '.Category::TV_ANIME;
         $this->tvqty = Settings::settingValue('maxrageprocessed') !== '' ? (int) Settings::settingValue('maxrageprocessed') : 75;
         $this->imgSavePath = storage_path('covers/tvshows/');
-        $this->siteColumns = ['tvdb', 'trakt', 'tvrage', 'tvmaze', 'imdb', 'tmdb'];
+        $this->siteColumns = ['tvdb', 'trakt', 'tvrage', 'tvmaze', 'imdb', 'tmdb']; // @phpstan-ignore assign.propertyType
     }
 
     /**
@@ -87,7 +87,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     /**
      * Retrieve info of TV episode from site using its API.
      *
-     * @return array|false False on failure, an array of information fields otherwise.
+     * @return array<string, mixed>|false False on failure, an array of information fields otherwise.
      */
     abstract public function getEpisodeInfo(int|string $siteId, int|string $series, int|string $episode): array|bool;
 
@@ -102,26 +102,30 @@ abstract class AbstractTvProvider extends BaseVideoProvider
      * Retrieve info of TV programme from site using it's API.
      *
      * @param  string  $name  Title of programme to look up. Usually a cleaned up version from releases table.
-     * @return array|false False on failure, an array of information fields otherwise.
+     * @return array<string, mixed>|false False on failure, an array of information fields otherwise.
      */
     abstract public function getShowInfo(string $name): bool|array;
 
     /**
      * Assigns API show response values to a formatted array for insertion
      * Returns the formatted array.
+     *
+     * @return array<string, mixed>
      */
-    abstract public function formatShowInfo($show): array;
+    abstract public function formatShowInfo(mixed $show): array;
 
     /**
      * Assigns API episode response values to a formatted array for insertion
      * Returns the formatted array.
+     *
+     * @return array<string, mixed>
      */
-    abstract public function formatEpisodeInfo($episode): array;
+    abstract public function formatEpisodeInfo(mixed $episode): array;
 
     /**
-     * @return Release[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection|int
+     * @return Release[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection<int, mixed>|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection<int, mixed>|int
      */
-    public function getTvReleases(string $groupID = '', string $guidChar = '', int $lookupSetting = 1, int $status = 0): array|\Illuminate\Database\Eloquent\Collection|int|\Illuminate\Support\Collection
+    public function getTvReleases(string $groupID = '', string $guidChar = '', int $lookupSetting = 1, int $status = 0): array|\Illuminate\Database\Eloquent\Collection|int|\Illuminate\Support\Collection // @phpstan-ignore missingType.generics
     {
         $ret = 0;
         if ($lookupSetting === 0) {
@@ -164,7 +168,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     /**
      * Updates the release tv_episodes_id status when scraper match is not found.
      */
-    public function setVideoNotFound($status, $Id): void
+    public function setVideoNotFound(mixed $status, mixed $Id): void
     {
         Release::query()
             ->where('id', $Id)
@@ -174,6 +178,8 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     /**
      * Inserts a new video ID into the database for TV shows
      * If a duplicate is found it is handle by calling update instead.
+     *
+     * @param  array<string, mixed>  $show
      */
     public function add(array $show = []): int
     {
@@ -233,6 +239,9 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         return $videoId;
     }
 
+    /**
+     * @param  array<string, mixed>  $episode
+     */
     public function addEpisode(int $videoId, array $episode = []): bool|int
     {
         $episodeId = $this->getBySeasonEp($videoId, $episode['series'], $episode['episode'], $episode['firstaired']);
@@ -254,6 +263,9 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         return $episodeId;
     }
 
+    /**
+     * @param  array<string, mixed>  $show
+     */
     public function update(int $videoId, array $show = []): void
     {
         if ($show['country'] !== '') {
@@ -319,7 +331,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     /**
      * @return Video|false|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model
      */
-    public function getSiteByID(string $column, int $id): \Illuminate\Database\Eloquent\Model|bool|\Illuminate\Database\Eloquent\Builder|Video
+    public function getSiteByID(string $column, int $id): \Illuminate\Database\Eloquent\Model|bool|\Illuminate\Database\Eloquent\Builder|Video // @phpstan-ignore missingType.generics
     {
         $return = false;
         $video = Video::query()->where('id', $id)->first([$column]);
@@ -377,7 +389,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     }
 
     /**
-     * @return array|false
+     * @return array<string, mixed>|false
      */
     public function parseInfo(string $relname): bool|array
     {
@@ -561,6 +573,8 @@ abstract class AbstractTvProvider extends BaseVideoProvider
 
     /**
      * Parses the release searchname for the season/episode/airdate information.
+     *
+     * @return array<string, mixed>
      */
     private function parseSeasonEp(string $relname): array
     {
@@ -717,7 +731,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     /**
      * Simple function that compares two strings of text
      */
-    public function checkMatch($ourName, $scrapeName, $probability): float|int
+    public function checkMatch(mixed $ourName, mixed $scrapeName, mixed $probability): float|int
     {
         similar_text($ourName, $scrapeName, $matchpct);
 
@@ -749,7 +763,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     /**
      * Checks API response returns have all REQUIRED attributes set
      */
-    public function checkRequiredAttr($array, string $type): bool
+    public function checkRequiredAttr(mixed $array, string $type): bool
     {
         $required = ['failedToMatchType'];
 

@@ -22,7 +22,7 @@ use Spatie\Permission\Models\Role;
  * @property \Carbon\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\RolePromotionStat[] $statistics
  */
-class RolePromotion extends Model
+class RolePromotion extends Model // @phpstan-ignore missingType.iterableValue
 {
     protected $fillable = [
         'name',
@@ -44,6 +44,8 @@ class RolePromotion extends Model
 
     /**
      * Get the statistics for this promotion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\RolePromotionStat, $this>
      */
     public function statistics(): HasMany
     {
@@ -53,7 +55,7 @@ class RolePromotion extends Model
     /**
      * Get the roles this promotion applies to
      */
-    public function getApplicableRolesModels()
+    public function getApplicableRolesModels(): mixed
     {
         if (empty($this->applicable_roles)) {
             return static::getCustomRoles();
@@ -65,7 +67,7 @@ class RolePromotion extends Model
     /**
      * Scope to get only valid (non-expired) promotions
      */
-    public function scopeValid($query)
+    public function scopeValid(mixed $query): mixed
     {
         $now = Carbon::now();
 
@@ -83,7 +85,7 @@ class RolePromotion extends Model
     /**
      * Get custom roles (excluding system roles)
      */
-    public static function getCustomRoles()
+    public static function getCustomRoles(): mixed
     {
         $systemRoles = ['Admin', 'User', 'Moderator', 'Disabled', 'Friend'];
 
@@ -115,7 +117,7 @@ class RolePromotion extends Model
     /**
      * Get active promotions for a specific role
      */
-    public static function getActivePromotions(?int $roleId = null)
+    public static function getActivePromotions(?int $roleId = null): mixed
     {
         $query = static::where('is_active', true);
 
@@ -153,6 +155,8 @@ class RolePromotion extends Model
 
     /**
      * Get summary statistics for this promotion
+     *
+     * @return array<string, mixed>
      */
     public function getSummaryStatistics(): array
     {
@@ -204,6 +208,8 @@ class RolePromotion extends Model
 
     /**
      * Get statistics grouped by role
+     *
+     * @return array<int, array<string, mixed>>
      */
     public function getStatisticsByRole(): array
     {
@@ -229,10 +235,11 @@ class RolePromotion extends Model
 
     /**
      * Get statistics for a specific time period
+     *
+     * @return array<string, mixed>
      */
     public function getStatisticsForPeriod(Carbon $startDate, Carbon $endDate): array
     {
-        /** @phpstan-ignore method.notFound */
         $stats = $this->statistics()
             ->appliedBetween($startDate, $endDate)
             ->get();

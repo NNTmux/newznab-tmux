@@ -45,16 +45,25 @@ class Genre extends Model
      */
     protected $guarded = [];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MusicInfo, $this>
+     */
     public function music(): HasMany
     {
         return $this->hasMany(MusicInfo::class, 'genres_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ConsoleInfo, $this>
+     */
     public function consoleInfo(): HasMany
     {
         return $this->hasMany(ConsoleInfo::class, 'genres_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\GamesInfo, $this>
+     */
     public function gamesInfo(): HasMany
     {
         return $this->hasMany(GamesInfo::class, 'genres_id');
@@ -63,7 +72,7 @@ class Genre extends Model
     /**
      * Scope to filter disabled genres.
      */
-    public function scopeDisabled(Builder $query): Builder
+    public function scopeDisabled(Builder $query): Builder // @phpstan-ignore missingType.generics
     {
         return $query->where('disabled', '=', 1);
     }
@@ -71,7 +80,7 @@ class Genre extends Model
     /**
      * Scope to filter enabled genres.
      */
-    public function scopeEnabled(Builder $query): Builder
+    public function scopeEnabled(Builder $query): Builder // @phpstan-ignore missingType.generics
     {
         return $query->where('disabled', '=', 0);
     }
@@ -79,7 +88,7 @@ class Genre extends Model
     /**
      * Scope to filter by type.
      */
-    public function scopeOfType(Builder $query, string $type): Builder
+    public function scopeOfType(Builder $query, string $type): Builder // @phpstan-ignore missingType.generics
     {
         if (! empty($type)) {
             return $query->where('type', '=', $type);
@@ -91,7 +100,7 @@ class Genre extends Model
     /**
      * Get filtered genres based on type and active status.
      */
-    public static function getFiltered(string $type = '', bool $activeOnly = false): Collection
+    public static function getFiltered(string $type = '', bool $activeOnly = false): Collection // @phpstan-ignore missingType.generics
     {
         if ($activeOnly) {
             return self::getActiveGenres($type);
@@ -127,7 +136,7 @@ class Genre extends Model
     /**
      * Get genres that are actively used in musicinfo, consoleinfo, or gamesinfo.
      */
-    private static function getActiveGenres(string $type = ''): Collection
+    private static function getActiveGenres(string $type = ''): Collection // @phpstan-ignore missingType.generics
     {
         $typeSql = ! empty($type) ? ' AND g.type = '.intval($type) : '';
 

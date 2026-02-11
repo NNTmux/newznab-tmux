@@ -51,6 +51,8 @@ class TraktService
 
     /**
      * Get the request headers for Trakt API.
+     *
+     * @return array<string, mixed>
      */
     protected function getHeaders(): array
     {
@@ -65,8 +67,8 @@ class TraktService
      * Make a GET request to the Trakt API.
      *
      * @param  string  $endpoint  The API endpoint
-     * @param  array  $params  Query parameters
-     * @return array|null Response data or null on failure
+     * @param  array<string, mixed>  $params  Query parameters
+     * @return array<string, mixed>|null Response data or null on failure
      */
     protected function get(string $endpoint, array $params = []): ?array
     {
@@ -145,7 +147,7 @@ class TraktService
      * @param  int|string  $episode  The episode number
      * @param  string  $extended  Extended info level: 'min', 'full', 'aliases', 'full,aliases'
      * @param  string  $idType  The ID type: 'trakt', 'imdb', 'tmdb', 'tvdb' (default: 'trakt')
-     * @return array|null Episode data or null on failure
+     * @return array<string, mixed>|null Episode data or null on failure
      */
     public function getEpisodeSummary(
         int|string $showId,
@@ -189,11 +191,11 @@ class TraktService
      * Get episode summary with fallback to multiple ID types.
      * Tries Trakt ID first, then falls back to TMDB, TVDB, and IMDB.
      *
-     * @param  array  $ids  Array of IDs: ['trakt' => X, 'tmdb' => Y, 'tvdb' => Z, 'imdb' => W]
+     * @param  array<string, mixed>  $ids  Array of IDs: ['trakt' => X, 'tmdb' => Y, 'tvdb' => Z, 'imdb' => W]
      * @param  int|string  $season  The season number
      * @param  int|string  $episode  The episode number
      * @param  string  $extended  Extended info level
-     * @return array|null Episode data or null on failure
+     * @return array<string, mixed>|null Episode data or null on failure
      */
     public function getEpisodeSummaryWithFallback(
         array $ids,
@@ -242,7 +244,7 @@ class TraktService
      *
      * @param  int|string  $showId  Show ID
      * @param  string  $idType  The ID type: 'trakt', 'imdb', 'tmdb', 'tvdb'
-     * @return array|null Show data with all IDs or null on failure
+     * @return array<string, mixed>|null Show data with all IDs or null on failure
      */
     public function getShowWithAllIds(int|string $showId, string $idType = 'trakt'): ?array
     {
@@ -264,7 +266,7 @@ class TraktService
      *
      * @param  int|string  $id  The external ID
      * @param  string  $idType  The ID type: 'imdb', 'tmdb', 'tvdb'
-     * @return array|null Array with all IDs: ['trakt' => X, 'imdb' => Y, 'tmdb' => Z, 'tvdb' => W] or null
+     * @return array<string, mixed>|null Array with all IDs: ['trakt' => X, 'imdb' => Y, 'tmdb' => Z, 'tvdb' => W] or null
      */
     public function lookupShowIds(int|string $id, string $idType = 'tmdb'): ?array
     {
@@ -281,7 +283,7 @@ class TraktService
 
         // Get the first matching show
         $show = $results[0]['show'] ?? null;
-        if ($show === null || ! isset($show['ids'])) {
+        if ($show === null || ! isset($show['ids'])) { // @phpstan-ignore isset.offset
             return null;
         }
 
@@ -298,7 +300,7 @@ class TraktService
     /**
      * Get current box office movies.
      *
-     * @return array|null Box office data or null on failure
+     * @return array<string, mixed>|null Box office data or null on failure
      */
     public function getBoxOffice(): ?array
     {
@@ -314,7 +316,7 @@ class TraktService
      *
      * @param  string  $startDate  Start date (YYYY-MM-DD format, defaults to today)
      * @param  int  $days  Number of days to retrieve (default: 7)
-     * @return array|null Calendar data or null on failure
+     * @return array<string, mixed>|null Calendar data or null on failure
      */
     public function getCalendar(string $startDate = '', int $days = 7): ?array
     {
@@ -334,7 +336,7 @@ class TraktService
      *
      * @param  string  $movie  Movie slug or ID
      * @param  string  $extended  Extended info level: 'min' or 'full'
-     * @return array|null Movie data or null on failure
+     * @return array<string, mixed>|null Movie data or null on failure
      */
     public function getMovieSummary(string $movie, string $extended = 'min'): ?array
     {
@@ -370,7 +372,7 @@ class TraktService
      * @param  int|string  $id  The ID to search for
      * @param  string  $idType  The ID type: 'imdb', 'tmdb', 'trakt', 'tvdb'
      * @param  string  $mediaType  Media type: 'movie', 'show', 'episode', or empty for all
-     * @return array|null Search results or null on failure
+     * @return array<string, mixed>|null Search results or null on failure
      */
     public function searchById(int|string $id, string $idType = 'trakt', string $mediaType = ''): ?array
     {
@@ -403,7 +405,7 @@ class TraktService
      *
      * @param  string  $query  Search query
      * @param  string  $type  Search type: 'show', 'movie', 'episode', 'person', 'list'
-     * @return array|null Search results or null on failure
+     * @return array<string, mixed>|null Search results or null on failure
      */
     public function searchShows(string $query, string $type = 'show'): ?array
     {
@@ -424,7 +426,7 @@ class TraktService
      *
      * @param  string  $show  Show slug or ID
      * @param  string  $extended  Extended info level: 'min' or 'full'
-     * @return array|null Show data or null on failure
+     * @return array<string, mixed>|null Show data or null on failure
      */
     public function getShowSummary(string $show, string $extended = 'full'): ?array
     {
@@ -446,7 +448,7 @@ class TraktService
      *
      * @param  string  $show  Show slug or ID
      * @param  string  $extended  Extended info level
-     * @return array|null Seasons data or null on failure
+     * @return array<string, mixed>|null Seasons data or null on failure
      */
     public function getShowSeasons(string $show, string $extended = 'full'): ?array
     {
@@ -468,7 +470,7 @@ class TraktService
      * @param  string  $show  Show slug or ID
      * @param  int  $season  Season number
      * @param  string  $extended  Extended info level
-     * @return array|null Episodes data or null on failure
+     * @return array<string, mixed>|null Episodes data or null on failure
      */
     public function getSeasonEpisodes(string $show, int $season, string $extended = 'full'): ?array
     {
@@ -489,7 +491,7 @@ class TraktService
      *
      * @param  int  $limit  Number of results to return
      * @param  string  $extended  Extended info level
-     * @return array|null Trending shows or null on failure
+     * @return array<string, mixed>|null Trending shows or null on failure
      */
     public function getTrendingShows(int $limit = 10, string $extended = 'full'): ?array
     {
@@ -508,7 +510,7 @@ class TraktService
      *
      * @param  int  $limit  Number of results to return
      * @param  string  $extended  Extended info level
-     * @return array|null Trending movies or null on failure
+     * @return array<string, mixed>|null Trending movies or null on failure
      */
     public function getTrendingMovies(int $limit = 10, string $extended = 'full'): ?array
     {
@@ -527,7 +529,7 @@ class TraktService
      *
      * @param  int  $limit  Number of results to return
      * @param  string  $extended  Extended info level
-     * @return array|null Popular shows or null on failure
+     * @return array<string, mixed>|null Popular shows or null on failure
      */
     public function getPopularShows(int $limit = 10, string $extended = 'full'): ?array
     {
@@ -546,7 +548,7 @@ class TraktService
      *
      * @param  int  $limit  Number of results to return
      * @param  string  $extended  Extended info level
-     * @return array|null Popular movies or null on failure
+     * @return array<string, mixed>|null Popular movies or null on failure
      */
     public function getPopularMovies(int $limit = 10, string $extended = 'full'): ?array
     {

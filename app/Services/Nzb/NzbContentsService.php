@@ -117,7 +117,7 @@ class NzbContentsService
      * @param  int  $relID  The release ID.
      * @param  int  $groupID  The group ID.
      * @param  bool  $nfoCheck  Whether to specifically look for an NFO file.
-     * @return array|false An array containing NFO message ID and hidden status, or false if not found/error.
+     * @return array<string, mixed>|false An array containing NFO message ID and hidden status, or false if not found/error.
      *
      * @throws \Exception If NNTP operations fail.
      */

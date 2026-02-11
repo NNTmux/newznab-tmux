@@ -34,7 +34,7 @@ class PasswordReset extends Mailable
     /**
      * PasswordReset constructor.
      */
-    public function __construct(User $user, $newPass)
+    public function __construct(User $user, mixed $newPass)
     {
         $this->user = $user;
         $this->newPass = $newPass;

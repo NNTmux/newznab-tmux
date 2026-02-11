@@ -38,7 +38,7 @@ class ProcessBackfill extends Command
         }
 
         try {
-            (new ForkingService)->backfill($options);
+            (new ForkingService)->backfill($options); // @phpstan-ignore argument.type
 
             return self::SUCCESS;
         } catch (\Exception $e) {

@@ -26,7 +26,7 @@ class ApiTransformer extends TransformerAbstract
      * Transform a release into an API response array.
      *
      * @param  Release|\stdClass  $release  The release to transform (can be Eloquent model or stdClass from raw query)
-     * @return array The transformed release data
+     * @return array<string, mixed> The transformed release data
      */
     public function transform(Release|\stdClass $release): array
     {
@@ -59,6 +59,8 @@ class ApiTransformer extends TransformerAbstract
 
     /**
      * Get base data common to all releases.
+     *
+     * @return array<string, mixed>
      */
     protected function getBaseData(Release|\stdClass $release): array
     {
@@ -80,6 +82,8 @@ class ApiTransformer extends TransformerAbstract
 
     /**
      * Get movie-specific data fields.
+     *
+     * @return array<string, mixed>
      */
     protected function getMovieSpecificData(Release|\stdClass $release): array
     {
@@ -92,6 +96,8 @@ class ApiTransformer extends TransformerAbstract
 
     /**
      * Get TV-specific data fields.
+     *
+     * @return array<string, mixed>
      */
     protected function getTvSpecificData(Release|\stdClass $release): array
     {

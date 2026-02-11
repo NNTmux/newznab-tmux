@@ -11,7 +11,7 @@ class AdminGroupController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index(Request $request)
+    public function index(Request $request): mixed
     {
         $groupname = $request->input('groupname') ?? '';
         $grouplist = UsenetGroup::getGroupsRange($groupname);
@@ -23,7 +23,7 @@ class AdminGroupController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function createBulk(Request $request)
+    public function createBulk(Request $request): mixed
     {
         // set the current action
         $action = $request->input('action') ?? 'view';
@@ -97,7 +97,7 @@ class AdminGroupController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function active(Request $request)
+    public function active(Request $request): mixed
     {
         $gname = '';
         if (! empty($request->input('groupname'))) {
@@ -114,7 +114,7 @@ class AdminGroupController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function inactive(Request $request)
+    public function inactive(Request $request): mixed
     {
         $gname = '';
         if (! empty($request->input('groupname'))) {

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DownloadStat extends Model
 {
-    use HasFactory;
+    use HasFactory; // @phpstan-ignore missingType.generics
 
     protected $guarded = [];
 
@@ -33,6 +33,9 @@ class DownloadStat extends Model
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public static function getTopDownloads(): array
     {
         return self::query()->select(['searchname', 'guid', 'adddate', 'grabs'])->get()->toArray();

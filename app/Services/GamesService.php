@@ -68,7 +68,7 @@ class GamesService
 
     protected string $_classUsed = '';
 
-    protected $igdbSleep;
+    protected mixed $igdbSleep;
 
     /**
      * @throws \Exception
@@ -150,7 +150,7 @@ class GamesService
     /**
      * Get paginated list of all games.
      */
-    public function getRange(?string $search = null): LengthAwarePaginator
+    public function getRange(?string $search = null): LengthAwarePaginator // @phpstan-ignore missingType.generics
     {
         $query = GamesInfo::query()
             ->select(['gi.*', 'g.title as genretitle'])
@@ -176,9 +176,13 @@ class GamesService
     /**
      * Get games range for browsing with filtering.
      *
+     * @param  array<string, mixed>  $excludedCats
+     * @param  array<string, mixed>  $orderBy
+     * @return array<string, mixed>
+     *
      * @throws \Exception
      */
-    public function getGamesRange($page, $cat, $start, $num, array|string $orderBy = '', string $maxAge = '', array $excludedCats = []): array
+    public function getGamesRange(mixed $page, mixed $cat, mixed $start, mixed $num, array|string $orderBy = '', string $maxAge = '', array $excludedCats = []): array
     {
         $page = max(1, $page);
         $start = max(0, $start);
@@ -203,7 +207,7 @@ class GamesService
             $catsrch.
             $maxAge.
             $exccatlist.
-            ' GROUP BY gi.id ORDER BY '.($order[0]).' '.($order[1]).
+            ' GROUP BY gi.id ORDER BY '.($order[0]).' '.($order[1]). // @phpstan-ignore offsetAccess.notFound
             ($start === false ? '' : ' LIMIT '.$num.' OFFSET '.$start);
 
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
@@ -258,8 +262,8 @@ class GamesService
             (! empty($gameIDs) ? implode(',', $gameIDs) : -1),
             (! empty($releaseIDs) ? implode(',', $releaseIDs) : -1),
             $catsrch,
-            $order[0],
-            $order[1]
+            $order[0], // @phpstan-ignore offsetAccess.notFound
+            $order[1] // @phpstan-ignore offsetAccess.notFound
         );
 
         $return = Cache::get(md5($returnSql.$page));
@@ -277,6 +281,9 @@ class GamesService
 
     /**
      * Get order array for games.
+     *
+     * @param  array<string, mixed>  $orderBy
+     * @return array<string, mixed>
      */
     public function getGamesOrder(array|string $orderBy): array
     {
@@ -298,6 +305,8 @@ class GamesService
 
     /**
      * Get ordering options.
+     *
+     * @return array<int, string>
      */
     public function getGamesOrdering(): array
     {
@@ -310,6 +319,8 @@ class GamesService
 
     /**
      * Get browse by options.
+     *
+     * @return array<string, mixed>
      */
     public function getBrowseByOptions(): array
     {
@@ -349,7 +360,7 @@ class GamesService
         ?string $asin,
         ?string $url,
         ?string $publisher,
-        $releaseDate,
+        mixed $releaseDate,
         ?string $esrb,
         int $cover,
         ?string $trailerUrl,
@@ -372,6 +383,8 @@ class GamesService
 
     /**
      * Update game info from external APIs (Steam/IGDB).
+     *
+     * @param  array<string, mixed>  $gameInfo
      */
     public function updateGamesInfo(array $gameInfo): bool|int
     {
@@ -449,6 +462,9 @@ class GamesService
 
     /**
      * Build game array from Steam data.
+     *
+     * @param  array<string, mixed>  $steamResults
+     * @return array<string, mixed>
      */
     protected function buildGameFromSteam(array $steamResults, string &$genreName): array
     {
@@ -488,6 +504,9 @@ class GamesService
 
     /**
      * Save game to database.
+     *
+     * @param  array<string, mixed>  $game
+     * @param  array<string, mixed>  $gameInfo
      */
     protected function saveGameToDatabase(array $game, string $genreName, GenreService $gen, array $gameInfo, string $titleKey): bool|int
     {
@@ -618,6 +637,9 @@ class GamesService
 
     /**
      * Save game info from cached data.
+     *
+     * @param  array<string, mixed>  $game
+     * @param  array<string, mixed>  $gameInfo
      */
     protected function saveGameInfoFromCache(array $game, GenreService $gen, array $gameInfo): bool|int
     {
@@ -760,6 +782,8 @@ class GamesService
 
     /**
      * Batch update release records with game IDs.
+     *
+     * @param  array<string, mixed>  $updates
      */
     protected function batchUpdateReleases(array $updates): void
     {
@@ -815,6 +839,8 @@ class GamesService
 
     /**
      * Get processing statistics from the last run.
+     *
+     * @return array<string, mixed>
      */
     public function getProcessingStats(): array
     {

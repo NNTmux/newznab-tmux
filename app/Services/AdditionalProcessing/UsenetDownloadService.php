@@ -24,7 +24,7 @@ class UsenetDownloadService
     /**
      * Download binary content from usenet using message IDs.
      *
-     * @param  array|string  $messageIDs  Single or array of message IDs
+     * @param  array<string, mixed>|string  $messageIDs  Single or array of message IDs
      * @param  string  $groupName  Group name for logging
      * @param  int|null  $releaseId  Release ID for logging
      * @return array{success: bool, data: string|null, groupUnavailable: bool, error: string|null}
@@ -107,6 +107,9 @@ class UsenetDownloadService
 
     /**
      * Download sample video content.
+     *
+     * @param  array<string, mixed>  $messageIDs
+     * @return array<string, mixed>
      */
     public function downloadSample(
         array $messageIDs,
@@ -118,6 +121,9 @@ class UsenetDownloadService
 
     /**
      * Download media info video content.
+     *
+     * @param  array<string, mixed>  $messageID
+     * @return array<string, mixed>
      */
     public function downloadMediaInfo(
         string|array $messageID,
@@ -129,6 +135,9 @@ class UsenetDownloadService
 
     /**
      * Download audio content.
+     *
+     * @param  array<string, mixed>  $messageID
+     * @return array<string, mixed>
      */
     public function downloadAudio(
         string|array $messageID,
@@ -140,6 +149,9 @@ class UsenetDownloadService
 
     /**
      * Download JPG content.
+     *
+     * @param  array<string, mixed>  $messageIDs
+     * @return array<string, mixed>
      */
     public function downloadJPG(
         array $messageIDs,
@@ -152,7 +164,7 @@ class UsenetDownloadService
     /**
      * Download compressed file content (RAR, ZIP, etc.).
      *
-     * @param  array  $messageIDs  Message IDs to download
+     * @param  array<string, mixed>  $messageIDs  Message IDs to download
      * @param  string  $groupName  Group name for logging
      * @param  int|null  $releaseId  Release ID for logging
      * @param  string|null  $fileTitle  File title for logging

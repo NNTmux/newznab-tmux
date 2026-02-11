@@ -34,7 +34,7 @@ class SendInvite extends Mailable
     /**
      * SendInvite constructor.
      */
-    public function __construct(User $user, $invite)
+    public function __construct(User $user, mixed $invite)
     {
         $this->user = $user;
         $this->invite = $invite;

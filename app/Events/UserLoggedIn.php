@@ -10,17 +10,14 @@ class UserLoggedIn
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * @var \App\Models\User
-     */
-    public $user;
+    public \App\Models\User $user;
 
-    public $ip;
+    public string $ip;
 
     /**
      * Create a new event instance.
      */
-    public function __construct($user, $ip = '')
+    public function __construct(\App\Models\User $user, string $ip = '')
     {
         $this->user = $user;
         $this->ip = $ip;

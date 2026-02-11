@@ -35,7 +35,7 @@ class ForgotPasswordController extends Controller
     /**
      * @throws \Exception
      */
-    public function showLinkRequestForm(Request $request)
+    public function showLinkRequestForm(Request $request): mixed
     {
         // If it's a GET request, just show the form
         if ($request->isMethod('get')) {

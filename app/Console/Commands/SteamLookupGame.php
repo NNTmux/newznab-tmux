@@ -93,6 +93,8 @@ class SteamLookupGame extends Command
 
     /**
      * Display game details in a formatted way.
+     *
+     * @param  array<string, mixed>  $details
      */
     protected function displayGameDetails(array $details): void
     {

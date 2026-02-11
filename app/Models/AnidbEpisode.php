@@ -53,11 +53,17 @@ class AnidbEpisode extends Model
      */
     protected $guarded = [];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\AnidbTitle, $this>
+     */
     public function title(): BelongsTo
     {
         return $this->belongsTo(AnidbTitle::class, 'anidbid');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AnidbInfo, $this>
+     */
     public function info(): HasMany
     {
         return $this->hasMany(AnidbInfo::class, 'anidbid');

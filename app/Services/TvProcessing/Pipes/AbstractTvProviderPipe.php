@@ -17,6 +17,9 @@ abstract class AbstractTvProviderPipe
 
     protected bool $echoOutput = true;
 
+    /**
+     * @var array<string, mixed>
+     */
     protected array $titleCache = [];
 
     public function __construct() {}

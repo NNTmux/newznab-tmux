@@ -68,6 +68,9 @@ class ReleaseRemoverService
 
     protected ReleaseManagementService $releaseManagement;
 
+    /**
+     * @var array<string, mixed>
+     */
     protected array $result = [];
 
     private NzbService $nzb;
@@ -76,6 +79,8 @@ class ReleaseRemoverService
 
     /**
      * Map of removal types to their handler methods.
+     *
+     * @var array<string, mixed>
      */
     private array $removalHandlers;
 
@@ -119,9 +124,9 @@ class ReleaseRemoverService
     /**
      * Remove releases using user criteria.
      *
-     * @param  array  $arguments  Array of criteria used to delete unwanted releases.
-     *                            Criteria format: columnName=modifier="content"
-     *                            Modifiers: equals, like, bigger, smaller
+     * @param  array<string, mixed>  $arguments  Array of criteria used to delete unwanted releases.
+     *                                           Criteria format: columnName=modifier="content"
+     *                                           Modifiers: equals, like, bigger, smaller
      *
      * @throws Exception
      */
@@ -601,6 +606,8 @@ class ReleaseRemoverService
 
     /**
      * Perform search using configured search engine.
+     *
+     * @return array<string, mixed>
      */
     private function performSearch(string $regexMatch): array
     {
@@ -685,6 +692,8 @@ class ReleaseRemoverService
 
     /**
      * Build the regex SQL and operation type name for blacklist.
+     *
+     * @return list<string>
      */
     private function buildBlacklistRegexSQL(int $msgcol, string $dbRegex): array
     {
@@ -804,7 +813,7 @@ class ReleaseRemoverService
      */
     protected function removeCodecPoster(): bool|string
     {
-        $categories = $this->buildCategoryList([
+        $categories = $this->buildCategoryList([ // @phpstan-ignore argument.type
             Category::MOVIE_3D,
             Category::MOVIE_BLURAY,
             Category::MOVIE_DVD,
@@ -851,6 +860,8 @@ class ReleaseRemoverService
 
     /**
      * Build a comma-separated list of category IDs.
+     *
+     * @param  array<string, mixed>  $categories
      */
     private function buildCategoryList(array $categories): string
     {
@@ -1132,6 +1143,8 @@ class ReleaseRemoverService
 
     /**
      * Extract search terms from a regex pattern for fulltext search optimization.
+     *
+     * @return array<string, mixed>
      */
     protected function extractSrchFromRegx(string $dbRegex = ''): array|string
     {

@@ -1,0 +1,811 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Method App\\Console\\Commands\\NntmuxOffsetPopulate\:\:createOffsetRanges\(\) should return array\<string, mixed\> but returns list\<array\<string, float\|int\<0, max\>\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Console/Commands/NntmuxOffsetPopulate.php
+
+		-
+			message: '#^PHPDoc tag @return with type list\<array\<string, float\|int\<0, max\>\>\> is incompatible with native type string\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Console/Commands/NntmuxOffsetPopulate.php
+
+		-
+			message: '#^Method App\\Console\\Commands\\NntmuxResetPostProcessing\:\:normalizeCategories\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Console/Commands/NntmuxResetPostProcessing.php
+
+		-
+			message: '#^Function getUserBrowseOrder\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Extensions/helper/helpers.php
+
+		-
+			message: '#^Class App\\Facades\\Elasticsearch has PHPDoc tag @method for method bulk\(\) parameter \#1 \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Elasticsearch.php
+
+		-
+			message: '#^Class App\\Facades\\Elasticsearch has PHPDoc tag @method for method bulk\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Elasticsearch.php
+
+		-
+			message: '#^Class App\\Facades\\Elasticsearch has PHPDoc tag @method for method deleteByQuery\(\) parameter \#1 \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Elasticsearch.php
+
+		-
+			message: '#^Class App\\Facades\\Elasticsearch has PHPDoc tag @method for method deleteByQuery\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Elasticsearch.php
+
+		-
+			message: '#^Class App\\Facades\\Elasticsearch has PHPDoc tag @method for method get\(\) parameter \#1 \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Elasticsearch.php
+
+		-
+			message: '#^Class App\\Facades\\Elasticsearch has PHPDoc tag @method for method get\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Elasticsearch.php
+
+		-
+			message: '#^Class App\\Facades\\Elasticsearch has PHPDoc tag @method for method search\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Elasticsearch.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method autocomplete\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method bulkInsertReleases\(\) parameter \#1 \$releases with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method bulkInsertReleases\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method fuzzySearchReleases\(\) parameter \#1 \$phrases with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method fuzzySearchReleases\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method getFuzzyConfig\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method insertPredb\(\) parameter \#1 \$parameters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchPredb\(\) parameter \#1 \$searchTerm with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchPredb\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchReleases\(\) parameter \#1 \$phrases with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchReleases\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchReleasesByCategory\(\) parameter \#1 \$categoryIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchReleasesByCategory\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchReleasesByExternalId\(\) parameter \#1 \$externalIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchReleasesByExternalId\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchReleasesWithCategoryFilter\(\) parameter \#2 \$categoryIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchReleasesWithCategoryFilter\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchReleasesWithFuzzy\(\) parameter \#1 \$phrases with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchReleasesWithFuzzy\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method suggest\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method truncateIndex\(\) parameter \#1 \$indexes with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method updatePreDb\(\) parameter \#1 \$parameters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\TvProcessing has PHPDoc tag @method for method getStats\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/TvProcessing.php
+
+		-
+			message: '#^Class App\\Facades\\TvProcessing has PHPDoc tag @method for method processRelease\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/TvProcessing.php
+
+		-
+			message: '#^Offset 1 does not exist on array\<string, mixed\>\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/DeletedUsersController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Api\\ApiController\:\:categoryID\(\) should return array\<string, mixed\> but returns list\<int\|string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Http/Controllers/Api/ApiController.php
+
+		-
+			message: '#^PHPDoc tag @return with type list\<int\|string\> is incompatible with native type bool\|int\|string\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Http/Controllers/Api/ApiController.php
+
+		-
+			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/Http/Controllers/MovieController.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: app/Http/Controllers/RssController.php
+
+		-
+			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/Http/Controllers/SeriesController.php
+
+		-
+			message: '#^Method App\\Models\\Category\:\:getForApi\(\) should return list\<mixed\> but returns Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\RootCategory\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/Category.php
+
+		-
+			message: '#^Method App\\Models\\Category\:\:getForMenu\(\) should return array\<string, mixed\> but returns list\<mixed\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/Category.php
+
+		-
+			message: '#^PHPDoc tag @return with type array\<int, string\> is incompatible with native type Illuminate\\Database\\Eloquent\\Collection\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Models/Category.php
+
+		-
+			message: '#^Method App\\Models\\Content\:\:scopeActive\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Content.php
+
+		-
+			message: '#^Method App\\Models\\Content\:\:scopeForRole\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Content.php
+
+		-
+			message: '#^Method App\\Models\\Content\:\:scopeFrontPage\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Content.php
+
+		-
+			message: '#^Method App\\Models\\Content\:\:scopeOfType\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Content.php
+
+		-
+			message: '#^Method App\\Models\\Genre\:\:scopeDisabled\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Genre.php
+
+		-
+			message: '#^Method App\\Models\\Genre\:\:scopeEnabled\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Genre.php
+
+		-
+			message: '#^Method App\\Models\\Genre\:\:scopeOfType\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Genre.php
+
+		-
+			message: '#^Method App\\Models\\Invitation\:\:scopeActive\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Invitation.php
+
+		-
+			message: '#^Method App\\Models\\Invitation\:\:scopeExpired\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Invitation.php
+
+		-
+			message: '#^Method App\\Models\\Invitation\:\:scopeUnused\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Invitation.php
+
+		-
+			message: '#^Method App\\Models\\Invitation\:\:scopeUsed\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Invitation.php
+
+		-
+			message: '#^Method App\\Models\\Invitation\:\:scopeValid\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Invitation.php
+
+		-
+			message: '#^Property App\\Models\\Release\:\:\$image \(string\|null\) does not accept bool\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Models/Release.php
+
+		-
+			message: '#^Property App\\Models\\Release\:\:\$source \(int\<0, max\>\|null\) does not accept bool\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Models/Release.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:scopeActive\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:scopeExcludeSharing\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:scopeExpired\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:scopeExpiringSoon\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:scopeVerified\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:scopeWithRole\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\UserActivityStat\:\:getDownloadsPerDay\(\) should return array\<string, mixed\> but returns list\<array\<string, int\|string\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/UserActivityStat.php
+
+		-
+			message: '#^Method App\\Models\\UserActivityStat\:\:getDownloadsPerHour\(\) should return array\<string, mixed\> but returns list\<array\<string, mixed\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/UserActivityStat.php
+
+		-
+			message: '#^Method App\\Models\\XxxInfo\:\:getAllGenres\(\) should return array\<string, mixed\> but returns list\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/XxxInfo.php
+
+		-
+			message: '#^Method App\\Models\\XxxInfo\:\:getGenres\(\) should return array\<string, mixed\> but returns App\\Models\\Genre\|null\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Models/XxxInfo.php
+
+		-
+			message: '#^Method App\\Services\\AdditionalProcessing\\ArchiveExtractionService\:\:extractViaSevenZip\(\) should return list\<string\> but returns array\{success\: false, files\: array\{\}, hasPassword\: false, passwordStatus\: 0\}\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Services/AdditionalProcessing/ArchiveExtractionService.php
+
+		-
+			message: '#^Method App\\Services\\AdditionalProcessing\\ArchiveExtractionService\:\:filterExtractedFiles\(\) should return array\{success\: false, files\: array\{\}, hasPassword\: false, passwordStatus\: 0\} but returns list\<mixed\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/AdditionalProcessing/ArchiveExtractionService.php
+
+		-
+			message: '#^Method App\\Services\\AdditionalProcessing\\ArchiveExtractionService\:\:filterSevenZipFiles\(\) should return list\<array\{name\: non\-falsy\-string, size\: int, encrypted\: bool, __any_encrypted__\?\: true\}\> but returns list\<array\{name\: mixed, size\: mixed, date\: int\<1, max\>, pass\: 0, crc32\: '''', source\: ''7z\-list''\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/AdditionalProcessing/ArchiveExtractionService.php
+
+		-
+			message: '#^Method App\\Services\\AdditionalProcessing\\ArchiveExtractionService\:\:listSevenZipEntries\(\) should return array\<string, mixed\> but returns list\<array\<string, int\|string\|false\>\>\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Services/AdditionalProcessing/ArchiveExtractionService.php
+
+		-
+			message: '#^Method App\\Services\\AdditionalProcessing\\ArchiveExtractionService\:\:parseSevenZipStructuredOutput\(\) should return list\<array\<string, int\|string\|false\>\> but returns list\<array\{name\: non\-falsy\-string, size\: int, encrypted\: bool, __any_encrypted__\?\: true\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/AdditionalProcessing/ArchiveExtractionService.php
+
+		-
+			message: '#^Method App\\Services\\AdditionalProcessing\\ArchiveExtractionService\:\:scanSevenZipFilenames\(\) should return list\<array\{name\: mixed, size\: mixed, date\: int\<1, max\>, pass\: 0, crc32\: '''', source\: ''7z\-list''\}\> but returns list\<string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/AdditionalProcessing/ArchiveExtractionService.php
+
+		-
+			message: '#^Method App\\Services\\AdditionalProcessing\\ArchiveExtractionService\:\:sortFilesWithNfoPriority\(\) should return array\<string, mixed\> but returns list\<mixed\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/AdditionalProcessing/ArchiveExtractionService.php
+
+		-
+			message: '#^PHPDoc tag @return with type list\<mixed\> is incompatible with native type void\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Services/AdditionalProcessing/ArchiveExtractionService.php
+
+		-
+			message: '#^Method App\\Services\\AdditionalProcessing\\NzbContentParser\:\:extractSegments\(\) should return array\<string, mixed\> but returns list\<string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/AdditionalProcessing/NzbContentParser.php
+
+		-
+			message: '#^PHPDoc tag @return with type list\<string\> is incompatible with native type string\|false\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Services/AdditionalProcessing/NzbContentParser.php
+
+		-
+			message: '#^Method App\\Services\\AdultProcessing\\AgeVerificationManager\:\:getStoredDomains\(\) should return array\<string, mixed\> but returns list\<string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/AdultProcessing/AgeVerificationManager.php
+
+		-
+			message: '#^PHPDoc tag @return with type list\<string\> is incompatible with native type bool\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Services/AdultProcessing/AgeVerificationManager.php
+
+		-
+			message: '#^Method App\\Services\\Archives\\SevenZipPartialParser\:\:getFilesByExtension\(\) should return array\<int, array\<string, mixed\>\> but returns array\<string, mixed\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Archives/SevenZipPartialParser.php
+
+		-
+			message: '#^Method App\\Services\\Archives\\SevenZipPartialParser\:\:parseBitVector\(\) should return list\<string\|null\> but returns array\<int\<0, max\>, bool\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Archives/SevenZipPartialParser.php
+
+		-
+			message: '#^Method App\\Services\\Archives\\SevenZipPartialParser\:\:parseBitVector\(\) should return list\<string\|null\> but returns list\<false\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Archives/SevenZipPartialParser.php
+
+		-
+			message: '#^Method App\\Services\\Archives\\SevenZipPartialParser\:\:parseBitVector\(\) should return list\<string\|null\> but returns list\<true\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Archives/SevenZipPartialParser.php
+
+		-
+			message: '#^Method App\\Services\\Archives\\SevenZipPartialParser\:\:parseFileTimes\(\) should return array\<int\<0, max\>, bool\> but returns array\<int\<0, max\>, int\|null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Archives/SevenZipPartialParser.php
+
+		-
+			message: '#^Method App\\Services\\Archives\\SevenZipPartialParser\:\:parseNames\(\) should return array\<string, mixed\> but returns list\<string\|null\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Archives/SevenZipPartialParser.php
+
+		-
+			message: '#^PHPDoc tag @return with type array\<string, mixed\> is incompatible with native type bool\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Services/Archives/SevenZipPartialParser.php
+
+		-
+			message: '#^Method App\\Services\\Binaries\\BinariesService\:\:groupMissingPartsIntoRanges\(\) should return array\<string, mixed\> but returns list\<array\<string, mixed\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Binaries/BinariesService.php
+
+		-
+			message: '#^PHPDoc tag @return with type list\<array\<string, mixed\>\> is incompatible with native type int\|null\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Services/Binaries/BinariesService.php
+
+		-
+			message: '#^Method App\\Services\\BookService\:\:getBookOrder\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/BookService.php
+
+		-
+			message: '#^Method App\\Services\\Categorization\\CategorizationService\:\:batchCategorize\(\) should return array\<string, mixed\> but returns list\<array\<string, mixed\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Categorization/CategorizationService.php
+
+		-
+			message: '#^PHPDoc tag @return with type list\<array\<string, mixed\>\> is incompatible with native type App\\Services\\Categorization\\CategorizationPipeline\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Services/Categorization/CategorizationService.php
+
+		-
+			message: '#^Method App\\Services\\ConsoleService\:\:getConsoleOrder\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/ConsoleService.php
+
+		-
+			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			identifier: argument.templateType
+			count: 6
+			path: app/Services/FanartTvService.php
+
+		-
+			message: '#^Method App\\Services\\GamesService\:\:getGamesOrder\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/GamesService.php
+
+		-
+			message: '#^Offset 1 does not exist on array\<string, mixed\>\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: app/Services/GamesService.php
+
+		-
+			message: '#^Method App\\Services\\GenreService\:\:loadGenres\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/GenreService.php
+
+		-
+			message: '#^PHPDoc tag @return with type array\<int, string\> is incompatible with native type Illuminate\\Database\\Eloquent\\Collection\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Services/GenreService.php
+
+		-
+			message: '#^Method App\\Services\\IGDBService\:\:extractGenres\(\) should return array\<string, mixed\> but returns array\<int\<0, max\>, mixed\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/IGDBService.php
+
+		-
+			message: '#^PHPDoc tag @return with type array\<int\<0, max\>, mixed\> is incompatible with native type string\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Services/IGDBService.php
+
+		-
+			message: '#^Method App\\Services\\MovieBrowseService\:\:getMovieOrder\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/MovieBrowseService.php
+
+		-
+			message: '#^Offset 1 does not exist on array\<string, mixed\>\.$#'
+			identifier: offsetAccess.notFound
+			count: 2
+			path: app/Services/MovieBrowseService.php
+
+		-
+			message: '#^Method App\\Services\\MusicService\:\:getMusicOrder\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/MusicService.php
+
+		-
+			message: '#^Method App\\Services\\NfoService\:\:extractAllMediaIds\(\) should return array\<string, mixed\> but returns list\<array\<string, string\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/NfoService.php
+
+		-
+			message: '#^Method App\\Services\\NfoService\:\:extractGenre\(\) should return array\<string, mixed\> but returns list\<string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/NfoService.php
+
+		-
+			message: '#^Method App\\Services\\NfoService\:\:extractLanguage\(\) should return array\<string, mixed\> but returns list\<string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/NfoService.php
+
+		-
+			message: '#^Method App\\Services\\NfoService\:\:extractUrls\(\) should return array\<string, mixed\> but returns array\<int\<0, max\>, string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/NfoService.php
+
+		-
+			message: '#^Method App\\Services\\NfoService\:\:parseNfoMetadata\(\) should return list\<array\<string, string\>\> but returns array\{urls\: array\<string, mixed\>, group\: string\|null, release_date\: string\|null, codec_info\: array\{video\?\: string, audio\?\: string, resolution\?\: string\}, file_size\: int\|null, media_ids\: array\<string, mixed\>, show_id\: array\{showid\: string, site\: string\}\|false, language\: array\<string, mixed\>, \.\.\.\}\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/NfoService.php
+
+		-
+			message: '#^PHPDoc tag @return with type array\<int\<0, max\>, string\> is incompatible with native type string\|null\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Services/NfoService.php
+
+		-
+			message: '#^PHPDoc tag @return with type list\<string\> is incompatible with native type int\|null\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Services/NfoService.php
+
+		-
+			message: '#^Method App\\Services\\Releases\\ReleaseBrowseService\:\:getBrowseOrder\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Releases/ReleaseBrowseService.php
+
+		-
+			message: '#^Method App\\Services\\Search\\Drivers\\ElasticSearchDriver\:\:buildHostsArray\(\) should return array\<string, mixed\> but returns list\<array\<string, mixed\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Search/Drivers/ElasticSearchDriver.php
+
+		-
+			message: '#^Method App\\Services\\Search\\Drivers\\ElasticSearchDriver\:\:searchReleasesWithCategoryFilter\(\) should return array\<string, mixed\> but returns list\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Search/Drivers/ElasticSearchDriver.php
+
+		-
+			message: '#^PHPDoc tag @return with type list\<array\<string, mixed\>\> is incompatible with native type bool\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Services/Search/Drivers/ElasticSearchDriver.php
+
+		-
+			message: '#^Method App\\Services\\Search\\Drivers\\ManticoreSearchDriver\:\:searchReleasesByExternalId\(\) should return array\<string, mixed\> but returns list\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Search/Drivers/ManticoreSearchDriver.php
+
+		-
+			message: '#^Method App\\Services\\SteamService\:\:getDLCList\(\) should return array\<string, mixed\> but returns list\<array\<string, mixed\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/SteamService.php
+
+		-
+			message: '#^Method App\\Services\\SteamService\:\:getFullAppList\(\) should return array\{inserted\: int\<0, max\>, updated\: 0, skipped\: int\<0, max\>, errors\: int\<0, max\>\} but returns array\{\}\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/SteamService.php
+
+		-
+			message: '#^Method App\\Services\\SteamService\:\:populateSteamAppsTable\(\) should return list\<array\<string, mixed\>\> but returns array\{inserted\: 0, updated\: 0, skipped\: 0, errors\: 0\}\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/SteamService.php
+
+		-
+			message: '#^Method App\\Services\\SteamService\:\:populateSteamAppsTable\(\) should return list\<array\<string, mixed\>\> but returns array\{inserted\: int\<0, max\>, updated\: 0, skipped\: int\<0, max\>, errors\: int\<0, max\>\}\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/SteamService.php
+
+		-
+			message: '#^Method App\\Services\\SteamService\:\:tokenize\(\) should return array\<string, mixed\> but returns list\<string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/SteamService.php
+
+		-
+			message: '#^PHPDoc tag @return with type array is incompatible with native type Illuminate\\Support\\Collection\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Services/SteamService.php
+
+		-
+			message: '#^PHPDoc tag @return with type list\<string\> is incompatible with native type string\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Services/SteamService.php
+
+		-
+			message: '#^Method App\\Services\\SystemMetricsService\:\:fillMissingHours\(\) should return list\<array\<string, float\|string\>\> but returns non\-empty\-array\<string, mixed\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/SystemMetricsService.php
+
+		-
+			message: '#^Method App\\Services\\SystemMetricsService\:\:getHourlyMetrics\(\) should return array\<string, mixed\> but returns list\<array\<string, float\|string\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/SystemMetricsService.php
+
+		-
+			message: '#^PHPDoc tag @return with type array\<string, mixed\> is incompatible with native type float\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Services/SystemMetricsService.php
+
+		-
+			message: '#^Method App\\Services\\UserStatsService\:\:getApiHitsPerMinute\(\) should return array\<string, mixed\> but returns list\<array\<string, int\|string\|null\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/UserStatsService.php
+
+		-
+			message: '#^Method App\\Services\\UserStatsService\:\:getDownloadsPerDay\(\) should return array\<string, mixed\> but returns list\<array\<string, int\|string\|null\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/UserStatsService.php
+
+		-
+			message: '#^Method App\\Services\\UserStatsService\:\:getDownloadsPerHour\(\) should return list\<array\<string, int\|string\|null\>\> but returns array\<string, mixed\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/UserStatsService.php
+
+		-
+			message: '#^Method App\\Services\\UserStatsService\:\:getDownloadsPerMinute\(\) should return array\<string, mixed\> but returns list\<array\<string, int\|string\|null\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/UserStatsService.php
+
+		-
+			message: '#^Method App\\Services\\UserStatsService\:\:getSummaryStats\(\) should return list\<array\<string, int\|string\|null\>\> but returns array\{total_users\: int\<0, max\>, downloads_today\: int\<0, max\>, downloads_week\: float\|int, api_hits_today\: int\<0, max\>, api_hits_week\: float\|int\}\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/UserStatsService.php
+
+		-
+			message: '#^Method App\\Services\\XrefService\:\:extractTokens\(\) should return array\<string, mixed\> but returns list\<string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/XrefService.php
+
+		-
+			message: '#^Method App\\Services\\XxxBrowseService\:\:getXXXOrder\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/XxxBrowseService.php
+
+		-
+			message: '#^Method App\\Support\\UpdatePerformanceHelper\:\:checkSystemResources\(\) should return array\<string, mixed\> but returns list\<string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Support/UpdatePerformanceHelper.php
+
+		-
+			message: '#^Method App\\Support\\UpdatePerformanceHelper\:\:getSystemMemoryInfo\(\) should return list\<string\>\|null but returns array\{total\: int, available\: int, used\: int, usage_percent\: \(float\|int\)\}\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Support/UpdatePerformanceHelper.php
+
+		-
+			message: '#^PHPDoc tag @return with type array\<string, float\|int\> is incompatible with native type int\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: app/Support/UpdatePerformanceHelper.php

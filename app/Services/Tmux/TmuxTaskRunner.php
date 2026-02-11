@@ -42,6 +42,8 @@ class TmuxTaskRunner
 
     /**
      * Run a task in a specific pane
+     *
+     * @param  array<string, mixed>  $config
      */
     public function runTask(string $taskName, array $config): bool
     {
@@ -80,6 +82,8 @@ class TmuxTaskRunner
 
     /**
      * Build a command with logging
+     *
+     * @param  array<string, mixed>  $options
      */
     public function buildCommand(string $baseCommand, array $options = []): string
     {
@@ -171,6 +175,8 @@ class TmuxTaskRunner
 
     /**
      * Run the IRC scraper
+     *
+     * @param  array<string, mixed>  $config
      */
     public function runIRCScraper(array $config): bool
     {
@@ -191,6 +197,8 @@ class TmuxTaskRunner
 
     /**
      * Run binaries update
+     *
+     * @param  array<string, mixed>  $config
      */
     public function runBinariesUpdate(array $config): bool
     {
@@ -225,6 +233,8 @@ class TmuxTaskRunner
 
     /**
      * Run backfill
+     *
+     * @param  array<string, mixed>  $config
      */
     public function runBackfill(array $config): bool
     {
@@ -269,6 +279,8 @@ class TmuxTaskRunner
 
     /**
      * Run releases update
+     *
+     * @param  array<string, mixed>  $config
      */
     public function runReleasesUpdate(array $config): bool
     {
@@ -291,8 +303,8 @@ class TmuxTaskRunner
      * Run a specific pane task based on task name
      *
      * @param  string  $taskName  The name of the task to run
-     * @param  array  $config  Configuration for the task (target pane, etc.)
-     * @param  array  $runVar  Runtime variables and settings
+     * @param  array<string, mixed>  $config  Configuration for the task (target pane, etc.)
+     * @param  array<string, mixed>  $runVar  Runtime variables and settings
      * @return bool Success status
      */
     public function runPaneTask(string $taskName, array $config, array $runVar): bool
@@ -317,6 +329,8 @@ class TmuxTaskRunner
 
     /**
      * Run main task (varies by sequential mode)
+     *
+     * @param  array<string, mixed>  $runVar
      */
     protected function runMainTask(int $sequential, array $runVar): bool
     {
@@ -330,6 +344,8 @@ class TmuxTaskRunner
 
     /**
      * Run main non-sequential task (binaries, backfill, releases)
+     *
+     * @param  array<string, mixed>  $runVar
      */
     protected function runMainNonSequential(array $runVar): bool
     {
@@ -344,6 +360,8 @@ class TmuxTaskRunner
 
     /**
      * Run main basic sequential task (just releases)
+     *
+     * @param  array<string, mixed>  $runVar
      */
     protected function runMainBasic(array $runVar): bool
     {
@@ -352,6 +370,8 @@ class TmuxTaskRunner
 
     /**
      * Run main full sequential task
+     *
+     * @param  array<string, mixed>  $runVar
      */
     protected function runMainSequential(array $runVar): bool
     {
@@ -368,6 +388,8 @@ class TmuxTaskRunner
 
     /**
      * Run fix release names task
+     *
+     * @param  array<string, mixed>  $runVar
      */
     protected function runFixNamesTask(array $runVar): bool
     {
@@ -402,6 +424,8 @@ class TmuxTaskRunner
 
     /**
      * Run remove crap releases task
+     *
+     * @param  array<string, mixed>  $runVar
      */
     protected function runRemoveCrapTask(array $runVar): bool
     {
@@ -482,6 +506,8 @@ class TmuxTaskRunner
 
     /**
      * Load crap removal state
+     *
+     * @return array<string, mixed>
      */
     protected function loadCrapState(string $file): array
     {
@@ -497,6 +523,8 @@ class TmuxTaskRunner
 
     /**
      * Save crap removal state
+     *
+     * @param  array<string, mixed>  $state
      */
     protected function saveCrapState(string $file, array $state): void
     {
@@ -510,6 +538,8 @@ class TmuxTaskRunner
 
     /**
      * Run post-process additional task
+     *
+     * @param  array<string, mixed>  $runVar
      */
     protected function runPostProcessAdditional(array $runVar): bool
     {
@@ -573,6 +603,8 @@ class TmuxTaskRunner
 
     /**
      * Run TV/Anime post-processing
+     *
+     * @param  array<string, mixed>  $runVar
      */
     protected function runTvTask(array $runVar): bool
     {
@@ -631,6 +663,8 @@ class TmuxTaskRunner
 
     /**
      * Run Movies post-processing
+     *
+     * @param  array<string, mixed>  $runVar
      */
     protected function runMoviesTask(array $runVar): bool
     {
@@ -669,6 +703,8 @@ class TmuxTaskRunner
      * Legacy method for backward compatibility - now just calls runTvTask
      *
      * @deprecated Use runTvTask() instead
+     *
+     * @param  array<string, mixed>  $runVar
      */
     protected function runNonAmazonTask(array $runVar): bool
     {
@@ -677,6 +713,8 @@ class TmuxTaskRunner
 
     /**
      * Run Amazon post-processing (Books, Music, Games, Console)
+     *
+     * @param  array<string, mixed>  $runVar
      */
     protected function runAmazonTask(array $runVar): bool
     {
@@ -744,6 +782,8 @@ class TmuxTaskRunner
 
     /**
      * Run XXX post-processing
+     *
+     * @param  array<string, mixed>  $runVar
      */
     protected function runXXXTask(array $runVar): bool
     {

@@ -38,9 +38,9 @@ class NntmuxPopulateSteamApps extends Command
 
             $this->info(sprintf(
                 'Added %d new steam app(s), %d skipped, %d errors',
-                $stats['inserted'],
-                $stats['skipped'],
-                $stats['errors']
+                $stats['inserted'], // @phpstan-ignore offsetAccess.notFound
+                $stats['skipped'], // @phpstan-ignore offsetAccess.notFound
+                $stats['errors'] // @phpstan-ignore offsetAccess.notFound
             ));
         } catch (\Exception $e) {
             $this->error($e->getMessage());

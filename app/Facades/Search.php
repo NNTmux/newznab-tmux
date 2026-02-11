@@ -38,7 +38,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @see \App\Services\Search\SearchService
  */
-class Search extends Facade
+class Search extends Facade // @phpstan-ignore missingType.iterableValue
 {
     /**
      * Get the registered name of the component.

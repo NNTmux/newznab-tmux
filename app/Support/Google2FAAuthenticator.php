@@ -30,7 +30,7 @@ class Google2FAAuthenticator extends Authenticator
     /**
      * Directly validate the cookie without any output or logging
      */
-    private function checkCookieValidity($cookie)
+    private function checkCookieValidity(mixed $cookie): mixed
     {
         try {
             $data = @json_decode($cookie, true);

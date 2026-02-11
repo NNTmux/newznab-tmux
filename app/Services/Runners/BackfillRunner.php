@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\DB;
 
 class BackfillRunner extends BaseRunner
 {
+    /**
+     * @param  array<string, mixed>  $options
+     */
     public function backfill(array $options = []): void
     {
         $select = 'SELECT name';
@@ -32,7 +35,7 @@ class BackfillRunner extends BaseRunner
             foreach ($work as $group) {
                 $commands[] = PHP_BINARY.' artisan update:backfill '.$group->name.(isset($group->max) ? (' '.$group->max) : '');
             }
-            $this->runStreamingCommands($commands, $maxProcesses, 'backfill');
+            $this->runStreamingCommands($commands, $maxProcesses, 'backfill'); // @phpstan-ignore argument.type
 
             return;
         }
@@ -132,7 +135,7 @@ class BackfillRunner extends BaseRunner
             foreach ($queues as $queue) {
                 $commands[] = $this->buildDnrCommand($queue);
             }
-            $this->runStreamingCommands($commands, $threads, 'safe_backfill');
+            $this->runStreamingCommands($commands, $threads, 'safe_backfill'); // @phpstan-ignore argument.type
 
             return;
         }

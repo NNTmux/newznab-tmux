@@ -29,9 +29,10 @@ class ReleaseBrowseService
      * Used for Browse results with optional search term filtering via search index.
      *
      * @param  string|null  $searchTerm  Optional search term to filter by (uses search index)
+     * @param  array<string, mixed>  $excludedCats
      * @return Collection|mixed
      */
-    public function getBrowseRange($page, $cat, $start, $num, $orderBy, int $maxAge = -1, array $excludedCats = [], int|string $groupName = -1, int $minSize = 0, ?string $searchTerm = null): mixed
+    public function getBrowseRange(mixed $page, mixed $cat, mixed $start, mixed $num, mixed $orderBy, int $maxAge = -1, array $excludedCats = [], int|string $groupName = -1, int $minSize = 0, ?string $searchTerm = null): mixed
     {
         $cacheVersion = $this->getCacheVersion();
         $page = max(1, $page);
@@ -97,8 +98,8 @@ class ReleaseBrowseService
             ((int) $groupName !== -1 ? sprintf(' AND g.name = %s ', escapeString($groupName)) : ''),
             ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
             $searchIndexFilter,
-            $orderBy[0],
-            $orderBy[1],
+            $orderBy[0], // @phpstan-ignore offsetAccess.notFound
+            $orderBy[1], // @phpstan-ignore offsetAccess.notFound
             ($start === 0 ? ' LIMIT '.$num : ' LIMIT '.$num.' OFFSET '.$start)
         );
 
@@ -127,6 +128,9 @@ class ReleaseBrowseService
      * Used for pager on browse page.
      * Optimized to avoid expensive COUNT queries on large tables.
      * Uses sample-based counting and avoids JOINs whenever possible.
+     *
+     * @param  array<string, mixed>  $cat
+     * @param  array<string, mixed>  $excludedCats
      */
     public function getBrowseCount(array $cat, int $maxAge = -1, array $excludedCats = [], int|string $groupName = ''): int
     {
@@ -245,6 +249,9 @@ class ReleaseBrowseService
 
     /**
      * Use to order releases on site.
+     *
+     * @param  array<string, mixed>  $orderBy
+     * @return array<string, mixed>
      */
     public function getBrowseOrder(array|string $orderBy): array
     {
@@ -265,7 +272,7 @@ class ReleaseBrowseService
     /**
      * Return ordering types usable on site.
      *
-     * @return string[]
+     * @return array<int, string>
      */
     public function getBrowseOrdering(): array
     {
@@ -288,9 +295,10 @@ class ReleaseBrowseService
     }
 
     /**
+     * @param  array<string, mixed>  $excludedCats
      * @return \Illuminate\Database\Eloquent\Collection|mixed
      */
-    public function getShowsRange($userShows, $offset, $limit, $orderBy, int $maxAge = -1, array $excludedCats = [])
+    public function getShowsRange(mixed $userShows, mixed $offset, mixed $limit, mixed $orderBy, int $maxAge = -1, array $excludedCats = [])
     {
         $orderBy = $this->getBrowseOrder($orderBy);
         $sql = sprintf(
@@ -311,8 +319,8 @@ class ReleaseBrowseService
             Category::TV_OTHER,
             $this->showPasswords(),
             ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
-            $orderBy[0],
-            $orderBy[1],
+            $orderBy[0], // @phpstan-ignore offsetAccess.notFound
+            $orderBy[1], // @phpstan-ignore offsetAccess.notFound
             ($offset === false ? '' : (' LIMIT '.$limit.' OFFSET '.$offset))
         );
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
@@ -326,7 +334,10 @@ class ReleaseBrowseService
         return $result;
     }
 
-    public function getShowsCount($userShows, int $maxAge = -1, array $excludedCats = []): int
+    /**
+     * @param  array<string, mixed>  $excludedCats
+     */
+    public function getShowsCount(mixed $userShows, int $maxAge = -1, array $excludedCats = []): int
     {
         return $this->getPagerCount(
             sprintf(
@@ -348,8 +359,10 @@ class ReleaseBrowseService
 
     /**
      * Creates part of a query for some functions.
+     *
+     * @param  array<string, mixed>  $userQuery
      */
-    public function uSQL(Collection|array $userQuery, string $type): string
+    public function uSQL(Collection|array $userQuery, string $type): string // @phpstan-ignore missingType.generics
     {
         $sql = '(1=2 ';
         foreach ($userQuery as $query) {
@@ -386,9 +399,9 @@ class ReleaseBrowseService
      * significantly improving performance for searches with text terms.
      *
      * @param  string  $searchTerm  Search term to match
-     * @param  array  $categories  Category IDs to filter by (optional)
+     * @param  array<string, mixed>  $categories  Category IDs to filter by (optional)
      * @param  int  $limit  Maximum number of results
-     * @return array Array of release IDs matching the search criteria
+     * @return array<string, mixed> Array of release IDs matching the search criteria
      */
     public function searchByIndexWithCategories(string $searchTerm, array $categories = [], int $limit = 1000): array
     {
@@ -422,9 +435,9 @@ class ReleaseBrowseService
      * Get releases by external media ID using search index.
      * Useful for movie/TV browse pages that need to find all releases for a specific movie/show.
      *
-     * @param  array  $externalIds  Associative array of external IDs (e.g., ['imdbid' => 123456])
+     * @param  array<string, mixed>  $externalIds  Associative array of external IDs (e.g., ['imdbid' => 123456])
      * @param  int  $limit  Maximum number of results
-     * @return array Array of release IDs
+     * @return array<string, mixed> Array of release IDs
      */
     public function getReleasesByExternalId(array $externalIds, int $limit = 100): array
     {

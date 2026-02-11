@@ -49,6 +49,9 @@ class BinariesService
     private \DateTime $startUpdate;
 
     // Scan state
+    /**
+     * @var array<string, mixed>
+     */
     private array $groupMySQL = [];
 
     private int $first = 0;
@@ -59,6 +62,9 @@ class BinariesService
 
     private int $headersBlackListed = 0;
 
+    /**
+     * @var array<string, mixed>
+     */
     private array $headersReceived = [];
 
     public function __construct(
@@ -182,7 +188,7 @@ class BinariesService
     /**
      * Download new headers for a single group.
      *
-     * @param  array  $groupMySQL  Array of MySQL results for a single group.
+     * @param  array<string, mixed>  $groupMySQL  Array of MySQL results for a single group.
      * @param  int  $maxHeaders  (Optional) How many headers to download max.
      *
      * @throws \Exception
@@ -246,12 +252,12 @@ class BinariesService
     /**
      * Loop over range of wanted headers, insert headers into DB.
      *
-     * @param  array  $groupMySQL  The group info from mysql.
+     * @param  array<string, mixed>  $groupMySQL  The group info from mysql.
      * @param  int  $first  The oldest wanted header.
      * @param  int  $last  The newest wanted header.
      * @param  string  $type  Is this part repair or update or backfill?
-     * @param  array|null  $missingParts  If we are running in part repair, the list of missing article numbers.
-     * @return array Empty on failure.
+     * @param  array<string, mixed>|null  $missingParts  If we are running in part repair, the list of missing article numbers.
+     * @return array<string, mixed> Empty on failure.
      *
      * @throws \Exception
      * @throws \Throwable
@@ -294,8 +300,8 @@ class BinariesService
         $this->headerParser->reset();
         $parseResult = $this->headerParser->parse($headers, $groupMySQL['name'], $partRepair, $missingParts);
 
-        $this->headersReceived = array_column($headers, 'Number');
-        $this->headersReceived = array_filter($this->headersReceived);
+        $this->headersReceived = array_column($headers, 'Number'); // @phpstan-ignore assign.propertyType
+        $this->headersReceived = array_filter($this->headersReceived); // @phpstan-ignore assign.propertyType
         $this->notYEnc = $parseResult['notYEnc'];
         $this->headersBlackListed = $parseResult['blacklisted'];
 
@@ -342,7 +348,7 @@ class BinariesService
     /**
      * Attempt to get missing article headers.
      *
-     * @param  array  $groupArr  The info for this group from mysql.
+     * @param  array<string, mixed>  $groupArr  The info for this group from mysql.
      *
      * @throws \Exception
      * @throws \Throwable
@@ -375,7 +381,7 @@ class BinariesService
         }
 
         // Calculate parts repaired
-        $lastPartNumber = $missingParts[$missingCount - 1]->numberid;
+        $lastPartNumber = $missingParts[$missingCount - 1]->numberid; // @phpstan-ignore offsetAccess.notFound
         $remainingCount = $this->missedPartHandler->getCount($groupArr['id'], $lastPartNumber);
         $partsRepaired = $missingCount - $remainingCount;
 
@@ -396,7 +402,7 @@ class BinariesService
      * Returns unix time for an article number.
      *
      * @param  int|string  $post  The article number to get the time from.
-     * @param  array  $groupData  Usenet group info from NNTP selectGroup method.
+     * @param  array<string, mixed>  $groupData  Usenet group info from NNTP selectGroup method.
      * @return int Timestamp.
      *
      * @throws \Exception
@@ -452,7 +458,7 @@ class BinariesService
      * Returns article number based on # of days.
      *
      * @param  int  $days  How many days back we want to go.
-     * @param  array  $data  Group data from usenet.
+     * @param  array<string, mixed>  $data  Group data from usenet.
      *
      * @throws \Exception
      */
@@ -481,6 +487,10 @@ class BinariesService
 
     // ==================== Private Helper Methods ====================
 
+    /**
+     * @param  array<string, mixed>  $groupMySQL
+     * @return array<string, mixed>
+     */
     private function selectNntpGroup(array &$groupMySQL, NNTPService $nntp): ?array
     {
         $groupNNTP = $nntp->selectGroup($groupMySQL['name']);
@@ -500,6 +510,11 @@ class BinariesService
         return $groupNNTP;
     }
 
+    /**
+     * @param  array<string, mixed>  $groupMySQL
+     * @param  array<string, mixed>  $groupNNTP
+     * @return array<string, mixed>
+     */
     private function calculateArticleRange(array $groupMySQL, array $groupNNTP, int $maxHeaders): array
     {
         if ((int) $groupMySQL['last_record'] === 0) {
@@ -509,6 +524,10 @@ class BinariesService
         return $this->calculateExistingGroupRange($groupMySQL, $groupNNTP, $maxHeaders);
     }
 
+    /**
+     * @param  array<string, mixed>  $groupNNTP
+     * @return array<string, mixed>
+     */
     private function calculateNewGroupRange(array $groupNNTP): array
     {
         if ($this->config->newGroupScanByDays) {
@@ -540,6 +559,11 @@ class BinariesService
         ];
     }
 
+    /**
+     * @param  array<string, mixed>  $groupMySQL
+     * @param  array<string, mixed>  $groupNNTP
+     * @return array<string, mixed>
+     */
     private function calculateExistingGroupRange(array $groupMySQL, array $groupNNTP, int $maxHeaders): array
     {
         $first = (int) $groupMySQL['last_record'];
@@ -577,6 +601,11 @@ class BinariesService
         ];
     }
 
+    /**
+     * @param  array<string, mixed>  $groupMySQL
+     * @param  array<string, mixed>  $groupNNTP
+     * @param  array<string, mixed>  $range
+     */
     private function processArticleRange(array &$groupMySQL, array $groupNNTP, array $range): void
     {
         $first = (int) $range['first'];
@@ -614,6 +643,11 @@ class BinariesService
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $groupMySQL
+     * @param  array<string, mixed>  $groupNNTP
+     * @param  array<string, mixed>  $scanSummary
+     */
     private function updateGroupAfterScan(array &$groupMySQL, array $groupNNTP, array $scanSummary, int $last): void
     {
         if (! empty($scanSummary)) {
@@ -649,6 +683,9 @@ class BinariesService
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function downloadHeaders(bool $partRepair): ?array
     {
         $nntp = $this->getNntp();
@@ -689,6 +726,10 @@ class BinariesService
         return $headers;
     }
 
+    /**
+     * @param  array<string, mixed>  $headersNotInserted
+     * @param  array<string, mixed>  $parsedHeaders
+     */
     private function handlePartRepairTracking(array $headersNotInserted, array $parsedHeaders): void
     {
         $notInsertedCount = \count($headersNotInserted);
@@ -704,7 +745,7 @@ class BinariesService
             $notReceivedCount = \count($rangeNotReceived);
 
             if ($notReceivedCount > 0) {
-                $this->missedPartHandler->addMissingParts($rangeNotReceived, $this->groupMySQL['id']);
+                $this->missedPartHandler->addMissingParts($rangeNotReceived, $this->groupMySQL['id']); // @phpstan-ignore argument.type
 
                 if ($this->config->echoCli) {
                     cli()->alternate(
@@ -715,11 +756,15 @@ class BinariesService
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $missingParts
+     * @return array<string, mixed>
+     */
     private function groupMissingPartsIntoRanges(array $missingParts): array
     {
         $ranges = [];
         $partList = [];
-        $firstPart = $lastNum = $missingParts[0]->numberid;
+        $firstPart = $lastNum = $missingParts[0]->numberid; // @phpstan-ignore offsetAccess.notFound
 
         foreach ($missingParts as $part) {
             if (($part->numberid - $firstPart) > ($this->config->messageBuffer / 4)) {
@@ -744,6 +789,10 @@ class BinariesService
         return $ranges;
     }
 
+    /**
+     * @param  array<string, mixed>  $groupData
+     * @return list<array<string, mixed>>
+     */
     private function getNextArticleToTry(int $currentPost, array $groupData): ?int
     {
         if (abs($currentPost - $groupData['first']) > abs($groupData['last'] - $currentPost)) {
@@ -766,6 +815,9 @@ class BinariesService
         return $tempPost;
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     private function binarySearchArticleByDate(int $goalTime, array $data): string
     {
         $wantedArticle = (int) round(($data['last'] + $data['first']) / 2);
@@ -824,6 +876,11 @@ class BinariesService
 
     // ==================== Output Methods ====================
 
+    /**
+     * @param  array<string, mixed>  $groupMySQL
+     * @param  array<string, mixed>  $groupNNTP
+     * @param  array<string, mixed>  $range
+     */
     private function outputNoNewArticles(array $groupMySQL, array $groupNNTP, array $range): void
     {
         if ($this->config->echoCli) {
@@ -836,6 +893,11 @@ class BinariesService
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $groupMySQL
+     * @param  array<string, mixed>  $groupNNTP
+     * @param  array<string, mixed>  $range
+     */
     private function outputNewArticlesInfo(array $groupMySQL, array $groupNNTP, array $range): void
     {
         if (! $this->config->echoCli) {

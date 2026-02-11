@@ -100,7 +100,7 @@ class NzbService
         $XMLWriter->startElement('head');
         $XMLWriter->startElement('meta');
         $XMLWriter->writeAttribute('type', 'category');
-        $XMLWriter->text(! empty($release->category->parent) ? $release->category->parent->title.' >'.$release->category->title : 'Other > Misc'); // @phpstan-ignore property.notFound
+        $XMLWriter->text(! empty($release->category->parent) ? $release->category->parent->title.' >'.$release->category->title : 'Other > Misc');
         $XMLWriter->endElement();
         $XMLWriter->startElement('meta');
         $XMLWriter->writeAttribute('type', 'name');

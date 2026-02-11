@@ -47,8 +47,8 @@ class FilePrioritizer
      * 5. NFO files
      * 6. Other files
      *
-     * @param  array  $files  Array of filenames
-     * @return array Sorted array of filenames
+     * @param  array<string, mixed>  $files  Array of filenames
+     * @return array<string, mixed> Sorted array of filenames
      */
     public function prioritizeForMatching(array $files): array
     {
@@ -71,8 +71,8 @@ class FilePrioritizer
      * Similar to prioritizeForMatching but with slightly different priorities
      * optimized for PreDB filename lookups.
      *
-     * @param  array  $files  Array of filenames
-     * @return array Sorted array of filenames
+     * @param  array<string, mixed>  $files  Array of filenames
+     * @return array<string, mixed> Sorted array of filenames
      */
     public function prioritizeForPreDb(array $files): array
     {
@@ -91,8 +91,8 @@ class FilePrioritizer
     /**
      * Categorize files into groups by type.
      *
-     * @param  array  $files  Array of filenames
-     * @return array Categorized files
+     * @param  array<string, mixed>  $files  Array of filenames
+     * @return array<string, mixed> Categorized files
      */
     protected function categorizeFiles(array $files): array
     {
@@ -230,7 +230,7 @@ class FilePrioritizer
      * Analyzes multiple RAR files from a release to determine the most likely
      * release name by finding common patterns.
      *
-     * @param  array  $rarFiles  Array of RAR filenames
+     * @param  array<string, mixed>  $rarFiles  Array of RAR filenames
      * @return string|null The most likely release name or null
      */
     public function findReleaseNameFromRarFiles(array $rarFiles): ?string

@@ -13,7 +13,7 @@ class AdminBlacklistController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function index(): mixed
     {
         $this->setAdminPrefs();
         $svc = new BlacklistService;

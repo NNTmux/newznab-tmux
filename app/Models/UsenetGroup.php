@@ -63,12 +63,12 @@ class UsenetGroup extends Model
     protected $guarded = [];
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
-    protected static $cbpm = ['collections', 'binaries', 'parts', 'missed_parts'];
+    protected static $cbpm = ['collections', 'binaries', 'parts', 'missed_parts']; // @phpstan-ignore property.defaultValue
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     protected static $cbppTableNames;
 
@@ -87,6 +87,9 @@ class UsenetGroup extends Model
         parent::__construct();
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Release, $this>
+     */
     public function release(): HasMany
     {
         return $this->hasMany(Release::class, 'groups_id');
@@ -94,6 +97,8 @@ class UsenetGroup extends Model
 
     /**
      * Returns an associative array of groups for list selection.
+     *
+     * @return array<string, mixed>
      */
     public static function getGroupsForSelect(): array
     {
@@ -115,26 +120,20 @@ class UsenetGroup extends Model
      *
      * @return Model|null|static
      */
-    public static function getGroupByID($id)
+    public static function getGroupByID(mixed $id)
     {
         return self::query()->where('id', $id)->first();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public static function getActive()
+    public static function getActive(): mixed
     {
         return self::query()->where('active', '=', 1)->orderBy('name')->get();
     }
 
     /**
      * Get active backfill groups ordered by name ascending.
-     *
-     *
-     * @return array|\Illuminate\Database\Eloquent\Collection
      */
-    public static function getActiveBackfill($order)
+    public static function getActiveBackfill(mixed $order): mixed
     {
         switch ($order) {
             case '':
@@ -149,11 +148,8 @@ class UsenetGroup extends Model
 
     /**
      * Get all active group IDs.
-     *
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public static function getActiveIDs()
+    public static function getActiveIDs(): mixed
     {
         return self::query()->where('active', '=', 1)->orderBy('name')->get(['id']);
     }
@@ -164,7 +160,7 @@ class UsenetGroup extends Model
      *
      * @return Model|null|static
      */
-    public static function getByName($grp)
+    public static function getByName(mixed $grp)
     {
         return self::query()->where('name', $grp)->first();
     }
@@ -217,7 +213,7 @@ class UsenetGroup extends Model
         return $res === null ? 0 : $res->count('id');
     }
 
-    public static function getGroupsRange(string $groupname = '', $active = null): LengthAwarePaginator
+    public static function getGroupsRange(string $groupname = '', mixed $active = null): LengthAwarePaginator // @phpstan-ignore missingType.generics
     {
         $groups = self::query()->groupBy('id')->orderBy('name');
 
@@ -237,7 +233,7 @@ class UsenetGroup extends Model
     /**
      * Update an existing group.
      */
-    public static function updateGroup($group): int
+    public static function updateGroup(mixed $group): int
     {
         return self::query()->where('id', $group['id'])->update(
             [
@@ -276,7 +272,7 @@ class UsenetGroup extends Model
      *
      * @return int|mixed
      */
-    public static function addGroup($group)
+    public static function addGroup(mixed $group)
     {
         $checkOld = UsenetGroup::query()->where('name', trim($group['name']))->first();
         if (empty($checkOld)) {
@@ -377,7 +373,7 @@ class UsenetGroup extends Model
      *
      * @throws \Exception
      */
-    public static function purge($id = false)
+    public static function purge($id = false): void
     {
         if ($id === false) {
             self::resetall();
@@ -411,7 +407,7 @@ class UsenetGroup extends Model
     /**
      * Adds new newsgroups based on a regular expression match against USP available.
      *
-     * @return array|string
+     * @return array<string, mixed>|string
      *
      * @throws \Exception
      */

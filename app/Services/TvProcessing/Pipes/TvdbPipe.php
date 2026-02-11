@@ -240,6 +240,8 @@ class TvdbPipe extends AbstractTvProviderPipe
     /**
      * Process episode matching for a video that already exists in local DB.
      * This is used when the show was added from another source (e.g., TMDB) and doesn't have a TVDB ID.
+     *
+     * @param  array<string, mixed>  $parsedInfo
      */
     private function processEpisodeForExistingVideo(
         TvProcessingPassable $passable,

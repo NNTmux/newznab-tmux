@@ -91,7 +91,7 @@ class RssController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function showRssDesc()
+    public function showRssDesc(): mixed
     {
         $rss = app(RSS::class);
 
@@ -120,7 +120,7 @@ class RssController extends BasePageController
     /**
      * @throws \Throwable
      */
-    public function cartRss(Request $request)
+    public function cartRss(Request $request): mixed
     {
         $rss = app(RSS::class);
         $offset = 0;
@@ -141,12 +141,14 @@ class RssController extends BasePageController
 
         $relData = $rss->getRss([-2], $userShow, $userAnidb, $user['user_id'], $userAirDate, $userLimit, $userNum);
         $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
+
+        return null;
     }
 
     /**
      * @throws \Throwable
      */
-    public function categoryFeedRss(Request $request)
+    public function categoryFeedRss(Request $request): mixed
     {
         $rss = app(RSS::class);
         $offset = 0;
@@ -171,12 +173,19 @@ class RssController extends BasePageController
         $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
         $relData = $rss->getRss($categoryId, $userShow, $userAnidb, $user['user_id'], $userAirDate, $userLimit, $userNum);
         $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
+
+        return null;
+
+        return null;
+
+        return null;
+
     }
 
     /**
      * @throws \Throwable
      */
-    public function trendingMoviesRss(Request $request)
+    public function trendingMoviesRss(Request $request): mixed
     {
         $rss = app(RSS::class);
         $offset = 0;
@@ -189,12 +198,15 @@ class RssController extends BasePageController
         $relData = $rss->getTrendingMoviesRss();
 
         $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
+
+        return null;
+
     }
 
     /**
      * @throws \Throwable
      */
-    public function trendingShowsRss(Request $request)
+    public function trendingShowsRss(Request $request): mixed
     {
         $rss = app(RSS::class);
         $offset = 0;
@@ -207,9 +219,14 @@ class RssController extends BasePageController
         $relData = $rss->getTrendingShowsRss();
 
         $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
+
+        return null;
+
     }
 
     /**
+     * @return array<string, mixed>
+     *
      * @throws \Throwable
      */
     private function userCheck(Request $request): JsonResponse|array

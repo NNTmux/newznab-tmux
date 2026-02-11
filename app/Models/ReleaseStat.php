@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class ReleaseStat extends Model
 {
-    use HasFactory;
+    use HasFactory; // @phpstan-ignore missingType.generics
 
     protected $guarded = [];
 
@@ -45,6 +45,9 @@ class ReleaseStat extends Model
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public static function getRecentlyAdded(): array
     {
         return self::query()->select(['category', 'count'])->get()->toArray();

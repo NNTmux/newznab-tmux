@@ -23,7 +23,7 @@ class AdminPageController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function index(): mixed
     {
         $this->setAdminPrefs();
 
@@ -52,6 +52,8 @@ class AdminPageController extends BasePageController
 
     /**
      * Get recent user activity from the user_activities table with caching
+     *
+     * @return array<string, mixed>
      */
     protected function getRecentUserActivity(): array
     {
@@ -78,7 +80,7 @@ class AdminPageController extends BasePageController
     /**
      * API endpoint to get recent user activity (for auto-refresh)
      */
-    public function getRecentActivity()
+    public function getRecentActivity(): mixed
     {
         $activities = $this->getRecentUserActivity();
 
@@ -101,6 +103,8 @@ class AdminPageController extends BasePageController
 
     /**
      * Get default dashboard statistics with caching for expensive queries
+     *
+     * @return array<string, mixed>
      */
     protected function getDefaultStats(): array
     {
@@ -179,6 +183,8 @@ class AdminPageController extends BasePageController
 
     /**
      * Get system metrics (CPU and RAM usage) with caching
+     *
+     * @return array<string, mixed>
      */
     protected function getSystemMetrics(): array
     {
@@ -297,6 +303,8 @@ class AdminPageController extends BasePageController
 
     /**
      * Get detailed CPU information (cores, threads, model)
+     *
+     * @return array<string, mixed>
      */
     protected function getCpuInfo(): array
     {
@@ -366,6 +374,8 @@ class AdminPageController extends BasePageController
 
     /**
      * Get system load average
+     *
+     * @return array<string, mixed>
      */
     protected function getLoadAverage(): array
     {
@@ -405,6 +415,8 @@ class AdminPageController extends BasePageController
 
     /**
      * Get RAM usage information
+     *
+     * @return array<string, mixed>
      */
     protected function getRamUsage(): array
     {
@@ -460,7 +472,7 @@ class AdminPageController extends BasePageController
     /**
      * Get minute-to-minute user activity data (API endpoint)
      */
-    public function getUserActivityMinutes()
+    public function getUserActivityMinutes(): mixed
     {
         $downloadsPerMinute = $this->userStatsService->getDownloadsPerMinute(60);
         $apiHitsPerMinute = $this->userStatsService->getApiHitsPerMinute(60);
@@ -474,7 +486,7 @@ class AdminPageController extends BasePageController
     /**
      * Get current system metrics (API endpoint)
      */
-    public function getCurrentMetrics()
+    public function getCurrentMetrics(): mixed
     {
         $cpuUsage = $this->getCpuUsage();
         $ramUsage = $this->getRamUsage();
@@ -501,7 +513,7 @@ class AdminPageController extends BasePageController
     /**
      * Get historical system metrics (API endpoint)
      */
-    public function getHistoricalMetrics()
+    public function getHistoricalMetrics(): mixed
     {
         $timeRange = request('range', '24h'); // 24h or 30d
 

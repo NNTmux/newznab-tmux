@@ -46,6 +46,9 @@ class UserRequest extends Model
      */
     protected $fillable = ['id', 'users_id', 'request', 'hosthash', 'timestamp'];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'users_id');
@@ -54,7 +57,7 @@ class UserRequest extends Model
     /**
      * @throws \Throwable
      */
-    public static function delApiRequests($userID): void
+    public static function delApiRequests(mixed $userID): void
     {
         DB::transaction(function () use ($userID) {
             self::query()->where('users_id', $userID)->delete();
@@ -80,7 +83,7 @@ class UserRequest extends Model
     /**
      * Get hourly API request counts for the last 24 hours.
      *
-     * @return array Array of hourly counts indexed by hour
+     * @return array<string, mixed> Array of hourly counts indexed by hour
      *
      * @throws \Exception
      */

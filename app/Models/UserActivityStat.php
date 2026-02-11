@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class UserActivityStat extends Model
 {
-    use HasFactory;
+    use HasFactory; // @phpstan-ignore missingType.generics
 
     protected $guarded = [];
 
@@ -47,6 +47,8 @@ class UserActivityStat extends Model
 
     /**
      * Get download stats for the last N days
+     *
+     * @return array<string, mixed>
      */
     public static function getDownloadsPerDay(int $days = 30): array
     {
@@ -75,6 +77,8 @@ class UserActivityStat extends Model
 
     /**
      * Get API hits stats for the last N days
+     *
+     * @return list<array<string, int|string>>
      */
     public static function getApiHitsPerDay(int $days = 30): array
     {
@@ -167,6 +171,8 @@ class UserActivityStat extends Model
 
     /**
      * Get download stats per hour for the last N hours
+     *
+     * @return array<string, mixed>
      */
     public static function getDownloadsPerHour(int $hours = 168): array
     {
@@ -209,6 +215,8 @@ class UserActivityStat extends Model
 
     /**
      * Get API hits stats per hour for the last N hours
+     *
+     * @return list<array<string, mixed>>
      */
     public static function getApiHitsPerHour(int $hours = 168): array
     {

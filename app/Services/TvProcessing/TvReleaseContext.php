@@ -20,6 +20,8 @@ class TvReleaseContext
 
     /**
      * Create from a Release model array/object.
+     *
+     * @param  array<string, mixed>  $release
      */
     public static function fromRelease(array|object $release): self
     {

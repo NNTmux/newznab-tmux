@@ -21,7 +21,7 @@ class ConsoleController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function show(Request $request, string $id = '')
+    public function show(Request $request, string $id = ''): mixed
     {
         if ($id === 'WiiVare') {
             $id = 'WiiVareVC';
@@ -55,7 +55,7 @@ class ConsoleController extends BasePageController
         $offset = ($page - 1) * config('nntmux.items_per_cover_page');
 
         $consoles = [];
-        $rslt = $this->consoleService->getConsoleRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, (array) $this->userdata->categoryexclusions);
+        $rslt = $this->consoleService->getConsoleRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, (array) $this->userdata->categoryexclusions); // @phpstan-ignore argument.type
         $results = $this->paginate($rslt, $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
         $maxwords = 50;
