@@ -51,8 +51,6 @@ class AdminTmuxController extends BasePageController
             'backfill_group' => ['Newest', 'Oldest', 'Alphabetical', 'Alphabetical - Reverse', 'Most Posts', 'Fewest Posts'],
             'backfill_days' => ['Days per Group', 'Safe Backfill day'],
             'backfill_days_ids' => [1, 2],
-            'dehash_ids' => [0, 1],
-            'dehash_names' => ['Disabled', 'Enabled'],
             'import_ids' => [0, 1, 2],
             'import_names' => ['Disabled', 'Import - Do Not Use Filenames', 'Import - Use Filenames'],
             'releases_ids' => [0, 1],

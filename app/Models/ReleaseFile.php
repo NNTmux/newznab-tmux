@@ -13,14 +13,12 @@ use Illuminate\Support\Facades\Log;
  * @property int $releases_id FK to releases.id
  * @property string $name
  * @property int $size
- * @property bool $ishashed
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
  * @property bool $passworded
  * @property-read Release $release
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereIshashed($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile wherePassworded($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseFile whereReleasesId($value)
@@ -112,7 +110,6 @@ class ReleaseFile extends Model
                     'updated_at' => now()->timestamp,
                     'passworded' => $hasPassword,
                     'crc32' => $crc,
-                    'ishashed' => preg_match('/^[a-fA-F0-9]{32}\b|^[a-fA-F0-9]{40}\b|^[a-fA-F0-9]{64}\b|^[a-fA-F0-9]{96}\b|^[a-fA-F0-9]{128}\b/i', $name) ? 1 : 0,
                 ]);
             } catch (\PDOException $e) {
                 Log::alert($e->getMessage());

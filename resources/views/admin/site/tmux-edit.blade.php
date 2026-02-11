@@ -284,7 +284,7 @@
                 <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
                     <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Fix Release Names</h2>
                     <div class="space-y-4">
-                        <x-form.group label="Fix Release Names" for="fix_names" help="Fix release names using NFOs, par2 files, filenames, md5 and sha1.">
+                        <x-form.group label="Fix Release Names" for="fix_names" help="Fix release names using NFOs, par2 files, and filenames.">
                             <x-select id="fix_names" name="fix_names" class="w-full">
                                 @foreach($yesno_ids as $index => $val)
                                     <option value="{{ $val }}" {{ ($site['fix_names'] ?? '') == $val ? 'selected' : '' }}>

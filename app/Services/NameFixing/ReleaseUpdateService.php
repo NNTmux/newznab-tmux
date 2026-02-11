@@ -316,7 +316,6 @@ class ReleaseUpdateService
             'NFO, ' => ['isrenamed' => 1, 'iscategorized' => 1, 'proc_nfo' => 1],
             'PAR2, ' => ['isrenamed' => 1, 'iscategorized' => 1, 'proc_par2' => 1],
             'Filenames, ', 'file matched source: ' => ['isrenamed' => 1, 'iscategorized' => 1, 'proc_files' => 1],
-            'SHA1, ', 'MD5, ' => ['isrenamed' => 1, 'iscategorized' => 1, 'dehashstatus' => 1],
             'PreDB FT Exact, ' => ['isrenamed' => 1, 'iscategorized' => 1],
             'sorter, ' => ['isrenamed' => 1, 'iscategorized' => 1, 'proc_sorter' => 1],
             'UID, ', 'Mediainfo, ' => ['isrenamed' => 1, 'iscategorized' => 1, 'proc_uid' => 1],

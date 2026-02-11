@@ -330,9 +330,9 @@ class ReleasesFixNamesGroup extends Command
         return Release::fromQuery(sprintf("
             SELECT
                 r.id AS releases_id, r.fromname, r.guid, r.groups_id, r.categories_id, r.name, r.searchname, r.proc_nfo,
-                r.proc_uid, r.proc_files, r.proc_par2, r.ishashed, r.dehashstatus, r.nfostatus,
+                r.proc_uid, r.proc_files, r.proc_par2, r.nfostatus,
                 r.size AS relsize, r.predb_id, r.proc_hash16k, r.proc_srr, r.proc_crc32,
-                IFNULL(rf.releases_id, 0) AS fileid, IF(rf.ishashed = 1, rf.name, 0) AS filehash,
+                IFNULL(rf.releases_id, 0) AS fileid,
                 IFNULL(GROUP_CONCAT(rf.name ORDER BY rf.name ASC SEPARATOR '|'), '') AS filestring,
                 IFNULL(UNCOMPRESS(rn.nfo), '') AS textstring,
                 IFNULL(ru.uniqueid, '') AS uid,
@@ -356,7 +356,6 @@ class ReleasesFixNamesGroup extends Command
                 OR r.proc_srr = %d
                 OR r.proc_hash16k = %d
                 OR r.proc_crc32 = %d
-                OR (r.ishashed = 1 AND r.dehashstatus BETWEEN -6 AND 0)
             )
             AND r.categories_id IN (%s)
             GROUP BY r.id

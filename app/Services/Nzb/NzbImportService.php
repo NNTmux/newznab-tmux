@@ -394,7 +394,6 @@ class NzbImportService
                     'isrenamed' => $renamed,
                     'predb_id' => 0,
                     'nzbstatus' => NzbService::NZB_ADDED,
-                    'ishashed' => 0,
                 ]
             );
         } else {

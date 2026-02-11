@@ -169,8 +169,6 @@ class Tmux
             'monitor_path_a' => 'monitor_path_a',
             'monitor_path_b' => 'monitor_path_b',
             'progressive' => 'progressive',
-            'dehash' => 'dehash',
-            'dehash_timer' => 'dehash_timer',
             'backfill_days' => 'backfilldays',
             'post_amazon' => 'post_amazon',
             'post_timer_amazon' => 'post_timer_amazon',
@@ -307,8 +305,7 @@ class Tmux
 					SUM(IF(categories_id BETWEEN %d AND %d AND xxxinfo_id = 0,1,0)) AS processxxx,
 					SUM(IF(1=1 %s,1,0)) AS processnfo,
 					SUM(IF(isrenamed = %d AND predb_id = 0 AND passwordstatus >= 0 AND nfostatus > %d
-						AND ((nfostatus = %d AND proc_nfo = %d) OR proc_files = %d OR proc_par2 = %d
-							OR (ishashed = 1 AND dehashstatus BETWEEN -6 AND 0)) AND categories_id IN (%s),1,0)) AS processrenames,
+						AND ((nfostatus = %d AND proc_nfo = %d) OR proc_files = %d OR proc_par2 = %d) AND categories_id IN (%s),1,0)) AS processrenames,
 					SUM(IF(isrenamed = %d,1,0)) AS renamed,
 					SUM(IF(nfostatus = %20$d,1,0)) AS nfo,
 					SUM(IF(predb_id > 0,1,0)) AS predb_matched,
