@@ -13,19 +13,19 @@
             direct NZB downloads based on your preferences.
         </p>
 
-        @if($loggedin ?? false)
+        @auth
             <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6 border border-gray-200 dark:border-gray-700 dark:bg-gray-700 dark:border-gray-600">
                 <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                     <i class="fa fa-key mr-2 text-gray-600 dark:text-gray-400"></i>Your API Token
                 </h4>
                 <div class="flex rounded-md shadow-sm">
-                    <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white" value="api_token={{ $userdata->api_token }}" readonly id="apiTokenInput">
+                    <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white" value="api_token={{ auth()->user()->api_token }}" readonly id="apiTokenInput">
                     <button class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" id="copyApiToken" title="Copy to clipboard">
                         <i class="fa fa-copy"></i>
                     </button>
                 </div>
             </div>
-        @endif
+        @endauth
 
         <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
             <i class="fa fa-cog mr-2 text-gray-600 dark:text-gray-400"></i>RSS Configuration Options
@@ -43,7 +43,7 @@
                     <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700">
                         <td class="px-6 py-4"><code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">api_token</code></td>
                         <td class="px-6 py-4 text-gray-700 dark:text-gray-300">Add this to your feed URL to allow NZB downloads without logging in</td>
-                        <td class="px-6 py-4"><code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">&amp;api_token={{ $userdata->api_token ?? 'YOUR_TOKEN' }}</code></td>
+                        <td class="px-6 py-4"><code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">&amp;api_token={{ auth()->user()->api_token ?? 'YOUR_TOKEN' }}</code></td>
                     </tr>
                     <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700">
                         <td class="px-6 py-4"><code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">del=1</code></td>
@@ -99,12 +99,12 @@
                         <strong class="text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                             <i class="fa fa-rss mr-2 text-orange-500 dark:text-orange-400"></i>Full Site Feed
                         </strong>
-                        <a href="{{ url('/rss/full-feed?dl=1&api_token=' . ($userdata->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" target="_blank">
+                        <a href="{{ url('/rss/full-feed?dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" target="_blank">
                             <i class="fa fa-external-link mr-1"></i>Open Feed
                         </a>
                     </div>
                     <div class="flex rounded-md shadow-sm">
-                        <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/full-feed?dl=1&api_token=' . ($userdata->api_token ?? '')) }}" readonly id="fullFeedUrl">
+                        <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/full-feed?dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" readonly id="fullFeedUrl">
                         <button class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500 copy-btn" type="button" data-copy-target="fullFeedUrl">
                             <i class="fa fa-copy"></i>
                         </button>
@@ -117,12 +117,12 @@
                         <strong class="text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                             <i class="fa fa-shopping-basket mr-2 text-blue-500 dark:text-blue-400"></i>My Cart Feed
                         </strong>
-                        <a href="{{ url('/rss/cart?dl=1&api_token=' . ($userdata->api_token ?? '') . '&del=1') }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" target="_blank">
+                        <a href="{{ url('/rss/cart?dl=1&api_token=' . (auth()->user()->api_token ?? '') . '&del=1') }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" target="_blank">
                             <i class="fa fa-external-link mr-1"></i>Open Feed
                         </a>
                     </div>
                     <div class="flex rounded-md shadow-sm">
-                        <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/cart?dl=1&api_token=' . ($userdata->api_token ?? '') . '&del=1') }}" readonly id="cartFeedUrl">
+                        <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/cart?dl=1&api_token=' . (auth()->user()->api_token ?? '') . '&del=1') }}" readonly id="cartFeedUrl">
                         <button class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500 copy-btn" type="button" data-copy-target="cartFeedUrl">
                             <i class="fa fa-copy"></i>
                         </button>
@@ -134,12 +134,12 @@
                         <strong class="text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                             <i class="fa fa-tv mr-2 text-green-600 dark:text-green-400"></i>My Shows Feed
                         </strong>
-                        <a href="{{ url('/rss/myshows?dl=1&api_token=' . ($userdata->api_token ?? '') . '&del=1') }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" target="_blank">
+                        <a href="{{ url('/rss/myshows?dl=1&api_token=' . (auth()->user()->api_token ?? '') . '&del=1') }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" target="_blank">
                             <i class="fa fa-external-link mr-1"></i>Open Feed
                         </a>
                     </div>
                     <div class="flex rounded-md shadow-sm">
-                        <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/myshows?dl=1&api_token=' . ($userdata->api_token ?? '') . '&del=1') }}" readonly id="myShowsFeedUrl">
+                        <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/myshows?dl=1&api_token=' . (auth()->user()->api_token ?? '') . '&del=1') }}" readonly id="myShowsFeedUrl">
                         <button class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500 copy-btn" type="button" data-copy-target="myShowsFeedUrl">
                             <i class="fa fa-copy"></i>
                         </button>
@@ -151,12 +151,12 @@
                         <strong class="text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                             <i class="fa fa-film mr-2 text-red-600 dark:text-red-400"></i>My Movies Feed
                         </strong>
-                        <a href="{{ url('/rss/mymovies?dl=1&api_token=' . ($userdata->api_token ?? '') . '&del=1') }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" target="_blank">
+                        <a href="{{ url('/rss/mymovies?dl=1&api_token=' . (auth()->user()->api_token ?? '') . '&del=1') }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" target="_blank">
                             <i class="fa fa-external-link mr-1"></i>Open Feed
                         </a>
                     </div>
                     <div class="flex rounded-md shadow-sm">
-                        <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/mymovies?dl=1&api_token=' . ($userdata->api_token ?? '') . '&del=1') }}" readonly id="myMoviesFeedUrl">
+                        <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/mymovies?dl=1&api_token=' . (auth()->user()->api_token ?? '') . '&del=1') }}" readonly id="myMoviesFeedUrl">
                         <button class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500 copy-btn" type="button" data-copy-target="myMoviesFeedUrl">
                             <i class="fa fa-copy"></i>
                         </button>
@@ -179,12 +179,12 @@
                         <strong class="text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                             <i class="fa fa-film mr-2 text-blue-600 dark:text-blue-400"></i>Trending Movies
                         </strong>
-                        <a href="{{ url('/rss/trending-movies?dl=1&api_token=' . ($userdata->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" target="_blank">
+                        <a href="{{ url('/rss/trending-movies?dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" target="_blank">
                             <i class="fa fa-external-link mr-1"></i>Open Feed
                         </a>
                     </div>
                     <div class="flex rounded-md shadow-sm">
-                        <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/trending-movies?dl=1&api_token=' . ($userdata->api_token ?? '')) }}" readonly id="trendingMoviesFeedUrl">
+                        <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/trending-movies?dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" readonly id="trendingMoviesFeedUrl">
                         <button class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500 copy-btn" type="button" data-copy-target="trendingMoviesFeedUrl">
                             <i class="fa fa-copy"></i>
                         </button>
@@ -195,12 +195,12 @@
                         <strong class="text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                             <i class="fa fa-tv mr-2 text-purple-600 dark:text-purple-400"></i>Trending TV Shows
                         </strong>
-                        <a href="{{ url('/rss/trending-shows?dl=1&api_token=' . ($userdata->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" target="_blank">
+                        <a href="{{ url('/rss/trending-shows?dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" target="_blank">
                             <i class="fa fa-external-link mr-1"></i>Open Feed
                         </a>
                     </div>
                     <div class="flex rounded-md shadow-sm">
-                        <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/trending-shows?dl=1&api_token=' . ($userdata->api_token ?? '')) }}" readonly id="trendingShowsFeedUrl">
+                        <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/trending-shows?dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" readonly id="trendingShowsFeedUrl">
                         <button class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500 copy-btn" type="button" data-copy-target="trendingShowsFeedUrl">
                             <i class="fa fa-copy"></i>
                         </button>
@@ -224,12 +224,12 @@
                                 <strong class="text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                                     <i class="fa fa-folder-open mr-2 text-yellow-600 dark:text-yellow-400"></i>{{ $category['title'] }}
                                 </strong>
-                                <a href="{{ url('/rss/category?id=' . $category['id'] . '&dl=1&api_token=' . ($userdata->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" target="_blank">
+                                <a href="{{ url('/rss/category?id=' . $category['id'] . '&dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" target="_blank">
                                     <i class="fa fa-external-link mr-1"></i>Open Feed
                                 </a>
                             </div>
                             <div class="flex rounded-md shadow-sm">
-                                <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/category?id=' . $category['id'] . '&dl=1&api_token=' . ($userdata->api_token ?? '')) }}" readonly id="parentCat{{ $category['id'] }}Url">
+                                <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/category?id=' . $category['id'] . '&dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" readonly id="parentCat{{ $category['id'] }}Url">
                                 <button class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500 copy-btn" type="button" data-copy-target="parentCat{{ $category['id'] }}Url">
                                     <i class="fa fa-copy"></i>
                                 </button>
@@ -258,12 +258,12 @@
                                     <strong class="text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                                         <i class="fa fa-tag mr-2 text-blue-500 dark:text-blue-400"></i>{{ $category['title'] }}
                                     </strong>
-                                    <a href="{{ url('/rss/category?id=' . $category['id'] . '&dl=1&api_token=' . ($userdata->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" target="_blank">
+                                    <a href="{{ url('/rss/category?id=' . $category['id'] . '&dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" target="_blank">
                                         <i class="fa fa-external-link mr-1"></i>Open Feed
                                     </a>
                                 </div>
                                 <div class="flex rounded-md shadow-sm">
-                                    <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/category?id=' . $category['id'] . '&dl=1&api_token=' . ($userdata->api_token ?? '')) }}" readonly id="subCat{{ $category['id'] }}Url">
+                                    <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-xs focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="{{ url('/rss/category?id=' . $category['id'] . '&dl=1&api_token=' . (auth()->user()->api_token ?? '')) }}" readonly id="subCat{{ $category['id'] }}Url">
                                     <button class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500 copy-btn" type="button" data-copy-target="subCat{{ $category['id'] }}Url">
                                         <i class="fa fa-copy"></i>
                                     </button>

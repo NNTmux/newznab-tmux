@@ -98,7 +98,9 @@ class XML_Response
 
         $this->xml = new \XMLWriter;
         $this->xml->openMemory();
-        $this->xml->setIndent(true);
+        // Disable indentation for API responses (smaller payload, faster generation).
+        // Clients (Sonarr, Radarr, etc.) don't need pretty-printed XML.
+        $this->xml->setIndent(false);
     }
 
     public function returnXML(): bool|string
@@ -119,6 +121,207 @@ class XML_Response
         }
 
         return false;
+    }
+
+    /**
+     * Build the API response as a PHP array instead of XML.
+     * Used for JSON output to avoid the expensive XML->xml_to_array->json_encode path.
+     *
+     * @return array<string, mixed>|false
+     */
+    public function returnArray(): array|false
+    {
+        return match ($this->type) {
+            'caps' => $this->buildCapsArray(),
+            'api' => $this->buildApiArray(),
+            'reg' => $this->buildRegArray(),
+            default => false,
+        };
+    }
+
+    /**
+     * Build capabilities response as array.
+     *
+     * @return array<string, mixed>
+     */
+    protected function buildCapsArray(): array
+    {
+        return [
+            'server' => $this->server['server'],
+            'limits' => $this->server['limits'],
+            'registration' => $this->server['registration'],
+            'searching' => $this->server['searching'],
+            'categories' => $this->server['categories'] ?? [],
+        ];
+    }
+
+    /**
+     * Build API response as array.
+     *
+     * @return array<string, mixed>
+     */
+    protected function buildApiArray(): array
+    {
+        $response = [
+            'offset' => $this->offset,
+            'total' => $this->releases[0]->_totalrows ?? 0,
+        ];
+
+        $response['apilimits'] = [
+            'apicurrent' => $this->parameters['requests'],
+            'apimax' => $this->parameters['apilimit'],
+            'grabcurrent' => $this->parameters['grabs'],
+            'grabmax' => $this->parameters['downloadlimit'],
+        ];
+        if (! empty($this->parameters['oldestapi'])) {
+            $response['apilimits']['apioldesttime'] = $this->parameters['oldestapi'];
+        }
+        if (! empty($this->parameters['oldestgrab'])) {
+            $response['apilimits']['graboldesttime'] = $this->parameters['oldestgrab'];
+        }
+
+        $response['item'] = [];
+        if (! empty($this->releases)) {
+            $releases = $this->releases instanceof Release ? [$this->releases] : $this->releases;
+            foreach ($releases as $release) {
+                $this->release = $release;
+                $item = $this->buildReleaseArray();
+                $response['item'][] = $item;
+            }
+        }
+
+        return $response;
+    }
+
+    /**
+     * Build a single release as array.
+     *
+     * @return array<string, mixed>
+     */
+    protected function buildReleaseArray(): array
+    {
+        $serverUrl = $this->server['server']['url'];
+        $delParam = ((int) $this->parameters['del'] === 1 ? '&del=1' : '');
+
+        $item = [
+            'title' => $this->release->searchname,
+            'guid' => $serverUrl.'/details/'.$this->release->guid,
+            'link' => $serverUrl.'/getnzb?id='.$this->release->guid.'.nzb&r='.$this->parameters['token'].$delParam,
+            'comments' => $serverUrl.'/details/'.$this->release->guid.'#comments',
+            'pubDate' => date(DATE_RSS, strtotime($this->release->adddate)),
+            'category' => $this->release->category_name,
+            'description' => $this->release->searchname,
+        ];
+
+        if (! isset($this->parameters['dl']) || (int) $this->parameters['dl'] === 1) {
+            $item['enclosure'] = [
+                'url' => $serverUrl.'/getnzb?id='.$this->release->guid.'.nzb&r='.$this->parameters['token'].$delParam,
+                'length' => $this->release->size,
+                'type' => 'application/x-nzb',
+            ];
+        }
+
+        // Attributes
+        $attrs = [
+            'category' => $this->release->categories_id,
+            'size' => $this->release->size,
+        ];
+
+        if (! empty($this->release->coverurl)) {
+            $attrs['coverurl'] = $serverUrl.'/covers/'.$this->release->coverurl;
+        }
+
+        if ((int) $this->parameters['extended'] === 1) {
+            $attrs['files'] = $this->release->totalpart;
+
+            if (($this->release->videos_id > 0 || $this->release->tv_episodes_id > 0)) {
+                $attrs = array_merge($attrs, $this->buildTvAttrArray());
+            }
+
+            if (isset($this->release->imdbid) && $this->release->imdbid > 0) {
+                $attrs['imdb'] = $this->release->imdbid;
+            }
+            if (isset($this->release->anidbid) && $this->release->anidbid > 0) {
+                $attrs['anidbid'] = $this->release->anidbid;
+            }
+            if (isset($this->release->predb_id) && $this->release->predb_id > 0) {
+                $attrs['prematch'] = '1';
+            }
+            if (isset($this->release->nfostatus) && (int) $this->release->nfostatus === 1) {
+                $attrs['info'] = $serverUrl.'api?t=info&id='.$this->release->guid.'&r='.$this->parameters['token'];
+            }
+
+            $attrs['grabs'] = $this->release->grabs;
+            $attrs['comments'] = $this->release->comments;
+            $attrs['password'] = $this->release->passwordstatus;
+            $attrs['usenetdate'] = Carbon::parse($this->release->postdate)->toRssString();
+            if (! empty($this->release->group_name)) {
+                $attrs['group'] = $this->release->group_name;
+            }
+        }
+
+        $item['attr'] = $attrs;
+
+        return $item;
+    }
+
+    /**
+     * Build TV attributes as array (scalar-safe).
+     *
+     * @return array<string, mixed>
+     */
+    protected function buildTvAttrArray(): array
+    {
+        $attrs = [];
+
+        if (! empty($this->release->title)) {
+            $attrs['title'] = $this->release->title;
+        }
+        if (isset($this->release->series) && $this->release->series > 0) {
+            $attrs['season'] = $this->release->series;
+        }
+        $episodeNum = $this->getScalarOrRelationValue('episode', 'episode');
+        if (! empty($episodeNum) && $episodeNum > 0) {
+            $attrs['episode'] = $episodeNum;
+        }
+        if (! empty($this->release->firstaired)) {
+            $attrs['tvairdate'] = $this->release->firstaired;
+        }
+        if (isset($this->release->tvdb) && $this->release->tvdb > 0) {
+            $attrs['tvdbid'] = $this->release->tvdb;
+        }
+        if (isset($this->release->trakt) && $this->release->trakt > 0) {
+            $attrs['traktid'] = $this->release->trakt;
+        }
+        if (isset($this->release->tvrage) && $this->release->tvrage > 0) {
+            $attrs['tvrageid'] = $this->release->tvrage;
+            $attrs['rageid'] = $this->release->tvrage;
+        }
+        if (isset($this->release->tvmaze) && $this->release->tvmaze > 0) {
+            $attrs['tvmazeid'] = $this->release->tvmaze;
+        }
+        if (isset($this->release->imdb) && $this->release->imdb > 0) {
+            $attrs['imdbid'] = $this->release->imdb;
+        }
+        if (isset($this->release->tmdb) && $this->release->tmdb > 0) {
+            $attrs['tmdbid'] = $this->release->tmdb;
+        }
+
+        return $attrs;
+    }
+
+    /**
+     * Build registration response as array.
+     *
+     * @return array<string, mixed>
+     */
+    protected function buildRegArray(): array
+    {
+        return [
+            'username' => $this->parameters['username'],
+            'password' => $this->parameters['password'],
+            'apikey' => $this->parameters['token'],
+        ];
     }
 
     /**
@@ -469,6 +672,8 @@ class XML_Response
 
     /**
      * Writes the TV Specific attributes.
+     * Uses scalar-safe access to avoid N+1 lazy loading when release data
+     * comes from raw SQL queries (stdClass with flat columns) vs Eloquent models.
      */
     protected function setTvAttr(): void
     {
@@ -478,8 +683,10 @@ class XML_Response
         if (isset($this->release->series) && $this->release->series > 0) {
             $this->writeZedAttr('season', $this->release->series);
         }
-        if (isset($this->release->episode->episode) && $this->release->episode->episode > 0) {
-            $this->writeZedAttr('episode', $this->release->episode->episode);
+        // episode can be a scalar (from raw SQL JOIN) or an Eloquent relation object
+        $episodeNum = $this->getScalarOrRelationValue('episode', 'episode');
+        if (! empty($episodeNum) && $episodeNum > 0) {
+            $this->writeZedAttr('episode', $episodeNum);
         }
         if (! empty($this->release->firstaired)) {
             $this->writeZedAttr('tvairdate', $this->release->firstaired);
@@ -503,6 +710,35 @@ class XML_Response
         if (isset($this->release->tmdb) && $this->release->tmdb > 0) {
             $this->writeZedAttr('tmdbid', $this->release->tmdb);
         }
+    }
+
+    /**
+     * Safely get a value that may be a scalar (from raw SQL) or a property on a related object.
+     * Prevents N+1 lazy loading when accessing Eloquent relation properties in a loop.
+     *
+     * @param  string  $property  The property name on the release (may be scalar or object)
+     * @param  string  $subProperty  The sub-property to access if $property is an object
+     * @return mixed The scalar value, or null if not available
+     */
+    protected function getScalarOrRelationValue(string $property, string $subProperty): mixed
+    {
+        $value = $this->release->$property ?? null;
+
+        if ($value === null) {
+            return null;
+        }
+
+        // If it's a scalar (from raw SQL JOIN), return directly
+        if (is_scalar($value)) {
+            return $value;
+        }
+
+        // If it's an object (Eloquent relation), access the sub-property
+        if (is_object($value)) {
+            return $value->$subProperty ?? null;
+        }
+
+        return null;
     }
 
     /**

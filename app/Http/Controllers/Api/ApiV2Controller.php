@@ -8,7 +8,6 @@ use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\User;
-use App\Models\UserDownload;
 use App\Models\UserRequest;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\Releases\ReleaseSearchService;
@@ -20,7 +19,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 class ApiV2Controller extends BasePageController
 {
@@ -40,33 +38,77 @@ class ApiV2Controller extends BasePageController
         $this->releaseBrowseService = $releaseBrowseService;
     }
 
+    /**
+     * Validate API token and return cached user, or null on failure.
+     * Caches user lookup for 5 minutes to reduce DB hits.
+     */
+    private function resolveUser(Request $request): ?User
+    {
+        if ($request->missing('api_token') || $request->isNotFilled('api_token')) {
+            return null;
+        }
+
+        $apiToken = $request->input('api_token');
+        $userCacheKey = 'api_user:'.md5($apiToken);
+
+        return Cache::remember($userCacheKey, 300, function () use ($apiToken) {
+            return User::query()
+                ->where('api_token', $apiToken)
+                ->with('role')
+                ->first();
+        });
+    }
+
+    /**
+     * Build the standard user stats portion of an API response.
+     * Uses the consolidated single-query + 60s cache from ApiController.
+     *
+     * @return array<string, mixed>
+     */
+    private function buildUserStatsResponse(User $user): array
+    {
+        $userStats = $this->api->getCachedUserStats($user->id);
+
+        return [
+            'apiCurrent' => (int) ($userStats->api_count ?? 0),
+            'apiMax' => $user->role->apirequests,
+            'grabCurrent' => (int) ($userStats->grab_count ?? 0),
+            'grabMax' => $user->role->downloadrequests,
+            'apiOldestTime' => $userStats->api_time ? Carbon::parse($userStats->api_time)->toRfc2822String() : '',
+            'grabOldestTime' => $userStats->grab_time ? Carbon::parse($userStats->grab_time)->toRfc2822String() : '',
+        ];
+    }
+
     public function capabilities(): JsonResponse
     {
-        $category = Category::getForApi();
+        // Cache the full capabilities response for 10 minutes
+        $capabilities = Cache::remember('api_v2_capabilities', 600, function () {
+            $category = Category::getForApi();
 
-        $capabilities = [
-            'server' => [
-                'title' => config('app.name'),
-                'strapline' => Settings::settingValue('strapline'),
-                'email' => config('mail.from.address'),
-                'url' => url('/'),
-            ],
-            'limits' => [
-                'max' => 100,
-                'default' => 100,
-            ],
-            'registration' => [
-                'available' => 'no',
-                'open' => (int) Settings::settingValue('registerstatus') === 0 ? 'yes' : 'no',
-            ],
-            'searching' => [
-                'search' => ['available' => 'yes', 'supportedParams' => 'id'],
-                'tv-search' => ['available' => 'yes', 'supportedParams' => 'id,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
-                'movie-search' => ['available' => 'yes', 'supportedParams' => 'id, imdbid, tmdbid, traktid'],
-                'audio-search' => ['available' => 'no',  'supportedParams' => ''],
-            ],
-            'categories' => fractal($category, new CategoryTransformer),
-        ];
+            return [
+                'server' => [
+                    'title' => config('app.name'),
+                    'strapline' => Settings::settingValue('strapline'),
+                    'email' => config('mail.from.address'),
+                    'url' => url('/'),
+                ],
+                'limits' => [
+                    'max' => 100,
+                    'default' => 100,
+                ],
+                'registration' => [
+                    'available' => 'no',
+                    'open' => (int) Settings::settingValue('registerstatus') === 0 ? 'yes' : 'no',
+                ],
+                'searching' => [
+                    'search' => ['available' => 'yes', 'supportedParams' => 'id'],
+                    'tv-search' => ['available' => 'yes', 'supportedParams' => 'id,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
+                    'movie-search' => ['available' => 'yes', 'supportedParams' => 'id, imdbid, tmdbid, traktid'],
+                    'audio-search' => ['available' => 'no',  'supportedParams' => ''],
+                ],
+                'categories' => fractal($category, new CategoryTransformer),
+            ];
+        });
 
         return response()->json($capabilities);
     }
@@ -76,28 +118,12 @@ class ApiV2Controller extends BasePageController
      */
     public function movie(Request $request): JsonResponse
     {
-        // Validate API token and get user in one query
-        if ($request->missing('api_token') || $request->isNotFilled('api_token')) {
-            return response()->json(['error' => 'Missing parameter (apikey)'], 403);
-        }
-
-        $apiToken = $request->input('api_token');
-
-        // Cache user lookup for 5 minutes to reduce DB hits
-        $userCacheKey = 'api_user:'.md5($apiToken);
-        $user = Cache::remember($userCacheKey, 300, function () use ($apiToken) {
-            return User::query()
-                ->where('api_token', $apiToken)
-                ->with('role')
-                ->first();
-        });
-
+        $user = $this->resolveUser($request);
         if (! $user) {
-            return response()->json(['error' => 'Invalid API key'], 403);
+            return response()->json(['error' => 'Missing or invalid API key'], 403);
         }
 
-        // Queue API request logging asynchronously (non-blocking)
-        UserRequest::addApiRequest($apiToken, $request->getRequestUri());
+        UserRequest::addApiRequest($user->id, $request->getRequestUri());
         event(new UserAccessedApi($user, $request->ip()));
 
         // Get request parameters efficiently
@@ -110,7 +136,7 @@ class ApiV2Controller extends BasePageController
         $limit = $this->api->limit($request);
         $categoryID = $this->api->categoryID($request);
         $maxAge = $this->api->maxAge($request);
-        $catExclusions = User::getCategoryExclusionForApi($request);
+        $catExclusions = User::getCategoryExclusionById($user->id);
 
         // Create cache key for movie search results
         $searchCacheKey = 'api_movie_search:'.md5(serialize([
@@ -137,31 +163,11 @@ class ApiV2Controller extends BasePageController
             );
         });
 
-        // Get user stats with a single optimized raw SQL query
-        $userStatsCacheKey = 'api_user_stats:'.$user->id;
-        $userStats = Cache::remember($userStatsCacheKey, 60, function () use ($user) {
-            $oneDayAgo = now()->subDay()->toDateTimeString();
-
-            return DB::selectOne('
-                SELECT
-                    (SELECT COUNT(*) FROM user_requests WHERE users_id = ? AND timestamp > ?) as api_count,
-                    (SELECT COUNT(*) FROM user_downloads WHERE users_id = ? AND timestamp > ?) as grab_count,
-                    (SELECT MIN(timestamp) FROM user_requests WHERE users_id = ? AND timestamp > ?) as api_time,
-                    (SELECT MIN(timestamp) FROM user_downloads WHERE users_id = ? AND timestamp > ?) as grab_time
-            ', [$user->id, $oneDayAgo, $user->id, $oneDayAgo, $user->id, $oneDayAgo, $user->id, $oneDayAgo]);
-        });
-
-        // Build response
-        $response = [
-            'Total' => $relData[0]->_totalrows ?? 0,
-            'apiCurrent' => (int) ($userStats->api_count ?? 0),
-            'apiMax' => $user->role->apirequests,
-            'grabCurrent' => (int) ($userStats->grab_count ?? 0),
-            'grabMax' => $user->role->downloadrequests,
-            'apiOldestTime' => $userStats->api_time ? Carbon::parse($userStats->api_time)->toRfc2822String() : '',
-            'grabOldestTime' => $userStats->grab_time ? Carbon::parse($userStats->grab_time)->toRfc2822String() : '',
-            'Results' => fractal($relData, new ApiTransformer($user)),
-        ];
+        $response = array_merge(
+            ['Total' => $relData[0]->_totalrows ?? 0],
+            $this->buildUserStatsResponse($user),
+            ['Results' => fractal($relData, new ApiTransformer($user))]
+        );
 
         return response()->json($response);
     }
@@ -172,17 +178,19 @@ class ApiV2Controller extends BasePageController
      */
     public function apiSearch(Request $request): JsonResponse
     {
-        if ($request->missing('api_token') || $request->isNotFilled('api_token')) {
-            return response()->json(['error' => 'Missing parameter (api_token)'], 403);
+        $user = $this->resolveUser($request);
+        if (! $user) {
+            return response()->json(['error' => 'Missing or invalid API key'], 403);
         }
-        $user = User::query()->where('api_token', $request->input('api_token'))->first();
+
+        UserRequest::addApiRequest($user->id, $request->getRequestUri());
+        event(new UserAccessedApi($user, $request->ip()));
+
         $offset = $this->api->offset($request);
-        $catExclusions = User::getCategoryExclusionForApi($request);
+        $catExclusions = User::getCategoryExclusionById($user->id);
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
         $maxAge = $this->api->maxAge($request);
         $groupName = $this->api->group($request);
-        UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
-        event(new UserAccessedApi($user, $request->ip()));
         $categoryID = $this->api->categoryID($request);
         $limit = $this->api->limit($request);
 
@@ -211,21 +219,11 @@ class ApiV2Controller extends BasePageController
             );
         }
 
-        $time = UserRequest::whereUsersId($user->id)->min('timestamp');
-        $apiOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc2822String() : '';
-        $grabTime = UserDownload::whereUsersId($user->id)->min('timestamp');
-        $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc2822String() : '';
-
-        $response = [
-            'Total' => $relData[0]->_totalrows ?? 0,
-            'apiCurrent' => UserRequest::getApiRequests($user->id),
-            'apiMax' => $user->role->apirequests,
-            'grabCurrent' => UserDownload::getDownloadRequests($user->id),
-            'grabMax' => $user->role->downloadrequests,
-            'apiOldestTime' => $apiOldestTime,
-            'grabOldestTime' => $oldestGrabTime,
-            'Results' => fractal($relData, new ApiTransformer($user)),
-        ];
+        $response = array_merge(
+            ['Total' => $relData[0]->_totalrows ?? 0],
+            $this->buildUserStatsResponse($user),
+            ['Results' => fractal($relData, new ApiTransformer($user))]
+        );
 
         return response()->json($response);
     }
@@ -236,14 +234,12 @@ class ApiV2Controller extends BasePageController
      */
     public function tv(Request $request): JsonResponse
     {
-        if ($request->missing('api_token') || $request->isNotFilled('api_token')) {
-            return response()->json(['error' => 'Missing parameter (api_token)'], 403);
+        $user = $this->resolveUser($request);
+        if (! $user) {
+            return response()->json(['error' => 'Missing or invalid API key'], 403);
         }
-        $user = User::query()->where('api_token', $request->input('api_token'))->first();
-        if ($user === null) {
-            return response()->json(['error' => 'Invalid API Token'], 403);
-        }
-        $catExclusions = User::getCategoryExclusionForApi($request);
+
+        $catExclusions = User::getCategoryExclusionById($user->id);
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
         $this->api->verifyEmptyParameter($request, 'id');
         $this->api->verifyEmptyParameter($request, 'vid');
@@ -256,7 +252,7 @@ class ApiV2Controller extends BasePageController
         $this->api->verifyEmptyParameter($request, 'season');
         $this->api->verifyEmptyParameter($request, 'ep');
         $maxAge = $this->api->maxAge($request);
-        UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
+        UserRequest::addApiRequest($user->id, $request->getRequestUri());
         event(new UserAccessedApi($user, $request->ip()));
 
         $siteIdArr = [
@@ -292,36 +288,24 @@ class ApiV2Controller extends BasePageController
             $catExclusions
         );
 
-        $time = UserRequest::whereUsersId($user->id)->min('timestamp');
-        $apiOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc2822String() : '';
-        $grabTime = UserDownload::whereUsersId($user->id)->min('timestamp');
-        $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc2822String() : '';
-
-        $response = [
-            'Total' => $relData[0]->_totalrows ?? 0,
-            'apiCurrent' => UserRequest::getApiRequests($user->id),
-            'apiMax' => $user->role->apirequests,
-            'grabCurrent' => UserDownload::getDownloadRequests($user->id),
-            'grabMax' => $user->role->downloadrequests,
-            'apiOldestTime' => $apiOldestTime,
-            'grabOldestTime' => $oldestGrabTime,
-            'Results' => fractal($relData, new ApiTransformer($user)),
-        ];
+        $response = array_merge(
+            ['Total' => $relData[0]->_totalrows ?? 0],
+            $this->buildUserStatsResponse($user),
+            ['Results' => fractal($relData, new ApiTransformer($user))]
+        );
 
         return response()->json($response);
     }
 
     public function getNzb(Request $request): \Illuminate\Foundation\Application|JsonResponse|\Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
-        if ($request->missing('api_token') || $request->isNotFilled('api_token')) {
-            return response()->json(['error' => 'Missing parameter (api_token)'], 403);
+        $user = $this->resolveUser($request);
+        if (! $user) {
+            return response()->json(['error' => 'Missing or invalid API key'], 403);
         }
-        $user = User::query()->where('api_token', $request->input('api_token'))->first();
-        if ($user === null) {
-            return response()->json(['error' => 'Invalid API Token'], 403);
-        }
+
         event(new UserAccessedApi($user, $request->ip()));
-        UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
+        UserRequest::addApiRequest($user->id, $request->getRequestUri());
         $relData = Release::checkGuidForApi($request->input('id'));
         if ($relData) {
             return redirect('/getnzb?r='.$request->input('api_token').'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
@@ -332,20 +316,17 @@ class ApiV2Controller extends BasePageController
 
     public function details(Request $request): JsonResponse
     {
-        if ($request->missing('api_token') || $request->isNotFilled('api_token')) {
-            return response()->json(['error' => 'Missing parameter (api_token)'], 403);
+        $user = $this->resolveUser($request);
+        if (! $user) {
+            return response()->json(['error' => 'Missing or invalid API key'], 403);
         }
         if ($request->missing('id')) {
             return response()->json(['error' => 'Missing parameter (guid is required for single release details)'], 400);
         }
 
-        UserRequest::addApiRequest($request->input('api_token'), $request->getRequestUri());
-        $user = User::query()->where('api_token', $request->input('api_token'))->first();
-        if ($user === null) {
-            return response()->json(['error' => 'Invalid API Token'], 403);
-        }
+        UserRequest::addApiRequest($user->id, $request->getRequestUri());
         event(new UserAccessedApi($user, $request->ip()));
-        $relData = Release::getByGuid($request->input('id'));
+        $relData = Release::getByGuidForApi($request->input('id'));
 
         $relData = fractal($relData, new DetailsTransformer($user));
 

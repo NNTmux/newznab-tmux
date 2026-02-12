@@ -427,6 +427,44 @@ class Release extends Model
     }
 
     /**
+     * Lighter version of getByGuid() optimized for API details responses.
+     * Skips video.tvInfo, releaseGroup, and fields not used by DetailsTransformer/XML_Response.
+     */
+    public static function getByGuidForApi(mixed $guid): mixed
+    {
+        $query = self::with([
+            'group:id,name',
+            'category:id,title,root_categories_id',
+            'category.parent:id,title',
+            'video:id,title,tvdb,trakt,tvrage,tvmaze',
+            'episode:id,title,firstaired',
+        ]);
+
+        if (is_array($guid)) {
+            $query->whereIn('guid', $guid);
+        } else {
+            $query->where('guid', $guid);
+        }
+
+        $releases = $query->get();
+
+        $releases->each(function ($release) {
+            $release->group_name = $release->group->name ?? null;
+            $release->tvdb = $release->video->tvdb ?? null;
+            $release->trakt = $release->video->trakt ?? null;
+            $release->tvrage = $release->video->tvrage ?? null;
+            $release->tvmaze = $release->video->tvmaze ?? null;
+            $release->title = $release->episode->title ?? null;
+            $release->firstaired = $release->episode->firstaired ?? null;
+            $release->parent_category = $release->category->parent->title ?? null;
+            $release->sub_category = $release->category->title ?? null;
+            $release->category_name = $release->parent_category.' > '.$release->sub_category;
+        });
+
+        return is_array($guid) ? $releases : $releases->first();
+    }
+
+    /**
      * Get a range of releases. used in admin manage list.
      */
     public static function getFailedRange(): LengthAwarePaginator // @phpstan-ignore missingType.generics

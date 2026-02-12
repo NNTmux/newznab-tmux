@@ -61,17 +61,16 @@ class UserDownload extends Model
 
     /**
      * Get the COUNT of how many NZB's the user has downloaded in the past day.
-     *
+     * Note: Old request cleanup is no longer done inline to avoid blocking API responses.
+     * Use a scheduled command to periodically clean old records instead.
      *
      * @throws \Exception
      */
     public static function getDownloadRequests(int $userID): int
     {
-        // Clear old requests.
-        self::whereUsersId($userID)->where('timestamp', '<', now()->subDay())->delete();
         $value = self::whereUsersId($userID)->where('timestamp', '>', now()->subDay())->count('id');
 
-        return $value === false ? 0 : $value;
+        return $value ?: 0;
     }
 
     /**

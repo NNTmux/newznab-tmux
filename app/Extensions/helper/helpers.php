@@ -786,10 +786,15 @@ if (! function_exists('streamSslContextOptions')) {
 
 if (! function_exists('getCoverURL')) {
     /**
+     * Get cover URL for a release. Uses a short-lived in-memory cache to avoid
+     * repeated filesystem file_exists() calls for the same cover during a single request.
+     *
      * @param  array<string, mixed>  $options
      */
     function getCoverURL(array $options = []): string
     {
+        static $coverCache = [];
+
         $defaults = [
             'id' => null,
             'suffix' => '-cover.jpg',
@@ -806,8 +811,15 @@ if (! function_exists('getCoverURL')) {
         )
         ) {
             $fileSpec = sprintf($fileSpecTemplate, $options['type'], $options['id'], $options['suffix']);
-            $fileSpec = file_exists(storage_path('covers/').$fileSpec) ? $fileSpec :
-                sprintf($fileSpecTemplate, $options['type'], 'no', $options['suffix']);
+            $cacheKey = $options['type'].':'.$options['id'];
+
+            if (! isset($coverCache[$cacheKey])) {
+                $coverCache[$cacheKey] = file_exists(storage_path('covers/').$fileSpec);
+            }
+
+            if (! $coverCache[$cacheKey]) {
+                $fileSpec = sprintf($fileSpecTemplate, $options['type'], 'no', $options['suffix']);
+            }
         }
 
         return $fileSpec;

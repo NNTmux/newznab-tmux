@@ -10,7 +10,6 @@ use App\Models\ReleaseNfo;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Models\User;
-use App\Models\UserDownload;
 use App\Models\UserRequest;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\Releases\ReleaseSearchService;
@@ -20,6 +19,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -104,7 +105,16 @@ class ApiController extends BasePageController
             }
 
             $apiKey = $request->input('apikey');
-            $res = User::getByRssToken($apiKey);
+
+            // Cache user lookup for 5 minutes to avoid repeated DB hits (same pattern as API v2)
+            $userCacheKey = 'api_user:'.md5($apiKey);
+            $res = Cache::remember($userCacheKey, 300, function () use ($apiKey) {
+                return User::query()
+                    ->where('api_token', $apiKey)
+                    ->with('role')
+                    ->first();
+            });
+
             if ($res === null) {
                 return showApiError(100, 'Incorrect user credentials (wrong API key)');
             }
@@ -114,20 +124,22 @@ class ApiController extends BasePageController
             }
 
             $uid = $res->id;
-            $catExclusions = User::getCategoryExclusionForApi($request);
+            // Use user ID directly instead of re-looking up by token
+            $catExclusions = User::getCategoryExclusionById($uid);
             $maxRequests = $res->role->apirequests;
             $maxDownloads = $res->role->downloadrequests;
-            $time = UserRequest::whereUsersId($uid)->min('timestamp');
-            $thisOldestTime = $time !== null ? Carbon::createFromTimeString($time)->toRfc2822String() : '';
-            $grabTime = UserDownload::whereUsersId($uid)->min('timestamp');
-            $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc2822String() : '';
+
+            // Consolidated user stats: single query with 60s cache instead of 4 separate queries
+            $userStats = $this->getCachedUserStats($uid);
+            $thisOldestTime = $userStats->api_time ? Carbon::parse($userStats->api_time)->toRfc2822String() : '';
+            $oldestGrabTime = $userStats->grab_time ? Carbon::parse($userStats->grab_time)->toRfc2822String() : '';
+            $thisRequests = (int) ($userStats->api_count ?? 0);
+            $grabs = (int) ($userStats->grab_count ?? 0);
         }
 
         // Record user access to the api, if its been called by a user (i.e. capabilities request do not require a user to be logged in or key provided).
         if ($uid !== '') {
             event(new UserAccessedApi($res, $request->ip()));
-            $thisRequests = UserRequest::getApiRequests($uid);
-            $grabs = UserDownload::getDownloadRequests($uid);
             if ($thisRequests > $maxRequests) {
                 return showApiError(500, 'Request limit reached ('.$thisRequests.'/'.$maxRequests.')');
             }
@@ -156,7 +168,7 @@ class ApiController extends BasePageController
                 $this->verifyEmptyParameter($request, 'q');
                 $maxAge = $this->maxAge($request);
                 $groupName = $this->group($request);
-                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
+                UserRequest::addApiRequest($uid, $request->getRequestUri());
                 $categoryID = $this->categoryID($request);
                 $limit = $this->limit($request);
 
@@ -199,7 +211,7 @@ class ApiController extends BasePageController
                 $this->verifyEmptyParameter($request, 'season');
                 $this->verifyEmptyParameter($request, 'ep');
                 $maxAge = $this->maxAge($request);
-                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
+                UserRequest::addApiRequest($uid, $request->getRequestUri());
 
                 $siteIdArr = [
                     'id' => $request->input('vid') ?? '0',
@@ -243,7 +255,7 @@ class ApiController extends BasePageController
                 $this->verifyEmptyParameter($request, 'q');
                 $this->verifyEmptyParameter($request, 'imdbid');
                 $maxAge = $this->maxAge($request);
-                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
+                UserRequest::addApiRequest($uid, $request->getRequestUri());
 
                 $imdbId = $request->has('imdbid') && $request->filled('imdbid') ? (int) $request->input('imdbid') : -1;
                 $tmdbId = $request->has('tmdbid') && $request->filled('tmdbid') ? (int) $request->input('tmdbid') : -1;
@@ -275,7 +287,7 @@ class ApiController extends BasePageController
                 // Get NZB.
             case 'g':
                 $this->verifyEmptyParameter($request, 'g');
-                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
+                UserRequest::addApiRequest($uid, $request->getRequestUri());
                 $relData = Release::checkGuidForApi($request->input('id'));
                 if ($relData) {
                     return redirect(url('/getnzb?r='.$apiKey.'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : '')));
@@ -289,8 +301,8 @@ class ApiController extends BasePageController
                     return showApiError(200, 'Missing parameter (guid is required for single release details)');
                 }
 
-                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
-                $data = Release::getByGuid($request->input('id'));
+                UserRequest::addApiRequest($uid, $request->getRequestUri());
+                $data = Release::getByGuidForApi($request->input('id'));
 
                 $this->output($data, $params, $outputXML, $offset, 'api');
                 break;
@@ -301,7 +313,7 @@ class ApiController extends BasePageController
                     return showApiError(200, 'Missing parameter (id is required for retrieving an NFO)');
                 }
 
-                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
+                UserRequest::addApiRequest($uid, $request->getRequestUri());
                 $rel = Release::query()->where('guid', $request->input('id'))->first(['id', 'searchname']);
 
                 if ($rel) {
@@ -341,7 +353,7 @@ class ApiController extends BasePageController
                     return response('Missing parameter (file is required for adding an NZB)', 400);
                 }
 
-                UserRequest::addApiRequest($apiKey, $request->getRequestUri());
+                UserRequest::addApiRequest($uid, $request->getRequestUri());
 
                 $nzbFile = $request->file('file');
 
@@ -398,14 +410,19 @@ class ApiController extends BasePageController
             'Type' => $type,
         ];
 
-        // Generate the XML Response
-        $response = (new XML_Response($options))->returnXML();
+        $xmlResponse = new XML_Response($options);
 
         if ($xml) {
+            // Generate XML response
+            $response = $xmlResponse->returnXML();
             header('Content-type: text/xml');
         } else {
-            // JSON encode the XMLWriter response
-            $response = json_encode(xml_to_array($response), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES);
+            // Build JSON directly from array (avoids expensive XML->xml_to_array->json_encode path)
+            $arrayData = $xmlResponse->returnArray();
+            if ($arrayData === false) {
+                return showApiError(201);
+            }
+            $response = json_encode($arrayData, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
             header('Content-type: application/json');
         }
         if ($response === false) {
@@ -419,7 +436,7 @@ class ApiController extends BasePageController
 
     /**
      * Collect and return various capability information for usage in API.
-     *
+     * Cached for 10 minutes to avoid repeated Settings DB lookups on every API response.
      *
      * @return array<string, mixed>
      *
@@ -427,35 +444,42 @@ class ApiController extends BasePageController
      */
     public function getForMenu(): array
     {
-        $serverroot = url('/');
+        $includeCats = $this->type === 'caps';
 
-        return [
-            'server' => [
-                'title' => config('app.name'),
-                'strapline' => Settings::settingValue('strapline'),
-                'email' => config('mail.from.address'),
-                'meta' => Settings::settingValue('metakeywords'),
-                'url' => $serverroot,
-                'image' => $serverroot.'/assets/images/tmux_logo.png',
-            ],
-            'limits' => [
-                'max' => 100,
-                'default' => 100,
-            ],
-            'registration' => [
-                'available' => 'yes',
-                'open' => (int) Settings::settingValue('registerstatus') === 0 ? 'yes' : 'no',
-            ],
-            'searching' => [
-                'search' => ['available' => 'yes', 'supportedParams' => 'q'],
-                'tv-search' => ['available' => 'yes', 'supportedParams' => 'q,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
-                'movie-search' => ['available' => 'yes', 'supportedParams' => 'q,imdbid, tmdbid, traktid'],
-                'audio-search' => ['available' => 'no',  'supportedParams' => ''],
-            ],
-            'categories' => $this->type === 'caps'
-                ? Category::getForMenu()
-                : null,
-        ];
+        // Cache the server info blob (without categories) for 10 minutes
+        $serverInfo = Cache::remember('api_v1_server_menu', 600, function () {
+            $serverroot = url('/');
+
+            return [
+                'server' => [
+                    'title' => config('app.name'),
+                    'strapline' => Settings::settingValue('strapline'),
+                    'email' => config('mail.from.address'),
+                    'meta' => Settings::settingValue('metakeywords'),
+                    'url' => $serverroot,
+                    'image' => $serverroot.'/assets/images/tmux_logo.png',
+                ],
+                'limits' => [
+                    'max' => 100,
+                    'default' => 100,
+                ],
+                'registration' => [
+                    'available' => 'yes',
+                    'open' => (int) Settings::settingValue('registerstatus') === 0 ? 'yes' : 'no',
+                ],
+                'searching' => [
+                    'search' => ['available' => 'yes', 'supportedParams' => 'q'],
+                    'tv-search' => ['available' => 'yes', 'supportedParams' => 'q,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
+                    'movie-search' => ['available' => 'yes', 'supportedParams' => 'q,imdbid, tmdbid, traktid'],
+                    'audio-search' => ['available' => 'no',  'supportedParams' => ''],
+                ],
+            ];
+        });
+
+        // Only load categories for caps requests (also cached via Category::getForMenu)
+        $serverInfo['categories'] = $includeCats ? Category::getForMenu() : null;
+
+        return $serverInfo;
     }
 
     /**
@@ -554,6 +578,27 @@ class ApiController extends BasePageController
         if ($request->has($parameter) && $request->isNotFilled($parameter)) {
             return showApiError(201, 'Incorrect parameter ('.$parameter.' must not be empty)');
         }
+    }
+
+    /**
+     * Get cached user stats (API requests + download counts/timestamps) in a single query.
+     * Cached for 60 seconds to reduce DB hits across rapid API calls.
+     */
+    public function getCachedUserStats(int $userId): object
+    {
+        $cacheKey = 'api_user_stats:'.$userId;
+
+        return Cache::remember($cacheKey, 60, function () use ($userId) {
+            $oneDayAgo = now()->subDay()->toDateTimeString();
+
+            return DB::selectOne('
+                SELECT
+                    (SELECT COUNT(*) FROM user_requests WHERE users_id = ? AND timestamp > ?) as api_count,
+                    (SELECT COUNT(*) FROM user_downloads WHERE users_id = ? AND timestamp > ?) as grab_count,
+                    (SELECT MIN(timestamp) FROM user_requests WHERE users_id = ? AND timestamp > ?) as api_time,
+                    (SELECT MIN(timestamp) FROM user_downloads WHERE users_id = ? AND timestamp > ?) as grab_time
+            ', [$userId, $oneDayAgo, $userId, $oneDayAgo, $userId, $oneDayAgo, $userId, $oneDayAgo]);
+        });
     }
 
     public function addCoverURL(mixed &$releases, callable $getCoverURL): void

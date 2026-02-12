@@ -49,5 +49,10 @@ if (config('nntmux.purge_inactive_users') === true) {
     Schedule::job(new RemoveInactiveAccounts)->daily();
     Schedule::job(new PurgeDeletedAccounts)->daily();
 }
+// Cleanup old API requests and download logs (older than 1 day) - deferred from inline API calls
+Schedule::call(function () {
+    \App\Models\UserRequest::clearApiRequests(false);
+    \App\Models\UserDownload::where('timestamp', '<', now()->subDay())->delete();
+})->name('cleanup-api-request-logs')->hourly()->withoutOverlapping();
 // Check tmux health and auto-restart if monitor pane is dead
 Schedule::command('tmux:health-check --auto-restart')->everyThirtyMinutes()->withoutOverlapping();

@@ -11,19 +11,19 @@
             Here lives the documentation for the API for accessing NZB and index data. API functions can be called by either
             logged in users, or by providing an API key.
         </p>
-        @if($loggedin ?? false)
+        @auth
             <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6 border border-gray-200 dark:border-gray-700 dark:bg-gray-700 dark:border-gray-600">
                 <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                     <i class="fa fa-key mr-2 text-gray-600 dark:text-gray-400"></i>Your API Credentials
                 </h4>
                 <div class="flex rounded-md shadow-sm" x-data="copyToClipboard()">
-                    <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white" value="apikey={{ $userdata->api_token }}" readonly id="apikeyInput">
+                    <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white" value="apikey={{ auth()->user()->api_token }}" readonly id="apikeyInput">
                     <button class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" x-on:click="copy('apikeyInput')" title="Copy to clipboard" x-bind:class="copied ? 'text-green-600' : ''">
                         <i class="fa" x-bind:class="copied ? 'fa-check' : 'fa-copy'"></i>
                     </button>
                 </div>
             </div>
-        @endif
+        @endauth
         <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
             <i class="fa fa-plug mr-2 text-gray-600 dark:text-gray-400"></i>Available Functions
         </h4>
@@ -72,16 +72,23 @@
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex flex-col gap-2">
-                                @if($loggedin ?? false)
-                                <a href="{{ url('/api/v1/api?t=search&q=linux&apikey=' . $userdata->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
+                                @auth
+                                <a href="{{ url('/api/v1/api?t=search&q=linux&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
                                     <i class="fa fa-external-link-alt mr-1"></i>
                                     <code class="text-blue-700 dark:text-blue-400">?t=search&amp;q=linux</code>
                                 </a>
-                                <a href="{{ url('/api/v1/api?t=search&cat=' . $catClass::GAME_ROOT . ',' . $catClass::MOVIE_ROOT . '&apikey=' . $userdata->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
+                                <a href="{{ url('/api/v1/api?t=search&cat=' . $catClass::GAME_ROOT . ',' . $catClass::MOVIE_ROOT . '&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
                                     <i class="fa fa-external-link-alt mr-1"></i>
                                     <code class="text-blue-700 dark:text-blue-400">?t=search&amp;cat={{ $catClass::GAME_ROOT }},{{ $catClass::MOVIE_ROOT }}</code>
                                 </a>
-                                @endif
+                                @else
+                                <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+                                    <code>?t=search&amp;q=linux</code>
+                                </span>
+                                <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+                                    <code>?t=search&amp;cat={{ $catClass::GAME_ROOT }},{{ $catClass::MOVIE_ROOT }}</code>
+                                </span>
+                                @endauth
                             </div>
                         </td>
                     </tr>
@@ -104,12 +111,16 @@
                             </div>
                         </td>
                         <td class="px-6 py-4">
-                            @if($loggedin ?? false)
-                            <a href="{{ url('/api/v1/api?t=tvsearch&q=law%20and%20order&season=7&ep=12&apikey=' . $userdata->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
+                            @auth
+                            <a href="{{ url('/api/v1/api?t=tvsearch&q=law%20and%20order&season=7&ep=12&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
                                 <i class="fa fa-external-link-alt mr-1"></i>
                                 <code class="text-blue-700 dark:text-blue-400">?t=tvsearch&amp;q=law and order&amp;season=7&amp;ep=12</code>
                             </a>
-                            @endif
+                            @else
+                            <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+                                <code>?t=tvsearch&amp;q=law and order&amp;season=7&amp;ep=12</code>
+                            </span>
+                            @endauth
                         </td>
                     </tr>
                     <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700">
@@ -126,24 +137,32 @@
                             </div>
                         </td>
                         <td class="px-6 py-4">
-                            @if($loggedin ?? false)
-                            <a href="{{ url('/api/v1/api?t=movie&imdbid=1418646&apikey=' . $userdata->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
+                            @auth
+                            <a href="{{ url('/api/v1/api?t=movie&imdbid=1418646&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
                                 <i class="fa fa-external-link-alt mr-1"></i>
                                 <code class="text-blue-700 dark:text-blue-400">?t=movie&amp;imdbid=1418646</code>
                             </a>
-                            @endif
+                            @else
+                            <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+                                <code>?t=movie&amp;imdbid=1418646</code>
+                            </span>
+                            @endauth
                         </td>
                     </tr>
                     <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700">
                         <td class="px-6 py-4"><strong class="text-gray-900 dark:text-gray-100 dark:text-white">Details</strong></td>
                         <td class="px-6 py-4"><span class="text-gray-700 dark:text-gray-300">Returns detailed information about an NZB.</span></td>
                         <td class="px-6 py-4">
-                            @if($loggedin ?? false)
-                            <a href="{{ url('/api/v1/api?t=details&id=9ca52909ba9b9e5e6758d815fef4ecda&apikey=' . $userdata->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
+                            @auth
+                            <a href="{{ url('/api/v1/api?t=details&id=9ca52909ba9b9e5e6758d815fef4ecda&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
                                 <i class="fa fa-external-link-alt mr-1"></i>
                                 <code class="text-blue-700 dark:text-blue-400">?t=details&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</code>
                             </a>
-                            @endif
+                            @else
+                            <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+                                <code>?t=details&amp;id=&lt;guid&gt;</code>
+                            </span>
+                            @endauth
                         </td>
                     </tr>
                     <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700">
@@ -154,24 +173,32 @@
                             </span>
                         </td>
                         <td class="px-6 py-4">
-                            @if($loggedin ?? false)
-                            <a href="{{ url('/api/v1/api?t=info&id=9ca52909ba9b9e5e6758d815fef4ecda&apikey=' . $userdata->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
+                            @auth
+                            <a href="{{ url('/api/v1/api?t=info&id=9ca52909ba9b9e5e6758d815fef4ecda&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
                                 <i class="fa fa-external-link-alt mr-1"></i>
                                 <code class="text-blue-700 dark:text-blue-400">?t=info&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</code>
                             </a>
-                            @endif
+                            @else
+                            <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+                                <code>?t=info&amp;id=&lt;guid&gt;</code>
+                            </span>
+                            @endauth
                         </td>
                     </tr>
                     <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700">
                         <td class="px-6 py-4"><strong class="text-gray-900 dark:text-gray-100 dark:text-white">Get</strong></td>
                         <td class="px-6 py-4"><span class="text-gray-700 dark:text-gray-300">Downloads the NZB file associated with an ID.</span></td>
                         <td class="px-6 py-4">
-                            @if($loggedin ?? false)
-                            <a href="{{ url('/api/v1/api?t=get&id=9ca52909ba9b9e5e6758d815fef4ecda&apikey=' . $userdata->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
+                            @auth
+                            <a href="{{ url('/api/v1/api?t=get&id=9ca52909ba9b9e5e6758d815fef4ecda&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
                                 <i class="fa fa-external-link-alt mr-1"></i>
                                 <code class="text-blue-700 dark:text-blue-400">?t=get&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</code>
                             </a>
-                            @endif
+                            @else
+                            <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+                                <code>?t=get&amp;id=&lt;guid&gt;</code>
+                            </span>
+                            @endauth
                         </td>
                     </tr>
                 </tbody>

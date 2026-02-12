@@ -66,18 +66,20 @@ class UserRequest extends Model
 
     /**
      * Get the quantity of API requests in the last day for the users_id.
-     *
+     * Note: Old request cleanup is no longer done inline to avoid blocking API responses.
+     * Use clearApiRequests() via a scheduled command or queue job instead.
      *
      * @throws \Exception
      * @throws \Throwable
      */
     public static function getApiRequests(int $userID): int
     {
-        // Clear old requests.
-        self::clearApiRequests($userID);
-        $requests = self::query()->where('users_id', $userID)->count('id');
+        $requests = self::query()
+            ->where('users_id', $userID)
+            ->where('timestamp', '>', now()->subDay())
+            ->count('id');
 
-        return ! $requests ? 0 : $requests;
+        return $requests ?: 0;
     }
 
     /**
@@ -117,12 +119,16 @@ class UserRequest extends Model
     /**
      * If a user accesses the API, log it.
      *
-     * @param  string  $token  API token of the user
+     * @param  string|int  $tokenOrUserId  API token string or user ID integer
      * @param  string  $request  The API request.
      */
-    public static function addApiRequest(string $token, string $request): void
+    public static function addApiRequest(string|int $tokenOrUserId, string $request): void
     {
-        $userID = User::query()->select(['id'])->where('api_token', $token)->value('id');
+        if (is_int($tokenOrUserId)) {
+            $userID = $tokenOrUserId;
+        } else {
+            $userID = User::query()->select(['id'])->where('api_token', $tokenOrUserId)->value('id');
+        }
         self::query()->insert(['users_id' => $userID, 'request' => $request, 'timestamp' => now()]);
     }
 
