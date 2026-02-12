@@ -8,50 +8,62 @@ use App\Models\Content;
 use App\Models\Settings;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class GlobalDataComposer
 {
     /**
+     * Cache TTL in seconds (5 minutes).
+     */
+    private const CACHE_TTL = 300;
+
+    /**
      * Bind data to the view.
      */
     public function compose(View $view): void
     {
-        $viewName = $view->getName() ?? '';
-        $isEmailView = str_starts_with($viewName, 'emails.');
-
-        // Load settings as array with type conversions (empty strings -> null, numeric strings -> numbers)
-        $siteArray = Settings::query()
-            ->pluck('value', 'name')
-            ->map(fn ($value) => Settings::convertValue($value))
-            ->all();
+        // Cached site settings (shared across all requests)
+        $siteArray = Cache::remember('site_settings_array', self::CACHE_TTL, function () {
+            return Settings::query()
+                ->pluck('value', 'name')
+                ->map(fn ($value) => Settings::convertValue($value))
+                ->all();
+        });
 
         $viewData = [
             'serverroot' => url('/'),
+            'site' => $siteArray,
         ];
 
-        // Email views expect $site to be the string provided by the mailable
-        if (! $isEmailView) {
-            $viewData['site'] = $siteArray;  // Now it's a proper array, not a Settings model
-        }
-
-        // Load useful links for sidebar
-        $usefulLinks = Content::active()
-            ->ofType(Content::TYPE_USEFUL)
-            ->orderBy('ordinal')
-            ->get();
-        $viewData['usefulLinks'] = $usefulLinks;
+        // Cached useful links for sidebar
+        $viewData['usefulLinks'] = Cache::remember('content_useful_links', self::CACHE_TTL, function () {
+            return Content::active()
+                ->ofType(Content::TYPE_USEFUL)
+                ->orderBy('ordinal')
+                ->get();
+        });
 
         if (Auth::check()) {
-            $userdata = User::find(Auth::id());
-            $userdata->categoryexclusions = User::getCategoryExclusionById(Auth::id());
+            $userId = Auth::id();
 
-            // Update last login every 15 mins.
+            // User data with category exclusions (short cache per user)
+            $userdata = Cache::remember('composer_user_'.$userId, self::CACHE_TTL, function () use ($userId) {
+                $user = User::find($userId);
+                $user->categoryexclusions = User::getCategoryExclusionById($userId);
+
+                return $user;
+            });
+
+            // Update last login every 3 hours (outside of cache to avoid stale checks)
             if (now()->subHours(3) > $userdata->lastlogin) {
                 event(new UserLoggedIn($userdata));
             }
 
-            $parentcatlist = Category::getForMenu($userdata->categoryexclusions);
+            // Cached menu categories per user (depends on their exclusions)
+            $parentcatlist = Cache::remember('menu_user_'.$userId, self::CACHE_TTL, function () use ($userdata) {
+                return Category::getForMenu($userdata->categoryexclusions);
+            });
 
             $viewData = array_merge($viewData, [
                 'userdata' => $userdata,

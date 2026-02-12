@@ -15,8 +15,11 @@
     --radius-card: 0.75rem;
 }
 
-/* Import FontAwesome */
-@import '@fortawesome/fontawesome-free/css/all.min.css';
+/* Import FontAwesome — only the weights we use (skips v4-compat font + shims) */
+@import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
+@import '@fortawesome/fontawesome-free/css/solid.min.css';
+@import '@fortawesome/fontawesome-free/css/regular.min.css';
+@import '@fortawesome/fontawesome-free/css/brands.min.css';
 
 /* Import custom CSP-safe styles */
 @import './csp-safe.css';

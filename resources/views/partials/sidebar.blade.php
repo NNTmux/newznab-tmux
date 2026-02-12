@@ -3,7 +3,7 @@
     <div class="sidebar-section">
         <button class="sidebar-toggle w-full flex items-center justify-between px-4 py-3 text-white hover:bg-gray-800 rounded-lg transition" data-target="submenu1">
             <div class="flex items-center">
-                <i class="fa fa-dashboard fa-fw mr-3"></i>
+                <i class="fas fa-tachometer-alt fa-fw mr-3"></i>
                 <span>Browse</span>
             </div>
             <i class="fas fa-chevron-down text-xs transition-transform"></i>

@@ -27,8 +27,14 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useTailwind();
 
-        // Share global data with all views using View Composer
-        view()->composer('*', \App\View\Composers\GlobalDataComposer::class);
+        // Share global data only with layouts and partials that need it
+        // (avoids running queries for emails, components, and other minimal views)
+        view()->composer([
+            'layouts.main',
+            'layouts.admin',
+            'layouts.guest',
+            'layouts.app',
+        ], \App\View\Composers\GlobalDataComposer::class);
 
         Gate::define('viewPulse', function (User $user) {
             return $user->hasRole('Admin');

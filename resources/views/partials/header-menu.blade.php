@@ -254,7 +254,7 @@
                                 <i class="fa fa-user fa-fw mr-2"></i>Profile
                             </a>
                             <a href="{{ route('logout') }}" data-logout class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white">
-                                <i class="fa fa-sign-out fa-fw mr-2"></i>Sign Out
+                                <i class="fas fa-sign-out-alt fa-fw mr-2"></i>Sign Out
                             </a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
                                 @csrf

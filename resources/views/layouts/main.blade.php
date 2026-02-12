@@ -100,59 +100,27 @@
     @include('partials.back-to-top')
 
     <!-- Theme Toggle -->
+    @php $themePreference = auth()->check() ? (auth()->user()->theme_preference ?? 'light') : 'light'; @endphp
     <button id="theme-toggle" class="fixed z-50 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-full shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-200 flex items-center gap-2 touch-target bottom-[max(1rem,env(safe-area-inset-bottom))] left-[max(1rem,env(safe-area-inset-left))]"
-            title="{{ ucfirst(auth()->check() ? (auth()->user()->theme_preference ?? 'light') : 'light') }} Mode">
-        <i id="theme-icon" class="fas
-            @if(auth()->check())
-                @if((auth()->user()->theme_preference ?? 'light') === 'dark')
-                    fa-moon
-                @elseif((auth()->user()->theme_preference ?? 'light') === 'system')
-                    fa-desktop
-                @else
-                    fa-sun
-                @endif
-            @else
-                fa-sun
-            @endif
-        "></i>
-        <span id="theme-label" class="text-xs font-medium hidden sm:inline">
-            @if(auth()->check())
-                {{ ucfirst(auth()->user()->theme_preference ?? 'light') }}
-            @else
-                Light
-            @endif
-        </span>
+            title="{{ ucfirst($themePreference) }} Mode">
+        <i id="theme-icon" class="fas {{ $themePreference === 'dark' ? 'fa-moon' : ($themePreference === 'system' ? 'fa-desktop' : 'fa-sun') }}"></i>
+        <span id="theme-label" class="text-xs font-medium hidden sm:inline">{{ ucfirst($themePreference) }}</span>
     </button>
 
-    <!-- Confirmation Modal -->
+    <!-- Confirmation Modal (used on many pages) -->
     @include('partials.confirmation-modal')
-
-    <!-- File List Modal -->
-    @include('partials.filelist-modal')
-
-    <!-- NFO Modal -->
-    @include('partials.nfo-modal')
-
-    <!-- Preview/Sample Image Modal -->
-    @include('partials.preview-modal')
-
-    <!-- Media Info Modal -->
-    @include('partials.mediainfo-modal')
-
-    <!-- Image Modal -->
-    @include('partials.image-modal')
-
-    <!-- Shared Report Modal (single instance for all report-trigger buttons) -->
-    @include('partials.report-modal')
 
     <!-- Toast Notifications (Alpine.js CSP Safe) -->
     @include('partials.toast-notifications')
+
+    {{-- Release-specific modals: pushed by pages that show releases --}}
+    @stack('modals')
 
     @stack('scripts')
 
     <!-- Theme Management Data (moved to csp-safe.js) -->
     <div id="current-theme-data"
-         data-theme="{{ auth()->check() ? (auth()->user()->theme_preference ?? 'light') : 'light' }}"
+         data-theme="{{ $themePreference }}"
          data-authenticated="{{ auth()->check() ? 'true' : 'false' }}"
          data-update-url="{{ route('profile.update-theme') }}"
          style="display: none;">

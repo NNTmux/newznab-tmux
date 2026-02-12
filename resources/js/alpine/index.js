@@ -1,6 +1,10 @@
 /**
  * Alpine.js CSP-safe initialization
- * Registers all stores and components, then starts Alpine.
+ *
+ * Core components are imported eagerly (used on every/most pages).
+ * Page-specific and heavy components are lazy-loaded: only the modules
+ * whose x-data names appear in the current page's DOM are fetched.
+ * This keeps the initial JS bundle small and improves TTI.
  */
 import Alpine from '@alpinejs/csp';
 
@@ -12,7 +16,7 @@ import './stores/theme.js';
 import './stores/toast.js';
 import './stores/cart.js';
 
-// --- Core UI components ---
+// --- Core UI components (used on every/most pages) ---
 import './components/theme-toggle.js';
 import './components/back-to-top.js';
 import './components/dropdown.js';
@@ -20,36 +24,12 @@ import './components/sidebar-toggle.js';
 import './components/admin-submenu.js';
 import './components/mobile-nav.js';
 import './components/password-toggle.js';
-
-// --- Modal components ---
 import './components/confirm-modal.js';
-import './components/nfo-modal.js';
-import './components/image-modal.js';
-import './components/preview-modal.js';
-import './components/mediainfo-modal.js';
-import './components/filelist-modal.js';
-
-// --- Feature components ---
+import './components/confirm-link.js';
+import './components/toast-notification.js';
 import './components/tab-switcher.js';
 import './components/cart-button.js';
-import './components/cart-page.js';
 import './components/search-autocomplete.js';
-import './components/quality-filter.js';
-import './components/content-toggle.js';
-import './components/movies-layout.js';
-import './components/movies-page.js';
-import './components/confirm-link.js';
-
-// --- Page-specific components ---
-import './components/release-report.js';
-import './components/profile-edit.js';
-import './components/auth-page.js';
-import './components/toast-notification.js';
-
-// --- Admin components ---
-import './components/admin/dashboard.js';
-import './components/admin/groups.js';
-import './components/admin/features.js';
 
 // --- Shared utility (backward compat) ---
 window.escapeHtml = function(text) {
@@ -57,5 +37,6 @@ window.escapeHtml = function(text) {
     return String(text).replace(/[&<>"']/g, m => map[m]);
 };
 
-// Start Alpine
-Alpine.start();
+// --- Lazy-load page-specific components, then start Alpine ---
+import { loadAndStart } from './lazy-loader.js';
+loadAndStart();

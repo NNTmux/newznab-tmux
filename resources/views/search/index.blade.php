@@ -1,5 +1,9 @@
 @extends('layouts.main')
 
+@push('modals')
+    @include('partials.release-modals')
+@endpush
+
 @section('content')
 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
     <div class="mb-6">
