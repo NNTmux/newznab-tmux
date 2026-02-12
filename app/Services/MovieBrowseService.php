@@ -75,16 +75,25 @@ class MovieBrowseService
             return $cached;
         }
 
-        // Step 1: Count total distinct movies matching filters
-        // Use LPAD to convert movieinfo.imdbid (int) to the zero-padded varchar format
-        // stored in releases.imdbid, so the index on r.imdbid can be used for the join.
-        $countSql = 'SELECT COUNT(DISTINCT m.imdbid) AS total '
-            .'FROM movieinfo m '
-            .'INNER JOIN releases r ON r.imdbid = LPAD(m.imdbid, 7, \'0\') '
-            .'WHERE '.$baseWhere;
+        // Step 1: Count total distinct movies matching filters.
+        // Cached separately with a longer TTL (30 min) since the total changes slowly
+        // and this query scans all 84K+ movieinfo rows joined to releases (~0.5s).
+        $countCacheKey = md5('movie_count_'.$baseWhere);
+        $totalCount = Cache::get($countCacheKey);
 
-        $totalResult = DB::select($countSql);
-        $totalCount = $totalResult[0]->total ?? 0;
+        if ($totalCount === null) {
+            // Use LPAD to convert movieinfo.imdbid (int) to the zero-padded varchar format
+            // stored in releases.imdbid, so the index on r.imdbid can be used for the join.
+            $countSql = 'SELECT COUNT(DISTINCT m.imdbid) AS total '
+                .'FROM movieinfo m '
+                .'INNER JOIN releases r ON r.imdbid = LPAD(m.imdbid, 7, \'0\') '
+                .'WHERE '.$baseWhere;
+
+            $totalResult = DB::select($countSql);
+            $totalCount = $totalResult[0]->total ?? 0;
+
+            Cache::put($countCacheKey, $totalCount, now()->addMinutes(30));
+        }
 
         if ($totalCount === 0) {
             return collect();
