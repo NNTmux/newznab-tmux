@@ -90,18 +90,37 @@ class MovieBrowseService
             return collect();
         }
 
-        // Step 2: Get paginated movie list with only needed columns
+        // Step 2: Get paginated movie list using two-phase subquery.
+        // Inner query aggregates by just imdbid (small temp table, fast filesort on ~53K
+        // narrow rows instead of 53K wide rows with TEXT columns like plot/genre/actors).
+        // Outer query joins back to movieinfo for full details on only the top N movies.
+        $isAggregateOrder = ($order[0] === 'MAX(r.postdate)'); // @phpstan-ignore offsetAccess.notFound
+
+        if ($isAggregateOrder) {
+            $innerOrderBy = 'latest_postdate';
+            $innerExtraGroupBy = '';
+            $outerOrderBy = 'stats.latest_postdate';
+        } else {
+            // orderField is like 'm.title', 'm.year', 'm.rating'
+            $innerOrderBy = $order[0]; // @phpstan-ignore offsetAccess.notFound
+            $innerExtraGroupBy = ', '.$order[0]; // @phpstan-ignore offsetAccess.notFound
+            $outerOrderBy = $order[0]; // @phpstan-ignore offsetAccess.notFound
+        }
+
         $moviesSql = 'SELECT m.imdbid, m.tmdbid, m.traktid, m.title, m.year, m.rating, '
             .'m.plot, m.genre, m.director, m.actors, m.cover, '
-            .'MAX(r.postdate) AS latest_postdate, '
-            .'COUNT(r.id) AS total_releases '
+            .'stats.latest_postdate, stats.total_releases '
+            .'FROM ('
+            .'SELECT m.imdbid, MAX(r.postdate) AS latest_postdate, COUNT(r.id) AS total_releases '
             .'FROM movieinfo m '
             .'INNER JOIN releases r ON r.imdbid = LPAD(m.imdbid, 7, \'0\') '
             .'WHERE '.$baseWhere.' '
-            .'GROUP BY m.imdbid, m.tmdbid, m.traktid, m.title, m.year, m.rating, '
-            .'m.plot, m.genre, m.director, m.actors, m.cover '
-            ."ORDER BY {$order[0]} {$order[1]} " // @phpstan-ignore offsetAccess.notFound
-            ."LIMIT {$num} OFFSET {$start}";
+            .'GROUP BY m.imdbid'.$innerExtraGroupBy.' '
+            ."ORDER BY {$innerOrderBy} {$order[1]} " // @phpstan-ignore offsetAccess.notFound
+            ."LIMIT {$num} OFFSET {$start}"
+            .') stats '
+            .'INNER JOIN movieinfo m ON m.imdbid = stats.imdbid '
+            ."ORDER BY {$outerOrderBy} {$order[1]}"; // @phpstan-ignore offsetAccess.notFound
 
         $movies = MovieInfo::fromQuery($moviesSql);
 
