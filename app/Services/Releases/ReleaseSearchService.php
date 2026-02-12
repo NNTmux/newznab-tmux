@@ -1254,7 +1254,7 @@ class ReleaseSearchService
                     $count = 0;
                 }
 
-                // Cap the count at max results if applicable
+                // Cap the count at max results to prevent extremely large pagers
                 if ($maxResults > 0 && $count > $maxResults) {
                     $count = $maxResults;
                 }
@@ -1301,25 +1301,14 @@ class ReleaseSearchService
         $countQuery = preg_replace('/LIMIT\s+\d+(\s+OFFSET\s+\d+)?$/is', '', $countQuery);
 
         try {
-            // If max results is set and query might return too many results
-            if ($maxResults > 0) {
-                // First check if count would exceed max
-                $testQuery = sprintf('SELECT 1 FROM (%s) as test LIMIT %d',
-                    preg_replace('/SELECT\s+COUNT.+?\s+FROM/is', 'SELECT 1 FROM', $countQuery),
-                    $maxResults + 1
-                );
-
-                $testResult = DB::select($testQuery);
-                if (count($testResult) > $maxResults) {
-                    Cache::put($cacheKey, $maxResults, now()->addMinutes($cacheExpiry));
-
-                    return $maxResults;
-                }
-            }
-
-            // Execute the count query
+            // Execute the count query directly
             $result = DB::select($countQuery);
             $count = isset($result[0]) ? (int) $result[0]->count : 0;
+
+            // Cap the count at max results to prevent extremely large pagers
+            if ($maxResults > 0 && $count > $maxResults) {
+                $count = $maxResults;
+            }
 
             // Cache the result
             Cache::put($cacheKey, $count, now()->addMinutes($cacheExpiry));
@@ -1336,15 +1325,13 @@ class ReleaseSearchService
 
                     $fallbackQuery = sprintf('SELECT COUNT(*) as count FROM releases r %s', trim($conditions));
 
-                    if ($maxResults > 0) {
-                        $fallbackQuery = sprintf('SELECT COUNT(*) as count FROM (SELECT 1 FROM releases r %s LIMIT %d) as limited',
-                            trim($conditions),
-                            $maxResults
-                        );
-                    }
-
                     $result = DB::select($fallbackQuery);
                     $count = isset($result[0]) ? (int) $result[0]->count : 0;
+
+                    // Cap the count at max results
+                    if ($maxResults > 0 && $count > $maxResults) {
+                        $count = $maxResults;
+                    }
 
                     Cache::put($cacheKey, $count, now()->addMinutes($cacheExpiry));
 

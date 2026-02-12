@@ -219,53 +219,22 @@ class ReleaseBrowseService
         $whereSql = 'WHERE '.implode(' AND ', $conditions);
 
         try {
-            // For queries with maxResults limit, use sample-based counting
-            if ($maxResults > 0) {
-                // Quick check using a small sample (1000 rows) to determine if we should
-                // just return maxResults or do a full count
-                $sampleLimit = min(1000, $maxResults);
-
-                if ($needsGroupJoin) {
-                    // Need JOIN for group filtering
-                    $sampleQuery = sprintf(
-                        'SELECT r.id FROM releases r INNER JOIN usenet_groups g ON g.id = r.groups_id %s ORDER BY r.id DESC LIMIT %d',
-                        $whereSql,
-                        $sampleLimit
-                    );
-                } else {
-                    // No JOIN needed - much faster query on releases table only
-                    $sampleQuery = sprintf(
-                        'SELECT r.id FROM releases r %s ORDER BY r.id DESC LIMIT %d',
-                        $whereSql,
-                        $sampleLimit
-                    );
-                }
-
-                $sampleResult = DB::select($sampleQuery);
-                $sampleCount = count($sampleResult);
-
-                // If we got the full sample, assume there are more rows than maxResults
-                if ($sampleCount >= $sampleLimit) {
-                    Cache::put($cacheKey, $maxResults, now()->addMinutes($cacheExpiry * 2));
-
-                    return $maxResults;
-                }
-
-                // Fewer than sample limit - this is the actual count
-                $count = $sampleCount;
+            // Always do accurate count query
+            if ($needsGroupJoin) {
+                $query = sprintf(
+                    'SELECT COUNT(r.id) AS count FROM releases r INNER JOIN usenet_groups g ON g.id = r.groups_id %s',
+                    $whereSql
+                );
             } else {
-                // No max limit set, need full count
-                if ($needsGroupJoin) {
-                    $query = sprintf(
-                        'SELECT COUNT(r.id) AS count FROM releases r INNER JOIN usenet_groups g ON g.id = r.groups_id %s',
-                        $whereSql
-                    );
-                } else {
-                    // No JOIN needed - simple count on releases table
-                    $query = sprintf('SELECT COUNT(r.id) AS count FROM releases r %s', $whereSql);
-                }
-                $result = DB::select($query);
-                $count = isset($result[0]) ? (int) $result[0]->count : 0;
+                // No JOIN needed - simple count on releases table
+                $query = sprintf('SELECT COUNT(r.id) AS count FROM releases r %s', $whereSql);
+            }
+            $result = DB::select($query);
+            $count = isset($result[0]) ? (int) $result[0]->count : 0;
+
+            // Cap at max results to prevent extremely large pagers
+            if ($maxResults > 0 && $count > $maxResults) {
+                $count = $maxResults;
             }
 
             // Cache with longer expiry for count queries
@@ -532,7 +501,7 @@ class ReleaseBrowseService
                     $count = 0;
                 }
 
-                // Cap the count at max results if applicable
+                // Cap the count at max results to prevent extremely large pagers
                 if ($maxResults > 0 && $count > $maxResults) {
                     $count = $maxResults;
                 }
@@ -579,25 +548,14 @@ class ReleaseBrowseService
         $countQuery = preg_replace('/LIMIT\s+\d+(\s+OFFSET\s+\d+)?$/is', '', $countQuery);
 
         try {
-            // If max results is set and query might return too many results
-            if ($maxResults > 0) {
-                // First check if count would exceed max
-                $testQuery = sprintf('SELECT 1 FROM (%s) as test LIMIT %d',
-                    preg_replace('/SELECT\s+COUNT.+?\s+FROM/is', 'SELECT 1 FROM', $countQuery),
-                    $maxResults + 1
-                );
-
-                $testResult = DB::select($testQuery);
-                if (count($testResult) > $maxResults) {
-                    Cache::put($cacheKey, $maxResults, now()->addMinutes($cacheExpiry));
-
-                    return $maxResults;
-                }
-            }
-
             // Execute the count query
             $result = DB::select($countQuery);
             $count = isset($result[0]) ? (int) $result[0]->count : 0;
+
+            // Cap the count at max results to prevent extremely large pagers
+            if ($maxResults > 0 && $count > $maxResults) {
+                $count = $maxResults;
+            }
 
             // Cache the result
             Cache::put($cacheKey, $count, now()->addMinutes($cacheExpiry));
@@ -614,15 +572,13 @@ class ReleaseBrowseService
 
                     $fallbackQuery = sprintf('SELECT COUNT(*) as count FROM releases r %s', trim($conditions));
 
-                    if ($maxResults > 0) {
-                        $fallbackQuery = sprintf('SELECT COUNT(*) as count FROM (SELECT 1 FROM releases r %s LIMIT %d) as limited',
-                            trim($conditions),
-                            $maxResults
-                        );
-                    }
-
                     $result = DB::select($fallbackQuery);
                     $count = isset($result[0]) ? (int) $result[0]->count : 0;
+
+                    // Cap the count at max results
+                    if ($maxResults > 0 && $count > $maxResults) {
+                        $count = $maxResults;
+                    }
 
                     Cache::put($cacheKey, $count, now()->addMinutes($cacheExpiry));
 
