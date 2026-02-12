@@ -142,6 +142,9 @@
     <!-- Image Modal -->
     @include('partials.image-modal')
 
+    <!-- Shared Report Modal (single instance for all report-trigger buttons) -->
+    @include('partials.report-modal')
+
     <!-- Toast Notifications (Alpine.js CSP Safe) -->
     @include('partials.toast-notifications')
 

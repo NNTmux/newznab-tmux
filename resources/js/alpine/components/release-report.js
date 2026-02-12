@@ -112,61 +112,36 @@ Alpine.data('adminReleaseReports', () => ({
 
 /**
  * Document-level delegation for .report-trigger buttons.
- * Handles the report modal open/close/submit flow for buttons without x-data.
+ * Uses a single shared modal (#shared-report-modal) rendered once in the layout,
+ * instead of per-element modals (which duplicated ~80 lines of HTML per release).
  */
-document.addEventListener('click', function(e) {
-    var reportTrigger = e.target.closest('.report-trigger');
-    if (!reportTrigger) return;
-
-    e.preventDefault();
-    e.stopPropagation();
-    var container = reportTrigger.closest('.report-button-container');
-    if (!container) return;
-    var modal = container.querySelector('.report-modal');
-    if (!modal) return;
-    // Skip if already handled by Alpine x-data
-    if (modal.hasAttribute('x-data')) return;
-
-    var releaseId = reportTrigger.getAttribute('data-report-release-id');
-    var reasonSelect = modal.querySelector('.report-reason');
-    var descriptionTextarea = modal.querySelector('.report-description');
-    var charCount = modal.querySelector('.report-char-count');
-    var submitButton = modal.querySelector('.report-submit');
-    var errorDiv = modal.querySelector('.report-error');
-    var successDiv = modal.querySelector('.report-success');
-    var closeButtons = modal.querySelectorAll('.report-modal-close');
-    var backdrop = modal.querySelector('.report-modal-backdrop');
-    var reportLabel = reportTrigger.querySelector('.report-label');
-    var flagIcon = reportTrigger.querySelector('i');
-
-    // Reset and show
-    if (errorDiv) errorDiv.classList.add('hidden');
-    if (successDiv) successDiv.classList.add('hidden');
-    if (reasonSelect) reasonSelect.value = '';
-    if (descriptionTextarea) descriptionTextarea.value = '';
-    if (charCount) charCount.textContent = '0/1000 characters';
-    if (submitButton) submitButton.disabled = true;
-    modal.classList.remove('hidden');
-
-    var hasReported = false;
+(function() {
+    var modal = null;
+    var reasonSelect, descriptionTextarea, charCount, submitButton, errorDiv, successDiv;
+    var currentTrigger = null;
     var isSubmitting = false;
 
-    function closeReportModal() {
-        modal.classList.add('hidden');
-        if (hasReported) {
-            reportTrigger.disabled = true;
-            reportTrigger.classList.add('opacity-50', 'cursor-not-allowed');
-            if (flagIcon) flagIcon.classList.add('text-red-500');
-            if (reportLabel) reportLabel.textContent = 'Reported';
-        }
-    }
+    function getModal() {
+        if (modal) return modal;
+        modal = document.getElementById('shared-report-modal');
+        if (!modal) return null;
+        reasonSelect = modal.querySelector('.report-reason');
+        descriptionTextarea = modal.querySelector('.report-description');
+        charCount = modal.querySelector('.report-char-count');
+        submitButton = modal.querySelector('.report-submit');
+        errorDiv = modal.querySelector('.report-error');
+        successDiv = modal.querySelector('.report-success');
 
-    if (!modal._bridgeWired) {
-        modal._bridgeWired = true;
-        closeButtons.forEach(function(btn) { btn.addEventListener('click', function(ev) { ev.preventDefault(); closeReportModal(); }); });
-        if (backdrop) backdrop.addEventListener('click', closeReportModal);
+        // Wire up events once
+        modal.querySelectorAll('.report-modal-close').forEach(function(btn) {
+            btn.addEventListener('click', function(ev) { ev.preventDefault(); closeModal(); });
+        });
+        var backdrop = modal.querySelector('.report-modal-backdrop');
+        if (backdrop) backdrop.addEventListener('click', closeModal);
         if (descriptionTextarea && charCount) {
-            descriptionTextarea.addEventListener('input', function() { charCount.textContent = this.value.length + '/1000 characters'; });
+            descriptionTextarea.addEventListener('input', function() {
+                charCount.textContent = this.value.length + '/1000 characters';
+            });
         }
         if (reasonSelect && submitButton) {
             reasonSelect.addEventListener('change', function() { submitButton.disabled = !this.value; });
@@ -175,32 +150,85 @@ document.addEventListener('click', function(e) {
             submitButton.addEventListener('click', function(ev) {
                 ev.preventDefault();
                 ev.stopPropagation();
-                if (isSubmitting || !reasonSelect || !reasonSelect.value) return;
-                isSubmitting = true;
-                submitButton.disabled = true;
-                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Submitting...';
-                if (errorDiv) errorDiv.classList.add('hidden');
-                if (successDiv) successDiv.classList.add('hidden');
-
-                var csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
-                fetch('/release-report', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
-                    body: JSON.stringify({ release_id: releaseId, reason: reasonSelect.value, description: descriptionTextarea ? descriptionTextarea.value : '' })
-                })
-                .then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); })
-                .then(function(result) {
-                    if (result.ok && result.data.success) {
-                        if (successDiv) { successDiv.querySelector('p').textContent = result.data.message; successDiv.classList.remove('hidden'); }
-                        hasReported = true;
-                        setTimeout(closeReportModal, 2000);
-                    } else {
-                        if (errorDiv) { errorDiv.querySelector('p').textContent = result.data.message || 'An error occurred.'; errorDiv.classList.remove('hidden'); }
-                    }
-                })
-                .catch(function() { if (errorDiv) { errorDiv.querySelector('p').textContent = 'Network error.'; errorDiv.classList.remove('hidden'); } })
-                .finally(function() { isSubmitting = false; if (submitButton) { submitButton.disabled = !reasonSelect.value; submitButton.innerHTML = 'Submit Report'; } });
+                submitReport();
             });
         }
+        return modal;
     }
-});
+
+    function closeModal() {
+        if (modal) modal.classList.add('hidden');
+    }
+
+    function markTriggerReported(trigger) {
+        if (!trigger) return;
+        trigger.disabled = true;
+        trigger.classList.add('opacity-50', 'cursor-not-allowed');
+        var icon = trigger.querySelector('i');
+        if (icon) icon.classList.add('text-red-500');
+        var label = trigger.querySelector('.report-label');
+        if (label) label.textContent = 'Reported';
+    }
+
+    function submitReport() {
+        if (isSubmitting || !reasonSelect || !reasonSelect.value) return;
+        var releaseId = modal.getAttribute('data-release-id');
+        if (!releaseId) return;
+
+        isSubmitting = true;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Submitting...';
+        if (errorDiv) errorDiv.classList.add('hidden');
+        if (successDiv) successDiv.classList.add('hidden');
+
+        var csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+        var triggerRef = currentTrigger;
+
+        fetch('/release-report', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+            body: JSON.stringify({ release_id: releaseId, reason: reasonSelect.value, description: descriptionTextarea ? descriptionTextarea.value : '' })
+        })
+        .then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); })
+        .then(function(result) {
+            if (result.ok && result.data.success) {
+                if (successDiv) { successDiv.querySelector('p').textContent = result.data.message; successDiv.classList.remove('hidden'); }
+                markTriggerReported(triggerRef);
+                setTimeout(closeModal, 2000);
+            } else {
+                if (errorDiv) { errorDiv.querySelector('p').textContent = result.data.message || 'An error occurred.'; errorDiv.classList.remove('hidden'); }
+            }
+        })
+        .catch(function() { if (errorDiv) { errorDiv.querySelector('p').textContent = 'Network error.'; errorDiv.classList.remove('hidden'); } })
+        .finally(function() { isSubmitting = false; if (submitButton) { submitButton.disabled = !reasonSelect.value; submitButton.innerHTML = 'Submit Report'; } });
+    }
+
+    document.addEventListener('click', function(e) {
+        var trigger = e.target.closest('.report-trigger');
+        if (!trigger) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        var m = getModal();
+        if (!m) return;
+
+        var releaseId = trigger.getAttribute('data-report-release-id');
+        if (!releaseId) return;
+
+        // Store current trigger and set release ID on the shared modal
+        currentTrigger = trigger;
+        m.setAttribute('data-release-id', releaseId);
+
+        // Reset form state
+        if (errorDiv) errorDiv.classList.add('hidden');
+        if (successDiv) successDiv.classList.add('hidden');
+        if (reasonSelect) reasonSelect.value = '';
+        if (descriptionTextarea) descriptionTextarea.value = '';
+        if (charCount) charCount.textContent = '0/1000 characters';
+        if (submitButton) { submitButton.disabled = true; submitButton.innerHTML = 'Submit Report'; }
+        isSubmitting = false;
+
+        m.classList.remove('hidden');
+    });
+})();
