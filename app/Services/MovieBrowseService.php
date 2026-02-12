@@ -76,9 +76,11 @@ class MovieBrowseService
         }
 
         // Step 1: Count total distinct movies matching filters
+        // Use LPAD to convert movieinfo.imdbid (int) to the zero-padded varchar format
+        // stored in releases.imdbid, so the index on r.imdbid can be used for the join.
         $countSql = 'SELECT COUNT(DISTINCT m.imdbid) AS total '
             .'FROM movieinfo m '
-            .'INNER JOIN releases r ON r.imdbid = m.imdbid '
+            .'INNER JOIN releases r ON r.imdbid = LPAD(m.imdbid, 7, \'0\') '
             .'WHERE '.$baseWhere;
 
         $totalResult = DB::select($countSql);
@@ -94,7 +96,7 @@ class MovieBrowseService
             .'MAX(r.postdate) AS latest_postdate, '
             .'COUNT(r.id) AS total_releases '
             .'FROM movieinfo m '
-            .'INNER JOIN releases r ON r.imdbid = m.imdbid '
+            .'INNER JOIN releases r ON r.imdbid = LPAD(m.imdbid, 7, \'0\') '
             .'WHERE '.$baseWhere.' '
             .'GROUP BY m.imdbid, m.tmdbid, m.traktid, m.title, m.year, m.rating, '
             .'m.plot, m.genre, m.director, m.actors, m.cover '
