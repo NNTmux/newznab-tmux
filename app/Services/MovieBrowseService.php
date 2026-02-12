@@ -25,7 +25,7 @@ class MovieBrowseService
      * Uses three separate queries instead of GROUP_CONCAT:
      * 1. COUNT query for total results (replaces SQL_CALC_FOUND_ROWS)
      * 2. Paginated movie list with only needed columns
-     * 3. Top 2 releases per movie using ROW_NUMBER() window function
+     * 3. Top 2 releases per movie using UNION ALL with LIMIT 2 per imdbid
      *
      * @param  array<string, mixed>  $cat
      * @param  array<string, mixed>  $excludedCats
@@ -35,18 +35,30 @@ class MovieBrowseService
         $page = max(1, $page);
         $start = max(0, $start);
 
-        $catsrch = '';
+        // Build effective category filter: merge inclusion and exclusion into a single IN clause
+        // to avoid redundant IN + NOT IN predicates and help the optimizer
+        $catArray = [];
         if (count($cat) > 0 && $cat[0] !== -1) { // @phpstan-ignore offsetAccess.notFound
-            $catsrch = Category::getCategorySearch($cat);
+            $catArray = (array) (Category::getCategorySearch($cat, null, true) ?? []);
+        }
+
+        if (! empty($catArray) && ! empty($excludedCats)) {
+            $catArray = array_values(array_diff($catArray, array_map('intval', $excludedCats)));
+        }
+
+        if (! empty($catArray)) {
+            $catFilter = ' AND r.categories_id IN ('.implode(',', $catArray).') ';
+            $whereExcluded = '';
+        } else {
+            $catFilter = '';
+            $whereExcluded = count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : '';
         }
 
         $order = $this->getMovieOrder($orderBy);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
 
         $whereAge = $maxAge > 0 ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ' : '';
-        $whereExcluded = count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : '';
         $browseBy = $this->getBrowseBy();
-        $catFilter = ! empty($catsrch) ? $catsrch.' ' : '';
 
         $baseWhere = "m.title != '' AND m.imdbid != '0000000' "
             ."AND r.passwordstatus {$this->showPasswords} "
@@ -97,24 +109,28 @@ class MovieBrowseService
 
         // Build list of movie IMDB IDs for release query
         $movieImdbIds = $movies->pluck('imdbid')->toArray();
-        $inMovieIds = implode(',', array_map('intval', $movieImdbIds));
 
-        // Step 3: Get top 2 releases per movie using ROW_NUMBER() window function
-        $releasesSql = 'SELECT ranked.id, ranked.imdbid, ranked.guid, ranked.searchname, '
-            .'ranked.size, ranked.postdate, ranked.adddate, ranked.haspreview '
-            .'FROM ( '
-            .'SELECT r.id, r.imdbid, r.guid, r.searchname, r.size, r.postdate, r.adddate, r.haspreview, '
-            .'ROW_NUMBER() OVER (PARTITION BY r.imdbid ORDER BY r.postdate DESC) AS rn '
-            .'FROM releases r '
-            ."WHERE r.imdbid IN ({$inMovieIds}) "
-            ."AND r.passwordstatus {$this->showPasswords} "
-            .$catFilter
-            .$whereAge
-            .$whereExcluded
-            .') ranked '
-            .'WHERE ranked.rn <= 2 '
-            .'ORDER BY ranked.imdbid, ranked.postdate DESC';
+        // Step 3: Get top 2 releases per movie using UNION ALL with LIMIT 2 per imdbid.
+        // Each subquery does an index lookup on imdbid and stops after 2 rows,
+        // avoiding the full-table-scan + ROW_NUMBER() materialization of millions of rows.
+        // IMDB IDs are quoted as strings with leading-zero padding to match the
+        // varchar format stored in releases.imdbid (e.g. '0099348'), preventing
+        // implicit type casts that would bypass index usage.
+        $unionParts = [];
+        foreach ($movieImdbIds as $id) {
+            $quotedId = "'".str_pad((string) intval($id), 7, '0', STR_PAD_LEFT)."'";
+            $unionParts[] = '(SELECT r.id, r.imdbid, r.guid, r.searchname, '
+                .'r.size, r.postdate, r.adddate, r.haspreview '
+                .'FROM releases r '
+                ."WHERE r.imdbid = {$quotedId} "
+                ."AND r.passwordstatus {$this->showPasswords} "
+                .$catFilter
+                .$whereExcluded
+                .$whereAge
+                .'ORDER BY r.postdate DESC LIMIT 2)';
+        }
 
+        $releasesSql = implode(' UNION ALL ', $unionParts);
         $releases = DB::select($releasesSql);
 
         // Group releases by imdbid for fast lookup
@@ -150,7 +166,7 @@ class MovieBrowseService
 
         $sql = 'SELECT r.id, r.guid, r.searchname, r.size, r.postdate, r.adddate, r.haspreview '
             .'FROM releases r '
-            .'WHERE r.imdbid = '.intval($imdbid).' '
+            ."WHERE r.imdbid = '".str_pad((string) intval($imdbid), 7, '0', STR_PAD_LEFT)."' "
             ."AND r.passwordstatus {$this->showPasswords} "
             .$whereExcluded.' '
             .'ORDER BY r.postdate DESC';
