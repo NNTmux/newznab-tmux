@@ -1,7 +1,6 @@
 import './bootstrap';
 
-// Import CSP-safe styles
-import '../css/csp-safe.css';
+// CSP-safe styles are loaded via resources/css/app.css (no duplicate import here)
 
 // Import Alpine.js CSP-safe components (replaces old csp-safe.js modules)
 import './alpine/index.js';
