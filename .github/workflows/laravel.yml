@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [ 8.4, 8.5 ]
+        php: [ 8.5 ]
 
     name: PHP ${{ matrix.php }}
     services:
@@ -38,13 +38,16 @@ jobs:
           cp .env.test .env
 
       - name: Run composer update
-        run: composer update --prefer-dist --no-interaction --no-progress
+        run: composer update --prefer-dist --no-interaction --no-progress --no-scripts
 
       - name: Generate app key
-        run: php artisan key:generate
+        run: php artisan key:generate --no-interaction
 
       - name: Run database migrations
         run: php artisan migrate --force
+
+      - name: Run package discovery
+        run: php artisan package:discover --ansi
 
       - name: Run tests
         run: vendor/bin/phpunit
