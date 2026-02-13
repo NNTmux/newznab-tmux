@@ -271,7 +271,7 @@ class InvitationController extends BasePageController
     public function cleanup(): JsonResponse
     {
         // Check if user is admin
-        if (! auth()->user()->hasRole('admin')) {
+        if (! auth()->user()->hasRole('Admin')) {
             abort(403, 'Unauthorized');
         }
 
