@@ -33,8 +33,7 @@ jobs:
       - name: Generate app key
         run: |
           APP_KEY=$(php -r "echo 'base64:' . base64_encode(random_bytes(32));")
-          sed -i "s/APP_KEY=.*/APP_KEY=$APP_KEY/" .env
-
+          sed -i "s|APP_KEY=.*|APP_KEY=$APP_KEY|" .env
 
       - name: Run tests
         run: vendor/bin/phpunit
