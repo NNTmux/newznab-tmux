@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [ 8.3, 8.4 ]
+        php: [ 8.4, 8.5 ]
 
     name: PHP ${{ matrix.php }}
     services:
@@ -30,7 +30,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, pdo_mysql
           coverage: none
 
       - name: Copy env file
@@ -42,6 +42,9 @@ jobs:
 
       - name: Generate app key
         run: php artisan key:generate
+
+      - name: Run database migrations
+        run: php artisan migrate --force
 
       - name: Run tests
         run: vendor/bin/phpunit
