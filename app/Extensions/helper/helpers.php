@@ -2,7 +2,6 @@
 
 use App\Models\Country as CountryModel;
 use App\Models\Release;
-use App\Models\XxxInfo;
 use App\Services\Nzb\NzbService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
@@ -39,45 +38,7 @@ if (! function_exists('getRawHtml')) {
             }
         }
 
-        // For adult sites, use age verification manager if available
-        if ($isAdultSite && class_exists('\App\Services\AdultProcessing\AgeVerificationManager')) {
-            try {
-                static $ageVerificationManager = null;
-                if ($ageVerificationManager === null) {
-                    $ageVerificationManager = new \App\Services\AdultProcessing\AgeVerificationManager;
-                }
-
-                if ($postData !== null) {
-                    // Handle POST requests
-                    $cookieJar = $ageVerificationManager->getCookieJar($url);
-                    $client = new Client([
-                        'cookies' => $cookieJar,
-                        'headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'],
-                    ]);
-
-                    $response = $client->post($url, ['form_params' => $postData]);
-                    $response = $response->getBody()->getContents();
-                } else {
-                    $response = $ageVerificationManager->makeRequest($url);
-                }
-
-                if ($response !== false) {
-                    $jsonResponse = json_decode($response, true);
-                    if (json_last_error() === JSON_ERROR_NONE) {
-                        return $jsonResponse;
-                    }
-
-                    return $response;
-                }
-            } catch (\Exception $e) {
-                // Fall through to standard method
-                if (function_exists('config') && config('app.debug') === true) {
-                    Log::error('Age verification failed, falling back to standard method: '.$e->getMessage());
-                }
-            }
-        }
-
-        // Standard method for non-adult sites or if age verification fails
+        // Standard method
         $cookieJar = new CookieJar;
         $client = new Client(['headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246']]);
         if ($cookie !== false && $cookie !== null && $cookie !== '') {
@@ -120,10 +81,6 @@ if (! function_exists('makeFieldLinks')) {
         foreach ($tmpArr as $ta) {
             if (trim($ta) === '') {
                 continue;
-            }
-            if ($type === 'xxx' && $field === 'genre') {
-                $ta = XxxInfo::getGenres(true, (int) $ta);
-                $ta = $ta['title'] ?? '';
             }
             if ($i > 7) {
                 break;
@@ -492,7 +449,6 @@ if (! function_exists('getReleaseCover')) {
         $consoleinfo_id = $getValue($release, 'consoleinfo_id');
         $bookinfo_id = $getValue($release, 'bookinfo_id');
         $gamesinfo_id = $getValue($release, 'gamesinfo_id');
-        $xxxinfo_id = $getValue($release, 'xxxinfo_id');
         $anidbid = $getValue($release, 'anidbid');
 
         if (! empty($imdbid) && $imdbid > 0) {
@@ -510,9 +466,6 @@ if (! function_exists('getReleaseCover')) {
         } elseif (! empty($gamesinfo_id)) {
             $coverType = 'games';
             $coverId = $gamesinfo_id;
-        } elseif (! empty($xxxinfo_id)) {
-            $coverType = 'xxx';
-            $coverId = $xxxinfo_id;
         } elseif (! empty($anidbid) && $anidbid > 0) {
             $coverType = 'anime';
             $coverId = $anidbid;
@@ -970,9 +923,6 @@ if (! function_exists('getRange')) {
     function getRange(mixed $tableName): \Illuminate\Contracts\Pagination\LengthAwarePaginator // @phpstan-ignore missingType.generics
     {
         $range = \Illuminate\Support\Facades\DB::table($tableName);
-        if ($tableName === 'xxxinfo') {
-            $range->selectRaw('UNCOMPRESS(plot) AS plot');
-        }
 
         return $range->orderByDesc('created_at')->paginate(config('nntmux.items_per_page'));
     }

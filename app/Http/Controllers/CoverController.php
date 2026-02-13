@@ -18,7 +18,7 @@ class CoverController extends Controller
     public function show(string $type, string $filename)
     {
         // Validate cover type
-        $validTypes = ['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies', 'music', 'preview', 'sample', 'tvrage', 'video', 'xxx', 'tvshows'];
+        $validTypes = ['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies', 'music', 'preview', 'sample', 'tvrage', 'video', 'tvshows'];
 
         if (! in_array($type, $validTypes)) {
             abort(404);

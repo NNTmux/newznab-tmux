@@ -431,20 +431,6 @@
                             </select>
                             <p class="mt-1 text-sm text-gray-500">Whether to attempt to lookup game information from Amazon.</p>
                         </div>
-
-                        <div>
-                            <label for="lookupxxx" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-video mr-1"></i>Lookup XXX
-                            </label>
-                            <select id="lookupxxx" name="lookupxxx" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($yesno['ids'] as $index => $yesnoId)
-                                    <option value="{{ $yesnoId }}" {{ ($site['lookupxxx'] ?? '') == $yesnoId ? 'selected' : '' }}>
-                                        {{ $yesno['names'][$index] }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <p class="mt-1 text-sm text-gray-500">Whether to attempt to lookup XXX information when processing binaries.</p>
-                        </div>
                     </div>
                 </div>
 
@@ -876,15 +862,6 @@
                             <input type="text" id="maxbooksprocessed" name="maxbooksprocessed" value="{{ $site['maxbooksprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             <p class="mt-1 text-sm text-gray-500">The maximum amount of books to process with amazon per run. This does not use an NNTP connection</p>
-                        </div>
-
-                        <div>
-                            <label for="maxxxxprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-video mr-1"></i>Maximum XXX Per Run
-                            </label>
-                            <input type="text" id="maxxxxprocessed" name="maxxxxprocessed" value="{{ $site['maxxxxprocessed'] ?? '' }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                            <p class="mt-1 text-sm text-gray-500">The maximum amount of XXX to process per run.</p>
                         </div>
 
                         <div>

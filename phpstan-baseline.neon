@@ -391,18 +391,6 @@ parameters:
 			path: app/Models/UserActivityStat.php
 
 		-
-			message: '#^Method App\\Models\\XxxInfo\:\:getAllGenres\(\) should return array\<string, mixed\> but returns list\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Models/XxxInfo.php
-
-		-
-			message: '#^Method App\\Models\\XxxInfo\:\:getGenres\(\) should return array\<string, mixed\> but returns App\\Models\\Genre\|null\.$#'
-			identifier: return.type
-			count: 2
-			path: app/Models/XxxInfo.php
-
-		-
 			message: '#^Method App\\Services\\AdditionalProcessing\\ArchiveExtractionService\:\:extractViaSevenZip\(\) should return list\<string\> but returns array\{success\: false, files\: array\{\}, hasPassword\: false, passwordStatus\: 0\}\.$#'
 			identifier: return.type
 			count: 2
@@ -461,18 +449,6 @@ parameters:
 			identifier: return.phpDocType
 			count: 1
 			path: app/Services/AdditionalProcessing/NzbContentParser.php
-
-		-
-			message: '#^Method App\\Services\\AdultProcessing\\AgeVerificationManager\:\:getStoredDomains\(\) should return array\<string, mixed\> but returns list\<string\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/AdultProcessing/AgeVerificationManager.php
-
-		-
-			message: '#^PHPDoc tag @return with type list\<string\> is incompatible with native type bool\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: app/Services/AdultProcessing/AgeVerificationManager.php
 
 		-
 			message: '#^Method App\\Services\\Archives\\SevenZipPartialParser\:\:getFilesByExtension\(\) should return array\<int, array\<string, mixed\>\> but returns array\<string, mixed\>\.$#'
@@ -779,12 +755,6 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: app/Services/XrefService.php
-
-		-
-			message: '#^Method App\\Services\\XxxBrowseService\:\:getXXXOrder\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/XxxBrowseService.php
 
 		-
 			message: '#^Method App\\Support\\UpdatePerformanceHelper\:\:checkSystemResources\(\) should return array\<string, mixed\> but returns list\<string\>\.$#'

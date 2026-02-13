@@ -359,16 +359,15 @@ class TmuxOutput extends Tmux
             'XXX',
             sprintf(
                 '%s(%s)',
-                number_format($this->runVar['counts']['now']['processxxx']),
-                $this->runVar['counts']['diff']['processxxx']
+                '0',
+                '0'
             ),
             sprintf(
                 '%s(%d%%)',
-                number_format($this->runVar['counts']['now']['xxx']),
-                $this->runVar['counts']['percent']['xxx']
+                number_format($this->runVar['counts']['now']['xxx'] ?? 0),
+                $this->runVar['counts']['percent']['xxx'] ?? 0
             )
         );
-
         $buffer .= $this->_getSeparator();
 
         $buffer .= sprintf(

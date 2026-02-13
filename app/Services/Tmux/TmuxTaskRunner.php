@@ -319,7 +319,6 @@ class TmuxTaskRunner
             'tv' => $this->runTvTask($runVar),
             'movies' => $this->runMoviesTask($runVar),
             'amazon' => $this->runAmazonTask($runVar),
-            'xxx' => $this->runXXXTask($runVar),
             'scraper' => $this->runIRCScraper($runVar),
             // Legacy mapping for backward compatibility
             'nonamazon' => $this->runTvTask($runVar),
@@ -778,33 +777,5 @@ class TmuxTaskRunner
         $fullCommand = "{$allCommands}; date +'%Y-%m-%d %T'; {$sleepCommand}";
 
         return $this->paneManager->respawnPane($pane, $fullCommand);
-    }
-
-    /**
-     * Run XXX post-processing
-     *
-     * @param  array<string, mixed>  $runVar
-     */
-    protected function runXXXTask(array $runVar): bool
-    {
-        $enabled = (int) ($runVar['settings']['processxxx'] ?? 0);
-        $pane = '2.4';
-
-        if ($enabled !== 1) {
-            return $this->disablePane($pane, 'Post-process XXX', 'disabled in settings');
-        }
-
-        $hasWork = (int) ($runVar['counts']['now']['processxxx'] ?? 0) > 0;
-
-        if (! $hasWork) {
-            return $this->disablePane($pane, 'Post-process XXX', 'no XXX releases to process');
-        }
-
-        $niceness = Settings::settingValue('niceness') ?? 2;
-        $command = "nice -n{$niceness} ".PHP_BINARY.' artisan update:postprocess xxx true';
-        $sleep = (int) ($runVar['settings']['post_timer_amazon'] ?? 300);
-        $command = $this->buildCommand($command, ['log_pane' => 'post_xxx', 'sleep' => $sleep]);
-
-        return $this->paneManager->respawnPane($pane, $command);
     }
 }

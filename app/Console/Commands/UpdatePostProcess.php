@@ -16,7 +16,7 @@ class UpdatePostProcess extends Command
      * @var string
      */
     protected $signature = 'update:postprocess
-                            {type : Type (all, nfo, movies, tv, music, console, games, book, anime, xxx, additional, amazon)}
+                            {type : Type (all, nfo, movies, tv, music, console, games, book, anime, additional, amazon)}
                             {echo? : Echo output (true/false, default: true)}';
 
     /**
@@ -43,7 +43,6 @@ class UpdatePostProcess extends Command
         'music' => false,
         'nfo' => true,
         'tv' => false,
-        'xxx' => false,
     ];
 
     public function __construct(
@@ -80,7 +79,6 @@ class UpdatePostProcess extends Command
                 'book' => $this->postProcessService->processBooks(),
                 'anime' => $this->postProcessService->processAnime(),
                 'tv' => $this->postProcessService->processTv(),
-                'xxx' => $this->postProcessService->processXXX(),
                 'additional' => $this->postProcessService->processAdditional(),
             };
 
@@ -108,13 +106,12 @@ class UpdatePostProcess extends Command
         $this->line('  book        - Processes books');
         $this->line('  anime       - Processes anime');
         $this->line('  tv          - Processes tv');
-        $this->line('  xxx         - Processes xxx');
         $this->line('  additional  - Processes previews/mediainfo/etc...');
-        $this->line('  amazon      - Processes books, music, console, games, and xxx');
+        $this->line('  amazon      - Processes books, music, console, and games');
     }
 
     /**
-     * Process amazon types (books, music, console, games, xxx).
+     * Process amazon types (books, music, console, games).
      */
     private function processAmazon(): void
     {
@@ -122,7 +119,6 @@ class UpdatePostProcess extends Command
         $this->postProcessService->processMusic();
         $this->postProcessService->processConsoles();
         $this->postProcessService->processGames();
-        $this->postProcessService->processXXX();
     }
 
     /**

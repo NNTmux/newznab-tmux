@@ -253,41 +253,6 @@
                 </div>
             @endif
 
-            <!-- XXX Information -->
-            @if(!empty($xxx))
-                @php
-                    $xxxData = is_object($xxx) ? get_object_vars($xxx) : $xxx;
-                    $xxxTitle = $xxxData['title'] ?? ($xxx->title ?? null);
-                    $xxxGenre = $xxxData['genre'] ?? ($xxx->genre ?? null);
-                    $xxxActors = $xxxData['actors'] ?? ($xxx->actors ?? null);
-                @endphp
-                <div class="bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900 dark:to-pink-900 rounded-lg p-6 border border-red-100 dark:border-red-800">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-exclamation-triangle mr-2 text-red-600 dark:text-red-400"></i> Adult Content Information
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        @if(!empty($xxxTitle))
-                            <div>
-                                <dt class="text-sm font-medium text-gray-600 dark:text-gray-400">Title</dt>
-                                <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $xxxTitle }}</dd>
-                            </div>
-                        @endif
-                        @if(!empty($xxxGenre))
-                            <div class="md:col-span-2">
-                                <dt class="text-sm font-medium text-gray-600 dark:text-gray-400">Genre</dt>
-                                <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{!! $xxxGenre !!}</dd>
-                            </div>
-                        @endif
-                        @if(!empty($xxxActors))
-                            <div class="md:col-span-2">
-                                <dt class="text-sm font-medium text-gray-600 dark:text-gray-400">Actors</dt>
-                                <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{!! $xxxActors !!}</dd>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            @endif
-
             <!-- Music Information -->
             @if(!empty($music))
                 @php

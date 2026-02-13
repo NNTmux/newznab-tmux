@@ -16,7 +16,6 @@ use dariusiii\rarinfo\Par2Info;
  * - NFO processing
  * - Movie/TV/Anime lookups
  * - Music/Books/Games/Console processing
- * - XXX content processing
  * - Additional processing (RAR/ZIP contents, samples, etc.)
  */
 final class PostProcessService
@@ -51,8 +50,6 @@ final class PostProcessService
 
     private readonly AnimeProcessor $animeProcessor;
 
-    private readonly XXXProcessor $xxxProcessor;
-
     public function __construct(
         ?NameFixingService $nameFixingService = null,
         ?Par2Info $par2Info = null,
@@ -66,7 +63,6 @@ final class PostProcessService
         ?ConsolesProcessor $consolesProcessor = null,
         ?GamesProcessor $gamesProcessor = null,
         ?AnimeProcessor $animeProcessor = null,
-        ?XXXProcessor $xxxProcessor = null,
     ) {
         $this->echoOutput = (bool) config('nntmux.echocli');
         $this->addPar2 = (bool) config('nntmux_settings.add_par2');
@@ -92,7 +88,6 @@ final class PostProcessService
         $this->consolesProcessor = $consolesProcessor ?? new ConsolesProcessor($this->echoOutput);
         $this->gamesProcessor = $gamesProcessor ?? new GamesProcessor($this->echoOutput);
         $this->animeProcessor = $animeProcessor ?? new AnimeProcessor($this->echoOutput);
-        $this->xxxProcessor = $xxxProcessor ?? new XXXProcessor($this->echoOutput);
     }
 
     /**
@@ -110,7 +105,6 @@ final class PostProcessService
         $this->processGames();
         $this->processAnime();
         $this->processTv();
-        $this->processXXX();
         $this->processBooks();
     }
 
@@ -228,16 +222,6 @@ final class PostProcessService
         } else {
             $this->tvProcessor->process($groupID, $guidChar, $processTV, $mode);
         }
-    }
-
-    /**
-     * Process XXX releases.
-     *
-     * @throws \Exception
-     */
-    public function processXXX(): void
-    {
-        $this->xxxProcessor->process();
     }
 
     /**

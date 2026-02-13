@@ -40,7 +40,6 @@ class TmuxLayoutBuilder
         'postprocessing_tv' => '󰟴 TV/Anime',
         'postprocessing_amazon' => ' Amazon',
         'postprocessing_movies' => ' Movies',
-        'postprocessing_xxx' => '󰞋 XXX',
 
         // IRC
         'scrapeIRC' => '󰻞 IRC Scraper',
@@ -125,7 +124,6 @@ class TmuxLayoutBuilder
         // Right side: After left splits, right side is now 2.3
         $this->paneManager->selectPane('2.3');
         $this->paneManager->setPaneTitle('2.3', $this->getPaneDisplayName('postprocessing_movies'));
-        $this->paneManager->splitVertical('2', '50%', $this->getPaneDisplayName('postprocessing_xxx'));
 
         // Window 3: IRC Scraper
         $this->createIRCScraperWindow();
@@ -171,7 +169,6 @@ class TmuxLayoutBuilder
         // Right side: After left splits, right side is now 2.3
         $this->paneManager->selectPane('2.3');
         $this->paneManager->setPaneTitle('2.3', $this->getPaneDisplayName('postprocessing_movies'));
-        $this->paneManager->splitVertical('2', '50%', $this->getPaneDisplayName('postprocessing_xxx'));
 
         // Window 3: IRC Scraper
         $this->createIRCScraperWindow();

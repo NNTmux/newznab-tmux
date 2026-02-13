@@ -87,7 +87,6 @@ class RecategorizeReleases extends Command
                         'gamesinfo_id' => 0,
                         'bookinfo_id' => 0,
                         'anidbid' => null,
-                        'xxxinfo_id' => 0,
                         'categories_id' => $catId['categories_id'],
                     ]);
 

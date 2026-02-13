@@ -13,7 +13,6 @@ use App\Models\ReleaseReport;
 use App\Models\Settings;
 use App\Models\UserDownload;
 use App\Models\Video;
-use App\Models\XxxInfo;
 use App\Services\AnidbService;
 use App\Services\BookService;
 use App\Services\ConsoleService;
@@ -22,7 +21,6 @@ use App\Services\MovieService;
 use App\Services\MusicService;
 use App\Services\ReleaseExtraService;
 use App\Services\Releases\ReleaseSearchService;
-use App\Services\XxxBrowseService;
 use Illuminate\Http\Request;
 
 class DetailsController extends BasePageController
@@ -31,20 +29,16 @@ class DetailsController extends BasePageController
 
     private MovieService $movieService;
 
-    private XxxBrowseService $xxxBrowseService;
-
     private ReleaseExtraService $releaseExtraService;
 
     public function __construct(
         ReleaseSearchService $releaseSearchService,
         MovieService $movieService,
-        XxxBrowseService $xxxBrowseService,
         ReleaseExtraService $releaseExtraService
     ) {
         parent::__construct();
         $this->releaseSearchService = $releaseSearchService;
         $this->movieService = $movieService;
-        $this->xxxBrowseService = $xxxBrowseService;
         $this->releaseExtraService = $releaseExtraService;
     }
 
@@ -104,24 +98,6 @@ class DetailsController extends BasePageController
             }
         }
 
-        $xxx = '';
-        if ($data['xxxinfo_id'] !== '' && $data['xxxinfo_id'] !== 0) {
-            $xxx = XxxInfo::getXXXInfo($data['xxxinfo_id']);
-
-            if (isset($xxx['trailers'])) {
-                $xxx['trailers'] = $this->xxxBrowseService->insertSwf($xxx['classused'], $xxx['trailers']);
-            }
-
-            if ($xxx && isset($xxx['title'])) {
-                $xxx['title'] = str_replace(['/', '\\'], '', $xxx['title']);
-                $xxx['actors'] = makeFieldLinks($xxx, 'actors', 'xxx');
-                $xxx['genre'] = makeFieldLinks($xxx, 'genre', 'xxx');
-                $xxx['director'] = makeFieldLinks($xxx, 'director', 'xxx');
-            } else {
-                $xxx = false;
-            }
-        }
-
         $game = '';
         if (! empty($data['gamesinfo_id'])) {
             $game = (new GamesService)->getGamesInfoById($data['gamesinfo_id']);
@@ -176,7 +152,6 @@ class DetailsController extends BasePageController
             'nfo' => $nfo,
             'show' => $showInfo,
             'movie' => $mov,
-            'xxx' => $xxx,
             'anidb' => $AniDBAPIArray,
             'music' => $mus,
             'con' => $con,

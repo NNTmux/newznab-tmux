@@ -149,7 +149,7 @@ class ProfileController extends BasePageController
                         $request->has('movieview') ? 1 : 0,
                         $request->has('musicview') ? 1 : 0,
                         $request->has('gameview') ? 1 : 0,
-                        $request->has('xxxview') ? 1 : 0,
+                        $this->userdata->xxxview ? 1 : 0,
                         $request->has('consoleview') ? 1 : 0,
                         $request->has('bookview') ? 1 : 0,
                         'None',

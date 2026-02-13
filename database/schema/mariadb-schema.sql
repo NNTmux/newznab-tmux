@@ -893,7 +893,6 @@ CREATE TABLE `releases` (
   `videos_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'FK to videos.id of the parent series.',
   `tv_episodes_id` int(11) NOT NULL DEFAULT 0 COMMENT 'FK to tv_episodes.id for the episode.',
   `imdbid` varchar(100) DEFAULT NULL,
-  `xxxinfo_id` int(11) NOT NULL DEFAULT 0,
   `musicinfo_id` int(11) DEFAULT NULL COMMENT 'FK to musicinfo.id',
   `consoleinfo_id` int(11) DEFAULT NULL COMMENT 'FK to consoleinfo.id',
   `gamesinfo_id` int(11) NOT NULL DEFAULT 0,
@@ -938,7 +937,6 @@ CREATE TABLE `releases` (
   KEY `ix_releases_videos_id` (`videos_id`),
   KEY `ix_releases_tv_episodes_id` (`tv_episodes_id`),
   KEY `ix_releases_imdbid` (`imdbid`),
-  KEY `ix_releases_xxxinfo_id` (`xxxinfo_id`),
   KEY `ix_releases_consoleinfo_id` (`consoleinfo_id`),
   KEY `ix_releases_gamesinfo_id` (`gamesinfo_id`),
   KEY `ix_releases_bookinfo_id` (`bookinfo_id`),
@@ -1290,29 +1288,6 @@ CREATE TABLE `videos_aliases` (
   PRIMARY KEY (`videos_id`,`title`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 
-DROP TABLE IF EXISTS `xxxinfo`;
-
-CREATE TABLE `xxxinfo` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `title` varchar(1024) NOT NULL,
-  `tagline` varchar(1024) NOT NULL,
-  `plot` blob DEFAULT NULL,
-  `genre` varchar(255) NOT NULL,
-  `director` varchar(255) DEFAULT NULL,
-  `actors` varchar(2500) NOT NULL,
-  `extras` text DEFAULT NULL,
-  `productinfo` text DEFAULT NULL,
-  `trailers` text DEFAULT NULL,
-  `directurl` varchar(2000) NOT NULL,
-  `classused` varchar(20) NOT NULL DEFAULT '',
-  `cover` tinyint(1) NOT NULL DEFAULT 0,
-  `backdrop` tinyint(1) NOT NULL DEFAULT 0,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ix_xxxinfo_title` (`title`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
-
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (1,'2014_01_16_195548_create_users_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (2,'2014_02_01_311070_create_firewall_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (3,'2017_11_29_223842_create_countries_table',1);
@@ -1366,7 +1341,6 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (52,'2018_01_20_200
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (53,'2018_01_20_200346_create_video_data_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (54,'2018_01_20_200353_create_videos_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (55,'2018_01_20_200403_create_videos_aliases_table',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (56,'2018_01_20_200417_create_xxxinfo_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (58,'2018_04_24_132758_create_cache_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (59,'2018_08_08_100000_create_telescope_entries_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (60,'2018_09_13_070520_add_verification_to_user_table',1);

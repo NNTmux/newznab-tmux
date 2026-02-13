@@ -132,7 +132,6 @@ class AdminUserController extends BasePageController
                     'notes' => '',
                     'invites' => $defaultInvites,
                     'movieview' => 0,
-                    'xxxview' => 0,
                     'musicview' => 0,
                     'consoleview' => 0,
                     'gameview' => 0,
@@ -236,7 +235,7 @@ class AdminUserController extends BasePageController
                         ($request->has('movieview') ? 1 : 0),
                         ($request->has('musicview') ? 1 : 0),
                         ($request->has('gameview') ? 1 : 0),
-                        ($request->has('xxxview') ? 1 : 0),
+                        ($editedUser->xxxview ? 1 : 0),
                         ($request->has('consoleview') ? 1 : 0),
                         ($request->has('bookview') ? 1 : 0)
                     );

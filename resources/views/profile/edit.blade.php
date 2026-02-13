@@ -183,11 +183,6 @@
                             class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
                         <span class="text-sm text-gray-700 dark:text-gray-300">Book Covers</span>
                     </label>
-                    <label class="flex items-center">
-                        <input type="checkbox" name="xxxview" value="1" {{ $user->xxxview ? 'checked' : '' }}
-                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
-                        <span class="text-sm text-gray-700 dark:text-gray-300">XXX Covers</span>
-                    </label>
                 </div>
             </div>
 

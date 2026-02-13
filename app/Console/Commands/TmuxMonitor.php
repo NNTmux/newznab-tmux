@@ -245,6 +245,5 @@ class TmuxMonitor extends Command
         $this->taskRunner->runPaneTask('tv', [], $runVar);
         $this->taskRunner->runPaneTask('movies', [], $runVar);
         $this->taskRunner->runPaneTask('amazon', [], $runVar);
-        $this->taskRunner->runPaneTask('xxx', [], $runVar);
     }
 }

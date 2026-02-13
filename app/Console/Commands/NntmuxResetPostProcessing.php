@@ -79,7 +79,6 @@ class NntmuxResetPostProcessing extends Command
                             'bookinfo_id' => null,
                             'videos_id' => 0,
                             'tv_episodes_id' => 0,
-                            'xxxinfo_id' => 0,
                             'passwordstatus' => -1,
                             'haspreview' => -1,
                             'jpgstatus' => 0,
@@ -137,7 +136,6 @@ class NntmuxResetPostProcessing extends Command
                         $this->resetMusic();
                         break;
                     case 'adult':
-                        $this->resetAdult();
                         break;
                     case 'tv':
                         $this->resetTv();
@@ -318,29 +316,6 @@ class NntmuxResetPostProcessing extends Command
             $bar->finish();
             $this->newLine();
             $this->info(number_format($total).' musicinfo_id\'s reset.');
-        } else {
-            $this->info('No releases to reset');
-        }
-    }
-
-    private function resetAdult(): void
-    {
-        $qry = Release::query()->whereNotNull('xxxinfo_id')->whereBetween('categories_id', [Category::XXX_ROOT, Category::XXX_OTHER])->get();
-        $total = $qry->count();
-        if ($total > 0) {
-            $bar = $this->output->createProgressBar($total);
-            $bar->setOverwrite(true); // Terminal needs to support ANSI Encoding for this?
-            $bar->start();
-            foreach ($qry as $releases) {
-                Release::query()->where('id', $releases->id)->update(
-                    [
-                        'xxxinfo_id' => null,
-                    ]);
-                $bar->advance();
-            }
-            $bar->finish();
-            $this->newLine();
-            $this->info(number_format($total).' xxxinfo_id\'s reset.');
         } else {
             $this->info('No releases to reset');
         }

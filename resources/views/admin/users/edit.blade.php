@@ -602,15 +602,6 @@
                                        class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
                                 <label for="bookview" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Books</label>
                             </div>
-                            <div class="flex items-center">
-                                <input type="checkbox"
-                                       id="xxxview"
-                                       name="xxxview"
-                                       value="1"
-                                       {{ (is_array($user) ? ($user['xxxview'] ?? 0) : ($user->xxxview ?? 0)) ? 'checked' : '' }}
-                                       class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
-                                <label for="xxxview" class="ml-2 text-sm text-gray-700 dark:text-gray-300">XXX</label>
-                            </div>
                         </div>
                     </div>
                 @endif

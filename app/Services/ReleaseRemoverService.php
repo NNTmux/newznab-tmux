@@ -835,7 +835,7 @@ class ReleaseRemoverService
             FROM releases r
             LEFT JOIN release_files rf ON r.id = rf.releases_id
             WHERE r.categories_id IN ({$categories})
-            AND (r.imdbid NOT IN ('0000000', 0) OR xxxinfo_id > 0)
+            AND (r.imdbid NOT IN ('0000000', 0) OR r.categories_id BETWEEN ".Category::XXX_ROOT.' AND '.Category::XXX_OTHER.")
             AND r.nfostatus = 1
             AND r.haspreview = 0
             AND r.jpgstatus = 0

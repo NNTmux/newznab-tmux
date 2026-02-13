@@ -325,10 +325,6 @@
                                         <i class="fa {{ $user->bookview ? 'fa-check-square text-green-600' : 'fa-square text-gray-400' }} mr-2"></i>
                                         <span>Book Covers</span>
                                     </div>
-                                    <div class="flex items-center">
-                                        <i class="fa {{ $user->xxxview ? 'fa-check-square text-green-600' : 'fa-square text-gray-400' }} mr-2"></i>
-                                        <span>XXX Covers</span>
-                                    </div>
                                 </div>
                             </div>
                         </div>
