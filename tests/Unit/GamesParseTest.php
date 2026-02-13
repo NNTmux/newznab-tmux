@@ -15,7 +15,7 @@ class GamesParseTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->parser = new GamesTitleParser();
+        $this->parser = new GamesTitleParser;
     }
 
     #[DataProvider('titlesProvider')]

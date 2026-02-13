@@ -16,7 +16,7 @@ class CategorizePcGameTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->categorizer = new PcCategorizer();
+        $this->categorizer = new PcCategorizer;
     }
 
     public function test_pc_game_detects_common_scene_groups(): void
