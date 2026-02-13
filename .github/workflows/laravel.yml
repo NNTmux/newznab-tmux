@@ -37,8 +37,8 @@ jobs:
         run:
           cp .env.test .env
 
-      - name: Run composer install
-        run: composer install --prefer-dist --no-interaction --no-progress
+      - name: Run composer update
+        run: composer update --prefer-dist --no-interaction --no-progress
 
       - name: Generate app key
         run: php artisan key:generate
