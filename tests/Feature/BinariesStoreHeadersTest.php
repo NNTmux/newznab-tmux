@@ -114,6 +114,11 @@ class BinariesStoreHeadersTest extends TestCase
 
     public function test_duplicate_collection_and_binary_reuse(): void
     {
+        // Skip this test when using SQLite as it doesn't support REGEXP function
+        if (DB::getDriverName() === 'sqlite') {
+            $this->markTestSkipped('This test requires MySQL REGEXP function which is not available in SQLite.');
+        }
+
         $harness = new TestBinariesHarness;
 
         $headers = [
@@ -137,6 +142,11 @@ class BinariesStoreHeadersTest extends TestCase
 
     public function test_raw_message_id_stored_unmodified(): void
     {
+        // Skip this test when using SQLite as it doesn't support REGEXP function
+        if (DB::getDriverName() === 'sqlite') {
+            $this->markTestSkipped('This test requires MySQL REGEXP function which is not available in SQLite.');
+        }
+
         $harness = new TestBinariesHarness;
         $headers = [$this->makeHeader(3001, 1, 1, 123)];
         $harness->publicStoreHeaders($headers);
