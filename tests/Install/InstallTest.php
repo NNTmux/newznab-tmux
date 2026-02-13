@@ -26,6 +26,11 @@ final class InstallTest extends TestCase
 {
     public function test_full_install(): void
     {
+        // Skip in CI when using SQLite in-memory database
+        if (config('database.default') === 'testing' || config('database.default') === 'sqlite') {
+            $this->markTestSkipped('Full install test requires a real database connection, not SQLite in-memory.');
+        }
+
         $this->artisan('migrate:fresh', ['--seed' => true])
             ->assertExitCode(0);
 

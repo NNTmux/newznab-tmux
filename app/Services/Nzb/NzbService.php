@@ -51,7 +51,12 @@ class NzbService
 
     public function __construct()
     {
-        $nzbSplitLevel = (int) Settings::settingValue('nzbsplitlevel');
+        try {
+            $nzbSplitLevel = (int) Settings::settingValue('nzbsplitlevel');
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Table doesn't exist yet (e.g., during migrations or tests)
+            $nzbSplitLevel = 1;
+        }
         $this->nzbSplitLevel = $nzbSplitLevel;
         $this->siteNzbPath = config('nntmux_settings.path_to_nzbs');
         if (! Str::endsWith($this->siteNzbPath, '/')) {
