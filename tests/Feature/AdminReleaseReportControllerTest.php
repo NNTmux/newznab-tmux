@@ -139,18 +139,18 @@ class AdminReleaseReportControllerTest extends TestCase
     }
 
     /**
-     * Test that MovieBrowseService includes resolved status in report query.
+     * Test that ReleaseBrowseService includes resolved status in report query.
      */
-    public function test_movie_browse_service_includes_resolved_status(): void
+    public function test_release_browse_service_includes_resolved_status(): void
     {
-        $servicePath = app_path('Services/MovieBrowseService.php');
+        $servicePath = app_path('Services/Releases/ReleaseBrowseService.php');
 
         $this->assertFileExists($servicePath);
 
         $content = file_get_contents($servicePath);
 
         // Check that the query includes resolved status
-        $this->assertStringContainsString("WHERE status IN (\\'pending\\', \\'reviewed\\', \\'resolved\\')", $content);
+        $this->assertStringContainsString("WHERE status IN ('pending', 'reviewed', 'resolved')", $content);
     }
 
     /**

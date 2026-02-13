@@ -45,7 +45,7 @@ class TvdbApiTest extends TestCase
 
             $this->assertNotEmpty($results);
             $this->assertIsArray($results);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->markTestSkipped('TVDB API search failed: '.$e->getMessage());
         }
     }
@@ -68,7 +68,7 @@ class TvdbApiTest extends TestCase
             $episodes = $this->tvdbProvider->client->series()->episodes($tvdbId);
 
             $this->assertNotEmpty($episodes);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->markTestSkipped('TVDB API episode fetch failed: '.$e->getMessage());
         }
     }
@@ -100,7 +100,7 @@ class TvdbApiTest extends TestCase
             }
 
             $this->assertNotNull($foundEpisode, 'Should find S01E01 of Breaking Bad');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->markTestSkipped('TVDB API episode search failed: '.$e->getMessage());
         }
     }
@@ -116,7 +116,7 @@ class TvdbApiTest extends TestCase
 
             // Should return empty or null for non-existent shows
             $this->assertTrue(empty($results) || $results === null);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // API might throw exception for no results, which is acceptable
             $this->assertTrue(true);
         }

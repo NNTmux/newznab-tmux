@@ -632,19 +632,18 @@ final class RoleUpgradeTest extends TestCase
 
         $this->user->refresh();
 
-        // Step 4: The stacked role should use the EXTENDED expiry date (2025-12-01)
-        // NOT the original expiry date (2025-07-01)
-        $this->assertNotNull($this->user->pending_role_start_date, 'Pending role start date should be set');
+        // Step 4: When renewing the SAME role, the expiry is extended directly
+        // (not via pending role stacking - that's only for DIFFERENT roles)
+        // The new expiry should be currentExpiry + addYears
+        $expectedNewExpiry = $extendedExpiryDate->copy()->addDays(365);
 
-        $pendingStartDate = Carbon::parse($this->user->pending_role_start_date);
+        $actualExpiryDate = Carbon::parse($this->user->rolechangedate);
 
-        // The pending role should start from the extended expiry (2025-12-01),
-        // not the original expiry (2025-07-01)
         $this->assertEquals(
-            $extendedExpiryDate->toDateString(),
-            $pendingStartDate->toDateString(),
-            'BUG: Role stacking should use the extended expiry date (2025-12-01), not the original (2025-07-01). '.
-            "The pending_role_start_date was {$pendingStartDate->toDateString()}."
+            $expectedNewExpiry->toDateString(),
+            $actualExpiryDate->toDateString(),
+            'Same role renewal should extend from current expiry date (2025-12-01 + 1 year). '.
+            "Expected {$expectedNewExpiry->toDateString()}, got {$actualExpiryDate->toDateString()}."
         );
 
         Carbon::setTestNow();

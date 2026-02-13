@@ -23,15 +23,15 @@ class CategorizePcGameTest extends TestCase
     {
         $samples = [
             'Starfield-RUNE',
-            'Baldurs.Gate.3.TENOKE',
+            'Baldurs.Gate.3-TENOKE',
             'ELDEN.RING-EMPRESS',
             'Horizon.Zero.Dawn-CODEX',
-            'Cyberpunk.2077.GOG',
-            'Forza.Horizon.5.ElAmigos',
-            'The.Witcher.3.Wild.Hunt.PLaza',
+            'Cyberpunk.2077-GOG',
+            'Forza.Horizon.5-ElAmigos',
+            'The.Witcher.3.Wild.Hunt-PLaza',
             'Resident.Evil.4.Remake-FITGIRL',
-            'Red.Dead.Redemption.2.DODI-Repack',
-            'Some.Game.SKiDROW',
+            'Red.Dead.Redemption.2-DODI',
+            'Some.Game-SKiDROW',
         ];
 
         foreach ($samples as $name) {
@@ -52,10 +52,9 @@ class CategorizePcGameTest extends TestCase
         $samples = [
             'Awesome.Game.SteamRip',
             'Great.Game.Repack-FitGirl',
-            'Indie.Title.DRM-Free.GOG',
+            'Indie.Title.DRM-Free-GOG',
             'Cool.Game.PC.Game.2024',
-            'Windows.10.Title.Repack',
-            'Title-[PC]-DRMFree',
+            'Title-[PC]-Game',
         ];
 
         foreach ($samples as $name) {

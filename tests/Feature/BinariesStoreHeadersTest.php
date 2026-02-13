@@ -81,6 +81,14 @@ class BinariesStoreHeadersTest extends TestCase
             attempts INT DEFAULT 0,
             UNIQUE(numberid, groups_id)
         )');
+
+        DB::statement('CREATE TABLE collection_regexes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            group_regex VARCHAR(255),
+            regex VARCHAR(255),
+            status INT DEFAULT 1,
+            ordinal INT DEFAULT 0
+        )');
     }
 
     private function makeHeader(int $articleNumber, int $partNumber, int $totalParts, int $bytes = 100): array

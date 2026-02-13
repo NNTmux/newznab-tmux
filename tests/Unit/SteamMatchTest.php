@@ -3,8 +3,8 @@
 namespace Tests\Unit;
 
 use App\Services\SteamService;
-use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use Tests\TestCase;
 
 class SteamMatchTest extends TestCase
 {
