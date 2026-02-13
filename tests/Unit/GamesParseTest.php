@@ -4,26 +4,26 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use App\Services\GamesTitleParser;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
 class GamesParseTest extends TestCase
 {
-    private function makeGamesInstance(): object
-    {
-        $rc = new ReflectionClass(\Blacklight\Games::class);
+    private GamesTitleParser $parser;
 
-        return $rc->newInstanceWithoutConstructor();
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->parser = new GamesTitleParser();
     }
 
     #[DataProvider('titlesProvider')]
     public function test_parse_title_variants(string $input, string $expected): void
     {
-        $games = $this->makeGamesInstance();
-        $res = $games->parseTitle($input);
+        $res = $this->parser->parse($input);
 
-        $this->assertIsArray($res, 'Expected parseTitle to return an array');
+        $this->assertIsArray($res, 'Expected parse to return an array');
         $this->assertArrayHasKey('title', $res);
         $this->assertSame($expected, $res['title']);
     }

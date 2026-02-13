@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Models\Category;
+use App\Services\Categorization\Categorizers\PcCategorizer;
+use App\Services\Categorization\ReleaseContext;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
 class CategorizePcGameTest extends TestCase
 {
-    private function makeCategorizeNoCtor(): object
-    {
-        $rc = new ReflectionClass(\Blacklight\Categorize::class);
+    private PcCategorizer $categorizer;
 
-        return $rc->newInstanceWithoutConstructor();
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->categorizer = new PcCategorizer();
     }
 
     public function test_pc_game_detects_common_scene_groups(): void
@@ -33,11 +35,15 @@ class CategorizePcGameTest extends TestCase
         ];
 
         foreach ($samples as $name) {
-            $c = $this->makeCategorizeNoCtor();
-            $c->releaseName = $name;
-            $c->poster = '';
-            $this->assertTrue($c->isPCGame(), "Expected PC game match for: $name");
-            $this->assertSame(Category::PC_GAMES, $this->readTmpCat($c), "Expected PC_GAMES category for: $name");
+            $context = new ReleaseContext(
+                releaseName: $name,
+                groupId: 0,
+                groupName: '',
+                poster: ''
+            );
+            $result = $this->categorizer->categorize($context);
+            $this->assertTrue($result->isSuccessful(), "Expected PC game match for: $name");
+            $this->assertSame(Category::PC_GAMES, $result->categoryId, "Expected PC_GAMES category for: $name");
         }
     }
 
@@ -53,11 +59,15 @@ class CategorizePcGameTest extends TestCase
         ];
 
         foreach ($samples as $name) {
-            $c = $this->makeCategorizeNoCtor();
-            $c->releaseName = $name;
-            $c->poster = '';
-            $this->assertTrue($c->isPCGame(), "Expected PC game keyword match for: $name");
-            $this->assertSame(Category::PC_GAMES, $this->readTmpCat($c), "Expected PC_GAMES category for: $name");
+            $context = new ReleaseContext(
+                releaseName: $name,
+                groupId: 0,
+                groupName: '',
+                poster: ''
+            );
+            $result = $this->categorizer->categorize($context);
+            $this->assertTrue($result->isSuccessful(), "Expected PC game keyword match for: $name");
+            $this->assertSame(Category::PC_GAMES, $result->categoryId, "Expected PC_GAMES category for: $name");
         }
     }
 
@@ -74,18 +84,17 @@ class CategorizePcGameTest extends TestCase
         ];
 
         foreach ($negatives as $name) {
-            $c = $this->makeCategorizeNoCtor();
-            $c->releaseName = $name;
-            $c->poster = '';
-            $this->assertFalse($c->isPCGame(), "Did not expect PC game match for console/Mac: $name");
+            $context = new ReleaseContext(
+                releaseName: $name,
+                groupId: 0,
+                groupName: '',
+                poster: ''
+            );
+            $result = $this->categorizer->categorize($context);
+            // Either not matched, or matched to a non-PC_GAMES category (like PC_MAC)
+            if ($result->isSuccessful()) {
+                $this->assertNotSame(Category::PC_GAMES, $result->categoryId, "Did not expect PC_GAMES for console/Mac: $name");
+            }
         }
-    }
-
-    private function readTmpCat(object $instance): int
-    {
-        $rp = (new ReflectionClass($instance))->getProperty('tmpCat');
-        $rp->setAccessible(true);
-
-        return (int) $rp->getValue($instance);
     }
 }

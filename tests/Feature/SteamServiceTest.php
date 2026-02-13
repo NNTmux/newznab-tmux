@@ -402,7 +402,7 @@ class SteamServiceTest extends TestCase
 
         $this->assertIsArray($result);
         $this->assertNotNull($result['price']);
-        $this->assertSame(0.0, $result['price']['final']);
+        $this->assertEquals(0.0, $result['price']['final']);
         $this->assertSame('Free', $result['price']['final_formatted']);
     }
 

@@ -162,6 +162,45 @@ final class RoleUpgradeTest extends TestCase
             reason TEXT NULL,
             created_at DATETIME NULL
         )');
+
+        // User activities table
+        DB::statement('CREATE TABLE IF NOT EXISTS user_activities (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NULL,
+            username VARCHAR(255) NOT NULL,
+            activity_type VARCHAR(50) NOT NULL,
+            description TEXT NOT NULL,
+            metadata TEXT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )');
+
+        // Role promotions table
+        DB::statement('CREATE TABLE IF NOT EXISTS role_promotions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name VARCHAR(255) NOT NULL,
+            description TEXT NULL,
+            applicable_roles TEXT NOT NULL,
+            additional_days INTEGER DEFAULT 0,
+            start_date DATE NULL,
+            end_date DATE NULL,
+            is_active INTEGER DEFAULT 1,
+            created_at DATETIME NULL,
+            updated_at DATETIME NULL
+        )');
+
+        // Role promotion stats table
+        DB::statement('CREATE TABLE IF NOT EXISTS role_promotion_stats (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            role_promotion_id INTEGER NOT NULL,
+            role_id INTEGER NOT NULL,
+            days_added INTEGER NOT NULL,
+            previous_expiry_date DATETIME NULL,
+            new_expiry_date DATETIME NULL,
+            applied_at DATETIME NOT NULL,
+            created_at DATETIME NULL,
+            updated_at DATETIME NULL
+        )');
     }
 
     /**
