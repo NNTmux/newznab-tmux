@@ -47,7 +47,7 @@ class MovieResource extends JsonResource
     }
 
     /**
-     * Get the cover image URL.
+     * Get the cover image URL (7-char padding for IDs < 10M, 8-char for 8-digit IDs).
      */
     protected function getCoverUrl(): ?string
     {
@@ -55,11 +55,14 @@ class MovieResource extends JsonResource
             return null;
         }
 
-        return url('/covers/movies/'.$this->imdbid.'-cover.jpg');
+        $id = (int) $this->imdbid;
+        $padded = str_pad((string) $this->imdbid, $id >= 10000000 ? 8 : 7, '0', STR_PAD_LEFT);
+
+        return url('/covers/movies/'.$padded.'-cover.jpg');
     }
 
     /**
-     * Get the backdrop image URL.
+     * Get the backdrop image URL (7-char padding for IDs < 10M, 8-char for 8-digit IDs).
      */
     protected function getBackdropUrl(): ?string
     {
@@ -67,6 +70,9 @@ class MovieResource extends JsonResource
             return null;
         }
 
-        return url('/covers/movies/'.$this->imdbid.'-backdrop.jpg');
+        $id = (int) $this->imdbid;
+        $padded = str_pad((string) $this->imdbid, $id >= 10000000 ? 8 : 7, '0', STR_PAD_LEFT);
+
+        return url('/covers/movies/'.$padded.'-backdrop.jpg');
     }
 }
