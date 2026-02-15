@@ -60,7 +60,7 @@ class MovieBrowseService
         $whereAge = $maxAge > 0 ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ' : '';
         $browseBy = $this->getBrowseBy();
 
-        $baseWhere = "m.title != '' AND m.imdbid != '0000000' "
+        $baseWhere = "m.title != '' AND m.imdbid NOT IN ('0000000', '00000000') "
             ."AND r.passwordstatus {$this->showPasswords} "
             .$browseBy.' '
             .$catFilter
@@ -82,11 +82,11 @@ class MovieBrowseService
         $totalCount = Cache::get($countCacheKey);
 
         if ($totalCount === null) {
-            // Normalize both sides so we match whether imdbid is stored with or without
-            // leading zeros (e.g. "0099348" vs "99348") in movieinfo or releases.
+            // releases.imdbid is stored 8-char normalized (imdb_id_pad); only pad movieinfo
+            // so the index on r.imdbid can be used.
             $countSql = 'SELECT COUNT(DISTINCT m.imdbid) AS total '
                 .'FROM movieinfo m '
-                .'INNER JOIN releases r ON LPAD(TRIM(r.imdbid), 8, \'0\') = LPAD(TRIM(m.imdbid), 8, \'0\') '
+                .'INNER JOIN releases r ON r.imdbid = LPAD(TRIM(m.imdbid), 8, \'0\') '
                 .'WHERE '.$baseWhere;
 
             $totalResult = DB::select($countSql);
@@ -122,7 +122,7 @@ class MovieBrowseService
             .'FROM ('
             .'SELECT m.imdbid, MAX(r.postdate) AS latest_postdate, COUNT(r.id) AS total_releases '
             .'FROM movieinfo m '
-            .'INNER JOIN releases r ON LPAD(TRIM(r.imdbid), 8, \'0\') = LPAD(TRIM(m.imdbid), 8, \'0\') '
+            .'INNER JOIN releases r ON r.imdbid = LPAD(TRIM(m.imdbid), 8, \'0\') '
             .'WHERE '.$baseWhere.' '
             .'GROUP BY m.imdbid'.$innerExtraGroupBy.' '
             ."ORDER BY {$innerOrderBy} {$order[1]} " // @phpstan-ignore offsetAccess.notFound
@@ -141,8 +141,7 @@ class MovieBrowseService
         $movieImdbIds = $movies->pluck('imdbid')->toArray();
 
         // Step 3: Get top 2 releases per movie using UNION ALL with LIMIT 2 per imdbid.
-        // Match releases by normalized 8-char imdbid so we find them whether stored
-        // with or without leading zeros (IMDb IDs are 7–8 digits).
+        // r.imdbid is stored 8-char normalized so index can be used.
         $unionParts = [];
         foreach ($movieImdbIds as $id) {
             $paddedId = str_pad((string) (int) $id, 8, '0', STR_PAD_LEFT);
@@ -150,7 +149,7 @@ class MovieBrowseService
             $unionParts[] = '(SELECT r.id, r.imdbid, r.guid, r.searchname, '
                 .'r.size, r.postdate, r.adddate, r.haspreview '
                 .'FROM releases r '
-                .'WHERE LPAD(TRIM(r.imdbid), 8, \'0\') = '.$quotedId.' '
+                .'WHERE r.imdbid = '.$quotedId.' '
                 ."AND r.passwordstatus {$this->showPasswords} "
                 .$catFilter
                 .$whereExcluded
@@ -161,14 +160,13 @@ class MovieBrowseService
         $releasesSql = implode(' UNION ALL ', $unionParts);
         $releases = DB::select($releasesSql);
 
-        // Group releases by normalized imdbid so lookup works regardless of stored format
+        // Group by imdbid (already 8-char in DB)
         $releasesByMovie = [];
         foreach ($releases as $release) {
-            $normId = str_pad((string) (int) $release->imdbid, 8, '0', STR_PAD_LEFT);
-            $releasesByMovie[$normId][] = $release;
+            $releasesByMovie[$release->imdbid][] = $release;
         }
 
-        // Attach releases to each movie object
+        // Attach releases to each movie (movie imdbid may be 7/8 digit; normalize for lookup)
         foreach ($movies as $movie) {
             $normMovieId = str_pad((string) (int) $movie->imdbid, 8, '0', STR_PAD_LEFT);
             $movie->releases = $releasesByMovie[$normMovieId] ?? []; // @phpstan-ignore assign.propertyReadOnly
@@ -197,7 +195,7 @@ class MovieBrowseService
 
         $sql = 'SELECT r.id, r.guid, r.searchname, r.size, r.postdate, r.adddate, r.haspreview '
             .'FROM releases r '
-            .'WHERE LPAD(TRIM(r.imdbid), 8, \'0\') = '.$paddedId.' '
+            .'WHERE r.imdbid = '.$paddedId.' '
             ."AND r.passwordstatus {$this->showPasswords} "
             .$whereExcluded.' '
             .'ORDER BY r.postdate DESC';

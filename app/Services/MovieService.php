@@ -878,7 +878,7 @@ class MovieService
     public function doMovieUpdate(string $buffer, string $service, int $id, int $processImdb = 1): string|false
     {
         $existingImdbId = Release::query()->where('id', $id)->value('imdbid');
-        if ($existingImdbId !== null && $existingImdbId !== '' && $existingImdbId !== '0000000') {
+        if ($existingImdbId !== null && $existingImdbId !== '' && $existingImdbId !== '0000000' && $existingImdbId !== '00000000') {
             return $existingImdbId;
         }
 
@@ -897,7 +897,7 @@ class MovieService
                 $movieInfoId = MovieInfo::query()->where('imdbid', $imdbId)->first(['id']);
 
                 Release::query()->where('id', $id)->update([
-                    'imdbid' => $imdbId,
+                    'imdbid' => imdb_id_pad($imdbId),
                     'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null,
                 ]);
 
@@ -912,7 +912,7 @@ class MovieService
                         $info = $this->updateMovieInfo($imdbId);
 
                         if ($info === false) {
-                            Release::query()->where('id', $id)->update(['imdbid' => '0000000']);
+                            Release::query()->where('id', $id)->update(['imdbid' => imdb_id_pad('0000000')]);
                         } elseif ($info === true) {
                             $freshMovieInfo = MovieInfo::query()->where('imdbid', $imdbId)->first(['id']);
 
@@ -1027,7 +1027,7 @@ class MovieService
                 }
 
                 foreach (array_chunk($failedIDs, 100) as $chunk) {
-                    Release::query()->whereIn('id', $chunk)->update(['imdbid' => '0000000']);
+                    Release::query()->whereIn('id', $chunk)->update(['imdbid' => imdb_id_pad('0000000')]);
                 }
             }
         }

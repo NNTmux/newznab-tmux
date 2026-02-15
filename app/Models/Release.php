@@ -235,7 +235,7 @@ class Release extends Model
                 'adddate' => $addedDate,
                 'videos_id' => $videoId,
                 'tv_episodes_id' => $episodeId,
-                'imdbid' => $imDbId,
+                'imdbid' => imdb_id_pad($imDbId),
                 'anidbid' => $aniDbId,
                 'movieinfo_id' => $movieInfoId !== null ? $movieInfoId->id : $movieInfoId,
             ]

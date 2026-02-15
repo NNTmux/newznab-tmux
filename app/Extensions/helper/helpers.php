@@ -221,6 +221,26 @@ if (! function_exists('runCmd')) {
     }
 }
 
+if (! function_exists('imdb_id_pad')) {
+    /**
+     * Normalize IMDB ID to 8 zero-padded digits for storage in releases / join consistency.
+     * Enables index use on releases.imdbid; call when writing to releases.imdbid.
+     */
+    function imdb_id_pad(mixed $id): string
+    {
+        if ($id === null || $id === '') {
+            return '00000000';
+        }
+        $s = (string) $id;
+        $s = trim($s);
+        if ($s === '' || $s === '0' || $s === '0000000' || $s === '00000000') {
+            return '00000000';
+        }
+
+        return str_pad((string) (int) $s, 8, '0', STR_PAD_LEFT);
+    }
+}
+
 if (! function_exists('escapeString')) {
 
     function escapeString(mixed $string): string
