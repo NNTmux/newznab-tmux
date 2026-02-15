@@ -233,7 +233,7 @@ class TraktService
         }
 
         return match ($idType) {
-            'imdb' => is_numeric($id) ? 'tt'.str_pad((string) $id, 7, '0', STR_PAD_LEFT) : (string) $id,
+            'imdb' => is_numeric($id) ? 'tt'.str_pad((string) $id, 8, '0', STR_PAD_LEFT) : (string) $id,
             'trakt', 'tmdb', 'tvdb' => (string) $id,
         };
     }

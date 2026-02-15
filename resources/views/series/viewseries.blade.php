@@ -176,7 +176,7 @@
                                     @if(!empty($show['imdb']) && $show['imdb'] > 0)
                                         <a class="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 inline-flex items-center text-sm font-medium transition"
                                            target="_blank"
-                                           href="{{ $site['dereferrer_link'] }}https://www.imdb.com/title/tt{{ str_pad($show['imdb'], 7, '0', STR_PAD_LEFT) }}"
+                                           href="{{ $site['dereferrer_link'] }}https://www.imdb.com/title/tt{{ str_pad($show['imdb'], 8, '0', STR_PAD_LEFT) }}"
                                            title="View at IMDb">
                                             <i class="fa fa-film mr-2"></i> IMDb
                                         </a>

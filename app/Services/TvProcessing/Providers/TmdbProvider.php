@@ -494,7 +494,7 @@ class TmdbProvider extends AbstractTvProvider
         $imdbId = 0;
         $externalIds = TmdbClient::getArray($show, 'external_ids');
         if (! empty($externalIds['imdb_id'])) {
-            preg_match('/tt(?P<imdbid>\d{6,7})$/i', $externalIds['imdb_id'], $imdb);
+            preg_match('/tt(?P<imdbid>\d{6,8})$/i', $externalIds['imdb_id'], $imdb);
             $imdbId = $imdb['imdbid'] ?? 0;
         }
 

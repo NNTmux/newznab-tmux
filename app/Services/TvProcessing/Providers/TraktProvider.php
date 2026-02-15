@@ -383,7 +383,7 @@ class TraktProvider extends AbstractTvProvider
      */
     public function formatShowInfo(mixed $show): array
     {
-        preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show['ids']['imdb'], $imdb);
+        preg_match('/tt(?P<imdbid>\d{6,8})$/i', $show['ids']['imdb'], $imdb);
         $this->posterUrl = $show['images']['poster']['thumb'] ?? '';
         $this->fanartUrl = $show['images']['fanart']['thumb'] ?? '';
         $this->localizedTZ = $show['airs']['timezone'] ?? '';
@@ -435,7 +435,7 @@ class TraktProvider extends AbstractTvProvider
 
             // Try IMDB ID as fallback
             if (! empty($imdbId) && $imdbId > 0) {
-                $imdbFormatted = 'tt'.str_pad((string) $imdbId, 7, '0', STR_PAD_LEFT);
+                $imdbFormatted = 'tt'.str_pad((string) $imdbId, 8, '0', STR_PAD_LEFT);
                 $result = $tvmazeClient->getShowBySiteID('imdb', $imdbFormatted);
                 if ($result !== null && isset($result->id)) {
                     return (int) $result->id;

@@ -453,7 +453,7 @@ if (! function_exists('getReleaseCover')) {
 
         if (! empty($imdbid) && $imdbid > 0) {
             $coverType = 'movies';
-            $coverId = str_pad($imdbid, 7, '0', STR_PAD_LEFT);
+            $coverId = str_pad($imdbid, 8, '0', STR_PAD_LEFT);
         } elseif (! empty($musicinfo_id)) {
             $coverType = 'music';
             $coverId = $musicinfo_id;
