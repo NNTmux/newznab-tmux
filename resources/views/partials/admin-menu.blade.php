@@ -8,15 +8,15 @@
     </div>
 
     <!-- Users -->
-    <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="users-menu">
+    <div class="mb-4" x-data="adminSubmenu">
+        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-users"></i>
                 <span>Users</span>
             </div>
-            <i class="fas fa-chevron-down text-sm transform transition-transform" id="users-menu-icon"></i>
+            <i class="fas fa-chevron-down text-sm transform transition-transform" x-bind:class="open ? 'rotate-180' : ''"></i>
         </button>
-        <div id="users-menu" class="hidden mt-2 ml-6 space-y-1">
+        <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/user-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">
                 <i class="fas fa-user-friends mr-2 text-blue-400"></i>User List
             </a>
@@ -44,15 +44,15 @@
     </div>
 
     <!-- Content -->
-    <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="content-menu">
+    <div class="mb-4" x-data="adminSubmenu">
+        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-file-alt"></i>
                 <span>Content</span>
             </div>
-            <i class="fas fa-chevron-down text-sm transform transition-transform" id="content-menu-icon"></i>
+            <i class="fas fa-chevron-down text-sm transform transition-transform" x-bind:class="open ? 'rotate-180' : ''"></i>
         </button>
-        <div id="content-menu" class="hidden mt-2 ml-6 space-y-1">
+        <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/content-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">
                 <i class="fas fa-list mr-2 text-blue-400"></i>Content List
             </a>
@@ -71,15 +71,15 @@
     </div>
 
     <!-- Releases -->
-    <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="releases-menu">
+    <div class="mb-4" x-data="adminSubmenu">
+        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-download"></i>
                 <span>Releases</span>
             </div>
-            <i class="fas fa-chevron-down text-sm transform transition-transform" id="releases-menu-icon"></i>
+            <i class="fas fa-chevron-down text-sm transform transition-transform" x-bind:class="open ? 'rotate-180' : ''"></i>
         </button>
-        <div id="releases-menu" class="hidden mt-2 ml-6 space-y-1">
+        <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/release-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">
                 <i class="fas fa-list-ul mr-2 text-blue-400"></i>Release List
             </a>
@@ -96,15 +96,15 @@
     </div>
 
     <!-- Movies -->
-    <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="movies-menu">
+    <div class="mb-4" x-data="adminSubmenu">
+        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-film"></i>
                 <span>Movies</span>
             </div>
-            <i class="fas fa-chevron-down text-sm transform transition-transform" id="movies-menu-icon"></i>
+            <i class="fas fa-chevron-down text-sm transform transition-transform" x-bind:class="open ? 'rotate-180' : ''"></i>
         </button>
-        <div id="movies-menu" class="hidden mt-2 ml-6 space-y-1">
+        <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/movie-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">
                 <i class="fas fa-video mr-2 text-blue-400"></i>Movie List
             </a>
@@ -115,15 +115,15 @@
     </div>
 
     <!-- TV Shows -->
-    <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="shows-menu">
+    <div class="mb-4" x-data="adminSubmenu">
+        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-tv"></i>
                 <span>TV Shows</span>
             </div>
-            <i class="fas fa-chevron-down text-sm transform transition-transform" id="shows-menu-icon"></i>
+            <i class="fas fa-chevron-down text-sm transform transition-transform" x-bind:class="open ? 'rotate-180' : ''"></i>
         </button>
-        <div id="shows-menu" class="hidden mt-2 ml-6 space-y-1">
+        <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/show-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">
                 <i class="fas fa-list mr-2 text-blue-400"></i>TV Shows List
             </a>
@@ -131,15 +131,15 @@
     </div>
 
     <!-- AniDB -->
-    <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="anidb-menu">
+    <div class="mb-4" x-data="adminSubmenu">
+        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-dragon"></i>
                 <span>AniDB</span>
             </div>
-            <i class="fas fa-chevron-down text-sm transform transition-transform" id="anidb-menu-icon"></i>
+            <i class="fas fa-chevron-down text-sm transform transition-transform" x-bind:class="open ? 'rotate-180' : ''"></i>
         </button>
-        <div id="anidb-menu" class="hidden mt-2 ml-6 space-y-1">
+        <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/anidb-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">
                 <i class="fas fa-list mr-2 text-pink-400"></i>AniDB List
             </a>
@@ -147,15 +147,15 @@
     </div>
 
     <!-- Games -->
-    <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="games-menu">
+    <div class="mb-4" x-data="adminSubmenu">
+        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-gamepad"></i>
                 <span>Games</span>
             </div>
-            <i class="fas fa-chevron-down text-sm transform transition-transform" id="games-menu-icon"></i>
+            <i class="fas fa-chevron-down text-sm transform transition-transform" x-bind:class="open ? 'rotate-180' : ''"></i>
         </button>
-        <div id="games-menu" class="hidden mt-2 ml-6 space-y-1">
+        <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/game-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">
                 <i class="fas fa-dice mr-2 text-green-400"></i>Game List
             </a>
@@ -163,15 +163,15 @@
     </div>
 
     <!-- Console -->
-    <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="console-menu">
+    <div class="mb-4" x-data="adminSubmenu">
+        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-desktop"></i>
                 <span>Console</span>
             </div>
-            <i class="fas fa-chevron-down text-sm transform transition-transform" id="console-menu-icon"></i>
+            <i class="fas fa-chevron-down text-sm transform transition-transform" x-bind:class="open ? 'rotate-180' : ''"></i>
         </button>
-        <div id="console-menu" class="hidden mt-2 ml-6 space-y-1">
+        <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/console-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">
                 <i class="fas fa-list mr-2 text-purple-400"></i>Console List
             </a>
@@ -179,15 +179,15 @@
     </div>
 
     <!-- Music -->
-    <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="music-menu">
+    <div class="mb-4" x-data="adminSubmenu">
+        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-music"></i>
                 <span>Music</span>
             </div>
-            <i class="fas fa-chevron-down text-sm transform transition-transform" id="music-menu-icon"></i>
+            <i class="fas fa-chevron-down text-sm transform transition-transform" x-bind:class="open ? 'rotate-180' : ''"></i>
         </button>
-        <div id="music-menu" class="hidden mt-2 ml-6 space-y-1">
+        <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/music-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">
                 <i class="fas fa-compact-disc mr-2 text-cyan-400"></i>Music List
             </a>
@@ -195,15 +195,15 @@
     </div>
 
     <!-- Books -->
-    <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="books-menu">
+    <div class="mb-4" x-data="adminSubmenu">
+        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-book"></i>
                 <span>Books</span>
             </div>
-            <i class="fas fa-chevron-down text-sm transform transition-transform" id="books-menu-icon"></i>
+            <i class="fas fa-chevron-down text-sm transform transition-transform" x-bind:class="open ? 'rotate-180' : ''"></i>
         </button>
-        <div id="books-menu" class="hidden mt-2 ml-6 space-y-1">
+        <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/book-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">
                 <i class="fas fa-book-open mr-2 text-amber-400"></i>Book List
             </a>
@@ -219,15 +219,15 @@
     </div>
 
     <!-- Blacklist -->
-    <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="blacklist-menu">
+    <div class="mb-4" x-data="adminSubmenu">
+        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-ban"></i>
                 <span>Blacklist</span>
             </div>
-            <i class="fas fa-chevron-down text-sm transform transition-transform" id="blacklist-menu-icon"></i>
+            <i class="fas fa-chevron-down text-sm transform transition-transform" x-bind:class="open ? 'rotate-180' : ''"></i>
         </button>
-        <div id="blacklist-menu" class="hidden mt-2 ml-6 space-y-1">
+        <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/binaryblacklist-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">
                 <i class="fas fa-file-circle-xmark mr-2 text-red-400"></i>Binary Blacklist
             </a>
@@ -235,15 +235,15 @@
     </div>
 
     <!-- Regexes -->
-    <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="regexes-menu">
+    <div class="mb-4" x-data="adminSubmenu">
+        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-code"></i>
                 <span>Regexes</span>
             </div>
-            <i class="fas fa-chevron-down text-sm transform transition-transform" id="regexes-menu-icon"></i>
+            <i class="fas fa-chevron-down text-sm transform transition-transform" x-bind:class="open ? 'rotate-180' : ''"></i>
         </button>
-        <div id="regexes-menu" class="hidden mt-2 ml-6 space-y-1">
+        <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/category_regexes-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">
                 <i class="fas fa-folder mr-2 text-yellow-400"></i>Category Regexes
             </a>
@@ -257,15 +257,15 @@
     </div>
 
     <!-- Groups -->
-    <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="groups-menu">
+    <div class="mb-4" x-data="adminSubmenu">
+        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-server"></i>
                 <span>Groups Management</span>
             </div>
-            <i class="fas fa-chevron-down text-sm transform transition-transform" id="groups-menu-icon"></i>
+            <i class="fas fa-chevron-down text-sm transform transition-transform" x-bind:class="open ? 'rotate-180' : ''"></i>
         </button>
-        <div id="groups-menu" class="hidden mt-2 ml-6 space-y-1">
+        <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/group-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">
                 <i class="fas fa-list mr-2 text-blue-400"></i>All Groups
             </a>
@@ -282,15 +282,15 @@
     </div>
 
     <!-- System -->
-    <div class="mb-4">
-        <button type="button" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition" data-toggle-submenu="system-menu">
+    <div class="mb-4" x-data="adminSubmenu">
+        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-cog"></i>
                 <span>System</span>
             </div>
-            <i class="fas fa-chevron-down text-sm transform transition-transform" id="system-menu-icon"></i>
+            <i class="fas fa-chevron-down text-sm transform transition-transform" x-bind:class="open ? 'rotate-180' : ''"></i>
         </button>
-        <div id="system-menu" class="hidden mt-2 ml-6 space-y-1">
+        <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/site-edit') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">
                 <i class="fas fa-sliders-h mr-2 text-blue-400"></i>Site Settings
             </a>
@@ -304,5 +304,4 @@
     </div>
 
 </div>
-
 
