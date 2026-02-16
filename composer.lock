@@ -8254,16 +8254,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "7.0.0",
+            "version": "7.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "f2a55b4fae0e44ffb1f1411ed3c7573cdd251a59"
+                "reference": "34bf23c9e541a5434e0898c7172fb6647d23889d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/f2a55b4fae0e44ffb1f1411ed3c7573cdd251a59",
-                "reference": "f2a55b4fae0e44ffb1f1411ed3c7573cdd251a59",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/34bf23c9e541a5434e0898c7172fb6647d23889d",
+                "reference": "34bf23c9e541a5434e0898c7172fb6647d23889d",
                 "shasum": ""
             },
             "require": {
@@ -8271,7 +8271,7 @@
                 "illuminate/container": "^12.0",
                 "illuminate/contracts": "^12.0",
                 "illuminate/database": "^12.0",
-                "php": "^8.4",
+                "php": "^8.3",
                 "spatie/laravel-package-tools": "^1.0"
             },
             "require-dev": {
@@ -8329,7 +8329,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-permission/issues",
-                "source": "https://github.com/spatie/laravel-permission/tree/7.0.0"
+                "source": "https://github.com/spatie/laravel-permission/tree/7.1.0"
             },
             "funding": [
                 {
@@ -8337,7 +8337,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-11T08:43:07+00:00"
+            "time": "2026-02-14T17:17:28+00:00"
         },
         {
             "name": "spatie/temporary-directory",
@@ -12510,16 +12510,16 @@
         },
         {
             "name": "captainhook/captainhook",
-            "version": "5.28.0",
+            "version": "5.28.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/captainhook-git/captainhook.git",
-                "reference": "9d0f34f2e9d112553ea342463371807e9864a87c"
+                "reference": "2adbc8fea26823ecf52578998de5daf57846872f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/captainhook-git/captainhook/zipball/9d0f34f2e9d112553ea342463371807e9864a87c",
-                "reference": "9d0f34f2e9d112553ea342463371807e9864a87c",
+                "url": "https://api.github.com/repos/captainhook-git/captainhook/zipball/2adbc8fea26823ecf52578998de5daf57846872f",
+                "reference": "2adbc8fea26823ecf52578998de5daf57846872f",
                 "shasum": ""
             },
             "require": {
@@ -12582,7 +12582,7 @@
             ],
             "support": {
                 "issues": "https://github.com/captainhook-git/captainhook/issues",
-                "source": "https://github.com/captainhook-git/captainhook/tree/5.28.0"
+                "source": "https://github.com/captainhook-git/captainhook/tree/5.28.2"
             },
             "funding": [
                 {
@@ -12590,7 +12590,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-08T14:15:15+00:00"
+            "time": "2026-02-15T14:36:43+00:00"
         },
         {
             "name": "captainhook/plugin-composer",
@@ -13953,16 +13953,16 @@
         },
         {
             "name": "justinrainbow/json-schema",
-            "version": "v6.7.1",
+            "version": "v6.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jsonrainbow/json-schema.git",
-                "reference": "cd3137ab4ad45033230f530ab7d5618d583c17be"
+                "reference": "6fea66c7204683af437864e7c4e7abf383d14bc0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jsonrainbow/json-schema/zipball/cd3137ab4ad45033230f530ab7d5618d583c17be",
-                "reference": "cd3137ab4ad45033230f530ab7d5618d583c17be",
+                "url": "https://api.github.com/repos/jsonrainbow/json-schema/zipball/6fea66c7204683af437864e7c4e7abf383d14bc0",
+                "reference": "6fea66c7204683af437864e7c4e7abf383d14bc0",
                 "shasum": ""
             },
             "require": {
@@ -14022,9 +14022,9 @@
             ],
             "support": {
                 "issues": "https://github.com/jsonrainbow/json-schema/issues",
-                "source": "https://github.com/jsonrainbow/json-schema/tree/v6.7.1"
+                "source": "https://github.com/jsonrainbow/json-schema/tree/v6.7.2"
             },
-            "time": "2026-02-13T16:16:54+00:00"
+            "time": "2026-02-15T15:06:22+00:00"
         },
         {
             "name": "larastan/larastan",
@@ -15418,16 +15418,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "12.5.11",
+            "version": "12.5.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "9b518cb40f9474572c9f0178e96ff3dc1cf02bf1"
+                "reference": "418e06b3b46b0d54bad749ff4907fc7dfb530199"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/9b518cb40f9474572c9f0178e96ff3dc1cf02bf1",
-                "reference": "9b518cb40f9474572c9f0178e96ff3dc1cf02bf1",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/418e06b3b46b0d54bad749ff4907fc7dfb530199",
+                "reference": "418e06b3b46b0d54bad749ff4907fc7dfb530199",
                 "shasum": ""
             },
             "require": {
@@ -15496,7 +15496,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.5.11"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.5.12"
             },
             "funding": [
                 {
@@ -15520,7 +15520,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-02-10T12:32:02+00:00"
+            "time": "2026-02-16T08:34:36+00:00"
         },
         {
             "name": "react/cache",
