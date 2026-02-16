@@ -41,6 +41,14 @@ const lazyComponentMap = {
     'recentActivity':  () => import('./components/admin/dashboard.js'), // same file
     'adminGroups':     () => import('./components/admin/groups.js'),
     'adminFeatures':   () => import('./components/admin/features.js'),
+    'adminUserEdit':   () => import('./components/admin/features.js'),  // same file
+    'adminUserList':   () => import('./components/admin/features.js'),  // same file
+    'adminDeletedUsers': () => import('./components/admin/features.js'), // same file
+    'adminInvitations': () => import('./components/admin/features.js'), // same file
+    'adminRegexForm':  () => import('./components/admin/features.js'),  // same file
+    'tinyMceEditor':   () => import('./components/admin/features.js'),  // same file
+    'verifyUser':      () => import('./components/admin/features.js'),  // same file
+    'tmuxEdit':        () => import('./components/admin/features.js'),  // same file
 };
 
 /**

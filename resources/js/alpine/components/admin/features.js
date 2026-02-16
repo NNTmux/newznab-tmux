@@ -165,6 +165,22 @@ Alpine.data('adminUserEdit', () => ({
         const y = document.getElementById('expiry_year'), m = document.getElementById('expiry_month');
         if (y) y.addEventListener('change', () => this.updateValidDays());
         if (m) m.addEventListener('change', () => this.updateValidDays());
+
+        // Setup quick action buttons
+        document.querySelectorAll('[data-expiry-action]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const action = btn.dataset.expiryAction;
+                if (action === 'set') {
+                    const days = parseInt(btn.dataset.days) || 0;
+                    const hours = parseInt(btn.dataset.hours) || 0;
+                    this.setExpiry(days, hours);
+                } else if (action === 'end-of-day') {
+                    this.setEndOfDay();
+                } else if (action === 'clear') {
+                    this.clearExpiry();
+                }
+            });
+        });
     },
 
     _updatePreview() {

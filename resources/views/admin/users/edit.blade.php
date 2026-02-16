@@ -27,7 +27,7 @@
         @endif
 
         <!-- User Form -->
-        <form method="post" action="{{ url('admin/user-edit') }}" class="p-6">
+        <form method="post" action="{{ url('admin/user-edit') }}" class="p-6" x-data="adminUserEdit">
             @csrf
             <input type="hidden" name="action" value="submit">
             @if(!empty($user['id']))
