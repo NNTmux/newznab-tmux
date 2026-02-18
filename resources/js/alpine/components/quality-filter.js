@@ -1,5 +1,6 @@
 /**
  * Alpine.data('qualityFilter') - Resolution and source filter buttons
+ * CSP-safe: Uses click handler with data attributes instead of inline expressions
  */
 import Alpine from '@alpinejs/csp';
 
@@ -12,20 +13,71 @@ Alpine.data('qualityFilter', () => ({
     init() {
         this.totalReleases = this.$el.querySelectorAll('.release-item').length;
         this.visibleCount = this.totalReleases;
+
+        // Set up click handlers via event delegation
+        this.$el.addEventListener('click', (e) => {
+            const resBtn = e.target.closest('[data-resolution]');
+            if (resBtn) {
+                const filter = resBtn.getAttribute('data-resolution');
+                if (filter) {
+                    this.activeResolution = filter;
+                    this._updateButtonStyles();
+                    this._applyFilters();
+                }
+                return;
+            }
+
+            const srcBtn = e.target.closest('[data-source]');
+            if (srcBtn) {
+                const filter = srcBtn.getAttribute('data-source');
+                if (filter) {
+                    this.activeSource = filter;
+                    this._updateButtonStyles();
+                    this._applyFilters();
+                }
+            }
+        });
+
+        // Initial button styles
+        this._updateButtonStyles();
     },
 
-    setResolution(filter) {
-        this.activeResolution = filter;
-        this._applyFilters();
-    },
+    /**
+     * Update button active/inactive styles
+     */
+    _updateButtonStyles() {
+        // Resolution buttons
+        this.$el.querySelectorAll('[data-resolution]').forEach(btn => {
+            const filter = btn.getAttribute('data-resolution');
+            const isActive = filter === this.activeResolution;
 
-    setSource(filter) {
-        this.activeSource = filter;
-        this._applyFilters();
-    },
+            // Remove all state classes first
+            btn.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+            btn.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300', 'hover:bg-gray-300', 'dark:hover:bg-gray-600');
 
-    isActiveResolution(f) { return this.activeResolution === f; },
-    isActiveSource(f) { return this.activeSource === f; },
+            if (isActive) {
+                btn.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+            } else {
+                btn.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300', 'hover:bg-gray-300', 'dark:hover:bg-gray-600');
+            }
+        });
+
+        // Source buttons
+        this.$el.querySelectorAll('[data-source]').forEach(btn => {
+            const filter = btn.getAttribute('data-source');
+            const isActive = filter === this.activeSource;
+
+            // Remove all state classes first
+            btn.classList.remove('bg-purple-600', 'text-white', 'hover:bg-purple-700');
+            btn.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300', 'hover:bg-gray-300', 'dark:hover:bg-gray-600');
+
+            if (isActive) {
+                btn.classList.add('bg-purple-600', 'text-white', 'hover:bg-purple-700');
+            } else {
+                btn.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300', 'hover:bg-gray-300', 'dark:hover:bg-gray-600');
+            }
+        });
+    },
 
     countText() {
         if (this.activeResolution === 'all' && this.activeSource === 'all') return '(' + this.totalReleases + ' total)';
@@ -47,8 +99,13 @@ Alpine.data('qualityFilter', () => ({
                 else matchS = name.includes(s);
             }
 
-            if (matchR && matchS) { item.style.display = ''; visible++; }
-            else item.style.display = 'none';
+            if (matchR && matchS) {
+                item.style.removeProperty('display');
+                item.classList.remove('hidden');
+                visible++;
+            } else {
+                item.style.setProperty('display', 'none', 'important');
+            }
         });
         this.visibleCount = visible;
     }

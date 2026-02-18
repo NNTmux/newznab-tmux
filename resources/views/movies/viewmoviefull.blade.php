@@ -144,11 +144,11 @@
 
             <!-- All Available Releases -->
             @if(isset($releases) && count($releases) > 0)
-                <div class="mt-8 pt-8 border-t border-gray-200">
+                <div class="mt-8 pt-8 border-t border-gray-200" x-data="qualityFilter">
                     <div class="mb-6">
                         <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
                             Available Releases
-                            <span class="text-lg font-normal text-gray-500" id="release-count">({{ count($releases) }} total)</span>
+                            <span class="text-lg font-normal text-gray-500" x-text="countText()"></span>
                         </h2>
 
                         <!-- Filter Buttons -->
@@ -156,16 +156,20 @@
                             <!-- Resolution Filters -->
                             <div class="flex flex-wrap gap-2 items-center">
                                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">Resolution:</span>
-                                <button class="resolution-filter-btn active px-4 py-2 rounded-lg text-sm font-medium transition bg-blue-600 text-white hover:bg-blue-700" data-filter="all">
+                                <button data-resolution="all"
+                                        class="px-4 py-2 rounded-lg text-sm font-medium transition bg-blue-600 text-white hover:bg-blue-700">
                                     <i class="fas fa-list mr-1"></i> All
                                 </button>
-                                <button class="resolution-filter-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="720p">
+                                <button data-resolution="720p"
+                                        class="px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
                                     <i class="fas fa-tv mr-1"></i> 720p
                                 </button>
-                                <button class="resolution-filter-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="1080p">
+                                <button data-resolution="1080p"
+                                        class="px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
                                     <i class="fas fa-desktop mr-1"></i> 1080p
                                 </button>
-                                <button class="resolution-filter-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="2160p">
+                                <button data-resolution="2160p"
+                                        class="px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
                                     <i class="fas fa-film mr-1"></i> 2160p / 4K
                                 </button>
                             </div>
@@ -173,16 +177,20 @@
                             <!-- Source Filters -->
                             <div class="flex flex-wrap gap-2 items-center">
                                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">Source:</span>
-                                <button class="source-filter-btn active px-4 py-2 rounded-lg text-sm font-medium transition bg-purple-600 text-white hover:bg-purple-700" data-filter="all">
+                                <button data-source="all"
+                                        class="px-4 py-2 rounded-lg text-sm font-medium transition bg-purple-600 text-white hover:bg-purple-700">
                                     <i class="fas fa-list mr-1"></i> All
                                 </button>
-                                <button class="source-filter-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="bluray">
+                                <button data-source="bluray"
+                                        class="px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
                                     <i class="fas fa-compact-disc mr-1"></i> Bluray
                                 </button>
-                                <button class="source-filter-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="web-dl">
+                                <button data-source="web-dl"
+                                        class="px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
                                     <i class="fas fa-cloud-download-alt mr-1"></i> WEB-DL
                                 </button>
-                                <button class="source-filter-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600" data-filter="webrip">
+                                <button data-source="webrip"
+                                        class="px-4 py-2 rounded-lg text-sm font-medium transition bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600">
                                     <i class="fas fa-globe mr-1"></i> WEBRip
                                 </button>
                             </div>
