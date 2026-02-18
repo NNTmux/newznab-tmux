@@ -234,7 +234,7 @@ class XML_Response
         if ((int) $this->parameters['extended'] === 1) {
             $attrs['files'] = $this->release->totalpart;
 
-            if (($this->release->videos_id > 0 || $this->release->tv_episodes_id > 0)) {
+            if ((isset($this->release->videos_id) && $this->release->videos_id > 0) || (isset($this->release->tv_episodes_id) && $this->release->tv_episodes_id > 0)) {
                 $attrs = array_merge($attrs, $this->buildTvAttrArray());
             }
 
