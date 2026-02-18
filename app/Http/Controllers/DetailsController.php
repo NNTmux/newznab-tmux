@@ -86,9 +86,15 @@ class DetailsController extends BasePageController
             $mov = $this->movieService->getMovieInfo($data['imdbid']);
             if (! empty($mov['title'])) {
                 $mov['title'] = str_replace(['/', '\\'], '', $mov['title']);
-                $mov['actors'] = makeFieldLinks($mov, 'actors', 'movies');
-                $mov['genre'] = makeFieldLinks($mov, 'genre', 'movies');
-                $mov['director'] = makeFieldLinks($mov, 'director', 'movies');
+                if (! empty($mov['actors'])) {
+                    $mov['actors'] = makeFieldLinks($mov, 'actors', 'movies');
+                }
+                if (! empty($mov['genre'])) {
+                    $mov['genre'] = makeFieldLinks($mov, 'genre', 'movies');
+                }
+                if (! empty($mov['director'])) {
+                    $mov['director'] = makeFieldLinks($mov, 'director', 'movies');
+                }
                 if (Settings::settingValue('trailers_display')) {
                     $trailer = empty($mov['trailer']) ? $this->movieService->getTrailer($data['imdbid']) : $mov['trailer'];
                     if ($trailer) {

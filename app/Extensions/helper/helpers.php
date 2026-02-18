@@ -75,6 +75,11 @@ if (! function_exists('makeFieldLinks')) {
      */
     function makeFieldLinks(mixed $data, mixed $field, mixed $type)
     {
+        // Check if field exists and is not empty
+        if (! isset($data[$field]) || empty($data[$field])) {
+            return '';
+        }
+
         $tmpArr = explode(', ', $data[$field]);
         $newArr = [];
         $i = 0;
