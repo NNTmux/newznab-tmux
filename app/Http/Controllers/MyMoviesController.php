@@ -86,6 +86,7 @@ class MyMoviesController extends BasePageController
                 $this->viewData['cat_selected'] = [];
                 $this->viewData['imdbid'] = $imdbid;
                 $this->viewData['movie'] = $movie;
+                $this->viewData['userdata'] = $this->userdata;
                 $this->viewData['content'] = view('mymovies.add', $this->viewData)->render();
 
                 return $this->pagerender();
@@ -120,6 +121,7 @@ class MyMoviesController extends BasePageController
                 $this->viewData['cat_selected'] = ! empty($movie['categories']) ? explode('|', $movie['categories']) : [];
                 $this->viewData['imdbid'] = $imdbid;
                 $this->viewData['movie'] = $movie;
+                $this->viewData['userdata'] = $this->userdata;
                 $this->viewData['content'] = view('mymovies.add', $this->viewData)->render();
 
                 return $this->pagerender();
@@ -207,6 +209,7 @@ class MyMoviesController extends BasePageController
                     $results[$moviek] = $movie;
                 }
                 $this->viewData['movies'] = $results;
+                $this->viewData['userdata'] = $this->userdata;
                 $this->viewData['content'] = view('mymovies.index', $this->viewData)->render();
                 $this->viewData = array_merge($this->viewData, compact('title', 'meta_title', 'meta_keywords', 'meta_description'));
 

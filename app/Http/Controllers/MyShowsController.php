@@ -82,6 +82,7 @@ class MyShowsController extends BasePageController
                 $this->viewData['cat_selected'] = [];
                 $this->viewData['video'] = $videoId;
                 $this->viewData['show'] = $show;
+                $this->viewData['userdata'] = $this->userdata;
                 $this->viewData['content'] = view('myshows.add', $this->viewData)->render();
 
                 return $this->pagerender();
@@ -116,6 +117,7 @@ class MyShowsController extends BasePageController
                 $this->viewData['cat_selected'] = explode('|', $show['categories']);
                 $this->viewData['video'] = $videoId;
                 $this->viewData['show'] = $show;
+                $this->viewData['userdata'] = $this->userdata;
                 $this->viewData['content'] = view('myshows.add', $this->viewData)->render();
 
                 return $this->pagerender();
@@ -154,6 +156,7 @@ class MyShowsController extends BasePageController
                     }
                 }
                 $this->viewData['shows'] = $results;
+                $this->viewData['userdata'] = $this->userdata;
                 $this->viewData['content'] = view('myshows.index', $this->viewData)->render();
                 $this->viewData = array_merge($this->viewData, compact('title', 'meta_title', 'meta_keywords', 'meta_description'));
 
