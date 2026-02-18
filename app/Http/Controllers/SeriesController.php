@@ -277,9 +277,11 @@ class SeriesController extends BasePageController
             foreach ($masterserieslist as $s) {
                 if (preg_match('/^[0-9]/', $s['title'])) {
                     $thisrange = '0-9';
-                } else {
-                    preg_match('/([A-Z]).*/i', $s['title'], $hits);
+                } elseif (preg_match('/([A-Z]).*/i', $s['title'], $hits)) {
                     $thisrange = strtoupper($hits[1]);
+                } else {
+                    // Handle titles that don't start with a letter or number
+                    $thisrange = '#';
                 }
                 $serieslist[$thisrange][] = $s;
             }
