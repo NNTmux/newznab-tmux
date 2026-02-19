@@ -87,9 +87,13 @@ class ReleaseProcessingContext
     // Temp path for this release
     public string $tmpPath = '';
 
+    // Timeout tracking
+    public float $startTime = 0;
+
     public function __construct(Release $release)
     {
         $this->release = $release;
+        $this->startTime = hrtime(true);
     }
 
     /**
@@ -166,5 +170,25 @@ class ReleaseProcessingContext
     public function needsSample(): bool
     {
         return ! $this->foundSample || ! $this->foundJPGSample;
+    }
+
+    /**
+     * Check if the release has exceeded the processing timeout.
+     */
+    public function isTimedOut(int $timeoutSeconds): bool
+    {
+        if ($timeoutSeconds <= 0) {
+            return false;
+        }
+
+        return (hrtime(true) - $this->startTime) / 1e9 > $timeoutSeconds;
+    }
+
+    /**
+     * Get elapsed processing time in seconds.
+     */
+    public function getElapsedSeconds(): int
+    {
+        return (int) ((hrtime(true) - $this->startTime) / 1e9);
     }
 }

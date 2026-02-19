@@ -117,7 +117,7 @@ class AdditionalProcessingOrchestrator
         $bindings = [];
 
         $sqlParts[] = 'SELECT r.id AS id, r.id AS releases_id, r.guid, r.name, r.size, r.groups_id, r.nfostatus, r.fromname,';
-        $sqlParts[] = 'r.completion, r.categories_id, r.searchname, r.predb_id, c.disablepreview';
+        $sqlParts[] = 'r.completion, r.categories_id, r.searchname, r.predb_id, r.pp_timeout_count, c.disablepreview';
         $sqlParts[] = 'FROM releases r';
         $sqlParts[] = 'LEFT JOIN categories c ON c.id = r.categories_id';
         $sqlParts[] = 'WHERE r.passwordstatus = ?';
@@ -188,6 +188,11 @@ class AdditionalProcessingOrchestrator
             }
             $context->nzbContents = $nzbResult['contents'];
 
+            // Check timeout after NZB parsing
+            if ($this->checkReleaseTimeout($context)) {
+                continue;
+            }
+
             // Initialize context
             $this->initializeContext($context);
 
@@ -224,16 +229,36 @@ class AdditionalProcessingOrchestrator
             ) {
                 $this->processMessageIDDownloads($context);
 
+                // Check timeout after message ID downloads
+                if ($this->checkReleaseTimeout($context)) {
+                    continue;
+                }
+
                 // Process compressed files
                 if (! $bookFlood && $context->nzbHasCompressedFile) {
                     $this->processNZBCompressedFiles($context, false);
 
+                    // Check timeout after compressed file processing
+                    if ($this->checkReleaseTimeout($context)) {
+                        continue;
+                    }
+
                     if ($this->config->fetchLastFiles) {
                         $this->processNZBCompressedFiles($context, true);
+
+                        // Check timeout after last files processing
+                        if ($this->checkReleaseTimeout($context)) {
+                            continue;
+                        }
                     }
 
                     if (! $context->releaseHasPassword) {
                         $this->processExtractedFiles($context);
+
+                        // Check timeout after extracted file processing
+                        if ($this->checkReleaseTimeout($context)) {
+                            continue;
+                        }
                     }
                 }
 
@@ -251,6 +276,43 @@ class AdditionalProcessingOrchestrator
         }
 
         $this->output->endOutput();
+    }
+
+    /**
+     * Check if the current release has exceeded the processing timeout.
+     * If timed out, handles cleanup, logs the event, and marks the release accordingly.
+     *
+     * @return bool True if the release timed out and should be skipped (caller should `continue`)
+     */
+    private function checkReleaseTimeout(ReleaseProcessingContext $context): bool
+    {
+        if (! $context->isTimedOut($this->config->releaseProcessingTimeout)) {
+            return false;
+        }
+
+        $elapsedSeconds = $context->getElapsedSeconds();
+
+        // Handle the timeout: increment counter, skip or delete
+        $deleted = $this->releaseManager->handleReleaseTimeout(
+            $context->release,
+            $this->config->maxPpTimeoutCount
+        );
+
+        if ($deleted) {
+            $this->output->echoReleaseTimeoutDeleted(
+                $context->release->id,
+                (int) ($context->release->pp_timeout_count ?? 0) + 1
+            );
+        } else {
+            $this->output->echoReleaseTimeout($context->release->id, $elapsedSeconds);
+        }
+
+        // Cleanup temp directory
+        if (! empty($context->tmpPath)) {
+            $this->tempWorkspace->clearDirectory($context->tmpPath, false);
+        }
+
+        return true;
     }
 
     /**

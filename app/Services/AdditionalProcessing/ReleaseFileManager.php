@@ -188,6 +188,40 @@ class ReleaseFileManager
     }
 
     /**
+     * Handle a release that has timed out during post-processing.
+     *
+     * Increments the timeout counter on the release. If the counter reaches
+     * the configured maximum, the release is deleted entirely. Otherwise,
+     * the release is marked as processed (haspreview=0, passwordstatus=0)
+     * to remove it from the re-selection query.
+     *
+     * @return bool True if the release was deleted, false if it was skipped
+     */
+    public function handleReleaseTimeout(Release $release, int $maxTimeoutCount): bool
+    {
+        $currentCount = (int) ($release->pp_timeout_count ?? 0);
+        $newCount = $currentCount + 1;
+
+        if ($newCount >= $maxTimeoutCount) {
+            Log::warning('Release '.$release->id.' deleted after '.$newCount.' post-processing timeout(s)');
+            $this->deleteRelease($release);
+
+            return true;
+        }
+
+        // Increment the timeout counter and mark as processed to skip re-selection
+        Release::query()->where('id', $release->id)->update([
+            'pp_timeout_count' => $newCount,
+            'haspreview' => 0,
+            'passwordstatus' => ReleaseBrowseService::PASSWD_NONE,
+        ]);
+
+        Log::warning('Release '.$release->id.' skipped after post-processing timeout ('.$newCount.'/'.$maxTimeoutCount.')');
+
+        return false;
+    }
+
+    /**
      * Delete a broken release completely.
      */
     public function deleteRelease(Release $release): void

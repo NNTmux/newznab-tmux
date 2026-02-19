@@ -653,6 +653,14 @@ class SettingsTableSeeder extends Seeder
                 'name' => 'exit',
                 'value' => '0',
             ],
+            239 => [
+                'name' => 'releaseprocessingtimeout',
+                'value' => '120',
+            ],
+            240 => [
+                'name' => 'maxpptimeoutcount',
+                'value' => '3',
+            ],
         ]);
     }
 }

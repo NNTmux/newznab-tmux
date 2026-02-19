@@ -36,7 +36,7 @@ class ConsoleOutputService
                 PHP_EOL.
                 'Downloaded: (xB)=yEnc article, (cB)=compressed part'.
                 PHP_EOL.
-                'Failures: fC#=Compressed(part #), fS=Sample, fM=Media(video), fA=Audio, fJ=JPEG, G=Missing group'.
+                'Failures: fC#=Compressed(part #), fS=Sample, fM=Media(video), fA=Audio, fJ=JPEG, G=Missing group, T=Timeout skip'.
                 PHP_EOL.
                 'Processing: r=RAR, z=ZIP, 7z=7zip (names/entries), g=GZIP, b=BZIP2, x=XZ, (vRAW)=Inline video detected'.
                 PHP_EOL.
@@ -157,6 +157,18 @@ class ConsoleOutputService
     public function echoInlineVideo(): void
     {
         $this->echo('(vRAW)', 'primaryOver');
+    }
+
+    public function echoReleaseTimeout(int $releaseId, int $elapsedSeconds): void
+    {
+        $this->echo('T', 'warningOver');
+        $this->echo(' Release '.$releaseId.' timed out after '.$elapsedSeconds.'s', 'warning');
+    }
+
+    public function echoReleaseTimeoutDeleted(int $releaseId, int $timeoutCount): void
+    {
+        $this->echo('T', 'warningOver');
+        $this->echo(' Release '.$releaseId.' deleted after '.$timeoutCount.' timeout(s)', 'warning');
     }
 
     public function warning(string $message): void

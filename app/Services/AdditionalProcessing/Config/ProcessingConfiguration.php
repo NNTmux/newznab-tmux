@@ -80,6 +80,11 @@ final readonly class ProcessingConfiguration
 
     public string|false $mediaInfoPath;
 
+    // Timeout settings
+    public int $releaseProcessingTimeout;
+
+    public int $maxPpTimeoutCount;
+
     // Regex patterns
     public string $audioFileRegex;
 
@@ -136,6 +141,8 @@ final readonly class ProcessingConfiguration
         $this->searchEnabled = in_array($this->searchDriver, ['manticore', 'elasticsearch']);
         $this->renameMusicMediaInfo = (bool) config('nntmux.rename_music_mediainfo');
         $this->renamePar2 = (bool) config('nntmux.rename_par2');
+        $this->releaseProcessingTimeout = (int) (Settings::settingValue('releaseprocessingtimeout') ?: 120);
+        $this->maxPpTimeoutCount = (int) (Settings::settingValue('maxpptimeoutcount') ?: 3);
         // Regex patterns
         $this->audioFileRegex = '\\.(AAC|AIFF|APE|AC3|ASF|DTS|FLAC|MKA|MKS|MP2|MP3|RA|OGG|OGM|W64|WAV|WMA)';
         $this->ignoreBookRegex = '/\\b(epub|lit|mobi|pdf|sipdf|html)\\b.*\\.rar(?!.{20,})/i';
