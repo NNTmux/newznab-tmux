@@ -24,10 +24,24 @@ class CategorizationResult
 
     /**
      * Check if this result represents a successful categorization.
+     *
+     * Returns true for any non-zero confidence result that was explicitly
+     * matched, including intentional OTHER_MISC assignments (e.g. archive,
+     * dataset, obfuscated_pattern). Only the default no-match sentinel
+     * (confidence 0, matchedBy 'no_match') is treated as unsuccessful.
      */
     public function isSuccessful(): bool
     {
-        return $this->categoryId !== Category::OTHER_MISC && $this->confidence > 0;
+        if ($this->confidence <= 0) {
+            return false;
+        }
+
+        // The default no-match sentinel is not successful
+        if ($this->categoryId === Category::OTHER_MISC && $this->matchedBy === 'no_match') {
+            return false;
+        }
+
+        return true;
     }
 
     /**

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\NameFixing;
 
+use App\Traits\DetectsHashedNames;
+
 /**
  * Utility class for cleaning and normalizing filenames.
  *
@@ -12,6 +14,8 @@ namespace App\Services\NameFixing;
  */
 class FileNameCleaner
 {
+    use DetectsHashedNames;
+
     /**
      * Archive extension patterns to remove.
      */
@@ -197,101 +201,7 @@ class FileNameCleaner
      */
     public function looksLikeHashedName(string $title): bool
     {
-        $t = trim($title);
-
-        // Remove common file extensions for analysis
-        $cleaned = preg_replace('/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx|par2?|nfo|sfv|nzb|rar|r\d{2,3}|zip|7z|gz|tar|001)$/i', '', $t);
-
-        // Get core name without separators
-        $coreName = preg_replace('/[.\-_\s]+/', '', $cleaned);
-
-        // Check for UUID patterns
-        if (preg_match('/^[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}$/i', $coreName)) {
-            return true;
-        }
-
-        // Check for pure hex strings (MD5, SHA1, etc.)
-        if (preg_match('/^[a-f0-9]{16,}$/i', $coreName)) {
-            return true;
-        }
-
-        // Analyze character patterns for randomness
-        $coreLen = strlen($coreName);
-        if ($coreLen >= 16 && preg_match('/^[a-zA-Z0-9]+$/', $coreName)) {
-            $transitions = $this->countCharacterTransitions($coreName);
-            $transitionRate = $transitions / ($coreLen - 1);
-
-            // High transition rate suggests randomness
-            if ($transitionRate > 0.35) {
-                if (! preg_match('/\b(movie|film|series|episode|season|show|video|audio|music|album|dvd|bluray|hdtv|webrip|xvid|x264|x265|hevc|aac|mp3|flac|720p|1080p|2160p|4k|complete|proper|repack|dubbed|subbed|english|french|german|spanish|italian|rip|web|hdr|remux|disc|internal|retail)\b/i', $t)) {
-                    return true;
-                }
-            }
-
-            // Check for lack of word-like sequences
-            $maxConsecutiveLetters = $this->getMaxConsecutiveLetters($coreName);
-            if ($coreLen >= 20 && $maxConsecutiveLetters < 5) {
-                if (! preg_match('/^[a-zA-Z]+\d{1,4}$/', $coreName)) {
-                    return true;
-                }
-            }
-        }
-
-        // Check for random-looking patterns
-        if (preg_match('/^[a-zA-Z]{1,3}\d{6,}[a-zA-Z]*$/i', $coreName) ||
-            preg_match('/^[a-zA-Z0-9]{2,4}\d{8,}$/i', $coreName)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Count character type transitions in a string.
-     */
-    private function countCharacterTransitions(string $str): int
-    {
-        $transitions = 0;
-        $len = strlen($str);
-
-        for ($i = 1; $i < $len; $i++) {
-            $prev = $str[$i - 1];
-            $curr = $str[$i];
-
-            $prevIsDigit = ctype_digit($prev);
-            $currIsDigit = ctype_digit($curr);
-            $prevIsUpper = ctype_upper($prev);
-            $currIsUpper = ctype_upper($curr);
-
-            if ($prevIsDigit !== $currIsDigit) {
-                $transitions++;
-            } elseif (! $prevIsDigit && ! $currIsDigit && $prevIsUpper !== $currIsUpper) {
-                $transitions++;
-            }
-        }
-
-        return $transitions;
-    }
-
-    /**
-     * Get the maximum consecutive letter count in a string.
-     */
-    private function getMaxConsecutiveLetters(string $str): int
-    {
-        $maxConsecutive = 0;
-        $currentConsecutive = 0;
-        $lastWasLetter = false;
-
-        for ($i = 0, $len = strlen($str); $i < $len; $i++) {
-            $isLetter = ctype_alpha($str[$i]);
-            if ($isLetter) {
-                $currentConsecutive = $lastWasLetter ? $currentConsecutive + 1 : 1;
-                $maxConsecutive = max($maxConsecutive, $currentConsecutive);
-            }
-            $lastWasLetter = $isLetter;
-        }
-
-        return $maxConsecutive;
+        return $this->isHashedOrGibberish($title);
     }
 
     /**

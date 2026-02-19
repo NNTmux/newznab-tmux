@@ -5,6 +5,7 @@ namespace App\Services\Categorization\Categorizers;
 use App\Models\Category;
 use App\Services\Categorization\CategorizationResult;
 use App\Services\Categorization\ReleaseContext;
+use App\Traits\DetectsHashedNames;
 
 /**
  * Categorizer for miscellaneous content and hash detection.
@@ -13,6 +14,8 @@ use App\Services\Categorization\ReleaseContext;
  */
 class MiscCategorizer extends AbstractCategorizer
 {
+    use DetectsHashedNames;
+
     protected int $priority = 1; // Highest priority - run first to catch hashes
 
     public function getName(): string
@@ -29,6 +32,16 @@ class MiscCategorizer extends AbstractCategorizer
             return $result;
         }
 
+        // Check for obfuscated/encoded patterns
+        if ($result = $this->checkObfuscated($name)) {
+            return $result;
+        }
+
+        // Check for gibberish patterns (character-analysis heuristics)
+        if ($result = $this->checkGibberish($name)) {
+            return $result;
+        }
+
         // Check for archive formats
         if ($result = $this->checkArchive($name)) {
             return $result;
@@ -39,34 +52,96 @@ class MiscCategorizer extends AbstractCategorizer
             return $result;
         }
 
-        // Check for obfuscated/encoded patterns
-        if ($result = $this->checkObfuscated($name)) {
-            return $result;
-        }
-
         return $this->noMatch();
     }
 
     protected function checkHash(string $name): ?CategorizationResult
     {
-        // MD5 hash (32 hex characters) - match with word boundaries or quotes/punctuation
-        if (preg_match('/(?:^|["\'\s\[\]\/\-])([a-f0-9]{32})(?:["\'\s\[\]\/\-\.]|$)/i', $name)) {
+        // MD5 hash (32 hex characters)
+        if ($this->isBoundedMd5Hash($name)) {
             return $this->matched(Category::OTHER_HASHED, 0.95, 'hash_md5');
         }
 
-        // SHA-1 hash (40 hex characters) - match with word boundaries or quotes/punctuation
-        if (preg_match('/(?:^|["\'\s\[\]\/\-])([a-f0-9]{40})(?:["\'\s\[\]\/\-\.]|$)/i', $name)) {
+        // SHA-1 hash (40 hex characters)
+        if ($this->isBoundedSha1Hash($name)) {
             return $this->matched(Category::OTHER_HASHED, 0.95, 'hash_sha1');
         }
 
-        // SHA-256 hash (64 hex characters) - match with word boundaries or quotes/punctuation
-        if (preg_match('/(?:^|["\'\s\[\]\/\-])([a-f0-9]{64})(?:["\'\s\[\]\/\-\.]|$)/i', $name)) {
+        // SHA-256 hash (64 hex characters)
+        if ($this->isBoundedSha256Hash($name)) {
             return $this->matched(Category::OTHER_HASHED, 0.95, 'hash_sha256');
         }
 
-        // Generic long hex hash (32-128 chars) - match with word boundaries or quotes/punctuation
-        if (preg_match('/(?:^|["\'\s\[\]\/\-])([a-f0-9]{32,128})(?:["\'\s\[\]\/\-\.]|$)/i', $name)) {
+        // Generic long hex hash (32-128 chars)
+        if ($this->isBoundedGenericHash($name)) {
             return $this->matched(Category::OTHER_HASHED, 0.95, 'hash_generic');
+        }
+
+        // Strip extensions and separators for core-name checks
+        $cleaned = $this->stripExtensionsForAnalysis($name);
+        $coreName = $this->getCoreNameWithoutSeparators($cleaned);
+
+        // UUID pattern
+        if ($this->isUuidPattern($coreName)) {
+            return $this->matched(Category::OTHER_HASHED, 0.95, 'hash_uuid');
+        }
+
+        // Pure hex string (≥16 chars)
+        if ($this->isPureHexString($coreName)) {
+            return $this->matched(Category::OTHER_HASHED, 0.95, 'hash_hex');
+        }
+
+        return null;
+    }
+
+    protected function checkObfuscated(string $name): ?CategorizationResult
+    {
+        // Release names consisting only of uppercase letters and numbers
+        if ($this->isObfuscatedUppercaseString($name)) {
+            return $this->matched(Category::OTHER_HASHED, 0.7, 'obfuscated_uppercase');
+        }
+
+        // Mixed-case alphanumeric strings without separators
+        if ($this->isObfuscatedMixedAlphanumeric($name)) {
+            return $this->matched(Category::OTHER_HASHED, 0.7, 'obfuscated_mixed_alphanumeric');
+        }
+
+        // Obfuscated filename embedded in usenet subject line format
+        if ($this->isObfuscatedUsenetFilename($name)) {
+            return $this->matched(Category::OTHER_HASHED, 0.85, 'obfuscated_usenet_filename');
+        }
+
+        // Only punctuation and numbers with no clear structure
+        if ($this->isObfuscatedPunctuation($name)) {
+            return $this->matched(Category::OTHER_MISC, 0.5, 'obfuscated_pattern');
+        }
+
+        return null;
+    }
+
+    /**
+     * Check for gibberish patterns using character-analysis heuristics.
+     * These are patterns ported from FileNameCleaner that were previously
+     * missing from the categorization pipeline.
+     */
+    protected function checkGibberish(string $name): ?CategorizationResult
+    {
+        $cleaned = $this->stripExtensionsForAnalysis($name);
+        $coreName = $this->getCoreNameWithoutSeparators($cleaned);
+
+        // High character-transition rate suggests randomness
+        if ($this->isRandomByCharacterAnalysis($coreName, $name)) {
+            return $this->matched(Category::OTHER_HASHED, 0.75, 'gibberish_random_transitions');
+        }
+
+        // Long alphanumeric but lacks word-like letter sequences
+        if ($this->hasInsufficientWordStructure($coreName)) {
+            return $this->matched(Category::OTHER_HASHED, 0.75, 'gibberish_no_word_structure');
+        }
+
+        // Random-looking patterns dominated by digits
+        if ($this->isRandomDigitPattern($coreName)) {
+            return $this->matched(Category::OTHER_HASHED, 0.7, 'gibberish_random_digits');
         }
 
         return null;
@@ -97,99 +172,5 @@ class MiscCategorizer extends AbstractCategorizer
         }
 
         return null;
-    }
-
-    protected function checkObfuscated(string $name): ?CategorizationResult
-    {
-        // Release names consisting only of uppercase letters and numbers
-        if (preg_match('/^[A-Z0-9]{15,}$/', $name)) {
-            return $this->matched(Category::OTHER_HASHED, 0.7, 'obfuscated_uppercase');
-        }
-
-        // Mixed-case alphanumeric strings without separators (common obfuscation pattern)
-        // These look like random strings: e.g., "AA7Jl2toE8Q53yNZmQ5R6G"
-        if (preg_match('/^[a-zA-Z0-9]{15,}$/', $name) &&
-            ! preg_match('/\b(19|20)\d{2}\b/', $name) &&
-            ! preg_match('/^[A-Z][a-z]+([A-Z][a-z]+)+$/', $name)) { // Exclude CamelCase words
-            return $this->matched(Category::OTHER_HASHED, 0.7, 'obfuscated_mixed_alphanumeric');
-        }
-
-        // Obfuscated filename embedded in usenet subject line format
-        // Matches patterns like: [XX/XX] - "RANDOMSTRING.partXX.rar" or "RANDOMSTRING.7z.001"
-        // The filename inside quotes is random alphanumeric with no meaningful words
-        if (preg_match('/\[\d+\/\d+\]\s*-\s*"([a-zA-Z0-9]{12,})\.(part\d+\.rar|7z\.\d{3}|rar|zip|vol\d+\+\d+\.par2|par2)"/i', $name, $matches)) {
-            $filename = $matches[1];
-            // Ensure the filename looks random (not a real title)
-            // Real titles would have words/structure, obfuscated ones are random chars
-            if (! preg_match('/[._ -]/', $filename) && // No separators
-                ! preg_match('/\b(19|20)\d{2}\b/', $filename) && // No year
-                $this->looksLikeRandomString($filename)) { // Additional entropy check
-                return $this->matched(Category::OTHER_HASHED, 0.85, 'obfuscated_usenet_filename');
-            }
-        }
-
-        // Only punctuation and numbers with no clear structure
-        if (preg_match('/^[^a-zA-Z]*[A-Z0-9\._\-]{5,}[^a-zA-Z]*$/', $name) &&
-            ! preg_match('/\.(mkv|avi|mp4|mp3|flac|pdf|epub|exe|iso)$/i', $name)) {
-            return $this->matched(Category::OTHER_MISC, 0.5, 'obfuscated_pattern');
-        }
-
-        return null;
-    }
-
-    /**
-     * Check if a string looks like a random/obfuscated string rather than a real title.
-     * Uses multiple heuristics to detect randomly generated filenames.
-     */
-    protected function looksLikeRandomString(string $str): bool
-    {
-        // If it's all uppercase or all lowercase with no pattern, likely random
-        if (preg_match('/^[A-Z]+$/', $str) || preg_match('/^[a-z]+$/', $str)) {
-            return strlen($str) >= 12;
-        }
-
-        // Count character type transitions (upper to lower, letter to digit, etc.)
-        // Random strings have more irregular transitions
-        $transitions = 0;
-        $len = strlen($str);
-        for ($i = 1; $i < $len; $i++) {
-            $prevIsUpper = ctype_upper($str[$i - 1]);
-            $currIsUpper = ctype_upper($str[$i]);
-            $prevIsDigit = ctype_digit($str[$i - 1]);
-            $currIsDigit = ctype_digit($str[$i]);
-
-            if (($prevIsUpper !== $currIsUpper && ! $prevIsDigit && ! $currIsDigit) ||
-                ($prevIsDigit !== $currIsDigit)) {
-                $transitions++;
-            }
-        }
-
-        // High transition ratio suggests random string
-        $transitionRatio = $transitions / max(1, $len - 1);
-
-        // Random strings typically have:
-        // - Many case transitions (not following CamelCase pattern)
-        // - Mix of letters and numbers throughout
-        // - No recognizable word patterns
-
-        // Check for common English word patterns (consonant-vowel patterns)
-        $hasWordPattern = preg_match('/[bcdfghjklmnpqrstvwxyz]{1,2}[aeiou][bcdfghjklmnpqrstvwxyz]{1,2}[aeiou]/i', $str);
-
-        // If transition ratio is high and no word patterns, likely random
-        if ($transitionRatio > 0.3 && ! $hasWordPattern) {
-            return true;
-        }
-
-        // Check for sequences of consonants that are unlikely in real words
-        if (preg_match('/[bcdfghjklmnpqrstvwxyz]{5,}/i', $str)) {
-            return true;
-        }
-
-        // If mixed case and digits with no clear structure
-        if (preg_match('/[A-Z]/', $str) && preg_match('/[a-z]/', $str) && preg_match('/\d/', $str)) {
-            return true;
-        }
-
-        return false;
     }
 }
