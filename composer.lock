@@ -8254,16 +8254,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "7.1.0",
+            "version": "7.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "34bf23c9e541a5434e0898c7172fb6647d23889d"
+                "reference": "7d5ca47515fcba891cd18a769de0b6f0aa2555d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/34bf23c9e541a5434e0898c7172fb6647d23889d",
-                "reference": "34bf23c9e541a5434e0898c7172fb6647d23889d",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/7d5ca47515fcba891cd18a769de0b6f0aa2555d8",
+                "reference": "7d5ca47515fcba891cd18a769de0b6f0aa2555d8",
                 "shasum": ""
             },
             "require": {
@@ -8329,7 +8329,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-permission/issues",
-                "source": "https://github.com/spatie/laravel-permission/tree/7.1.0"
+                "source": "https://github.com/spatie/laravel-permission/tree/7.2.0"
             },
             "funding": [
                 {
@@ -8337,7 +8337,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-14T17:17:28+00:00"
+            "time": "2026-02-16T22:23:26+00:00"
         },
         {
             "name": "spatie/temporary-directory",
@@ -13692,16 +13692,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v3.94.0",
+            "version": "v3.94.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer.git",
-                "reference": "883b20fb38c7866de9844ab6d0a205c423bde2d4"
+                "reference": "d1a3634e29916367b885250e1fc4dfd5ffe3b091"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/883b20fb38c7866de9844ab6d0a205c423bde2d4",
-                "reference": "883b20fb38c7866de9844ab6d0a205c423bde2d4",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/d1a3634e29916367b885250e1fc4dfd5ffe3b091",
+                "reference": "d1a3634e29916367b885250e1fc4dfd5ffe3b091",
                 "shasum": ""
             },
             "require": {
@@ -13784,7 +13784,7 @@
             ],
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues",
-                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.94.0"
+                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.94.1"
             },
             "funding": [
                 {
@@ -13792,7 +13792,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-11T16:44:33+00:00"
+            "time": "2026-02-18T12:24:42+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",
@@ -14118,16 +14118,16 @@
         },
         {
             "name": "laravel/boost",
-            "version": "v2.1.6",
+            "version": "v2.1.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/boost.git",
-                "reference": "b8923e6131e5b705da299891284d327562445618"
+                "reference": "3f999986f9dc0f1faa9a6607739e938d551e27df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/boost/zipball/b8923e6131e5b705da299891284d327562445618",
-                "reference": "b8923e6131e5b705da299891284d327562445618",
+                "url": "https://api.github.com/repos/laravel/boost/zipball/3f999986f9dc0f1faa9a6607739e938d551e27df",
+                "reference": "3f999986f9dc0f1faa9a6607739e938d551e27df",
                 "shasum": ""
             },
             "require": {
@@ -14180,7 +14180,7 @@
                 "issues": "https://github.com/laravel/boost/issues",
                 "source": "https://github.com/laravel/boost"
             },
-            "time": "2026-02-16T23:53:14+00:00"
+            "time": "2026-02-18T12:19:28+00:00"
         },
         {
             "name": "laravel/mcp",
@@ -15415,16 +15415,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "12.5.13",
+            "version": "12.5.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "89d94361ae5bc3244e7e769ee65267b2e4976749"
+                "reference": "47283cfd98d553edcb1353591f4e255dc1bb61f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/89d94361ae5bc3244e7e769ee65267b2e4976749",
-                "reference": "89d94361ae5bc3244e7e769ee65267b2e4976749",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/47283cfd98d553edcb1353591f4e255dc1bb61f0",
+                "reference": "47283cfd98d553edcb1353591f4e255dc1bb61f0",
                 "shasum": ""
             },
             "require": {
@@ -15493,7 +15493,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.5.13"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.5.14"
             },
             "funding": [
                 {
@@ -15517,7 +15517,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-02-18T08:58:58+00:00"
+            "time": "2026-02-18T12:38:40+00:00"
         },
         {
             "name": "react/cache",
