@@ -4,24 +4,24 @@
 <div class="container mx-auto px-4 py-6">
     <!-- Flash Messages -->
     @if(session('success'))
-        <div x-data="{ show: true }" x-show="show" class="mb-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 flex items-center justify-between">
+        <div x-data="dismissible" x-show="show" class="mb-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 flex items-center justify-between">
             <div class="flex items-center">
                 <i class="fas fa-check-circle text-green-600 dark:text-green-400 mr-3 text-xl"></i>
                 <p class="text-sm text-green-800 dark:text-green-200 font-medium">{{ session('success') }}</p>
             </div>
-            <button x-on:click="show = false" class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200">
+            <button x-on:click="dismiss" class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200">
                 <i class="fas fa-times"></i>
             </button>
         </div>
     @endif
 
     @if(session('error'))
-        <div x-data="{ show: true }" x-show="show" class="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-center justify-between">
+        <div x-data="dismissible" x-show="show" class="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-center justify-between">
             <div class="flex items-center">
                 <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 mr-3 text-xl"></i>
                 <p class="text-sm text-red-800 dark:text-red-200 font-medium">{{ session('error') }}</p>
             </div>
-            <button x-on:click="show = false" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200">
+            <button x-on:click="dismiss" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200">
                 <i class="fas fa-times"></i>
             </button>
         </div>

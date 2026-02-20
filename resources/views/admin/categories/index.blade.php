@@ -119,7 +119,8 @@
                                         </a>
                                         <button type="button"
                                                 class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                                x-on:click="$dispatch('open-category-delete-modal', { id: {{ $category->id }} })"
+                                                data-category-id="{{ $category->id }}"
+                                                x-on:click="$dispatch('open-category-delete-modal', { id: $el.dataset.categoryId })"
                                                 title="Delete Category">
                                             <i class="fa fa-trash"></i>
                                         </button>
@@ -156,8 +157,9 @@
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div x-data="{ open: false, categoryId: null }"
-     x-on:open-category-delete-modal.window="open = true; categoryId = $event.detail.id"
+<div x-data="categoryDeleteModal"
+     data-delete-url="{{ url('/admin/category-delete') }}"
+     x-on:open-category-delete-modal.window="openModal($event.detail.id)"
      x-show="open"
      x-cloak
      class="fixed inset-0 bg-gray-600/50 overflow-y-auto h-full w-full z-50">
@@ -165,7 +167,7 @@
         <div class="mt-3">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Confirm Delete</h3>
-                <button type="button" x-on:click="open = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <button type="button" x-on:click="close" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
                     <i class="fa fa-times"></i>
                 </button>
             </div>
@@ -178,10 +180,10 @@
                 </p>
             </div>
             <div class="flex gap-3 px-4 py-3">
-                <button type="button" x-on:click="open = false" class="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                <button type="button" x-on:click="close" class="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
                     Cancel
                 </button>
-                <a x-bind:href="'{{ url('/admin/category-delete') }}?id=' + categoryId" class="flex-1 px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-center rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition">
+                <a x-bind:href="deleteUrl()" class="flex-1 px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-center rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition">
                     Delete
                 </a>
             </div>

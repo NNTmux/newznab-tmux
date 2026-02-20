@@ -30,6 +30,7 @@ import './components/toast-notification.js';
 import './components/tab-switcher.js';
 import './components/cart-button.js';
 import './components/search-autocomplete.js';
+import './components/dismissible.js';
 
 // --- Shared utility (backward compat) ---
 window.escapeHtml = function(text) {

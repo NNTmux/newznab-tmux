@@ -60,10 +60,10 @@
 
     <!-- Date Range Filter -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-6">
-        <form method="GET" action="{{ route('admin.promotions.show-statistics', $promotion->id) }}" class="flex flex-wrap gap-4 items-end" x-data="{ showCustom: {{ $selectedPeriod === 'custom' ? 'true' : 'false' }} }" x-ref="periodForm">
+        <form method="GET" action="{{ route('admin.promotions.show-statistics', $promotion->id) }}" class="flex flex-wrap gap-4 items-end" x-data="periodFilter({{ $selectedPeriod === 'custom' ? 'true' : 'false' }})" x-ref="periodForm">
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Time Period</label>
-                <select name="period" class="form-select rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" x-on:change="if($event.target.value === 'custom') { showCustom = true } else { showCustom = false; $refs.periodForm.submit() }">
+                <select name="period" class="form-select rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" x-on:change="onPeriodChange">
                     <option value="7days" {{ $selectedPeriod === '7days' ? 'selected' : '' }}>Last 7 Days</option>
                     <option value="30days" {{ $selectedPeriod === '30days' ? 'selected' : '' }}>Last 30 Days</option>
                     <option value="90days" {{ $selectedPeriod === '90days' ? 'selected' : '' }}>Last 90 Days</option>
