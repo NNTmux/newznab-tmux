@@ -121,11 +121,10 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <button type="button"
-                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition"
+                                        class="comment-delete-btn text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition"
                                         title="Delete"
                                         data-comment-id="{{ $comment->id }}"
-                                        data-comment-text="{{ addslashes(Str::limit($comment->text, 50)) }}"
-                                        x-on:click="$dispatch('open-delete-modal', { id: $el.dataset.commentId, text: $el.dataset.commentText })">
+                                        data-comment-text="{{ addslashes(Str::limit($comment->text, 50)) }}">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </td>
@@ -151,7 +150,6 @@
 <!-- Delete Confirmation Modal -->
 <div x-data="commentDeleteModal"
      data-delete-url="{{ url('admin/comment-delete') }}"
-     x-on:open-delete-modal.window="openModal($event.detail.id, $event.detail.text)"
      x-show="open"
      x-cloak
      class="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 transition-opacity">

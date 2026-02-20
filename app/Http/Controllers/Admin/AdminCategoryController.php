@@ -135,4 +135,38 @@ class AdminCategoryController extends BasePageController
 
         return view('admin.categories.edit', $this->viewData);
     }
+
+    /**
+     * Delete a category.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     *
+     * @throws \Exception
+     */
+    public function destroy(Request $request)
+    {
+        $this->setAdminPrefs();
+
+        $id = $request->input('id');
+
+        if (! $id) {
+            return redirect()->to('admin/category-list')->with('error', 'No category ID provided.');
+        }
+
+        $category = Category::find($id);
+
+        if (! $category) {
+            return redirect()->to('admin/category-list')->with('error', 'Category not found.');
+        }
+
+        // Check for child categories
+        if (Category::where('root_categories_id', $id)->exists()) {
+            return redirect()->to('admin/category-list')->with('error', 'Cannot delete category "'.$category->title.'" because it has child categories. Remove or reassign them first.');
+        }
+
+        $title = $category->title;
+        $category->delete();
+
+        return redirect()->to('admin/category-list')->with('success', 'Category "'.$title.'" deleted successfully.');
+    }
 }

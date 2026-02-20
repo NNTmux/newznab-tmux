@@ -118,9 +118,8 @@
                                             <i class="fa fa-edit"></i>
                                         </a>
                                         <button type="button"
-                                                class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                                class="category-delete-btn text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                                                 data-category-id="{{ $category->id }}"
-                                                x-on:click="$dispatch('open-category-delete-modal', { id: $el.dataset.categoryId })"
                                                 title="Delete Category">
                                             <i class="fa fa-trash"></i>
                                         </button>
@@ -159,7 +158,6 @@
 <!-- Delete Confirmation Modal -->
 <div x-data="categoryDeleteModal"
      data-delete-url="{{ url('/admin/category-delete') }}"
-     x-on:open-category-delete-modal.window="openModal($event.detail.id)"
      x-show="open"
      x-cloak
      class="fixed inset-0 bg-gray-600/50 overflow-y-auto h-full w-full z-50">
@@ -190,7 +188,5 @@
         </div>
     </div>
 </div>
-
-{{-- Scripts moved to resources/js/csp-safe.js --}}
 @endsection
 

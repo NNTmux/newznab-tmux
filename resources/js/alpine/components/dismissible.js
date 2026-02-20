@@ -23,13 +23,21 @@ Alpine.data('commentDeleteModal', () => ({
 
     init() {
         this._baseUrl = this.$el.dataset.deleteUrl || '';
+        // Listen for delete button clicks via delegation (CSP-safe, no $dispatch with inline objects)
+        var self = this;
+        document.addEventListener('click', function(e) {
+            var btn = e.target.closest('.comment-delete-btn');
+            if (btn) {
+                self.openModal(btn.dataset.commentId, btn.dataset.commentText);
+            }
+        });
     },
 
     openModal(id, text) {
         this.commentId = id;
         this.commentText = text;
         this.open = true;
-        const form = this.$refs.deleteForm;
+        var form = this.$refs.deleteForm;
         if (form) {
             form.action = this._baseUrl + '?id=' + id;
         }
@@ -49,6 +57,14 @@ Alpine.data('categoryDeleteModal', () => ({
 
     init() {
         this._baseUrl = this.$el.dataset.deleteUrl || '';
+        // Listen for delete button clicks via delegation (CSP-safe, no $dispatch with inline objects)
+        var self = this;
+        document.addEventListener('click', function(e) {
+            var btn = e.target.closest('.category-delete-btn');
+            if (btn) {
+                self.openModal(btn.dataset.categoryId);
+            }
+        });
     },
 
     openModal(id) {
