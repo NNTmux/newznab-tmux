@@ -299,7 +299,7 @@
                             <!-- Collapsible Disable Form -->
                             <div class="space-y-3" x-data="profileEdit">
                                 <button x-show="!show2faForm"
-                                        x-on:click="toggle2fa"
+                                        x-on:click="toggle2fa()"
                                         type="button"
                                         class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition">
                                     <i class="fas fa-times-circle mr-2"></i>Disable 2FA
@@ -340,7 +340,7 @@
                                                     class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition">
                                                 <i class="fas fa-check mr-2"></i>Confirm Disable
                                             </button>
-                                            <button x-on:click="cancel2fa"
+                                            <button x-on:click="cancel2fa()"
                                                     type="button"
                                                     class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition">
                                                 <i class="fas fa-times mr-2"></i>Cancel

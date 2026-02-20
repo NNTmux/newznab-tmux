@@ -86,8 +86,10 @@ Alpine.data('categoryDeleteModal', () => ({
 Alpine.data('periodFilter', (initialShowCustom) => ({
     showCustom: initialShowCustom || false,
 
-    onPeriodChange(e) {
-        if (e.target.value === 'custom') {
+    onPeriodChange() {
+        var select = this.$refs.periodForm ? this.$refs.periodForm.querySelector('select[name="period"]') : null;
+        if (!select) return;
+        if (select.value === 'custom') {
             this.showCustom = true;
         } else {
             this.showCustom = false;

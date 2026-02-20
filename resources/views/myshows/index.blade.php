@@ -150,7 +150,7 @@
                                            data-message="Are you sure you want to remove this show from your list?"
                                            data-confirm-text="Remove"
                                            data-type="danger"
-                                           x-on:click.prevent="navigate">
+                                           x-on:click.prevent="navigate()">
                                             <i class="fa fa-trash mr-1.5"></i>
                                             <span class="hidden xl:inline">Delete</span>
                                         </a>
@@ -210,7 +210,7 @@
                                    data-message="Are you sure you want to remove this show from your list?"
                                    data-confirm-text="Remove"
                                    data-type="danger"
-                                   x-on:click.prevent="navigate">
+                                   x-on:click.prevent="navigate()">
                                     <i class="fa fa-trash"></i>
                                 </a>
                             </div>

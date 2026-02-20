@@ -21,7 +21,7 @@
                               x-data="confirmForm"
                               data-message="Are you sure you want to cancel this invitation?">
                             @csrf
-                            <button type="button" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700" x-on:click="submit">
+                            <button type="button" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700" x-on:click="submit()">
                                 <i class="fas fa-ban mr-2"></i>Cancel
                             </button>
                         </form>

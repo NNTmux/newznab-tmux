@@ -115,7 +115,7 @@
                                                data-message="Are you sure you want to remove this movie from your watchlist?"
                                                data-confirm-text="Remove"
                                                data-type="danger"
-                                               x-on:click.prevent="navigate">
+                                               x-on:click.prevent="navigate()">
                                                 <i class="fa fa-trash mr-1.5"></i>Delete
                                             </a>
                                         </div>
@@ -228,7 +228,7 @@
                                    data-message="Are you sure you want to remove this movie from your watchlist?"
                                    data-confirm-text="Remove"
                                    data-type="danger"
-                                   x-on:click.prevent="navigate">
+                                   x-on:click.prevent="navigate()">
                                     <i class="fa fa-trash"></i>
                                 </a>
                             </div>

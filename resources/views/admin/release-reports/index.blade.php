@@ -9,7 +9,7 @@
                 <i class="fas fa-check-circle text-green-600 dark:text-green-400 mr-3 text-xl"></i>
                 <p class="text-sm text-green-800 dark:text-green-200 font-medium">{{ session('success') }}</p>
             </div>
-            <button x-on:click="dismiss" class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200">
+            <button x-on:click="dismiss()" class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -21,7 +21,7 @@
                 <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 mr-3 text-xl"></i>
                 <p class="text-sm text-red-800 dark:text-red-200 font-medium">{{ session('error') }}</p>
             </div>
-            <button x-on:click="dismiss" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200">
+            <button x-on:click="dismiss()" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200">
                 <i class="fas fa-times"></i>
             </button>
         </div>

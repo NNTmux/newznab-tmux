@@ -9,7 +9,7 @@
                 <i class="fas fa-check-circle text-green-600 dark:text-green-400 mr-3 text-xl"></i>
                 <p class="text-sm text-green-800 dark:text-green-200 font-medium">{{ session('success') }}</p>
             </div>
-            <button x-on:click="dismiss" class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200">
+            <button x-on:click="dismiss()" class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -21,7 +21,7 @@
                 <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 mr-3 text-xl"></i>
                 <p class="text-sm text-red-800 dark:text-red-200 font-medium">{{ session('error') }}</p>
             </div>
-            <button x-on:click="dismiss" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200">
+            <button x-on:click="dismiss()" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -160,7 +160,7 @@
                     <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400 mr-2"></i>
                     Confirm Deletion
                 </h3>
-                <button type="button" x-on:click="close" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <button type="button" x-on:click="close()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -174,7 +174,7 @@
         </div>
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
             <button type="button"
-                    x-on:click="close"
+                    x-on:click="close()"
                     class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition font-medium">
                 <i class="fas fa-times mr-2"></i>Cancel
             </button>
