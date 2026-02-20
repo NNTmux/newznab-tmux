@@ -199,7 +199,7 @@
 
             <!-- Episodes by Season - Tabbed Interface -->
             @if(!empty($seasons))
-                <form id="nzb_multi_operations_form" method="get">
+                <form id="nzb_multi_operations_form" method="get" x-data="releaseMultiOps">
                 <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm" x-data="seasonSwitcher">
                     <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                         <div class="flex items-center justify-between">
@@ -229,7 +229,7 @@
                     <!-- Season Tabs -->
                     <div class="border-b border-gray-200">
                         <div class="flex items-center px-4 py-2 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
-                            <input type="checkbox" class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700 mr-2" id="chkSelectAll">
+                            <input type="checkbox" class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700 mr-2" id="chkSelectAll" x-model="allChecked" @change="toggleAll()">
                             <label for="chkSelectAll" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">Select All</label>
                         </div>
                         <nav class="flex flex-wrap -mb-px px-4" aria-label="Tabs">
@@ -261,7 +261,7 @@
                                             @foreach($releases as $release)
                                                 <div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-900 rounded p-3 hover:bg-gray-100">
                                                     <div class="flex-shrink-0">
-                                                        <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" name="release[]" value="{{ $release->guid }}">
+                                                        <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" name="release[]" value="{{ $release->guid }}" @change="onCheckboxChange()">
                                                     </div>
                                                     <div class="flex-1">
                                                         <div class="flex items-center gap-2 flex-wrap">

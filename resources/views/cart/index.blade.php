@@ -31,7 +31,7 @@
 
         @if(count($results) > 0)
             <!-- Cart Items -->
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm">
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm" x-data="cartPage">
                 <div class="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                     <h5 class="text-lg font-semibold text-gray-800 dark:text-gray-200">My Download Basket</h5>
                     <div class="flex items-center gap-2">
@@ -53,7 +53,7 @@
                             <tr>
                                 <th class="px-4 py-3 text-left" style="width: 30px">
                                     <label class="inline-flex items-center cursor-pointer">
-                                        <input id="check-all" type="checkbox" class="form-checkbox h-4 w-4 text-blue-600 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:focus:ring-blue-600 focus:ring-2">
+                                        <input id="check-all" type="checkbox" class="form-checkbox h-4 w-4 text-blue-600 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:focus:ring-blue-600 focus:ring-2" x-model="allChecked" @change="toggleAll()">
                                     </label>
                                 </th>
                                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Name</th>
@@ -70,7 +70,8 @@
                                                type="checkbox"
                                                name="table_records"
                                                class="cart-checkbox form-checkbox h-4 w-4 text-blue-600 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:focus:ring-blue-600 focus:ring-2 cursor-pointer"
-                                               value="{{ $result->release->guid }}">
+                                               value="{{ $result->release->guid }}"
+                                               @change="onCheckboxChange()">
                                     </td>
                                     <td class="px-4 py-3">
                                         <a href="{{ url('/details/' . $result->release->guid) }}"

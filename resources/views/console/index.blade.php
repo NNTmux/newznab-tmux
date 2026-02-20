@@ -41,7 +41,7 @@
     </div>
 
     @if($results->count() > 0)
-        <form id="nzb_multi_operations_form" method="get">
+        <form id="nzb_multi_operations_form" method="get" x-data="releaseMultiOps">
             <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200">
                 <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                     <!-- Left Section -->
@@ -176,7 +176,7 @@
                                                                         {{ $release->searchname }}
                                                                     </a>
                                                                     <label class="inline-flex items-center flex-shrink-0">
-                                                                        <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600" value="{{ $release->guid }}" id="chksingle"/>
+                                                                        <input type="checkbox" class="chkRelease form-checkbox h-4 w-4 text-blue-600" value="{{ $release->guid }}" name="release[]" @change="onCheckboxChange()"/>
                                                                     </label>
                                                                 </div>
 
