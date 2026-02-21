@@ -148,7 +148,7 @@
 
     <!-- Search Results -->
     @if(isset($results) && ((is_array($results) && count($results) > 0) || (is_object($results) && $results->count() > 0)))
-        <form id="nzb_multi_operations_form" method="get">
+        <form id="nzb_multi_operations_form" method="get" x-data="releaseMultiOps">
             <!-- Multi-operations toolbar -->
             <div class="mb-4 bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -193,7 +193,7 @@
                     <thead class="bg-gray-100 dark:bg-gray-900">
                         <tr>
                             <th class="px-3 py-3 text-left">
-                                <input type="checkbox" class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" id="chkSelectAll">
+                                <input type="checkbox" class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" id="chkSelectAll" x-model="allChecked" @change="toggleAll()">
                             </th>
                             <th class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Name</th>
                             <th class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Category</th>
@@ -208,7 +208,7 @@
                         @foreach($results as $result)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                                 <td class="px-3 py-4 whitespace-nowrap">
-                                    <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" name="release[]" value="{{ $result->guid }}">
+                                    <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" name="release[]" value="{{ $result->guid }}" @change="onCheckboxChange()">
                                 </td>
                                 <td class="px-3 py-4">
                                     <div class="flex-1">
@@ -346,7 +346,7 @@
                 @foreach($results as $result)
                     <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:shadow-md transition">
                         <div class="flex items-start gap-3">
-                            <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700 mt-1" name="release[]" value="{{ $result->guid }}">
+                            <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700 mt-1" name="release[]" value="{{ $result->guid }}" @change="onCheckboxChange()">
                             <div class="flex-1">
                                 <div class="flex items-center gap-2 flex-wrap mb-2">
                                     <a href="{{ url('/details/' . $result->guid) }}" class="text-lg font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 break-words break-all">

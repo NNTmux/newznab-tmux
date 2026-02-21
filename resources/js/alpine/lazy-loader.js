@@ -33,6 +33,7 @@ const lazyComponentMap = {
     'profilePage':     () => import('./components/profile-edit.js'),    // same file
     'copyToClipboard': () => import('./components/profile-edit.js'),    // same file
     'cartPage':        () => import('./components/cart-page.js'),
+    'releaseMultiOps': () => import('./components/cart-page.js'),  // same file
     'authPage':        () => import('./components/auth-page.js'),
     'otpInput':        () => import('./components/auth-page.js'),       // same file
 

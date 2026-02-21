@@ -9,18 +9,18 @@
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.11",
-        "@tailwindcss/vite": "^4.1.18",
+        "@tailwindcss/vite": "^4.2.0",
         "axios": "^1.13.5",
         "lodash": "^4.17.23",
-        "npm-check-updates": "^19.3.2",
+        "npm-check-updates": "^19.4.1",
         "prettier": "^3.8.1",
-        "tailwindcss": "^4.1.18",
+        "tailwindcss": "^4.2.0",
         "vite": "^7.3",
-        "vue": "^3.5.27"
+        "vue": "^3.5.28"
     },
     "dependencies": {
         "@alpinejs/csp": "^3.15.8",
-        "@fortawesome/fontawesome-free": "^7.1.0",
+        "@fortawesome/fontawesome-free": "^7.2.0",
         "@melloware/coloris": "^0.25.0",
         "@simonwep/pickr": "^1.9.1",
         "chart.js": "^4.5.1",

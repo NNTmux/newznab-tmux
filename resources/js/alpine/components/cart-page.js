@@ -86,6 +86,12 @@ Alpine.data('releaseMultiOps', () => ({
         boxes.forEach(cb => { cb.checked = this.allChecked; });
     },
 
+    onCheckboxChange() {
+        const boxes = document.querySelectorAll('.chkRelease');
+        const checked = document.querySelectorAll('.chkRelease:checked');
+        this.allChecked = boxes.length > 0 && checked.length === boxes.length;
+    },
+
     _getSelected() {
         return Array.from(document.querySelectorAll('.chkRelease:checked')).map(cb => cb.value);
     },

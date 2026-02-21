@@ -88,12 +88,12 @@
                                 <i class="fa fa-refresh mr-1"></i> Reset Selected
                             </button>
                             <button type="button"
-                                    @click="resetAllOpen = true"
+                                    @click="handleAction('show-reset-modal')"
                                     class="px-3 py-2 bg-yellow-600 text-white text-sm rounded-lg hover:bg-yellow-700">
                                 <i class="fa fa-refresh mr-1"></i> Reset All
                             </button>
                             <button type="button"
-                                    @click="purgeAllOpen = true"
+                                    @click="handleAction('show-purge-modal')"
                                     class="px-3 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-lg hover:bg-red-700">
                                 <i class="fa fa-trash mr-1"></i> Purge All
                             </button>
@@ -281,7 +281,7 @@
      x-transition:leave-end="opacity-0"
      class="fixed inset-0 bg-gray-600/50 overflow-y-auto h-full w-full z-50">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800"
-         @click.outside="resetAllOpen = false">
+         @click.outside="handleAction('hide-reset-modal')">
         <div class="mt-3">
             <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Confirm Reset All Groups</h3>
             <p class="text-sm text-red-600 dark:text-red-400 mb-2">
@@ -292,7 +292,7 @@
             </p>
             <div class="flex justify-end gap-3">
                 <button type="button"
-                        @click="resetAllOpen = false"
+                        @click="handleAction('hide-reset-modal')"
                         class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
                     Cancel
                 </button>
@@ -317,7 +317,7 @@
      x-transition:leave-end="opacity-0"
      class="fixed inset-0 bg-gray-600/50 overflow-y-auto h-full w-full z-50">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800"
-         @click.outside="purgeAllOpen = false">
+         @click.outside="handleAction('hide-purge-modal')">
         <div class="mt-3">
             <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Confirm Purge All Groups</h3>
             <p class="text-sm text-red-600 dark:text-red-400 mb-2">
@@ -328,7 +328,7 @@
             </p>
             <div class="flex justify-end gap-3">
                 <button type="button"
-                        @click="purgeAllOpen = false"
+                        @click="handleAction('hide-purge-modal')"
                         class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
                     Cancel
                 </button>
@@ -353,7 +353,7 @@
      x-transition:leave-end="opacity-0"
      class="fixed inset-0 bg-gray-600/50 overflow-y-auto h-full w-full z-50">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800"
-         @click.outside="resetSelectedOpen = false">
+         @click.outside="handleAction('hide-reset-selected-modal')">
         <div class="mt-3">
             <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Confirm Reset Selected Groups</h3>
             <p class="text-sm text-orange-600 dark:text-orange-400 mb-2">
@@ -369,7 +369,7 @@
             </div>
             <div class="flex justify-end gap-3">
                 <button type="button"
-                        @click="resetSelectedOpen = false"
+                        @click="handleAction('hide-reset-selected-modal')"
                         class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
                     Cancel
                 </button>

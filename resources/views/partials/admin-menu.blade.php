@@ -9,7 +9,7 @@
 
     <!-- Users -->
     <div class="mb-4" x-data="adminSubmenu">
-        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
+        <button type="button" x-on:click="toggle()" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-users"></i>
                 <span>Users</span>
@@ -45,7 +45,7 @@
 
     <!-- Content -->
     <div class="mb-4" x-data="adminSubmenu">
-        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
+        <button type="button" x-on:click="toggle()" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-file-alt"></i>
                 <span>Content</span>
@@ -72,7 +72,7 @@
 
     <!-- Releases -->
     <div class="mb-4" x-data="adminSubmenu">
-        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
+        <button type="button" x-on:click="toggle()" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-download"></i>
                 <span>Releases</span>
@@ -97,7 +97,7 @@
 
     <!-- Movies -->
     <div class="mb-4" x-data="adminSubmenu">
-        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
+        <button type="button" x-on:click="toggle()" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-film"></i>
                 <span>Movies</span>
@@ -116,7 +116,7 @@
 
     <!-- TV Shows -->
     <div class="mb-4" x-data="adminSubmenu">
-        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
+        <button type="button" x-on:click="toggle()" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-tv"></i>
                 <span>TV Shows</span>
@@ -132,7 +132,7 @@
 
     <!-- AniDB -->
     <div class="mb-4" x-data="adminSubmenu">
-        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
+        <button type="button" x-on:click="toggle()" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-dragon"></i>
                 <span>AniDB</span>
@@ -148,7 +148,7 @@
 
     <!-- Games -->
     <div class="mb-4" x-data="adminSubmenu">
-        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
+        <button type="button" x-on:click="toggle()" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-gamepad"></i>
                 <span>Games</span>
@@ -164,7 +164,7 @@
 
     <!-- Console -->
     <div class="mb-4" x-data="adminSubmenu">
-        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
+        <button type="button" x-on:click="toggle()" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-desktop"></i>
                 <span>Console</span>
@@ -180,7 +180,7 @@
 
     <!-- Music -->
     <div class="mb-4" x-data="adminSubmenu">
-        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
+        <button type="button" x-on:click="toggle()" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-music"></i>
                 <span>Music</span>
@@ -196,7 +196,7 @@
 
     <!-- Books -->
     <div class="mb-4" x-data="adminSubmenu">
-        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
+        <button type="button" x-on:click="toggle()" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-book"></i>
                 <span>Books</span>
@@ -220,7 +220,7 @@
 
     <!-- Blacklist -->
     <div class="mb-4" x-data="adminSubmenu">
-        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
+        <button type="button" x-on:click="toggle()" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-ban"></i>
                 <span>Blacklist</span>
@@ -236,7 +236,7 @@
 
     <!-- Regexes -->
     <div class="mb-4" x-data="adminSubmenu">
-        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
+        <button type="button" x-on:click="toggle()" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-code"></i>
                 <span>Regexes</span>
@@ -258,7 +258,7 @@
 
     <!-- Groups -->
     <div class="mb-4" x-data="adminSubmenu">
-        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
+        <button type="button" x-on:click="toggle()" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-server"></i>
                 <span>Groups Management</span>
@@ -283,7 +283,7 @@
 
     <!-- System -->
     <div class="mb-4" x-data="adminSubmenu">
-        <button type="button" x-on:click="toggle" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
+        <button type="button" x-on:click="toggle()" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 py-2 px-3 rounded transition">
             <div class="flex items-center space-x-3">
                 <i class="fas fa-cog"></i>
                 <span>System</span>

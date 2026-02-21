@@ -71,6 +71,9 @@
                             Authentication Code
                         </label>
                         <input
+                            x-data="otpInput"
+                            x-model="value"
+                            x-on:input="onInput()"
                             type="text"
                             name="one_time_password"
                             id="one_time_password"

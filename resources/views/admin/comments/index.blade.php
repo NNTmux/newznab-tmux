@@ -4,24 +4,24 @@
 <div class="container mx-auto px-4 py-6">
     <!-- Flash Messages -->
     @if(session('success'))
-        <div x-data="{ show: true }" x-show="show" class="mb-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 flex items-center justify-between">
+        <div x-data="dismissible" x-show="show" class="mb-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 flex items-center justify-between">
             <div class="flex items-center">
                 <i class="fas fa-check-circle text-green-600 dark:text-green-400 mr-3 text-xl"></i>
                 <p class="text-sm text-green-800 dark:text-green-200 font-medium">{{ session('success') }}</p>
             </div>
-            <button x-on:click="show = false" class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200">
+            <button x-on:click="dismiss()" class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200">
                 <i class="fas fa-times"></i>
             </button>
         </div>
     @endif
 
     @if(session('error'))
-        <div x-data="{ show: true }" x-show="show" class="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-center justify-between">
+        <div x-data="dismissible" x-show="show" class="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-center justify-between">
             <div class="flex items-center">
                 <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 mr-3 text-xl"></i>
                 <p class="text-sm text-red-800 dark:text-red-200 font-medium">{{ session('error') }}</p>
             </div>
-            <button x-on:click="show = false" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200">
+            <button x-on:click="dismiss()" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -121,9 +121,10 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <button type="button"
-                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition"
+                                        class="comment-delete-btn text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition"
                                         title="Delete"
-                                        x-on:click="$dispatch('open-delete-modal', { id: {{ $comment->id }}, text: '{{ addslashes(Str::limit($comment->text, 50)) }}' })">
+                                        data-comment-id="{{ $comment->id }}"
+                                        data-comment-text="{{ addslashes(Str::limit($comment->text, 50)) }}">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </td>
@@ -147,8 +148,8 @@
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div x-data="{ open: false, commentId: null, commentText: '' }"
-     x-on:open-delete-modal.window="open = true; commentId = $event.detail.id; commentText = $event.detail.text; $refs.deleteForm.action = '{{ url('admin/comment-delete') }}?id=' + $event.detail.id"
+<div x-data="commentDeleteModal"
+     data-delete-url="{{ url('admin/comment-delete') }}"
      x-show="open"
      x-cloak
      class="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 transition-opacity">
@@ -159,7 +160,7 @@
                     <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400 mr-2"></i>
                     Confirm Deletion
                 </h3>
-                <button type="button" x-on:click="open = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <button type="button" x-on:click="close()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -173,7 +174,7 @@
         </div>
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
             <button type="button"
-                    x-on:click="open = false"
+                    x-on:click="close()"
                     class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition font-medium">
                 <i class="fas fa-times mr-2"></i>Cancel
             </button>
