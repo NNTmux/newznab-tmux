@@ -84,11 +84,12 @@ Alpine.data('sortDropdown', () => ({
     open: false,
 
     toggle() { this.open = !this.open; },
-    close() { this.open = false; }
+    close() { this.open = false; },
+    chevronClass() { return this.open ? 'rotate-180' : ''; }
 }));
 
 /**
- * Document-level delegation for search autocomplete and sort dropdowns
+ * Document-level delegation for search autocomplete
  * without x-data attributes.
  */
 (function() {
@@ -161,31 +162,4 @@ Alpine.data('sortDropdown', () => ({
         var formId = el.getAttribute('data-autocomplete-form');
         if (el.id && ddId) initAutocomplete(el.id, ddId, formId, 'autocomplete-suggestion', 10);
     });
-
-    // Sort dropdowns delegation
-    document.querySelectorAll('.sort-dropdown').forEach(function(dd) {
-        if (dd.closest('[x-data]')) return;
-        var toggle = dd.querySelector('.sort-dropdown-toggle');
-        var menu = dd.querySelector('.sort-dropdown-menu');
-        var chevron = dd.querySelector('.sort-dropdown-chevron');
-        if (!toggle || !menu) return;
-        if (toggle.hasAttribute('data-sort-initialized')) return;
-        toggle.setAttribute('data-sort-initialized', 'true');
-        toggle.addEventListener('click', function(ev) {
-            ev.preventDefault(); ev.stopPropagation();
-            var isOpen = !menu.classList.contains('hidden');
-            document.querySelectorAll('.sort-dropdown-menu').forEach(function(m) { m.classList.add('hidden'); });
-            document.querySelectorAll('.sort-dropdown-chevron').forEach(function(c) { c.classList.remove('rotate-180'); });
-            if (!isOpen) { menu.classList.remove('hidden'); if (chevron) chevron.classList.add('rotate-180'); }
-        });
-    });
-    if (!window._sortDropdownOutsideListenerAdded) {
-        window._sortDropdownOutsideListenerAdded = true;
-        document.addEventListener('click', function(ev) {
-            if (!ev.target.closest('.sort-dropdown')) {
-                document.querySelectorAll('.sort-dropdown-menu').forEach(function(m) { m.classList.add('hidden'); });
-                document.querySelectorAll('.sort-dropdown-chevron').forEach(function(c) { c.classList.remove('rotate-180'); });
-            }
-        });
-    }
 })();
