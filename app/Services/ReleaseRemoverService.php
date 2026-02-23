@@ -883,7 +883,7 @@ class ReleaseRemoverService
         $this->executeSimpleRemoval('Par2Only', sprintf(
             "SELECT r.guid, r.searchname, r.id
             FROM releases r
-            WHERE r.name REGEXP '\\.(vol[0-9]+\\+[0-9]+\\.par2|par2)[\"\\' ]*$'
+            WHERE r.searchname REGEXP '\\.(vol[0-9]+\\+[0-9]+\\.par2|par2)[\"\\' ]*$'
             AND r.id NOT IN (
                 SELECT rf.releases_id FROM release_files rf
                 WHERE rf.name NOT REGEXP '\\.par2'
