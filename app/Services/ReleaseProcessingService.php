@@ -431,7 +431,7 @@ final class ReleaseProcessingService
                 ->where('c.filecheck', CollectionFileCheckStatus::Sized->value)
                 ->where('c.filesize', '>', 0)
                 ->groupBy('c.id')
-                ->havingRaw('COUNT(b.id) = SUM(CASE WHEN b.name REGEXP %s THEN 1 ELSE 0 END)', ['\\.par2'])
+                ->havingRaw("COUNT(b.id) = SUM(CASE WHEN b.name REGEXP '\\\\.par2' THEN 1 ELSE 0 END)")
                 ->pluck('c.id');
 
             if ($par2OnlyCollectionIds->isNotEmpty()) {
@@ -1235,7 +1235,7 @@ final class ReleaseProcessingService
         $par2OnlyReleaseIds = DB::table('releases as r')
             ->join('release_files as rf', 'r.id', '=', 'rf.releases_id')
             ->groupBy('r.id')
-            ->havingRaw('COUNT(rf.id) = SUM(CASE WHEN rf.name REGEXP %s THEN 1 ELSE 0 END)', ['\\.par2$'])
+            ->havingRaw("COUNT(rf.id) = SUM(CASE WHEN rf.name REGEXP '\\\\.par2$' THEN 1 ELSE 0 END)")
             ->pluck('r.id');
 
         if ($par2OnlyReleaseIds->isNotEmpty()) {
