@@ -19,9 +19,31 @@ class GlobalDataComposer
     private const CACHE_TTL = 300;
 
     /**
+     * Resolved data for this request, so we only build it once
+     * even when the composer matches multiple views (layout + child).
+     *
+     * @var array<string, mixed>|null
+     */
+    private static ?array $resolvedData = null;
+
+    /**
      * Bind data to the view.
      */
     public function compose(View $view): void
+    {
+        if (self::$resolvedData === null) {
+            self::$resolvedData = $this->resolveData();
+        }
+
+        $view->with(self::$resolvedData);
+    }
+
+    /**
+     * Build the global view data (called once per request).
+     *
+     * @return array<string, mixed>
+     */
+    private function resolveData(): array
     {
         // Cached site settings (shared across all requests)
         $siteArray = Cache::remember('site_settings_array', self::CACHE_TTL, function () {
@@ -81,6 +103,6 @@ class GlobalDataComposer
             ]);
         }
 
-        $view->with($viewData);
+        return $viewData;
     }
 }
