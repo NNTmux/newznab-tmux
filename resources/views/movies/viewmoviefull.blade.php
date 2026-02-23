@@ -228,7 +228,7 @@
                                             @endif
                                         </div>
                                     </div>
-                                    <div class="flex gap-2 flex-shrink-0">
+                                    <div class="flex gap-2 shrink-0">
                                         <a href="{{ url('/getnzb/' . $release->guid) }}" class="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-700 text-white text-sm font-medium rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition">
                                             <i class="fas fa-download mr-2"></i> Download
                                         </a>

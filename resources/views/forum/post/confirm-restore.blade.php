@@ -2,7 +2,7 @@
 
 @section ('content')
     <div id="delete-post">
-        <h2 class="flex-grow-1">{{ trans_choice('forum::posts.restore', 1) }}</h2>
+        <h2 class="grow">{{ trans_choice('forum::posts.restore', 1) }}</h2>
 
         <hr>
 

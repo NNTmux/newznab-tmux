@@ -138,13 +138,13 @@
                                             $hasValidCover = $coverUrl && !str_contains($coverUrl, 'no-cover.png');
                                         @endphp
                                         @if($hasValidCover)
-                                            <a href="{{ url('/details/' . $result->guid) }}" class="flex-shrink-0">
+                                            <a href="{{ url('/details/' . $result->guid) }}" class="shrink-0">
                                                 <img src="{{ $coverUrl }}" class="w-12 h-16 object-cover rounded mr-3 shadow-sm hover:shadow-md transition" alt="Cover" loading="lazy">
                                             </a>
                                         @endif
                                         <div class="flex-1">
                                             <div class="flex items-center gap-2 flex-wrap">
-                                                <a href="{{ url('/details/' . $result->guid) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium break-words break-all">{{ $result->searchname }}</a>
+                                                <a href="{{ url('/details/' . $result->guid) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium wrap-break-word break-all">{{ $result->searchname }}</a>
                                                 @if(!empty($result->report_count) && $result->report_count > 0)
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200"
                                                           title="Reported: {{ \App\Models\ReleaseReport::reasonKeysToLabels($result->report_reasons ?? '') }}">
@@ -290,7 +290,7 @@
                                         <img src="{{ $mCoverUrl }}" class="w-16 h-20 object-cover rounded-lg shadow-sm" alt="Cover" loading="lazy">
                                     </a>
                                 @endif
-                                <a href="{{ url('/details/' . $result->guid) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium break-words text-base">
+                                <a href="{{ url('/details/' . $result->guid) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium wrap-break-word text-base">
                                     {{ $result->searchname }}
                                 </a>
                                 <div class="flex flex-wrap items-center gap-2 mt-2 text-sm text-gray-600 dark:text-gray-400">

@@ -3,7 +3,7 @@
     @include ('forum::components.breadcrumbs')
 
     <div class="flex justify-center items-center">
-        <div class="grow max-w-screen-xl">
+        <div class="grow max-w-(--breakpoint-xl)">
             <h1 class="mb-2">{{ trans('forum::posts.view') }}</h1>
             <h2 class="text-slate-500">Re: {{ $post->thread->title }}</h2>
 

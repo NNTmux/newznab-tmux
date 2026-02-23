@@ -20,7 +20,7 @@
             @if($success)
                 <div class="bg-green-50 dark:bg-green-900 border-l-4 border-green-500 dark:border-green-600 p-4 rounded mb-6">
                     <div class="flex">
-                        <div class="flex-shrink-0">
+                        <div class="shrink-0">
                             <i class="fas fa-check-circle text-green-600 dark:text-green-400 text-xl"></i>
                         </div>
                         <div class="ml-3">
@@ -56,7 +56,7 @@
             @else
                 <div class="bg-red-50 dark:bg-red-900 border-l-4 border-red-500 dark:border-red-600 p-4 rounded mb-6">
                     <div class="flex">
-                        <div class="flex-shrink-0">
+                        <div class="shrink-0">
                             <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 text-xl"></i>
                         </div>
                         <div class="ml-3">
@@ -79,7 +79,7 @@
             <!-- Info Box -->
             <div class="mt-6 bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 dark:border-blue-600 p-4 rounded">
                 <div class="flex">
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                         <i class="fas fa-info-circle text-blue-600 dark:text-blue-400"></i>
                     </div>
                     <div class="ml-3">

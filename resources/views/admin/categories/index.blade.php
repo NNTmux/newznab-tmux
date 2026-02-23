@@ -20,7 +20,7 @@
         <!-- Info Alert -->
         <div class="px-6 py-4 bg-blue-50 dark:bg-blue-900 border-b border-blue-100 dark:border-blue-800">
             <div class="flex">
-                <div class="flex-shrink-0">
+                <div class="shrink-0">
                     <i class="fa fa-info-circle text-blue-500 dark:text-blue-400 text-2xl"></i>
                 </div>
                 <div class="ml-3">

@@ -75,7 +75,7 @@
                                     </td>
                                     <td class="px-4 py-3">
                                         <a href="{{ url('/details/' . $result->release->guid) }}"
-                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-semibold break-words break-all">
+                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-semibold wrap-break-word break-all">
                                             {{ $result->release->searchname }}
                                         </a>
                                     </td>

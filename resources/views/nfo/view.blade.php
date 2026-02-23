@@ -11,7 +11,7 @@
                 <a href="{{ url('/') }}" class="hover:text-blue-600">Home</a>
                 <i class="fas fa-chevron-right mx-2 text-xs"></i>
                 @if(isset($rel))
-                    <a href="{{ url('/details/' . $rel['guid']) }}" class="hover:text-blue-600 break-words break-all">{{ $rel['searchname'] }}</a>
+                    <a href="{{ url('/details/' . $rel['guid']) }}" class="hover:text-blue-600 wrap-break-word break-all">{{ $rel['searchname'] }}</a>
                     <i class="fas fa-chevron-right mx-2 text-xs"></i>
                 @endif
                 <span>NFO</span>

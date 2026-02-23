@@ -33,7 +33,7 @@
     <div class="h-screen flex">
         <!-- Sidebar -->
         @auth
-            <aside id="sidebar" class="hidden md:flex md:flex-col w-64 bg-gray-900 dark:bg-gray-950 text-white flex-shrink-0 h-full overflow-y-auto rounded-r-xl">
+            <aside id="sidebar" class="hidden md:flex md:flex-col w-64 bg-gray-900 dark:bg-gray-950 text-white shrink-0 h-full overflow-y-auto rounded-r-xl">
                 <div class="flex items-center justify-between p-4 border-b border-gray-800 dark:border-gray-700">
                     <a href="{{ $site['home_link'] ?? url('/') }}" class="flex items-center space-x-3">
                         <img src="{{ asset('assets/images/logo.svg') }}" alt="{{ config('app.name') }} Logo" class="w-12 h-12" aria-hidden="true">
@@ -51,7 +51,7 @@
         <div class="flex-1 flex flex-col h-full overflow-hidden">
             <!-- Top Navigation -->
             @auth
-                <header class="bg-gray-800 dark:bg-gray-950 text-white shadow-lg flex-shrink-0 z-10 rounded-b-xl">
+                <header class="bg-gray-800 dark:bg-gray-950 text-white shadow-lg shrink-0 z-10 rounded-b-xl">
                     @include('partials.header-menu')
                 </header>
             @endauth
@@ -85,7 +85,7 @@
             </main>
 
             <!-- Footer - Fixed at bottom -->
-            <footer class="flex-shrink-0 rounded-t-xl">
+            <footer class="shrink-0 rounded-t-xl">
                 @include('partials.footer')
             </footer>
         </div>

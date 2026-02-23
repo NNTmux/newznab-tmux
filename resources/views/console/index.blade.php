@@ -90,7 +90,7 @@
                         <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                             <div class="flex flex-row">
                                 <!-- Console Cover -->
-                                <div class="flex-shrink-0">
+                                <div class="shrink-0">
                                     @if($guid)
                                         <a href="{{ url('/details/' . $guid) }}" class="block relative">
                                             <img class="w-32 h-48 object-cover"
@@ -175,7 +175,7 @@
                                                                     <a href="{{ url('/details/' . $release->guid) }}" class="text-sm text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 font-medium block break-all flex-1" title="{{ $release->searchname }}">
                                                                         {{ $release->searchname }}
                                                                     </a>
-                                                                    <label class="inline-flex items-center flex-shrink-0">
+                                                                    <label class="inline-flex items-center shrink-0">
                                                                         <input type="checkbox" class="chkRelease form-checkbox h-4 w-4 text-blue-600" value="{{ $release->guid }}" name="release[]" @change="onCheckboxChange()"/>
                                                                     </label>
                                                                 </div>

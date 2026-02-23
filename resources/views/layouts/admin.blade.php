@@ -28,7 +28,7 @@
 <body class="bg-gray-100 dark:bg-gray-900 font-sans antialiased transition-colors duration-200">
     <div class="h-screen flex">
         <!-- Admin Sidebar -->
-        <aside class="hidden md:flex md:flex-col w-64 bg-gray-900 dark:bg-gray-950 text-white flex-shrink-0 h-full overflow-y-auto rounded-r-xl">
+        <aside class="hidden md:flex md:flex-col w-64 bg-gray-900 dark:bg-gray-950 text-white shrink-0 h-full overflow-y-auto rounded-r-xl">
             <div class="flex items-center justify-between p-4 border-b border-gray-800 dark:border-gray-700">
                 <a href="{{ route('admin.index') }}" class="flex items-center space-x-2">
                     <i class="fas fa-cog text-2xl text-blue-500 dark:text-blue-400"></i>
@@ -44,7 +44,7 @@
         <!-- Main Content -->
         <div class="flex-1 flex flex-col h-full overflow-hidden">
             <!-- Top Bar -->
-            <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 flex-shrink-0 rounded-b-xl">
+            <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 shrink-0 rounded-b-xl">
                 <div class="flex items-center justify-between px-6 py-4">
                     <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">{{ $page_title ?? 'Admin Dashboard' }}</h1>
                     <div class="flex items-center space-x-4">
@@ -81,7 +81,7 @@
             </main>
 
             <!-- Admin Footer - Fixed at bottom -->
-            <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex-shrink-0 rounded-t-xl">
+            <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shrink-0 rounded-t-xl">
                 <div class="px-6 py-3">
                     <div class="flex flex-wrap items-center justify-between gap-2 text-sm text-gray-600 dark:text-gray-400">
                         <p>&copy; {{ now()->year }} <a href="https://github.com/NNTmux/newznab-tmux" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition">NNTmux</a> Admin Panel</p>

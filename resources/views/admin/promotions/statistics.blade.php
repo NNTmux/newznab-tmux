@@ -53,7 +53,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div class="flex items-center">
-                <div class="flex-shrink-0 bg-blue-100 dark:bg-blue-900 rounded-full p-3">
+                <div class="shrink-0 bg-blue-100 dark:bg-blue-900 rounded-full p-3">
                     <i class="fa fa-gift text-2xl text-blue-600 dark:text-blue-400"></i>
                 </div>
                 <div class="ml-4">
@@ -65,7 +65,7 @@
 
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div class="flex items-center">
-                <div class="flex-shrink-0 bg-green-100 dark:bg-green-900 rounded-full p-3">
+                <div class="shrink-0 bg-green-100 dark:bg-green-900 rounded-full p-3">
                     <i class="fa fa-check-circle text-2xl text-green-600 dark:text-green-400"></i>
                 </div>
                 <div class="ml-4">
@@ -77,7 +77,7 @@
 
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div class="flex items-center">
-                <div class="flex-shrink-0 bg-purple-100 dark:bg-purple-900 rounded-full p-3">
+                <div class="shrink-0 bg-purple-100 dark:bg-purple-900 rounded-full p-3">
                     <i class="fa fa-arrow-up text-2xl text-purple-600 dark:text-purple-400"></i>
                 </div>
                 <div class="ml-4">
@@ -89,7 +89,7 @@
 
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div class="flex items-center">
-                <div class="flex-shrink-0 bg-yellow-100 dark:bg-yellow-900 rounded-full p-3">
+                <div class="shrink-0 bg-yellow-100 dark:bg-yellow-900 rounded-full p-3">
                     <i class="fa fa-users text-2xl text-yellow-600 dark:text-yellow-400"></i>
                 </div>
                 <div class="ml-4">
@@ -101,7 +101,7 @@
 
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div class="flex items-center">
-                <div class="flex-shrink-0 bg-red-100 dark:bg-red-900 rounded-full p-3">
+                <div class="shrink-0 bg-red-100 dark:bg-red-900 rounded-full p-3">
                     <i class="fa fa-calendar-plus text-2xl text-red-600 dark:text-red-400"></i>
                 </div>
                 <div class="ml-4">

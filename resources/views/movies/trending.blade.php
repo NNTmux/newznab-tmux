@@ -28,7 +28,7 @@
     </div>
 
     <!-- Header -->
-    <div class="px-6 py-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+    <div class="px-6 py-6 bg-linear-to-r from-blue-500 to-purple-600 text-white">
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold mb-2">
@@ -59,13 +59,13 @@
                             <!-- Rank Badge -->
                             <div class="absolute top-4 left-4 z-10">
                                 <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg
-                                    {{ $index < 3 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' : 'bg-gradient-to-br from-gray-400 to-gray-600' }}">
+                                    {{ $index < 3 ? 'bg-linear-to-br from-yellow-400 to-yellow-600' : 'bg-linear-to-br from-gray-400 to-gray-600' }}">
                                     #{{ $index + 1 }}
                                 </div>
                             </div>
 
                             <!-- Movie Poster -->
-                            <div class="flex-shrink-0 relative">
+                            <div class="shrink-0 relative">
                                 <a href="{{ route('movie.view', ['imdbid' => $movie->imdbid]) }}" class="block">
                                     @if($movie->cover)
                                         <img src="{{ $movie->cover }}" alt="{{ $movie->title }}" class="w-full md:w-64 h-96 object-cover">

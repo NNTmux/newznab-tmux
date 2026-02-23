@@ -3,7 +3,7 @@
     @include ('forum::components.breadcrumbs')
 
     <div class="flex justify-center items-center">
-        <div class="grow max-w-screen-md">
+        <div class="grow max-w-(--breakpoint-md)">
             <h1 class="mb-2">{{ trans('forum::categories.edit') }}</h1>
             <h2 class="mb-4 text-slate-500">{{ $category->title }}</h2>
 

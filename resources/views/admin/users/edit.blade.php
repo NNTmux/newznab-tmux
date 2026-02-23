@@ -110,7 +110,7 @@
                 </div>
 
                 <!-- Role Expiry Date -->
-                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-linear-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
                     <div class="flex items-center justify-between mb-3">
                         <label for="rolechangedate" class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
                             <i class="fa fa-calendar-alt mr-2 text-blue-600 dark:text-blue-400"></i>
@@ -327,7 +327,7 @@
                         $allPendingRoles = $user->getAllPendingStackedRoles();
                     @endphp
                     @if($allPendingRoles->count() > 0)
-                        <div class="border-2 border-blue-300 dark:border-blue-600 rounded-lg p-4 bg-gradient-to-br from-blue-50 via-blue-50 to-white dark:from-blue-900/30 dark:via-blue-900/20 dark:to-gray-800 shadow-md">
+                        <div class="border-2 border-blue-300 dark:border-blue-600 rounded-lg p-4 bg-linear-to-br from-blue-50 via-blue-50 to-white dark:from-blue-900/30 dark:via-blue-900/20 dark:to-gray-800 shadow-md">
                             <div class="flex items-center justify-between mb-3">
                                 <label class="text-sm font-semibold text-blue-700 dark:text-blue-300 flex items-center">
                                     <i class="fa fa-layer-group mr-2 text-lg"></i>
@@ -388,7 +388,7 @@
                         </div>
                     @elseif(!empty($user->pending_roles_id) && !empty($user->pending_role_start_date))
                         {{-- Fallback to old display if no history records but pending_roles_id is set --}}
-                        <div class="border-2 border-blue-300 dark:border-blue-600 rounded-lg p-4 bg-gradient-to-br from-blue-50 via-blue-50 to-white dark:from-blue-900/30 dark:via-blue-900/20 dark:to-gray-800 shadow-md">
+                        <div class="border-2 border-blue-300 dark:border-blue-600 rounded-lg p-4 bg-linear-to-br from-blue-50 via-blue-50 to-white dark:from-blue-900/30 dark:via-blue-900/20 dark:to-gray-800 shadow-md">
                             <div class="flex items-center justify-between mb-3">
                                 <label class="text-sm font-semibold text-blue-700 dark:text-blue-300 flex items-center">
                                     <i class="fa fa-layer-group mr-2 text-lg"></i>
@@ -437,7 +437,7 @@
 
                 <!-- Role Stacking Option -->
                 @if(!is_array($user) && !empty($user->rolechangedate) && \Carbon\Carbon::parse($user->rolechangedate)->isFuture())
-                    <div class="border border-purple-300 dark:border-purple-600 rounded-lg p-4 bg-gradient-to-br from-purple-50 via-purple-50 to-white dark:from-gray-800 dark:via-gray-800 dark:to-gray-700 shadow-sm">
+                    <div class="border border-purple-300 dark:border-purple-600 rounded-lg p-4 bg-linear-to-br from-purple-50 via-purple-50 to-white dark:from-gray-800 dark:via-gray-800 dark:to-gray-700 shadow-sm">
                         <label class="flex items-center cursor-pointer group">
                             <input type="checkbox" name="stack_role" value="1" checked
                                    class="rounded border-gray-300 dark:border-gray-500 text-purple-600 dark:text-purple-500 shadow-sm focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-purple-500 dark:focus:border-purple-400 bg-white dark:bg-gray-700">
@@ -472,7 +472,7 @@
                     </div>
 
                     <!-- Daily Activity Stats -->
-                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-linear-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
                         <div class="flex items-center mb-3">
                             <i class="fa fa-chart-line mr-2 text-purple-600 dark:text-purple-400"></i>
                             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">

@@ -127,7 +127,7 @@
                     <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                         <div class="flex flex-row">
                             <!-- Album Cover -->
-                            <div class="flex-shrink-0">
+                            <div class="shrink-0">
                                 @if($guid)
                                     <a href="{{ url('/details/' . $guid) }}" class="block">
                                         @if(!empty($result->cover))

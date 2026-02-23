@@ -109,7 +109,7 @@
                                             {{ $row['binaryID'] ?? $row['id'] ?? 'N/A' }}
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-500">
-                                            <div class="max-w-2xl break-words">
+                                            <div class="max-w-2xl wrap-break-word">
                                                 {{ $row['subject'] ?? '' }}
                                             </div>
                                         </td>

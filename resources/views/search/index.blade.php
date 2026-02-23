@@ -213,7 +213,7 @@
                                 <td class="px-3 py-4">
                                     <div class="flex-1">
                                         <div class="flex items-center gap-2 flex-wrap">
-                                            <a href="{{ url('/details/' . $result->guid) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium break-words break-all">{{ $result->searchname }}</a>
+                                            <a href="{{ url('/details/' . $result->guid) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium wrap-break-word break-all">{{ $result->searchname }}</a>
                                             @if(!empty($result->report_count) && $result->report_count > 0)
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200"
                                                       title="Reported: {{ \App\Models\ReleaseReport::reasonKeysToLabels($result->report_reasons ?? '') }}">
@@ -349,7 +349,7 @@
                             <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700 mt-1" name="release[]" value="{{ $result->guid }}" @change="onCheckboxChange()">
                             <div class="flex-1">
                                 <div class="flex items-center gap-2 flex-wrap mb-2">
-                                    <a href="{{ url('/details/' . $result->guid) }}" class="text-lg font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 break-words break-all">
+                                    <a href="{{ url('/details/' . $result->guid) }}" class="text-lg font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 wrap-break-word break-all">
                                         {{ $result->searchname }}
                                     </a>
                                     @if(!empty($result->report_count) && $result->report_count > 0)

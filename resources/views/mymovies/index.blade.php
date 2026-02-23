@@ -24,7 +24,7 @@
     <!-- RSS Feed Info Card -->
     <div class="info-card-gradient border-l-4 border-blue-500 rounded-lg p-5 mb-6 shadow">
         <div class="flex items-start">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
                 <div class="flex items-center justify-center h-10 w-10 rounded-lg bg-blue-500 text-white">
                     <i class="fa fa-rss text-lg"></i>
                 </div>
@@ -77,7 +77,7 @@
                         <div class="p-6 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors duration-150">
                             <div class="flex gap-6">
                                 <!-- Movie Poster -->
-                                <div class="flex-shrink-0">
+                                <div class="shrink-0">
                                     <img class="rounded-lg movie-poster-shadow w-32 h-48 object-cover"
                                          src="{{ url('/covers/movies/' . (($movie['cover'] ?? 0) == 1 ? $movie['imdbid'] . '-cover.jpg' : 'no-cover.jpg')) }}"
                                          alt="{{ e($movie['title'] ?? '') }}"/>
@@ -143,7 +143,7 @@
 
                                     @if(!empty($movie['actors']))
                                         <div class="flex items-start text-sm mb-3">
-                                            <span class="font-semibold text-gray-700 dark:text-gray-300 mr-2 flex-shrink-0"><i class="fa fa-users mr-1 text-blue-600 dark:text-blue-400"></i>Starring:</span>
+                                            <span class="font-semibold text-gray-700 dark:text-gray-300 mr-2 shrink-0"><i class="fa fa-users mr-1 text-blue-600 dark:text-blue-400"></i>Starring:</span>
                                             <span class="text-gray-600 dark:text-gray-400">{{ e($movie['actors']) }}</span>
                                         </div>
                                     @endif
@@ -174,7 +174,7 @@
                 @foreach($movies as $movie)
                     <div class="p-6 border-b border-gray-200 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors duration-150">
                         <div class="flex gap-4 mb-4">
-                            <div class="flex-shrink-0">
+                            <div class="shrink-0">
                                 <img class="rounded-lg movie-poster-shadow w-24 h-36 object-cover"
                                      src="{{ url('/covers/movies/' . (($movie['cover'] ?? 0) == 1 ? $movie['imdbid'] . '-cover.jpg' : 'no-cover.jpg')) }}"
                                      alt="{{ e($movie['title'] ?? '') }}"/>

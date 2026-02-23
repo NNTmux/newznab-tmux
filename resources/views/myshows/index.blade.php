@@ -24,7 +24,7 @@
     <!-- RSS Feed Info Card -->
     <div class="info-card-gradient border-l-4 border-blue-500 rounded-lg p-5 mb-6 shadow">
         <div class="flex items-start">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
                 <div class="flex items-center justify-center h-10 w-10 rounded-lg bg-blue-500 text-white">
                     <i class="fa fa-rss text-lg"></i>
                 </div>
@@ -99,7 +99,7 @@
                             <tr class="hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors duration-150">
                                 <td class="px-8 py-5">
                                     <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-12 w-12 show-avatar rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-sm">
+                                        <div class="shrink-0 h-12 w-12 show-avatar rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-sm">
                                             {{ strtoupper(substr($show['title'] ?? 'T', 0, 1)) }}
                                         </div>
                                         <div class="ml-4">
@@ -168,7 +168,7 @@
                     <div class="p-6 border-b border-gray-200 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors duration-150">
                         <div class="flex items-start justify-between mb-4">
                             <div class="flex items-center flex-1">
-                                <div class="flex-shrink-0 h-12 w-12 show-avatar rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-sm">
+                                <div class="shrink-0 h-12 w-12 show-avatar rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-sm">
                                     {{ strtoupper(substr($show['title'] ?? 'T', 0, 1)) }}
                                 </div>
                                 <div class="ml-3 flex-1">

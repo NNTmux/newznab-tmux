@@ -18,7 +18,7 @@
         <!-- Info Alert -->
         <div class="px-6 py-4 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-800">
             <div class="flex">
-                <div class="flex-shrink-0">
+                <div class="shrink-0">
                     <i class="fa fa-info-circle text-blue-500 dark:text-blue-400 text-2xl"></i>
                 </div>
                 <div class="ml-3">
@@ -93,7 +93,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-sm">
-                                    <div class="max-w-[200px] break-words">
+                                    <div class="max-w-[200px] wrap-break-word">
                                         <code class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-2 py-1 rounded text-xs break-all" title="{{ htmlspecialchars($row->regex) }}">
                                             {{ htmlspecialchars($row->regex) }}
                                         </code>

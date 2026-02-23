@@ -53,7 +53,7 @@ Alpine.data('mediainfoModal', () => ({
         let html = '<div class="space-y-6">';
 
         if (data.video) {
-            html += '<div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-lg p-4">';
+            html += '<div class="bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-lg p-4">';
             html += '<h4 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center"><i class="fas fa-video mr-2 text-blue-600 dark:text-blue-400"></i> Video Information</h4>';
             html += '<dl class="grid grid-cols-2 gap-3">';
             const v = data.video;
@@ -70,7 +70,7 @@ Alpine.data('mediainfoModal', () => ({
         }
 
         if (data.audio && data.audio.length > 0) {
-            html += '<div class="bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900 dark:to-teal-900 rounded-lg p-4">';
+            html += '<div class="bg-linear-to-r from-green-50 to-teal-50 dark:from-green-900 dark:to-teal-900 rounded-lg p-4">';
             html += '<h4 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center"><i class="fas fa-volume-up mr-2 text-green-600 dark:text-green-400"></i> Audio Information</h4>';
             data.audio.forEach((a, i) => {
                 if (i > 0) html += '<hr class="my-3 border-gray-200 dark:border-gray-700">';
@@ -86,7 +86,7 @@ Alpine.data('mediainfoModal', () => ({
         }
 
         if (data.subs) {
-            html += '<div class="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900 dark:to-pink-900 rounded-lg p-4">';
+            html += '<div class="bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-900 dark:to-pink-900 rounded-lg p-4">';
             html += '<h4 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center"><i class="fas fa-closed-captioning mr-2 text-purple-600 dark:text-purple-400"></i> Subtitles</h4>';
             html += '<p class="text-sm text-gray-900 dark:text-gray-100">' + escapeHtml(data.subs) + '</p></div>';
         }

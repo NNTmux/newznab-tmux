@@ -1,7 +1,7 @@
 <div class="max-w-4xl mx-auto">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 mb-6">
         <!-- Header -->
-        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+        <div class="bg-linear-to-r from-blue-600 to-blue-700 px-6 py-4">
             <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <h3 class="text-xl font-bold text-white flex items-center">
                     <i class="fa fa-film mr-2"></i>{{ ucfirst($type ?? 'add') }} Movie to Watchlist
@@ -59,7 +59,7 @@
                     <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">Choose Categories:</label>
                     <div class="flex flex-wrap gap-3" id="category-container">
                         @foreach($cat_ids ?? [] as $index => $cat_id)
-                            <label class="inline-flex items-center px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:bg-gray-800 transition-all duration-200 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-500 has-[:checked]:text-blue-700">
+                            <label class="inline-flex items-center px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:bg-gray-800 transition-all duration-200 has-checked:bg-blue-50 has-checked:border-blue-500 has-checked:text-blue-700">
                                 <input type="checkbox"
                                        id="category_{{ $cat_id }}"
                                        name="category[]"

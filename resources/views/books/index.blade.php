@@ -121,7 +121,7 @@
                                 </div>
                             @endif
                             <div class="p-3">
-                                <h3 class="font-semibold text-sm text-gray-800 dark:text-gray-200 line-clamp-2 mb-1 break-words break-all" title="{{ $result->title }}">
+                                <h3 class="font-semibold text-sm text-gray-800 dark:text-gray-200 line-clamp-2 mb-1 wrap-break-word break-all" title="{{ $result->title }}">
                                     {{ $result->title }}
                                 </h3>
                                 @if(!empty($result->author))

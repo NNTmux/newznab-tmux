@@ -44,7 +44,7 @@ Alpine.data('moviesLayout', () => ({
         const effectiveLayout = isLargeScreen ? this.layout : 1;
 
         // Select movie poster images and placeholder divs
-        const images = grid.querySelectorAll('.flex-shrink-0 img, .flex-shrink-0 > a > div, .flex-shrink-0 > div');
+        const images = grid.querySelectorAll('.shrink-0 img, .shrink-0 > a > div, .shrink-0 > div');
         const containers = grid.querySelectorAll('.release-card-container');
 
         if (effectiveLayout === 1) {
@@ -57,7 +57,7 @@ Alpine.data('moviesLayout', () => ({
                 const info = c.querySelector('.release-info-wrapper');
                 if (info) info.classList.add('flex-1', 'min-w-0');
                 const acts = c.querySelector('.release-actions');
-                if (acts) { acts.classList.remove('flex-wrap', 'mt-2'); acts.classList.add('flex-shrink-0', 'flex-row', 'items-center'); }
+                if (acts) { acts.classList.remove('flex-wrap', 'mt-2'); acts.classList.add('shrink-0', 'flex-row', 'items-center'); }
             });
         } else {
             // Two column layout
@@ -69,7 +69,7 @@ Alpine.data('moviesLayout', () => ({
                 const info = c.querySelector('.release-info-wrapper');
                 if (info) info.classList.remove('flex-1', 'min-w-0');
                 const acts = c.querySelector('.release-actions');
-                if (acts) { acts.classList.add('flex-wrap', 'items-center', 'mt-2'); acts.classList.remove('flex-shrink-0', 'flex-row'); }
+                if (acts) { acts.classList.add('flex-wrap', 'items-center', 'mt-2'); acts.classList.remove('shrink-0', 'flex-row'); }
             });
         }
     }

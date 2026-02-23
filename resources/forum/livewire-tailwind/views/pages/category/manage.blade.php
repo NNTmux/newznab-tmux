@@ -3,7 +3,7 @@
     @include ('forum::components.breadcrumbs')
 
     <div class="flex justify-center items-center">
-        <div class="grow max-w-screen-lg">
+        <div class="grow max-w-(--breakpoint-lg)">
             <h1>{{ trans('forum::general.manage') }}</h1>
 
             @can ('createCategories')

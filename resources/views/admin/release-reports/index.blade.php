@@ -327,7 +327,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Additional Details</label>
-                    <div id="reportDescContent" class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words max-h-64 overflow-y-auto"></div>
+                    <div id="reportDescContent" class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg text-gray-700 dark:text-gray-300 whitespace-pre-wrap wrap-break-word max-h-64 overflow-y-auto"></div>
                 </div>
             </div>
 

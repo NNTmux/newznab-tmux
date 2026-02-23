@@ -35,31 +35,31 @@
                     <!-- Series Stats -->
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
                         @if(!empty($show['started']))
-                            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+                            <div class="bg-linear-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
                                 <div class="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase mb-1">Series Started</div>
                                 <div class="text-lg font-bold text-blue-900">
                                     {{ \Carbon\Carbon::parse($show['started'])->format('M d, Y') }}
                                 </div>
                             </div>
                         @endif
-                        <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+                        <div class="bg-linear-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
                             <div class="text-xs font-semibold text-purple-600 uppercase mb-1">Total Seasons Aired</div>
                             <div class="text-lg font-bold text-purple-900">{{ $totalSeasonsAired ?? 0 }}</div>
                         </div>
-                        <div class="bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg p-4 border border-pink-200">
+                        <div class="bg-linear-to-br from-pink-50 to-pink-100 rounded-lg p-4 border border-pink-200">
                             <div class="text-xs font-semibold text-pink-600 uppercase mb-1">Seasons Available</div>
                             <div class="text-lg font-bold text-pink-900">{{ $totalSeasonsAvailable ?? 0 }}</div>
                         </div>
-                        <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg p-4 border border-indigo-200">
+                        <div class="bg-linear-to-br from-indigo-50 to-indigo-100 rounded-lg p-4 border border-indigo-200">
                             <div class="text-xs font-semibold text-indigo-600 uppercase mb-1">Total Episodes Aired</div>
                             <div class="text-lg font-bold text-indigo-900">{{ $totalEpisodesAired ?? 0 }}</div>
                         </div>
-                        <div class="bg-gradient-to-br from-violet-50 to-violet-100 rounded-lg p-4 border border-violet-200">
+                        <div class="bg-linear-to-br from-violet-50 to-violet-100 rounded-lg p-4 border border-violet-200">
                             <div class="text-xs font-semibold text-violet-600 uppercase mb-1">Episodes Available</div>
                             <div class="text-lg font-bold text-violet-900">{{ $episodeCount ?? 0 }}</div>
                         </div>
                         @if(!empty($firstEpisodeAired))
-                            <div class="bg-gradient-to-br from-teal-50 to-teal-100 rounded-lg p-4 border border-teal-200">
+                            <div class="bg-linear-to-br from-teal-50 to-teal-100 rounded-lg p-4 border border-teal-200">
                                 <div class="text-xs font-semibold text-teal-600 uppercase mb-1">First Episode Aired</div>
                                 <div class="text-sm font-bold text-teal-900">
                                     {{ $firstEpisodeAired->format('M d, Y') }}
@@ -67,7 +67,7 @@
                             </div>
                         @endif
                         @if(!empty($lastEpisodeAired))
-                            <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-4 border border-orange-200">
+                            <div class="bg-linear-to-br from-orange-50 to-orange-100 rounded-lg p-4 border border-orange-200">
                                 <div class="text-xs font-semibold text-orange-600 uppercase mb-1">Last Episode Aired</div>
                                 <div class="text-sm font-bold text-orange-900">
                                     {{ $lastEpisodeAired->format('M d, Y') }}
@@ -75,7 +75,7 @@
                             </div>
                         @endif
                         @if(!empty($seriescountry))
-                            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+                            <div class="bg-linear-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
                                 <div class="text-xs font-semibold text-green-600 uppercase mb-1">Country</div>
                                 <div class="text-lg font-bold text-green-900">{{ strtoupper($seriescountry) }}</div>
                             </div>
@@ -132,7 +132,7 @@
                                         </a>
                                     @endif
 
-                                    <a class="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 inline-flex items-center text-sm font-medium shadow-sm transition"
+                                    <a class="px-4 py-2 bg-linear-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 inline-flex items-center text-sm font-medium shadow-sm transition"
                                        href="{{ url('/rss/full-feed?show=' . $show['id'] . (isset($category) && $category != '' ? '&t=' . $category : '') . '&dl=1&i=' . auth()->id() . '&api_token=' . auth()->user()->api_token) }}">
                                         <i class="fa fa-rss mr-2"></i> RSS Feed
                                     </a>
@@ -260,13 +260,13 @@
                                         <div class="space-y-2">
                                             @foreach($releases as $release)
                                                 <div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-900 rounded p-3 hover:bg-gray-100">
-                                                    <div class="flex-shrink-0">
+                                                    <div class="shrink-0">
                                                         <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" name="release[]" value="{{ $release->guid }}" @change="onCheckboxChange()">
                                                     </div>
                                                     <div class="flex-1">
                                                         <div class="flex items-center gap-2 flex-wrap">
                                                             <a href="{{ url('/details/' . $release->guid) }}"
-                                                               class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium break-words break-all">
+                                                               class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium wrap-break-word break-all">
                                                                 {{ $release->searchname }}
                                                             </a>
                                                             @if(!empty($release->failed) && $release->failed->count() > 0)

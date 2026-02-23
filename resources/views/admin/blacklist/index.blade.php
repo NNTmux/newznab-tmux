@@ -18,7 +18,7 @@
         <!-- Info Alert -->
         <div class="px-6 py-4 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-800">
             <div class="flex">
-                <div class="flex-shrink-0">
+                <div class="shrink-0">
                     <i class="fa fa-info-circle text-blue-500 dark:text-blue-400 text-2xl"></i>
                 </div>
                 <div class="ml-3">
@@ -89,7 +89,7 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-sm">
-                                    <div class="max-w-[200px] break-words">
+                                    <div class="max-w-[200px] wrap-break-word">
                                         <a href="{{ url('/admin/binaryblacklist-edit?id=' . $bin->id) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" title="{{ htmlspecialchars($bin->regex) }}">
                                             <code class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-2 py-1 rounded text-xs break-all">{{ htmlspecialchars($bin->regex) }}</code>
                                         </a>

@@ -5,7 +5,7 @@
     <!-- Header -->
     <div class="mb-8">
         <div class="flex items-center space-x-3">
-            <div class="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl shadow-md">
+            <div class="flex items-center justify-center w-12 h-12 bg-linear-to-br from-blue-400 to-purple-500 rounded-xl shadow-md">
                 <i class="fa fa-chart-bar text-white text-xl"></i>
             </div>
             <div>
@@ -19,7 +19,7 @@
         <!-- Top Grabbers -->
         @if(!empty($topgrabs) && count($topgrabs) > 0)
             <div class="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-300 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
-                <div class="bg-gradient-to-r from-blue-400 to-blue-500 px-6 py-4">
+                <div class="bg-linear-to-r from-blue-400 to-blue-500 px-6 py-4">
                     <div class="flex items-center space-x-3">
                         <div class="flex items-center justify-center w-10 h-10 bg-blue-700/40 rounded-lg">
                             <i class="fa fa-trophy text-blue-100 text-lg"></i>
@@ -55,7 +55,7 @@
         <!-- Recently Added -->
         @if(!empty($recent) && count($recent) > 0)
             <div class="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-300 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
-                <div class="bg-gradient-to-r from-green-400 to-green-500 px-6 py-4">
+                <div class="bg-linear-to-r from-green-400 to-green-500 px-6 py-4">
                     <div class="flex items-center space-x-3">
                         <div class="flex items-center justify-center w-10 h-10 bg-green-700/40 rounded-lg">
                             <i class="fa fa-clock text-green-100 text-lg"></i>
@@ -86,7 +86,7 @@
         <!-- Users by Month -->
         @if(!empty($usersbymonth) && count($usersbymonth) > 0)
             <div class="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-300 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
-                <div class="bg-gradient-to-r from-indigo-400 to-indigo-500 px-6 py-4">
+                <div class="bg-linear-to-r from-indigo-400 to-indigo-500 px-6 py-4">
                     <div class="flex items-center space-x-3">
                         <div class="flex items-center justify-center w-10 h-10 bg-indigo-700/40 rounded-lg">
                             <i class="fa fa-calendar text-indigo-100 text-lg"></i>
@@ -117,7 +117,7 @@
         <!-- Users by Role -->
         @if(!empty($usersbyrole) && count($usersbyrole) > 0)
             <div class="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-300 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
-                <div class="bg-gradient-to-r from-pink-400 to-pink-500 px-6 py-4">
+                <div class="bg-linear-to-r from-pink-400 to-pink-500 px-6 py-4">
                     <div class="flex items-center space-x-3">
                         <div class="flex items-center justify-center w-10 h-10 bg-pink-700/40 rounded-lg">
                             <i class="fa fa-user-shield text-pink-100 text-lg"></i>
@@ -149,7 +149,7 @@
     @if(empty($topgrabs) && empty($recent) && empty($usersbymonth) && empty($usersbyrole))
         <div class="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md p-12 text-center border border-gray-300 dark:border-gray-700">
             <div class="flex justify-center mb-6">
-                <div class="flex items-center justify-center w-24 h-24 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-full">
+                <div class="flex items-center justify-center w-24 h-24 bg-linear-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-full">
                     <i class="fa fa-chart-bar text-gray-500 dark:text-gray-500 text-4xl"></i>
                 </div>
             </div>

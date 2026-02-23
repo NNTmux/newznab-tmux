@@ -12,7 +12,7 @@
                 @if(isset($parentcatlist))
                     @foreach($parentcatlist as $parentcat)
                         @if($parentcat['id'] == App\Models\Category::TV_ROOT)
-                            <div class="relative dropdown-container flex-shrink-0">
+                            <div class="relative dropdown-container shrink-0">
                                 <button class="dropdown-toggle flex items-center px-3 py-2 text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-700 dark:hover:bg-gray-800 rounded-lg transition text-sm whitespace-nowrap">
                                     <i class="fa fa-television mr-1.5"></i>
                                     <span>{{ $parentcat['title'] }}</span>
@@ -52,7 +52,7 @@
                                 </div>
                             </div>
                         @elseif($parentcat['id'] == App\Models\Category::MOVIE_ROOT)
-                            <div class="relative dropdown-container flex-shrink-0">
+                            <div class="relative dropdown-container shrink-0">
                                 <button class="dropdown-toggle flex items-center px-3 py-2 text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-700 dark:hover:bg-gray-800 rounded-lg transition text-sm whitespace-nowrap">
                                     <i class="fa fa-film mr-1.5"></i>
                                     <span>{{ $parentcat['title'] }}</span>
@@ -109,7 +109,7 @@
                                 </div>
                             </div>
                         @elseif($parentcat['id'] == App\Models\Category::GAME_ROOT)
-                            <div class="relative dropdown-container flex-shrink-0">
+                            <div class="relative dropdown-container shrink-0">
                                 <button class="dropdown-toggle flex items-center px-3 py-2 text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-700 dark:hover:bg-gray-800 rounded-lg transition text-sm whitespace-nowrap">
                                     <i class="fa fa-gamepad mr-1.5"></i>
                                     <span>{{ $parentcat['title'] }}</span>
@@ -132,7 +132,7 @@
                                 </div>
                             </div>
                         @elseif($parentcat['id'] == App\Models\Category::PC_ROOT)
-                            <div class="relative dropdown-container flex-shrink-0">
+                            <div class="relative dropdown-container shrink-0">
                                 <button class="dropdown-toggle flex items-center px-3 py-2 text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-700 dark:hover:bg-gray-800 rounded-lg transition text-sm whitespace-nowrap">
                                     <i class="fa fa-desktop mr-1.5"></i>
                                     <span>{{ $parentcat['title'] }}</span>
@@ -159,7 +159,7 @@
                                 ];
                                 $desktopIcon = $desktopIconMap[$parentcat['id']] ?? 'fa-folder';
                             @endphp
-                            <div class="relative dropdown-container flex-shrink-0">
+                            <div class="relative dropdown-container shrink-0">
                                 <button class="dropdown-toggle flex items-center px-3 py-2 text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-700 dark:hover:bg-gray-800 rounded-lg transition text-sm whitespace-nowrap">
                                     <i class="fa {{ $desktopIcon }} mr-1.5"></i>
                                     <span>{{ $parentcat['title'] }}</span>

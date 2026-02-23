@@ -51,7 +51,7 @@
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $release->id }}</td>
                                 <td class="px-6 py-4 text-sm">
-                                    <div class="text-gray-900 dark:text-gray-100 font-medium max-w-md break-words break-all" title="{{ $release->searchname }}">
+                                    <div class="text-gray-900 dark:text-gray-100 font-medium max-w-md wrap-break-word break-all" title="{{ $release->searchname }}">
                                         {{ $release->searchname }}
                                     </div>
                                     <div class="text-gray-500 dark:text-gray-400 text-xs mt-1 max-w-md truncate" title="{{ $release->name }}">

@@ -111,23 +111,23 @@
 
         <!-- Summary Stats Row -->
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 rounded-lg p-4 text-center">
+            <div class="bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 rounded-lg p-4 text-center">
                 <p class="text-sm text-blue-600 dark:text-blue-300 font-medium mb-1">Total Users</p>
                 <p class="text-2xl font-bold text-blue-800 dark:text-blue-100">{{ number_format($userStats['summary']['total_users']) }}</p>
             </div>
-            <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 rounded-lg p-4 text-center">
+            <div class="bg-linear-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 rounded-lg p-4 text-center">
                 <p class="text-sm text-green-600 dark:text-green-300 font-medium mb-1">Downloads Today</p>
                 <p class="text-2xl font-bold text-green-800 dark:text-green-100">{{ number_format($userStats['summary']['downloads_today']) }}</p>
             </div>
-            <div class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900 dark:to-purple-800 rounded-lg p-4 text-center">
+            <div class="bg-linear-to-br from-purple-50 to-purple-100 dark:from-purple-900 dark:to-purple-800 rounded-lg p-4 text-center">
                 <p class="text-sm text-purple-600 dark:text-purple-300 font-medium mb-1">Downloads (7d)</p>
                 <p class="text-2xl font-bold text-purple-800 dark:text-purple-100">{{ number_format($userStats['summary']['downloads_week']) }}</p>
             </div>
-            <div class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900 dark:to-orange-800 rounded-lg p-4 text-center">
+            <div class="bg-linear-to-br from-orange-50 to-orange-100 dark:from-orange-900 dark:to-orange-800 rounded-lg p-4 text-center">
                 <p class="text-sm text-orange-600 dark:text-orange-300 font-medium mb-1">API Hits Today</p>
                 <p class="text-2xl font-bold text-orange-800 dark:text-orange-100">{{ number_format($userStats['summary']['api_hits_today']) }}</p>
             </div>
-            <div class="bg-gradient-to-br from-pink-50 to-pink-100 dark:from-pink-900 dark:to-pink-800 rounded-lg p-4 text-center">
+            <div class="bg-linear-to-br from-pink-50 to-pink-100 dark:from-pink-900 dark:to-pink-800 rounded-lg p-4 text-center">
                 <p class="text-sm text-pink-600 dark:text-pink-300 font-medium mb-1">API Hits (7d)</p>
                 <p class="text-2xl font-bold text-pink-800 dark:text-pink-100">{{ number_format($userStats['summary']['api_hits_week']) }}</p>
             </div>
@@ -287,7 +287,7 @@
 
         <!-- Current Usage Stats -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900 dark:to-orange-800 rounded-lg p-4">
+            <div class="bg-linear-to-br from-orange-50 to-orange-100 dark:from-orange-900 dark:to-orange-800 rounded-lg p-4">
                 <div class="flex items-center justify-between mb-3">
                     <div>
                         <p class="text-sm text-orange-600 dark:text-orange-300 font-medium mb-1">CPU Usage</p>
@@ -328,7 +328,7 @@
                 </div>
             </div>
 
-            <div class="bg-gradient-to-br from-cyan-50 to-cyan-100 dark:from-cyan-900 dark:to-cyan-800 rounded-lg p-4">
+            <div class="bg-linear-to-br from-cyan-50 to-cyan-100 dark:from-cyan-900 dark:to-cyan-800 rounded-lg p-4">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-cyan-600 dark:text-cyan-300 font-medium mb-1">RAM Usage</p>
@@ -473,7 +473,7 @@
                 @if(isset($recent_activity) && count($recent_activity) > 0)
                     @foreach($recent_activity as $activity)
                         <div class="flex items-start activity-item rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
-                            <div class="w-8 h-8 {{ $activity->icon_bg }} rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                            <div class="w-8 h-8 {{ $activity->icon_bg }} rounded-full flex items-center justify-center mr-3 shrink-0">
                                 <i class="fas fa-{{ $activity->icon }} {{ $activity->icon_color }} text-sm"></i>
                             </div>
                             <div class="flex-1">

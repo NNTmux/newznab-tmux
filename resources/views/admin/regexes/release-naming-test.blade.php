@@ -127,13 +127,13 @@
                                             {{ $row['releaseID'] ?? $row['id'] ?? 'N/A' }}
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-500">
-                                            <div class="max-w-xl break-words">
+                                            <div class="max-w-xl wrap-break-word">
                                                 {{ $row['oldName'] ?? $row['name'] ?? '' }}
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 text-sm">
                                             @if(isset($row['newName']) && $row['newName'])
-                                                <div class="max-w-xl break-words font-semibold text-green-600">
+                                                <div class="max-w-xl wrap-break-word font-semibold text-green-600">
                                                     {{ $row['newName'] }}
                                                 </div>
                                             @else

@@ -11,7 +11,7 @@
         <nav class="text-sm text-gray-600">
             <a href="{{ url('/') }}" class="hover:text-blue-600">Home</a>
             <i class="fas fa-chevron-right mx-2 text-xs"></i>
-            <span class="break-words break-all">{{ $release->searchname }}</span>
+            <span class="wrap-break-word break-all">{{ $release->searchname }}</span>
         </nav>
     </div>
 
@@ -22,18 +22,18 @@
             <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
                 <div class="flex gap-4 mb-4">
                     <!-- Cover Image -->
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                         <img src="{{ getReleaseCover($release) }}"
                              alt="{{ $release->searchname }}"
                              class="w-48 h-72 object-cover rounded-lg shadow-md max-w-[192px] max-h-[288px]"
-                             class="rounded-lg shadow-lg object-cover w-192 h-288"
+                             class="rounded-lg shadow-lg object-cover w-3xl h-288"
                              data-fallback-src="{{ asset('assets/images/no-cover.png') }}">
                     </div>
 
                     <!-- Title and Actions -->
                     <div class="flex-1">
                         <div class="mb-3">
-                            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2 break-words break-all">{{ $release->searchname }}</h2>
+                            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2 wrap-break-word break-all">{{ $release->searchname }}</h2>
                             <div class="flex flex-wrap gap-2">
                                 @if(!empty($reportCount) && $reportCount > 0)
                                     <div class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 border border-orange-200 dark:border-orange-800"
@@ -138,7 +138,7 @@
                     $movieLanguage = $movieData['language'] ?? ($movie->language ?? null);
                     $movieTrailer = $movieData['trailer'] ?? ($movie->trailer ?? null);
                 @endphp
-                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-lg p-6 border border-blue-100 dark:border-blue-800">
+                <div class="bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-lg p-6 border border-blue-100 dark:border-blue-800">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-film mr-2 text-blue-600 dark:text-blue-400"></i> Movie Information
                     </h3>
@@ -222,7 +222,7 @@
                     $showStarted = $showData['started'] ?? ($show->started ?? null);
                     $showTvdb = $showData['tvdb'] ?? ($show->tvdb ?? null);
                 @endphp
-                <div class="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900 dark:to-pink-900 rounded-lg p-6 border border-purple-100 dark:border-purple-800">
+                <div class="bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-900 dark:to-pink-900 rounded-lg p-6 border border-purple-100 dark:border-purple-800">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-tv mr-2 text-purple-600 dark:text-purple-400"></i> TV Show Information
                     </h3>
@@ -263,7 +263,7 @@
                     $musicReleaseDate = $musicData['releasedate'] ?? ($music->releasedate ?? null);
                     $musicGenres = $musicData['genres'] ?? ($music->genres ?? null);
                 @endphp
-                <div class="bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900 dark:to-teal-900 rounded-lg p-6 border border-green-100 dark:border-green-800">
+                <div class="bg-linear-to-r from-green-50 to-teal-50 dark:from-green-900 dark:to-teal-900 rounded-lg p-6 border border-green-100 dark:border-green-800">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-music mr-2 text-green-600 dark:text-green-400"></i> Music Information
                     </h3>
@@ -311,7 +311,7 @@
                     $gameReleaseDate = $gameData['releasedate'] ?? ($game->releasedate ?? null);
                     $gameGenres = $gameData['genres'] ?? ($game->genres ?? null);
                 @endphp
-                <div class="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900 dark:to-yellow-900 rounded-lg p-6 border border-orange-100 dark:border-orange-800">
+                <div class="bg-linear-to-r from-orange-50 to-yellow-50 dark:from-orange-900 dark:to-yellow-900 rounded-lg p-6 border border-orange-100 dark:border-orange-800">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-gamepad mr-2 text-orange-600 dark:text-orange-400"></i> Game Information
                     </h3>
@@ -352,7 +352,7 @@
                     $conPublisher = $conData['publisher'] ?? ($con->publisher ?? null);
                     $conReleaseDate = $conData['releasedate'] ?? ($con->releasedate ?? null);
                 @endphp
-                <div class="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900 dark:to-blue-900 rounded-lg p-6 border border-indigo-100 dark:border-indigo-800">
+                <div class="bg-linear-to-r from-indigo-50 to-blue-50 dark:from-indigo-900 dark:to-blue-900 rounded-lg p-6 border border-indigo-100 dark:border-indigo-800">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-gamepad mr-2 text-indigo-600 dark:text-indigo-400"></i> Console Game Information
                     </h3>
@@ -389,7 +389,7 @@
                     $bookPublishDate = $bookData['publishdate'] ?? ($book->publishdate ?? null);
                     $bookOverview = $bookData['overview'] ?? ($book->overview ?? null);
                 @endphp
-                <div class="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900 dark:to-orange-900 rounded-lg p-6 border border-amber-100 dark:border-amber-800">
+                <div class="bg-linear-to-r from-amber-50 to-orange-50 dark:from-amber-900 dark:to-orange-900 rounded-lg p-6 border border-amber-100 dark:border-amber-800">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-book mr-2 text-amber-600 dark:text-amber-400"></i> Book Information
                     </h3>
@@ -486,7 +486,7 @@
                     ];
                     $anidbSourceLabel = $sourceLabels[$anidbSource] ?? $anidbSource;
                 @endphp
-                <div class="bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-900 dark:to-purple-900 rounded-lg p-6 border border-pink-100 dark:border-pink-800">
+                <div class="bg-linear-to-r from-pink-50 to-purple-50 dark:from-pink-900 dark:to-purple-900 rounded-lg p-6 border border-pink-100 dark:border-pink-800">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-dragon mr-2 text-pink-600 dark:text-pink-400"></i>
                         @if($anidbMediaType === 'MANGA')
@@ -679,7 +679,7 @@
 
             <!-- Password Information -->
             @if(isset($release->passwordstatus) && $release->passwordstatus > 0)
-                <div class="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900 dark:to-orange-900 rounded-lg p-6 border border-red-100 dark:border-red-800">
+                <div class="bg-linear-to-r from-red-50 to-orange-50 dark:from-red-900 dark:to-orange-900 rounded-lg p-6 border border-red-100 dark:border-red-800">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-lock mr-2 text-red-600 dark:text-red-400"></i> Password Protected Release
                     </h3>
@@ -726,7 +726,7 @@
 
             <!-- Video/Audio Metadata -->
             @if(!empty($reVideo) || !empty($reAudio) || !empty($reSubs))
-                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
+                <div class="bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-photo-video mr-2 text-blue-600 dark:text-blue-400"></i> Media Information
                     </h3>
@@ -871,7 +871,7 @@
 
             <!-- PreDB Information -->
             @if(!empty($predb) && is_array($predb))
-                <div class="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-lg p-6">
+                <div class="bg-linear-to-r from-cyan-50 to-blue-50 rounded-lg p-6">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-database mr-2 text-cyan-600"></i> PreDB Information
                     </h3>
@@ -1010,7 +1010,7 @@
                             <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition">
                                 <div class="flex items-start justify-between mb-3">
                                     <div class="flex items-center">
-                                        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-800 rounded-full flex items-center justify-center text-white font-bold mr-3 shadow-sm">
+                                        <div class="w-10 h-10 bg-linear-to-br from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-800 rounded-full flex items-center justify-center text-white font-bold mr-3 shadow-sm">
                                             {{ strtoupper(substr($comment['username'] ?? 'U', 0, 1)) }}
                                         </div>
                                         <div>

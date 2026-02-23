@@ -65,7 +65,7 @@
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
                                 <td class="px-3 py-4">
                                     <div class="flex items-start gap-3">
-                                        <div class="flex-shrink-0 w-12 h-16 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
+                                        <div class="shrink-0 w-12 h-16 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
                                             <i class="fas fa-film text-gray-400 text-lg"></i>
                                         </div>
                                         <div class="flex-1 min-w-0">

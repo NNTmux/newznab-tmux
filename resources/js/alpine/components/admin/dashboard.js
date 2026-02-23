@@ -79,7 +79,7 @@ Alpine.data('recentActivity', () => ({
             data.activities.forEach(a => {
                 const div = document.createElement('div');
                 div.className = 'flex items-start activity-item rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors';
-                div.innerHTML = '<div class="w-8 h-8 ' + a.icon_bg + ' rounded-full flex items-center justify-center mr-3 flex-shrink-0"><i class="fas fa-' + a.icon + ' ' + a.icon_color + ' text-sm"></i></div><div class="flex-1"><p class="text-sm text-gray-800 dark:text-gray-200">' + escapeHtml(a.message) + '</p><p class="text-xs text-gray-500 dark:text-gray-400">' + escapeHtml(a.created_at) + '</p></div>';
+                div.innerHTML = '<div class="w-8 h-8 ' + a.icon_bg + ' rounded-full flex items-center justify-center mr-3 shrink-0"><i class="fas fa-' + a.icon + ' ' + a.icon_color + ' text-sm"></i></div><div class="flex-1"><p class="text-sm text-gray-800 dark:text-gray-200">' + escapeHtml(a.message) + '</p><p class="text-xs text-gray-500 dark:text-gray-400">' + escapeHtml(a.created_at) + '</p></div>';
                 this.$el.appendChild(div);
             });
             const ts = document.getElementById('activity-last-updated');

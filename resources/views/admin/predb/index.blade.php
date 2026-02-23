@@ -167,7 +167,7 @@
     @if($lastSearch)
     <div class="mt-6 bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 dark:border-blue-600 p-4 rounded">
         <div class="flex">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
                 <i class="fas fa-info-circle text-blue-600 dark:text-blue-400"></i>
             </div>
             <div class="ml-3">

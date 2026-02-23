@@ -1,6 +1,6 @@
 <div tabindex="-1" role="dialog" data-modal="{{ $key }}" class="fixed top-0 left-0 w-full h-full hidden z-10 items-center justify-center">
     <div class="fixed top-0 left-0 w-full h-full bg-black/25 dark:bg-black/50" data-close-modal></div>
-    <div class="relative bg-white dark:bg-gray-800 rounded-md max-w-screen-sm w-full m-2 transition-colors" role="document">
+    <div class="relative bg-white dark:bg-gray-800 rounded-md max-w-(--breakpoint-sm) w-full m-2 transition-colors" role="document">
         <div class="">
             <div class="border-b dark:border-gray-700 px-6 py-4 flex justify-between">
                 <h5 class="text-xl font-medium flex items-center gap-1 text-gray-900 dark:text-gray-100">{!!$title !!}</h5>
