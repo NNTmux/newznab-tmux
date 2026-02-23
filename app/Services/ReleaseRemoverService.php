@@ -868,21 +868,34 @@ class ReleaseRemoverService
      * These releases are useless since PAR2 files are only repair/verification
      * data and cannot be used without the original content files.
      *
+     * Two detection strategies are used:
+     * 1. The release name contains a .par2 filename pattern AND has no associated
+     *    release_files (99% of par2-only releases have no inner file metadata).
+     * 2. All associated release_files have names containing .par2 (rare edge case
+     *    where par2 metadata was stored during post-processing).
+     *
      * @throws Exception
      */
     protected function removePar2Only(): bool|string
     {
-        return $this->executeSimpleRemoval('Par2Only', sprintf(
+        // Strategy 1: Release name contains .par2 and has no release_files
+        $this->executeSimpleRemoval('Par2Only', sprintf(
+            "SELECT r.guid, r.searchname, r.id
+            FROM releases r
+            WHERE r.name REGEXP '\\.par2'
+            AND r.id NOT IN (SELECT rf.releases_id FROM release_files rf)
+            %s",
+            $this->crapTime
+        ));
+
+        // Strategy 2: All release_files are .par2
+        return $this->executeSimpleRemoval('Par2Only_Files', sprintf(
             "SELECT r.guid, r.searchname, r.id
             FROM releases r
             INNER JOIN release_files rf ON r.id = rf.releases_id
-            WHERE r.id NOT IN (
-                SELECT rf2.releases_id
-                FROM release_files rf2
-                WHERE rf2.name NOT REGEXP '\\.par2$'
-            )
+            WHERE 1=1 %s
             GROUP BY r.id, r.guid, r.searchname
-            %s",
+            HAVING COUNT(*) = SUM(CASE WHEN rf.name REGEXP '\\.par2' THEN 1 ELSE 0 END)",
             $this->crapTime
         ));
     }

@@ -1228,28 +1228,48 @@ final class ReleaseProcessingService
      *
      * PAR2-only releases are useless since they only contain repair/verification
      * data without the original content files they are meant to repair.
+     *
+     * Two detection strategies are used:
+     * 1. The release name contains a .par2 filename pattern AND has no associated
+     *    release_files (99% of par2-only releases have no inner file metadata).
+     * 2. All associated release_files have names containing .par2 (rare edge case
+     *    where par2 metadata was stored during post-processing).
      */
     private function deletePar2OnlyReleases(ReleaseDeleteStats $stats): ReleaseDeleteStats
     {
-        // Find releases where ALL associated release_files have names ending in .par2
-        $par2OnlyReleaseIds = DB::table('releases as r')
-            ->join('release_files as rf', 'r.id', '=', 'rf.releases_id')
-            ->groupBy('r.id')
-            ->havingRaw("COUNT(rf.id) = SUM(CASE WHEN rf.name REGEXP '\\\\.par2$' THEN 1 ELSE 0 END)")
-            ->pluck('r.id');
+        // Strategy 1: Release name contains .par2 and has no release_files.
+        // This is the most common case — par2-only collections never have inner
+        // content files extracted, so release_files will be empty.
+        Release::query()
+            ->whereRaw("name REGEXP '\\\\.par2'")
+            ->whereNotExists(function ($query): void {
+                $query->select(DB::raw(1))
+                    ->from('release_files')
+                    ->whereColumn('release_files.releases_id', 'releases.id');
+            })
+            ->select(['id', 'guid'])
+            ->chunkById(self::BATCH_SIZE, function ($releases) use (&$stats): bool {
+                foreach ($releases as $release) {
+                    $this->deleteSingleRelease($release);
+                    $stats = $stats->increment('par2Only');
+                }
 
-        if ($par2OnlyReleaseIds->isNotEmpty()) {
-            Release::query()
-                ->whereIn('id', $par2OnlyReleaseIds)
-                ->select(['id', 'guid'])
-                ->chunkById(self::BATCH_SIZE, function ($releases) use (&$stats): bool {
-                    foreach ($releases as $release) {
-                        $this->deleteSingleRelease($release);
-                        $stats = $stats->increment('par2Only');
-                    }
+                return true;
+            });
 
-                    return true;
-                });
+        // Strategy 2: All release_files entries are .par2 files.
+        // Catches releases that do have release_files, but every single one is a par2.
+        $par2OnlyByFiles = DB::select("
+            SELECT r.id, r.guid
+            FROM releases r
+            INNER JOIN release_files rf ON r.id = rf.releases_id
+            GROUP BY r.id, r.guid
+            HAVING COUNT(*) = SUM(CASE WHEN rf.name REGEXP '\\\\.par2' THEN 1 ELSE 0 END)
+        ");
+
+        foreach ($par2OnlyByFiles as $release) {
+            $this->deleteSingleRelease($release);
+            $stats = $stats->increment('par2Only');
         }
 
         return $stats;
