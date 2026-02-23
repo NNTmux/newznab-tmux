@@ -48,6 +48,8 @@ class ReleaseRemoverService
 
     private const string TYPE_WMV_ALL = 'wmv_all';
 
+    private const string TYPE_PAR2ONLY = 'par2only';
+
     protected string $blacklistID = '';
 
     protected string $crapTime = '';
@@ -118,6 +120,7 @@ class ReleaseRemoverService
             self::TYPE_NZB => fn () => $this->removeSingleNZB(),
             self::TYPE_CODEC => fn () => $this->removeCodecPoster(),
             self::TYPE_WMV_ALL => fn () => $this->removeWMV(),
+            self::TYPE_PAR2ONLY => fn () => $this->removePar2Only(),
         ];
     }
 
@@ -272,6 +275,7 @@ class ReleaseRemoverService
             self::TYPE_SIZE,
             self::TYPE_NZB,
             self::TYPE_CODEC,
+            self::TYPE_PAR2ONLY,
         ];
 
         foreach ($defaultTypes as $removalType) {
@@ -856,6 +860,31 @@ class ReleaseRemoverService
                 OR rf.name LIKE '%Lesen Sie mir, wenn der Film nicht starten.txt%'
             )
             GROUP BY r.id {$this->crapTime}");
+    }
+
+    /**
+     * Remove releases that contain only PAR2 files (no actual content files).
+     *
+     * These releases are useless since PAR2 files are only repair/verification
+     * data and cannot be used without the original content files.
+     *
+     * @throws Exception
+     */
+    protected function removePar2Only(): bool|string
+    {
+        return $this->executeSimpleRemoval('Par2Only', sprintf(
+            "SELECT r.guid, r.searchname, r.id
+            FROM releases r
+            INNER JOIN release_files rf ON r.id = rf.releases_id
+            WHERE r.id NOT IN (
+                SELECT rf2.releases_id
+                FROM release_files rf2
+                WHERE rf2.name NOT REGEXP '\\.par2$'
+            )
+            GROUP BY r.id, r.guid, r.searchname
+            %s",
+            $this->crapTime
+        ));
     }
 
     /**

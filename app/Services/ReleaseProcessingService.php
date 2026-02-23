@@ -422,7 +422,24 @@ final class ReleaseProcessingService
             ? UsenetGroup::getActiveIDs()
             : [['id' => $normalizedGroupId]];
 
-        $stats = ['minSize' => 0, 'maxSize' => 0, 'minFiles' => 0];
+        $stats = ['minSize' => 0, 'maxSize' => 0, 'minFiles' => 0, 'par2Only' => 0];
+
+        // Delete collections where ALL binaries are par2 files (no actual content)
+        DB::transaction(static function () use (&$stats): void {
+            $par2OnlyCollectionIds = DB::table('collections as c')
+                ->join('binaries as b', 'c.id', '=', 'b.collections_id')
+                ->where('c.filecheck', CollectionFileCheckStatus::Sized->value)
+                ->where('c.filesize', '>', 0)
+                ->groupBy('c.id')
+                ->havingRaw('COUNT(b.id) = SUM(CASE WHEN b.name REGEXP %s THEN 1 ELSE 0 END)', ['\\.par2'])
+                ->pluck('c.id');
+
+            if ($par2OnlyCollectionIds->isNotEmpty()) {
+                $stats['par2Only'] += Collection::query()
+                    ->whereIn('id', $par2OnlyCollectionIds)
+                    ->delete();
+            }
+        }, 10);
 
         foreach ($groupIDs as $grpID) {
             $groupSettings = UsenetGroup::getGroupByID($grpID['id']);
@@ -618,6 +635,7 @@ final class ReleaseProcessingService
         $stats = $this->deleteDisabledCategoryReleases($stats);
         $stats = $this->deleteCategoryMinSizeReleases($stats);
         $stats = $this->deleteDisabledGenreReleases($stats);
+        $stats = $this->deletePar2OnlyReleases($stats);
         $stats = $this->deleteMiscReleases($stats);
 
         $this->outputReleaseDeleteStats($stats, $startTime);
@@ -1205,6 +1223,38 @@ final class ReleaseProcessingService
         return $stats;
     }
 
+    /**
+     * Delete releases that contain only PAR2 files (no actual content).
+     *
+     * PAR2-only releases are useless since they only contain repair/verification
+     * data without the original content files they are meant to repair.
+     */
+    private function deletePar2OnlyReleases(ReleaseDeleteStats $stats): ReleaseDeleteStats
+    {
+        // Find releases where ALL associated release_files have names ending in .par2
+        $par2OnlyReleaseIds = DB::table('releases as r')
+            ->join('release_files as rf', 'r.id', '=', 'rf.releases_id')
+            ->groupBy('r.id')
+            ->havingRaw('COUNT(rf.id) = SUM(CASE WHEN rf.name REGEXP %s THEN 1 ELSE 0 END)', ['\\.par2$'])
+            ->pluck('r.id');
+
+        if ($par2OnlyReleaseIds->isNotEmpty()) {
+            Release::query()
+                ->whereIn('id', $par2OnlyReleaseIds)
+                ->select(['id', 'guid'])
+                ->chunkById(self::BATCH_SIZE, function ($releases) use (&$stats): bool {
+                    foreach ($releases as $release) {
+                        $this->deleteSingleRelease($release);
+                        $stats = $stats->increment('par2Only');
+                    }
+
+                    return true;
+                });
+        }
+
+        return $stats;
+    }
+
     private function deleteMiscReleases(ReleaseDeleteStats $stats): ReleaseDeleteStats
     {
         if ($this->settings->miscOtherRetentionHours > 0) {
@@ -1396,12 +1446,15 @@ final class ReleaseProcessingService
      */
     private function outputCollectionDeleteStats(array $stats, DateTimeInterface $startTime): void
     {
-        $totalDeleted = $stats['minSize'] + $stats['maxSize'] + $stats['minFiles'];
+        $totalDeleted = $stats['minSize'] + $stats['maxSize'] + $stats['minFiles'] + ($stats['par2Only'] ?? 0);
 
         if ($totalDeleted > 0) {
             $this->outputStat('Too small', $stats['minSize']);
             $this->outputStat('Too large', $stats['maxSize']);
             $this->outputStat('Too few files', $stats['minFiles']);
+            if (($stats['par2Only'] ?? 0) > 0) {
+                $this->outputStat('Par2 only', $stats['par2Only']);
+            }
             $this->outputStat('Total removed', $totalDeleted);
         } else {
             $this->outputInfo('No collections filtered');
@@ -1459,6 +1512,9 @@ final class ReleaseProcessingService
             }
             if ($stats->miscHashed > 0) {
                 $this->outputStat('Misc->Hashed expired', $stats->miscHashed);
+            }
+            if ($stats->par2Only > 0) {
+                $this->outputStat('Par2-only releases', $stats->par2Only);
             }
 
             $this->outputStat('Total releases removed', $total);
