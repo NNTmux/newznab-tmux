@@ -24,7 +24,6 @@ final readonly class ProcessingConfiguration
 
     public string|false $unzipPath;
 
-
     public string|false $timeoutPath;
 
     public int $timeoutSeconds;

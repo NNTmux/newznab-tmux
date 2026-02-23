@@ -51,7 +51,6 @@ class ArchiveExtractionService
 
         $context->compressedFilesChecked++;
 
-
         // Try ArchiveInfo for RAR/ZIP
         if (! $this->archiveInfo->setData($compressedData, true)) {
             // Handle standalone video detection
@@ -125,7 +124,6 @@ class ArchiveExtractionService
             'dataSummary' => $dataSummary,
         ];
     }
-
 
     /**
      * Filter extracted files by allowed extensions.
@@ -414,7 +412,6 @@ class ArchiveExtractionService
         return null;
     }
 
-
     /**
      * Extract a specific file using unrar.
      */
@@ -513,5 +510,4 @@ class ArchiveExtractionService
 
         return null;
     }
-
 }
