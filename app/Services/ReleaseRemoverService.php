@@ -869,10 +869,13 @@ class ReleaseRemoverService
      * data and cannot be used without the original content files.
      *
      * Two detection strategies are used:
-     * 1. The release name contains a .par2 filename AND has no associated
-     *    release_files, or only par2 release_files. Matches both searchname
-     *    and raw name to handle cleaned search names and releases with
-     *    trailing metadata (e.g. [DE], [To] [2026], "by" poster info).
+     * 1. The searchname contains a .par2 filename AND has no associated
+     *    release_files, or only par2 release_files. The character class after
+     *    .par2 includes underscore because the searchname sanitizer replaces
+     *    quotes and special chars with underscores (e.g. .par2" becomes .par2_).
+     *    Note: We intentionally do NOT match on r.name (raw Usenet subject)
+     *    because many legitimate releases list a .par2 index file in the subject
+     *    even though the actual content is video/audio/etc.
      * 2. All associated release_files have names containing .par2 (rare edge case
      *    where par2 metadata was stored during post-processing).
      *
@@ -880,22 +883,23 @@ class ReleaseRemoverService
      */
     protected function removePar2Only(): bool|string
     {
-        // Strategy 1: Release name contains a par2 filename pattern and has
+        // Strategy 1: searchname contains a par2 filename pattern and has
         // no non-par2 release_files. Matches .par2 (index) and .vol123+45.par2 (volumes)
-        // followed by a non-alphanumeric char (quote, space, bracket) or end of string.
-        // Checks both searchname and raw name for broader coverage.
-        $par2Regex = '\\.(vol[0-9]+\\+[0-9]+\\.par2|par2)([\"\\047 \\]\\[)(>]|$)';
+        // followed by a delimiter char or end of string.
+        // IMPORTANT: We use [.] and [+] instead of \. and \+ because MySQL's SQL
+        // string parser silently strips backslashes before unrecognized escape chars
+        // (e.g. \. → . , \+ → +) before the regex engine sees them.
+        // The delimiter class []" _[)(>] includes: ] " space _ [ ) ( > where ]
+        // must be first in the class per regex syntax.
         $this->executeSimpleRemoval('Par2Only', sprintf(
             "SELECT r.guid, r.searchname, r.id
             FROM releases r
-            WHERE (r.searchname REGEXP '%s' OR r.name REGEXP '%s')
+            WHERE r.searchname REGEXP '[.](vol[0-9]+[+][0-9]+[.]par2|par2)([]\" _[)(>]|$)'
             AND r.id NOT IN (
                 SELECT rf.releases_id FROM release_files rf
-                WHERE rf.name NOT REGEXP '\\.par2'
+                WHERE rf.name NOT REGEXP '[.]par2'
             )
             %s",
-            $par2Regex,
-            $par2Regex,
             $this->crapTime
         ));
 
@@ -906,7 +910,7 @@ class ReleaseRemoverService
             INNER JOIN release_files rf ON r.id = rf.releases_id
             WHERE 1=1 %s
             GROUP BY r.id, r.guid, r.searchname
-            HAVING COUNT(*) = SUM(CASE WHEN rf.name REGEXP '\\.par2' THEN 1 ELSE 0 END)",
+            HAVING COUNT(*) = SUM(CASE WHEN rf.name REGEXP '[.]par2' THEN 1 ELSE 0 END)",
             $this->crapTime
         ));
     }
