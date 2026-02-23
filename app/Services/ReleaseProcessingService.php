@@ -431,7 +431,7 @@ final class ReleaseProcessingService
                 ->where('c.filecheck', CollectionFileCheckStatus::Sized->value)
                 ->where('c.filesize', '>', 0)
                 ->groupBy('c.id')
-                ->havingRaw("COUNT(b.id) = SUM(CASE WHEN b.name REGEXP '\\\\.par2' THEN 1 ELSE 0 END)")
+                ->havingRaw("COUNT(b.id) = SUM(CASE WHEN b.name REGEXP '\\\\.(vol[0-9]+\\\\+[0-9]+\\\\.par2|par2)' THEN 1 ELSE 0 END)")
                 ->pluck('c.id');
 
             if ($par2OnlyCollectionIds->isNotEmpty()) {
@@ -635,7 +635,6 @@ final class ReleaseProcessingService
         $stats = $this->deleteDisabledCategoryReleases($stats);
         $stats = $this->deleteCategoryMinSizeReleases($stats);
         $stats = $this->deleteDisabledGenreReleases($stats);
-        $stats = $this->deletePar2OnlyReleases($stats);
         $stats = $this->deleteMiscReleases($stats);
 
         $this->outputReleaseDeleteStats($stats, $startTime);
@@ -1223,58 +1222,6 @@ final class ReleaseProcessingService
         return $stats;
     }
 
-    /**
-     * Delete releases that contain only PAR2 files (no actual content).
-     *
-     * PAR2-only releases are useless since they only contain repair/verification
-     * data without the original content files they are meant to repair.
-     *
-     * Two detection strategies are used:
-     * 1. The release name contains a .par2 filename pattern AND has no associated
-     *    release_files (99% of par2-only releases have no inner file metadata).
-     * 2. All associated release_files have names containing .par2 (rare edge case
-     *    where par2 metadata was stored during post-processing).
-     */
-    private function deletePar2OnlyReleases(ReleaseDeleteStats $stats): ReleaseDeleteStats
-    {
-        // Strategy 1: Release name contains .par2 and has no release_files.
-        // This is the most common case — par2-only collections never have inner
-        // content files extracted, so release_files will be empty.
-        Release::query()
-            ->whereRaw("name REGEXP '\\\\.par2'")
-            ->whereNotExists(function ($query): void {
-                $query->select(DB::raw(1))
-                    ->from('release_files')
-                    ->whereColumn('release_files.releases_id', 'releases.id');
-            })
-            ->select(['id', 'guid'])
-            ->chunkById(self::BATCH_SIZE, function ($releases) use (&$stats): bool {
-                foreach ($releases as $release) {
-                    $this->deleteSingleRelease($release);
-                    $stats = $stats->increment('par2Only');
-                }
-
-                return true;
-            });
-
-        // Strategy 2: All release_files entries are .par2 files.
-        // Catches releases that do have release_files, but every single one is a par2.
-        $par2OnlyByFiles = DB::select("
-            SELECT r.id, r.guid
-            FROM releases r
-            INNER JOIN release_files rf ON r.id = rf.releases_id
-            GROUP BY r.id, r.guid
-            HAVING COUNT(*) = SUM(CASE WHEN rf.name REGEXP '\\\\.par2' THEN 1 ELSE 0 END)
-        ");
-
-        foreach ($par2OnlyByFiles as $release) {
-            $this->deleteSingleRelease($release);
-            $stats = $stats->increment('par2Only');
-        }
-
-        return $stats;
-    }
-
     private function deleteMiscReleases(ReleaseDeleteStats $stats): ReleaseDeleteStats
     {
         if ($this->settings->miscOtherRetentionHours > 0) {
@@ -1532,9 +1479,6 @@ final class ReleaseProcessingService
             }
             if ($stats->miscHashed > 0) {
                 $this->outputStat('Misc->Hashed expired', $stats->miscHashed);
-            }
-            if ($stats->par2Only > 0) {
-                $this->outputStat('Par2-only releases', $stats->par2Only);
             }
 
             $this->outputStat('Total releases removed', $total);

@@ -21,7 +21,6 @@ final readonly class ReleaseDeleteStats
         public int $disabledGenre = 0,
         public int $miscOther = 0,
         public int $miscHashed = 0,
-        public int $par2Only = 0,
     ) {}
 
     /**
@@ -39,7 +38,6 @@ final readonly class ReleaseDeleteStats
             'disabledGenre' => $this->disabledGenre,
             'miscOther' => $this->miscOther,
             'miscHashed' => $this->miscHashed,
-            'par2Only' => $this->par2Only,
         ];
 
         if (isset($values[$field])) {
@@ -62,8 +60,7 @@ final readonly class ReleaseDeleteStats
             + $this->categoryMinSize
             + $this->disabledGenre
             + $this->miscOther
-            + $this->miscHashed
-            + $this->par2Only;
+            + $this->miscHashed;
     }
 
     /**
@@ -83,7 +80,6 @@ final readonly class ReleaseDeleteStats
             'disabledGenre' => $this->disabledGenre,
             'miscOther' => $this->miscOther,
             'miscHashed' => $this->miscHashed,
-            'par2Only' => $this->par2Only,
         ];
     }
 
@@ -104,7 +100,6 @@ final readonly class ReleaseDeleteStats
             disabledGenre: $data['disabledGenre'] ?? 0,
             miscOther: $data['miscOther'] ?? 0,
             miscHashed: $data['miscHashed'] ?? 0,
-            par2Only: $data['par2Only'] ?? 0,
         );
     }
 }

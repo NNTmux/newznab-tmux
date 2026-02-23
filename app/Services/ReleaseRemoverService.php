@@ -869,8 +869,8 @@ class ReleaseRemoverService
      * data and cannot be used without the original content files.
      *
      * Two detection strategies are used:
-     * 1. The release name contains a .par2 filename pattern AND has no associated
-     *    release_files (99% of par2-only releases have no inner file metadata).
+     * 1. The release name ends with a .par2 filename AND has no associated
+     *    release_files, or only par2 release_files.
      * 2. All associated release_files have names containing .par2 (rare edge case
      *    where par2 metadata was stored during post-processing).
      *
@@ -878,12 +878,16 @@ class ReleaseRemoverService
      */
     protected function removePar2Only(): bool|string
     {
-        // Strategy 1: Release name contains .par2 and has no release_files
+        // Strategy 1: Release name ends with a par2 filename pattern and has
+        // no non-par2 release_files. Matches .par2" (index) and .vol123+45.par2" (volumes).
         $this->executeSimpleRemoval('Par2Only', sprintf(
             "SELECT r.guid, r.searchname, r.id
             FROM releases r
-            WHERE r.name REGEXP '\\.par2'
-            AND r.id NOT IN (SELECT rf.releases_id FROM release_files rf)
+            WHERE r.name REGEXP '\\.(vol[0-9]+\\+[0-9]+\\.par2|par2)[\"\\' ]*$'
+            AND r.id NOT IN (
+                SELECT rf.releases_id FROM release_files rf
+                WHERE rf.name NOT REGEXP '\\.par2'
+            )
             %s",
             $this->crapTime
         ));
