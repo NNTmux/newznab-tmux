@@ -24,7 +24,6 @@ final readonly class ProcessingConfiguration
 
     public string|false $unzipPath;
 
-    public string|false $sevenZipPath;
 
     public string|false $timeoutPath;
 
@@ -106,7 +105,6 @@ final readonly class ProcessingConfiguration
         $this->fetchLastFiles = (bool) config('nntmux_settings.fetch_last_file');
         $this->unrarPath = config('nntmux_settings.unrar_path') ?: false;
         $this->unzipPath = config('nntmux_settings.unzip_path') ?: false;
-        $this->sevenZipPath = config('nntmux_settings.7zip_path') ?: false;
         $this->timeoutPath = config('nntmux_settings.timeout_path') ?: false;
         $this->timeoutSeconds = (int) Settings::settingValue('timeoutseconds');
         $this->queryLimit = (int) (Settings::settingValue('maxaddprocessed') ?: 25);

@@ -5,7 +5,6 @@ LABEL maintainer="Fossil01"
 ARG WWWGROUP
 ARG NODE_VERSION=22
 ARG POSTGRES_VERSION=17
-ARG SEVENZIP_VERSION=2409
 ARG MYSQL_CLIENT="mariadb-client"
 
 WORKDIR /var/www/html
@@ -14,7 +13,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 # Install base packages and add repositories
 RUN apt-get update \
-    && apt-get install -y gnupg gosu curl ca-certificates zip unzip unrar 7zip lame git supervisor sqlite3 libcap2-bin libpng-dev python3 dnsutils \
+    && apt-get install -y gnupg gosu curl ca-certificates zip unzip unrar lame git supervisor sqlite3 libcap2-bin libpng-dev python3 dnsutils \
     && curl -sS 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x14aa40ec0831756756d7f66c4f4ea0aae5267a6c' | gpg --dearmor | tee /etc/apt/keyrings/ppa_ondrej_php.gpg > /dev/null \
     && echo "deb [signed-by=/etc/apt/keyrings/ppa_ondrej_php.gpg] https://ppa.launchpadcontent.net/ondrej/php/ubuntu noble main" > /etc/apt/sources.list.d/ppa_ondrej_php.list \
     && echo "deb [signed-by=/etc/apt/keyrings/ppa_ondrej_php.gpg] https://ppa.launchpadcontent.net/ondrej/nginx/ubuntu noble main" > /etc/apt/sources.list.d/ppa_ondrej_nginx.list \
@@ -67,18 +66,6 @@ RUN apt-get install -y yarn $MYSQL_CLIENT postgresql-client-$POSTGRES_VERSION \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Determine ARCH and download and extract the appropriate version of 7-Zip
-RUN ARCH="$(dpkg --print-architecture)" && \
-    if [ "$ARCH" = "amd64" ]; then \
-        SZIP_URL="https://www.7-zip.org/a/7z$SEVENZIP_VERSION-linux-x64.tar.xz"; \
-    fi && \
-    if [ "$ARCH" = "arm64" ]; then \
-        SZIP_URL="https://www.7-zip.org/a/7z$SEVENZIP_VERSION-linux-arm64.tar.xz"; \
-    fi && \
-    wget "$SZIP_URL" -O /tmp/7z.tar.xz && \
-    tar -xf /tmp/7z.tar.xz -C /tmp/ && \
-    mv /tmp/7zz /usr/bin/7zz && \
-    rm -f /tmp/7z.tar.xz && rm -f /tmp/7zzs
 
 RUN groupadd --force -g $WWWGROUP sail
 RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail

@@ -38,11 +38,11 @@ class ConsoleOutputService
                 PHP_EOL.
                 'Failures: fC#=Compressed(part #), fS=Sample, fM=Media(video), fA=Audio, fJ=JPEG, G=Missing group, T=Timeout skip'.
                 PHP_EOL.
-                'Processing: r=RAR, z=ZIP, 7z=7zip (names/entries), g=GZIP, b=BZIP2, x=XZ, (vRAW)=Inline video detected'.
+                'Processing: r=RAR, z=ZIP, (vRAW)=Inline video detected'.
                 PHP_EOL.
                 'Added: s=Sample image, j=JPEG image, A=Audio sample, a=Audio MediaInfo, v=Video sample'.
                 PHP_EOL.
-                'Added: m=Video MediaInfo, n=NFO, ^=Inner file details (RAR/ZIP/7z/etc)'.
+                'Added: m=Video MediaInfo, n=NFO, ^=Inner file details (RAR/ZIP)'.
                 '',
                 'header'
             );

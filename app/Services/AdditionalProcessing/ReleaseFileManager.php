@@ -78,7 +78,7 @@ class ReleaseFileManager
 
         // Skip support files
         if (preg_match(
-            '/(?:'.$supportFileRegex.'|part\d+|[rz]\d{1,3}|zipr\d{2,3}|\d{2,3}|zipx?|zip|rar|7z|gz|bz2|xz)(\s*\.rar)?$/i',
+            '/(?:'.$supportFileRegex.'|part\d+|[rz]\d{1,3}|zipr\d{2,3}|\d{2,3}|zipx?|zip|rar)(\s*\.rar)?$/i',
             $file['name']
         )) {
             return false;

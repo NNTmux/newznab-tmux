@@ -4,7 +4,6 @@ FROM dunglas/frankenphp:1-php8.3
 LABEL maintainer="PyRowMan"
 ENV SERVER_NAME=:${APP_PORT:-80}
 ARG MYSQL_CLIENT="mariadb-client"
-ARG SEVENZIP_VERSION=2407
 
 WORKDIR /app
 
@@ -14,7 +13,7 @@ COPY --from=composer-base --link /usr/bin/composer /usr/bin/composer
 
 RUN apt update \
  && apt install -y --no-install-recommends \
-     unrar-free 7zip lame libcap2-bin python3 gettext-base \
+     unrar-free lame libcap2-bin python3 gettext-base \
      curl zip unzip git nano bash-completion sudo wget tmux time fonts-powerline \
      gnupg libpng-dev dnsutils jq htop iputils-ping net-tools ffmpeg \
      jpegoptim webp optipng pngquant libavif-bin watch iproute2 nmon \
@@ -36,18 +35,6 @@ RUN docker-php-ext-install \
  && docker-php-ext-enable redis \
  && apt clean \
  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-# Determine ARCH and download and extract the appropriate version of 7-Zip
-RUN ARCH="$(dpkg --print-architecture)" && \
-    if [ "$ARCH" = "amd64" ]; then \
-        SZIP_URL="https://www.7-zip.org/a/7z$SEVENZIP_VERSION-linux-x64.tar.xz"; \
-    fi && \
-    if [ "$ARCH" = "arm64" ]; then \
-        SZIP_URL="https://www.7-zip.org/a/7z$SEVENZIP_VERSION-linux-arm64.tar.xz"; \
-    fi && \
-    wget "$SZIP_URL" -O /tmp/7z.tar.xz && \
-    tar -xf /tmp/7z.tar.xz -C /tmp/ && \
-    mv /tmp/7zz /usr/bin/7zz && \
-    rm -f /tmp/7z.tar.xz && rm -f /tmp/7zzs
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 COPY ./docker/8.3/php.ini "$PHP_INI_DIR/conf.d/custom-conf.ini"

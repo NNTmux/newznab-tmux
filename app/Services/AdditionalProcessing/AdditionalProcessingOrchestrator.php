@@ -500,7 +500,7 @@ class AdditionalProcessingOrchestrator
 
             $title = $nzbFile['title'] ?? '';
             if (! preg_match(
-                '/(\\.(part\\d+|[rz]\\d+|rar|0+|0*10?|zipr\\d{2,3}|zipx?|7z(?:\\.\\d{3})?|(?:tar\\.)?(?:gz|bz2|xz))(\\s*\\.rar)*($|[ ")]|-])|"[a-f0-9]{32}\\.[1-9]\\d{1,2}".*\\(\\d+\\/\\d{2,}\\)$)/i',
+                '/(\\.(part\\d+|[rz]\\d+|rar|0+|0*10?|zipr\\d{2,3}|zipx?)(\\s*\\.rar)*($|[ ")]|-])|"[a-f0-9]{32}\\.[1-9]\\d{1,2}".*\\(\\d+\\/\\d{2,}\\)$)/i',
                 $title
             )) {
                 continue;
@@ -737,7 +737,7 @@ class AdditionalProcessingOrchestrator
 
             $title = $nzbFile['title'] ?? '';
             if (! preg_match(
-                '/(\\.(part0*1|rar|zip|7z))(\\s*\\.rar)*($|[ ")]|-])|"[a-f0-9]{32}\\.[1-9]\\d{1,2}".*\\(\\d+\\/\\d{2,}\\)$/i',
+                '/(\\.(part0*1|rar|zip))(\\s*\\.rar)*($|[ ")]|-])|"[a-f0-9]{32}\\.[1-9]\\d{1,2}".*\\(\\d+\\/\\d{2,}\\)$/i',
                 $title
             )) {
                 continue;
@@ -816,7 +816,7 @@ class AdditionalProcessingOrchestrator
             }
 
             $foundCompressed = false;
-            $pattern = '/.*\.([rz]\d{2,}|rar|zipx?|0{0,2}1|7z(?:\.\d{3})?|(?:tar\.)?(?:gz|bz2|xz))($|[^a-z0-9])/i';
+            $pattern = '/.*\.([rz]\d{2,}|rar|zipx?|0{0,2}1)($|[^a-z0-9])/i';
 
             try {
                 $files = $this->tempWorkspace->listFiles($context->tmpPath, $pattern);
