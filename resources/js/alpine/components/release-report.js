@@ -1,58 +1,107 @@
 /**
- * Alpine.data('releaseReport') - Release report modal per-release
+ * Alpine.data('releaseReport') - Shared release report modal (singleton)
  * Alpine.data('adminReleaseReports') - Admin release reports page
+ *
+ * Uses document-level click delegation in init() so that .report-trigger
+ * buttons anywhere on the page can open the single shared modal.
  */
 import Alpine from '@alpinejs/csp';
 
 Alpine.data('releaseReport', () => ({
     open: false,
-    hasReported: false,
-    isSubmitting: false,
+    releaseId: '',
     reason: '',
     description: '',
+    isSubmitting: false,
     errorMsg: '',
     successMsg: '',
+    _currentTrigger: null,
 
-    openModal() {
-        if (this.hasReported) return;
-        this.open = true;
+    openModal(releaseId, trigger) {
+        this.releaseId = releaseId;
+        this._currentTrigger = trigger || null;
         this.reason = '';
         this.description = '';
         this.errorMsg = '';
         this.successMsg = '';
+        this.isSubmitting = false;
+        this.open = true;
     },
 
     close() {
         this.open = false;
     },
 
-    charCount() { return this.description.length + '/1000 characters'; },
-    canSubmit() { return !!this.reason && !this.isSubmitting; },
+    charCount() {
+        return this.description.length + '/1000 characters';
+    },
 
-    submit(releaseId) {
-        if (this.isSubmitting || !this.reason) return;
+    canSubmit() {
+        return !!this.reason && !this.isSubmitting;
+    },
+
+    submitText() {
+        return this.isSubmitting ? 'Submitting...' : 'Submit Report';
+    },
+
+    submit() {
+        if (this.isSubmitting || !this.reason || !this.releaseId) return;
         this.isSubmitting = true;
         this.errorMsg = '';
         this.successMsg = '';
 
-        const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+        var self = this;
+        var csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+        var triggerRef = this._currentTrigger;
+
         fetch('/release-report', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
-            body: JSON.stringify({ release_id: releaseId, reason: this.reason, description: this.description })
+            body: JSON.stringify({ release_id: self.releaseId, reason: self.reason, description: self.description })
         })
-        .then(r => r.json().then(data => ({ ok: r.ok, data })))
-        .then(result => {
+        .then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); })
+        .then(function(result) {
             if (result.ok && result.data.success) {
-                this.successMsg = result.data.message;
-                this.hasReported = true;
-                setTimeout(() => this.close(), 2000);
+                self.successMsg = result.data.message;
+                // Mark the trigger button as reported
+                if (triggerRef) {
+                    triggerRef.disabled = true;
+                    triggerRef.classList.add('opacity-50', 'cursor-not-allowed');
+                    var icon = triggerRef.querySelector('i');
+                    if (icon) icon.classList.add('text-red-500');
+                    var label = triggerRef.querySelector('.report-label');
+                    if (label) label.textContent = 'Reported';
+                }
+                setTimeout(function() { self.close(); }, 2000);
             } else {
-                this.errorMsg = result.data.message || 'An error occurred. Please try again.';
+                self.errorMsg = result.data.message || 'An error occurred. Please try again.';
             }
         })
-        .catch(() => { this.errorMsg = 'Network error. Please try again.'; })
-        .finally(() => { this.isSubmitting = false; });
+        .catch(function() { self.errorMsg = 'Network error. Please try again.'; })
+        .finally(function() { self.isSubmitting = false; });
+    },
+
+    init() {
+        var self = this;
+
+        // Document-level click delegation for .report-trigger buttons
+        document.addEventListener('click', function(e) {
+            var trigger = e.target.closest('.report-trigger');
+            if (!trigger) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            var releaseId = trigger.getAttribute('data-report-release-id');
+            if (!releaseId) return;
+
+            self.openModal(releaseId, trigger);
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && self.open) self.close();
+        });
     }
 }));
 
@@ -110,125 +159,3 @@ Alpine.data('adminReleaseReports', () => ({
     }
 }));
 
-/**
- * Document-level delegation for .report-trigger buttons.
- * Uses a single shared modal (#shared-report-modal) rendered once in the layout,
- * instead of per-element modals (which duplicated ~80 lines of HTML per release).
- */
-(function() {
-    var modal = null;
-    var reasonSelect, descriptionTextarea, charCount, submitButton, errorDiv, successDiv;
-    var currentTrigger = null;
-    var isSubmitting = false;
-
-    function getModal() {
-        if (modal) return modal;
-        modal = document.getElementById('shared-report-modal');
-        if (!modal) return null;
-        reasonSelect = modal.querySelector('.report-reason');
-        descriptionTextarea = modal.querySelector('.report-description');
-        charCount = modal.querySelector('.report-char-count');
-        submitButton = modal.querySelector('.report-submit');
-        errorDiv = modal.querySelector('.report-error');
-        successDiv = modal.querySelector('.report-success');
-
-        // Wire up events once
-        modal.querySelectorAll('.report-modal-close').forEach(function(btn) {
-            btn.addEventListener('click', function(ev) { ev.preventDefault(); closeModal(); });
-        });
-        var backdrop = modal.querySelector('.report-modal-backdrop');
-        if (backdrop) backdrop.addEventListener('click', closeModal);
-        if (descriptionTextarea && charCount) {
-            descriptionTextarea.addEventListener('input', function() {
-                charCount.textContent = this.value.length + '/1000 characters';
-            });
-        }
-        if (reasonSelect && submitButton) {
-            reasonSelect.addEventListener('change', function() { submitButton.disabled = !this.value; });
-        }
-        if (submitButton) {
-            submitButton.addEventListener('click', function(ev) {
-                ev.preventDefault();
-                ev.stopPropagation();
-                submitReport();
-            });
-        }
-        return modal;
-    }
-
-    function closeModal() {
-        if (modal) modal.classList.add('hidden');
-    }
-
-    function markTriggerReported(trigger) {
-        if (!trigger) return;
-        trigger.disabled = true;
-        trigger.classList.add('opacity-50', 'cursor-not-allowed');
-        var icon = trigger.querySelector('i');
-        if (icon) icon.classList.add('text-red-500');
-        var label = trigger.querySelector('.report-label');
-        if (label) label.textContent = 'Reported';
-    }
-
-    function submitReport() {
-        if (isSubmitting || !reasonSelect || !reasonSelect.value) return;
-        var releaseId = modal.getAttribute('data-release-id');
-        if (!releaseId) return;
-
-        isSubmitting = true;
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Submitting...';
-        if (errorDiv) errorDiv.classList.add('hidden');
-        if (successDiv) successDiv.classList.add('hidden');
-
-        var csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
-        var triggerRef = currentTrigger;
-
-        fetch('/release-report', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
-            body: JSON.stringify({ release_id: releaseId, reason: reasonSelect.value, description: descriptionTextarea ? descriptionTextarea.value : '' })
-        })
-        .then(function(r) { return r.json().then(function(data) { return { ok: r.ok, data: data }; }); })
-        .then(function(result) {
-            if (result.ok && result.data.success) {
-                if (successDiv) { successDiv.querySelector('p').textContent = result.data.message; successDiv.classList.remove('hidden'); }
-                markTriggerReported(triggerRef);
-                setTimeout(closeModal, 2000);
-            } else {
-                if (errorDiv) { errorDiv.querySelector('p').textContent = result.data.message || 'An error occurred.'; errorDiv.classList.remove('hidden'); }
-            }
-        })
-        .catch(function() { if (errorDiv) { errorDiv.querySelector('p').textContent = 'Network error.'; errorDiv.classList.remove('hidden'); } })
-        .finally(function() { isSubmitting = false; if (submitButton) { submitButton.disabled = !reasonSelect.value; submitButton.innerHTML = 'Submit Report'; } });
-    }
-
-    document.addEventListener('click', function(e) {
-        var trigger = e.target.closest('.report-trigger');
-        if (!trigger) return;
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        var m = getModal();
-        if (!m) return;
-
-        var releaseId = trigger.getAttribute('data-report-release-id');
-        if (!releaseId) return;
-
-        // Store current trigger and set release ID on the shared modal
-        currentTrigger = trigger;
-        m.setAttribute('data-release-id', releaseId);
-
-        // Reset form state
-        if (errorDiv) errorDiv.classList.add('hidden');
-        if (successDiv) successDiv.classList.add('hidden');
-        if (reasonSelect) reasonSelect.value = '';
-        if (descriptionTextarea) descriptionTextarea.value = '';
-        if (charCount) charCount.textContent = '0/1000 characters';
-        if (submitButton) { submitButton.disabled = true; submitButton.innerHTML = 'Submit Report'; }
-        isSubmitting = false;
-
-        m.classList.remove('hidden');
-    });
-})();
