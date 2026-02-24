@@ -119,7 +119,7 @@ class MusicService
             .$catsrch.' '
             .$exccatlist;
 
-        $cacheKey = md5('music_range_'.$baseWhere.$order[0].$order[1].$start.$num.$page); // @phpstan-ignore offsetAccess.notFound
+        $cacheKey = md5('music_range_'.$baseWhere.$order[0].$order[1].$start.$num.$page);
 
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
@@ -148,7 +148,7 @@ class MusicService
             .'INNER JOIN releases r ON r.musicinfo_id = m.id '
             .'WHERE '.$baseWhere.' '
             .'GROUP BY m.id, m.title, m.artist, m.cover, m.publisher, m.releasedate, m.review, m.url, m.year, m.genres_id '
-            ."ORDER BY {$order[0]} {$order[1]} " // @phpstan-ignore offsetAccess.notFound
+            ."ORDER BY {$order[0]} {$order[1]} "
             ."LIMIT {$num} OFFSET {$start}";
 
         $musicEntities = MusicInfo::fromQuery($musicSql);
@@ -197,7 +197,7 @@ class MusicService
 
         // Set total count on first item
         if ($musicEntities->isNotEmpty()) {
-            $musicEntities[0]->_totalcount = $totalCount; // @phpstan-ignore property.notFound, assign.propertyReadOnly
+            $musicEntities[0]->_totalcount = $totalCount;
         }
 
         Cache::put($cacheKey, $musicEntities, $expiresAt);
@@ -208,7 +208,7 @@ class MusicService
     /**
      * Parse order by parameter and return order field and direction.
      *
-     * @return array<string, mixed>
+     * @return array{0: string, 1: string}
      */
     public function getMusicOrder(string $orderBy): array
     {

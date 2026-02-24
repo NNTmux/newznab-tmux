@@ -68,7 +68,7 @@ class MovieBrowseService
             .$whereExcluded;
 
         // Build a cache key from all the query parameters
-        $cacheKey = md5('movie_range_'.$baseWhere.$order[0].$order[1].$start.$num.$page); // @phpstan-ignore offsetAccess.notFound
+        $cacheKey = md5('movie_range_'.$baseWhere.$order[0].$order[1].$start.$num.$page);
 
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
@@ -103,7 +103,7 @@ class MovieBrowseService
         // Inner query aggregates by just imdbid (small temp table, fast filesort on ~53K
         // narrow rows instead of 53K wide rows with TEXT columns like plot/genre/actors).
         // Outer query joins back to movieinfo for full details on only the top N movies.
-        $isAggregateOrder = ($order[0] === 'MAX(r.postdate)'); // @phpstan-ignore offsetAccess.notFound
+        $isAggregateOrder = ($order[0] === 'MAX(r.postdate)');
 
         if ($isAggregateOrder) {
             $innerOrderBy = 'latest_postdate';
@@ -111,9 +111,9 @@ class MovieBrowseService
             $outerOrderBy = 'stats.latest_postdate';
         } else {
             // orderField is like 'm.title', 'm.year', 'm.rating'
-            $innerOrderBy = $order[0]; // @phpstan-ignore offsetAccess.notFound
-            $innerExtraGroupBy = ', '.$order[0]; // @phpstan-ignore offsetAccess.notFound
-            $outerOrderBy = $order[0]; // @phpstan-ignore offsetAccess.notFound
+            $innerOrderBy = $order[0];
+            $innerExtraGroupBy = ', '.$order[0];
+            $outerOrderBy = $order[0];
         }
 
         $moviesSql = 'SELECT m.imdbid, m.tmdbid, m.traktid, m.title, m.year, m.rating, '
@@ -125,11 +125,11 @@ class MovieBrowseService
             .'INNER JOIN releases r ON r.imdbid = LPAD(TRIM(m.imdbid), 8, \'0\') '
             .'WHERE '.$baseWhere.' '
             .'GROUP BY m.imdbid'.$innerExtraGroupBy.' '
-            ."ORDER BY {$innerOrderBy} {$order[1]} " // @phpstan-ignore offsetAccess.notFound
+            ."ORDER BY {$innerOrderBy} {$order[1]} "
             ."LIMIT {$num} OFFSET {$start}"
             .') stats '
             .'INNER JOIN movieinfo m ON m.imdbid = stats.imdbid '
-            ."ORDER BY {$outerOrderBy} {$order[1]}"; // @phpstan-ignore offsetAccess.notFound
+            ."ORDER BY {$outerOrderBy} {$order[1]}";
 
         $movies = MovieInfo::fromQuery($moviesSql);
 
@@ -206,7 +206,7 @@ class MovieBrowseService
     /**
      * Get the order type the user requested on the movies page.
      *
-     * @return array<string, mixed>
+     * @return array{0: string, 1: string}
      */
     protected function getMovieOrder(string $orderBy): array
     {

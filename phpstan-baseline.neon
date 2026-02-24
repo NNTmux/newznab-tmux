@@ -228,11 +228,6 @@ parameters:
 			count: 1
 			path: app/Http/Controllers/Api/ApiController.php
 
-		-
-			message: '#^Unable to resolve the template type TValue in call to function collect$#'
-			identifier: argument.templateType
-			count: 1
-			path: app/Http/Controllers/MovieController.php
 
 		-
 			message: '#^Unable to resolve the template type TValue in call to function collect$#'
@@ -390,41 +385,6 @@ parameters:
 			count: 1
 			path: app/Models/UserActivityStat.php
 
-		-
-			message: '#^Method App\\Services\\AdditionalProcessing\\ArchiveExtractionService\:\:extractViaSevenZip\(\) should return list\<string\> but returns array\{success\: false, files\: array\{\}, hasPassword\: false, passwordStatus\: 0\}\.$#'
-			identifier: return.type
-			count: 2
-			path: app/Services/AdditionalProcessing/ArchiveExtractionService.php
-
-		-
-			message: '#^Method App\\Services\\AdditionalProcessing\\ArchiveExtractionService\:\:filterExtractedFiles\(\) should return array\{success\: false, files\: array\{\}, hasPassword\: false, passwordStatus\: 0\} but returns list\<mixed\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/AdditionalProcessing/ArchiveExtractionService.php
-
-		-
-			message: '#^Method App\\Services\\AdditionalProcessing\\ArchiveExtractionService\:\:filterSevenZipFiles\(\) should return list\<array\{name\: non\-falsy\-string, size\: int, encrypted\: bool, __any_encrypted__\?\: true\}\> but returns list\<array\{name\: mixed, size\: mixed, date\: int\<1, max\>, pass\: 0, crc32\: '''', source\: ''7z\-list''\}\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/AdditionalProcessing/ArchiveExtractionService.php
-
-		-
-			message: '#^Method App\\Services\\AdditionalProcessing\\ArchiveExtractionService\:\:listSevenZipEntries\(\) should return array\<string, mixed\> but returns list\<array\<string, int\|string\|false\>\>\.$#'
-			identifier: return.type
-			count: 2
-			path: app/Services/AdditionalProcessing/ArchiveExtractionService.php
-
-		-
-			message: '#^Method App\\Services\\AdditionalProcessing\\ArchiveExtractionService\:\:parseSevenZipStructuredOutput\(\) should return list\<array\<string, int\|string\|false\>\> but returns list\<array\{name\: non\-falsy\-string, size\: int, encrypted\: bool, __any_encrypted__\?\: true\}\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/AdditionalProcessing/ArchiveExtractionService.php
-
-		-
-			message: '#^Method App\\Services\\AdditionalProcessing\\ArchiveExtractionService\:\:scanSevenZipFilenames\(\) should return list\<array\{name\: mixed, size\: mixed, date\: int\<1, max\>, pass\: 0, crc32\: '''', source\: ''7z\-list''\}\> but returns list\<string\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/AdditionalProcessing/ArchiveExtractionService.php
 
 		-
 			message: '#^Method App\\Services\\AdditionalProcessing\\ArchiveExtractionService\:\:sortFilesWithNfoPriority\(\) should return array\<string, mixed\> but returns list\<mixed\>\.$#'
@@ -450,47 +410,6 @@ parameters:
 			count: 1
 			path: app/Services/AdditionalProcessing/NzbContentParser.php
 
-		-
-			message: '#^Method App\\Services\\Archives\\SevenZipPartialParser\:\:getFilesByExtension\(\) should return array\<int, array\<string, mixed\>\> but returns array\<string, mixed\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/Archives/SevenZipPartialParser.php
-
-		-
-			message: '#^Method App\\Services\\Archives\\SevenZipPartialParser\:\:parseBitVector\(\) should return list\<string\|null\> but returns array\<int\<0, max\>, bool\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/Archives/SevenZipPartialParser.php
-
-		-
-			message: '#^Method App\\Services\\Archives\\SevenZipPartialParser\:\:parseBitVector\(\) should return list\<string\|null\> but returns list\<false\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/Archives/SevenZipPartialParser.php
-
-		-
-			message: '#^Method App\\Services\\Archives\\SevenZipPartialParser\:\:parseBitVector\(\) should return list\<string\|null\> but returns list\<true\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/Archives/SevenZipPartialParser.php
-
-		-
-			message: '#^Method App\\Services\\Archives\\SevenZipPartialParser\:\:parseFileTimes\(\) should return array\<int\<0, max\>, bool\> but returns array\<int\<0, max\>, int\|null\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/Archives/SevenZipPartialParser.php
-
-		-
-			message: '#^Method App\\Services\\Archives\\SevenZipPartialParser\:\:parseNames\(\) should return array\<string, mixed\> but returns list\<string\|null\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/Archives/SevenZipPartialParser.php
-
-		-
-			message: '#^PHPDoc tag @return with type array\<string, mixed\> is incompatible with native type bool\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: app/Services/Archives/SevenZipPartialParser.php
 
 		-
 			message: '#^Method App\\Services\\Binaries\\BinariesService\:\:groupMissingPartsIntoRanges\(\) should return array\<string, mixed\> but returns list\<array\<string, mixed\>\>\.$#'
@@ -504,11 +423,6 @@ parameters:
 			count: 1
 			path: app/Services/Binaries/BinariesService.php
 
-		-
-			message: '#^Method App\\Services\\BookService\:\:getBookOrder\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/BookService.php
 
 		-
 			message: '#^Method App\\Services\\Categorization\\CategorizationService\:\:batchCategorize\(\) should return array\<string, mixed\> but returns list\<array\<string, mixed\>\>\.$#'
@@ -522,11 +436,6 @@ parameters:
 			count: 1
 			path: app/Services/Categorization/CategorizationService.php
 
-		-
-			message: '#^Method App\\Services\\ConsoleService\:\:getConsoleOrder\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/ConsoleService.php
 
 		-
 			message: '#^Unable to resolve the template type TValue in call to function collect$#'
@@ -534,17 +443,6 @@ parameters:
 			count: 6
 			path: app/Services/FanartTvService.php
 
-		-
-			message: '#^Method App\\Services\\GamesService\:\:getGamesOrder\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/GamesService.php
-
-		-
-			message: '#^Offset 1 does not exist on array\<string, mixed\>\.$#'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: app/Services/GamesService.php
 
 		-
 			message: '#^Method App\\Services\\GenreService\:\:loadGenres\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
@@ -570,23 +468,6 @@ parameters:
 			count: 1
 			path: app/Services/IGDBService.php
 
-		-
-			message: '#^Method App\\Services\\MovieBrowseService\:\:getMovieOrder\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/MovieBrowseService.php
-
-		-
-			message: '#^Offset 1 does not exist on array\<string, mixed\>\.$#'
-			identifier: offsetAccess.notFound
-			count: 2
-			path: app/Services/MovieBrowseService.php
-
-		-
-			message: '#^Method App\\Services\\MusicService\:\:getMusicOrder\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/MusicService.php
 
 		-
 			message: '#^Method App\\Services\\NfoService\:\:extractAllMediaIds\(\) should return array\<string, mixed\> but returns list\<array\<string, string\>\>\.$#'

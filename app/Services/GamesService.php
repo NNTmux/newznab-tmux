@@ -210,7 +210,7 @@ class GamesService
             .$whereAge
             .$exccatlist;
 
-        $cacheKey = md5('games_range_'.$baseWhere.$order[0].$order[1].$start.$num.$page); // @phpstan-ignore offsetAccess.notFound
+        $cacheKey = md5('games_range_'.$baseWhere.$order[0].$order[1].$start.$num.$page);
 
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
@@ -239,7 +239,7 @@ class GamesService
             .'INNER JOIN releases r ON gi.id = r.gamesinfo_id '
             .'WHERE '.$baseWhere.' '
             .'GROUP BY gi.id, gi.title, gi.cover, gi.publisher, gi.releasedate, gi.review, gi.url '
-            ."ORDER BY {$order[0]} {$order[1]} " // @phpstan-ignore offsetAccess.notFound
+            ."ORDER BY {$order[0]} {$order[1]} "
             ."LIMIT {$num} OFFSET {$start}";
 
         $games = GamesInfo::fromQuery($gamesSql);
@@ -300,8 +300,8 @@ class GamesService
     /**
      * Get order array for games.
      *
-     * @param  array<string, mixed>  $orderBy
-     * @return array<string, mixed>
+     * @param  array<string, mixed>|string  $orderBy
+     * @return array{0: string, 1: string}
      */
     public function getGamesOrder(array|string $orderBy): array
     {

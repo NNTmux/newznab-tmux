@@ -120,7 +120,7 @@ class BookService
             .$catsrch.' '
             .$exccatlist;
 
-        $cacheKey = md5('book_range_'.$baseWhere.$order[0].$order[1].$start.$num.$page); // @phpstan-ignore offsetAccess.notFound
+        $cacheKey = md5('book_range_'.$baseWhere.$order[0].$order[1].$start.$num.$page);
 
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
@@ -148,7 +148,7 @@ class BookService
             .'INNER JOIN releases r ON boo.id = r.bookinfo_id '
             .'WHERE '.$baseWhere.' '
             .'GROUP BY boo.id, boo.title, boo.author, boo.cover, boo.publisher, boo.publishdate, boo.review, boo.url '
-            ."ORDER BY {$order[0]} {$order[1]} " // @phpstan-ignore offsetAccess.notFound
+            ."ORDER BY {$order[0]} {$order[1]} "
             ."LIMIT {$num} OFFSET {$start}";
 
         $books = BookInfo::fromQuery($bookSql);
@@ -209,6 +209,9 @@ class BookService
      * Get book order array.
      *
      * @return array<string, mixed>
+     */
+    /**
+     * @return array{0: string, 1: string}
      */
     public function getBookOrder(string $orderBy): array
     {

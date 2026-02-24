@@ -5,22 +5,18 @@ namespace App\Services\NNTP;
 use App\Models\Settings;
 use App\Services\Tmux\Tmux;
 use App\Services\YencService;
-
-/*
- * Response codes not defined in Net_NNTP
- */
-defined('NET_NNTP_PROTOCOL_RESPONSECODE_DISCONNECTING_FORCED') || define('NET_NNTP_PROTOCOL_RESPONSECODE_DISCONNECTING_FORCED', 400);
-defined('NET_NNTP_PROTOCOL_RESPONSECODE_XGTITLE_GROUPS_UNAVAILABLE') || define('NET_NNTP_PROTOCOL_RESPONSECODE_XGTITLE_GROUPS_UNAVAILABLE', 481);
-defined('NET_NNTP_PROTOCOL_RESPONSECODE_TLS_FAILED_NEGOTIATION') || define('NET_NNTP_PROTOCOL_RESPONSECODE_TLS_FAILED_NEGOTIATION', 580);
+use DariusIII\NetNntp\Client as NntpClient;
+use DariusIII\NetNntp\Error as NntpError;
+use DariusIII\NetNntp\Protocol\ResponseCode;
 
 /**
  * NNTP Service for connecting to usenet, retrieving articles and article headers,
  * decoding yEnc articles, and decompressing article headers.
  *
- * This service wraps the Net_NNTP_Client class with enhanced functionality
+ * This service wraps the DariusIII\NetNntp\Client class with enhanced functionality
  * and Laravel-friendly dependency injection.
  */
-class NNTPService extends \Net_NNTP_Client
+class NNTPService extends NntpClient
 {
     protected bool $_debugBool;
 
@@ -84,13 +80,6 @@ class NNTPService extends \Net_NNTP_Client
     protected int $_socketTimeout = 120;
 
     protected Tmux $_tmux;
-
-    /**
-     * @var resource|null
-     *
-     * @phpstan-ignore property.phpDocType
-     */
-    protected $_socket = null;
 
     /**
      * Cached config values for performance.
@@ -184,14 +173,14 @@ class NNTPService extends \Net_NNTP_Client
     }
 
     /**
-     * Check if a value is a Net_NNTP_Error instance.
+     * Check if a value is a DariusIII\NetNntp\Error instance.
      *
      * @param  mixed  $data  The value to check
-     * @return bool True if $data is a Net_NNTP_Error instance
+     * @return bool True if $data is a DariusIII\NetNntp\Error instance
      */
     public static function isError(mixed $data): bool
     {
-        return \Net_NNTP_Error::isError($data);
+        return NntpError::isError($data);
     }
 
     /**
@@ -211,7 +200,7 @@ class NNTPService extends \Net_NNTP_Client
      * @return mixed On success = (bool)   Did we successfully connect to the usenet?
      *
      * @throws \Exception
-     *                    On failure = (object) PEAR_Error.
+     *                    On failure = (object) DariusIII\NetNntp\Error.
      */
     public function doConnect(bool $compression = true, bool $alternate = false): mixed
     {
@@ -360,14 +349,14 @@ class NNTPService extends \Net_NNTP_Client
      *
      * @param  bool  $force  Force quit even if not connected?
      * @return mixed On success : (bool)   Did we successfully disconnect from usenet?
-     *               On Failure : (object) PEAR_Error.
+     *               On Failure : (object) DariusIII\NetNntp\Error.
      */
     public function doQuit(bool $force = false): mixed
     {
         $this->_resetProperties();
 
         // Check if we are connected to usenet.
-        if ($force || $this->_isConnected(false)) {
+        if ($force || parent::_isConnected()) {
             // Disconnect from usenet.
             return $this->disconnect();
         }
@@ -411,7 +400,7 @@ class NNTPService extends \Net_NNTP_Client
      * @return mixed On success : (array)  Group information.
      *
      * @throws \Exception
-     *                    On failure : (object) PEAR_Error.
+     *                    On failure : (object) DariusIII\NetNntp\Error.
      */
     public function selectGroup(string $group, mixed $articles = false, bool $force = false): mixed
     {
@@ -436,9 +425,9 @@ class NNTPService extends \Net_NNTP_Client
      * @return mixed On success : (array)  Multidimensional array with article headers.
      *
      * @throws \Exception
-     *                    On failure : (object) PEAR_Error.
+     *                    On failure : (object) DariusIII\NetNntp\Error.
      */
-    public function getOverview($range = null, $names = true, $forceNames = true): mixed
+    public function getOverview(mixed $range = null, bool $names = true, bool $forceNames = true): mixed
     {
         $connected = $this->_checkConnection();
         if ($connected !== true) {
@@ -475,7 +464,7 @@ class NNTPService extends \Net_NNTP_Client
      *                         All newer than article number: "679871775-"
      *                         All older than article number: "-679871775"
      *                         Message-ID:                    "<part1of1.uS*yYxQvtAYt$5t&wmE%UejhjkCKXBJ!@example.local>"
-     * @return array<string, mixed>|string|NNTPService Multi-dimensional Array of headers on success, PEAR object on failure.
+     * @return array<string, mixed>|string|NNTPService Multi-dimensional Array of headers on success, Error object on failure.
      *
      * @throws \Exception
      */
@@ -497,7 +486,7 @@ class NNTPService extends \Net_NNTP_Client
         }
 
         // Verify the NNTP server got the right command, get the headers data.
-        if ($response === NET_NNTP_PROTOCOL_RESPONSECODE_OVERVIEW_FOLLOWS) {
+        if ($response === ResponseCode::OverviewFollows->value) {
             $data = $this->_getTextResponse();
             if (self::isError($data)) {
                 return $data;
@@ -582,7 +571,7 @@ class NNTPService extends \Net_NNTP_Client
      * @return mixed On success : (string) The article bodies.
      *
      * @throws \Exception
-     *                    On failure : (object) PEAR_Error.
+     *                    On failure : (object) DariusIII\NetNntp\Error.
      */
     public function getMessages(string $groupName, mixed $identifiers, bool $alternate = false): mixed
     {
@@ -625,7 +614,7 @@ class NNTPService extends \Net_NNTP_Client
                         $messageSize = \strlen($message);
                     }
 
-                    // If there is an error try the alternate provider or return the PEAR error.
+                    // If there is an error try the alternate provider or return the error.
                 } elseif ($alternate) {
                     if (! $aConnected) {
                         // Check if the current connected server is the alternate or not.
@@ -689,7 +678,7 @@ class NNTPService extends \Net_NNTP_Client
      *
      * @param  mixed  $identifiers  string|array Message-ID(s) (with or without < >)
      * @param  bool  $alternate  Use alternate NNTP server if primary fails for any ID.
-     * @return mixed string concatenated bodies on success, PEAR_Error object on total failure.
+     * @return mixed string concatenated bodies on success, Error object on total failure.
      *
      * @throws \Exception
      */
@@ -697,7 +686,7 @@ class NNTPService extends \Net_NNTP_Client
     {
         $connected = $this->_checkConnection(false); // no need to reselect group
         if ($connected !== true) {
-            return $connected; // PEAR error passthrough
+            return $connected; // error passthrough
         }
 
         $body = '';
@@ -757,7 +746,7 @@ class NNTPService extends \Net_NNTP_Client
      * Accepts article numbers but these require a group; will return error if numeric passed.
      *
      * @param  mixed  $identifier  Message-ID or article number.
-     * @return mixed string body on success, PEAR_Error on failure.
+     * @return mixed string body on success, Error on failure.
      *
      * @throws \Exception
      */
@@ -772,7 +761,7 @@ class NNTPService extends \Net_NNTP_Client
         if (self::isError($response)) {
             return $response;
         }
-        if ($response !== NET_NNTP_PROTOCOL_RESPONSECODE_BODY_FOLLOWS) {
+        if ($response !== ResponseCode::BodyFollows->value) {
             return $this->_handleErrorResponse($response);
         }
 
@@ -809,7 +798,7 @@ class NNTPService extends \Net_NNTP_Client
      * @return mixed On success : (array)  The group summary.
      *
      * @throws \Exception
-     *                    On Failure : (object) PEAR_Error.
+     *                    On Failure : (object) DariusIII\NetNntp\Error.
      */
     public function dataError(NNTPService $nntp, string $group, bool $comp = true): mixed
     {
@@ -823,7 +812,7 @@ class NNTPService extends \Net_NNTP_Client
         // Try re-selecting the group.
         $data = $nntp->selectGroup($group);
         if (self::isError($data)) {
-            $message = "Code {$data->code}: {$data->message}\nSkipping group: {$group}";
+            $message = "Code {$data->getCode()}: {$data->getMessage()}\nSkipping group: {$group}";
 
             if ($this->_echo) {
                 cli()->error($message);
@@ -861,7 +850,7 @@ class NNTPService extends \Net_NNTP_Client
      * @param  bool  $secondTry  This is only used if enabling compression fails, the function will call itself to retry.
      * @return mixed On success : (bool)   True:  The server understood and compression is enabled.
      *               (bool)   False: The server did not understand, compression is not enabled.
-     *               On failure : (object) PEAR_Error.
+     *               On failure : (object) DariusIII\NetNntp\Error.
      *
      * @throws \Exception
      */
@@ -905,7 +894,7 @@ class NNTPService extends \Net_NNTP_Client
     }
 
     /**
-     * Override PEAR NNTP's function to use our _getXFeatureTextResponse instead
+     * Override the parent's _getTextResponse to use our _getXFeatureTextResponse instead
      * of their _getTextResponse function since it is incompatible at decoding
      * headers when XFeature GZip compression is enabled server side.
      *
@@ -934,7 +923,7 @@ class NNTPService extends \Net_NNTP_Client
      * problem downloading the data, etc..
      *
      * @return array<string, mixed>|string On success : (array)  The headers.
-     *                                     On failure : (object) PEAR_Error.
+     *                                     On failure : (object) DariusIII\NetNntp\Error.
      *                                     On decompress failure: (string) error message
      */
     protected function &_getXFeatureTextResponse(): array|string
@@ -1063,7 +1052,7 @@ class NNTPService extends \Net_NNTP_Client
         if ($this->group() !== $groupName) {
             // Select the group.
             $summary = $this->selectGroup($groupName);
-            // If there was an error selecting the group, return a PEAR error object.
+            // If there was an error selecting the group, return an error object.
             if (self::isError($summary)) {
                 return $summary;
             }
@@ -1081,7 +1070,7 @@ class NNTPService extends \Net_NNTP_Client
             return $response;
         }
 
-        if ($response === NET_NNTP_PROTOCOL_RESPONSECODE_BODY_FOLLOWS) {
+        if ($response === ResponseCode::BodyFollows->value) {
             // Use array to accumulate lines (faster than string concatenation for many appends)
             $bodyParts = [];
             $socket = $this->_socket;
@@ -1126,7 +1115,7 @@ class NNTPService extends \Net_NNTP_Client
      * @return mixed On success: (bool)   True;
      *
      * @throws \Exception
-     *                    On failure: (object) PEAR_Error
+     *                    On failure: (object) DariusIII\NetNntp\Error
      */
     protected function _checkConnection(bool $reSelectGroup = true): mixed
     {
@@ -1164,82 +1153,58 @@ class NNTPService extends \Net_NNTP_Client
     }
 
     /**
-     * Verify NNTP error code and return PEAR error.
+     * Verify NNTP error code and return error.
      *
-     * @param  int  $response  NET_NNTP Response code
-     * @return object PEAR error
+     * @param  int  $response  NNTP Response code
+     * @return object DariusIII\NetNntp\Error
      */
     protected function _handleErrorResponse(int $response): object
     {
-        switch ($response) {
+        return match ($response) {
             // 381, RFC2980: 'More authentication information required'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_AUTHENTICATION_CONTINUE:
-                return $this->throwError('More authentication information required', $response, $this->_currentStatusResponse());
-                // 400, RFC977: 'Service discontinued'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_DISCONNECTING_FORCED:
-                return $this->throwError('Server refused connection', $response, $this->_currentStatusResponse());
-                // 411, RFC977: 'no such news group'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_NO_SUCH_GROUP:
-                return $this->throwError('No such news group on server', $response, $this->_currentStatusResponse());
-                // 412, RFC2980: 'No news group current selected'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_NO_GROUP_SELECTED:
-                return $this->throwError('No news group current selected', $response, $this->_currentStatusResponse());
-                // 420, RFC2980: 'Current article number is invalid'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_NO_ARTICLE_SELECTED:
-                return $this->throwError('Current article number is invalid', $response, $this->_currentStatusResponse());
-                // 421, RFC977: 'no next article in this group'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_NO_NEXT_ARTICLE:
-                return $this->throwError('No next article in this group', $response, $this->_currentStatusResponse());
-                // 422, RFC977: 'no previous article in this group'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_NO_PREVIOUS_ARTICLE:
-                return $this->throwError('No previous article in this group', $response, $this->_currentStatusResponse());
-                // 423, RFC977: 'No such article number in this group'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_NO_SUCH_ARTICLE_NUMBER:
-                return $this->throwError('No such article number in this group', $response, $this->_currentStatusResponse());
-                // 430, RFC977: 'No such article found'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_NO_SUCH_ARTICLE_ID:
-                return $this->throwError('No such article found', $response, $this->_currentStatusResponse());
-                // 435, RFC977: 'Article not wanted'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_TRANSFER_UNWANTED:
-                return $this->throwError('Article not wanted', $response, $this->_currentStatusResponse());
-                // 436, RFC977: 'Transfer failed - try again later'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_TRANSFER_FAILURE:
-                return $this->throwError('Transfer failed - try again later', $response, $this->_currentStatusResponse());
-                // 437, RFC977: 'Article rejected - do not try again'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_TRANSFER_REJECTED:
-                return $this->throwError('Article rejected - do not try again', $response, $this->_currentStatusResponse());
-                // 440, RFC977: 'posting not allowed'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_POSTING_PROHIBITED:
-                return $this->throwError('Posting not allowed', $response, $this->_currentStatusResponse());
-                // 441, RFC977: 'posting failed'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_POSTING_FAILURE:
-                return $this->throwError('Posting failed', $response, $this->_currentStatusResponse());
-                // 481, RFC2980: 'Groups and descriptions unavailable'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_XGTITLE_GROUPS_UNAVAILABLE:
-                return $this->throwError('Groups and descriptions unavailable', $response, $this->_currentStatusResponse());
-                // 482, RFC2980: 'Authentication rejected'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_AUTHENTICATION_REJECTED:
-                return $this->throwError('Authentication rejected', $response, $this->_currentStatusResponse());
-                // 500, RFC977: 'Command not recognized'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_UNKNOWN_COMMAND:
-                return $this->throwError('Command not recognized', $response, $this->_currentStatusResponse());
-                // 501, RFC977: 'Command syntax error'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_SYNTAX_ERROR:
-                return $this->throwError('Command syntax error', $response, $this->_currentStatusResponse());
-                // 502, RFC2980: 'No permission'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_NOT_PERMITTED:
-                return $this->throwError('No permission', $response, $this->_currentStatusResponse());
-                // 503, RFC2980: 'Program fault - command not performed'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_NOT_SUPPORTED:
-                return $this->throwError('Internal server error, function not performed', $response, $this->_currentStatusResponse());
-                // RFC4642: 'Can not initiate TLS negotiation'
-            case NET_NNTP_PROTOCOL_RESPONSECODE_TLS_FAILED_NEGOTIATION:
-                return $this->throwError('Can not initiate TLS negotiation', $response, $this->_currentStatusResponse());
-            default:
-                $text = $this->_currentStatusResponse();
-
-                return $this->throwError("Unexpected response: '$text'", $response, $text);
-        }
+            ResponseCode::AuthenticationContinue->value => $this->throwError('More authentication information required', $response, $this->_currentStatusResponse()),
+            // 400, RFC977: 'Service discontinued'
+            ResponseCode::DisconnectingForced->value => $this->throwError('Server refused connection', $response, $this->_currentStatusResponse()),
+            // 411, RFC977: 'no such news group'
+            ResponseCode::NoSuchGroup->value => $this->throwError('No such news group on server', $response, $this->_currentStatusResponse()),
+            // 412, RFC2980: 'No news group current selected'
+            ResponseCode::NoGroupSelected->value => $this->throwError('No news group current selected', $response, $this->_currentStatusResponse()),
+            // 420, RFC2980: 'Current article number is invalid'
+            ResponseCode::NoArticleSelected->value => $this->throwError('Current article number is invalid', $response, $this->_currentStatusResponse()),
+            // 421, RFC977: 'no next article in this group'
+            ResponseCode::NoNextArticle->value => $this->throwError('No next article in this group', $response, $this->_currentStatusResponse()),
+            // 422, RFC977: 'no previous article in this group'
+            ResponseCode::NoPreviousArticle->value => $this->throwError('No previous article in this group', $response, $this->_currentStatusResponse()),
+            // 423, RFC977: 'No such article number in this group'
+            ResponseCode::NoSuchArticleNumber->value => $this->throwError('No such article number in this group', $response, $this->_currentStatusResponse()),
+            // 430, RFC977: 'No such article found'
+            ResponseCode::NoSuchArticleId->value => $this->throwError('No such article found', $response, $this->_currentStatusResponse()),
+            // 435, RFC977: 'Article not wanted'
+            ResponseCode::TransferUnwanted->value => $this->throwError('Article not wanted', $response, $this->_currentStatusResponse()),
+            // 436, RFC977: 'Transfer failed - try again later'
+            ResponseCode::TransferFailure->value => $this->throwError('Transfer failed - try again later', $response, $this->_currentStatusResponse()),
+            // 437, RFC977: 'Article rejected - do not try again'
+            ResponseCode::TransferRejected->value => $this->throwError('Article rejected - do not try again', $response, $this->_currentStatusResponse()),
+            // 440, RFC977: 'posting not allowed'
+            ResponseCode::PostingProhibited->value => $this->throwError('Posting not allowed', $response, $this->_currentStatusResponse()),
+            // 441, RFC977: 'posting failed'
+            ResponseCode::PostingFailure->value => $this->throwError('Posting failed', $response, $this->_currentStatusResponse()),
+            // 481, RFC2980: 'Groups and descriptions unavailable'
+            ResponseCode::XgtitleUnavailable->value => $this->throwError('Groups and descriptions unavailable', $response, $this->_currentStatusResponse()),
+            // 482, RFC2980: 'Authentication rejected'
+            ResponseCode::AuthenticationRejected->value => $this->throwError('Authentication rejected', $response, $this->_currentStatusResponse()),
+            // 500, RFC977: 'Command not recognized'
+            ResponseCode::UnknownCommand->value => $this->throwError('Command not recognized', $response, $this->_currentStatusResponse()),
+            // 501, RFC977: 'Command syntax error'
+            ResponseCode::SyntaxError->value => $this->throwError('Command syntax error', $response, $this->_currentStatusResponse()),
+            // 502, RFC2980: 'No permission'
+            ResponseCode::NotPermitted->value => $this->throwError('No permission', $response, $this->_currentStatusResponse()),
+            // 503, RFC2980: 'Program fault - command not performed'
+            ResponseCode::NotSupported->value => $this->throwError('Internal server error, function not performed', $response, $this->_currentStatusResponse()),
+            // RFC4642: 'Can not initiate TLS negotiation'
+            ResponseCode::TlsRefused->value => $this->throwError('Can not initiate TLS negotiation', $response, $this->_currentStatusResponse()),
+            default => $this->throwError("Unexpected response: '{$this->_currentStatusResponse()}'", $response, $this->_currentStatusResponse()),
+        };
     }
 
     /**
@@ -1254,7 +1219,7 @@ class NNTPService extends \Net_NNTP_Client
      * @param  int|null  $timeout  (optional) How many seconds to wait before giving up when connecting.
      * @param  int  $socketTimeout  (optional) How many seconds to wait before timing out the (blocked) socket.
      * @return mixed (bool) On success: True when posting allowed, otherwise false.
-     *                      (object) On failure: pear_error
+     *                      (object) On failure: DariusIII\NetNntp\Error
      */
     public function connect(?string $host = null, mixed $encryption = null, ?int $port = null, ?int $timeout = 15, int $socketTimeout = 120): mixed
     {
@@ -1263,7 +1228,7 @@ class NNTPService extends \Net_NNTP_Client
         }
         // v1.0.x API
         if (is_int($encryption)) {
-            trigger_error('You are using deprecated API v1.0 in Net_NNTP_Protocol_Client: connect() !', E_USER_NOTICE);
+            trigger_error('You are using deprecated API v1.0 in DariusIII\NetNntp\Protocol\Client: connect() !', E_USER_NOTICE);
             $port = $encryption;
             $encryption = false;
         }
@@ -1273,6 +1238,7 @@ class NNTPService extends \Net_NNTP_Client
         // Choose transport based on encryption, and if no port is given, use default for that encryption.
         switch ($encryption) {
             case null:
+            case false:
             case 'tcp':
                 $transport = 'tcp';
                 $port = $port ?? 119;
@@ -1321,10 +1287,10 @@ class NNTPService extends \Net_NNTP_Client
         }
         switch ($response) {
             // 200, Posting allowed
-            case NET_NNTP_PROTOCOL_RESPONSECODE_READY_POSTING_ALLOWED:
+            case ResponseCode::ReadyPostingAllowed->value:
                 return true;
                 // 201, Posting NOT allowed
-            case NET_NNTP_PROTOCOL_RESPONSECODE_READY_POSTING_PROHIBITED:
+            case ResponseCode::ReadyPostingProhibited->value:
 
                 return false;
             default:
@@ -1335,12 +1301,11 @@ class NNTPService extends \Net_NNTP_Client
     /**
      * Test whether we are connected or not.
      *
-     * @param  bool  $feOf  Check for the end of file pointer.
      * @return bool true or false
      */
-    public function _isConnected(bool $feOf = true): bool
+    public function _isConnected(): bool
     {
-        return is_resource($this->_socket) && (! $feOf || ! feof($this->_socket));
+        return is_resource($this->_socket) && ! feof($this->_socket);
     }
 
     /**

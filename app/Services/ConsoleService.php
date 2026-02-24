@@ -151,7 +151,7 @@ class ConsoleService
             .$catsrch.' '
             .$exccatlist;
 
-        $cacheKey = md5('console_range_'.$baseWhere.$order[0].$order[1].$start.$num.$page); // @phpstan-ignore offsetAccess.notFound
+        $cacheKey = md5('console_range_'.$baseWhere.$order[0].$order[1].$start.$num.$page);
 
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
@@ -181,7 +181,7 @@ class ConsoleService
             .'LEFT JOIN genres ON con.genres_id = genres.id '
             .'WHERE '.$baseWhere.' '
             .'GROUP BY con.id, con.title, con.cover, con.publisher, con.releasedate, con.review, con.url, con.genres_id, genres.title '
-            ."ORDER BY {$order[0]} {$order[1]} " // @phpstan-ignore offsetAccess.notFound
+            ."ORDER BY {$order[0]} {$order[1]} "
             ."LIMIT {$num} OFFSET {$start}";
 
         $consoles = ConsoleInfo::fromQuery($consoleSql);
@@ -242,6 +242,9 @@ class ConsoleService
      * Get console order array.
      *
      * @return array<string, mixed>
+     */
+    /**
+     * @return array{0: string, 1: string}
      */
     public function getConsoleOrder(string $orderBy): array
     {

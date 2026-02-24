@@ -126,62 +126,6 @@ class ArchiveExtractionService
     }
 
     /**
-     * Filter extracted files by allowed extensions.
-     *
-     * @param  array<string, mixed>  $files
-     * @return array{success: false, files: array{}, hasPassword: false, passwordStatus: 0}
-     */
-    private function filterExtractedFiles(array $files): array
-    {
-        $allowedExtensions = $this->getAllowedExtensions();
-        $filtered = [];
-
-        foreach ($files as $file) {
-            $name = $file['name'] ?? '';
-            $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
-
-            if (! in_array($ext, $allowedExtensions, true)) {
-                continue;
-            }
-
-            $base = pathinfo($name, PATHINFO_FILENAME);
-            $letterCount = preg_match_all('/[a-z]/i', $base);
-            if ($letterCount <= 5) {
-                continue;
-            }
-
-            $filtered[] = $file;
-        }
-
-        return $filtered;
-    }
-
-    /**
-     * Get list of allowed file extensions.
-     *
-     * @return list<mixed>
-     */
-    private function getAllowedExtensions(): array
-    {
-        return [
-            // NFO and info files (prioritized for extraction)
-            'nfo', 'diz', 'inf', 'txt',
-            // Subtitles
-            'srt', 'sub', 'idx', 'ass', 'ssa', 'vtt',
-            // Video
-            'mkv', 'mpeg', 'avi', 'mp4', 'm4v', 'mov', 'wmv', 'flv', 'ts', 'vob', 'm2ts', 'webm',
-            // Audio
-            'mp3', 'm4a', 'flac', 'ogg', 'aac', 'wav', 'wma', 'opus', 'ape',
-            // Images
-            'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp',
-            // Documents
-            'epub', 'pdf', 'cbz', 'cbr', 'djvu', 'mobi', 'azw', 'azw3',
-            // Executables (for software releases)
-            'exe', 'msi',
-        ];
-    }
-
-    /**
      * Check if a file is an NFO or info file.
      *
      * @param  string  $filename  The filename to check.
