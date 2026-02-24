@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "de826ec2e5fc22d57a9e2d47775b03fa",
+    "content-hash": "e613b6a8e65f476554f9e78b14a32c15",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -546,28 +546,48 @@
         },
         {
             "name": "dariusiii/net_nntp",
-            "version": "3.0.2",
+            "version": "4.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/Net_NNTP.git",
-                "reference": "66ed30f36d3b1083dfcb0e9d53eee6492c4b4fa6"
+                "reference": "1786c7ee4a60ec7ccbc93651b48db7ecf048b031"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/Net_NNTP/zipball/66ed30f36d3b1083dfcb0e9d53eee6492c4b4fa6",
-                "reference": "66ed30f36d3b1083dfcb0e9d53eee6492c4b4fa6",
+                "url": "https://api.github.com/repos/DariusIII/Net_NNTP/zipball/1786c7ee4a60ec7ccbc93651b48db7ecf048b031",
+                "reference": "1786c7ee4a60ec7ccbc93651b48db7ecf048b031",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.5"
+                "php": ">=8.5",
+                "psr/log": "^3.0",
+                "vlucas/phpdotenv": "^5.6"
             },
             "require-dev": {
+                "phpstan/phpstan": "^2.1",
                 "phpunit/phpunit": "*"
             },
             "type": "library",
             "autoload": {
-                "classmap": [
-                    "./"
+                "psr-4": {
+                    "DariusIII\\NetNntp\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "DariusIII\\NetNntp\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "phpunit"
+                ],
+                "analyse": [
+                    "phpstan analyse"
+                ],
+                "check": [
+                    "@analyse",
+                    "@test"
                 ]
             },
             "license": [
@@ -585,7 +605,7 @@
             "support": {
                 "source": "https://github.com/DariusIII/Net_NNTP"
             },
-            "time": "2026-02-19T14:25:18+00:00"
+            "time": "2026-02-24T11:42:57+00:00"
         },
         {
             "name": "dariusiii/rarinfo",
