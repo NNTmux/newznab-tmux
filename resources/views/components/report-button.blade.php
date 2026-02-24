@@ -1,3 +1,4 @@
+@blaze
 {{-- Report button trigger - the modal is rendered once in layouts/main via partials/report-modal --}}
 @props([
     'releaseId' => null,

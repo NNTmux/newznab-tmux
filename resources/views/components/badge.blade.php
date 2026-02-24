@@ -1,3 +1,4 @@
+@blaze
 @props([
     'type' => 'default'
 ])

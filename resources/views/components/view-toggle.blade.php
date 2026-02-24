@@ -1,3 +1,4 @@
+@blaze
 @props([
     'currentView' => 'list',
     'covgroup' => null,

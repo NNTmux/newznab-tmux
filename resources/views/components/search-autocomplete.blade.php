@@ -1,3 +1,4 @@
+@blaze
 @props([
     'placeholder' => 'Search releases...',
     'name' => 'search',

@@ -1,3 +1,4 @@
+@blaze
 @props(['label', 'for', 'help' => null])
 
 <div class="space-y-1">

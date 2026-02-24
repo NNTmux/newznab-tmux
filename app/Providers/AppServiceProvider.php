@@ -27,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useTailwind();
 
+
         // Share global data with layouts and all admin views
         // Admin child views need direct registration because @section blocks
         // are evaluated before the layout composer runs
