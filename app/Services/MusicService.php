@@ -215,30 +215,15 @@ class MusicService
         $order = ($orderBy === '') ? 'r.postdate' : $orderBy;
         $orderArr = explode('_', $order);
 
-        switch ($orderArr[0]) {
-            case 'artist':
-                $orderfield = 'm.artist';
-                break;
-            case 'size':
-                $orderfield = 'r.size';
-                break;
-            case 'files':
-                $orderfield = 'r.totalpart';
-                break;
-            case 'stats':
-                $orderfield = 'r.grabs';
-                break;
-            case 'year':
-                $orderfield = 'm.year';
-                break;
-            case 'genre':
-                $orderfield = 'm.genres_id';
-                break;
-            case 'posted':
-            default:
-                $orderfield = 'r.postdate';
-                break;
-        }
+        $orderfield = match ($orderArr[0]) {
+            'artist' => 'm.artist',
+            'size' => 'r.size',
+            'files' => 'r.totalpart',
+            'stats' => 'r.grabs',
+            'year' => 'm.year',
+            'genre' => 'm.genres_id',
+            default => 'r.postdate',
+        };
 
         $ordersort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 
@@ -452,7 +437,7 @@ class MusicService
                     // Do a local lookup first
                     $musicCheck = $this->getMusicInfoByName('', $album['name']);
 
-                    if ($musicCheck === null && \in_array($album['name'].$album['year'], $this->failCache, false)) {
+                    if ($musicCheck === null && \in_array($album['name'].$album['year'], $this->failCache, true)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echooutput) {
                             cli()->headerOver('Cached previous failure. Skipping.');
@@ -531,100 +516,32 @@ class MusicService
     {
         $str = '';
 
-        // music nodes above mp3 download nodes
-        switch ($nodeId) {
-            case '163420':
-                $str = 'Music Video & Concerts';
-                break;
-            case '30':
-            case '624869011':
-                $str = 'Alternative Rock';
-                break;
-            case '31':
-            case '624881011':
-                $str = 'Blues';
-                break;
-            case '265640':
-            case '624894011':
-                $str = 'Broadway & Vocalists';
-                break;
-            case '173425':
-            case '624899011':
-                $str = "Children's Music";
-                break;
-            case '173429': // christian
-            case '2231705011': // gospel
-            case '624905011': // christian & gospel
-                $str = 'Christian & Gospel';
-                break;
-            case '67204':
-            case '624916011':
-                $str = 'Classic Rock';
-                break;
-            case '85':
-            case '624926011':
-                $str = 'Classical';
-                break;
-            case '16':
-            case '624976011':
-                $str = 'Country';
-                break;
-            case '7': // dance & electronic
-            case '624988011': // dance & dj
-                $str = 'Dance & Electronic';
-                break;
-            case '32':
-            case '625003011':
-                $str = 'Folk';
-                break;
-            case '67207':
-            case '625011011':
-                $str = 'Hard Rock & Metal';
-                break;
-            case '33': // world music
-            case '625021011': // international
-                $str = 'World Music';
-                break;
-            case '34':
-            case '625036011':
-                $str = 'Jazz';
-                break;
-            case '289122':
-            case '625054011':
-                $str = 'Latin Music';
-                break;
-            case '36':
-            case '625070011':
-                $str = 'New Age';
-                break;
-            case '625075011':
-                $str = 'Opera & Vocal';
-                break;
-            case '37':
-            case '625092011':
-                $str = 'Pop';
-                break;
-            case '39':
-            case '625105011':
-                $str = 'R&B';
-                break;
-            case '38':
-            case '625117011':
-                $str = 'Rap & Hip-Hop';
-                break;
-            case '40':
-            case '625129011':
-                $str = 'Rock';
-                break;
-            case '42':
-            case '625144011':
-                $str = 'Soundtracks';
-                break;
-            case '35':
-            case '625061011':
-                $str = 'Miscellaneous';
-                break;
-        }
+        $str = match ($nodeId) {
+            '163420' => 'Music Video & Concerts',
+            '30', '624869011' => 'Alternative Rock',
+            '31', '624881011' => 'Blues',
+            '265640', '624894011' => 'Broadway & Vocalists',
+            '173425', '624899011' => "Children's Music",
+            '173429', '2231705011', '624905011' => 'Christian & Gospel',
+            '67204', '624916011' => 'Classic Rock',
+            '85', '624926011' => 'Classical',
+            '16', '624976011' => 'Country',
+            '7', '624988011' => 'Dance & Electronic',
+            '32', '625003011' => 'Folk',
+            '67207', '625011011' => 'Hard Rock & Metal',
+            '33', '625021011' => 'World Music',
+            '34', '625036011' => 'Jazz',
+            '289122', '625054011' => 'Latin Music',
+            '36', '625070011' => 'New Age',
+            '625075011' => 'Opera & Vocal',
+            '37', '625092011' => 'Pop',
+            '39', '625105011' => 'R&B',
+            '38', '625117011' => 'Rap & Hip-Hop',
+            '40', '625129011' => 'Rock',
+            '42', '625144011' => 'Soundtracks',
+            '35', '625061011' => 'Miscellaneous',
+            default => '',
+        };
 
         return ($str !== '') ? $str : false;
     }
@@ -666,8 +583,8 @@ class MusicService
         $genreName = $album['genre'] ?? '';
 
         if (! empty($genreName)) {
-            if (\in_array(strtolower($genreName), $defaultGenres, false)) {
-                $genreKey = array_search(strtolower($genreName), $defaultGenres, false);
+            if (\in_array(strtolower($genreName), $defaultGenres, true)) {
+                $genreKey = array_search(strtolower($genreName), $defaultGenres, true);
             } else {
                 $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => GenreService::MUSIC_TYPE]);
             }

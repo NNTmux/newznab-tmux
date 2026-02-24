@@ -142,7 +142,7 @@ class Invitation extends Model // @phpstan-ignore missingType.iterableValue
     {
         return $this->is_active &&
                $this->expires_at->isFuture() &&
-               is_null($this->used_at);
+               $this->used_at === null;
     }
 
     /**
@@ -158,7 +158,7 @@ class Invitation extends Model // @phpstan-ignore missingType.iterableValue
      */
     public function isUsed(): bool
     {
-        return ! is_null($this->used_at);
+        return $this->used_at !== null;
     }
 
     /**

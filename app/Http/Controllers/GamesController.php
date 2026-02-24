@@ -23,7 +23,7 @@ class GamesController extends BasePageController
             $ctmp[$ccat['id']] = $ccat;
         }
         $category = Category::PC_GAMES;
-        if ($request->has('t') && array_key_exists($request->input('t'), $ctmp)) {
+        if ($request->has('t') && isset($ctmp[$request->input('t')])) {
             $category = $request->input('t') + 0;
         }
 
@@ -32,7 +32,7 @@ class GamesController extends BasePageController
 
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $ordering = $games->getGamesOrdering();
-        $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
+        $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, true) ? $request->input('ob') : '';
         $offset = ($page - 1) * config('nntmux.items_per_cover_page');
         $rslt = $games->getGamesRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, '', (array) $this->userdata->categoryexclusions);
         $results = $this->paginate($rslt, $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
@@ -48,9 +48,9 @@ class GamesController extends BasePageController
 
         $years = range(1903, date('Y') + 1);
         rsort($years);
-        $year = ($request->has('year') && \in_array($request->input('year'), $years, false)) ? $request->input('year') : '';
+        $year = ($request->has('year') && \in_array($request->input('year'), $years, true)) ? $request->input('year') : '';
 
-        $genre = ($request->has('genre') && array_key_exists($request->input('genre'), $tmpgnr)) ? $request->input('genre') : '';
+        $genre = ($request->has('genre') && isset($tmpgnr[$request->input('genre')])) ? $request->input('genre') : '';
 
         if ((int) $category === -1) {
             $catname = 'All';

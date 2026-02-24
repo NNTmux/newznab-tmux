@@ -75,7 +75,7 @@ class GroupsUpdate extends Command
             $bar->start();
 
             foreach ($data as $newgroup) {
-                if (\in_array($newgroup['group'], $activeGroups, false)) {
+                if (\in_array($newgroup['group'], $activeGroups, true)) {
                     ShortGroup::query()->insert([
                         'name' => $newgroup['group'],
                         'first_record' => $newgroup['first'],

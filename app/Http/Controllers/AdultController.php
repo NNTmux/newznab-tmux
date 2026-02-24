@@ -31,7 +31,7 @@ class AdultController extends BasePageController
             ];
         }
         $category = $request->has('t') ? $request->input('t') : Category::XXX_ROOT;
-        if ($id && \in_array($id, Arr::pluck($mtmp, 'title'), false)) {
+        if ($id && \in_array($id, Arr::pluck($mtmp, 'title'), true)) {
             $cat = Category::query()
                 ->where('title', $id)
                 ->where('root_categories_id', '=', Category::XXX_ROOT)
@@ -42,7 +42,7 @@ class AdultController extends BasePageController
         $catarray[] = $category;
 
         $ordering = $this->releaseBrowseService->getBrowseOrdering();
-        $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
+        $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, true) ? $request->input('ob') : '';
 
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');

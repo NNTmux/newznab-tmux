@@ -135,15 +135,11 @@ class UsenetGroup extends Model
      */
     public static function getActiveBackfill(mixed $order): mixed
     {
-        switch ($order) {
-            case '':
-            case 'normal':
-                return self::query()->where('backfill', '=', 1)->where('last_record', '<>', 0)->orderBy('name')->get();
-            case 'date':
-                return self::query()->where('backfill', '=', 1)->where('last_record', '<>', 0)->orderByDesc('first_record_postdate')->get();
-            default:
-                return [];
-        }
+        return match ($order) {
+            '', 'normal' => self::query()->where('backfill', '=', 1)->where('last_record', '<>', 0)->orderBy('name')->get(),
+            'date' => self::query()->where('backfill', '=', 1)->where('last_record', '<>', 0)->orderByDesc('first_record_postdate')->get(),
+            default => [],
+        };
     }
 
     /**

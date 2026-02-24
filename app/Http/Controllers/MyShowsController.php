@@ -182,7 +182,7 @@ class MyShowsController extends BasePageController
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_page');
         $ordering = $this->releaseBrowseService->getBrowseOrdering();
-        $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
+        $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, true) ? $request->input('ob') : '';
         $browseCount = $shows ? $shows->count() : 0;
 
         $rslt = $this->releaseBrowseService->getShowsRange($shows ?? [], $offset, config('nntmux.items_per_page'), $orderby, -1, (array) $this->userdata->categoryexclusions);

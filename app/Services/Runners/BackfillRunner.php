@@ -68,19 +68,14 @@ class BackfillRunner extends BaseRunner
         $maxMessages = (int) Settings::settingValue('maxmssgs');
         $threads = (int) Settings::settingValue('backfillthreads');
 
-        $orderby = 'ORDER BY a.last_record ASC';
-        switch ($backfill_order) {
-            case 1: $orderby = 'ORDER BY first_record_postdate DESC';
-                break;
-            case 2: $orderby = 'ORDER BY first_record_postdate ASC';
-                break;
-            case 3: $orderby = 'ORDER BY name ASC';
-                break;
-            case 4: $orderby = 'ORDER BY name DESC';
-                break;
-            case 5: $orderby = 'ORDER BY a.last_record DESC';
-                break;
-        }
+        $orderby = match ($backfill_order) {
+            1 => 'ORDER BY first_record_postdate DESC',
+            2 => 'ORDER BY first_record_postdate ASC',
+            3 => 'ORDER BY name ASC',
+            4 => 'ORDER BY name DESC',
+            5 => 'ORDER BY a.last_record DESC',
+            default => 'ORDER BY a.last_record ASC',
+        };
 
         $backfilldays = '0';
         if ($backfill_days === 1) {

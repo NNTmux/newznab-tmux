@@ -542,7 +542,7 @@ class ConsoleService
                     // Check for existing console entry.
                     $gameCheck = $this->getConsoleInfoByName($gameInfo['title'], $gameInfo['platform']);
 
-                    if ($gameCheck === false && \in_array($gameInfo['title'].$gameInfo['platform'], $this->failCache, false)) {
+                    if ($gameCheck === false && \in_array($gameInfo['title'].$gameInfo['platform'], $this->failCache, true)) {
                         // Lookup recently failed, no point trying again
                         if ($this->echoOutput) {
                             cli()->info('Cached previous failure. Skipping.');
@@ -806,8 +806,8 @@ class ConsoleService
     {
         $genreassoc = $this->loadGenres();
 
-        if (\in_array(strtolower($genreName), $genreassoc, false)) {
-            $genreKey = array_search(strtolower($genreName), $genreassoc, false);
+        if (\in_array(strtolower($genreName), $genreassoc, true)) {
+            $genreKey = array_search(strtolower($genreName), $genreassoc, true);
         } else {
             $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => GenreService::CONSOLE_TYPE]);
         }

@@ -531,9 +531,9 @@ class PopulateAniListService
                 $title = $edge['node']['title']['english'] ?? $edge['node']['title']['romaji'] ?? '';
                 $id = $edge['node']['id'] ?? '';
 
-                if (in_array($relationType, ['SEQUEL', 'PREQUEL', 'SIDE_STORY', 'PARENT', 'SPIN_OFF'])) {
+                if (in_array($relationType, ['SEQUEL', 'PREQUEL', 'SIDE_STORY', 'PARENT', 'SPIN_OFF'], true)) {
                     $relatedItems[] = $title.' ('.$id.')';
-                } elseif (in_array($relationType, ['ALTERNATIVE', 'CHARACTER'])) {
+                } elseif (in_array($relationType, ['ALTERNATIVE', 'CHARACTER'], true)) {
                     $similarItems[] = $title.' ('.$id.')';
                 }
             }

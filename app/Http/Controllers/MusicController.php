@@ -29,7 +29,7 @@ class MusicController extends BasePageController
         }
 
         $category = $request->has('t') ? $request->input('t') : Category::MUSIC_ROOT;
-        if ($id && \in_array($id, Arr::pluck($mtmp, 'title'), false)) {
+        if ($id && \in_array($id, Arr::pluck($mtmp, 'title'), true)) {
             $cat = Category::query()
                 ->where('title', $id)
                 ->where('root_categories_id', '=', Category::MUSIC_ROOT)
@@ -43,7 +43,7 @@ class MusicController extends BasePageController
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $offset = ($page - 1) * config('nntmux.items_per_cover_page');
         $ordering = $music->getMusicOrdering();
-        $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
+        $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, true) ? $request->input('ob') : '';
 
         $musics = [];
         $rslt = $music->getMusicRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, (array) $this->userdata->categoryexclusions); // @phpstan-ignore argument.type
@@ -66,11 +66,11 @@ class MusicController extends BasePageController
             $musics[] = $result;
         }
 
-        $genre = ($request->has('genre') && array_key_exists($request->input('genre'), $tmpgnr)) ? $request->input('genre') : '';
+        $genre = ($request->has('genre') && isset($tmpgnr[$request->input('genre')])) ? $request->input('genre') : '';
 
         $years = range(1950, date('Y') + 1);
         rsort($years);
-        $year = ($request->has('year') && \in_array($request->input('year'), $years, false)) ? $request->input('year') : '';
+        $year = ($request->has('year') && \in_array($request->input('year'), $years, true)) ? $request->input('year') : '';
 
         if ((int) $category === -1) {
             $catname = 'All';

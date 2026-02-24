@@ -800,7 +800,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         }
 
         foreach ($required as $req) {
-            if (! \in_array($type, ['tmdbS', 'tmdbE', 'traktS', 'traktE'], false)) {
+            if (! \in_array($type, ['tmdbS', 'tmdbE', 'traktS', 'traktE'], true)) {
                 if (! isset($array->$req)) {
                     return false;
                 }

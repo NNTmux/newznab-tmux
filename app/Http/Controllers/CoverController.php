@@ -26,7 +26,7 @@ class CoverController extends Controller
 
         // Build the file path
         // For preview and sample images, try with _thumb suffix first
-        if (in_array($type, ['preview', 'sample'])) {
+        if (in_array($type, ['preview', 'sample'], true)) {
             $pathInfo = pathinfo($filename);
             $thumbFilename = $pathInfo['filename'].'_thumb.'.($pathInfo['extension'] ?? 'jpg');
             $thumbPath = storage_path("covers/{$type}/{$thumbFilename}");

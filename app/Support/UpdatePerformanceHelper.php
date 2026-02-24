@@ -207,17 +207,14 @@ class UpdatePerformanceHelper
             return -1;
         }
 
-        $last = strtolower($limit[strlen($limit) - 1]);
-        $value = (int) $limit;
+        $last = strtolower($limit[-1]);
 
-        switch ($last) {
-            case 'g':
-                $value *= 1024;
-            case 'm':
-                $value *= 1024;
-            case 'k':
-                $value *= 1024;
-        }
+        $value = match ($last) {
+            'g' => (int) $limit * 1024 * 1024 * 1024,
+            'm' => (int) $limit * 1024 * 1024,
+            'k' => (int) $limit * 1024,
+            default => (int) $limit,
+        };
 
         return $value;
     }

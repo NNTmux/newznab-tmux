@@ -42,7 +42,7 @@ class MovieController extends BasePageController
 
         $orderby = $request->input('ob', '');
         $ordering = $this->movieBrowseService->getMovieOrdering();
-        if (! in_array($orderby, $ordering, false)) {
+        if (! in_array($orderby, $ordering, true)) {
             $orderby = '';
         }
 

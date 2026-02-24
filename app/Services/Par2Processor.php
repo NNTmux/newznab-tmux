@@ -58,7 +58,7 @@ class Par2Processor
 
         // Only get a new name if the category is OTHER.
         $foundName = true;
-        if (\in_array((int) $query['categories_id'], Category::OTHERS_GROUP, false)) {
+        if (\in_array((int) $query['categories_id'], Category::OTHERS_GROUP, true)) {
             $foundName = false;
         }
 

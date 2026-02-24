@@ -79,7 +79,7 @@ class ConsoleController extends BasePageController
             /** @var \App\Models\Genre $gn */
             $tmpgnr[$gn->id] = $gn->title;
         }
-        $genre = ($request->has('genre') && array_key_exists($request->input('genre'), $tmpgnr)) ? $request->input('genre') : '';
+        $genre = ($request->has('genre') && isset($tmpgnr[$request->input('genre')])) ? $request->input('genre') : '';
 
         if ((int) $category === -1) {
             $catname = 'All';

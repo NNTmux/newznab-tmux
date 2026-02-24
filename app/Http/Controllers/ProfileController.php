@@ -158,7 +158,7 @@ class ProfileController extends BasePageController
                     // Update theme preference
                     if ($request->has('theme_preference')) {
                         $themeValue = $request->input('theme_preference');
-                        if (in_array($themeValue, ['light', 'dark', 'system'])) {
+                        if (in_array($themeValue, ['light', 'dark', 'system'], true)) {
                             User::where('id', $userid)->update(['theme_preference' => $themeValue]);
                         }
                     }
@@ -167,7 +167,7 @@ class ProfileController extends BasePageController
                     if ($request->has('timezone')) {
                         $timezoneValue = $request->input('timezone');
                         $validTimezones = array_merge(['UTC'], ...array_values(getAvailableTimezones()));
-                        if (in_array($timezoneValue, $validTimezones)) {
+                        if (in_array($timezoneValue, $validTimezones, true)) {
                             User::where('id', $userid)->update(['timezone' => $timezoneValue]);
                         }
                     }

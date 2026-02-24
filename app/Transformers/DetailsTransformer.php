@@ -43,12 +43,12 @@ class DetailsTransformer extends TransformerAbstract
         ];
 
         // Add movie-specific data
-        if (\in_array($release->categories_id, Category::MOVIES_GROUP, false)) {
+        if (\in_array($release->categories_id, Category::MOVIES_GROUP, true)) {
             $data['imdbid'] = $release->imdbid;
         }
 
         // Add TV-specific data
-        if (\in_array($release->categories_id, Category::TV_GROUP, false)) {
+        if (\in_array($release->categories_id, Category::TV_GROUP, true)) {
             $data['tvairdate'] = $release->firstaired;
             $data['tvdbid'] = $release->tvdb;
             $data['traktid'] = $release->trakt;

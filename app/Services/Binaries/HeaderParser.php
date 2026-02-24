@@ -57,7 +57,7 @@ final class HeaderParser
 
             // For part repair, only process missing parts
             if ($partRepair && $missingParts !== null) {
-                if (! \in_array($header['Number'], $missingParts, false)) {
+                if (! \in_array($header['Number'], $missingParts, true)) {
                     continue;
                 }
                 $headersRepaired[] = $header['Number'];

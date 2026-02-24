@@ -272,122 +272,65 @@ class DeleteReleases extends Command
         $modifier = trim($args[1]);
         $value = trim($args[2], '"\'');
 
-        switch ($column) {
-            case 'categories_id':
-                if ($modifier === 'equals') {
-                    return " AND categories_id = {$value}";
-                }
-                break;
-            case 'imdbid':
-                if ($modifier === 'equals') {
-                    if ($value === 'NULL') {
-                        return ' AND imdbid IS NULL';
-                    }
+        return match ($column) {
+            'categories_id' => $modifier === 'equals' ? " AND categories_id = {$value}" : null,
+            'imdbid' => $modifier === 'equals' ? ($value === 'NULL' ? ' AND imdbid IS NULL' : " AND imdbid = {$value}") : null,
+            'nzbstatus' => $modifier === 'equals' ? " AND nzbstatus = {$value}" : null,
+            'rageid' => $modifier === 'equals' ? " AND rageid = {$value}" : null,
+            'totalpart' => match ($modifier) {
+                'equals' => " AND totalpart = {$value}",
+                'bigger' => " AND totalpart > {$value}",
+                'smaller' => " AND totalpart < {$value}",
+                default => null,
+            },
+            'completion' => $modifier === 'smaller' ? " AND completion < {$value}" : null,
+            'size' => match ($modifier) {
+                'equals' => " AND size = {$value}",
+                'bigger' => " AND size > {$value}",
+                'smaller' => " AND size < {$value}",
+                default => null,
+            },
+            'adddate' => match ($modifier) {
+                'bigger' => " AND adddate < (NOW() - INTERVAL {$value} HOUR)",
+                'smaller' => " AND adddate > (NOW() - INTERVAL {$value} HOUR)",
+                default => null,
+            },
+            'postdate' => match ($modifier) {
+                'bigger' => " AND postdate < (NOW() - INTERVAL {$value} HOUR)",
+                'smaller' => " AND postdate > (NOW() - INTERVAL {$value} HOUR)",
+                default => null,
+            },
+            'fromname' => match ($modifier) {
+                'equals' => ' AND fromname = '.DB::connection()->getPdo()->quote($value),
+                'like' => ' AND fromname LIKE '.DB::connection()->getPdo()->quote('%'.str_replace(' ', '%', $value).'%'),
+                default => null,
+            },
+            'groupname' => match ($modifier) {
+                'equals' => (static function () use ($value) {
+                    $group = DB::select('SELECT id FROM usenet_groups WHERE name = ?', [$value]);
 
-                    return " AND imdbid = {$value}";
-                }
-                break;
-            case 'nzbstatus':
-                if ($modifier === 'equals') {
-                    return " AND nzbstatus = {$value}";
-                }
-                break;
-            case 'rageid':
-                if ($modifier === 'equals') {
-                    return " AND rageid = {$value}";
-                }
-                break;
-            case 'totalpart':
-                switch ($modifier) {
-                    case 'equals':
-                        return " AND totalpart = {$value}";
-                    case 'bigger':
-                        return " AND totalpart > {$value}";
-                    case 'smaller':
-                        return " AND totalpart < {$value}";
-                }
-                break;
-            case 'completion':
-                if ($modifier === 'smaller') {
-                    return " AND completion < {$value}";
-                }
-                break;
-            case 'size':
-                switch ($modifier) {
-                    case 'equals':
-                        return " AND size = {$value}";
-                    case 'bigger':
-                        return " AND size > {$value}";
-                    case 'smaller':
-                        return " AND size < {$value}";
-                }
-                break;
-            case 'adddate':
-                switch ($modifier) {
-                    case 'bigger':
-                        return " AND adddate < (NOW() - INTERVAL {$value} HOUR)";
-                    case 'smaller':
-                        return " AND adddate > (NOW() - INTERVAL {$value} HOUR)";
-                }
-                break;
-            case 'postdate':
-                switch ($modifier) {
-                    case 'bigger':
-                        return " AND postdate < (NOW() - INTERVAL {$value} HOUR)";
-                    case 'smaller':
-                        return " AND postdate > (NOW() - INTERVAL {$value} HOUR)";
-                }
-                break;
-            case 'fromname':
-                switch ($modifier) {
-                    case 'equals':
-                        return ' AND fromname = '.DB::connection()->getPdo()->quote($value);
-                    case 'like':
-                        return ' AND fromname LIKE '.DB::connection()->getPdo()->quote('%'.str_replace(' ', '%', $value).'%');
-                }
-                break;
-            case 'groupname':
-                switch ($modifier) {
-                    case 'equals':
-                        $group = DB::select('SELECT id FROM usenet_groups WHERE name = ?', [$value]);
-                        if (! empty($group)) {
-                            return " AND groups_id = {$group[0]->id}";
-                        }
-                        break;
-                    case 'like':
-                        $groups = DB::select('SELECT id FROM usenet_groups WHERE name LIKE ?', ['%'.str_replace(' ', '%', $value).'%']);
-                        if (! empty($groups)) {
-                            $ids = array_column($groups, 'id');
+                    return ! empty($group) ? " AND groups_id = {$group[0]->id}" : null;
+                })(),
+                'like' => (static function () use ($value) {
+                    $groups = DB::select('SELECT id FROM usenet_groups WHERE name LIKE ?', ['%'.str_replace(' ', '%', $value).'%']);
 
-                            return ' AND groups_id IN ('.implode(',', $ids).')';
-                        }
-                        break;
-                }
-                break;
-            case 'guid':
-                if ($modifier === 'equals') {
-                    return ' AND guid = '.DB::connection()->getPdo()->quote($value);
-                }
-                break;
-            case 'name':
-                switch ($modifier) {
-                    case 'equals':
-                        return ' AND name = '.DB::connection()->getPdo()->quote($value);
-                    case 'like':
-                        return ' AND name LIKE '.DB::connection()->getPdo()->quote('%'.str_replace(' ', '%', $value).'%');
-                }
-                break;
-            case 'searchname':
-                switch ($modifier) {
-                    case 'equals':
-                        return ' AND searchname = '.DB::connection()->getPdo()->quote($value);
-                    case 'like':
-                        return ' AND searchname LIKE '.DB::connection()->getPdo()->quote('%'.str_replace(' ', '%', $value).'%');
-                }
-                break;
-        }
-
-        return null;
+                    return ! empty($groups) ? ' AND groups_id IN ('.implode(',', array_column($groups, 'id')).')' : null;
+                })(),
+                default => null,
+            },
+            'guid' => $modifier === 'equals' ? ' AND guid = '.DB::connection()->getPdo()->quote($value) : null,
+            'name' => match ($modifier) {
+                'equals' => ' AND name = '.DB::connection()->getPdo()->quote($value),
+                'like' => ' AND name LIKE '.DB::connection()->getPdo()->quote('%'.str_replace(' ', '%', $value).'%'),
+                default => null,
+            },
+            'searchname' => match ($modifier) {
+                'equals' => ' AND searchname = '.DB::connection()->getPdo()->quote($value),
+                'like' => ' AND searchname LIKE '.DB::connection()->getPdo()->quote('%'.str_replace(' ', '%', $value).'%'),
+                default => null,
+            },
+            default => null,
+        };
     }
 
     /**

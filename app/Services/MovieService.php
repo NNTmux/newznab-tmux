@@ -252,7 +252,7 @@ class MovieService
         foreach ($values as $key => $value) {
             if (! empty($value)) {
                 $found++;
-                if (\in_array($key, ['genre', 'language'], false)) {
+                if (\in_array($key, ['genre', 'language'], true)) {
                     $value = substr($value, 0, 64);
                 }
                 $query += [$key => $value];

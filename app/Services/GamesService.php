@@ -552,8 +552,8 @@ class GamesService
             $genreName = 'Unknown';
         }
 
-        if (in_array(strtolower($genreName), $defaultGenres, false)) {
-            $genreKey = array_search(strtolower($genreName), $defaultGenres, false);
+        if (in_array(strtolower($genreName), $defaultGenres, true)) {
+            $genreKey = array_search(strtolower($genreName), $defaultGenres, true);
         } else {
             $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => GenreService::GAME_TYPE]);
         }
@@ -664,8 +664,8 @@ class GamesService
         $defaultGenres = $gen->loadGenres((string) GenreService::GAME_TYPE);
         $genreName = $game['gamesgenre'] ?? 'Unknown';
 
-        if (in_array(strtolower($genreName), $defaultGenres, false)) {
-            $genreKey = array_search(strtolower($genreName), $defaultGenres, false);
+        if (in_array(strtolower($genreName), $defaultGenres, true)) {
+            $genreKey = array_search(strtolower($genreName), $defaultGenres, true);
         } else {
             $genreKey = Genre::query()->insertGetId(['title' => $genreName, 'type' => GenreService::GAME_TYPE]);
         }

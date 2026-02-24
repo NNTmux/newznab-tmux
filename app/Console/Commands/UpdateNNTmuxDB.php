@@ -85,7 +85,7 @@ class UpdateNNTmuxDB extends Command
             $driver = $dbConfig['driver'] ?? null;
 
             // Detect actual database type for MySQL-compatible drivers
-            if (in_array($driver, ['mysql', 'mariadb'])) {
+            if (in_array($driver, ['mysql', 'mariadb'], true)) {
                 $version = DB::select('SELECT VERSION() as version')[0]->version;
 
                 if (str_contains(strtolower($version), 'mariadb')) {
@@ -198,7 +198,7 @@ class UpdateNNTmuxDB extends Command
     private function optimizeDatabase(string $dbType): void
     {
         try {
-            if (in_array($dbType, ['mysql', 'mariadb'])) {
+            if (in_array($dbType, ['mysql', 'mariadb'], true)) {
                 $this->optimizeMysqlCompatible($dbType);
             } elseif ($dbType === 'pgsql') {
                 $this->optimizePostgres();

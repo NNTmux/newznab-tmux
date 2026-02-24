@@ -1574,7 +1574,7 @@ final class User extends Authenticatable
 
         $excludedRoots = [];
         foreach ($categoryPermissions as $permission => $rootId) {
-            if (! in_array($permission, $allowed, false)) {
+            if (! in_array($permission, $allowed, true)) {
                 $excludedRoots[] = $rootId;
             }
         }

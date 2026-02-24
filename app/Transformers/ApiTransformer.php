@@ -34,11 +34,11 @@ class ApiTransformer extends TransformerAbstract
 
         $categoriesId = $this->getValue($release, 'categories_id');
 
-        if (\in_array($categoriesId, Category::MOVIES_GROUP, false)) {
+        if (\in_array($categoriesId, Category::MOVIES_GROUP, true)) {
             return array_merge($data, $this->getMovieSpecificData($release));
         }
 
-        if (\in_array($categoriesId, Category::TV_GROUP, false)) {
+        if (\in_array($categoriesId, Category::TV_GROUP, true)) {
             return array_merge($data, $this->getTvSpecificData($release));
         }
 

@@ -865,76 +865,25 @@ if (! function_exists('showApiError')) {
     {
         $errorHeader = 'HTTP 1.1 400 Bad Request';
         if ($errorText === '') {
-            switch ($errorCode) {
-                case 100:
-                    $errorText = 'Incorrect user credentials';
-                    $errorHeader = 'HTTP 1.1 401 Unauthorized';
-                    break;
-                case 101:
-                    $errorText = 'Account suspended';
-                    $errorHeader = 'HTTP 1.1 403 Forbidden';
-                    break;
-                case 102:
-                    $errorText = 'Insufficient privileges/not authorized';
-                    $errorHeader = 'HTTP 1.1 401 Unauthorized';
-                    break;
-                case 103:
-                    $errorText = 'Registration denied';
-                    $errorHeader = 'HTTP 1.1 403 Forbidden';
-                    break;
-                case 104:
-                    $errorText = 'Registrations are closed';
-                    $errorHeader = 'HTTP 1.1 403 Forbidden';
-                    break;
-                case 105:
-                    $errorText = 'Invalid registration (Email Address Taken)';
-                    $errorHeader = 'HTTP 1.1 403 Forbidden';
-                    break;
-                case 106:
-                    $errorText = 'Invalid registration (Email Address Bad Format)';
-                    $errorHeader = 'HTTP 1.1 403 Forbidden';
-                    break;
-                case 107:
-                    $errorText = 'Registration Failed (Data error)';
-                    $errorHeader = 'HTTP 1.1 400 Bad Request';
-                    break;
-                case 200:
-                    $errorText = 'Missing parameter';
-                    $errorHeader = 'HTTP 1.1 400 Bad Request';
-                    break;
-                case 201:
-                    $errorText = 'Incorrect parameter';
-                    $errorHeader = 'HTTP 1.1 400 Bad Request';
-                    break;
-                case 202:
-                    $errorText = 'No such function';
-                    $errorHeader = 'HTTP 1.1 404 Not Found';
-                    break;
-                case 203:
-                    $errorText = 'Function not available';
-                    $errorHeader = 'HTTP 1.1 400 Bad Request';
-                    break;
-                case 300:
-                    $errorText = 'No such item';
-                    $errorHeader = 'HTTP 1.1 404 Not Found';
-                    break;
-                case 500:
-                    $errorText = 'Request limit reached';
-                    $errorHeader = 'HTTP 1.1 429 Too Many Requests';
-                    break;
-                case 501:
-                    $errorText = 'Download limit reached';
-                    $errorHeader = 'HTTP 1.1 429 Too Many Requests';
-                    break;
-                case 910:
-                    $errorText = 'API disabled';
-                    $errorHeader = 'HTTP 1.1 401 Unauthorized';
-                    break;
-                default:
-                    $errorText = 'Unknown error';
-                    $errorHeader = 'HTTP 1.1 400 Bad Request';
-                    break;
-            }
+            [$errorText, $errorHeader] = match ($errorCode) {
+                100 => ['Incorrect user credentials', 'HTTP 1.1 401 Unauthorized'],
+                101 => ['Account suspended', 'HTTP 1.1 403 Forbidden'],
+                102 => ['Insufficient privileges/not authorized', 'HTTP 1.1 401 Unauthorized'],
+                103 => ['Registration denied', 'HTTP 1.1 403 Forbidden'],
+                104 => ['Registrations are closed', 'HTTP 1.1 403 Forbidden'],
+                105 => ['Invalid registration (Email Address Taken)', 'HTTP 1.1 403 Forbidden'],
+                106 => ['Invalid registration (Email Address Bad Format)', 'HTTP 1.1 403 Forbidden'],
+                107 => ['Registration Failed (Data error)', 'HTTP 1.1 400 Bad Request'],
+                200 => ['Missing parameter', 'HTTP 1.1 400 Bad Request'],
+                201 => ['Incorrect parameter', 'HTTP 1.1 400 Bad Request'],
+                202 => ['No such function', 'HTTP 1.1 404 Not Found'],
+                203 => ['Function not available', 'HTTP 1.1 400 Bad Request'],
+                300 => ['No such item', 'HTTP 1.1 404 Not Found'],
+                500 => ['Request limit reached', 'HTTP 1.1 429 Too Many Requests'],
+                501 => ['Download limit reached', 'HTTP 1.1 429 Too Many Requests'],
+                910 => ['API disabled', 'HTTP 1.1 401 Unauthorized'],
+                default => ['Unknown error', 'HTTP 1.1 400 Bad Request'],
+            };
         }
 
         $response =
