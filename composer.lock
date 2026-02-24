@@ -546,16 +546,16 @@
         },
         {
             "name": "dariusiii/net_nntp",
-            "version": "4.1.1",
+            "version": "4.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DariusIII/Net_NNTP.git",
-                "reference": "1786c7ee4a60ec7ccbc93651b48db7ecf048b031"
+                "reference": "0eb0ec5bbca338148d95ee4f1ec3b9857d32a900"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DariusIII/Net_NNTP/zipball/1786c7ee4a60ec7ccbc93651b48db7ecf048b031",
-                "reference": "1786c7ee4a60ec7ccbc93651b48db7ecf048b031",
+                "url": "https://api.github.com/repos/DariusIII/Net_NNTP/zipball/0eb0ec5bbca338148d95ee4f1ec3b9857d32a900",
+                "reference": "0eb0ec5bbca338148d95ee4f1ec3b9857d32a900",
                 "shasum": ""
             },
             "require": {
@@ -605,7 +605,7 @@
             "support": {
                 "source": "https://github.com/DariusIII/Net_NNTP"
             },
-            "time": "2026-02-24T11:42:57+00:00"
+            "time": "2026-02-24T12:48:31+00:00"
         },
         {
             "name": "dariusiii/rarinfo",
