@@ -6209,16 +6209,16 @@
         },
         {
             "name": "predis/predis",
-            "version": "v3.4.0",
+            "version": "v3.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/predis/predis.git",
-                "reference": "1183f5732e6b10efd33f64984a96726eaecb59aa"
+                "reference": "0850f2f36ee179f0ff96c92c750e1366c6cd754c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/predis/predis/zipball/1183f5732e6b10efd33f64984a96726eaecb59aa",
-                "reference": "1183f5732e6b10efd33f64984a96726eaecb59aa",
+                "url": "https://api.github.com/repos/predis/predis/zipball/0850f2f36ee179f0ff96c92c750e1366c6cd754c",
+                "reference": "0850f2f36ee179f0ff96c92c750e1366c6cd754c",
                 "shasum": ""
             },
             "require": {
@@ -6260,7 +6260,7 @@
             ],
             "support": {
                 "issues": "https://github.com/predis/predis/issues",
-                "source": "https://github.com/predis/predis/tree/v3.4.0"
+                "source": "https://github.com/predis/predis/tree/v3.4.1"
             },
             "funding": [
                 {
@@ -6268,7 +6268,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-11T17:30:28+00:00"
+            "time": "2026-02-23T19:51:21+00:00"
         },
         {
             "name": "propaganistas/laravel-disposable-email",
@@ -8256,16 +8256,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "7.2.2",
+            "version": "7.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "4b2572eb5ef2c8cb719df09e0e6feb7431fda93f"
+                "reference": "062b0cd8e3a1753fa7a53e468b918710004aa06b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/4b2572eb5ef2c8cb719df09e0e6feb7431fda93f",
-                "reference": "4b2572eb5ef2c8cb719df09e0e6feb7431fda93f",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/062b0cd8e3a1753fa7a53e468b918710004aa06b",
+                "reference": "062b0cd8e3a1753fa7a53e468b918710004aa06b",
                 "shasum": ""
             },
             "require": {
@@ -8273,7 +8273,7 @@
                 "illuminate/container": "^12.0|^13.0",
                 "illuminate/contracts": "^12.0|^13.0",
                 "illuminate/database": "^12.0|^13.0",
-                "php": "^8.3",
+                "php": "^8.4",
                 "spatie/laravel-package-tools": "^1.0"
             },
             "require-dev": {
@@ -8331,7 +8331,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-permission/issues",
-                "source": "https://github.com/spatie/laravel-permission/tree/7.2.2"
+                "source": "https://github.com/spatie/laravel-permission/tree/7.2.3"
             },
             "funding": [
                 {
@@ -8339,7 +8339,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-22T08:20:44+00:00"
+            "time": "2026-02-23T20:30:07+00:00"
         },
         {
             "name": "spatie/temporary-directory",
@@ -15018,11 +15018,11 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.1.39",
+            "version": "2.1.40",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/c6f73a2af4cbcd99c931d0fb8f08548cc0fa8224",
-                "reference": "c6f73a2af4cbcd99c931d0fb8f08548cc0fa8224",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/9b2c7aeb83a75d8680ea5e7c9b7fca88052b766b",
+                "reference": "9b2c7aeb83a75d8680ea5e7c9b7fca88052b766b",
                 "shasum": ""
             },
             "require": {
@@ -15067,7 +15067,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-11T14:48:56+00:00"
+            "time": "2026-02-23T15:04:35+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
