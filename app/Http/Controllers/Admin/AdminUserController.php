@@ -233,7 +233,7 @@ class AdminUserController extends BasePageController
                         $editedUser->grabs,
                         $editedUser->roles_id, // Use current role, not the request role
                         $request->input('notes'),
-                        $request->input('invites'),
+                        (int) $request->input('invites', 0),
                         ($request->has('movieview') ? 1 : 0),
                         ($request->has('musicview') ? 1 : 0),
                         ($request->has('gameview') ? 1 : 0),
