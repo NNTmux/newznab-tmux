@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\TvProcessing\Pipes;
 
 use App\Services\TvProcessing\Providers\TvMazeProvider;
@@ -67,7 +69,7 @@ class TvMazePipe extends AbstractTvProviderPipe
         $videoId = $tvmaze->getByTitle($cleanName, self::TYPE_TV, self::SOURCE_TVMAZE);
 
         // If not found and cleanName contains a year in parentheses, try without the year
-        if ($videoId === 0 && preg_match('/^(.+?)\s*\(\d{4}\)$/', $cleanName, $yearMatch)) {
+        if ($videoId === 0 && preg_match('/^(.+?)\s*\(\d{4}\)$/', (string) $cleanName, $yearMatch)) {
             $nameWithoutYear = trim($yearMatch[1]);
             $videoId = $tvmaze->getByTitle($nameWithoutYear, self::TYPE_TV, self::SOURCE_TVMAZE);
         }
@@ -92,14 +94,14 @@ class TvMazePipe extends AbstractTvProviderPipe
             $tvmazeShow = $tvmaze->getShowInfo((string) $cleanName);
 
             // If not found and cleanName contains a year in parentheses, try without the year
-            if ($tvmazeShow === false && preg_match('/^(.+?)\s*\(\d{4}\)$/', $cleanName, $yearMatch)) {
+            if ($tvmazeShow === false && preg_match('/^(.+?)\s*\(\d{4}\)$/', (string) $cleanName, $yearMatch)) {
                 $nameWithoutYear = trim($yearMatch[1]);
                 $tvmazeShow = $tvmaze->getShowInfo($nameWithoutYear);
             }
 
             if (is_array($tvmazeShow)) {
                 // Check if we have a valid country
-                if (isset($parsedInfo['country']) && strlen($parsedInfo['country']) === 2) {
+                if (isset($parsedInfo['country']) && strlen((string) $parsedInfo['country']) === 2) {
                     $tvmazeShow['country'] = $parsedInfo['country'];
                 }
                 $videoId = $tvmaze->add($tvmazeShow);

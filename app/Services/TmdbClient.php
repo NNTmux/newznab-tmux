@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
@@ -185,6 +187,17 @@ class TmdbClient
     public function getMovieExternalIds(int $movieId): ?array
     {
         return $this->get('/movie/'.$movieId.'/external_ids');
+    }
+
+    /**
+     * Get alternative titles for a movie (including international / alternate names).
+     *
+     * @param  int  $movieId  The TMDB movie ID
+     * @return array<string, mixed>|null Response with 'titles' array (each has 'title', 'iso_3166_1', 'type') or null on failure
+     */
+    public function getMovieAlternativeTitles(int $movieId): ?array
+    {
+        return $this->get('/movie/'.$movieId.'/alternative_titles');
     }
 
     // =========================================================================

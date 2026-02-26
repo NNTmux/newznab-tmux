@@ -20,6 +20,7 @@ use App\Support\DTOs\ProcessReleasesSettings;
 use App\Support\DTOs\ReleaseCreationResult;
 use App\Support\DTOs\ReleaseDeleteStats;
 use DateTimeInterface;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -761,16 +762,62 @@ final class ReleaseProcessingService
                 ->update(['collections.filecheck' => CollectionFileCheckStatus::ZeroPart->value]);
         }, 10);
 
-        DB::transaction(static function () use ($groupID): void {
-            $query = Collection::query()
-                ->where('filecheck', '=', CollectionFileCheckStatus::CompleteCollection->value);
+        $this->updateCollectionsFilecheckInChunks(
+            $groupID,
+            CollectionFileCheckStatus::CompleteCollection->value,
+            CollectionFileCheckStatus::TempComplete->value
+        );
+    }
 
-            if ($groupID !== 0) {
-                $query->where('groups_id', $groupID);
+    /**
+     * Update collections filecheck in small chunks to reduce deadlock risk.
+     * Retries on deadlock (1213) with exponential backoff.
+     *
+     * @throws Throwable
+     */
+    private function updateCollectionsFilecheckInChunks(int $groupID, int $fromStatus, int $toStatus): void
+    {
+        $attempt = 0;
+        $maxAttempts = self::MAX_RETRIES + 1;
+
+        while ($attempt < $maxAttempts) {
+            try {
+                $updated = 0;
+                do {
+                    $ids = Collection::query()
+                        ->where('filecheck', $fromStatus)
+                        ->when($groupID !== 0, static fn ($q) => $q->where('groups_id', $groupID))
+                        ->orderBy('id')
+                        ->limit(self::BATCH_SIZE)
+                        ->pluck('id')
+                        ->all();
+
+                    if ($ids === []) {
+                        break;
+                    }
+
+                    DB::transaction(static function () use ($ids, $toStatus): void {
+                        Collection::query()
+                            ->whereIn('id', $ids)
+                            ->update(['filecheck' => $toStatus]);
+                    }, 10);
+
+                    $updated = \count($ids);
+                } while ($updated === self::BATCH_SIZE);
+
+                return;
+            } catch (QueryException $e) {
+                $isDeadlock = ($e->errorInfo[1] ?? 0) === 1213
+                    || str_contains($e->getMessage(), 'Deadlock');
+
+                if ($isDeadlock && $attempt < $maxAttempts - 1) {
+                    $attempt++;
+                    usleep(self::RETRY_BASE_DELAY_US * (2 ** $attempt));
+                } else {
+                    throw $e;
+                }
             }
-
-            $query->update(['filecheck' => CollectionFileCheckStatus::TempComplete->value]);
-        }, 10);
+        }
     }
 
     /**

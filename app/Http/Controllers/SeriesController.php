@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\TvEpisode;
@@ -40,7 +42,7 @@ class SeriesController extends BasePageController
             $page = max($page, 1);
             $offset = $seriesLimit > 0 ? ($page - 1) * $seriesLimit : 0;
 
-            $rel = $this->releaseSearchService->tvSearch(['id' => $id], '', '', '', $offset, $seriesLimit, '', $catarray, -1); // @phpstan-ignore argument.type
+            $rel = $this->releaseSearchService->tvSearch(['id' => $id], '', '', '', $offset, $seriesLimit, '', $catarray, -1);
 
             $show = Video::getByVideoID($id);
 

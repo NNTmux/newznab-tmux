@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\TvProcessing;
 
 /**
@@ -34,7 +36,7 @@ class TvReleaseContext
 
         return new self(
             releaseId: (int) ($data['id'] ?? 0),
-            searchName: $data['searchname'] ?? '',
+            searchName: (string) ($data['searchname'] ?? ''),
             groupsId: (int) ($data['groups_id'] ?? 0),
             categoriesId: (int) ($data['categories_id'] ?? 0),
             videosId: (int) ($data['videos_id'] ?? 0),
@@ -49,6 +51,6 @@ class TvReleaseContext
      */
     public function matchesPattern(string $pattern): bool
     {
-        return (bool) preg_match($pattern, $this->searchName);
+        return (bool) preg_match($pattern, (string) $this->searchName);
     }
 }

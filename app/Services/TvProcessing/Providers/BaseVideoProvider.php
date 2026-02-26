@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -121,7 +123,7 @@ abstract class BaseVideoProvider
         }
 
         // If title contains a year in parentheses, try without the year
-        if (preg_match('/^(.+?)\s*\(\d{4}\)$/', $title, $yearMatch)) {
+        if (preg_match('/^(.+?)\s*\(\d{4}\)$/', (string) $title, $yearMatch)) {
             $titleWithoutYear = trim($yearMatch[1]);
             $res = $this->getTitleExact($titleWithoutYear, $type, $source);
             if ($res !== 0) {
@@ -230,7 +232,7 @@ abstract class BaseVideoProvider
 
         if (! empty($title)) {
             $sql = Video::query()
-                ->where('title', 'like', rtrim($title, '%'))
+                ->where('title', 'like', rtrim((string) $title, '%'))
                 ->where('type', $type);
             if ($source > 0) {
                 $sql->where('source', $source);
@@ -244,7 +246,7 @@ abstract class BaseVideoProvider
             if (empty($return)) {
                 $sql = Video::query()
                     ->join('videos_aliases', 'videos.id', '=', 'videos_aliases.videos_id')
-                    ->where('videos_aliases.title', '=', rtrim($title, '%'))
+                    ->where('videos_aliases.title', '=', rtrim((string) $title, '%'))
                     ->where('type', $type);
                 if ($source > 0) {
                     $sql->where('videos.source', $source);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\TvProcessing\Providers;
 
 use App\Services\ReleaseImageService;
@@ -111,7 +113,7 @@ class TvMazeProvider extends AbstractTvProvider
                             $siteId = (int) $tvMazeShow['tvmaze'];
                             // Check if we have the TVDB ID already, if we do use that Video ID, unless it is 0
                             if ((int) $tvMazeShow['tvdb'] !== 0) {
-                                $dupeCheck = $this->getVideoIDFromSiteID('tvdb', $tvMazeShow['tvdb']);
+                                $dupeCheck = $this->getVideoIDFromSiteID('tvdb', (int) $tvMazeShow['tvdb']);
                             }
                             if ($dupeCheck === false) {
                                 $videoId = $this->add($tvMazeShow);
@@ -137,8 +139,8 @@ class TvMazeProvider extends AbstractTvProvider
                         // Now that we have valid video and tvmaze ids, try to get the poster
                         $this->getPoster($videoId);
 
-                        $seriesNo = preg_replace('/^S0*/i', '', $release['season']);
-                        $episodeNo = preg_replace('/^E0*/i', '', $release['episode']);
+                        $seriesNo = preg_replace('/^S0*/i', '', (string) $release['season']);
+                        $episodeNo = preg_replace('/^E0*/i', '', (string) $release['episode']);
 
                         if ($episodeNo === 'all') {
                             // Set the video ID and leave episode 0
@@ -444,7 +446,7 @@ class TvMazeProvider extends AbstractTvProvider
 
         // Extract IMDB ID if available
         if (! empty($show->externalIDs['imdb'])) {
-            preg_match('/tt(?P<imdbid>\d{6,9})$/i', $show->externalIDs['imdb'], $imdb);
+            preg_match('/tt(?P<imdbid>\d{6,9})$/i', (string) $show->externalIDs['imdb'], $imdb);
             $imdbId = (int) ($imdb['imdbid'] ?? 0);
         }
 

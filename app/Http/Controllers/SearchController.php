@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Category;
@@ -73,7 +75,10 @@ class SearchController extends BasePageController
 
             $categoryID = [-1];
             if ($request->has('t')) {
-                $categoryID = array_map('intval', explode(',', $request->input('t')));
+                $t = $request->input('t');
+                if ($t !== null && $t !== '') {
+                    $categoryID = array_map('intval', explode(',', (string) $t));
+                }
             }
 
             $orderByUrls = [];
@@ -89,12 +94,12 @@ class SearchController extends BasePageController
                 -1,
                 -1,
                 $offset,
-                config('nntmux.items_per_page'),
+                (int) config('nntmux.items_per_page'),
                 $orderBy,
                 -1,
                 $this->userdata->categoryexclusions ?? [],
                 'basic',
-                $categoryID); // @phpstan-ignore argument.type
+                $categoryID);
 
             $results = $this->paginate($rslt ?? [], $rslt[0]->_totalrows ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());
             $category = $categoryID;
@@ -194,12 +199,12 @@ class SearchController extends BasePageController
                 ($searchVars['searchadvdaysnew'] === '' ? -1 : $searchVars['searchadvdaysnew']),
                 ($searchVars['searchadvdaysold'] === '' ? -1 : $searchVars['searchadvdaysold']),
                 $offset,
-                config('nntmux.items_per_page'),
+                (int) config('nntmux.items_per_page'),
                 $orderBy,
                 -1,
                 $this->userdata->categoryexclusions ?? [],
                 'advanced',
-                [$searchVars['searchadvcat'] === '' ? -1 : $searchVars['searchadvcat']] // @phpstan-ignore argument.type
+                [$searchVars['searchadvcat'] === '' ? -1 : $searchVars['searchadvcat']]
             );
 
             $results = $this->paginate($rslt ?? [], $rslt[0]->_totalrows ?? 0, config('nntmux.items_per_page'), $page, $request->url(), $request->query());

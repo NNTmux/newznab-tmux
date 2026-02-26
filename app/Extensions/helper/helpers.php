@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\Country as CountryModel;
 use App\Models\Release;
 use App\Services\Nzb\NzbService;
@@ -16,10 +18,10 @@ use Symfony\Component\Process\Process;
 
 if (! function_exists('getRawHtml')) {
     /**
-     * @param  bool  $cookie
-     * @return bool|mixed|string
+     * @param  array<string, mixed>|null  $postData
+     * @return array<string, mixed>|false|string
      */
-    function getRawHtml(mixed $url, $cookie = false, mixed $postData = null)
+    function getRawHtml(string $url, bool|string|null $cookie = false, ?array $postData = null): array|false|string
     {
         // Check if this is an adult site that needs age verification
         $adultSites = [
@@ -69,11 +71,11 @@ if (! function_exists('getRawHtml')) {
 
 if (! function_exists('makeFieldLinks')) {
     /**
-     * @return string
+     * @param  array<string, mixed>|object  $data  Array or model (ArrayAccess)
      *
      * @throws Exception
      */
-    function makeFieldLinks(mixed $data, mixed $field, mixed $type)
+    function makeFieldLinks(array|object $data, string $field, string $type): string
     {
         // Check if field exists and is not empty
         if (! isset($data[$field]) || empty($data[$field])) {
@@ -100,10 +102,9 @@ if (! function_exists('makeFieldLinks')) {
 
 if (! function_exists('getUserBrowseOrder')) {
     /**
-     * @param  string  $orderBy
-     * @return array<string, mixed>
+     * @return array{0: string, 1: string}
      */
-    function getUserBrowseOrder($orderBy): array
+    function getUserBrowseOrder(string $orderBy): array
     {
         $order = ($orderBy === '' ? 'username_desc' : $orderBy);
         $orderArr = explode('_', $order);
@@ -159,20 +160,14 @@ if (! function_exists('getUserBrowseOrdering')) {
 }
 
 if (! function_exists('getSimilarName')) {
-    /**
-     * @param  string  $name
-     */
-    function getSimilarName($name): string
+    function getSimilarName(string $name): string
     {
         return implode(' ', \array_slice(str_word_count(str_replace(['.', '_', '-'], ' ', $name), 2), 0, 2));
     }
 }
 
 if (! function_exists('human_filesize')) {
-    /**
-     * @param  int  $decimals
-     */
-    function human_filesize(mixed $bytes, $decimals = 0): string
+    function human_filesize(int|float|string $bytes, int $decimals = 0): string
     {
         $size = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $factor = (int) floor((\strlen((string) $bytes) - 1) / 3);
@@ -182,10 +177,7 @@ if (! function_exists('human_filesize')) {
 }
 
 if (! function_exists('bcdechex')) {
-    /**
-     * @return string
-     */
-    function bcdechex(mixed $dec)
+    function bcdechex(string $dec): string
     {
         $hex = '';
         do {
@@ -201,13 +193,8 @@ if (! function_exists('bcdechex')) {
 if (! function_exists('runCmd')) {
     /**
      * Run CLI command.
-     *
-     *
-     * @param  string  $command
-     * @param  bool  $debug
-     * @return string
      */
-    function runCmd($command, $debug = false)
+    function runCmd(string $command, bool $debug = false): string
     {
         if ($debug) {
             echo '-Running Command: '.PHP_EOL.'   '.$command.PHP_EOL;
@@ -231,7 +218,7 @@ if (! function_exists('imdb_id_pad')) {
      * Normalize IMDB ID to 8 zero-padded digits for storage in releases / join consistency.
      * Enables index use on releases.imdbid; call when writing to releases.imdbid.
      */
-    function imdb_id_pad(mixed $id): string
+    function imdb_id_pad(int|string|null $id): string
     {
         if ($id === null || $id === '') {
             return '00000000';
@@ -281,7 +268,7 @@ if (! function_exists('is_it_json')) {
 
 if (! function_exists('getStreamingZip')) {
     /**
-     * @param  array<string, mixed>  $guids
+     * @param  list<string>  $guids
      *
      * @throws Exception
      */
@@ -450,9 +437,8 @@ if (! function_exists('getReleaseCover')) {
      * Get the cover image URL for a release based on its type and ID
      *
      * @param  object|array<string, mixed>  $release  The release object or array
-     * @return string The cover image URL or placeholder if no cover exists
      */
-    function getReleaseCover($release): string
+    function getReleaseCover(object|array $release): string
     {
         $coverType = null;
         $coverId = null;
@@ -545,13 +531,11 @@ if (! function_exists('sanitize')) {
 if (! function_exists('formatBytes')) {
     /**
      * Format bytes into human-readable file size.
-     *
-     * @param  int|float|null  $bytes
      */
-    function formatBytes($bytes = 0): string
+    function formatBytes(int|float|null $bytes = 0): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        $bytes = max((int) $bytes, 0);
+        $bytes = max((int) ($bytes ?? 0), 0);
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow = min($pow, count($units) - 1);
 
@@ -675,10 +659,8 @@ if (! function_exists('getAvailableTimezones')) {
 if (! function_exists('countryCode')) {
     /**
      * Get a country code for a country name.
-     *
-     * @return mixed
      */
-    function countryCode(string $country)
+    function countryCode(string $country): string
     {
         if (\strlen($country) > 2) {
             $code = CountryModel::whereFullName($country)->orWhere('name', $country)->first(['iso_3166_2']);
@@ -694,10 +676,8 @@ if (! function_exists('countryCode')) {
 if (! function_exists('unzipGzipFile')) {
     /**
      * Unzip a gzip file, return the output. Return false on error / empty.
-     *
-     * @return bool|string
      */
-    function unzipGzipFile(string $filePath)
+    function unzipGzipFile(string $filePath): false|string
     {
         $string = '';
         $gzFile = @gzopen($filePath, 'rb', false);
@@ -894,7 +874,7 @@ if (! function_exists('showApiError')) {
 }
 
 if (! function_exists('getRange')) {
-    function getRange(mixed $tableName): \Illuminate\Contracts\Pagination\LengthAwarePaginator // @phpstan-ignore missingType.generics
+    function getRange(string $tableName): \Illuminate\Contracts\Pagination\LengthAwarePaginator // @phpstan-ignore missingType.generics
     {
         $range = \Illuminate\Support\Facades\DB::table($tableName);
 

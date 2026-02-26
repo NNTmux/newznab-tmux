@@ -515,7 +515,7 @@ final class User extends Authenticatable
             return ['country' => null, 'countryCode' => null];
         }
 
-        $cacheKey = 'ip_country_lookup_'.md5($ip);
+        $cacheKey = 'ip_country_lookup_'.md5((string) $ip);
 
         return Cache::remember($cacheKey, 86400, function () use ($ip) {
             return $this->fetchCountryFromApi($ip);

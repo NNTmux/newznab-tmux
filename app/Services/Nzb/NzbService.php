@@ -181,7 +181,7 @@ class NzbService
         // Mark release as having NZB.
         $release->update(['nzbstatus' => self::NZB_ADDED]);
         if (! empty($nzb_guid)) {
-            $release->update(['nzb_guid' => DB::raw('UNHEX( '.escapeString(md5($nzb_guid)).' )')]);
+            $release->update(['nzb_guid' => DB::raw('UNHEX( '.escapeString(md5((string) $nzb_guid)).' )')]);
         }
 
         // Delete CBP (Collections, Binaries, Parts) for release that has its NZB created.

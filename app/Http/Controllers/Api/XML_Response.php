@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -208,7 +210,7 @@ class XML_Response
             'guid' => $serverUrl.'/details/'.$this->release->guid,
             'link' => $serverUrl.'/getnzb?id='.$this->release->guid.'.nzb&r='.$this->parameters['token'].$delParam,
             'comments' => $serverUrl.'/details/'.$this->release->guid.'#comments',
-            'pubDate' => date(DATE_RSS, strtotime($this->release->adddate)),
+            'pubDate' => date(DATE_RSS, strtotime((string) $this->release->adddate)),
             'category' => $this->release->category_name,
             'description' => $this->release->searchname,
         ];
@@ -396,9 +398,9 @@ class XML_Response
     {
         $this->xml->startDocument('1.0', 'UTF-8');
         $this->xml->startElement('register');
-        $this->xml->writeAttribute('username', $this->parameters['username']);
-        $this->xml->writeAttribute('password', $this->parameters['password']);
-        $this->xml->writeAttribute('apikey', $this->parameters['token']);
+        $this->xml->writeAttribute('username', (string) ($this->parameters['username'] ?? ''));
+        $this->xml->writeAttribute('password', (string) ($this->parameters['password'] ?? ''));
+        $this->xml->writeAttribute('apikey', (string) ($this->parameters['token'] ?? ''));
         $this->xml->endElement();
         $this->xml->endDocument();
 
@@ -414,7 +416,7 @@ class XML_Response
     {
         $this->xml->startElement($element['name']);
         foreach ($element['data'] as $attr => $val) {
-            $this->xml->writeAttribute($attr, $val);
+            $this->xml->writeAttribute($attr, (string) $val);
         }
         $this->xml->endElement();
     }
@@ -443,17 +445,17 @@ class XML_Response
         $this->xml->startElement('categories');
         foreach ($this->server['categories'] as $this->parameters) {
             $this->xml->startElement('category');
-            $this->xml->writeAttribute('id', $this->parameters['id']);
-            $this->xml->writeAttribute('name', html_entity_decode($this->parameters['title']));
+            $this->xml->writeAttribute('id', (string) $this->parameters['id']);
+            $this->xml->writeAttribute('name', html_entity_decode((string) $this->parameters['title']));
             if (! empty($this->parameters['description'])) {
-                $this->xml->writeAttribute('description', html_entity_decode($this->parameters['description']));
+                $this->xml->writeAttribute('description', html_entity_decode((string) $this->parameters['description']));
             }
             foreach ($this->parameters['categories'] as $c) {
                 $this->xml->startElement('subcat');
-                $this->xml->writeAttribute('id', $c['id']);
-                $this->xml->writeAttribute('name', html_entity_decode($c['title']));
+                $this->xml->writeAttribute('id', (string) $c['id']);
+                $this->xml->writeAttribute('name', html_entity_decode((string) $c['title']));
                 if (! empty($c['description'])) {
-                    $this->xml->writeAttribute('description', html_entity_decode($c['description']));
+                    $this->xml->writeAttribute('description', html_entity_decode((string) $c['description']));
                 }
                 $this->xml->endElement();
             }
@@ -541,23 +543,23 @@ class XML_Response
     public function includeTotalRows(): void
     {
         $this->xml->startElement($this->namespace.':response');
-        $this->xml->writeAttribute('offset', $this->offset);
-        $this->xml->writeAttribute('total', $this->releases[0]->_totalrows ?? 0);
+        $this->xml->writeAttribute('offset', (string) $this->offset);
+        $this->xml->writeAttribute('total', (string) ($this->releases[0]->_totalrows ?? 0));
         $this->xml->endElement();
     }
 
     public function includeLimits(): void
     {
         $this->xml->startElement($this->namespace.':apilimits');
-        $this->xml->writeAttribute('apicurrent', $this->parameters['requests']);
-        $this->xml->writeAttribute('apimax', $this->parameters['apilimit']);
-        $this->xml->writeAttribute('grabcurrent', $this->parameters['grabs']);
-        $this->xml->writeAttribute('grabmax', $this->parameters['downloadlimit']);
+        $this->xml->writeAttribute('apicurrent', (string) $this->parameters['requests']);
+        $this->xml->writeAttribute('apimax', (string) $this->parameters['apilimit']);
+        $this->xml->writeAttribute('grabcurrent', (string) $this->parameters['grabs']);
+        $this->xml->writeAttribute('grabmax', (string) $this->parameters['downloadlimit']);
         if (! empty($this->parameters['oldestapi'])) {
-            $this->xml->writeAttribute('apioldesttime', $this->parameters['oldestapi']);
+            $this->xml->writeAttribute('apioldesttime', (string) $this->parameters['oldestapi']);
         }
         if (! empty($this->parameters['oldestgrab'])) {
-            $this->xml->writeAttribute('graboldesttime', $this->parameters['oldestgrab']);
+            $this->xml->writeAttribute('graboldesttime', (string) $this->parameters['oldestgrab']);
         }
         $this->xml->endElement();
     }
@@ -602,7 +604,7 @@ class XML_Response
             ((int) $this->parameters['del'] === 1 ? '&del=1' : '')
         );
         $this->xml->writeElement('comments', "{$this->server['server']['url']}/details/{$this->release->guid}#comments");
-        $this->xml->writeElement('pubDate', date(DATE_RSS, strtotime($this->release->adddate)));
+        $this->xml->writeElement('pubDate', date(DATE_RSS, strtotime((string) $this->release->adddate)));
         $this->xml->writeElement('category', $this->release->category_name);
         if ($this->namespace === 'newznab') {
             $this->xml->writeElement('description', $this->release->searchname);
@@ -617,7 +619,7 @@ class XML_Response
                 "&r={$this->parameters['token']}".
                 ((int) $this->parameters['del'] === 1 ? '&del=1' : '')
             );
-            $this->xml->writeAttribute('length', $this->release->size);
+            $this->xml->writeAttribute('length', (string) $this->release->size);
             $this->xml->writeAttribute('type', 'application/x-nzb');
             $this->xml->endElement();
         }
@@ -745,13 +747,13 @@ class XML_Response
      * Writes individual zed (newznab) type attributes.
      *
      * @param  string  $name  The namespaced attribute name tag
-     * @param  string|null  $value  The namespaced attribute value
+     * @param  mixed  $value  The namespaced attribute value (int/string/null from DB)
      */
-    protected function writeZedAttr(string $name, ?string $value): void
+    protected function writeZedAttr(string $name, mixed $value): void
     {
         $this->xml->startElement($this->namespace.':attr');
         $this->xml->writeAttribute('name', $name);
-        $this->xml->writeAttribute('value', $value);
+        $this->xml->writeAttribute('value', $value === null ? '' : (string) $value);
         $this->xml->endElement();
     }
 
@@ -914,7 +916,7 @@ class XML_Response
             if (! empty($this->release->$info)) {
                 if ($info === 'mu_releasedate') {
                     $ucInfo = 'Released';
-                    $rDate = date('Y-m-d', strtotime($this->release->$info));
+                    $rDate = date('Y-m-d', strtotime((string) $this->release->$info));
                     $cData .= "<li>{$ucInfo}: {$rDate}</li>\n";
                 } else {
                     $ucInfo = ucfirst(preg_replace('/^[a-z]{2}_/i', '', $info));

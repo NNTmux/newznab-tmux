@@ -122,7 +122,7 @@ class ConsoleService
     /**
      * Get console games range with pagination.
      *
-     * @param  array<string, mixed>  $cat
+     * @param  array<int|string, mixed>  $cat  Category IDs (list or associative)
      * @param  array<string, mixed>  $excludedCats
      *
      * @throws \Exception
@@ -134,7 +134,7 @@ class ConsoleService
 
         $browseBy = $this->getBrowseBy();
         $catsrch = '';
-        if (\count($cat) > 0 && (int) $cat[0] !== -1) { // @phpstan-ignore offsetAccess.notFound
+        if (\count($cat) > 0 && (int) $cat[0] !== -1) {
             $catsrch = Category::getCategorySearch($cat);
         }
         $exccatlist = '';

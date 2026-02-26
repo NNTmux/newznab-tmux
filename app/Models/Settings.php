@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -173,7 +175,7 @@ class Settings extends Model
         // Convert numeric strings to actual numbers
         if (is_numeric($value)) {
             // Check if it's an integer or float
-            if (strpos($value, '.') !== false) {
+            if (strpos((string) $value, '.') !== false) {
                 return (float) $value;
             }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Sleep display script for tmux panes
  * Shows a countdown timer in the pane

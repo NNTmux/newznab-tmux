@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\TvProcessing\Providers;
 
 use App\Services\FanartTvService;
@@ -143,8 +145,8 @@ class TvdbProvider extends AbstractTvProvider
                         }
                     }
 
-                    $seriesNo = (! empty($release['season']) ? preg_replace('/^S0*/i', '', $release['season']) : '');
-                    $episodeNo = (! empty($release['episode']) ? preg_replace('/^E0*/i', '', $release['episode']) : '');
+                    $seriesNo = (! empty($release['season']) ? preg_replace('/^S0*/i', '', (string) $release['season']) : '');
+                    $episodeNo = (! empty($release['episode']) ? preg_replace('/^E0*/i', '', (string) $release['episode']) : '');
                     $hasAirdate = ! empty($release['airdate']);
 
                     if ($episodeNo === 'all') {
@@ -386,7 +388,7 @@ class TvdbProvider extends AbstractTvProvider
     public function formatShowInfo(mixed $show): array
     {
         try {
-            $poster = $this->client->series()->artworks($show->tvdb_id);
+            $poster = $this->client->series()->artworks((int) $show->tvdb_id);
             $poster = collect($poster)->where('type', 2)->sortByDesc('score')->first();
             $this->posterUrl = ! empty($poster->image) ? $poster->image : '';
         } catch (ResourceNotFoundException $e) {
@@ -402,8 +404,8 @@ class TvdbProvider extends AbstractTvProvider
         $imdbId = 0;
         $imdbIdObj = null;
         try {
-            $imdbIdObj = $this->client->series()->extended($show->tvdb_id);
-            preg_match('/tt(?P<imdbid>\d{6,9})$/i', $imdbIdObj->getIMDBId(), $imdb);
+            $imdbIdObj = $this->client->series()->extended((int) $show->tvdb_id);
+            preg_match('/tt(?P<imdbid>\d{6,9})$/i', (string) ($imdbIdObj->getIMDBId() ?? ''), $imdb);
             $imdbId = $imdb['imdbid'] ?? 0;
         } catch (ResourceNotFoundException $e) {
             cli()->error('Show ImdbId not found on TVDB');
@@ -412,7 +414,7 @@ class TvdbProvider extends AbstractTvProvider
         }
 
         // Look up TMDB and Trakt IDs using available external IDs
-        $externalIds = $this->lookupExternalIds($show->tvdb_id, $imdbId);
+        $externalIds = $this->lookupExternalIds((int) $show->tvdb_id, $imdbId);
 
         return [
             'type' => parent::TYPE_TV,

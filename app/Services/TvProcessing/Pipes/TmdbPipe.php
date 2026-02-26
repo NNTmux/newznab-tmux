@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\TvProcessing\Pipes;
 
 use App\Services\TvProcessing\Providers\TmdbProvider;
@@ -67,7 +69,7 @@ class TmdbPipe extends AbstractTvProviderPipe
         $videoId = $tmdb->getByTitle($cleanName, self::TYPE_TV, self::SOURCE_TMDB);
 
         // If not found and cleanName contains a year in parentheses, try without the year
-        if ($videoId === 0 && preg_match('/^(.+?)\s*\(\d{4}\)$/', $cleanName, $yearMatch)) {
+        if ($videoId === 0 && preg_match('/^(.+?)\s*\(\d{4}\)$/', (string) $cleanName, $yearMatch)) {
             $nameWithoutYear = trim($yearMatch[1]);
             $videoId = $tmdb->getByTitle($nameWithoutYear, self::TYPE_TV, self::SOURCE_TMDB);
         }
@@ -93,14 +95,14 @@ class TmdbPipe extends AbstractTvProviderPipe
             $tmdbShow = $tmdb->getShowInfo((string) $cleanName);
 
             // If not found and cleanName contains a year in parentheses, try without the year
-            if ($tmdbShow === false && preg_match('/^(.+?)\s*\(\d{4}\)$/', $cleanName, $yearMatch)) {
+            if ($tmdbShow === false && preg_match('/^(.+?)\s*\(\d{4}\)$/', (string) $cleanName, $yearMatch)) {
                 $nameWithoutYear = trim($yearMatch[1]);
                 $tmdbShow = $tmdb->getShowInfo($nameWithoutYear);
             }
 
             if (is_array($tmdbShow)) {
                 // Check if we have a valid country
-                if (isset($parsedInfo['country']) && strlen($parsedInfo['country']) === 2) {
+                if (isset($parsedInfo['country']) && strlen((string) $parsedInfo['country']) === 2) {
                     $tmdbShow['country'] = $parsedInfo['country'];
                 }
                 $videoId = $tmdb->add($tmdbShow);

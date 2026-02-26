@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Support;
 
 use PragmaRX\Google2FALaravel\Exceptions\InvalidSecretKey;

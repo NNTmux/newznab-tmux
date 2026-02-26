@@ -19,12 +19,6 @@ parameters:
 			path: app/Console/Commands/NntmuxResetPostProcessing.php
 
 		-
-			message: '#^Function getUserBrowseOrder\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Extensions/helper/helpers.php
-
-		-
 			message: '#^Class App\\Facades\\Elasticsearch has PHPDoc tag @method for method bulk\(\) parameter \#1 \$params with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1

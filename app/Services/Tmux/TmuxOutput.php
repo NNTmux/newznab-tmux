@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Tmux;
 
 use Illuminate\Support\Facades\Process;
@@ -186,7 +188,7 @@ class TmuxOutput extends Tmux
         $buffer .= sprintf(
             $this->tmpMasks[1],
             'Parts in Repair:',
-            number_format($this->runVar['counts']['now']['missed_parts_table'])
+            number_format((int) ($this->runVar['counts']['now']['missed_parts_table'] ?? 0))
         );
 
         if (((int) $this->runVar['settings']['post'] === 1 || (int) $this->runVar['settings']['post'] === 3) && (int) $this->runVar['constants']['sequential'] !== 2) {
@@ -213,12 +215,12 @@ class TmuxOutput extends Tmux
             'Nfo',
             sprintf(
                 '%s(%s)',
-                number_format($this->runVar['counts']['now']['processnfo']),
+                number_format((int) ($this->runVar['counts']['now']['processnfo'] ?? 0)),
                 $this->runVar['counts']['diff']['processnfo']
             ),
             sprintf(
                 '%s(%d%%)',
-                number_format($this->runVar['counts']['now']['nfo']),
+                number_format((int) ($this->runVar['counts']['now']['nfo'] ?? 0)),
                 $this->runVar['counts']['percent']['nfo']
             )
         );
@@ -227,13 +229,13 @@ class TmuxOutput extends Tmux
             'PreDB',
             sprintf(
                 '%s(%s)',
-                number_format($this->runVar['counts']['now']['predb'] -
-                    $this->runVar['counts']['now']['distinct_predb_matched']),
+                number_format((int) ($this->runVar['counts']['now']['predb'] ?? 0) -
+                    (int) ($this->runVar['counts']['now']['distinct_predb_matched'] ?? 0)),
                 $this->runVar['counts']['diff']['distinct_predb_matched']
             ),
             sprintf(
                 '%s(%d%%)',
-                number_format($this->runVar['counts']['now']['predb_matched']),
+                number_format((int) ($this->runVar['counts']['now']['predb_matched'] ?? 0)),
                 $this->runVar['counts']['percent']['predb_matched']
             )
         );
@@ -242,12 +244,12 @@ class TmuxOutput extends Tmux
             'Renames',
             sprintf(
                 '%s(%s)',
-                number_format($this->runVar['counts']['now']['processrenames']),
+                number_format((int) ($this->runVar['counts']['now']['processrenames'] ?? 0)),
                 $this->runVar['counts']['diff']['processrenames']
             ),
             sprintf(
                 '%s(%d%%)',
-                number_format($this->runVar['counts']['now']['renamed']),
+                number_format((int) ($this->runVar['counts']['now']['renamed'] ?? 0)),
                 $this->runVar['counts']['percent']['renamed']
             )
         );
@@ -261,12 +263,12 @@ class TmuxOutput extends Tmux
             'Audio',
             sprintf(
                 '%s(%s)',
-                number_format($this->runVar['counts']['now']['processmusic']),
+                number_format((int) ($this->runVar['counts']['now']['processmusic'] ?? 0)),
                 $this->runVar['counts']['diff']['processmusic']
             ),
             sprintf(
                 '%s(%d%%)',
-                number_format($this->runVar['counts']['now']['audio']),
+                number_format((int) ($this->runVar['counts']['now']['audio'] ?? 0)),
                 $this->runVar['counts']['percent']['audio']
             )
         );
@@ -275,12 +277,12 @@ class TmuxOutput extends Tmux
             'Books',
             sprintf(
                 '%s(%s)',
-                number_format($this->runVar['counts']['now']['processbooks']),
+                number_format((int) ($this->runVar['counts']['now']['processbooks'] ?? 0)),
                 $this->runVar['counts']['diff']['processbooks']
             ),
             sprintf(
                 '%s(%d%%)',
-                number_format($this->runVar['counts']['now']['books']),
+                number_format((int) ($this->runVar['counts']['now']['books'] ?? 0)),
                 $this->runVar['counts']['percent']['books']
             )
         );
@@ -289,12 +291,12 @@ class TmuxOutput extends Tmux
             'Console',
             sprintf(
                 '%s(%s)',
-                number_format($this->runVar['counts']['now']['processconsole']),
+                number_format((int) ($this->runVar['counts']['now']['processconsole'] ?? 0)),
                 $this->runVar['counts']['diff']['processconsole']
             ),
             sprintf(
                 '%s(%d%%)',
-                number_format($this->runVar['counts']['now']['console']),
+                number_format((int) ($this->runVar['counts']['now']['console'] ?? 0)),
                 $this->runVar['counts']['percent']['console']
             )
         );
@@ -303,12 +305,12 @@ class TmuxOutput extends Tmux
             'Misc',
             sprintf(
                 '%s(%s)',
-                number_format($this->runVar['counts']['now']['work']),
+                number_format((int) ($this->runVar['counts']['now']['work'] ?? 0)),
                 $this->runVar['counts']['diff']['work']
             ),
             sprintf(
                 '%s(%d%%)',
-                number_format($this->runVar['counts']['now']['misc']),
+                number_format((int) ($this->runVar['counts']['now']['misc'] ?? 0)),
                 $this->runVar['counts']['percent']['misc']
             )
         );
@@ -317,12 +319,12 @@ class TmuxOutput extends Tmux
             'Movie',
             sprintf(
                 '%s(%s)',
-                number_format($this->runVar['counts']['now']['processmovies']),
+                number_format((int) ($this->runVar['counts']['now']['processmovies'] ?? 0)),
                 $this->runVar['counts']['diff']['processmovies']
             ),
             sprintf(
                 '%s(%d%%)',
-                number_format($this->runVar['counts']['now']['movies']),
+                number_format((int) ($this->runVar['counts']['now']['movies'] ?? 0)),
                 $this->runVar['counts']['percent']['movies']
             )
         );
@@ -331,12 +333,12 @@ class TmuxOutput extends Tmux
             'PC',
             sprintf(
                 '%s(%s)',
-                number_format($this->runVar['counts']['now']['processgames']),
+                number_format((int) ($this->runVar['counts']['now']['processgames'] ?? 0)),
                 $this->runVar['counts']['diff']['processgames']
             ),
             sprintf(
                 '%s(%d%%)',
-                number_format($this->runVar['counts']['now']['pc']),
+                number_format((int) ($this->runVar['counts']['now']['pc'] ?? 0)),
                 $this->runVar['counts']['percent']['pc']
             )
         );
@@ -345,12 +347,12 @@ class TmuxOutput extends Tmux
             'TV',
             sprintf(
                 '%s(%s)',
-                number_format($this->runVar['counts']['now']['processtv']),
+                number_format((int) ($this->runVar['counts']['now']['processtv'] ?? 0)),
                 $this->runVar['counts']['diff']['processtv']
             ),
             sprintf(
                 '%s(%d%%)',
-                number_format($this->runVar['counts']['now']['tv']),
+                number_format((int) ($this->runVar['counts']['now']['tv'] ?? 0)),
                 $this->runVar['counts']['percent']['tv']
             )
         );
@@ -364,7 +366,7 @@ class TmuxOutput extends Tmux
             ),
             sprintf(
                 '%s(%d%%)',
-                number_format($this->runVar['counts']['now']['xxx'] ?? 0),
+                number_format((int) ($this->runVar['counts']['now']['xxx'] ?? 0)),
                 $this->runVar['counts']['percent']['xxx'] ?? 0
             )
         );
@@ -375,12 +377,12 @@ class TmuxOutput extends Tmux
             'Total',
             sprintf(
                 '%s(%s)',
-                number_format($this->runVar['counts']['now']['total_work']),
+                number_format((int) ($this->runVar['counts']['now']['total_work'] ?? 0)),
                 $this->runVar['counts']['diff']['total_work']
             ),
             sprintf(
                 '%s(%s)',
-                number_format($this->runVar['counts']['now']['releases']),
+                number_format((int) ($this->runVar['counts']['now']['releases'] ?? 0)),
                 $this->runVar['counts']['diff']['releases']
             )
         );
@@ -507,9 +509,9 @@ class TmuxOutput extends Tmux
         $buffer .= $this->_getSeparator();
         $buffer .= sprintf(
             $this->tmpMasks[5],
-            number_format($this->runVar['counts']['now']['collections_table']),
-            number_format($this->runVar['counts']['now']['binaries_table']),
-            number_format($this->runVar['counts']['now']['parts_table'])
+            number_format((int) ($this->runVar['counts']['now']['collections_table'] ?? 0)),
+            number_format((int) ($this->runVar['counts']['now']['binaries_table'] ?? 0)),
+            number_format((int) ($this->runVar['counts']['now']['parts_table'] ?? 0))
         );
 
         return $buffer;

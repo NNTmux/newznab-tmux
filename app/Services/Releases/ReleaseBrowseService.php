@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Releases;
 
 use App\Facades\Search;
@@ -399,13 +401,13 @@ class ReleaseBrowseService
 
     public static function bumpCacheVersion(): void
     {
-        $current = Cache::get(self::CACHE_VERSION_KEY, 1);
+        $current = (int) Cache::get(self::CACHE_VERSION_KEY, 1);
         Cache::forever(self::CACHE_VERSION_KEY, $current + 1);
     }
 
     private function getCacheVersion(): int
     {
-        return Cache::get(self::CACHE_VERSION_KEY, 1);
+        return (int) Cache::get(self::CACHE_VERSION_KEY, 1);
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\TvProcessing\Pipes;
 
 use App\Services\TvProcessing\Providers\TraktProvider;
@@ -67,7 +69,7 @@ class TraktPipe extends AbstractTvProviderPipe
         $videoId = $trakt->getByTitle($cleanName, self::TYPE_TV, self::SOURCE_TRAKT);
 
         // If not found and cleanName contains a year in parentheses, try without the year
-        if ($videoId === 0 && preg_match('/^(.+?)\s*\(\d{4}\)$/', $cleanName, $yearMatch)) {
+        if ($videoId === 0 && preg_match('/^(.+?)\s*\(\d{4}\)$/', (string) $cleanName, $yearMatch)) {
             $nameWithoutYear = trim($yearMatch[1]);
             $videoId = $trakt->getByTitle($nameWithoutYear, self::TYPE_TV, self::SOURCE_TRAKT);
         }
@@ -92,7 +94,7 @@ class TraktPipe extends AbstractTvProviderPipe
             $traktShow = $trakt->getShowInfo((string) $cleanName);
 
             // If not found and cleanName contains a year in parentheses, try without the year
-            if ($traktShow === false && preg_match('/^(.+?)\s*\(\d{4}\)$/', $cleanName, $yearMatch)) {
+            if ($traktShow === false && preg_match('/^(.+?)\s*\(\d{4}\)$/', (string) $cleanName, $yearMatch)) {
                 $nameWithoutYear = trim($yearMatch[1]);
                 $traktShow = $trakt->getShowInfo($nameWithoutYear);
             }

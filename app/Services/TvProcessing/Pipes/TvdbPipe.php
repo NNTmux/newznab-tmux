@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\TvProcessing\Pipes;
 
 use App\Services\FanartTvService;
@@ -69,7 +71,7 @@ class TvdbPipe extends AbstractTvProviderPipe
         $videoId = $tvdb->getByTitle($cleanName, self::TYPE_TV);
 
         // If not found and cleanName contains a year in parentheses, try without the year
-        if ($videoId === 0 && preg_match('/^(.+?)\s*\(\d{4}\)$/', $cleanName, $yearMatch)) {
+        if ($videoId === 0 && preg_match('/^(.+?)\s*\(\d{4}\)$/', (string) $cleanName, $yearMatch)) {
             $nameWithoutYear = trim($yearMatch[1]);
             $videoId = $tvdb->getByTitle($nameWithoutYear, self::TYPE_TV);
         }
@@ -89,7 +91,7 @@ class TvdbPipe extends AbstractTvProviderPipe
 
         // Check if we have a valid country
         $country = (
-            isset($parsedInfo['country']) && strlen($parsedInfo['country']) === 2
+            isset($parsedInfo['country']) && strlen((string) $parsedInfo['country']) === 2
                 ? (string) $parsedInfo['country']
                 : ''
         );
@@ -101,7 +103,7 @@ class TvdbPipe extends AbstractTvProviderPipe
             $tvdbShow = $tvdb->getShowInfo((string) $cleanName);
 
             // If not found and cleanName contains a year in parentheses, try without the year
-            if ($tvdbShow === false && preg_match('/^(.+?)\s*\(\d{4}\)$/', $cleanName, $yearMatch)) {
+            if ($tvdbShow === false && preg_match('/^(.+?)\s*\(\d{4}\)$/', (string) $cleanName, $yearMatch)) {
                 $nameWithoutYear = trim($yearMatch[1]);
                 $tvdbShow = $tvdb->getShowInfo($nameWithoutYear);
             }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Models\Release;
@@ -90,10 +92,10 @@ class FindSizeMismatchedReleases extends Command
             return [
                 $release->id,
                 $release->searchname,
-                number_format($release->release_size, 2).' GiB',
-                number_format($release->files_total_size, 2).' GiB',
-                number_format($release->size_diff, 2).' GiB',
-                number_format($release->diff_percent, 2).'%',
+                number_format((float) ($release->release_size ?? 0), 2).' GiB',
+                number_format((float) ($release->files_total_size ?? 0), 2).' GiB',
+                number_format((float) ($release->size_diff ?? 0), 2).' GiB',
+                number_format((float) ($release->diff_percent ?? 0), 2).'%',
             ];
         });
 

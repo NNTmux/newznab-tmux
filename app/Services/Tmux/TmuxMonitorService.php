@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Tmux;
 
 use App\Models\Category;
@@ -232,7 +234,7 @@ class TmuxMonitorService
             $maxSize = $this->runVar['settings']['maxsize_pp'] ?? '';
             $minSize = $this->runVar['settings']['minsize_pp'] ?? '';
 
-            $proc2Query = $this->tmux->proc_query(2, $bookReqIds, $dbName, $maxSize, $minSize);
+            $proc2Query = $this->tmux->proc_query(2, $bookReqIds, $dbName, (string) $maxSize, (string) $minSize);
             $proc2Result = DB::selectOne($proc2Query);
 
             if ($proc2Result) {
@@ -348,8 +350,8 @@ class TmuxMonitorService
 
         // Calculate diffs
         foreach ($this->runVar['counts']['now'] as $key => $value) {
-            $startValue = $this->runVar['counts']['start'][$key] ?? 0;
-            $this->runVar['counts']['diff'][$key] = number_format($value - $startValue);
+            $startValue = (int) ($this->runVar['counts']['start'][$key] ?? 0);
+            $this->runVar['counts']['diff'][$key] = number_format((int) $value - $startValue);
         }
 
         // Calculate percentages for category counts (as % of total categorized releases)
@@ -358,13 +360,13 @@ class TmuxMonitorService
         // Sum all category counts to get the true total
         $totalCategorized = 0;
         foreach ($categoryKeys as $key) {
-            $totalCategorized += $this->runVar['counts']['now'][$key] ?? 0;
+            $totalCategorized += (int) ($this->runVar['counts']['now'][$key] ?? 0);
         }
 
         foreach ($categoryKeys as $key) {
-            $value = $this->runVar['counts']['now'][$key] ?? 0;
+            $value = (int) ($this->runVar['counts']['now'][$key] ?? 0);
             $this->runVar['counts']['percent'][$key] = $totalCategorized > 0
-                ? sprintf('%02d', floor(($value / $totalCategorized) * 100))
+                ? sprintf('%02d', (int) floor(($value / $totalCategorized) * 100))
                 : 0;
         }
 

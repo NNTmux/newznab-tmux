@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Category;
@@ -38,7 +40,7 @@ class MovieController extends BasePageController
         $catarray = $category !== -1 ? [$category] : [];
 
         $page = $request->input('page', 1);
-        $offset = ($page - 1) * config('nntmux.items_per_cover_page');
+        $offset = ($page - 1) * (int) config('nntmux.items_per_cover_page');
 
         $orderby = $request->input('ob', '');
         $ordering = $this->movieBrowseService->getMovieOrdering();
@@ -46,9 +48,9 @@ class MovieController extends BasePageController
             $orderby = '';
         }
 
-        $rslt = $this->movieBrowseService->getMovieRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, -1, (array) $this->userdata->categoryexclusions);
+        $rslt = $this->movieBrowseService->getMovieRange($page, $catarray, $offset, (int) config('nntmux.items_per_cover_page'), $orderby, -1, (array) $this->userdata->categoryexclusions);
         $totalCount = $rslt->isNotEmpty() ? ($rslt[0]->_totalcount ?? 0) : 0;
-        $results = $this->paginate($rslt ?? [], $totalCount, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
+        $results = $this->paginate($rslt ?? [], $totalCount, (int) config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
         $movies = $results->map(function ($result) {
             $result->genre = makeFieldLinks($result, 'genre', 'movies');

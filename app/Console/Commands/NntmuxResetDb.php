@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Facades\Elasticsearch;
@@ -264,8 +266,9 @@ class NntmuxResetDb extends Command
 
             $files = File::allFiles(storage_path('covers/'));
             foreach ($files as $file) {
-                if (basename($file) !== '.gitignore' && basename($file) !== 'no-cover.jpg' && basename($file) !== 'no-backdrop.jpg') {
-                    File::delete($file);
+                $path = $file->getPathname();
+                if (basename($path) !== '.gitignore' && basename($path) !== 'no-cover.jpg' && basename($path) !== 'no-backdrop.jpg') {
+                    File::delete($path);
                 }
             }
 

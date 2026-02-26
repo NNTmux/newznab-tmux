@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Release;
@@ -8,15 +10,12 @@ use App\Models\UserDownload;
 use App\Models\UsersRelease;
 use App\Services\Nzb\NzbService;
 use Exception;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use ZipStream\ZipStream;
 
 class GetNzbController extends BasePageController
 {
@@ -27,11 +26,9 @@ class GetNzbController extends BasePageController
     /**
      * Download NZB file(s) for authenticated users
      *
-     * @return Application|ResponseFactory|\Illuminate\Foundation\Application|JsonResponse|Response|ZipStream|StreamedResponse
-     *
      * @throws Exception
      */
-    public function getNzb(Request $request, ?string $guid = null)
+    public function getNzb(Request $request, ?string $guid = null): JsonResponse|Response|StreamedResponse|\STS\ZipStream\Builder
     {
         // Normalize guid parameter
         $this->normalizeGuidParameter($request, $guid);
@@ -80,7 +77,7 @@ class GetNzbController extends BasePageController
      *
      * @return array<string, mixed>|Response
      */
-    private function authenticateUser(Request $request)
+    private function authenticateUser(Request $request): array|Response
     {
         // Try session authentication first
         if ($request->user()) {
@@ -96,7 +93,7 @@ class GetNzbController extends BasePageController
      *
      * @return array<string, mixed>|Response
      */
-    private function getUserDataFromSession()
+    private function getUserDataFromSession(): array|Response
     {
         if ($this->userdata->hasRole('Disabled')) {
             return showApiError(101);
@@ -115,7 +112,7 @@ class GetNzbController extends BasePageController
      *
      * @return array<string, mixed>|Response
      */
-    private function getUserDataFromRssToken(Request $request)
+    private function getUserDataFromRssToken(Request $request): array|Response
     {
         if ($request->missing('r')) {
             return showApiError(200);
@@ -141,11 +138,10 @@ class GetNzbController extends BasePageController
     /**
      * Check if user has exceeded download limits
      *
-     * @return Response|null
      *
      * @throws Exception
      */
-    private function checkDownloadLimit(int $uid, int $maxDownloads): mixed
+    private function checkDownloadLimit(int $uid, int $maxDownloads): ?Response
     {
         $requests = UserDownload::getDownloadRequests($uid);
         if ($requests > $maxDownloads) {
@@ -157,10 +153,8 @@ class GetNzbController extends BasePageController
 
     /**
      * Validate and sanitize the release ID parameter
-     *
-     * @return string|Response
      */
-    private function validateAndSanitizeId(Request $request)
+    private function validateAndSanitizeId(Request $request): string|Response
     {
         $id = $request->input('id');
 
@@ -186,8 +180,6 @@ class GetNzbController extends BasePageController
     /**
      * Handle zip download of multiple releases
      *
-     * @return JsonResponse|ZipStream|StreamedResponse|\STS\ZipStream\Builder
-     *
      * @throws Exception
      */
     private function handleZipDownload(
@@ -196,7 +188,7 @@ class GetNzbController extends BasePageController
         string $userName,
         int $maxDownloads,
         string $releaseId
-    ) {
+    ): JsonResponse|StreamedResponse|\STS\ZipStream\Builder {
         $guids = explode(',', $releaseId);
         $guidCount = \count($guids);
 
@@ -206,13 +198,13 @@ class GetNzbController extends BasePageController
             return showApiError(501);
         }
 
-        $zip = getStreamingZip($guids); // @phpstan-ignore argument.type
+        $zip = getStreamingZip($guids);
         if ($zip === '') { // @phpstan-ignore identical.alwaysFalse
             return response()->json(['message' => 'Unable to create .zip file'], 404);
         }
 
         // Update statistics
-        $this->updateZipDownloadStatistics($request, $uid, $guids); // @phpstan-ignore argument.type
+        $this->updateZipDownloadStatistics($request, $uid, $guids);
 
         Log::channel('zipped')->info("User {$userName} downloaded zipped files from site with IP: {$request->ip()}");
 
@@ -222,7 +214,7 @@ class GetNzbController extends BasePageController
     /**
      * Update statistics for zip downloads
      *
-     * @param  array<string, mixed>  $guids
+     * @param  list<string>  $guids
      */
     private function updateZipDownloadStatistics(Request $request, int $uid, array $guids): void
     {
@@ -243,15 +235,13 @@ class GetNzbController extends BasePageController
 
     /**
      * Handle single NZB file download
-     *
-     * @return Response|StreamedResponse
      */
     private function handleSingleNzbDownload(
         Request $request,
         int $uid,
         string $rssToken,
         string $releaseId
-    ) {
+    ): Response|StreamedResponse {
         // Get NZB file path and validate
         $nzbPath = app(NzbService::class)->getNzbPath($releaseId);
         if (! File::exists($nzbPath)) {

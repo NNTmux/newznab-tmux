@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
@@ -46,7 +48,7 @@ class AdminUserController extends BasePageController
 
         $result = User::getRange(
             $offset,
-            config('nntmux.items_per_page'),
+            (int) config('nntmux.items_per_page'),
             $orderBy,
             $variables['username'],
             $variables['email'],

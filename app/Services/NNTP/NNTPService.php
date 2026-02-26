@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\NNTP;
 
 use App\Models\Settings;
@@ -922,11 +924,11 @@ class NNTPService extends NntpClient
      * Have we failed to decompress the data, was there a
      * problem downloading the data, etc..
      *
-     * @return array<string, mixed>|string On success : (array)  The headers.
-     *                                     On failure : (object) DariusIII\NetNntp\Error.
-     *                                     On decompress failure: (string) error message
+     * @return array<string, mixed>|string|NntpError On success : (array)  The headers.
+     *                                               On failure : (object) DariusIII\NetNntp\Error.
+     *                                               On decompress failure: (string) error message
      */
-    protected function &_getXFeatureTextResponse(): array|string
+    protected function &_getXFeatureTextResponse(): array|string|NntpError
     {
         $possibleTerm = false;
         // Use array accumulation for better performance with large data

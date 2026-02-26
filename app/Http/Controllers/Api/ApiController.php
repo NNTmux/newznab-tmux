@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
 use App\Events\UserAccessedApi;
@@ -107,7 +109,7 @@ class ApiController extends BasePageController
             $apiKey = $request->input('apikey');
 
             // Cache user lookup for 5 minutes to avoid repeated DB hits (same pattern as API v2)
-            $userCacheKey = 'api_user:'.md5($apiKey);
+            $userCacheKey = 'api_user:'.md5((string) $apiKey);
             $res = Cache::remember($userCacheKey, 300, function () use ($apiKey) {
                 return User::query()
                     ->where('api_token', $apiKey)
@@ -358,7 +360,7 @@ class ApiController extends BasePageController
                 $nzbFile = $request->file('file');
 
                 // Save the file to the server, get the name without the extension.
-                if (File::isFile($nzbFile)) {
+                if ($nzbFile !== null) {
                     // We need to check if file is an actual nzb file.
                     if ($nzbFile->getClientOriginalExtension() !== 'nzb') {
                         return response('File is not an NZB file', 400);
@@ -379,7 +381,7 @@ class ApiController extends BasePageController
 
                     Log::channel('nzb_upload')->warning('NZB file uploaded by API failed: '.$nzbFile->getClientOriginalName());
                 } else {
-                    Log::channel('nzb_upload')->warning('NZB file uploaded by API failed: '.$nzbFile->getClientOriginalName());
+                    Log::channel('nzb_upload')->warning('NZB file uploaded by API failed: no file provided');
 
                     return response('NZB file upload failed', 500);
                 }

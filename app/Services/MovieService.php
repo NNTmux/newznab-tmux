@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use aharen\OMDbAPI;
@@ -22,6 +24,9 @@ use Illuminate\Support\Str;
 class MovieService
 {
     protected const MATCH_PERCENT = 75;
+
+    /** Lower threshold when year matches exactly; allows matching by alternate title (e.g. "Girl Cops" vs primary). */
+    protected const MATCH_PERCENT_ALT_TITLE = 55;
 
     protected const YEAR_MATCH_PERCENT = 80;
 
@@ -214,22 +219,22 @@ class MovieService
      * @param  array<string, mixed>  $variable5
      * @return array<string, mixed>
      */
-    protected function setVariables(string|array $variable1, string|array $variable2, string|array $variable3, string|array $variable4, string|array $variable5 = ''): array|string
+    protected function setVariables(string|array|int|float $variable1, string|array|int|float $variable2, string|array|int|float $variable3, string|array|int|float $variable4, string|array|int|float $variable5 = ''): array|string
     {
         if (! empty($variable1)) {
-            return $variable1;
+            return is_array($variable1) ? $variable1 : (string) $variable1;
         }
         if (! empty($variable2)) {
-            return $variable2;
+            return is_array($variable2) ? $variable2 : (string) $variable2;
         }
         if (! empty($variable3)) {
-            return $variable3;
+            return is_array($variable3) ? $variable3 : (string) $variable3;
         }
         if (! empty($variable4)) {
-            return $variable4;
+            return is_array($variable4) ? $variable4 : (string) $variable4;
         }
         if (! empty($variable5)) {
-            return $variable5;
+            return is_array($variable5) ? $variable5 : (string) $variable5;
         }
 
         return '';
@@ -263,7 +268,7 @@ class MovieService
             return false;
         }
         foreach ($query as $key => $value) {
-            $query[$key] = rtrim($value, ', ');
+            $query[$key] = rtrim((string) $value, ', ');
         }
 
         MovieInfo::upsert($query, ['imdbid'], $onDuplicateKey);
@@ -549,9 +554,25 @@ class MovieService
             if ($this->currentTitle !== '' && ! empty($title)) {
                 similar_text($this->currentTitle, $title, $percent);
                 if ($percent < self::MATCH_PERCENT) {
-                    Cache::put($cacheKey, false, $expiresAt);
+                    $tmdbId = TmdbClient::getInt($tmdbLookup, 'id');
+                    $altTitles = $tmdbId > 0 ? $tmdbClient->getMovieAlternativeTitles($tmdbId) : null;
+                    $titles = is_array($altTitles) ? ($altTitles['titles'] ?? []) : [];
+                    $matched = false;
+                    foreach ($titles as $alt) {
+                        $altTitle = is_array($alt) ? ($alt['title'] ?? '') : '';
+                        if ($altTitle !== '') {
+                            similar_text($this->currentTitle, $altTitle, $altPercent);
+                            if ($altPercent >= self::MATCH_PERCENT) {
+                                $matched = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (! $matched) {
+                        Cache::put($cacheKey, false, $expiresAt);
 
-                    return false;
+                        return false;
+                    }
                 }
             }
 
@@ -907,7 +928,7 @@ class MovieService
 
                     if ($movCheck === null ||
                         (isset($movCheck['updated_at']) &&
-                            (time() - strtotime($movCheck['updated_at'])) > $thirtyDaysInSeconds)) {
+                            (time() - strtotime((string) $movCheck['updated_at'])) > $thirtyDaysInSeconds)) {
 
                         $info = $this->updateMovieInfo($imdbId);
 
@@ -980,7 +1001,7 @@ class MovieService
                     continue;
                 }
 
-                $this->currentRelID = $arr['id'];
+                $this->currentRelID = (string) $arr['id'];
                 $movieName = $this->formatMovieName();
 
                 if ($this->echooutput) {
@@ -1066,14 +1087,17 @@ class MovieService
                     continue;
                 }
                 similar_text($title, $this->currentTitle, $percent);
-                if ($percent < self::MATCH_PERCENT) {
+                $yearMatches = empty($this->currentYear) || empty($match['year']);
+                if (! $yearMatches) {
+                    similar_text($this->currentYear, $match['year'], $yearPercent);
+                    $yearMatches = $yearPercent >= self::YEAR_MATCH_PERCENT;
+                }
+                $titleMatchThreshold = $yearMatches ? self::MATCH_PERCENT_ALT_TITLE : self::MATCH_PERCENT;
+                if ($percent < $titleMatchThreshold) {
                     continue;
                 }
-                if (! empty($this->currentYear) && ! empty($match['year'])) {
-                    similar_text($this->currentYear, $match['year'], $yearPercent);
-                    if ($yearPercent < self::YEAR_MATCH_PERCENT) {
-                        continue;
-                    }
+                if (! $yearMatches) {
+                    continue;
                 }
                 $imdbId = $this->doMovieUpdate('tt'.$match['imdbid'], 'IMDb(scrape)', $releaseId);
                 if ($imdbId !== false) {
@@ -1099,6 +1123,15 @@ class MovieService
             $buffer = $this->currentYear !== ''
                 ? $this->omdbApi->search($omdbTitle, 'movie', $this->currentYear)
                 : $this->omdbApi->search($omdbTitle, 'movie');
+
+            if ($this->currentYear !== '' && (
+                ! is_object($buffer) ||
+                $buffer->message !== 'OK' ||
+                ($buffer->data->Response ?? '') !== 'True' ||
+                empty($buffer->data->Search[0]->imdbID ?? null)
+            )) {
+                $buffer = $this->omdbApi->search($omdbTitle, 'movie');
+            }
 
             if (! is_object($buffer) ||
                 $buffer->message !== 'OK' ||
@@ -1153,7 +1186,8 @@ class MovieService
                 return false;
             }
 
-            $data = $tmdbClient->searchMovies($this->currentTitle);
+            $year = $this->currentYear !== '' ? $this->currentYear : null;
+            $data = $tmdbClient->searchMovies($this->currentTitle, 1, $year);
 
             if ($data === null || empty($data['total_results']) || empty($data['results'])) {
                 return false;
@@ -1249,8 +1283,23 @@ class MovieService
         return false;
     }
 
+    /**
+     * Normalize release searchname before movie title/year parsing.
+     * Replaces dots and underscores with spaces so patterns like "Title_2024" or "Title.Year.2024"
+     * can be matched by the name+year regex (which expects a non-word character before the year).
+     */
+    protected function cleanReleaseNameForMovieLookup(string $searchname): string
+    {
+        $s = str_replace(['.', '_'], ' ', $searchname);
+        $s = trim(preg_replace('/\s{2,}/', ' ', $s));
+
+        return $s;
+    }
+
     protected function parseMovieSearchName(string $releaseName): bool
     {
+        $releaseName = $this->cleanReleaseNameForMovieLookup($releaseName);
+
         if (empty(trim($releaseName))) {
             return false;
         }

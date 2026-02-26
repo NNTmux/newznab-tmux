@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\TvProcessing\Providers;
 
 use App\Models\Category;
@@ -199,7 +201,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         // if that fails be sure we're not inserting duplicates by checking the title
         foreach ($this->siteColumns as $column) {
             if ((int) $show[$column] > 0) {
-                $videoId = $this->getVideoIDFromSiteID($column, $show[$column]);
+                $videoId = $this->getVideoIDFromSiteID($column, (int) $show[$column]);
             }
             if ($videoId !== false) {
                 break;
@@ -362,7 +364,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         if ($series > 0 && $episode > 0) {
             $queryString = sprintf('tve.series = %d AND tve.episode = %d', $series, $episode);
         } elseif (! empty($airdate)) {
-            $queryString = sprintf('DATE(tve.firstaired) = %s', escapeString(date('Y-m-d', strtotime($airdate))));
+            $queryString = sprintf('DATE(tve.firstaired) = %s', escapeString(date('Y-m-d', strtotime((string) $airdate))));
         } else {
             return false;
         }

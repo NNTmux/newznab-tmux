@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\TvProcessing\Providers;
 
 use App\Services\ReleaseImageService;
@@ -93,7 +95,7 @@ class TmdbProvider extends AbstractTvProvider
 
                         if (is_array($tmdbShow)) {
                             // Check if we have the TMDB ID already, if we do use that Video ID
-                            $dupeCheck = $this->getVideoIDFromSiteID('tvdb', $tmdbShow['tvdb']);
+                            $dupeCheck = $this->getVideoIDFromSiteID('tvdb', (int) $tmdbShow['tvdb']);
                             if ($dupeCheck === false) {
                                 $videoId = $this->add($tmdbShow);
                                 $siteId = $tmdbShow['tmdb'];
@@ -118,8 +120,8 @@ class TmdbProvider extends AbstractTvProvider
                         // Now that we have valid video and tmdb ids, try to get the poster
                         $this->getPoster($videoId);
 
-                        $seriesNo = preg_replace('/^S0*/i', '', $release['season']);
-                        $episodeNo = preg_replace('/^E0*/i', '', $release['episode']);
+                        $seriesNo = preg_replace('/^S0*/i', '', (string) $release['season']);
+                        $episodeNo = preg_replace('/^E0*/i', '', (string) $release['episode']);
                         $hasAirdate = ! empty($release['airdate']);
 
                         if ($episodeNo === 'all') {
@@ -494,7 +496,7 @@ class TmdbProvider extends AbstractTvProvider
         $imdbId = 0;
         $externalIds = TmdbClient::getArray($show, 'external_ids');
         if (! empty($externalIds['imdb_id'])) {
-            preg_match('/tt(?P<imdbid>\d{6,8})$/i', $externalIds['imdb_id'], $imdb);
+            preg_match('/tt(?P<imdbid>\d{6,8})$/i', (string) $externalIds['imdb_id'], $imdb);
             $imdbId = $imdb['imdbid'] ?? 0;
         }
 

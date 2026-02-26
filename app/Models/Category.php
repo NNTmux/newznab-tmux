@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -304,13 +306,13 @@ class Category extends Model
     }
 
     /**
-     * @param  array<string, mixed>  $cat
-     * @return array<string, mixed>
+     * @param  array<int|string, mixed>  $cat  Category IDs (list or associative)
+     * @return array<string, mixed>|string|null
      */
     public static function getCategorySearch(array $cat = [], ?string $searchType = null, mixed $builder = false): string|array|null
     {
         // Generate a cache key based on the input parameters
-        $cacheKey = 'cat_search_'.md5(serialize($cat).$searchType.($builder ? '1' : '0'));
+        $cacheKey = 'cat_search_'.md5(serialize($cat).(string) ($searchType ?? '').($builder ? '1' : '0'));
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
@@ -433,13 +435,14 @@ class Category extends Model
     public static function getChildren(mixed $categoryId)
     {
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
-        $result = Cache::get(md5($categoryId));
+        $cacheKey = md5((string) $categoryId);
+        $result = Cache::get($cacheKey);
         if ($result !== null) {
             return $result;
         }
 
         $result = RootCategory::find($categoryId)->categories;
-        Cache::put(md5($categoryId), $result, $expiresAt);
+        Cache::put($cacheKey, $result, $expiresAt);
 
         return $result;
     }
@@ -469,13 +472,14 @@ class Category extends Model
     {
         if (\count($ids) > 0) {
             $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
-            $result = Cache::get(md5(implode(',', $ids)));
+            $idsKey = implode(',', array_map('strval', (array) $ids));
+            $result = Cache::get(md5($idsKey));
             if ($result !== null) {
                 return $result;
             }
             $result = self::query()->whereIn('id', $ids)->get();
 
-            Cache::put(md5(md5(implode(',', $ids))), $result, $expiresAt);
+            Cache::put(md5($idsKey), $result, $expiresAt);
 
             return $result;
         }

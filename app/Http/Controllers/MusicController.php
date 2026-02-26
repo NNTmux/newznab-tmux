@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Category;
@@ -41,13 +43,13 @@ class MusicController extends BasePageController
         $catarray[] = $category;
 
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
-        $offset = ($page - 1) * config('nntmux.items_per_cover_page');
+        $offset = ($page - 1) * (int) config('nntmux.items_per_cover_page');
         $ordering = $music->getMusicOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, true) ? $request->input('ob') : '';
 
         $musics = [];
-        $rslt = $music->getMusicRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, (array) $this->userdata->categoryexclusions); // @phpstan-ignore argument.type
-        $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
+        $rslt = $music->getMusicRange($page, $catarray, $offset, (int) config('nntmux.items_per_cover_page'), $orderby, (array) $this->userdata->categoryexclusions);
+        $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, (int) config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
         $artist = ($request->has('artist') && ! empty($request->input('artist'))) ? stripslashes($request->input('artist')) : '';
 

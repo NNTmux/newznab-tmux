@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\BookInfo;
@@ -93,7 +95,7 @@ class BookService
     /**
      * Get book range with pagination.
      *
-     * @param  array<string, mixed>  $cat
+     * @param  array<int|string, mixed>  $cat  Category IDs (list or associative)
      * @param  array<string, mixed>  $excludedCats
      */
     public function getBookRange(int $page, array $cat, int $start, int $num, string $orderBy, array $excludedCats = []): mixed
@@ -103,7 +105,7 @@ class BookService
 
         $browseby = $this->getBrowseBy();
         $catsrch = '';
-        if (\count($cat) > 0 && $cat[0] !== -1) { // @phpstan-ignore offsetAccess.notFound
+        if (\count($cat) > 0 && $cat[0] !== -1) {
             $catsrch = Category::getCategorySearch($cat);
         }
         $exccatlist = '';

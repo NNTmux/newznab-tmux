@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Category;
@@ -33,9 +35,9 @@ class GamesController extends BasePageController
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
         $ordering = $games->getGamesOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, true) ? $request->input('ob') : '';
-        $offset = ($page - 1) * config('nntmux.items_per_cover_page');
-        $rslt = $games->getGamesRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, '', (array) $this->userdata->categoryexclusions);
-        $results = $this->paginate($rslt, $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
+        $offset = ($page - 1) * (int) config('nntmux.items_per_cover_page');
+        $rslt = $games->getGamesRange($page, $catarray, $offset, (int) config('nntmux.items_per_cover_page'), $orderby, '', (array) $this->userdata->categoryexclusions);
+        $results = $this->paginate($rslt, $rslt[0]->_totalcount ?? 0, (int) config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
 

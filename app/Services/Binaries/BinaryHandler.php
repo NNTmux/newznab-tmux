@@ -56,7 +56,7 @@ final class BinaryHandler
             return $binaryId;
         }
 
-        $hash = md5($header['matches'][1].$header['From'].$groupId);
+        $hash = md5((string) ($header['matches'][1] ?? '').(string) ($header['From'] ?? '').(string) $groupId);
         $driver = DB::getDriverName();
 
         try {

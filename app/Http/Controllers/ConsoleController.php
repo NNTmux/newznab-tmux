@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Category;
@@ -52,11 +54,11 @@ class ConsoleController extends BasePageController
         $ordering = $this->consoleService->getConsoleOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
-        $offset = ($page - 1) * config('nntmux.items_per_cover_page');
+        $offset = ($page - 1) * (int) config('nntmux.items_per_cover_page');
 
         $consoles = [];
-        $rslt = $this->consoleService->getConsoleRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, (array) $this->userdata->categoryexclusions); // @phpstan-ignore argument.type
-        $results = $this->paginate($rslt, $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
+        $rslt = $this->consoleService->getConsoleRange($page, $catarray, $offset, (int) config('nntmux.items_per_cover_page'), $orderby, (array) $this->userdata->categoryexclusions);
+        $results = $this->paginate($rslt, $rslt[0]->_totalcount ?? 0, (int) config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
         $maxwords = 50;
         foreach ($results as $result) {

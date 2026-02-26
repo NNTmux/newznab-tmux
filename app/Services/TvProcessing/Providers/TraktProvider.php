@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\TvProcessing\Providers;
 
 use App\Services\ReleaseImageService;
@@ -125,8 +127,8 @@ class TraktProvider extends AbstractTvProvider
                         // Now that we have valid video and trakt ids, try to get the poster
                         // $this->getPoster($videoId, $traktid);
 
-                        $seasonNo = preg_replace('/^S0*/i', '', $release['season']);
-                        $episodeNo = preg_replace('/^E0*/i', '', $release['episode']);
+                        $seasonNo = preg_replace('/^S0*/i', '', (string) $release['season']);
+                        $episodeNo = preg_replace('/^E0*/i', '', (string) $release['episode']);
 
                         if ($episodeNo === 'all') {
                             // Set the video ID and leave episode 0
@@ -383,7 +385,7 @@ class TraktProvider extends AbstractTvProvider
      */
     public function formatShowInfo(mixed $show): array
     {
-        preg_match('/tt(?P<imdbid>\d{6,8})$/i', $show['ids']['imdb'], $imdb);
+        preg_match('/tt(?P<imdbid>\d{6,8})$/i', (string) ($show['ids']['imdb'] ?? ''), $imdb);
         $this->posterUrl = $show['images']['poster']['thumb'] ?? '';
         $this->fanartUrl = $show['images']['fanart']['thumb'] ?? '';
         $this->localizedTZ = $show['airs']['timezone'] ?? '';

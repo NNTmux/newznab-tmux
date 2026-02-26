@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Category;
@@ -135,7 +137,7 @@ class MyMoviesController extends BasePageController
 
                 $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
 
-                $offset = ($page - 1) * config('nntmux.items_per_cover_page');
+                $offset = ($page - 1) * (int) config('nntmux.items_per_cover_page');
 
                 $movies = UserMovie::getMovies($this->userdata->id);
                 /** @var array<string, string> $categories */
@@ -159,7 +161,7 @@ class MyMoviesController extends BasePageController
 
                 $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
 
-                $results = $this->movieBrowseService->getMovieRange($page, [], $offset, config('nntmux.items_per_cover_page'), $ordering, -1, (array) $this->userdata->categoryexclusions);
+                $results = $this->movieBrowseService->getMovieRange($page, [], $offset, (int) config('nntmux.items_per_cover_page'), $ordering, -1, (array) $this->userdata->categoryexclusions);
 
                 $this->viewData['covgroup'] = '';
 

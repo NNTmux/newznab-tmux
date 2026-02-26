@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
@@ -57,7 +59,7 @@ class AdminSiteController extends BasePageController
 
         // convert from a list to an array as we need to use an array, but the Settings table only saves strings
         $bookReqidsValue = Settings::settingValue('book_reqids') ?? '';
-        $books_selected = $bookReqidsValue !== '' ? explode(',', $bookReqidsValue) : [];
+        $books_selected = $bookReqidsValue !== '' ? explode(',', (string) $bookReqidsValue) : [];
 
         // convert from a string array to an int array, filtering out empty values
         $books_selected = array_map(fn ($value) => (int) trim($value), array_filter($books_selected));

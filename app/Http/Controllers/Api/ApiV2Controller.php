@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
 use App\Events\UserAccessedApi;
@@ -49,7 +51,7 @@ class ApiV2Controller extends BasePageController
         }
 
         $apiToken = $request->input('api_token');
-        $userCacheKey = 'api_user:'.md5($apiToken);
+        $userCacheKey = 'api_user:'.md5((string) $apiToken);
 
         return Cache::remember($userCacheKey, 300, function () use ($apiToken) {
             return User::query()

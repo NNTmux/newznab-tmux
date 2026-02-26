@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\TvProcessing\Pipes;
 
 use App\Services\TvProcessing\Providers\LocalDbProvider;
@@ -57,7 +59,7 @@ class LocalDbPipe extends AbstractTvProviderPipe
         $videoId = $localDb->getByTitle($cleanName, self::TYPE_TV, 0);
 
         // If not found and cleanName contains a year in parentheses, try without the year
-        if (($videoId === 0 || $videoId === false) && preg_match('/^(.+?)\s*\(\d{4}\)$/', $cleanName, $yearMatch)) {
+        if (($videoId === 0 || $videoId === false) && preg_match('/^(.+?)\s*\(\d{4}\)$/', (string) $cleanName, $yearMatch)) {
             $nameWithoutYear = trim($yearMatch[1]);
             $videoId = $localDb->getByTitle($nameWithoutYear, self::TYPE_TV, 0);
         }

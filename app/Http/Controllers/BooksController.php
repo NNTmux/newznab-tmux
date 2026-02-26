@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Category;
@@ -43,9 +45,9 @@ class BooksController extends BasePageController
 
         $books = [];
         $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
-        $offset = ($page - 1) * config('nntmux.items_per_cover_page');
-        $rslt = $bookService->getBookRange($page, $catarray, $offset, config('nntmux.items_per_cover_page'), $orderby, (array) $this->userdata->categoryexclusions); // @phpstan-ignore argument.type
-        $results = $this->paginate($rslt, $rslt[0]->_totalcount ?? 0, config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
+        $offset = ($page - 1) * (int) config('nntmux.items_per_cover_page');
+        $rslt = $bookService->getBookRange($page, $catarray, $offset, (int) config('nntmux.items_per_cover_page'), $orderby, (array) $this->userdata->categoryexclusions);
+        $results = $this->paginate($rslt, $rslt[0]->_totalcount ?? 0, (int) config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
         $maxwords = 50;
         foreach ($results as $result) {
             if (! empty($result->overview)) {

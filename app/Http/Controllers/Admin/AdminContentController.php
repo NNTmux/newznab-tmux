@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
@@ -81,7 +83,7 @@ class AdminContentController extends BasePageController
             default:
                 if ($request->has('id')) {
                     $meta_title = 'Content Edit';
-                    $id = $request->input('id');
+                    $id = (int) $request->input('id');
                     $content = $this->getContentById($id);
                 }
                 break;
