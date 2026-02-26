@@ -35,7 +35,7 @@ class RssController extends BasePageController
 
         $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
 
-        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 0);
+        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs((int) $request->input('num')) : 0);
 
         $relData = $rss->getMyMoviesRss($userNum, $user['user_id'], User::getCategoryExclusionById($user['user_id']));
 
@@ -55,8 +55,8 @@ class RssController extends BasePageController
         if (is_object($user)) {
             return $user;
         }
-        $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
-        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 0);
+        $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs((int) $request->input('airdate')) : -1;
+        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs((int) $request->input('num')) : 0);
         $relData = $rss->getShowsRss($userNum, $user['user_id'], User::getCategoryExclusionById($user['user_id']), $userAirDate);
         $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
 
@@ -76,8 +76,8 @@ class RssController extends BasePageController
         if (is_object($user)) {
             return $user;
         }
-        $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
-        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 0);
+        $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs((int) $request->input('airdate')) : -1;
+        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs((int) $request->input('num')) : 0);
         $userLimit = $request->has('limit') && is_numeric($request->input('limit')) ? $request->input('limit') : 100;
         $userShow = $userAnidb = -1;
         if ($request->has('show')) {
@@ -131,8 +131,8 @@ class RssController extends BasePageController
             return $user;
         }
         $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
-        $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
-        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 0);
+        $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs((int) $request->input('airdate')) : -1;
+        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs((int) $request->input('num')) : 0);
         $userLimit = $request->has('limit') && is_numeric($request->input('limit')) ? $request->input('limit') : 100;
         $userShow = $userAnidb = -1;
         if ($request->has('show')) {
@@ -163,8 +163,8 @@ class RssController extends BasePageController
             return $user;
         }
         $categoryId = explode(',', $request->input('id'));
-        $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs($request->input('airdate')) : -1;
-        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs($request->input('num')) : 0);
+        $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs((int) $request->input('airdate')) : -1;
+        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs((int) $request->input('num')) : 0);
         $userLimit = $request->has('limit') && is_numeric($request->input('limit')) ? $request->input('limit') : 100;
         $userShow = $userAnidb = -1;
         if ($request->has('show')) {
