@@ -39,7 +39,7 @@ class MovieController extends BasePageController
 
         $catarray = $category !== -1 ? [$category] : [];
 
-        $page = $request->input('page', 1);
+        $page = (int) $request->input('page', 1);
         $offset = ($page - 1) * (int) config('nntmux.items_per_cover_page');
 
         $orderby = $request->input('ob', '');
