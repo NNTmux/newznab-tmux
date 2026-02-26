@@ -338,14 +338,15 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     /**
      * @return Video|false|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model
      */
-    public function getSiteByID(string $column, int $id): \Illuminate\Database\Eloquent\Model|bool|\Illuminate\Database\Eloquent\Builder|Video // @phpstan-ignore missingType.generics
+    public function getSiteByID(string $column, int $id): \Illuminate\Database\Eloquent\Model|bool|\Illuminate\Database\Eloquent\Builder|Video|int|string // @phpstan-ignore missingType.generics
     {
         $return = false;
         $video = Video::query()->where('id', $id)->first([$column]);
         if ($column === '*') {
             $return = $video;
         } elseif ($column !== '*' && $video !== null) {
-            $return = $video[$column];
+            $value = $video[$column];
+            $return = ($value !== null && $value !== '') ? $value : false;
         }
 
         return $return;
