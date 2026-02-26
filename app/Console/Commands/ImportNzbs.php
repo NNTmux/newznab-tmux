@@ -52,7 +52,7 @@ class ImportNzbs extends Command
                 $deleteFailedNZB = false;
             }
             if ($this->option('source')) {
-                $source = $this->option('source');
+                $source = (int) $this->option('source');
             } else {
                 $source = 1;
             }
