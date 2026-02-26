@@ -132,7 +132,7 @@ class TvMazeProvider extends AbstractTvProvider
                             cli()->primaryOver(' → ');
                             cli()->info('Found in DB');
                         }
-                        $siteId = $this->getSiteIDFromVideoID('tvmaze', $videoId);
+                        $siteId = $this->getSiteIDFromVideoID('tvmaze', (int) $videoId);
                     }
 
                     if (is_numeric($videoId) && $videoId > 0 && is_numeric($siteId) && $siteId > 0) {

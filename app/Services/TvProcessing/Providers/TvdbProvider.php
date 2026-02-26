@@ -98,7 +98,7 @@ class TvdbProvider extends AbstractTvProvider
                 $videoId = $this->getByTitle($release['cleanname'], parent::TYPE_TV);
 
                 if ($videoId !== 0) {
-                    $siteId = $this->getSiteByID('tvdb', $videoId);
+                    $siteId = $this->getSiteByID('tvdb', (int) $videoId);
                 }
 
                 $lookupSetting = true;

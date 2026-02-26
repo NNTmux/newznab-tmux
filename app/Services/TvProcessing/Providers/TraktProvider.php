@@ -119,7 +119,7 @@ class TraktProvider extends AbstractTvProvider
                             cli()->primaryOver(' → ');
                             cli()->info('Found in DB');
                         }
-                        $traktid = $this->getSiteIDFromVideoID('trakt', $videoId);
+                        $traktid = $this->getSiteIDFromVideoID('trakt', (int) $videoId);
                         $this->localizedTZ = $this->getLocalZoneFromVideoID($videoId);
                     }
 

@@ -77,7 +77,7 @@ class TvdbPipe extends AbstractTvProviderPipe
         }
 
         if ($videoId !== 0) {
-            $siteId = $tvdb->getSiteByID('tvdb', $videoId);
+            $siteId = $tvdb->getSiteByID('tvdb', (int) $videoId);
             // If show exists in local DB but doesn't have a TVDB ID, use the existing video
             // and process episode matching without trying to search TVDB API
             if ($siteId === false || $siteId === 0) { // @phpstan-ignore identical.alwaysFalse

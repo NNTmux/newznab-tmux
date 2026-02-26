@@ -103,7 +103,7 @@ class TmdbProvider extends AbstractTvProvider
                                 $videoId = $dupeCheck;
                                 // Update any missing fields and add site IDs
                                 $this->update($videoId, $tmdbShow);
-                                $siteId = $this->getSiteIDFromVideoID('tmdb', $videoId);
+                                $siteId = $this->getSiteIDFromVideoID('tmdb', (int) $videoId);
                             }
                         }
                     } else {
@@ -113,7 +113,7 @@ class TmdbProvider extends AbstractTvProvider
                             cli()->primaryOver(' → ');
                             cli()->info('Found in DB');
                         }
-                        $siteId = $this->getSiteIDFromVideoID('tmdb', $videoId);
+                        $siteId = $this->getSiteIDFromVideoID('tmdb', (int) $videoId);
                     }
 
                     if (is_numeric($videoId) && $videoId > 0 && is_numeric($siteId) && $siteId > 0) {

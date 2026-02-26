@@ -75,7 +75,7 @@ class TraktPipe extends AbstractTvProviderPipe
         }
 
         if ($videoId !== 0) {
-            $siteId = $trakt->getSiteIDFromVideoID('trakt', $videoId);
+            $siteId = $trakt->getSiteIDFromVideoID('trakt', (int) $videoId);
             // If show exists in local DB but doesn't have a Trakt ID, use the existing video
             // and process episode matching without trying to search Trakt API
             if ($siteId === false || $siteId === 0) {

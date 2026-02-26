@@ -75,7 +75,7 @@ class TmdbPipe extends AbstractTvProviderPipe
         }
 
         if ($videoId !== 0) {
-            $siteId = $tmdb->getSiteByID('tmdb', $videoId);
+            $siteId = $tmdb->getSiteByID('tmdb', (int) $videoId);
             // If show exists in local DB with a TMDB ID, use it directly
             if ($siteId !== false && $siteId !== 0) { // @phpstan-ignore notIdentical.alwaysTrue
                 $this->outputFoundInDb($cleanName);
