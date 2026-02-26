@@ -1316,11 +1316,13 @@ class NameFixingService
 
     /**
      * Check if a release name looks like a season pack.
+     * Season packs have S01/S02 etc. without an episode (E01) suffix.
+     * Uses atomic group so "S02E07" matches "S02" then fails the (?!E\d+) lookahead
+     * instead of backtracking to "S0" and incorrectly matching.
      */
     public function isSeasonPack(string $name): bool
     {
-        // Season pack pattern: S01 without E01
-        return (bool) preg_match('/S\d{1,2}(?!E\d)/i', $name);
+        return (bool) preg_match('/S(?>\d{1,2})(?!E\d+)/i', $name);
     }
 
     /**
