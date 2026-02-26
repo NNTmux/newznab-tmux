@@ -27,6 +27,12 @@ class TraktService
 
     protected const ID_TYPES = ['imdb', 'tmdb', 'trakt', 'tvdb'];
 
+    /** Minimum seconds between requests to avoid rate limiting (Trakt/Cloudflare). */
+    protected const THROTTLE_SECONDS = 1;
+
+    /** Default backoff (seconds) when rate limited (429). */
+    protected const RATE_LIMIT_BACKOFF_SECONDS = 60;
+
     protected string $clientId;
 
     protected int $timeout;
@@ -41,6 +47,22 @@ class TraktService
         $this->timeout = (int) config('nntmux_api.trakttv_timeout', 30);
         $this->retryTimes = (int) config('nntmux_api.trakttv_retry_times', 3);
         $this->retryDelay = (int) config('nntmux_api.trakttv_retry_delay', 100);
+    }
+
+    /**
+     * Throttle requests: ensure minimum delay since last Trakt API call (global across workers).
+     */
+    protected function throttle(): void
+    {
+        $key = 'trakt_last_request_at';
+        $last = Cache::get($key);
+        if ($last !== null) {
+            $elapsed = microtime(true) - (float) $last;
+            if ($elapsed < self::THROTTLE_SECONDS) {
+                usleep((int) ((self::THROTTLE_SECONDS - $elapsed) * 1_000_000));
+            }
+        }
+        Cache::put($key, microtime(true), 10);
     }
 
     /**
@@ -67,12 +89,14 @@ class TraktService
 
     /**
      * Make a GET request to the Trakt API.
+     * Throttles requests, retries on transient failures, and on 429 (rate limit) backs off then retries once.
      *
      * @param  string  $endpoint  The API endpoint
      * @param  array<string, mixed>  $params  Query parameters
+     * @param  bool  $isRetryAfterRateLimit  Internal: true when this is the single retry after a 429
      * @return array<string, mixed>|null Response data or null on failure
      */
-    protected function get(string $endpoint, array $params = []): ?array
+    protected function get(string $endpoint, array $params = [], bool $isRetryAfterRateLimit = false): ?array
     {
         if (! $this->isConfigured()) {
             Log::debug('Trakt API key is not configured');
@@ -80,14 +104,23 @@ class TraktService
             return null;
         }
 
+        $this->throttle();
+
         $url = self::BASE_URL.'/'.ltrim($endpoint, '/');
 
         try {
             $response = Http::timeout($this->timeout)
                 ->retry($this->retryTimes, $this->retryDelay, function (\Throwable $exception, \Illuminate\Http\Client\PendingRequest $request, ?string $key = null) {
-                    // Don't retry on 404 errors - resource simply doesn't exist
+                    // Don't retry on 404 - resource doesn't exist
                     if ($exception instanceof \Illuminate\Http\Client\RequestException) {
-                        return $exception->response->status() !== 404;
+                        $status = $exception->response->status();
+                        if ($status === 404) {
+                            return false;
+                        }
+                        // Don't retry 429 with short delay - we handle it below with backoff
+                        if ($status === 429) {
+                            return false;
+                        }
                     }
 
                     return true;
@@ -110,7 +143,19 @@ class TraktService
                 return $data;
             }
 
-            // Handle specific error codes - 404 is normal (resource not found)
+            // Handle 429 (rate limit / Cloudflare 1015): back off then retry once
+            if ($response->status() === 429 && ! $isRetryAfterRateLimit) {
+                $backoff = $this->getRateLimitBackoff($response);
+                Log::warning('Trakt API rate limited (429), backing off then retrying once', [
+                    'endpoint' => $endpoint,
+                    'backoff_seconds' => $backoff,
+                ]);
+                sleep($backoff);
+
+                return $this->get($endpoint, $params, true);
+            }
+
+            // Handle 404 - normal (resource not found)
             if ($response->status() === 404) {
                 Log::debug('Trakt: Resource not found', ['endpoint' => $endpoint]);
 
@@ -139,6 +184,21 @@ class TraktService
 
             return null;
         }
+    }
+
+    /**
+     * Get backoff seconds from 429 response (Retry-After header or default).
+     */
+    protected function getRateLimitBackoff(\Illuminate\Http\Client\Response $response): int
+    {
+        $retryAfter = $response->header('Retry-After');
+        if ($retryAfter !== null && is_numeric($retryAfter)) {
+            $seconds = (int) $retryAfter;
+
+            return min(max($seconds, 1), 300);
+        }
+
+        return self::RATE_LIMIT_BACKOFF_SECONDS;
     }
 
     /**
@@ -398,8 +458,11 @@ class TraktService
             $params['type'] = $mediaType;
         }
 
-        // Don't cache ID searches as they're typically one-off lookups
-        return $this->get('search/'.$idType.'/'.$id, ['type' => $mediaType ?: null]);
+        $cacheKey = 'trakt_search_'.$idType.'_'.preg_replace('/[^a-zA-Z0-9_-]/', '_', (string) $id).'_'.($mediaType ?: 'all');
+
+        return Cache::remember($cacheKey, now()->addHours(self::CACHE_TTL_HOURS), function () use ($id, $idType, $mediaType) {
+            return $this->get('search/'.$idType.'/'.$id, ['type' => $mediaType ?: null]);
+        });
     }
 
     /**
