@@ -364,7 +364,11 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         if ($series > 0 && $episode > 0) {
             $queryString = sprintf('tve.series = %d AND tve.episode = %d', $series, $episode);
         } elseif (! empty($airdate)) {
-            $queryString = sprintf('DATE(tve.firstaired) = %s', escapeString(date('Y-m-d', strtotime((string) $airdate))));
+            $ts = strtotime((string) $airdate);
+            if ($ts === false) {
+                return false;
+            }
+            $queryString = sprintf('DATE(tve.firstaired) = %s', escapeString(date('Y-m-d', $ts)));
         } else {
             return false;
         }
@@ -621,13 +625,15 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         elseif (preg_match('/^(.*?)[^a-z0-9](?P<airdate>(19|20)(\d{2})[.\/-](\d{2})[.\/-](\d{2}))[^a-z0-9]?/i', $relname, $hits)) {
             $episodeArr['season'] = 0;
             $episodeArr['episode'] = 0;
-            $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $hits['airdate'])));
+            $ts = strtotime(preg_replace('/[^0-9]/i', '/', $hits['airdate']));
+            $episodeArr['airdate'] = ($ts !== false) ? date('Y-m-d', $ts) : '';
         }
         // 01.01.2009
         elseif (preg_match('/^(.*?)[^a-z0-9](?P<airdate>(\d{2})[^a-z0-9](\d{2})[^a-z0-9](19|20)(\d{2}))[^a-z0-9]?/i', $relname, $hits)) {
             $episodeArr['season'] = 0;
             $episodeArr['episode'] = 0;
-            $episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $hits['airdate'])));
+            $ts = strtotime(preg_replace('/[^0-9]/i', '/', $hits['airdate']));
+            $episodeArr['airdate'] = ($ts !== false) ? date('Y-m-d', $ts) : '';
         }
         // 01.01.09
         elseif (preg_match('/^(.*?)[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9]?/i', $relname, $hits)) {
@@ -635,7 +641,8 @@ abstract class AbstractTvProvider extends BaseVideoProvider
             $airdate = $year.'/'.$hits[2].'/'.$hits[3];
             $episodeArr['season'] = 0;
             $episodeArr['episode'] = 0;
-            $episodeArr['airdate'] = date('Y-m-d', strtotime($airdate));
+            $ts = strtotime($airdate);
+            $episodeArr['airdate'] = ($ts !== false) ? date('Y-m-d', $ts) : '';
         }
         // 2009.E01
         elseif (preg_match('/^(.*?)[^a-z0-9]20(\d{2})[^a-z0-9](\d{1,3})[^a-z0-9]?/i', $relname, $hits)) {
@@ -758,7 +765,8 @@ abstract class AbstractTvProvider extends BaseVideoProvider
             $chk = explode(' ', $date);
             $chkd = explode('-', $chk[0]);
             if ($chkd[1] > 12) {
-                $date = date('Y-m-d H:i:s', strtotime($chkd[1].' '.$chkd[2].' '.$chkd[0]));
+                $ts = strtotime($chkd[1].' '.$chkd[2].' '.$chkd[0]);
+                $date = ($ts !== false) ? date('Y-m-d H:i:s', $ts) : $date;
             }
         } else {
             $date = null;
