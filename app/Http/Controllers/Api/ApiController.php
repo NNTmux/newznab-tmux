@@ -149,7 +149,7 @@ class ApiController extends BasePageController
 
         // Set Query Parameters based on Request objects
         $outputXML = ! ($request->has('o') && $request->input('o') === 'json');
-        $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
+        $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? (int) $request->input('minsize') : 0;
         $offset = $this->offset($request);
 
         // Set API Parameters based on Request objects
