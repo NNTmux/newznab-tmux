@@ -382,7 +382,7 @@ class MusicService
                     '   Year:   '.$year
                 );
             }
-            $mus['cover'] = $ri->saveImage($musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
+            $mus['cover'] = $ri->saveImage((string) $musicId, $mus['coverurl'], $this->imgSavePath, 250, 250);
         } elseif ($this->echooutput) {
             if ($mus['artist'] === '') {
                 $artist = '';
