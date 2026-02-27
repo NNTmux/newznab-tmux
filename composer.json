@@ -63,6 +63,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/scout": "^10.13",
         "laravel/tinker": "^2.10.1",
+        "laravel/ui": "^4.6",
         "livewire/blaze": "^1.0",
         "livewire/livewire": "^3.6",
         "livewire/volt": "^1.6",
