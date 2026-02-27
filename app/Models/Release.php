@@ -258,6 +258,24 @@ class Release extends Model
     }
 
     /**
+     * Increment grabs for multiple releases by guid (single query).
+     *
+     * @param  list<string>  $guids
+     *
+     * @throws \Exception
+     */
+    public static function updateGrabsByGuids(array $guids): void
+    {
+        if ($guids === []) {
+            return;
+        }
+        $updateGrabs = ((int) Settings::settingValue('grabstatus') !== 0);
+        if ($updateGrabs) {
+            self::query()->whereIn('guid', $guids)->increment('grabs');
+        }
+    }
+
+    /**
      * @return Model|null|static
      */
     public static function getCatByRelId(mixed $id)

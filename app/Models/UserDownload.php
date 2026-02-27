@@ -135,6 +135,28 @@ class UserDownload extends Model
     }
 
     /**
+     * Log multiple NZB downloads for a user in a single insert.
+     *
+     * @param  list<int>  $releaseIds  Release IDs (releases.id)
+     */
+    public static function addDownloadRequestsBatch(int $userID, array $releaseIds): void
+    {
+        if ($releaseIds === []) {
+            return;
+        }
+        $now = now();
+        $rows = array_map(
+            fn (int $releaseId): array => [
+                'users_id' => $userID,
+                'releases_id' => $releaseId,
+                'timestamp' => $now,
+            ],
+            $releaseIds
+        );
+        self::query()->insert($rows);
+    }
+
+    /**
      * @return mixed
      *
      * @throws \Exception

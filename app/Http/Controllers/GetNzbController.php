@@ -212,24 +212,28 @@ class GetNzbController extends BasePageController
     }
 
     /**
-     * Update statistics for zip downloads
+     * Update statistics for zip downloads (batched to avoid N+1 queries).
      *
      * @param  list<string>  $guids
      */
     private function updateZipDownloadStatistics(Request $request, int $uid, array $guids): void
     {
+        if ($guids === []) {
+            return;
+        }
+
         $guidCount = \count($guids);
         User::incrementGrabs($uid, $guidCount);
 
+        // Resolve guids to release ids in one query for batch operations
+        $releaseIds = Release::query()->whereIn('guid', $guids)->pluck('id')->all();
+
+        Release::updateGrabsByGuids($guids);
+        UserDownload::addDownloadRequestsBatch($uid, $releaseIds);
+
         $shouldDeleteFromCart = $request->has('del') && (int) $request->input('del') === 1;
-
-        foreach ($guids as $guid) {
-            Release::updateGrab($guid);
-            UserDownload::addDownloadRequest($uid, $guid);
-
-            if ($shouldDeleteFromCart) {
-                UsersRelease::delCartByUserAndRelease($guid, $uid);
-            }
+        if ($shouldDeleteFromCart && $releaseIds !== []) {
+            UsersRelease::delCartByUserAndReleases($uid, $releaseIds);
         }
     }
 

@@ -112,6 +112,19 @@ class UsersRelease extends Model
         }
     }
 
+    /**
+     * Remove multiple releases from a user's cart in one query.
+     *
+     * @param  list<int>  $releaseIds
+     */
+    public static function delCartByUserAndReleases(int $uid, array $releaseIds): void
+    {
+        if ($releaseIds === []) {
+            return;
+        }
+        self::query()->where('users_id', $uid)->whereIn('releases_id', $releaseIds)->delete();
+    }
+
     public static function delCartForRelease(mixed $rid): void
     {
         self::query()->where('releases_id', $rid)->delete();
