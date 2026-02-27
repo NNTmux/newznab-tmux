@@ -59,6 +59,7 @@
         "intervention/image": "^3.11",
         "jrean/laravel-user-verification": "^13.0",
         "laravel/framework": "^12.28",
+        "laravel/horizon": "^5.23",
         "laravel/pulse": "^1.4",
         "laravel/sanctum": "^4.0",
         "laravel/scout": "^10.13",

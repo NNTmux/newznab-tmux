@@ -300,6 +300,9 @@
             <a href="{{ url('/admin/site-stats') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">
                 <i class="fas fa-chart-bar mr-2 text-purple-400"></i>Statistics
             </a>
+            <a href="{{ url(config('horizon.path', 'horizon')) }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-gray-800 dark:hover:bg-gray-800 rounded transition">
+                <i class="fas fa-stream mr-2 text-cyan-400"></i>Horizon
+            </a>
         </div>
     </div>
 
