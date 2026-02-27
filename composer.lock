@@ -14111,26 +14111,26 @@
         },
         {
             "name": "jubeki/laravel-code-style",
-            "version": "2.18.0",
+            "version": "2.19.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Jubeki/laravel-code-style.git",
-                "reference": "1259e5638b2a173bdfdf967d60f4b4b0e23f5f02"
+                "reference": "08dc0308e7a2304f01586e0b26905215d4eede35"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Jubeki/laravel-code-style/zipball/1259e5638b2a173bdfdf967d60f4b4b0e23f5f02",
-                "reference": "1259e5638b2a173bdfdf967d60f4b4b0e23f5f02",
+                "url": "https://api.github.com/repos/Jubeki/laravel-code-style/zipball/08dc0308e7a2304f01586e0b26905215d4eede35",
+                "reference": "08dc0308e7a2304f01586e0b26905215d4eede35",
                 "shasum": ""
             },
             "require": {
                 "friendsofphp/php-cs-fixer": "^3.47",
-                "illuminate/support": "^9.34 || ^10.0 || ^11.0 || ^12.0",
+                "illuminate/support": "^9.34 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
                 "php": "^8.0"
             },
             "require-dev": {
-                "orchestra/testbench": "^8.0 || ^9.0 || ^10.0",
-                "phpunit/phpunit": "^10.4.1 || ^11.0"
+                "orchestra/testbench": "^10.0 || ^11.0",
+                "phpunit/phpunit": "^12.0"
             },
             "type": "library",
             "extra": {
@@ -14170,9 +14170,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Jubeki/laravel-code-style/issues",
-                "source": "https://github.com/Jubeki/laravel-code-style/tree/2.18.0"
+                "source": "https://github.com/Jubeki/laravel-code-style/tree/2.19.0"
             },
-            "time": "2025-02-14T08:42:47+00:00"
+            "time": "2026-02-26T21:32:40+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
