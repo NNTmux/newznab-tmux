@@ -371,8 +371,18 @@
     </div>
 </div>
 
-<!-- Verify User Confirmation Modal -->
-<div id="verifyUserModal" class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 hidden items-center justify-center z-50 transition-opacity">
+<!-- Verify User Confirmation Modal (x-data mounts verifyUser so showVerifyModal/submitVerifyForm exist) -->
+<div id="verifyUserModal"
+     x-data="verifyUser"
+     x-show="open"
+     x-cloak
+     x-transition:enter="transition ease-out duration-200"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-150"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 flex items-center justify-center z-50">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between">
