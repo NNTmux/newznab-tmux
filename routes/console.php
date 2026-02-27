@@ -27,8 +27,6 @@ Schedule::command('nntmux:update-expired-roles')->daily();
 // Automatically disable promotions that have passed their end_date
 Schedule::command('nntmux:disable-expired-promotions')->daily();
 Schedule::command('nntmux:remove-bad')->hourly()->withoutOverlapping();
-Schedule::command('telescope:prune')->daily();
-Schedule::command('horizon:snapshot')->everyFiveMinutes()->withoutOverlapping();
 Schedule::command('cloudflare:reload')->daily();
 Schedule::command('cache:prune-stale-tags')->hourly();
 Schedule::command('nntmux:collect-stats')->hourly();
