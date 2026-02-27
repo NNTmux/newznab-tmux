@@ -10,7 +10,7 @@ use App\Models\Invitation;
 use App\Models\Settings;
 use App\Models\User;
 use App\Rules\ValidEmailDomain;
-use Illuminate\Foundation\Auth\RegistersUsers;
+use App\Support\Auth\RegistersUsers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;

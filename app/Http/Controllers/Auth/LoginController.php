@@ -9,9 +9,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginLoginRequest;
 use App\Models\User;
 use App\Services\PasswordBreachService;
+use App\Support\Auth\AuthenticatesUsers;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -42,6 +42,14 @@ class LoginController extends Controller
      * Where to redirect users after login.
      */
     protected string $redirectTo = '/';
+
+    /**
+     * Get the login username to be used (form field name; value may be email or username).
+     */
+    public function username(): string
+    {
+        return 'username';
+    }
 
     /**
      * Create a new controller instance.

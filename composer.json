@@ -63,7 +63,6 @@
         "laravel/sanctum": "^4.0",
         "laravel/scout": "^10.13",
         "laravel/tinker": "^2.10.1",
-        "laravel/ui": "^4.6",
         "livewire/blaze": "^1.0",
         "livewire/livewire": "^3.6",
         "livewire/volt": "^1.6",
@@ -163,8 +162,7 @@
     },
     "scripts": {
         "post-update-cmd": [
-            "@php artisan ide-helper:generate --ansi",
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+            "@php artisan ide-helper:generate --ansi"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
