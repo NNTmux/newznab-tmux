@@ -22,6 +22,17 @@ class ContentSecurityPolicy
 
         $response = $next($request);
 
+        // Skip strict CSP for Horizon dashboard (admin-only). Horizon uses inline
+        // scripts and does not support nonces; it is already protected by auth/role.
+        $horizonPath = trim(config('horizon.path', 'horizon'), '/');
+        if ($horizonPath !== '' && $request->is($horizonPath, $horizonPath.'/*')) {
+            $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+            $response->headers->set('X-Content-Type-Options', 'nosniff');
+            $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+            return $response;
+        }
+
         // Check if Turnstile is enabled
         $turnstileEnabled = config('captcha.provider') === 'turnstile'
             && config('captcha.turnstile.enabled') === true;
