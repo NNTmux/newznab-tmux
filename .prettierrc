@@ -1,6 +1,16 @@
 {
-    "printWidth": 100,
     "singleQuote": true,
-    "tabWidth": 4,
-    "trailingComma": "es5"
+    "trailingComma": "all",
+    "plugins": [
+        "./node_modules/prettier-plugin-blade",
+        "./node_modules/prettier-plugin-tailwindcss"
+    ],
+    "overrides": [
+        {
+            "files": "*.blade.php",
+            "options": {
+                "parser": "blade"
+            }
+        }
+    ]
 }
