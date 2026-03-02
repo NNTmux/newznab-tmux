@@ -4072,16 +4072,16 @@
         },
         {
             "name": "livewire/blaze",
-            "version": "v1.0.2",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/livewire/blaze.git",
-                "reference": "27fe332930ad2029113e9acc5d652ab8030f4360"
+                "reference": "581ee7feff0f594e1e1678a59bda186a2154e335"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/livewire/blaze/zipball/27fe332930ad2029113e9acc5d652ab8030f4360",
-                "reference": "27fe332930ad2029113e9acc5d652ab8030f4360",
+                "url": "https://api.github.com/repos/livewire/blaze/zipball/581ee7feff0f594e1e1678a59bda186a2154e335",
+                "reference": "581ee7feff0f594e1e1678a59bda186a2154e335",
                 "shasum": ""
             },
             "require": {
@@ -4124,9 +4124,9 @@
             "description": "A tool for optimizing Blade component performance by folding them into parent templates",
             "support": {
                 "issues": "https://github.com/livewire/blaze/issues",
-                "source": "https://github.com/livewire/blaze/tree/v1.0.2"
+                "source": "https://github.com/livewire/blaze/tree/v1.0.4"
             },
-            "time": "2026-02-26T11:31:57+00:00"
+            "time": "2026-03-01T21:10:57+00:00"
         },
         {
             "name": "livewire/livewire",
@@ -6211,16 +6211,16 @@
         },
         {
             "name": "propaganistas/laravel-disposable-email",
-            "version": "2.4.23",
+            "version": "2.4.24",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Propaganistas/Laravel-Disposable-Email.git",
-                "reference": "cba1566365e09e59e03523b328954e080e7408a5"
+                "reference": "16a63c55e7b23267d300abab5ffeb66314975f31"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/cba1566365e09e59e03523b328954e080e7408a5",
-                "reference": "cba1566365e09e59e03523b328954e080e7408a5",
+                "url": "https://api.github.com/repos/Propaganistas/Laravel-Disposable-Email/zipball/16a63c55e7b23267d300abab5ffeb66314975f31",
+                "reference": "16a63c55e7b23267d300abab5ffeb66314975f31",
                 "shasum": ""
             },
             "require": {
@@ -6237,7 +6237,7 @@
                 "laravel/pint": "^1.14",
                 "mockery/mockery": "^1.4.2",
                 "orchestra/testbench": "*",
-                "phpunit/phpunit": "^10.5|^11.5.3"
+                "phpunit/phpunit": "^11.5.3"
             },
             "type": "library",
             "extra": {
@@ -6275,7 +6275,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Propaganistas/Laravel-Disposable-Email/issues",
-                "source": "https://github.com/Propaganistas/Laravel-Disposable-Email/tree/2.4.23"
+                "source": "https://github.com/Propaganistas/Laravel-Disposable-Email/tree/2.4.24"
             },
             "funding": [
                 {
@@ -6283,7 +6283,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-01T01:17:34+00:00"
+            "time": "2026-03-01T01:16:14+00:00"
         },
         {
             "name": "psr/cache",
@@ -12460,16 +12460,16 @@
         },
         {
             "name": "captainhook/captainhook",
-            "version": "5.28.4",
+            "version": "5.28.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/captainhook-git/captainhook.git",
-                "reference": "9cf7e17c1f74e9aa3bbf5b394ae86510be503a91"
+                "reference": "2a7316bf4ba4c3b11b3544c063788622d3520ee1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/captainhook-git/captainhook/zipball/9cf7e17c1f74e9aa3bbf5b394ae86510be503a91",
-                "reference": "9cf7e17c1f74e9aa3bbf5b394ae86510be503a91",
+                "url": "https://api.github.com/repos/captainhook-git/captainhook/zipball/2a7316bf4ba4c3b11b3544c063788622d3520ee1",
+                "reference": "2a7316bf4ba4c3b11b3544c063788622d3520ee1",
                 "shasum": ""
             },
             "require": {
@@ -12532,7 +12532,7 @@
             ],
             "support": {
                 "issues": "https://github.com/captainhook-git/captainhook/issues",
-                "source": "https://github.com/captainhook-git/captainhook/tree/5.28.4"
+                "source": "https://github.com/captainhook-git/captainhook/tree/5.28.5"
             },
             "funding": [
                 {
@@ -12540,7 +12540,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-27T11:47:08+00:00"
+            "time": "2026-02-28T08:59:22+00:00"
         },
         {
             "name": "captainhook/plugin-composer",
