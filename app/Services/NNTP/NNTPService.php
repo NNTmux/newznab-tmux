@@ -59,12 +59,12 @@ class NNTPService extends NntpClient
     /**
      * How many connections should we use on primary NNTP server.
      */
-    protected string $_primaryNntpConnections;
+    protected int $_primaryNntpConnections;
 
     /**
      * How many connections should we use on alternate NNTP server.
      */
-    protected string $_alternateNntpConnections;
+    protected int $_alternateNntpConnections;
 
     /**
      * How many connections do we use on primary NNTP server.
