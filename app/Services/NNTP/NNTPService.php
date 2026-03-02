@@ -168,8 +168,8 @@ class NNTPService extends NntpClient
 
         $this->_currentPort = $this->_configPort;
         $this->_currentServer = $this->_configServer;
-        $this->_primaryNntpConnections = config('nntmux_nntp.main_nntp_connections');
-        $this->_alternateNntpConnections = config('nntmux_nntp.alternate_nntp_connections');
+        $this->_primaryNntpConnections = (int) config('nntmux_nntp.main_nntp_connections');
+        $this->_alternateNntpConnections = (int) config('nntmux_nntp.alternate_nntp_connections');
         $this->_selectedGroupSummary = null;
         $this->_overviewFormatCache = null;
     }
