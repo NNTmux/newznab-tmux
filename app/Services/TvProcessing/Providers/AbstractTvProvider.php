@@ -209,8 +209,8 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         }
 
         if ($videoId === false) {
-            $title = Video::query()->where('title', $show['title'])->first(['title']);
-            if ($title === null) {
+            $existingVideo = Video::query()->where('title', $show['title'])->first(['id']);
+            if ($existingVideo === null) {
                 // Insert the Show using Eloquent create() to trigger VideoObserver
                 $video = Video::create([
                     'type' => $show['type'],
@@ -237,6 +237,10 @@ abstract class AbstractTvProvider extends BaseVideoProvider
                 if (! empty($show['aliases'])) {
                     $this->addAliases($videoId, $show['aliases']);
                 }
+            } else {
+                // Title exists but wasn't matched by site ID — update with new info
+                $videoId = $existingVideo->id;
+                $this->update($videoId, $show);
             }
         } else {
             // If a local match was found, just update missing video info
