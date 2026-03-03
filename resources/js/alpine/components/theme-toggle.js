@@ -49,4 +49,16 @@ Alpine.data('themeRadio', () => ({
             Alpine.store('theme').set(this.value);
         });
     });
+
+    // Dropdown and mobile theme switcher buttons
+    document.querySelectorAll('.dropdown-theme-btn, .mobile-theme-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var theme = this.dataset.theme;
+            if (theme) {
+                Alpine.store('theme').set(theme);
+            }
+        });
+    });
 })();

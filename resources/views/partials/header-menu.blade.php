@@ -250,6 +250,32 @@
                                 </a>
                             @endif
                             <div class="border-t border-gray-700"></div>
+                            <!-- Theme Switcher -->
+                            <div class="px-4 py-2">
+                                <span class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Theme</span>
+                                <div class="flex items-center gap-1" id="dropdown-theme-switcher">
+                                    @php $currentTheme = auth()->user()->theme_preference ?? 'light'; @endphp
+                                    <button type="button" data-theme="light"
+                                        class="dropdown-theme-btn flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs rounded-lg transition {{ $currentTheme === 'light' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}"
+                                        title="Light Mode">
+                                        <i class="fas fa-sun"></i>
+                                        <span>Light</span>
+                                    </button>
+                                    <button type="button" data-theme="dark"
+                                        class="dropdown-theme-btn flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs rounded-lg transition {{ $currentTheme === 'dark' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}"
+                                        title="Dark Mode">
+                                        <i class="fas fa-moon"></i>
+                                        <span>Dark</span>
+                                    </button>
+                                    <button type="button" data-theme="system"
+                                        class="dropdown-theme-btn flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs rounded-lg transition {{ $currentTheme === 'system' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}"
+                                        title="System (Auto)">
+                                        <i class="fas fa-desktop"></i>
+                                        <span>Auto</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="border-t border-gray-700"></div>
                             <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white">
                                 <i class="fa fa-user fa-fw mr-2"></i>Profile
                             </a>
@@ -402,6 +428,31 @@
                             <i class="fa fa-cogs fa-fw mr-3 text-gray-400"></i>Admin
                         </a>
                     @endif
+                    <!-- Mobile Theme Switcher -->
+                    <div class="px-4 py-2.5">
+                        <span class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Theme</span>
+                        <div class="flex items-center gap-1.5" id="mobile-theme-switcher">
+                            @php $mobileTheme = auth()->user()->theme_preference ?? 'light'; @endphp
+                            <button type="button" data-theme="light"
+                                class="mobile-theme-btn flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg transition touch-target {{ $mobileTheme === 'light' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}"
+                                title="Light Mode">
+                                <i class="fas fa-sun"></i>
+                                <span>Light</span>
+                            </button>
+                            <button type="button" data-theme="dark"
+                                class="mobile-theme-btn flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg transition touch-target {{ $mobileTheme === 'dark' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}"
+                                title="Dark Mode">
+                                <i class="fas fa-moon"></i>
+                                <span>Dark</span>
+                            </button>
+                            <button type="button" data-theme="system"
+                                class="mobile-theme-btn flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg transition touch-target {{ $mobileTheme === 'system' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}"
+                                title="System (Auto)">
+                                <i class="fas fa-desktop"></i>
+                                <span>Auto</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             @endauth
         </div>

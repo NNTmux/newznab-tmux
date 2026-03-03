@@ -66,6 +66,23 @@ Alpine.store('theme', {
         if (toggle) {
             toggle.title = this.title();
         }
+
+        // Update dropdown & mobile theme switcher buttons
+        var self = this;
+        document.querySelectorAll('.dropdown-theme-btn, .mobile-theme-btn').forEach(function(btn) {
+            var isActive = btn.dataset.theme === self.current;
+            btn.classList.remove('bg-blue-600', 'text-white', 'text-gray-300', 'hover:bg-gray-800', 'hover:bg-gray-700', 'hover:text-white');
+            if (isActive) {
+                btn.classList.add('bg-blue-600', 'text-white');
+            } else {
+                btn.classList.add('text-gray-300', 'hover:text-white');
+                if (btn.classList.contains('mobile-theme-btn')) {
+                    btn.classList.add('hover:bg-gray-700');
+                } else {
+                    btn.classList.add('hover:bg-gray-800');
+                }
+            }
+        });
     },
 
     icon() {
