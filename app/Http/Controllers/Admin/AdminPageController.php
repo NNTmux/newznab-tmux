@@ -142,13 +142,25 @@ class AdminPageController extends BasePageController
             return \App\Models\ReleaseReport::where('status', 'pending')->count();
         });
 
+        // Cache soft-deleted users count for 5 minutes
+        $softDeletedCount = \Illuminate\Support\Facades\Cache::remember('admin_stats_soft_deleted_users_count', 300, function () {
+            return \App\Models\User::onlyTrashed()->count();
+        });
+
+        // Cache permanently deleted users count for 5 minutes (from activity log)
+        $permanentlyDeletedCount = \Illuminate\Support\Facades\Cache::remember('admin_stats_permanently_deleted_users_count', 300, function () {
+            return \App\Models\UserActivity::where('activity_type', 'deleted')
+                ->whereJsonContains('metadata->permanent', true)
+                ->count();
+        });
+
         // Today's counts can be cached for 1 minute since they change frequently
         $releasesToday = \Illuminate\Support\Facades\Cache::remember('admin_stats_releases_today_'.$today, 60, function () use ($today) {
             return \App\Models\Release::whereRaw('DATE(adddate) = ?', [$today])->count();
         });
 
         $usersToday = \Illuminate\Support\Facades\Cache::remember('admin_stats_users_today_'.$today, 60, function () use ($today) {
-            return \App\Models\User::whereRaw('DATE(created_at) = ?', [$today])->count();
+            return \App\Models\User::whereNull('deleted_at')->whereRaw('DATE(created_at) = ?', [$today])->count();
         });
 
         return [
@@ -160,6 +172,8 @@ class AdminPageController extends BasePageController
             'active_groups' => $activeGroupsCount,
             'failed' => $failedCount,
             'reported' => $reportedCount,
+            'soft_deleted_users' => $softDeletedCount,
+            'permanently_deleted_users' => $permanentlyDeletedCount,
             'disk_free' => $this->getDiskSpace(),
         ];
     }

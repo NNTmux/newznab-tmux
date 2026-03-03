@@ -9,7 +9,7 @@
     </div>
 
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
         <!-- Total Releases -->
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between">
@@ -96,6 +96,32 @@
             <div class="mt-4">
                 <a href="{{ url('/admin/release-reports') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
                     View reports <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Deleted Users -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Deleted Users</p>
+                    <p class="text-3xl font-bold text-gray-800 dark:text-gray-200">{{ number_format(($stats['soft_deleted_users'] ?? 0) + ($stats['permanently_deleted_users'] ?? 0)) }}</p>
+                </div>
+                <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-user-slash text-2xl text-red-600 dark:text-red-400"></i>
+                </div>
+            </div>
+            <div class="mt-4 space-y-1">
+                <span class="text-sm text-yellow-600 dark:text-yellow-400 block">
+                    <i class="fas fa-trash"></i> {{ number_format($stats['soft_deleted_users'] ?? 0) }} soft deleted
+                </span>
+                <span class="text-sm text-red-600 dark:text-red-400 block">
+                    <i class="fas fa-trash-alt"></i> {{ number_format($stats['permanently_deleted_users'] ?? 0) }} permanently deleted
+                </span>
+            </div>
+            <div class="mt-2">
+                <a href="{{ route('admin.deleted.users.index') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                    View deleted users <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
         </div>
