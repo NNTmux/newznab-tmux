@@ -1,7 +1,7 @@
 {{--
-    Dark mode initialization - MUST be included at the very top of <head>,
+    Dark mode and color scheme initialization - MUST be included at the very top of <head>,
     BEFORE any CSS/Vite tags, to prevent white flash on page load.
-    This tiny blocking script applies the 'dark' class to <html> synchronously
+    This tiny blocking script applies the 'dark' class and data-color-scheme to <html> synchronously
     before the browser paints any content.
 --}}
 <script nonce="{{ csp_nonce() }}">
@@ -9,11 +9,14 @@
     var d = document.documentElement;
     @auth
         var t = '{{ auth()->user()->theme_preference ?? "light" }}';
+        var scheme = '{{ auth()->user()->color_scheme ?? "blue" }}';
     @else
         var t = localStorage.getItem('theme') || 'light';
+        var scheme = localStorage.getItem('color_scheme') || 'blue';
     @endauth
     if (t === 'dark' || (t === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         d.classList.add('dark');
     }
+    d.setAttribute('data-color-scheme', scheme);
 })();
 </script>

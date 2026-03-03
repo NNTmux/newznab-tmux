@@ -5,11 +5,11 @@
 @endpush
 
 @section('content')
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+<div class="surface-panel rounded-xl shadow-sm p-6">
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Release Details</h1>
-        <nav class="text-sm text-gray-600">
-            <a href="{{ url('/') }}" class="hover:text-blue-600">Home</a>
+        <nav class="text-sm text-gray-600 dark:text-gray-400">
+            <a href="{{ url('/') }}" class="hover:text-primary-600 dark:hover:text-primary-400">Home</a>
             <i class="fas fa-chevron-right mx-2 text-xs"></i>
             <span class="wrap-break-word break-all">{{ $release->searchname }}</span>
         </nav>
@@ -51,20 +51,20 @@
                             </div>
                         </div>
                         <div class="flex flex-wrap gap-2">
-                            <a href="{{ url('/getnzb/' . $release->guid) }}" class="download-nzb px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition inline-flex items-center">
+                            <a href="{{ url('/getnzb/' . $release->guid) }}" class="download-nzb px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition inline-flex items-center">
                                 <i class="fas fa-download mr-2"></i> Download NZB
                             </a>
-                            <a href="#" class="add-to-cart px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition inline-flex items-center" data-guid="{{ $release->guid }}">
+                            <a href="#" class="add-to-cart px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition inline-flex items-center" data-guid="{{ $release->guid }}">
                                 <i class="icon_cart fas fa-shopping-basket mr-2"></i> Add to Cart
                             </a>
                             @if(isset($release->nfostatus) && $release->nfostatus == 1)
-                                <button type="button" class="nfo-badge px-4 py-2 bg-yellow-600 dark:bg-yellow-700 text-white rounded-lg hover:bg-yellow-700 dark:hover:bg-yellow-800 transition inline-flex items-center" data-guid="{{ $release->guid }}" title="View NFO file">
+                                <button type="button" class="nfo-badge px-4 py-2 bg-primary-500 dark:bg-primary-600 text-white rounded-lg hover:bg-primary-600 dark:hover:bg-primary-700 transition inline-flex items-center" data-guid="{{ $release->guid }}" title="View NFO file">
                                     <i class="fas fa-file-alt mr-2"></i> View NFO
                                 </button>
                             @endif
                             @auth
                                 @if(auth()->user()->hasRole('Admin') || auth()->user()->hasRole('Moderator'))
-                                    <a href="{{ route('admin.release-edit', ['id' => $release->guid]) }}" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition inline-flex items-center" title="Edit Release">
+                                    <a href="{{ route('admin.release-edit', ['id' => $release->guid]) }}" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition inline-flex items-center" title="Edit Release">
                                         <i class="fas fa-edit mr-2"></i> Edit Release
                                     </a>
                                 @endif
@@ -84,7 +84,7 @@
             @if($hasPreviewImage || $hasSampleImage)
                 <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center">
-                        <i class="fas fa-images mr-2 text-purple-600"></i>
+                        <i class="fas fa-images mr-2 text-primary-600"></i>
                         @if($hasPreviewImage && $hasSampleImage)
                             Preview & Sample Images
                         @elseif($hasPreviewImage)
@@ -138,9 +138,9 @@
                     $movieLanguage = $movieData['language'] ?? ($movie->language ?? null);
                     $movieTrailer = $movieData['trailer'] ?? ($movie->trailer ?? null);
                 @endphp
-                <div class="bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-lg p-6 border border-blue-100 dark:border-blue-800">
+                <div class="surface-panel-alt rounded-lg p-6 border">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-film mr-2 text-blue-600 dark:text-blue-400"></i> Movie Information
+                        <i class="fas fa-film mr-2 text-primary-600 dark:text-primary-400"></i> Movie Information
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if(!empty($movieTitle))
@@ -222,9 +222,9 @@
                     $showStarted = $showData['started'] ?? ($show->started ?? null);
                     $showTvdb = $showData['tvdb'] ?? ($show->tvdb ?? null);
                 @endphp
-                <div class="bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-900 dark:to-pink-900 rounded-lg p-6 border border-purple-100 dark:border-purple-800">
+                <div class="surface-panel-alt rounded-lg p-6 border">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-tv mr-2 text-purple-600 dark:text-purple-400"></i> TV Show Information
+                        <i class="fas fa-tv mr-2 text-primary-600 dark:text-primary-400"></i> TV Show Information
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if(!empty($showTitle))
@@ -243,7 +243,7 @@
                             <div>
                                 <dt class="text-sm font-medium text-gray-600 dark:text-gray-400">TVDB</dt>
                                 <dd class="mt-1">
-                                    <a href="{{ $site['dereferrer_link'] }}https://thetvdb.com/?tab=series&id={{ $showTvdb }}" target="_blank" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                                    <a href="{{ $site['dereferrer_link'] }}https://thetvdb.com/?tab=series&id={{ $showTvdb }}" target="_blank" class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
                                         View on TVDB <i class="fas fa-external-link-alt text-xs"></i>
                                     </a>
                                 </dd>
@@ -263,9 +263,9 @@
                     $musicReleaseDate = $musicData['releasedate'] ?? ($music->releasedate ?? null);
                     $musicGenres = $musicData['genres'] ?? ($music->genres ?? null);
                 @endphp
-                <div class="bg-linear-to-r from-green-50 to-teal-50 dark:from-green-900 dark:to-teal-900 rounded-lg p-6 border border-green-100 dark:border-green-800">
+                <div class="surface-panel-alt rounded-lg p-6 border">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-music mr-2 text-green-600 dark:text-green-400"></i> Music Information
+                        <i class="fas fa-music mr-2 text-primary-600 dark:text-primary-400"></i> Music Information
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if(!empty($musicTitle))
@@ -311,9 +311,9 @@
                     $gameReleaseDate = $gameData['releasedate'] ?? ($game->releasedate ?? null);
                     $gameGenres = $gameData['genres'] ?? ($game->genres ?? null);
                 @endphp
-                <div class="bg-linear-to-r from-orange-50 to-yellow-50 dark:from-orange-900 dark:to-yellow-900 rounded-lg p-6 border border-orange-100 dark:border-orange-800">
+                <div class="surface-panel-alt rounded-lg p-6 border">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-gamepad mr-2 text-orange-600 dark:text-orange-400"></i> Game Information
+                        <i class="fas fa-gamepad mr-2 text-primary-600 dark:text-primary-400"></i> Game Information
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if(!empty($gameTitle))
@@ -352,9 +352,9 @@
                     $conPublisher = $conData['publisher'] ?? ($con->publisher ?? null);
                     $conReleaseDate = $conData['releasedate'] ?? ($con->releasedate ?? null);
                 @endphp
-                <div class="bg-linear-to-r from-indigo-50 to-blue-50 dark:from-indigo-900 dark:to-blue-900 rounded-lg p-6 border border-indigo-100 dark:border-indigo-800">
+                <div class="surface-panel-alt rounded-lg p-6 border">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-gamepad mr-2 text-indigo-600 dark:text-indigo-400"></i> Console Game Information
+                        <i class="fas fa-gamepad mr-2 text-primary-600 dark:text-primary-400"></i> Console Game Information
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if(!empty($conTitle))
@@ -389,9 +389,9 @@
                     $bookPublishDate = $bookData['publishdate'] ?? ($book->publishdate ?? null);
                     $bookOverview = $bookData['overview'] ?? ($book->overview ?? null);
                 @endphp
-                <div class="bg-linear-to-r from-amber-50 to-orange-50 dark:from-amber-900 dark:to-orange-900 rounded-lg p-6 border border-amber-100 dark:border-amber-800">
+                <div class="surface-panel-alt rounded-lg p-6 border">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-book mr-2 text-amber-600 dark:text-amber-400"></i> Book Information
+                        <i class="fas fa-book mr-2 text-primary-600 dark:text-primary-400"></i> Book Information
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if(!empty($bookTitle))
@@ -486,9 +486,9 @@
                     ];
                     $anidbSourceLabel = $sourceLabels[$anidbSource] ?? $anidbSource;
                 @endphp
-                <div class="bg-linear-to-r from-pink-50 to-purple-50 dark:from-pink-900 dark:to-purple-900 rounded-lg p-6 border border-pink-100 dark:border-pink-800">
+                <div class="surface-panel-alt rounded-lg p-6 border">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-dragon mr-2 text-pink-600 dark:text-pink-400"></i>
+                        <i class="fas fa-dragon mr-2 text-primary-600 dark:text-primary-400"></i>
                         @if($anidbMediaType === 'MANGA')
                             Manga Information
                         @else
@@ -531,7 +531,7 @@
                                     @if(!empty($anidbHashtag))
                                         <div class="text-sm text-gray-900 dark:text-gray-100">
                                             <span class="text-xs text-gray-500 dark:text-gray-400 font-normal mr-2">Hashtag:</span>
-                                            <span class="font-mono text-blue-600 dark:text-blue-400">{{ $anidbHashtag }}</span>
+                                            <span class="font-mono text-primary-600 dark:text-primary-400">{{ $anidbHashtag }}</span>
                                         </div>
                                     @endif
                                     @if(empty($anidbEnglishTitle) && empty($anidbOriginalTitle) && empty($anidbRomajiTitle) && !empty($anidbTitle))
@@ -552,7 +552,7 @@
                                 <dt class="text-sm font-medium text-gray-600 dark:text-gray-400">Media Type</dt>
                                 <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">
                                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-                                        {{ $anidbMediaType === 'ANIME' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' }}">
+                                        {{ $anidbMediaType === 'ANIME' ? 'bg-primary-100 text-primary-800 dark:bg-primary-900/50 dark:text-primary-200' : 'bg-primary-100 text-primary-800 dark:bg-primary-900/50 dark:text-primary-200' }}">
                                         {{ $anidbMediaType === 'ANIME' ? 'Anime' : 'Manga' }}
                                     </span>
                                 </dd>
@@ -662,7 +662,7 @@
                             <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">External Links</h4>
                             <div class="flex flex-wrap gap-3">
                                 @if(!empty($anilistId))
-                                    <a href="{{ $site['dereferrer_link'] ?? '' }}https://anilist.co/anime/{{ $anilistId }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition">
+                                    <a href="{{ $site['dereferrer_link'] ?? '' }}https://anilist.co/anime/{{ $anilistId }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-primary-100 text-primary-800 rounded-lg hover:bg-primary-200 transition dark:bg-primary-900/30 dark:text-primary-200 dark:hover:bg-primary-800/30">
                                         <i class="fas fa-external-link-alt mr-2"></i> View on AniList
                                     </a>
                                 @endif
@@ -726,15 +726,15 @@
 
             <!-- Video/Audio Metadata -->
             @if(!empty($reVideo) || !empty($reAudio) || !empty($reSubs))
-                <div class="bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
+                <div class="surface-panel-alt rounded-lg p-6 border">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-photo-video mr-2 text-blue-600 dark:text-blue-400"></i> Media Information
+                        <i class="fas fa-photo-video mr-2 text-primary-600 dark:text-primary-400"></i> Media Information
                     </h3>
 
                     @if(!empty($reVideo))
                         <div class="mb-6">
                             <h4 class="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
-                                <i class="fas fa-video mr-2 text-blue-500 dark:text-blue-400"></i> Video Details
+                                <i class="fas fa-video mr-2 text-primary-500 dark:text-primary-400"></i> Video Details
                             </h4>
                             <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
                                 <dl class="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -806,7 +806,7 @@
                     @if(!empty($reAudio))
                         <div class="mb-6">
                             <h4 class="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
-                                <i class="fas fa-volume-up mr-2 text-green-500 dark:text-green-400"></i> Audio Details
+                                <i class="fas fa-volume-up mr-2 text-primary-500 dark:text-primary-400"></i> Audio Details
                             </h4>
                             @foreach($reAudio as $index => $audio)
                                 <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 {{ $index > 0 ? 'mt-3' : '' }}">
@@ -859,7 +859,7 @@
                     @if(!empty($reSubs))
                         <div>
                             <h4 class="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
-                                <i class="fas fa-closed-captioning mr-2 text-purple-500"></i> Subtitles
+                                <i class="fas fa-closed-captioning mr-2 text-primary-500"></i> Subtitles
                             </h4>
                             <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
                                 <p class="text-sm text-gray-900 dark:text-gray-100 font-semibold">{{ $reSubs->subs }}</p>
@@ -871,9 +871,9 @@
 
             <!-- PreDB Information -->
             @if(!empty($predb) && is_array($predb))
-                <div class="bg-linear-to-r from-cyan-50 to-blue-50 rounded-lg p-6">
+                <div class="surface-panel-alt rounded-lg p-6 border">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                        <i class="fas fa-database mr-2 text-cyan-600"></i> PreDB Information
+                        <i class="fas fa-database mr-2 text-primary-600"></i> PreDB Information
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         @if(!empty($predb['title']))
@@ -918,15 +918,15 @@
             @if(isset($files) && count($files) > 0)
                 <div>
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Files ({{ count($files) }})</h3>
-                    <div class="bg-gray-50 dark:bg-gray-900 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <div class="surface-panel-alt rounded-lg overflow-hidden border">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-100 dark:bg-gray-800">
+                            <thead class="surface-panel-alt">
                                 <tr>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-300">Filename</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-700 dark:text-gray-300">Size</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                                 @foreach($files as $file)
                                     <tr class="hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                                         <td class="px-4 py-2 text-sm text-gray-800 dark:text-gray-200">{{ $file->name }}</td>
@@ -942,7 +942,7 @@
             <!-- Comments Section -->
             <div>
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
-                    <i class="fas fa-comments mr-2 text-blue-600 dark:text-blue-400"></i>
+                    <i class="fas fa-comments mr-2 text-primary-600 dark:text-primary-400"></i>
                     Comments ({{ isset($comments) ? count($comments) : 0 }})
                 </h3>
 
@@ -967,7 +967,7 @@
 
                 <!-- Add Comment Form -->
                 @auth
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+                    <div class="surface-panel rounded-lg p-4 mb-6 border shadow-sm">
                         <form method="POST" action="{{ url('/details/' . $release->guid) }}" id="commentForm">
                             @csrf
                             <div class="mb-3">
@@ -978,7 +978,7 @@
                                     name="txtAddComment"
                                     id="txtAddComment"
                                     rows="4"
-                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                                     placeholder="Share your thoughts about this release..."
                                     required
                                 ></textarea>
@@ -986,7 +986,7 @@
                             <div class="flex justify-end">
                                 <button
                                     type="submit"
-                                    class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition inline-flex items-center font-medium shadow-sm"
+                                    class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition inline-flex items-center font-medium shadow-sm"
                                 >
                                     <i class="fas fa-paper-plane mr-2"></i>
                                     Post Comment
@@ -1010,7 +1010,7 @@
                             <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition">
                                 <div class="flex items-start justify-between mb-3">
                                     <div class="flex items-center">
-                                        <div class="w-10 h-10 bg-linear-to-br from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-800 rounded-full flex items-center justify-center text-white font-bold mr-3 shadow-sm">
+                                        <div class="w-10 h-10 bg-primary-600 dark:bg-primary-700 rounded-full flex items-center justify-center text-white font-bold mr-3 shadow-sm">
                                             {{ strtoupper(substr($comment['username'] ?? 'U', 0, 1)) }}
                                         </div>
                                         <div>
@@ -1037,7 +1037,7 @@
 
         <!-- Sidebar -->
         <div class="lg:col-span-1">
-            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 sticky top-4 border border-gray-200 dark:border-gray-700">
+            <div class="surface-panel-alt rounded-lg p-4 sticky top-4 border">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Information</h3>
                 <dl class="space-y-3">
                     <div>
@@ -1068,7 +1068,7 @@
                         <div>
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Posted By</dt>
                             <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100 break-all">
-                                <span class="inline-flex items-center px-2 py-1 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-xs font-mono">
+                                <span class="inline-flex items-center px-2 py-1 rounded bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 text-xs font-mono">
                                     <i class="fas fa-user mr-1"></i>{{ $release->fromname }}
                                 </span>
                             </dd>
@@ -1082,7 +1082,7 @@
                         <div>
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">IMDB</dt>
                             <dd class="mt-1">
-                                <a href="{{ $site['dereferrer_link'] }}https://www.imdb.com/title/tt{{ $release->imdbid }}" target="_blank" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                                <a href="{{ $site['dereferrer_link'] }}https://www.imdb.com/title/tt{{ $release->imdbid }}" target="_blank" class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300">
                                     View on IMDB <i class="fas fa-external-link-alt text-xs"></i>
                                 </a>
                             </dd>

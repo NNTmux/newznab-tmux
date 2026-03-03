@@ -9,10 +9,121 @@
 /* Dark mode: class-based strategy (replaces darkMode: 'class' in tailwind.config.js) */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Color scheme: surface + accent variables. data-color-scheme set on <html>. */
+:root,
+[data-color-scheme="blue"] {
+    /* Surface - Blue/Slate */
+    --surface-body: #f8fafc;
+    --surface-body-dark: #0f172a;
+    --surface-sidebar: #1e293b;
+    --surface-sidebar-dark: #020617;
+    --surface-header: #1e293b;
+    --surface-header-dark: #020617;
+    --surface-card: #ffffff;
+    --surface-card-dark: #1e293b;
+    --surface-dropdown: #0f172a;
+    --surface-dropdown-dark: #020617;
+    --surface-footer: #f1f5f9;
+    --surface-footer-dark: #1e293b;
+    --surface-hover: #334155;
+    --surface-hover-dark: #1e293b;
+    --border-default: #e2e8f0;
+    --border-default-dark: #334155;
+    --text-muted: #64748b;
+    --text-muted-dark: #94a3b8;
+    /* Accent - Blue */
+    --color-primary-50: #eff6ff;
+    --color-primary-100: #dbeafe;
+    --color-primary-200: #bfdbfe;
+    --color-primary-300: #93c5fd;
+    --color-primary-400: #60a5fa;
+    --color-primary-500: #3b82f6;
+    --color-primary-600: #2563eb;
+    --color-primary-700: #1d4ed8;
+    --color-primary-800: #1e40af;
+    --color-primary-900: #1e3a8a;
+    --color-primary-950: #172554;
+}
+
+[data-color-scheme="emerald"] {
+    --surface-body: #f0fdf4;
+    --surface-body-dark: #071a12;
+    --surface-sidebar: #14332a;
+    --surface-sidebar-dark: #020c09;
+    --surface-header: #14332a;
+    --surface-header-dark: #020c09;
+    --surface-card: #ffffff;
+    --surface-card-dark: #0f2e24;
+    --surface-dropdown: #0d281f;
+    --surface-dropdown-dark: #020c09;
+    --surface-footer: #ecfdf5;
+    --surface-footer-dark: #14332a;
+    --surface-hover: #166534;
+    --surface-hover-dark: #14532d;
+    --border-default: #bbf7d0;
+    --border-default-dark: #14532d;
+    --text-muted: #047857;
+    --text-muted-dark: #6ee7b7;
+    --color-primary-50: #ecfdf5;
+    --color-primary-100: #d1fae5;
+    --color-primary-200: #a7f3d0;
+    --color-primary-300: #6ee7b7;
+    --color-primary-400: #34d399;
+    --color-primary-500: #10b981;
+    --color-primary-600: #059669;
+    --color-primary-700: #047857;
+    --color-primary-800: #065f46;
+    --color-primary-900: #064e3b;
+    --color-primary-950: #022c22;
+}
+
+[data-color-scheme="violet"] {
+    --surface-body: #faf5ff;
+    --surface-body-dark: #120b20;
+    --surface-sidebar: #2d1f4e;
+    --surface-sidebar-dark: #0f0620;
+    --surface-header: #2d1f4e;
+    --surface-header-dark: #0f0620;
+    --surface-card: #ffffff;
+    --surface-card-dark: #1e1b4b;
+    --surface-dropdown: #1e1b4b;
+    --surface-dropdown-dark: #0f0620;
+    --surface-footer: #f5f3ff;
+    --surface-footer-dark: #2d1f4e;
+    --surface-hover: #5b21b6;
+    --surface-hover-dark: #3b0764;
+    --border-default: #e9d5ff;
+    --border-default-dark: #6b21a8;
+    --text-muted: #6d28d9;
+    --text-muted-dark: #c4b5fd;
+    --color-primary-50: #f5f3ff;
+    --color-primary-100: #ede9fe;
+    --color-primary-200: #ddd6fe;
+    --color-primary-300: #c4b5fd;
+    --color-primary-400: #a78bfa;
+    --color-primary-500: #8b5cf6;
+    --color-primary-600: #7c3aed;
+    --color-primary-700: #6d28d9;
+    --color-primary-800: #5b21b6;
+    --color-primary-900: #4c1d95;
+    --color-primary-950: #2e1065;
+}
+
 /* Theme customization (replaces theme.extend in tailwind.config.js) */
 @theme {
     --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --radius-card: 0.75rem;
+    --color-primary-50: var(--color-primary-50);
+    --color-primary-100: var(--color-primary-100);
+    --color-primary-200: var(--color-primary-200);
+    --color-primary-300: var(--color-primary-300);
+    --color-primary-400: var(--color-primary-400);
+    --color-primary-500: var(--color-primary-500);
+    --color-primary-600: var(--color-primary-600);
+    --color-primary-700: var(--color-primary-700);
+    --color-primary-800: var(--color-primary-800);
+    --color-primary-900: var(--color-primary-900);
+    --color-primary-950: var(--color-primary-950);
 }
 
 /* Import FontAwesome — only the weights we use (skips v4-compat font + shims) */
@@ -33,6 +144,43 @@
 html, body {
     height: 100%;
     overflow: hidden;
+}
+
+/* Structural surfaces: color scheme variables applied to main chrome */
+body {
+    background-color: var(--surface-body) !important;
+}
+.dark body {
+    background-color: var(--surface-body-dark) !important;
+}
+#sidebar {
+    background-color: var(--surface-sidebar) !important;
+}
+.dark #sidebar {
+    background-color: var(--surface-sidebar-dark) !important;
+}
+/* Header bar and the nav inside it - .surface-header raises specificity so we beat Tailwind bg utilities */
+header.surface-header,
+header.surface-header nav {
+    background-color: var(--surface-header) !important;
+}
+.dark header.surface-header,
+.dark header.surface-header nav {
+    background-color: var(--surface-header-dark) !important;
+}
+.dropdown-menu {
+    background-color: var(--surface-dropdown) !important;
+}
+.dark .dropdown-menu {
+    background-color: var(--surface-dropdown-dark) !important;
+}
+footer {
+    background-color: var(--surface-footer) !important;
+    border-color: var(--border-default) !important;
+}
+.dark footer {
+    background-color: var(--surface-footer-dark) !important;
+    border-color: var(--border-default-dark) !important;
 }
 
 /* Dark Mode Text Readability Fixes */
@@ -88,9 +236,83 @@ html, body {
     }
 }
 
-/* Page-level card container (rounded-xl, shadow) */
+/* Page-level card container (rounded-xl, shadow) - !important so scheme wins over Tailwind utilities */
 .card {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 transition-colors duration-200;
+    background-color: var(--surface-card) !important;
+    border: 1px solid var(--border-default) !important;
+    @apply rounded-xl shadow-md transition-colors duration-200;
+}
+.dark .card {
+    background-color: var(--surface-card-dark) !important;
+    border-color: var(--border-default-dark) !important;
+}
+
+/* Content panels (welcome card, movies wrapper, profile wrapper, etc.) - same surface as cards */
+.surface-panel {
+    background-color: var(--surface-card) !important;
+    border-color: var(--border-default);
+}
+.surface-panel.border {
+    border-width: 1px;
+    border-style: solid;
+}
+.dark .surface-panel {
+    background-color: var(--surface-card-dark) !important;
+    border-color: var(--border-default-dark);
+}
+/* Sub-sections (filter bars, toolbars) - use footer surface for slight contrast */
+.surface-panel-alt {
+    background-color: var(--surface-footer) !important;
+    border-color: var(--border-default);
+}
+.dark .surface-panel-alt {
+    background-color: var(--surface-footer-dark) !important;
+    border-color: var(--border-default-dark);
+}
+.surface-panel-alt.border-b,
+.surface-panel-alt.border-t {
+    border-color: var(--border-default);
+}
+.dark .surface-panel-alt.border-b,
+.dark .surface-panel-alt.border-t {
+    border-color: var(--border-default-dark);
+}
+
+/* Tables in main content - use scheme surfaces so they match sidebar/header/cards */
+main table {
+    background-color: var(--surface-card) !important;
+}
+.dark main table {
+    background-color: var(--surface-card-dark) !important;
+}
+main thead th {
+    background-color: var(--surface-dropdown) !important;
+    border-bottom-color: var(--border-default) !important;
+}
+.dark main thead th {
+    background-color: var(--surface-dropdown-dark) !important;
+    border-bottom-color: var(--border-default-dark) !important;
+}
+/* Table body and every row use scheme surface (override Tailwind bg-white / dark:bg-gray-800) */
+main tbody {
+    background-color: var(--surface-card) !important;
+}
+.dark main tbody {
+    background-color: var(--surface-card-dark) !important;
+}
+main tbody tr {
+    background-color: var(--surface-card) !important;
+    border-bottom-color: var(--border-default);
+}
+.dark main tbody tr {
+    background-color: var(--surface-card-dark) !important;
+    border-bottom-color: var(--border-default-dark);
+}
+main tbody tr:hover {
+    background-color: var(--surface-hover) !important;
+}
+.dark main tbody tr:hover {
+    background-color: var(--surface-hover-dark) !important;
 }
 
 /* Custom styles for proper spacing and button alignment */
@@ -103,7 +325,7 @@ html, body {
 }
 
 .btn-primary {
-    @apply bg-blue-600 dark:bg-blue-700 text-white border-blue-600 dark:border-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800;
+    @apply bg-primary-600 text-white border border-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:border-primary-700 dark:hover:bg-primary-800;
 }
 
 .btn-secondary {

@@ -189,7 +189,7 @@
 
                 <!-- Desktop Search Form with Autocomplete (visible at lg+) -->
                 <form method="GET" action="{{ route('search') }}" class="hidden lg:flex items-center relative" id="header-search-form">
-                    <select name="t" class="bg-gray-700 text-white text-sm rounded-l-lg px-3 py-2 border-r border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select name="t" class="bg-gray-700 text-white text-sm rounded-l-lg px-3 py-2 border-r border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500">
                         <option value="-1">All</option>
                         @if(isset($parentcatlist))
                             @foreach($parentcatlist as $parentcat)
@@ -207,12 +207,12 @@
                                value="{{ $header_menu_search ?? '' }}"
                                placeholder="Search..."
                                autocomplete="off"
-                               class="bg-gray-700 text-white text-sm px-3 py-2 w-40 xl:w-48 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                               class="bg-gray-700 text-white text-sm px-3 py-2 w-40 xl:w-48 focus:outline-none focus:ring-2 focus:ring-primary-500">
                         <!-- Autocomplete dropdown for header -->
                         <div id="header-autocomplete-dropdown" class="hidden absolute z-50 w-64 mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto right-0">
                         </div>
                     </div>
-                    <button type="submit" class="bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-800 text-white px-4 py-2 rounded-r-lg transition">
+                    <button type="submit" class="bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 text-white px-4 py-2 rounded-r-lg transition">
                         <i class="fa fa-search"></i>
                     </button>
                 </form>
@@ -221,7 +221,7 @@
                 @auth
                     <div class="relative dropdown-container">
                         <button class="dropdown-toggle flex items-center space-x-2 text-gray-300 hover:text-white px-2 lg:px-3 py-2 rounded-lg hover:bg-gray-700 transition">
-                            <span class="w-8 h-8 bg-blue-600 dark:bg-blue-700 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            <span class="w-8 h-8 bg-primary-600 dark:bg-primary-700 rounded-full flex items-center justify-center text-white font-bold text-sm">
                                 {{ strtoupper(substr(auth()->user()->username, 0, 1)) }}
                             </span>
                             <span class="hidden lg:block text-sm">{{ auth()->user()->username }}</span>
@@ -256,22 +256,41 @@
                                 <div class="flex items-center gap-1" id="dropdown-theme-switcher">
                                     @php $currentTheme = auth()->user()->theme_preference ?? 'light'; @endphp
                                     <button type="button" data-theme="light"
-                                        class="dropdown-theme-btn flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs rounded-lg transition {{ $currentTheme === 'light' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}"
+                                        class="dropdown-theme-btn flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs rounded-lg transition {{ $currentTheme === 'light' ? 'bg-primary-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}"
                                         title="Light Mode">
                                         <i class="fas fa-sun"></i>
                                         <span>Light</span>
                                     </button>
                                     <button type="button" data-theme="dark"
-                                        class="dropdown-theme-btn flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs rounded-lg transition {{ $currentTheme === 'dark' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}"
+                                        class="dropdown-theme-btn flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs rounded-lg transition {{ $currentTheme === 'dark' ? 'bg-primary-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}"
                                         title="Dark Mode">
                                         <i class="fas fa-moon"></i>
                                         <span>Dark</span>
                                     </button>
                                     <button type="button" data-theme="system"
-                                        class="dropdown-theme-btn flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs rounded-lg transition {{ $currentTheme === 'system' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}"
+                                        class="dropdown-theme-btn flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs rounded-lg transition {{ $currentTheme === 'system' ? 'bg-primary-600 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white' }}"
                                         title="System (Auto)">
                                         <i class="fas fa-desktop"></i>
                                         <span>Auto</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Color Scheme -->
+                            <div class="px-4 py-2">
+                                <span class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Color Scheme</span>
+                                <div class="flex items-center justify-center gap-2" id="dropdown-scheme-switcher">
+                                    @php $currentScheme = auth()->user()->color_scheme ?? 'blue'; @endphp
+                                    <button type="button" data-scheme="blue" title="Blue"
+                                        class="dropdown-scheme-btn w-8 h-8 rounded-full bg-blue-600 transition ring-offset-2 ring-offset-gray-900 {{ $currentScheme === 'blue' ? 'ring-2 ring-primary-500' : '' }}">
+                                        <span class="sr-only">Blue</span>
+                                    </button>
+                                    <button type="button" data-scheme="emerald" title="Emerald"
+                                        class="dropdown-scheme-btn w-8 h-8 rounded-full bg-emerald-600 transition ring-offset-2 ring-offset-gray-900 {{ $currentScheme === 'emerald' ? 'ring-2 ring-primary-500' : '' }}">
+                                        <span class="sr-only">Emerald</span>
+                                    </button>
+                                    <button type="button" data-scheme="violet" title="Violet"
+                                        class="dropdown-scheme-btn w-8 h-8 rounded-full bg-violet-600 transition ring-offset-2 ring-offset-gray-900 {{ $currentScheme === 'violet' ? 'ring-2 ring-primary-500' : '' }}">
+                                        <span class="sr-only">Violet</span>
                                     </button>
                                 </div>
                             </div>
@@ -293,7 +312,7 @@
                         <a href="{{ route('login') }}" class="px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition">
                             <i class="fa fa-sign-in mr-1"></i><span class="hidden sm:inline">Login</span>
                         </a>
-                        <a href="{{ route('register') }}" class="px-3 py-2 text-sm bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-800 text-white rounded-lg transition">
+                        <a href="{{ route('register') }}" class="px-3 py-2 text-sm bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 text-white rounded-lg transition">
                             <i class="fa fa-user-plus mr-1"></i><span class="hidden sm:inline">Register</span>
                         </a>
                     </div>
@@ -306,7 +325,7 @@
     <div id="mobile-search-form" class="lg:hidden hidden bg-gray-800 dark:bg-gray-950 border-t border-gray-700 dark:border-gray-600 shadow-lg z-50">
         <div class="container mx-auto px-4 py-3">
             <form method="GET" action="{{ route('search') }}" class="space-y-3" id="mobile-search-form-el">
-                <select name="t" class="w-full bg-gray-700 text-white text-sm rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 touch-target">
+                <select name="t" class="w-full bg-gray-700 text-white text-sm rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 touch-target">
                     <option value="-1">All Categories</option>
                     @if(isset($parentcatlist))
                         @foreach($parentcatlist as $parentcat)
@@ -324,12 +343,12 @@
                            value="{{ $header_menu_search ?? '' }}"
                            placeholder="Search releases..."
                            autocomplete="off"
-                           class="w-full bg-gray-700 text-white text-sm px-3 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-target">
+                           class="w-full bg-gray-700 text-white text-sm px-3 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 touch-target">
                     <!-- Autocomplete dropdown for mobile -->
                     <div id="mobile-autocomplete-dropdown" class="hidden absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-800 text-white px-4 py-3 rounded-lg transition touch-target font-semibold">
+                <button type="submit" class="w-full bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 text-white px-4 py-3 rounded-lg transition touch-target font-semibold">
                     <i class="fa fa-search mr-2"></i>Search
                 </button>
             </form>
@@ -434,22 +453,41 @@
                         <div class="flex items-center gap-1.5" id="mobile-theme-switcher">
                             @php $mobileTheme = auth()->user()->theme_preference ?? 'light'; @endphp
                             <button type="button" data-theme="light"
-                                class="mobile-theme-btn flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg transition touch-target {{ $mobileTheme === 'light' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}"
+                                class="mobile-theme-btn flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg transition touch-target {{ $mobileTheme === 'light' ? 'bg-primary-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}"
                                 title="Light Mode">
                                 <i class="fas fa-sun"></i>
                                 <span>Light</span>
                             </button>
                             <button type="button" data-theme="dark"
-                                class="mobile-theme-btn flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg transition touch-target {{ $mobileTheme === 'dark' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}"
+                                class="mobile-theme-btn flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg transition touch-target {{ $mobileTheme === 'dark' ? 'bg-primary-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}"
                                 title="Dark Mode">
                                 <i class="fas fa-moon"></i>
                                 <span>Dark</span>
                             </button>
                             <button type="button" data-theme="system"
-                                class="mobile-theme-btn flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg transition touch-target {{ $mobileTheme === 'system' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}"
+                                class="mobile-theme-btn flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg transition touch-target {{ $mobileTheme === 'system' ? 'bg-primary-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}"
                                 title="System (Auto)">
                                 <i class="fas fa-desktop"></i>
                                 <span>Auto</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Mobile Color Scheme -->
+                    <div class="px-4 py-2.5">
+                        <span class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Color Scheme</span>
+                        <div class="flex items-center justify-center gap-3" id="mobile-scheme-switcher">
+                            @php $mobileScheme = auth()->user()->color_scheme ?? 'blue'; @endphp
+                            <button type="button" data-scheme="blue" title="Blue"
+                                class="mobile-scheme-btn w-9 h-9 rounded-full bg-blue-600 transition touch-target ring-offset-2 ring-offset-gray-900 {{ $mobileScheme === 'blue' ? 'ring-2 ring-primary-500' : '' }}">
+                                <span class="sr-only">Blue</span>
+                            </button>
+                            <button type="button" data-scheme="emerald" title="Emerald"
+                                class="mobile-scheme-btn w-9 h-9 rounded-full bg-emerald-600 transition touch-target ring-offset-2 ring-offset-gray-900 {{ $mobileScheme === 'emerald' ? 'ring-2 ring-primary-500' : '' }}">
+                                <span class="sr-only">Emerald</span>
+                            </button>
+                            <button type="button" data-scheme="violet" title="Violet"
+                                class="mobile-scheme-btn w-9 h-9 rounded-full bg-violet-600 transition touch-target ring-offset-2 ring-offset-gray-900 {{ $mobileScheme === 'violet' ? 'ring-2 ring-primary-500' : '' }}">
+                                <span class="sr-only">Violet</span>
                             </button>
                         </div>
                     </div>

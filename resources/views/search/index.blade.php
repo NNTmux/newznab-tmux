@@ -5,7 +5,7 @@
 @endpush
 
 @section('content')
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+<div class="surface-panel rounded-xl shadow-sm p-6">
     <div class="mb-6">
         <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2">Search Releases</h1>
         <p class="text-gray-600">Find exactly what you're looking for</p>
@@ -22,7 +22,7 @@
                            id="search"
                            name="search"
                            value="{{ request('search') }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                            placeholder="Enter search terms..."
                            autocomplete="off"
                            @if(isset($autocompleteEnabled) && $autocompleteEnabled) data-autocomplete="true" @endif>
@@ -36,7 +36,7 @@
                     <div class="mt-2 text-sm">
                         <span class="text-gray-600 dark:text-gray-400">Did you mean: </span>
                         <a href="{{ route('search', array_merge(request()->except('search'), ['search' => $spellSuggestion])) }}"
-                           class="text-blue-600 dark:text-blue-400 hover:underline font-medium">
+                           class="text-primary-600 dark:text-primary-400 hover:underline font-medium">
                             {{ $spellSuggestion }}
                         </a>
                         <span class="text-gray-500 dark:text-gray-500">?</span>
@@ -49,7 +49,7 @@
                 <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
                 <select id="category"
                         name="t"
-                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                     <option value="">All Categories</option>
                     @if(isset($parentcatlist))
                         @foreach($parentcatlist as $parentcat)
@@ -84,48 +84,48 @@
             <!-- Hidden field to maintain advanced search mode -->
             <input type="hidden" name="search_type" value="adv">
             <!-- Advanced Search Options -->
-            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 mb-4">
+            <div class="surface-panel-alt rounded-lg p-4 mb-4 border">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Advanced Options</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div>
                         <label for="group" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Usenet Group</label>
                         <input type="text" id="group" name="group" value="{{ request('group') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                placeholder="e.g., alt.binaries.teevee">
                     </div>
 
                     <div>
                         <label for="minage" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Min Age (days)</label>
                         <input type="number" id="minage" name="minage" value="{{ request('minage') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                min="0">
                     </div>
 
                     <div>
                         <label for="maxage" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Max Age (days)</label>
                         <input type="number" id="maxage" name="maxage" value="{{ request('maxage') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                min="0">
                     </div>
 
                     <div>
                         <label for="minsize" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Min Size (MB)</label>
                         <input type="number" id="minsize" name="minsize" value="{{ request('minsize') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                min="0">
                     </div>
 
                     <div>
                         <label for="maxsize" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Max Size (MB)</label>
                         <input type="number" id="maxsize" name="maxsize" value="{{ request('maxsize') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                min="0">
                     </div>
 
                     <div>
                         <label for="poster" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Poster</label>
                         <input type="text" id="poster" name="searchadvposter" value="{{ request('searchadvposter') }}"
-                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                               class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                placeholder="e.g., poster@example.com">
                     </div>
                 </div>
@@ -134,10 +134,10 @@
 
         <!-- Action Buttons -->
         <div class="flex flex-col sm:flex-row flex-wrap gap-2">
-            <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition inline-flex items-center justify-center font-semibold">
+            <button type="submit" class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition inline-flex items-center justify-center font-semibold">
                 <i class="fas fa-search mr-2"></i> Search
             </button>
-            <a href="{{ url('/search?search_type=adv') }}" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition inline-flex items-center justify-center">
+            <a href="{{ url('/search?search_type=adv') }}" class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition inline-flex items-center justify-center">
                 <i class="fas fa-sliders-h mr-2"></i> Advanced Search
             </a>
             <a href="{{ route('search') }}" class="px-6 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-100 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-700 transition justify-center inline-flex">
@@ -150,7 +150,7 @@
     @if(isset($results) && ((is_array($results) && count($results) > 0) || (is_object($results) && $results->count() > 0)))
         <form id="nzb_multi_operations_form" method="get" x-data="releaseMultiOps">
             <!-- Multi-operations toolbar -->
-            <div class="mb-4 bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+            <div class="mb-4 surface-panel-alt rounded-lg p-4 border">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div class="flex flex-wrap items-center gap-2">
                         <small class="text-gray-600 dark:text-gray-400">With Selected:</small>
@@ -158,7 +158,7 @@
                             <button type="button" class="nzb_multi_operations_download px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition text-sm" title="Download NZBs">
                                 <i class="fa fa-cloud-download"></i>
                             </button>
-                            <button type="button" class="nzb_multi_operations_cart px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition text-sm" title="Send to Download Basket">
+                            <button type="button" class="nzb_multi_operations_cart px-3 py-1 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition text-sm" title="Send to Download Basket">
                                 <i class="fa fa-shopping-basket"></i>
                             </button>
                             @if(auth()->check() && auth()->user()->hasRole('Admin'))
@@ -182,7 +182,7 @@
             </div>
 
             <!-- Sort Options -->
-            <div class="mb-4 bg-gray-50 dark:bg-gray-900 rounded-lg p-4 flex items-center justify-between">
+            <div class="mb-4 surface-panel-alt rounded-lg p-4 border flex items-center justify-between">
                 <span class="font-medium text-gray-700 dark:text-gray-300 text-sm">Sort results:</span>
                 <x-sort-dropdown />
             </div>
@@ -193,7 +193,7 @@
                     <thead class="bg-gray-100 dark:bg-gray-900">
                         <tr>
                             <th class="px-3 py-3 text-left">
-                                <input type="checkbox" class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" id="chkSelectAll" x-model="allChecked" @change="toggleAll()">
+                                <input type="checkbox" class="rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400 dark:bg-gray-700" id="chkSelectAll" x-model="allChecked" @change="toggleAll()">
                             </th>
                             <th class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Name</th>
                             <th class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Category</th>
@@ -208,12 +208,12 @@
                         @foreach($results as $result)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                                 <td class="px-3 py-4 whitespace-nowrap">
-                                    <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" name="release[]" value="{{ $result->guid }}" @change="onCheckboxChange()">
+                                    <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400 dark:bg-gray-700" name="release[]" value="{{ $result->guid }}" @change="onCheckboxChange()">
                                 </td>
                                 <td class="px-3 py-4">
                                     <div class="flex-1">
                                         <div class="flex items-center gap-2 flex-wrap">
-                                            <a href="{{ url('/details/' . $result->guid) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium wrap-break-word break-all">{{ $result->searchname }}</a>
+                                            <a href="{{ url('/details/' . $result->guid) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium wrap-break-word break-all">{{ $result->searchname }}</a>
                                             @if(!empty($result->report_count) && $result->report_count > 0)
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200"
                                                       title="Reported: {{ \App\Models\ReleaseReport::reasonKeysToLabels($result->report_reasons ?? '') }}">
@@ -244,7 +244,7 @@
                                             @endif
                                             @if(isset($result->reid) && $result->reid != null)
                                                 <button type="button"
-                                                        class="mediainfo-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition cursor-pointer"
+                                                        class="mediainfo-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 hover:bg-primary-200 dark:hover:bg-primary-800 transition cursor-pointer"
                                                         data-release-id="{{ $result->id }}"
                                                         title="View media info">
                                                     <i class="fas fa-info-circle mr-1"></i> Media Info
@@ -286,7 +286,7 @@
                                     </div>
                                 </td>
                                 <td class="px-3 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200">
                                         {{ $result->category_name ?? 'Other' }}
                                     </span>
                                 </td>
@@ -299,7 +299,7 @@
                                 <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
                                     @if($result->totalpart > 0)
                                         <button type="button"
-                                                class="filelist-badge text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium cursor-pointer hover:underline"
+                                                class="filelist-badge text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium cursor-pointer hover:underline"
                                                 data-guid="{{ $result->guid }}"
                                                 title="View file list">
                                             {{ $result->totalpart ?? 0 }}
@@ -311,7 +311,7 @@
                                 <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
                                     <div class="flex items-center gap-2">
                                         <span title="Grabs"><i class="fas fa-download text-green-600 dark:text-green-400"></i> {{ $result->grabs ?? 0 }}</span>
-                                        <span title="Comments"><i class="fas fa-comment text-blue-600 dark:text-blue-400"></i> {{ $result->comments ?? 0 }}</span>
+                                        <span title="Comments"><i class="fas fa-comment text-primary-600 dark:text-primary-400"></i> {{ $result->comments ?? 0 }}</span>
                                     </div>
                                 </td>
                                 <td class="px-3 py-4 whitespace-nowrap">
@@ -319,7 +319,7 @@
                                         <a href="{{ url('/getnzb/' . $result->guid) }}" class="download-nzb px-2 py-1 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition text-sm" title="Download NZB">
                                             <i class="fa fa-download"></i>
                                         </a>
-                                        <a href="{{ url('/details/' . $result->guid) }}" class="px-2 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition text-sm" title="View Details">
+                                        <a href="{{ url('/details/' . $result->guid) }}" class="px-2 py-1 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition text-sm" title="View Details">
                                             <i class="fa fa-info"></i>
                                         </a>
                                         <a href="#" class="add-to-cart px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition text-sm" data-guid="{{ $result->guid }}" title="Add to Cart">
@@ -346,10 +346,10 @@
                 @foreach($results as $result)
                     <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:shadow-md transition">
                         <div class="flex items-start gap-3">
-                            <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700 mt-1" name="release[]" value="{{ $result->guid }}" @change="onCheckboxChange()">
+                            <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400 dark:bg-gray-700 mt-1" name="release[]" value="{{ $result->guid }}" @change="onCheckboxChange()">
                             <div class="flex-1">
                                 <div class="flex items-center gap-2 flex-wrap mb-2">
-                                    <a href="{{ url('/details/' . $result->guid) }}" class="text-lg font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 wrap-break-word break-all">
+                                    <a href="{{ url('/details/' . $result->guid) }}" class="text-lg font-medium text-primary-600 dark:text-primary-400 hover:text-primary-800 wrap-break-word break-all">
                                         {{ $result->searchname }}
                                     </a>
                                     @if(!empty($result->report_count) && $result->report_count > 0)
@@ -382,7 +382,7 @@
                                     @endif
                                     @if(isset($result->reid) && $result->reid != null)
                                         <button type="button"
-                                                class="mediainfo-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition cursor-pointer"
+                                                class="mediainfo-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 hover:bg-primary-200 dark:hover:bg-primary-800 transition cursor-pointer"
                                                 data-release-id="{{ $result->id }}"
                                                 title="View media info">
                                             <i class="fas fa-info-circle mr-1"></i> Media Info
@@ -405,14 +405,14 @@
                                     @endif
                                 </div>
                                 <div class="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200">
                                         {{ $result->category_name ?? 'Other' }}
                                     </span>
                                     <span><i class="fas fa-clock mr-1"></i>{{ userDateDiffForHumans($result->postdate) }}</span>
                                     <span><i class="fas fa-hdd mr-1"></i>{{ number_format($result->size / 1073741824, 2) }} GB</span>
                                     <span><i class="fas fa-file mr-1"></i>{{ $result->totalpart ?? 0 }} files</span>
                                     <span title="Grabs"><i class="fas fa-download text-green-600 dark:text-green-400 mr-1"></i>{{ $result->grabs ?? 0 }}</span>
-                                    <span title="Comments"><i class="fas fa-comment text-blue-600 dark:text-blue-400 mr-1"></i>{{ $result->comments ?? 0 }}</span>
+                                    <span title="Comments"><i class="fas fa-comment text-primary-600 dark:text-primary-400 mr-1"></i>{{ $result->comments ?? 0 }}</span>
                                     @if($result->group_name)
                                         <span><i class="fas fa-users mr-1"></i>{{ $result->group_name }}</span>
                                     @endif
@@ -429,7 +429,7 @@
                                         <i class="fa fa-download"></i>
                                     </a>
                                     <a href="{{ url('/details/' . $result->guid) }}"
-                                       class="px-2 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition text-sm"
+                                       class="px-2 py-1 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition text-sm"
                                        title="View Details">
                                         <i class="fa fa-info"></i>
                                     </a>

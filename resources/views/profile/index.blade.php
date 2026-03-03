@@ -4,17 +4,17 @@
 <!-- Breadcrumb -->
 <nav class="mb-4 text-sm" aria-label="breadcrumb">
     <ol class="flex items-center space-x-2">
-        <li><a href="{{ url('/') }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800">Home</a></li>
+        <li><a href="{{ url('/') }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800">Home</a></li>
         <li class="text-gray-400">/</li>
-        <li><a href="#" class="text-blue-600 dark:text-blue-400 hover:text-blue-800">Profile</a></li>
+        <li><a href="#" class="text-primary-600 dark:text-primary-400 hover:text-primary-800">Profile</a></li>
         <li class="text-gray-400">/</li>
         <li class="text-gray-600">{{ $user->username }}</li>
     </ol>
 </nav>
 
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+<div class="surface-panel rounded-xl shadow-sm overflow-hidden">
         <!-- Profile Header -->
-        <div class="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
+        <div class="surface-panel-alt border-b px-6 py-4 flex justify-between items-center">
             <h1 class="text-xl font-semibold text-gray-800">
                 <i class="fas fa-user mr-2"></i>User Profile
             </h1>
@@ -47,7 +47,7 @@
 
                     <!-- Tab Navigation -->
                     <div class="space-y-1">
-                        <a href="#general" class="tab-link flex items-center px-4 py-3 bg-blue-50 text-blue-700 rounded-lg font-medium">
+                        <a href="#general" class="tab-link flex items-center px-4 py-3 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-lg font-medium">
                             <i class="fa fa-info-circle mr-3"></i>General Information
                         </a>
                         <a href="#preferences" class="tab-link flex items-center px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 rounded-lg">
@@ -68,9 +68,9 @@
                 <div class="lg:col-span-3">
                     <!-- General Information Tab -->
                     <div id="general" class="tab-content">
-                        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6">
+                        <div class="surface-panel-alt rounded-lg p-6 mb-6 border">
                             <div class="flex items-center mb-4">
-                                <i class="fa fa-info-circle text-blue-600 dark:text-blue-400 mr-2"></i>
+                                <i class="fa fa-info-circle text-primary-600 dark:text-primary-400 mr-2"></i>
                                 <h2 class="text-lg font-semibold">General Information</h2>
                             </div>
                             <div class="space-y-4">
@@ -98,7 +98,7 @@
                                 <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
                                     <div class="w-1/3 text-gray-600">Role</div>
                                     <div class="w-2/3">
-                                        <span class="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
+                                        <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 text-sm rounded-full">
                                             <i class="fa fa-id-badge mr-1"></i>{{ $user->roles->first()->name ?? 'User' }}
                                         </span>
                                     </div>
@@ -151,12 +151,12 @@
                                                 @foreach($allPendingRoles as $index => $pendingRoleInfo)
                                                     <div class="@if(!$loop->last) pb-3 border-b border-gray-100 dark:border-gray-700 @endif">
                                                         <div class="flex items-center">
-                                                            <span class="flex items-center justify-center w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-full mr-2">
+                                                            <span class="flex items-center justify-center w-6 h-6 bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400 text-xs font-bold rounded-full mr-2">
                                                                 {{ $index + 1 }}
                                                             </span>
-                                                            <i class="fa fa-layer-group text-blue-400 mr-2"></i>
-                                                            <span class="font-medium text-blue-600 dark:text-blue-400">{{ $pendingRoleInfo['role_name'] }}</span>
-                                                            <span class="ml-2 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded">
+                                                            <i class="fa fa-layer-group text-primary-400 mr-2"></i>
+                                                            <span class="font-medium text-primary-600 dark:text-primary-400">{{ $pendingRoleInfo['role_name'] }}</span>
+                                                            <span class="ml-2 px-2 py-1 bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 text-xs rounded">
                                                                 <i class="fa fa-clock mr-1"></i>Scheduled
                                                             </span>
                                                         </div>
@@ -175,7 +175,7 @@
                                                         </div>
                                                     </div>
                                                 @endforeach
-                                                <div class="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 p-2 rounded mt-2">
+                                                <div class="text-xs text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 p-2 rounded mt-2">
                                                     <i class="fa fa-info-circle mr-1"></i>
                                                     These roles will automatically activate in sequence as each previous role expires
                                                 </div>
@@ -193,9 +193,9 @@
                                             @endphp
                                             <div class="space-y-2">
                                                 <div class="flex items-center">
-                                                    <i class="fa fa-layer-group text-blue-400 mr-2"></i>
-                                                    <span class="font-medium text-blue-600 dark:text-blue-400">{{ $pendingRole->name ?? 'Unknown' }}</span>
-                                                    <span class="ml-2 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded">
+                                                    <i class="fa fa-layer-group text-primary-400 mr-2"></i>
+                                                    <span class="font-medium text-primary-600 dark:text-primary-400">{{ $pendingRole->name ?? 'Unknown' }}</span>
+                                                    <span class="ml-2 px-2 py-1 bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 text-xs rounded">
                                                         <i class="fa fa-clock mr-1"></i>Scheduled
                                                     </span>
                                                 </div>
@@ -203,7 +203,7 @@
                                                     <i class="fa fa-calendar-alt mr-1"></i>
                                                     Will activate {{ $pendingStartDate->diffForHumans() }} on {{ $pendingStartDate->format('M d, Y g:i A') }}
                                                 </div>
-                                                <div class="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
+                                                <div class="text-xs text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 p-2 rounded">
                                                     <i class="fa fa-info-circle mr-1"></i>
                                                     This role will automatically activate when your current role expires
                                                 </div>
@@ -221,7 +221,7 @@
                                     <div class="flex border-b border-gray-200 dark:border-gray-700 pb-3">
                                         <div class="w-1/3 text-gray-600">Invited By</div>
                                         <div class="w-2/3">
-                                            <a href="{{ url('/profile?id=' . $userinvitedby->id) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800">
+                                            <a href="{{ url('/profile?id=' . $userinvitedby->id) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800">
                                                 {{ $userinvitedby->username }}
                                             </a>
                                         </div>
@@ -250,7 +250,7 @@
                                             }
                                         @endphp
                                         <div class="flex items-center">
-                                            <i class="fa fa-clock text-blue-600 dark:text-blue-400 mr-2"></i>
+                                            <i class="fa fa-clock text-primary-600 dark:text-primary-400 mr-2"></i>
                                             <span class="font-medium">{{ $timezoneDisplay }}</span>
                                         </div>
                                         <div class="mt-1 text-sm text-gray-500">
@@ -265,9 +265,9 @@
 
                     <!-- UI Preferences Tab -->
                     <div id="preferences" class="tab-content hidden-by-default">
-                        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6">
+                        <div class="surface-panel-alt rounded-lg p-6 mb-6 border">
                             <div class="flex items-center mb-4">
-                                <i class="fa fa-sliders-h text-blue-600 dark:text-blue-400 mr-2"></i>
+                                <i class="fa fa-sliders-h text-primary-600 dark:text-primary-400 mr-2"></i>
                                 <h2 class="text-lg font-semibold">UI Preferences</h2>
                             </div>
 
@@ -286,8 +286,8 @@
                                             <span class="font-medium">Dark Mode</span>
                                         </div>
                                     @elseif($themePreference === 'system')
-                                        <div class="flex items-center px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-lg">
-                                            <i class="fas fa-desktop text-blue-600 dark:text-blue-400 text-lg mr-2"></i>
+                                        <div class="flex items-center px-4 py-2 bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 rounded-lg">
+                                            <i class="fas fa-desktop text-primary-600 dark:text-primary-400 text-lg mr-2"></i>
                                             <span class="font-medium">System (Auto)</span>
                                         </div>
                                     @else
@@ -332,16 +332,16 @@
 
                     <!-- API & Downloads Tab -->
                     <div id="api" class="tab-content hidden-by-default">
-                        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6">
+                        <div class="surface-panel-alt rounded-lg p-6 mb-6 border">
                             <div class="flex items-center mb-4">
-                                <i class="fa fa-key text-blue-600 dark:text-blue-400 mr-2"></i>
+                                <i class="fa fa-key text-primary-600 dark:text-primary-400 mr-2"></i>
                                 <h2 class="text-lg font-semibold">API & Downloads</h2>
                             </div>
 
                             <!-- Usage Limits -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                 <!-- Downloads Usage -->
-                                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
+                                <div class="surface-panel rounded-lg p-4 shadow">
                                     <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                                         @php
                                             $downloadPercentage = $downloadLimit > 0 ? min(($grabstoday / $downloadLimit) * 100, 100) : 0;
@@ -355,7 +355,7 @@
                                 </div>
 
                                 <!-- API Requests Usage -->
-                                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
+                                <div class="surface-panel rounded-lg p-4 shadow">
                                     <div class="flex justify-between items-center mb-2">
                                         <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
                                             <i class="fa fa-server text-purple-600 mr-2"></i>API Requests (24h)
@@ -379,15 +379,15 @@
 
                             <!-- Stats Cards -->
                             <div class="grid grid-cols-3 gap-4 mb-6">
-                                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow">
-                                    <div class="text-3xl font-bold text-blue-600">{{ $user->grabs ?? 0 }}</div>
+                                <div class="surface-panel rounded-lg p-4 text-center shadow">
+                                    <div class="text-3xl font-bold text-primary-600 dark:text-primary-400">{{ $user->grabs ?? 0 }}</div>
                                     <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Total Grabs</div>
                                 </div>
-                                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow">
+                                <div class="surface-panel rounded-lg p-4 text-center shadow">
                                     <div class="text-3xl font-bold text-green-600">{{ $grabstoday ?? 0 }}</div>
                                     <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Today</div>
                                 </div>
-                                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow">
+                                <div class="surface-panel rounded-lg p-4 text-center shadow">
                                     <div class="text-3xl font-bold text-purple-600">{{ $apirequests ?? 0 }}</div>
                                     <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">API Requests</div>
                                 </div>

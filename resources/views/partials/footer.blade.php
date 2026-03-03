@@ -4,7 +4,7 @@
             <!-- Copyright -->
             <p class="text-gray-600 dark:text-gray-400">
                 &copy; {{ now()->year }}
-                <a href="https://github.com/NNTmux/newznab-tmux" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition">NNTmux</a>
+                <a href="https://github.com/NNTmux/newznab-tmux" class="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition">NNTmux</a>
             </p>
 
             <!-- Quick Links -->

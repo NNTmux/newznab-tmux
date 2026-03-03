@@ -1,16 +1,16 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+<div class="surface-panel rounded-xl shadow-sm">
     <!-- Header -->
-    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+    <div class="surface-panel-alt px-6 py-4 border-b">
         <div class="flex justify-between items-center">
             <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 flex items-center">
-                <i class="fa fa-tv mr-3 text-blue-600"></i>TV Series
+                <i class="fa fa-tv mr-3 text-primary-600 dark:text-primary-400"></i>TV Series
             </h3>
             <nav aria-label="breadcrumb">
                 <ol class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                    <li><a href="{{ url($site['home_link'] ?? '/') }}" class="hover:text-blue-600 dark:hover:text-blue-400">Home</a></li>
+                    <li><a href="{{ url($site['home_link'] ?? '/') }}" class="hover:text-primary-600 dark:hover:text-primary-400">Home</a></li>
                     <li><i class="fas fa-chevron-right text-xs mx-2"></i></li>
                     <li class="text-gray-500 dark:text-gray-400">TV Series List</li>
                 </ol>
@@ -24,9 +24,9 @@
             <div class="flex items-center flex-wrap gap-2">
                 <span class="font-semibold mr-2 text-gray-800 dark:text-gray-200">Jump to:</span>
                 <div class="flex gap-1">
-                    <a href="{{ url('/series/0-9') }}" class="px-3 py-1 rounded {{ $seriesletter == '0-9' ? 'bg-blue-600 dark:bg-blue-700 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600' }}">0-9</a>
+                    <a href="{{ url('/series/0-9') }}" class="px-3 py-1 rounded {{ $seriesletter == '0-9' ? 'bg-primary-600 dark:bg-primary-700 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600' }}">0-9</a>
                     @foreach($seriesrange as $range)
-                        <a href="{{ url('/series/' . $range) }}" class="px-3 py-1 rounded {{ $range == $seriesletter ? 'bg-blue-600 dark:bg-blue-700 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600' }}">{{ $range }}</a>
+                        <a href="{{ url('/series/' . $range) }}" class="px-3 py-1 rounded {{ $range == $seriesletter ? 'bg-primary-600 dark:bg-primary-700 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600' }}">{{ $range }}</a>
                     @endforeach
                 </div>
             </div>
@@ -38,7 +38,7 @@
                 <a href="{{ route('trending-tv') }}" class="inline-flex items-center px-4 py-2 bg-linear-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition shadow-md">
                     <i class="fas fa-fire mr-2"></i> View Trending TV Shows
                 </a>
-                <a class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800 inline-flex items-center" href="{{ route('myshows') }}" title="List my watched shows">
+                <a class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded hover:bg-primary-700 dark:hover:bg-primary-800 inline-flex items-center" href="{{ route('myshows') }}" title="List my watched shows">
                     <i class="fa fa-list mr-2"></i>My Shows
                 </a>
                 <a class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 inline-flex items-center" href="{{ url('/myshows/browse') }}" title="Browse your shows">
@@ -48,12 +48,12 @@
 
             <!-- Search form -->
             <form method="get" action="{{ url('/series') }}" class="flex gap-2">
-                <input class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                <input class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
                        type="text"
                        name="title"
                        value="{{ $showname ?? '' }}"
                        placeholder="Search series">
-                <button class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800" type="submit" title="Search series">
+                <button class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded hover:bg-primary-700 dark:hover:bg-primary-800" type="submit" title="Search series">
                     <i class="fa fa-search"></i>
                 </button>
             </form>
@@ -64,13 +64,13 @@
             <div class="overflow-x-auto">
                 @foreach($serieslist as $sletter => $series)
                     <div class="mb-6">
-                        <div class="bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-t-lg">
+                        <div class="surface-panel-alt px-4 py-2 rounded-t-lg border border-b-0">
                             <h4 class="text-xl font-bold text-gray-800 dark:text-gray-200 flex items-center">
-                                <i class="fa fa-bookmark mr-2 text-blue-600"></i>{{ $sletter }}
+                                <i class="fa fa-bookmark mr-2 text-primary-600 dark:text-primary-400"></i>{{ $sletter }}
                             </h4>
                         </div>
-                        <table class="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
+                        <table class="min-w-full border border-gray-200 dark:border-gray-700">
+                            <thead>
                                 <tr>
                                     <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">Name</th>
                                     <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-200 w-120">Network</th>
@@ -87,14 +87,14 @@
                                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                         <td class="px-4 py-3">
                                             <div class="mb-1">
-                                                <a class="font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                                                <a class="font-semibold text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300"
                                                    title="View series details"
                                                    href="{{ url('/series/' . $sData['id']) }}">
                                                     {{ $sData['title'] ?? '' }}
                                                 </a>
                                             </div>
                                             @if(!empty($sData['prevdate']))
-                                                <span class="inline-block px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
+                                                <span class="inline-block px-2 py-1 text-xs bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 rounded">
                                                     <i class="fa fa-calendar mr-1"></i>Last: {{ $sData['previnfo'] ?? '' }} aired {{ \Carbon\Carbon::parse($sData['prevdate'])->format('M d, Y') }}
                                                 </span>
                                             @endif
@@ -133,7 +133,7 @@
                                         </td>
                                         <td class="px-4 py-3">
                                             <div class="flex justify-center gap-2">
-                                                <a class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded hover:bg-blue-200 dark:hover:bg-blue-800 text-sm"
+                                                <a class="px-2 py-1 bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300 rounded hover:bg-primary-200 dark:hover:bg-primary-800 text-sm"
                                                    title="View series details"
                                                    href="{{ url('/series/' . $sData['id']) }}">
                                                     <i class="fa fa-tv"></i>

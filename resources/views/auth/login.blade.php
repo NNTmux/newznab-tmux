@@ -154,13 +154,13 @@
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-3 text-sm">
                     <div class="flex flex-col sm:flex-row gap-3 items-center">
                         @if(Route::has('register'))
-                            <a href="{{ route('register') }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-500 font-medium transition">
+                            <a href="{{ route('register') }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-500 font-medium transition">
                                 <i class="fas fa-user-plus mr-1"></i> Create an account
                             </a>
                         @endif
 
                         @if(Route::has('contact-us'))
-                            <a href="{{ route('contact-us') }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-500 font-medium transition">
+                            <a href="{{ route('contact-us') }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-500 font-medium transition">
                                 <i class="fas fa-envelope mr-1"></i> Contact Us
                             </a>
                         @endif

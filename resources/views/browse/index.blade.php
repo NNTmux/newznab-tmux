@@ -5,13 +5,13 @@
 @endpush
 
 @section('content')
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm transition-colors duration-200">
+<div class="surface-panel rounded-xl shadow-sm transition-colors duration-200">
     <!-- Breadcrumb -->
     <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <nav class="flex" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a href="{{ url($site['home_link'] ?? '/') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-400 inline-flex items-center">
+                    <a href="{{ url($site['home_link'] ?? '/') }}" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 inline-flex items-center">
                         <i class="fas fa-home mr-2"></i> Home
                     </a>
                 </li>
@@ -19,7 +19,7 @@
                     <li>
                         <div class="flex items-center">
                             <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 mx-2"></i>
-                            <a href="{{ url('/browse/' . ($parentcat == 'music' ? 'Audio' : $parentcat)) }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-400">{{ $parentcat }}</a>
+                            <a href="{{ url('/browse/' . ($parentcat == 'music' ? 'Audio' : $parentcat)) }}" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400">{{ $parentcat }}</a>
                         </div>
                     </li>
                     @if(isset($catname) && $catname != '' && $catname != 'all')
@@ -44,19 +44,19 @@
 
     @if($results->count() > 0)
         <form id="nzb_multi_operations_form" method="get" x-data="releaseMultiOps">
-            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+            <div class="px-6 py-4 surface-panel-alt border-b">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     <!-- Left Section -->
                     <div class="space-y-3">
                         @if(isset($shows))
                             <div class="flex flex-wrap gap-2 text-sm">
-                                <a href="{{ route('series') }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300" title="View available TV series">Series List</a>
+                                <a href="{{ route('series') }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300" title="View available TV series">Series List</a>
                                 <span class="text-gray-400 dark:text-gray-500">|</span>
                                 <a href="{{ route('trending-tv') }}" class="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300" title="View trending TV shows"><i class="fas fa-fire mr-1"></i>Trending TV</a>
                                 <span class="text-gray-400 dark:text-gray-500">|</span>
-                                <a href="{{ route('myshows') }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300" title="Manage your shows">Manage My Shows</a>
+                                <a href="{{ route('myshows') }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300" title="Manage your shows">Manage My Shows</a>
                                 <span class="text-gray-400 dark:text-gray-500">|</span>
-                                <a href="{{ url('/rss/myshows?dl=1&i=' . auth()->id() . '&api_token=' . auth()->user()->api_token) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300" title="RSS Feed">RSS Feed</a>
+                                <a href="{{ url('/rss/myshows?dl=1&i=' . auth()->id() . '&api_token=' . auth()->user()->api_token) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300" title="RSS Feed">RSS Feed</a>
                             </div>
                         @endif
 
@@ -76,7 +76,7 @@
                                 <button type="button" class="nzb_multi_operations_download px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition text-sm" title="Download NZBs">
                                     <i class="fa fa-cloud-download"></i>
                                 </button>
-                                <button type="button" class="nzb_multi_operations_cart px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition text-sm" title="Send to Download Basket">
+                                <button type="button" class="nzb_multi_operations_cart px-3 py-1 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition text-sm" title="Send to Download Basket">
                                     <i class="fa fa-shopping-basket"></i>
                                 </button>
                                 @if(auth()->check() && auth()->user()->hasRole('Admin'))
@@ -103,7 +103,7 @@
             </div>
 
             <!-- Top Pagination -->
-            <div class="px-6 py-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+            <div class="px-6 py-3 surface-panel-alt border-b">
                 {{ $results->links() }}
             </div>
 
@@ -113,7 +113,7 @@
                     <thead class="bg-gray-100 dark:bg-gray-800 dark:bg-gray-900">
                         <tr>
                             <th class="px-3 py-3 text-left">
-                                <input type="checkbox" class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" id="chkSelectAll" x-model="allChecked" @change="toggleAll()">
+                                <input type="checkbox" class="rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400 dark:bg-gray-700" id="chkSelectAll" x-model="allChecked" @change="toggleAll()">
                             </th>
                             <th class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Name</th>
                             <th class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Category</th>
@@ -128,7 +128,7 @@
                         @foreach($results as $result)
                             <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 transition">
                                 <td class="px-3 py-4 whitespace-nowrap">
-                                    <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" name="release[]" value="{{ $result->guid }}" @change="onCheckboxChange()">
+                                    <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400 dark:bg-gray-700" name="release[]" value="{{ $result->guid }}" @change="onCheckboxChange()">
                                 </td>
                                 <td class="px-3 py-4">
                                     <div class="flex items-start">
@@ -144,7 +144,7 @@
                                         @endif
                                         <div class="flex-1">
                                             <div class="flex items-center gap-2 flex-wrap">
-                                                <a href="{{ url('/details/' . $result->guid) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium wrap-break-word break-all">{{ $result->searchname }}</a>
+                                                <a href="{{ url('/details/' . $result->guid) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium wrap-break-word break-all">{{ $result->searchname }}</a>
                                                 @if(!empty($result->report_count) && $result->report_count > 0)
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200"
                                                           title="Reported: {{ \App\Models\ReleaseReport::reasonKeysToLabels($result->report_reasons ?? '') }}">
@@ -182,7 +182,7 @@
                                                 @endif
                                                 @if(isset($result->reid) && $result->reid != null)
                                                     <button type="button"
-                                                            class="mediainfo-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition cursor-pointer"
+                                                            class="mediainfo-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 hover:bg-primary-200 dark:hover:bg-primary-800 transition cursor-pointer"
                                                             data-release-id="{{ $result->id }}"
                                                             title="View media info">
                                                         <i class="fas fa-info-circle mr-1"></i> Media Info
@@ -231,7 +231,7 @@
                                 <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
                                     @if($result->totalpart > 0)
                                         <button type="button"
-                                                class="filelist-badge text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium cursor-pointer hover:underline"
+                                                class="filelist-badge text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium cursor-pointer hover:underline"
                                                 data-guid="{{ $result->guid }}"
                                                 title="View file list">
                                             {{ $result->totalpart ?? 0 }}
@@ -243,7 +243,7 @@
                                 <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
                                     <div class="flex items-center gap-2">
                                         <span title="Grabs"><i class="fas fa-download text-green-600 dark:text-green-400"></i> {{ $result->grabs ?? 0 }}</span>
-                                        <span title="Comments"><i class="fas fa-comment text-blue-600 dark:text-blue-400"></i> {{ $result->comments ?? 0 }}</span>
+                                        <span title="Comments"><i class="fas fa-comment text-primary-600 dark:text-primary-400"></i> {{ $result->comments ?? 0 }}</span>
                                     </div>
                                 </td>
                                 <td class="px-3 py-4 whitespace-nowrap">
@@ -251,7 +251,7 @@
                                         <a href="{{ url('/getnzb/' . $result->guid) }}" class="download-nzb px-2 py-1 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition text-sm" title="Download NZB">
                                             <i class="fa fa-download"></i>
                                         </a>
-                                        <a href="{{ url('/details/' . $result->guid) }}" class="px-2 py-1 bg-blue-600 dark:bg-blue-700 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 dark:hover:bg-blue-800 transition text-sm" title="View Details">
+                                        <a href="{{ url('/details/' . $result->guid) }}" class="px-2 py-1 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition text-sm" title="View Details">
                                             <i class="fa fa-info"></i>
                                         </a>
                                         <a href="#" class="add-to-cart px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition text-sm" data-guid="{{ $result->guid }}" title="Add to Cart">
@@ -276,9 +276,9 @@
             <!-- Mobile Card View -->
             <div class="md:hidden space-y-3 px-4 py-4">
                 @foreach($results as $result)
-                    <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:shadow-md transition bg-white dark:bg-gray-800">
+                    <div class="surface-panel border rounded-xl p-4 hover:shadow-md transition">
                         <div class="flex items-start gap-3">
-                            <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:bg-gray-700 mt-1" name="release[]" value="{{ $result->guid }}" @change="onCheckboxChange()">
+                            <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:bg-gray-700 mt-1" name="release[]" value="{{ $result->guid }}" @change="onCheckboxChange()">
                             <div class="flex-1 min-w-0">
                                 @php
                                     $showThumbs = request()->query('thumbs', '0') === '1';
@@ -290,7 +290,7 @@
                                         <img src="{{ $mCoverUrl }}" class="w-16 h-20 object-cover rounded-lg shadow-sm" alt="Cover" loading="lazy">
                                     </a>
                                 @endif
-                                <a href="{{ url('/details/' . $result->guid) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium wrap-break-word text-base">
+                                <a href="{{ url('/details/' . $result->guid) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium wrap-break-word text-base">
                                     {{ $result->searchname }}
                                 </a>
                                 <div class="flex flex-wrap items-center gap-2 mt-2 text-sm text-gray-600 dark:text-gray-400">
@@ -306,7 +306,7 @@
                                     <a href="{{ url('/getnzb/' . $result->guid) }}" class="download-nzb px-3 py-1.5 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition text-sm" title="Download NZB">
                                         <i class="fa fa-download"></i>
                                     </a>
-                                    <a href="{{ url('/details/' . $result->guid) }}" class="px-3 py-1.5 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition text-sm" title="View Details">
+                                    <a href="{{ url('/details/' . $result->guid) }}" class="px-3 py-1.5 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition text-sm" title="View Details">
                                         <i class="fa fa-info"></i>
                                     </a>
                                     <a href="#" class="add-to-cart px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition text-sm" data-guid="{{ $result->guid }}" title="Add to Cart">
@@ -321,7 +321,7 @@
             </div>
 
             <!-- Bottom Pagination -->
-            <div class="px-6 py-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+            <div class="px-6 py-3 surface-panel-alt border-t">
                 {{ $results->links() }}
             </div>
         </form>

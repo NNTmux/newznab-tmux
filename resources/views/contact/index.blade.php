@@ -3,12 +3,12 @@
 
 @section('content')
 <div class="w-full contact-page-container mx-auto">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm mb-6">
-        <div class="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-lg">
+    <div class="surface-panel rounded-xl shadow-sm mb-6">
+        <div class="surface-panel-alt px-6 py-4 border-b rounded-t-lg">
             <h4 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-0">Contact Us</h4>
             <nav class="mt-2" aria-label="breadcrumb">
                 <ol class="flex space-x-2 text-sm">
-                    <li><a href="{{ url($site['home_link'] ?? '/') }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">Home</a></li>
+                    <li><a href="{{ url($site['home_link'] ?? '/') }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">Home</a></li>
                     <li class="text-gray-500 dark:text-gray-400">/</li>
                     <li class="text-gray-600 dark:text-gray-300">Contact</li>
                 </ol>
@@ -55,7 +55,7 @@
                         </span>
                         <input id="username" type="text" name="username" value="{{ old('username') }}"
                                placeholder="Your name"
-                               class="flex-1 block w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-r-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 dark:placeholder-gray-500 @error('username') border-red-500 @enderror"
+                               class="flex-1 block w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-r-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder-gray-400 dark:placeholder-gray-500 @error('username') border-red-500 @enderror"
                                required>
                     </div>
                     @error('username')
@@ -73,7 +73,7 @@
                         </span>
                         <input type="email" id="useremail" name="useremail" value="{{ old('useremail') }}"
                                placeholder="Your email address"
-                               class="flex-1 block w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-r-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 dark:placeholder-gray-500 @error('useremail') border-red-500 @enderror"
+                               class="flex-1 block w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-r-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder-gray-400 dark:placeholder-gray-500 @error('useremail') border-red-500 @enderror"
                                required>
                     </div>
                     @error('useremail')
@@ -91,7 +91,7 @@
                         </span>
                         <textarea rows="7" name="comment" id="comment"
                                   placeholder="Your message"
-                                  class="flex-1 block w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-r-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 dark:placeholder-gray-500 @error('comment') border-red-500 @enderror"
+                                  class="flex-1 block w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-r-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder-gray-400 dark:placeholder-gray-500 @error('comment') border-red-500 @enderror"
                                   required>{{ old('comment') }}</textarea>
                     </div>
                     @error('comment')
@@ -116,7 +116,7 @@
             {{ html()->form()->close() }}
         </div>
 
-        <div class="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-t border-gray-200 dark:border-gray-700 rounded-b-lg text-center">
+        <div class="surface-panel-alt px-6 py-4 border-t rounded-b-lg text-center">
             <p class="mb-0 text-gray-600 dark:text-gray-400">
                 <i class="fas fa-info-circle mr-1"></i>
                 We typically respond to messages within 1-2 business days.

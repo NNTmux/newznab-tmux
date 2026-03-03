@@ -1,12 +1,12 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+<div class="surface-panel rounded-xl shadow-sm">
     <!-- Breadcrumb -->
-    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+    <div class="surface-panel-alt px-6 py-4 border-b">
         <nav aria-label="breadcrumb">
             <ol class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                <li><a href="{{ url($site['home_link'] ?? '/') }}" class="hover:text-blue-600 dark:hover:text-blue-400">Home</a></li>
+                <li><a href="{{ url($site['home_link'] ?? '/') }}" class="hover:text-primary-600 dark:hover:text-primary-400">Home</a></li>
                 <li><i class="fas fa-chevron-right text-xs mx-2"></i></li>
                 <li class="text-gray-500 dark:text-gray-400">Download Basket</li>
             </ol>
@@ -16,14 +16,14 @@
     <div class="px-6 py-4">
 
         <!-- RSS Feed Alert -->
-        <div class="bg-blue-50 dark:bg-gray-700 border border-blue-200 dark:border-gray-600 rounded-lg p-4 mb-6 flex items-start">
-            <i class="fa fa-rss-square text-blue-600 dark:text-blue-400 text-2xl mr-4 mt-1"></i>
+        <div class="surface-panel-alt border rounded-lg p-4 mb-6 flex items-start">
+            <i class="fa fa-rss-square text-primary-600 dark:text-primary-400 text-2xl mr-4 mt-1"></i>
             <div>
-                <strong class="text-blue-900 dark:text-gray-100">RSS Feed</strong>
-                <p class="text-blue-800 dark:text-gray-300 mt-1">
+                <strong class="text-gray-900 dark:text-gray-100">RSS Feed</strong>
+                <p class="text-gray-700 dark:text-gray-300 mt-1">
                     Your download basket can also be accessed via an
                     <a href="{{ url('/rss/cart?dl=1&i=' . auth()->id() . '&api_token=' . auth()->user()->api_token . '&del=1') }}"
-                       class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline">RSS feed</a>.
+                       class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 underline">RSS feed</a>.
                     Some NZB downloaders can read this feed and automatically start downloading.
                 </p>
             </div>
@@ -31,8 +31,8 @@
 
         @if(count($results) > 0)
             <!-- Cart Items -->
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm" x-data="cartPage">
-                <div class="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <div class="surface-panel-alt border rounded-xl shadow-sm" x-data="cartPage">
+                <div class="px-4 py-3 surface-panel-alt border-b flex justify-between items-center">
                     <h5 class="text-lg font-semibold text-gray-800 dark:text-gray-200">My Download Basket</h5>
                     <div class="flex items-center gap-2">
                         <small class="text-gray-600 dark:text-gray-400">With Selected:</small>
@@ -53,7 +53,7 @@
                             <tr>
                                 <th class="px-4 py-3 text-left" style="width: 30px">
                                     <label class="inline-flex items-center cursor-pointer">
-                                        <input id="check-all" type="checkbox" class="form-checkbox h-4 w-4 text-blue-600 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:focus:ring-blue-600 focus:ring-2" x-model="allChecked" @change="toggleAll()">
+                                        <input id="check-all" type="checkbox" class="form-checkbox h-4 w-4 text-primary-600 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:focus:ring-primary-600 focus:ring-2" x-model="allChecked" @change="toggleAll()">
                                     </label>
                                 </th>
                                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Name</th>
@@ -69,13 +69,13 @@
                                         <input id="chk{{ substr($result->release->guid, 0, 7) }}"
                                                type="checkbox"
                                                name="table_records"
-                                               class="cart-checkbox form-checkbox h-4 w-4 text-blue-600 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:focus:ring-blue-600 focus:ring-2 cursor-pointer"
+                                               class="cart-checkbox form-checkbox h-4 w-4 text-primary-600 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:focus:ring-primary-600 focus:ring-2 cursor-pointer"
                                                value="{{ $result->release->guid }}"
                                                @change="onCheckboxChange()">
                                     </td>
                                     <td class="px-4 py-3">
                                         <a href="{{ url('/details/' . $result->release->guid) }}"
-                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-semibold wrap-break-word break-all">
+                                           class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-semibold wrap-break-word break-all">
                                             {{ $result->release->searchname }}
                                         </a>
                                     </td>
@@ -93,7 +93,7 @@
                                                 <i class="fa fa-cloud-download"></i>
                                             </a>
                                             <a href="{{ url('/details/' . $result->release->guid) }}"
-                                               class="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-sm"
+                                               class="px-2 py-1 bg-primary-600 dark:bg-primary-700 text-white rounded hover:bg-primary-700 dark:hover:bg-primary-800 text-sm"
                                                title="View details">
                                                 <i class="fa fa-info-circle"></i>
                                             </a>
@@ -112,7 +112,7 @@
                     </table>
                 </div>
 
-                <div class="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <div class="px-4 py-3 surface-panel-alt border-t flex justify-between items-center">
                     <span class="text-gray-600 dark:text-gray-400">Found {{ count($results) }} items in your basket</span>
                     <div class="flex items-center gap-2">
                         <small class="text-gray-600 dark:text-gray-400">With Selected:</small>
@@ -133,7 +133,7 @@
                 <i class="fa fa-shopping-basket text-yellow-600 dark:text-yellow-400 text-5xl mb-4"></i>
                 <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Your basket is empty</h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-4">Add some releases to your download basket to get started.</p>
-                <a href="{{ url('/browse/All') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
+                <a href="{{ url('/browse/All') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800">
                     <i class="fa fa-search mr-2"></i> Browse Releases
                 </a>
             </div>

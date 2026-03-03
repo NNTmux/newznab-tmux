@@ -165,6 +165,14 @@ class ProfileController extends BasePageController
                         }
                     }
 
+                    // Update color scheme
+                    if ($request->has('color_scheme')) {
+                        $schemeValue = $request->input('color_scheme');
+                        if (in_array($schemeValue, ['blue', 'emerald', 'violet'], true)) {
+                            User::where('id', $userid)->update(['color_scheme' => $schemeValue]);
+                        }
+                    }
+
                     // Update timezone preference
                     if ($request->has('timezone')) {
                         $timezoneValue = $request->input('timezone');
@@ -346,7 +354,7 @@ class ProfileController extends BasePageController
     }
 
     /**
-     * Update user's dark mode preference
+     * Update user's theme preference (light/dark/system) and/or color scheme (blue/emerald/violet).
      */
     public function updateTheme(Request $request): mixed
     {
@@ -357,16 +365,26 @@ class ProfileController extends BasePageController
         }
 
         $validator = Validator::make($request->all(), [
-            'theme_preference' => ['required', 'in:light,dark,system'],
+            'theme_preference' => ['sometimes', 'in:light,dark,system'],
+            'color_scheme' => ['sometimes', 'in:blue,emerald,violet'],
         ]);
 
         if ($validator->fails()) {
             return response()->json(['success' => false, 'message' => 'Invalid input'], 400);
         }
 
-        $user->theme_preference = $request->input('theme_preference');
+        if ($request->has('theme_preference')) {
+            $user->theme_preference = $request->input('theme_preference');
+        }
+        if ($request->has('color_scheme')) {
+            $user->color_scheme = $request->input('color_scheme');
+        }
         $user->save();
 
-        return response()->json(['success' => true, 'theme_preference' => $user->theme_preference]);
+        return response()->json([
+            'success' => true,
+            'theme_preference' => $user->theme_preference,
+            'color_scheme' => $user->color_scheme,
+        ]);
     }
 }

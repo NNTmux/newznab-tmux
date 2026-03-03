@@ -1,9 +1,9 @@
 @extends('layouts.main')
 @section('content')
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm mb-6 dark:bg-gray-800">
-    <div class="bg-gray-50 dark:bg-gray-900 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-lg dark:bg-gray-700 dark:border-gray-600">
-        <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
-            <i class="fa fa-code mr-2 text-blue-600 dark:text-blue-400 dark:text-blue-400"></i>{{ $title }}
+<div class="surface-panel rounded-xl shadow-sm mb-6">
+    <div class="surface-panel-alt px-6 py-4 border-b rounded-t-lg">
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center">
+            <i class="fa fa-code mr-2 text-primary-600 dark:text-primary-400"></i>{{ $title }}
         </h3>
     </div>
     <div class="p-6">
@@ -12,13 +12,13 @@
             logged in users, or by providing an API key.
         </p>
         @auth
-            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6 border border-gray-200 dark:border-gray-700 dark:bg-gray-700 dark:border-gray-600">
+            <div class="surface-panel-alt rounded-lg p-6 mb-6 border">
                 <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                     <i class="fa fa-key mr-2 text-gray-600 dark:text-gray-400"></i>Your API Credentials
                 </h4>
                 <div class="flex rounded-md shadow-sm" x-data="copyToClipboard()">
-                    <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white" value="apikey={{ auth()->user()->api_token }}" readonly id="apikeyInput">
-                    <button class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" x-on:click="copy('apikeyInput')" title="Copy to clipboard" x-bind:class="copied ? 'text-green-600' : ''">
+                    <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white" value="apikey={{ auth()->user()->api_token }}" readonly id="apikeyInput">
+                    <button class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" x-on:click="copy('apikeyInput')" title="Copy to clipboard" x-bind:class="copied ? 'text-green-600' : ''">
                         <i class="fa" x-bind:class="copied ? 'fa-check' : 'fa-copy'"></i>
                     </button>
                 </div>
@@ -50,9 +50,9 @@
                             </div>
                         </td>
                         <td class="px-6 py-4">
-                            <a href="{{ url('/api/v1/api?t=caps') }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
+                            <a href="{{ url('/api/v1/api?t=caps') }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
                                 <i class="fa fa-external-link-alt mr-1"></i>
-                                <code class="text-blue-700 dark:text-blue-400">?t=caps</code>
+                                <code class="text-primary-700 dark:text-primary-400">?t=caps</code>
                             </a>
                         </td>
                     </tr>
@@ -64,7 +64,7 @@
                                 a comma separated list of categories.
                             </span>
                             <div class="mt-2">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">OPTIONS</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/50 dark:text-primary-200">OPTIONS</span>
                                 <div class="mt-1 ml-2 text-sm text-gray-700 dark:text-gray-300">
                                     <code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:bg-gray-700 dark:text-red-400">extended=1</code> - Return extended information in results
                                 </div>
@@ -73,13 +73,13 @@
                         <td class="px-6 py-4">
                             <div class="flex flex-col gap-2">
                                 @auth
-                                <a href="{{ url('/api/v1/api?t=search&q=linux&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
+                                <a href="{{ url('/api/v1/api?t=search&q=linux&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
                                     <i class="fa fa-external-link-alt mr-1"></i>
-                                    <code class="text-blue-700 dark:text-blue-400">?t=search&amp;q=linux</code>
+                                    <code class="text-primary-700 dark:text-primary-400">?t=search&amp;q=linux</code>
                                 </a>
-                                <a href="{{ url('/api/v1/api?t=search&cat=' . $catClass::GAME_ROOT . ',' . $catClass::MOVIE_ROOT . '&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
+                                <a href="{{ url('/api/v1/api?t=search&cat=' . $catClass::GAME_ROOT . ',' . $catClass::MOVIE_ROOT . '&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
                                     <i class="fa fa-external-link-alt mr-1"></i>
-                                    <code class="text-blue-700 dark:text-blue-400">?t=search&amp;cat={{ $catClass::GAME_ROOT }},{{ $catClass::MOVIE_ROOT }}</code>
+                                    <code class="text-primary-700 dark:text-primary-400">?t=search&amp;cat={{ $catClass::GAME_ROOT }},{{ $catClass::MOVIE_ROOT }}</code>
                                 </a>
                                 @else
                                 <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
@@ -99,7 +99,7 @@
                                 Returns a list of NZBs matching a query, category, or TV ID. Filter by season, episode, or various database IDs.
                             </span>
                             <div class="mt-2">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">ID OPTIONS</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/50 dark:text-primary-200">ID OPTIONS</span>
                                 <div class="mt-1 ml-2 text-sm text-gray-700 dark:text-gray-300">
                                     <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:bg-gray-700 dark:text-red-400">rid=25056</code> - TVRage<br>
                                     <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:bg-gray-700 dark:text-red-400">tvdbid=153021</code> - TVDB<br>
@@ -112,9 +112,9 @@
                         </td>
                         <td class="px-6 py-4">
                             @auth
-                            <a href="{{ url('/api/v1/api?t=tvsearch&q=law%20and%20order&season=7&ep=12&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
+                            <a href="{{ url('/api/v1/api?t=tvsearch&q=law%20and%20order&season=7&ep=12&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
                                 <i class="fa fa-external-link-alt mr-1"></i>
-                                <code class="text-blue-700 dark:text-blue-400">?t=tvsearch&amp;q=law and order&amp;season=7&amp;ep=12</code>
+                                <code class="text-primary-700 dark:text-primary-400">?t=tvsearch&amp;q=law and order&amp;season=7&amp;ep=12</code>
                             </a>
                             @else
                             <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
@@ -130,7 +130,7 @@
                                 Returns a list of NZBs matching a query, an IMDB ID and optionally a category.
                             </span>
                             <div class="mt-2">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">OPTIONS</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/50 dark:text-primary-200">OPTIONS</span>
                                 <div class="mt-1 ml-2 text-sm text-gray-700 dark:text-gray-300">
                                     <code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:bg-gray-700 dark:text-red-400">extended=1</code> - Return extended information in results
                                 </div>
@@ -138,9 +138,9 @@
                         </td>
                         <td class="px-6 py-4">
                             @auth
-                            <a href="{{ url('/api/v1/api?t=movie&imdbid=1418646&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
+                            <a href="{{ url('/api/v1/api?t=movie&imdbid=1418646&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
                                 <i class="fa fa-external-link-alt mr-1"></i>
-                                <code class="text-blue-700 dark:text-blue-400">?t=movie&amp;imdbid=1418646</code>
+                                <code class="text-primary-700 dark:text-primary-400">?t=movie&amp;imdbid=1418646</code>
                             </a>
                             @else
                             <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
@@ -154,9 +154,9 @@
                         <td class="px-6 py-4"><span class="text-gray-700 dark:text-gray-300">Returns detailed information about an NZB.</span></td>
                         <td class="px-6 py-4">
                             @auth
-                            <a href="{{ url('/api/v1/api?t=details&id=9ca52909ba9b9e5e6758d815fef4ecda&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
+                            <a href="{{ url('/api/v1/api?t=details&id=9ca52909ba9b9e5e6758d815fef4ecda&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
                                 <i class="fa fa-external-link-alt mr-1"></i>
-                                <code class="text-blue-700 dark:text-blue-400">?t=details&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</code>
+                                <code class="text-primary-700 dark:text-primary-400">?t=details&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</code>
                             </a>
                             @else
                             <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
@@ -174,9 +174,9 @@
                         </td>
                         <td class="px-6 py-4">
                             @auth
-                            <a href="{{ url('/api/v1/api?t=info&id=9ca52909ba9b9e5e6758d815fef4ecda&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
+                            <a href="{{ url('/api/v1/api?t=info&id=9ca52909ba9b9e5e6758d815fef4ecda&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
                                 <i class="fa fa-external-link-alt mr-1"></i>
-                                <code class="text-blue-700 dark:text-blue-400">?t=info&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</code>
+                                <code class="text-primary-700 dark:text-primary-400">?t=info&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</code>
                             </a>
                             @else
                             <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
@@ -190,9 +190,9 @@
                         <td class="px-6 py-4"><span class="text-gray-700 dark:text-gray-300">Downloads the NZB file associated with an ID.</span></td>
                         <td class="px-6 py-4">
                             @auth
-                            <a href="{{ url('/api/v1/api?t=get&id=9ca52909ba9b9e5e6758d815fef4ecda&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white dark:bg-gray-800 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600">
+                            <a href="{{ url('/api/v1/api?t=get&id=9ca52909ba9b9e5e6758d815fef4ecda&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
                                 <i class="fa fa-external-link-alt mr-1"></i>
-                                <code class="text-blue-700 dark:text-blue-400">?t=get&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</code>
+                                <code class="text-primary-700 dark:text-primary-400">?t=get&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</code>
                             </a>
                             @else
                             <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
@@ -209,19 +209,19 @@
         </h4>
         <p class="text-gray-700 dark:text-gray-300 mb-4 dark:text-gray-300">Select your preferred output format (not applicable to functions which return an NZB/NFO file).</p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm h-full dark:bg-gray-800 dark:border-gray-600">
+            <div class="surface-panel-alt rounded-lg border shadow-sm h-full">
                 <div class="p-6">
                     <h5 class="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
-                        <i class="fa fa-code mr-2 text-blue-600 dark:text-blue-400 dark:text-blue-400"></i>XML (default)
+                        <i class="fa fa-code mr-2 text-primary-600 dark:text-primary-400"></i>XML (default)
                     </h5>
                     <p class="text-gray-700 dark:text-gray-300 mb-3 dark:text-gray-300">Returns the data in an XML document.</p>
                     <code class="block bg-gray-100 dark:bg-gray-800 p-2 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">?t=search&amp;q=linux&amp;o=xml</code>
                 </div>
             </div>
-            <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm h-full dark:bg-gray-800 dark:border-gray-600">
+            <div class="surface-panel-alt rounded-lg border shadow-sm h-full">
                 <div class="p-6">
                     <h5 class="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
-                        <i class="fa fa-brackets-curly mr-2 text-blue-600 dark:text-blue-400 dark:text-blue-400"></i>JSON
+                        <i class="fa fa-brackets-curly mr-2 text-primary-600 dark:text-primary-400"></i>JSON
                     </h5>
                     <p class="text-gray-700 dark:text-gray-300 mb-3 dark:text-gray-300">Returns the data in a JSON object.</p>
                     <code class="block bg-gray-100 dark:bg-gray-800 p-2 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">?t=search&amp;q=linux&amp;o=json</code>

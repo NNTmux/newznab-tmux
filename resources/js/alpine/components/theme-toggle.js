@@ -61,4 +61,20 @@ Alpine.data('themeRadio', () => ({
             }
         });
     });
+
+    // Color scheme swatch buttons (dropdown + mobile)
+    document.body.addEventListener('click', function(e) {
+        var btn = e.target.closest('.dropdown-scheme-btn, .mobile-scheme-btn');
+        if (!btn || !btn.dataset.scheme) return;
+        e.preventDefault();
+        e.stopPropagation();
+        Alpine.store('theme').setScheme(btn.dataset.scheme);
+    });
+
+    // Profile edit page: live preview when color scheme radio changes
+    document.body.addEventListener('change', function(e) {
+        var radio = e.target.closest('input.profile-scheme-radio');
+        if (!radio || !radio.dataset.scheme) return;
+        Alpine.store('theme').setScheme(radio.dataset.scheme);
+    });
 })();

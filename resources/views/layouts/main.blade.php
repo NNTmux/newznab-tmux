@@ -18,6 +18,7 @@
 
     <!-- Theme Preference - Set via meta tag for CSP compliance -->
     <meta name="theme-preference" content="{{ auth()->check() ? (auth()->user()->theme_preference ?? 'light') : 'light' }}">
+    <meta name="color-scheme-preference" content="{{ auth()->check() ? (auth()->user()->color_scheme ?? 'blue') : 'blue' }}">
     <!-- CSP Nonce for dynamic script loading -->
     <meta name="csp-nonce" content="{{ csp_nonce() }}">
     @auth
@@ -51,7 +52,7 @@
         <div class="flex-1 flex flex-col h-full overflow-hidden">
             <!-- Top Navigation -->
             @auth
-                <header class="bg-gray-800 dark:bg-gray-950 text-white shadow-lg shrink-0 z-10 rounded-b-xl">
+                <header class="surface-header bg-gray-800 dark:bg-gray-950 text-white shadow-lg shrink-0 z-10 rounded-b-xl">
                     @include('partials.header-menu')
                 </header>
             @endauth
@@ -92,7 +93,7 @@
     </div>
 
     <!-- Mobile Sidebar Toggle -->
-    <button id="mobile-sidebar-toggle" class="md:hidden fixed z-50 bg-blue-600 dark:bg-blue-700 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-all touch-target bottom-[max(5rem,calc(env(safe-area-inset-bottom)+4rem))] right-[max(1rem,env(safe-area-inset-right))]" aria-label="Toggle Sidebar">
+    <button id="mobile-sidebar-toggle" class="md:hidden fixed z-50 bg-primary-600 dark:bg-primary-700 text-white p-4 rounded-full shadow-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition-all touch-target bottom-[max(5rem,calc(env(safe-area-inset-bottom)+4rem))] right-[max(1rem,env(safe-area-inset-right))]" aria-label="Toggle Sidebar">
         <i class="fas fa-bars text-lg"></i>
     </button>
 
@@ -119,8 +120,10 @@
     @stack('scripts')
 
     <!-- Theme Management Data (moved to csp-safe.js) -->
+    @php $colorScheme = auth()->check() ? (auth()->user()->color_scheme ?? 'blue') : 'blue'; @endphp
     <div id="current-theme-data"
          data-theme="{{ $themePreference }}"
+         data-color-scheme="{{ $colorScheme }}"
          data-authenticated="{{ auth()->check() ? 'true' : 'false' }}"
          data-update-url="{{ route('profile.update-theme') }}"
          style="display: none;">

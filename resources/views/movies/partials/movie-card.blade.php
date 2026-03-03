@@ -20,7 +20,7 @@
     $coverClass = $layout == 1 ? 'w-48 h-72' : 'w-32 h-48';
 @endphp
 
-<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300">
+<div class="surface-panel border rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300">
     <div class="flex flex-row">
         {{-- Movie Poster --}}
         <div class="shrink-0">
@@ -57,7 +57,7 @@
             <div class="flex justify-between items-start mb-2">
                 <div class="flex-1 min-w-0">
                     @if(isset($result->imdbid) && $result->imdbid)
-                        <a href="{{ route('movie.view', ['imdbid' => $result->imdbid]) }}" class="hover:text-blue-600 dark:hover:text-blue-400 transition">
+                        <a href="{{ route('movie.view', ['imdbid' => $result->imdbid]) }}" class="hover:text-primary-600 dark:hover:text-primary-400 transition">
                             <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 truncate">{{ $result->title }}</h3>
                         </a>
                     @else
@@ -90,7 +90,7 @@
                             <a href="{{ ($site['dereferrer_link'] ?? '') }}https://www.themoviedb.org/movie/{{ $result->tmdbid }}"
                                target="_blank"
                                rel="noopener noreferrer"
-                               class="inline-flex items-center px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded hover:bg-blue-200 dark:hover:bg-blue-800 transition">
+                               class="inline-flex items-center px-2 py-1 bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200 rounded hover:bg-primary-200 dark:hover:bg-primary-800 transition">
                                 <i class="fas fa-film mr-1"></i> TMDb
                             </a>
                         @endif
@@ -149,7 +149,7 @@
                                         <div class="release-info-wrapper {{ $layout == 1 ? 'flex-1 min-w-0' : '' }}">
                                             {{-- Release Name --}}
                                             <a href="{{ url('/details/' . $release->guid) }}"
-                                               class="text-sm text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 font-medium block break-all"
+                                               class="text-sm text-gray-800 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 font-medium block break-all"
                                                title="{{ $release->searchname }}">
                                                 {{ $release->searchname }}
                                             </a>
@@ -193,7 +193,7 @@
                                             </a>
 
                                             <button type="button"
-                                                    class="add-to-cart inline-flex items-center px-3 py-1 rounded text-xs font-medium bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-800 transition"
+                                                    class="add-to-cart inline-flex items-center px-3 py-1 rounded text-xs font-medium bg-primary-600 dark:bg-primary-700 text-white hover:bg-primary-700 dark:hover:bg-primary-800 transition"
                                                     data-guid="{{ $release->guid }}">
                                                 <i class="fas fa-shopping-cart mr-1"></i> Cart
                                             </button>

@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <div class="surface-panel rounded-xl shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200">
             <h1 class="text-2xl font-bold text-gray-800">Edit Profile</h1>
@@ -37,7 +37,7 @@
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
                 <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}"
-                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 @error('email') border-red-500 dark:border-red-600 @enderror">
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 @error('email') border-red-500 dark:border-red-600 @enderror">
                 @error('email')
                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -48,7 +48,7 @@
                 <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">New Password (leave blank to keep current)</label>
                 <div class="relative">
                     <input type="password" name="password" id="password"
-                        class="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 @error('password') border-red-500 dark:border-red-600 @enderror">
+                        class="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 @error('password') border-red-500 dark:border-red-600 @enderror">
                     <button type="button" class="password-toggle-btn absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-field-id="password">
                         <i class="fas fa-eye" id="password-eye"></i>
                     </button>
@@ -64,7 +64,7 @@
                 <label for="password_confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Confirm Password</label>
                 <div class="relative">
                     <input type="password" name="password_confirmation" id="password_confirmation"
-                        class="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500">
+                        class="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500">
                     <button type="button" class="password-toggle-btn absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-field-id="password_confirmation">
                         <i class="fas fa-eye" id="password_confirmation-eye"></i>
                     </button>
@@ -74,12 +74,12 @@
             <!-- Theme Preference -->
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
-                    <i class="fas fa-palette mr-2 text-blue-600 dark:text-blue-400"></i>Theme Preference
+                    <i class="fas fa-palette mr-2 text-primary-600 dark:text-primary-400"></i>Theme Preference
                 </h3>
                 <div class="space-y-3">
-                    <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition {{ ($user->theme_preference ?? 'light') === 'light' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700' }}">
+                    <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition {{ ($user->theme_preference ?? 'light') === 'light' ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20' : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700' }}">
                         <input type="radio" name="theme_preference" value="light" {{ ($user->theme_preference ?? 'light') === 'light' ? 'checked' : '' }}
-                            class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            class="w-4 h-4 text-primary-600 focus:ring-primary-500 border-gray-300">
                         <div class="ml-3 flex-1">
                             <div class="flex items-center">
                                 <i class="fas fa-sun text-yellow-500 text-xl mr-3"></i>
@@ -90,9 +90,9 @@
                             </div>
                         </div>
                     </label>
-                    <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition {{ ($user->theme_preference ?? 'light') === 'dark' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700' }}">
+                    <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition {{ ($user->theme_preference ?? 'light') === 'dark' ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20' : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700' }}">
                         <input type="radio" name="theme_preference" value="dark" {{ ($user->theme_preference ?? 'light') === 'dark' ? 'checked' : '' }}
-                            class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            class="w-4 h-4 text-primary-600 focus:ring-primary-500 border-gray-300">
                         <div class="ml-3 flex-1">
                             <div class="flex items-center">
                                 <i class="fas fa-moon text-indigo-500 text-xl mr-3"></i>
@@ -103,12 +103,12 @@
                             </div>
                         </div>
                     </label>
-                    <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition {{ ($user->theme_preference ?? 'light') === 'system' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700' }}">
+                    <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition {{ ($user->theme_preference ?? 'light') === 'system' ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20' : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700' }}">
                         <input type="radio" name="theme_preference" value="system" {{ ($user->theme_preference ?? 'light') === 'system' ? 'checked' : '' }}
-                            class="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            class="w-4 h-4 text-primary-600 focus:ring-primary-500 border-gray-300">
                         <div class="ml-3 flex-1">
                             <div class="flex items-center">
-                                <i class="fas fa-desktop text-blue-500 text-xl mr-3"></i>
+                                <i class="fas fa-desktop text-primary-500 text-xl mr-3"></i>
                                 <div>
                                     <span class="block text-sm font-medium text-gray-900 dark:text-gray-100">System (Auto)</span>
                                     <span class="block text-xs text-gray-600 dark:text-gray-400">Match your operating system's theme</span>
@@ -122,17 +122,49 @@
                 </p>
             </div>
 
+            <!-- Color Scheme -->
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                    <i class="fas fa-swatchbook mr-2 text-primary-600"></i>Color Scheme
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">Choose the main color scheme for the site (sidebar, header, buttons, and accents).</p>
+                <div class="flex flex-wrap items-center gap-4">
+                    @php $currentScheme = $user->color_scheme ?? 'blue'; @endphp
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="color_scheme" value="blue" {{ $currentScheme === 'blue' ? 'checked' : '' }}
+                            class="sr-only profile-scheme-radio" data-scheme="blue">
+                        <span class="w-10 h-10 rounded-full bg-blue-600 ring-2 ring-offset-2 transition {{ $currentScheme === 'blue' ? 'ring-primary-500 ring-offset-gray-100 dark:ring-offset-gray-800' : 'ring-transparent ring-offset-gray-100 dark:ring-offset-gray-800 hover:ring-gray-300' }}" aria-hidden="true"></span>
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Blue</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="color_scheme" value="emerald" {{ $currentScheme === 'emerald' ? 'checked' : '' }}
+                            class="sr-only profile-scheme-radio" data-scheme="emerald">
+                        <span class="w-10 h-10 rounded-full bg-emerald-600 ring-2 ring-offset-2 transition {{ $currentScheme === 'emerald' ? 'ring-primary-500 ring-offset-gray-100 dark:ring-offset-gray-800' : 'ring-transparent ring-offset-gray-100 dark:ring-offset-gray-800 hover:ring-gray-300' }}" aria-hidden="true"></span>
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Emerald</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="color_scheme" value="violet" {{ $currentScheme === 'violet' ? 'checked' : '' }}
+                            class="sr-only profile-scheme-radio" data-scheme="violet">
+                        <span class="w-10 h-10 rounded-full bg-violet-600 ring-2 ring-offset-2 transition {{ $currentScheme === 'violet' ? 'ring-primary-500 ring-offset-gray-100 dark:ring-offset-gray-800' : 'ring-transparent ring-offset-gray-100 dark:ring-offset-gray-800 hover:ring-gray-300' }}" aria-hidden="true"></span>
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Violet</span>
+                    </label>
+                </div>
+                <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-info-circle mr-1"></i>Save your profile to apply the color scheme. You can also change it from the user menu in the header.
+                </p>
+            </div>
+
             <!-- Timezone Preference -->
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
-                    <i class="fas fa-clock mr-2 text-blue-600 dark:text-blue-400"></i>Timezone Preference
+                    <i class="fas fa-clock mr-2 text-primary-600 dark:text-primary-400"></i>Timezone Preference
                 </h3>
                 <div>
                     <label for="timezone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Select Your Timezone
                     </label>
                     <select name="timezone" id="timezone"
-                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         @php
                             $timezones = getAvailableTimezones();
                             $currentTimezone = old('timezone', $user->timezone ?? 'UTC');
@@ -160,27 +192,27 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <label class="flex items-center">
                         <input type="checkbox" name="movieview" value="1" {{ $user->movieview ? 'checked' : '' }}
-                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-400 focus:ring-primary-500 mr-2">
                         <span class="text-sm text-gray-700 dark:text-gray-300">Movie Covers</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="musicview" value="1" {{ $user->musicview ? 'checked' : '' }}
-                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-400 focus:ring-primary-500 mr-2">
                         <span class="text-sm text-gray-700 dark:text-gray-300">Music Covers</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="consoleview" value="1" {{ $user->consoleview ? 'checked' : '' }}
-                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-400 focus:ring-primary-500 mr-2">
                         <span class="text-sm text-gray-700 dark:text-gray-300">Console Covers</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="gameview" value="1" {{ $user->gameview ? 'checked' : '' }}
-                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-400 focus:ring-primary-500 mr-2">
                         <span class="text-sm text-gray-700 dark:text-gray-300">Game Covers</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="bookview" value="1" {{ $user->bookview ? 'checked' : '' }}
-                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-400 focus:ring-primary-500 mr-2">
                         <span class="text-sm text-gray-700 dark:text-gray-300">Book Covers</span>
                     </label>
                 </div>
@@ -192,42 +224,42 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <label class="flex items-center">
                         <input type="checkbox" name="viewmovies" value="1" {{ $user->hasDirectPermission('view movies') ? 'checked' : '' }}
-                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-400 focus:ring-primary-500 mr-2">
                         <span class="text-sm text-gray-700 dark:text-gray-300">Movies</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="viewtv" value="1" {{ $user->hasDirectPermission('view tv') ? 'checked' : '' }}
-                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-400 focus:ring-primary-500 mr-2">
                         <span class="text-sm text-gray-700 dark:text-gray-300">TV</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="viewaudio" value="1" {{ $user->hasDirectPermission('view audio') ? 'checked' : '' }}
-                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-400 focus:ring-primary-500 mr-2">
                         <span class="text-sm text-gray-700 dark:text-gray-300">Audio</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="viewpc" value="1" {{ $user->hasDirectPermission('view pc') ? 'checked' : '' }}
-                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-400 focus:ring-primary-500 mr-2">
                         <span class="text-sm text-gray-700 dark:text-gray-300">PC</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="viewconsole" value="1" {{ $user->hasDirectPermission('view console') ? 'checked' : '' }}
-                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-400 focus:ring-primary-500 mr-2">
                         <span class="text-sm text-gray-700 dark:text-gray-300">Console</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="viewbooks" value="1" {{ $user->hasDirectPermission('view books') ? 'checked' : '' }}
-                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-400 focus:ring-primary-500 mr-2">
                         <span class="text-sm text-gray-700 dark:text-gray-300">Books</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="viewadult" value="1" {{ $user->hasDirectPermission('view adult') ? 'checked' : '' }}
-                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-400 focus:ring-primary-500 mr-2">
                         <span class="text-sm text-gray-700 dark:text-gray-300">Adult</span>
                     </label>
                     <label class="flex items-center">
                         <input type="checkbox" name="viewother" value="1" {{ $user->hasDirectPermission('view other') ? 'checked' : '' }}
-                            class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-400 focus:ring-blue-500 mr-2">
+                            class="rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-400 focus:ring-primary-500 mr-2">
                         <span class="text-sm text-gray-700 dark:text-gray-300">Other</span>
                     </label>
                 </div>
@@ -270,11 +302,11 @@
                 </a>
                 <div class="flex space-x-2">
                     <a href="{{ route('profileedit', ['action' => 'newapikey']) }}"
-                       class="px-6 py-2 text-blue-700 bg-blue-100 rounded-lg hover:bg-blue-200 transition"
+                       class="px-6 py-2 text-primary-700 bg-primary-100 rounded-lg hover:bg-primary-200 transition"
                        data-confirm="Are you sure you want to generate a new API key?">
                         <i class="fas fa-key mr-2"></i>New API Key
                     </a>
-                    <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition">
+                    <button type="submit" class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition">
                         <i class="fas fa-save mr-2"></i>Save Changes
                     </button>
                 </div>
@@ -284,7 +316,7 @@
         <!-- 2FA Section (Outside main form) -->
         <div class="p-6 border-t border-gray-200">
             <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
-                <i class="fas fa-shield-alt mr-2 text-blue-600"></i>Two-Factor Authentication (2FA)
+                <i class="fas fa-shield-alt mr-2 text-primary-600"></i>Two-Factor Authentication (2FA)
             </h3>
 
             @if($user->passwordSecurity()->exists() && $user->passwordSecurity->google2fa_enable)
@@ -354,14 +386,14 @@
                 </div>
             @elseif($user->passwordSecurity()->exists() && !$user->passwordSecurity->google2fa_enable)
                 <!-- 2FA Setup Started but Not Enabled -->
-                <div class="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4">
+                <div class="bg-primary-50 dark:bg-primary-900/20 border-l-4 border-primary-500 rounded-lg p-4">
                     <div class="flex items-start">
-                        <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 text-xl mr-3 mt-1"></i>
+                        <i class="fas fa-info-circle text-primary-600 dark:text-primary-400 text-xl mr-3 mt-1"></i>
                         <div class="flex-1">
-                            <h4 class="text-blue-800 font-semibold mb-2">Complete Your 2FA Setup</h4>
-                            <p class="text-blue-700 text-sm mb-4">Follow these steps to enable two-factor authentication:</p>
+                            <h4 class="text-primary-800 dark:text-primary-200 font-semibold mb-2">Complete Your 2FA Setup</h4>
+                            <p class="text-primary-700 dark:text-primary-300 text-sm mb-4">Follow these steps to enable two-factor authentication:</p>
 
-                            <ol class="list-decimal list-inside space-y-2 text-sm text-blue-700 mb-4">
+                            <ol class="list-decimal list-inside space-y-2 text-sm text-primary-700 dark:text-primary-300 mb-4">
                                 <li>Install an authenticator app (Google Authenticator, Authy, or similar)</li>
                                 <li>Scan the QR code below with your authenticator app</li>
                                 <li>Enter the 6-digit code from your app to verify</li>
@@ -371,7 +403,7 @@
                                 {!! $google2fa_url !!}
                             </div>
 
-                            <p class="text-xs text-blue-600 dark:text-blue-400 mb-4">
+                            <p class="text-xs text-primary-600 dark:text-primary-400 mb-4">
                                 <strong>Secret Key (manual entry):</strong>
                                 <code class="bg-white dark:bg-gray-800 px-2 py-1 rounded">{{ $user->passwordSecurity->google2fa_secret }}</code>
                             </p>
@@ -389,7 +421,7 @@
                                            placeholder="Enter 6-digit code"
                                            maxlength="6"
                                            required
-                                           class="w-full md:w-64 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center text-lg tracking-widest bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500">
+                                           class="w-full md:w-64 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-center text-lg tracking-widest bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500">
                                 </div>
                                 <div class="flex gap-2">
                                     <button type="submit" class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white text-sm rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition">
@@ -419,7 +451,7 @@
                             <form method="POST" action="{{ route('generate2faSecret') }}">
                                 @csrf
                                 <input type="hidden" name="from_profile" value="1">
-                                <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white text-sm rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition">
+                                <button type="submit" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white text-sm rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition">
                                     <i class="fas fa-shield-alt mr-2"></i>Enable Two-Factor Authentication
                                 </button>
                             </form>
