@@ -188,7 +188,7 @@ class GetNzbController extends BasePageController
         string $userName,
         int $maxDownloads,
         string $releaseId
-    ): JsonResponse|StreamedResponse|\STS\ZipStream\Builder {
+    ): JsonResponse|Response|StreamedResponse|\STS\ZipStream\Builder {
         $guids = explode(',', $releaseId);
         $guidCount = \count($guids);
 
