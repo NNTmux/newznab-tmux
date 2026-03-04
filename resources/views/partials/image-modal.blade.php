@@ -40,8 +40,8 @@
 
                 <!-- Image -->
                 <div class="flex justify-center">
-                    <img x-bind:src="imageUrl"
-                         x-bind:alt="imageTitle"
+                    <img :src="imageUrl"
+                         :alt="imageTitle"
                          class="max-w-full max-h-[85vh] rounded-lg shadow-lg">
                 </div>
             </div>

@@ -21,7 +21,7 @@
                               x-data="confirmForm"
                               data-message="Are you sure you want to cancel this invitation?">
                             @csrf
-                            <button type="button" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700" x-on:click="submit()">
+                            <button type="button" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700" @click="submit()">
                                 <i class="fas fa-ban mr-2"></i>Cancel
                             </button>
                         </form>
@@ -183,7 +183,7 @@
                                     <div class="bg-gray-100 dark:bg-gray-800 p-2 rounded break-all font-mono text-xs">
                                         {{ url('register?invitation=' . $invitation->token) }}
                                     </div>
-                                    <button x-data="copyToClipboard()" x-on:click="copy('invitation-link-{{ $invitation->id }}')" class="mt-2 px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">
+                                    <button x-data="copyToClipboard()" @click="copy('invitation-link-{{ $invitation->id }}')" class="mt-2 px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">
                                         <i class="fas fa-copy mr-1"></i><span x-text="copied ? 'Copied!' : 'Copy Link'"></span>
                                     </button>
                                     <input type="hidden" id="invitation-link-{{ $invitation->id }}" value="{{ url('register?invitation=' . $invitation->token) }}" />

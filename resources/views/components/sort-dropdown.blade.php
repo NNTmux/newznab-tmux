@@ -1,12 +1,12 @@
 <div class="relative inline-block" x-data="sortDropdown" @click.outside="close()">
     <button
         type="button"
-        x-on:click="toggle"
+        @click="toggle"
         class="inline-flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition shadow-sm"
     >
         <i class="fas {{ $currentIcon }} text-gray-500 dark:text-gray-300"></i>
         <span>Sort: {{ $currentLabel }}</span>
-        <i class="fas fa-chevron-down text-xs text-gray-400 dark:text-gray-300 transition-transform" x-bind:class="chevronClass()"></i>
+        <i class="fas fa-chevron-down text-xs text-gray-400 dark:text-gray-300 transition-transform" :class="chevronClass()"></i>
     </button>
 
     <div x-show="open"

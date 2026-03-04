@@ -126,7 +126,7 @@
          data-color-scheme="{{ $colorScheme }}"
          data-authenticated="{{ auth()->check() ? 'true' : 'false' }}"
          data-update-url="{{ route('profile.update-theme') }}"
-         style="display: none;">
+         class="hidden">
     </div>
 
     <!-- Flash Messages Data (moved to csp-safe.js) -->
@@ -137,7 +137,7 @@
              'warning' => session('warning'),
              'info' => session('info')
          ]) }}"
-         style="display: none;">
+         class="hidden">
     </div>
 </body>
 </html>

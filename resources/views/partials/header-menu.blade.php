@@ -30,7 +30,7 @@
                                                     <span>{{ $subcat['title'] }}</span>
                                                     <i class="fas fa-chevron-right text-xs"></i>
                                                 </a>
-                                                <div class="submenu absolute left-full top-0 w-40 bg-gray-900 dark:bg-gray-950 rounded-xl shadow-lg z-50 ml-0.5" style="display: none;">
+                                                <div class="submenu absolute left-full top-0 w-40 bg-gray-900 dark:bg-gray-950 rounded-xl shadow-lg z-50 ml-0.5 hidden">
                                                     <a href="{{ url('/browse/TV/' . $subcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">All Foreign</a>
                                                     <div class="border-t border-gray-700 dark:border-gray-600"></div>
                                                     <a href="{{ route('search', ['search' => 'German|Deutsch|DE|GER', 't' => App\Models\Category::TV_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">German</a>
@@ -81,7 +81,7 @@
                                                         <i class="fas fa-chevron-right text-xs"></i>
                                                     </a>
                                                 @endif
-                                                <div class="submenu absolute left-full top-0 w-40 bg-gray-900 dark:bg-gray-950 rounded-xl shadow-lg z-50 ml-0.5" style="display: none;">
+                                                <div class="submenu absolute left-full top-0 w-40 bg-gray-900 dark:bg-gray-950 rounded-xl shadow-lg z-50 ml-0.5 hidden">
                                                     @if(auth()->check() && auth()->user()->movieview == "1")
                                                         <a href="{{ url('/' . $parentcat['title'] . '/' . $subcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-gray-800 dark:hover:bg-gray-800 hover:text-white dark:hover:text-white">All Foreign</a>
                                                     @else

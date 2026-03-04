@@ -47,11 +47,12 @@
                     </div>
                 </div>
 
-                <div class="overflow-x-auto">
+                <!-- Desktop Table -->
+                <div class="hidden md:block overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-700">
                             <tr>
-                                <th class="px-4 py-3 text-left" style="width: 30px">
+                                <th class="px-4 py-3 text-left w-8">
                                     <label class="inline-flex items-center cursor-pointer">
                                         <input id="check-all" type="checkbox" class="form-checkbox h-4 w-4 text-primary-600 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:focus:ring-primary-600 focus:ring-2" x-model="allChecked" @change="toggleAll()">
                                     </label>
@@ -110,6 +111,44 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Mobile Cards -->
+                <div class="md:hidden divide-y divide-gray-200 dark:divide-gray-700">
+                    @foreach($results as $result)
+                        @continue(!$result->release)
+                        <div id="m-guid{{ $result->release->guid }}" class="p-4 space-y-3">
+                            <div class="flex items-start gap-3">
+                                <input type="checkbox"
+                                       name="table_records"
+                                       class="cart-checkbox form-checkbox h-4 w-4 mt-1 text-primary-600 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:focus:ring-primary-600 focus:ring-2 cursor-pointer shrink-0"
+                                       value="{{ $result->release->guid }}"
+                                       @change="onCheckboxChange()">
+                                <a href="{{ url('/details/' . $result->release->guid) }}"
+                                   class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-semibold text-sm break-all flex-1">
+                                    {{ $result->release->searchname }}
+                                </a>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-500 dark:text-gray-400">
+                                    <i class="fa fa-clock-o mr-1"></i>{{ \Carbon\Carbon::parse($result->created_at)->diffForHumans() }}
+                                </span>
+                                <div class="flex gap-2">
+                                    <a href="{{ url('/getnzb?id=' . $result->release->guid) }}" class="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-sm" title="Download NZB">
+                                        <i class="fa fa-cloud-download"></i>
+                                    </a>
+                                    <a href="{{ url('/details/' . $result->release->guid) }}" class="px-2 py-1 bg-primary-600 dark:bg-primary-700 text-white rounded text-sm" title="View details">
+                                        <i class="fa fa-info-circle"></i>
+                                    </a>
+                                    <button type="button" class="cart-delete-link px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded text-sm" title="Delete"
+                                            data-delete-url="{{ url('/cart/delete/' . $result->release->guid) }}"
+                                            data-release-name="{{ Str::limit($result->release->searchname, 50) }}">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
 
                 <div class="px-4 py-3 surface-panel-alt border-t flex justify-between items-center">

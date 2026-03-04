@@ -20,7 +20,7 @@
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
-                    <i class="fas mr-2" x-bind:class="iconClass()"></i>
+                    <i class="fas mr-2" :class="iconClass()"></i>
                     <span x-text="title">Confirm Action</span>
                 </h3>
                 <button type="button" @click="cancel()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
@@ -44,7 +44,7 @@
             </button>
             <button type="button"
                     @click="confirm()"
-                    x-bind:class="confirmBtnClass()">
+                    :class="confirmBtnClass()">
                 <i class="fas fa-check mr-2"></i><span x-text="confirmText">Confirm</span>
             </button>
         </div>

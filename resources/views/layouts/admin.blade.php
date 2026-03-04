@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     {{-- Apply dark mode BEFORE any CSS loads to prevent white flash --}}
@@ -136,7 +136,7 @@
              'warning' => session('warning'),
              'info' => session('info')
          ]) }}"
-         style="display: none;">
+         class="hidden">
     </div>
 
     <!-- Meta tags for theme management (CSP-safe) -->

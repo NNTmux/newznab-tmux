@@ -7,9 +7,9 @@
      class="fixed top-4 right-4 z-9999 flex flex-col gap-2 pointer-events-none"
      aria-live="polite"
      aria-atomic="true">
-    <template x-for="toast in items()" x-bind:key="toast.id">
+    <template x-for="toast in items()" :key="toast.id">
         <div class="pointer-events-auto max-w-sm w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden transform transition-all duration-300"
-             x-bind:class="toast.removing ? 'opacity-0 translate-x-full' : 'opacity-100 translate-x-0'"
+             :class="toast.removing ? 'opacity-0 translate-x-full' : 'opacity-100 translate-x-0'"
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 translate-x-full"
              x-transition:enter-end="opacity-100 translate-x-0"
@@ -19,7 +19,7 @@
             <div class="p-4 flex items-start gap-3">
                 <div class="shrink-0">
                     <i class="fas"
-                       x-bind:class="[
+                       :class="[
                            iconFor(toast.type),
                            toast.type === 'success' ? 'text-green-500' : '',
                            toast.type === 'error' ? 'text-red-500' : '',

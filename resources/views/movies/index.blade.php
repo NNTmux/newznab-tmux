@@ -48,7 +48,7 @@
                         @click="toggleLayout()"
                         class="inline-flex items-center px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500"
                         title="Toggle layout">
-                    <i class="mr-2" x-bind:class="layoutIcon"></i>
+                    <i class="mr-2" :class="layoutIcon"></i>
                     <span x-text="layoutLabel"></span>
                 </button>
 
@@ -144,7 +144,7 @@
             {{-- Movies Grid --}}
             <div id="moviesGrid"
                  class="movies-grid"
-                 x-bind:data-layout="layout">
+                 :data-layout="layout">
                 @foreach($results as $result)
                     @include('movies.partials.movie-card', ['result' => $result, 'site' => $site])
                 @endforeach

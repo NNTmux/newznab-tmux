@@ -18,8 +18,8 @@
                 </h4>
                 <div class="flex rounded-md shadow-sm" x-data="copyToClipboard()">
                     <input type="text" class="flex-1 rounded-l-md border-gray-300 dark:border-gray-600 font-mono text-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white" value="apikey={{ auth()->user()->api_token }}" readonly id="apikeyInput">
-                    <button class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" x-on:click="copy('apikeyInput')" title="Copy to clipboard" x-bind:class="copied ? 'text-green-600' : ''">
-                        <i class="fa" x-bind:class="copied ? 'fa-check' : 'fa-copy'"></i>
+                    <button class="inline-flex items-center px-4 py-2 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500" type="button" @click="copy('apikeyInput')" title="Copy to clipboard" :class="copied ? 'text-green-600' : ''">
+                        <i class="fa" :class="copied ? 'fa-check' : 'fa-copy'"></i>
                     </button>
                 </div>
             </div>

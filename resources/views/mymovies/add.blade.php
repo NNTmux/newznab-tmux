@@ -86,143 +86,179 @@
         </div>
     </div>
 </div>
-<div class="card card-default shadow-sm mb-4">
-    <div class="card-header bg-light">
-        <div class="d-flex justify-content-between align-items-center">
-            <h3 class="mb-0"><i class="fa fa-film me-2 text-primary"></i>My Movies</h3>
-            <div class="breadcrumb-wrapper">
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+        <div class="bg-linear-to-r from-blue-600 to-blue-700 px-6 py-4">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+                <h3 class="text-xl font-bold text-white flex items-center">
+                    <i class="fa fa-film mr-2"></i>My Movies
+                </h3>
                 <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0 py-0">
-                        <li class="breadcrumb-item"><a href="{{ url($site['home_link']) }}">Home</a></li>
-                        <li class="breadcrumb-item active">My Movies</li>
+                    <ol class="flex items-center space-x-2 text-sm text-blue-100">
+                        <li><a href="{{ url($site['home_link']) }}" class="hover:text-white transition">Home</a></li>
+                        <li><i class="fas fa-chevron-right text-xs"></i></li>
+                        <li class="text-white font-medium">My Movies</li>
                     </ol>
                 </nav>
             </div>
         </div>
-    </div>
 
-    <div class="card-body">
-        <div class="alert alert-info mb-4">
-            <i class="fa fa-info-circle me-2"></i>
-            Using 'My Movies' you can search for movies, and add them to a wishlist. If the movie becomes available it will be added to an
-            <strong><a href="{{ url("/rss/mymovies?dl=1&i={$userdata->id}&api_token={$userdata->api_token}") }}" class="alert-link">
-                <i class="fa fa-rss me-1"></i>RSS Feed
-            </a></strong>
-            you can use to automatically download. You can
-            <strong><a href="{{ route('mymovies') }}" class="alert-link">
-                <i class="fa fa-list me-1"></i>Manage Your Movie List
-            </a></strong>
-            to remove old items.
-        </div>
+        <div class="p-6">
+            <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg">
+                <div class="flex items-start">
+                    <i class="fa fa-info-circle text-blue-600 dark:text-blue-400 mt-0.5 mr-3"></i>
+                    <p class="text-sm text-blue-800 dark:text-blue-200">
+                        Using 'My Movies' you can search for movies and add them to a wishlist. If the movie becomes available it will be added to an
+                        <a href="{{ url("/rss/mymovies?dl=1&i={$userdata->id}&api_token={$userdata->api_token}") }}" class="font-semibold underline hover:text-blue-600 dark:hover:text-blue-300">
+                            <i class="fa fa-rss mr-1"></i>RSS Feed
+                        </a>
+                        you can use to automatically download. You can
+                        <a href="{{ route('mymovies') }}" class="font-semibold underline hover:text-blue-600 dark:hover:text-blue-300">
+                            <i class="fa fa-list mr-1"></i>Manage Your Movie List
+                        </a>
+                        to remove old items.
+                    </p>
+                </div>
+            </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <a href="{{ url("/rss/mymovies?dl=1&i={$userdata->id}&api_token={$userdata->api_token}") }}" class="btn btn-outline-secondary">
-                <i class="fa fa-rss me-2"></i>RSS Feed
-            </a>
-        </div>
+            <div class="flex justify-between items-center mb-4">
+                <a href="{{ url("/rss/mymovies?dl=1&i={$userdata->id}&api_token={$userdata->api_token}") }}" class="btn btn-secondary btn-sm">
+                    <i class="fa fa-rss mr-2"></i>RSS Feed
+                </a>
+            </div>
 
-        @if(count($movies ?? []) > 0)
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width:140px">Cover</th>
-                            <th>Information</th>
-                            <th>Category</th>
-                            <th>Added</th>
-                            <th class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($movies as $movie)
-                            <tr>
-                                <td>
-                                    <div class="text-center">
-                                        <img class="img-fluid rounded shadow-sm" style="max-width:120px"
+            @if(count($movies ?? []) > 0)
+                <!-- Desktop Table -->
+                <div class="hidden md:block overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-left text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">
+                                <th class="px-4 py-3 w-36">Cover</th>
+                                <th class="px-4 py-3">Information</th>
+                                <th class="px-4 py-3">Category</th>
+                                <th class="px-4 py-3">Added</th>
+                                <th class="px-4 py-3 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                            @foreach($movies as $movie)
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+                                    <td class="px-4 py-3">
+                                        <img class="rounded-lg shadow-sm max-w-[120px]"
                                              src="{{ url('/covers/movies/' . (($movie['cover'] ?? 0) == 1 ? $movie['imdbid'] . '-cover.jpg' : 'no-cover.jpg')) }}"
                                              alt="{{ e($movie['title'] ?? '') }}"/>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="mb-2">
-                                        <h5 class="mb-1">
-                                            <a href="{{ url("/Movies?imdb={$movie['imdbid']}") }}" class="text-decoration-none" data-bs-toggle="tooltip" data-bs-placement="top" title="View movie details">
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <div class="mb-2">
+                                            <a href="{{ url("/Movies?imdb={$movie['imdbid']}") }}" class="text-gray-900 dark:text-gray-100 font-semibold hover:text-blue-600 dark:hover:text-blue-400 transition" title="View movie details">
                                                 {{ e($movie['title'] ?? '') }} ({{ $movie['year'] ?? '' }})
                                             </a>
-                                        </h5>
-
-                                        @if(!empty($movie['tagline']))
-                                            <div class="fst-italic text-muted mb-2">{{ e($movie['tagline']) }}</div>
+                                            @if(!empty($movie['tagline']))
+                                                <div class="italic text-gray-500 dark:text-gray-400 text-xs mt-1">{{ e($movie['tagline']) }}</div>
+                                            @endif
+                                        </div>
+                                        @if(!empty($movie['plot']))
+                                            <p class="text-gray-600 dark:text-gray-300 text-sm mb-2">{{ e($movie['plot']) }}</p>
                                         @endif
-                                    </div>
-
-                                    @if(!empty($movie['plot']))
-                                        <p class="mb-2">{{ e($movie['plot']) }}</p>
-                                    @endif
-
-                                    <div class="d-flex flex-wrap gap-3 mt-2">
-                                        @if(!empty($movie['genre']))
-                                            <div>
-                                                <span class="fw-bold text-secondary"><i class="fa fa-tag me-1"></i>Genre:</span> {{ e($movie['genre']) }}
-                                            </div>
-                                        @endif
-
-                                        @if(!empty($movie['director']))
-                                            <div>
-                                                <span class="fw-bold text-secondary"><i class="fa fa-video-camera me-1"></i>Director:</span> {{ e($movie['director']) }}
-                                            </div>
-                                        @endif
-
+                                        <div class="flex flex-wrap gap-3 text-xs text-gray-600 dark:text-gray-400 mt-2">
+                                            @if(!empty($movie['genre']))
+                                                <span><span class="font-semibold"><i class="fa fa-tag mr-1"></i>Genre:</span> {{ e($movie['genre']) }}</span>
+                                            @endif
+                                            @if(!empty($movie['director']))
+                                                <span><span class="font-semibold"><i class="fa fa-video mr-1"></i>Director:</span> {{ e($movie['director']) }}</span>
+                                            @endif
+                                        </div>
                                         @if(!empty($movie['actors']))
-                                            <div class="w-100 mt-1">
-                                                <span class="fw-bold text-secondary"><i class="fa fa-users me-1"></i>Starring:</span> {{ e($movie['actors']) }}
+                                            <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                                <span class="font-semibold"><i class="fa fa-users mr-1"></i>Starring:</span> {{ e($movie['actors']) }}
                                             </div>
                                         @endif
-                                    </div>
-
-                                    <div class="mt-2">
-                                        <a class="badge bg-warning text-dark" target="_blank"
-                                           href="{{ $site['dereferrer_link'] }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}"
-                                           data-bs-toggle="tooltip" data-bs-placement="top" title="View on IMDB">
-                                            <i class="fa fa-external-link me-1"></i>IMDB
-                                        </a>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge bg-secondary rounded-pill">
-                                        <i class="fa fa-folder-open me-1"></i>{{ !empty($movie['categoryNames']) ? e($movie['categoryNames']) : 'All' }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center" title="Added on {{ $movie['created_at'] ?? '' }}">
-                                        <i class="fa fa-calendar text-muted me-2"></i>
+                                        <div class="mt-2">
+                                            <a class="inline-flex items-center px-2 py-1 text-xs font-medium rounded bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-200" target="_blank"
+                                               href="{{ $site['dereferrer_link'] }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}" title="View on IMDB">
+                                                <i class="fa fa-external-link mr-1"></i>IMDB
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                            <i class="fa fa-folder-open mr-1"></i>{{ !empty($movie['categoryNames']) ? e($movie['categoryNames']) : 'All' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3 text-gray-600 dark:text-gray-400 text-xs whitespace-nowrap" title="Added on {{ $movie['created_at'] ?? '' }}">
+                                        <i class="fa fa-calendar mr-1"></i>
                                         {{ isset($movie['created_at']) ? date('M d, Y', strtotime($movie['created_at'])) : '' }}
+                                    </td>
+                                    <td class="px-4 py-3 text-right">
+                                        <div class="flex items-center justify-end gap-2">
+                                            <a class="btn btn-warning btn-sm" href="{{ url("/mymovies?id=edit&imdb={$movie['imdbid']}") }}" title="Edit Categories">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            <a class="btn btn-danger btn-sm" href="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}" title="Remove from My Movies">
+                                                <i class="fa fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile Cards -->
+                <div class="md:hidden space-y-4">
+                    @foreach($movies as $movie)
+                        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                            <div class="flex gap-3">
+                                <img class="rounded-lg shadow-sm w-20 h-auto shrink-0"
+                                     src="{{ url('/covers/movies/' . (($movie['cover'] ?? 0) == 1 ? $movie['imdbid'] . '-cover.jpg' : 'no-cover.jpg')) }}"
+                                     alt="{{ e($movie['title'] ?? '') }}"/>
+                                <div class="min-w-0 flex-1">
+                                    <a href="{{ url("/Movies?imdb={$movie['imdbid']}") }}" class="text-gray-900 dark:text-gray-100 font-semibold hover:text-blue-600 dark:hover:text-blue-400 transition text-sm">
+                                        {{ e($movie['title'] ?? '') }} ({{ $movie['year'] ?? '' }})
+                                    </a>
+                                    @if(!empty($movie['tagline']))
+                                        <div class="italic text-gray-500 dark:text-gray-400 text-xs mt-0.5">{{ e($movie['tagline']) }}</div>
+                                    @endif
+                                    <div class="flex flex-wrap gap-2 mt-2">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                            <i class="fa fa-folder-open mr-1"></i>{{ !empty($movie['categoryNames']) ? e($movie['categoryNames']) : 'All' }}
+                                        </span>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                                            <i class="fa fa-calendar mr-1"></i>{{ isset($movie['created_at']) ? date('M d, Y', strtotime($movie['created_at'])) : '' }}
+                                        </span>
                                     </div>
-                                </td>
-                                <td class="text-end">
-                                    <div class="btn-group">
-                                        <a class="btn btn-sm btn-warning mymovies"
-                                           href="{{ url("/mymovies?id=edit&imdb={$movie['imdbid']}") }}" rel="edit"
-                                           name="movies{{ $movie['imdbid'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Categories">
-                                            <i class="fa fa-edit"></i>
-                                        </a>
-                                        <a class="btn btn-sm btn-danger mymovies"
-                                           href="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}" rel="remove"
-                                           name="movies{{ $movie['imdbid'] }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Remove from My Movies">
-                                            <i class="fa fa-trash"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @else
-            <div class="alert alert-info">
-                <i class="fa fa-info-circle me-2"></i>No movies bookmarked yet. Add movies from movie pages.
-            </div>
-        @endif
+                                </div>
+                            </div>
+                            @if(!empty($movie['plot']))
+                                <p class="text-gray-600 dark:text-gray-300 text-xs mt-3">{{ e($movie['plot']) }}</p>
+                            @endif
+                            <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                <a class="inline-flex items-center px-2 py-1 text-xs font-medium rounded bg-yellow-100 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-200" target="_blank"
+                                   href="{{ $site['dereferrer_link'] }}http://www.imdb.com/title/tt{{ $movie['imdbid'] }}">
+                                    <i class="fa fa-external-link mr-1"></i>IMDB
+                                </a>
+                                <div class="flex gap-2">
+                                    <a class="btn btn-warning btn-sm" href="{{ url("/mymovies?id=edit&imdb={$movie['imdbid']}") }}" title="Edit">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a class="btn btn-danger btn-sm" href="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}" title="Remove">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg">
+                    <div class="flex items-center">
+                        <i class="fa fa-info-circle text-blue-600 dark:text-blue-400 mr-3"></i>
+                        <span class="text-blue-800 dark:text-blue-200 text-sm">No movies bookmarked yet. Add movies from movie pages.</span>
+                    </div>
+                </div>
+            @endif
+        </div>
     </div>
 </div>
 

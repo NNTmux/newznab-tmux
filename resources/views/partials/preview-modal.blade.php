@@ -52,18 +52,18 @@
 
                 <!-- Image -->
                 <div x-show="imageLoaded && !imageError" class="flex justify-center">
-                    <img x-bind:src="imageUrl"
-                         x-bind:alt="title"
+                    <img :src="imageUrl"
+                         :alt="title"
                          x-on:error="onImageError()"
-                         x-on:load="onImageLoad()"
+                         @load="onImageLoad()"
                          class="max-w-full max-h-[80vh] rounded-lg shadow-lg">
                 </div>
 
                 <!-- Hidden image for preloading -->
                 <img x-show="false"
-                     x-bind:src="imageUrl"
+                     :src="imageUrl"
                      x-on:error="onImageError()"
-                     x-on:load="onImageLoad()">
+                     @load="onImageLoad()">
             </div>
             <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button type="button"

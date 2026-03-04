@@ -363,7 +363,7 @@
                 This will reset the article pointers for the selected groups back to their current state.
             </p>
             <div class="max-h-32 overflow-y-auto mb-4 text-xs text-gray-500 dark:text-gray-400">
-                <template x-for="name in selectedGroupNames" x-bind:key="name">
+                <template x-for="name in selectedGroupNames" :key="name">
                     <div x-text="name"></div>
                 </template>
             </div>
