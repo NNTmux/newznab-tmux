@@ -3,6 +3,21 @@
  */
 import Alpine from '@alpinejs/csp';
 
+const prefetchedUrls = new Set();
+
+function buildImageUrl(guid, type) {
+    return '/covers/' + (type || 'preview') + '/' + guid + '_thumb.jpg';
+}
+
+function prefetchImage(guid, type) {
+    const url = buildImageUrl(guid, type);
+    if (!prefetchedUrls.has(url)) {
+        const img = new Image();
+        img.src = url;
+        prefetchedUrls.add(url);
+    }
+}
+
 Alpine.data('previewModal', () => ({
     open: false,
     title: 'Preview Image',
@@ -13,9 +28,16 @@ Alpine.data('previewModal', () => ({
     show(guid, type) {
         type = type || 'preview';
         this.title = type === 'sample' ? 'Sample Image' : 'Preview Image';
-        this.imageUrl = '/covers/' + type + '/' + guid + '_thumb.jpg';
+        const newUrl = buildImageUrl(guid, type);
+
+        if (this.imageUrl === newUrl) {
+            this.open = true;
+            return;
+        }
+
+        this.imageUrl = newUrl;
         this.imageError = false;
-        this.imageLoaded = false;
+        this.imageLoaded = prefetchedUrls.has(newUrl);
         this.open = true;
     },
 
@@ -29,7 +51,6 @@ Alpine.data('previewModal', () => ({
 
     close() {
         this.open = false;
-        this.imageUrl = '';
     },
 
     errorMessage() {
@@ -41,7 +62,6 @@ Alpine.data('previewModal', () => ({
         window.showPreviewImage = function(guid, type) { self.show(guid, type); };
         window.closePreviewModal = function() { self.close(); };
 
-        // Document-level click delegation for preview/sample triggers
         document.addEventListener('click', function(e) {
             const preview = e.target.closest('.preview-badge');
             if (preview) { e.preventDefault(); self.show(preview.dataset.guid, 'preview'); return; }
@@ -50,8 +70,39 @@ Alpine.data('previewModal', () => ({
             if (e.target.closest('[data-close-preview-modal]')) { e.preventDefault(); self.close(); }
         });
 
+        // Prefetch on hover so the image is cached before click
+        document.addEventListener('mouseover', function(e) {
+            const preview = e.target.closest('.preview-badge');
+            if (preview) { prefetchImage(preview.dataset.guid, 'preview'); return; }
+            const sample = e.target.closest('.sample-badge');
+            if (sample) { prefetchImage(sample.dataset.guid, 'sample'); }
+        });
+
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && self.open) self.close();
         });
+
+        // Prefetch images for badges visible in the viewport during idle time
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        const el = entry.target;
+                        const type = el.classList.contains('sample-badge') ? 'sample' : 'preview';
+                        const guid = el.dataset.guid;
+                        if (typeof requestIdleCallback === 'function') {
+                            requestIdleCallback(function() { prefetchImage(guid, type); });
+                        } else {
+                            setTimeout(function() { prefetchImage(guid, type); }, 200);
+                        }
+                        observer.unobserve(el);
+                    }
+                });
+            }, { rootMargin: '200px' });
+
+            document.querySelectorAll('.sample-badge, .preview-badge').forEach(function(el) {
+                observer.observe(el);
+            });
+        }
     }
 }));

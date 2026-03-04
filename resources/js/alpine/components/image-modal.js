@@ -16,7 +16,6 @@ Alpine.data('imageModal', () => ({
 
     close() {
         this.open = false;
-        this.imageUrl = '';
     },
 
     init() {

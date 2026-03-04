@@ -42,6 +42,7 @@
                 <div class="flex justify-center">
                     <img :src="imageUrl"
                          :alt="imageTitle"
+                         decoding="async"
                          class="max-w-full max-h-[85vh] rounded-lg shadow-lg">
                 </div>
             </div>

@@ -56,14 +56,10 @@
                          :alt="title"
                          x-on:error="onImageError()"
                          @load="onImageLoad()"
+                         decoding="async"
+                         fetchpriority="high"
                          class="max-w-full max-h-[80vh] rounded-lg shadow-lg">
                 </div>
-
-                <!-- Hidden image for preloading -->
-                <img x-show="false"
-                     :src="imageUrl"
-                     x-on:error="onImageError()"
-                     @load="onImageLoad()">
             </div>
             <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button type="button"
