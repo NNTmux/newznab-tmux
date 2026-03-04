@@ -14,6 +14,10 @@ import Alpine from '@alpinejs/csp';
  * Each module registers itself via Alpine.data() as a side effect.
  */
 const lazyComponentMap = {
+    // --- Components only needed on specific pages ---
+    'adminSubmenu':    () => import('./components/admin-submenu.js'),
+    'passwordToggle':  () => import('./components/password-toggle.js'),
+
     // --- Modal components (only on release pages) ---
     'nfoModal':        () => import('./components/nfo-modal.js'),
     'filelistModal':   () => import('./components/filelist-modal.js'),
@@ -83,15 +87,27 @@ export function loadAndStart() {
 
     if (imports.size === 0) {
         Alpine.start();
+        enableTransitions();
         return;
     }
 
     // Load all needed modules in parallel, then start Alpine
     Promise.all([...imports].map(fn => fn()))
-        .then(() => Alpine.start())
+        .then(() => {
+            Alpine.start();
+            enableTransitions();
+        })
         .catch(err => {
             console.error('[lazy-loader] Failed to load component:', err);
-            // Start Alpine anyway so the page is usable
             Alpine.start();
+            enableTransitions();
         });
+}
+
+function enableTransitions() {
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            document.documentElement.removeAttribute('data-loading');
+        });
+    });
 }
