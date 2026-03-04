@@ -17,6 +17,14 @@ use Illuminate\Support\Carbon;
 
 class RssController extends BasePageController
 {
+    private RSS $rss;
+
+    public function __construct(RSS $rss)
+    {
+        parent::__construct();
+        $this->rss = $rss;
+    }
+
     /**
      * @return JsonResponse|void
      *
@@ -24,22 +32,16 @@ class RssController extends BasePageController
      */
     public function myMoviesRss(Request $request)
     {
-        $rss = app(RSS::class);
-        $offset = 0;
-
         $user = $this->userCheck($request);
-
-        if (is_object($user)) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
 
-        $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
+        $outputXML = ! ($request->has('o') && $request->input('o') === 'json');
+        $userNum = $request->has('num') && is_numeric($request->input('num')) ? abs((int) $request->input('num')) : 0;
 
-        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs((int) $request->input('num')) : 0);
-
-        $relData = $rss->getMyMoviesRss($userNum, $user['user_id'], User::getCategoryExclusionById($user['user_id']));
-
-        $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
+        $relData = $this->rss->getMyMoviesRss($userNum, $user['user_id'], User::getCategoryExclusionById($user['user_id']));
+        $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
     }
 
     /**
@@ -49,18 +51,17 @@ class RssController extends BasePageController
      */
     public function myShowsRss(Request $request)
     {
-        $rss = app(RSS::class);
-        $offset = 0;
         $user = $this->userCheck($request);
-        if (is_object($user)) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
-        $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs((int) $request->input('airdate')) : -1;
-        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs((int) $request->input('num')) : 0);
-        $relData = $rss->getShowsRss($userNum, $user['user_id'], User::getCategoryExclusionById($user['user_id']), $userAirDate);
-        $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
 
-        $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
+        $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs((int) $request->input('airdate')) : -1;
+        $userNum = $request->has('num') && is_numeric($request->input('num')) ? abs((int) $request->input('num')) : 0;
+        $outputXML = ! ($request->has('o') && $request->input('o') === 'json');
+
+        $relData = $this->rss->getShowsRss($userNum, $user['user_id'], User::getCategoryExclusionById($user['user_id']), $userAirDate);
+        $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
     }
 
     /**
@@ -70,24 +71,15 @@ class RssController extends BasePageController
      */
     public function fullFeedRss(Request $request)
     {
-        $rss = app(RSS::class);
-        $offset = 0;
         $user = $this->userCheck($request);
-        if (is_object($user)) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
-        $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs((int) $request->input('airdate')) : -1;
-        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs((int) $request->input('num')) : 0);
-        $userLimit = $request->has('limit') && is_numeric($request->input('limit')) ? $request->input('limit') : 100;
-        $userShow = $userAnidb = -1;
-        if ($request->has('show')) {
-            $userShow = ((int) $request->input('show') === 0 ? -1 : $request->input('show') + 0);
-        } elseif ($request->has('anidb')) {
-            $userAnidb = ((int) $request->input('anidb') === 0 ? -1 : $request->input('anidb') + 0);
-        }
-        $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
-        $relData = $rss->getRss(Arr::wrap(0), $userShow, $userAnidb, $user['user_id'], $userAirDate, $userLimit, $userNum);
-        $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
+
+        [$userShow, $userAnidb, $userAirDate, $userNum, $userLimit, $outputXML] = $this->parseCommonRssParams($request);
+
+        $relData = $this->rss->getRss(Arr::wrap(0), $userShow, $userAnidb, $user['user_id'], $userAirDate, $userLimit, $userNum);
+        $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
     }
 
     /**
@@ -95,10 +87,8 @@ class RssController extends BasePageController
      */
     public function showRssDesc(): mixed
     {
-        $rss = app(RSS::class);
-
-        $firstShow = $rss->getFirstInstance('videos_id', 'releases', 'id');
-        $firstAni = $rss->getFirstInstance('anidbid', 'releases', 'id');
+        $firstShow = $this->rss->getFirstInstance('videos_id', 'releases', 'id');
+        $firstAni = $this->rss->getFirstInstance('anidbid', 'releases', 'id');
 
         $show = ($firstShow !== null) ? $firstShow->videos_id : 1;
         $anidb = ($firstAni !== null) ? $firstAni->anidbid : 1;
@@ -120,107 +110,104 @@ class RssController extends BasePageController
     }
 
     /**
+     * @return JsonResponse|void
+     *
      * @throws \Throwable
      */
-    public function cartRss(Request $request): mixed
+    public function cartRss(Request $request)
     {
-        $rss = app(RSS::class);
-        $offset = 0;
         $user = $this->userCheck($request);
-        if (is_object($user)) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
-        $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
-        $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs((int) $request->input('airdate')) : -1;
-        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs((int) $request->input('num')) : 0);
-        $userLimit = $request->has('limit') && is_numeric($request->input('limit')) ? $request->input('limit') : 100;
-        $userShow = $userAnidb = -1;
-        if ($request->has('show')) {
-            $userShow = ((int) $request->input('show') === 0 ? -1 : $request->input('show') + 0);
-        } elseif ($request->has('anidb')) {
-            $userAnidb = ((int) $request->input('anidb') === 0 ? -1 : $request->input('anidb') + 0);
-        }
 
-        $relData = $rss->getRss([-2], $userShow, $userAnidb, $user['user_id'], $userAirDate, $userLimit, $userNum);
-        $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
+        [$userShow, $userAnidb, $userAirDate, $userNum, $userLimit, $outputXML] = $this->parseCommonRssParams($request);
 
-        return null;
+        $relData = $this->rss->getRss([-2], $userShow, $userAnidb, $user['user_id'], $userAirDate, $userLimit, $userNum);
+        $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
     }
 
     /**
+     * @return JsonResponse|void
+     *
      * @throws \Throwable
      */
-    public function categoryFeedRss(Request $request): mixed
+    public function categoryFeedRss(Request $request)
     {
-        $rss = app(RSS::class);
-        $offset = 0;
         if ($request->missing('id')) {
             return response()->json(['error' => 'Category ID is missing'], 403);
         }
 
         $user = $this->userCheck($request);
-        if (is_object($user)) {
+        if ($user instanceof JsonResponse) {
             return $user;
         }
+
         $categoryId = explode(',', $request->input('id'));
-        $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs((int) $request->input('airdate')) : -1;
-        $userNum = ($request->has('num') && is_numeric($request->input('num')) ? abs((int) $request->input('num')) : 0);
-        $userLimit = $request->has('limit') && is_numeric($request->input('limit')) ? $request->input('limit') : 100;
+        [$userShow, $userAnidb, $userAirDate, $userNum, $userLimit, $outputXML] = $this->parseCommonRssParams($request);
+
+        $relData = $this->rss->getRss($categoryId, $userShow, $userAnidb, $user['user_id'], $userAirDate, $userLimit, $userNum);
+        $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
+    }
+
+    /**
+     * @return JsonResponse|void
+     *
+     * @throws \Throwable
+     */
+    public function trendingMoviesRss(Request $request)
+    {
+        $user = $this->userCheck($request);
+        if ($user instanceof JsonResponse) {
+            return $user;
+        }
+
+        $outputXML = ! ($request->has('o') && $request->input('o') === 'json');
+        $relData = $this->rss->getTrendingMoviesRss();
+        $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
+    }
+
+    /**
+     * @return JsonResponse|void
+     *
+     * @throws \Throwable
+     */
+    public function trendingShowsRss(Request $request)
+    {
+        $user = $this->userCheck($request);
+        if ($user instanceof JsonResponse) {
+            return $user;
+        }
+
+        $outputXML = ! ($request->has('o') && $request->input('o') === 'json');
+        $relData = $this->rss->getTrendingShowsRss();
+        $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
+    }
+
+    /**
+     * Parse common RSS request parameters (show, anidb, airdate, num, limit, outputXML).
+     *
+     * @return array{int, int, int, int, int|string, bool}
+     */
+    private function parseCommonRssParams(Request $request): array
+    {
         $userShow = $userAnidb = -1;
         if ($request->has('show')) {
-            $userShow = ((int) $request->input('show') === 0 ? -1 : $request->input('show') + 0);
+            $userShow = (int) $request->input('show') === 0 ? -1 : $request->input('show') + 0;
         } elseif ($request->has('anidb')) {
-            $userAnidb = ((int) $request->input('anidb') === 0 ? -1 : $request->input('anidb') + 0);
+            $userAnidb = (int) $request->input('anidb') === 0 ? -1 : $request->input('anidb') + 0;
         }
-        $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
-        $relData = $rss->getRss($categoryId, $userShow, $userAnidb, $user['user_id'], $userAirDate, $userLimit, $userNum);
-        $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
 
-        return null;
+        $userAirDate = $request->has('airdate') && is_numeric($request->input('airdate')) ? abs((int) $request->input('airdate')) : -1;
+        $userNum = $request->has('num') && is_numeric($request->input('num')) ? abs((int) $request->input('num')) : 0;
+        $userLimit = $request->has('limit') && is_numeric($request->input('limit')) ? $request->input('limit') : 100;
+        $outputXML = ! ($request->has('o') && $request->input('o') === 'json');
+
+        return [$userShow, $userAnidb, $userAirDate, $userNum, $userLimit, $outputXML];
     }
 
     /**
-     * @throws \Throwable
-     */
-    public function trendingMoviesRss(Request $request): mixed
-    {
-        $rss = app(RSS::class);
-        $offset = 0;
-        $user = $this->userCheck($request);
-        if (is_object($user)) {
-            return $user;
-        }
-        $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
-
-        $relData = $rss->getTrendingMoviesRss();
-
-        $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
-
-        return null;
-    }
-
-    /**
-     * @throws \Throwable
-     */
-    public function trendingShowsRss(Request $request): mixed
-    {
-        $rss = app(RSS::class);
-        $offset = 0;
-        $user = $this->userCheck($request);
-        if (is_object($user)) {
-            return $user;
-        }
-        $outputXML = (! ($request->has('o') && $request->input('o') === 'json'));
-
-        $relData = $rss->getTrendingShowsRss();
-
-        $rss->output($relData, $user['params'], $outputXML, $offset, 'rss');
-
-        return null;
-    }
-
-    /**
-     * @return array<string, mixed>
+     * @return JsonResponse|array<string, mixed>
      *
      * @throws \Throwable
      */
@@ -252,24 +239,24 @@ class RssController extends BasePageController
 
         if ($usedRequests > $maxRequests) {
             return response()->json(['error' => 'You have reached your daily limit for API requests!'], 403);
-        } else {
-            UserRequest::addApiRequest($rssToken, $request->getRequestUri());
-            event(new UserAccessedApi($res, $request->ip()));
         }
-        $params =
-            [
-                'dl' => $request->has('dl') && $request->input('dl') === '1' ? '1' : '0',
-                'del' => $request->has('del') && $request->input('del') === '1' ? '1' : '0',
-                'extended' => 1,
-                'uid' => $uid,
-                'token' => $rssToken,
-                'apilimit' => $maxRequests,
-                'requests' => $usedRequests,
-                'downloadlimit' => $maxDownloads,
-                'grabs' => UserDownload::getDownloadRequests($uid),
-                'oldestapi' => $apiOldestTime,
-                'oldestgrab' => $oldestGrabTime,
-            ];
+
+        UserRequest::addApiRequest($rssToken, $request->getRequestUri());
+        event(new UserAccessedApi($res, $request->ip()));
+
+        $params = [
+            'dl' => $request->has('dl') && $request->input('dl') === '1' ? '1' : '0',
+            'del' => $request->has('del') && $request->input('del') === '1' ? '1' : '0',
+            'extended' => 1,
+            'uid' => $uid,
+            'token' => $rssToken,
+            'apilimit' => $maxRequests,
+            'requests' => $usedRequests,
+            'downloadlimit' => $maxDownloads,
+            'grabs' => UserDownload::getDownloadRequests($uid),
+            'oldestapi' => $apiOldestTime,
+            'oldestgrab' => $oldestGrabTime,
+        ];
 
         return ['user' => $res, 'user_id' => $uid, 'rss_token' => $rssToken, 'max_requests' => $maxRequests, 'params' => $params];
     }

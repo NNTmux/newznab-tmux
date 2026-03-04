@@ -5,9 +5,16 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
+use App\Models\DnzbFailure;
+use App\Models\Release;
+use App\Models\ReleaseReport;
+use App\Models\UsenetGroup;
+use App\Models\User;
+use App\Models\UserActivity;
 use App\Services\SystemMetricsService;
 use App\Services\UserStatsService;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 
 class AdminPageController extends BasePageController
 {
@@ -29,13 +36,12 @@ class AdminPageController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        // Cache user statistics for 2 minutes
-        $userStats = \Illuminate\Support\Facades\Cache::remember('admin_user_stats', 120, function () {
+        $userStats = Cache::remember('admin_user_stats', 120, function () {
             return [
                 'users_by_role' => $this->userStatsService->getUsersByRole(),
-                'downloads_per_hour' => $this->userStatsService->getDownloadsPerHour(168), // Last 7 days in hours
+                'downloads_per_hour' => $this->userStatsService->getDownloadsPerHour(168),
                 'downloads_per_minute' => $this->userStatsService->getDownloadsPerMinute(60),
-                'api_hits_per_hour' => $this->userStatsService->getApiHitsPerHour(168), // Last 7 days in hours
+                'api_hits_per_hour' => $this->userStatsService->getApiHitsPerHour(168),
                 'api_hits_per_minute' => $this->userStatsService->getApiHitsPerMinute(60),
                 'summary' => $this->userStatsService->getSummaryStats(),
                 'top_downloaders' => $this->userStatsService->getTopDownloaders(5),
@@ -53,14 +59,12 @@ class AdminPageController extends BasePageController
     }
 
     /**
-     * Get recent user activity from the user_activities table with caching
-     *
      * @return array<string, mixed>
      */
     protected function getRecentUserActivity(): array
     {
-        return \Illuminate\Support\Facades\Cache::remember('admin_recent_activity', 60, function () {
-            $activities = \App\Models\UserActivity::orderBy('created_at', 'desc')
+        return Cache::remember('admin_recent_activity', 60, function () {
+            $activities = UserActivity::orderBy('created_at', 'desc')
                 ->limit(10)
                 ->get();
 
@@ -79,10 +83,7 @@ class AdminPageController extends BasePageController
         });
     }
 
-    /**
-     * API endpoint to get recent user activity (for auto-refresh)
-     */
-    public function getRecentActivity(): mixed
+    public function getRecentActivity(): JsonResponse
     {
         $activities = $this->getRecentUserActivity();
 
@@ -104,64 +105,33 @@ class AdminPageController extends BasePageController
     }
 
     /**
-     * Get default dashboard statistics with caching for expensive queries
-     *
      * @return array<string, mixed>
      */
     protected function getDefaultStats(): array
     {
         $today = now()->format('Y-m-d');
 
-        // Cache total releases count for 5 minutes (expensive query on large tables)
-        $releasesCount = \Illuminate\Support\Facades\Cache::remember('admin_stats_releases_count', 300, function () {
-            return \App\Models\Release::count();
-        });
+        $releasesCount = Cache::remember('admin_stats_releases_count', 300, fn () => Release::count());
 
-        // Cache users count for 5 minutes
-        $usersCount = \Illuminate\Support\Facades\Cache::remember('admin_stats_users_count', 300, function () {
-            return \App\Models\User::whereNull('deleted_at')->count();
-        });
+        $usersCount = Cache::remember('admin_stats_users_count', 300, fn () => User::whereNull('deleted_at')->count());
 
-        // Cache groups count for 10 minutes (rarely changes)
-        $groupsCount = \Illuminate\Support\Facades\Cache::remember('admin_stats_groups_count', 600, function () {
-            return \App\Models\UsenetGroup::count();
-        });
+        $groupsCount = Cache::remember('admin_stats_groups_count', 600, fn () => UsenetGroup::count());
 
-        // Cache active groups count for 10 minutes
-        $activeGroupsCount = \Illuminate\Support\Facades\Cache::remember('admin_stats_active_groups_count', 600, function () {
-            return \App\Models\UsenetGroup::where('active', 1)->count();
-        });
+        $activeGroupsCount = Cache::remember('admin_stats_active_groups_count', 600, fn () => UsenetGroup::where('active', 1)->count());
 
-        // Cache failed count for 5 minutes
-        $failedCount = \Illuminate\Support\Facades\Cache::remember('admin_stats_failed_count', 300, function () {
-            return \App\Models\DnzbFailure::count();
-        });
+        $failedCount = Cache::remember('admin_stats_failed_count', 300, fn () => DnzbFailure::count());
 
-        // Cache reported releases count for 5 minutes
-        $reportedCount = \Illuminate\Support\Facades\Cache::remember('admin_stats_reported_count', 300, function () {
-            return \App\Models\ReleaseReport::where('status', 'pending')->count();
-        });
+        $reportedCount = Cache::remember('admin_stats_reported_count', 300, fn () => ReleaseReport::where('status', 'pending')->count());
 
-        // Cache soft-deleted users count for 5 minutes
-        $softDeletedCount = \Illuminate\Support\Facades\Cache::remember('admin_stats_soft_deleted_users_count', 300, function () {
-            return \App\Models\User::onlyTrashed()->count();
-        });
+        $softDeletedCount = Cache::remember('admin_stats_soft_deleted_users_count', 300, fn () => User::onlyTrashed()->count());
 
-        // Cache permanently deleted users count for 5 minutes (from activity log)
-        $permanentlyDeletedCount = \Illuminate\Support\Facades\Cache::remember('admin_stats_permanently_deleted_users_count', 300, function () {
-            return \App\Models\UserActivity::where('activity_type', 'deleted')
-                ->whereJsonContains('metadata->permanent', true)
-                ->count();
-        });
+        $permanentlyDeletedCount = Cache::remember('admin_stats_permanently_deleted_users_count', 300, fn () => UserActivity::where('activity_type', 'deleted')
+            ->whereJsonContains('metadata->permanent', true)
+            ->count());
 
-        // Today's counts can be cached for 1 minute since they change frequently
-        $releasesToday = \Illuminate\Support\Facades\Cache::remember('admin_stats_releases_today_'.$today, 60, function () use ($today) {
-            return \App\Models\Release::whereRaw('DATE(adddate) = ?', [$today])->count();
-        });
+        $releasesToday = Cache::remember('admin_stats_releases_today_'.$today, 60, fn () => Release::whereDate('adddate', $today)->count());
 
-        $usersToday = \Illuminate\Support\Facades\Cache::remember('admin_stats_users_today_'.$today, 60, function () use ($today) {
-            return \App\Models\User::whereNull('deleted_at')->whereRaw('DATE(created_at) = ?', [$today])->count();
-        });
+        $usersToday = Cache::remember('admin_stats_users_today_'.$today, 60, fn () => User::whereNull('deleted_at')->whereDate('created_at', $today)->count());
 
         return [
             'releases' => $releasesCount,
@@ -174,70 +144,30 @@ class AdminPageController extends BasePageController
             'reported' => $reportedCount,
             'soft_deleted_users' => $softDeletedCount,
             'permanently_deleted_users' => $permanentlyDeletedCount,
-            'disk_free' => $this->getDiskSpace(),
+            'disk_free' => $this->systemMetricsService->getDiskSpace(),
         ];
     }
 
     /**
-     * Get disk space information
-     */
-    protected function getDiskSpace(): string
-    {
-        try {
-            $bytes = disk_free_space('/');
-            $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-
-            for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
-                $bytes /= 1024;
-            }
-
-            return round($bytes, 2).' '.$units[$i];
-        } catch (\Exception $e) {
-            return 'N/A';
-        }
-    }
-
-    /**
-     * Get system metrics (CPU and RAM usage) with caching
-     *
      * @return array<string, mixed>
      */
     protected function getSystemMetrics(): array
     {
-        // Cache CPU info for 1 hour (doesn't change)
-        $cpuInfo = \Illuminate\Support\Facades\Cache::remember('admin_cpu_info', 3600, function () {
-            return $this->getCpuInfo();
-        });
+        $cpuInfo = Cache::remember('admin_cpu_info', 3600, fn () => $this->systemMetricsService->getCpuInfo());
 
-        // Cache current metrics for 30 seconds
-        $cpuUsage = \Illuminate\Support\Facades\Cache::remember('admin_cpu_usage', 30, function () {
-            return $this->getCpuUsage();
-        });
+        $cpuUsage = Cache::remember('admin_cpu_usage', 30, fn () => $this->systemMetricsService->getCpuUsage());
 
-        $ramUsage = \Illuminate\Support\Facades\Cache::remember('admin_ram_usage', 30, function () {
-            return $this->getRamUsage();
-        });
+        $ramUsage = Cache::remember('admin_ram_usage', 30, fn () => $this->systemMetricsService->getRamUsage());
 
-        $loadAverage = \Illuminate\Support\Facades\Cache::remember('admin_load_average', 30, function () {
-            return $this->getLoadAverage();
-        });
+        $loadAverage = Cache::remember('admin_load_average', 30, fn () => $this->systemMetricsService->getLoadAverage());
 
-        // Cache historical data for 5 minutes (from database)
-        $cpuHistory24h = \Illuminate\Support\Facades\Cache::remember('admin_cpu_history_24h', 300, function () {
-            return $this->systemMetricsService->getHourlyMetrics('cpu', 24);
-        });
+        $cpuHistory24h = Cache::remember('admin_cpu_history_24h', 300, fn () => $this->systemMetricsService->getHourlyMetrics('cpu', 24));
 
-        $cpuHistory30d = \Illuminate\Support\Facades\Cache::remember('admin_cpu_history_30d', 300, function () {
-            return $this->systemMetricsService->getDailyMetrics('cpu', 30);
-        });
+        $cpuHistory30d = Cache::remember('admin_cpu_history_30d', 300, fn () => $this->systemMetricsService->getDailyMetrics('cpu', 30));
 
-        $ramHistory24h = \Illuminate\Support\Facades\Cache::remember('admin_ram_history_24h', 300, function () {
-            return $this->systemMetricsService->getHourlyMetrics('ram', 24);
-        });
+        $ramHistory24h = Cache::remember('admin_ram_history_24h', 300, fn () => $this->systemMetricsService->getHourlyMetrics('ram', 24));
 
-        $ramHistory30d = \Illuminate\Support\Facades\Cache::remember('admin_ram_history_30d', 300, function () {
-            return $this->systemMetricsService->getDailyMetrics('ram', 30);
-        });
+        $ramHistory30d = Cache::remember('admin_ram_history_30d', 300, fn () => $this->systemMetricsService->getDailyMetrics('ram', 30));
 
         return [
             'cpu' => [
@@ -261,234 +191,7 @@ class AdminPageController extends BasePageController
         ];
     }
 
-    /**
-     * Get current CPU usage percentage
-     */
-    protected function getCpuUsage(): float
-    {
-        try {
-            if (PHP_OS_FAMILY === 'Windows') {
-                // Windows command
-                $output = shell_exec('wmic cpu get loadpercentage');
-                if ($output) {
-                    preg_match('/\d+/', $output, $matches);
-
-                    return $matches[0] ?? 0;
-                }
-            } else {
-                // Linux command - get load average and convert to percentage
-                $load = sys_getloadavg();
-                if ($load !== false) {
-                    $cpuCount = $this->getCpuCount();
-
-                    return round(($load[0] / $cpuCount) * 100, 2);
-                }
-            }
-        } catch (\Exception $e) {
-            Log::warning('Could not get CPU usage: '.$e->getMessage());
-        }
-
-        return 0;
-    }
-
-    /**
-     * Get number of CPU cores
-     */
-    protected function getCpuCount(): int
-    {
-        try {
-            if (PHP_OS_FAMILY === 'Windows') {
-                $output = shell_exec('wmic cpu get NumberOfLogicalProcessors');
-                if ($output) {
-                    preg_match('/\d+/', $output, $matches);
-
-                    return (int) ($matches[0] ?? 1);
-                }
-            } else {
-                $cpuinfo = file_get_contents('/proc/cpuinfo');
-                preg_match_all('/^processor/m', $cpuinfo, $matches);
-
-                return count($matches[0]) ?: 1;
-            }
-        } catch (\Exception $e) {
-            return 1;
-        }
-
-        return 1;
-    }
-
-    /**
-     * Get detailed CPU information (cores, threads, model)
-     *
-     * @return array<string, mixed>
-     */
-    protected function getCpuInfo(): array
-    {
-        $info = [
-            'cores' => 0,
-            'threads' => 0,
-            'model' => 'Unknown',
-        ];
-
-        try {
-            if (PHP_OS_FAMILY === 'Windows') {
-                // Get number of cores
-                $coresOutput = shell_exec('wmic cpu get NumberOfCores');
-                if ($coresOutput) {
-                    preg_match('/\d+/', $coresOutput, $matches);
-                    $info['cores'] = (int) ($matches[0] ?? 0);
-                }
-
-                // Get number of logical processors (threads)
-                $threadsOutput = shell_exec('wmic cpu get NumberOfLogicalProcessors');
-                if ($threadsOutput) {
-                    preg_match('/\d+/', $threadsOutput, $matches);
-                    $info['threads'] = (int) ($matches[0] ?? 0);
-                }
-
-                // Get CPU model
-                $modelOutput = shell_exec('wmic cpu get Name');
-                if ($modelOutput) {
-                    $lines = explode("\n", trim($modelOutput));
-                    if (isset($lines[1])) {
-                        $info['model'] = trim($lines[1]);
-                    }
-                }
-            } else {
-                // Linux
-                $cpuinfo = file_get_contents('/proc/cpuinfo');
-
-                // Get number of physical cores
-                preg_match_all('/^cpu cores\s*:\s*(\d+)/m', $cpuinfo, $coresMatches);
-                if (! empty($coresMatches[1])) {
-                    $info['cores'] = (int) $coresMatches[1][0];
-                }
-
-                // Get number of logical processors (threads)
-                preg_match_all('/^processor/m', $cpuinfo, $processorMatches);
-                $info['threads'] = count($processorMatches[0]) ?: 0;
-
-                // Get CPU model
-                preg_match('/^model name\s*:\s*(.+)$/m', $cpuinfo, $modelMatches);
-                if (! empty($modelMatches[1])) {
-                    $info['model'] = trim($modelMatches[1]);
-                }
-
-                // If cores is 0, try to get from physical id count
-                if ($info['cores'] === 0) {
-                    preg_match_all('/^physical id\s*:\s*(\d+)/m', $cpuinfo, $physicalMatches);
-                    $uniquePhysical = ! empty($physicalMatches[1]) ? count(array_unique($physicalMatches[1])) : 1;
-                    $info['cores'] = (int) ($info['threads'] / $uniquePhysical);
-                }
-            }
-        } catch (\Exception $e) {
-            Log::warning('Could not get CPU info: '.$e->getMessage());
-        }
-
-        return $info;
-    }
-
-    /**
-     * Get system load average
-     *
-     * @return array<string, mixed>
-     */
-    protected function getLoadAverage(): array
-    {
-        $loadAvg = [
-            '1min' => 0,
-            '5min' => 0,
-            '15min' => 0,
-        ];
-
-        try {
-            if (PHP_OS_FAMILY === 'Windows') {
-                // Windows doesn't have load average, use CPU queue length instead
-                $output = shell_exec('wmic path Win32_PerfFormattedData_PerfOS_System get ProcessorQueueLength');
-                if ($output) {
-                    preg_match('/\d+/', $output, $matches);
-                    $queueLength = (int) ($matches[0] ?? 0);
-                    // Approximate load average
-                    $loadAvg['1min'] = round($queueLength / 2, 2);
-                    $loadAvg['5min'] = round($queueLength / 2, 2);
-                    $loadAvg['15min'] = round($queueLength / 2, 2);
-                }
-            } else {
-                // Linux has native load average
-                $load = sys_getloadavg();
-                if ($load !== false) {
-                    $loadAvg['1min'] = round($load[0], 2);
-                    $loadAvg['5min'] = round($load[1], 2);
-                    $loadAvg['15min'] = round($load[2], 2);
-                }
-            }
-        } catch (\Exception $e) {
-            Log::warning('Could not get load average: '.$e->getMessage());
-        }
-
-        return $loadAvg;
-    }
-
-    /**
-     * Get RAM usage information
-     *
-     * @return array<string, mixed>
-     */
-    protected function getRamUsage(): array
-    {
-        try {
-            if (PHP_OS_FAMILY === 'Windows') {
-                // Windows command
-                $output = shell_exec('wmic OS get FreePhysicalMemory,TotalVisibleMemorySize /Value');
-                if ($output) {
-                    preg_match('/FreePhysicalMemory=(\d+)/', $output, $free);
-                    preg_match('/TotalVisibleMemorySize=(\d+)/', $output, $total);
-
-                    if (isset($free[1]) && isset($total[1])) {
-                        $freeKb = (float) $free[1];
-                        $totalKb = (float) $total[1];
-                        $usedKb = $totalKb - $freeKb;
-
-                        return [
-                            'used' => round($usedKb / 1024 / 1024, 2),
-                            'total' => round($totalKb / 1024 / 1024, 2),
-                            'percentage' => round(($usedKb / $totalKb) * 100, 2),
-                        ];
-                    }
-                }
-            } else {
-                // Linux command
-                $meminfo = file_get_contents('/proc/meminfo');
-                preg_match('/MemTotal:\s+(\d+)/', $meminfo, $total);
-                preg_match('/MemAvailable:\s+(\d+)/', $meminfo, $available);
-
-                if (isset($total[1]) && isset($available[1])) {
-                    $totalKb = (float) $total[1];
-                    $availableKb = (float) $available[1];
-                    $usedKb = $totalKb - $availableKb;
-
-                    return [
-                        'used' => round($usedKb / 1024 / 1024, 2),
-                        'total' => round($totalKb / 1024 / 1024, 2),
-                        'percentage' => round(($usedKb / $totalKb) * 100, 2),
-                    ];
-                }
-            }
-        } catch (\Exception $e) {
-            Log::warning('Could not get RAM usage: '.$e->getMessage());
-        }
-
-        return [
-            'used' => 0,
-            'total' => 0,
-            'percentage' => 0,
-        ];
-    }
-
-    /**
-     * Get minute-to-minute user activity data (API endpoint)
-     */
-    public function getUserActivityMinutes(): mixed
+    public function getUserActivityMinutes(): JsonResponse
     {
         $downloadsPerMinute = $this->userStatsService->getDownloadsPerMinute(60);
         $apiHitsPerMinute = $this->userStatsService->getApiHitsPerMinute(60);
@@ -499,15 +202,12 @@ class AdminPageController extends BasePageController
         ]);
     }
 
-    /**
-     * Get current system metrics (API endpoint)
-     */
-    public function getCurrentMetrics(): mixed
+    public function getCurrentMetrics(): JsonResponse
     {
-        $cpuUsage = $this->getCpuUsage();
-        $ramUsage = $this->getRamUsage();
-        $cpuInfo = $this->getCpuInfo();
-        $loadAverage = $this->getLoadAverage();
+        $cpuUsage = $this->systemMetricsService->getCpuUsage();
+        $ramUsage = $this->systemMetricsService->getRamUsage();
+        $cpuInfo = $this->systemMetricsService->getCpuInfo();
+        $loadAverage = $this->systemMetricsService->getLoadAverage();
 
         return response()->json([
             'success' => true,
@@ -526,12 +226,9 @@ class AdminPageController extends BasePageController
         ]);
     }
 
-    /**
-     * Get historical system metrics (API endpoint)
-     */
-    public function getHistoricalMetrics(): mixed
+    public function getHistoricalMetrics(): JsonResponse
     {
-        $timeRange = request('range', '24h'); // 24h or 30d
+        $timeRange = request('range', '24h');
 
         if ($timeRange === '30d') {
             $cpuHistory = $this->systemMetricsService->getDailyMetrics('cpu', 30);

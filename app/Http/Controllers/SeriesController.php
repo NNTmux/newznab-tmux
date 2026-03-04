@@ -7,19 +7,25 @@ namespace App\Http\Controllers;
 use App\Models\TvEpisode;
 use App\Models\UserSerie;
 use App\Models\Video;
+use App\Services\EpisodeHydrationService;
 use App\Services\Releases\ReleaseSearchService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class SeriesController extends BasePageController
 {
     private ReleaseSearchService $releaseSearchService;
 
-    public function __construct(ReleaseSearchService $releaseSearchService)
+    private EpisodeHydrationService $episodeHydrationService;
+
+    public function __construct(ReleaseSearchService $releaseSearchService, EpisodeHydrationService $episodeHydrationService)
     {
         parent::__construct();
         $this->releaseSearchService = $releaseSearchService;
+        $this->episodeHydrationService = $episodeHydrationService;
     }
 
     /**
@@ -60,109 +66,7 @@ class SeriesController extends BasePageController
             } else {
                 $myshows = UserSerie::getShow($this->userdata->id, $show['id']);
 
-                // Hydrate missing season/episode numbers if tv_episodes_id is set but series/episode missing or zero.
-                $episodeMeta = collect();
-                /** @phpstan-ignore argument.templateType */
-                $episodeIds = collect($rel)->pluck('tv_episodes_id')->filter(fn ($v) => $v > 0)->unique()->values();
-                if ($episodeIds->isNotEmpty()) {
-                    $episodeMeta = TvEpisode::whereIn('id', $episodeIds)->get()->keyBy('id');
-                }
-
-                foreach ($rel as $r) {
-                    if ($r->tv_episodes_id > 0 && $episodeMeta->has($r->tv_episodes_id)) {
-                        $meta = $episodeMeta[$r->tv_episodes_id];
-                        if (empty($r->series) || (int) $r->series === 0) {
-                            $r->series = (int) $meta->series;
-                        }
-                        if (empty($r->episode) || (int) $r->episode === 0) {
-                            $r->episode = (int) $meta->episode;
-                        }
-                        if ((! $meta->series || (int) $meta->series === 0) && ! empty($meta->firstaired)) {
-                            if (empty($r->series) || (int) $r->series === 0) {
-                                $r->series = (int) Carbon::parse($meta->firstaired)->format('Y');
-                            }
-                            if (empty($r->episode) || (int) $r->episode === 0) {
-                                $r->episode = (int) Carbon::parse($meta->firstaired)->format('md');
-                            }
-                        }
-                    } elseif (! empty($r->firstaired)) {
-                        if (empty($r->series) || (int) $r->series === 0) {
-                            $r->series = (int) Carbon::parse($r->firstaired)->format('Y');
-                        }
-                        if (empty($r->episode) || (int) $r->episode === 0) {
-                            $r->episode = (int) Carbon::parse($r->firstaired)->format('md');
-                        }
-                    }
-
-                    if ((empty($r->series) || (int) $r->series === 0 || empty($r->episode) || (int) $r->episode === 0) && ! empty($r->searchname)) {
-                        $matched = false;
-
-                        if (preg_match('/\bS(\d{1,2})E(\d{1,3})\b/i', $r->searchname, $m)) {
-                            if (empty($r->series) || (int) $r->series === 0) {
-                                $r->series = (int) $m[1];
-                            }
-                            if (empty($r->episode) || (int) $r->episode === 0) {
-                                $r->episode = (int) $m[2];
-                            }
-                            $matched = true;
-                        }
-
-                        if (! $matched && preg_match('/\b(\d{1,2})x(\d{1,3})\b/i', $r->searchname, $m)) {
-                            if (empty($r->series) || (int) $r->series === 0) {
-                                $r->series = (int) $m[1];
-                            }
-                            if (empty($r->episode) || (int) $r->episode === 0) {
-                                $r->episode = (int) $m[2];
-                            }
-                            $matched = true;
-                        }
-
-                        if (! $matched && preg_match('/\bSeason[\s._-]*(\d{1,2})[\s._-]*Episode[\s._-]*(\d{1,3})\b/i', $r->searchname, $m)) {
-                            if (empty($r->series) || (int) $r->series === 0) {
-                                $r->series = (int) $m[1];
-                            }
-                            if (empty($r->episode) || (int) $r->episode === 0) {
-                                $r->episode = (int) $m[2];
-                            }
-                            $matched = true;
-                        }
-
-                        if (! $matched && preg_match('/\b(\d)(0[1-9]|[1-9]\d)\b/', $r->searchname, $m)) {
-                            if ((empty($r->series) || (int) $r->series === 0) && (empty($r->episode) || (int) $r->episode === 0)) {
-                                $r->series = (int) $m[1];
-                                $r->episode = (int) $m[2];
-                                $matched = true;
-                            }
-                        }
-
-                        if (! $matched && preg_match('/\b(\d{4})[._-](\d{2})[._-](\d{2})\b/', $r->searchname, $m)) {
-                            if (empty($r->series) || (int) $r->series === 0) {
-                                $r->series = (int) $m[1];
-                            }
-                            if (empty($r->episode) || (int) $r->episode === 0) {
-                                $r->episode = (int) ($m[2].$m[3]);
-                            }
-                            $matched = true;
-                        }
-
-                        if (! $matched && preg_match('/\b(?:Part|Pt)[\s._-]*(\d{1,3})\b/i', $r->searchname, $m)) {
-                            if (empty($r->episode) || (int) $r->episode === 0) {
-                                $r->episode = (int) $m[1];
-                                if (empty($r->series) || (int) $r->series === 0) {
-                                    $r->series = 1;
-                                }
-                                $matched = true;
-                            }
-                        }
-
-                        if (! $matched && (empty($r->episode) || (int) $r->episode === 0) && preg_match('/\bEp?[\s._-]*(\d{1,3})\b/i', $r->searchname, $m)) {
-                            $r->episode = (int) $m[1];
-                            if (empty($r->series) || (int) $r->series === 0) {
-                                $r->series = 1;
-                            }
-                        }
-                    }
-                }
+                $this->episodeHydrationService->hydrateEpisodeMetadata($rel);
 
                 // Sort releases by season, episode, date posted.
                 $series = $episode = $posted = [];
@@ -209,7 +113,7 @@ class SeriesController extends BasePageController
             $totalEpisodesAired = 0;
 
             if (! empty($show['id'])) {
-                $episodeStats = \App\Models\TvEpisode::query()
+                $episodeStats = TvEpisode::query()
                     ->where('videos_id', $show['id'])
                     ->whereNotNull('firstaired')
                     ->where('firstaired', '!=', '')
@@ -218,10 +122,10 @@ class SeriesController extends BasePageController
 
                 if ($episodeStats) {
                     if (! empty($episodeStats->first_aired) && $episodeStats->first_aired != '0000-00-00') {
-                        $firstEpisodeAired = \Carbon\Carbon::parse($episodeStats->first_aired);
+                        $firstEpisodeAired = Carbon::parse($episodeStats->first_aired);
                     }
                     if (! empty($episodeStats->last_aired) && $episodeStats->last_aired != '0000-00-00') {
-                        $lastEpisodeAired = \Carbon\Carbon::parse($episodeStats->last_aired);
+                        $lastEpisodeAired = Carbon::parse($episodeStats->last_aired);
                     }
                     $totalSeasonsAired = $episodeStats->total_seasons ?? 0;
                     $totalEpisodesAired = $episodeStats->total_episodes ?? 0;
@@ -314,13 +218,10 @@ class SeriesController extends BasePageController
         $cacheKey = 'trending_tv_top_15_48h';
 
         // Get trending TV shows from cache or calculate (refresh every hour)
-        $trendingShows = \Illuminate\Support\Facades\Cache::remember($cacheKey, 3600, function () {
-            // Calculate timestamp for 48 hours ago
-            $fortyEightHoursAgo = \Illuminate\Support\Carbon::now()->subHours(48);
+        $trendingShows = Cache::remember($cacheKey, 3600, function () {
+            $fortyEightHoursAgo = Carbon::now()->subHours(48);
 
-            // Get TV shows with their download counts from last 48 hours
-            // Join with user_downloads to get actual download timestamps
-            $query = \Illuminate\Support\Facades\DB::table('videos as v')
+            $query = DB::table('videos as v')
                 ->join('tv_info as ti', 'v.id', '=', 'ti.videos_id')
                 ->join('releases as r', 'v.id', '=', 'r.videos_id')
                 ->leftJoin('user_downloads as ud', 'r.id', '=', 'ud.releases_id')
@@ -335,8 +236,8 @@ class SeriesController extends BasePageController
                     'v.countries_id',
                     'ti.summary',
                     'ti.image',
-                    \Illuminate\Support\Facades\DB::raw('COUNT(DISTINCT ud.id) as total_downloads'),
-                    \Illuminate\Support\Facades\DB::raw('COUNT(DISTINCT r.id) as release_count'),
+                    DB::raw('COUNT(DISTINCT ud.id) as total_downloads'),
+                    DB::raw('COUNT(DISTINCT r.id) as release_count'),
                 ])
                 ->where('v.type', 0) // 0 = TV
                 ->where('v.title', '!=', '')

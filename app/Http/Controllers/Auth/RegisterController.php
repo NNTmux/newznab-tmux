@@ -11,6 +11,7 @@ use App\Models\Settings;
 use App\Models\User;
 use App\Rules\ValidEmailDomain;
 use App\Support\Auth\RegistersUsers;
+use App\Support\PermissionSyncHelper;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
@@ -74,37 +75,7 @@ class RegisterController extends Controller
 
         if ($role !== null) {
             $user->syncRoles([$role->name]);
-            if ($user->can('view console')) {
-                $user->givePermissionTo('view console');
-            }
-
-            if ($user->can('view movies')) {
-                $user->givePermissionTo('view movies');
-            }
-
-            if ($user->can('view audio')) {
-                $user->givePermissionTo('view audio');
-            }
-
-            if ($user->can('view pc')) {
-                $user->givePermissionTo('view pc');
-            }
-
-            if ($user->can('view tv')) {
-                $user->givePermissionTo('view tv');
-            }
-
-            if ($user->can('view adult')) {
-                $user->givePermissionTo('view adult');
-            }
-
-            if ($user->can('view books')) {
-                $user->givePermissionTo('view books');
-            }
-
-            if ($user->can('view other')) {
-                $user->givePermissionTo('view other');
-            }
+            PermissionSyncHelper::grantInheritedPermissions($user);
         }
 
         return $user;

@@ -9,6 +9,7 @@ use App\Models\Invitation;
 use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UserRequest;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -20,17 +21,13 @@ class AdminUserController extends BasePageController
     /**
      * @throws \Throwable
      */
-    public function index(Request $request): mixed
+    public function index(Request $request): View
     {
         $this->setAdminPrefs();
 
         $meta_title = $title = 'User List';
 
-        $roles = [];
-        $userRoles = Role::cursor()->remember();
-        foreach ($userRoles as $userRole) {
-            $roles[$userRole->id] = $userRole->name;
-        }
+        $roles = Role::pluck('name', 'id')->toArray();
 
         $ordering = getUserBrowseOrdering();
         $orderBy = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
@@ -307,7 +304,10 @@ class AdminUserController extends BasePageController
     {
         if ($request->has('id')) {
             $user = User::find($request->input('id'));
-            $username = $user->username; // Store username before deletion
+            if ($user === null) {
+                return redirect()->back();
+            }
+            $username = $user->username;
 
             $user->delete();
 

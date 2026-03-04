@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateThemeRequest;
 use App\Jobs\SendAccountDeletedEmail;
 use App\Models\ReleaseComment;
 use App\Models\RootCategory;
@@ -11,13 +12,16 @@ use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UserRequest;
 use App\Rules\ValidEmailDomain;
+use App\Support\PermissionSyncHelper;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Jrean\UserVerification\Facades\UserVerification;
 use PragmaRX\Google2FALaravel\Facade as Google2FA;
@@ -188,96 +192,9 @@ class ProfileController extends BasePageController
                     $excludedCategories = array_map('intval', array_filter($excludedCategories, 'is_numeric'));
                     $this->userdata->syncExcludedCategories($excludedCategories);
 
-                    // Clear the category exclusions cache for this user
-                    \Illuminate\Support\Facades\Cache::forget('user_category_exclusions_'.$userid);
+                    Cache::forget('user_category_exclusions_'.$userid);
 
-                    // Handle Console permission
-                    if ($request->has('viewconsole')) {
-                        if (! $this->userdata->hasDirectPermission('view console')) {
-                            $this->userdata->givePermissionTo('view console');
-                        }
-                    } else {
-                        if ($this->userdata->hasPermissionTo('view console')) {
-                            $this->userdata->revokePermissionTo('view console');
-                        }
-                    }
-
-                    // Handle Movies permission
-                    if ($request->has('viewmovies')) {
-                        if (! $this->userdata->hasDirectPermission('view movies')) {
-                            $this->userdata->givePermissionTo('view movies');
-                        }
-                    } else {
-                        if ($this->userdata->hasPermissionTo('view movies')) {
-                            $this->userdata->revokePermissionTo('view movies');
-                        }
-                    }
-
-                    // Handle Audio permission
-                    if ($request->has('viewaudio')) {
-                        if (! $this->userdata->hasDirectPermission('view audio')) {
-                            $this->userdata->givePermissionTo('view audio');
-                        }
-                    } else {
-                        if ($this->userdata->hasPermissionTo('view audio')) {
-                            $this->userdata->revokePermissionTo('view audio');
-                        }
-                    }
-
-                    // Handle PC/Games permission
-                    if ($request->has('viewpc')) {
-                        if (! $this->userdata->hasDirectPermission('view pc')) {
-                            $this->userdata->givePermissionTo('view pc');
-                        }
-                    } else {
-                        if ($this->userdata->hasPermissionTo('view pc')) {
-                            $this->userdata->revokePermissionTo('view pc');
-                        }
-                    }
-
-                    // Handle TV permission
-                    if ($request->has('viewtv')) {
-                        if (! $this->userdata->hasDirectPermission('view tv')) {
-                            $this->userdata->givePermissionTo('view tv');
-                        }
-                    } else {
-                        if ($this->userdata->hasPermissionTo('view tv')) {
-                            $this->userdata->revokePermissionTo('view tv');
-                        }
-                    }
-
-                    // Handle Adult permission
-                    if ($request->has('viewadult')) {
-                        if (! $this->userdata->hasDirectPermission('view adult')) {
-                            $this->userdata->givePermissionTo('view adult');
-                        }
-                    } else {
-                        if ($this->userdata->hasPermissionTo('view adult')) {
-                            $this->userdata->revokePermissionTo('view adult');
-                        }
-                    }
-
-                    // Handle Books permission
-                    if ($request->has('viewbooks')) {
-                        if (! $this->userdata->hasDirectPermission('view books')) {
-                            $this->userdata->givePermissionTo('view books');
-                        }
-                    } else {
-                        if ($this->userdata->hasPermissionTo('view books')) {
-                            $this->userdata->revokePermissionTo('view books');
-                        }
-                    }
-
-                    // Handle Other permission
-                    if ($request->has('viewother')) {
-                        if (! $this->userdata->hasDirectPermission('view other')) {
-                            $this->userdata->givePermissionTo('view other');
-                        }
-                    } else {
-                        if ($this->userdata->hasPermissionTo('view other')) {
-                            $this->userdata->revokePermissionTo('view other');
-                        }
-                    }
+                    PermissionSyncHelper::syncUserPermissions($this->userdata, $request);
 
                     if ($request->has('password') && ! empty($request->input('password'))) {
                         User::updatePassword($userid, $request->input('password'));
@@ -341,6 +258,9 @@ class ProfileController extends BasePageController
 
         if ($userId !== null && (int) $userId === $this->userdata->id && ! $this->userdata->hasRole('Admin')) {
             $user = User::find($userId);
+            if ($user === null) {
+                return redirect()->to('profile');
+            }
             SendAccountDeletedEmail::dispatch($user);
             Auth::logout();
             $user->delete();
@@ -353,24 +273,12 @@ class ProfileController extends BasePageController
         return view('errors.503')->with('warning', 'Dont try to delete another user account!');
     }
 
-    /**
-     * Update user's theme preference (light/dark/system) and/or color scheme (blue/emerald/violet).
-     */
-    public function updateTheme(Request $request): mixed
+    public function updateTheme(UpdateThemeRequest $request): JsonResponse
     {
         $user = Auth::user();
 
         if (! $user) {
             return response()->json(['success' => false, 'message' => 'User not authenticated'], 401);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'theme_preference' => ['sometimes', 'in:light,dark,system'],
-            'color_scheme' => ['sometimes', 'in:blue,emerald,violet'],
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'message' => 'Invalid input'], 400);
         }
 
         if ($request->has('theme_preference')) {

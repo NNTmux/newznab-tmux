@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
+use App\Http\Requests\Admin\AdminPromotionRequest;
 use App\Models\RolePromotion;
 use App\Models\RolePromotionStat;
+use App\Support\DateRangeFilter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
-use Spatie\Permission\Models\Role;
 
 class AdminPromotionController extends BasePageController
 {
@@ -45,25 +45,8 @@ class AdminPromotionController extends BasePageController
     /**
      * Store a newly created promotion in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(AdminPromotionRequest $request): RedirectResponse
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'applicable_roles' => 'nullable|array',
-            'applicable_roles.*' => 'exists:roles,id',
-            'additional_days' => 'required|integer|min:0',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'is_active' => 'boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
         RolePromotion::create([
             'name' => $request->input('name'),
             'description' => $request->input('description'),
@@ -95,26 +78,9 @@ class AdminPromotionController extends BasePageController
     /**
      * Update the specified promotion in storage.
      */
-    public function update(Request $request, int $id): RedirectResponse
+    public function update(AdminPromotionRequest $request, int $id): RedirectResponse
     {
         $promotion = RolePromotion::findOrFail($id);
-
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'applicable_roles' => 'nullable|array',
-            'applicable_roles.*' => 'exists:roles,id',
-            'additional_days' => 'required|integer|min:0',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'is_active' => 'boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
 
         $promotion->update([
             'name' => $request->input('name'),
@@ -161,32 +127,7 @@ class AdminPromotionController extends BasePageController
      */
     public function statistics(Request $request): View
     {
-        // Get date range filter (default to last 30 days)
-        $endDate = Carbon::now();
-        $startDate = Carbon::now()->subDays(30);
-
-        if ($request->has('start_date') && $request->has('end_date')) {
-            $startDate = Carbon::parse($request->input('start_date'));
-            $endDate = Carbon::parse($request->input('end_date'));
-        } elseif ($request->has('period')) {
-            switch ($request->input('period')) {
-                case '7days':
-                    $startDate = Carbon::now()->subDays(7);
-                    break;
-                case '30days':
-                    $startDate = Carbon::now()->subDays(30);
-                    break;
-                case '90days':
-                    $startDate = Carbon::now()->subDays(90);
-                    break;
-                case 'year':
-                    $startDate = Carbon::now()->subYear();
-                    break;
-                case 'all':
-                    $startDate = null;
-                    break;
-            }
-        }
+        [$startDate, $endDate] = DateRangeFilter::fromRequest($request);
 
         // Get all promotions with their statistics
         $promotions = RolePromotion::withCount(['statistics' => function ($query) use ($startDate, $endDate) {
@@ -253,32 +194,7 @@ class AdminPromotionController extends BasePageController
     {
         $promotion = RolePromotion::findOrFail($id);
 
-        // Get date range filter
-        $endDate = Carbon::now();
-        $startDate = Carbon::now()->subDays(30);
-
-        if ($request->has('start_date') && $request->has('end_date')) {
-            $startDate = Carbon::parse($request->input('start_date'));
-            $endDate = Carbon::parse($request->input('end_date'));
-        } elseif ($request->has('period')) {
-            switch ($request->input('period')) {
-                case '7days':
-                    $startDate = Carbon::now()->subDays(7);
-                    break;
-                case '30days':
-                    $startDate = Carbon::now()->subDays(30);
-                    break;
-                case '90days':
-                    $startDate = Carbon::now()->subDays(90);
-                    break;
-                case 'year':
-                    $startDate = Carbon::now()->subYear();
-                    break;
-                case 'all':
-                    $startDate = null;
-                    break;
-            }
-        }
+        [$startDate, $endDate] = DateRangeFilter::fromRequest($request);
 
         // Get promotion statistics
         $stats = $promotion->getStatisticsForPeriod($startDate ?? Carbon::createFromTimestamp(0), $endDate);
