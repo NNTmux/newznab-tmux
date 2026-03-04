@@ -34,8 +34,8 @@
     <div class="h-screen flex">
         <!-- Sidebar -->
         @auth
-            <aside id="sidebar" class="hidden md:flex md:flex-col w-64 bg-gray-900 dark:bg-gray-950 text-white shrink-0 h-full overflow-y-auto rounded-r-xl">
-                <div class="flex items-center justify-between p-4 border-b border-gray-800 dark:border-gray-700">
+            <aside id="sidebar" class="hidden md:flex md:flex-col w-64 bg-gray-900 dark:bg-gray-950 text-white shrink-0 h-full overflow-y-auto">
+                <div class="flex items-center justify-between p-4 border-b border-white/10 dark:border-white/5">
                     <a href="{{ $site['home_link'] ?? url('/') }}" class="flex items-center space-x-3">
                         <img src="{{ asset('assets/images/logo.svg') }}" alt="{{ config('app.name') }} Logo" class="w-12 h-12" aria-hidden="true">
                         <span class="text-xl font-semibold">{{ config('app.name') }}</span>
@@ -52,13 +52,13 @@
         <div class="flex-1 flex flex-col h-full overflow-hidden">
             <!-- Top Navigation -->
             @auth
-                <header class="surface-header bg-gray-800 dark:bg-gray-950 text-white shadow-lg shrink-0 z-10 rounded-b-xl">
+                <header class="surface-header bg-gray-800 dark:bg-gray-950 text-white shrink-0 z-10">
                     @include('partials.header-menu')
                 </header>
             @endauth
 
             <!-- Page Content - This is the scrollable area -->
-            <main class="flex-1 overflow-y-auto" data-scroll-container>
+            <main class="flex-1 overflow-y-auto rounded-xl shadow-inner ring-1 ring-black/10 dark:ring-white/5" data-scroll-container>
                 <div class="container mx-auto px-4 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
                     @if(session('success'))
                         <div class="mb-4 p-4 bg-green-100 dark:bg-green-900 border border-green-400 dark:border-green-700 text-green-700 dark:text-green-200 rounded-lg">
@@ -86,7 +86,7 @@
             </main>
 
             <!-- Footer - Fixed at bottom -->
-            <footer class="shrink-0 rounded-t-xl">
+            <footer class="shrink-0">
                 @include('partials.footer')
             </footer>
         </div>

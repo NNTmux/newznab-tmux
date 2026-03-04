@@ -23,14 +23,18 @@
     --surface-card-dark: #1e293b;
     --surface-dropdown: #0f172a;
     --surface-dropdown-dark: #020617;
-    --surface-footer: #f1f5f9;
-    --surface-footer-dark: #1e293b;
+    --surface-footer: #1e293b;
+    --surface-footer-dark: #020617;
     --surface-hover: #334155;
     --surface-hover-dark: #1e293b;
     --border-default: #e2e8f0;
     --border-default-dark: #334155;
     --text-muted: #64748b;
     --text-muted-dark: #94a3b8;
+    --surface-panel-alt: #f1f5f9;
+    --surface-panel-alt-dark: #1e293b;
+    --surface-chrome-border: rgba(255,255,255,0.08);
+    --surface-chrome-border-dark: rgba(255,255,255,0.05);
     /* Accent - Blue */
     --color-primary-50: #eff6ff;
     --color-primary-100: #dbeafe;
@@ -56,14 +60,18 @@
     --surface-card-dark: #0f2e24;
     --surface-dropdown: #0d281f;
     --surface-dropdown-dark: #020c09;
-    --surface-footer: #ecfdf5;
-    --surface-footer-dark: #14332a;
+    --surface-footer: #14332a;
+    --surface-footer-dark: #020c09;
     --surface-hover: #166534;
     --surface-hover-dark: #14532d;
     --border-default: #bbf7d0;
     --border-default-dark: #14532d;
     --text-muted: #047857;
     --text-muted-dark: #6ee7b7;
+    --surface-panel-alt: #ecfdf5;
+    --surface-panel-alt-dark: #14332a;
+    --surface-chrome-border: rgba(255,255,255,0.08);
+    --surface-chrome-border-dark: rgba(255,255,255,0.05);
     --color-primary-50: #ecfdf5;
     --color-primary-100: #d1fae5;
     --color-primary-200: #a7f3d0;
@@ -88,14 +96,18 @@
     --surface-card-dark: #1e1b4b;
     --surface-dropdown: #1e1b4b;
     --surface-dropdown-dark: #0f0620;
-    --surface-footer: #f5f3ff;
-    --surface-footer-dark: #2d1f4e;
+    --surface-footer: #2d1f4e;
+    --surface-footer-dark: #0f0620;
     --surface-hover: #5b21b6;
     --surface-hover-dark: #3b0764;
     --border-default: #e9d5ff;
     --border-default-dark: #6b21a8;
     --text-muted: #6d28d9;
     --text-muted-dark: #c4b5fd;
+    --surface-panel-alt: #f5f3ff;
+    --surface-panel-alt-dark: #2d1f4e;
+    --surface-chrome-border: rgba(255,255,255,0.08);
+    --surface-chrome-border-dark: rgba(255,255,255,0.05);
     --color-primary-50: #f5f3ff;
     --color-primary-100: #ede9fe;
     --color-primary-200: #ddd6fe;
@@ -176,11 +188,11 @@ header.surface-header nav {
 }
 footer {
     background-color: var(--surface-footer) !important;
-    border-color: var(--border-default) !important;
+    color: white;
 }
 .dark footer {
     background-color: var(--surface-footer-dark) !important;
-    border-color: var(--border-default-dark) !important;
+    color: white;
 }
 
 /* Dark Mode Text Readability Fixes */
@@ -260,13 +272,13 @@ footer {
     background-color: var(--surface-card-dark) !important;
     border-color: var(--border-default-dark);
 }
-/* Sub-sections (filter bars, toolbars) - use footer surface for slight contrast */
+/* Sub-sections (filter bars, toolbars) - subtle contrast from cards */
 .surface-panel-alt {
-    background-color: var(--surface-footer) !important;
+    background-color: var(--surface-panel-alt) !important;
     border-color: var(--border-default);
 }
 .dark .surface-panel-alt {
-    background-color: var(--surface-footer-dark) !important;
+    background-color: var(--surface-panel-alt-dark) !important;
     border-color: var(--border-default-dark);
 }
 .surface-panel-alt.border-b,
