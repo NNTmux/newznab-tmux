@@ -25,7 +25,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 font-sans antialiased transition-colors duration-200">
+<body class="bg-gray-100 dark:bg-gray-900 font-sans antialiased">
     <div class="h-screen flex">
         <!-- Admin Sidebar -->
         <aside id="sidebar" class="hidden md:flex md:flex-col w-64 bg-gray-900 dark:bg-gray-950 text-white shrink-0 h-full overflow-y-auto">

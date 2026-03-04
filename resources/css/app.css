@@ -161,6 +161,7 @@ html, body {
 /* Structural surfaces: color scheme variables applied to main chrome */
 body {
     background-color: var(--surface-body) !important;
+    transition: background-color 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 .dark body {
     background-color: var(--surface-body-dark) !important;

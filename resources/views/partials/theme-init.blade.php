@@ -1,9 +1,9 @@
 {{--
     Dark mode and color scheme initialization - MUST be included at the very top of <head>,
     BEFORE any CSS/Vite tags, to prevent white flash on page load.
-    This tiny blocking script applies the 'dark' class and data-color-scheme to <html> synchronously
-    before the browser paints any content, and sets an inline background-color on <html> so the
-    first paint is never white (even before external CSS loads).
+    1. The blocking script applies the 'dark' class and data-color-scheme to <html> synchronously.
+    2. The style tag that follows uses those attributes to set html AND body background-color
+       for every scheme/dark combo so the first paint is never white.
 --}}
 <script nonce="{{ csp_nonce() }}">
 (function() {
@@ -20,6 +20,13 @@
         d.classList.add('dark');
     }
     d.setAttribute('data-color-scheme', scheme);
-    d.style.backgroundColor = isDark ? '#0f172a' : '#f8fafc';
 })();
 </script>
+<style nonce="{{ csp_nonce() }}">
+html, body { background-color: #f8fafc; }
+html.dark, html.dark body { background-color: #0f172a; }
+html[data-color-scheme="emerald"], html[data-color-scheme="emerald"] body { background-color: #f0fdf4; }
+html.dark[data-color-scheme="emerald"], html.dark[data-color-scheme="emerald"] body { background-color: #071a12; }
+html[data-color-scheme="violet"], html[data-color-scheme="violet"] body { background-color: #faf5ff; }
+html.dark[data-color-scheme="violet"], html.dark[data-color-scheme="violet"] body { background-color: #120b20; }
+</style>
