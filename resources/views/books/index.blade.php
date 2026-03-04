@@ -1,9 +1,9 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+<div class="surface-panel rounded-xl shadow-sm">
     <!-- Breadcrumb -->
-    <div class="px-6 py-4 border-b border-gray-200">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <nav aria-label="breadcrumb">
             <ol class="flex items-center space-x-2 text-sm text-gray-600">
                 <li><a href="{{ url($site['home_link'] ?? '/') }}" class="hover:text-blue-600">Home</a></li>

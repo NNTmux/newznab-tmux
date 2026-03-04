@@ -5,7 +5,7 @@
 @endpush
 
 @section('content')
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+<div class="surface-panel rounded-xl shadow-sm">
     <!-- Breadcrumb -->
     <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <nav aria-label="breadcrumb">

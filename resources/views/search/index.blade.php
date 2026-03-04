@@ -204,7 +204,7 @@
                             <th class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <tbody class="surface-panel divide-y divide-gray-200 dark:divide-gray-700">
                         @foreach($results as $result)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                                 <td class="px-3 py-4 whitespace-nowrap">

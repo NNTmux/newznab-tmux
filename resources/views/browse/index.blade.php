@@ -43,7 +43,7 @@
     </div>
 
     @if($results->count() > 0)
-        <form id="nzb_multi_operations_form" method="get" x-data="releaseMultiOps">
+        <form id="nzb_multi_operations_form" method="get" x-data="releaseMultiOps" data-show-thumbs="{{ request()->query('thumbs', '0') === '1' ? '1' : '0' }}">
             <div class="px-6 py-4 surface-panel-alt border-b">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     <!-- Left Section -->
@@ -124,7 +124,7 @@
                             <th class="px-3 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <tbody class="surface-panel divide-y divide-gray-200 dark:divide-gray-700">
                         @foreach($results as $result)
                             <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 transition">
                                 <td class="px-3 py-4 whitespace-nowrap">
@@ -133,13 +133,12 @@
                                 <td class="px-3 py-4">
                                     <div class="flex items-start">
                                         @php
-                                            $showThumbnails = request()->query('thumbs', '0') === '1';
-                                            $coverUrl = ($result->cover ?? false) ? $result->cover : ($showThumbnails ? getReleaseCover($result) : null);
+                                            $coverUrl = ($result->cover ?? false) ? $result->cover : getReleaseCover($result);
                                             $hasValidCover = $coverUrl && !str_contains($coverUrl, 'no-cover.png');
                                         @endphp
                                         @if($hasValidCover)
-                                            <a href="{{ url('/details/' . $result->guid) }}" class="shrink-0">
-                                                <img src="{{ $coverUrl }}" class="w-12 h-16 object-cover rounded mr-3 shadow-sm hover:shadow-md transition" alt="Cover" loading="lazy">
+                                            <a href="{{ url('/details/' . $result->guid) }}" class="shrink-0 bg-gray-100 dark:bg-gray-700 rounded mr-3" x-show="showThumbs" x-cloak>
+                                                <img x-bind:src="showThumbs ? '{{ $coverUrl }}' : ''" class="w-12 h-16 object-cover rounded shadow-sm hover:shadow-md transition" alt="Cover" loading="lazy">
                                             </a>
                                         @endif
                                         <div class="flex-1">
@@ -281,13 +280,12 @@
                             <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:bg-gray-700 mt-1" name="release[]" value="{{ $result->guid }}" @change="onCheckboxChange()">
                             <div class="flex-1 min-w-0">
                                 @php
-                                    $showThumbs = request()->query('thumbs', '0') === '1';
-                                    $mCoverUrl = ($result->cover ?? false) ? $result->cover : ($showThumbs ? getReleaseCover($result) : null);
+                                    $mCoverUrl = ($result->cover ?? false) ? $result->cover : getReleaseCover($result);
                                     $mHasCover = $mCoverUrl && !str_contains($mCoverUrl, 'no-cover.png');
                                 @endphp
                                 @if($mHasCover)
-                                    <a href="{{ url('/details/' . $result->guid) }}" class="block mb-2">
-                                        <img src="{{ $mCoverUrl }}" class="w-16 h-20 object-cover rounded-lg shadow-sm" alt="Cover" loading="lazy">
+                                    <a href="{{ url('/details/' . $result->guid) }}" class="block mb-2 bg-gray-100 dark:bg-gray-700 rounded-lg" x-show="showThumbs" x-cloak>
+                                        <img x-bind:src="showThumbs ? '{{ $mCoverUrl }}' : ''" class="w-16 h-20 object-cover rounded-lg shadow-sm" alt="Cover" loading="lazy">
                                     </a>
                                 @endif
                                 <a href="{{ url('/details/' . $result->guid) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium wrap-break-word text-base">

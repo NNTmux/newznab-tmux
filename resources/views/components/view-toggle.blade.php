@@ -82,11 +82,7 @@
         $listUrl .= '?' . http_build_query($listParams);
     }
 
-    // Build thumbnail toggle URL for list view
-    $thumbParams = $currentParams;
     $showThumbnails = request()->query('thumbs', '0') === '1';
-    $thumbParams['thumbs'] = $showThumbnails ? '0' : '1';
-    $thumbUrl = request()->url() . '?' . http_build_query($thumbParams);
 @endphp
 
 <div class="flex items-center gap-2 text-sm">
@@ -105,15 +101,17 @@
         @endif
         <span class="font-semibold text-gray-800 dark:text-gray-200">List</span>
 
-        {{-- Thumbnail toggle in list view --}}
+        {{-- Thumbnail toggle in list view - client-side via Alpine --}}
         @if($covgroup || $shows)
             <span class="text-gray-400 dark:text-gray-500 ml-2">|</span>
-            <a href="{{ $thumbUrl }}"
-               class="inline-flex items-center gap-1 {{ $showThumbnails ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400' }} hover:text-blue-800 dark:hover:text-blue-300"
-               title="{{ $showThumbnails ? 'Hide thumbnails' : 'Show thumbnails' }}">
+            <button type="button"
+               @click="toggleThumbs()"
+               class="inline-flex items-center gap-1 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer"
+               x-bind:class="showThumbs ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400'"
+               x-bind:title="showThumbs ? 'Hide thumbnails' : 'Show thumbnails'">
                 <i class="fas fa-image text-xs"></i>
-                <span>{{ $showThumbnails ? 'Hide Thumbs' : 'Show Thumbs' }}</span>
-            </a>
+                <span x-text="showThumbs ? 'Hide Thumbs' : 'Show Thumbs'"></span>
+            </button>
         @endif
     @endif
 </div>

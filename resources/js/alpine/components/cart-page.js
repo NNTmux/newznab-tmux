@@ -80,6 +80,23 @@ Alpine.data('cartPage', () => ({
 // Multi-operations for browse pages (select all releases, download, cart, delete)
 Alpine.data('releaseMultiOps', () => ({
     allChecked: false,
+    showThumbs: false,
+
+    init() {
+        var attr = this.$el.getAttribute('data-show-thumbs');
+        this.showThumbs = attr === '1';
+    },
+
+    toggleThumbs() {
+        this.showThumbs = !this.showThumbs;
+        var url = new URL(window.location);
+        if (this.showThumbs) {
+            url.searchParams.set('thumbs', '1');
+        } else {
+            url.searchParams.delete('thumbs');
+        }
+        history.replaceState(null, '', url);
+    },
 
     toggleAll() {
         const boxes = document.querySelectorAll('.chkRelease');

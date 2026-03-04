@@ -5,9 +5,9 @@
 @endpush
 
 @section('content')
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+<div class="surface-panel rounded-xl shadow-sm">
     <!-- Breadcrumb -->
-    <div class="px-6 py-4 border-b border-gray-200">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <nav class="flex" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
@@ -87,7 +87,7 @@
                             $totalFailed = collect($releases)->sum(fn($r) => (int)($r->failed_count ?? 0));
                         @endphp
 
-                        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+                        <div class="surface-panel border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                             <div class="flex flex-row">
                                 <!-- Console Cover -->
                                 <div class="shrink-0">
