@@ -1,15 +1,14 @@
 /**
  * Alpine.data('moviesPage') - Movies page layout toggle
- * Allows switching between 1 and 2 column layouts with persistence via AJAX
+ * Switches between 1 and 2 column layouts instantly via CSS cascade,
+ * persisting the preference to the server in the background.
  */
 import Alpine from '@alpinejs/csp';
 
 Alpine.data('moviesPage', () => ({
     layout: 2,
-    isUpdating: false,
 
     init() {
-        // Read initial layout from data attribute if set
         const layoutAttr = this.$el.dataset.movieLayout;
         if (layoutAttr) {
             this.layout = parseInt(layoutAttr, 10) || 2;
@@ -25,34 +24,19 @@ Alpine.data('moviesPage', () => ({
     },
 
     toggleLayout() {
-        if (this.isUpdating) return;
-        this.isUpdating = true;
+        this.layout = this.layout === 1 ? 2 : 1;
 
-        const newLayout = this.layout === 1 ? 2 : 1;
         const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-
         if (csrf) {
             fetch('/movies/update-layout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrf,
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
                 },
-                body: JSON.stringify({ layout: newLayout })
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Reload page to apply new layout
-                    window.location.reload();
-                } else {
-                    this.isUpdating = false;
-                }
-            })
-            .catch(() => {
-                this.isUpdating = false;
-            });
+                body: JSON.stringify({ layout: this.layout }),
+            }).catch(() => {});
         }
-    }
+    },
 }));
-

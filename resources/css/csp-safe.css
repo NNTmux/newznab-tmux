@@ -814,3 +814,73 @@ code.api-token::-webkit-scrollbar-thumb:hover {
     background: rgb(107, 114, 128); /* gray-500 */
 }
 
+/* ------------------------------------------------------------------ */
+/* Movies grid: layout toggle (1-column default, 2-column on lg+)    */
+/* Driven by [data-layout] attribute set via Alpine.js                */
+/* ------------------------------------------------------------------ */
+
+.movies-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    transition: gap 0.3s ease;
+}
+
+@media (min-width: 1024px) {
+    .movies-grid[data-layout="2"] {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+}
+
+/* Cover image / placeholder sizing */
+.movies-grid .movie-cover {
+    width: 12rem;
+    height: 18rem;
+    transition: width 0.3s ease, height 0.3s ease;
+}
+
+.movies-grid[data-layout="2"] .movie-cover {
+    width: 8rem;
+    height: 12rem;
+}
+
+/* Release card: row layout by default (1-col), column in 2-col */
+.movies-grid .release-card-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    transition: gap 0.2s ease;
+}
+
+.movies-grid[data-layout="2"] .release-card-container {
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.movies-grid .release-info-wrapper {
+    flex: 1;
+    min-width: 0;
+}
+
+.movies-grid[data-layout="2"] .release-info-wrapper {
+    flex: unset;
+    min-width: unset;
+}
+
+/* Release action buttons */
+.movies-grid .release-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.movies-grid[data-layout="2"] .release-actions {
+    flex-shrink: unset;
+    margin-top: 0.5rem;
+}
+

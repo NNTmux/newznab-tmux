@@ -47,8 +47,7 @@
                 <button type="button"
                         @click="toggleLayout()"
                         class="inline-flex items-center px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-                        title="Toggle layout"
-                        x-bind:disabled="isUpdating">
+                        title="Toggle layout">
                     <i class="mr-2" x-bind:class="layoutIcon"></i>
                     <span x-text="layoutLabel"></span>
                 </button>
@@ -142,12 +141,14 @@
                 </div>
             </div>
 
-            {{-- Movies Grid - Conditionally include layout --}}
-            @if(($movie_layout ?? 2) == 1)
-                @include('movies.layouts.one-column', ['results' => $results, 'site' => $site])
-            @else
-                @include('movies.layouts.two-column', ['results' => $results, 'site' => $site])
-            @endif
+            {{-- Movies Grid --}}
+            <div id="moviesGrid"
+                 class="movies-grid"
+                 x-bind:data-layout="layout">
+                @foreach($results as $result)
+                    @include('movies.partials.movie-card', ['result' => $result, 'site' => $site])
+                @endforeach
+            </div>
 
             {{-- Bottom Pagination --}}
             <div class="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">

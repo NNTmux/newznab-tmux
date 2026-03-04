@@ -23,7 +23,6 @@ const lazyComponentMap = {
 
     // --- Page-specific components ---
     'moviesPage':      () => import('./components/movies-page.js'),
-    'moviesLayout':    () => import('./components/movies-layout.js'),
     'qualityFilter':   () => import('./components/quality-filter.js'),
     'contentToggle':   () => import('./components/content-toggle.js'),
     'contentDelete':   () => import('./components/content-toggle.js'),  // same file

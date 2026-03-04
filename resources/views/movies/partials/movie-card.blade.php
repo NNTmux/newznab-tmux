@@ -1,23 +1,17 @@
 {{-- Movie Card Partial --}}
-{{-- Props: $result (movie object with ->releases array), $layout (1 or 2), $site (site configuration) --}}
+{{-- Props: $result (movie object with ->releases array), $site (site configuration) --}}
+{{-- Layout-agnostic: visual differences are driven by CSS via the parent .movies-grid[data-layout] --}}
 
 @props([
     'result',
-    'layout' => 2,
     'site' => [],
 ])
 
 @php
-    // Releases are already attached as an array of objects (max 2 from the query)
     $releases = $result->releases ?? [];
     $totalReleases = $result->total_releases ?? count($releases);
     $maxReleases = 2;
-
-    // Get the first GUID from releases
     $guid = !empty($releases) ? $releases[0]->guid : null;
-
-    // Image dimensions based on layout
-    $coverClass = $layout == 1 ? 'w-48 h-72' : 'w-32 h-48';
 @endphp
 
 <div class="surface-panel border rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300">
@@ -29,10 +23,10 @@
                     @if(isset($result->cover) && $result->cover)
                         <img src="{{ $result->cover }}"
                              alt="{{ $result->title }}"
-                             class="{{ $coverClass }} object-cover movie-cover"
+                             class="object-cover movie-cover"
                              loading="lazy">
                     @else
-                        <div class="{{ $coverClass }} bg-gray-200 dark:bg-gray-700 flex items-center justify-center movie-cover">
+                        <div class="bg-gray-200 dark:bg-gray-700 flex items-center justify-center movie-cover">
                             <i class="fas fa-film text-gray-400 text-3xl"></i>
                         </div>
                     @endif
@@ -41,10 +35,10 @@
                 @if(isset($result->cover) && $result->cover)
                     <img src="{{ $result->cover }}"
                          alt="{{ $result->title }}"
-                         class="{{ $coverClass }} object-cover movie-cover"
+                         class="object-cover movie-cover"
                          loading="lazy">
                 @else
-                    <div class="{{ $coverClass }} bg-gray-200 dark:bg-gray-700 flex items-center justify-center movie-cover">
+                    <div class="bg-gray-200 dark:bg-gray-700 flex items-center justify-center movie-cover">
                         <i class="fas fa-film text-gray-400 text-3xl"></i>
                     </div>
                 @endif
@@ -145,8 +139,8 @@
                         @foreach($releases as $index => $release)
                             @if(($release->searchname ?? null) && ($release->guid ?? null))
                                 <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-                                    <div class="release-card-container {{ $layout == 1 ? 'flex flex-row items-start justify-between gap-4' : 'flex flex-col space-y-3' }}">
-                                        <div class="release-info-wrapper {{ $layout == 1 ? 'flex-1 min-w-0' : '' }}">
+                                    <div class="release-card-container">
+                                        <div class="release-info-wrapper">
                                             {{-- Release Name --}}
                                             <a href="{{ url('/details/' . $release->guid) }}"
                                                class="text-sm text-gray-800 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 font-medium block break-all"
@@ -186,7 +180,7 @@
                                         </div>
 
                                         {{-- Action Buttons --}}
-                                        <div class="release-actions flex flex-wrap items-center gap-2 {{ $layout == 1 ? 'shrink-0' : 'mt-2' }}">
+                                        <div class="release-actions">
                                             <a href="{{ url('/getnzb/' . $release->guid) }}"
                                                class="inline-flex items-center px-3 py-1 rounded text-xs font-medium bg-green-600 dark:bg-green-700 text-white hover:bg-green-700 dark:hover:bg-green-800 transition">
                                                 <i class="fas fa-download mr-1"></i> Download
