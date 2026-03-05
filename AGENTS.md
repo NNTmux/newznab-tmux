@@ -23,10 +23,12 @@ NNTP → NNTPService → BinariesRunner → ReleaseCreationService → ReleasePr
 
 | Pattern | Location | Example |
 |---------|----------|---------|
-| **Service Layer** | `app/Services/` | 50+ services with facades (`Search::`, `Categorization::`) |
-| **Pipeline** | `*/Pipes/` | `TvProcessingPipeline` (TMDB→TVDB→TVMaze→Trakt fallback) |
+| **Service Layer** | `app/Services/` | 50+ services with facades (`Search::`, `Categorization::`, `TvProcessing::`, `Yenc::`, `Elasticsearch::`) |
+| **Pipeline** | `*/Pipes/` | `TvProcessingPipeline` (TMDB→TVDB→TVMaze→Trakt), `CategorizationPipeline` (TV→Movie→PC→Console→Music→Book→XXX→Misc) |
 | **Driver** | `Search/Drivers/` | Manticore/Elasticsearch via `SEARCH_DRIVER` env var |
-| **Runners** | `Runners/` | `BinariesRunner`, `ReleasesRunner`, `BackfillRunner` |
+| **Runners** | `Runners/` | `BinariesRunner`, `ReleasesRunner`, `BackfillRunner`, `PostProcessRunner` |
+| **DTO** | `*/DTO/`, `app/Support/DTOs/` | `NameFixResult`, `ReleaseProcessingContext`, `ReleaseCreationResult` |
+| **Enum** | `app/Enums/` | `UserRole`, `QueueType`, `FileCompletionStatus` |
 
 ## Tmux Processing Engine
 
@@ -47,9 +49,11 @@ PHPUnit only (no Pest). Create tests: `php artisan make:test --phpunit {name}`
 
 - In-memory SQLite (`DB_CONNECTION=testing`)
 - All HTTP mocked - no real API calls
-- Suites: `Install`, `Unit`, `Feature`
+- Suites: `Install`, `Unit`, `Feature` (also `tests/Integration/` for live API tests, not in CI)
 - Use model factories; check for custom states first
 - Mocks in `tests/Fixtures/`, `tests/mock_data/`
+- Test harnesses in `tests/Support/` (e.g., `DatabaseTestCase`, `TestBinariesHarness`)
+- PHPUnit 12 — use `#[Test]` attributes or `test` prefix naming
 
 ## Project Conventions
 
@@ -94,7 +98,11 @@ Requires `.env` keys: TMDB, TVDB, TVMaze, Trakt, OMDB (TV/Movies); IGDB, GiantBo
 Blade + TailwindCSS v4 + Vite bundling. Run `npm run build` after changes.
 
 - **Livewire 3**: Used only in the forum package
-- **Alpine.js**: CSP-safe build used for all interactivity in `resources/js/csp-safe.js`
-- **CSS**: All styles go in `resources/css/csp-safe.css`
+- **Alpine.js**: CSP-safe build with component architecture in `resources/js/alpine/`
+  - Core components loaded eagerly in `alpine/index.js`
+  - Page-specific components lazy-loaded via `alpine/lazy-loader.js`
+  - Stores in `alpine/stores/`, components in `alpine/components/`
+- **CSS**: Main entry is `resources/css/app.css` (imports `csp-safe.css` for component styles)
+- **Vite entry points**: `resources/js/app.js`, `resources/css/app.css`, plus forum assets
 
 This structure ensures Content Security Policy (CSP) compliance by using Alpine.js CSP-safe build and keeping scripts and styles in external files.
