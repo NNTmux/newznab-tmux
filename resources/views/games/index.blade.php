@@ -96,7 +96,7 @@
 
         <!-- Results -->
         @if(count($results) > 0)
-            <div class="mb-4 flex justify-between items-center">
+            <div class="mb-4 flex flex-wrap justify-between items-center gap-4">
                 <div class="flex items-center gap-4">
                     <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
                         <i class="fa fa-gamepad mr-2 text-blue-600"></i>
@@ -110,9 +110,12 @@
                         :shows="false"
                     />
                 </div>
-                <span class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ $results->total() }} results found
-                </span>
+                <div class="flex items-center gap-4">
+                    <x-inline-search placeholder="Search in Games..." :category="$category ?? null" />
+                    <span class="text-sm text-gray-600 dark:text-gray-400">
+                        {{ $results->total() }} results found
+                    </span>
+                </div>
             </div>
 
             <!-- Games Grid - Card Layout with Multiple Releases -->
@@ -234,7 +237,7 @@
                                                                 </a>
                                                                 <button class="add-to-cart inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-800 transition" data-guid="{{ $release->guid }}">
                                                                     <i class="fas fa-shopping-cart mr-1"></i> Cart
-                                                                </a>
+                                                                </button>
                                                                 <a href="{{ url('/details/' . $release->guid) }}" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-600 dark:bg-gray-700 text-white hover:bg-gray-700 dark:hover:bg-gray-800 transition">
                                                                     <i class="fas fa-info-circle mr-1"></i> Details
                                                                 </a>

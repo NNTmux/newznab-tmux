@@ -2,30 +2,11 @@
 
 @section('content')
 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
-    <!-- Breadcrumb -->
-    <div class="px-6 py-4 border-b border-gray-200">
-        <nav class="flex" aria-label="Breadcrumb">
-            <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                <li class="inline-flex items-center">
-                    <a href="{{ url($site['home_link'] ?? '/') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 inline-flex items-center">
-                        <i class="fas fa-home mr-2"></i> Home
-                    </a>
-                </li>
-                <li>
-                    <div class="flex items-center">
-                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
-                        <a href="{{ route('Movies') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600">Movies</a>
-                    </div>
-                </li>
-                <li>
-                    <div class="flex items-center">
-                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
-                        <span class="text-gray-500">{{ $movie['title'] ?? 'Movie Details' }}</span>
-                    </div>
-                </li>
-            </ol>
-        </nav>
-    </div>
+    <x-breadcrumb :items="[
+        ['label' => 'Home', 'url' => url($site['home_link'] ?? '/'), 'icon' => 'fas fa-home'],
+        ['label' => 'Movies', 'url' => route('Movies')],
+        ['label' => $movie['title'] ?? 'Movie Details'],
+    ]" />
 
     @if(isset($movie))
         <div class="px-6 py-6">
@@ -232,7 +213,7 @@
                                         <a href="{{ url('/getnzb/' . $release->guid) }}" class="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-700 text-white text-sm font-medium rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition">
                                             <i class="fas fa-download mr-2"></i> Download
                                         </a>
-                                        <button class="add-to-cart inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white text-sm font-medium rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition" data-guid="{{ $release->guid }}">
+                                        <button class="add-to-cart inline-flex items-center px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white text-sm font-medium rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition" data-guid="{{ $release->guid }}">
                                             <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
                                         </button>
                                         <a href="{{ url('/details/' . $release->guid) }}" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition">

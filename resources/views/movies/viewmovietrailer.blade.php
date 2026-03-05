@@ -2,30 +2,11 @@
 
 @section('content')
 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
-    <!-- Breadcrumb -->
-    <div class="px-6 py-4 border-b border-gray-200">
-        <nav class="flex" aria-label="Breadcrumb">
-            <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                <li class="inline-flex items-center">
-                    <a href="{{ url($site['home_link'] ?? '/') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 inline-flex items-center">
-                        <i class="fas fa-home mr-2"></i> Home
-                    </a>
-                </li>
-                <li>
-                    <div class="flex items-center">
-                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
-                        <a href="{{ route('Movies') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600">Movies</a>
-                    </div>
-                </li>
-                <li>
-                    <div class="flex items-center">
-                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
-                        <span class="text-gray-500">Trailer</span>
-                    </div>
-                </li>
-            </ol>
-        </nav>
-    </div>
+    <x-breadcrumb :items="[
+        ['label' => 'Home', 'url' => url($site['home_link'] ?? '/'), 'icon' => 'fas fa-home'],
+        ['label' => 'Movies', 'url' => route('Movies')],
+        ['label' => 'Trailer'],
+    ]" />
 
     <div class="px-6 py-6">
         @if(isset($movie))

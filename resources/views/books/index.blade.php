@@ -73,7 +73,7 @@
 
         <!-- Results -->
         @if(count($results) > 0)
-            <div class="mb-4 flex justify-between items-center">
+            <div class="mb-4 flex flex-wrap justify-between items-center gap-4">
                 <div class="flex items-center gap-4">
                     <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
                         <i class="fa fa-book mr-2 text-blue-600"></i>
@@ -87,9 +87,12 @@
                         :shows="false"
                     />
                 </div>
-                <span class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ $results->total() }} results found
-                </span>
+                <div class="flex items-center gap-4">
+                    <x-inline-search placeholder="Search in Books..." :category="$category ?? null" />
+                    <span class="text-sm text-gray-600 dark:text-gray-400">
+                        {{ $results->total() }} results found
+                    </span>
+                </div>
             </div>
 
             <!-- Books Grid -->

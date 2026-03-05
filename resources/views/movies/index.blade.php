@@ -6,25 +6,10 @@
 
 @section('content')
 <div class="surface-panel rounded-xl shadow-sm" x-data="moviesPage" data-movie-layout="{{ $movie_layout ?? 2 }}">
-    {{-- Breadcrumb --}}
-    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-        <nav class="flex" aria-label="Breadcrumb">
-            <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                <li class="inline-flex items-center">
-                    <a href="{{ url($site['home_link'] ?? '/') }}"
-                       class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 inline-flex items-center transition">
-                        <i class="fas fa-home mr-2"></i> Home
-                    </a>
-                </li>
-                <li>
-                    <div class="flex items-center">
-                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
-                        <span class="text-gray-500 dark:text-gray-400">Movies</span>
-                    </div>
-                </li>
-            </ol>
-        </nav>
-    </div>
+    <x-breadcrumb :items="[
+        ['label' => 'Home', 'url' => url($site['home_link'] ?? '/'), 'icon' => 'fas fa-home'],
+        ['label' => 'Movies'],
+    ]" />
 
     {{-- Movies Filter Section --}}
     <div class="px-6 py-5 surface-panel-alt border-b">
@@ -129,14 +114,15 @@
     @if(isset($results) && $results->count() > 0)
         <div class="px-6 py-6">
             {{-- Results Summary and Pagination --}}
-            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-                <div class="text-sm text-gray-700 dark:text-gray-300 mb-3 sm:mb-0">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700 gap-4">
+                <div class="text-sm text-gray-700 dark:text-gray-300">
                     <span class="font-medium">{{ $results->total() }}</span> movies found
                     <span class="text-gray-500 dark:text-gray-400">
                         (showing {{ $results->firstItem() }}-{{ $results->lastItem() }})
                     </span>
                 </div>
-                <div>
+                <div class="flex items-center gap-4">
+                    <x-inline-search placeholder="Search in Movies..." :category="$category ?? null" />
                     {{ $results->links() }}
                 </div>
             </div>
@@ -156,16 +142,11 @@
             </div>
         </div>
     @else
-        {{-- Empty State --}}
-        <div class="px-6 py-16 text-center">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full mb-6">
-                <i class="fas fa-film text-gray-400 dark:text-gray-500 text-4xl"></i>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No Movies Found</h3>
-            <p class="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-                Try adjusting your search filters or check back later for new releases.
-            </p>
-        </div>
+        <x-empty-state
+            icon="fas fa-film"
+            title="No Movies Found"
+            message="Try adjusting your search filters or check back later for new releases."
+        />
     @endif
 </div>
 

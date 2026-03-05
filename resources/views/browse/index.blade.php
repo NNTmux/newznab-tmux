@@ -6,41 +6,18 @@
 
 @section('content')
 <div class="surface-panel rounded-xl shadow-sm transition-colors duration-200">
-    <!-- Breadcrumb -->
-    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-        <nav class="flex" aria-label="Breadcrumb">
-            <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                <li class="inline-flex items-center">
-                    <a href="{{ url($site['home_link'] ?? '/') }}" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 inline-flex items-center">
-                        <i class="fas fa-home mr-2"></i> Home
-                    </a>
-                </li>
-                @if(isset($parentcat) && $parentcat != '')
-                    <li>
-                        <div class="flex items-center">
-                            <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 mx-2"></i>
-                            <a href="{{ url('/browse/' . ($parentcat == 'music' ? 'Audio' : $parentcat)) }}" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400">{{ $parentcat }}</a>
-                        </div>
-                    </li>
-                    @if(isset($catname) && $catname != '' && $catname != 'all')
-                        <li>
-                            <div class="flex items-center">
-                                <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 mx-2"></i>
-                                <span class="text-gray-500 dark:text-gray-400">{{ $catname }}</span>
-                            </div>
-                        </li>
-                    @endif
-                @else
-                    <li>
-                        <div class="flex items-center">
-                            <i class="fas fa-chevron-right text-gray-400 dark:text-gray-500 mx-2"></i>
-                            <span class="text-gray-500 dark:text-gray-400">Browse / {{ $catname ?? 'All' }}</span>
-                        </div>
-                    </li>
-                @endif
-            </ol>
-        </nav>
-    </div>
+    @php
+        $crumbs = [['label' => 'Home', 'url' => url($site['home_link'] ?? '/'), 'icon' => 'fas fa-home']];
+        if (isset($parentcat) && $parentcat != '') {
+            $crumbs[] = ['label' => $parentcat, 'url' => url('/browse/' . ($parentcat == 'music' ? 'Audio' : $parentcat))];
+            if (isset($catname) && $catname != '' && $catname != 'all') {
+                $crumbs[] = ['label' => $catname];
+            }
+        } else {
+            $crumbs[] = ['label' => 'Browse / ' . ($catname ?? 'All')];
+        }
+    @endphp
+    <x-breadcrumb :items="$crumbs" />
 
     @if($results->count() > 0)
         <form id="nzb_multi_operations_form" method="get" x-data="releaseMultiOps" data-show-thumbs="{{ request()->query('thumbs', '0') === '1' ? '1' : '0' }}">
@@ -95,8 +72,19 @@
                         </div>
                     </div>
 
-                    <!-- Right Section - Sort Options -->
-                    <div class="flex items-center justify-end">
+                    <!-- Right Section - Sort & Search -->
+                    <div class="flex items-center justify-end gap-3">
+                        @php
+                            $searchPlaceholder = 'Search';
+                            if (!empty($parentcat) && $parentcat !== 'All') {
+                                $searchPlaceholder .= ' in ' . $parentcat;
+                                if (!empty($catname) && $catname !== 'All' && $catname !== 'all') {
+                                    $searchPlaceholder .= ' ' . $catname;
+                                }
+                            }
+                            $searchPlaceholder .= '...';
+                        @endphp
+                        <x-inline-search :placeholder="$searchPlaceholder" :category="$category ?? null" />
                         <x-sort-dropdown />
                     </div>
                 </div>
@@ -217,7 +205,7 @@
                                     </div>
                                 </td>
                                 <td class="px-3 py-4 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200">
                                         {{ $result->category_name ?? 'Other' }}
                                     </span>
                                 </td>
@@ -292,7 +280,7 @@
                                     {{ $result->searchname }}
                                 </a>
                                 <div class="flex flex-wrap items-center gap-2 mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200">
                                         {{ $result->category_name ?? 'Other' }}
                                     </span>
                                     <span><i class="fas fa-clock mr-1"></i>{{ userDateDiffForHumans($result->adddate) }}</span>
@@ -324,11 +312,11 @@
             </div>
         </form>
     @else
-        <div class="px-6 py-12 text-center">
-            <i class="fas fa-search text-6xl text-gray-300 dark:text-gray-600 dark:text-gray-400 mb-4"></i>
-            <h3 class="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2">No releases found</h3>
-            <p class="text-gray-500 dark:text-gray-400">Try adjusting your search criteria or browse other categories.</p>
-        </div>
+        <x-empty-state
+            icon="fas fa-search"
+            title="No releases found"
+            message="Try adjusting your search criteria or browse other categories."
+        />
     @endif
 
     {{-- All modals (preview, mediainfo, filelist, NFO) are included globally via layouts.main --}}

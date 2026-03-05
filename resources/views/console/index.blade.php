@@ -6,39 +6,16 @@
 
 @section('content')
 <div class="surface-panel rounded-xl shadow-sm">
-    <!-- Breadcrumb -->
-    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-        <nav class="flex" aria-label="Breadcrumb">
-            <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                <li class="inline-flex items-center">
-                    <a href="{{ url($site['home_link'] ?? '/') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 inline-flex items-center">
-                        <i class="fas fa-home mr-2"></i> Home
-                    </a>
-                </li>
-                @if(!empty($catname) && is_object($catname) && !empty($catname->parent))
-                    <li>
-                        <div class="flex items-center">
-                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
-                            <a href="{{ url('/browse/' . $catname->parent->title) }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600">{{ $catname->parent->title }}</a>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="flex items-center">
-                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
-                            <a href="{{ url('/browse/' . $catname->title) }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600">{{ $catname->title }}</a>
-                        </div>
-                    </li>
-                @else
-                    <li>
-                        <div class="flex items-center">
-                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
-                            <span class="text-gray-500">Console / {{ is_object($catname) ? $catname->title : $catname }}</span>
-                        </div>
-                    </li>
-                @endif
-            </ol>
-        </nav>
-    </div>
+    @php
+        $crumbs = [['label' => 'Home', 'url' => url($site['home_link'] ?? '/'), 'icon' => 'fas fa-home']];
+        if (!empty($catname) && is_object($catname) && !empty($catname->parent)) {
+            $crumbs[] = ['label' => $catname->parent->title, 'url' => url('/browse/' . $catname->parent->title)];
+            $crumbs[] = ['label' => $catname->title, 'url' => url('/browse/' . $catname->title)];
+        } else {
+            $crumbs[] = ['label' => 'Console / ' . (is_object($catname) ? $catname->title : $catname)];
+        }
+    @endphp
+    <x-breadcrumb :items="$crumbs" />
 
     @if($results->count() > 0)
         <form id="nzb_multi_operations_form" method="get" x-data="releaseMultiOps">
@@ -71,6 +48,10 @@
                         </div>
                     </div>
 
+                    <!-- Right Section - Inline Search -->
+                    <div class="flex items-center">
+                        <x-inline-search placeholder="Search in Console..." :category="$category ?? null" />
+                    </div>
                 </div>
             </div>
 
@@ -250,12 +231,11 @@
             </div>
         </form>
     @else
-        <div class="px-6 py-8">
-            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4 text-blue-800 dark:text-blue-200">
-                <i class="fa fa-info-circle mr-2"></i>
-                No console releases with covers available!
-            </div>
-        </div>
+        <x-empty-state
+            icon="fas fa-gamepad"
+            title="No console releases found"
+            message="No console releases with covers available! Check back later."
+        />
     @endif
 </div>
 

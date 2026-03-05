@@ -2,30 +2,11 @@
 
 @section('content')
 <div class="surface-panel rounded-xl shadow-sm">
-    <!-- Breadcrumb -->
-    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-        <nav class="flex" aria-label="Breadcrumb">
-            <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                <li class="inline-flex items-center">
-                    <a href="{{ url($site['home_link'] ?? '/') }}" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 inline-flex items-center">
-                        <i class="fas fa-home mr-2"></i> Home
-                    </a>
-                </li>
-                <li>
-                    <div class="flex items-center">
-                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
-                        <a href="{{ route('Movies') }}" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400">Movies</a>
-                    </div>
-                </li>
-                <li>
-                    <div class="flex items-center">
-                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
-                        <span class="text-gray-500">Trending</span>
-                    </div>
-                </li>
-            </ol>
-        </nav>
-    </div>
+    <x-breadcrumb :items="[
+        ['label' => 'Home', 'url' => url($site['home_link'] ?? '/'), 'icon' => 'fas fa-home'],
+        ['label' => 'Movies', 'url' => route('Movies')],
+        ['label' => 'Trending'],
+    ]" />
 
     <!-- Header -->
     <div class="px-6 py-6 bg-primary-600 text-white">
@@ -159,11 +140,14 @@
             </div>
         </div>
     @else
-        <div class="px-6 py-12 text-center">
-            <i class="fas fa-chart-line text-gray-400 text-5xl mb-4"></i>
-            <p class="text-gray-600 dark:text-gray-400 text-lg mb-2">No trending movies found.</p>
-            <p class="text-gray-500 dark:text-gray-500 text-sm">Check back soon for the most popular downloads!</p>
-        </div>
+        <x-empty-state
+            icon="fas fa-chart-line"
+            title="No trending movies found"
+            message="Check back soon for the most popular downloads!"
+            action-url="{{ route('Movies') }}"
+            action-label="Browse All Movies"
+            action-icon="fas fa-film"
+        />
     @endif
 
     <!-- Info Box -->

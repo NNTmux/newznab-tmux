@@ -27,6 +27,7 @@ import './components/confirm-link.js';
 import './components/toast-notification.js';
 import './components/tab-switcher.js';
 import './components/cart-button.js';
+import './components/inline-search.js';
 import './components/search-autocomplete.js';
 import './components/dismissible.js';
 
