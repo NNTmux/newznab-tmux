@@ -1,12 +1,12 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div class="space-y-6">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                <i class="fa fa-user-shield mr-2"></i>{{ $title }}
+                <i class="fas fa-user-shield mr-2"></i>{{ $title }}
             </h1>
         </div>
 
@@ -233,21 +233,21 @@
                     <!-- Action Buttons -->
                     <div class="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                         <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
-                            <i class="fa fa-save mr-2"></i>Update Role
+                            <i class="fas fa-save mr-2"></i>Update Role
                         </button>
                         <a href="{{ url('admin/role-list') }}" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
-                            <i class="fa fa-times mr-2"></i>Cancel
+                            <i class="fas fa-times mr-2"></i>Cancel
                         </a>
                     </div>
                 </div>
             </form>
         @else
             <div class="px-6 py-12 text-center">
-                <i class="fa fa-exclamation-circle text-red-400 text-5xl mb-4"></i>
+                <i class="fas fa-exclamation-circle text-red-400 text-5xl mb-4"></i>
                 <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Role not found</h3>
                 <p class="text-gray-500 mb-4">The requested role could not be found.</p>
                 <a href="{{ url('admin/role-list') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
-                    <i class="fa fa-arrow-left mr-2"></i> Back to Role List
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Role List
                 </a>
             </div>
         @endif

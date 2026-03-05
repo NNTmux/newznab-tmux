@@ -1,16 +1,16 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div class="space-y-6">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                    <i class="fa fa-users mr-2"></i>{{ $title }}
+                    <i class="fas fa-users mr-2"></i>{{ $title }}
                 </h1>
                 <a href="{{ url('admin/user-edit?action=add') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
-                    <i class="fa fa-plus mr-2"></i>Add New User
+                    <i class="fas fa-plus mr-2"></i>Add New User
                 </a>
             </div>
         </div>
@@ -78,10 +78,10 @@
                 </div>
                 <div class="mt-4 flex gap-2">
                     <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800">
-                        <i class="fa fa-search mr-2"></i>Filter
+                        <i class="fas fa-search mr-2"></i>Filter
                     </button>
                     <a href="{{ url('admin/user-list') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600">
-                        <i class="fa fa-times mr-2"></i>Clear
+                        <i class="fas fa-times mr-2"></i>Clear
                     </a>
                 </div>
             </form>
@@ -91,7 +91,7 @@
         @if(request()->has('deleted') && request()->input('deleted') == 1)
             <div class="mx-6 mt-4 p-4 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-lg">
                 <p class="text-green-800 dark:text-green-200">
-                    <i class="fa fa-check-circle mr-2"></i>
+                    <i class="fas fa-check-circle mr-2"></i>
                     User "{{ request()->input('username') }}" has been deleted successfully.
                 </p>
             </div>
@@ -100,7 +100,7 @@
         @if(session('success'))
             <div class="mx-6 mt-4 p-4 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-lg">
                 <p class="text-green-800 dark:text-green-200">
-                    <i class="fa fa-check-circle mr-2"></i>{{ session('success') }}
+                    <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
                 </p>
             </div>
         @endif
@@ -108,7 +108,7 @@
         @if(session('error'))
             <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg">
                 <p class="text-red-800 dark:text-red-200">
-                    <i class="fa fa-exclamation-circle mr-2"></i>{{ session('error') }}
+                    <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
                 </p>
             </div>
         @endif
@@ -129,11 +129,11 @@
                                 <a href="{{ url('admin/user-list?' . http_build_query(array_merge(request()->except('ob'), ['ob' => request('ob') === 'username_asc' ? 'username_desc' : 'username_asc']))) }}" class="group inline-flex items-center hover:text-gray-700 dark:hover:text-gray-200">
                                     Username
                                     @if(request('ob') === 'username_asc')
-                                        <i class="fa fa-sort-up ml-1"></i>
+                                        <i class="fas fa-sort-up ml-1"></i>
                                     @elseif(request('ob') === 'username_desc')
-                                        <i class="fa fa-sort-down ml-1"></i>
+                                        <i class="fas fa-sort-down ml-1"></i>
                                     @else
-                                        <i class="fa fa-sort ml-1 opacity-50 group-hover:opacity-100"></i>
+                                        <i class="fas fa-sort ml-1 opacity-50 group-hover:opacity-100"></i>
                                     @endif
                                 </a>
                             </th>
@@ -142,27 +142,27 @@
                                 <a href="{{ url('admin/user-list?' . http_build_query(array_merge(request()->except('ob'), ['ob' => request('ob') === 'apiaccess_asc' ? 'apiaccess_desc' : 'apiaccess_asc']))) }}" class="group inline-flex items-center hover:text-gray-700 dark:hover:text-gray-200">
                                     Status
                                     @if(request('ob') === 'apiaccess_asc')
-                                        <i class="fa fa-sort-up ml-1"></i>
+                                        <i class="fas fa-sort-up ml-1"></i>
                                     @elseif(request('ob') === 'apiaccess_desc')
-                                        <i class="fa fa-sort-down ml-1"></i>
+                                        <i class="fas fa-sort-down ml-1"></i>
                                     @else
-                                        <i class="fa fa-sort ml-1 opacity-50 group-hover:opacity-100"></i>
+                                        <i class="fas fa-sort ml-1 opacity-50 group-hover:opacity-100"></i>
                                     @endif
                                 </a>
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                <i class="fa fa-layer-group mr-1"></i>Pending Role
+                                <i class="fas fa-layer-group mr-1"></i>Pending Role
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 <a href="{{ url('admin/user-list?' . http_build_query(array_merge(request()->except('ob'), ['ob' => request('ob') === 'rolechangedate_asc' ? 'rolechangedate_desc' : 'rolechangedate_asc']))) }}" class="group inline-flex items-center hover:text-gray-700 dark:hover:text-gray-200">
                                     Role Expiry
                                     @if(request('ob') === 'rolechangedate_asc')
-                                        <i class="fa fa-sort-up ml-1"></i>
+                                        <i class="fas fa-sort-up ml-1"></i>
                                     @elseif(request('ob') === 'rolechangedate_desc')
-                                        <i class="fa fa-sort-down ml-1"></i>
+                                        <i class="fas fa-sort-down ml-1"></i>
                                     @else
-                                        <i class="fa fa-sort ml-1 opacity-50 group-hover:opacity-100"></i>
+                                        <i class="fas fa-sort ml-1 opacity-50 group-hover:opacity-100"></i>
                                     @endif
                                 </a>
                             </th>
@@ -173,19 +173,19 @@
                                 <a href="{{ url('admin/user-list?' . http_build_query(array_merge(request()->except('ob'), ['ob' => request('ob') === 'createdat_asc' ? 'createdat_desc' : 'createdat_asc']))) }}" class="group inline-flex items-center hover:text-gray-700 dark:hover:text-gray-200">
                                     Created
                                     @if(request('ob') === 'createdat_asc')
-                                        <i class="fa fa-sort-up ml-1"></i>
+                                        <i class="fas fa-sort-up ml-1"></i>
                                     @elseif(request('ob') === 'createdat_desc')
-                                        <i class="fa fa-sort-down ml-1"></i>
+                                        <i class="fas fa-sort-down ml-1"></i>
                                     @else
-                                        <i class="fa fa-sort ml-1 opacity-50 group-hover:opacity-100"></i>
+                                        <i class="fas fa-sort ml-1 opacity-50 group-hover:opacity-100"></i>
                                     @endif
                                 </a>
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" title="Daily API requests in last 24 hours">
-                                <i class="fa fa-code mr-1"></i>Daily API
+                                <i class="fas fa-code mr-1"></i>Daily API
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" title="Daily downloads in last 24 hours">
-                                <i class="fa fa-download mr-1"></i>Daily DLs
+                                <i class="fas fa-download mr-1"></i>Daily DLs
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                         </tr>
@@ -201,15 +201,15 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($user->deleted_at)
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200" title="Soft Deleted on {{ \Carbon\Carbon::parse($user->deleted_at)->format('M j, Y g:i A') }}">
-                                            <i class="fa fa-trash mr-1"></i>Deleted
+                                            <i class="fas fa-trash mr-1"></i>Deleted
                                         </span>
                                     @elseif($user->roles_id === \App\Enums\UserRole::DISABLED->value)
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200" title="User Disabled">
-                                            <i class="fa fa-ban mr-1"></i>Disabled
+                                            <i class="fas fa-ban mr-1"></i>Disabled
                                         </span>
                                     @else
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                            <i class="fa fa-check-circle mr-1"></i>Active
+                                            <i class="fas fa-check-circle mr-1"></i>Active
                                         </span>
                                     @endif
                                 </td>
@@ -226,10 +226,10 @@
                                         @endphp
                                         <div class="flex flex-col gap-1">
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 w-fit">
-                                                <i class="fa fa-layer-group mr-1"></i>{{ $pendingRole->name ?? 'Unknown' }}
+                                                <i class="fas fa-layer-group mr-1"></i>{{ $pendingRole->name ?? 'Unknown' }}
                                             </span>
                                             <span class="text-xs text-gray-500 dark:text-gray-400">
-                                                <i class="fa fa-clock mr-1"></i>{{ $pendingStartDate->diffForHumans() }}
+                                                <i class="fas fa-clock mr-1"></i>{{ $pendingStartDate->diffForHumans() }}
                                             </span>
                                         </div>
                                     @else
@@ -249,17 +249,17 @@
                                                 @elseif($isExpiringSoon) bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200
                                                 @else bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300
                                                 @endif">
-                                                <i class="fa fa-calendar mr-1"></i>{{ $expiryDate->format('M j, Y') }}
-                                                @if($isExpired) <i class="fa fa-exclamation-circle ml-1"></i>@endif
+                                                <i class="fas fa-calendar mr-1"></i>{{ $expiryDate->format('M j, Y') }}
+                                                @if($isExpired) <i class="fas fa-exclamation-circle ml-1"></i>@endif
                                             </span>
                                             <span class="text-xs text-gray-500 dark:text-gray-400 flex items-center">
-                                                <i class="fa fa-clock mr-1"></i>{{ $expiryDate->format('g:i A') }}
+                                                <i class="fas fa-clock mr-1"></i>{{ $expiryDate->format('g:i A') }}
                                                 <span class="ml-2 italic">({{ $expiryDate->diffForHumans(['parts' => 2]) }})</span>
                                             </span>
                                         </div>
                                     @else
                                         <span class="text-gray-400 dark:text-gray-500 flex items-center">
-                                            <i class="fa fa-infinity mr-1"></i>Never
+                                            <i class="fas fa-infinity mr-1"></i>Never
                                         </span>
                                     @endif
                                 </td>
@@ -274,11 +274,11 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($user->verified)
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                            <i class="fa fa-check mr-1"></i>Yes
+                                            <i class="fas fa-check mr-1"></i>Yes
                                         </span>
                                     @else
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                            <i class="fa fa-times mr-1"></i>No
+                                            <i class="fas fa-times mr-1"></i>No
                                         </span>
                                     @endif
                                 </td>
@@ -288,13 +288,13 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100" title="API requests in last 24 hours">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                         {{ ($user->daily_api_count ?? 0) > 0 ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300' }}">
-                                        <i class="fa fa-code mr-1"></i>{{ $user->daily_api_count ?? 0 }}
+                                        <i class="fas fa-code mr-1"></i>{{ $user->daily_api_count ?? 0 }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100" title="Downloads in last 24 hours">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                         {{ ($user->daily_download_count ?? 0) > 0 ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300' }}">
-                                        <i class="fa fa-download mr-1"></i>{{ $user->daily_download_count ?? 0 }}
+                                        <i class="fas fa-download mr-1"></i>{{ $user->daily_download_count ?? 0 }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -306,19 +306,19 @@
                                                     title="Restore User"
                                                     data-user-id="{{ $user->id }}"
                                                     data-username="{{ $user->username }}">
-                                                <i class="fa fa-undo"></i>
+                                                <i class="fas fa-undo"></i>
                                             </button>
                                         @else
                                             <!-- Show normal actions for active users -->
                                             <a href="{{ url('admin/user-edit?id=' . $user->id) }}"
                                                class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
                                                title="Edit">
-                                                <i class="fa fa-edit"></i>
+                                                <i class="fas fa-edit"></i>
                                             </a>
                                             <a href="{{ url('admin/user-role-history/' . $user->id) }}"
                                                class="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300"
                                                title="Role History">
-                                                <i class="fa fa-history"></i>
+                                                <i class="fas fa-history"></i>
                                             </a>
                                             @if(!$user->verified)
                                                 <form method="POST" action="{{ route('admin.verify') }}" class="inline verify-user-form">
@@ -329,13 +329,13 @@
                                                             title="Verify User"
                                                             data-show-verify-modal
                                                             data-form-id="{{ $user->id }}">
-                                                        <i class="fa fa-check-circle"></i>
+                                                        <i class="fas fa-check-circle"></i>
                                                     </button>
                                                 </form>
                                                 <a href="{{ url('admin/resendverification?id=' . $user->id) }}"
                                                    class="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300"
                                                    title="Resend Verification">
-                                                    <i class="fa fa-envelope"></i>
+                                                    <i class="fas fa-envelope"></i>
                                                 </a>
                                             @endif
                                             <form action="{{ url('admin/user-delete') }}" method="POST" class="inline-form">
@@ -345,7 +345,7 @@
                                                         class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-transparent border-0 p-0 cursor-pointer"
                                                         title="Delete"
                                                         data-confirm="Are you sure you want to delete user '{{ $user->username }}'?">
-                                                    <i class="fa fa-trash"></i>
+                                                    <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
                                         @endif
@@ -363,7 +363,7 @@
             </div>
         @else
             <div class="px-6 py-12 text-center">
-                <i class="fa fa-users text-gray-400 text-5xl mb-4"></i>
+                <i class="fas fa-users text-gray-400 text-5xl mb-4"></i>
                 <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No users found</h3>
                 <p class="text-gray-500">Try adjusting your search filters or add a new user.</p>
             </div>
@@ -387,7 +387,7 @@
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
-                    <i class="fa fa-check-circle text-green-600 dark:text-green-400 mr-2"></i>
+                    <i class="fas fa-check-circle text-green-600 dark:text-green-400 mr-2"></i>
                     Verify User
                 </h3>
                 <button type="button" data-close-verify-modal class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
@@ -409,7 +409,7 @@
             <button type="button"
                     data-submit-verify-form
                     class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition font-medium">
-                <i class="fa fa-check mr-2"></i>Verify
+                <i class="fas fa-check mr-2"></i>Verify
             </button>
         </div>
     </div>

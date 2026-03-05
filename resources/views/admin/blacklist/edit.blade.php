@@ -1,16 +1,16 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div class="space-y-6">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
         <!-- Header -->
-        <div class="px-6 py-4 border-b border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800">
-                    <i class="fa fa-edit mr-2"></i>{{ $title ?? 'Binary Black/Whitelist Edit' }}
+                    <i class="fas fa-edit mr-2"></i>{{ $title ?? 'Binary Black/Whitelist Edit' }}
                 </h1>
                 <a href="{{ url('/admin/binaryblacklist-list') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200">
-                    <i class="fa fa-arrow-left mr-2"></i>Back to List
+                    <i class="fas fa-arrow-left mr-2"></i>Back to List
                 </a>
             </div>
         </div>
@@ -24,7 +24,7 @@
             @if($error)
                 <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                     <div class="flex">
-                        <i class="fa fa-exclamation-triangle text-red-500 dark:text-red-400 mr-3"></i>
+                        <i class="fas fa-exclamation-triangle text-red-500 dark:text-red-400 mr-3"></i>
                         <p class="text-red-800 dark:text-red-300">{{ $error }}</p>
                     </div>
                 </div>
@@ -37,7 +37,7 @@
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fa fa-layer-group text-gray-400"></i>
+                        <i class="fas fa-layer-group text-gray-400"></i>
                     </div>
                     <input type="text"
                            id="groupname"
@@ -47,7 +47,7 @@
                            required>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    <i class="fa fa-info-circle mr-1"></i>The full name of a valid newsgroup. (Wildcard in the format 'alt.binaries.*')
+                    <i class="fas fa-info-circle mr-1"></i>The full name of a valid newsgroup. (Wildcard in the format 'alt.binaries.*')
                 </p>
             </div>
 
@@ -58,7 +58,7 @@
                 </label>
                 <div class="relative">
                     <div class="absolute top-3 left-3 pointer-events-none">
-                        <i class="fa fa-code text-gray-400"></i>
+                        <i class="fas fa-code text-gray-400"></i>
                     </div>
                     <textarea id="regex"
                               name="regex"
@@ -67,7 +67,7 @@
                               required>{{ htmlspecialchars($regex->regex ?? '') }}</textarea>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    <i class="fa fa-info-circle mr-1"></i>The regex to be applied. (Note: Beginning and Ending / are already included)
+                    <i class="fas fa-info-circle mr-1"></i>The regex to be applied. (Note: Beginning and Ending / are already included)
                 </p>
             </div>
 
@@ -78,7 +78,7 @@
                 </label>
                 <div class="relative">
                     <div class="absolute top-3 left-3 pointer-events-none">
-                        <i class="fa fa-align-left text-gray-400"></i>
+                        <i class="fas fa-align-left text-gray-400"></i>
                     </div>
                     <textarea id="description"
                               name="description"
@@ -86,7 +86,7 @@
                               rows="3">{{ htmlspecialchars($regex->description ?? '') }}</textarea>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    <i class="fa fa-info-circle mr-1"></i>A description for this regex
+                    <i class="fas fa-info-circle mr-1"></i>A description for this regex
                 </p>
             </div>
 
@@ -111,7 +111,7 @@
                     @endforeach
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    <i class="fa fa-info-circle mr-1"></i>Which field in the message to apply the black/white list to.
+                    <i class="fas fa-info-circle mr-1"></i>Which field in the message to apply the black/white list to.
                 </p>
             </div>
 
@@ -136,7 +136,7 @@
                     @endforeach
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    <i class="fa fa-info-circle mr-1"></i>Only active regexes are applied during the release process.
+                    <i class="fas fa-info-circle mr-1"></i>Only active regexes are applied during the release process.
                 </p>
             </div>
 
@@ -161,7 +161,7 @@
                     @endforeach
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    <i class="fa fa-info-circle mr-1"></i>Black will exclude all messages for a group which match this regex. White will include only those which match.
+                    <i class="fas fa-info-circle mr-1"></i>Black will exclude all messages for a group which match this regex. White will include only those which match.
                 </p>
             </div>
         </form>
@@ -170,10 +170,10 @@
         <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
             <div class="flex justify-between">
                 <a href="{{ url('/admin/binaryblacklist-list') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500">
-                    <i class="fa fa-times mr-2"></i>Cancel
+                    <i class="fas fa-times mr-2"></i>Cancel
                 </a>
                 <button type="submit" form="blacklistForm" class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800">
-                    <i class="fa fa-save mr-2"></i>Save Changes
+                    <i class="fas fa-save mr-2"></i>Save Changes
                 </button>
             </div>
         </div>

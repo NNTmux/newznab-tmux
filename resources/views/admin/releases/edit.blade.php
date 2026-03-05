@@ -3,7 +3,7 @@
 @section('title', 'Edit Release')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div class="space-y-6">
     <div class="mb-6">
         <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Edit Release</h1>
         <nav class="text-sm text-gray-600 dark:text-gray-400 mt-2">

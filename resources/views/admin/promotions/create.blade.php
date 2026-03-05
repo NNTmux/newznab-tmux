@@ -1,12 +1,12 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div class="space-y-6">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm max-w-3xl mx-auto">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                <i class="fa fa-plus mr-2"></i>Create New Promotion
+                <i class="fas fa-plus mr-2"></i>Create New Promotion
             </h1>
         </div>
 
@@ -122,7 +122,7 @@
                 </a>
                 <button type="submit"
                         class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
-                    <i class="fa fa-save mr-2"></i>Create Promotion
+                    <i class="fas fa-save mr-2"></i>Create Promotion
                 </button>
             </div>
         </form>

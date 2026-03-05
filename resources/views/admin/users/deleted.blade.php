@@ -1,16 +1,16 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container mx-auto px-4 py-6" x-data="adminDeletedUsers">
+<div class="space-y-6" x-data="adminDeletedUsers">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
-                    <i class="fa fa-trash-restore mr-2"></i>{{ $title }}
+                    <i class="fas fa-trash-restore mr-2"></i>{{ $title }}
                 </h1>
                 <a href="{{ url('admin/user-list') }}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                    <i class="fa fa-arrow-left mr-2"></i>Back to Active Users
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Active Users
                 </a>
             </div>
         </div>
@@ -81,10 +81,10 @@
                 </div>
                 <div class="mt-4 flex gap-2">
                     <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700">
-                        <i class="fa fa-search mr-2"></i>Filter
+                        <i class="fas fa-search mr-2"></i>Filter
                     </button>
                     <a href="{{ url('admin/deleted-users') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600">
-                        <i class="fa fa-times mr-2"></i>Clear
+                        <i class="fas fa-times mr-2"></i>Clear
                     </a>
                 </div>
             </form>
@@ -94,7 +94,7 @@
         <!-- Validation Error Messages (for bulk actions) -->
         <div id="validationError" class="mx-6 mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg hidden">
             <p class="text-yellow-800 dark:text-yellow-300">
-                <i class="fa fa-exclamation-triangle mr-2"></i><span id="validationErrorMessage"></span>
+                <i class="fas fa-exclamation-triangle mr-2"></i><span id="validationErrorMessage"></span>
             </p>
         </div>
 
@@ -113,7 +113,7 @@
                         <button type="submit"
                                 id="bulkActionBtn"
                                 class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700">
-                            <i class="fa fa-check mr-2"></i>Apply
+                            <i class="fas fa-check mr-2"></i>Apply
                         </button>
                     </div>
                 </div>
@@ -129,7 +129,7 @@
                                     <a href="{{ url('admin/deleted-users?ob=username_' . ($orderby == 'username_asc' ? 'desc' : 'asc') . ($queryString ? '&' . $queryString : '')) }}" class="hover:text-gray-700 dark:hover:text-gray-300">
                                         Username
                                         @if(str_starts_with($orderby ?? '', 'username'))
-                                            <i class="fa fa-sort-{{ str_ends_with($orderby, 'desc') ? 'down' : 'up' }} ml-1"></i>
+                                            <i class="fas fa-sort-{{ str_ends_with($orderby, 'desc') ? 'down' : 'up' }} ml-1"></i>
                                         @endif
                                     </a>
                                 </th>
@@ -137,7 +137,7 @@
                                     <a href="{{ url('admin/deleted-users?ob=email_' . ($orderby == 'email_asc' ? 'desc' : 'asc') . ($queryString ? '&' . $queryString : '')) }}" class="hover:text-gray-700 dark:hover:text-gray-300">
                                         Email
                                         @if(str_starts_with($orderby ?? '', 'email'))
-                                            <i class="fa fa-sort-{{ str_ends_with($orderby, 'desc') ? 'down' : 'up' }} ml-1"></i>
+                                            <i class="fas fa-sort-{{ str_ends_with($orderby, 'desc') ? 'down' : 'up' }} ml-1"></i>
                                         @endif
                                     </a>
                                 </th>
@@ -148,7 +148,7 @@
                                     <a href="{{ url('admin/deleted-users?ob=createdat_' . ($orderby == 'createdat_asc' ? 'desc' : 'asc') . ($queryString ? '&' . $queryString : '')) }}" class="hover:text-gray-700 dark:hover:text-gray-300">
                                         Created
                                         @if(str_starts_with($orderby ?? '', 'createdat'))
-                                            <i class="fa fa-sort-{{ str_ends_with($orderby, 'desc') ? 'down' : 'up' }} ml-1"></i>
+                                            <i class="fas fa-sort-{{ str_ends_with($orderby, 'desc') ? 'down' : 'up' }} ml-1"></i>
                                         @endif
                                     </a>
                                 </th>
@@ -156,7 +156,7 @@
                                     <a href="{{ url('admin/deleted-users?ob=deletedat_' . ($orderby == 'deletedat_asc' ? 'desc' : 'asc') . ($queryString ? '&' . $queryString : '')) }}" class="hover:text-gray-700 dark:hover:text-gray-300">
                                         Deleted
                                         @if(str_starts_with($orderby ?? '', 'deletedat'))
-                                            <i class="fa fa-sort-{{ str_ends_with($orderby, 'desc') ? 'down' : 'up' }} ml-1"></i>
+                                            <i class="fas fa-sort-{{ str_ends_with($orderby, 'desc') ? 'down' : 'up' }} ml-1"></i>
                                         @endif
                                     </a>
                                 </th>
@@ -183,11 +183,11 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @if($user->verified)
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                                <i class="fa fa-check mr-1"></i>Yes
+                                                <i class="fas fa-check mr-1"></i>Yes
                                             </span>
                                         @else
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                                <i class="fa fa-times mr-1"></i>No
+                                                <i class="fas fa-times mr-1"></i>No
                                             </span>
                                         @endif
                                     </td>
@@ -200,15 +200,15 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @if($user->deleted_by === 'Self')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                                                <i class="fa fa-user mr-1"></i>Self
+                                                <i class="fas fa-user mr-1"></i>Self
                                             </span>
                                         @elseif($user->deleted_by === 'System')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                                <i class="fa fa-robot mr-1"></i>System
+                                                <i class="fas fa-robot mr-1"></i>System
                                             </span>
                                         @elseif($user->deleted_by)
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200" title="Deleted by admin: {{ $user->deleted_by }}">
-                                                <i class="fa fa-user-shield mr-1"></i>{{ $user->deleted_by }}
+                                                <i class="fas fa-user-shield mr-1"></i>{{ $user->deleted_by }}
                                             </span>
                                         @else
                                             <span class="text-gray-400 dark:text-gray-500">N/A</span>
@@ -221,14 +221,14 @@
                                                     title="Restore User"
                                                     data-user-id="{{ $user->id }}"
                                                     data-username="{{ $user->username }}">
-                                                <i class="fa fa-undo"></i>
+                                                <i class="fas fa-undo"></i>
                                             </button>
                                             <button type="button"
                                                     class="delete-user-btn text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-transparent border-0 p-0 cursor-pointer"
                                                     title="Permanently Delete"
                                                     data-user-id="{{ $user->id }}"
                                                     data-username="{{ $user->username }}">
-                                                <i class="fa fa-trash-alt"></i>
+                                                <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </div>
                                     </td>
@@ -245,7 +245,7 @@
             </div>
         @else
             <div class="px-6 py-12 text-center">
-                <i class="fa fa-trash-restore text-gray-400 dark:text-gray-600 text-5xl mb-4"></i>
+                <i class="fas fa-trash-restore text-gray-400 dark:text-gray-600 text-5xl mb-4"></i>
                 <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No deleted users found</h3>
                 <p class="text-gray-500 dark:text-gray-400">There are no soft-deleted users matching your filters.</p>
             </div>

@@ -2,28 +2,20 @@
 
 @section('content')
 
-<div class="container mx-auto px-4 py-6" x-data="tinyMceEditor">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+<div class="space-y-6" x-data="tinyMceEditor">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
         <!-- Header -->
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h1 class="text-2xl font-semibold text-gray-800">
-                <i class="fa fa-cog mr-2"></i>{{ $title }}
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                <i class="fas fa-cog mr-2"></i>{{ $title }}
             </h1>
         </div>
 
-        <!-- Success/Error Messages -->
-        @if(session('success'))
-            <div class="mx-6 mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <p class="text-green-800">
-                    <i class="fa fa-check-circle mr-2"></i>{{ session('success') }}
-                </p>
-            </div>
-        @endif
-
+        <!-- Error Messages -->
         @if(!empty($error))
-            <div class="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p class="text-red-800">
-                    <i class="fa fa-exclamation-circle mr-2"></i>{{ $error }}
+            <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <p class="text-red-800 dark:text-red-200">
+                    <i class="fas fa-exclamation-circle mr-2"></i>{{ $error }}
                 </p>
             </div>
         @endif
@@ -41,7 +33,7 @@
                     <div class="space-y-4">
                         <div>
                             <label for="strapline" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-quote-right mr-1"></i>Strapline
+                                <i class="fas fa-quote-right mr-1"></i>Strapline
                             </label>
                             <input type="text" id="strapline" name="strapline" value="{{ $site['strapline'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -50,7 +42,7 @@
 
                         <div>
                             <label for="metatitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-heading mr-1"></i>Meta Title
+                                <i class="fas fa-heading mr-1"></i>Meta Title
                             </label>
                             <input type="text" id="metatitle" name="metatitle" value="{{ $site['metatitle'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -59,7 +51,7 @@
 
                         <div>
                             <label for="metadescription" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-comment mr-1"></i>Meta Description
+                                <i class="fas fa-comment mr-1"></i>Meta Description
                             </label>
                             <textarea id="metadescription" name="metadescription" rows="3"
                                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">{{ $site['metadescription'] ?? '' }}</textarea>
@@ -68,7 +60,7 @@
 
                         <div>
                             <label for="metakeywords" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-tags mr-1"></i>Meta Keywords
+                                <i class="fas fa-tags mr-1"></i>Meta Keywords
                             </label>
                             <textarea id="metakeywords" name="metakeywords" rows="3"
                                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">{{ $site['metakeywords'] ?? '' }}</textarea>
@@ -77,7 +69,7 @@
 
                         <div>
                             <label for="footer" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-copyright mr-1"></i>Footer
+                                <i class="fas fa-copyright mr-1"></i>Footer
                             </label>
                             <textarea id="footer" name="footer" rows="3"
                                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">{{ $site['footer'] ?? '' }}</textarea>
@@ -86,7 +78,7 @@
 
                         <div>
                             <label for="home_link" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-home mr-1"></i>Default Home Page
+                                <i class="fas fa-home mr-1"></i>Default Home Page
                             </label>
                             <input type="text" id="home_link" name="home_link" value="{{ $site['home_link'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -95,7 +87,7 @@
 
                         <div>
                             <label for="dereferrer_link" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-external-link-alt mr-1"></i>Dereferrer Link
+                                <i class="fas fa-external-link-alt mr-1"></i>Dereferrer Link
                             </label>
                             <input type="text" id="dereferrer_link" name="dereferrer_link" value="{{ $site['dereferrer_link'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -104,7 +96,7 @@
 
                         <div>
                             <label for="tandc" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-gavel mr-1"></i>Terms and Conditions
+                                <i class="fas fa-gavel mr-1"></i>Terms and Conditions
                             </label>
                             <textarea id="tandc" name="tandc" rows="15"
                                       data-tinymce-api-key="{{ config('tinymce.api_key', 'no-api-key') }}"
@@ -121,7 +113,7 @@
                     <div class="space-y-4">
                         <div>
                             <label for="nzbsplitlevel" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-folder-tree mr-1"></i>NZB File Path Level Deep
+                                <i class="fas fa-folder-tree mr-1"></i>NZB File Path Level Deep
                             </label>
                             <input type="text" id="nzbsplitlevel" name="nzbsplitlevel" value="{{ $site['nzbsplitlevel'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -130,7 +122,7 @@
 
                         <div>
                             <label for="partretentionhours" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-clock mr-1"></i>Part Retention Hours
+                                <i class="fas fa-clock mr-1"></i>Part Retention Hours
                             </label>
                             <input type="text" id="partretentionhours" name="partretentionhours" value="{{ $site['partretentionhours'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -139,7 +131,7 @@
 
                         <div>
                             <label for="releaseretentiondays" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-calendar-days mr-1"></i>Release Retention
+                                <i class="fas fa-calendar-days mr-1"></i>Release Retention
                             </label>
                             <input type="text" id="releaseretentiondays" name="releaseretentiondays" value="{{ $site['releaseretentiondays'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -148,7 +140,7 @@
 
                         <div>
                             <label for="miscotherretentionhours" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-hourglass mr-1"></i>Other->Misc Retention Hours
+                                <i class="fas fa-hourglass mr-1"></i>Other->Misc Retention Hours
                             </label>
                             <input type="text" id="miscotherretentionhours" name="miscotherretentionhours" value="{{ $site['miscotherretentionhours'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -157,7 +149,7 @@
 
                         <div>
                             <label for="mischashedretentionhours" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-hashtag mr-1"></i>Other->Hashed Retention Hours
+                                <i class="fas fa-hashtag mr-1"></i>Other->Hashed Retention Hours
                             </label>
                             <input type="text" id="mischashedretentionhours" name="mischashedretentionhours" value="{{ $site['mischashedretentionhours'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -166,7 +158,7 @@
 
                         <div>
                             <label for="partsdeletechunks" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-trash mr-1"></i>Parts Delete In Chunks
+                                <i class="fas fa-trash mr-1"></i>Parts Delete In Chunks
                             </label>
                             <input type="text" id="partsdeletechunks" name="partsdeletechunks" value="{{ $site['partsdeletechunks'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -175,7 +167,7 @@
 
                         <div>
                             <label for="minfilestoformrelease" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-file-alt mr-1"></i>Minimum Files to Make a Release
+                                <i class="fas fa-file-alt mr-1"></i>Minimum Files to Make a Release
                             </label>
                             <input type="text" id="minfilestoformrelease" name="minfilestoformrelease" value="{{ $site['minfilestoformrelease'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -184,7 +176,7 @@
 
                         <div>
                             <label for="minsizetoformrelease" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-compress mr-1"></i>Minimum File Size to Make a Release
+                                <i class="fas fa-compress mr-1"></i>Minimum File Size to Make a Release
                             </label>
                             <input type="text" id="minsizetoformrelease" name="minsizetoformrelease" value="{{ $site['minsizetoformrelease'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -193,7 +185,7 @@
 
                         <div>
                             <label for="maxsizetoformrelease" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-expand mr-1"></i>Maximum File Size to Make a Release
+                                <i class="fas fa-expand mr-1"></i>Maximum File Size to Make a Release
                             </label>
                             <input type="text" id="maxsizetoformrelease" name="maxsizetoformrelease" value="{{ $site['maxsizetoformrelease'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -202,7 +194,7 @@
 
                         <div>
                             <label for="completionpercent" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-percentage mr-1"></i>Minimum Completion Percent
+                                <i class="fas fa-percentage mr-1"></i>Minimum Completion Percent
                             </label>
                             <input type="text" id="completionpercent" name="completionpercent" value="{{ $site['completionpercent'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -211,7 +203,7 @@
 
                         <div>
                             <label for="grabstatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-sync mr-1"></i>Update Grabs
+                                <i class="fas fa-sync mr-1"></i>Update Grabs
                             </label>
                             <select id="grabstatus" name="grabstatus" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($yesno['ids'] as $index => $yesnoId)
@@ -225,7 +217,7 @@
 
                         <div>
                             <label for="crossposttime" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-clock mr-1"></i>Crossposted Time Check
+                                <i class="fas fa-clock mr-1"></i>Crossposted Time Check
                             </label>
                             <input type="text" id="crossposttime" name="crossposttime" value="{{ $site['crossposttime'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -234,7 +226,7 @@
 
                         <div>
                             <label for="maxmssgs" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-envelope mr-1"></i>Max Messages
+                                <i class="fas fa-envelope mr-1"></i>Max Messages
                             </label>
                             <input type="text" id="maxmssgs" name="maxmssgs" value="{{ $site['maxmssgs'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -243,7 +235,7 @@
 
                         <div>
                             <label for="max_headers_iteration" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-list-ol mr-1"></i>Max Headers Iteration
+                                <i class="fas fa-list-ol mr-1"></i>Max Headers Iteration
                             </label>
                             <input type="text" id="max_headers_iteration" name="max_headers_iteration" value="{{ $site['max_headers_iteration'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -252,7 +244,7 @@
 
                         <div>
                             <label for="newgroupscanmethod" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-question-circle mr-1"></i>Where to Start New Groups
+                                <i class="fas fa-question-circle mr-1"></i>Where to Start New Groups
                             </label>
                             <select id="newgroupscanmethod" name="newgroupscanmethod" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 mb-2">
                                 @foreach($yesno['ids'] as $index => $yesnoId)
@@ -278,7 +270,7 @@
 
                         <div>
                             <label for="safebackfilldate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-calendar-alt mr-1"></i>Safe Backfill Date
+                                <i class="fas fa-calendar-alt mr-1"></i>Safe Backfill Date
                             </label>
                             <input type="text" id="safebackfilldate" name="safebackfilldate" value="{{ $site['safebackfilldate'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -287,7 +279,7 @@
 
                         <div>
                             <label for="disablebackfillgroup" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-power-off mr-1"></i>Auto Disable Groups During Backfill
+                                <i class="fas fa-power-off mr-1"></i>Auto Disable Groups During Backfill
                             </label>
                             <select id="disablebackfillgroup" name="disablebackfillgroup" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($yesno['ids'] as $index => $yesnoId)
@@ -308,7 +300,7 @@
                     <div class="space-y-4">
                         <div>
                             <label for="lookuptv" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-tv mr-1"></i>Lookup TV
+                                <i class="fas fa-tv mr-1"></i>Lookup TV
                             </label>
                             <select id="lookuptv" name="lookuptv" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($lookuptv['ids'] as $index => $lookuptvId)
@@ -322,7 +314,7 @@
 
                         <div>
                             <label for="lookupbooks" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-book mr-1"></i>Lookup Books
+                                <i class="fas fa-book mr-1"></i>Lookup Books
                             </label>
                             <select id="lookupbooks" name="lookupbooks" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($lookupbooks['ids'] as $index => $lookupbooksId)
@@ -336,7 +328,7 @@
 
                         <div>
                             <label for="book_reqids" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-list mr-1"></i>Type of Books to Look Up
+                                <i class="fas fa-list mr-1"></i>Type of Books to Look Up
                             </label>
                             <select id="book_reqids" name="book_reqids[]" multiple class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" size="4">
                                 @foreach($book_reqids['ids'] as $index => $bookReqId)
@@ -350,7 +342,7 @@
 
                         <div>
                             <label for="lookupimdb" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-film mr-1"></i>Lookup Movies
+                                <i class="fas fa-film mr-1"></i>Lookup Movies
                             </label>
                             <select id="lookupimdb" name="lookupimdb" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($lookupmovies['ids'] as $index => $lookupmoviesId)
@@ -364,7 +356,7 @@
 
                         <div>
                             <label for="lookuplanguage" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-language mr-1"></i>Movie Lookup Language
+                                <i class="fas fa-language mr-1"></i>Movie Lookup Language
                             </label>
                             <select id="lookuplanguage" name="lookuplanguage" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($lookuplanguage['iso'] as $index => $languageIso)
@@ -378,7 +370,7 @@
 
                         <div>
                             <label for="lookupanidb" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-dragon mr-1"></i>Lookup AniDB
+                                <i class="fas fa-dragon mr-1"></i>Lookup AniDB
                             </label>
                             <select id="lookupanidb" name="lookupanidb" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($yesno['ids'] as $index => $yesnoId)
@@ -392,7 +384,7 @@
 
                         <div>
                             <label for="lookupmusic" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-music mr-1"></i>Lookup Music
+                                <i class="fas fa-music mr-1"></i>Lookup Music
                             </label>
                             <select id="lookupmusic" name="lookupmusic" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($lookupmusic['ids'] as $index => $lookupmusicId)
@@ -406,7 +398,7 @@
 
                         <div>
                             <label for="saveaudiopreview" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-music mr-1"></i>Save Audio Preview
+                                <i class="fas fa-music mr-1"></i>Save Audio Preview
                             </label>
                             <select id="saveaudiopreview" name="saveaudiopreview" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($yesno['ids'] as $index => $yesnoId)
@@ -420,7 +412,7 @@
 
                         <div>
                             <label for="lookupgames" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-gamepad mr-1"></i>Lookup Games
+                                <i class="fas fa-gamepad mr-1"></i>Lookup Games
                             </label>
                             <select id="lookupgames" name="lookupgames" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($lookupgames['ids'] as $index => $lookupgamesId)
@@ -441,7 +433,7 @@
                     <div class="space-y-4">
                         <div>
                             <label for="categorizeforeign" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-globe mr-1"></i>Categorize Foreign
+                                <i class="fas fa-globe mr-1"></i>Categorize Foreign
                             </label>
                             <select id="categorizeforeign" name="categorizeforeign" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($yesno['ids'] as $index => $yesnoId)
@@ -455,7 +447,7 @@
 
                         <div>
                             <label for="catwebdl" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-cloud-download-alt mr-1"></i>Categorize WEB-DL
+                                <i class="fas fa-cloud-download-alt mr-1"></i>Categorize WEB-DL
                             </label>
                             <select id="catwebdl" name="catwebdl" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($yesno['ids'] as $index => $yesnoId)
@@ -476,7 +468,7 @@
                     <div class="space-y-4">
                         <div>
                             <label for="registerstatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-user-plus mr-1"></i>Registration Status
+                                <i class="fas fa-user-plus mr-1"></i>Registration Status
                             </label>
                             <select id="registerstatus" name="registerstatus" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($registerstatus['ids'] as $index => $statusId)
@@ -490,7 +482,7 @@
 
                         <div>
                             <label for="userdownloadpurgedays" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-calendar mr-1"></i>User Downloads Purge Days
+                                <i class="fas fa-calendar mr-1"></i>User Downloads Purge Days
                             </label>
                             <input type="text" id="userdownloadpurgedays" name="userdownloadpurgedays" value="{{ $site['userdownloadpurgedays'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -499,7 +491,7 @@
 
                         <div>
                             <label for="userhostexclusion" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-shield mr-1"></i>IP Whitelist
+                                <i class="fas fa-shield mr-1"></i>IP Whitelist
                             </label>
                             <input type="text" id="userhostexclusion" name="userhostexclusion" value="{{ $site['userhostexclusion'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -516,7 +508,7 @@
                     <div class="space-y-4">
                         <div>
                             <label for="end" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-file-archive mr-1"></i>Download Last Compressed File
+                                <i class="fas fa-file-archive mr-1"></i>Download Last Compressed File
                             </label>
                             <select id="end" name="end" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($yesno['ids'] as $index => $yesnoId)
@@ -530,7 +522,7 @@
 
                         <div>
                             <label for="showpasswordedrelease" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-lock mr-1"></i>Show Passworded Releases
+                                <i class="fas fa-lock mr-1"></i>Show Passworded Releases
                             </label>
                             <select id="showpasswordedrelease" name="showpasswordedrelease" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($passworded['ids'] as $index => $passwordedId)
@@ -551,7 +543,7 @@
                     <div class="space-y-4">
                         <div>
                             <label for="maxsizetopostprocess" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-file-archive mr-1"></i>Maximum Release Size to Post Process
+                                <i class="fas fa-file-archive mr-1"></i>Maximum Release Size to Post Process
                             </label>
                             <div class="flex gap-2">
                                 <input type="text" id="maxsizetopostprocess" name="maxsizetopostprocess" value="{{ $site['maxsizetopostprocess'] ?? '' }}"
@@ -563,7 +555,7 @@
 
                         <div>
                             <label for="minsizetopostprocess" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-file-archive mr-1"></i>Minimum Release Size to Post Process
+                                <i class="fas fa-file-archive mr-1"></i>Minimum Release Size to Post Process
                             </label>
                             <div class="flex gap-2">
                                 <input type="text" id="minsizetopostprocess" name="minsizetopostprocess" value="{{ $site['minsizetopostprocess'] ?? '' }}"
@@ -582,7 +574,7 @@
                     <div class="space-y-4">
                         <div>
                             <label for="maxnzbsprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-file-code mr-1"></i>Maximum NZBs Stage5
+                                <i class="fas fa-file-code mr-1"></i>Maximum NZBs Stage5
                             </label>
                             <input type="text" id="maxnzbsprocessed" name="maxnzbsprocessed" value="{{ $site['maxnzbsprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -591,7 +583,7 @@
 
                         <div>
                             <label for="partrepair" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-toolbox mr-1"></i>Part Repair
+                                <i class="fas fa-toolbox mr-1"></i>Part Repair
                             </label>
                             <select id="partrepair" name="partrepair" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($yesno['ids'] as $index => $yesnoId)
@@ -605,7 +597,7 @@
 
                         <div>
                             <label for="safepartrepair" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-shield-alt mr-1"></i>Part Repair for Backfill Scripts
+                                <i class="fas fa-shield-alt mr-1"></i>Part Repair for Backfill Scripts
                             </label>
                             <select id="safepartrepair" name="safepartrepair" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($yesno['ids'] as $index => $yesnoId)
@@ -619,7 +611,7 @@
 
                         <div>
                             <label for="maxpartrepair" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-tools mr-1"></i>Maximum Repair Per Run
+                                <i class="fas fa-tools mr-1"></i>Maximum Repair Per Run
                             </label>
                             <input type="text" id="maxpartrepair" name="maxpartrepair" value="{{ $site['maxpartrepair'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -628,7 +620,7 @@
 
                         <div>
                             <label for="partrepairmaxtries" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-redo mr-1"></i>Maximum Repair Tries
+                                <i class="fas fa-redo mr-1"></i>Maximum Repair Tries
                             </label>
                             <input type="text" id="partrepairmaxtries" name="partrepairmaxtries" value="{{ $site['partrepairmaxtries'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -637,7 +629,7 @@
 
                         <div>
                             <label for="processjpg" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-image mr-1"></i>Process JPG
+                                <i class="fas fa-image mr-1"></i>Process JPG
                             </label>
                             <select id="processjpg" name="processjpg" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($yesno['ids'] as $index => $yesnoId)
@@ -651,7 +643,7 @@
 
                         <div>
                             <label for="processthumbnails" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-file-image mr-1"></i>Process Video Thumbnails
+                                <i class="fas fa-file-image mr-1"></i>Process Video Thumbnails
                             </label>
                             <select id="processthumbnails" name="processthumbnails" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($yesno['ids'] as $index => $yesnoId)
@@ -665,7 +657,7 @@
 
                         <div>
                             <label for="processvideos" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-film mr-1"></i>Process Video Samples
+                                <i class="fas fa-film mr-1"></i>Process Video Samples
                             </label>
                             <select id="processvideos" name="processvideos" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($yesno['ids'] as $index => $yesnoId)
@@ -679,7 +671,7 @@
 
                         <div>
                             <label for="segmentstodownload" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-download mr-1"></i>Number of Segments to Download
+                                <i class="fas fa-download mr-1"></i>Number of Segments to Download
                             </label>
                             <input type="text" id="segmentstodownload" name="segmentstodownload" value="{{ $site['segmentstodownload'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -688,7 +680,7 @@
 
                         <div>
                             <label for="ffmpeg_duration" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-film mr-1"></i>Video Sample File Duration
+                                <i class="fas fa-film mr-1"></i>Video Sample File Duration
                             </label>
                             <div class="flex gap-2">
                                 <input type="text" id="ffmpeg_duration" name="ffmpeg_duration" value="{{ $site['ffmpeg_duration'] ?? '' }}"
@@ -700,7 +692,7 @@
 
                         <div>
                             <label for="maxnestedlevels" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-layer-group mr-1"></i>Nested Archive Depth
+                                <i class="fas fa-layer-group mr-1"></i>Nested Archive Depth
                             </label>
                             <div class="flex gap-2">
                                 <input type="text" id="maxnestedlevels" name="maxnestedlevels" value="{{ $site['maxnestedlevels'] ?? '' }}"
@@ -712,7 +704,7 @@
 
                         <div>
                             <label for="innerfileblacklist" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-ban mr-1"></i>Inner File Black List Regex
+                                <i class="fas fa-ban mr-1"></i>Inner File Black List Regex
                             </label>
                             <textarea id="innerfileblacklist" name="innerfileblacklist" rows="3" placeholder="Example: /setup\.exe|password\.url/i"
                                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">{{ $site['innerfileblacklist'] ?? '' }}</textarea>
@@ -728,7 +720,7 @@
                     <div class="space-y-4">
                         <div>
                             <label for="trailers_display" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-play-circle mr-1"></i>Fetch/Display Movie Trailers
+                                <i class="fas fa-play-circle mr-1"></i>Fetch/Display Movie Trailers
                             </label>
                             <select id="trailers_display" name="trailers_display" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($yesno['ids'] as $index => $yesnoId)
@@ -742,7 +734,7 @@
 
                         <div>
                             <label for="trailers_size_x" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-arrows-alt-h mr-1"></i>Trailers Width
+                                <i class="fas fa-arrows-alt-h mr-1"></i>Trailers Width
                             </label>
                             <div class="flex gap-2">
                                 <input type="text" id="trailers_size_x" name="trailers_size_x" value="{{ $site['trailers_size_x'] ?? '' }}"
@@ -754,7 +746,7 @@
 
                         <div>
                             <label for="trailers_size_y" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-arrows-alt-v mr-1"></i>Trailers Height
+                                <i class="fas fa-arrows-alt-v mr-1"></i>Trailers Height
                             </label>
                             <div class="flex gap-2">
                                 <input type="text" id="trailers_size_y" name="trailers_size_y" value="{{ $site['trailers_size_y'] ?? '' }}"
@@ -773,7 +765,7 @@
                     <div class="space-y-4">
                         <div>
                             <label for="timeoutseconds" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-clock mr-1"></i>Time in Seconds to Kill Unrar/7zip/Mediainfo/FFmpeg/Avconv
+                                <i class="fas fa-clock mr-1"></i>Time in Seconds to Kill Unrar/7zip/Mediainfo/FFmpeg/Avconv
                             </label>
                             <div class="flex gap-2">
                                 <input type="text" id="timeoutseconds" name="timeoutseconds" value="{{ $site['timeoutseconds'] ?? '' }}"
@@ -785,7 +777,7 @@
 
                         <div>
                             <label for="releaseprocessingtimeout" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-hourglass-half mr-1"></i>Per-Release Processing Timeout
+                                <i class="fas fa-hourglass-half mr-1"></i>Per-Release Processing Timeout
                             </label>
                             <div class="flex gap-2">
                                 <input type="text" id="releaseprocessingtimeout" name="releaseprocessingtimeout" value="{{ $site['releaseprocessingtimeout'] ?? '120' }}"
@@ -797,7 +789,7 @@
 
                         <div>
                             <label for="maxpptimeoutcount" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-trash-alt mr-1"></i>Max PP Timeout Strikes Before Deletion
+                                <i class="fas fa-trash-alt mr-1"></i>Max PP Timeout Strikes Before Deletion
                             </label>
                             <input type="text" id="maxpptimeoutcount" name="maxpptimeoutcount" value="{{ $site['maxpptimeoutcount'] ?? '3' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -806,7 +798,7 @@
 
                         <div>
                             <label for="maxaddprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-list-ol mr-1"></i>Maximum Add PP Per Run
+                                <i class="fas fa-list-ol mr-1"></i>Maximum Add PP Per Run
                             </label>
                             <input type="text" id="maxaddprocessed" name="maxaddprocessed" value="{{ $site['maxaddprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -815,7 +807,7 @@
 
                         <div>
                             <label for="maxpartsprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-download mr-1"></i>Maximum Add PP Parts Downloaded
+                                <i class="fas fa-download mr-1"></i>Maximum Add PP Parts Downloaded
                             </label>
                             <input type="text" id="maxpartsprocessed" name="maxpartsprocessed" value="{{ $site['maxpartsprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -824,7 +816,7 @@
 
                         <div>
                             <label for="passchkattempts" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-check-double mr-1"></i>Maximum Add PP Parts Checked
+                                <i class="fas fa-check-double mr-1"></i>Maximum Add PP Parts Checked
                             </label>
                             <input type="text" id="passchkattempts" name="passchkattempts" value="{{ $site['passchkattempts'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -833,7 +825,7 @@
 
                         <div>
                             <label for="maxrageprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-tv mr-1"></i>Maximum TV Per Run
+                                <i class="fas fa-tv mr-1"></i>Maximum TV Per Run
                             </label>
                             <input type="text" id="maxrageprocessed" name="maxrageprocessed" value="{{ $site['maxrageprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -842,7 +834,7 @@
 
                         <div>
                             <label for="maximdbprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-film mr-1"></i>Maximum Movies Per Run
+                                <i class="fas fa-film mr-1"></i>Maximum Movies Per Run
                             </label>
                             <input type="text" id="maximdbprocessed" name="maximdbprocessed" value="{{ $site['maximdbprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -851,7 +843,7 @@
 
                         <div>
                             <label for="maxanidbprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-dragon mr-1"></i>Maximum AniDB Per Run
+                                <i class="fas fa-dragon mr-1"></i>Maximum AniDB Per Run
                             </label>
                             <input type="text" id="maxanidbprocessed" name="maxanidbprocessed" value="{{ $site['maxanidbprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -860,7 +852,7 @@
 
                         <div>
                             <label for="maxmusicprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-music mr-1"></i>Maximum Music Per Run
+                                <i class="fas fa-music mr-1"></i>Maximum Music Per Run
                             </label>
                             <input type="text" id="maxmusicprocessed" name="maxmusicprocessed" value="{{ $site['maxmusicprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -869,7 +861,7 @@
 
                         <div>
                             <label for="maxgamesprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-gamepad mr-1"></i>Maximum Games Per Run
+                                <i class="fas fa-gamepad mr-1"></i>Maximum Games Per Run
                             </label>
                             <input type="text" id="maxgamesprocessed" name="maxgamesprocessed" value="{{ $site['maxgamesprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -878,7 +870,7 @@
 
                         <div>
                             <label for="maxbooksprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-book mr-1"></i>Maximum Books Per Run
+                                <i class="fas fa-book mr-1"></i>Maximum Books Per Run
                             </label>
                             <input type="text" id="maxbooksprocessed" name="maxbooksprocessed" value="{{ $site['maxbooksprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -887,7 +879,7 @@
 
                         <div>
                             <label for="fixnamesperrun" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-edit mr-1"></i>fixReleaseNames Per Run
+                                <i class="fas fa-edit mr-1"></i>fixReleaseNames Per Run
                             </label>
                             <input type="text" id="fixnamesperrun" name="fixnamesperrun" value="{{ $site['fixnamesperrun'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -896,7 +888,7 @@
 
                         <div>
                             <label for="amazonsleep" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-hourglass mr-1"></i>Amazon Sleep Time
+                                <i class="fas fa-hourglass mr-1"></i>Amazon Sleep Time
                             </label>
                             <div class="flex gap-2">
                                 <input type="text" id="amazonsleep" name="amazonsleep" value="{{ $site['amazonsleep'] ?? '' }}"
@@ -915,7 +907,7 @@
                     <div class="space-y-4">
                         <div>
                             <label for="lookupnfo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-file-alt mr-1"></i>Lookup NFO
+                                <i class="fas fa-file-alt mr-1"></i>Lookup NFO
                             </label>
                             <select id="lookupnfo" name="lookupnfo" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($yesno['ids'] as $index => $yesnoId)
@@ -929,7 +921,7 @@
 
                         <div>
                             <label for="maxnfoprocessed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-file-text mr-1"></i>Maximum NFO Files Per Run
+                                <i class="fas fa-file-text mr-1"></i>Maximum NFO Files Per Run
                             </label>
                             <input type="text" id="maxnfoprocessed" name="maxnfoprocessed" value="{{ $site['maxnfoprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -938,7 +930,7 @@
 
                         <div>
                             <label for="maxsizetoprocessnfo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-upload mr-1"></i>Maximum Release Size to Process NFOs
+                                <i class="fas fa-upload mr-1"></i>Maximum Release Size to Process NFOs
                             </label>
                             <div class="flex gap-2">
                                 <input type="text" id="maxsizetoprocessnfo" name="maxsizetoprocessnfo" value="{{ $site['maxsizetoprocessnfo'] ?? '' }}"
@@ -950,7 +942,7 @@
 
                         <div>
                             <label for="minsizetoprocessnfo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-download mr-1"></i>Minimum Release Size to Process NFOs
+                                <i class="fas fa-download mr-1"></i>Minimum Release Size to Process NFOs
                             </label>
                             <div class="flex gap-2">
                                 <input type="text" id="minsizetoprocessnfo" name="minsizetoprocessnfo" value="{{ $site['minsizetoprocessnfo'] ?? '' }}"
@@ -962,7 +954,7 @@
 
                         <div>
                             <label for="maxnforetries" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-refresh mr-1"></i>Maximum Amount of Times to Redownload a NFO
+                                <i class="fas fa-refresh mr-1"></i>Maximum Amount of Times to Redownload a NFO
                             </label>
                             <div class="flex gap-2">
                                 <input type="text" id="maxnforetries" name="maxnforetries" value="{{ $site['maxnforetries'] ?? '' }}"
@@ -981,7 +973,7 @@
                     <div class="space-y-4">
                         <div>
                             <label for="nntpretries" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-refresh mr-1"></i>NNTP Retry Attempts
+                                <i class="fas fa-refresh mr-1"></i>NNTP Retry Attempts
                             </label>
                             <input type="text" id="nntpretries" name="nntpretries" value="{{ $site['nntpretries'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -990,7 +982,7 @@
 
                         <div>
                             <label for="delaytime" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-clock-o mr-1"></i>Delay Time Check
+                                <i class="fas fa-clock-o mr-1"></i>Delay Time Check
                             </label>
                             <input type="text" id="delaytime" name="delaytime" value="{{ $site['delaytime'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -999,7 +991,7 @@
 
                         <div>
                             <label for="collection_timeout" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-hourglass-end mr-1"></i>Collection Timeout Check
+                                <i class="fas fa-hourglass-end mr-1"></i>Collection Timeout Check
                             </label>
                             <input type="text" id="collection_timeout" name="collection_timeout" value="{{ $site['collection_timeout'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -1015,7 +1007,7 @@
                     <div class="space-y-4">
                         <div>
                             <label for="showdroppedyencparts" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-bug mr-1"></i>Log Dropped Headers
+                                <i class="fas fa-bug mr-1"></i>Log Dropped Headers
                             </label>
                             <select id="showdroppedyencparts" name="showdroppedyencparts" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 @foreach($yesno['ids'] as $index => $yesnoId)
@@ -1036,7 +1028,7 @@
                     <div class="space-y-4">
                         <div>
                             <label for="binarythreads" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-tasks mr-1"></i>Update Binaries Threads
+                                <i class="fas fa-tasks mr-1"></i>Update Binaries Threads
                             </label>
                             <input type="text" id="binarythreads" name="binarythreads" value="{{ $site['binarythreads'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -1045,7 +1037,7 @@
 
                         <div>
                             <label for="backfillthreads" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-tasks mr-1"></i>Backfill Threads
+                                <i class="fas fa-tasks mr-1"></i>Backfill Threads
                             </label>
                             <input type="text" id="backfillthreads" name="backfillthreads" value="{{ $site['backfillthreads'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -1054,7 +1046,7 @@
 
                         <div>
                             <label for="releasethreads" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-tasks mr-1"></i>Update Releases Threads
+                                <i class="fas fa-tasks mr-1"></i>Update Releases Threads
                             </label>
                             <input type="text" id="releasethreads" name="releasethreads" value="{{ $site['releasethreads'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -1063,7 +1055,7 @@
 
                         <div>
                             <label for="postthreads" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-tasks mr-1"></i>Postprocessing Additional Threads
+                                <i class="fas fa-tasks mr-1"></i>Postprocessing Additional Threads
                             </label>
                             <input type="text" id="postthreads" name="postthreads" value="{{ $site['postthreads'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -1072,7 +1064,7 @@
 
                         <div>
                             <label for="nfothreads" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-tasks mr-1"></i>NFO Threads
+                                <i class="fas fa-tasks mr-1"></i>NFO Threads
                             </label>
                             <input type="text" id="nfothreads" name="nfothreads" value="{{ $site['nfothreads'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -1081,7 +1073,7 @@
 
                         <div>
                             <label for="postthreadsnon" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-tasks mr-1"></i>Postprocessing Non-Amazon Threads
+                                <i class="fas fa-tasks mr-1"></i>Postprocessing Non-Amazon Threads
                             </label>
                             <input type="text" id="postthreadsnon" name="postthreadsnon" value="{{ $site['postthreadsnon'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -1090,7 +1082,7 @@
 
                         <div>
                             <label for="fixnamethreads" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fa fa-tasks mr-1"></i>fixReleaseNames Threads
+                                <i class="fas fa-tasks mr-1"></i>fixReleaseNames Threads
                             </label>
                             <input type="text" id="fixnamethreads" name="fixnamethreads" value="{{ $site['fixnamethreads'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
@@ -1102,7 +1094,7 @@
                 <!-- Note about full settings -->
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p class="text-blue-800 text-sm">
-                        <i class="fa fa-info-circle mr-2"></i>
+                        <i class="fas fa-info-circle mr-2"></i>
                         This is a simplified settings page. For complete site configuration, please use the full settings management interface or edit settings directly in the database.
                     </p>
                 </div>
@@ -1110,10 +1102,10 @@
                 <!-- Action Buttons -->
                 <div class="flex gap-3 pt-4 border-t border-gray-200">
                     <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
-                        <i class="fa fa-save mr-2"></i>Save Settings
+                        <i class="fas fa-save mr-2"></i>Save Settings
                     </button>
                     <a href="{{ url('admin') }}" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
-                        <i class="fa fa-times mr-2"></i>Cancel
+                        <i class="fas fa-times mr-2"></i>Cancel
                     </a>
                 </div>
             </div>

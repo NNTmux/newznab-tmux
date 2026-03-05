@@ -1,16 +1,16 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div class="space-y-6">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
-                    <i class="fa fa-tag mr-2"></i>{{ $title ?? 'Release Naming Regex List' }}
+                    <i class="fas fa-tag mr-2"></i>{{ $title ?? 'Release Naming Regex List' }}
                 </h1>
                 <a href="{{ url('/admin/release_naming_regexes-edit') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
-                    <i class="fa fa-plus mr-2"></i>Add New Regex
+                    <i class="fas fa-plus mr-2"></i>Add New Regex
                 </a>
             </div>
         </div>
@@ -19,7 +19,7 @@
         <div class="px-6 py-4 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-800">
             <div class="flex">
                 <div class="shrink-0">
-                    <i class="fa fa-info-circle text-blue-500 dark:text-blue-400 text-2xl"></i>
+                    <i class="fas fa-info-circle text-blue-500 dark:text-blue-400 text-2xl"></i>
                 </div>
                 <div class="ml-3">
                     <p class="text-sm text-blue-700 dark:text-blue-300">
@@ -41,7 +41,7 @@
                 <div class="flex gap-2">
                     <div class="relative flex-1">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fa fa-search text-gray-400"></i>
+                            <i class="fas fa-search text-gray-400"></i>
                         </div>
                         <input id="group"
                                type="text"
@@ -102,11 +102,11 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-center">
                                     @if($row->status == 1)
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
-                                            <i class="fa fa-check-circle mr-1"></i>Active
+                                            <i class="fas fa-check-circle mr-1"></i>Active
                                         </span>
                                     @else
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">
-                                            <i class="fa fa-times-circle mr-1"></i>Disabled
+                                            <i class="fas fa-times-circle mr-1"></i>Disabled
                                         </span>
                                     @endif
                                 </td>
@@ -115,14 +115,14 @@
                                         <a href="{{ url('/admin/release_naming_regexes-edit?id=' . $row->id) }}"
                                            class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
                                            title="Edit this regex">
-                                            <i class="fa fa-edit"></i>
+                                            <i class="fas fa-edit"></i>
                                         </a>
                                                 <button type="button"
                                                         class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                                                         data-delete-regex="{{ $row->id }}"
                                                         data-delete-url="{{ url('/admin/release_naming_regexes-delete') }}"
                                                         title="Delete this regex">
-                                                    <i class="fa fa-trash"></i>
+                                                    <i class="fas fa-trash"></i>
                                                 </button>
                                     </div>
                                 </td>
@@ -140,11 +140,11 @@
             @endif
         @else
             <div class="px-6 py-12 text-center">
-                <i class="fa fa-exclamation-triangle text-gray-400 text-5xl mb-4"></i>
+                <i class="fas fa-exclamation-triangle text-gray-400 text-5xl mb-4"></i>
                 <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No regex patterns found</h3>
                 <p class="text-gray-500 dark:text-gray-400 mb-4">Try a different search term or add a new regex.</p>
                 <a href="{{ url('/admin/release_naming_regexes-edit') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
-                    <i class="fa fa-plus mr-2"></i>Add New Regex
+                    <i class="fas fa-plus mr-2"></i>Add New Regex
                 </a>
             </div>
         @endif
@@ -163,10 +163,10 @@
                 </span>
                 <div class="flex gap-2">
                     <a href="{{ url('/admin/release_naming_regexes-test') }}" class="px-4 py-2 bg-purple-600 dark:bg-purple-700 text-white rounded-lg hover:bg-purple-700 dark:hover:bg-purple-800 text-sm">
-                        <i class="fa fa-flask mr-2"></i>Test Regex
+                        <i class="fas fa-flask mr-2"></i>Test Regex
                     </a>
                     <a href="{{ url('/admin/release_naming_regexes-edit') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 text-sm">
-                        <i class="fa fa-plus mr-2"></i>Add New Regex
+                        <i class="fas fa-plus mr-2"></i>Add New Regex
                     </a>
                 </div>
             </div>

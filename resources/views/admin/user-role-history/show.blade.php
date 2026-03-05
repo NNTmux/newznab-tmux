@@ -1,20 +1,20 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div class="space-y-6">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                    <i class="fa fa-history mr-2"></i>{{ $title }}
+                    <i class="fas fa-history mr-2"></i>{{ $title }}
                 </h1>
                 <div class="flex gap-2">
                     <a href="{{ url('admin/user-edit?id=' . $user->id) }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
-                        <i class="fa fa-edit mr-2"></i>Edit User
+                        <i class="fas fa-edit mr-2"></i>Edit User
                     </a>
                     <a href="{{ url('admin/user-role-history') }}" class="px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-800">
-                        <i class="fa fa-arrow-left mr-2"></i>Back to All
+                        <i class="fas fa-arrow-left mr-2"></i>Back to All
                     </a>
                 </div>
             </div>
@@ -153,7 +153,7 @@
                     @empty
                         <tr>
                             <td colspan="9" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                                <i class="fa fa-info-circle mr-2"></i>No role history records found for this user
+                                <i class="fas fa-info-circle mr-2"></i>No role history records found for this user
                             </td>
                         </tr>
                     @endforelse

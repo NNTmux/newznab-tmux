@@ -1,18 +1,18 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div class="space-y-6">
     <!-- Header -->
     <div class="mb-6">
         <div class="flex justify-between items-center">
             <div>
                 <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-200">
-                    <i class="fa fa-chart-bar mr-2"></i>Promotion Statistics
+                    <i class="fas fa-chart-bar mr-2"></i>Promotion Statistics
                 </h1>
                 <p class="text-gray-600 dark:text-gray-400 mt-1">Overview of all promotion activities</p>
             </div>
             <a href="{{ route('admin.promotions.index') }}" class="px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700">
-                <i class="fa fa-arrow-left mr-2"></i>Back to Promotions
+                <i class="fas fa-arrow-left mr-2"></i>Back to Promotions
             </a>
         </div>
     </div>
@@ -42,7 +42,7 @@
                 </div>
                 <div>
                     <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        <i class="fa fa-filter mr-2"></i>Apply
+                        <i class="fas fa-filter mr-2"></i>Apply
                     </button>
                 </div>
             </div>
@@ -54,7 +54,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-blue-100 dark:bg-blue-900 rounded-full p-3">
-                    <i class="fa fa-gift text-2xl text-blue-600 dark:text-blue-400"></i>
+                    <i class="fas fa-gift text-2xl text-blue-600 dark:text-blue-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Total Promotions</p>
@@ -66,7 +66,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-green-100 dark:bg-green-900 rounded-full p-3">
-                    <i class="fa fa-check-circle text-2xl text-green-600 dark:text-green-400"></i>
+                    <i class="fas fa-check-circle text-2xl text-green-600 dark:text-green-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Active Promotions</p>
@@ -78,7 +78,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-purple-100 dark:bg-purple-900 rounded-full p-3">
-                    <i class="fa fa-arrow-up text-2xl text-purple-600 dark:text-purple-400"></i>
+                    <i class="fas fa-arrow-up text-2xl text-purple-600 dark:text-purple-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Total Applications</p>
@@ -90,7 +90,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-yellow-100 dark:bg-yellow-900 rounded-full p-3">
-                    <i class="fa fa-users text-2xl text-yellow-600 dark:text-yellow-400"></i>
+                    <i class="fas fa-users text-2xl text-yellow-600 dark:text-yellow-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Unique Users</p>
@@ -102,7 +102,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-red-100 dark:bg-red-900 rounded-full p-3">
-                    <i class="fa fa-calendar-plus text-2xl text-red-600 dark:text-red-400"></i>
+                    <i class="fas fa-calendar-plus text-2xl text-red-600 dark:text-red-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Total Days Added</p>
@@ -117,7 +117,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                    <i class="fa fa-trophy mr-2 text-yellow-500"></i>Top Promotions by Usage
+                    <i class="fas fa-trophy mr-2 text-yellow-500"></i>Top Promotions by Usage
                 </h2>
             </div>
             <div class="p-6">
@@ -130,8 +130,8 @@
                                 <div class="flex-1">
                                     <h3 class="font-semibold text-gray-800 dark:text-gray-200">{{ $promotion->name }}</h3>
                                     <div class="flex gap-4 mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                        <span><i class="fa fa-arrow-up mr-1"></i>{{ $promotion->statistics_count }} applications</span>
-                                        <span><i class="fa fa-calendar mr-1"></i>{{ $promotion->additional_days }} days</span>
+                                        <span><i class="fas fa-arrow-up mr-1"></i>{{ $promotion->statistics_count }} applications</span>
+                                        <span><i class="fas fa-calendar mr-1"></i>{{ $promotion->additional_days }} days</span>
                                     </div>
                                 </div>
                                 <a href="{{ route('admin.promotions.show-statistics', $promotion->id) }}" class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
@@ -148,7 +148,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                    <i class="fa fa-user-tag mr-2"></i>Statistics by Role
+                    <i class="fas fa-user-tag mr-2"></i>Statistics by Role
                 </h2>
             </div>
             <div class="p-6">
@@ -187,18 +187,18 @@
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                <i class="fa fa-list mr-2"></i>All Promotions Statistics
+                <i class="fas fa-list mr-2"></i>All Promotions Statistics
             </h2>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Promotion</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Applications</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Days/Application</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Promotion</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Applications</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Days/Application</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -221,7 +221,7 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($promotion->is_active && $promotion->isCurrentlyActive())
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                        <i class="fa fa-check mr-1"></i>Active
+                                        <i class="fas fa-check mr-1"></i>Active
                                     </span>
                                 @else
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
@@ -231,7 +231,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <a href="{{ route('admin.promotions.show-statistics', $promotion->id) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
-                                    View Details <i class="fa fa-arrow-right ml-1"></i>
+                                    View Details <i class="fas fa-arrow-right ml-1"></i>
                                 </a>
                             </td>
                         </tr>
@@ -251,18 +251,18 @@
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm mt-6">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                <i class="fa fa-clock mr-2"></i>Recent Promotion Activity
+                <i class="fas fa-clock mr-2"></i>Recent Promotion Activity
             </h2>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">User</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Promotion</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Role</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Days Added</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Applied At</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">User</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Promotion</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Days Added</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Applied At</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">

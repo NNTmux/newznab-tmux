@@ -1,16 +1,16 @@
 @extends('layouts.admin')
 
 @section('content')
-    <div class="container mx-auto px-4 py-6">
+    <div class="space-y-6">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
             <!-- Header -->
-            <div class="px-6 py-4 border-b border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <div class="flex justify-between items-center">
                     <h1 class="text-2xl font-semibold text-gray-800">
-                        <i class="fa fa-edit mr-2"></i>{{ $title ?? 'Release Naming Regex Edit' }}
+                        <i class="fas fa-edit mr-2"></i>{{ $title ?? 'Release Naming Regex Edit' }}
                     </h1>
                     <a href="{{ url('/admin/release_naming_regexes-list') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200">
-                        <i class="fa fa-arrow-left mr-2"></i>Back to List
+                        <i class="fas fa-arrow-left mr-2"></i>Back to List
                     </a>
                 </div>
             </div>
@@ -24,7 +24,7 @@
                 @if($error)
                     <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                         <div class="flex">
-                            <i class="fa fa-exclamation-triangle text-red-500 mr-3"></i>
+                            <i class="fas fa-exclamation-triangle text-red-500 mr-3"></i>
                             <p class="text-red-800">{{ $error }}</p>
                         </div>
                     </div>
@@ -37,7 +37,7 @@
                     </label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fa fa-users text-gray-400"></i>
+                            <i class="fas fa-users text-gray-400"></i>
                         </div>
                         <input type="text"
                                id="group_regex"
@@ -60,7 +60,7 @@
                     </label>
                     <div class="relative">
                         <div class="absolute top-3 left-3 pointer-events-none">
-                            <i class="fa fa-code text-gray-400"></i>
+                            <i class="fas fa-code text-gray-400"></i>
                         </div>
                         <textarea id="regex"
                                   name="regex"
@@ -82,7 +82,7 @@
                     </label>
                     <div class="relative">
                         <div class="absolute top-3 left-3 pointer-events-none">
-                            <i class="fa fa-align-left text-gray-400"></i>
+                            <i class="fas fa-align-left text-gray-400"></i>
                         </div>
                         <textarea id="description"
                                   name="description"
@@ -101,7 +101,7 @@
                     </label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fa fa-sort-numeric-asc text-gray-400"></i>
+                            <i class="fas fa-sort-numeric-asc text-gray-400"></i>
                         </div>
                         <input type="number"
                                id="ordinal"
@@ -147,10 +147,10 @@
             <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50">
                 <div class="flex justify-between">
                     <a href="{{ url('/admin/release_naming_regexes-list') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
-                        <i class="fa fa-times mr-2"></i>Cancel
+                        <i class="fas fa-times mr-2"></i>Cancel
                     </a>
                     <button type="submit" form="regexForm" class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700">
-                        <i class="fa fa-save mr-2"></i>Save Changes
+                        <i class="fas fa-save mr-2"></i>Save Changes
                     </button>
                 </div>
             </div>

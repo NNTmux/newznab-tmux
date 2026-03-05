@@ -1,16 +1,16 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div class="space-y-6">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
         <!-- Header -->
-        <div class="px-6 py-4 border-b border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800">
-                    <i class="fa fa-flask mr-2"></i>{{ $title ?? 'Release Naming Regex Test' }}
+                    <i class="fas fa-flask mr-2"></i>{{ $title ?? 'Release Naming Regex Test' }}
                 </h1>
                 <a href="{{ url('/admin/release_naming_regexes-list') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200">
-                    <i class="fa fa-arrow-left mr-2"></i>Back to List
+                    <i class="fas fa-arrow-left mr-2"></i>Back to List
                 </a>
             </div>
         </div>
@@ -18,7 +18,7 @@
         <!-- Info Alert -->
         <div class="px-6 py-4 bg-blue-50 border-b border-blue-100">
             <div class="flex">
-                <i class="fa fa-info-circle text-blue-500 text-xl mr-3"></i>
+                <i class="fas fa-info-circle text-blue-500 text-xl mr-3"></i>
                 <p class="text-sm text-blue-700">
                     Test your release naming regex patterns against actual release data from your database.
                 </p>
@@ -98,7 +98,7 @@
 
             <!-- Submit Button -->
             <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
-                <i class="fa fa-play mr-2"></i>Test Regex
+                <i class="fas fa-play mr-2"></i>Test Regex
             </button>
         </form>
 
@@ -106,12 +106,12 @@
         @if($data)
             <div class="px-6 py-6 border-t border-gray-200">
                 <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-                    <i class="fa fa-chart-bar mr-2"></i>Test Results:
+                    <i class="fas fa-chart-bar mr-2"></i>Test Results:
                 </h2>
 
                 @if(count($data) > 0)
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Release ID</th>
@@ -120,7 +120,7 @@
                                     <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-28">Match</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                 @foreach($data as $row)
                                     <tr class="hover:bg-gray-50">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
@@ -143,11 +143,11 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-center">
                                             @if(isset($row['match']) && $row['match'])
                                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-                                                    <i class="fa fa-check mr-1"></i>Match
+                                                    <i class="fas fa-check mr-1"></i>Match
                                                 </span>
                                             @else
                                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
-                                                    <i class="fa fa-times mr-1"></i>No Match
+                                                    <i class="fas fa-times mr-1"></i>No Match
                                                 </span>
                                             @endif
                                         </td>
@@ -160,7 +160,7 @@
                     <!-- Success Summary -->
                     <div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
                         <div class="flex">
-                            <i class="fa fa-check-circle text-green-500 text-xl mr-3"></i>
+                            <i class="fas fa-check-circle text-green-500 text-xl mr-3"></i>
                             <div>
                                 <p class="text-green-800 font-medium">
                                     Tested {{ count($data) }} releases
@@ -175,7 +175,7 @@
                     <!-- No Results Warning -->
                     <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                         <div class="flex">
-                            <i class="fa fa-exclamation-triangle text-yellow-500 text-xl mr-3"></i>
+                            <i class="fas fa-exclamation-triangle text-yellow-500 text-xl mr-3"></i>
                             <div>
                                 <p class="text-yellow-800 font-medium">No releases found</p>
                                 <p class="text-sm text-yellow-700 mt-1">

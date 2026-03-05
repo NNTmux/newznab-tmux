@@ -1,13 +1,13 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div class="space-y-6">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
         <!-- Header -->
-        <div class="px-6 py-4 border-b border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                    <i class="fa fa-gamepad mr-2"></i>{{ $title }}
+                    <i class="fas fa-gamepad mr-2"></i>{{ $title }}
                 </h1>
             </div>
         </div>
@@ -16,7 +16,7 @@
         @if(session('success'))
             <div class="mx-6 mt-4 p-4 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-lg">
                 <p class="text-green-800 dark:text-green-200">
-                    <i class="fa fa-check-circle mr-2"></i>{{ session('success') }}
+                    <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
                 </p>
             </div>
         @endif
@@ -24,7 +24,7 @@
         @if(session('error'))
             <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg">
                 <p class="text-red-800 dark:text-red-200">
-                    <i class="fa fa-exclamation-circle mr-2"></i>{{ session('error') }}
+                    <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
                 </p>
             </div>
         @endif
@@ -32,18 +32,18 @@
         @if(session('warning'))
             <div class="mx-6 mt-4 p-4 bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-lg">
                 <p class="text-yellow-800 dark:text-yellow-200">
-                    <i class="fa fa-exclamation-triangle mr-2"></i>{{ session('warning') }}
+                    <i class="fas fa-exclamation-triangle mr-2"></i>{{ session('warning') }}
                 </p>
             </div>
         @endif
 
         <!-- Search Form -->
-        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200">
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
             <form method="GET" action="{{ url('admin/game-list') }}">
                 <div class="flex gap-2">
                     <div class="relative flex-1">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fa fa-search text-gray-400"></i>
+                            <i class="fas fa-search text-gray-400"></i>
                         </div>
                         <input type="text"
                                name="gamesearch"
@@ -66,20 +66,20 @@
         <!-- Game List Table -->
         @if(!empty($gamelist) && count($gamelist) > 0)
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50 dark:bg-gray-700">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-900">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Title</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Publisher</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Genre</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ESRB</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Release Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Cover</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Publisher</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Genre</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ESRB</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Release Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Cover</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                         @foreach($gamelist as $game)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
@@ -109,17 +109,17 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                     @if(!empty($game['cover']) && $game['cover'] == 1)
                                         <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                            <i class="fa fa-check"></i> Yes
+                                            <i class="fas fa-check"></i> Yes
                                         </span>
                                     @else
                                         <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
-                                            <i class="fa fa-times"></i> No
+                                            <i class="fas fa-times"></i> No
                                         </span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <a href="{{ url('admin/game-edit?id=' . $game['id']) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900">
-                                        <i class="fa fa-edit"></i> Edit
+                                        <i class="fas fa-edit"></i> Edit
                                     </a>
                                 </td>
                             </tr>
@@ -129,7 +129,7 @@
             </div>
         @else
             <div class="px-6 py-12 text-center">
-                <i class="fa fa-gamepad text-gray-400 text-5xl mb-4"></i>
+                <i class="fas fa-gamepad text-gray-400 text-5xl mb-4"></i>
                 <p class="text-gray-500 dark:text-gray-400 text-lg">
                     @if(!empty($lastSearch))
                         No games found matching "{{ $lastSearch }}".

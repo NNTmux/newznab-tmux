@@ -1,9 +1,9 @@
-<div class="container mx-auto px-4 py-6">
+<div class="space-y-6">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
         <!-- Header -->
-        <div class="px-6 py-4 border-b border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h1 class="text-2xl font-semibold text-gray-800">
-                <i class="fa fa-terminal mr-2"></i>{{ $title }}
+                <i class="fas fa-terminal mr-2"></i>{{ $title }}
             </h1>
         </div>
 
@@ -11,7 +11,7 @@
         @if(session('success'))
             <div class="mx-6 mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                 <p class="text-green-800 dark:text-green-300">
-                    <i class="fa fa-check-circle mr-2"></i>{{ session('success') }}
+                    <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
                 </p>
             </div>
         @endif
@@ -31,7 +31,7 @@
                         <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">Each script is run in its own shell environment. It is not looped, but allowed to run once and then exit. This notifies tmux that the pane is dead and can then be respawned with another iteration of the script in a new shell environment.</p>
                         <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">This allows for scripts that crash to be restarted without user intervention.</p>
                         <div class="bg-yellow-50 dark:bg-gray-800 border border-yellow-300 dark:border-gray-600 rounded p-3 mt-3">
-                            <p class="text-sm font-medium text-yellow-800 dark:text-gray-300"><i class="fa fa-exclamation-triangle mr-2"></i>NOTICE:</p>
+                            <p class="text-sm font-medium text-yellow-800 dark:text-gray-300"><i class="fas fa-exclamation-triangle mr-2"></i>NOTICE:</p>
                             <p class="text-sm text-yellow-700 dark:text-gray-400">If "Save Tmux Settings" is the last thing you did on this page, refreshing will save the current form values again, not reload from database.</p>
                         </div>
                     </div>
@@ -90,7 +90,7 @@
                         </x-form.group>
 
                         <div class="bg-yellow-50 dark:bg-gray-800 border border-yellow-300 dark:border-gray-600 rounded p-3">
-                            <p class="text-sm text-yellow-700 dark:text-gray-400"><i class="fa fa-exclamation-triangle mr-2"></i>Sequential mode is not recommended as it's not tested enough.</p>
+                            <p class="text-sm text-yellow-700 dark:text-gray-400"><i class="fas fa-exclamation-triangle mr-2"></i>Sequential mode is not recommended as it's not tested enough.</p>
                         </div>
                     </div>
                 </div>
@@ -369,7 +369,7 @@
                     <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Console & Monitoring Tools</h2>
                     <div class="bg-blue-50 dark:bg-gray-700 border border-blue-200 dark:border-gray-600 rounded-lg p-4 mb-4">
                         <p class="text-sm text-gray-700 dark:text-gray-300">
-                            <i class="fa fa-info-circle mr-2"></i>
+                            <i class="fas fa-info-circle mr-2"></i>
                             Enable monitoring tools to display system metrics in separate tmux windows. Each tool requires the corresponding package to be installed on your system.
                         </p>
                     </div>
@@ -479,7 +479,7 @@
 
                         <div class="bg-yellow-50 dark:bg-gray-800 border border-yellow-300 dark:border-gray-600 rounded p-3">
                             <p class="text-sm text-yellow-700 dark:text-gray-400">
-                                <i class="fa fa-exclamation-triangle mr-2"></i>
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
                                 Note: Enabling a monitoring tool without having it installed will cause the tmux window to fail. Install required packages before enabling them.
                             </p>
                         </div>
@@ -489,7 +489,7 @@
                 <!-- Submit Button -->
                 <div class="flex justify-end">
                     <x-button type="submit" class="px-6 py-2">
-                        <i class="fa fa-save mr-2"></i>Save Tmux Settings
+                        <i class="fas fa-save mr-2"></i>Save Tmux Settings
                     </x-button>
                 </div>
             </div>

@@ -1,26 +1,26 @@
 @extends('layouts.admin')
 
 @section('content')
-<div x-data="adminGroups" class="max-w-full px-4 py-6" data-ajax-url="{{ url('/admin/ajax') }}" data-csrf-token="{{ csrf_token() }}">
+<div x-data="adminGroups" class="space-y-6" data-ajax-url="{{ url('/admin/ajax') }}" data-csrf-token="{{ csrf_token() }}">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex flex-wrap justify-between items-center gap-3">
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
-                    <i class="fa fa-users mr-2"></i>{{ $title ?? 'Group List' }}
+                    <i class="fas fa-users mr-2"></i>{{ $title ?? 'Group List' }}
                 </h1>
                 <div class="flex flex-wrap gap-2">
                     <a href="{{ url('/admin/group-list-active') }}" class="px-3 py-2 bg-blue-600 dark:bg-blue-700 text-white text-sm rounded-lg hover:bg-blue-700">
-                        <i class="fa fa-check-circle mr-1"></i>Active Groups
+                        <i class="fas fa-check-circle mr-1"></i>Active Groups
                     </a>
                     <a href="{{ url('/admin/group-list-inactive') }}" class="px-3 py-2 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700">
-                        <i class="fa fa-times-circle mr-1"></i>Inactive Groups
+                        <i class="fas fa-times-circle mr-1"></i>Inactive Groups
                     </a>
                     <a href="{{ url('/admin/group-list') }}" class="px-3 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700">
-                        <i class="fa fa-list mr-1"></i>All Groups
+                        <i class="fas fa-list mr-1"></i>All Groups
                     </a>
                     <a href="{{ url('/admin/group-bulk') }}" class="px-3 py-2 bg-green-600 dark:bg-green-700 text-white text-sm rounded-lg hover:bg-green-700">
-                        <i class="fa fa-plus-circle mr-1"></i>Bulk Add
+                        <i class="fas fa-plus-circle mr-1"></i>Bulk Add
                     </a>
                 </div>
             </div>
@@ -29,7 +29,7 @@
         <!-- Info Alert -->
         <div class="px-6 py-4 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-900">
             <div class="flex">
-                <i class="fa fa-info-circle text-blue-500 dark:text-blue-400 text-xl mr-3"></i>
+                <i class="fas fa-info-circle text-blue-500 dark:text-blue-400 text-xl mr-3"></i>
                 <p class="text-sm text-blue-700 dark:text-blue-300">
                     Below is a list of all usenet groups available to be indexed. Click 'Activate' to start indexing a group.
                     Backfill works independently of active.
@@ -53,7 +53,7 @@
                             <div class="flex gap-2">
                                 <div class="relative flex-1">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fa fa-search text-gray-400"></i>
+                                        <i class="fas fa-search text-gray-400"></i>
                                     </div>
                                     <input id="groupname"
                                            type="text"
@@ -85,17 +85,17 @@
                                     id="reset-selected-btn"
                                     @click="handleAction('show-reset-selected-modal')"
                                     class="hidden px-3 py-2 bg-orange-600 dark:bg-orange-700 text-white text-sm rounded-lg hover:bg-orange-700 dark:hover:bg-orange-600">
-                                <i class="fa fa-refresh mr-1"></i> Reset Selected
+                                <i class="fas fa-refresh mr-1"></i> Reset Selected
                             </button>
                             <button type="button"
                                     @click="handleAction('show-reset-modal')"
                                     class="px-3 py-2 bg-yellow-600 text-white text-sm rounded-lg hover:bg-yellow-700">
-                                <i class="fa fa-refresh mr-1"></i> Reset All
+                                <i class="fas fa-refresh mr-1"></i> Reset All
                             </button>
                             <button type="button"
                                     @click="handleAction('show-purge-modal')"
                                     class="px-3 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-lg hover:bg-red-700">
-                                <i class="fa fa-trash mr-1"></i> Purge All
+                                <i class="fas fa-trash mr-1"></i> Purge All
                             </button>
                         </div>
                     </div>
@@ -161,13 +161,13 @@
                                         <button type="button"
                                                 @click="handleAction('toggle-group-status', '{{ $group->id }}', '0')"
                                                 class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 hover:bg-green-200">
-                                            <i class="fa fa-check-circle mr-1"></i>Active
+                                            <i class="fas fa-check-circle mr-1"></i>Active
                                         </button>
                                     @else
                                         <button type="button"
                                                 @click="handleAction('toggle-group-status', '{{ $group->id }}', '1')"
                                                 class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200">
-                                            <i class="fa fa-times-circle mr-1"></i>Inactive
+                                            <i class="fas fa-times-circle mr-1"></i>Inactive
                                         </button>
                                     @endif
                                 </td>
@@ -176,13 +176,13 @@
                                         <button type="button"
                                                 @click="handleAction('toggle-backfill', '{{ $group->id }}', '0')"
                                                 class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 hover:bg-blue-200">
-                                            <i class="fa fa-check-circle mr-1"></i>Enabled
+                                            <i class="fas fa-check-circle mr-1"></i>Enabled
                                         </button>
                                     @else
                                         <button type="button"
                                                 @click="handleAction('toggle-backfill', '{{ $group->id }}', '1')"
                                                 class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200">
-                                            <i class="fa fa-times-circle mr-1"></i>Disabled
+                                            <i class="fas fa-times-circle mr-1"></i>Disabled
                                         </button>
                                     @endif
                                 </td>
@@ -219,25 +219,25 @@
                                         <a href="{{ url('/admin/group-edit?id=' . $group->id) }}"
                                            class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
                                            title="Edit this group">
-                                            <i class="fa fa-pencil"></i>
+                                            <i class="fas fa-pencil"></i>
                                         </a>
                                         <button type="button"
                                                 @click="handleAction('reset-group', '{{ $group->id }}')"
                                                 class="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300"
                                                 title="Reset this group">
-                                            <i class="fa fa-refresh"></i>
+                                            <i class="fas fa-refresh"></i>
                                         </button>
                                         <button type="button"
                                                 @click="handleAction('delete-group', '{{ $group->id }}')"
                                                 class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                                                 title="Delete this group">
-                                            <i class="fa fa-trash"></i>
+                                            <i class="fas fa-trash"></i>
                                         </button>
                                         <button type="button"
                                                 @click="handleAction('purge-group', '{{ $group->id }}')"
                                                 class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                                                 title="Purge this group">
-                                            <i class="fa fa-eraser"></i>
+                                            <i class="fas fa-eraser"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -260,11 +260,11 @@
             </div>
         @else
             <div class="px-6 py-12 text-center">
-                <i class="fa fa-exclamation-triangle text-gray-400 text-5xl mb-4"></i>
+                <i class="fas fa-exclamation-triangle text-gray-400 text-5xl mb-4"></i>
                 <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No groups available</h3>
                 <p class="text-gray-500 mb-4">No groups have been added yet.</p>
                 <a href="{{ url('/admin/group-bulk') }}" class="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700">
-                    <i class="fa fa-plus-circle mr-2"></i>Add Groups
+                    <i class="fas fa-plus-circle mr-2"></i>Add Groups
                 </a>
             </div>
         @endif
@@ -285,7 +285,7 @@
         <div class="mt-3">
             <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Confirm Reset All Groups</h3>
             <p class="text-sm text-red-600 dark:text-red-400 mb-2">
-                <i class="fa fa-exclamation-triangle mr-2"></i>Are you sure you want to reset all groups?
+                <i class="fas fa-exclamation-triangle mr-2"></i>Are you sure you want to reset all groups?
             </p>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 This will reset the article pointers for all groups back to their current state.
@@ -321,7 +321,7 @@
         <div class="mt-3">
             <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Confirm Purge All Groups</h3>
             <p class="text-sm text-red-600 dark:text-red-400 mb-2">
-                <i class="fa fa-exclamation-triangle mr-2"></i>Are you sure you want to purge all groups?
+                <i class="fas fa-exclamation-triangle mr-2"></i>Are you sure you want to purge all groups?
             </p>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 This will delete all releases and binaries for all groups. This action cannot be undone!
@@ -357,7 +357,7 @@
         <div class="mt-3">
             <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Confirm Reset Selected Groups</h3>
             <p class="text-sm text-orange-600 dark:text-orange-400 mb-2">
-                <i class="fa fa-exclamation-triangle mr-2"></i>Are you sure you want to reset <span x-text="selectedGroupNames.length">0</span> selected group(s)?
+                <i class="fas fa-exclamation-triangle mr-2"></i>Are you sure you want to reset <span x-text="selectedGroupNames.length">0</span> selected group(s)?
             </p>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 This will reset the article pointers for the selected groups back to their current state.

@@ -66,17 +66,25 @@
 
             <!-- Page Content - Scrollable Area -->
             <main class="flex-1 overflow-y-auto p-6 rounded-xl shadow-inner ring-1 ring-black/10 dark:ring-white/5" data-scroll-container>
-                @if(session('success'))
-                    <div class="mb-4 p-4 bg-green-50 dark:bg-green-900 border-l-4 border-green-500 dark:border-green-600 text-green-800 dark:text-green-200 rounded">
-                        <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
-                    </div>
-                @endif
+                @unless(trim($__env->yieldContent('suppress_layout_flash')))
+                    @if(session('success'))
+                        <div class="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 dark:border-green-600 text-green-800 dark:text-green-200 rounded">
+                            <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
+                        </div>
+                    @endif
 
-                @if(session('error'))
-                    <div class="mb-4 p-4 bg-red-50 dark:bg-red-900 border-l-4 border-red-500 dark:border-red-600 text-red-800 dark:text-red-200 rounded">
-                        <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
-                    </div>
-                @endif
+                    @if(session('error'))
+                        <div class="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-600 text-red-800 dark:text-red-200 rounded">
+                            <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
+                        </div>
+                    @endif
+
+                    @if(session('warning'))
+                        <div class="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 dark:border-yellow-600 text-yellow-800 dark:text-yellow-200 rounded">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>{{ session('warning') }}
+                        </div>
+                    @endif
+                @endunless
 
                 @yield('content')
             </main>

@@ -1,16 +1,16 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div class="space-y-6">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
-                    <i class="fa fa-edit mr-2"></i>{{ $title ?? 'Group Edit' }}
+                    <i class="fas fa-edit mr-2"></i>{{ $title ?? 'Group Edit' }}
                 </h1>
                 <a href="{{ url('/admin/group-list') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200">
-                    <i class="fa fa-arrow-left mr-2"></i>Back to Groups
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Groups
                 </a>
             </div>
         </div>
@@ -19,7 +19,7 @@
         @if(isset($error) && $error != '')
             <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 rounded-lg">
                 <div class="flex">
-                    <i class="fa fa-exclamation-circle text-red-500 dark:text-red-400 mr-3"></i>
+                    <i class="fas fa-exclamation-circle text-red-500 dark:text-red-400 mr-3"></i>
                     <p class="text-red-800 dark:text-red-300">{{ $error }}</p>
                 </div>
             </div>
@@ -37,7 +37,7 @@
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fa fa-users text-gray-400"></i>
+                        <i class="fas fa-users text-gray-400"></i>
                     </div>
                     <input type="text"
                            id="name"
@@ -57,7 +57,7 @@
                 </label>
                 <div class="relative">
                     <div class="absolute top-3 left-3 pointer-events-none">
-                        <i class="fa fa-align-left text-gray-400"></i>
+                        <i class="fas fa-align-left text-gray-400"></i>
                     </div>
                     <textarea id="description"
                               name="description"
@@ -76,7 +76,7 @@
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fa fa-calendar text-gray-400"></i>
+                        <i class="fas fa-calendar text-gray-400"></i>
                     </div>
                     <input type="number"
                            id="backfill_target"
@@ -96,7 +96,7 @@
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fa fa-file text-gray-400"></i>
+                        <i class="fas fa-file text-gray-400"></i>
                     </div>
                     <input type="number"
                            id="minfilestoformrelease"
@@ -116,7 +116,7 @@
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fa fa-download text-gray-400"></i>
+                        <i class="fas fa-download text-gray-400"></i>
                     </div>
                     <input type="number"
                            id="minsizetoformrelease"
@@ -136,7 +136,7 @@
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fa fa-angle-double-left text-gray-400"></i>
+                        <i class="fas fa-angle-double-left text-gray-400"></i>
                     </div>
                     <input type="number"
                            id="first_record"
@@ -156,7 +156,7 @@
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fa fa-angle-double-right text-gray-400"></i>
+                        <i class="fas fa-angle-double-right text-gray-400"></i>
                     </div>
                     <input type="number"
                            id="last_record"
@@ -232,19 +232,19 @@
                 <div class="flex gap-2">
                     <a href="{{ url('/admin/group-list') }}"
                             class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
-                        <i class="fa fa-times mr-2"></i>Cancel
+                        <i class="fas fa-times mr-2"></i>Cancel
                     </a>
                     <button type="button"
                             data-action="reset-group"
                             data-group-id="{{ $group['id'] ?? '' }}"
                             class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700">
-                        <i class="fa fa-refresh mr-2"></i>Reset Group
+                        <i class="fas fa-refresh mr-2"></i>Reset Group
                     </button>
                 </div>
                 <button type="submit"
                         form="groupForm"
                         class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600">
-                    <i class="fa fa-save mr-2"></i>Save Changes
+                    <i class="fas fa-save mr-2"></i>Save Changes
                 </button>
             </div>
         </div>

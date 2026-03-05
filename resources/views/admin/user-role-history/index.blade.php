@@ -1,13 +1,13 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div class="space-y-6">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                    <i class="fa fa-history mr-2"></i>{{ $title }}
+                    <i class="fas fa-history mr-2"></i>{{ $title }}
                 </h1>
             </div>
         </div>
@@ -65,7 +65,7 @@
                     </div>
                     <div class="flex items-end">
                         <button type="submit" class="w-full px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800">
-                            <i class="fa fa-search mr-2"></i>Filter
+                            <i class="fas fa-search mr-2"></i>Filter
                         </button>
                     </div>
                 </div>
@@ -178,12 +178,12 @@
                                         <a href="{{ url('admin/user-edit?id=' . $record->user_id) }}"
                                            class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
                                            title="Edit User">
-                                            <i class="fa fa-edit"></i>
+                                            <i class="fas fa-edit"></i>
                                         </a>
                                         <a href="{{ url('admin/user-role-history/' . $record->user_id) }}"
                                            class="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300"
                                            title="View User's History">
-                                            <i class="fa fa-history"></i>
+                                            <i class="fas fa-history"></i>
                                         </a>
                                     @endif
                                 </div>
@@ -192,7 +192,7 @@
                     @empty
                         <tr>
                             <td colspan="10" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                                <i class="fa fa-info-circle mr-2"></i>No role history records found
+                                <i class="fas fa-info-circle mr-2"></i>No role history records found
                             </td>
                         </tr>
                     @endforelse

@@ -1,22 +1,22 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div class="space-y-6">
     <!-- Header -->
     <div class="mb-6">
         <div class="flex justify-between items-center">
             <div>
                 <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-200">
-                    <i class="fa fa-chart-line mr-2"></i>{{ $promotion->name }} - Statistics
+                    <i class="fas fa-chart-line mr-2"></i>{{ $promotion->name }} - Statistics
                 </h1>
                 <p class="text-gray-600 dark:text-gray-400 mt-1">Detailed statistics for this promotion</p>
             </div>
             <div class="flex gap-2">
                 <a href="{{ route('admin.promotions.statistics') }}" class="px-4 py-2 bg-purple-600 dark:bg-purple-700 text-white rounded-lg hover:bg-purple-700">
-                    <i class="fa fa-chart-bar mr-2"></i>All Statistics
+                    <i class="fas fa-chart-bar mr-2"></i>All Statistics
                 </a>
                 <a href="{{ route('admin.promotions.index') }}" class="px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700">
-                    <i class="fa fa-arrow-left mr-2"></i>Back to Promotions
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Promotions
                 </a>
             </div>
         </div>
@@ -29,11 +29,11 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400">Status</p>
                 @if($promotion->is_active && $promotion->isCurrentlyActive())
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                        <i class="fa fa-check-circle mr-2"></i>Active
+                        <i class="fas fa-check-circle mr-2"></i>Active
                     </span>
                 @else
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                        <i class="fa fa-pause-circle mr-2"></i>Inactive
+                        <i class="fas fa-pause-circle mr-2"></i>Inactive
                     </span>
                 @endif
             </div>
@@ -83,7 +83,7 @@
                 </div>
                 <div>
                     <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        <i class="fa fa-filter mr-2"></i>Apply
+                        <i class="fas fa-filter mr-2"></i>Apply
                     </button>
                 </div>
             </div>
@@ -95,7 +95,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-blue-100 dark:bg-blue-900 rounded-full p-3">
-                    <i class="fa fa-arrow-up text-2xl text-blue-600 dark:text-blue-400"></i>
+                    <i class="fas fa-arrow-up text-2xl text-blue-600 dark:text-blue-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Total Upgrades</p>
@@ -107,7 +107,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-green-100 dark:bg-green-900 rounded-full p-3">
-                    <i class="fa fa-users text-2xl text-green-600 dark:text-green-400"></i>
+                    <i class="fas fa-users text-2xl text-green-600 dark:text-green-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Unique Users</p>
@@ -119,7 +119,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-purple-100 dark:bg-purple-900 rounded-full p-3">
-                    <i class="fa fa-calendar-plus text-2xl text-purple-600 dark:text-purple-400"></i>
+                    <i class="fas fa-calendar-plus text-2xl text-purple-600 dark:text-purple-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Total Days Added</p>
@@ -131,7 +131,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-yellow-100 dark:bg-yellow-900 rounded-full p-3">
-                    <i class="fa fa-user-tag text-2xl text-yellow-600 dark:text-yellow-400"></i>
+                    <i class="fas fa-user-tag text-2xl text-yellow-600 dark:text-yellow-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Roles Affected</p>
@@ -146,17 +146,17 @@
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm mb-6">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                <i class="fa fa-user-tag mr-2"></i>Statistics by Role
+                <i class="fas fa-user-tag mr-2"></i>Statistics by Role
             </h2>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Role</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total Upgrades</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Unique Users</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total Days Added</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Upgrades</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Unique Users</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Days Added</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -189,7 +189,7 @@
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm mb-6">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                <i class="fa fa-chart-area mr-2"></i>Daily Activity
+                <i class="fas fa-chart-area mr-2"></i>Daily Activity
             </h2>
         </div>
         <div class="p-6">
@@ -228,19 +228,19 @@
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                <i class="fa fa-list mr-2"></i>Recent Applications
+                <i class="fas fa-list mr-2"></i>Recent Applications
             </h2>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-900">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">User</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Role</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Days Added</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Previous Expiry</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">New Expiry</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Applied At</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">User</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Days Added</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Previous Expiry</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">New Expiry</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Applied At</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">

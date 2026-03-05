@@ -1,17 +1,17 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
+<div class="space-y-6">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                    <i class="fa fa-user mr-2"></i>{{ $title }}
+                    <i class="fas fa-user mr-2"></i>{{ $title }}
                 </h1>
                 @if(!empty($user['id']))
                     <a href="{{ url('admin/user-role-history/' . $user['id']) }}" class="px-4 py-2 bg-purple-600 dark:bg-purple-700 text-white rounded-lg hover:bg-purple-700 dark:hover:bg-purple-800">
-                        <i class="fa fa-history mr-2"></i>View Role History
+                        <i class="fas fa-history mr-2"></i>View Role History
                     </a>
                 @endif
             </div>
@@ -21,7 +21,7 @@
         @if(!empty($error))
             <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg">
                 <p class="text-red-800 dark:text-red-200">
-                    <i class="fa fa-exclamation-circle mr-2"></i>{{ $error }}
+                    <i class="fas fa-exclamation-circle mr-2"></i>{{ $error }}
                 </p>
             </div>
         @endif
@@ -74,7 +74,7 @@
                                @if(empty($user['id'])) required @endif
                                class="w-full px-3 py-2 pr-12 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500">
                         <button type="button" class="password-toggle-btn absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-field-id="password">
-                            <i class="fa fa-eye" id="password-eye"></i>
+                            <i class="fas fa-eye" id="password-eye"></i>
                         </button>
                     </div>
                     @if(!empty($user['id']))
@@ -92,7 +92,7 @@
                             $pendingRole = \Spatie\Permission\Models\Role::find($user->pending_roles_id);
                         @endphp
                         <div class="mb-2 p-2 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 rounded text-sm text-blue-800 dark:text-blue-200 flex items-center">
-                            <i class="fa fa-info-circle mr-2"></i>
+                            <i class="fas fa-info-circle mr-2"></i>
                             <span><strong>Note:</strong> This user has a pending role change to <strong>{{ $pendingRole->name ?? 'Unknown' }}</strong></span>
                         </div>
                     @endif
@@ -113,7 +113,7 @@
                 <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-linear-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
                     <div class="flex items-center justify-between mb-3">
                         <label for="rolechangedate" class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
-                            <i class="fa fa-calendar-alt mr-2 text-blue-600 dark:text-blue-400"></i>
+                            <i class="fas fa-calendar-alt mr-2 text-blue-600 dark:text-blue-400"></i>
                             Role Expiry Date
                         </label>
                         @if(!empty($user->rolechangedate ?? ''))
@@ -126,24 +126,24 @@
                             @endphp
                             @if($isExpired)
                                 <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 animate-pulse">
-                                    <i class="fa fa-exclamation-triangle mr-1"></i> Expired
+                                    <i class="fas fa-exclamation-triangle mr-1"></i> Expired
                                 </span>
                             @elseif($daysUntilExpiry <= 7)
                                 <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
-                                    <i class="fa fa-exclamation-circle mr-1"></i> Expiring Soon
+                                    <i class="fas fa-exclamation-circle mr-1"></i> Expiring Soon
                                 </span>
                             @elseif($daysUntilExpiry <= 30)
                                 <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                                    <i class="fa fa-check-circle mr-1"></i> Active
+                                    <i class="fas fa-check-circle mr-1"></i> Active
                                 </span>
                             @else
                                 <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                    <i class="fa fa-check-circle mr-1"></i> Active
+                                    <i class="fas fa-check-circle mr-1"></i> Active
                                 </span>
                             @endif
                         @else
                             <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
-                                <i class="fa fa-infinity mr-1"></i> No Expiry
+                                <i class="fas fa-infinity mr-1"></i> No Expiry
                             </span>
                         @endif
                     </div>
@@ -159,7 +159,7 @@
                         <!-- Year Selector -->
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                                <i class="fa fa-calendar-alt mr-1"></i>Year
+                                <i class="fas fa-calendar-alt mr-1"></i>Year
                             </label>
                             <select id="expiry_year"
                                     class="w-full px-2 py-3 text-lg font-semibold bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500">
@@ -173,7 +173,7 @@
                         <!-- Month Selector -->
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                                <i class="fa fa-calendar mr-1"></i>Month
+                                <i class="fas fa-calendar mr-1"></i>Month
                             </label>
                             <select id="expiry_month"
                                     class="w-full px-2 py-3 text-lg font-semibold bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500">
@@ -196,7 +196,7 @@
                         <!-- Day Selector -->
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                                <i class="fa fa-calendar-day mr-1"></i>Day
+                                <i class="fas fa-calendar-day mr-1"></i>Day
                             </label>
                             <select id="expiry_day"
                                     class="w-full px-2 py-3 text-lg font-semibold bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500">
@@ -210,7 +210,7 @@
                         <!-- Hour Selector -->
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                                <i class="fa fa-clock mr-1"></i>Hour
+                                <i class="fas fa-clock mr-1"></i>Hour
                             </label>
                             <select id="expiry_hour"
                                     class="w-full px-2 py-3 text-lg font-semibold bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500">
@@ -224,7 +224,7 @@
                         <!-- Minute Selector -->
                         <div>
                             <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                                <i class="fa fa-hourglass-half mr-1"></i>Min
+                                <i class="fas fa-hourglass-half mr-1"></i>Min
                             </label>
                             <select id="expiry_minute"
                                     class="w-full px-2 py-3 text-lg font-semibold bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500">
@@ -240,7 +240,7 @@
                     <div id="datetime_preview" class="mt-3 p-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg hidden">
                         <div class="flex items-center justify-between">
                             <span class="text-sm text-gray-600 dark:text-gray-400">
-                                <i class="fa fa-info-circle mr-2"></i>Selected:
+                                <i class="fas fa-info-circle mr-2"></i>Selected:
                             </span>
                             <span id="datetime_display" class="text-base font-bold text-blue-600 dark:text-blue-400"></span>
                         </div>
@@ -250,39 +250,39 @@
                     <div class="mt-3 space-y-2">
                         <div class="flex flex-wrap gap-2">
                             <button type="button" data-expiry-action="set" data-days="1" data-hours="0" class="px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all hover:scale-105">
-                                <i class="fa fa-clock mr-1"></i> +1 Day
+                                <i class="fas fa-clock mr-1"></i> +1 Day
                             </button>
                             <button type="button" data-expiry-action="set" data-days="7" data-hours="0" class="px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all hover:scale-105">
-                                <i class="fa fa-calendar-week mr-1"></i> +1 Week
+                                <i class="fas fa-calendar-week mr-1"></i> +1 Week
                             </button>
                             <button type="button" data-expiry-action="set" data-days="30" data-hours="0" class="px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all hover:scale-105">
-                                <i class="fa fa-calendar-alt mr-1"></i> +1 Month
+                                <i class="fas fa-calendar-alt mr-1"></i> +1 Month
                             </button>
                             <button type="button" data-expiry-action="set" data-days="90" data-hours="0" class="px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all hover:scale-105">
-                                <i class="fa fa-calendar mr-1"></i> +3 Months
+                                <i class="fas fa-calendar mr-1"></i> +3 Months
                             </button>
                             <button type="button" data-expiry-action="set" data-days="365" data-hours="0" class="px-3 py-1.5 text-xs font-medium text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800 rounded-md hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-all hover:scale-105">
-                                <i class="fa fa-calendar-check mr-1"></i> +1 Year
+                                <i class="fas fa-calendar-check mr-1"></i> +1 Year
                             </button>
                         </div>
                         <div class="flex flex-wrap gap-2">
                             <button type="button" data-expiry-action="set" data-days="0" data-hours="1" class="px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-md hover:bg-green-100 dark:hover:bg-green-900/50 transition-all hover:scale-105">
-                                <i class="fa fa-hourglass-start mr-1"></i> +1 Hour
+                                <i class="fas fa-hourglass-start mr-1"></i> +1 Hour
                             </button>
                             <button type="button" data-expiry-action="set" data-days="0" data-hours="6" class="px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-md hover:bg-green-100 dark:hover:bg-green-900/50 transition-all hover:scale-105">
-                                <i class="fa fa-hourglass-half mr-1"></i> +6 Hours
+                                <i class="fas fa-hourglass-half mr-1"></i> +6 Hours
                             </button>
                             <button type="button" data-expiry-action="set" data-days="0" data-hours="12" class="px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-md hover:bg-green-100 dark:hover:bg-green-900/50 transition-all hover:scale-105">
-                                <i class="fa fa-hourglass-end mr-1"></i> +12 Hours
+                                <i class="fas fa-hourglass-end mr-1"></i> +12 Hours
                             </button>
                             <button type="button" data-expiry-action="set" data-days="0" data-hours="24" class="px-3 py-1.5 text-xs font-medium text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-md hover:bg-green-100 dark:hover:bg-green-900/50 transition-all hover:scale-105">
-                                <i class="fa fa-clock mr-1"></i> +24 Hours
+                                <i class="fas fa-clock mr-1"></i> +24 Hours
                             </button>
                             <button type="button" data-expiry-action="end-of-day" class="px-3 py-1.5 text-xs font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 rounded-md hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-all hover:scale-105">
-                                <i class="fa fa-moon mr-1"></i> End of Today
+                                <i class="fas fa-moon mr-1"></i> End of Today
                             </button>
                             <button type="button" data-expiry-action="clear" class="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-all hover:scale-105">
-                                <i class="fa fa-times-circle mr-1"></i> Clear
+                                <i class="fas fa-times-circle mr-1"></i> Clear
                             </button>
                         </div>
                     </div>
@@ -301,13 +301,13 @@
                                         @endif
                                     </p>
                                     <p class="text-xs {{ $isExpired ? 'text-red-700 dark:text-red-300' : ($daysUntilExpiry <= 7 ? 'text-yellow-700 dark:text-yellow-300' : 'text-blue-700 dark:text-blue-300') }} mt-1">
-                                        <i class="fa fa-calendar-alt mr-1"></i>{{ $expiryDate->format('F j, Y') }}
+                                        <i class="fas fa-calendar-alt mr-1"></i>{{ $expiryDate->format('F j, Y') }}
                                         <span class="mx-2">•</span>
-                                        <i class="fa fa-clock mr-1"></i>{{ $expiryDate->format('g:i A') }}
+                                        <i class="fas fa-clock mr-1"></i>{{ $expiryDate->format('g:i A') }}
                                     </p>
                                     @if($daysUntilExpiry <= 7 && !$isExpired)
                                         <p class="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
-                                            <i class="fa fa-hourglass-half mr-1"></i>{{ $daysUntilExpiry }} day{{ $daysUntilExpiry != 1 ? 's' : '' }} and {{ $hoursUntilExpiry }} hour{{ $hoursUntilExpiry != 1 ? 's' : '' }} remaining
+                                            <i class="fas fa-hourglass-half mr-1"></i>{{ $daysUntilExpiry }} day{{ $daysUntilExpiry != 1 ? 's' : '' }} and {{ $hoursUntilExpiry }} hour{{ $hoursUntilExpiry != 1 ? 's' : '' }} remaining
                                         </p>
                                     @endif
                                 </div>
@@ -315,7 +315,7 @@
                         </div>
                     @else
                         <p class="mt-3 text-xs text-gray-600 dark:text-gray-400 flex items-center">
-                            <i class="fa fa-lightbulb mr-1.5 text-yellow-500"></i>
+                            <i class="fas fa-lightbulb mr-1.5 text-yellow-500"></i>
                             <span>Leave empty for permanent role assignment, or use quick actions above to set an expiry date and time.</span>
                         </p>
                     @endif
@@ -330,12 +330,12 @@
                         <div class="border-2 border-blue-300 dark:border-blue-600 rounded-lg p-4 bg-linear-to-br from-blue-50 via-blue-50 to-white dark:from-blue-900/30 dark:via-blue-900/20 dark:to-gray-800 shadow-md">
                             <div class="flex items-center justify-between mb-3">
                                 <label class="text-sm font-semibold text-blue-700 dark:text-blue-300 flex items-center">
-                                    <i class="fa fa-layer-group mr-2 text-lg"></i>
+                                    <i class="fas fa-layer-group mr-2 text-lg"></i>
                                     Pending Stacked Role{{ $allPendingRoles->count() > 1 ? 's' : '' }}
                                     <span class="ml-2 px-2 py-0.5 bg-blue-600 text-white text-xs rounded-full">{{ $allPendingRoles->count() }}</span>
                                 </label>
                                 <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-bold rounded-full bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-100 animate-pulse">
-                                    <i class="fa fa-clock mr-1"></i> SCHEDULED
+                                    <i class="fas fa-clock mr-1"></i> SCHEDULED
                                 </span>
                             </div>
 
@@ -351,14 +351,14 @@
                                         <div class="ml-8 space-y-1 text-sm">
                                             <div class="flex items-center justify-between">
                                                 <span class="text-xs font-medium text-gray-600 dark:text-gray-300">
-                                                    <i class="fa fa-play-circle text-green-500 mr-1"></i>Starts:
+                                                    <i class="fas fa-play-circle text-green-500 mr-1"></i>Starts:
                                                 </span>
                                                 <span class="font-semibold text-gray-900 dark:text-gray-100">{{ $pendingRoleInfo['start_date']->format('M j, Y g:i A') }}</span>
                                             </div>
                                             @if($pendingRoleInfo['end_date'])
                                                 <div class="flex items-center justify-between">
                                                     <span class="text-xs font-medium text-gray-600 dark:text-gray-300">
-                                                        <i class="fa fa-stop-circle text-red-400 mr-1"></i>Ends:
+                                                        <i class="fas fa-stop-circle text-red-400 mr-1"></i>Ends:
                                                     </span>
                                                     <span class="font-semibold text-gray-900 dark:text-gray-100">{{ $pendingRoleInfo['end_date']->format('M j, Y g:i A') }}</span>
                                                 </div>
@@ -374,7 +374,7 @@
 
                             <div class="flex items-center justify-between mt-3">
                                 <p class="text-xs text-blue-700 dark:text-blue-300">
-                                    <i class="fa fa-info-circle mr-1"></i>
+                                    <i class="fas fa-info-circle mr-1"></i>
                                     These roles will automatically activate in sequence as each previous role expires
                                 </p>
                                 @if(!empty($user->pending_roles_id))
@@ -391,11 +391,11 @@
                         <div class="border-2 border-blue-300 dark:border-blue-600 rounded-lg p-4 bg-linear-to-br from-blue-50 via-blue-50 to-white dark:from-blue-900/30 dark:via-blue-900/20 dark:to-gray-800 shadow-md">
                             <div class="flex items-center justify-between mb-3">
                                 <label class="text-sm font-semibold text-blue-700 dark:text-blue-300 flex items-center">
-                                    <i class="fa fa-layer-group mr-2 text-lg"></i>
+                                    <i class="fas fa-layer-group mr-2 text-lg"></i>
                                     Pending Stacked Role
                                 </label>
                                 <span class="px-3 py-1 inline-flex items-center text-xs leading-5 font-bold rounded-full bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-100 animate-pulse">
-                                    <i class="fa fa-clock mr-1"></i> SCHEDULED
+                                    <i class="fas fa-clock mr-1"></i> SCHEDULED
                                 </span>
                             </div>
 
@@ -422,7 +422,7 @@
 
                             <div class="flex items-center justify-between">
                                 <p class="text-xs text-blue-700 dark:text-blue-300">
-                                    <i class="fa fa-info-circle mr-1"></i>
+                                    <i class="fas fa-info-circle mr-1"></i>
                                     This role will automatically activate when the current role expires
                                 </p>
                                 <label class="inline-flex items-center px-3 py-2 rounded-md bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 hover:bg-red-100 dark:hover:bg-red-900/50 cursor-pointer transition-all">
@@ -443,7 +443,7 @@
                                    class="rounded border-gray-300 dark:border-gray-500 text-purple-600 dark:text-purple-500 shadow-sm focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-purple-500 dark:focus:border-purple-400 bg-white dark:bg-gray-700">
                             <div class="ml-3 flex-1">
                                 <span class="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors">
-                                    <i class="fa fa-layer-group mr-1 text-purple-600 dark:text-purple-400"></i>
+                                    <i class="fas fa-layer-group mr-1 text-purple-600 dark:text-purple-400"></i>
                                     Stack role changes
                                 </span>
                                 <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">
@@ -467,14 +467,14 @@
                                disabled
                                class="w-full px-3 py-2 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-md cursor-not-allowed opacity-75">
                         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            <i class="fa fa-info-circle mr-1"></i>Total grabs is read-only and automatically tracked
+                            <i class="fas fa-info-circle mr-1"></i>Total grabs is read-only and automatically tracked
                         </p>
                     </div>
 
                     <!-- Daily Activity Stats -->
                     <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-linear-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
                         <div class="flex items-center mb-3">
-                            <i class="fa fa-chart-line mr-2 text-purple-600 dark:text-purple-400"></i>
+                            <i class="fas fa-chart-line mr-2 text-purple-600 dark:text-purple-400"></i>
                             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Daily Activity (Last 24 Hours)
                             </label>
@@ -485,18 +485,18 @@
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <p class="text-xs text-blue-600 dark:text-blue-400 font-medium uppercase tracking-wide">
-                                            <i class="fa fa-code mr-1"></i>API Requests
+                                            <i class="fas fa-code mr-1"></i>API Requests
                                         </p>
                                         <p class="text-2xl font-bold text-blue-900 dark:text-blue-100 mt-1">
                                             {{ is_array($user) ? ($user['daily_api_count'] ?? 0) : ($user->daily_api_count ?? 0) }}
                                         </p>
                                     </div>
                                     <div class="text-blue-600 dark:text-blue-400">
-                                        <i class="fa fa-code text-3xl opacity-20"></i>
+                                        <i class="fas fa-code text-3xl opacity-20"></i>
                                     </div>
                                 </div>
                                 <p class="text-xs text-blue-600 dark:text-blue-400 mt-2">
-                                    <i class="fa fa-clock mr-1"></i>In the last 24 hours
+                                    <i class="fas fa-clock mr-1"></i>In the last 24 hours
                                 </p>
                             </div>
 
@@ -505,23 +505,23 @@
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <p class="text-xs text-green-600 dark:text-green-400 font-medium uppercase tracking-wide">
-                                            <i class="fa fa-download mr-1"></i>Downloads
+                                            <i class="fas fa-download mr-1"></i>Downloads
                                         </p>
                                         <p class="text-2xl font-bold text-green-900 dark:text-green-100 mt-1">
                                             {{ is_array($user) ? ($user['daily_download_count'] ?? 0) : ($user->daily_download_count ?? 0) }}
                                         </p>
                                     </div>
                                     <div class="text-green-600 dark:text-green-400">
-                                        <i class="fa fa-download text-3xl opacity-20"></i>
+                                        <i class="fas fa-download text-3xl opacity-20"></i>
                                     </div>
                                 </div>
                                 <p class="text-xs text-green-600 dark:text-green-400 mt-2">
-                                    <i class="fa fa-clock mr-1"></i>In the last 24 hours
+                                    <i class="fas fa-clock mr-1"></i>In the last 24 hours
                                 </p>
                             </div>
                         </div>
                         <p class="mt-3 text-xs text-gray-600 dark:text-gray-400 flex items-center">
-                            <i class="fa fa-info-circle mr-1.5 text-blue-500"></i>
+                            <i class="fas fa-info-circle mr-1.5 text-blue-500"></i>
                             <span>These counters show activity from the past 24 hours and are automatically updated.</span>
                         </p>
                     </div>
@@ -609,10 +609,10 @@
                 <!-- Action Buttons -->
                 <div class="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
-                        <i class="fa fa-save mr-2"></i>Save User
+                        <i class="fas fa-save mr-2"></i>Save User
                     </button>
                     <a href="{{ url('admin/user-list') }}" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
-                        <i class="fa fa-times mr-2"></i>Cancel
+                        <i class="fas fa-times mr-2"></i>Cancel
                     </a>
                 </div>
             </div>
