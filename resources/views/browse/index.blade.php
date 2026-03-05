@@ -41,7 +41,7 @@
                             <x-view-toggle
                                 current-view="list"
                                 :covgroup="$covgroup ?? null"
-                                :category="$category ?? null"
+                                :category="$catname ?? 'All'"
                                 :parentcat="$parentcat ?? null"
                                 :shows="$shows ?? false"
                             />

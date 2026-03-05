@@ -6,10 +6,16 @@
 
 @section('content')
 <div class="surface-panel rounded-xl shadow-sm" x-data="moviesPage" data-movie-layout="{{ $movie_layout ?? 2 }}">
-    <x-breadcrumb :items="[
-        ['label' => 'Home', 'url' => url($site['home_link'] ?? '/'), 'icon' => 'fas fa-home'],
-        ['label' => 'Movies'],
-    ]" />
+    @php
+        $movieCrumbs = [
+            ['label' => 'Home', 'url' => url($site['home_link'] ?? '/'), 'icon' => 'fas fa-home'],
+            ['label' => 'Movies', 'url' => !empty($categorytitle) ? route('Movies') : null],
+        ];
+        if (!empty($categorytitle)) {
+            $movieCrumbs[] = ['label' => $categorytitle];
+        }
+    @endphp
+    <x-breadcrumb :items="$movieCrumbs" />
 
     {{-- Movies Filter Section --}}
     <div class="px-6 py-5 surface-panel-alt border-b">
@@ -21,7 +27,7 @@
                 <x-view-toggle
                     current-view="covers"
                     covgroup="movies"
-                    category="All"
+                    :category="$categorytitle ?: 'All'"
                     parentcat="Movies"
                     :shows="false"
                 />
