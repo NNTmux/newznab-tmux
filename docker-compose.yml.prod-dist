@@ -11,62 +11,61 @@ services:
         environment:
             TZ: ${APP_TIMEZONE}
         healthcheck:
-          test: [ "CMD", "curl", "-f", "http://localhost:${APP_PORT:-80}" ]
-          interval: 10s
-          timeout: 5s
-          retries: 5
+            test: ["CMD", "curl", "-f", "http://localhost:${APP_PORT:-80}"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 30s
         env_file:
-          - .env
+            - .env
         volumes:
-          - 'install:/app/_install'
-          - 'storage:/app/storage'
-#          - 'resources:/var/www/html/resources'
+            - 'install:/app/_install'
+            - 'storage:/app/storage'
         networks:
             - nntmux
         depends_on:
-            - mariadb
-            - redis
-            - mailpit
-            - elasticsearch
-            - manticore
+            mariadb:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
     worker:
-      command: >
-        sh -c "php artisan tmux-ui:start & php artisan horizon"
-      image: pyrowman/nntmux
-      extra_hosts:
-        - 'host.docker.internal:host-gateway'
-      tty: true
-      environment:
-        TZ: ${APP_TIMEZONE}
-      env_file:
-        - .env
-      volumes:
-        - 'install:/app/_install'
-        - 'storage:/app/storage'
-      networks:
-        - nntmux
-      depends_on:
-        webapp:
-          condition: service_healthy
+        command: >
+            sh -c "php artisan tmux-ui:start & php artisan horizon"
+        image: pyrowman/nntmux
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        tty: true
+        environment:
+            TZ: ${APP_TIMEZONE}
+        env_file:
+            - .env
+        volumes:
+            - 'install:/app/_install'
+            - 'storage:/app/storage'
+        networks:
+            - nntmux
+        depends_on:
+            webapp:
+                condition: service_healthy
     scheduler:
-      image: pyrowman/nntmux
-      extra_hosts:
-        - 'host.docker.internal:host-gateway'
-      tty: true
-      env_file:
-        - .env
-      environment:
-        TZ: ${APP_TIMEZONE}
-      volumes:
-        - 'install:/app/_install'
-        - 'storage:/app/storage'
-      networks:
-        - nntmux
-      depends_on:
-        webapp:
-          condition: service_healthy
-      command: >
-        sh -c "while [ true ]; do php artisan schedule:run; sleep 60;done"
+        image: pyrowman/nntmux
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        tty: true
+        env_file:
+            - .env
+        environment:
+            TZ: ${APP_TIMEZONE}
+        volumes:
+            - 'install:/app/_install'
+            - 'storage:/app/storage'
+        networks:
+            - nntmux
+        depends_on:
+            webapp:
+                condition: service_healthy
+        command: >
+            sh -c "while [ true ]; do php artisan schedule:run; sleep 60; done"
     mariadb:
         image: 'mariadb:11'
         ports:
@@ -89,13 +88,11 @@ services:
         networks:
             - nntmux
         healthcheck:
-            test:
-                - CMD
-                - mysqladmin
-                - ping
-                - '-p${DB_PASSWORD}'
+            test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+            interval: 10s
             retries: 3
             timeout: 5s
+            start_period: 15s
     redis:
         image: 'redis:alpine'
         ports:
@@ -108,33 +105,45 @@ services:
             - nntmux
         healthcheck:
             test:
-              - CMD
-              - redis-cli
-              - ping
+                - CMD
+                - redis-cli
+                - ping
             retries: 3
             timeout: 5s
     manticore:
-      image: manticoresearch/manticore
-      environment:
-        TZ: ${APP_TIMEZONE}
-        EXTRA: 1 # Activates extra features
-      restart: always
-      ports:
-        - 9306:9306
-        - 9308:9308
-      ulimits:
-        nproc: 65535
-        nofile:
-          soft: 65535
-          hard: 65535
-        memlock:
-          soft: -1
-          hard: -1
-      volumes:
-        - 'manticore:/var/lib/manticore'
-        - ./config/manticore.conf:/etc/manticoresearch/manticore.conf
-      networks:
-        - nntmux
+        image: manticoresearch/manticore:7.4.6
+        profiles:
+            - manticore
+        environment:
+            TZ: ${APP_TIMEZONE}
+            EXTRA: 1
+        restart: always
+        ports:
+            - 9306:9306
+            - 9308:9308
+        ulimits:
+            nproc: 65535
+            nofile:
+                soft: 65535
+                hard: 65535
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - 'manticore:/var/lib/manticore'
+            - ./config/manticore.conf:/etc/manticoresearch/manticore.conf
+        networks:
+            - nntmux
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-P", "9306"]
+            interval: 15s
+            timeout: 5s
+            retries: 3
+            start_period: 15s
+        deploy:
+            resources:
+                limits:
+                    memory: 1g
     mailpit:
         image: 'axllent/mailpit:latest'
         ports:
@@ -144,6 +153,8 @@ services:
             - nntmux
     elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+        profiles:
+            - elasticsearch
         environment:
             - TZ=${APP_TIMEZONE}
             - discovery.type=single-node
@@ -156,18 +167,24 @@ services:
             - elasticsearch:/usr/share/elasticsearch/data
         networks:
             - nntmux
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health"]
+            interval: 15s
+            timeout: 5s
+            retries: 3
+            start_period: 30s
         deploy:
-          resources:
-            limits:
-              memory: 1g
+            resources:
+                limits:
+                    memory: 1g
 networks:
     nntmux:
         driver: bridge
 volumes:
-  mariadb:
-  redis:
-  elasticsearch:
-  manticore:
-  storage:
-  resources:
-  install:
+    mariadb:
+    redis:
+    elasticsearch:
+    manticore:
+    storage:
+    resources:
+    install:

@@ -1,6 +1,6 @@
 
 FROM composer:latest AS composer-base
-FROM dunglas/frankenphp:1-php8.3
+FROM dunglas/frankenphp:1-php8.4
 LABEL maintainer="PyRowMan"
 ENV SERVER_NAME=:${APP_PORT:-80}
 ARG MYSQL_CLIENT="mariadb-client"
@@ -8,7 +8,7 @@ ARG MYSQL_CLIENT="mariadb-client"
 WORKDIR /app
 
 
-COPY --from=node:21 /usr/local/ /usr/local/
+COPY --from=node:22 /usr/local/ /usr/local/
 COPY --from=composer-base --link /usr/bin/composer /usr/bin/composer
 
 RUN apt update \
@@ -37,7 +37,7 @@ RUN docker-php-ext-install \
  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
-COPY ./docker/8.3/php.ini "$PHP_INI_DIR/conf.d/custom-conf.ini"
+COPY ./docker/8.5/php.ini "$PHP_INI_DIR/conf.d/custom-conf.ini"
 
 COPY --chmod=755 ./docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 
