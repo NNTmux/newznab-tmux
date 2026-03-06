@@ -8,13 +8,17 @@
 <div class="surface-panel rounded-xl shadow-sm transition-colors duration-200">
     @php
         $crumbs = [['label' => 'Home', 'url' => url($site['home_link'] ?? '/'), 'icon' => 'fas fa-home']];
+        $currentCategoryLabel = isset($catname) && is_string($catname) && strtolower($catname) === 'all'
+            ? 'All'
+            : ($catname ?? 'All');
         if (isset($parentcat) && $parentcat != '') {
             $crumbs[] = ['label' => $parentcat, 'url' => url('/browse/' . ($parentcat == 'music' ? 'Audio' : $parentcat))];
             if (isset($catname) && $catname != '' && $catname != 'all') {
                 $crumbs[] = ['label' => $catname];
             }
         } else {
-            $crumbs[] = ['label' => 'Browse / ' . ($catname ?? 'All')];
+            $crumbs[] = ['label' => 'Browse', 'url' => route('All')];
+            $crumbs[] = ['label' => $currentCategoryLabel];
         }
     @endphp
     <x-breadcrumb :items="$crumbs" />

@@ -7,13 +7,12 @@
 @section('content')
 <div class="surface-panel rounded-xl shadow-sm" x-data="moviesPage" data-movie-layout="{{ $movie_layout ?? 2 }}">
     @php
+        $currentMovieCategory = !empty($categorytitle) ? $categorytitle : 'All';
         $movieCrumbs = [
             ['label' => 'Home', 'url' => url($site['home_link'] ?? '/'), 'icon' => 'fas fa-home'],
-            ['label' => 'Movies', 'url' => !empty($categorytitle) ? route('Movies') : null],
+            ['label' => 'Movies', 'url' => $currentMovieCategory !== 'All' ? route('Movies') : null],
+            ['label' => $currentMovieCategory],
         ];
-        if (!empty($categorytitle)) {
-            $movieCrumbs[] = ['label' => $categorytitle];
-        }
     @endphp
     <x-breadcrumb :items="$movieCrumbs" />
 
