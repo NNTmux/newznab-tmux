@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Facades\Search;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -56,6 +57,34 @@ class ReleaseFile extends Model
     public function release(): \Illuminate\Database\Eloquent\Relations\BelongsTo // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
     {
         return $this->belongsTo(Release::class, 'releases_id');
+    }
+
+    /**
+     * Scope to filter release files that look like NFO files.
+     *
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
+    public function scopeNfoFiles(Builder $query): Builder // @phpstan-ignore missingType.generics, return.phpDocType
+    {
+        return $query->where(function (Builder $q) { // @phpstan-ignore missingType.generics
+            $q->where('name', 'like', '%.nfo')
+                ->orWhere('name', 'like', '%.diz')
+                ->orWhere('name', 'like', '%.inf')
+                ->orWhere('name', 'like', '%file\_id.diz')
+                ->orWhere('name', 'like', '%info.txt');
+        });
+    }
+
+    /**
+     * Scope to filter NFO files that have non-zero size (likely contain actual content).
+     *
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
+    public function scopeNfoFilesWithContent(Builder $query): Builder // @phpstan-ignore missingType.generics, return.phpDocType
+    {
+        return $query->nfoFiles()->where('size', '>', 0);
     }
 
     /**

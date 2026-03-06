@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Release;
+use App\Models\ReleaseFile;
 use App\Models\ReleaseNfo;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\NNTP\NNTPService;
 use App\Services\Nzb\NzbContentsService;
+use App\Services\Nzb\NzbParserService;
+use App\Services\Nzb\NzbService;
 use dariusiii\rarinfo\Par2Info;
 use dariusiii\rarinfo\SfvInfo;
 use Illuminate\Support\Facades\Cache;
@@ -134,7 +137,15 @@ class NfoService
      */
     protected bool $echo;
 
+    private string|false $unrarPath;
+
+    private string|false $timeoutPath;
+
+    private int $timeoutSeconds;
+
     public const NFO_FAILED = -9; // We failed to get a NFO after admin set max retries.
+
+    public const NFO_FAILED_ARCHIVE = -10; // Archive-based NFO extraction also failed; no more retries.
 
     public const NFO_UNPROC = -1; // Release has not been processed yet.
 
@@ -176,6 +187,9 @@ class NfoService
         });
 
         $this->tmpPath = rtrim((string) config('nntmux.tmp_unrar_path'), '/\\').'/';
+        $this->unrarPath = config('nntmux_settings.unrar_path') ?: false;
+        $this->timeoutPath = config('nntmux_settings.timeout_path') ?: false;
+        $this->timeoutSeconds = (int) (Settings::settingValue('timeoutseconds') ?: 60);
     }
 
     /**
@@ -493,6 +507,165 @@ class NfoService
     }
 
     /**
+     * Fallback: attempt to extract an NFO from a compressed archive in the NZB
+     * when the direct NZB-subject-based download has failed.
+     *
+     * Uses the release_files table to know which NFO filename to look for,
+     * then downloads a RAR/ZIP from the NZB and extracts it with unrar/unzip.
+     *
+     * When NFO entries exist in release_files but extraction yields no valid
+     * content (e.g. 0-byte file), sets nfostatus to NFO_NONFO to stop retries.
+     *
+     * @return string|false The NFO content, or false on failure
+     */
+    public function attemptNfoFromArchive(string $guid, int $releaseId, NNTPService $nntp): string|false
+    {
+        if ($this->unrarPath === false) {
+            return false;
+        }
+
+        $nfoFiles = ReleaseFile::where('releases_id', $releaseId)
+            ->nfoFiles()
+            ->limit(3)
+            ->pluck('name')
+            ->all();
+
+        if (empty($nfoFiles)) {
+            return false;
+        }
+
+        $hasContentfulNfo = ReleaseFile::where('releases_id', $releaseId)
+            ->nfoFilesWithContent()
+            ->exists();
+
+        if (! $hasContentfulNfo) {
+            Release::whereId($releaseId)->update(['nfostatus' => self::NFO_NONFO]);
+
+            return false;
+        }
+
+        $nzbService = app(NzbService::class);
+        $nzbContents = $nzbService->readNzbContents($guid);
+        if ($nzbContents === false) {
+            return false;
+        }
+
+        $parserService = app(NzbParserService::class);
+        $fileList = $parserService->parseNzbFileList($nzbContents);
+        if (empty($fileList)) {
+            return false;
+        }
+
+        $alternateNntp = (bool) config('nntmux_nntp.use_alternate_nntp_server');
+        $maxSegments = 40;
+        $triedArchive = false;
+
+        foreach ($fileList as $nzbFile) {
+            $title = $nzbFile['title'] ?? '';
+            if (! preg_match(
+                '/(\\.(part0*1|rar|zip))(\\s*\\.rar)*($|[ ")]|-])|"[a-f0-9]{32}\\.[1-9]\\d{1,2}".*\\(\\d+\\/\\d{2,}\\)$/i',
+                $title
+            )) {
+                continue;
+            }
+
+            $segments = $nzbFile['segments'] ?? [];
+            if (empty($segments)) {
+                continue;
+            }
+
+            $messageIDs = array_slice($segments, 0, $maxSegments);
+            $compressedData = $nntp->getMessagesByMessageID($messageIDs, $alternateNntp);
+
+            if (! is_string($compressedData) || $compressedData === '') {
+                continue;
+            }
+
+            $triedArchive = true;
+            $extracted = $this->extractNfoViaUnrar($compressedData, $nfoFiles, $guid);
+            if ($extracted !== false) {
+                return $extracted;
+            }
+
+            break;
+        }
+
+        if ($triedArchive) {
+            Release::whereId($releaseId)->update(['nfostatus' => self::NFO_NONFO]);
+        }
+
+        return false;
+    }
+
+    /**
+     * Extract an NFO file from compressed archive data using the unrar binary.
+     *
+     * @param  string  $compressedData  Raw archive bytes
+     * @param  array<string>  $nfoFilenames  NFO filenames to try extracting
+     * @param  string  $guid  Release GUID for NFO validation
+     * @return string|false Extracted NFO content, or false on failure
+     */
+    private function extractNfoViaUnrar(string $compressedData, array $nfoFilenames, string $guid): string|false
+    {
+        $uniqueId = uniqid('nfo_', true);
+        $archiveFile = $this->tmpPath.'archive_'.$uniqueId.'.rar';
+        $extractDir = $this->tmpPath.'extract_'.$uniqueId.'/';
+
+        try {
+            if (! File::isDirectory($extractDir)) {
+                File::makeDirectory($extractDir, 0777, true, true);
+            }
+
+            File::put($archiveFile, $compressedData);
+
+            $killString = $this->getKillString();
+
+            foreach ($nfoFilenames as $nfoFilename) {
+                runCmd($killString.$this->unrarPath.'" e -y -c- -inul -p- "'.$archiveFile.'" "'.$nfoFilename.'" "'.$extractDir.'"');
+
+                $extractedPath = $extractDir.basename($nfoFilename);
+                if (! File::isFile($extractedPath)) {
+                    $allFiles = File::allFiles($extractDir);
+                    foreach ($allFiles as $file) {
+                        if (strcasecmp($file->getFilename(), basename($nfoFilename)) === 0) {
+                            $extractedPath = $file->getPathname();
+                            break;
+                        }
+                    }
+                }
+
+                if (File::isFile($extractedPath) && File::size($extractedPath) > 0) {
+                    $content = File::get($extractedPath);
+                    if ($this->isNFO($content, $guid)) {
+                        return $content;
+                    }
+                }
+            }
+        } catch (Throwable $e) {
+            Log::debug('NFO unrar extraction failed: '.$e->getMessage());
+        } finally {
+            File::delete($archiveFile);
+            if (File::isDirectory($extractDir)) {
+                File::deleteDirectory($extractDir);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Build the kill/timeout string for wrapping CLI commands.
+     */
+    private function getKillString(): string
+    {
+        if ($this->timeoutPath && $this->timeoutSeconds > 0) {
+            return '"'.$this->timeoutPath.'" --foreground --signal=KILL '.$this->timeoutSeconds.' "';
+        }
+
+        return '"';
+    }
+
+    /**
      * Attempt to find NFO files inside the NZB's of releases.
      *
      * @param  NNTPService  $nntp  The NNTP connection object
@@ -539,10 +712,17 @@ class NfoService
                     $groupName = UsenetGroup::getNameByID($release['groups_id']);
                     $fetchedBinary = $nzbContentsService->getNfoFromNzb($release['guid'], $release['id'], $release['groups_id'], $groupName);
 
+                    // Fallback: try extracting NFO from a RAR/ZIP in the NZB
+                    if ($fetchedBinary === false) {
+                        $fetchedBinary = $this->attemptNfoFromArchive($release['guid'], $release['id'], $nntp);
+                        if ($fetchedBinary !== false && $this->echo) {
+                            echo 'A';
+                        }
+                    }
+
                     if ($fetchedBinary !== false) {
                         DB::beginTransaction();
                         try {
-                            // Only insert if not already present
                             $exists = ReleaseNfo::whereReleasesId($release['id'])->exists();
                             if (! $exists) {
                                 ReleaseNfo::query()->insert([
@@ -551,7 +731,6 @@ class NfoService
                                 ]);
                             }
 
-                            // Update status
                             Release::whereId($release['id'])->update(['nfostatus' => self::NFO_FOUND]);
                             DB::commit();
                             $processedCount++;
@@ -570,8 +749,10 @@ class NfoService
             }
         }
 
-        // Process failed NFO attempts
-        $this->handleFailedNfoAttempts($groupID, $guidChar);
+        // Second pass: attempt archive-based extraction for NFO_FAILED (-9) releases
+        // that have NFO files listed in release_files with non-zero size.
+        $archiveProcessed = $this->processFailedReleasesViaArchive($nntp, $groupID, $guidChar);
+        $processedCount += $archiveProcessed;
 
         // Output results
         if ($this->echo) {
@@ -651,41 +832,92 @@ class NfoService
     }
 
     /**
-     * Handle releases that have failed too many NFO fetch attempts
+     * Process releases at NFO_FAILED (-9) that have NFO files in release_files
+     * with non-zero size. Attempts archive-based extraction via unrar.
+     * On failure, sets nfostatus to NFO_FAILED_ARCHIVE (-10) to prevent further retries.
      */
-    private function handleFailedNfoAttempts(string $groupID, string $guidChar): void
+    private function processFailedReleasesViaArchive(NNTPService $nntp, string $groupID, string $guidChar): int
     {
-        $failedQuery = Release::query()
-            ->where('nfostatus', '<', $this->maxRetries)
-            ->where('nfostatus', '>', self::NFO_FAILED);
+        $query = Release::query()
+            ->where('nfostatus', self::NFO_FAILED)
+            ->whereExists(function ($sub) {
+                $sub->select(DB::raw(1))
+                    ->from('release_files')
+                    ->whereColumn('release_files.releases_id', 'releases.id')
+                    ->where('size', '>', 0)
+                    ->where(function ($q) {
+                        $q->where('name', 'like', '%.nfo')
+                            ->orWhere('name', 'like', '%.diz')
+                            ->orWhere('name', 'like', '%.inf')
+                            ->orWhere('name', 'like', '%file\_id.diz')
+                            ->orWhere('name', 'like', '%info.txt');
+                    });
+            });
 
         if ($guidChar !== '') {
-            $failedQuery->where('leftguid', $guidChar);
+            $query->where('leftguid', $guidChar);
         }
 
         if ($groupID !== '') {
-            $failedQuery->where('groups_id', $groupID);
+            $query->where('groups_id', $groupID);
         }
 
-        // Process in chunks to avoid memory issues with large result sets
-        $failedQuery->select(['id'])->chunk(100, function ($releases) {
-            DB::beginTransaction();
-            try {
-                foreach ($releases as $release) {
-                    // Remove any releasenfo for failed attempts
-                    ReleaseNfo::whereReleasesId($release->id)->delete();
+        $releases = $query->limit($this->nzbs)
+            ->get(['id', 'guid', 'groups_id', 'name']);
 
-                    // Set release.nfostatus to failed
-                    Release::whereId($release->id)->update(['nfostatus' => self::NFO_FAILED]);
+        if ($releases->isEmpty()) {
+            return 0;
+        }
+
+        if ($this->echo) {
+            cli()->primary(PHP_EOL.'Attempting archive-based NFO extraction for '.$releases->count().' NFO_FAILED release(s).');
+        }
+
+        $processed = 0;
+
+        foreach ($releases as $release) {
+            try {
+                $fetchedBinary = $this->attemptNfoFromArchive($release['guid'], $release['id'], $nntp);
+
+                if ($fetchedBinary !== false) {
+                    DB::beginTransaction();
+                    try {
+                        if (! ReleaseNfo::whereReleasesId($release['id'])->exists()) {
+                            ReleaseNfo::query()->insert([
+                                'releases_id' => $release['id'],
+                                'nfo' => "\x1f\x8b\x08\x00".gzcompress($fetchedBinary),
+                            ]);
+                        }
+                        Release::whereId($release['id'])->update(['nfostatus' => self::NFO_FOUND]);
+                        DB::commit();
+                        $processed++;
+
+                        if ($this->echo) {
+                            echo 'A';
+                        }
+                    } catch (\Exception $e) {
+                        DB::rollBack();
+                        if ($this->echo) {
+                            cli()->error("Error saving archive NFO for release {$release['id']}: {$e->getMessage()}");
+                        }
+                    }
+                } else {
+                    Release::whereId($release['id'])->update(['nfostatus' => self::NFO_FAILED_ARCHIVE]);
+
+                    if ($this->echo) {
+                        echo '-';
+                    }
                 }
-                DB::commit();
             } catch (\Exception $e) {
-                DB::rollBack();
+                Release::whereId($release['id'])->update(['nfostatus' => self::NFO_FAILED_ARCHIVE]);
+
                 if ($this->echo) {
-                    cli()->error("Error handling failed NFO attempts: {$e->getMessage()}");
+                    cli()->error("Error in archive NFO extraction for release {$release['id']}: {$e->getMessage()}");
                 }
             }
-        });
+        }
+
+        return $processed;
     }
 
     /**

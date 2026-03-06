@@ -268,6 +268,11 @@ class AdditionalProcessingOrchestrator
                 if (! $context->foundJPGSample && $this->config->processJPGSample) {
                     $this->processJpgFromReleaseFiles($context);
                 }
+
+                // If still no NFO, try to fetch NFO from release_files entries
+                if ($context->releaseHasNoNFO) {
+                    $this->processNfoFromReleaseFiles($context);
+                }
             }
 
             // Finalize
@@ -800,6 +805,90 @@ class AdditionalProcessingOrchestrator
                 }
 
                 File::delete($tempImagePath);
+            }
+        }
+    }
+
+    /**
+     * Process NFO files from existing release_files entries.
+     * When archive extraction failed to produce NFO on disk, this falls back to
+     * checking the release_files table and re-downloading the archive to extract by name.
+     */
+    private function processNfoFromReleaseFiles(ReleaseProcessingContext $context): void
+    {
+        $nfoFiles = ReleaseFile::where('releases_id', $context->release->id)
+            ->nfoFiles()
+            ->limit(3)
+            ->get();
+
+        if ($nfoFiles->isEmpty()) {
+            return;
+        }
+
+        if (empty($context->nzbContents)) {
+            return;
+        }
+
+        foreach ($context->nzbContents as $nzbFile) {
+            if (! $context->releaseHasNoNFO) {
+                break;
+            }
+
+            $title = $nzbFile['title'] ?? '';
+            if (! preg_match(
+                '/(\\.(part0*1|rar|zip))(\\s*\\.rar)*($|[ ")]|-])|"[a-f0-9]{32}\\.[1-9]\\d{1,2}".*\\(\\d+\\/\\d{2,}\\)$/i',
+                $title
+            )) {
+                continue;
+            }
+
+            $segments = $nzbFile['segments'] ?? [];
+            if (empty($segments)) {
+                continue;
+            }
+
+            $messageIDs = [];
+            $segCount = min(count($segments), $this->config->maximumRarSegments);
+            for ($i = 0; $i < $segCount; $i++) {
+                $messageIDs[] = (string) $segments[$i];
+            }
+
+            if (empty($messageIDs)) {
+                continue;
+            }
+
+            $result = $this->downloadService->downloadCompressedFile(
+                $messageIDs, // @phpstan-ignore argument.type
+                $context->releaseGroupName,
+                $context->release->id,
+                $title
+            );
+
+            if (! $result['success'] || empty($result['data'])) {
+                continue;
+            }
+
+            foreach ($nfoFiles as $nfoFile) {
+                $nfoData = $this->archiveService->extractSpecificFile(
+                    $result['data'],
+                    $nfoFile->name,
+                    $context->tmpPath
+                );
+
+                if ($nfoData === null || empty($nfoData)) {
+                    continue;
+                }
+
+                $tempNfoPath = $context->tmpPath.'release_file_'.uniqid('', true).'.nfo';
+                File::put($tempNfoPath, $nfoData);
+
+                if ($this->releaseManager->processNfoFile($tempNfoPath, $context, $this->downloadService->getNNTP())) {
+                    $this->output->echoNfoFound();
+                    File::delete($tempNfoPath);
+                    break 2;
+                }
+
+                File::delete($tempNfoPath);
             }
         }
     }
