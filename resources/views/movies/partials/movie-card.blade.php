@@ -14,19 +14,19 @@
     $guid = !empty($releases) ? $releases[0]->guid : null;
 @endphp
 
-<div class="surface-panel border rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300">
+<div class="surface-panel border rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
     <div class="flex flex-row">
         {{-- Movie Poster --}}
-        <div class="shrink-0">
+        <div class="shrink-0 p-4">
             @if($guid)
                 <a href="{{ url('/details/' . $guid) }}" class="block">
                     @if(isset($result->cover) && $result->cover)
                         <img src="{{ $result->cover }}"
                              alt="{{ $result->title }}"
-                             class="object-cover movie-cover"
+                             class="object-cover movie-cover rounded-lg shadow-lg"
                              loading="lazy">
                     @else
-                        <div class="bg-gray-200 dark:bg-gray-700 flex items-center justify-center movie-cover">
+                        <div class="bg-gray-200 dark:bg-gray-700 flex items-center justify-center movie-cover rounded-lg shadow-lg">
                             <i class="fas fa-film text-gray-400 text-3xl"></i>
                         </div>
                     @endif
@@ -35,10 +35,10 @@
                 @if(isset($result->cover) && $result->cover)
                     <img src="{{ $result->cover }}"
                          alt="{{ $result->title }}"
-                         class="object-cover movie-cover"
+                         class="object-cover movie-cover rounded-lg shadow-lg"
                          loading="lazy">
                 @else
-                    <div class="bg-gray-200 dark:bg-gray-700 flex items-center justify-center movie-cover">
+                    <div class="bg-gray-200 dark:bg-gray-700 flex items-center justify-center movie-cover rounded-lg shadow-lg">
                         <i class="fas fa-film text-gray-400 text-3xl"></i>
                     </div>
                 @endif
@@ -46,7 +46,7 @@
         </div>
 
         {{-- Movie Details --}}
-        <div class="flex-1 p-4 min-w-0">
+        <div class="flex-1 py-4 pr-4 min-w-0">
             {{-- Title --}}
             <div class="flex justify-between items-start mb-2">
                 <div class="flex-1 min-w-0">
@@ -138,7 +138,7 @@
                     <div class="space-y-3">
                         @foreach($releases as $index => $release)
                             @if(($release->searchname ?? null) && ($release->guid ?? null))
-                                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+                                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 border border-gray-200 dark:border-gray-700 shadow-sm">
                                     <div class="release-card-container">
                                         <div class="release-info-wrapper">
                                             {{-- Release Name --}}

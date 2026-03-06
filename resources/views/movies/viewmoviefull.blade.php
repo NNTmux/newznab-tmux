@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+<div class="movie-detail-page bg-white dark:bg-gray-800 rounded-xl shadow-sm">
     <x-breadcrumb :items="[
         ['label' => 'Home', 'url' => url($site['home_link'] ?? '/'), 'icon' => 'fas fa-home'],
         ['label' => 'Movies', 'url' => route('Movies')],
@@ -14,9 +14,9 @@
                 <!-- Movie Poster -->
                 <div class="lg:col-span-1">
                     @if(!empty($movie['cover'] ?? null))
-                        <img src="{{ $movie['cover'] }}" alt="{{ $movie['title'] ?? 'Movie' }}" class="w-full rounded-lg shadow-lg">
+                        <img src="{{ $movie['cover'] }}" alt="{{ $movie['title'] ?? 'Movie' }}" class="movie-detail-poster w-full rounded-lg">
                     @else
-                        <div class="w-full h-96 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                        <div class="movie-detail-poster w-full h-96 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
                             <i class="fas fa-film text-gray-400 text-6xl"></i>
                         </div>
                     @endif
@@ -115,7 +115,7 @@
                     @if(!empty($movie['trailer'] ?? null))
                         <div class="mb-6">
                             <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Trailer</h2>
-                            <div class="aspect-video">
+                            <div class="movie-detail-trailer aspect-video">
                                 {!! $movie['trailer'] !!}
                             </div>
                         </div>
@@ -180,7 +180,7 @@
 
                     <div class="space-y-3" id="releases-container">
                         @foreach($releases as $release)
-                            <div class="release-item bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition" data-release-name="{{ strtolower($release->searchname) }}">
+                            <div class="movie-release-card release-item bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700" data-release-name="{{ strtolower($release->searchname) }}">
                                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                                     <div class="flex-1 min-w-0">
                                         <a href="{{ url('/details/' . $release->guid) }}" class="text-base text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:text-blue-400 font-medium block truncate" title="{{ $release->searchname }}">

@@ -947,3 +947,65 @@ code.api-token::-webkit-scrollbar-thumb:hover {
     padding: 0;
 }
 
+/* ------------------------------------------------------------------ */
+/* Detail pages: shared card and image shadows                        */
+/* ------------------------------------------------------------------ */
+
+.release-detail-page {
+    @apply shadow-md;
+}
+
+.release-detail-page .surface-panel-alt,
+.release-detail-page .detail-password-card,
+.release-detail-page .detail-file-list,
+.release-detail-page .detail-info-sidebar,
+.release-detail-page .detail-empty-comments {
+    @apply shadow-sm;
+}
+
+.release-detail-page .detail-comment-card {
+    @apply shadow-sm hover:shadow-md transition-shadow duration-300;
+}
+
+.release-detail-page .detail-cover-image {
+    @apply rounded-xl shadow-xl;
+}
+
+.release-detail-page .detail-gallery-image {
+    @apply shadow-md hover:shadow-lg transition-shadow duration-300;
+}
+
+.movie-detail-page {
+    @apply shadow-md;
+}
+
+.movie-detail-page .movie-detail-poster {
+    @apply rounded-xl shadow-xl;
+}
+
+.movie-detail-page .movie-detail-trailer {
+    @apply overflow-hidden rounded-xl shadow-lg;
+}
+
+.movie-detail-page .movie-release-card {
+    @apply shadow-sm hover:shadow-md transition-shadow duration-300;
+}
+
+.series-detail-page {
+    @apply shadow-md;
+}
+
+.series-detail-page .series-main-card,
+.series-detail-page .series-episodes-card {
+    @apply shadow-md;
+}
+
+.series-detail-page .series-stat-card,
+.series-detail-page .series-episode-card {
+    @apply shadow-sm hover:shadow-md transition-shadow duration-300;
+}
+
+.series-detail-page .series-detail-poster {
+    @apply rounded-xl shadow-xl transition-shadow duration-300;
+}
+

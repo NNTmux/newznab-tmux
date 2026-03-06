@@ -5,7 +5,7 @@
 @endpush
 
 @section('content')
-<div class="surface-panel rounded-xl shadow-sm p-6">
+<div class="release-detail-page surface-panel rounded-xl shadow-sm p-6">
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Release Details</h1>
         <nav class="text-sm text-gray-600 dark:text-gray-400">
@@ -25,8 +25,7 @@
                     <div class="shrink-0">
                         <img src="{{ getReleaseCover($release) }}"
                              alt="{{ $release->searchname }}"
-                             class="w-48 h-72 object-cover rounded-lg shadow-md max-w-[192px] max-h-[288px]"
-                             class="rounded-lg shadow-lg object-cover w-3xl h-288"
+                             class="detail-cover-image w-48 h-72 object-cover max-w-[192px] max-h-[288px]"
                              data-fallback-src="{{ asset('assets/images/no-cover.png') }}">
                     </div>
 
@@ -100,7 +99,7 @@
                                 <div class="block cursor-pointer image-modal-trigger" data-image-url="{{ url('/covers/preview/' . $release->guid . '_thumb.jpg') }}" data-image-title="Preview Image">
                                     <img src="{{ url('/covers/preview/' . $release->guid . '_thumb.jpg') }}"
                                          alt="Preview"
-                                         class="w-full h-auto rounded-lg shadow-md hover:shadow-lg transition"
+                                         class="detail-gallery-image w-full h-auto rounded-lg"
                                          loading="lazy">
                                 </div>
                                 <p class="text-xs text-gray-500 mt-1 text-center">Preview</p>
@@ -113,7 +112,7 @@
                                 <div class="block cursor-pointer image-modal-trigger" data-image-url="{{ url('/covers/sample/' . $release->guid . '_thumb.jpg') }}" data-image-title="Sample Image">
                                     <img src="{{ url('/covers/sample/' . $release->guid . '_thumb.jpg') }}"
                                          alt="Sample"
-                                         class="w-full h-auto rounded-lg shadow-md hover:shadow-lg transition"
+                                         class="detail-gallery-image w-full h-auto rounded-lg"
                                          loading="lazy">
                                 </div>
                                 <p class="text-xs text-gray-500 mt-1 text-center">Sample</p>
@@ -679,7 +678,7 @@
 
             <!-- Password Information -->
             @if(isset($release->passwordstatus) && $release->passwordstatus > 0)
-                <div class="bg-linear-to-r from-red-50 to-orange-50 dark:from-red-900 dark:to-orange-900 rounded-lg p-6 border border-red-100 dark:border-red-800">
+                <div class="detail-password-card bg-linear-to-r from-red-50 to-orange-50 dark:from-red-900 dark:to-orange-900 rounded-lg p-6 border border-red-100 dark:border-red-800">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                         <i class="fas fa-lock mr-2 text-red-600 dark:text-red-400"></i> Password Protected Release
                     </h3>
@@ -918,7 +917,7 @@
             @if(isset($files) && count($files) > 0)
                 <div>
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Files ({{ count($files) }})</h3>
-                    <div class="surface-panel-alt rounded-lg overflow-hidden border">
+                    <div class="detail-file-list surface-panel-alt rounded-lg overflow-hidden border">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="surface-panel-alt">
                                 <tr>
@@ -1007,7 +1006,7 @@
                 @if(isset($comments) && count($comments) > 0)
                     <div class="space-y-4">
                         @foreach($comments as $comment)
-                            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition">
+                            <div class="detail-comment-card bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition">
                                 <div class="flex items-start justify-between mb-3">
                                     <div class="flex items-center">
                                         <div class="w-10 h-10 bg-primary-600 dark:bg-primary-700 rounded-full flex items-center justify-center text-white font-bold mr-3 shadow-sm">
@@ -1027,7 +1026,7 @@
                         @endforeach
                     </div>
                 @else
-                    <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-8 border border-gray-200 dark:border-gray-700 text-center">
+                    <div class="detail-empty-comments bg-gray-50 dark:bg-gray-900 rounded-lg p-8 border border-gray-200 dark:border-gray-700 text-center">
                         <i class="fas fa-comments text-4xl text-gray-400 dark:text-gray-600 mb-3"></i>
                         <p class="text-gray-500 dark:text-gray-400">No comments yet. Be the first to comment!</p>
                     </div>
@@ -1037,7 +1036,7 @@
 
         <!-- Sidebar -->
         <div class="lg:col-span-1">
-            <div class="surface-panel-alt rounded-lg p-4 sticky top-4 border">
+            <div class="detail-info-sidebar surface-panel-alt rounded-lg p-4 sticky top-4 border">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Information</h3>
                 <dl class="space-y-3">
                     <div>

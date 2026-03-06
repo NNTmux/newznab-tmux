@@ -35,7 +35,7 @@
         <div class="px-6 py-6">
             <div class="grid grid-cols-1 gap-6">
                 @foreach($trendingMovies as $index => $movie)
-                    <div class="surface-panel border rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <div class="surface-panel relative border rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
                         <div class="flex flex-col md:flex-row">
                             <!-- Rank Badge -->
                             <div class="absolute top-4 left-4 z-10">
@@ -46,12 +46,12 @@
                             </div>
 
                             <!-- Movie Poster -->
-                            <div class="shrink-0 relative">
+                            <div class="shrink-0 relative p-4">
                                 <a href="{{ route('movie.view', ['imdbid' => $movie->imdbid]) }}" class="block">
                                     @if($movie->cover)
-                                        <img src="{{ $movie->cover }}" alt="{{ $movie->title }}" class="w-full md:w-64 h-96 object-cover">
+                                        <img src="{{ $movie->cover }}" alt="{{ $movie->title }}" class="w-full md:w-64 h-96 object-cover rounded-xl shadow-xl">
                                     @else
-                                        <div class="w-full md:w-64 h-96 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                        <div class="w-full md:w-64 h-96 bg-gray-200 dark:bg-gray-700 flex items-center justify-center rounded-xl shadow-xl">
                                             <i class="fas fa-film text-gray-400 text-5xl"></i>
                                         </div>
                                     @endif
@@ -63,7 +63,7 @@
                             </div>
 
                             <!-- Movie Details -->
-                            <div class="flex-1 p-6 ml-0 md:ml-4">
+                            <div class="flex-1 py-6 pr-6 min-w-0">
                                 <div class="flex flex-col h-full">
                                     <!-- Title and Info -->
                                     <div class="flex-1">
