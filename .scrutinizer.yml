@@ -1,0 +1,18 @@
+# Scrutinizer CI configuration (repository-side).
+# Fixes: use Composer 2 and PHP 8.4 so dependency install and tests match local/CI.
+# Site config: ensure no conflicting overrides (e.g. PHP version or dependency commands).
+build:
+  nodes:
+    tests:
+      environment:
+        php:
+          version: "8.4"
+      dependencies:
+        before:
+          # Force Composer 2; default image often ships Composer 1.
+          - composer self-update --2
+          # Allow Composer 2 plugins (e.g. Laravel / PHPStan)
+          - composer config allow-plugins true --no-interaction
+      tests:
+        override:
+          - vendor/bin/phpunit
