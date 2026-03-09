@@ -17,14 +17,14 @@ class ReleaseReportController extends BasePageController
      */
     public function store(Request $request): JsonResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'release_id' => 'required|integer',
             'reason' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
         ]);
 
-        $releaseId = $request->input('release_id');
-        $userId = Auth::id();
+        $releaseId = (int) $validated['release_id'];
+        $userId = $this->authenticatedUserId();
 
         // Check if release exists
         $release = Release::find($releaseId);
@@ -47,8 +47,8 @@ class ReleaseReportController extends BasePageController
         ReleaseReport::create([
             'releases_id' => $releaseId,
             'users_id' => $userId,
-            'reason' => $request->input('reason'),
-            'description' => $request->input('description'),
+            'reason' => $validated['reason'],
+            'description' => $validated['description'] ?? null,
             'status' => 'pending',
         ]);
 
@@ -73,13 +73,35 @@ class ReleaseReportController extends BasePageController
      */
     public function checkReported(Request $request): JsonResponse
     {
-        $releaseId = $request->input('release_id');
-        $userId = Auth::id();
+        $validated = $request->validate([
+            'release_id' => 'required|integer',
+        ]);
+
+        $releaseId = (int) $validated['release_id'];
+        $userId = $this->authenticatedUserId();
 
         $hasReported = ReleaseReport::hasUserReported($releaseId, $userId);
 
         return response()->json([
             'has_reported' => $hasReported,
         ]);
+    }
+
+    /**
+     * Normalize the authenticated user identifier to an integer.
+     */
+    private function authenticatedUserId(): int
+    {
+        $userId = Auth::id();
+
+        if (is_int($userId)) {
+            return $userId;
+        }
+
+        if (is_string($userId) && ctype_digit($userId)) {
+            return (int) $userId;
+        }
+
+        abort(401, 'Authentication required.');
     }
 }
