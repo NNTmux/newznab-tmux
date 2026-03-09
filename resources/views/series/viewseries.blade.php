@@ -269,10 +269,10 @@
                                                                class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium wrap-break-word break-all">
                                                                 {{ $release->searchname }}
                                                             </a>
-                                                            @if(!empty($release->failed) && $release->failed->count() > 0)
+                                                            @if(($release->failed_count ?? 0) > 0)
                                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800"
-                                                                      title="{{ $release->failed->count() }} user(s) reported download failure">
-                                                                    <i class="fas fa-exclamation-triangle mr-1"></i> Failed ({{ $release->failed->count() }})
+                                                                      title="{{ $release->failed_count }} user(s) reported download failure">
+                                                                    <i class="fas fa-exclamation-triangle mr-1"></i> Failed ({{ $release->failed_count }})
                                                                 </span>
                                                             @endif
                                                         </div>

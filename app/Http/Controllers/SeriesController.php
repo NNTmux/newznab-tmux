@@ -10,6 +10,7 @@ use App\Models\Video;
 use App\Services\EpisodeHydrationService;
 use App\Services\Releases\ReleaseSearchService;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
@@ -67,6 +68,9 @@ class SeriesController extends BasePageController
                 $myshows = UserSerie::getShow($this->userdata->id, $show['id']);
 
                 $this->episodeHydrationService->hydrateEpisodeMetadata($rel);
+                if ($rel instanceof EloquentCollection && $rel->isNotEmpty()) {
+                    $rel->loadCount('failed');
+                }
 
                 // Sort releases by season, episode, date posted.
                 $series = $episode = $posted = [];
