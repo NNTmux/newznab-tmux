@@ -851,7 +851,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
             }
         }
 
-        $result = $this->searchIndexes($this->getReleasesIndex(), '', [], $searchArray);
+        $result = $this->searchIndexes($this->getReleasesIndex(), '', [], $searchArray, $limit);
 
         return ! empty($result) ? ($result['id'] ?? []) : [];
     }
@@ -965,6 +965,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
             return [];
         }
 
+        $normalizedLimit = $this->normalizeSearchLimit($limit);
         $fuzzyConfig = $this->getFuzzyConfig();
         $distance = $fuzzyConfig['max_distance'] ?? 2;
 
@@ -972,7 +973,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
         $cacheKey = 'manticore:fuzzy:'.md5(serialize([
             'index' => $index,
             'array' => $searchArray,
-            'limit' => $limit,
+            'limit' => $normalizedLimit,
             'distance' => $distance,
         ]));
 
@@ -1025,7 +1026,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 ->search($searchExpr)
                 ->option('fuzzy', true)
                 ->option('distance', $distance)
-                ->limit(min($limit, 10000));
+                ->limit($normalizedLimit);
 
             $results = $query->get();
         } catch (ResponseException $e) {
@@ -1039,7 +1040,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 ]);
 
                 // Fall back to regular search without fuzzy
-                return $this->searchIndexes($index, '', [], $searchArray);
+                return $this->searchIndexes($index, '', [], $searchArray, $normalizedLimit);
             }
 
             Log::error('ManticoreSearch fuzzySearchIndexes ResponseException: '.$message, [
@@ -1109,7 +1110,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
      * @param  array<string, mixed>  $searchArray
      * @return array<string, mixed>
      */
-    public function searchIndexes(string $rt_index, ?string $searchString, array $column = [], array $searchArray = []): array
+    public function searchIndexes(string $rt_index, ?string $searchString, array $column = [], array $searchArray = [], int $limit = 1000): array
     {
         if (empty($rt_index)) {
             Log::warning('ManticoreSearch: Index name is required for search');
@@ -1117,12 +1118,15 @@ class ManticoreSearchDriver implements SearchDriverInterface
             return [];
         }
 
+        $normalizedLimit = $this->normalizeSearchLimit($limit);
+
         if (config('app.debug')) {
             Log::debug('ManticoreSearch::searchIndexes called', [
                 'rt_index' => $rt_index,
                 'searchString' => $searchString,
                 'column' => $column,
                 'searchArray' => $searchArray,
+                'limit' => $normalizedLimit,
             ]);
         }
 
@@ -1132,6 +1136,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
             'search' => $searchString,
             'columns' => $column,
             'array' => $searchArray,
+            'limit' => $normalizedLimit,
         ]));
 
         $cached = Cache::get($cacheKey);
@@ -1207,8 +1212,8 @@ class ManticoreSearchDriver implements SearchDriverInterface
             $query = (new Search($this->manticoreSearch))
                 ->setTable($rt_index)
                 ->option('ranker', 'sph04')
-                ->maxMatches(10000)
-                ->limit(10000)
+                ->maxMatches($normalizedLimit)
+                ->limit($normalizedLimit)
                 ->stripBadUtf8(true)
                 ->search($searchExpr);
 
@@ -1224,8 +1229,8 @@ class ManticoreSearchDriver implements SearchDriverInterface
                     $query = (new Search($this->manticoreSearch))
                         ->setTable($rt_index)
                         ->option('ranker', 'sph04')
-                        ->maxMatches(10000)
-                        ->limit(10000)
+                        ->maxMatches($normalizedLimit)
+                        ->limit($normalizedLimit)
                         ->stripBadUtf8(true)
                         ->search($searchExpr);
 
@@ -1285,6 +1290,13 @@ class ManticoreSearchDriver implements SearchDriverInterface
         }
 
         return $result;
+    }
+
+    private function normalizeSearchLimit(int $limit): int
+    {
+        $maxMatches = max(1, (int) ($this->config['max_matches'] ?? 10000));
+
+        return max(1, min($limit, $maxMatches));
     }
 
     /**

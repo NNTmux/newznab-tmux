@@ -107,4 +107,27 @@ class ReleaseSearchServiceOrderingTest extends TestCase
 
         $this->assertEquals(['categories_id', 'asc'], $result);
     }
+
+    /**
+     * Test that the search candidate buffer fetches enough rows for page one without exploding.
+     */
+    public function test_determine_search_candidate_limit_buffers_first_page(): void
+    {
+        $reflection = new ReflectionClass(ReleaseSearchService::class);
+        $method = $reflection->getMethod('determineSearchCandidateLimit');
+
+        $this->assertSame(500, $method->invoke($this->service, 0, 50));
+    }
+
+    /**
+     * Test that the search candidate buffer grows with the offset and caps deep pages.
+     */
+    public function test_determine_search_candidate_limit_caps_large_offsets(): void
+    {
+        $reflection = new ReflectionClass(ReleaseSearchService::class);
+        $method = $reflection->getMethod('determineSearchCandidateLimit');
+
+        $this->assertSame(550, $method->invoke($this->service, 50, 50));
+        $this->assertSame(2000, $method->invoke($this->service, 2500, 50));
+    }
 }

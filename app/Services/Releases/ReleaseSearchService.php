@@ -22,6 +22,12 @@ class ReleaseSearchService
 {
     private const CACHE_VERSION_KEY = 'releases:cache_version';
 
+    private const SEARCH_INDEX_BUFFER_PAGES = 10;
+
+    private const SEARCH_INDEX_MIN_CANDIDATES = 250;
+
+    private const SEARCH_INDEX_MAX_CANDIDATES = 2000;
+
     // RAR/ZIP Password indicator.
     public const PASSWD_NONE = 0;
 
@@ -61,8 +67,10 @@ class ReleaseSearchService
             ]);
         }
 
+        $searchLimit = $this->determineSearchCandidateLimit($offset, $limit);
+
         // Get search results from index
-        $searchResult = $this->performIndexSearch($searchArr, $limit);
+        $searchResult = $this->performIndexSearch($searchArr, $searchLimit);
 
         if (config('app.debug')) {
             Log::debug('ReleaseSearchService::search after performIndexSearch', [
@@ -145,11 +153,13 @@ class ReleaseSearchService
             ]);
         }
 
+        $searchLimit = $this->determineSearchCandidateLimit($offset, $limit);
+
         // Early return if searching with no results
         $searchResult = [];
         if ($searchName !== -1 && $searchName !== '' && $searchName !== null) {
             // Use the unified Search facade with fuzzy fallback
-            $fuzzyResult = Search::searchReleasesWithFuzzy($searchName, $limit);
+            $fuzzyResult = Search::searchReleasesWithFuzzy($searchName, $searchLimit);
             $searchResult = $fuzzyResult['ids'] ?? [];
 
             if (config('app.debug') && ($fuzzyResult['fuzzy'] ?? false)) {
@@ -161,7 +171,7 @@ class ReleaseSearchService
                 if (config('app.debug')) {
                     Log::debug('apiSearch: Falling back to MySQL search');
                 }
-                $searchResult = $this->performMySQLSearch(['searchname' => $searchName], $limit);
+                $searchResult = $this->performMySQLSearch(['searchname' => $searchName], $searchLimit);
             }
 
             if (empty($searchResult)) {
@@ -265,6 +275,7 @@ class ReleaseSearchService
         $shouldCache = ! (isset($siteIdArr['id']) && (int) $siteIdArr['id'] > 0);
         $rawCacheKey = md5(serialize(func_get_args()).'tvSearch');
         $cacheKey = null;
+        $searchLimit = $this->determineSearchCandidateLimit($offset, $limit);
         if ($shouldCache) {
             $cacheKey = md5($this->getCacheVersion().$rawCacheKey);
             $cached = Cache::get($cacheKey);
@@ -307,7 +318,7 @@ class ReleaseSearchService
         // Try to get releases directly from search index using external IDs
         $searchResult = [];
         if (! empty($externalIds)) {
-            $searchResult = Search::searchReleasesByExternalId($externalIds, $limit * 2);
+            $searchResult = Search::searchReleasesByExternalId($externalIds, $searchLimit);
 
             if (config('app.debug') && ! empty($searchResult)) {
                 Log::debug('tvSearch: Found releases via search index by external IDs', [
@@ -400,12 +411,12 @@ class ReleaseSearchService
             }
 
             // Use the unified Search facade with fuzzy fallback
-            $fuzzyResult = Search::searchReleasesWithFuzzy(['searchname' => $searchName], $limit);
+            $fuzzyResult = Search::searchReleasesWithFuzzy(['searchname' => $searchName], $searchLimit);
             $searchResult = $fuzzyResult['ids'] ?? [];
 
             // Fall back to MySQL if search engine failed (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
-                $searchResult = $this->performMySQLSearch(['searchname' => $searchName], $limit);
+                $searchResult = $this->performMySQLSearch(['searchname' => $searchName], $searchLimit);
             }
 
             if (empty($searchResult)) {
@@ -532,6 +543,8 @@ class ReleaseSearchService
      */
     public function apiTvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
+        $searchLimit = $this->determineSearchCandidateLimit($offset, $limit);
+
         // OPTIMIZATION: Try to find releases using search index external IDs first
         $externalIds = [];
         foreach ($siteIdArr as $column => $Id) {
@@ -554,7 +567,7 @@ class ReleaseSearchService
         // Try to get releases directly from search index using external IDs
         $indexSearchResult = [];
         if (! empty($externalIds)) {
-            $indexSearchResult = Search::searchReleasesByExternalId($externalIds, $limit * 2);
+            $indexSearchResult = Search::searchReleasesByExternalId($externalIds, $searchLimit);
 
             if (config('app.debug') && ! empty($indexSearchResult)) {
                 Log::debug('apiTvSearch: Found releases via search index by external IDs', [
@@ -615,12 +628,12 @@ class ReleaseSearchService
         $searchResult = $indexSearchResult; // Use index search result if we have it
         if (empty($searchResult) && ! empty($name)) {
             // Use the unified Search facade with fuzzy fallback
-            $fuzzyResult = Search::searchReleasesWithFuzzy(['searchname' => $name], $limit);
+            $fuzzyResult = Search::searchReleasesWithFuzzy(['searchname' => $name], $searchLimit);
             $searchResult = $fuzzyResult['ids'] ?? [];
 
             // Fall back to MySQL if search engine failed (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
-                $searchResult = $this->performMySQLSearch(['searchname' => $name], $limit);
+                $searchResult = $this->performMySQLSearch(['searchname' => $name], $searchLimit);
             }
 
             if (count($searchResult) === 0) {
@@ -677,15 +690,16 @@ class ReleaseSearchService
      */
     public function animeSearch(mixed $aniDbID, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, array $excludedCategories = []): mixed
     {
+        $searchLimit = $this->determineSearchCandidateLimit($offset, $limit);
         $searchResult = [];
         if (! empty($name)) {
             // Use the unified Search facade with fuzzy fallback
-            $fuzzyResult = Search::searchReleasesWithFuzzy($name, $limit);
+            $fuzzyResult = Search::searchReleasesWithFuzzy($name, $searchLimit);
             $searchResult = $fuzzyResult['ids'] ?? [];
 
             // Fall back to MySQL if search engine returned no results (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
-                $searchResult = $this->performMySQLSearch(['searchname' => $name], $limit);
+                $searchResult = $this->performMySQLSearch(['searchname' => $name], $searchLimit);
             }
 
             if (count($searchResult) === 0) {
@@ -747,6 +761,7 @@ class ReleaseSearchService
      */
     public function moviesSearch(int $imDbId = -1, int $tmDbId = -1, int $traktId = -1, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
+        $searchLimit = $this->determineSearchCandidateLimit($offset, $limit);
         $searchResult = [];
 
         // OPTIMIZATION: If we have external IDs, use the search index to find releases directly
@@ -764,7 +779,7 @@ class ReleaseSearchService
 
         // Use search index for external ID lookups (much faster than database JOINs)
         if (! empty($externalIds)) {
-            $searchResult = Search::searchReleasesByExternalId($externalIds, $limit * 2);
+            $searchResult = Search::searchReleasesByExternalId($externalIds, $searchLimit);
 
             if (config('app.debug') && ! empty($searchResult)) {
                 Log::debug('moviesSearch: Found releases via search index by external IDs', [
@@ -777,12 +792,12 @@ class ReleaseSearchService
         // If no external IDs provided or index search failed, search by name
         if (empty($searchResult) && ! empty($name)) {
             // Use the unified Search facade with fuzzy fallback
-            $fuzzyResult = Search::searchReleasesWithFuzzy($name, $limit);
+            $fuzzyResult = Search::searchReleasesWithFuzzy($name, $searchLimit);
             $searchResult = $fuzzyResult['ids'] ?? [];
 
             // Fall back to MySQL if search engine returned no results (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
-                $searchResult = $this->performMySQLSearch(['searchname' => $name], $limit);
+                $searchResult = $this->performMySQLSearch(['searchname' => $name], $searchLimit);
             }
 
             // Only return empty if we were specifically searching by name but found nothing
@@ -975,6 +990,23 @@ class ReleaseSearchService
         }
 
         return [];
+    }
+
+    /**
+     * Search-backed pages still apply SQL filters and ordering after the index lookup,
+     * so fetch a buffered candidate set without handing MySQL thousands of IDs.
+     */
+    private function determineSearchCandidateLimit(int $offset, int $limit): int
+    {
+        $pageSize = max(1, $limit);
+        $requestedRows = max($pageSize, $offset + $pageSize);
+        $bufferedRows = max(
+            $requestedRows,
+            $offset + ($pageSize * self::SEARCH_INDEX_BUFFER_PAGES),
+            self::SEARCH_INDEX_MIN_CANDIDATES
+        );
+
+        return min($bufferedRows, self::SEARCH_INDEX_MAX_CANDIDATES);
     }
 
     /**

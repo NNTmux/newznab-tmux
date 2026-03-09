@@ -6,6 +6,7 @@ use App\Services\Search\Drivers\ManticoreSearchDriver;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class ManticoreSearchQueryTest extends TestCase
 {
@@ -167,5 +168,43 @@ class ManticoreSearchQueryTest extends TestCase
             'empty array' => [[], false],
             'array with -1 values' => [['searchname' => '-1'], false],
         ];
+    }
+
+    #[Test]
+    public function it_passes_release_search_limit_to_search_indexes(): void
+    {
+        $driver = new class extends ManticoreSearchDriver
+        {
+            public int $capturedLimit = 0;
+
+            public function __construct() {}
+
+            public function searchIndexes(string $rt_index, ?string $searchString, array $column = [], array $searchArray = [], int $limit = 1000): array
+            {
+                $this->capturedLimit = $limit;
+
+                return ['id' => [101, 202]];
+            }
+        };
+
+        $result = $driver->searchReleases(['searchname' => 'harry potter'], 75);
+
+        $this->assertSame(75, $driver->capturedLimit);
+        $this->assertSame([101, 202], $result);
+    }
+
+    #[Test]
+    public function it_clamps_search_limit_to_configured_max_matches(): void
+    {
+        $reflection = new ReflectionClass(ManticoreSearchDriver::class);
+        $driver = $reflection->newInstanceWithoutConstructor();
+
+        $configProperty = $reflection->getProperty('config');
+        $configProperty->setValue($driver, ['max_matches' => 500]);
+
+        $method = $reflection->getMethod('normalizeSearchLimit');
+
+        $this->assertSame(500, $method->invoke($driver, 750));
+        $this->assertSame(1, $method->invoke($driver, 0));
     }
 }
