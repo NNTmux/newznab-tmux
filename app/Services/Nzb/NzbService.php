@@ -127,7 +127,7 @@ class NzbService
                     return false;
                 }
 
-                $subject = $binary->name.'(1/'.$binary->totalparts.')';
+                $subject = $this->buildBinarySubject($binary->name, $binary->totalparts);
                 $XMLWriter->startElement('file');
                 $XMLWriter->writeAttribute('poster', (string) $poster);
                 $XMLWriter->writeAttribute('date', (string) $collection->udate);
@@ -149,13 +149,14 @@ class NzbService
                 $XMLWriter->endElement(); // groups
                 $XMLWriter->startElement('segments');
                 foreach ($parts as $part) {
+                    $messageId = $this->normalizeSegmentMessageId($part->messageid);
                     if ($nzb_guid === '') {
-                        $nzb_guid = $part->messageid;
+                        $nzb_guid = $messageId;
                     }
                     $XMLWriter->startElement('segment');
                     $XMLWriter->writeAttribute('bytes', (string) $part->size);
                     $XMLWriter->writeAttribute('number', (string) $part->partnumber);
-                    $XMLWriter->text($part->messageid);
+                    $XMLWriter->text($messageId);
                     $XMLWriter->endElement();
                 }
                 $XMLWriter->endElement(); // segments
@@ -305,5 +306,41 @@ class NzbService
     public function getSiteNzbPath(): string
     {
         return $this->siteNzbPath;
+    }
+
+    /**
+     * Build the NZB subject line in the shape expected by downstream parsers.
+     */
+    private function buildBinarySubject(string $binaryName, int $totalParts): string
+    {
+        return rtrim($binaryName).' (1/'.$totalParts.')';
+    }
+
+    /**
+     * Normalize stored message IDs before writing them into NZB segments.
+     */
+    private function normalizeSegmentMessageId(string $messageId): string
+    {
+        $messageId = trim($messageId);
+
+        if ($messageId === '') {
+            return '';
+        }
+
+        if (
+            \strlen($messageId) >= 2
+            && (($messageId[0] === '"' && str_ends_with($messageId, '"'))
+                || ($messageId[0] === "'" && str_ends_with($messageId, "'")))
+        ) {
+            $messageId = substr($messageId, 1, -1);
+        }
+
+        $messageId = trim($messageId);
+
+        if (str_starts_with($messageId, '<') && str_ends_with($messageId, '>')) {
+            $messageId = substr($messageId, 1, -1);
+        }
+
+        return trim($messageId);
     }
 }
