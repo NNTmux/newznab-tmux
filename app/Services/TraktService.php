@@ -489,18 +489,20 @@ class TraktService
     /**
      * Get show summary.
      *
-     * @param  string  $show  Show slug or ID
+     * @param  int|string  $show  Show slug or ID
      * @param  string  $extended  Extended info level: 'min' or 'full'
      * @return array<string, mixed>|null Show data or null on failure
      */
-    public function getShowSummary(string $show, string $extended = 'full'): ?array
+    public function getShowSummary(int|string $show, string $extended = 'full'): ?array
     {
-        if (empty($show)) {
+        $showKey = trim((string) $show);
+
+        if ($showKey === '') {
             return null;
         }
 
         $extended = $extended === 'full' ? 'full' : 'min';
-        $slug = Str::slug($show);
+        $slug = Str::slug($showKey);
         $cacheKey = "trakt_show_{$slug}_{$extended}";
 
         return Cache::remember($cacheKey, now()->addHours(self::CACHE_TTL_HOURS), function () use ($slug, $extended) {
