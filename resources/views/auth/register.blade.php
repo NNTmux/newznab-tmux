@@ -40,6 +40,15 @@
                     </div>
                 @endif
 
+                @if(!empty($notice))
+                    <div class="mb-4 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700">
+                        <div class="flex items-start">
+                            <i class="fas fa-circle-info text-blue-600 dark:text-blue-400 mr-3 mt-0.5"></i>
+                            <p class="text-sm text-blue-800 dark:text-blue-200">{{ $notice }}</p>
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Validation Error Messages -->
                 @if($errors->any())
                     <div class="mb-4 p-4 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700">
@@ -59,7 +68,7 @@
 
                 <!-- Register Form -->
                 @if($showregister == 1)
-                <form method="POST" action="{{ route('register') }}" class="space-y-5">
+                <form method="POST" action="{{ route('register.post') }}" class="space-y-5">
                     @csrf
                     <input type="hidden" name="action" value="submit">
 
@@ -101,7 +110,7 @@
                                 id="email"
                                 type="email"
                                 name="email"
-                                value="{{ old('email') }}"
+                                value="{{ old('email', $email ?? '') }}"
                                 required
                                 class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @error('email') border-red-500 @enderror"
                                 placeholder="your@email.com"

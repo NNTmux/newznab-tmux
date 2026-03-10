@@ -5,19 +5,23 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Invitation;
-use App\Models\Settings;
+use App\Models\User;
 use App\Services\InvitationService;
+use App\Services\RegistrationStatusService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class InvitationController extends BasePageController
 {
     protected InvitationService $invitationService;
 
-    public function __construct(InvitationService $invitationService)
-    {
+    public function __construct(
+        InvitationService $invitationService,
+        private readonly RegistrationStatusService $registrationStatusService
+    ) {
         parent::__construct();
         $this->invitationService = $invitationService;
         $this->middleware('auth')->except(['show', 'accept']);
@@ -29,7 +33,7 @@ class InvitationController extends BasePageController
     public function index(Request $request): View
     {
 
-        $inviteMode = (int) Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_INVITE;
+        $inviteMode = $this->registrationStatusService->resolve()['is_invite_only'];
         $status = $request->get('status');
 
         $this->viewData['meta_title'] = 'My Invitations';
@@ -51,7 +55,8 @@ class InvitationController extends BasePageController
             return view('invitations.index', $this->viewData);
         }
 
-        $user = auth()->user();
+        /** @var User $user */
+        $user = Auth::user();
 
         $invitations = $this->invitationService->getUserInvitations($user->id, $status);
         $stats = $this->invitationService->getUserInvitationStats($user->id);
@@ -91,7 +96,7 @@ class InvitationController extends BasePageController
     public function create(): View
     {
 
-        $inviteMode = (int) Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_INVITE;
+        $inviteMode = $this->registrationStatusService->resolve()['is_invite_only'];
 
         $this->viewData['meta_title'] = 'Send New Invitation';
         $this->viewData['meta_keywords'] = 'invitation,invite,send,new,user';
@@ -106,7 +111,8 @@ class InvitationController extends BasePageController
             return view('invitations.create', $this->viewData);
         }
 
-        $user = auth()->user();
+        /** @var User $user */
+        $user = Auth::user();
 
         // Calculate available invites (total - active pending invitations)
         $activeInvitations = Invitation::where('invited_by', $user->id)
@@ -132,7 +138,7 @@ class InvitationController extends BasePageController
      */
     public function store(Request $request): RedirectResponse
     {
-        if ((int) Settings::settingValue('registerstatus') !== Settings::REGISTER_STATUS_INVITE) {
+        if (! $this->registrationStatusService->resolve()['is_invite_only']) {
             return redirect()->route('invitations.index')->with('error', 'Invitations are currently disabled.');
         }
 
@@ -152,7 +158,7 @@ class InvitationController extends BasePageController
 
             $invitation = $this->invitationService->createAndSendInvitation(
                 $request->email,
-                auth()->id(),
+                (int) Auth::id(),
                 $expiryDays,
                 $metadata
             );
@@ -188,6 +194,7 @@ class InvitationController extends BasePageController
 
         $this->viewData['preview'] = $preview;
         $this->viewData['token'] = $token;
+        $this->viewData['registrationStatus'] = $this->registrationStatusService->resolve();
 
         // Set meta information
         $this->viewData['meta_title'] = $preview ? 'Invitation to Join' : 'Invalid Invitation';
@@ -202,7 +209,7 @@ class InvitationController extends BasePageController
      */
     public function resend(int $id): RedirectResponse
     {
-        if ((int) Settings::settingValue('registerstatus') !== Settings::REGISTER_STATUS_INVITE) {
+        if (! $this->registrationStatusService->resolve()['is_invite_only']) {
             return redirect()->route('invitations.index')->with('error', 'Invitations are currently disabled.');
         }
 
@@ -210,7 +217,7 @@ class InvitationController extends BasePageController
             $invitation = Invitation::findOrFail($id);
 
             // Check if user owns this invitation
-            if ($invitation->invited_by !== auth()->id()) {
+            if ($invitation->invited_by !== (int) Auth::id()) {
                 abort(403, 'Unauthorized');
             }
 
@@ -230,7 +237,7 @@ class InvitationController extends BasePageController
      */
     public function destroy(int $id): RedirectResponse
     {
-        if ((int) Settings::settingValue('registerstatus') !== Settings::REGISTER_STATUS_INVITE) {
+        if (! $this->registrationStatusService->resolve()['is_invite_only']) {
             return redirect()->route('invitations.index')->with('error', 'Invitations are currently disabled.');
         }
 
@@ -238,7 +245,7 @@ class InvitationController extends BasePageController
             $invitation = Invitation::findOrFail($id);
 
             // Check if user owns this invitation
-            if ($invitation->invited_by !== auth()->id()) {
+            if ($invitation->invited_by !== (int) Auth::id()) {
                 abort(403, 'Unauthorized');
             }
 
@@ -258,11 +265,11 @@ class InvitationController extends BasePageController
      */
     public function stats(): JsonResponse
     {
-        if ((int) Settings::settingValue('registerstatus') !== Settings::REGISTER_STATUS_INVITE) {
+        if (! $this->registrationStatusService->resolve()['is_invite_only']) {
             return response()->json(['message' => 'Invitations are disabled'], 404);
         }
 
-        $stats = $this->invitationService->getUserInvitationStats(auth()->id());
+        $stats = $this->invitationService->getUserInvitationStats((int) Auth::id());
 
         return response()->json($stats);
     }
@@ -273,7 +280,9 @@ class InvitationController extends BasePageController
     public function cleanup(): JsonResponse
     {
         // Check if user is admin
-        if (! auth()->user()->hasRole('Admin')) {
+        /** @var User|null $user */
+        $user = Auth::user();
+        if (! $user?->hasRole('Admin')) {
             abort(403, 'Unauthorized');
         }
 

@@ -136,8 +136,14 @@
                         <a href="{{ url('/contact') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
                             <i class="fa fa-envelope mr-1"></i> Contact Support
                         </a>
+                    @elseif($registrationStatus['is_closed'])
+                        <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-6 mb-4 dark:bg-yellow-900 dark:border-yellow-700 dark:text-yellow-300">
+                            <i class="fas fa-door-closed text-4xl mb-2"></i>
+                            <h6 class="font-semibold mb-2">Registrations are currently closed</h6>
+                            <p class="mb-0">{{ $registrationStatus['message'] }}</p>
+                        </div>
                     @else
-                        <a href="{{ url('/register?invitation=' . $token) }}" class="inline-flex items-center px-6 py-3 border border-transparent rounded-md shadow-lg text-base font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        <a href="{{ route('register', ['token' => $token]) }}" class="inline-flex items-center px-6 py-3 border border-transparent rounded-md shadow-lg text-base font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                             <i class="fas fa-user-plus mr-2"></i> Accept Invitation & Create Account
                         </a>
                         <div class="mt-3">
@@ -156,9 +162,11 @@
                         <a href="{{ url('/contact') }}" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
                             <i class="fa fa-envelope mr-1"></i> Contact Support
                         </a>
-                        <a href="{{ url('/register') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                            <i class="fa fa-user-plus mr-1"></i> Register Without Invitation
-                        </a>
+                        @if($registrationStatus['is_open'])
+                            <a href="{{ url('/register') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                <i class="fa fa-user-plus mr-1"></i> Register Without Invitation
+                            </a>
+                        @endif
                     </div>
                 </div>
             @endif

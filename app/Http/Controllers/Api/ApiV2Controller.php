@@ -11,6 +11,7 @@ use App\Models\Release;
 use App\Models\Settings;
 use App\Models\User;
 use App\Models\UserRequest;
+use App\Services\RegistrationStatusService;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\Releases\ReleaseSearchService;
 use App\Transformers\ApiTransformer;
@@ -98,10 +99,6 @@ class ApiV2Controller extends BasePageController
                     'max' => 100,
                     'default' => 100,
                 ],
-                'registration' => [
-                    'available' => 'no',
-                    'open' => (int) Settings::settingValue('registerstatus') === 0 ? 'yes' : 'no',
-                ],
                 'searching' => [
                     'search' => ['available' => 'yes', 'supportedParams' => 'id'],
                     'tv-search' => ['available' => 'yes', 'supportedParams' => 'id,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
@@ -111,6 +108,12 @@ class ApiV2Controller extends BasePageController
                 'categories' => fractal($category, new CategoryTransformer),
             ];
         });
+
+        $registrationStatus = app(RegistrationStatusService::class)->resolve();
+        $capabilities['registration'] = [
+            'available' => $registrationStatus['available'] ? 'yes' : 'no',
+            'open' => $registrationStatus['is_open'] ? 'yes' : 'no',
+        ];
 
         return response()->json($capabilities);
     }
@@ -193,6 +196,9 @@ class ApiV2Controller extends BasePageController
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
         $maxAge = $this->api->maxAge($request);
         $groupName = $this->api->group($request);
+        if (is_array($groupName)) {
+            $groupName = $groupName[0] ?? -1;
+        }
         $categoryID = $this->api->categoryID($request);
         $limit = $this->api->limit($request);
 

@@ -467,17 +467,18 @@
 
                     <div class="space-y-4">
                         <div>
-                            <label for="registerstatus" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fas fa-user-plus mr-1"></i>Registration Status
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                <i class="fas fa-user-plus mr-1"></i>Registration Management
                             </label>
-                            <select id="registerstatus" name="registerstatus" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                @foreach($registerstatus['ids'] as $index => $statusId)
-                                    <option value="{{ $statusId }}" {{ ($site['registerstatus'] ?? '') == $statusId ? 'selected' : '' }}>
-                                        {{ $registerstatus['names'][$index] }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <p class="mt-1 text-sm text-gray-500">The status of registrations to the site.</p>
+                            <div class="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+                                <p class="text-sm text-blue-800 dark:text-blue-200">
+                                    Registration status, scheduled open periods, and registration activity are now managed from the dedicated registration admin page.
+                                </p>
+                                <a href="{{ route('admin.registrations.index') }}"
+                                   class="mt-3 inline-flex items-center rounded-md border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-blue-400/40 dark:bg-blue-500/90 dark:hover:bg-blue-400 dark:focus:ring-offset-gray-900">
+                                    <i class="fas fa-arrow-up-right-from-square mr-2"></i>Open Registration Admin
+                                </a>
+                            </div>
                         </div>
 
                         <div>

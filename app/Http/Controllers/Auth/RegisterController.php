@@ -7,9 +7,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRegisterRequest;
 use App\Models\Invitation;
-use App\Models\Settings;
 use App\Models\User;
 use App\Rules\ValidEmailDomain;
+use App\Services\RegistrationStatusService;
 use App\Support\Auth\RegistersUsers;
 use App\Support\PermissionSyncHelper;
 use Illuminate\Http\RedirectResponse;
@@ -49,13 +49,9 @@ class RegisterController extends Controller
 
     private string $inviteCodeQuery = '';
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
+    public function __construct(
+        private readonly RegistrationStatusService $registrationStatusService
+    ) {
         $this->middleware('guest', ['except' => ['getVerification', 'getVerificationError']]);
     }
 
@@ -93,19 +89,8 @@ class RegisterController extends Controller
     public function register(RegisterRegisterRequest $request)
     {
         $error = '';
-        $inviteCode = '';
         $showRegister = 1;
-
-        if ($request->has('invitecode')) {
-            $inviteCode = $request->input('invitecode');
-            $this->inviteCodeQuery = '&invitecode='.$inviteCode;
-        }
-
-        // Handle invitation token from URL (for email links)
-        if ($request->has('token')) {
-            $inviteCode = $request->input('token');
-            $this->inviteCodeQuery = '&token='.$inviteCode;
-        }
+        $inviteCode = $this->extractInviteCode($request);
 
         $validator = Validator::make($request->all(), [
             'username' => ['required', 'string', 'min:5', 'max:255', 'unique:users'],
@@ -162,29 +147,14 @@ class RegisterController extends Controller
                 // Get the default user role.
                 $userDefault = Role::query()->where('isdefault', '=', 1)->first();
 
-                // Check invitation validity using custom system
+                $status = $this->registrationStatusService->resolve();
                 $invitationValid = $this->isInvitationValid($inviteCode, $email);
-                $registrationOpen = Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_OPEN;
 
-                if ($invitationValid || $registrationOpen) {
-                    // Get invited_by from invitation if available
-                    $invitedBy = 0;
+                if ($status['is_open'] || ($status['is_invite_only'] && $invitationValid)) {
                     $invitation = null;
 
-                    if (! empty($inviteCode)) {
+                    if ($invitationValid) {
                         $invitation = Invitation::findValidByToken($inviteCode);
-                        if ($invitation) {
-                            $invitedBy = $invitation->invited_by;
-
-                            // Validate email matches invitation
-                            if (! empty($invitation->email) && ! $this->emailsMatch($invitation->email, $email)) {
-                                return $this->redirectBackWithRegistrationError(
-                                    $request,
-                                    'The email address you entered does not match the invitation. Please use the invited email address to register.',
-                                    'invitation_email_mismatch'
-                                );
-                            }
-                        }
                     }
 
                     $userData = [
@@ -230,18 +200,12 @@ class RegisterController extends Controller
                         ->with('info', 'Your account has been created. You will receive an account confirmation email shortly. Please verify your email address before logging in.');
                 }
 
-                $error = 'Invalid or expired invitation token!';
-                $this->logRegistrationFailure(
-                    $request,
-                    'invalid_or_expired_invitation',
-                    'The registration attempt used an invalid or expired invitation token.'
-                );
-                break;
+                return $this->rejectUnavailableRegistration($request, $status, $inviteCode);
 
             case 'view':
                 // Don't set showRegister here - let showRegistrationForm handle it
                 // Only validate invite code if present
-                if (($inviteCode !== null) && ! $this->isInvitationTokenValid($inviteCode)) {
+                if ($inviteCode !== '' && ! $this->isInvitationTokenValid($inviteCode)) {
                     $error = 'Invalid invitation token!';
                 }
                 break;
@@ -252,55 +216,55 @@ class RegisterController extends Controller
 
     public function showRegistrationForm(Request $request, string $error = '', int $showRegister = 0): mixed
     {
-        $inviteCode = '';
-        if ($request->has('invitecode')) {
-            $inviteCode = $request->input('invitecode');
-            $this->inviteCodeQuery = '&invitecode='.$inviteCode;
-        }
-
-        // Handle invitation token from URL (for email links)
-        if ($request->has('token')) {
-            $inviteCode = $request->input('token');
-            $this->inviteCodeQuery = '&token='.$inviteCode;
-        }
+        $inviteCode = $this->extractInviteCode($request);
 
         $emailFromInvite = '';
+        $notice = '';
+        $status = $this->registrationStatusService->resolve();
 
-        if ((int) Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_INVITE) {
+        if ($status['is_open']) {
+            $showRegister = 1;
+
             if (! empty($inviteCode)) {
-                if ($this->isInvitationTokenValid($inviteCode)) {
-                    $error = '';
-                    $showRegister = 1;
-
-                    // Pre-fill email if invitation has one
-                    $invitation = Invitation::findValidByToken($inviteCode);
-                    if ($invitation && ! empty($invitation->email)) {
-                        $emailFromInvite = $invitation->email;
-                    }
-                } else {
-                    $error = 'Invalid or expired invitation token!';
-                    $showRegister = 0;
+                $invitation = Invitation::findValidByToken($inviteCode);
+                if ($invitation && ! empty($invitation->email)) {
+                    $emailFromInvite = $invitation->email;
+                } elseif (! $this->isInvitationTokenValid($inviteCode)) {
+                    $notice = 'Registration is currently open, so you can register without a valid invitation.';
                 }
+            }
+
+            if ($status['scheduled_override_active']) {
+                $notice = $status['message'];
+            }
+        } elseif ($status['is_invite_only']) {
+            if (! empty($inviteCode) && $this->isInvitationTokenValid($inviteCode)) {
+                $showRegister = 1;
+
+                $invitation = Invitation::findValidByToken($inviteCode);
+                if ($invitation && ! empty($invitation->email)) {
+                    $emailFromInvite = $invitation->email;
+                }
+            } elseif (! empty($inviteCode)) {
+                $error = 'Invalid or expired invitation token!';
+                $showRegister = 0;
             } else {
-                $error = 'Registrations are currently invite only.';
+                $error = $status['message'];
                 $showRegister = 0;
             }
-        } elseif ((int) Settings::settingValue('registerstatus') === Settings::REGISTER_STATUS_CLOSED) {
-            $error = 'Registrations are currently closed.';
-            $showRegister = 0;
-        } elseif ($request->has('invitecode') || $request->has('token')) {
-            $error = 'Registration is open, you don\'t need the invite code to register.';
-            $showRegister = 0;
         } else {
-            $showRegister = 1;
+            $error = $status['message'];
+            $showRegister = 0;
         }
 
         return view('auth.register')->with([
             'showregister' => $showRegister,
             'error' => $error,
+            'notice' => $notice,
             'email' => $emailFromInvite,
             'invite_code_query' => $this->inviteCodeQuery,
             'invitecode' => $inviteCode,
+            'registrationStatus' => $status,
         ]);
     }
 
@@ -369,17 +333,73 @@ class RegisterController extends Controller
         string $level = 'warning',
         array $context = []
     ): void {
+        $status = $this->registrationStatusService->resolve();
+
         $logContext = array_merge([
             'reason' => $reason,
             'message' => $message,
             'username' => $request->input('username'),
             'email' => $request->input('email'),
             'ip' => $request->ip(),
-            'registration_status' => Settings::settingValue('registerstatus'),
-            'has_invite_code' => $request->filled('invitecode') || $request->filled('token'),
+            'registration_status' => $status['effective_status'],
+            'manual_registration_status' => $status['manual_status'],
+            'registration_status_reason' => $status['reason'],
+            'has_invite_code' => $request->filled('invitecode') || $request->filled('token') || $request->filled('invitation'),
         ], $context);
 
         Log::channel('registration')->{$level}("Registration attempt failed: {$reason}", $logContext);
+    }
+
+    /**
+     * @return RedirectResponse|Redirector
+     */
+    private function rejectUnavailableRegistration(Request $request, array $status, string $inviteCode)
+    {
+        if ($status['is_closed']) {
+            return $this->redirectBackWithRegistrationError(
+                $request,
+                $status['message'],
+                'registrations_closed'
+            );
+        }
+
+        if ($status['is_invite_only']) {
+            if (! empty($inviteCode) && ! $this->isInvitationTokenValid($inviteCode)) {
+                return $this->redirectBackWithRegistrationError(
+                    $request,
+                    'Invalid or expired invitation token!',
+                    'invalid_or_expired_invitation'
+                );
+            }
+
+            return $this->redirectBackWithRegistrationError(
+                $request,
+                $status['message'],
+                'registrations_invite_only'
+            );
+        }
+
+        return $this->redirectBackWithRegistrationError(
+            $request,
+            'Registrations are not currently available.',
+            'registrations_unavailable'
+        );
+    }
+
+    private function extractInviteCode(Request $request): string
+    {
+        $this->inviteCodeQuery = '';
+
+        foreach (['invitecode', 'token', 'invitation'] as $parameter) {
+            if ($request->filled($parameter)) {
+                $inviteCode = (string) $request->input($parameter);
+                $this->inviteCodeQuery = '&'.$parameter.'='.$inviteCode;
+
+                return $inviteCode;
+            }
+        }
+
+        return '';
     }
 
     private function emailsMatch(string $firstEmail, string $secondEmail): bool

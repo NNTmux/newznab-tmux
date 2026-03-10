@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Http\Controllers\Auth\RegisterController;
 use App\Models\User;
+use App\Services\RegistrationStatusService;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Cache;
@@ -13,7 +14,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Mockery;
-use Mockery\MockInterface;
 use Tests\TestCase;
 
 class RegisterControllerTest extends TestCase
@@ -88,6 +88,31 @@ class RegisterControllerTest extends TestCase
             $table->softDeletes();
         });
 
+        Schema::create('registration_periods', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->string('name');
+            $table->dateTime('starts_at');
+            $table->dateTime('ends_at');
+            $table->boolean('is_enabled')->default(true);
+            $table->text('notes')->nullable();
+            $table->unsignedInteger('created_by')->nullable();
+            $table->unsignedInteger('updated_by')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('invitations', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->string('token')->unique();
+            $table->string('email')->nullable();
+            $table->unsignedInteger('invited_by');
+            $table->timestamp('expires_at');
+            $table->timestamp('used_at')->nullable();
+            $table->unsignedInteger('used_by')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->json('metadata')->nullable();
+            $table->timestamps();
+        });
+
         DB::table('settings')->insert([
             'name' => 'registerstatus',
             'value' => '0',
@@ -106,17 +131,12 @@ class RegisterControllerTest extends TestCase
 
     public function test_successful_registration_redirects_to_login_with_confirmation_message(): void
     {
-        $this->partialMock(RegisterController::class, function (MockInterface $mock): void {
-            $mock->shouldAllowMockingProtectedMethods();
-            $mock->shouldReceive('create')
-                ->once()
-                ->andReturn(new User([
-                    'id' => 123,
-                    'username' => 'newmember',
-                    'email' => 'newmember@example.com',
-                    'roles_id' => 1,
-                ]));
-        });
+        $this->mockRegisterControllerCreate(new User([
+            'id' => 123,
+            'username' => 'newmember',
+            'email' => 'newmember@example.com',
+            'roles_id' => 1,
+        ]));
 
         $response = $this->post(route('register.post'), [
             'action' => 'submit',
@@ -203,12 +223,9 @@ class RegisterControllerTest extends TestCase
                 })
             );
 
-        $this->partialMock(RegisterController::class, function (MockInterface $mock): void {
-            $mock->shouldAllowMockingProtectedMethods();
-            $mock->shouldReceive('create')
-                ->once()
-                ->andThrow(new \RuntimeException('Simulated registration failure'));
-        });
+        $this->mockRegisterControllerCreate(
+            new \RuntimeException('Simulated registration failure')
+        );
 
         $response = $this->from(route('register'))->post(route('register.post'), [
             'action' => 'submit',
@@ -223,5 +240,134 @@ class RegisterControllerTest extends TestCase
         $response->assertSessionHasErrors([
             'registration' => 'We could not complete your registration right now. Please try again in a few minutes. If the problem continues, contact support.',
         ]);
+    }
+
+    public function test_invite_only_registration_with_valid_invitation_succeeds(): void
+    {
+        DB::table('settings')
+            ->where('name', 'registerstatus')
+            ->update(['value' => '1']);
+
+        DB::table('invitations')->insert([
+            'token' => 'valid-token',
+            'email' => 'invitee@example.com',
+            'invited_by' => 1,
+            'expires_at' => now()->addDay(),
+            'is_active' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->mockRegisterControllerCreate(new User([
+            'id' => 321,
+            'username' => 'inviteemember',
+            'email' => 'invitee@example.com',
+            'roles_id' => 1,
+        ]));
+
+        $response = $this->post(route('register.post'), [
+            'action' => 'submit',
+            'token' => 'valid-token',
+            'username' => 'inviteemember',
+            'email' => 'invitee@example.com',
+            'password' => 'ValidPass1!',
+            'password_confirmation' => 'ValidPass1!',
+            'terms' => 'on',
+        ]);
+
+        $response->assertRedirect(route('login'));
+
+        $this->assertNotNull(
+            DB::table('invitations')
+                ->where('token', 'valid-token')
+                ->value('used_at')
+        );
+    }
+
+    public function test_closed_registration_rejects_even_valid_invitation(): void
+    {
+        DB::table('settings')
+            ->where('name', 'registerstatus')
+            ->update(['value' => '2']);
+
+        DB::table('invitations')->insert([
+            'token' => 'closed-token',
+            'email' => 'invitee@example.com',
+            'invited_by' => 1,
+            'expires_at' => now()->addDay(),
+            'is_active' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->from(route('register'))->post(route('register.post'), [
+            'action' => 'submit',
+            'token' => 'closed-token',
+            'username' => 'closedmember',
+            'email' => 'invitee@example.com',
+            'password' => 'ValidPass1!',
+            'password_confirmation' => 'ValidPass1!',
+            'terms' => 'on',
+        ]);
+
+        $response->assertRedirect(route('register'));
+        $response->assertSessionHasErrors([
+            'registration' => 'Registrations are currently closed.',
+        ]);
+    }
+
+    public function test_scheduled_open_period_allows_registration_when_manual_status_is_closed(): void
+    {
+        DB::table('settings')
+            ->where('name', 'registerstatus')
+            ->update(['value' => '2']);
+
+        DB::table('registration_periods')->insert([
+            'name' => 'Weekend Open',
+            'starts_at' => now()->subHour(),
+            'ends_at' => now()->addHour(),
+            'is_enabled' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->mockRegisterControllerCreate(new User([
+            'id' => 456,
+            'username' => 'scheduledmember',
+            'email' => 'scheduled@example.com',
+            'roles_id' => 1,
+        ]));
+
+        $response = $this->post(route('register.post'), [
+            'action' => 'submit',
+            'username' => 'scheduledmember',
+            'email' => 'scheduled@example.com',
+            'password' => 'ValidPass1!',
+            'password_confirmation' => 'ValidPass1!',
+            'terms' => 'on',
+        ]);
+
+        $response->assertRedirect(route('login'));
+    }
+
+    private function mockRegisterControllerCreate(User|\Throwable $result): void
+    {
+        $mock = Mockery::mock(RegisterController::class)->makePartial();
+
+        $mock->shouldAllowMockingProtectedMethods();
+
+        $reflection = new \ReflectionProperty(RegisterController::class, 'registrationStatusService');
+        $reflection->setAccessible(true);
+        $reflection->setValue($mock, app(RegistrationStatusService::class));
+
+        $expectation = $mock->shouldReceive('create')->once();
+
+        if ($result instanceof \Throwable) {
+            $expectation->andThrow($result);
+        } else {
+            $expectation->andReturn($result);
+        }
+
+        $this->app->instance(RegisterController::class, $mock);
     }
 }

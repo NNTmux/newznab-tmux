@@ -25,6 +25,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Settings - model for settings table.
@@ -193,5 +194,18 @@ class Settings extends Model
         foreach ($data as $key => $value) {
             self::query()->where('name', $key)->update(['value' => \is_array($value) ? implode(', ', $value) : $value]);
         }
+
+        self::forgetCachedSettings();
+    }
+
+    public static function forgetCachedSettings(): void
+    {
+        Cache::forget('site_settings');
+        Cache::forget('site_settings_array');
+        Cache::forget('site_settings_converted');
+        Cache::forget('api_v1_server_menu');
+        Cache::forget('api_v2_capabilities');
+
+        self::$settingsCollection = null;
     }
 }

@@ -13,6 +13,7 @@ use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Models\User;
 use App\Models\UserRequest;
+use App\Services\RegistrationStatusService;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\Releases\ReleaseSearchService;
 use Illuminate\Contracts\Foundation\Application;
@@ -465,10 +466,6 @@ class ApiController extends BasePageController
                     'max' => 100,
                     'default' => 100,
                 ],
-                'registration' => [
-                    'available' => 'yes',
-                    'open' => (int) Settings::settingValue('registerstatus') === 0 ? 'yes' : 'no',
-                ],
                 'searching' => [
                     'search' => ['available' => 'yes', 'supportedParams' => 'q'],
                     'tv-search' => ['available' => 'yes', 'supportedParams' => 'q,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
@@ -477,6 +474,12 @@ class ApiController extends BasePageController
                 ],
             ];
         });
+
+        $registrationStatus = app(RegistrationStatusService::class)->resolve();
+        $serverInfo['registration'] = [
+            'available' => $registrationStatus['available'] ? 'yes' : 'no',
+            'open' => $registrationStatus['is_open'] ? 'yes' : 'no',
+        ];
 
         // Only load categories for caps requests (also cached via Category::getForMenu)
         $serverInfo['categories'] = $includeCats ? Category::getForMenu() : null;
@@ -525,9 +528,6 @@ class ApiController extends BasePageController
 
     /**
      * Verify groupName parameter.
-     *
-     *
-     * @return list<int|string>
      *
      * @throws \Exception
      */
