@@ -10,7 +10,9 @@ use Illuminate\Contracts\Validation\UncompromisedVerifier;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
+use Mockery;
 use Mockery\MockInterface;
 use Tests\TestCase;
 
@@ -132,6 +134,26 @@ class RegisterControllerTest extends TestCase
 
     public function test_registration_failure_shows_explanation_for_deactivated_account(): void
     {
+        Log::partialMock();
+
+        $registrationLogger = Mockery::mock();
+        Log::shouldReceive('channel')
+            ->once()
+            ->with('registration')
+            ->andReturn($registrationLogger);
+
+        $registrationLogger->shouldReceive('warning')
+            ->once()
+            ->with(
+                'Registration attempt failed: deactivated_account',
+                Mockery::on(function (array $context): bool {
+                    return $context['reason'] === 'deactivated_account'
+                        && $context['email'] === 'disabled@example.com'
+                        && $context['username'] === 'freshmember'
+                        && $context['registration_status'] === 0;
+                })
+            );
+
         DB::table('users')->insert([
             'username' => 'oldmember',
             'email' => 'disabled@example.com',
@@ -156,6 +178,51 @@ class RegisterControllerTest extends TestCase
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors([
             'registration' => 'This email address belongs to a deactivated account. Please contact us if you need help reactivating it.',
+        ]);
+    }
+
+    public function test_registration_exception_is_logged_to_registration_channel(): void
+    {
+        Log::partialMock();
+
+        $registrationLogger = Mockery::mock();
+        Log::shouldReceive('channel')
+            ->once()
+            ->with('registration')
+            ->andReturn($registrationLogger);
+
+        $registrationLogger->shouldReceive('error')
+            ->once()
+            ->with(
+                'Registration attempt failed: unexpected_exception',
+                Mockery::on(function (array $context): bool {
+                    return $context['reason'] === 'unexpected_exception'
+                        && $context['email'] === 'broken@example.com'
+                        && $context['username'] === 'brokenmember'
+                        && $context['exception'] === \RuntimeException::class
+                        && $context['registration_status'] === 0;
+                })
+            );
+
+        $this->partialMock(RegisterController::class, function (MockInterface $mock): void {
+            $mock->shouldAllowMockingProtectedMethods();
+            $mock->shouldReceive('create')
+                ->once()
+                ->andThrow(new \RuntimeException('Simulated registration failure'));
+        });
+
+        $response = $this->from(route('register'))->post(route('register.post'), [
+            'action' => 'submit',
+            'username' => 'brokenmember',
+            'email' => 'broken@example.com',
+            'password' => 'ValidPass1!',
+            'password_confirmation' => 'ValidPass1!',
+            'terms' => 'on',
+        ]);
+
+        $response->assertRedirect(route('register'));
+        $response->assertSessionHasErrors([
+            'registration' => 'We could not complete your registration right now. Please try again in a few minutes. If the problem continues, contact support.',
         ]);
     }
 }

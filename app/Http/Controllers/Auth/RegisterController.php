@@ -128,6 +128,14 @@ class RegisterController extends Controller
         ]);
 
         if ($validator->fails()) {
+            $this->logRegistrationFailure(
+                $request,
+                'validation_failed',
+                'The registration request failed validation.',
+                'warning',
+                ['validation_errors' => $validator->errors()->toArray()]
+            );
+
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput($request->except('password', 'password_confirmation'));
@@ -146,7 +154,8 @@ class RegisterController extends Controller
                 if ($existingUser && $existingUser->trashed()) {
                     return $this->redirectBackWithRegistrationError(
                         $request,
-                        'This email address belongs to a deactivated account. Please contact us if you need help reactivating it.'
+                        'This email address belongs to a deactivated account. Please contact us if you need help reactivating it.',
+                        'deactivated_account'
                     );
                 }
 
@@ -171,7 +180,8 @@ class RegisterController extends Controller
                             if (! empty($invitation->email) && ! $this->emailsMatch($invitation->email, $email)) {
                                 return $this->redirectBackWithRegistrationError(
                                     $request,
-                                    'The email address you entered does not match the invitation. Please use the invited email address to register.'
+                                    'The email address you entered does not match the invitation. Please use the invited email address to register.',
+                                    'invitation_email_mismatch'
                                 );
                             }
                         }
@@ -203,16 +213,15 @@ class RegisterController extends Controller
                             }
                         });
                     } catch (Throwable $exception) {
-                        Log::error('User registration failed', [
-                            'username' => $userName,
-                            'email' => $email,
-                            'ip' => $request->ip(),
-                            'error' => $exception->getMessage(),
-                        ]);
-
                         return $this->redirectBackWithRegistrationError(
                             $request,
-                            'We could not complete your registration right now. Please try again in a few minutes. If the problem continues, contact support.'
+                            'We could not complete your registration right now. Please try again in a few minutes. If the problem continues, contact support.',
+                            'unexpected_exception',
+                            'error',
+                            [
+                                'error' => $exception->getMessage(),
+                                'exception' => $exception::class,
+                            ]
                         );
                     }
 
@@ -223,6 +232,11 @@ class RegisterController extends Controller
                 }
 
                 $error = 'Invalid or expired invitation token!';
+                $this->logRegistrationFailure(
+                    $request,
+                    'invalid_or_expired_invitation',
+                    'The registration attempt used an invalid or expired invitation token.'
+                );
                 break;
 
             case 'view':
@@ -328,12 +342,45 @@ class RegisterController extends Controller
         return $invitation !== null;
     }
 
-    private function redirectBackWithRegistrationError(Request $request, string $message): RedirectResponse
-    {
+    /**
+     * @param  array<string, mixed>  $context
+     */
+    private function redirectBackWithRegistrationError(
+        Request $request,
+        string $message,
+        string $reason = 'registration_failed',
+        string $level = 'warning',
+        array $context = []
+    ): RedirectResponse {
+        $this->logRegistrationFailure($request, $reason, $message, $level, $context);
+
         return redirect()
             ->back()
             ->withErrors(['registration' => $message])
             ->withInput($request->except('password', 'password_confirmation'));
+    }
+
+    /**
+     * @param  array<string, mixed>  $context
+     */
+    private function logRegistrationFailure(
+        Request $request,
+        string $reason,
+        string $message,
+        string $level = 'warning',
+        array $context = []
+    ): void {
+        $logContext = array_merge([
+            'reason' => $reason,
+            'message' => $message,
+            'username' => $request->input('username'),
+            'email' => $request->input('email'),
+            'ip' => $request->ip(),
+            'registration_status' => Settings::settingValue('registerstatus'),
+            'has_invite_code' => $request->filled('invitecode') || $request->filled('token'),
+        ], $context);
+
+        Log::channel('registration')->{$level}("Registration attempt failed: {$reason}", $logContext);
     }
 
     private function emailsMatch(string $firstEmail, string $secondEmail): bool

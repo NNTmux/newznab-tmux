@@ -38,7 +38,7 @@ return [
         'papertrail' => [
             'driver' => 'monolog',
             'level' => 'debug',
-            'handler' => SyslogUdpHandler::class,
+            'handler' => Monolog\Handler\SyslogUdpHandler::class,
             'handler_with' => [
                 'host' => env('PAPERTRAIL_URL'),
                 'port' => env('PAPERTRAIL_PORT'),
@@ -46,7 +46,7 @@ return [
         ],
         'stderr' => [
             'driver' => 'monolog',
-            'handler' => StreamHandler::class,
+            'handler' => Monolog\Handler\StreamHandler::class,
             'formatter' => env('LOG_STDERR_FORMATTER'),
             'with' => [
                 'stream' => 'php://stderr',
@@ -81,6 +81,15 @@ return [
         'failed_login' => [
             'driver' => 'daily',
             'path' => storage_path('logs/failed_login.log'),
+            'level' => 'debug',
+            'days' => 7,
+            'bubble' => true,
+            'permission' => 0775,
+            'locking' => false,
+        ],
+        'registration' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/registration.log'),
             'level' => 'debug',
             'days' => 7,
             'bubble' => true,
