@@ -128,6 +128,23 @@ class AdminReleaseReportControllerTest extends TestCase
     }
 
     /**
+     * Test that release report bulk-selection JS queries from the component root.
+     */
+    public function test_release_report_component_uses_root_scoped_selection_queries(): void
+    {
+        $scriptPath = resource_path('js/alpine/components/release-report.js');
+
+        $this->assertFileExists($scriptPath);
+
+        $content = file_get_contents($scriptPath);
+
+        $this->assertStringContainsString('rootEl: null', $content);
+        $this->assertStringContainsString('this.rootEl = this.$root;', $content);
+        $this->assertStringContainsString('return root ? [...root.querySelectorAll(\'.report-checkbox\')] : [];', $content);
+        $this->assertStringNotContainsString('this.$el.querySelectorAll(\'.report-checkbox\')', $content);
+    }
+
+    /**
      * Test that bulk action dropdown includes revert option.
      */
     public function test_bulk_action_dropdown_has_revert_option(): void
@@ -140,6 +157,25 @@ class AdminReleaseReportControllerTest extends TestCase
 
         // Check that the bulk action dropdown contains revert option
         $this->assertStringContainsString('<option value="revert">Revert to Reviewed</option>', $content);
+    }
+
+    /**
+     * Test that bulk selection controls are rendered above the table and
+     * row checkboxes are associated to the bulk form.
+     */
+    public function test_bulk_selection_controls_use_a_dedicated_bulk_form(): void
+    {
+        $viewPath = resource_path('views/admin/release-reports/index.blade.php');
+
+        $this->assertFileExists($viewPath);
+
+        $content = file_get_contents($viewPath);
+
+        $this->assertStringContainsString('id="bulk-action-form"', $content);
+        $this->assertStringContainsString('Select All', $content);
+        $this->assertStringContainsString('Clear Selection', $content);
+        $this->assertStringContainsString('form="bulk-action-form"', $content);
+        $this->assertStringContainsString('x-text="selectedCount"', $content);
     }
 
     /**

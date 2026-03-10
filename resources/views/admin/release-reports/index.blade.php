@@ -69,215 +69,237 @@
         @if($reportsList->count() > 0)
             <form id="bulk-action-form" method="POST" action="{{ route('admin.release-reports.bulk') }}" @submit="validateBulkAction($event)">
                 @csrf
-                <div class="px-6 py-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center gap-4">
-                    <input type="checkbox" id="select-all" x-model="allChecked" @change="toggleAll()" class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-700">
-                    <select name="action" class="text-sm border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200">
-                        <option value="">Bulk Actions</option>
-                        <option value="reviewed">Mark as Reviewed</option>
-                        <option value="resolve">Mark as Resolved</option>
-                        <option value="dismiss">Dismiss Selected</option>
-                        <option value="revert">Revert to Reviewed</option>
-                        <option value="delete">Delete Releases & Resolve</option>
-                    </select>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
-                        Apply
-                    </button>
-                </div>
+                <div class="px-6 py-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button type="button"
+                                @click="selectAll()"
+                                class="px-3 py-1.5 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition text-sm font-medium">
+                            <i class="fas fa-check-square mr-1"></i> Select All
+                        </button>
+                        <button type="button"
+                                @click="clearSelection()"
+                                class="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition text-sm font-medium">
+                            <i class="fas fa-square mr-1"></i> Clear Selection
+                        </button>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">
+                            <span x-text="selectedCount"></span> selected
+                        </span>
+                    </div>
 
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-900">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-10"></th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Release</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Reporter</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Reason</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                            @foreach($reportsList as $report)
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                    <td class="px-4 py-4 whitespace-nowrap">
-                                        <input type="checkbox" name="report_ids[]" value="{{ $report->id }}" @change="onCheckboxChange()" class="report-checkbox rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-700">
-                                    </td>
-                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200 font-mono">
-                                        #{{ $report->id }}
-                                    </td>
-                                    <td class="px-4 py-4">
-                                        <div class="max-w-md">
-                                            @if($report->release)
-                                                <a href="{{ url('/details/' . $report->release->guid) }}"
-                                                   target="_blank"
-                                                   class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 font-medium text-sm break-all">
-                                                    {{ Str::limit($report->release->searchname, 80) }}
-                                                </a>
-                                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                    ID: {{ $report->releases_id }} | Size: {{ number_format($report->release->size / 1073741824, 2) }} GB
-                                                </div>
-                                            @else
-                                                <span class="text-red-500 dark:text-red-400 text-sm">
-                                                    <i class="fas fa-exclamation-triangle mr-1"></i> Release Deleted
-                                                </span>
-                                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                    Original ID: {{ $report->releases_id }}
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </td>
-                                    <td class="px-4 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900 dark:text-gray-200">
-                                            @if($report->user)
-                                                {{ $report->user->username }}
-                                            @else
-                                                <span class="text-gray-500">Deleted User</span>
-                                            @endif
-                                        </div>
-                                    </td>
-                                    <td class="px-4 py-4">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200">
-                                            {{ $report->reason_label }}
-                                        </span>
-                                        @if($report->description)
-                                            <button type="button"
-                                                    class="report-description-btn ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                                                    data-description="{{ $report->description }}"
-                                                    data-reason="{{ $report->reason_label }}"
-                                                    data-reporter="{{ $report->user ? $report->user->username : 'Unknown' }}"
-                                                    @click="showDescription($event.currentTarget.dataset.description, $event.currentTarget.dataset.reason, $event.currentTarget.dataset.reporter)"
-                                                    title="View description">
-                                                <i class="fas fa-comment-dots"></i>
-                                            </button>
-                                        @endif
-                                    </td>
-                                    <td class="px-4 py-4 whitespace-nowrap">
-                                        @php
-                                            $statusColors = [
-                                                'pending' => 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200',
-                                                'reviewed' => 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200',
-                                                'resolved' => 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200',
-                                                'dismissed' => 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
-                                            ];
-                                            $statusIcons = [
-                                                'pending' => 'fa-clock',
-                                                'reviewed' => 'fa-eye',
-                                                'resolved' => 'fa-check',
-                                                'dismissed' => 'fa-ban',
-                                            ];
-                                        @endphp
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusColors[$report->status] ?? 'bg-gray-100 text-gray-800' }}">
-                                            <i class="fas {{ $statusIcons[$report->status] ?? 'fa-question' }} mr-1"></i>
-                                            {{ ucfirst($report->status) }}
-                                        </span>
-                                        @if($report->reviewer && $report->reviewed_at)
-                                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                by {{ $report->reviewer->username }} at {{ $report->reviewed_at->format('M d, Y H:i') }}
-                                            </div>
-                                        @endif
-                                    </td>
-                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                                        {{ $report->created_at->format('M d, Y') }}
-                                        <div class="text-xs">{{ $report->created_at->format('H:i') }}</div>
-                                    </td>
-                                    <td class="px-4 py-4 whitespace-nowrap">
-                                        <div class="flex items-center gap-2 flex-wrap">
-                                            @if($report->release && in_array($report->status, ['pending', 'reviewed']))
-                                                <!-- Delete Release Button -->
-                                                <form method="POST" action="{{ route('admin.release-reports.delete-release', $report->id) }}" class="inline"
-                                                      x-data="confirmForm"
-                                                      data-message="Are you sure you want to DELETE this release? This action cannot be undone."
-                                                      data-title="Delete Release"
-                                                      data-type="danger"
-                                                      data-confirm-text="Delete"
-                                                      @submit.prevent="submit()">
-                                                    @csrf
-                                                    <button type="submit"
-                                                            class="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm inline-flex items-center"
-                                                            title="Delete Release">
-                                                        <i class="fas fa-trash mr-1"></i> Delete
-                                                    </button>
-                                                </form>
-                                            @endif
-
-                                            @if($report->status === 'pending')
-                                                <!-- Mark as Reviewed Button -->
-                                                <form method="POST" action="{{ route('admin.release-reports.update-status', $report->id) }}" class="inline">
-                                                    @csrf
-                                                    <input type="hidden" name="status" value="reviewed">
-                                                    <button type="submit"
-                                                            class="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm inline-flex items-center"
-                                                            title="Mark as Reviewed">
-                                                        <i class="fas fa-eye mr-1"></i> Reviewed
-                                                    </button>
-                                                </form>
-
-                                                <!-- Dismiss Button -->
-                                                <form method="POST" action="{{ route('admin.release-reports.dismiss', $report->id) }}" class="inline">
-                                                    @csrf
-                                                    <button type="submit"
-                                                            class="px-3 py-1.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition text-sm inline-flex items-center"
-                                                            title="Dismiss Report">
-                                                        <i class="fas fa-ban mr-1"></i> Dismiss
-                                                    </button>
-                                                </form>
-                                            @elseif($report->status === 'reviewed')
-                                                <!-- Mark as Resolved Button -->
-                                                <form method="POST" action="{{ route('admin.release-reports.update-status', $report->id) }}" class="inline">
-                                                    @csrf
-                                                    <input type="hidden" name="status" value="resolved">
-                                                    <button type="submit"
-                                                            class="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm inline-flex items-center"
-                                                            title="Mark as Resolved">
-                                                        <i class="fas fa-check mr-1"></i> Resolve
-                                                    </button>
-                                                </form>
-
-                                                <!-- Dismiss Button -->
-                                                <form method="POST" action="{{ route('admin.release-reports.dismiss', $report->id) }}" class="inline">
-                                                    @csrf
-                                                    <button type="submit"
-                                                            class="px-3 py-1.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition text-sm inline-flex items-center"
-                                                            title="Dismiss Report">
-                                                        <i class="fas fa-ban mr-1"></i> Dismiss
-                                                    </button>
-                                                </form>
-                                            @elseif(!$report->release)
-                                                <span class="text-xs text-gray-500 dark:text-gray-400">Release already deleted</span>
-                                            @elseif(in_array($report->status, ['resolved', 'dismissed']))
-                                                <!-- Revert Button for resolved/dismissed reports -->
-                                                <button type="button"
-                                                        class="revert-report-btn px-3 py-1.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition text-sm inline-flex items-center"
-                                                        data-report-id="{{ $report->id }}"
-                                                        data-report-status="{{ $report->status }}"
-                                                        data-action-url="{{ route('admin.release-reports.revert', $report->id) }}"
-                                                        @click="showRevert($event.currentTarget.dataset.actionUrl, $event.currentTarget.dataset.reportStatus)"
-                                                        title="Revert to Reviewed for further action">
-                                                    <i class="fas fa-undo mr-1"></i> Revert
-                                                </button>
-                                                <span class="text-xs text-gray-500 dark:text-gray-400">{{ ucfirst($report->status) }}</span>
-                                            @else
-                                                <span class="text-xs text-gray-500 dark:text-gray-400">{{ ucfirst($report->status) }}</span>
-                                            @endif
-
-                                            @if($report->release)
-                                                <a href="{{ url('/details/' . $report->release->guid) }}"
-                                                   target="_blank"
-                                                   class="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm inline-flex items-center"
-                                                   title="View Release">
-                                                    <i class="fas fa-external-link-alt"></i>
-                                                </a>
-                                            @endif
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <select name="action" class="text-sm border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200">
+                            <option value="">Bulk Actions</option>
+                            <option value="reviewed">Mark as Reviewed</option>
+                            <option value="resolve">Mark as Resolved</option>
+                            <option value="dismiss">Dismiss Selected</option>
+                            <option value="revert">Revert to Reviewed</option>
+                            <option value="delete">Delete Releases & Resolve</option>
+                        </select>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
+                            Apply
+                        </button>
+                    </div>
                 </div>
             </form>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-900">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-10">Select</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Release</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Reporter</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Reason</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        @foreach($reportsList as $report)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <input type="checkbox"
+                                           form="bulk-action-form"
+                                           name="report_ids[]"
+                                           value="{{ $report->id }}"
+                                           @change="onCheckboxChange()"
+                                           class="report-checkbox rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-700">
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200 font-mono">
+                                    #{{ $report->id }}
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="max-w-md">
+                                        @if($report->release)
+                                            <a href="{{ url('/details/' . $report->release->guid) }}"
+                                               target="_blank"
+                                               class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 font-medium text-sm break-all">
+                                                {{ Str::limit($report->release->searchname, 80) }}
+                                            </a>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                ID: {{ $report->releases_id }} | Size: {{ number_format($report->release->size / 1073741824, 2) }} GB
+                                            </div>
+                                        @else
+                                            <span class="text-red-500 dark:text-red-400 text-sm">
+                                                <i class="fas fa-exclamation-triangle mr-1"></i> Release Deleted
+                                            </span>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                Original ID: {{ $report->releases_id }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900 dark:text-gray-200">
+                                        @if($report->user)
+                                            {{ $report->user->username }}
+                                        @else
+                                            <span class="text-gray-500">Deleted User</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200">
+                                        {{ $report->reason_label }}
+                                    </span>
+                                    @if($report->description)
+                                        <button type="button"
+                                                class="report-description-btn ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                                data-description="{{ $report->description }}"
+                                                data-reason="{{ $report->reason_label }}"
+                                                data-reporter="{{ $report->user ? $report->user->username : 'Unknown' }}"
+                                                @click="showDescription($event.currentTarget.dataset.description, $event.currentTarget.dataset.reason, $event.currentTarget.dataset.reporter)"
+                                                title="View description">
+                                            <i class="fas fa-comment-dots"></i>
+                                        </button>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    @php
+                                        $statusColors = [
+                                            'pending' => 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200',
+                                            'reviewed' => 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200',
+                                            'resolved' => 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200',
+                                            'dismissed' => 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
+                                        ];
+                                        $statusIcons = [
+                                            'pending' => 'fa-clock',
+                                            'reviewed' => 'fa-eye',
+                                            'resolved' => 'fa-check',
+                                            'dismissed' => 'fa-ban',
+                                        ];
+                                    @endphp
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusColors[$report->status] ?? 'bg-gray-100 text-gray-800' }}">
+                                        <i class="fas {{ $statusIcons[$report->status] ?? 'fa-question' }} mr-1"></i>
+                                        {{ ucfirst($report->status) }}
+                                    </span>
+                                    @if($report->reviewer && $report->reviewed_at)
+                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            by {{ $report->reviewer->username }} at {{ $report->reviewed_at->format('M d, Y H:i') }}
+                                        </div>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                                    {{ $report->created_at->format('M d, Y') }}
+                                    <div class="text-xs">{{ $report->created_at->format('H:i') }}</div>
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        @if($report->release && in_array($report->status, ['pending', 'reviewed']))
+                                            <!-- Delete Release Button -->
+                                            <form method="POST" action="{{ route('admin.release-reports.delete-release', $report->id) }}" class="inline"
+                                                  x-data="confirmForm"
+                                                  data-message="Are you sure you want to DELETE this release? This action cannot be undone."
+                                                  data-title="Delete Release"
+                                                  data-type="danger"
+                                                  data-confirm-text="Delete"
+                                                  @submit.prevent="submit()">
+                                                @csrf
+                                                <button type="submit"
+                                                        class="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm inline-flex items-center"
+                                                        title="Delete Release">
+                                                    <i class="fas fa-trash mr-1"></i> Delete
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        @if($report->status === 'pending')
+                                            <!-- Mark as Reviewed Button -->
+                                            <form method="POST" action="{{ route('admin.release-reports.update-status', $report->id) }}" class="inline">
+                                                @csrf
+                                                <input type="hidden" name="status" value="reviewed">
+                                                <button type="submit"
+                                                        class="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm inline-flex items-center"
+                                                        title="Mark as Reviewed">
+                                                    <i class="fas fa-eye mr-1"></i> Reviewed
+                                                </button>
+                                            </form>
+
+                                            <!-- Dismiss Button -->
+                                            <form method="POST" action="{{ route('admin.release-reports.dismiss', $report->id) }}" class="inline">
+                                                @csrf
+                                                <button type="submit"
+                                                        class="px-3 py-1.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition text-sm inline-flex items-center"
+                                                        title="Dismiss Report">
+                                                    <i class="fas fa-ban mr-1"></i> Dismiss
+                                                </button>
+                                            </form>
+                                        @elseif($report->status === 'reviewed')
+                                            <!-- Mark as Resolved Button -->
+                                            <form method="POST" action="{{ route('admin.release-reports.update-status', $report->id) }}" class="inline">
+                                                @csrf
+                                                <input type="hidden" name="status" value="resolved">
+                                                <button type="submit"
+                                                        class="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm inline-flex items-center"
+                                                        title="Mark as Resolved">
+                                                    <i class="fas fa-check mr-1"></i> Resolve
+                                                </button>
+                                            </form>
+
+                                            <!-- Dismiss Button -->
+                                            <form method="POST" action="{{ route('admin.release-reports.dismiss', $report->id) }}" class="inline">
+                                                @csrf
+                                                <button type="submit"
+                                                        class="px-3 py-1.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition text-sm inline-flex items-center"
+                                                        title="Dismiss Report">
+                                                    <i class="fas fa-ban mr-1"></i> Dismiss
+                                                </button>
+                                            </form>
+                                        @elseif(!$report->release)
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Release already deleted</span>
+                                        @elseif(in_array($report->status, ['resolved', 'dismissed']))
+                                            <!-- Revert Button for resolved/dismissed reports -->
+                                            <button type="button"
+                                                    class="revert-report-btn px-3 py-1.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition text-sm inline-flex items-center"
+                                                    data-report-id="{{ $report->id }}"
+                                                    data-report-status="{{ $report->status }}"
+                                                    data-action-url="{{ route('admin.release-reports.revert', $report->id) }}"
+                                                    @click="showRevert($event.currentTarget.dataset.actionUrl, $event.currentTarget.dataset.reportStatus)"
+                                                    title="Revert to Reviewed for further action">
+                                                <i class="fas fa-undo mr-1"></i> Revert
+                                            </button>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">{{ ucfirst($report->status) }}</span>
+                                        @else
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">{{ ucfirst($report->status) }}</span>
+                                        @endif
+
+                                        @if($report->release)
+                                            <a href="{{ url('/details/' . $report->release->guid) }}"
+                                               target="_blank"
+                                               class="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm inline-flex items-center"
+                                               title="View Release">
+                                                <i class="fas fa-external-link-alt"></i>
+                                            </a>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Pagination -->
             <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
