@@ -15,12 +15,16 @@ use App\Support\PermissionSyncHelper;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Jrean\UserVerification\Traits\VerifiesUsers;
 use Spatie\Permission\Models\Role;
+use Throwable;
 
 class RegisterController extends Controller
 {
@@ -88,7 +92,8 @@ class RegisterController extends Controller
      */
     public function register(RegisterRegisterRequest $request)
     {
-        $error = $userName = $password = $confirmPassword = $email = $inviteCode = '';
+        $error = '';
+        $inviteCode = '';
         $showRegister = 1;
 
         if ($request->has('invitecode')) {
@@ -104,7 +109,14 @@ class RegisterController extends Controller
 
         $validator = Validator::make($request->all(), [
             'username' => ['required', 'string', 'min:5', 'max:255', 'unique:users'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users', new ValidEmailDomain],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->where(fn ($query) => $query->whereNull('deleted_at')),
+                new ValidEmailDomain,
+            ],
             'password' => ['required', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
         ], [
             'password.min' => 'The password must be at least 8 characters.',
@@ -125,17 +137,17 @@ class RegisterController extends Controller
 
         switch ($action) {
             case 'submit':
-                $userName = $request->input('username');
-                $password = $request->input('password');
-                $confirmPassword = $request->input('password_confirmation');
-                $email = $request->input('email');
+                $userName = (string) $request->input('username');
+                $password = (string) $request->input('password');
+                $email = (string) $request->input('email');
 
                 // Check if the email is associated with a soft-deleted user
                 $existingUser = User::withTrashed()->where('email', $email)->first();
                 if ($existingUser && $existingUser->trashed()) {
-                    $error = 'This email address belongs to a deactivated account.';
-
-                    return $this->showRegistrationForm($request, $error);
+                    return $this->redirectBackWithRegistrationError(
+                        $request,
+                        'This email address belongs to a deactivated account. Please contact us if you need help reactivating it.'
+                    );
                 }
 
                 // Get the default user role.
@@ -156,10 +168,11 @@ class RegisterController extends Controller
                             $invitedBy = $invitation->invited_by;
 
                             // Validate email matches invitation
-                            if (! empty($invitation->email) && $invitation->email !== $email) {
-                                $error = 'Email address does not match the invitation.';
-
-                                return $this->showRegistrationForm($request, $error);
+                            if (! empty($invitation->email) && ! $this->emailsMatch($invitation->email, $email)) {
+                                return $this->redirectBackWithRegistrationError(
+                                    $request,
+                                    'The email address you entered does not match the invitation. Please use the invited email address to register.'
+                                );
                             }
                         }
                     }
@@ -181,27 +194,32 @@ class RegisterController extends Controller
                         }
                     }
 
-                    $user = $this->create($userData);
+                    try {
+                        DB::transaction(function () use ($invitation, $userData): void {
+                            $user = $this->create($userData);
 
-                    // Mark invitation as used
-                    if ($invitation) {
-                        $invitation->markAsUsed($user->id);
+                            if ($invitation && ! $invitation->markAsUsed($user->id)) {
+                                throw new \RuntimeException('Failed to mark invitation as used.');
+                            }
+                        });
+                    } catch (Throwable $exception) {
+                        Log::error('User registration failed', [
+                            'username' => $userName,
+                            'email' => $email,
+                            'ip' => $request->ip(),
+                            'error' => $exception->getMessage(),
+                        ]);
+
+                        return $this->redirectBackWithRegistrationError(
+                            $request,
+                            'We could not complete your registration right now. Please try again in a few minutes. If the problem continues, contact support.'
+                        );
                     }
 
-                    // Create verification message that will be shown on login page
-                    $notificationMessage = 'Your Account has been created. A verification email has been sent to your email address. You will be able to log in after completing the verification process.';
-
-                    // Store notification in session so it's available after redirect
-                    // Use 'message' key to match the key expected by the login template
-                    $request->session()->flash('message', $notificationMessage);
-
-                    // Set the message type to info for proper styling
-                    $request->session()->flash('message_type', 'info');
-
-                    // First ensure the user is created and verification is sent, then redirect to login
-                    $this->registered($request, $user);
-
-                    return redirect('/login');
+                    return redirect()
+                        ->route('login')
+                        ->with('message', 'Your account has been created. You will receive an account confirmation email shortly. Please verify your email address before logging in.')
+                        ->with('message_type', 'info');
                 }
 
                 $error = 'Invalid or expired invitation token!';
@@ -289,7 +307,7 @@ class RegisterController extends Controller
         }
 
         // If invitation has specific email, validate it matches
-        if (! empty($invitation->email) && $invitation->email !== $email) {
+        if (! empty($invitation->email) && ! $this->emailsMatch($invitation->email, $email)) {
             return false;
         }
 
@@ -308,5 +326,18 @@ class RegisterController extends Controller
         $invitation = Invitation::findValidByToken($token);
 
         return $invitation !== null;
+    }
+
+    private function redirectBackWithRegistrationError(Request $request, string $message): RedirectResponse
+    {
+        return redirect()
+            ->back()
+            ->withErrors(['registration' => $message])
+            ->withInput($request->except('password', 'password_confirmation'));
+    }
+
+    private function emailsMatch(string $firstEmail, string $secondEmail): bool
+    {
+        return strcasecmp(trim($firstEmail), trim($secondEmail)) === 0;
     }
 }
