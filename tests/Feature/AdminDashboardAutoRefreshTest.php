@@ -31,7 +31,7 @@ class AdminDashboardAutoRefreshTest extends TestCase
         $this->assertStringContainsString('Auto-refreshes every 15 minutes', $content);
         $this->assertStringContainsString('Last dashboard refresh:', $content);
         $this->assertStringContainsString('$dashboardLastRefreshedAt', $content);
-        $this->assertStringNotContainsString("@php(\$dashboardLastRefreshedAt", $content);
+        $this->assertStringNotContainsString('@php($dashboardLastRefreshedAt', $content);
         $this->assertStringNotContainsString('Auto-refreshes every 20 minutes', $content);
         $this->assertStringNotContainsString('Auto-updates every minute', $content);
     }
