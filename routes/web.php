@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\AdminContentController;
 use App\Http\Controllers\Admin\AdminFailedReleasesController;
 use App\Http\Controllers\Admin\AdminGameController;
 use App\Http\Controllers\Admin\AdminGroupController;
+use App\Http\Controllers\Admin\AdminLogViewerController;
 use App\Http\Controllers\Admin\AdminMovieController;
 use App\Http\Controllers\Admin\AdminMusicController;
 use App\Http\Controllers\Admin\AdminPageController;
@@ -213,6 +214,7 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::get('user-role-history/{userId}', [AdminUserRoleHistoryController::class, 'show'])->name('admin.user-role-history.show');
     Route::match(['GET', 'POST'], 'site-edit', [AdminSiteController::class, 'edit'])->name('admin.site-edit');
     Route::get('site-stats', [AdminSiteController::class, 'stats'])->name('admin.site-stats');
+    Route::get('logs', [AdminLogViewerController::class, 'index'])->name('admin.logs.index');
     Route::get('role-list', [AdminRoleController::class, 'index'])->name('admin.role-list');
     Route::match(['GET', 'POST'], 'role-add', [AdminRoleController::class, 'create'])->name('admin.role-add');
     Route::match(['GET', 'POST'], 'role-edit', [AdminRoleController::class, 'edit'])->name('admin.role-edit');
