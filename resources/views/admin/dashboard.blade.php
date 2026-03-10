@@ -1,11 +1,29 @@
 @extends('layouts.admin')
 
 @section('content')
-<div x-data="adminDashboard" class="space-y-6" id="adminDashboard">
+@php
+    $dashboardLastRefreshedAt = now()->format('H:i:s');
+@endphp
+
+<div x-data="adminDashboard"
+     id="adminDashboard"
+     data-refresh-url="{{ route('admin.index') }}"
+     data-refresh-interval="{{ 15 * 60 * 1000 }}">
+    <div class="space-y-6" data-dashboard-content>
     <!-- Welcome Section -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Admin Dashboard</h2>
-        <p class="text-gray-600">Welcome to the administration panel</p>
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Admin Dashboard</h2>
+                <p class="text-gray-600">Welcome to the administration panel</p>
+            </div>
+            <div class="rounded-lg bg-gray-50 dark:bg-gray-900 px-4 py-3 text-sm text-gray-600 dark:text-gray-300 lg:text-right">
+                <p class="font-medium text-gray-700 dark:text-gray-200">
+                    <i class="fas fa-sync-alt mr-1"></i> Last dashboard refresh: {{ $dashboardLastRefreshedAt }}
+                </p>
+                <p class="mt-1 text-xs text-green-600 dark:text-green-400">Auto-refreshes every 15 minutes</p>
+            </div>
+        </div>
     </div>
 
     <!-- Stats Grid -->
@@ -373,8 +391,8 @@
         <!-- Last Updated Indicator -->
         <div class="mb-4 text-right">
             <span class="text-xs text-gray-500 dark:text-gray-400">
-                <i class="fas fa-sync-alt mr-1"></i>Last updated: <span data-metric="last-updated">{{ now()->format('H:i:s') }}</span>
-                <span class="ml-2 text-green-600 dark:text-green-400">(Auto-updates every minute)</span>
+                <i class="fas fa-sync-alt mr-1"></i>Last dashboard refresh: <span data-metric="last-updated">{{ $dashboardLastRefreshedAt }}</span>
+                <span class="ml-2 text-green-600 dark:text-green-400">(Auto-refreshes every 15 minutes)</span>
             </span>
         </div>
 
@@ -492,10 +510,10 @@
                     Recent User Activity
                 </span>
                 <span class="text-xs text-gray-500 dark:text-gray-400" id="activity-last-updated">
-                    <i class="fas fa-sync-alt"></i> Auto-refreshes every 20 minutes
+                    <i class="fas fa-sync-alt"></i> Last dashboard refresh: {{ $dashboardLastRefreshedAt }}
                 </span>
             </h3>
-            <div x-data="recentActivity" class="space-y-3" id="recent-activity-container" data-refresh-url="{{ route('admin.api.user-activity.recent') }}">
+            <div class="space-y-3" id="recent-activity-container">
                 @if(isset($recent_activity) && count($recent_activity) > 0)
                     @foreach($recent_activity as $activity)
                         <div class="flex items-start activity-item rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
@@ -544,6 +562,7 @@
             </a>
         </div>
     </div>
+</div>
 </div>
 @endsection
 
