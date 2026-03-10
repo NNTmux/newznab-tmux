@@ -94,6 +94,22 @@ class AdminReleaseReportControllerTest extends TestCase
     }
 
     /**
+     * Test that the admin view mounts the Alpine component that drives the modals.
+     */
+    public function test_admin_view_mounts_release_reports_component(): void
+    {
+        $viewPath = resource_path('views/admin/release-reports/index.blade.php');
+
+        $this->assertFileExists($viewPath);
+
+        $content = file_get_contents($viewPath);
+
+        $this->assertStringContainsString('x-data="adminReleaseReports"', $content);
+        $this->assertStringContainsString('@click="showDescription(', $content);
+        $this->assertStringContainsString('@click="showRevert(', $content);
+    }
+
+    /**
      * Test that bulk action dropdown includes revert option.
      */
     public function test_bulk_action_dropdown_has_revert_option(): void

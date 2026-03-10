@@ -1,7 +1,8 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-6">
+<div x-data="adminReleaseReports">
+    <div class="space-y-6">
     <!-- Flash Messages -->
     @if(session('success'))
         <div x-data="dismissible" x-show="show" class="mb-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 flex items-center justify-between">
@@ -66,10 +67,10 @@
 
         <!-- Reports Table -->
         @if($reportsList->count() > 0)
-            <form id="bulk-action-form" method="POST" action="{{ route('admin.release-reports.bulk') }}">
+            <form id="bulk-action-form" method="POST" action="{{ route('admin.release-reports.bulk') }}" @submit="validateBulkAction($event)">
                 @csrf
                 <div class="px-6 py-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center gap-4">
-                    <input type="checkbox" id="select-all" class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-700">
+                    <input type="checkbox" id="select-all" x-model="allChecked" @change="toggleAll()" class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-700">
                     <select name="action" class="text-sm border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200">
                         <option value="">Bulk Actions</option>
                         <option value="reviewed">Mark as Reviewed</option>
@@ -101,7 +102,7 @@
                             @foreach($reportsList as $report)
                                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                     <td class="px-4 py-4 whitespace-nowrap">
-                                        <input type="checkbox" name="report_ids[]" value="{{ $report->id }}" class="report-checkbox rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-700">
+                                        <input type="checkbox" name="report_ids[]" value="{{ $report->id }}" @change="onCheckboxChange()" class="report-checkbox rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-700">
                                     </td>
                                     <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200 font-mono">
                                         #{{ $report->id }}
@@ -143,9 +144,10 @@
                                         @if($report->description)
                                             <button type="button"
                                                     class="report-description-btn ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                                                    data-description="{{ htmlspecialchars($report->description, ENT_QUOTES) }}"
+                                                    data-description="{{ $report->description }}"
                                                     data-reason="{{ $report->reason_label }}"
                                                     data-reporter="{{ $report->user ? $report->user->username : 'Unknown' }}"
+                                                    @click="showDescription($event.currentTarget.dataset.description, $event.currentTarget.dataset.reason, $event.currentTarget.dataset.reporter)"
                                                     title="View description">
                                                 <i class="fas fa-comment-dots"></i>
                                             </button>
@@ -251,6 +253,7 @@
                                                         data-report-id="{{ $report->id }}"
                                                         data-report-status="{{ $report->status }}"
                                                         data-action-url="{{ route('admin.release-reports.revert', $report->id) }}"
+                                                        @click="showRevert($event.currentTarget.dataset.actionUrl, $event.currentTarget.dataset.reportStatus)"
                                                         title="Revert to Reviewed for further action">
                                                     <i class="fas fa-undo mr-1"></i> Revert
                                                 </button>
@@ -295,15 +298,20 @@
             </div>
         @endif
     </div>
-</div>
+    </div>
 
 <!-- Report Description Modal -->
-<div id="reportDescriptionModal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+<div id="reportDescriptionModal"
+     x-cloak
+     x-show="descModalOpen"
+     @keydown.escape.window="closeDescription()"
+     class="fixed inset-0 z-50 overflow-y-auto">
     <!-- Backdrop -->
-    <div class="report-desc-modal-backdrop fixed inset-0 transition-opacity bg-gray-500/75 dark:bg-gray-900/75"></div>
+    <div class="report-desc-modal-backdrop fixed inset-0 transition-opacity bg-gray-500/75 dark:bg-gray-900/75"
+         @click="closeDescription()"></div>
 
     <!-- Modal panel container -->
-    <div class="fixed inset-0 z-10 overflow-y-auto">
+    <div class="fixed inset-0 z-10 overflow-y-auto" @click.self="closeDescription()">
         <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
             <!-- Modal Content -->
             <div class="relative w-full max-w-lg p-6 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-lg">
@@ -311,7 +319,7 @@
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
                     <i class="fas fa-comment-dots text-blue-500 mr-2"></i>Report Details
                 </h3>
-                <button type="button" class="report-desc-modal-close text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <button type="button" class="report-desc-modal-close text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" @click="closeDescription()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -319,20 +327,20 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Reason</label>
-                    <p id="reportDescReason" class="text-gray-900 dark:text-gray-100 font-medium"></p>
+                    <p id="reportDescReason" x-text="descReason" class="text-gray-900 dark:text-gray-100 font-medium"></p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Reported By</label>
-                    <p id="reportDescReporter" class="text-gray-900 dark:text-gray-100"></p>
+                    <p id="reportDescReporter" x-text="descReporter" class="text-gray-900 dark:text-gray-100"></p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Additional Details</label>
-                    <div id="reportDescContent" class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg text-gray-700 dark:text-gray-300 whitespace-pre-wrap wrap-break-word max-h-64 overflow-y-auto"></div>
+                    <div id="reportDescContent" x-text="descContent" class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words max-h-64 overflow-y-auto"></div>
                 </div>
             </div>
 
             <div class="mt-6 flex justify-end">
-                <button type="button" class="report-desc-modal-close px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                <button type="button" class="report-desc-modal-close px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition" @click="closeDescription()">
                     Close
                 </button>
             </div>
@@ -342,12 +350,17 @@
 </div>
 
 <!-- Revert Confirmation Modal -->
-<div id="revertConfirmModal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+<div id="revertConfirmModal"
+     x-cloak
+     x-show="revertModalOpen"
+     @keydown.escape.window="closeRevert()"
+     class="fixed inset-0 z-50 overflow-y-auto">
     <!-- Backdrop -->
-    <div class="revert-modal-backdrop fixed inset-0 transition-opacity bg-gray-500/75 dark:bg-gray-900/75"></div>
+    <div class="revert-modal-backdrop fixed inset-0 transition-opacity bg-gray-500/75 dark:bg-gray-900/75"
+         @click="closeRevert()"></div>
 
     <!-- Modal panel container -->
-    <div class="fixed inset-0 z-10 overflow-y-auto">
+    <div class="fixed inset-0 z-10 overflow-y-auto" @click.self="closeRevert()">
         <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
             <!-- Modal Content -->
             <div class="relative w-full max-w-md p-6 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-lg">
@@ -355,24 +368,24 @@
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
                     <i class="fas fa-undo text-orange-500 mr-2"></i>Confirm Revert
                 </h3>
-                <button type="button" class="revert-modal-close text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <button type="button" class="revert-modal-close text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" @click="closeRevert()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
 
             <div class="mb-6">
                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                    Are you sure you want to revert this <span id="revertReportStatus" class="font-semibold text-orange-600 dark:text-orange-400"></span> report back to <span class="font-semibold text-blue-600 dark:text-blue-400">Reviewed</span> status?
+                    Are you sure you want to revert this <span id="revertReportStatus" x-text="revertStatus" class="font-semibold text-orange-600 dark:text-orange-400"></span> report back to <span class="font-semibold text-blue-600 dark:text-blue-400">Reviewed</span> status?
                 </p>
                 <p class="text-sm text-gray-500 dark:text-gray-500">
                     This will allow further action to be taken on the report if an issue was found with the release.
                 </p>
             </div>
 
-            <form id="revertConfirmForm" method="POST" action="">
+            <form id="revertConfirmForm" x-ref="revertForm" method="POST" action="" @submit.prevent="submitRevert()">
                 @csrf
                 <div class="flex justify-end gap-3">
-                    <button type="button" class="revert-modal-close px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                    <button type="button" class="revert-modal-close px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition" @click="closeRevert()">
                         Cancel
                     </button>
                     <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition">
@@ -383,6 +396,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 @endsection
 
