@@ -1,16 +1,16 @@
 @extends('layouts.guest')
 
 @section('content')
-<div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
+<div class="min-h-dvh flex items-start justify-center bg-gray-100 dark:bg-gray-900 px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
+    <div class="w-full max-w-md space-y-6 sm:space-y-8">
         <!-- Logo and Title -->
         <div class="text-center">
-            <a href="{{ url('/') }}" class="inline-flex items-center justify-center mb-4">
-                <div class="w-16 h-16 bg-blue-600 dark:bg-gray-700 rounded-full flex items-center justify-center shadow-lg">
-                    <i class="fas fa-file-download text-3xl text-white"></i>
+            <a href="{{ url('/') }}" class="mb-3 inline-flex items-center justify-center sm:mb-4">
+                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 shadow-lg dark:bg-gray-700 sm:h-16 sm:w-16">
+                    <i class="fas fa-file-download text-2xl text-white sm:text-3xl"></i>
                 </div>
             </a>
-            <h2 class="mt-4 text-4xl font-extrabold text-gray-900 dark:text-white">
+            <h2 class="mt-3 text-3xl font-extrabold text-gray-900 dark:text-white sm:mt-4 sm:text-4xl">
                 {{ config('app.name') }}
             </h2>
             <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">
@@ -20,7 +20,7 @@
 
         <!-- Login Card -->
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
-            <div class="px-8 py-6">
+            <div class="px-5 py-5 sm:px-8 sm:py-6">
                 <!-- Session Messages -->
                 @if(session('message'))
                     <div class="mb-4 p-4 rounded-lg {{ session('message_type') == 'success' ? 'bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700' : (session('message_type') == 'danger' ? 'bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700' : 'bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700') }}">
@@ -150,7 +150,7 @@
             </div>
 
             <!-- Card Footer -->
-            <div class="px-8 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+            <div class="border-t border-gray-200 bg-gray-50 px-5 py-4 dark:border-gray-700 dark:bg-gray-900 sm:px-8">
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-3 text-sm">
                     <div class="flex flex-col sm:flex-row gap-3 items-center">
                         @if(Route::has('register'))

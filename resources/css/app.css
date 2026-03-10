@@ -152,9 +152,16 @@
     display: none !important;
 }
 
-/* Fixed layout - ensure html and body have proper height constraints */
-html, body {
+/* Default document flow - public/guest pages need vertical scrolling */
+html,
+body {
     height: 100%;
+    overflow-x: hidden;
+}
+
+/* App shells keep a fixed viewport and scroll inside their content panels */
+html.app-shell,
+body.app-shell {
     overflow: hidden;
 }
 
