@@ -35,17 +35,17 @@ class ResetPasswordController extends Controller
     public function reset(Request $request): mixed
     {
         if ($request->missing('guid')) {
-            return redirect()->route('password.request')->withErrors(['error' => 'No reset code provided.']);
+            return redirect()->route('password.request')->with('error', 'No reset code provided.');
         }
 
         $user = User::getByPassResetGuid($request->input('guid'));
         if ($user === null) {
-            return redirect()->route('password.request')->withErrors(['error' => 'Bad reset code provided.']);
+            return redirect()->route('password.request')->with('error', 'Bad reset code provided.');
         }
 
         // Check if user is soft deleted
         if ($user->trashed()) {
-            return redirect()->route('password.request')->withErrors(['error' => 'This account has been deactivated.']);
+            return redirect()->route('password.request')->with('error', 'This account has been deactivated.');
         }
 
         // Reset the password, inform the user, send out the email
@@ -56,8 +56,7 @@ class ResetPasswordController extends Controller
         SendPasswordResetEmail::dispatch($user, $newpass);
 
         return redirect()->route('login')
-            ->with('message', 'Your password has been reset to <strong>'.$newpass.'</strong> and sent to your e-mail address.')
-            ->with('message_type', 'success');
+            ->with('success', 'Your password has been reset to '.$newpass.' and sent to your e-mail address.');
     }
 
     public function showResetForm(Request $request, mixed $token = null): mixed

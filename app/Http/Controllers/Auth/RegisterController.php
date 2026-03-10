@@ -227,8 +227,7 @@ class RegisterController extends Controller
 
                     return redirect()
                         ->route('login')
-                        ->with('message', 'Your account has been created. You will receive an account confirmation email shortly. Please verify your email address before logging in.')
-                        ->with('message_type', 'info');
+                        ->with('info', 'Your account has been created. You will receive an account confirmation email shortly. Please verify your email address before logging in.');
                 }
 
                 $error = 'Invalid or expired invitation token!';

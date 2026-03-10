@@ -25,23 +25,6 @@
                     </p>
                 </div>
 
-                @if (session('error'))
-                    <div class="mb-4 p-4 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700">
-                        <div class="flex items-center">
-                            <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 mr-3"></i>
-                            <span class="text-red-800 dark:text-red-200">{{ session('error') }}</span>
-                        </div>
-                    </div>
-                @endif
-                @if (session('success'))
-                    <div class="mb-4 p-4 rounded-lg bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700">
-                        <div class="flex items-center">
-                            <i class="fas fa-check-circle text-green-600 dark:text-green-400 mr-3"></i>
-                            <span class="text-green-800 dark:text-green-200">{{ session('success') }}</span>
-                        </div>
-                    </div>
-                @endif
-
                 @if(!($data['user']->passwordSecurity))
                     <div class="space-y-4">
                         <p class="text-gray-700 dark:text-gray-300 font-medium">To enable 2FA on your account:</p>

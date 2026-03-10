@@ -24,9 +24,7 @@ class PasswordSecurityController extends Controller
         $user = $request->user();
 
         if (! $user) {
-            return redirect()->route('login')
-                ->with('message', 'Please log in to access 2FA settings.')
-                ->with('message_type', 'danger');
+            return $this->redirectToLoginWithError('Please log in to access 2FA settings.');
         }
 
         $google2fa_url = '';
@@ -55,9 +53,7 @@ class PasswordSecurityController extends Controller
         $user = $request->user();
 
         if (! $user) {
-            return redirect()->route('login')
-                ->with('message', 'Please log in to access 2FA settings.')
-                ->with('message_type', 'danger');
+            return $this->redirectToLoginWithError('Please log in to access 2FA settings.');
         }
 
         // Add the secret key to the registration data
@@ -87,9 +83,7 @@ class PasswordSecurityController extends Controller
         $user = $request->user();
 
         if (! $user) {
-            return redirect()->route('login')
-                ->with('message', 'Please log in to access 2FA settings.')
-                ->with('message_type', 'danger');
+            return $this->redirectToLoginWithError('Please log in to access 2FA settings.');
         }
 
         $secret = $request->input('verify-code');
@@ -111,9 +105,7 @@ class PasswordSecurityController extends Controller
         $user = $request->user();
 
         if (! $user) {
-            return redirect()->route('login')
-                ->with('message', 'Please log in to access 2FA settings.')
-                ->with('message_type', 'danger');
+            return $this->redirectToLoginWithError('Please log in to access 2FA settings.');
         }
 
         // Only allow canceling if 2FA is not yet enabled
@@ -131,9 +123,7 @@ class PasswordSecurityController extends Controller
         $user = $request->user();
 
         if (! $user) {
-            return redirect()->route('login')
-                ->with('message', 'Please log in to access 2FA settings.')
-                ->with('message_type', 'danger');
+            return $this->redirectToLoginWithError('Please log in to access 2FA settings.');
         }
 
         if (! (Hash::check($request->get('current-password'), $user->password))) {
@@ -164,9 +154,7 @@ class PasswordSecurityController extends Controller
 
         // Get the user ID from session
         if (! $request->session()->has('2fa:user:id')) {
-            return redirect()->route('login')
-                ->with('message', 'The two-factor authentication session has expired. Please login again.')
-                ->with('message_type', 'danger');
+            return $this->redirectToLoginWithError('The two-factor authentication session has expired. Please login again.');
         }
 
         $userId = $request->session()->get('2fa:user:id');
@@ -175,9 +163,7 @@ class PasswordSecurityController extends Controller
         if (! $user || ! $user->passwordSecurity) {
             $request->session()->forget('2fa:user:id');
 
-            return redirect()->route('login')
-                ->with('message', 'User not found or 2FA not configured. Please login again.')
-                ->with('message_type', 'danger');
+            return $this->redirectToLoginWithError('User not found or 2FA not configured. Please login again.');
         }
 
         // Verify the OTP code
@@ -188,8 +174,7 @@ class PasswordSecurityController extends Controller
 
         if (! $valid) {
             return redirect()->route('2fa.verify')
-                ->with('message', 'Invalid authentication code. Please try again.')
-                ->with('message_type', 'danger');
+                ->with('error', 'Invalid authentication code. Please try again.');
         }
 
         // Get the remember me preference from session (defaults to false if not set)
@@ -213,8 +198,7 @@ class PasswordSecurityController extends Controller
 
         // Create the redirect response
         $redirect = redirect()->to($redirectUrl)
-            ->with('message', 'Two-factor authentication verified successfully.')
-            ->with('message_type', 'success');
+            ->with('success', 'Two-factor authentication verified successfully.');
 
         // Check for password breach if we have the password stored
         if ($passwordToCheck) {
@@ -279,8 +263,7 @@ class PasswordSecurityController extends Controller
     {
         // Check if user ID is stored in the session
         if (! $request->session()->has('2fa:user:id')) {
-            return redirect()->route('login')
-                ->withErrors(['msg' => 'The two-factor authentication session has expired. Please login again.']);
+            return $this->redirectToLoginWithError('The two-factor authentication session has expired. Please login again.');
         }
 
         // Get the user ID from session
@@ -291,8 +274,7 @@ class PasswordSecurityController extends Controller
         if (! $user) {
             $request->session()->forget('2fa:user:id');
 
-            return redirect()->route('login')
-                ->withErrors(['msg' => 'User not found. Please login again.']);
+            return $this->redirectToLoginWithError('User not found. Please login again.');
         }
 
         return view('auth.2fa_verify', compact('user'));
@@ -307,9 +289,7 @@ class PasswordSecurityController extends Controller
         $user = $request->user();
 
         if (! $user) {
-            return redirect()->route('login')
-                ->with('message', 'Please log in to access 2FA settings.')
-                ->with('message_type', 'danger');
+            return $this->redirectToLoginWithError('Please log in to access 2FA settings.');
         }
 
         $request->validate([
@@ -336,9 +316,7 @@ class PasswordSecurityController extends Controller
         $user = $request->user();
 
         if (! $user) {
-            return redirect()->route('login')
-                ->with('message', 'Please log in to access 2FA settings.')
-                ->with('message_type', 'danger');
+            return $this->redirectToLoginWithError('Please log in to access 2FA settings.');
         }
 
         $google2fa_url = '';
@@ -366,9 +344,7 @@ class PasswordSecurityController extends Controller
         $user = $request->user();
 
         if (! $user) {
-            return redirect()->route('login')
-                ->with('message', 'Please log in to access 2FA settings.')
-                ->with('message_type', 'danger');
+            return $this->redirectToLoginWithError('Please log in to access 2FA settings.');
         }
 
         $google2fa_url = '';
@@ -386,5 +362,10 @@ class PasswordSecurityController extends Controller
         ];
 
         return view('auth.2fa')->with('data', $data);
+    }
+
+    private function redirectToLoginWithError(string $message): RedirectResponse
+    {
+        return redirect()->route('login')->with('error', $message);
     }
 }

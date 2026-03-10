@@ -34,9 +34,35 @@
     @endif
 </head>
 <body class="font-sans antialiased pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]">
+    @php
+        $legacyMessage = session('message');
+        $legacyType = session('message_type');
+        $legacyType = is_string($legacyType) ? $legacyType : null;
+        $verificationResent = session('resent') ? __('A fresh verification link has been sent to your email address.') : null;
+
+        $guestFlashMessages = [
+            'success' => session('success')
+                ?? session('status')
+                ?? $verificationResent
+                ?? ($legacyMessage && $legacyType === 'success' ? $legacyMessage : null),
+            'error' => session('error')
+                ?? ($legacyMessage && in_array($legacyType, ['danger', 'error'], true) ? $legacyMessage : null),
+            'warning' => session('warning')
+                ?? ($legacyMessage && $legacyType === 'warning' ? $legacyMessage : null),
+            'info' => session('info')
+                ?? ($legacyMessage && ! in_array($legacyType, ['success', 'danger', 'error', 'warning'], true) ? $legacyMessage : null),
+        ];
+    @endphp
+
     @yield('content')
 
     @include('partials.back-to-top')
+    @include('partials.toast-notifications')
+
+    <div id="flash-messages-data"
+         data-messages="{{ json_encode($guestFlashMessages) }}"
+         class="hidden">
+    </div>
 
     <!-- Scripts -->
     @stack('scripts')

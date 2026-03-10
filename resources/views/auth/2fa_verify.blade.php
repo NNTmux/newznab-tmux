@@ -21,18 +21,6 @@
         <!-- 2FA Verification Card -->
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
             <div class="px-8 py-6">
-                <!-- Session Messages -->
-                @if(session('message'))
-                    <div class="mb-4 p-4 rounded-lg {{ session('message_type') == 'success' ? 'bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700' : (session('message_type') == 'danger' ? 'bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700' : 'bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700') }}">
-                        <div class="flex items-center">
-                            <i class="fas {{ session('message_type') == 'success' ? 'fa-check-circle text-green-600 dark:text-green-400' : (session('message_type') == 'danger' ? 'fa-exclamation-circle text-red-600 dark:text-red-400' : 'fa-info-circle text-blue-600 dark:text-blue-400') }} mr-3"></i>
-                            <span class="{{ session('message_type') == 'success' ? 'text-green-800 dark:text-green-200' : (session('message_type') == 'danger' ? 'text-red-800 dark:text-red-200' : 'text-blue-800 dark:text-blue-200') }}">
-                                {{ session('message') }}
-                            </span>
-                        </div>
-                    </div>
-                @endif
-
                 @if($errors->any())
                     <div class="mb-4 p-4 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700">
                         <div class="flex items-start">

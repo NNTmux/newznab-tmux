@@ -128,8 +128,7 @@ class RegisterControllerTest extends TestCase
         ]);
 
         $response->assertRedirect(route('login'));
-        $response->assertSessionHas('message', 'Your account has been created. You will receive an account confirmation email shortly. Please verify your email address before logging in.');
-        $response->assertSessionHas('message_type', 'info');
+        $response->assertSessionHas('info', 'Your account has been created. You will receive an account confirmation email shortly. Please verify your email address before logging in.');
     }
 
     public function test_registration_failure_shows_explanation_for_deactivated_account(): void

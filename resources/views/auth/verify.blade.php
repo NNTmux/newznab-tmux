@@ -16,17 +16,6 @@
 
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
             <div class="px-8 py-6">
-                @if (session('resent'))
-                    <div class="mb-4 p-4 rounded-lg bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700">
-                        <div class="flex items-center">
-                            <i class="fas fa-check-circle text-green-600 dark:text-green-400 mr-3"></i>
-                            <span class="text-green-800 dark:text-green-200">
-                                {{ __('A fresh verification link has been sent to your email address.') }}
-                            </span>
-                        </div>
-                    </div>
-                @endif
-
                 <p class="text-gray-700 dark:text-gray-300 mb-4">
                     {{ __('Before proceeding, please check your email for a verification link.') }}
                 </p>

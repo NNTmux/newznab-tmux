@@ -50,26 +50,38 @@ class ForgotPasswordController extends Controller
         $rssToken = $request->input('apikey') ?? '';
 
         if (empty($email) && empty($rssToken)) {
-            return view('auth.passwords.email')->withErrors(['error' => 'Missing parameter (email and/or apikey) to send password reset']);
+            return redirect()
+                ->route('forgottenpassword')
+                ->withErrors(['error' => 'Missing parameter (email and/or apikey) to send password reset'])
+                ->withInput($request->except(\App\Support\CaptchaHelper::getResponseFieldName()));
         }
 
         if (\App\Support\CaptchaHelper::isEnabled()) {
             $validate = Validator::make($request->all(), \App\Support\CaptchaHelper::getValidationRules());
             if ($validate->fails()) {
-                return view('auth.passwords.email')->withErrors(['error' => 'Captcha validation failed.']);
+                return redirect()
+                    ->route('forgottenpassword')
+                    ->withErrors(['error' => 'Captcha validation failed.'])
+                    ->withInput($request->except(\App\Support\CaptchaHelper::getResponseFieldName()));
             }
         }
 
         // Check users exists and send an email
         $ret = ! empty($rssToken) ? User::getByRssToken($rssToken) : User::getByEmail($email);
         if ($ret === null) {
-            return view('auth.passwords.email')->withErrors(['error' => 'The email or apikey are not recognised.']);
+            return redirect()
+                ->route('forgottenpassword')
+                ->withErrors(['error' => 'The email or apikey are not recognised.'])
+                ->withInput($request->except(\App\Support\CaptchaHelper::getResponseFieldName()));
         }
 
         // Check if user is soft deleted
         $user = User::withTrashed()->find($ret['id']);
         if ($user && $user->trashed()) {
-            return view('auth.passwords.email')->withErrors(['error' => 'This account has been deactivated.']);
+            return redirect()
+                ->route('forgottenpassword')
+                ->withErrors(['error' => 'This account has been deactivated.'])
+                ->withInput($request->except(\App\Support\CaptchaHelper::getResponseFieldName()));
         }
 
         // Generate a forgottenpassword guid, store it in the user table
@@ -80,6 +92,6 @@ class ForgotPasswordController extends Controller
         $resetLink = url('/').'/resetpassword?guid='.$guid;
         SendPasswordForgottenEmail::dispatch($ret, $resetLink);
 
-        return view('auth.passwords.email')->with('status', 'Password reset email has been sent!');
+        return redirect()->route('forgottenpassword')->with('success', 'Password reset email has been sent!');
     }
 }

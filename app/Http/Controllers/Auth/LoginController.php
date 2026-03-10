@@ -79,7 +79,7 @@ class LoginController extends Controller
 
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
-            $request->session()->flash('message', 'You have failed to login too many times.Try again in '.$this->decayMinutes().' minutes.');
+            $request->session()->flash('warning', 'You have failed to log in too many times. Try again in '.$this->decayMinutes().' minutes.');
 
             return redirect()->to('login');
         }
@@ -95,7 +95,7 @@ class LoginController extends Controller
             if ($user !== null) {
                 // Check if user is soft deleted
                 if ($user->trashed()) {
-                    $request->session()->flash('message', 'This account has been deactivated. Please contact us through contact form to have your account reactivated.');
+                    $request->session()->flash('error', 'This account has been deactivated. Please contact us through contact form to have your account reactivated.');
 
                     return redirect()->to('login');
                 }
@@ -103,7 +103,7 @@ class LoginController extends Controller
                 $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';
 
                 if (! $user->isVerified() || $user->isPendingVerification()) {
-                    $request->session()->flash('message', 'You have not verified your email address!');
+                    $request->session()->flash('warning', 'You have not verified your email address!');
 
                     return redirect()->to('login');
                 }
@@ -179,18 +179,18 @@ class LoginController extends Controller
 
                 $this->incrementLoginAttempts($request);
                 Log::channel('failed_login')->error('Failed login attempt by user: '.$request->input('username').' from IP address: '.$request->ip());
-                $request->session()->flash('message', 'Username or email and password combination used does not match our records!');
+                $request->session()->flash('error', 'Username or email and password combination used does not match our records!');
             } else {
                 $this->incrementLoginAttempts($request);
                 Log::channel('failed_login')->error('Failed login attempt by user: '.$request->input('username').' from IP address: '.$request->ip());
-                $request->session()->flash('message', 'Username or email used do not match our records!');
+                $request->session()->flash('error', 'Username or email used do not match our records!');
             }
 
             return redirect()->to('login');
         }
 
         $this->incrementLoginAttempts($request);
-        $request->session()->flash('message', implode('', Arr::collapse($validator->errors()->toArray())));
+        $request->session()->flash('error', implode('', Arr::collapse($validator->errors()->toArray())));
         Log::channel('failed_login')->error('Failed login attempt by user: '.$request->input('username').' from IP address: '.$request->ip());
 
         return redirect()->to('login');
@@ -260,7 +260,7 @@ class LoginController extends Controller
             }
         }
 
-        return redirect()->to('login')->with('message', 'You have been logged out successfully');
+        return redirect()->to('login')->with('success', 'You have been logged out successfully');
     }
 
     /**

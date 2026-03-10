@@ -21,16 +21,6 @@
         <!-- Reset Password Card -->
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
             <div class="px-8 py-6">
-                <!-- Success Message -->
-                @if(session('status'))
-                    <div class="mb-4 p-4 rounded-lg bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700">
-                        <div class="flex items-center">
-                            <i class="fas fa-check-circle text-green-600 dark:text-green-400 mr-3"></i>
-                            <span class="text-green-800 dark:text-green-200">{{ session('status') }}</span>
-                        </div>
-                    </div>
-                @endif
-
                 <!-- Error Messages -->
                 @if(isset($errors) && $errors->any())
                     <div class="mb-4 p-4 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700">
