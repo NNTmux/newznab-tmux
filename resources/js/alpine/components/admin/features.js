@@ -458,51 +458,6 @@ Alpine.data('myMovies', () => ({
 (function() {
     // --- Click delegation ---
     document.addEventListener('click', function(e) {
-        // Admin Release Reports: Description modal
-        var reportDescBtn = e.target.closest('.report-description-btn');
-        if (reportDescBtn) {
-            e.preventDefault();
-            var modal = document.getElementById('reportDescriptionModal');
-            if (modal) {
-                document.getElementById('reportDescReason').textContent = reportDescBtn.dataset.reason || '';
-                document.getElementById('reportDescReporter').textContent = reportDescBtn.dataset.reporter || '';
-                document.getElementById('reportDescContent').textContent = reportDescBtn.dataset.description || '';
-                modal.classList.remove('hidden');
-            }
-            return;
-        }
-
-        // Admin Release Reports: Close description modal
-        if (e.target.closest('.report-desc-modal-close') || e.target.closest('.report-desc-modal-backdrop')) {
-            e.preventDefault();
-            var modal = document.getElementById('reportDescriptionModal');
-            if (modal) modal.classList.add('hidden');
-            return;
-        }
-
-        // Admin Release Reports: Revert button
-        var revertBtn = e.target.closest('.revert-report-btn');
-        if (revertBtn) {
-            e.preventDefault();
-            var modal = document.getElementById('revertConfirmModal');
-            var form = document.getElementById('revertConfirmForm');
-            var statusSpan = document.getElementById('revertReportStatus');
-            if (modal && form) {
-                form.action = revertBtn.dataset.actionUrl || '';
-                if (statusSpan) statusSpan.textContent = revertBtn.dataset.reportStatus || '';
-                modal.classList.remove('hidden');
-            }
-            return;
-        }
-
-        // Admin Release Reports: Close revert modal
-        if (e.target.closest('.revert-modal-close') || e.target.closest('.revert-modal-backdrop')) {
-            e.preventDefault();
-            var modal = document.getElementById('revertConfirmModal');
-            if (modal) modal.classList.add('hidden');
-            return;
-        }
-
         // Admin menu submenu toggle
         var menuToggle = e.target.closest('[data-toggle-submenu]');
         if (menuToggle) {
@@ -725,30 +680,7 @@ Alpine.data('myMovies', () => ({
         });
     });
 
-    // --- Escape key for admin modals ---
-    document.addEventListener('keydown', function(e) {
-        if (e.key !== 'Escape') return;
-        var descModal = document.getElementById('reportDescriptionModal');
-        if (descModal && !descModal.classList.contains('hidden')) descModal.classList.add('hidden');
-        var revertModal = document.getElementById('revertConfirmModal');
-        if (revertModal && !revertModal.classList.contains('hidden')) revertModal.classList.add('hidden');
-    });
-
     // --- Admin select-alls and bulk forms ---
-    // Release reports select-all
-    var selectAllReports = document.getElementById('select-all');
-    if (selectAllReports) {
-        var boxes = document.querySelectorAll('.report-checkbox');
-        if (boxes.length > 0) {
-            selectAllReports.addEventListener('change', function() { boxes.forEach(function(cb) { cb.checked = selectAllReports.checked; }); });
-            boxes.forEach(function(cb) { cb.addEventListener('change', function() {
-                var all = Array.from(boxes).every(function(c) { return c.checked; });
-                var some = Array.from(boxes).some(function(c) { return c.checked; });
-                selectAllReports.checked = all; selectAllReports.indeterminate = some && !all;
-            }); });
-        }
-    }
-
     // Invitations select-all
     var selectAllInv = document.getElementById('select_all');
     if (selectAllInv) {

@@ -110,6 +110,24 @@ class AdminReleaseReportControllerTest extends TestCase
     }
 
     /**
+     * Test that legacy admin feature JS no longer handles release report modals.
+     */
+    public function test_legacy_admin_features_js_no_longer_handles_release_reports(): void
+    {
+        $scriptPath = resource_path('js/alpine/components/admin/features.js');
+
+        $this->assertFileExists($scriptPath);
+
+        $content = file_get_contents($scriptPath);
+
+        $this->assertStringNotContainsString('reportDescriptionModal', $content);
+        $this->assertStringNotContainsString('revertConfirmModal', $content);
+        $this->assertStringNotContainsString('.report-checkbox', $content);
+        $this->assertStringNotContainsString('.report-description-btn', $content);
+        $this->assertStringNotContainsString('.revert-report-btn', $content);
+    }
+
+    /**
      * Test that bulk action dropdown includes revert option.
      */
     public function test_bulk_action_dropdown_has_revert_option(): void
