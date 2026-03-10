@@ -10,12 +10,12 @@ use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Middleware to prevent caching of authenticated user pages.
+ * Middleware to prevent caching of authenticated and auth-flow pages.
  *
  * This prevents issues where:
  * - CDNs (like Cloudflare) cache user-specific pages
- * - Reverse proxies cache authenticated pages showing wrong user data
- * - Browsers cache authenticated pages
+ * - Flash messages on login/register flows are served from stale HTML
+ * - Browsers reuse cached auth forms after redirects or CAPTCHA validation
  * - One user could see another user's data due to cache poisoning
  */
 class NoCacheForAuthenticatedUsers
@@ -27,37 +27,54 @@ class NoCacheForAuthenticatedUsers
     {
         $response = $next($request);
 
-        // For authenticated users, add headers to prevent caching of personal data
-        if (Auth::check()) {
-            // Prevent any caching of authenticated user responses
-            // 'private' tells CDNs like Cloudflare not to cache this response
-            $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, private, max-age=0, s-maxage=0');
-            $response->headers->set('Pragma', 'no-cache');
-            $response->headers->set('Expires', 'Thu, 01 Jan 1970 00:00:00 GMT');
-
-            // Cloudflare-specific: Tell Cloudflare to bypass cache for this response
-            // CDN-Cache-Control is respected by Cloudflare and other CDNs
-            $response->headers->set('CDN-Cache-Control', 'no-store');
-
-            // Cloudflare also respects this header
-            $response->headers->set('Cloudflare-CDN-Cache-Control', 'no-store');
-
-            // Add Vary header to ensure caches differentiate by user session
-            $existingVary = $response->headers->get('Vary', '');
-            $varyHeaders = array_filter(array_map('trim', explode(',', $existingVary)));
-
-            // Add Cookie to Vary header if not already present
-            if (! in_array('Cookie', $varyHeaders, true)) {
-                $varyHeaders[] = 'Cookie';
-            }
-            // Add Authorization to Vary header for API requests
-            if ($request->bearerToken() && ! in_array('Authorization', $varyHeaders, true)) {
-                $varyHeaders[] = 'Authorization';
-            }
-
-            $response->headers->set('Vary', implode(', ', $varyHeaders));
+        if ($this->shouldPreventCaching($request)) {
+            $this->applyNoCacheHeaders($request, $response);
         }
 
         return $response;
+    }
+
+    /**
+     * Keep session-backed auth flows out of CDN/browser caches.
+     */
+    private function shouldPreventCaching(Request $request): bool
+    {
+        return Auth::check() || $request->routeIs(
+            'login',
+            'login.post',
+            'register',
+            'register.post',
+            'logout',
+            'forgottenpassword',
+            'password.request',
+            '2fa.verify',
+            '2fa.post',
+            '2faVerify'
+        );
+    }
+
+    private function applyNoCacheHeaders(Request $request, Response $response): void
+    {
+        // 'private' tells shared caches that this response must not be reused.
+        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, private, max-age=0, s-maxage=0');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', 'Thu, 01 Jan 1970 00:00:00 GMT');
+
+        // Cloudflare-specific headers to reinforce cache bypass at the edge.
+        $response->headers->set('CDN-Cache-Control', 'no-store');
+        $response->headers->set('Cloudflare-CDN-Cache-Control', 'no-store');
+
+        $existingVary = $response->headers->get('Vary', '');
+        $varyHeaders = array_filter(array_map('trim', explode(',', $existingVary)));
+
+        if (! in_array('Cookie', $varyHeaders, true)) {
+            $varyHeaders[] = 'Cookie';
+        }
+
+        if ($request->bearerToken() && ! in_array('Authorization', $varyHeaders, true)) {
+            $varyHeaders[] = 'Authorization';
+        }
+
+        $response->headers->set('Vary', implode(', ', $varyHeaders));
     }
 }
