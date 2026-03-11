@@ -83,4 +83,11 @@ class RegistrationPeriod extends Model
             && $this->starts_at->lte($at)
             && $this->ends_at->gte($at);
     }
+
+    public function hasEndedAt(?CarbonInterface $at = null): bool
+    {
+        $at ??= now();
+
+        return $this->ends_at !== null && $this->ends_at->lt($at);
+    }
 }

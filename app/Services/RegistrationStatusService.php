@@ -9,6 +9,7 @@ use App\Models\RegistrationStatusHistory;
 use App\Models\Settings;
 use App\Models\User;
 use Carbon\CarbonInterface;
+use Illuminate\Support\Collection;
 
 class RegistrationStatusService
 {
@@ -218,6 +219,41 @@ class RegistrationStatusService
         );
 
         return $period;
+    }
+
+    /**
+     * @return Collection<int, RegistrationPeriod>
+     */
+    public function disableExpiredPeriods(?CarbonInterface $at = null): Collection
+    {
+        $at ??= now();
+
+        $expiredPeriods = RegistrationPeriod::query()
+            ->where('is_enabled', true)
+            ->where('ends_at', '<', $at)
+            ->get();
+
+        foreach ($expiredPeriods as $period) {
+            $period->forceFill([
+                'is_enabled' => false,
+                'updated_by' => null,
+            ])->save();
+
+            RegistrationStatusHistory::record(
+                RegistrationStatusHistory::ACTION_PERIOD_COMPLETED,
+                sprintf('Scheduled open period "%s" completed after reaching its end time.', $period->name),
+                null,
+                null,
+                null,
+                $period->id,
+                [
+                    'completed_at' => $at->toDateTimeString(),
+                    'period' => $this->serializePeriod($period),
+                ]
+            );
+        }
+
+        return $expiredPeriods;
     }
 
     public function deletePeriod(RegistrationPeriod $period, ?User $changedBy = null, ?string $note = null): void

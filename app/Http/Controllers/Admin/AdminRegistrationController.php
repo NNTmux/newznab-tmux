@@ -29,7 +29,10 @@ class AdminRegistrationController extends BasePageController
 
     public function index(Request $request): View|RedirectResponse
     {
+        $now = now();
+
         $this->setAdminPrefs();
+        $this->registrationStatusService->disableExpiredPeriods($now);
 
         $editingPeriod = null;
         if ($request->filled('edit_period')) {
@@ -44,11 +47,21 @@ class AdminRegistrationController extends BasePageController
             }
         }
 
-        $status = $this->registrationStatusService->resolve();
+        $status = $this->registrationStatusService->resolve($now);
         $periods = RegistrationPeriod::query()
             ->with(['createdByUser', 'updatedByUser'])
-            ->orderByDesc('starts_at')
             ->get();
+        [$pastPeriods, $currentPeriods] = $periods->partition(
+            fn (RegistrationPeriod $period): bool => $period->hasEndedAt($now)
+        );
+
+        $currentPeriods = $currentPeriods
+            ->sortBy(fn (RegistrationPeriod $period): int => $period->starts_at?->getTimestamp() ?? PHP_INT_MAX)
+            ->values();
+        $pastPeriods = $pastPeriods
+            ->sortByDesc(fn (RegistrationPeriod $period): int => $period->ends_at?->getTimestamp() ?? 0)
+            ->values();
+
         $history = RegistrationStatusHistory::query()
             ->with(['changedByUser', 'registrationPeriod'])
             ->orderByDesc('created_at')
@@ -87,7 +100,8 @@ class AdminRegistrationController extends BasePageController
             'meta_description' => 'Manage registration status, scheduled open periods, and registration activity.',
             'registrationStatus' => $status,
             'statusOptions' => $this->registrationStatusService->statusOptions(),
-            'periods' => $periods,
+            'currentPeriods' => $currentPeriods,
+            'pastPeriods' => $pastPeriods,
             'editingPeriod' => $editingPeriod,
             'history' => $history,
             'recentSuccessfulRegistrations' => $recentSuccessfulRegistrations,
@@ -157,6 +171,14 @@ class AdminRegistrationController extends BasePageController
     {
         /** @var User|null $admin */
         $admin = Auth::user();
+
+        if ($period->hasEndedAt()) {
+            $this->registrationStatusService->disableExpiredPeriods();
+
+            return redirect()
+                ->route('admin.registrations.index')
+                ->with('success', 'That scheduled open-registration period has already passed and is now marked as done.');
+        }
 
         $this->registrationStatusService->togglePeriod(
             $period,

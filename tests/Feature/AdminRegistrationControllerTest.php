@@ -233,6 +233,84 @@ class AdminRegistrationControllerTest extends TestCase
         $this->assertContains(RegistrationStatusHistory::ACTION_PERIOD_DELETED, $actions);
     }
 
+    public function test_expired_registration_periods_are_disabled_and_shown_as_done(): void
+    {
+        $admin = $this->createUserWithRole('Admin');
+        /** @var Authenticatable $authenticatedAdmin */
+        $authenticatedAdmin = $admin;
+
+        DB::table('registration_periods')->insert([
+            'name' => 'Current Window',
+            'starts_at' => now()->subMinutes(30),
+            'ends_at' => now()->addHour(),
+            'is_enabled' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('registration_periods')->insert([
+            'name' => 'Upcoming Disabled Window',
+            'starts_at' => now()->addHours(2),
+            'ends_at' => now()->addHours(4),
+            'is_enabled' => false,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('registration_periods')->insert([
+            'name' => 'Completed Window',
+            'starts_at' => now()->subHours(3),
+            'ends_at' => now()->subMinutes(10),
+            'is_enabled' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->artisan('nntmux:disable-expired-registration-periods')
+            ->expectsOutputToContain('Successfully completed 1 expired registration period(s).')
+            ->assertExitCode(0);
+
+        $completedPeriod = DB::table('registration_periods')->where('name', 'Completed Window')->first();
+        $this->assertNotNull($completedPeriod);
+        $this->assertSame(0, (int) $completedPeriod->is_enabled);
+
+        $currentPeriod = DB::table('registration_periods')->where('name', 'Current Window')->first();
+        $this->assertNotNull($currentPeriod);
+        $this->assertSame(1, (int) $currentPeriod->is_enabled);
+
+        $history = DB::table('registration_status_history')
+            ->where('action', RegistrationStatusHistory::ACTION_PERIOD_COMPLETED)
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($history);
+        $this->assertStringContainsString('completed after reaching its end time', $history->description);
+
+        $response = $this->actingAs($authenticatedAdmin)->get(route('admin.registrations.index'));
+
+        $response->assertOk();
+        $response->assertSeeInOrder([
+            'Current & Upcoming Open Periods',
+            'Current Window',
+            'Upcoming Disabled Window',
+            'Past Open Periods',
+            'Completed Window',
+        ]);
+        $response->assertSee('Active Right Now');
+        $response->assertSee('Done');
+        $response->assertSee('x-data="confirmForm"', false);
+        $response->assertSee('data-title="Disable Scheduled Period"', false);
+        $response->assertSee('data-title="Enable Scheduled Period"', false);
+        $response->assertSee('data-title="Delete Scheduled Period"', false);
+        $response->assertSee('data-title="Delete Past Period"', false);
+    }
+
     private function createSchema(): void
     {
         Schema::create('settings', function (Blueprint $table): void {

@@ -17,6 +17,8 @@ class RegistrationStatusHistory extends Model
 
     public const ACTION_PERIOD_TOGGLED = 'period_toggled';
 
+    public const ACTION_PERIOD_COMPLETED = 'period_completed';
+
     public const ACTION_PERIOD_DELETED = 'period_deleted';
 
     protected $table = 'registration_status_history';

@@ -16,6 +16,7 @@
             ? 'border border-emerald-500/30 bg-emerald-600 text-white shadow-sm dark:border-emerald-300/20 dark:bg-emerald-500 dark:text-slate-950'
             : 'border border-slate-400/30 bg-slate-600 text-white shadow-sm dark:border-slate-300/20 dark:bg-slate-500 dark:text-slate-950';
     };
+    $periodDoneClasses = 'border border-cyan-500/30 bg-cyan-600 text-white shadow-sm dark:border-cyan-300/20 dark:bg-cyan-500 dark:text-slate-950';
     $primaryButtonClasses = 'inline-flex items-center rounded-lg border border-blue-700 bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-blue-300/20 dark:bg-blue-500 dark:text-white dark:hover:bg-blue-400 dark:focus:ring-offset-gray-900';
     $secondaryButtonClasses = 'inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-500 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600 dark:focus:ring-offset-gray-900';
     $editButtonClasses = 'inline-flex items-center rounded-md border border-sky-700 bg-sky-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:border-sky-300/20 dark:bg-sky-500 dark:text-white dark:hover:bg-sky-400 dark:focus:ring-offset-gray-900';
@@ -193,88 +194,183 @@
         </x-admin.card>
     </div>
 
-    <x-admin.card>
-        <div class="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Scheduled Open Periods</h2>
-            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Manage temporary windows when registrations should be publicly open.</p>
-        </div>
-
-        @if($periods->isEmpty())
-            <div class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
-                <i class="fas fa-calendar-xmark mb-3 text-3xl"></i>
-                <p>No scheduled open-registration periods have been created yet.</p>
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <x-admin.card>
+            <div class="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Current &amp; Upcoming Open Periods</h2>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Active and upcoming registration windows stay here until their end time.</p>
             </div>
-        @else
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-900">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Window</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Notes</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Updated By</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
-                        @foreach($periods as $period)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40">
-                                <td class="px-6 py-4 align-top">
-                                    <p class="font-medium text-gray-900 dark:text-gray-100">{{ $period->name }}</p>
-                                    @if($registrationStatus['active_period'] && $registrationStatus['active_period']->id === $period->id)
-                                        <span class="mt-2 inline-flex items-center justify-center rounded-full border border-blue-500/30 bg-blue-600 px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm dark:border-blue-300/20 dark:bg-blue-500 dark:text-white">
-                                            Active Right Now
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 align-top">
-                                    <span class="inline-flex min-w-20 items-center justify-center rounded-full px-3 py-1.5 text-xs font-semibold {{ $periodStatusClasses($period->is_enabled) }}">
-                                        {{ $period->is_enabled ? 'Enabled' : 'Disabled' }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 align-top text-sm text-gray-700 dark:text-gray-300">
-                                    <p>{{ $period->starts_at->format('Y-m-d H:i') }}</p>
-                                    <p class="mt-1 text-gray-500 dark:text-gray-400">to {{ $period->ends_at->format('Y-m-d H:i') }}</p>
-                                </td>
-                                <td class="px-6 py-4 align-top text-sm text-gray-700 dark:text-gray-300">
-                                    {{ $period->notes ? Str::limit($period->notes, 100) : '—' }}
-                                </td>
-                                <td class="px-6 py-4 align-top text-sm text-gray-700 dark:text-gray-300">
-                                    {{ $period->updatedByUser?->username ?? $period->createdByUser?->username ?? 'System' }}
-                                </td>
-                                <td class="px-6 py-4 align-top">
-                                    <div class="flex flex-wrap gap-2">
-                                        <a href="{{ route('admin.registrations.index', ['edit_period' => $period->id]) }}"
-                                           class="{{ $editButtonClasses }}">
-                                            <i class="fas fa-pen mr-1.5"></i>Edit
-                                        </a>
 
-                                        <form method="POST" action="{{ route('admin.registrations.periods.toggle', $period) }}">
-                                            @csrf
-                                            <button type="submit"
-                                                    class="{{ $toggleButtonClasses }}">
-                                                <i class="fas {{ $period->is_enabled ? 'fa-pause' : 'fa-play' }} mr-1.5"></i>{{ $period->is_enabled ? 'Disable' : 'Enable' }}
-                                            </button>
-                                        </form>
-
-                                        <form method="POST" action="{{ route('admin.registrations.periods.destroy', $period) }}" onsubmit="return confirm('Delete this scheduled registration period?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                    class="{{ $deleteButtonClasses }}">
-                                                <i class="fas fa-trash mr-1.5"></i>Delete
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
+            @if($currentPeriods->isEmpty())
+                <div class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-calendar-plus mb-3 text-3xl"></i>
+                    <p>No current or upcoming open-registration periods are scheduled.</p>
+                </div>
+            @else
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-900">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Window</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Notes</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Updated By</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Actions</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+                            @foreach($currentPeriods as $period)
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40">
+                                    <td class="px-6 py-4 align-top">
+                                        <p class="font-medium text-gray-900 dark:text-gray-100">{{ $period->name }}</p>
+                                        @if($registrationStatus['active_period'] && $registrationStatus['active_period']->id === $period->id)
+                                            <span class="mt-2 inline-flex items-center justify-center rounded-full border border-blue-500/30 bg-blue-600 px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm dark:border-blue-300/20 dark:bg-blue-500 dark:text-white">
+                                                Active Right Now
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 align-top">
+                                        <span class="inline-flex min-w-20 items-center justify-center rounded-full px-3 py-1.5 text-xs font-semibold {{ $periodStatusClasses($period->is_enabled) }}">
+                                            {{ $period->is_enabled ? 'Enabled' : 'Disabled' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 align-top text-sm text-gray-700 dark:text-gray-300">
+                                        <p>{{ $period->starts_at->format('Y-m-d H:i') }}</p>
+                                        <p class="mt-1 text-gray-500 dark:text-gray-400">to {{ $period->ends_at->format('Y-m-d H:i') }}</p>
+                                    </td>
+                                    <td class="px-6 py-4 align-top text-sm text-gray-700 dark:text-gray-300">
+                                        {{ $period->notes ? Str::limit($period->notes, 100) : '—' }}
+                                    </td>
+                                    <td class="px-6 py-4 align-top text-sm text-gray-700 dark:text-gray-300">
+                                        {{ $period->updatedByUser?->username ?? $period->createdByUser?->username ?? 'System' }}
+                                    </td>
+                                    <td class="px-6 py-4 align-top">
+                                        <div class="flex flex-wrap gap-2">
+                                            <a href="{{ route('admin.registrations.index', ['edit_period' => $period->id]) }}"
+                                               class="{{ $editButtonClasses }}">
+                                                <i class="fas fa-pen mr-1.5"></i>Edit
+                                            </a>
+
+                                            <form method="POST"
+                                                  action="{{ route('admin.registrations.periods.toggle', $period) }}"
+                                                  x-data="confirmForm"
+                                                  data-message="{{ $period->is_enabled
+                                                      ? "Disable the scheduled open period '{$period->name}'? If it is currently active, registrations will fall back to the manual baseline."
+                                                      : "Enable the scheduled open period '{$period->name}'? If the current time is within its window, registrations may open immediately." }}"
+                                                  data-title="{{ $period->is_enabled ? 'Disable Scheduled Period' : 'Enable Scheduled Period' }}"
+                                                  data-type="{{ $period->is_enabled ? 'warning' : 'success' }}"
+                                                  data-confirm-text="{{ $period->is_enabled ? 'Disable' : 'Enable' }}"
+                                                  @submit.prevent="submit()">
+                                                @csrf
+                                                <button type="submit"
+                                                        class="{{ $toggleButtonClasses }}">
+                                                    <i class="fas {{ $period->is_enabled ? 'fa-pause' : 'fa-play' }} mr-1.5"></i>{{ $period->is_enabled ? 'Disable' : 'Enable' }}
+                                                </button>
+                                            </form>
+
+                                            <form method="POST"
+                                                  action="{{ route('admin.registrations.periods.destroy', $period) }}"
+                                                  x-data="confirmForm"
+                                                  data-message="Delete the scheduled open period '{{ $period->name }}'? This cannot be undone."
+                                                  data-title="Delete Scheduled Period"
+                                                  data-type="danger"
+                                                  data-confirm-text="Delete"
+                                                  @submit.prevent="submit()">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                        class="{{ $deleteButtonClasses }}">
+                                                    <i class="fas fa-trash mr-1.5"></i>Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </x-admin.card>
+
+        <x-admin.card>
+            <div class="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Past Open Periods</h2>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Completed registration windows move here automatically and are marked as done.</p>
             </div>
-        @endif
-    </x-admin.card>
+
+            @if($pastPeriods->isEmpty())
+                <div class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-clock mb-3 text-3xl"></i>
+                    <p>No past open-registration periods have been recorded yet.</p>
+                </div>
+            @else
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-900">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Window</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Notes</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Updated By</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+                            @foreach($pastPeriods as $period)
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40">
+                                    <td class="px-6 py-4 align-top">
+                                        <p class="font-medium text-gray-900 dark:text-gray-100">{{ $period->name }}</p>
+                                    </td>
+                                    <td class="px-6 py-4 align-top">
+                                        <span class="inline-flex min-w-20 items-center justify-center rounded-full px-3 py-1.5 text-xs font-semibold {{ $periodDoneClasses }}">
+                                            Done
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 align-top text-sm text-gray-700 dark:text-gray-300">
+                                        <p>{{ $period->starts_at->format('Y-m-d H:i') }}</p>
+                                        <p class="mt-1 text-gray-500 dark:text-gray-400">to {{ $period->ends_at->format('Y-m-d H:i') }}</p>
+                                    </td>
+                                    <td class="px-6 py-4 align-top text-sm text-gray-700 dark:text-gray-300">
+                                        {{ $period->notes ? Str::limit($period->notes, 100) : '—' }}
+                                    </td>
+                                    <td class="px-6 py-4 align-top text-sm text-gray-700 dark:text-gray-300">
+                                        {{ $period->updatedByUser?->username ?? $period->createdByUser?->username ?? 'System' }}
+                                    </td>
+                                    <td class="px-6 py-4 align-top">
+                                        <div class="flex flex-wrap gap-2">
+                                            <a href="{{ route('admin.registrations.index', ['edit_period' => $period->id]) }}"
+                                               class="{{ $editButtonClasses }}">
+                                                <i class="fas fa-pen mr-1.5"></i>Edit
+                                            </a>
+
+                                            <form method="POST"
+                                                  action="{{ route('admin.registrations.periods.destroy', $period) }}"
+                                                  x-data="confirmForm"
+                                                  data-message="Delete the past open period '{{ $period->name }}'? This cannot be undone."
+                                                  data-title="Delete Past Period"
+                                                  data-type="danger"
+                                                  data-confirm-text="Delete"
+                                                  @submit.prevent="submit()">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                        class="{{ $deleteButtonClasses }}">
+                                                    <i class="fas fa-trash mr-1.5"></i>Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </x-admin.card>
+    </div>
 
     <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <x-admin.card>
