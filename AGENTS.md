@@ -75,6 +75,16 @@ PHPUnit only (no Pest). Create tests: `php artisan make:test --phpunit {name}`
 - 80+ auto-registered in `app/Console/Commands/`
 - Create with `php artisan make:` + `--no-interaction`
 
+## Code Formatting
+
+**Always run Pint after completing any PHP code changes:**
+
+```bash
+./vendor/bin/pint --dirty  # Format only changed files
+```
+
+This is mandatory — run it before considering any task done. Do not wait for the pre-commit hook to catch formatting issues.
+
 ## Pre-commit (CaptainHook)
 
 Auto-runs: PHP lint, Composer lock validation, Pint formatting. Commit limits: 200 char subject, 72 char body.
