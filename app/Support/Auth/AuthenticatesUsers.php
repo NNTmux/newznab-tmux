@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Support\Auth;
 
+use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -16,7 +19,7 @@ trait AuthenticatesUsers
     /**
      * Show the application's login form.
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
     public function showLoginForm(): mixed
     {
@@ -59,7 +62,7 @@ trait AuthenticatesUsers
     /**
      * Send the response after the user was authenticated.
      */
-    protected function sendLoginResponse(Request $request): \Illuminate\Http\RedirectResponse|JsonResponse
+    protected function sendLoginResponse(Request $request): RedirectResponse|JsonResponse
     {
         $request->session()->regenerate();
 
@@ -78,7 +81,7 @@ trait AuthenticatesUsers
      * The user has been authenticated.
      *
      * @param  mixed  $user
-     * @return \Illuminate\Http\RedirectResponse|JsonResponse|null
+     * @return RedirectResponse|JsonResponse|null
      */
     protected function authenticated(Request $request, $user): mixed
     {
@@ -108,7 +111,7 @@ trait AuthenticatesUsers
     /**
      * Get the guard to be used during authentication.
      */
-    protected function guard(): \Illuminate\Contracts\Auth\StatefulGuard
+    protected function guard(): StatefulGuard
     {
         return Auth::guard();
     }

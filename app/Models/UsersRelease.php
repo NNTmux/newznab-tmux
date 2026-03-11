@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -13,8 +15,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $users_id
  * @property int $releases_id FK to releases.id
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property-read Release $release
  * @property-read User $user
  *
@@ -40,7 +42,7 @@ class UsersRelease extends Model
     protected $guarded = ['id'];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -48,7 +50,7 @@ class UsersRelease extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Release, $this>
+     * @return BelongsTo<Release, $this>
      */
     public function release(): BelongsTo
     {
@@ -61,7 +63,7 @@ class UsersRelease extends Model
     }
 
     /**
-     * @return int|\Illuminate\Database\Eloquent\Builder
+     * @return int|Builder
      */
     public static function addCart(mixed $uid, mixed $releaseid) // @phpstan-ignore missingType.generics
     {

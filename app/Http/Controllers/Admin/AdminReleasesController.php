@@ -8,7 +8,11 @@ use App\Http\Controllers\BasePageController;
 use App\Models\Category;
 use App\Models\Release;
 use App\Services\Releases\ReleaseManagementService;
+use Illuminate\Foundation\Application;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
+use Illuminate\View\View;
 
 class AdminReleasesController extends BasePageController
 {
@@ -40,7 +44,7 @@ class AdminReleasesController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
+     * @return \Illuminate\Contracts\Foundation\Application|Application|RedirectResponse|Redirector|View
      *
      * @throws \Exception
      */

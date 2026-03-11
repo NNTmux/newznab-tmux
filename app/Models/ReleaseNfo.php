@@ -40,7 +40,7 @@ class ReleaseNfo extends Model
     protected $guarded = [];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Release, $this>
+     * @return BelongsTo<Release, $this>
      */
     public function release(): BelongsTo
     {

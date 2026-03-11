@@ -9,6 +9,7 @@ use App\Models\Release;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\Releases\ReleaseSearchService;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -161,7 +162,7 @@ class RSS extends ApiController
         $cacheKey = 'rss_trending_movies_48h';
 
         return Cache::remember($cacheKey, 3600, function () {
-            $fortyEightHoursAgo = \Illuminate\Support\Carbon::now()->subHours(48);
+            $fortyEightHoursAgo = Carbon::now()->subHours(48);
 
             // First get the top 15 movies by download count
             $topMovies = DB::table('movieinfo as m')
@@ -225,7 +226,7 @@ class RSS extends ApiController
         $cacheKey = 'rss_trending_shows_48h';
 
         return Cache::remember($cacheKey, 3600, function () {
-            $fortyEightHoursAgo = \Illuminate\Support\Carbon::now()->subHours(48);
+            $fortyEightHoursAgo = Carbon::now()->subHours(48);
 
             // First get the top 15 TV shows by download count
             $topShows = DB::table('videos as v')

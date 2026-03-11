@@ -8,6 +8,8 @@ use App\Enums\BlacklistConstants;
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
 use App\Services\BlacklistService;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class AdminBlacklistController extends BasePageController
@@ -34,7 +36,7 @@ class AdminBlacklistController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Contracts\View\View|void
+     * @return RedirectResponse|View|void
      *
      * @throws \Exception
      */

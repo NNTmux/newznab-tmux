@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Http\Middleware\Google2FAMiddleware;
 use App\Models\User;
+use App\View\Composers\GlobalDataComposer;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Cache;
@@ -297,7 +298,7 @@ class AdminLogViewerControllerTest extends TestCase
 
     private function resetGlobalComposerState(): void
     {
-        $reflection = new \ReflectionClass(\App\View\Composers\GlobalDataComposer::class);
+        $reflection = new \ReflectionClass(GlobalDataComposer::class);
         $property = $reflection->getProperty('resolvedData');
         $property->setAccessible(true);
         $property->setValue(null, null);

@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\MovieInfo;
 use App\Models\Release;
 use App\Models\Settings;
+use App\Services\Releases\ReleaseBrowseService;
 use App\Services\TvProcessing\Providers\TraktProvider;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -92,7 +93,7 @@ class MovieService
 
         $this->imdburl = (int) Settings::settingValue('imdburl') !== 0;
         $this->movieqty = Settings::settingValue('maximdbprocessed') !== '' ? (int) Settings::settingValue('maximdbprocessed') : 100;
-        $this->showPasswords = app(\App\Services\Releases\ReleaseBrowseService::class)->showPasswords();
+        $this->showPasswords = app(ReleaseBrowseService::class)->showPasswords();
 
         $this->echooutput = config('nntmux.echocli');
         $this->imgSavePath = storage_path('covers/movies/');

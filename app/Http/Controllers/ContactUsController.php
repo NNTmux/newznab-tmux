@@ -6,11 +6,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ContactContactURequest;
 use App\Jobs\SendContactUsEmail;
+use App\Support\CaptchaHelper;
+use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 
 class ContactUsController extends BasePageController
 {
     /**
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function contact(ContactContactURequest $request): mixed
     {
@@ -22,7 +25,7 @@ class ContactUsController extends BasePageController
             $mailTo = config('mail.from.address');
             $mailBody = 'Values submitted from contact form: ';
 
-            $captchaFieldName = \App\Support\CaptchaHelper::getResponseFieldName();
+            $captchaFieldName = CaptchaHelper::getResponseFieldName();
             foreach ($request->all() as $key => $value) {
                 if ($key !== 'submit' && $key !== '_token' && $key !== 'g-recaptcha-response' && $key !== 'cf-turnstile-response') {
                     $mailBody .= "$key : $value".PHP_EOL;
@@ -39,7 +42,7 @@ class ContactUsController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\View\View
+     * @return View
      *
      * @throws \Exception
      */

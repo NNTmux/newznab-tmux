@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Tmux;
 
 use App\Models\Settings;
+use Illuminate\Support\Facades\Process;
 
 /**
  * Service for building tmux window layouts based on sequential mode
@@ -326,7 +327,7 @@ class TmuxLayoutBuilder
      */
     protected function commandExists(string $command): bool
     {
-        $result = \Illuminate\Support\Facades\Process::timeout(5)
+        $result = Process::timeout(5)
             ->run("which {$command} 2>/dev/null");
 
         return $result->successful() && str_contains($result->output(), $command);

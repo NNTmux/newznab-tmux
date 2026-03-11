@@ -6,6 +6,8 @@ namespace App\Services\TvProcessing\Providers;
 
 use App\Services\FanartTvService;
 use App\Services\ReleaseImageService;
+use App\Services\TmdbClient;
+use App\Services\TraktService;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ParseException;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\ResourceNotFoundException;
 use CanIHaveSomeCoffee\TheTVDbAPI\Exception\UnauthorizedException;
@@ -448,7 +450,7 @@ class TvdbProvider extends AbstractTvProvider
 
         try {
             // Try to get TMDB ID and other IDs via TMDB's find endpoint
-            $tmdbClient = app(\App\Services\TmdbClient::class);
+            $tmdbClient = app(TmdbClient::class);
             if ($tmdbClient->isConfigured() && $tvdbId > 0) {
                 $tmdbIds = $tmdbClient->lookupTvShowIds($tvdbId, 'tvdb');
                 if ($tmdbIds !== null) {
@@ -457,7 +459,7 @@ class TvdbProvider extends AbstractTvProvider
             }
 
             // Try to get Trakt ID via Trakt's search endpoint
-            $traktService = app(\App\Services\TraktService::class);
+            $traktService = app(TraktService::class);
             if ($traktService->isConfigured()) {
                 // Try TVDB ID first
                 if ($tvdbId > 0) {

@@ -1,5 +1,7 @@
 <?php
 
+use Spatie\DirectoryCleanup\Policies\DeleteEverything;
+
 return [
 
     'directories' => [
@@ -30,5 +32,5 @@ return [
      * You can customize this behaviour by writing your own clean up policy.  A valid policy
      * is any class that implements `Spatie\DirectoryCleanup\Policies\CleanupPolicy`.
      */
-    'cleanup_policy' => Spatie\DirectoryCleanup\Policies\DeleteEverything::class,
+    'cleanup_policy' => DeleteEverything::class,
 ];

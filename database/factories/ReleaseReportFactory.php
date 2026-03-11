@@ -8,14 +8,14 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ReleaseReport>
+ * @extends Factory<ReleaseReport>
  */
 class ReleaseReportFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
-     * @var class-string<\App\Models\ReleaseReport>
+     * @var class-string<ReleaseReport>
      */
     protected $model = ReleaseReport::class;
 

@@ -1,5 +1,14 @@
 <?php
 
+use App\Models\User;
+use App\Policies\CategoryPolicy;
+use App\Policies\ForumPolicy;
+use App\Policies\PostPolicy;
+use App\Policies\ThreadPolicy;
+use TeamTeaTime\Forum\Models\Category;
+use TeamTeaTime\Forum\Models\Post;
+use TeamTeaTime\Forum\Models\Thread;
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -12,11 +21,11 @@ return [
     */
 
     'policies' => [
-        'forum' => App\Policies\ForumPolicy::class,
+        'forum' => ForumPolicy::class,
         'model' => [
-            TeamTeaTime\Forum\Models\Category::class => \App\Policies\CategoryPolicy::class,
-            TeamTeaTime\Forum\Models\Thread::class => \App\Policies\ThreadPolicy::class,
-            TeamTeaTime\Forum\Models\Post::class => \App\Policies\PostPolicy::class,
+            Category::class => CategoryPolicy::class,
+            Thread::class => ThreadPolicy::class,
+            Post::class => PostPolicy::class,
         ],
     ],
 
@@ -29,7 +38,7 @@ return [
     |
     */
 
-    'user_model' => App\Models\User::class,
+    'user_model' => User::class,
 
     /*
     |--------------------------------------------------------------------------

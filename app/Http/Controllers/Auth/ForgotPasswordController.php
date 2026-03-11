@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendPasswordForgottenEmail;
 use App\Models\User;
+use App\Support\CaptchaHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -53,16 +54,16 @@ class ForgotPasswordController extends Controller
             return redirect()
                 ->route('forgottenpassword')
                 ->withErrors(['error' => 'Missing parameter (email and/or apikey) to send password reset'])
-                ->withInput($request->except(\App\Support\CaptchaHelper::getResponseFieldName()));
+                ->withInput($request->except(CaptchaHelper::getResponseFieldName()));
         }
 
-        if (\App\Support\CaptchaHelper::isEnabled()) {
-            $validate = Validator::make($request->all(), \App\Support\CaptchaHelper::getValidationRules());
+        if (CaptchaHelper::isEnabled()) {
+            $validate = Validator::make($request->all(), CaptchaHelper::getValidationRules());
             if ($validate->fails()) {
                 return redirect()
                     ->route('forgottenpassword')
                     ->withErrors(['error' => 'Captcha validation failed.'])
-                    ->withInput($request->except(\App\Support\CaptchaHelper::getResponseFieldName()));
+                    ->withInput($request->except(CaptchaHelper::getResponseFieldName()));
             }
         }
 
@@ -72,7 +73,7 @@ class ForgotPasswordController extends Controller
             return redirect()
                 ->route('forgottenpassword')
                 ->withErrors(['error' => 'The email or apikey are not recognised.'])
-                ->withInput($request->except(\App\Support\CaptchaHelper::getResponseFieldName()));
+                ->withInput($request->except(CaptchaHelper::getResponseFieldName()));
         }
 
         // Check if user is soft deleted
@@ -81,7 +82,7 @@ class ForgotPasswordController extends Controller
             return redirect()
                 ->route('forgottenpassword')
                 ->withErrors(['error' => 'This account has been deactivated.'])
-                ->withInput($request->except(\App\Support\CaptchaHelper::getResponseFieldName()));
+                ->withInput($request->except(CaptchaHelper::getResponseFieldName()));
         }
 
         // Generate a forgottenpassword guid, store it in the user table

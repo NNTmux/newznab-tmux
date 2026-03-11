@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\AdditionalProcessing;
 
+use App\Facades\Search;
+use App\Models\Category;
 use App\Models\MediaInfo as MediaInfoModel;
 use App\Models\Predb;
 use App\Models\Release;
@@ -17,6 +19,7 @@ use App\Services\NNTP\NNTPService;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
 use App\Services\Releases\ReleaseBrowseService;
+use dariusiii\rarinfo\Par2Info;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
@@ -146,7 +149,7 @@ class ReleaseFileManager
      */
     public function updateSearchIndex(int $releaseId): void
     {
-        \App\Facades\Search::updateRelease($releaseId);
+        Search::updateRelease($releaseId);
     }
 
     /**
@@ -275,7 +278,7 @@ class ReleaseFileManager
 
             // Delete from search index
             try {
-                \App\Facades\Search::deleteRelease($id);
+                Search::deleteRelease($id);
             } catch (\Throwable) {
                 // Ignore
             }
@@ -296,7 +299,7 @@ class ReleaseFileManager
     public function processPar2File(
         string $fileLocation,
         ReleaseProcessingContext $context,
-        \dariusiii\rarinfo\Par2Info $par2Info
+        Par2Info $par2Info
     ): bool {
         $par2Info->open($fileLocation);
 
@@ -318,7 +321,7 @@ class ReleaseFileManager
         // Only get new name if category is OTHER
         $foundName = true;
         if ((int) $releaseInfo->proc_pp === 0 && $this->config->renamePar2
-            && in_array((int) $context->release->categories_id, \App\Models\Category::OTHERS_GROUP, false)
+            && in_array((int) $context->release->categories_id, Category::OTHERS_GROUP, false)
         ) {
             $foundName = false;
         }

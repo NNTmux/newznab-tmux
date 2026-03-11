@@ -7,7 +7,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
 use App\Services\RegexService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AdminCategoryRegexesController extends BasePageController
 {
@@ -35,7 +37,7 @@ class AdminCategoryRegexesController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     * @return RedirectResponse|View
      *
      * @throws \Exception
      */

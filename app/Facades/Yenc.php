@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Facades;
 
+use App\Services\YencService;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string encode(string $data, string $filename, int $lineLength = 128, bool $includeCrc32 = true)
  * @method static array|null extractMetadata(string $text)
  *
- * @see \App\Services\YencService
+ * @see YencService
  */
 class Yenc extends Facade // @phpstan-ignore missingType.iterableValue
 {
@@ -25,6 +26,6 @@ class Yenc extends Facade // @phpstan-ignore missingType.iterableValue
      */
     protected static function getFacadeAccessor(): string
     {
-        return \App\Services\YencService::class;
+        return YencService::class;
     }
 }

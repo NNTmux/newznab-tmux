@@ -7,7 +7,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
 use App\Models\RootCategory;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AdminCategoryController extends BasePageController
 {
@@ -31,7 +33,7 @@ class AdminCategoryController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     * @return RedirectResponse|View
      *
      * @throws \Exception
      */
@@ -88,7 +90,7 @@ class AdminCategoryController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     * @return RedirectResponse|View
      *
      * @throws \Exception
      */
@@ -141,7 +143,7 @@ class AdminCategoryController extends BasePageController
     /**
      * Delete a category.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      *
      * @throws \Exception
      */

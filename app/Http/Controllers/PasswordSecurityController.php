@@ -6,15 +6,20 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Disable2faPasswordSecurityRequest;
 use App\Models\PasswordSecurity;
+use App\Models\User;
 use App\Services\PasswordBreachService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException;
+use PragmaRX\Google2FA\Exceptions\InvalidCharactersException;
+use PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException;
 use PragmaRX\Google2FALaravel\Facade as Google2FA;
 
 class PasswordSecurityController extends Controller
@@ -44,9 +49,9 @@ class PasswordSecurityController extends Controller
     }
 
     /**
-     * @throws \PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException
-     * @throws \PragmaRX\Google2FA\Exceptions\InvalidCharactersException
-     * @throws \PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException
+     * @throws IncompatibleWithGoogleAuthenticatorException
+     * @throws InvalidCharactersException
+     * @throws SecretKeyTooShortException
      */
     public function generate2faSecret(Request $request): RedirectResponse
     {
@@ -74,9 +79,9 @@ class PasswordSecurityController extends Controller
     }
 
     /**
-     * @throws \PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException
-     * @throws \PragmaRX\Google2FA\Exceptions\InvalidCharactersException
-     * @throws \PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException
+     * @throws IncompatibleWithGoogleAuthenticatorException
+     * @throws InvalidCharactersException
+     * @throws SecretKeyTooShortException
      */
     public function enable2fa(Request $request): RedirectResponse
     {
@@ -118,7 +123,7 @@ class PasswordSecurityController extends Controller
         return redirect()->to('profileedit#security')->with('error_2fa', 'Unable to cancel 2FA setup.');
     }
 
-    public function disable2fa(Disable2faPasswordSecurityRequest $request): \Illuminate\Routing\Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
+    public function disable2fa(Disable2faPasswordSecurityRequest $request): Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         $user = $request->user();
 
@@ -158,7 +163,7 @@ class PasswordSecurityController extends Controller
         }
 
         $userId = $request->session()->get('2fa:user:id');
-        $user = \App\Models\User::find($userId);
+        $user = User::find($userId);
 
         if (! $user || ! $user->passwordSecurity) {
             $request->session()->forget('2fa:user:id');
@@ -270,7 +275,7 @@ class PasswordSecurityController extends Controller
         $userId = $request->session()->get('2fa:user:id');
 
         // Get the user
-        $user = \App\Models\User::find($userId);
+        $user = User::find($userId);
         if (! $user) {
             $request->session()->forget('2fa:user:id');
 

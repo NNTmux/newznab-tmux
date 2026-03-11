@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -46,7 +49,7 @@ class UserDownload extends Model
     protected $guarded = [];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -54,7 +57,7 @@ class UserDownload extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Release, $this>
+     * @return BelongsTo<Release, $this>
      */
     public function release(): BelongsTo
     {
@@ -99,7 +102,7 @@ class UserDownload extends Model
             ->get();
 
         foreach ($downloads as $download) {
-            $hourKey = \Carbon\Carbon::parse($download->timestamp)->format('H:00');
+            $hourKey = Carbon::parse($download->timestamp)->format('H:00');
             if (isset($hourlyData[$hourKey])) {
                 $hourlyData[$hourKey]++;
             }
@@ -109,7 +112,7 @@ class UserDownload extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection<int, self>
+     * @return Collection<int, self>
      */
     public static function getDownloadRequestsForUser(mixed $userID)
     {
@@ -120,7 +123,7 @@ class UserDownload extends Model
      * If a user downloads a NZB, log it.
      *
      *
-     * @return int|\Illuminate\Database\Eloquent\Builder
+     * @return int|Builder
      */
     public static function addDownloadRequest(mixed $userID, mixed $releaseID) // @phpstan-ignore missingType.generics
     {

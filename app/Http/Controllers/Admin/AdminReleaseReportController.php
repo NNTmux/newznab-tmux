@@ -63,7 +63,7 @@ class AdminReleaseReportController extends BasePageController
         $report = ReleaseReport::with('release')->findOrFail($id);
 
         if ($report->release) {
-            /** @var \App\Models\Release $release */
+            /** @var Release $release */
             $release = $report->release;
             $releaseName = $release->searchname;
             $releaseId = $report->releases_id;

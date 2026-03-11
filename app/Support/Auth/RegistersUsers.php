@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Support\Auth;
 
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,7 +19,7 @@ trait RegistersUsers
     /**
      * Show the application registration form.
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
     public function showRegistrationForm(): mixed
     {
@@ -26,7 +29,7 @@ trait RegistersUsers
     /**
      * Handle a registration request for the application.
      */
-    public function register(Request $request): \Illuminate\Http\RedirectResponse|JsonResponse
+    public function register(Request $request): RedirectResponse|JsonResponse
     {
         $this->validator($request->all())->validate();
 
@@ -46,7 +49,7 @@ trait RegistersUsers
     /**
      * Get the guard to be used during registration.
      */
-    protected function guard(): \Illuminate\Contracts\Auth\StatefulGuard
+    protected function guard(): StatefulGuard
     {
         return Auth::guard();
     }
@@ -55,7 +58,7 @@ trait RegistersUsers
      * The user has been registered.
      *
      * @param  mixed  $user
-     * @return \Illuminate\Http\RedirectResponse|JsonResponse|null
+     * @return RedirectResponse|JsonResponse|null
      */
     protected function registered(Request $request, $user): mixed
     {

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Models\RootCategory.
@@ -13,9 +15,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $title
  * @property int $status
  * @property int $disablepreview
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Category[] $categories
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection|Category[] $categories
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RootCategory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\RootCategory newQuery()

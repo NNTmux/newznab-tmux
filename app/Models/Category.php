@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -22,9 +23,9 @@ use Illuminate\Support\Facades\DB;
  * @property int $minsizetoformrelease
  * @property int $maxsizetoformrelease
  * @property int|null $count Computed count from aggregate queries
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Category[] $children
+ * @property-read Collection|Category[] $children
  * @property-read Category|null $parent
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $releases
+ * @property-read Collection|Release[] $releases
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereDisablepreview($value)
@@ -268,7 +269,7 @@ class Category extends Model
     protected $guarded = [];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Release, $this>
+     * @return HasMany<Release, $this>
      */
     public function releases(): HasMany
     {
@@ -276,7 +277,7 @@ class Category extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\RootCategory, $this>
+     * @return BelongsTo<RootCategory, $this>
      */
     public function parent(): BelongsTo
     {
@@ -589,7 +590,7 @@ class Category extends Model
      * @param  array<string, mixed>  $excludedCats
      * @return array<int, string>
      */
-    public static function getCategories(bool $activeOnly = false, array $excludedCats = []): \Illuminate\Database\Eloquent\Collection // @phpstan-ignore missingType.generics
+    public static function getCategories(bool $activeOnly = false, array $excludedCats = []): Collection // @phpstan-ignore missingType.generics
     {
         $sql = self::query()
             ->with('parent')

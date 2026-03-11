@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Scout\Searchable;
@@ -24,8 +25,8 @@ use Laravel\Scout\Searchable;
  * @property int|null $genres_id
  * @property string|null $tracks
  * @property bool $cover
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property int|null $_totalcount Computed total count from aggregate queries
  * @property-read Genre|null $genre
  *
@@ -73,7 +74,7 @@ class MusicInfo extends Model
     protected $guarded = [];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Genre, $this>
+     * @return BelongsTo<Genre, $this>
      */
     public function genre(): BelongsTo
     {

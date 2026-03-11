@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Facades\Yenc;
 use App\Services\YencService;
 use RuntimeException;
 use Tests\TestCase;
@@ -179,6 +180,6 @@ class YencServiceTest extends TestCase
 
     public function test_facade_works(): void
     {
-        $this->assertTrue(\App\Facades\Yenc::enabled());
+        $this->assertTrue(Yenc::enabled());
     }
 }

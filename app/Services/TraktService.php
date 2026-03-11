@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -110,9 +113,9 @@ class TraktService
 
         try {
             $response = Http::timeout($this->timeout)
-                ->retry($this->retryTimes, $this->retryDelay, function (\Throwable $exception, \Illuminate\Http\Client\PendingRequest $request, ?string $key = null) {
+                ->retry($this->retryTimes, $this->retryDelay, function (\Throwable $exception, PendingRequest $request, ?string $key = null) {
                     // Don't retry on 404 - resource doesn't exist
-                    if ($exception instanceof \Illuminate\Http\Client\RequestException) {
+                    if ($exception instanceof RequestException) {
                         $status = $exception->response->status();
                         if ($status === 404) {
                             return false;
@@ -171,7 +174,7 @@ class TraktService
             return null;
         } catch (\Throwable $e) {
             // Check if this is a 404 wrapped in an exception
-            if ($e instanceof \Illuminate\Http\Client\RequestException && $e->response->status() === 404) {
+            if ($e instanceof RequestException && $e->response->status() === 404) {
                 Log::debug('Trakt: Resource not found', ['endpoint' => $endpoint]);
 
                 return null;
@@ -189,7 +192,7 @@ class TraktService
     /**
      * Get backoff seconds from 429 response (Retry-After header or default).
      */
-    protected function getRateLimitBackoff(\Illuminate\Http\Client\Response $response): int
+    protected function getRateLimitBackoff(Response $response): int
     {
         $retryAfter = $response->header('Retry-After');
         if ($retryAfter !== null && is_numeric($retryAfter)) {

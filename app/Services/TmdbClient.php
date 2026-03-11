@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -62,9 +64,9 @@ class TmdbClient
 
         try {
             $response = Http::timeout($this->timeout)
-                ->retry($this->retryTimes, $this->retryDelay, function (\Throwable $exception, \Illuminate\Http\Client\PendingRequest $request, ?string $key = null) {
+                ->retry($this->retryTimes, $this->retryDelay, function (\Throwable $exception, PendingRequest $request, ?string $key = null) {
                     // Don't retry on 404 errors - resource simply doesn't exist
-                    if ($exception instanceof \Illuminate\Http\Client\RequestException) {
+                    if ($exception instanceof RequestException) {
                         return $exception->response->status() !== 404;
                     }
 
@@ -92,7 +94,7 @@ class TmdbClient
             return null;
         } catch (\Throwable $e) {
             // Check if this is a 404 wrapped in an exception
-            if ($e instanceof \Illuminate\Http\Client\RequestException && $e->response->status() === 404) {
+            if ($e instanceof RequestException && $e->response->status() === 404) {
                 Log::debug('TMDB: Resource not found', ['endpoint' => $endpoint]);
 
                 return null;

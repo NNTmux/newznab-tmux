@@ -268,7 +268,7 @@ class ReleaseSearchService
      * @param  array<int|string, mixed>  $cat  Category IDs (list or associative)
      * @param  array<string, mixed>  $excludedCategories
      * @param  array<string, mixed>  $siteIdArr
-     * @return array|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|mixed
+     * @return array|Collection|\Illuminate\Support\Collection|mixed
      */
     public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {

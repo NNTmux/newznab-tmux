@@ -8,6 +8,7 @@ use App\Models\BookInfo;
 use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
+use App\Services\Releases\ReleaseBrowseService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -114,7 +115,7 @@ class BookService
         }
         $order = $this->getBookOrder($orderBy);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        $showPasswords = app(\App\Services\Releases\ReleaseBrowseService::class)->showPasswords();
+        $showPasswords = app(ReleaseBrowseService::class)->showPasswords();
 
         $baseWhere = "boo.cover = 1 AND boo.title != '' "
             ."AND r.passwordstatus {$showPasswords} "

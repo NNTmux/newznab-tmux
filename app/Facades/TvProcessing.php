@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Illuminate\Support\Collection getPipes()
  * @method static array getStats()
  *
- * @see \App\Services\TvProcessing\TvProcessingPipeline
+ * @see TvProcessingPipeline
  */
 class TvProcessing extends Facade // @phpstan-ignore missingType.iterableValue, missingType.generics
 {

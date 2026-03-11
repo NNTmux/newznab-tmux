@@ -18,7 +18,7 @@ return new class extends Migration
                 // Drop the existing foreign key constraint first
                 try {
                     $table->dropForeign('FK_users_inv');
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     // Foreign key might not exist or have different name
                 }
 
@@ -109,7 +109,7 @@ return new class extends Migration
                     $table->index($columns, $indexName);
                 });
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Index creation failed, but continue
         }
     }
@@ -126,7 +126,7 @@ return new class extends Migration
                     $table->dropIndex($indexName);
                 });
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Index drop failed, but continue
         }
     }

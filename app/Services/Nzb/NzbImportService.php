@@ -10,6 +10,7 @@ use App\Models\UsenetGroup;
 use App\Services\BlacklistService;
 use App\Services\Categorization\CategorizationService;
 use App\Services\ReleaseCleaningService;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -80,7 +81,7 @@ class NzbImportService
     /**
      * Begin importing NZB files.
      *
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws FileNotFoundException
      */
     public function beginImport(mixed $filesToProcess, bool $useNzbName = false, bool $delete = false, bool $deleteFailed = false, int $source = 1): bool|string
     {

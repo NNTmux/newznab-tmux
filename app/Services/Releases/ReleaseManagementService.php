@@ -8,6 +8,8 @@ use App\Facades\Search;
 use App\Models\Release;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
@@ -105,7 +107,7 @@ class ReleaseManagementService
     }
 
     /**
-     * @return Release[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection<int, mixed>|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection<int, mixed>
+     * @return Release[]|Builder[]|\Illuminate\Database\Eloquent\Collection<int, mixed>|\Illuminate\Database\Query\Builder[]|Collection<int, mixed>
      */
     public function getForExport(string $postFrom = '', string $postTo = '', string $groupID = '') // @phpstan-ignore missingType.generics
     {

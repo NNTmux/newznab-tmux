@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Cache;
@@ -27,8 +28,8 @@ use Illuminate\Support\Facades\Cache;
  * @property string $language
  * @property bool $cover
  * @property bool $backdrop
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property string $trailer
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\MovieInfo whereActors($value)

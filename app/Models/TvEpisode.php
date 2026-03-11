@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -19,7 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $title Title of the episode.
  * @property string $firstaired Date of original airing/release.
  * @property string $summary Description/summary of the episode.
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $release
+ * @property-read Collection|Release[] $release
  * @property-read Video $video
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\TvEpisode whereEpisode($value)
@@ -52,7 +53,7 @@ class TvEpisode extends Model
     public $timestamps = false;
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Video, $this>
+     * @return BelongsTo<Video, $this>
      */
     public function video(): BelongsTo
     {
@@ -60,7 +61,7 @@ class TvEpisode extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Release, $this>
+     * @return HasMany<Release, $this>
      */
     public function release(): HasMany
     {

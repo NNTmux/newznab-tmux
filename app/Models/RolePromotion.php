@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
@@ -22,7 +23,7 @@ use Spatie\Permission\Models\Role;
  * @property bool $is_active
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\RolePromotionStat[] $statistics
+ * @property-read Collection|RolePromotionStat[] $statistics
  */
 class RolePromotion extends Model // @phpstan-ignore missingType.iterableValue
 {
@@ -47,7 +48,7 @@ class RolePromotion extends Model // @phpstan-ignore missingType.iterableValue
     /**
      * Get the statistics for this promotion
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\RolePromotionStat, $this>
+     * @return HasMany<RolePromotionStat, $this>
      */
     public function statistics(): HasMany
     {
@@ -195,8 +196,8 @@ class RolePromotion extends Model // @phpstan-ignore missingType.iterableValue
     public function trackApplication(
         int $userId,
         int $roleId,
-        ?\Illuminate\Support\Carbon $previousExpiryDate = null,
-        ?\Illuminate\Support\Carbon $newExpiryDate = null
+        ?Carbon $previousExpiryDate = null,
+        ?Carbon $newExpiryDate = null
     ): RolePromotionStat {
         return RolePromotionStat::recordPromotion(
             $userId,
@@ -220,7 +221,7 @@ class RolePromotion extends Model // @phpstan-ignore missingType.iterableValue
             ->get()
             ->groupBy('role_id')
             ->map(function ($stats, $roleId) {
-                /** @var \App\Models\RolePromotionStat|null $firstStat */
+                /** @var RolePromotionStat|null $firstStat */
                 $firstStat = $stats->first();
 
                 return [

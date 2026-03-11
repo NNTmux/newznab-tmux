@@ -20,6 +20,7 @@ use FFMpeg\FFProbe;
 use FFMpeg\Filters\Video\ResizeFilter;
 use FFMpeg\Format\Audio\Vorbis;
 use FFMpeg\Format\Video\Ogg;
+use FFMpeg\Media\Video;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Mhor\MediaInfo\MediaInfo;
@@ -89,7 +90,7 @@ class MediaExtractionService
 
         try {
             if ($this->ffprobe()->isValid($fileLocation)) {
-                /** @var \FFMpeg\Media\Video $video */
+                /** @var Video $video */
                 $video = $this->ffmpeg()->open($fileLocation);
                 $video->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time))
                     ->save($fileName);
@@ -150,7 +151,7 @@ class MediaExtractionService
 
                 try {
                     if ($this->ffprobe()->isValid($fileLocation)) {
-                        /** @var \FFMpeg\Media\Video $video */
+                        /** @var Video $video */
                         $video = $this->ffmpeg()->open($fileLocation);
                         $clip = $video->clip(
                             TimeCode::fromString($lowestLength),
@@ -173,7 +174,7 @@ class MediaExtractionService
         if (! $newMethod) {
             try {
                 if ($this->ffprobe()->isValid($fileLocation)) {
-                    /** @var \FFMpeg\Media\Video $video */
+                    /** @var Video $video */
                     $video = $this->ffmpeg()->open($fileLocation);
                     $clip = $video->clip(
                         TimeCode::fromSeconds(0),

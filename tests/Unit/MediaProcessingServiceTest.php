@@ -31,7 +31,7 @@ class MediaProcessingServiceTest extends TestCase
         Facade::setFacadeApplication($container);
 
         $this->tmpDir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'mps_'.uniqid().DIRECTORY_SEPARATOR;
-        \Illuminate\Support\Facades\File::makeDirectory($this->tmpDir, 0777, true, true);
+        File::makeDirectory($this->tmpDir, 0777, true, true);
     }
 
     protected function tearDown(): void

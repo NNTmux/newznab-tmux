@@ -8,7 +8,9 @@ use App\Http\Controllers\BasePageController;
 use App\Models\MovieInfo;
 use App\Models\Release;
 use App\Services\MovieService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AdminMovieController extends BasePageController
 {
@@ -39,7 +41,7 @@ class AdminMovieController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     * @return RedirectResponse|View
      *
      * @throws \Exception
      */
@@ -104,7 +106,7 @@ class AdminMovieController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     * @return RedirectResponse|View
      *
      * @throws \Exception
      */

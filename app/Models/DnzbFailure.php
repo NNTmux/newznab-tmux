@@ -49,7 +49,7 @@ class DnzbFailure extends Model
     protected $guarded = [];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Release, $this>
+     * @return BelongsTo<Release, $this>
      */
     public function release(): BelongsTo
     {
@@ -57,7 +57,7 @@ class DnzbFailure extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {

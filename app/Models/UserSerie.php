@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -14,8 +16,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $users_id
  * @property int $videos_id FK to videos.id
  * @property string|null $categories List of categories for user tv shows
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property-read User $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserSerie whereCategories($value)
@@ -41,7 +43,7 @@ class UserSerie extends Model
     protected $dateFormat = false;
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -53,7 +55,7 @@ class UserSerie extends Model
      *
      *
      * @param  array<string, mixed>  $catID
-     * @return int|\Illuminate\Database\Eloquent\Builder
+     * @return int|Builder
      */
     public static function addShow(mixed $userId, mixed $videoId, array $catID = []) // @phpstan-ignore missingType.generics
     {

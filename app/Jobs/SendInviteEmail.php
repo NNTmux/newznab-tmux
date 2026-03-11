@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Mail\SendInvite;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -20,12 +21,12 @@ class SendInviteEmail implements ShouldQueue
 
     private string $url;
 
-    private \App\Models\User $user;
+    private User $user;
 
     /**
      * SendInviteEmail constructor.
      */
-    public function __construct(string $email, \App\Models\User $user, string $url)
+    public function __construct(string $email, User $user, string $url)
     {
         $this->email = $email;
         $this->user = $user;

@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Release;
 use App\Models\UsersRelease;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,7 +34,7 @@ class CartController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function store(Request $request): RedirectResponse|\Illuminate\Http\JsonResponse
+    public function store(Request $request): RedirectResponse|JsonResponse
     {
         $guids = explode(',', $request->input('id'));
 

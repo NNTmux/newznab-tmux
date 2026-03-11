@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
  * @property string $title
  * @property int|null $type
  * @property bool $disabled
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\MusicInfo[] $music
+ * @property-read Collection|MusicInfo[] $music
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Genre whereDisabled($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Genre whereId($value)
@@ -48,7 +48,7 @@ class Genre extends Model
     protected $guarded = [];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MusicInfo, $this>
+     * @return HasMany<MusicInfo, $this>
      */
     public function music(): HasMany
     {
@@ -56,7 +56,7 @@ class Genre extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ConsoleInfo, $this>
+     * @return HasMany<ConsoleInfo, $this>
      */
     public function consoleInfo(): HasMany
     {
@@ -64,7 +64,7 @@ class Genre extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\GamesInfo, $this>
+     * @return HasMany<GamesInfo, $this>
      */
     public function gamesInfo(): HasMany
     {

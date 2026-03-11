@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use Elasticsearch\ClientBuilder;
 use Illuminate\Console\Command;
 use Manticoresearch\Client;
 use Manticoresearch\Exceptions\ResponseException;
@@ -267,7 +268,7 @@ class CreateMediaIndexes extends Command
         try {
             // Create Elasticsearch client directly
             $esConfig = config('search.drivers.elasticsearch');
-            $esClient = \Elasticsearch\ClientBuilder::create()
+            $esClient = ClientBuilder::create()
                 ->setHosts($esConfig['hosts'] ?? [['host' => 'localhost', 'port' => 9200]])
                 ->build();
 

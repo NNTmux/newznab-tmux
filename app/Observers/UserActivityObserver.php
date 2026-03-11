@@ -7,6 +7,7 @@ namespace App\Observers;
 use App\Jobs\SendAccountChangedEmail;
 use App\Models\User;
 use App\Models\UserActivity;
+use Spatie\Permission\Models\Role;
 
 class UserActivityObserver
 {
@@ -162,7 +163,7 @@ class UserActivityObserver
         }
 
         try {
-            $role = \Spatie\Permission\Models\Role::find($roleId);
+            $role = Role::find($roleId);
 
             return $role ? $role->name : "Role #{$roleId}";
         } catch (\Exception $e) {

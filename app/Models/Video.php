@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\DB;
 
 /**
  * App\Models\Video.
@@ -25,9 +27,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property int $tvmaze ID number for TVMaze site.
  * @property int $tvrage ID number for TVRage site.
  * @property bool $source Which site did we use for info?
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\VideoAlias[] $alias
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\TvEpisode[] $episode
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $release
+ * @property-read Collection|VideoAlias[] $alias
+ * @property-read Collection|TvEpisode[] $episode
+ * @property-read Collection|Release[] $release
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereAnidb($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Video whereCountriesId($value)
@@ -64,7 +66,7 @@ class Video extends Model
     public $timestamps = false;
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\VideoAlias, $this>
+     * @return HasMany<VideoAlias, $this>
      */
     public function alias(): HasMany
     {
@@ -72,7 +74,7 @@ class Video extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Release, $this>
+     * @return HasMany<Release, $this>
      */
     public function release(): HasMany
     {
@@ -80,7 +82,7 @@ class Video extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\TvEpisode, $this>
+     * @return HasMany<TvEpisode, $this>
      */
     public function episode(): HasMany
     {
@@ -88,7 +90,7 @@ class Video extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\TvInfo, $this>
+     * @return HasOne<TvInfo, $this>
      */
     public function tvInfo(): HasOne
     {
@@ -203,7 +205,7 @@ class Video extends Model
             ORDER BY videos.title ASC
         ";
 
-        $results = \Illuminate\Support\Facades\DB::select($sql, $params);
+        $results = DB::select($sql, $params);
 
         // Convert stdClass objects to arrays for backward compatibility
         return array_map(fn ($row) => (array) $row, $results);

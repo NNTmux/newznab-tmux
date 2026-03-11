@@ -1,5 +1,7 @@
 <?php
 
+use TeamTeaTime\Forum\Support\Frontend\Forum;
+
 return [
 
     /*
@@ -78,6 +80,6 @@ return [
     |
     */
 
-    'utility_class' => TeamTeaTime\Forum\Support\Frontend\Forum::class,
+    'utility_class' => Forum::class,
 
 ];

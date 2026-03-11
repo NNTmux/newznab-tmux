@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\BlacklistConstants;
+use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Settings;
 use App\Services\Nzb\NzbService;
 use App\Services\Releases\ReleaseManagementService;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
@@ -288,7 +290,7 @@ class ReleaseRemoverService
     /**
      * Log completion message.
      */
-    private function logCompletion(\Carbon\Carbon $timeStart): void
+    private function logCompletion(Carbon $timeStart): void
     {
         if ($this->echoCLI) {
             cli()->headerOver(($this->delete ? 'Deleted ' : 'Would have deleted ').$this->deletedCount.' release(s). This script ran for ');
@@ -615,7 +617,7 @@ class ReleaseRemoverService
      */
     private function performSearch(string $regexMatch): array
     {
-        return \App\Facades\Search::searchReleases($regexMatch, 100);
+        return Search::searchReleases($regexMatch, 100);
     }
 
     /**

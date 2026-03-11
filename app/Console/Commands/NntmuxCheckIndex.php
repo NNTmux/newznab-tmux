@@ -6,6 +6,8 @@ namespace App\Console\Commands;
 
 use App\Facades\Elasticsearch;
 use Exception;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Console\Command;
 
 class NntmuxCheckIndex extends Command
@@ -119,7 +121,7 @@ class NntmuxCheckIndex extends Command
             $baseUrl = "http://{$host}:{$port}";
 
             // Check if table exists using HTTP API
-            $client = new \GuzzleHttp\Client([
+            $client = new Client([
                 'base_uri' => $baseUrl,
                 'timeout' => 10,
                 'http_errors' => false, // Don't throw on HTTP errors
@@ -227,13 +229,13 @@ class NntmuxCheckIndex extends Command
                         );
                     }
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Ignore describe errors
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Error checking ManticoreSearch table: {$e->getMessage()}");
-            if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
+            if ($e instanceof RequestException && $e->hasResponse()) {
                 $this->error('Response body: '.$e->getResponse()->getBody());
             }
         }

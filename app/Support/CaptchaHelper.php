@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+use App\Rules\TurnstileRule;
 use App\Services\TurnstileService;
 use Illuminate\Support\Facades\Log;
 
@@ -120,7 +121,7 @@ class CaptchaHelper
             return [
                 $fieldName => [
                     'required',
-                    new \App\Rules\TurnstileRule,
+                    new TurnstileRule,
                 ],
             ];
         }

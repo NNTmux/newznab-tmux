@@ -2,6 +2,9 @@
 
 use App\Jobs\PurgeDeletedAccounts;
 use App\Jobs\RemoveInactiveAccounts;
+use App\Models\UserActivityStat;
+use App\Models\UserDownload;
+use App\Models\UserRequest;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Schedule;
 
@@ -37,11 +40,11 @@ Schedule::command('metrics:collect')->everyFiveMinutes()->withoutOverlapping();
 Schedule::command('metrics:collect --cleanup')->dailyAt('03:00');
 // Cleanup old user activity stats weekly (keep last 90 days)
 Schedule::call(function () {
-    \App\Models\UserActivityStat::cleanupOldStats(90);
+    UserActivityStat::cleanupOldStats(90);
 })->weeklyOn(1, '04:00');
 // Cleanup old hourly stats daily (keep last 30 days)
 Schedule::call(function () {
-    \App\Models\UserActivityStat::cleanupOldHourlyStats(30);
+    UserActivityStat::cleanupOldHourlyStats(30);
 })->dailyAt('04:30');
 if (config('nntmux.purge_inactive_users') === true) {
     Schedule::job(new RemoveInactiveAccounts)->daily();
@@ -49,8 +52,8 @@ if (config('nntmux.purge_inactive_users') === true) {
 }
 // Cleanup old API requests and download logs (older than 1 day) - deferred from inline API calls
 Schedule::call(function () {
-    \App\Models\UserRequest::clearApiRequests(false);
-    \App\Models\UserDownload::where('timestamp', '<', now()->subDay())->delete();
+    UserRequest::clearApiRequests(false);
+    UserDownload::where('timestamp', '<', now()->subDay())->delete();
 })->name('cleanup-api-request-logs')->hourly()->withoutOverlapping();
 // Check tmux health and auto-restart if monitor pane is dead
 Schedule::command('tmux:health-check --auto-restart')->everyThirtyMinutes()->withoutOverlapping();

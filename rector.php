@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Rector\CodeQuality\Rector\Class_\InlineConstructorDefaultToPropertyRector;
 use Rector\Config\RectorConfig;
+use Rector\Set\ValueObject\SetList;
 use RectorLaravel\Set\LaravelSetList;
 
 return static function (RectorConfig $rectorConfig): void {
@@ -26,7 +27,7 @@ return static function (RectorConfig $rectorConfig): void {
     // define sets of rules
     $rectorConfig->sets([
         LaravelSetList::LARAVEL_100,
-        \Rector\Set\ValueObject\SetList::PHP_84,
-        \Rector\Set\ValueObject\SetList::CODE_QUALITY,
+        SetList::PHP_84,
+        SetList::CODE_QUALITY,
     ]);
 };

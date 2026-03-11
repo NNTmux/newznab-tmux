@@ -9,6 +9,7 @@ use App\Models\GamesInfo;
 use App\Models\Genre;
 use App\Models\Release;
 use App\Models\Settings;
+use App\Services\Releases\ReleaseBrowseService;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
@@ -201,7 +202,7 @@ class GamesService
         }
         $order = $this->getGamesOrder($orderBy);
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        $showPasswords = app(\App\Services\Releases\ReleaseBrowseService::class)->showPasswords();
+        $showPasswords = app(ReleaseBrowseService::class)->showPasswords();
 
         $baseWhere = "gi.title != '' AND gi.cover = 1 "
             ."AND r.passwordstatus {$showPasswords} "

@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Session\TokenMismatchException;
+use Spatie\Permission\Exceptions\UnauthorizedException;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -46,25 +51,25 @@ class Handler extends ExceptionHandler
      *
      * @return void
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
-    public function report(\Throwable $exception)
+    public function report(Throwable $exception)
     {
         parent::report($exception);
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @param  Request  $request
+     * @return RedirectResponse|Response
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
-    public function render($request, \Throwable $exception)
+    public function render($request, Throwable $exception)
     {
-        if ($exception instanceof \Spatie\Permission\Exceptions\UnauthorizedException) {
+        if ($exception instanceof UnauthorizedException) {
             abort(401);
         }
-        if ($exception instanceof \Illuminate\Session\TokenMismatchException) {
+        if ($exception instanceof TokenMismatchException) {
             return redirect()
                 ->back()
                 ->withInput($request->except(['password', 'password_confirmation']))

@@ -6,7 +6,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
 use App\Models\Content;
+use Illuminate\Foundation\Application;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
+use Illuminate\View\View;
 
 class AdminContentController extends BasePageController
 {
@@ -35,7 +39,7 @@ class AdminContentController extends BasePageController
     /**
      * Show form to create or edit content.
      *
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
+     * @return \Illuminate\Contracts\Foundation\Application|Application|RedirectResponse|Redirector|View
      *
      * @throws \Exception
      */

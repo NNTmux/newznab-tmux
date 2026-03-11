@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Genre;
 use App\Services\GenreService;
 use App\Services\MusicService;
 use Illuminate\Http\Request;
@@ -58,7 +59,7 @@ class MusicController extends BasePageController
         $genres = $gen->getGenres((string) GenreService::MUSIC_TYPE, true);
         $tmpgnr = [];
         foreach ($genres as $gn) {
-            /** @var \App\Models\Genre $gn */
+            /** @var Genre $gn */
             $tmpgnr[$gn->id] = $gn->title;
         }
 

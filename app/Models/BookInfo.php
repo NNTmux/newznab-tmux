@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Scout\Searchable;
@@ -25,8 +26,8 @@ use Laravel\Scout\Searchable;
  * @property string|null $overview
  * @property string $genre
  * @property bool $cover
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BookInfo whereAsin($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\BookInfo whereAuthor($value)
@@ -86,7 +87,7 @@ class BookInfo extends Model
     /**
      * Get the releases associated with this book.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Release, $this>
+     * @return HasMany<Release, $this>
      */
     public function releases(): HasMany
     {

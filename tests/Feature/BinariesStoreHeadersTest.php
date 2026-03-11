@@ -12,8 +12,8 @@ class BinariesStoreHeadersTest extends TestCase
     {
         parent::setUp();
         config(['database.default' => 'sqlite', 'database.connections.sqlite.database' => ':memory:']);
-        \Illuminate\Support\Facades\DB::purge();
-        \Illuminate\Support\Facades\DB::reconnect();
+        DB::purge();
+        DB::reconnect();
 
         // Minimal tables.
         DB::statement('CREATE TABLE settings (

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services\TvProcessing\Providers;
 
 use App\Services\ReleaseImageService;
+use App\Services\TmdbClient;
+use App\Services\TraktService;
 use DariusIII\TVMaze\TVMaze as Client;
 
 /**
@@ -485,7 +487,7 @@ class TvMazeProvider extends AbstractTvProvider
 
         try {
             // Try to get TMDB ID via TMDB's find endpoint
-            $tmdbClient = app(\App\Services\TmdbClient::class);
+            $tmdbClient = app(TmdbClient::class);
             if ($tmdbClient->isConfigured()) {
                 // Try TVDB ID first
                 if ($tvdbId > 0) {
@@ -504,7 +506,7 @@ class TvMazeProvider extends AbstractTvProvider
             }
 
             // Try to get Trakt ID via Trakt's search endpoint
-            $traktService = app(\App\Services\TraktService::class);
+            $traktService = app(TraktService::class);
             if ($traktService->isConfigured()) {
                 // Try TVDB ID first
                 if ($tvdbId > 0) {

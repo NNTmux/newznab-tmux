@@ -11,12 +11,14 @@ use App\Models\ReleaseStat;
 use App\Models\RoleStat;
 use App\Models\Settings;
 use App\Models\SignupStat;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AdminSiteController extends BasePageController
 {
     /**
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     * @return RedirectResponse|View
      *
      * @throws \Exception
      */

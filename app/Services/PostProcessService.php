@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Settings;
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\NameFixing\NameFixingService;
 use App\Services\NNTP\NNTPService;
@@ -215,7 +216,7 @@ final class PostProcessService
             $forkingService = new ForkingService;
             $processTV = is_numeric($processTV)
                 ? $processTV
-                : \App\Models\Settings::settingValue('lookuptv');
+                : Settings::settingValue('lookuptv');
             $renamedOnly = ((int) $processTV === 2);
 
             $forkingService->processTv($renamedOnly);

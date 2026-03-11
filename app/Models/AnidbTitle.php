@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $type type of title.
  * @property string $lang
  * @property string $title
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\AnidbInfo[] $info
+ * @property-read Collection|AnidbInfo[] $info
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbTitle whereAnidbid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbTitle whereLang($value)
@@ -52,7 +53,7 @@ class AnidbTitle extends Model
     protected $guarded = [];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AnidbInfo, $this>
+     * @return HasMany<AnidbInfo, $this>
      */
     public function info(): HasMany
     {

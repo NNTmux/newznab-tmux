@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
@@ -13,7 +14,7 @@ class AccountDeleted extends Mailable
     use Queueable, SerializesModels;
 
     /**
-     * @var \Illuminate\Database\Eloquent\Model|null|object|static
+     * @var Model|null|object|static
      */
     private $user;
 

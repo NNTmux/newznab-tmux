@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -24,8 +25,8 @@ use Laravel\Scout\Searchable;
  * @property string|null $releasedate
  * @property string|null $review
  * @property bool $cover
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ConsoleInfo whereAsin($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ConsoleInfo whereCover($value)
@@ -87,7 +88,7 @@ class ConsoleInfo extends Model
     /**
      * Get the genre for the console info.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Genre, $this>
+     * @return BelongsTo<Genre, $this>
      */
     public function genre(): BelongsTo
     {
@@ -97,7 +98,7 @@ class ConsoleInfo extends Model
     /**
      * Get the releases for the console info.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Release, $this>
+     * @return HasMany<Release, $this>
      */
     public function releases(): HasMany
     {

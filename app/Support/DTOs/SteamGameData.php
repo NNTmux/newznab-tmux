@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Support\DTOs;
 
+use Illuminate\Support\Carbon;
+
 /**
  * Data Transfer Object for Steam Game data.
  *
@@ -177,7 +179,7 @@ final readonly class SteamGameData
         $releaseDate = null;
         if (! empty($data['release_date']['date'])) {
             try {
-                $releaseDate = \Illuminate\Support\Carbon::parse($data['release_date']['date'])->format('Y-m-d');
+                $releaseDate = Carbon::parse($data['release_date']['date'])->format('Y-m-d');
             } catch (\Exception $e) {
                 $releaseDate = $data['release_date']['date'];
             }

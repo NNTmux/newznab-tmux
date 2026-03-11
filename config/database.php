@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Str;
+use PDO\MYSQL;
 
 return [
 
@@ -36,7 +37,7 @@ return [
             'strict' => false,
             'engine' => 'InnoDB ROW_FORMAT=DYNAMIC',
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO\MYSQL::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                MYSQL::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
 
@@ -77,7 +78,7 @@ return [
             'strict' => false,
             'engine' => 'InnoDB ROW_FORMAT=DYNAMIC',
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO\MYSQL::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                MYSQL::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
     ],

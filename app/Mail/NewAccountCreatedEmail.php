@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Mail;
 
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -13,7 +14,7 @@ class NewAccountCreatedEmail extends Mailable
     use Queueable, SerializesModels;
 
     /**
-     * @var \App\Models\User
+     * @var User
      */
     private $user;
 

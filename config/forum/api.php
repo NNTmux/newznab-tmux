@@ -1,5 +1,9 @@
 <?php
 
+use TeamTeaTime\Forum\Http\Resources\CategoryResource;
+use TeamTeaTime\Forum\Http\Resources\PostResource;
+use TeamTeaTime\Forum\Http\Resources\ThreadResource;
+
 return [
 
     /*
@@ -51,9 +55,9 @@ return [
     */
 
     'resources' => [
-        'category' => TeamTeaTime\Forum\Http\Resources\CategoryResource::class,
-        'thread' => TeamTeaTime\Forum\Http\Resources\ThreadResource::class,
-        'post' => TeamTeaTime\Forum\Http\Resources\PostResource::class,
+        'category' => CategoryResource::class,
+        'thread' => ThreadResource::class,
+        'post' => PostResource::class,
     ],
 
 ];

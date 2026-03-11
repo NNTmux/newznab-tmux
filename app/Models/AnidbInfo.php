@@ -87,7 +87,7 @@ class AnidbInfo extends Model
     /**
      * Get the title associated with this info.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\AnidbTitle, $this>
+     * @return BelongsTo<AnidbTitle, $this>
      */
     public function title(): BelongsTo
     {
@@ -97,7 +97,7 @@ class AnidbInfo extends Model
     /**
      * Get the releases associated with this anime.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Release, $this>
+     * @return HasMany<Release, $this>
      */
     public function releases(): HasMany
     {

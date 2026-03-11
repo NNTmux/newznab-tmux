@@ -11,6 +11,10 @@ use App\Models\TvEpisode;
 use App\Models\TvInfo;
 use App\Models\Video;
 use App\Services\Releases\ReleaseBrowseService;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -78,7 +82,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         $this->catWhere = 'categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER.' AND categories_id != '.Category::TV_ANIME;
         try {
             $this->tvqty = Settings::settingValue('maxrageprocessed') !== '' ? (int) Settings::settingValue('maxrageprocessed') : 75;
-        } catch (\Illuminate\Database\QueryException $e) {
+        } catch (QueryException $e) {
             // Table doesn't exist yet (e.g., during migrations or tests)
             $this->tvqty = 75;
         }
@@ -130,9 +134,9 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     abstract public function formatEpisodeInfo(mixed $episode): array;
 
     /**
-     * @return Release[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection<int, mixed>|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection<int, mixed>|int
+     * @return Release[]|Builder[]|\Illuminate\Database\Eloquent\Collection<int, mixed>|\Illuminate\Database\Query\Builder[]|Collection<int, mixed>|int
      */
-    public function getTvReleases(string $groupID = '', string $guidChar = '', int $lookupSetting = 1, int $status = 0): array|\Illuminate\Database\Eloquent\Collection|int|\Illuminate\Support\Collection // @phpstan-ignore missingType.generics
+    public function getTvReleases(string $groupID = '', string $guidChar = '', int $lookupSetting = 1, int $status = 0): array|\Illuminate\Database\Eloquent\Collection|int|Collection // @phpstan-ignore missingType.generics
     {
         $ret = 0;
         if ($lookupSetting === 0) {
@@ -340,9 +344,9 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     }
 
     /**
-     * @return Video|false|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model
+     * @return Video|false|Builder|Model
      */
-    public function getSiteByID(string $column, int $id): \Illuminate\Database\Eloquent\Model|bool|\Illuminate\Database\Eloquent\Builder|Video|int|string // @phpstan-ignore missingType.generics
+    public function getSiteByID(string $column, int $id): Model|bool|Builder|Video|int|string // @phpstan-ignore missingType.generics
     {
         $return = false;
         $video = Video::query()->where('id', $id)->first([$column]);

@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Models\UserExcludedCategory.
@@ -13,10 +14,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $users_id
  * @property int $categories_id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User $user
- * @property-read \App\Models\Category $category
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User $user
+ * @property-read Category $category
  *
  * @method static \Illuminate\Database\Eloquent\Builder|UserExcludedCategory whereUsersId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserExcludedCategory whereCategoriesId($value)
@@ -41,7 +42,7 @@ class UserExcludedCategory extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -49,7 +50,7 @@ class UserExcludedCategory extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Category, $this>
+     * @return BelongsTo<Category, $this>
      */
     public function category(): BelongsTo
     {

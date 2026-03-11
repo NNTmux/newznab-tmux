@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Mail;
 
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -14,7 +15,7 @@ class AccountWillExpire extends Mailable
 
     private int $days;
 
-    private \App\Models\User $user;
+    private User $user;
 
     private mixed $siteEmail;
 
@@ -23,7 +24,7 @@ class AccountWillExpire extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(\App\Models\User $user, int $days)
+    public function __construct(User $user, int $days)
     {
         $this->user = $user;
         $this->days = $days;

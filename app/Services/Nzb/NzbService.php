@@ -9,6 +9,7 @@ use App\Models\Collection;
 use App\Models\Part;
 use App\Models\Release;
 use App\Models\Settings;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -53,7 +54,7 @@ class NzbService
     {
         try {
             $nzbSplitLevel = (int) Settings::settingValue('nzbsplitlevel');
-        } catch (\Illuminate\Database\QueryException $e) {
+        } catch (QueryException $e) {
             // Table doesn't exist yet (e.g., during migrations or tests)
             $nzbSplitLevel = 1;
         }

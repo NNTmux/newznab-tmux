@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\TvProcessing;
 
+use Illuminate\Database\Eloquent\Model;
+
 /**
  * Value object containing release information for TV processing.
  */
@@ -28,7 +30,7 @@ class TvReleaseContext
     public static function fromRelease(array|object $release): self
     {
         // Handle Eloquent models properly - use toArray() instead of casting
-        if ($release instanceof \Illuminate\Database\Eloquent\Model) {
+        if ($release instanceof Model) {
             $data = $release->toArray();
         } else {
             $data = is_array($release) ? $release : (array) $release;

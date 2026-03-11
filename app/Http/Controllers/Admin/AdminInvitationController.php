@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\InvitationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class AdminInvitationController extends BasePageController
@@ -132,7 +133,7 @@ class AdminInvitationController extends BasePageController
      */
     private function getOverallStats(): array
     {
-        return \Illuminate\Support\Facades\Cache::remember('admin_invitation_stats', 300, function () {
+        return Cache::remember('admin_invitation_stats', 300, function () {
             return [
                 'total' => Invitation::count(),
                 'pending' => Invitation::valid()->count(),
@@ -158,7 +159,7 @@ class AdminInvitationController extends BasePageController
      */
     private function getTopInviters(int $limit = 10): array
     {
-        return \Illuminate\Support\Facades\Cache::remember('admin_top_inviters', 300, function () use ($limit) {
+        return Cache::remember('admin_top_inviters', 300, function () use ($limit) {
             return User::select('users.*')
                 ->selectRaw('COUNT(invitations.id) as total_invitations')
                 ->selectRaw('COUNT(CASE WHEN invitations.used_at IS NOT NULL THEN 1 END) as successful_invitations')

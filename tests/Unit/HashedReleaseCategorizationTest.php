@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Models\Category;
+use App\Services\Categorization\CategorizationResult;
 use App\Services\Categorization\Categorizers\MiscCategorizer;
 use App\Services\Categorization\Pipes\CategorizationPassable;
 use App\Services\Categorization\Pipes\ConsolePipe;
@@ -303,7 +304,7 @@ class HashedReleaseCategorizationTest extends TestCase
 
     public function test_other_misc_with_matched_by_is_successful(): void
     {
-        $result = new \App\Services\Categorization\CategorizationResult(
+        $result = new CategorizationResult(
             Category::OTHER_MISC, 0.5, 'obfuscated_pattern'
         );
 
@@ -312,14 +313,14 @@ class HashedReleaseCategorizationTest extends TestCase
 
     public function test_no_match_sentinel_is_not_successful(): void
     {
-        $result = \App\Services\Categorization\CategorizationResult::noMatch();
+        $result = CategorizationResult::noMatch();
 
         $this->assertFalse($result->isSuccessful());
     }
 
     public function test_other_hashed_is_successful(): void
     {
-        $result = new \App\Services\Categorization\CategorizationResult(
+        $result = new CategorizationResult(
             Category::OTHER_HASHED, 0.95, 'hash_md5'
         );
 

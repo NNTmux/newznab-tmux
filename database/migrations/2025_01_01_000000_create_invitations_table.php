@@ -126,7 +126,7 @@ return new class extends Migration
                     $table->index($columns, $indexName);
                 });
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Index creation failed, but continue
         }
     }
@@ -143,7 +143,7 @@ return new class extends Migration
                     $table->dropIndex($indexName);
                 });
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Index drop failed, but continue
         }
     }

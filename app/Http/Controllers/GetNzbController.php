@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use STS\ZipStream\Builder;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class GetNzbController extends BasePageController
@@ -28,7 +29,7 @@ class GetNzbController extends BasePageController
      *
      * @throws Exception
      */
-    public function getNzb(Request $request, ?string $guid = null): JsonResponse|Response|StreamedResponse|\STS\ZipStream\Builder
+    public function getNzb(Request $request, ?string $guid = null): JsonResponse|Response|StreamedResponse|Builder
     {
         // Normalize guid parameter
         $this->normalizeGuidParameter($request, $guid);
@@ -188,7 +189,7 @@ class GetNzbController extends BasePageController
         string $userName,
         int $maxDownloads,
         string $releaseId
-    ): JsonResponse|Response|StreamedResponse|\STS\ZipStream\Builder {
+    ): JsonResponse|Response|StreamedResponse|Builder {
         $guids = explode(',', $releaseId);
         $guidCount = \count($guids);
 

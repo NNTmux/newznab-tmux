@@ -17,6 +17,7 @@ use App\Services\RegistrationStatusService;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\Releases\ReleaseSearchService;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -488,7 +489,7 @@ class ApiController extends BasePageController
     }
 
     /**
-     * @return Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Foundation\Application|Response|int
+     * @return Application|ResponseFactory|\Illuminate\Foundation\Application|Response|int
      */
     public function maxAge(Request $request)
     {

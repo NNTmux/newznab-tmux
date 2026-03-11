@@ -186,7 +186,7 @@ class ReleaseCreationService
                 ' Releases added and '.
                 number_format($duplicate).
                 ' duplicate collections deleted in '.
-                $totalTime.\Illuminate\Support\Str::plural(' second', (int) $totalTime),
+                $totalTime.Str::plural(' second', (int) $totalTime),
                 true
             );
         }

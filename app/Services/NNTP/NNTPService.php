@@ -900,8 +900,8 @@ class NNTPService extends NntpClient
      * of their _getTextResponse function since it is incompatible at decoding
      * headers when XFeature GZip compression is enabled server side.
      *
-     * @return \App\Services\NNTP\NNTPService|array<string, mixed>|string Our overridden function when compression is enabled.
-     *                                                                    parent  Parent function when no compression.
+     * @return NNTPService|array<string, mixed>|string Our overridden function when compression is enabled.
+     *                                                 parent  Parent function when no compression.
      */
     public function _getTextResponse(): NNTPService|array|string
     {

@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\Category;
 use App\Models\MovieInfo;
+use App\Services\Releases\ReleaseBrowseService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -18,7 +19,7 @@ class MovieBrowseService
 
     public function __construct()
     {
-        $this->showPasswords = app(\App\Services\Releases\ReleaseBrowseService::class)->showPasswords();
+        $this->showPasswords = app(ReleaseBrowseService::class)->showPasswords();
     }
 
     /**

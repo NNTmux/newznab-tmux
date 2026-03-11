@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $episode_no Numeric version of episode (leave 0 for combined episodes).
  * @property string $episode_title Title of the episode (en, x-jat)
  * @property string $airdate
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\AnidbInfo[] $info
+ * @property-read Collection|AnidbInfo[] $info
  * @property-read AnidbTitle $title
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\AnidbEpisode whereAirdate($value)
@@ -56,7 +57,7 @@ class AnidbEpisode extends Model
     protected $guarded = [];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\AnidbTitle, $this>
+     * @return BelongsTo<AnidbTitle, $this>
      */
     public function title(): BelongsTo
     {
@@ -64,7 +65,7 @@ class AnidbEpisode extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AnidbInfo, $this>
+     * @return HasMany<AnidbInfo, $this>
      */
     public function info(): HasMany
     {

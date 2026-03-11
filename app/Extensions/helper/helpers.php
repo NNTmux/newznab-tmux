@@ -9,10 +9,14 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use sspat\ESQuerySanitizer\Sanitizer;
+use STS\ZipStream\Builder;
 use STS\ZipStream\Facades\Zip as ZipStream;
 use Symfony\Component\Process\Process;
 
@@ -272,7 +276,7 @@ if (! function_exists('getStreamingZip')) {
      *
      * @throws Exception
      */
-    function getStreamingZip(array $guids = []): STS\ZipStream\Builder
+    function getStreamingZip(array $guids = []): Builder
     {
         $nzb = app(NzbService::class);
         $zipped = ZipStream::create(now()->format('Ymdhis').'.zip');
@@ -581,15 +585,15 @@ if (! function_exists('userDate')) {
             // Parse the date in the app's timezone (which should be UTC)
             // If dates in DB are stored in server timezone, they'll be parsed correctly
             $appTimezone = config('app.timezone', 'UTC');
-            $carbon = \Illuminate\Support\Carbon::parse($date, $appTimezone);
+            $carbon = Carbon::parse($date, $appTimezone);
 
             // If user is authenticated and has a timezone set, convert to it
-            if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->timezone) {
-                $carbon->setTimezone(\Illuminate\Support\Facades\Auth::user()->timezone);
+            if (Auth::check() && Auth::user()->timezone) {
+                $carbon->setTimezone(Auth::user()->timezone);
             }
 
             return $carbon->format($format);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $date;
         }
     }
@@ -612,15 +616,15 @@ if (! function_exists('userDateDiffForHumans')) {
             // Parse the date in the app's timezone (which should be UTC)
             // If dates in DB are stored in server timezone, they'll be parsed correctly
             $appTimezone = config('app.timezone', 'UTC');
-            $carbon = \Illuminate\Support\Carbon::parse($date, $appTimezone);
+            $carbon = Carbon::parse($date, $appTimezone);
 
             // If user is authenticated and has a timezone set, convert to it
-            if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->timezone) {
-                $carbon->setTimezone(\Illuminate\Support\Facades\Auth::user()->timezone);
+            if (Auth::check() && Auth::user()->timezone) {
+                $carbon->setTimezone(Auth::user()->timezone);
             }
 
             return $carbon->diffForHumans();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $date;
         }
     }
@@ -636,20 +640,20 @@ if (! function_exists('getAvailableTimezones')) {
     {
         $timezones = [];
         $regions = [
-            'Africa' => \DateTimeZone::AFRICA,
-            'America' => \DateTimeZone::AMERICA,
-            'Antarctica' => \DateTimeZone::ANTARCTICA,
-            'Arctic' => \DateTimeZone::ARCTIC,
-            'Asia' => \DateTimeZone::ASIA,
-            'Atlantic' => \DateTimeZone::ATLANTIC,
-            'Australia' => \DateTimeZone::AUSTRALIA,
-            'Europe' => \DateTimeZone::EUROPE,
-            'Indian' => \DateTimeZone::INDIAN,
-            'Pacific' => \DateTimeZone::PACIFIC,
+            'Africa' => DateTimeZone::AFRICA,
+            'America' => DateTimeZone::AMERICA,
+            'Antarctica' => DateTimeZone::ANTARCTICA,
+            'Arctic' => DateTimeZone::ARCTIC,
+            'Asia' => DateTimeZone::ASIA,
+            'Atlantic' => DateTimeZone::ATLANTIC,
+            'Australia' => DateTimeZone::AUSTRALIA,
+            'Europe' => DateTimeZone::EUROPE,
+            'Indian' => DateTimeZone::INDIAN,
+            'Pacific' => DateTimeZone::PACIFIC,
         ];
 
         foreach ($regions as $name => $region) {
-            $timezones[$name] = \DateTimeZone::listIdentifiers($region);
+            $timezones[$name] = DateTimeZone::listIdentifiers($region);
         }
 
         return $timezones;
@@ -792,12 +796,12 @@ if (! function_exists('fileInfo')) {
      * @param  string  $path  Path to the file / folder to check.
      * @return string File info. Empty string on failure.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     function fileInfo(string $path): string
     {
         $magicPath = config('nntmux_settings.magic_file_path');
-        if ($magicPath !== null && \Illuminate\Support\Facades\Process::run('which file')->successful()) {
+        if ($magicPath !== null && Illuminate\Support\Facades\Process::run('which file')->successful()) {
             $magicSwitch = " -m $magicPath";
             $output = runCmd('file'.$magicSwitch.' -b "'.$path.'"');
         } else {
@@ -874,9 +878,9 @@ if (! function_exists('showApiError')) {
 }
 
 if (! function_exists('getRange')) {
-    function getRange(string $tableName): \Illuminate\Contracts\Pagination\LengthAwarePaginator // @phpstan-ignore missingType.generics
+    function getRange(string $tableName): LengthAwarePaginator // @phpstan-ignore missingType.generics
     {
-        $range = \Illuminate\Support\Facades\DB::table($tableName);
+        $range = DB::table($tableName);
 
         return $range->orderByDesc('created_at')->paginate(config('nntmux.items_per_page'));
     }

@@ -6,11 +6,13 @@ namespace App\Models;
 
 use App\Facades\Search;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -63,7 +65,7 @@ class Release extends Model
     protected $guarded = [];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\UsenetGroup, $this>
+     * @return BelongsTo<UsenetGroup, $this>
      */
     public function group(): BelongsTo
     {
@@ -71,7 +73,7 @@ class Release extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserDownload, $this>
+     * @return HasMany<UserDownload, $this>
      */
     public function download(): HasMany
     {
@@ -79,7 +81,7 @@ class Release extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UsersRelease, $this>
+     * @return HasMany<UsersRelease, $this>
      */
     public function userRelease(): HasMany
     {
@@ -87,7 +89,7 @@ class Release extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ReleaseFile, $this>
+     * @return HasMany<ReleaseFile, $this>
      */
     public function file(): HasMany
     {
@@ -95,7 +97,7 @@ class Release extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Category, $this>
+     * @return BelongsTo<Category, $this>
      */
     public function category(): BelongsTo
     {
@@ -103,7 +105,7 @@ class Release extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Predb, $this>
+     * @return BelongsTo<Predb, $this>
      */
     public function predb(): BelongsTo
     {
@@ -111,7 +113,7 @@ class Release extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\DnzbFailure, $this>
+     * @return HasMany<DnzbFailure, $this>
      */
     public function failed(): HasMany
     {
@@ -119,7 +121,7 @@ class Release extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\ReleaseNfo, $this>
+     * @return HasOne<ReleaseNfo, $this>
      */
     public function nfo(): HasOne
     {
@@ -127,7 +129,7 @@ class Release extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ReleaseComment, $this>
+     * @return HasMany<ReleaseComment, $this>
      */
     public function comment(): HasMany
     {
@@ -135,7 +137,7 @@ class Release extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ReleaseReport, $this>
+     * @return HasMany<ReleaseReport, $this>
      */
     public function reports(): HasMany
     {
@@ -143,7 +145,7 @@ class Release extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ReleasesGroups, $this>
+     * @return HasMany<ReleasesGroups, $this>
      */
     public function releaseGroup(): HasMany
     {
@@ -151,7 +153,7 @@ class Release extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Video, $this>
+     * @return BelongsTo<Video, $this>
      */
     public function video(): BelongsTo
     {
@@ -159,7 +161,7 @@ class Release extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\VideoData, $this>
+     * @return HasOne<VideoData, $this>
      */
     public function videoData(): HasOne
     {
@@ -167,7 +169,7 @@ class Release extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\TvEpisode, $this>
+     * @return BelongsTo<TvEpisode, $this>
      */
     public function episode(): BelongsTo
     {
@@ -338,7 +340,7 @@ class Release extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|\Illuminate\Support\Collection|mixed
+     * @return Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder[]|Collection|mixed
      */
     public static function getReleases()
     {
@@ -500,7 +502,7 @@ class Release extends Model
     }
 
     /**
-     * @return Release|false|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|object|null
+     * @return Release|false|Builder|Model|\Illuminate\Database\Query\Builder|object|null
      */
     public static function getAlternate(string $guid, int $userid)
     {

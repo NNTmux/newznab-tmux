@@ -13,6 +13,7 @@ use App\Observers\MovieInfoObserver;
 use App\Observers\ReleaseObserver;
 use App\Observers\RolePromotionObserver;
 use App\Observers\VideoObserver;
+use App\View\Composers\GlobalDataComposer;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Event;
@@ -38,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
             'layouts.guest',
             'layouts.app',
             'admin.*',
-        ], \App\View\Composers\GlobalDataComposer::class);
+        ], GlobalDataComposer::class);
 
         Gate::define('viewPulse', function (User $user) {
             return $user->hasRole('Admin');

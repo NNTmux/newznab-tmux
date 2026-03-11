@@ -38,7 +38,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static array searchReleasesByCategory(array $categoryIds, int $limit = 1000)
  * @method static array searchReleasesWithCategoryFilter(string $searchTerm, array $categoryIds = [], int $limit = 1000)
  *
- * @see \App\Services\Search\SearchService
+ * @see SearchService
  */
 class Search extends Facade // @phpstan-ignore missingType.iterableValue
 {

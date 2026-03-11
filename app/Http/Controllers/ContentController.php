@@ -6,14 +6,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Content;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ContentController extends BasePageController
 {
     /**
      * Display content page(s).
      *
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\View\View
+     * @return JsonResponse|View
      *
      * @throws \Exception
      */

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Permission\Models\Role;
 
 /**
  * App\Models\UserRoleHistory
@@ -21,8 +23,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property bool $is_stacked
  * @property string|null $change_reason
  * @property int|null $changed_by
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property-read User $user
  * @property-read User|null $changedByUser
  */
@@ -52,7 +54,7 @@ class UserRoleHistory extends Model
     /**
      * Get the user this history belongs to
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -62,7 +64,7 @@ class UserRoleHistory extends Model
     /**
      * Get the admin who made this change
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     * @return BelongsTo<User, $this>
      */
     public function changedByUser(): BelongsTo
     {
@@ -74,7 +76,7 @@ class UserRoleHistory extends Model
      */
     public function oldRole(): BelongsTo // @phpstan-ignore missingType.generics
     {
-        return $this->belongsTo(\Spatie\Permission\Models\Role::class, 'old_role_id');
+        return $this->belongsTo(Role::class, 'old_role_id');
     }
 
     /**
@@ -82,7 +84,7 @@ class UserRoleHistory extends Model
      */
     public function newRole(): BelongsTo // @phpstan-ignore missingType.generics
     {
-        return $this->belongsTo(\Spatie\Permission\Models\Role::class, 'new_role_id');
+        return $this->belongsTo(Role::class, 'new_role_id');
     }
 
     /**

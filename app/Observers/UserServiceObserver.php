@@ -9,6 +9,7 @@ use App\Jobs\SendWelcomeEmail;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Jrean\UserVerification\Exceptions\ModelNotCompliantException;
 use Jrean\UserVerification\Facades\UserVerification;
 use Spatie\Permission\Models\Role;
 
@@ -18,7 +19,7 @@ class UserServiceObserver
      * Handle the user "created" event.
      *
      *
-     * @throws \Jrean\UserVerification\Exceptions\ModelNotCompliantException
+     * @throws ModelNotCompliantException
      */
     public function created(User $user): void
     {

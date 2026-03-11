@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Models\AnidbInfo;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * AniDB API Resource for transforming anime data.
  *
- * @mixin \App\Models\AnidbInfo
+ * @mixin AnidbInfo
  */
 class AnidbResource extends JsonResource
 {

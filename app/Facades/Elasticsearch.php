@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Mailerlite\LaravelElasticsearch\Manager;
 
 /**
  * Elasticsearch Facade - provides static access to Elasticsearch client.
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static array get(array $params)
  * @method static array deleteByQuery(array $params)
  *
- * @see \Mailerlite\LaravelElasticsearch\Manager
+ * @see Manager
  */
 class Elasticsearch extends Facade // @phpstan-ignore missingType.iterableValue
 {

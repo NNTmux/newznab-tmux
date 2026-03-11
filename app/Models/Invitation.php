@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
@@ -16,15 +17,15 @@ use Illuminate\Support\Str;
  * @property string $token
  * @property string $email
  * @property int $invited_by
- * @property \Illuminate\Support\Carbon $expires_at
- * @property \Illuminate\Support\Carbon|null $used_at
+ * @property Carbon $expires_at
+ * @property Carbon|null $used_at
  * @property int|null $used_by
  * @property bool $is_active
  * @property array|null $metadata
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User $invitedBy
- * @property-read \App\Models\User|null $usedBy
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User $invitedBy
+ * @property-read User|null $usedBy
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invitation newQuery()
@@ -78,7 +79,7 @@ class Invitation extends Model // @phpstan-ignore missingType.iterableValue
     /**
      * Get the user who created this invitation
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     * @return BelongsTo<User, $this>
      */
     public function invitedBy(): BelongsTo
     {
@@ -88,7 +89,7 @@ class Invitation extends Model // @phpstan-ignore missingType.iterableValue
     /**
      * Get the user who used this invitation
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     * @return BelongsTo<User, $this>
      */
     public function usedBy(): BelongsTo
     {

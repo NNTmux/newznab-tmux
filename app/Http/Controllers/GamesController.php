@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Genre;
 use App\Services\GamesService;
 use App\Services\GenreService;
 use Illuminate\Http\Request;
@@ -44,7 +45,7 @@ class GamesController extends BasePageController
         $genres = $gen->getGenres((string) GenreService::GAME_TYPE, true);
         $tmpgnr = [];
         foreach ($genres as $gn) {
-            /** @var \App\Models\Genre $gn */
+            /** @var Genre $gn */
             $tmpgnr[$gn->id] = $gn->title;
         }
 

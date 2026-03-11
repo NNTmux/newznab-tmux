@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
@@ -313,7 +314,7 @@ class IGDBService
         $developers = [];
         if (! empty($game->involved_companies)) {
             $involvedCompanies = $game->involved_companies;
-            if ($involvedCompanies instanceof \Illuminate\Support\Collection) {
+            if ($involvedCompanies instanceof Collection) {
                 $involvedCompanies = $involvedCompanies->toArray();
             }
             foreach ($involvedCompanies as $company) {
@@ -393,7 +394,7 @@ class IGDBService
         $genres = [];
         if (! empty($game->genres)) {
             $gameGenres = $game->genres;
-            if ($gameGenres instanceof \Illuminate\Support\Collection) {
+            if ($gameGenres instanceof Collection) {
                 $gameGenres = $gameGenres->toArray();
             }
             foreach ($gameGenres as $genre) {
@@ -404,7 +405,7 @@ class IGDBService
         // Fall back to themes if no genres
         if (empty($genres) && ! empty($game->themes)) {
             $gameThemes = $game->themes;
-            if ($gameThemes instanceof \Illuminate\Support\Collection) {
+            if ($gameThemes instanceof Collection) {
                 $gameThemes = $gameThemes->toArray();
             }
             foreach ($gameThemes as $theme) {
@@ -459,7 +460,7 @@ class IGDBService
     {
         if (! empty($game->artworks)) {
             $artworks = $game->artworks;
-            $firstArtwork = ($artworks instanceof \Illuminate\Support\Collection) ? $artworks->first() : ($artworks[0] ?? null);
+            $firstArtwork = ($artworks instanceof Collection) ? $artworks->first() : ($artworks[0] ?? null);
             $url = $this->getImageUrl($firstArtwork, '1080p');
             if (! empty($url)) {
                 return $url;
@@ -468,7 +469,7 @@ class IGDBService
 
         if (! empty($game->screenshots)) {
             $screenshots = $game->screenshots;
-            $firstScreenshot = ($screenshots instanceof \Illuminate\Support\Collection) ? $screenshots->first() : ($screenshots[0] ?? null);
+            $firstScreenshot = ($screenshots instanceof Collection) ? $screenshots->first() : ($screenshots[0] ?? null);
 
             return $this->getImageUrl($firstScreenshot, '1080p');
         }
@@ -483,7 +484,7 @@ class IGDBService
     {
         if (! empty($game->videos)) {
             $videos = $game->videos;
-            if ($videos instanceof \Illuminate\Support\Collection) {
+            if ($videos instanceof Collection) {
                 $videos = $videos->toArray();
             }
             foreach ($videos as $video) {
@@ -503,7 +504,7 @@ class IGDBService
     protected function getAgeRating(Game $game): string
     {
         $ageRatings = $game->age_ratings ?? [];
-        if ($ageRatings instanceof \Illuminate\Support\Collection) {
+        if ($ageRatings instanceof Collection) {
             $ageRatings = $ageRatings->toArray();
         }
 
@@ -594,7 +595,7 @@ class IGDBService
         }
         if (! empty($game->game_modes)) {
             $gameModes = $game->game_modes;
-            if ($gameModes instanceof \Illuminate\Support\Collection) {
+            if ($gameModes instanceof Collection) {
                 $modes = $gameModes->map(fn ($m) => is_array($m) ? ($m['name'] ?? '') : ($m->name ?? ''))->toArray();
             } else {
                 $modes = array_map(fn ($m) => $m['name'] ?? '', $gameModes);

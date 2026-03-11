@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Services\TmdbClient;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
@@ -509,7 +510,7 @@ class TmdbClientTest extends TestCase
     {
         Http::fake([
             'api.themoviedb.org/*' => function () {
-                throw new \Illuminate\Http\Client\ConnectionException('Connection timed out');
+                throw new ConnectionException('Connection timed out');
             },
         ]);
 

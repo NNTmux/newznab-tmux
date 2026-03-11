@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Models\Settings;
+use App\Services\Tmux\TmuxPaneManager;
 use App\Services\Tmux\TmuxSessionManager;
 use Illuminate\Console\Command;
 
@@ -47,7 +48,7 @@ class TmuxAttach extends Command
         $this->info('💡 Press Ctrl+A then D to detach');
 
         // Select monitor pane before attaching so user lands there
-        $paneManager = new \App\Services\Tmux\TmuxPaneManager($sessionName);
+        $paneManager = new TmuxPaneManager($sessionName);
         $paneManager->selectWindow(0);
         $paneManager->selectPane('0.0');
 

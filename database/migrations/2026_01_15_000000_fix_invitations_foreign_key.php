@@ -146,7 +146,7 @@ return new class extends Migration
                     $table->dropForeign($foreignKeyName);
                 });
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Foreign key might not exist, continue
             report($e);
         }
@@ -164,7 +164,7 @@ return new class extends Migration
                     $table->index($columns, $indexName);
                 });
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Index creation failed, but continue
             report($e);
         }
@@ -182,7 +182,7 @@ return new class extends Migration
                     $table->dropIndex($indexName);
                 });
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Index drop failed, but continue
             report($e);
         }

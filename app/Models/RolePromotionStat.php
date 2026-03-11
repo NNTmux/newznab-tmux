@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Permission\Models\Role;
 
 /**
  * App\Models\RolePromotionStat
@@ -15,14 +17,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $role_promotion_id
  * @property int $role_id
  * @property int $days_added
- * @property \Carbon\Carbon|null $previous_expiry_date
- * @property \Carbon\Carbon|null $new_expiry_date
- * @property \Carbon\Carbon $applied_at
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
- * @property-read \App\Models\User $user
- * @property-read \App\Models\RolePromotion $promotion
- * @property-read \Spatie\Permission\Models\Role $role
+ * @property Carbon|null $previous_expiry_date
+ * @property Carbon|null $new_expiry_date
+ * @property Carbon $applied_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User $user
+ * @property-read RolePromotion $promotion
+ * @property-read Role $role
  */
 class RolePromotionStat extends Model
 {
@@ -46,7 +48,7 @@ class RolePromotionStat extends Model
     /**
      * Get the user that received the promotion
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -56,7 +58,7 @@ class RolePromotionStat extends Model
     /**
      * Get the promotion that was applied
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\RolePromotion, $this>
+     * @return BelongsTo<RolePromotion, $this>
      */
     public function promotion(): BelongsTo
     {
@@ -68,7 +70,7 @@ class RolePromotionStat extends Model
      */
     public function role(): BelongsTo // @phpstan-ignore missingType.generics
     {
-        return $this->belongsTo(\Spatie\Permission\Models\Role::class);
+        return $this->belongsTo(Role::class);
     }
 
     /**
@@ -153,8 +155,8 @@ class RolePromotionStat extends Model
         int $promotionId,
         int $roleId,
         int $daysAdded,
-        ?\Carbon\Carbon $previousExpiryDate = null,
-        ?\Carbon\Carbon $newExpiryDate = null
+        ?Carbon $previousExpiryDate = null,
+        ?Carbon $newExpiryDate = null
     ): self {
         return static::create([
             'user_id' => $userId,

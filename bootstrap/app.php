@@ -1,14 +1,34 @@
 <?php
 
+use App\Http\Middleware\BlockAbusiveServices;
+use App\Http\Middleware\ClearanceMiddleware;
+use App\Http\Middleware\ContentSecurityPolicy;
+use App\Http\Middleware\ForceJsonOnAPI;
+use App\Http\Middleware\Google2FAMiddleware;
+use App\Http\Middleware\NoCacheForAuthenticatedUsers;
+use App\Http\Middleware\SetUserTimezone;
+use App\Http\Middleware\TrustedDevice2FAMiddleware;
+use Creativeorange\Gravatar\GravatarServiceProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode;
+use Illuminate\Http\Middleware\TrustProxies;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\AuthenticateSession;
+use Jrean\UserVerification\Middleware\IsVerified;
+use Jrean\UserVerification\UserVerificationServiceProvider;
+use Laravel\Tinker\TinkerServiceProvider;
+use Sentry\Laravel\Integration;
+use Spatie\Permission\Middleware\PermissionMiddleware;
+use Spatie\Permission\Middleware\RoleMiddleware;
+use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
-        \Laravel\Tinker\TinkerServiceProvider::class,
-        \Jrean\UserVerification\UserVerificationServiceProvider::class,
-        \Creativeorange\Gravatar\GravatarServiceProvider::class,
+        TinkerServiceProvider::class,
+        UserVerificationServiceProvider::class,
+        GravatarServiceProvider::class,
     ])
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -35,36 +55,36 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->append([
-            \Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::class,
-            \App\Http\Middleware\ForceJsonOnAPI::class,
-            \App\Http\Middleware\BlockAbusiveServices::class, // Block AIOStreams, Oracle Cloud, UsenetStreamer, Cloudflare WARP
+            CheckForMaintenanceMode::class,
+            ForceJsonOnAPI::class,
+            BlockAbusiveServices::class, // Block AIOStreams, Oracle Cloud, UsenetStreamer, Cloudflare WARP
         ]);
 
         $middleware->replace(
-            \Illuminate\Http\Middleware\TrustProxies::class,
-            \Monicahq\Cloudflare\Http\Middleware\TrustProxies::class
+            TrustProxies::class,
+            Monicahq\Cloudflare\Http\Middleware\TrustProxies::class
         );
 
         $middleware->web([
-            \Illuminate\Session\Middleware\AuthenticateSession::class,
-            \App\Http\Middleware\TrustedDevice2FAMiddleware::class, // Add our new trusted device middleware
-            \App\Http\Middleware\ContentSecurityPolicy::class, // Add CSP middleware for security
-            \App\Http\Middleware\SetUserTimezone::class, // Set user timezone
-            \App\Http\Middleware\NoCacheForAuthenticatedUsers::class, // Prevent Cloudflare/CDN caching of authenticated pages
+            AuthenticateSession::class,
+            TrustedDevice2FAMiddleware::class, // Add our new trusted device middleware
+            ContentSecurityPolicy::class, // Add CSP middleware for security
+            SetUserTimezone::class, // Set user timezone
+            NoCacheForAuthenticatedUsers::class, // Prevent Cloudflare/CDN caching of authenticated pages
         ]);
 
         $middleware->throttleApi('60,1');
 
         $middleware->alias([
-            '2fa' => \App\Http\Middleware\Google2FAMiddleware::class,
-            'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            'clearance' => \App\Http\Middleware\ClearanceMiddleware::class,
-            'isVerified' => \Jrean\UserVerification\Middleware\IsVerified::class,
-            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
-            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
-            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            '2fa' => Google2FAMiddleware::class,
+            'bindings' => SubstituteBindings::class,
+            'clearance' => ClearanceMiddleware::class,
+            'isVerified' => IsVerified::class,
+            'permission' => PermissionMiddleware::class,
+            'role' => RoleMiddleware::class,
+            'role_or_permission' => RoleOrPermissionMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        \Sentry\Laravel\Integration::handles($exceptions);
+        Integration::handles($exceptions);
     })->create();

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -13,8 +15,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $users_id
  * @property int|null $imdbid
  * @property string|null $categories List of categories for user movies
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie whereCategories($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UserMovie whereCreatedAt($value)
@@ -40,7 +42,7 @@ class UserMovie extends Model
 
     /**
      * @param  array<string, mixed>  $catID
-     * @return int|\Illuminate\Database\Eloquent\Builder
+     * @return int|Builder
      */
     public static function addMovie(mixed $uid, mixed $imdbid, array $catID = []) // @phpstan-ignore missingType.generics
     {

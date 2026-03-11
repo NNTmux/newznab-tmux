@@ -27,7 +27,7 @@ return new class extends Migration
             try {
                 // Convert table to utf8mb4
                 DB::statement("ALTER TABLE `{$tableName}` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 echo "Warning: Could not convert table {$tableName}: ".$e->getMessage()."\n";
             }
         }

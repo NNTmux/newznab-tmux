@@ -17,7 +17,7 @@ class SetUserTimezone
      * with database operations and helper functions. Instead, the timezone
      * conversion happens in the userDate() and userDateDiffForHumans() helpers.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {

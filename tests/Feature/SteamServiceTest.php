@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Models\SteamApp;
 use App\Services\SteamService;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -458,7 +459,7 @@ class SteamServiceTest extends TestCase
     {
         Http::fake([
             'store.steampowered.com/api/appdetails*' => function () {
-                throw new \Illuminate\Http\Client\ConnectionException('Connection timed out');
+                throw new ConnectionException('Connection timed out');
             },
         ]);
 

@@ -344,7 +344,7 @@ final class BackfillService
     /**
      * Log backfill completion.
      */
-    private function logBackfillComplete(\Illuminate\Support\Carbon $startTime): void
+    private function logBackfillComplete(Carbon $startTime): void
     {
         $duration = now()->diffInSeconds($startTime, true);
         $this->log("Backfilling completed in {$duration} seconds.");
@@ -385,7 +385,7 @@ final class BackfillService
     /**
      * Log group completion.
      */
-    private function logGroupComplete(string $shortGroupName, \Illuminate\Support\Carbon $startTime): void
+    private function logGroupComplete(string $shortGroupName, Carbon $startTime): void
     {
         $duration = number_format(now()->timestamp - $startTime->timestamp, 2);
         $this->log(PHP_EOL."Group {$shortGroupName} processed in {$duration} seconds.");

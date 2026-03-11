@@ -1,15 +1,27 @@
 <?php
 
+use App\Providers\AdditionalProcessingServiceProvider;
+use App\Providers\AppServiceProvider;
+use App\Providers\CategorizationServiceProvider;
+use App\Providers\ForumServiceProvider;
+use App\Providers\HorizonServiceProvider;
+use App\Providers\ProcessingServiceProvider;
+use App\Providers\RouteServiceProvider;
+use App\Providers\SearchServiceProvider;
+use App\Providers\TvProcessingServiceProvider;
+use App\Providers\UserServiceProvider;
+use App\Providers\VoltServiceProvider;
+
 return [
-    App\Providers\AdditionalProcessingServiceProvider::class,
-    App\Providers\AppServiceProvider::class,
-    App\Providers\CategorizationServiceProvider::class,
-    App\Providers\ForumServiceProvider::class,
-    App\Providers\HorizonServiceProvider::class,
-    App\Providers\ProcessingServiceProvider::class,
-    App\Providers\RouteServiceProvider::class,
-    App\Providers\SearchServiceProvider::class,
-    App\Providers\TvProcessingServiceProvider::class,
-    App\Providers\UserServiceProvider::class,
-    App\Providers\VoltServiceProvider::class,
+    AdditionalProcessingServiceProvider::class,
+    AppServiceProvider::class,
+    CategorizationServiceProvider::class,
+    ForumServiceProvider::class,
+    HorizonServiceProvider::class,
+    ProcessingServiceProvider::class,
+    RouteServiceProvider::class,
+    SearchServiceProvider::class,
+    TvProcessingServiceProvider::class,
+    UserServiceProvider::class,
+    VoltServiceProvider::class,
 ];

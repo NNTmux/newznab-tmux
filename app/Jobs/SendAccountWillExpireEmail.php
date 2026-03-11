@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Mail\AccountWillExpire;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -18,12 +19,12 @@ class SendAccountWillExpireEmail implements ShouldQueue
 
     private int $days;
 
-    private \App\Models\User $user;
+    private User $user;
 
     /**
      * Create a new job instance.
      */
-    public function __construct(\App\Models\User $user, int $days)
+    public function __construct(User $user, int $days)
     {
         $this->user = $user;
         $this->days = $days;

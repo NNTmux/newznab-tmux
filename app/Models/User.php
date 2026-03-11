@@ -198,7 +198,7 @@ final class User extends Authenticatable
     // ===== Relationships =====
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Spatie\Permission\Models\Role, $this>
+     * @return BelongsTo<Role, $this>
      */
     public function role(): BelongsTo
     {
@@ -206,7 +206,7 @@ final class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserRequest, $this>
+     * @return HasMany<UserRequest, $this>
      */
     public function requests(): HasMany
     {
@@ -214,7 +214,7 @@ final class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserDownload, $this>
+     * @return HasMany<UserDownload, $this>
      */
     public function downloads(): HasMany
     {
@@ -222,7 +222,7 @@ final class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UsersRelease, $this>
+     * @return HasMany<UsersRelease, $this>
      */
     public function releases(): HasMany
     {
@@ -230,7 +230,7 @@ final class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserSerie, $this>
+     * @return HasMany<UserSerie, $this>
      */
     public function series(): HasMany
     {
@@ -238,7 +238,7 @@ final class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Invitation, $this>
+     * @return HasMany<Invitation, $this>
      */
     public function invitations(): HasMany
     {
@@ -246,7 +246,7 @@ final class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\DnzbFailure, $this>
+     * @return HasMany<DnzbFailure, $this>
      */
     public function failedReleases(): HasMany
     {
@@ -254,7 +254,7 @@ final class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ReleaseComment, $this>
+     * @return HasMany<ReleaseComment, $this>
      */
     public function comments(): HasMany
     {
@@ -262,7 +262,7 @@ final class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\RolePromotionStat, $this>
+     * @return HasMany<RolePromotionStat, $this>
      */
     public function promotionStats(): HasMany
     {
@@ -270,7 +270,7 @@ final class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserRoleHistory, $this>
+     * @return HasMany<UserRoleHistory, $this>
      */
     public function roleHistory(): HasMany
     {
@@ -278,7 +278,7 @@ final class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\PasswordSecurity, $this>
+     * @return HasOne<PasswordSecurity, $this>
      */
     public function passwordSecurity(): HasOne
     {
@@ -286,7 +286,7 @@ final class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserExcludedCategory, $this>
+     * @return HasMany<UserExcludedCategory, $this>
      */
     public function excludedCategories(): HasMany
     {

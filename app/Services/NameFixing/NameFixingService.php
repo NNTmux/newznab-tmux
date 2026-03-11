@@ -10,6 +10,7 @@ use App\Models\Release;
 use App\Services\NameFixing\Extractors\FileNameExtractor;
 use App\Services\NameFixing\Extractors\NfoNameExtractor;
 use App\Services\NNTP\NNTPService;
+use App\Services\Nzb\NzbContentsService;
 
 /**
  * Main service for name fixing operations.
@@ -993,7 +994,7 @@ class NameFixingService
         if ($total > 0) {
             $this->_totalReleases = $total;
             cli()->info(number_format($total).' releases to process.');
-            $nzbContentsService = app(\App\Services\Nzb\NzbContentsService::class);
+            $nzbContentsService = app(NzbContentsService::class);
 
             foreach ($releases as $release) {
                 /** @var Release $release */

@@ -1,5 +1,7 @@
 <?php
 
+use Monolog\Logger;
+
 return [
 
     /**
@@ -100,7 +102,7 @@ return [
 
             'logPath' => storage_path('logs/elasticsearch.log'),
 
-            'logLevel' => Monolog\Logger::INFO,
+            'logLevel' => Logger::INFO,
 
             /**
              * Retries

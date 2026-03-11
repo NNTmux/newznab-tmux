@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\AdminContentController;
 use App\Http\Controllers\Admin\AdminFailedReleasesController;
 use App\Http\Controllers\Admin\AdminGameController;
 use App\Http\Controllers\Admin\AdminGroupController;
+use App\Http\Controllers\Admin\AdminInvitationController;
 use App\Http\Controllers\Admin\AdminLogViewerController;
 use App\Http\Controllers\Admin\AdminMovieController;
 use App\Http\Controllers\Admin\AdminMusicController;
@@ -32,6 +33,7 @@ use App\Http\Controllers\Admin\AdminPredbController;
 use App\Http\Controllers\Admin\AdminPromotionController;
 use App\Http\Controllers\Admin\AdminRegistrationController;
 use App\Http\Controllers\Admin\AdminReleaseNamingRegexesController;
+use App\Http\Controllers\Admin\AdminReleaseReportController;
 use App\Http\Controllers\Admin\AdminReleasesController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\AdminShowsController;
@@ -42,6 +44,7 @@ use App\Http\Controllers\Admin\AdminUserRoleHistoryController;
 use App\Http\Controllers\Admin\DeletedUsersController;
 use App\Http\Controllers\AdultController;
 use App\Http\Controllers\AjaxController;
+use App\Http\Controllers\Api\FileListApiController;
 use App\Http\Controllers\ApiHelpController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -55,6 +58,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\ConsoleController;
 use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\ContentController;
+use App\Http\Controllers\CoverController;
 use App\Http\Controllers\DetailsController;
 use App\Http\Controllers\FailedReleasesController;
 use App\Http\Controllers\GamesController;
@@ -69,13 +73,15 @@ use App\Http\Controllers\PasswordSecurityController;
 use App\Http\Controllers\PrivacyPolicyController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfileSecurityController;
+use App\Http\Controllers\ReleaseReportController;
 use App\Http\Controllers\RssController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SearchSuggestController;
 use App\Http\Controllers\SeriesController;
 use App\Http\Controllers\TermsController;
 
 // Serve cover images from storage - Must be public (no auth required)
-Route::get('/covers/{type}/{filename}', [App\Http\Controllers\CoverController::class, 'show'])
+Route::get('/covers/{type}/{filename}', [CoverController::class, 'show'])
     ->where('type', 'anime|audio|audiosample|book|console|games|movies|music|preview|sample|tvrage|video')
     ->where('filename', '.*')
     ->name('covers.show');
@@ -101,9 +107,9 @@ Route::post('2fa/verify', [PasswordSecurityController::class, 'verify2fa'])->nam
 Route::post('2faVerify', [PasswordSecurityController::class, 'verify2fa'])->name('2faVerify');
 
 // Search autocomplete and suggest API routes (no auth required for better UX)
-Route::get('api/search/autocomplete', [\App\Http\Controllers\SearchSuggestController::class, 'autocomplete'])->name('api.search.autocomplete');
-Route::get('api/search/suggest', [\App\Http\Controllers\SearchSuggestController::class, 'suggest'])->name('api.search.suggest');
-Route::get('api/search/assist', [\App\Http\Controllers\SearchSuggestController::class, 'searchAssist'])->name('api.search.assist');
+Route::get('api/search/autocomplete', [SearchSuggestController::class, 'autocomplete'])->name('api.search.autocomplete');
+Route::get('api/search/suggest', [SearchSuggestController::class, 'suggest'])->name('api.search.suggest');
+Route::get('api/search/assist', [SearchSuggestController::class, 'searchAssist'])->name('api.search.assist');
 
 Route::middleware('isVerified')->group(function () {
     Route::match(['GET', 'POST'], 'resetpassword', [ResetPasswordController::class, 'reset'])->name('resetpassword');
@@ -164,11 +170,11 @@ Route::middleware('isVerified')->group(function () {
     Route::match(['GET', 'POST'], 'search', [SearchController::class, 'search'])->name('search');
 
     // Release Report routes
-    Route::post('release-report', [\App\Http\Controllers\ReleaseReportController::class, 'store'])->name('release-report.store');
-    Route::get('release-report/reasons', [\App\Http\Controllers\ReleaseReportController::class, 'getReasons'])->name('release-report.reasons');
-    Route::get('release-report/check', [\App\Http\Controllers\ReleaseReportController::class, 'checkReported'])->name('release-report.check');
+    Route::post('release-report', [ReleaseReportController::class, 'store'])->name('release-report.store');
+    Route::get('release-report/reasons', [ReleaseReportController::class, 'getReasons'])->name('release-report.reasons');
+    Route::get('release-report/check', [ReleaseReportController::class, 'checkReported'])->name('release-report.check');
 
-    Route::get('api/release/{guid}/filelist', [\App\Http\Controllers\Api\FileListApiController::class, 'getFileList'])->name('api.filelist');
+    Route::get('api/release/{guid}/filelist', [FileListApiController::class, 'getFileList'])->name('api.filelist');
     Route::match(['GET', 'POST'], 'ajax_profile', [AjaxController::class, 'profile'])->name('ajax_profile');
     Route::match(['GET', 'POST'], '2fa', [PasswordSecurityController::class, 'show2faForm'])->name('2fa');
     Route::get('2fa/enable', [PasswordSecurityController::class, 'showEnable2faForm'])->name('2fa.enable');
@@ -255,12 +261,12 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::post('release-delete/{id}', [AdminReleasesController::class, 'destroy'])->name('admin.release-delete');
 
     // Release Reports Management
-    Route::get('release-reports', [\App\Http\Controllers\Admin\AdminReleaseReportController::class, 'index'])->name('admin.release-reports');
-    Route::post('release-reports/{id}/status', [\App\Http\Controllers\Admin\AdminReleaseReportController::class, 'updateStatus'])->name('admin.release-reports.update-status');
-    Route::post('release-reports/{id}/delete-release', [\App\Http\Controllers\Admin\AdminReleaseReportController::class, 'deleteRelease'])->name('admin.release-reports.delete-release');
-    Route::post('release-reports/{id}/dismiss', [\App\Http\Controllers\Admin\AdminReleaseReportController::class, 'dismiss'])->name('admin.release-reports.dismiss');
-    Route::post('release-reports/{id}/revert', [\App\Http\Controllers\Admin\AdminReleaseReportController::class, 'revert'])->name('admin.release-reports.revert');
-    Route::post('release-reports/bulk', [\App\Http\Controllers\Admin\AdminReleaseReportController::class, 'bulkAction'])->name('admin.release-reports.bulk');
+    Route::get('release-reports', [AdminReleaseReportController::class, 'index'])->name('admin.release-reports');
+    Route::post('release-reports/{id}/status', [AdminReleaseReportController::class, 'updateStatus'])->name('admin.release-reports.update-status');
+    Route::post('release-reports/{id}/delete-release', [AdminReleaseReportController::class, 'deleteRelease'])->name('admin.release-reports.delete-release');
+    Route::post('release-reports/{id}/dismiss', [AdminReleaseReportController::class, 'dismiss'])->name('admin.release-reports.dismiss');
+    Route::post('release-reports/{id}/revert', [AdminReleaseReportController::class, 'revert'])->name('admin.release-reports.revert');
+    Route::post('release-reports/bulk', [AdminReleaseReportController::class, 'bulkAction'])->name('admin.release-reports.bulk');
 
     Route::get('show-list', [AdminShowsController::class, 'index'])->name('admin.show-list');
     Route::match(['GET', 'POST'], 'show-edit', [AdminShowsController::class, 'edit'])->name('admin.show-edit');
@@ -314,12 +320,12 @@ Route::get('/invitation/{token}', [InvitationController::class, 'show'])->name('
 
 // Admin invitation management routes
 Route::middleware(['role:Admin', '2fa'])->prefix('admin/invitations')->name('admin.invitations.')->group(function () {
-    Route::get('/', [App\Http\Controllers\Admin\AdminInvitationController::class, 'index'])->name('index');
-    Route::get('/{id}', [App\Http\Controllers\Admin\AdminInvitationController::class, 'show'])->name('show');
-    Route::post('/{id}/resend', [App\Http\Controllers\Admin\AdminInvitationController::class, 'resend'])->name('resend');
-    Route::post('/{id}/cancel', [App\Http\Controllers\Admin\AdminInvitationController::class, 'cancel'])->name('cancel');
-    Route::post('/bulk', [App\Http\Controllers\Admin\AdminInvitationController::class, 'bulkAction'])->name('bulk');
-    Route::post('/cleanup', [App\Http\Controllers\Admin\AdminInvitationController::class, 'cleanup'])->name('cleanup');
+    Route::get('/', [AdminInvitationController::class, 'index'])->name('index');
+    Route::get('/{id}', [AdminInvitationController::class, 'show'])->name('show');
+    Route::post('/{id}/resend', [AdminInvitationController::class, 'resend'])->name('resend');
+    Route::post('/{id}/cancel', [AdminInvitationController::class, 'cancel'])->name('cancel');
+    Route::post('/bulk', [AdminInvitationController::class, 'bulkAction'])->name('bulk');
+    Route::post('/cleanup', [AdminInvitationController::class, 'cleanup'])->name('cleanup');
 });
 
 Route::post('btcpay/webhook', [BtcPaymentController::class, 'btcPayCallback'])->name('btcpay.webhook');

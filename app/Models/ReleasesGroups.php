@@ -66,7 +66,7 @@ class ReleasesGroups extends Model
     protected $guarded = [];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Release, $this>
+     * @return BelongsTo<Release, $this>
      */
     public function release(): BelongsTo
     {
@@ -74,7 +74,7 @@ class ReleasesGroups extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\UsenetGroup, $this>
+     * @return BelongsTo<UsenetGroup, $this>
      */
     public function group(): BelongsTo
     {

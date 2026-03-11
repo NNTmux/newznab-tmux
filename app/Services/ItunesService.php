@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Cache;
@@ -369,7 +370,7 @@ class ItunesService
     protected function parseDate(string $dateString): ?string
     {
         try {
-            return \Carbon\Carbon::parse($dateString)->format('Y-m-d');
+            return Carbon::parse($dateString)->format('Y-m-d');
         } catch (\Exception $e) {
             return null;
         }

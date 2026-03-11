@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Models\BookInfo;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * Book API Resource for transforming book data.
  *
- * @mixin \App\Models\BookInfo
+ * @mixin BookInfo
  */
 class BookResource extends JsonResource
 {

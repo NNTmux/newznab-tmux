@@ -6,6 +6,7 @@ namespace App\Services\Categorization;
 
 use App\Models\Category;
 use App\Services\Categorization\Pipes\AbstractCategorizationPipe;
+use Blacklight\Categorize;
 
 /**
  * Categorization service using Laravel Pipeline.
@@ -106,9 +107,9 @@ class CategorizationService
         $legacyCategoryId = Category::OTHER_MISC;
         $legacyCategoryName = 'Unknown';
 
-        if (class_exists(\Blacklight\Categorize::class)) {
+        if (class_exists(Categorize::class)) {
             try {
-                $legacy = new \Blacklight\Categorize;
+                $legacy = new Categorize;
                 /** @var int $legacyCategoryId */
                 $legacyCategoryId = (int) $legacy->determineCategory($groupId, $releaseName);
                 $legacyCategory = Category::find($legacyCategoryId);

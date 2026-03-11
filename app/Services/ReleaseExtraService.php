@@ -7,6 +7,8 @@ namespace App\Services;
 use App\Models\AudioData;
 use App\Models\ReleaseSubtitle;
 use App\Models\VideoData;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Mhor\MediaInfo\Container\MediaInfoContainer;
 
@@ -19,7 +21,7 @@ class ReleaseExtraService
      * Get video data for a release.
      *
      * @param  int  $id  Release ID
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @return Model|null
      */
     public function get(int $id)
     {
@@ -65,7 +67,7 @@ class ReleaseExtraService
      * Get subtitles for a release.
      *
      * @param  int  $id  Release ID
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @return Model|null
      */
     public function getSubs(int $id)
     {
@@ -80,7 +82,7 @@ class ReleaseExtraService
      * Get video data by release GUID.
      *
      * @param  string  $guid  Release GUID
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|null
+     * @return Builder|Model|\Illuminate\Database\Query\Builder|null
      */
     public function getByGuid(string $guid) // @phpstan-ignore missingType.generics
     {

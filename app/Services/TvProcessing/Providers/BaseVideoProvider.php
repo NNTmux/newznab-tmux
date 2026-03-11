@@ -28,6 +28,8 @@ namespace App\Services\TvProcessing\Providers;
 use App\Models\TvInfo;
 use App\Models\Video;
 use App\Models\VideoAlias;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -320,7 +322,7 @@ abstract class BaseVideoProvider
      * Retrieves all aliases for given VideoID or VideoID for a given alias.
      *
      *
-     * @return VideoAlias[]|bool|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|mixed
+     * @return VideoAlias[]|bool|Builder[]|Collection|mixed
      */
     public function getAliases(int $videoId, string $alias = ''): mixed
     {

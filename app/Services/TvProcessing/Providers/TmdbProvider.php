@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\TvProcessing\Providers;
 
+use App\Models\Video;
 use App\Services\ReleaseImageService;
 use App\Services\TmdbClient;
+use App\Services\TraktService;
 
 class TmdbProvider extends AbstractTvProvider
 {
@@ -377,7 +379,7 @@ class TmdbProvider extends AbstractTvProvider
      */
     protected function getAllSiteIdsFromVideoID(int $videoId): array
     {
-        $result = \App\Models\Video::query()
+        $result = Video::query()
             ->where('id', $videoId)
             ->first(['tmdb', 'tvdb', 'imdb']);
 
@@ -541,7 +543,7 @@ class TmdbProvider extends AbstractTvProvider
     protected function lookupTraktId(int $tmdbId, int|string $imdbId, int $tvdbId): int
     {
         try {
-            $traktService = app(\App\Services\TraktService::class);
+            $traktService = app(TraktService::class);
 
             if (! $traktService->isConfigured()) {
                 return 0;

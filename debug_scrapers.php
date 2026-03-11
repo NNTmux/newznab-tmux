@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+use voku\helper\HtmlDomParser;
+
 /**
  * Debug Adult Scrapers
  * Shows what HTML is actually being returned from sites
@@ -40,7 +42,7 @@ file_put_contents('/tmp/ade_search_response.html', $response);
 echo "Full response saved to: /tmp/ade_search_response.html\n\n";
 
 // Try to parse it
-$parser = new \voku\helper\HtmlDomParser;
+$parser = new HtmlDomParser;
 $html = $parser->loadHtml($response);
 
 // Try various selectors

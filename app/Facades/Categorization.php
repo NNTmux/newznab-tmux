@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Illuminate\Support\Collection getCategorizers()
  * @method static CategorizationPipeline addCategorizer(\App\Services\Categorization\Contracts\CategorizerInterface $categorizer)
  *
- * @see \App\Services\Categorization\CategorizationPipeline
+ * @see CategorizationPipeline
  */
 class Categorization extends Facade // @phpstan-ignore missingType.iterableValue, missingType.generics
 {

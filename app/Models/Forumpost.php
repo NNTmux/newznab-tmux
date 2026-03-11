@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,8 +20,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $locked
  * @property bool $sticky
  * @property int $replies
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Forumpost whereForumid($value)

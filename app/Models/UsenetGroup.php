@@ -7,7 +7,9 @@ namespace App\Models;
 use App\Services\NNTP\NNTPService;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
+use App\Services\Releases\ReleaseManagementService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
@@ -28,7 +30,7 @@ use Illuminate\Support\Facades\DB;
  * @property bool $active
  * @property bool $backfill
  * @property string|null $description
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Release[] $release
+ * @property-read Collection|Release[] $release
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\UsenetGroup whereBackfill($value)
@@ -90,7 +92,7 @@ class UsenetGroup extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Release, $this>
+     * @return HasMany<Release, $this>
      */
     public function release(): HasMany
     {
@@ -387,7 +389,7 @@ class UsenetGroup extends Model
 
         $releases = $res->get();
 
-        $releaseManagement = app(\App\Services\Releases\ReleaseManagementService::class);
+        $releaseManagement = app(ReleaseManagementService::class);
         $nzb = app(NzbService::class);
         $releaseImage = new ReleaseImageService;
         foreach ($releases as $row) {

@@ -14,6 +14,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -64,7 +65,7 @@ class LoginController extends Controller
     /**
      * @throws AuthenticationException
      */
-    public function login(LoginLoginRequest $request): \Illuminate\Foundation\Application|\Illuminate\Routing\Redirector|Application|RedirectResponse
+    public function login(LoginLoginRequest $request): \Illuminate\Foundation\Application|Redirector|Application|RedirectResponse
     {
         $validator = Validator::make($request->all(), [
             'username' => ['required'],
@@ -201,7 +202,7 @@ class LoginController extends Controller
         return view('auth.login');
     }
 
-    public function logout(Request $request): \Illuminate\Routing\Redirector|RedirectResponse
+    public function logout(Request $request): Redirector|RedirectResponse
     {
         // Save 2FA trusted device cookie value before logout
         $trustedDeviceCookie = $request->cookie('2fa_trusted_device');

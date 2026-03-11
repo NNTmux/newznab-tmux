@@ -75,7 +75,7 @@ class ReleaseReport extends Model
     /**
      * Get the release that was reported.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Release, $this>
+     * @return BelongsTo<Release, $this>
      */
     public function release(): BelongsTo
     {
@@ -85,7 +85,7 @@ class ReleaseReport extends Model
     /**
      * Get the user who reported the release.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -95,7 +95,7 @@ class ReleaseReport extends Model
     /**
      * Get the admin who reviewed the report.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     * @return BelongsTo<User, $this>
      */
     public function reviewer(): BelongsTo
     {

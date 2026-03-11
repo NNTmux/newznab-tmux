@@ -15,6 +15,7 @@ use App\Models\UsenetGroup;
 use App\Services\Categorization\CategorizationService;
 use App\Services\NNTP\NNTPService;
 use App\Services\Nzb\NzbService;
+use App\Services\Releases\ReleaseBrowseService;
 use App\Services\Releases\ReleaseManagementService;
 use App\Support\DTOs\ProcessReleasesSettings;
 use App\Support\DTOs\ReleaseCreationResult;
@@ -1123,11 +1124,11 @@ final class ReleaseProcessingService
 
         Release::query()
             ->select(['id', 'guid'])
-            ->where('passwordstatus', '=', \App\Services\Releases\ReleaseBrowseService::PASSWD_RAR)
+            ->where('passwordstatus', '=', ReleaseBrowseService::PASSWD_RAR)
             ->orWhereIn('id', function ($query): void {
                 $query->select('releases_id')
                     ->from('release_files')
-                    ->where('passworded', '=', \App\Services\Releases\ReleaseBrowseService::PASSWD_RAR);
+                    ->where('passworded', '=', ReleaseBrowseService::PASSWD_RAR);
             })
             ->chunkById(self::BATCH_SIZE, function ($releases) use (&$stats): bool {
                 foreach ($releases as $release) {

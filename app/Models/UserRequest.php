@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
@@ -49,7 +50,7 @@ class UserRequest extends Model
     protected $fillable = ['id', 'users_id', 'request', 'hosthash', 'timestamp'];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -109,7 +110,7 @@ class UserRequest extends Model
             ->get();
 
         foreach ($requests as $request) {
-            $hourKey = \Carbon\Carbon::parse($request->timestamp)->format('H:00');
+            $hourKey = Carbon::parse($request->timestamp)->format('H:00');
             if (isset($hourlyData[$hourKey])) {
                 $hourlyData[$hourKey]++;
             }

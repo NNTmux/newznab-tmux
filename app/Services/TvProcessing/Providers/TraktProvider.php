@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\TvProcessing\Providers;
 
+use App\Models\Video;
 use App\Services\ReleaseImageService;
 use App\Services\TraktService;
+use DariusIII\TVMaze\TVMaze;
 use Illuminate\Support\Carbon;
 
 /**
@@ -247,7 +249,7 @@ class TraktProvider extends AbstractTvProvider
      */
     protected function getAllSiteIdsFromVideoID(int $videoId): array
     {
-        $result = \App\Models\Video::query()
+        $result = Video::query()
             ->where('id', $videoId)
             ->first(['trakt', 'tmdb', 'tvdb', 'imdb']);
 
@@ -425,7 +427,7 @@ class TraktProvider extends AbstractTvProvider
     protected function lookupTvMazeId(int $tvdbId, int|string $imdbId): int
     {
         try {
-            $tvmazeClient = new \DariusIII\TVMaze\TVMaze;
+            $tvmazeClient = new TVMaze;
 
             // Try TVDB ID first
             if ($tvdbId > 0) {

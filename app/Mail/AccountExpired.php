@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Mail;
 
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -12,7 +13,7 @@ class AccountExpired extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public \App\Models\User $user;
+    public User $user;
 
     private mixed $siteEmail;
 
@@ -21,7 +22,7 @@ class AccountExpired extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(\App\Models\User $user)
+    public function __construct(User $user)
     {
         $this->user = $user;
         $this->siteEmail = config('mail.from.address');

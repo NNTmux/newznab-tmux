@@ -9,6 +9,7 @@ use App\Models\Release;
 use App\Models\ReleaseInform;
 use App\Models\User;
 use App\Services\NameFixing\ReleaseUpdateService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ApiInformController extends Controller
@@ -19,7 +20,7 @@ class ApiInformController extends Controller
      *
      * @throws \Exception
      */
-    public function release(Request $request): \Illuminate\Http\JsonResponse
+    public function release(Request $request): JsonResponse
     {
         $releaseObName = $request->has('relo') && ! empty($request->input('relo')) ? $request->input('relo') : '';
         $releasePrName = $request->has('relp') && ! empty($request->input('relp')) ? $request->input('relp') : '';

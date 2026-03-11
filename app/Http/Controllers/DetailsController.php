@@ -21,6 +21,7 @@ use App\Services\ConsoleService;
 use App\Services\GamesService;
 use App\Services\MovieService;
 use App\Services\MusicService;
+use App\Services\PopulateAniListService;
 use App\Services\ReleaseExtraService;
 use App\Services\Releases\ReleaseSearchService;
 use Illuminate\Http\Request;
@@ -63,7 +64,7 @@ class DetailsController extends BasePageController
         }
 
         $nfoData = ReleaseNfo::getReleaseNfo($data['id']);
-        /** @var \App\Models\ReleaseNfo|null $nfoData */
+        /** @var ReleaseNfo|null $nfoData */
         $nfo = $nfoData ? $nfoData->nfo : null;
         $reVideo = $this->releaseExtraService->getVideo($data['id']);
         $reAudio = $this->releaseExtraService->getAudio($data['id']);
@@ -136,7 +137,7 @@ class DetailsController extends BasePageController
                 if (empty($AniDBAPIArray->country) && empty($AniDBAPIArray->media_type)) {
                     // Fetch fresh data from AniList if country/media_type is missing
                     try {
-                        $palist = new \App\Services\PopulateAniListService;
+                        $palist = new PopulateAniListService;
                         $palist->populateTable('info', $anilistId);
                         // Refresh the data
                         $AniDBAPIArray = (new AnidbService)->getAnimeInfo($data['anidbid']);

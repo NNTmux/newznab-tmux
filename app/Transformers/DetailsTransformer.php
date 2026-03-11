@@ -6,17 +6,18 @@ namespace App\Transformers;
 
 use App\Models\Category;
 use App\Models\Release;
+use App\Models\User;
 use Illuminate\Support\Carbon;
 use League\Fractal\TransformerAbstract;
 
 class DetailsTransformer extends TransformerAbstract
 {
-    protected \App\Models\User $user;
+    protected User $user;
 
     /**
      * DetailsTransformer constructor.
      */
-    public function __construct(\App\Models\User $user)
+    public function __construct(User $user)
     {
         $this->user = $user;
     }

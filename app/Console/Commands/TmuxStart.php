@@ -7,9 +7,11 @@ namespace App\Console\Commands;
 use App\Models\Collection;
 use App\Models\Settings;
 use App\Services\Tmux\TmuxLayoutBuilder;
+use App\Services\Tmux\TmuxPaneManager;
 use App\Services\Tmux\TmuxSessionManager;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Process;
 
 class TmuxStart extends Command
 {
@@ -100,7 +102,7 @@ class TmuxStart extends Command
             $this->startMonitor($sessionName);
 
             // Select monitor pane (0.0) so attach lands there
-            $paneManager = new \App\Services\Tmux\TmuxPaneManager($sessionName);
+            $paneManager = new TmuxPaneManager($sessionName);
             $paneManager->selectWindow(0);
             $paneManager->selectPane('0.0');
 
@@ -133,7 +135,7 @@ class TmuxStart extends Command
      */
     private function checkTmuxInstalled(): bool
     {
-        $result = \Illuminate\Support\Facades\Process::timeout(5)
+        $result = Process::timeout(5)
             ->run('which tmux 2>/dev/null');
 
         return $result->successful() && str_contains($result->output(), 'tmux');
@@ -169,7 +171,7 @@ class TmuxStart extends Command
      */
     private function startMonitor(string $sessionName): void
     {
-        $paneManager = new \App\Services\Tmux\TmuxPaneManager($sessionName);
+        $paneManager = new TmuxPaneManager($sessionName);
 
         // Priority: new monitor > old monitor > artisan command
         $newMonitor = base_path('app/Services/Tmux/Scripts/monitor.php');

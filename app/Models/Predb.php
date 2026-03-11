@@ -86,7 +86,7 @@ class Predb extends Model
     protected $guarded = [];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PredbHash, $this>
+     * @return HasMany<PredbHash, $this>
      */
     public function hash(): HasMany
     {
@@ -94,7 +94,7 @@ class Predb extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Release, $this>
+     * @return HasMany<Release, $this>
      */
     public function release(): HasMany
     {

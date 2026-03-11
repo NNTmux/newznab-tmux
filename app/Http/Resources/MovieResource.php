@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Models\MovieInfo;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * Movie API Resource for transforming movie data.
  *
- * @mixin \App\Models\MovieInfo
+ * @mixin MovieInfo
  */
 class MovieResource extends JsonResource
 {

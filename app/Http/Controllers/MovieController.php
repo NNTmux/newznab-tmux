@@ -7,7 +7,12 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Services\MovieBrowseService;
 use App\Services\MovieService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 
 class MovieController extends BasePageController
 {
@@ -153,7 +158,7 @@ class MovieController extends BasePageController
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\View\View
+     * @return JsonResponse|View
      */
     public function showTrailer(Request $request)
     {
@@ -201,13 +206,13 @@ class MovieController extends BasePageController
         $cacheKey = 'trending_movies_top_15_48h';
 
         // Get trending movies from cache or calculate (refresh every hour)
-        $trendingMovies = \Illuminate\Support\Facades\Cache::remember($cacheKey, 3600, function () {
+        $trendingMovies = Cache::remember($cacheKey, 3600, function () {
             // Calculate timestamp for 48 hours ago
-            $fortyEightHoursAgo = \Illuminate\Support\Carbon::now()->subHours(48);
+            $fortyEightHoursAgo = Carbon::now()->subHours(48);
 
             // Get movies with their download counts from last 48 hours
             // Join with user_downloads to get actual download timestamps
-            $query = \Illuminate\Support\Facades\DB::table('movieinfo as m')
+            $query = DB::table('movieinfo as m')
                 ->join('releases as r', 'm.imdbid', '=', 'r.imdbid')
                 ->leftJoin('user_downloads as ud', 'r.id', '=', 'ud.releases_id')
                 ->select([
@@ -220,8 +225,8 @@ class MovieController extends BasePageController
                     'm.cover',
                     'm.tmdbid',
                     'm.traktid',
-                    \Illuminate\Support\Facades\DB::raw('COUNT(DISTINCT ud.id) as total_downloads'),
-                    \Illuminate\Support\Facades\DB::raw('COUNT(DISTINCT r.id) as release_count'),
+                    DB::raw('COUNT(DISTINCT ud.id) as total_downloads'),
+                    DB::raw('COUNT(DISTINCT r.id) as release_count'),
                 ])
                 ->where('m.title', '!=', '')
                 ->where('m.imdbid', '!=', '0000000')

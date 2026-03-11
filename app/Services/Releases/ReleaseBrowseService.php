@@ -313,7 +313,7 @@ class ReleaseBrowseService
 
     /**
      * @param  array<string, mixed>  $excludedCats
-     * @return \Illuminate\Database\Eloquent\Collection|mixed
+     * @return Collection|mixed
      */
     public function getShowsRange(mixed $userShows, mixed $offset, mixed $limit, mixed $orderBy, int $maxAge = -1, array $excludedCats = [])
     {
@@ -588,7 +588,7 @@ class ReleaseBrowseService
                 }
             } catch (\Exception $fallbackException) {
                 // Log the error for debugging
-                \Illuminate\Support\Facades\Log::error('getPagerCount failed', [
+                Log::error('getPagerCount failed', [
                     'query' => $query,
                     'error' => $fallbackException->getMessage(),
                 ]);

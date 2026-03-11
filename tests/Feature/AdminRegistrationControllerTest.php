@@ -10,6 +10,7 @@ use App\Models\RegistrationStatusHistory;
 use App\Models\Settings;
 use App\Models\User;
 use App\Services\RegistrationFailureLogService;
+use App\View\Composers\GlobalDataComposer;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Cache;
@@ -410,7 +411,7 @@ class AdminRegistrationControllerTest extends TestCase
 
     private function resetGlobalComposerState(): void
     {
-        $reflection = new ReflectionClass(\App\View\Composers\GlobalDataComposer::class);
+        $reflection = new ReflectionClass(GlobalDataComposer::class);
         $property = $reflection->getProperty('resolvedData');
         $property->setAccessible(true);
         $property->setValue(null, null);

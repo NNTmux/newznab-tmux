@@ -14,6 +14,7 @@
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Api\ApiInformController;
 use App\Http\Controllers\Api\ApiV2Controller;
+use App\Services\ReleaseExtraService;
 
 Route::prefix('v1')->group(function () {
     Route::match(['post', 'get'], 'api', [ApiController::class, 'api']);
@@ -37,7 +38,7 @@ Route::prefix('inform')->middleware('auth:api')->group(function () {
 
 // Mediainfo endpoint (no auth required for internal use)
 Route::get('release/{id}/mediainfo', function ($id) {
-    $releaseExtra = app(\App\Services\ReleaseExtraService::class);
+    $releaseExtra = app(ReleaseExtraService::class);
 
     $video = $releaseExtra->getVideo($id);
     $audio = $releaseExtra->getAudio($id);
