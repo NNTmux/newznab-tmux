@@ -29,8 +29,7 @@ class AdminPageController extends BasePageController
         UserStatsService $userStatsService,
         SystemMetricsService $systemMetricsService,
         RegistrationStatusService $registrationStatusService
-    )
-    {
+    ) {
         parent::__construct();
         $this->userStatsService = $userStatsService;
         $this->systemMetricsService = $systemMetricsService;
