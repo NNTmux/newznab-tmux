@@ -52,6 +52,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $resetguid
  * @property Carbon|null $lastlogin
  * @property Carbon|null $apiaccess
+ * @property Carbon|null $lastdownload
  * @property int $invites
  * @property int|null $invitedby
  * @property bool $movieview
@@ -166,6 +167,7 @@ final class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'lastlogin' => 'datetime',
             'apiaccess' => 'datetime',
+            'lastdownload' => 'datetime',
             'rolechangedate' => 'datetime',
             'pending_role_start_date' => 'datetime',
             'created_at' => 'datetime',
@@ -1411,7 +1413,9 @@ final class User extends Authenticatable
      */
     public static function incrementGrabs(int $id, int $num = 1): void
     {
-        static::find($id)?->increment('grabs', $num);
+        static::query()
+            ->whereKey($id)
+            ->increment('grabs', $num, ['lastdownload' => now()]);
     }
 
     // ===== Validation Methods =====
