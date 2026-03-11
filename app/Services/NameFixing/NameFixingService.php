@@ -66,6 +66,8 @@ class NameFixingService
 
     protected FilePrioritizer $filePrioritizer;
 
+    protected PredbMatchSelector $predbMatchSelector;
+
     protected bool $echoOutput;
 
     protected string $othercats;
@@ -86,7 +88,8 @@ class NameFixingService
         ?NfoNameExtractor $nfoExtractor = null,
         ?FileNameExtractor $fileExtractor = null,
         ?FileNameCleaner $fileNameCleaner = null,
-        ?FilePrioritizer $filePrioritizer = null
+        ?FilePrioritizer $filePrioritizer = null,
+        ?PredbMatchSelector $predbMatchSelector = null
     ) {
         $this->updateService = $updateService ?? new ReleaseUpdateService;
         $this->checkerService = $checkerService ?? new NameCheckerService;
@@ -94,6 +97,7 @@ class NameFixingService
         $this->fileExtractor = $fileExtractor ?? new FileNameExtractor;
         $this->fileNameCleaner = $fileNameCleaner ?? new FileNameCleaner;
         $this->filePrioritizer = $filePrioritizer ?? new FilePrioritizer;
+        $this->predbMatchSelector = $predbMatchSelector ?? new PredbMatchSelector($this->fileNameCleaner);
         $this->echoOutput = config('nntmux.echocli');
 
         $this->othercats = implode(',', Category::OTHERS_GROUP);
@@ -789,23 +793,20 @@ class NameFixingService
             return false;
         }
 
-        $results = Search::searchPredb($fileName);
-        foreach ($results as $hit) {
-            if (! empty($hit)) {
-                $hitData = is_array($hit) ? $hit : (array) $hit;
-                $this->updateService->updateRelease(
-                    $release,
-                    $hitData['title'] ?? '',
-                    'PreDb: Filename match',
-                    $echo,
-                    $type,
-                    $nameStatus,
-                    $show,
-                    $hitData['id'] ?? null
-                );
+        $bestMatch = $this->findBestPredbMatch($fileName);
+        if ($bestMatch !== null) {
+            $this->updateService->updateRelease(
+                $release,
+                $bestMatch['title'] ?? '',
+                'PreDb: Filename match',
+                $echo,
+                $type,
+                $nameStatus,
+                $show,
+                $bestMatch['id'] ?? null
+            );
 
-                return true;
-            }
+            return true;
         }
 
         return false;
@@ -822,26 +823,33 @@ class NameFixingService
             return false;
         }
 
-        $results = Search::searchPredb($fileName);
-        foreach ($results as $hit) {
-            if (! empty($hit)) {
-                $hitData = is_array($hit) ? $hit : (array) $hit;
-                $this->updateService->updateRelease(
-                    $release,
-                    $hitData['title'] ?? '',
-                    'PreDb: Title match',
-                    $echo,
-                    $type,
-                    $nameStatus,
-                    $show,
-                    $hitData['id'] ?? null
-                );
+        $bestMatch = $this->findBestPredbMatch($fileName);
+        if ($bestMatch !== null) {
+            $this->updateService->updateRelease(
+                $release,
+                $bestMatch['title'] ?? '',
+                'PreDb: Title match',
+                $echo,
+                $type,
+                $nameStatus,
+                $show,
+                $bestMatch['id'] ?? null
+            );
 
-                return true;
-            }
+            return true;
         }
 
         return false;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    protected function findBestPredbMatch(string $fileName): ?array
+    {
+        $results = Search::searchPredb($fileName);
+
+        return $this->predbMatchSelector->selectBestMatch($fileName, $results);
     }
 
     /**
