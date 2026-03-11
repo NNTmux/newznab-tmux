@@ -11,6 +11,7 @@ use App\Models\ReleaseReport;
 use App\Models\UsenetGroup;
 use App\Models\User;
 use App\Models\UserActivity;
+use App\Services\RegistrationStatusService;
 use App\Services\SystemMetricsService;
 use App\Services\UserStatsService;
 use Illuminate\Http\JsonResponse;
@@ -22,11 +23,18 @@ class AdminPageController extends BasePageController
 
     protected SystemMetricsService $systemMetricsService;
 
-    public function __construct(UserStatsService $userStatsService, SystemMetricsService $systemMetricsService)
+    protected RegistrationStatusService $registrationStatusService;
+
+    public function __construct(
+        UserStatsService $userStatsService,
+        SystemMetricsService $systemMetricsService,
+        RegistrationStatusService $registrationStatusService
+    )
     {
         parent::__construct();
         $this->userStatsService = $userStatsService;
         $this->systemMetricsService = $systemMetricsService;
+        $this->registrationStatusService = $registrationStatusService;
     }
 
     /**
@@ -35,6 +43,7 @@ class AdminPageController extends BasePageController
     public function index(): mixed
     {
         $this->setAdminPrefs();
+        $now = now();
 
         $userStats = Cache::remember('admin_user_stats', 120, function () {
             return [
@@ -48,12 +57,19 @@ class AdminPageController extends BasePageController
             ];
         });
 
+        $registrationStatus = $this->registrationStatusService->resolve($now);
+        $nextRegistrationPeriod = $registrationStatus['active_period'] === null
+            ? $this->registrationStatusService->getNextUpcomingPeriod($now)
+            : null;
+
         return view('admin.dashboard', array_merge($this->viewData, [
             'meta_title' => 'Admin Home',
             'meta_description' => 'Admin home page',
             'userStats' => $userStats,
             'stats' => $this->getDefaultStats(),
             'systemMetrics' => $this->getSystemMetrics(),
+            'registrationStatus' => $registrationStatus,
+            'nextRegistrationPeriod' => $nextRegistrationPeriod,
             'recent_activity' => $this->getRecentUserActivity(),
         ]));
     }

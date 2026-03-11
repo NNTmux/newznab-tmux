@@ -51,6 +51,17 @@ class RegistrationStatusService
             ->first();
     }
 
+    public function getNextUpcomingPeriod(?CarbonInterface $at = null): ?RegistrationPeriod
+    {
+        $at ??= now();
+
+        return RegistrationPeriod::query()
+            ->enabled()
+            ->upcoming($at)
+            ->orderBy('starts_at')
+            ->first();
+    }
+
     /**
      * @return array{
      *     manual_status: int,

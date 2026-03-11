@@ -3,6 +3,13 @@
 @section('content')
 @php
     $dashboardLastRefreshedAt = now()->format('H:i:s');
+    $dashboardStatusBadgeClasses = static function (int $status): string {
+        return match ($status) {
+            \App\Models\Settings::REGISTER_STATUS_OPEN => 'border border-emerald-500/30 bg-emerald-600 text-white shadow-sm dark:border-emerald-300/20 dark:bg-emerald-500 dark:text-slate-950',
+            \App\Models\Settings::REGISTER_STATUS_INVITE => 'border border-amber-500/30 bg-amber-500 text-slate-950 shadow-sm dark:border-amber-200/20 dark:bg-amber-400 dark:text-slate-950',
+            default => 'border border-rose-500/30 bg-rose-600 text-white shadow-sm dark:border-rose-200/20 dark:bg-rose-500 dark:text-white',
+        };
+    };
 @endphp
 
 <div x-data="adminDashboard"
@@ -141,6 +148,83 @@
                 <a href="{{ route('admin.deleted.users.index') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
                     View deleted users <i class="fas fa-arrow-right"></i>
                 </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration Status Widget -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 flex items-center">
+                    <i class="fas fa-user-plus mr-2 text-blue-600 dark:text-blue-400"></i>
+                    Site Registration Status
+                </h3>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    Live registration availability, manual baseline, and the current schedule summary.
+                </p>
+            </div>
+            <a href="{{ route('admin.registrations.index') }}"
+               class="inline-flex items-center rounded-lg border border-blue-700 bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-blue-300/20 dark:bg-blue-500 dark:text-white dark:hover:bg-blue-400 dark:focus:ring-offset-gray-900">
+                <i class="fas fa-arrow-up-right-from-square mr-2"></i>Manage Registrations
+            </a>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-3">
+            <div class="rounded-xl border border-gray-200 bg-gray-50 p-5 dark:border-gray-700 dark:bg-gray-900">
+                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Effective Status</p>
+                <div class="mt-3 flex flex-wrap items-center gap-2">
+                    <span class="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm font-semibold {{ $dashboardStatusBadgeClasses($registrationStatus['effective_status']) }}">
+                        {{ $registrationStatus['effective_status_label'] }}
+                    </span>
+                    @if($registrationStatus['scheduled_override_active'])
+                        <span class="inline-flex items-center justify-center rounded-full border border-blue-500/30 bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm dark:border-blue-300/20 dark:bg-blue-500 dark:text-white">
+                            Scheduled Override
+                        </span>
+                    @endif
+                </div>
+                <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">{{ $registrationStatus['message'] }}</p>
+            </div>
+
+            <div class="rounded-xl border border-gray-200 bg-gray-50 p-5 dark:border-gray-700 dark:bg-gray-900">
+                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Manual Baseline</p>
+                <div class="mt-3">
+                    <span class="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-sm font-semibold {{ $dashboardStatusBadgeClasses($registrationStatus['manual_status']) }}">
+                        {{ $registrationStatus['manual_status_label'] }}
+                    </span>
+                </div>
+                <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                    Used whenever no scheduled open period is currently active.
+                </p>
+            </div>
+
+            <div class="rounded-xl border border-gray-200 bg-gray-50 p-5 dark:border-gray-700 dark:bg-gray-900">
+                @if($registrationStatus['active_period'])
+                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Active Open Period</p>
+                    <div class="mt-3">
+                        <p class="text-base font-semibold text-gray-900 dark:text-gray-100">{{ $registrationStatus['active_period']->name }}</p>
+                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                            {{ $registrationStatus['active_period']->starts_at->format('Y-m-d H:i') }} to
+                            {{ $registrationStatus['active_period']->ends_at->format('Y-m-d H:i') }}
+                        </p>
+                    </div>
+                    <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">This window is active on the public registration form right now.</p>
+                @elseif($nextRegistrationPeriod)
+                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Next Scheduled Open Period</p>
+                    <div class="mt-3">
+                        <p class="text-base font-semibold text-gray-900 dark:text-gray-100">{{ $nextRegistrationPeriod->name }}</p>
+                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                            {{ $nextRegistrationPeriod->starts_at->format('Y-m-d H:i') }} to
+                            {{ $nextRegistrationPeriod->ends_at->format('Y-m-d H:i') }}
+                        </p>
+                    </div>
+                    <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">The next temporary public signup window is already scheduled.</p>
+                @else
+                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Scheduled Open Periods</p>
+                    <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                        No active or upcoming open-registration periods are currently scheduled.
+                    </p>
+                @endif
             </div>
         </div>
     </div>
