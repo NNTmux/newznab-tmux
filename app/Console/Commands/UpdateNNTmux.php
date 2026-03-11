@@ -264,7 +264,6 @@ class UpdateNNTmux extends Command
         $this->call('route:cache');
         $this->info('Routes cached successfully');
 
-
         // Merge environment variables
         $this->info('⚙️ Merging environment configuration...');
         $this->mergeEnvironmentConfig();
