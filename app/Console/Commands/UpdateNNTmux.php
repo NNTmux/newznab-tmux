@@ -257,6 +257,13 @@ class UpdateNNTmux extends Command
         // Clear view cache
         $this->info('🧹 Clearing view cache...');
         $this->call('view:clear');
+        $this->info('Clearing route cache...');
+        $this->call('route:clear');
+        $this->info('Cache cleared successfully');
+        $this->info('Caching routes...');
+        $this->call('route:cache');
+        $this->info('Routes cached successfully');
+
 
         // Merge environment variables
         $this->info('⚙️ Merging environment configuration...');
