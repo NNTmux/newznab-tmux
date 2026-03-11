@@ -17,6 +17,17 @@ class FileNameCleaner
     use DetectsHashedNames;
 
     /**
+     * Generic DVD structure filenames and similarly low-information names.
+     *
+     * @var list<string>
+     */
+    private const IGNORABLE_NAME_PATTERNS = [
+        '/^(?:audio|video)[._-]?ts$/i',
+        '/^vts[._-]?\d{1,2}[._-]?\d{1,2}$/i',
+        '/^\d{1,3}$/',
+    ];
+
+    /**
      * Archive extension patterns to remove.
      */
     private const ARCHIVE_PATTERNS = [
@@ -81,6 +92,10 @@ class FileNameCleaner
         // Extract filename from path
         $fileName = $this->extractFilenameFromPath($fileName);
 
+        if ($this->isIgnorableForMatching($fileName)) {
+            return false;
+        }
+
         // Remove sample/proof indicators
         $fileName = preg_replace('/[\.\-_](sample|proof|subs?|thumbs?|cover|screens?)[\.\-_]?$/i', '', $fileName);
 
@@ -106,7 +121,11 @@ class FileNameCleaner
         // Trim whitespace and punctuation
         $fileName = trim($fileName, " \t\n\r\0\x0B.-_");
 
-        return $fileName !== '' ? $fileName : false;
+        if ($fileName === '' || $this->looksLikeStructuralJunk($fileName)) {
+            return false;
+        }
+
+        return $fileName;
     }
 
     /**
@@ -289,6 +308,38 @@ class FileNameCleaner
         // Check for year pattern
         if (preg_match('/[._-](19|20)\d{2}[._-]/i', $baseName)) {
             return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Ignore junk inputs that should never drive PreDB matches.
+     */
+    protected function isIgnorableForMatching(string $fileName): bool
+    {
+        if (preg_match('/\.url$/i', $fileName)) {
+            return true;
+        }
+
+        return $this->looksLikeStructuralJunk((string) pathinfo($fileName, PATHINFO_FILENAME));
+    }
+
+    /**
+     * Detect low-information DVD structure names and numeric image files.
+     */
+    protected function looksLikeStructuralJunk(string $fileName): bool
+    {
+        $normalized = strtolower(trim($fileName, " \t\n\r\0\x0B.-_"));
+
+        if ($normalized === '') {
+            return true;
+        }
+
+        foreach (self::IGNORABLE_NAME_PATTERNS as $pattern) {
+            if (preg_match($pattern, $normalized)) {
+                return true;
+            }
         }
 
         return false;

@@ -37,6 +37,17 @@ class FilePrioritizer
     private const PRIORITY_OTHER = 50;
 
     /**
+     * Generic DVD structure names and similar low-information files.
+     *
+     * @var list<string>
+     */
+    private const IGNORABLE_NAME_PATTERNS = [
+        '/^(?:audio|video)[._-]?ts$/i',
+        '/^vts[._-]?\d{1,2}[._-]?\d{1,2}$/i',
+        '/^\d{1,3}$/',
+    ];
+
+    /**
      * Prioritize files for name matching.
      *
      * Returns files sorted by usefulness for name matching:
@@ -108,8 +119,8 @@ class FilePrioritizer
         foreach ($files as $file) {
             $lowerFile = strtolower($file);
 
-            // Skip sample/proof files
-            if ($this->isSampleOrProof($file)) {
+            // Skip junk files that do not carry release identity.
+            if ($this->shouldIgnoreForNameMatching($file) || $this->isSampleOrProof($file)) {
                 continue;
             }
 
@@ -222,6 +233,37 @@ class FilePrioritizer
     protected function isNfoFile(string $lowerFilename): bool
     {
         return str_ends_with($lowerFilename, '.nfo');
+    }
+
+    /**
+     * Skip files that are usually just DVD structure noise or URL spam.
+     */
+    protected function shouldIgnoreForNameMatching(string $filename): bool
+    {
+        $baseName = $this->extractFilenameFromPath($filename);
+
+        if (preg_match('/\.url$/i', $baseName)) {
+            return true;
+        }
+
+        $baseName = strtolower(trim((string) pathinfo($baseName, PATHINFO_FILENAME), " \t\n\r\0\x0B.-_"));
+
+        foreach (self::IGNORABLE_NAME_PATTERNS as $pattern) {
+            if (preg_match($pattern, $baseName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function extractFilenameFromPath(string $filename): string
+    {
+        if (preg_match('/[\\\\\/]([^\\\\\/]+)$/', $filename, $match)) {
+            return $match[1];
+        }
+
+        return $filename;
     }
 
     /**
