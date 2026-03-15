@@ -4073,16 +4073,16 @@
         },
         {
             "name": "livewire/blaze",
-            "version": "v1.0.7",
+            "version": "v1.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/livewire/blaze.git",
-                "reference": "20cb545a8f70a3325f17c97254bb2532a99c0731"
+                "reference": "b7d8976e540f792aaf52c4955c3576fcc7eb5c0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/livewire/blaze/zipball/20cb545a8f70a3325f17c97254bb2532a99c0731",
-                "reference": "20cb545a8f70a3325f17c97254bb2532a99c0731",
+                "url": "https://api.github.com/repos/livewire/blaze/zipball/b7d8976e540f792aaf52c4955c3576fcc7eb5c0e",
+                "reference": "b7d8976e540f792aaf52c4955c3576fcc7eb5c0e",
                 "shasum": ""
             },
             "require": {
@@ -4125,9 +4125,9 @@
             "description": "A tool for optimizing Blade component performance by folding them into parent templates",
             "support": {
                 "issues": "https://github.com/livewire/blaze/issues",
-                "source": "https://github.com/livewire/blaze/tree/v1.0.7"
+                "source": "https://github.com/livewire/blaze/tree/v1.0.8"
             },
-            "time": "2026-03-12T14:25:42+00:00"
+            "time": "2026-03-14T15:06:24+00:00"
         },
         {
             "name": "livewire/livewire",
@@ -16344,16 +16344,16 @@
         },
         {
             "name": "sebastian/environment",
-            "version": "8.0.3",
+            "version": "8.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/environment.git",
-                "reference": "24a711b5c916efc6d6e62aa65aa2ec98fef77f68"
+                "reference": "7b8842c2d8e85d0c3a5831236bf5869af6ab2a11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/24a711b5c916efc6d6e62aa65aa2ec98fef77f68",
-                "reference": "24a711b5c916efc6d6e62aa65aa2ec98fef77f68",
+                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/7b8842c2d8e85d0c3a5831236bf5869af6ab2a11",
+                "reference": "7b8842c2d8e85d0c3a5831236bf5869af6ab2a11",
                 "shasum": ""
             },
             "require": {
@@ -16396,7 +16396,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/environment/issues",
                 "security": "https://github.com/sebastianbergmann/environment/security/policy",
-                "source": "https://github.com/sebastianbergmann/environment/tree/8.0.3"
+                "source": "https://github.com/sebastianbergmann/environment/tree/8.0.4"
             },
             "funding": [
                 {
@@ -16416,7 +16416,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-08-12T14:11:56+00:00"
+            "time": "2026-03-15T07:05:40+00:00"
         },
         {
             "name": "sebastian/exporter",
