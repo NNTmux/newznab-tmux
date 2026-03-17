@@ -514,15 +514,33 @@ class ApiController extends BasePageController
      */
     public function categoryID(Request $request): array
     {
-        $categoryID[] = -1;
-        if ($request->has('cat')) {
-            $categoryIDs = urldecode($request->input('cat'));
-            // Append Web-DL category ID if HD present for SickBeard / Sonarr compatibility.
-            if (str_contains($categoryIDs, (string) Category::TV_HD) && ! str_contains($categoryIDs, (string) Category::TV_WEBDL) && (int) Settings::settingValue('catwebdl') === 0) {
-                $categoryIDs .= (','.Category::TV_WEBDL);
-            }
-            $categoryID = explode(',', $categoryIDs);
+        $categoryID = [-1];
+        if (! $request->has('cat')) {
+            return $categoryID;
         }
+
+        $rawCategoryIDs = $request->input('cat');
+        if (is_array($rawCategoryIDs)) {
+            $categoryIDs = implode(',', array_values(array_filter(array_map(
+                static fn (mixed $categoryId): string => urldecode(trim((string) $categoryId)),
+                $rawCategoryIDs
+            ), static fn (string $categoryId): bool => $categoryId !== '')));
+        } elseif (is_scalar($rawCategoryIDs)) {
+            $categoryIDs = urldecode(trim((string) $rawCategoryIDs));
+        } else {
+            return $categoryID;
+        }
+
+        if ($categoryIDs === '') {
+            return $categoryID;
+        }
+
+        // Append Web-DL category ID if HD present for SickBeard / Sonarr compatibility.
+        if (str_contains($categoryIDs, (string) Category::TV_HD) && ! str_contains($categoryIDs, (string) Category::TV_WEBDL) && (int) Settings::settingValue('catwebdl') === 0) {
+            $categoryIDs .= (','.Category::TV_WEBDL);
+        }
+
+        $categoryID = array_values(array_filter(array_map('trim', explode(',', $categoryIDs)), static fn (string $categoryId): bool => $categoryId !== ''));
 
         return $categoryID;
     }
