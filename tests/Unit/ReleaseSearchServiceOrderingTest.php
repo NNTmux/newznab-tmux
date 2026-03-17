@@ -157,17 +157,20 @@ class ReleaseSearchServiceOrderingTest extends TestCase
     /**
      * Test that the lightweight count query is built directly against releases.
      */
-    public function test_build_search_count_sql_uses_releases_only_count_query(): void
+    public function test_get_releases_count_for_where_builds_releases_only_count_query(): void
     {
         $reflection = new ReflectionClass(ReleaseSearchService::class);
-        $method = $reflection->getMethod('buildSearchCountSql');
+        $method = $reflection->getMethod('getReleasesCountForWhere');
 
-        $sql = $method->invoke($this->service, 'WHERE r.passwordstatus = 0 AND r.id IN (1,2,3)');
+        $service = $this->getMockBuilder(ReleaseSearchService::class)
+            ->onlyMethods(['getPagerCount'])
+            ->getMock();
 
-        $this->assertSame(
-            'SELECT COUNT(*) as count FROM releases r WHERE r.passwordstatus = 0 AND r.id IN (1,2,3)',
-            $sql
-        );
-        $this->assertStringNotContainsString('JOIN', $sql);
+        $service->expects($this->once())
+            ->method('getPagerCount')
+            ->with('SELECT COUNT(*) as count FROM releases r WHERE r.passwordstatus = 0 AND r.id IN (1,2,3)')
+            ->willReturn(3);
+
+        $this->assertSame(3, $method->invoke($service, 'WHERE r.passwordstatus = 0 AND r.id IN (1,2,3)'));
     }
 }
