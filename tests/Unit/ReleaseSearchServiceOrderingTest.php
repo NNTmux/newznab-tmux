@@ -130,4 +130,44 @@ class ReleaseSearchServiceOrderingTest extends TestCase
         $this->assertSame(550, $method->invoke($this->service, 50, 50));
         $this->assertSame(2000, $method->invoke($this->service, 2500, 50));
     }
+
+    /**
+     * Test that the paged ID query only selects release IDs from the releases table.
+     */
+    public function test_build_search_page_ids_sql_uses_releases_only(): void
+    {
+        $reflection = new ReflectionClass(ReleaseSearchService::class);
+        $method = $reflection->getMethod('buildSearchPageIdsSql');
+
+        $sql = $method->invoke(
+            $this->service,
+            'WHERE r.passwordstatus = 0 AND r.id IN (1,2,3)',
+            ['postdate', 'desc'],
+            50,
+            0
+        );
+
+        $this->assertSame(
+            'SELECT r.id FROM releases r WHERE r.passwordstatus = 0 AND r.id IN (1,2,3) ORDER BY r.postdate desc LIMIT 50 OFFSET 0',
+            $sql
+        );
+        $this->assertStringNotContainsString('JOIN', $sql);
+    }
+
+    /**
+     * Test that the lightweight count query is built directly against releases.
+     */
+    public function test_build_search_count_sql_uses_releases_only_count_query(): void
+    {
+        $reflection = new ReflectionClass(ReleaseSearchService::class);
+        $method = $reflection->getMethod('buildSearchCountSql');
+
+        $sql = $method->invoke($this->service, 'WHERE r.passwordstatus = 0 AND r.id IN (1,2,3)');
+
+        $this->assertSame(
+            'SELECT COUNT(*) as count FROM releases r WHERE r.passwordstatus = 0 AND r.id IN (1,2,3)',
+            $sql
+        );
+        $this->assertStringNotContainsString('JOIN', $sql);
+    }
 }

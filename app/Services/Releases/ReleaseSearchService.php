@@ -103,29 +103,37 @@ class ReleaseSearchService
         // Get order by clause
         $orderBy = $this->getBrowseOrder($orderBy === '' ? 'posted_desc' : $orderBy);
 
-        // Build final SQL with pagination
-        $sql = sprintf(
-            'SELECT * FROM (%s) r ORDER BY r.%s %s LIMIT %d OFFSET %d',
-            $baseSql,
-            $orderBy[0], // @phpstan-ignore offsetAccess.notFound
-            $orderBy[1], // @phpstan-ignore offsetAccess.notFound
-            $limit,
-            $offset
-        );
+        $pagedIdsSql = $this->buildSearchPageIdsSql($whereSql, $orderBy, $limit, $offset);
 
         // Check cache
-        $cacheKey = md5($this->getCacheVersion().$sql);
+        $cacheKey = md5($this->getCacheVersion().$pagedIdsSql.$baseSql);
         $releases = Cache::get($cacheKey);
         if ($releases !== null) {
             return $releases;
         }
 
-        // Execute query
-        $releases = Release::fromQuery($sql);
+        $pagedIds = array_map(
+            static fn (object $row): int => (int) $row->id,
+            DB::select($pagedIdsSql)
+        );
+
+        if ($pagedIds === []) {
+            return collect();
+        }
+
+        $pageWhereSql = sprintf('WHERE r.id IN (%s)', implode(',', $pagedIds));
+        $detailSql = sprintf(
+            'SELECT * FROM (%s) r ORDER BY FIELD(r.id, %s)',
+            $this->buildSearchBaseSql($pageWhereSql),
+            implode(',', $pagedIds)
+        );
+
+        // Execute query for the final page only.
+        $releases = Release::fromQuery($detailSql);
 
         // Add total count for pagination
         if ($releases->isNotEmpty()) {
-            $releases[0]->_totalrows = $this->getPagerCount($baseSql);
+            $releases[0]->_totalrows = $this->getReleasesCountForWhere($whereSql);
         }
 
         // Cache results
@@ -1207,6 +1215,40 @@ class ReleaseSearchService
             %s",
             $whereSql
         );
+    }
+
+    /**
+     * Build the lightweight page-ID query for web search.
+     * This keeps the expensive joins out of the ORDER BY/LIMIT phase.
+     *
+     * @param  array<string, mixed>  $orderBy
+     */
+    private function buildSearchPageIdsSql(string $whereSql, array $orderBy, int $limit, int $offset): string
+    {
+        return sprintf(
+            'SELECT r.id FROM releases r %s ORDER BY r.%s %s LIMIT %d OFFSET %d',
+            $whereSql,
+            $orderBy[0], // @phpstan-ignore offsetAccess.notFound
+            $orderBy[1], // @phpstan-ignore offsetAccess.notFound
+            $limit,
+            $offset
+        );
+    }
+
+    /**
+     * Get the total number of matching web-search releases without the expensive detail joins.
+     */
+    private function getReleasesCountForWhere(string $whereSql): int
+    {
+        return $this->getPagerCount($this->buildSearchCountSql($whereSql));
+    }
+
+    /**
+     * Build the releases-only count query for web search pagination.
+     */
+    private function buildSearchCountSql(string $whereSql): string
+    {
+        return sprintf('SELECT COUNT(*) as count FROM releases r %s', $whereSql);
     }
 
     /**
