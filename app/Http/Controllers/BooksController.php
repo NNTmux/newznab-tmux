@@ -11,13 +11,19 @@ use Illuminate\Support\Arr;
 
 class BooksController extends BasePageController
 {
+    protected BookService $bookService;
+
+    public function __construct(BookService $bookService)
+    {
+        parent::__construct();
+        $this->bookService = $bookService;
+    }
+
     /**
      * @throws \Exception
      */
     public function index(Request $request, string $id = ''): mixed
     {
-        $bookService = new BookService;
-
         $boocats = Category::getChildren(Category::BOOKS_ROOT);
 
         $btmp = [];
@@ -40,13 +46,14 @@ class BooksController extends BasePageController
         $catarray = [];
         $catarray[] = $category;
 
-        $ordering = $bookService->getBookOrdering();
+        $ordering = $this->bookService->getBookOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, false) ? $request->input('ob') : '';
 
         $books = [];
-        $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
+        $pageInput = $request->input('page');
+        $page = is_scalar($pageInput) && preg_match('/^\d+$/', (string) $pageInput) === 1 ? max(1, (int) $pageInput) : 1;
         $offset = ($page - 1) * (int) config('nntmux.items_per_cover_page');
-        $rslt = $bookService->getBookRange($page, $catarray, $offset, (int) config('nntmux.items_per_cover_page'), $orderby, (array) $this->userdata->categoryexclusions);
+        $rslt = $this->bookService->getBookRange($page, $catarray, $offset, (int) config('nntmux.items_per_cover_page'), $orderby, (array) $this->userdata->categoryexclusions);
         $results = $this->paginate($rslt, $rslt[0]->_totalcount ?? 0, (int) config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
         $maxwords = 50;
         foreach ($results as $result) {
