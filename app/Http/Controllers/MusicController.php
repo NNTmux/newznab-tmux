@@ -13,14 +13,22 @@ use Illuminate\Support\Arr;
 
 class MusicController extends BasePageController
 {
+    protected MusicService $musicService;
+
+    protected GenreService $genreService;
+
+    public function __construct(MusicService $musicService, GenreService $genreService)
+    {
+        parent::__construct();
+        $this->musicService = $musicService;
+        $this->genreService = $genreService;
+    }
+
     /**
      * @throws \Exception
      */
     public function show(Request $request, string $id = ''): mixed
     {
-        $music = new MusicService;
-        $gen = new GenreService;
-
         $musiccats = Category::getChildren(Category::MUSIC_ROOT);
         $mtmp = [];
         foreach ($musiccats as $mcat) {
@@ -43,20 +51,21 @@ class MusicController extends BasePageController
         $catarray = [];
         $catarray[] = $category;
 
-        $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
+        $pageInput = $request->input('page');
+        $page = is_scalar($pageInput) && preg_match('/^\d+$/', (string) $pageInput) === 1 ? max(1, (int) $pageInput) : 1;
         $offset = ($page - 1) * (int) config('nntmux.items_per_cover_page');
-        $ordering = $music->getMusicOrdering();
+        $ordering = $this->musicService->getMusicOrdering();
         $orderby = $request->has('ob') && \in_array($request->input('ob'), $ordering, true) ? $request->input('ob') : '';
 
         $musics = [];
-        $rslt = $music->getMusicRange($page, $catarray, $offset, (int) config('nntmux.items_per_cover_page'), $orderby, (array) $this->userdata->categoryexclusions);
+        $rslt = $this->musicService->getMusicRange($page, $catarray, $offset, (int) config('nntmux.items_per_cover_page'), $orderby, (array) $this->userdata->categoryexclusions);
         $results = $this->paginate($rslt ?? [], $rslt[0]->_totalcount ?? 0, (int) config('nntmux.items_per_cover_page'), $page, $request->url(), $request->query());
 
         $artist = ($request->has('artist') && ! empty($request->input('artist'))) ? stripslashes($request->input('artist')) : '';
 
         $title = ($request->has('title') && ! empty($request->input('title'))) ? stripslashes($request->input('title')) : '';
 
-        $genres = $gen->getGenres((string) GenreService::MUSIC_TYPE, true);
+        $genres = $this->genreService->getGenres((string) GenreService::MUSIC_TYPE, true);
         $tmpgnr = [];
         foreach ($genres as $gn) {
             /** @var Genre $gn */
