@@ -66,6 +66,34 @@ class BooksControllerTest extends TestCase
         $this->assertInstanceOf(LengthAwarePaginator::class, $response->getData()['results']);
     }
 
+    public function test_index_defaults_invalid_page_query_values_to_the_first_page(): void
+    {
+        $bookService = Mockery::mock(BookService::class);
+        $bookService->shouldReceive('getBookOrdering')
+            ->times(4)
+            ->andReturn(['posted_desc']);
+        $bookService->shouldReceive('getBookRange')
+            ->times(4)
+            ->with(1, [Category::BOOKS_ROOT], 0, 50, '', [])
+            ->andReturn(collect());
+
+        $invalidPageValues = ['0', '-2', 'abc', ['2']];
+
+        foreach ($invalidPageValues as $invalidPageValue) {
+            $controller = new BooksController($bookService);
+            $user = new User;
+            $user->categoryexclusions = [];
+            $controller->userdata = $user;
+
+            $request = Request::create('/Books', 'GET', ['page' => $invalidPageValue]);
+
+            $response = $controller->index($request);
+
+            $this->assertSame(1, $response->getData()['results']->currentPage());
+            $this->assertInstanceOf(LengthAwarePaginator::class, $response->getData()['results']);
+        }
+    }
+
     private function createSchema(): void
     {
         Schema::create('settings', function (Blueprint $table): void {

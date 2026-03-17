@@ -48,6 +48,8 @@ Multi-pane terminal orchestrator at `app/Services/Tmux/`. Components: `TmuxSessi
 PHPUnit only (no Pest). Create tests: `php artisan make:test --phpunit {name}`
 
 - In-memory SQLite (`DB_CONNECTION=testing`)
+- App boot can hit `Settings::settingValue()` via `CategorizationPipeline` (`app/Providers/CategorizationServiceProvider.php` → `app/Services/Categorization/CategorizationPipeline.php`), even in focused controller tests
+- For isolated tests that bypass the normal app test DB setup, create a minimal `settings` table/rows first; `categorizeforeign` and `catwebdl` are the minimum keys needed for this bootstrap path
 - All HTTP mocked - no real API calls
 - Suites: `Install`, `Unit`, `Feature` (also `tests/Integration/` for live API tests, not in CI)
 - Use model factories; check for custom states first
