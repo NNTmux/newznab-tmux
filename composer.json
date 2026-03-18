@@ -75,7 +75,7 @@
         "monolog/monolog": "^3.8",
         "nesbot/carbon": "^3.8",
         "php-ffmpeg/php-ffmpeg": "^1.3",
-        "pragmarx/google2fa-laravel": "^2.3",
+        "pragmarx/google2fa-laravel": "^3.0",
         "predis/predis": "^v3.0.0",
         "propaganistas/laravel-disposable-email": "^2.4",
         "riari/laravel-forum": "^7.0",
