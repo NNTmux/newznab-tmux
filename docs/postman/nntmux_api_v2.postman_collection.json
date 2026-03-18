@@ -1,0 +1,580 @@
+{
+  "info": {
+    "_postman_id": "5f2f7e0b-66a9-4d0f-9f68-2a0e7ac5d4f2",
+    "name": "NNTmux API v2",
+    "description": "Code-aligned collection for NNTmux `/api/v2` endpoints.\n\nSource references:\n- routes/api.php\n- app/Http/Controllers/Api/ApiV2Controller.php\n- app/Transformers/ApiTransformer.php\n- app/Transformers/DetailsTransformer.php\n\nNotes:\n- `capabilities` is public.\n- Other endpoints require `api_token` query param and may also be guarded by `auth:api` middleware depending on server auth setup.\n- `details` returns a single object (`link` field), while search endpoints return an envelope with `Results` (`url` field).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://example.com"
+    },
+    {
+      "key": "apiToken",
+      "value": "replace-with-user-api-token"
+    },
+    {
+      "key": "guid",
+      "value": "replace-with-release-guid"
+    }
+  ],
+  "item": [
+    {
+      "name": "Capabilities",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "description": "Public capabilities endpoint with server info, registration flags, supported search params, and category tree.",
+        "url": {
+          "raw": "{{baseUrl}}/api/v2/capabilities",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v2",
+            "capabilities"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK - Capabilities",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/capabilities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "capabilities"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"server\": {\n    \"title\": \"NNTmux\",\n    \"strapline\": \"High speed indexing\",\n    \"email\": \"admin@example.com\",\n    \"url\": \"https://example.com\"\n  },\n  \"limits\": {\n    \"max\": 100,\n    \"default\": 100\n  },\n  \"searching\": {\n    \"search\": {\n      \"available\": \"yes\",\n      \"supportedParams\": \"id\"\n    },\n    \"tv-search\": {\n      \"available\": \"yes\",\n      \"supportedParams\": \"id,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep\"\n    },\n    \"movie-search\": {\n      \"available\": \"yes\",\n      \"supportedParams\": \"id, imdbid, tmdbid, traktid\"\n    },\n    \"audio-search\": {\n      \"available\": \"no\",\n      \"supportedParams\": \"\"\n    }\n  },\n  \"registration\": {\n    \"available\": \"no\",\n    \"open\": \"yes\"\n  },\n  \"categories\": [\n    {\n      \"id\": 2000,\n      \"name\": \"Movies\",\n      \"subcategories\": {\n        \"2030\": \"SD\",\n        \"2040\": \"HD\"\n      }\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "Search",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "description": "General search. If `id` is omitted, backend returns browse-style recent releases using provided filters.",
+        "url": {
+          "raw": "{{baseUrl}}/api/v2/search?api_token={{apiToken}}&id=linux&cat=1000,2000&offset=0&limit=100&maxage=30&minsize=0",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v2",
+            "search"
+          ],
+          "query": [
+            {
+              "key": "api_token",
+              "value": "{{apiToken}}"
+            },
+            {
+              "key": "id",
+              "value": "linux",
+              "description": "Search text (optional)."
+            },
+            {
+              "key": "cat",
+              "value": "1000,2000",
+              "description": "Comma-separated categories (optional)."
+            },
+            {
+              "key": "offset",
+              "value": "0"
+            },
+            {
+              "key": "limit",
+              "value": "100"
+            },
+            {
+              "key": "maxage",
+              "value": "30"
+            },
+            {
+              "key": "minsize",
+              "value": "0"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK - Search Results",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/search?api_token={{apiToken}}&id=linux&cat=1000,2000&offset=0&limit=100&maxage=30&minsize=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "api_token",
+                  "value": "{{apiToken}}"
+                },
+                {
+                  "key": "id",
+                  "value": "linux"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"Total\": 123,\n  \"apiCurrent\": 2,\n  \"apiMax\": 1000,\n  \"grabCurrent\": 1,\n  \"grabMax\": 100,\n  \"apiOldestTime\": \"Wed, 20 Nov 2024 12:00:00 +0000\",\n  \"grabOldestTime\": \"\",\n  \"Results\": [\n    {\n      \"title\": \"Linux.ISO.Collection.2024-11\",\n      \"details\": \"https://example.com/details/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n      \"url\": \"https://example.com/getnzb?id=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.nzb&r=replace-with-user-api-token\",\n      \"category\": 4050,\n      \"category_name\": \"PC > 0day\",\n      \"added\": \"Wed, 20 Nov 2024 12:00:00 +0000\",\n      \"size\": 734003200,\n      \"files\": 55,\n      \"grabs\": null,\n      \"comments\": null,\n      \"password\": 0,\n      \"usenetdate\": \"Wed, 20 Nov 2024 10:00:00 +0000\"\n    }\n  ]\n}"
+        },
+        {
+          "name": "403 Forbidden - Missing or Invalid API Key",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/search?id=linux",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "linux"
+                }
+              ]
+            }
+          },
+          "status": "Forbidden",
+          "code": 403,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"error\": \"Missing or invalid API key\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "TV Search",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "description": "TV-focused search by external IDs and/or title. Daily episode lookup is supported with `season=YYYY` and `ep=MM/DD`.",
+        "url": {
+          "raw": "{{baseUrl}}/api/v2/tv?api_token={{apiToken}}&id=law and order&season=7&ep=12&tvdbid=153021",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v2",
+            "tv"
+          ],
+          "query": [
+            {
+              "key": "api_token",
+              "value": "{{apiToken}}"
+            },
+            {
+              "key": "id",
+              "value": "law and order",
+              "description": "Title query (optional)."
+            },
+            {
+              "key": "season",
+              "value": "7"
+            },
+            {
+              "key": "ep",
+              "value": "12"
+            },
+            {
+              "key": "tvdbid",
+              "value": "153021",
+              "description": "Optional external IDs: vid, tvdbid, traktid, rid, tvmazeid, imdbid, tmdbid."
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK - TV Results",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/tv?api_token={{apiToken}}&id=law and order&season=7&ep=12&tvdbid=153021",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "tv"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"Total\": 1,\n  \"apiCurrent\": 5,\n  \"apiMax\": 1000,\n  \"grabCurrent\": 1,\n  \"grabMax\": 100,\n  \"apiOldestTime\": \"Wed, 20 Nov 2024 12:00:00 +0000\",\n  \"grabOldestTime\": \"\",\n  \"Results\": [\n    {\n      \"title\": \"Law.And.Order.S07E12.1080p.WEB-DL\",\n      \"details\": \"https://example.com/details/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\n      \"url\": \"https://example.com/getnzb?id=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.nzb&r=replace-with-user-api-token\",\n      \"category\": 5040,\n      \"category_name\": \"TV > HD\",\n      \"added\": \"Wed, 20 Nov 2024 12:30:00 +0000\",\n      \"size\": 1450971565,\n      \"files\": 44,\n      \"grabs\": 3,\n      \"comments\": 0,\n      \"password\": 0,\n      \"usenetdate\": \"Wed, 20 Nov 2024 10:30:00 +0000\",\n      \"episode_title\": \"Final Answer\",\n      \"season\": \"7\",\n      \"episode\": \"12\",\n      \"tvairdate\": \"2024-11-19\",\n      \"tvdbid\": 153021,\n      \"traktid\": 1393,\n      \"tvrageid\": null,\n      \"tvmazeid\": 73,\n      \"imdbid\": 1520211,\n      \"tmdbid\": 1402\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "Movie Search",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "description": "Movie search by identifiers (`imdbid`, `tmdbid`, `traktid`) and/or title (`id`).",
+        "url": {
+          "raw": "{{baseUrl}}/api/v2/movies?api_token={{apiToken}}&imdbid=1418646&cat=2030,2040",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v2",
+            "movies"
+          ],
+          "query": [
+            {
+              "key": "api_token",
+              "value": "{{apiToken}}"
+            },
+            {
+              "key": "imdbid",
+              "value": "1418646"
+            },
+            {
+              "key": "cat",
+              "value": "2030,2040"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK - Movie Results",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/movies?api_token={{apiToken}}&imdbid=1418646&cat=2030,2040",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "movies"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"Total\": 1,\n  \"apiCurrent\": 8,\n  \"apiMax\": 1000,\n  \"grabCurrent\": 1,\n  \"grabMax\": 100,\n  \"apiOldestTime\": \"Wed, 20 Nov 2024 12:00:00 +0000\",\n  \"grabOldestTime\": \"\",\n  \"Results\": [\n    {\n      \"title\": \"Movie.Title.2024.1080p.BluRay.x264\",\n      \"details\": \"https://example.com/details/cccccccccccccccccccccccccccccccc\",\n      \"url\": \"https://example.com/getnzb?id=cccccccccccccccccccccccccccccccc.nzb&r=replace-with-user-api-token\",\n      \"category\": 2040,\n      \"category_name\": \"Movies > HD\",\n      \"added\": \"Wed, 20 Nov 2024 12:15:00 +0000\",\n      \"size\": 2854971565,\n      \"files\": 77,\n      \"grabs\": 12,\n      \"comments\": 2,\n      \"password\": 0,\n      \"usenetdate\": \"Wed, 20 Nov 2024 09:00:00 +0000\",\n      \"imdbid\": 1418646,\n      \"tmdbid\": 43418,\n      \"traktid\": 29200\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "Details",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "description": "Single release lookup by GUID. Returns one object (not search envelope).",
+        "url": {
+          "raw": "{{baseUrl}}/api/v2/details?api_token={{apiToken}}&id={{guid}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v2",
+            "details"
+          ],
+          "query": [
+            {
+              "key": "api_token",
+              "value": "{{apiToken}}"
+            },
+            {
+              "key": "id",
+              "value": "{{guid}}"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "200 OK - Release Details",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/details?api_token={{apiToken}}&id={{guid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "details"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"title\": \"Some.Show.S01E01.720p.WEB-DL\",\n  \"details\": \"https://example.com/details/dddddddddddddddddddddddddddddddd\",\n  \"link\": \"https://example.com/getnzb?id=dddddddddddddddddddddddddddddddd.nzb&r=replace-with-user-api-token\",\n  \"category\": 5030,\n  \"category_name\": \"TV > SD\",\n  \"added\": \"Wed, 20 Nov 2024 12:00:00 +0000\",\n  \"size\": 450971565,\n  \"files\": 44,\n  \"grabs\": 3,\n  \"comments\": 0,\n  \"password\": 0,\n  \"usenetdate\": \"Wed, 20 Nov 2024 10:00:00 +0000\",\n  \"tvairdate\": \"2024-11-19\",\n  \"tvdbid\": 12345,\n  \"traktid\": 67890,\n  \"tvrageid\": null,\n  \"tvmazeid\": null,\n  \"imdbid\": 1234567,\n  \"tmdbid\": 98765\n}"
+        },
+        {
+          "name": "400 Bad Request - Missing GUID",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/details?api_token={{apiToken}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "details"
+              ]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"error\": \"Missing parameter (guid is required for single release details)\"\n}"
+        },
+        {
+          "name": "403 Forbidden - Missing or Invalid API Key",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/details?id={{guid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "details"
+              ]
+            }
+          },
+          "status": "Forbidden",
+          "code": 403,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"error\": \"Missing or invalid API key\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Get NZB",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "description": "Redirects to the NZB download endpoint when GUID exists. Optional `del=1` forwards delete-on-download behavior.",
+        "url": {
+          "raw": "{{baseUrl}}/api/v2/getnzb?api_token={{apiToken}}&id={{guid}}&del=1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v2",
+            "getnzb"
+          ],
+          "query": [
+            {
+              "key": "api_token",
+              "value": "{{apiToken}}"
+            },
+            {
+              "key": "id",
+              "value": "{{guid}}"
+            },
+            {
+              "key": "del",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "302 Found - Redirect to Download",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/getnzb?api_token={{apiToken}}&id={{guid}}&del=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "getnzb"
+              ]
+            }
+          },
+          "status": "Found",
+          "code": 302,
+          "_postman_previewlanguage": "text",
+          "header": [
+            {
+              "key": "Location",
+              "value": "https://example.com/getnzb?r=replace-with-user-api-token&id=replace-with-release-guid&del=1"
+            }
+          ],
+          "cookie": [],
+          "body": ""
+        },
+        {
+          "name": "404 Not Found - GUID Missing in Database",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/getnzb?api_token={{apiToken}}&id=not-a-real-guid",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "getnzb"
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"data\": \"No such item (the guid you provided has no release in our database)\"\n}"
+        },
+        {
+          "name": "403 Forbidden - Missing or Invalid API Key",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v2/getnzb?id={{guid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "getnzb"
+              ]
+            }
+          },
+          "status": "Forbidden",
+          "code": 403,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"error\": \"Missing or invalid API key\"\n}"
+        }
+      ]
+    }
+  ]
+}
+
