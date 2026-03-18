@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Bhuvidya\Countries\CountriesSeeder;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,7 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         // $this->call(UsersTableSeeder::class);
         // \App\Models\User::factory(10)->create();
-        $this->call(CountriesSeeder::class);
+        $this->call(CountriesTableSeeder::class);
         $this->call(RootCategoriesTableSeeder::class);
         $this->call(CategoriesTableSeeder::class);
         $this->call(CategoryRegexesTableSeeder::class);

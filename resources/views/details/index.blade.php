@@ -454,7 +454,7 @@
                     // Get country name from country code
                     $countryName = null;
                     if (!empty($anidbCountry)) {
-                        $country = \App\Models\Country::where('iso_3166_2', $anidbCountry)->first();
+                        $country = \App\Models\Country::query()->find($anidbCountry);
                         $countryName = $country->name ?? $anidbCountry;
                     }
 

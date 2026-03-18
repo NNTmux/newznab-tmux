@@ -667,10 +667,10 @@ if (! function_exists('countryCode')) {
     function countryCode(string $country): string
     {
         if (\strlen($country) > 2) {
-            $code = CountryModel::whereFullName($country)->orWhere('name', $country)->first(['iso_3166_2']);
-            if ($code !== null && isset($code['iso_3166_2'])) {
-                return $code['iso_3166_2'];
-            }
+            return CountryModel::query()
+                ->where('full_name', $country)
+                ->orWhere('name', $country)
+                ->value('iso_3166_2') ?? '';
         }
 
         return '';
