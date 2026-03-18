@@ -53,7 +53,6 @@
         "dariusiii/rarinfo": "^3.0",
         "dariusiii/tv-maze-php-api": "^2.0.0",
         "fakerphp/faker": "^1.23",
-        "genealabs/laravel-caffeine": "^12.0",
         "geoip2/geoip2": "^3.1",
         "guzzlehttp/guzzle": "^7.9",
         "intervention/image": "^3.11",

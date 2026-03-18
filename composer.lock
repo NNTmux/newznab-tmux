@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8e894d46d3dd39e448e4a09d40c19504",
+    "content-hash": "290f455ccdb1cdfccdea94777666bf74",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -1690,67 +1690,6 @@
                 }
             ],
             "time": "2025-12-03T09:33:47+00:00"
-        },
-        {
-            "name": "genealabs/laravel-caffeine",
-            "version": "12.0.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mikebronner/laravel-caffeine.git",
-                "reference": "79a3cb163f1d3c79a004725cbd9ee17ed9e06415"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mikebronner/laravel-caffeine/zipball/79a3cb163f1d3c79a004725cbd9ee17ed9e06415",
-                "reference": "79a3cb163f1d3c79a004725cbd9ee17ed9e06415",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/routing": "^10.0|^11.0|^12.0",
-                "illuminate/support": "^10.0|^11.0|^12.0"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^10.0",
-                "orchestra/testbench-browser-kit": "^10.0",
-                "orchestra/testbench-dusk": "^10.0",
-                "phpmd/phpmd": "^2.13",
-                "phpunit/phpunit": "^11.5.3"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "GeneaLabs\\LaravelCaffeine\\Providers\\Service"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "GeneaLabs\\LaravelCaffeine\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Mike Bronner",
-                    "email": "hello@genealabs.com"
-                }
-            ],
-            "description": "Keeping Your Laravel Forms Awake",
-            "support": {
-                "issues": "https://github.com/mikebronner/laravel-caffeine/issues",
-                "source": "https://github.com/mikebronner/laravel-caffeine/tree/12.0.3"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/mikebronner",
-                    "type": "github"
-                }
-            ],
-            "time": "2025-03-18T12:36:36+00:00"
         },
         {
             "name": "geoip2/geoip2",
