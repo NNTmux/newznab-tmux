@@ -121,10 +121,6 @@
         {
             "type": "vcs",
             "url": "https://github.com/DariusIII/Net_NNTP"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/DariusIII/tmdbapi"
         }
     ],
     "minimum-stability": "dev",
