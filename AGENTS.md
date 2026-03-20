@@ -49,7 +49,7 @@ PHPUnit only (no Pest). Create tests: `php artisan make:test --phpunit {name}`
 
 - In-memory SQLite (`DB_CONNECTION=testing`)
 - App boot can hit `Settings::settingValue()` via `CategorizationPipeline` (`app/Providers/CategorizationServiceProvider.php` → `app/Services/Categorization/CategorizationPipeline.php`), even in focused controller tests
-- For isolated tests that bypass the normal app test DB setup, create a minimal `settings` table/rows first; `categorizeforeign` and `catwebdl` are the minimum keys needed for this bootstrap path
+- For isolated tests that bypass the normal app test DB setup, seed a minimal `settings` table before app bootstrap; `categorizeforeign` and `catwebdl` are the minimum keys needed for this path, and `tests/Feature/AdminContentControllerTest.php` shows the file-backed SQLite workaround when `php artisan test` would otherwise fail during startup
 - All HTTP mocked - no real API calls
 - Suites: `Install`, `Unit`, `Feature` (also `tests/Integration/` for live API tests, not in CI)
 - Use model factories; check for custom states first
@@ -113,6 +113,7 @@ Blade + TailwindCSS v4 + Vite bundling. Run `npm run build` after changes.
 - **Alpine.js**: CSP-safe build with component architecture in `resources/js/alpine/`
   - Core components loaded eagerly in `alpine/index.js`
   - Page-specific components lazy-loaded via `alpine/lazy-loader.js`
+  - Lazy-loaded pages must declare an `x-data` name that matches a key in `alpine/lazy-loader.js`, or the component JS will never load; example: `resources/views/admin/content/index.blade.php` uses `x-data="contentToggle"` so delete/toggle handlers from `resources/js/alpine/components/content-toggle.js` are available
   - Stores in `alpine/stores/`, components in `alpine/components/`
 - **CSS**: Main entry is `resources/css/app.css` (imports `csp-safe.css` for component styles)
 - **Vite entry points**: `resources/js/app.js`, `resources/css/app.css`, plus forum assets

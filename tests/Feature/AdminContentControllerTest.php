@@ -197,6 +197,39 @@ class AdminContentControllerTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Untitled');
+        $response->assertSee('x-data="contentToggle"', false);
+        $response->assertSee('x-on:click.prevent="deleteContent(', false);
+    }
+
+    public function test_admin_can_delete_content_via_ajax(): void
+    {
+        $admin = $this->createUserWithRole('Admin');
+        /** @var Authenticatable $authenticatedAdmin */
+        $authenticatedAdmin = $admin;
+
+        $content = Content::query()->create([
+            'title' => 'Delete Me',
+            'url' => '/delete-me/',
+            'body' => '<p>Delete me</p>',
+            'metadescription' => 'Delete me description',
+            'metakeywords' => 'delete',
+            'contenttype' => Content::TYPE_USEFUL,
+            'status' => Content::STATUS_ENABLED,
+            'ordinal' => 3,
+            'role' => Content::ROLE_EVERYONE,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->actingAs($authenticatedAdmin)
+            ->postJson(route('admin.content-delete'), ['id' => $content->id]);
+
+        $response->assertOk();
+        $response->assertJson([
+            'success' => true,
+            'message' => 'Content deleted successfully',
+        ]);
+        $this->assertDatabaseMissing('content', ['id' => $content->id]);
     }
 
     private function createSchema(): void

@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-6">
+<div class="space-y-6" x-data="contentToggle">
     <x-admin.card>
         <x-admin.page-header :title="$title" icon="fas fa-file-alt">
             <x-slot:actions>
@@ -90,6 +90,7 @@
                                         class="content-toggle-status text-{{ $item->status == 1 ? 'green' : 'gray' }}-600 dark:text-{{ $item->status == 1 ? 'green' : 'gray' }}-400 hover:text-{{ $item->status == 1 ? 'green' : 'gray' }}-900 dark:hover:text-{{ $item->status == 1 ? 'green' : 'gray' }}-300"
                                         data-content-id="{{ $item->id }}"
                                         data-current-status="{{ $item->status }}"
+                                        x-on:click.prevent="toggleStatus({{ $item->id }}, {{ $item->status }}, $el)"
                                         title="{{ $item->status == 1 ? 'Disable' : 'Enable' }}">
                                     <i class="fas fa-toggle-{{ $item->status == 1 ? 'on' : 'off' }}"></i>
                                 </button>
@@ -97,6 +98,7 @@
                                         class="content-delete text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                                         data-content-id="{{ $item->id }}"
                                         data-content-title="{{ filled($item->title) ? $item->title : 'Untitled' }}"
+                                        x-on:click.prevent="deleteContent({{ $item->id }}, @js(filled($item->title) ? $item->title : 'Untitled'), $el)"
                                         title="Delete">
                                     <i class="fas fa-trash"></i>
                                 </button>
