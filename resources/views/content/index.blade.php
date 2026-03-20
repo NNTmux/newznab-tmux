@@ -10,7 +10,7 @@
                     @foreach($content as $item)
                         <article class="surface-panel rounded-lg shadow-md p-6 border hover:shadow-lg transition-shadow duration-200">
                             <div class="prose max-w-none">
-                                @if(isset($item->title))
+                                @if(filled($item->title))
                                     <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ $item->title }}</h1>
                                 @endif
 
@@ -50,7 +50,7 @@
                             <div class="surface-panel-alt rounded-lg p-6 hover:shadow-md transition">
                                 <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">
                                     <a href="{{ url('/content?page=content&id=' . $item->id) }}" class="hover:text-primary-600 dark:hover:text-primary-400 transition">
-                                        {{ $item->title ?? 'Untitled' }}
+                                        {{ filled($item->title) ? $item->title : 'Untitled' }}
                                     </a>
                                 </h3>
 

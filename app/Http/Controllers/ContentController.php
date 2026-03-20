@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Content;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -60,7 +61,7 @@ class ContentController extends BasePageController
             $content = $this->getFrontPageContent()->all();
             $index = $this->getIndexContent();
             $isFront = true;
-            $meta_title = $index->title ?? 'Contents page';
+            $meta_title = filled($index?->title) ? $index->title : 'Contents page';
             $meta_keywords = $index->metakeywords ?? 'contents';
             $meta_description = $index->metadescription ?? 'This is the contents page.';
         }
@@ -86,7 +87,7 @@ class ContentController extends BasePageController
      *
      * @return Collection<int, mixed>
      */
-    protected function getActiveContent(): \Illuminate\Database\Eloquent\Collection // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
+    protected function getActiveContent(): Collection // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
     {
         return Content::active()
             ->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')
@@ -98,7 +99,7 @@ class ContentController extends BasePageController
      *
      * @return Collection<int, mixed>
      */
-    protected function getAllButFront(): \Illuminate\Database\Eloquent\Collection // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
+    protected function getAllButFront(): Collection // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
     {
         return Content::query()
             ->where('id', '<>', 1)
@@ -122,7 +123,7 @@ class ContentController extends BasePageController
      *
      * @return Collection<int, mixed>
      */
-    protected function getFrontPageContent(): \Illuminate\Database\Eloquent\Collection // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
+    protected function getFrontPageContent(): Collection // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
     {
         return Content::frontPage()->get();
     }

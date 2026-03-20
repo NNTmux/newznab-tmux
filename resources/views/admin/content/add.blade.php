@@ -1,6 +1,10 @@
 @extends('layouts.admin')
 
 @section('content')
+@php
+    $contentId = old('id', data_get($content, 'id', ''));
+    $isEditing = filled($contentId);
+@endphp
 <div class="space-y-6" x-data="tinyMceEditor">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
         <!-- Header -->
@@ -11,25 +15,31 @@
         </div>
 
         <!-- Content Form -->
-        <form method="post" action="{{ url('admin/content-add') }}" class="p-6">
+        <form method="post" action="{{ route('admin.content-add') }}" class="p-6">
             @csrf
             <input type="hidden" name="action" value="submit">
-            @if(!empty($content['id']))
-                <input type="hidden" name="id" value="{{ is_array($content) ? $content['id'] : $content->id }}">
+            @if($isEditing)
+                <input type="hidden" name="id" value="{{ $contentId }}">
             @endif
 
             <div class="space-y-6">
                 <!-- Title -->
                 <div>
                     <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Title <span class="text-red-500">*</span>
+                        Title @if($isEditing)<span class="text-red-500">*</span>@else<span class="text-gray-400 dark:text-gray-500">(optional)</span>@endif
                     </label>
                     <input type="text"
                            id="title"
                            name="title"
-                           value="{{ is_array($content) ? ($content['title'] ?? '') : ($content->title ?? '') }}"
-                           required
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                           value="{{ old('title', data_get($content, 'title', '')) }}"
+                           @if($isEditing) required @endif
+                           class="w-full px-3 py-2 border {{ $errors->has('title') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        {{ $isEditing ? 'Required when updating existing content.' : 'Leave blank to create content without a page title.' }}
+                    </p>
+                    @error('title')
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- URL -->
@@ -40,10 +50,13 @@
                     <input type="text"
                            id="url"
                            name="url"
-                           value="{{ is_array($content) ? ($content['url'] ?? '') : ($content->url ?? '') }}"
+                           value="{{ old('url', data_get($content, 'url', '')) }}"
                            placeholder="/page-slug or https://example.com"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400">
+                           class="w-full px-3 py-2 border {{ $errors->has('url') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400">
                     <p class="mt-1 text-sm text-gray-500">Internal URL (e.g., /about) or external URL (e.g., https://example.com)</p>
+                    @error('url')
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Body -->
@@ -55,8 +68,11 @@
                               name="body"
                               rows="15"
                               data-tinymce-api-key="{{ config('tinymce.api_key', 'no-api-key') }}"
-                              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">{{ is_array($content) ? trim(($content['body'] ?? ''), '\'"') : trim(($content->body ?? ''), '\'"') }}</textarea>
+                              class="w-full px-3 py-2 border {{ $errors->has('body') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">{{ old('body', is_string(data_get($content, 'body')) ? trim((string) data_get($content, 'body'), '\'"') : '') }}</textarea>
                     <p class="mt-1 text-sm text-gray-500">Use the rich text editor to format your content</p>
+                    @error('body')
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -68,14 +84,17 @@
                         <select id="contenttype"
                                 name="contenttype"
                                 required
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                                class="w-full px-3 py-2 border {{ $errors->has('contenttype') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                             @foreach($contenttypelist as $typeId => $typeName)
                                 <option value="{{ $typeId }}"
-                                    {{ (is_array($content) ? ($content['contenttype'] ?? '') : ($content->contenttype ?? '')) == $typeId ? 'selected' : '' }}>
+                                    {{ (string) old('contenttype', data_get($content, 'contenttype', '')) === (string) $typeId ? 'selected' : '' }}>
                                     {{ $typeName }}
                                 </option>
                             @endforeach
                         </select>
+                        @error('contenttype')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <!-- Role -->
@@ -86,14 +105,17 @@
                         <select id="role"
                                 name="role"
                                 required
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                                class="w-full px-3 py-2 border {{ $errors->has('role') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                             @foreach($rolelist as $roleId => $roleName)
                                 <option value="{{ $roleId }}"
-                                    {{ (is_array($content) ? ($content['role'] ?? '') : ($content->role ?? '')) == $roleId ? 'selected' : '' }}>
+                                    {{ (string) old('role', data_get($content, 'role', '')) === (string) $roleId ? 'selected' : '' }}>
                                     {{ $roleName }}
                                 </option>
                             @endforeach
                         </select>
+                        @error('role')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <!-- Status -->
@@ -104,14 +126,17 @@
                         <select id="status"
                                 name="status"
                                 required
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                                class="w-full px-3 py-2 border {{ $errors->has('status') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                             @foreach($status_ids as $index => $statusId)
                                 <option value="{{ $statusId }}"
-                                    {{ (is_array($content) ? ($content['status'] ?? '') : ($content->status ?? '')) == $statusId ? 'selected' : '' }}>
+                                    {{ (string) old('status', data_get($content, 'status', '')) === (string) $statusId ? 'selected' : '' }}>
                                     {{ $status_names[$index] }}
                                 </option>
                             @endforeach
                         </select>
+                        @error('status')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <!-- Ordinal -->
@@ -122,9 +147,12 @@
                         <input type="number"
                                id="ordinal"
                                name="ordinal"
-                               value="{{ is_array($content) ? ($content['ordinal'] ?? 0) : ($content->ordinal ?? 0) }}"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                               value="{{ old('ordinal', data_get($content, 'ordinal', 0)) }}"
+                               class="w-full px-3 py-2 border {{ $errors->has('ordinal') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                         <p class="mt-1 text-sm text-gray-500">Lower numbers appear first</p>
+                        @error('ordinal')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
@@ -136,8 +164,11 @@
                     <textarea id="metadescription"
                               name="metadescription"
                               rows="3"
-                              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">{{ is_array($content) ? ($content['metadescription'] ?? '') : ($content->metadescription ?? '') }}</textarea>
+                              class="w-full px-3 py-2 border {{ $errors->has('metadescription') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">{{ old('metadescription', data_get($content, 'metadescription', '')) }}</textarea>
                     <p class="mt-1 text-sm text-gray-500">SEO meta description</p>
+                    @error('metadescription')
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Meta Keywords -->
@@ -148,17 +179,20 @@
                     <input type="text"
                            id="metakeywords"
                            name="metakeywords"
-                           value="{{ is_array($content) ? ($content['metakeywords'] ?? '') : ($content->metakeywords ?? '') }}"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                           value="{{ old('metakeywords', data_get($content, 'metakeywords', '')) }}"
+                           class="w-full px-3 py-2 border {{ $errors->has('metakeywords') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                     <p class="mt-1 text-sm text-gray-500">Comma-separated keywords for SEO</p>
+                    @error('metakeywords')
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <!-- Action Buttons -->
                 <div class="flex gap-3 pt-4 border-t border-gray-200">
                     <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
-                        <i class="fas fa-save mr-2"></i>{{ !empty($content['id']) ? 'Update' : 'Create' }} Content
+                        <i class="fas fa-save mr-2"></i>{{ $isEditing ? 'Update' : 'Create' }} Content
                     </button>
-                    <a href="{{ url('admin/content-list') }}" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
+                    <a href="{{ route('admin.content-list') }}" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
                         <i class="fas fa-times mr-2"></i>Cancel
                     </a>
                 </div>

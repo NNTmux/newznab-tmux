@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
+use App\Http\Requests\Admin\AdminContentRequest;
 use App\Models\Content;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
@@ -43,7 +44,7 @@ class AdminContentController extends BasePageController
      *
      * @throws \Exception
      */
-    public function create(Request $request)
+    public function create(AdminContentRequest $request)
     {
         $this->setAdminPrefs();
         $meta_title = 'Content Add';
@@ -73,15 +74,20 @@ class AdminContentController extends BasePageController
                 break;
 
             case 'submit':
-                // Validate and add or update content
+                $validated = $request->validated();
+
                 if ($request->missing('id') || empty($request->input('id'))) {
-                    $returnid = $this->addContent($request->all());
+                    $returnid = $this->addContent($validated);
+                    $message = 'Content created successfully';
                 } else {
-                    $this->updateContent($request->all());
-                    $returnid = $request->input('id');
+                    $this->updateContent($validated);
+                    $returnid = (int) $request->input('id');
+                    $message = 'Content updated successfully';
                 }
 
-                return redirect('admin/content-add?id='.$returnid);
+                return redirect()
+                    ->route('admin.content-add', ['id' => $returnid])
+                    ->with('success', $message);
 
             case 'view':
             default:

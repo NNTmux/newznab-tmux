@@ -28,7 +28,7 @@
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $item->id }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $item->title }}</div>
+                            <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ filled($item->title) ? $item->title : 'Untitled' }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                             @if(!empty($item->url))
@@ -96,7 +96,7 @@
                                 <button type="button"
                                         class="content-delete text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                                         data-content-id="{{ $item->id }}"
-                                        data-content-title="{{ $item->title }}"
+                                        data-content-title="{{ filled($item->title) ? $item->title : 'Untitled' }}"
                                         title="Delete">
                                     <i class="fas fa-trash"></i>
                                 </button>
