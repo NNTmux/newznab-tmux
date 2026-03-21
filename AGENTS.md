@@ -9,6 +9,7 @@ php artisan test --compact --filter=TestName  # Run single test (PHPUnit only)
 ./vendor/bin/pint --dirty                     # Format changed files
 php artisan tmux:start                        # Start processing engine
 npm run build                                 # Required after frontend changes
+php artisan route:cache                       # Refresh cached routes if new routes seem missing
 ```
 
 ## Architecture
@@ -76,6 +77,15 @@ PHPUnit only (no Pest). Create tests: `php artisan make:test --phpunit {name}`
 ### Commands
 - 80+ auto-registered in `app/Console/Commands/`
 - Create with `php artisan make:` + `--no-interaction`
+- This workspace may have cached routes (`bootstrap/cache/routes-v7.php`); after adding/changing routes, refresh with `php artisan route:cache` if a route appears missing
+
+### Admin Content
+- Admin content ordering is scoped by `contenttype`, not global: Homepage rows only reorder Homepage rows, Useful Links only reorder Useful Links
+- The admin list at `resources/views/admin/content/index.blade.php` renders one draggable table per content group and uses Alpine component `contentToggle`
+- `resources/js/alpine/components/content-toggle.js` is the integration point for admin content interactions: grouped drag ordering, enable/disable toggles, and delete confirmations all live there
+- Reorder requests go to `AdminContentController::reorder()` and must include the exact ID set for one `contenttype`; mixed-type or partial payloads are rejected
+- The ordinal field is intentionally hidden on `resources/views/admin/content/add.blade.php`; the server assigns new items to the bottom of their own group in `AdminContentController::nextBottomOrdinal()`
+- Deleting content does not renumber remaining items; gaps in per-group ordinals are expected
 
 ## Code Formatting
 
