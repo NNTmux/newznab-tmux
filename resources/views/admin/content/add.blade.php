@@ -139,21 +139,6 @@
                         @enderror
                     </div>
 
-                    <!-- Ordinal -->
-                    <div>
-                        <label for="ordinal" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Order (Ordinal)
-                        </label>
-                        <input type="number"
-                               id="ordinal"
-                               name="ordinal"
-                               value="{{ old('ordinal', data_get($content, 'ordinal', 0)) }}"
-                               class="w-full px-3 py-2 border {{ $errors->has('ordinal') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
-                        <p class="mt-1 text-sm text-gray-500">Lower numbers appear first</p>
-                        @error('ordinal')
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                        @enderror
-                    </div>
                 </div>
 
                 <!-- Meta Description -->

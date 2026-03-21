@@ -89,9 +89,7 @@ class ContentController extends BasePageController
      */
     protected function getActiveContent(): Collection // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
     {
-        return Content::active()
-            ->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')
-            ->get();
+        return Content::active()->ordered()->get(); // @phpstan-ignore method.notFound
     }
 
     /**
@@ -103,7 +101,7 @@ class ContentController extends BasePageController
     {
         return Content::query()
             ->where('id', '<>', 1)
-            ->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')
+            ->ordered() // @phpstan-ignore method.notFound
             ->get();
     }
 
@@ -133,6 +131,9 @@ class ContentController extends BasePageController
      */
     protected function getIndexContent(): ?Content
     {
-        return Content::active()->ofType(Content::TYPE_INDEX)->first();
+        return Content::active()
+            ->ofType(Content::TYPE_INDEX)
+            ->ordered() // @phpstan-ignore method.notFound
+            ->first();
     }
 }

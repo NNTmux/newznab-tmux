@@ -11,6 +11,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class AdminContentController extends BasePageController
@@ -24,12 +26,23 @@ class AdminContentController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $contentList = Content::query()
-            ->orderByRaw('contenttype, COALESCE(ordinal, 1000000)')
-            ->get();
+        $contentList = Content::query()->ordered()->get();
+        $contentGroups = $contentList
+            ->groupBy('contenttype')
+            ->sortKeys()
+            ->map(function ($items, $contentType) {
+                /** @var Collection<int, Content> $items */
+                return [
+                    'contenttype' => (int) $contentType,
+                    'label' => $items->first()?->getContentTypeLabel() ?? 'Unknown',
+                    'items' => $items,
+                ];
+            })
+            ->values();
 
         $this->viewData = array_merge($this->viewData, [
             'contentlist' => $contentList,
+            'contentGroups' => $contentGroups,
             'meta_title' => 'Content List',
             'title' => 'Content List',
         ]);
@@ -155,6 +168,63 @@ class AdminContentController extends BasePageController
     }
 
     /**
+     * Persist a new global content order.
+     */
+    public function reorder(Request $request): mixed
+    {
+        $validated = $request->validate([
+            'contenttype' => ['required', 'integer'],
+            'ordered_ids' => ['required', 'array', 'min:1'],
+            'ordered_ids.*' => ['integer', 'distinct', 'exists:content,id'],
+        ]);
+
+        $contentType = (int) $validated['contenttype'];
+        $orderedIds = array_map('intval', $validated['ordered_ids']);
+        $expectedIds = Content::query()
+            ->where('contenttype', $contentType)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        if (
+            count($orderedIds) !== count($expectedIds)
+            || array_diff($orderedIds, $expectedIds) !== []
+            || array_diff($expectedIds, $orderedIds) !== []
+        ) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Reorder payload must include every content row for the selected group.',
+            ], 422);
+        }
+
+        $timestamp = now();
+        $ordinals = [];
+
+        DB::transaction(function () use ($contentType, $orderedIds, $timestamp, &$ordinals): void {
+            foreach ($orderedIds as $index => $contentId) {
+                $ordinal = $index + 1;
+
+                Content::query()
+                    ->whereKey($contentId)
+                    ->where('contenttype', $contentType)
+                    ->update([
+                        'ordinal' => $ordinal,
+                        'updated_at' => $timestamp,
+                    ]);
+
+                $ordinals[$contentId] = $ordinal;
+            }
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Content order updated successfully',
+            'contenttype' => $contentType,
+            'ordinals' => $ordinals,
+        ]);
+    }
+
+    /**
      * Delete content by ID.
      */
     public function destroy(Request $request): mixed
@@ -200,11 +270,6 @@ class AdminContentController extends BasePageController
         // Normalize URL
         $data = $this->normalizeContentUrl($data);
 
-        // If ordinal is 1, increment all existing ordinals
-        if (($data['ordinal'] ?? 0) === 1) {
-            Content::query()->where('ordinal', '>', 0)->increment('ordinal');
-        }
-
         return Content::query()->insertGetId([
             'role' => $data['role'] ?? Content::ROLE_EVERYONE,
             'title' => $data['title'] ?? '',
@@ -214,7 +279,7 @@ class AdminContentController extends BasePageController
             'metakeywords' => $data['metakeywords'] ?? '',
             'contenttype' => $data['contenttype'] ?? Content::TYPE_USEFUL,
             'status' => $data['status'] ?? Content::STATUS_ENABLED,
-            'ordinal' => $data['ordinal'] ?? 0,
+            'ordinal' => $this->nextBottomOrdinal((int) ($data['contenttype'] ?? Content::TYPE_USEFUL)),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -230,8 +295,14 @@ class AdminContentController extends BasePageController
         // Normalize URL
         $data = $this->normalizeContentUrl($data);
 
+        $content = Content::query()->findOrFail($data['id']);
+        $updatedContentType = (int) ($data['contenttype'] ?? $content->contenttype);
+        $ordinal = $content->contenttype === $updatedContentType
+            ? $content->ordinal
+            : $this->nextBottomOrdinal($updatedContentType);
+
         return Content::query()
-            ->where('id', $data['id'])
+            ->whereKey($content->id)
             ->update([
                 'role' => $data['role'] ?? Content::ROLE_EVERYONE,
                 'title' => $data['title'] ?? '',
@@ -239,9 +310,9 @@ class AdminContentController extends BasePageController
                 'body' => $data['body'] ?? '',
                 'metadescription' => $data['metadescription'] ?? '',
                 'metakeywords' => $data['metakeywords'] ?? '',
-                'contenttype' => $data['contenttype'] ?? Content::TYPE_USEFUL,
+                'contenttype' => $updatedContentType,
                 'status' => $data['status'] ?? Content::STATUS_ENABLED,
-                'ordinal' => $data['ordinal'] ?? 0,
+                'ordinal' => $ordinal,
                 'updated_at' => now(),
             ]);
     }
@@ -285,5 +356,21 @@ class AdminContentController extends BasePageController
         }
 
         return $data;
+    }
+
+    /**
+     * Get the ordinal that places new content at the bottom of the list.
+     */
+    protected function nextBottomOrdinal(int $contentType): int
+    {
+        $maximumOrdinal = Content::query()
+            ->where('contenttype', $contentType)
+            ->max('ordinal');
+
+        if ($maximumOrdinal === null) {
+            return 1;
+        }
+
+        return (int) $maximumOrdinal + 1;
     }
 }

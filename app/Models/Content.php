@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Content ofType($type)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Content forRole($role)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Content frontPage()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Content ordered()
  *
  * @mixin \Eloquent
  *
@@ -122,13 +123,23 @@ class Content extends Model
     }
 
     /**
+     * Scope: Order content by type and ordinal within each type.
+     */
+    public function scopeOrdered(Builder $query): Builder // @phpstan-ignore missingType.generics
+    {
+        return $query
+            ->orderBy('contenttype')
+            ->orderByRaw('COALESCE(ordinal, 1000000) ASC, id ASC');
+    }
+
+    /**
      * Scope: Get front page content.
      */
     public function scopeFrontPage(Builder $query): Builder // @phpstan-ignore missingType.generics
     {
         return $query->active() // @phpstan-ignore method.notFound
             ->ofType(self::TYPE_INDEX)
-            ->orderByRaw('ordinal ASC, COALESCE(ordinal, 1000000), id');
+            ->ordered(); // @phpstan-ignore method.notFound
     }
 
     /**

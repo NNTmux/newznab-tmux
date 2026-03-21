@@ -232,6 +232,173 @@ class AdminContentControllerTest extends TestCase
         $this->assertDatabaseMissing('content', ['id' => $content->id]);
     }
 
+    public function test_admin_content_list_orders_by_lowest_ordinal_first_within_each_group(): void
+    {
+        $admin = $this->createUserWithRole('Admin');
+        /** @var Authenticatable $authenticatedAdmin */
+        $authenticatedAdmin = $admin;
+
+        $this->createContent([
+            'title' => 'Lower Ordinal',
+            'ordinal' => 2,
+        ]);
+
+        $this->createContent([
+            'title' => 'Higher Ordinal',
+            'ordinal' => 9,
+        ]);
+
+        $this->createContent([
+            'title' => 'Homepage First',
+            'contenttype' => Content::TYPE_INDEX,
+            'ordinal' => 1,
+        ]);
+
+        $this->createContent([
+            'title' => 'Homepage Second',
+            'contenttype' => Content::TYPE_INDEX,
+            'ordinal' => 3,
+        ]);
+
+        $response = $this->actingAs($authenticatedAdmin)->get(route('admin.content-list'));
+
+        $response->assertOk();
+        $response->assertSeeInOrder(['Lower Ordinal', 'Higher Ordinal']);
+        $response->assertSeeInOrder(['Homepage First', 'Homepage Second']);
+    }
+
+    public function test_admin_can_reorder_content_within_a_group_only(): void
+    {
+        $admin = $this->createUserWithRole('Admin');
+        /** @var Authenticatable $authenticatedAdmin */
+        $authenticatedAdmin = $admin;
+
+        $first = $this->createContent([
+            'title' => 'First',
+            'ordinal' => 30,
+        ]);
+
+        $second = $this->createContent([
+            'title' => 'Second',
+            'ordinal' => 20,
+        ]);
+
+        $third = $this->createContent([
+            'title' => 'Third',
+            'ordinal' => 10,
+        ]);
+
+        $homepage = $this->createContent([
+            'title' => 'Homepage Item',
+            'contenttype' => Content::TYPE_INDEX,
+            'ordinal' => 7,
+        ]);
+
+        $response = $this->actingAs($authenticatedAdmin)
+            ->postJson(route('admin.content-reorder'), [
+                'contenttype' => Content::TYPE_USEFUL,
+                'ordered_ids' => [$third->id, $first->id, $second->id],
+            ]);
+
+        $response->assertOk();
+        $response->assertJson([
+            'success' => true,
+            'message' => 'Content order updated successfully',
+        ]);
+
+        $this->assertSame(
+            [$third->id, $first->id, $second->id],
+            Content::query()->where('contenttype', Content::TYPE_USEFUL)->ordered()->pluck('id')->all()
+        );
+        $this->assertSame(1, $third->fresh()->ordinal);
+        $this->assertSame(2, $first->fresh()->ordinal);
+        $this->assertSame(3, $second->fresh()->ordinal);
+        $this->assertSame(7, $homepage->fresh()->ordinal);
+    }
+
+    public function test_new_content_defaults_to_bottom_ordinal_within_its_group(): void
+    {
+        $admin = $this->createUserWithRole('Admin');
+        /** @var Authenticatable $authenticatedAdmin */
+        $authenticatedAdmin = $admin;
+
+        $this->createContent([
+            'title' => 'Top Content',
+            'ordinal' => 8,
+        ]);
+
+        $this->createContent([
+            'title' => 'Bottom Content',
+            'ordinal' => 4,
+        ]);
+
+        $this->createContent([
+            'title' => 'Homepage Content',
+            'contenttype' => Content::TYPE_INDEX,
+            'ordinal' => 99,
+        ]);
+
+        $response = $this->actingAs($authenticatedAdmin)->post(route('admin.content-add'), [
+            'action' => 'submit',
+            'title' => 'Appended Content',
+            'url' => 'appended',
+            'body' => '<p>Appended body</p>',
+            'metadescription' => 'Appended description',
+            'metakeywords' => 'appended',
+            'contenttype' => Content::TYPE_USEFUL,
+            'status' => Content::STATUS_ENABLED,
+            'role' => Content::ROLE_EVERYONE,
+        ]);
+
+        $content = Content::query()->where('title', 'Appended Content')->firstOrFail();
+
+        $response->assertRedirect(route('admin.content-add', ['id' => $content->id]));
+        $this->assertSame(9, $content->ordinal);
+    }
+
+    public function test_deleting_content_does_not_reassign_remaining_ordinals(): void
+    {
+        $admin = $this->createUserWithRole('Admin');
+        /** @var Authenticatable $authenticatedAdmin */
+        $authenticatedAdmin = $admin;
+
+        $remainingContent = $this->createContent([
+            'title' => 'Keep Me',
+            'ordinal' => 12,
+        ]);
+
+        $deletedContent = $this->createContent([
+            'title' => 'Remove Me',
+            'ordinal' => 5,
+        ]);
+
+        $response = $this->actingAs($authenticatedAdmin)
+            ->postJson(route('admin.content-delete'), ['id' => $deletedContent->id]);
+
+        $response->assertOk();
+        $this->assertSame(12, $remainingContent->fresh()->ordinal);
+        $this->assertDatabaseMissing('content', ['id' => $deletedContent->id]);
+    }
+
+    private function createContent(array $overrides = []): Content
+    {
+        $defaults = [
+            'title' => 'Test Content',
+            'url' => '/test-content/',
+            'body' => '<p>Test content body</p>',
+            'metadescription' => 'Test description',
+            'metakeywords' => 'test',
+            'contenttype' => Content::TYPE_USEFUL,
+            'status' => Content::STATUS_ENABLED,
+            'ordinal' => 1,
+            'role' => Content::ROLE_EVERYONE,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+
+        return Content::query()->create(array_merge($defaults, $overrides));
+    }
+
     private function createSchema(): void
     {
         if (! Schema::hasTable('settings')) {
