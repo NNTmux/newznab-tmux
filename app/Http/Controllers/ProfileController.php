@@ -44,7 +44,7 @@ class ProfileController extends BasePageController
 
             // If both 'id' and 'name' are specified, 'id' should take precedence.
             if ($altID === false && $altUsername !== false) {
-                $user = User::getByUsername($altUsername);
+                $user = User::findByUsername($altUsername);
                 if ($user) {
                     $this->userdata = $user;
                     $altID = $user['id'];

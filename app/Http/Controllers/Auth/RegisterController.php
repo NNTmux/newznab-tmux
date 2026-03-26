@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRegisterRequest;
 use App\Models\Invitation;
@@ -69,7 +70,6 @@ class RegisterController extends Controller
             'api_token' => md5(Str::random(40)),
             'verified' => false,
             'email_verified_at' => null,
-            'verification_token' => null,
         ]);
 
         $role = Role::query()->where('id', '=', $data['roles_id'])->first();
@@ -163,7 +163,7 @@ class RegisterController extends Controller
                         'password' => $password,
                         'email' => $email,
                         'host' => $request->ip(),
-                        'roles_id' => $userDefault !== null ? $userDefault['id'] : User::ROLE_USER,
+                        'roles_id' => $userDefault !== null ? $userDefault['id'] : UserRole::USER->value,
                         'notes' => '',
                         'defaultinvites' => $userDefault !== null ? $userDefault['defaultinvites'] : Invitation::DEFAULT_INVITES,
                     ];

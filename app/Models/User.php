@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Enums\QueueType;
 use App\Enums\SignupError;
 use App\Enums\UserRole;
 use App\Jobs\SendAccountExpiredEmail;
@@ -112,7 +111,6 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder|User whereEmail(string $value)
  * @method static Builder|User whereApiToken(string $value)
  * @method static Builder|User whereResetguid(string $value)
- * @method static Builder|User whereVerified(int $value)
  * @method static Builder|User active()
  * @method static Builder|User verified()
  * @method static Builder|User withRole(int|string $role)
@@ -344,7 +342,11 @@ final class User extends Authenticatable implements MustVerifyEmailContract
      */
     public function scopeVerified(Builder $query): Builder // @phpstan-ignore missingType.generics
     {
-        return $query->where('verified', true);
+        return $query->where(function (Builder $verifiedQuery): void {
+            $verifiedQuery
+                ->where('verified', true)
+                ->orWhereNotNull('email_verified_at');
+        });
     }
 
     /**
@@ -385,22 +387,6 @@ final class User extends Authenticatable implements MustVerifyEmailContract
     public function sendEmailVerificationNotification(): void
     {
         $this->notify(new VerifyEmail);
-    }
-
-    /**
-     * Legacy compatibility helper used by existing login flows.
-     */
-    public function isVerified(): bool
-    {
-        return $this->hasVerifiedEmail();
-    }
-
-    /**
-     * Legacy compatibility helper used by existing login flows.
-     */
-    public function isPendingVerification(): bool
-    {
-        return ! $this->hasVerifiedEmail();
     }
 
     /**
@@ -774,40 +760,6 @@ final class User extends Authenticatable implements MustVerifyEmailContract
     public static function findByResetGuid(string $guid): ?static
     {
         return static::whereResetguid($guid)->first();
-    }
-
-    // ===== Backward Compatibility Aliases =====
-
-    /**
-     * @deprecated Use findByUsername() instead
-     */
-    public static function getByUsername(string $userName): ?static
-    {
-        return static::findByUsername($userName);
-    }
-
-    /**
-     * @deprecated Use findByEmail() instead
-     */
-    public static function getByEmail(string $email): ?static
-    {
-        return static::findByEmail($email);
-    }
-
-    /**
-     * @deprecated Use findByRssToken() instead
-     */
-    public static function getByRssToken(string $rssToken): ?static
-    {
-        return static::findByRssToken($rssToken);
-    }
-
-    /**
-     * @deprecated Use findByResetGuid() instead
-     */
-    public static function getByPassResetGuid(string $guid): ?static
-    {
-        return static::findByResetGuid($guid);
     }
 
     // ===== User Management Methods =====
@@ -1744,7 +1696,9 @@ final class User extends Authenticatable implements MustVerifyEmailContract
      */
     public static function deleteUnVerified(): void
     {
-        static::whereVerified(0)
+        static::query()
+            ->where('verified', false)
+            ->whereNull('email_verified_at')
             ->where('created_at', '<', now()->subDays(3))
             ->delete();
     }
@@ -1764,48 +1718,4 @@ final class User extends Authenticatable implements MustVerifyEmailContract
     {
         return $this->timezone ?? 'UTC';
     }
-
-    // ===== Legacy Constants (Deprecated - Use Enums) =====
-
-    /** @deprecated Use SignupError::BAD_USERNAME->value instead */
-    public const ERR_SIGNUP_BADUNAME = SignupError::BAD_USERNAME->value;
-
-    /** @deprecated Use SignupError::BAD_PASSWORD->value instead */
-    public const ERR_SIGNUP_BADPASS = SignupError::BAD_PASSWORD->value;
-
-    /** @deprecated Use SignupError::BAD_EMAIL->value instead */
-    public const ERR_SIGNUP_BADEMAIL = SignupError::BAD_EMAIL->value;
-
-    /** @deprecated Use SignupError::USERNAME_IN_USE->value instead */
-    public const ERR_SIGNUP_UNAMEINUSE = SignupError::USERNAME_IN_USE->value;
-
-    /** @deprecated Use SignupError::EMAIL_IN_USE->value instead */
-    public const ERR_SIGNUP_EMAILINUSE = SignupError::EMAIL_IN_USE->value;
-
-    /** @deprecated Use SignupError::BAD_INVITE_CODE->value instead */
-    public const ERR_SIGNUP_BADINVITECODE = SignupError::BAD_INVITE_CODE->value;
-
-    /** @deprecated Use SignupError::SUCCESS->value instead */
-    public const SUCCESS = SignupError::SUCCESS->value;
-
-    /** @deprecated Use UserRole::USER->value instead */
-    public const ROLE_USER = UserRole::USER->value;
-
-    /** @deprecated Use UserRole::ADMIN->value instead */
-    public const ROLE_ADMIN = UserRole::ADMIN->value;
-
-    /** @deprecated Use UserRole::DISABLED->value instead */
-    public const ROLE_DISABLED = UserRole::DISABLED->value;
-
-    /** @deprecated Use UserRole::MODERATOR->value instead */
-    public const ROLE_MODERATOR = UserRole::MODERATOR->value;
-
-    /** @deprecated Use QueueType::NONE->value instead */
-    public const QUEUE_NONE = QueueType::NONE->value;
-
-    /** @deprecated Use QueueType::SABNZBD->value instead */
-    public const QUEUE_SABNZBD = QueueType::SABNZBD->value;
-
-    /** @deprecated Use QueueType::NZBGET->value instead */
-    public const QUEUE_NZBGET = QueueType::NZBGET->value;
 }

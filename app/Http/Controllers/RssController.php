@@ -217,7 +217,7 @@ class RssController extends BasePageController
             return response()->json(['error' => 'API key is required for viewing the RSS!'], 403);
         }
 
-        $res = User::getByRssToken($request->input('api_token'));
+        $res = User::findByRssToken($request->input('api_token'));
 
         if ($res === null) {
             return response()->json(['error' => 'Invalid RSS token'], 403);

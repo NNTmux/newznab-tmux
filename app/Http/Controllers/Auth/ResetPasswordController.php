@@ -38,7 +38,7 @@ class ResetPasswordController extends Controller
             return redirect()->route('password.request')->with('error', 'No reset code provided.');
         }
 
-        $user = User::getByPassResetGuid($request->input('guid'));
+        $user = User::findByResetGuid($request->input('guid'));
         if ($user === null) {
             return redirect()->route('password.request')->with('error', 'Bad reset code provided.');
         }

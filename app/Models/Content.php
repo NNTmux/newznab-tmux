@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -80,14 +81,17 @@ class Content extends Model
     protected $guarded = [];
 
     /**
-     * @var array<string, string>
+     * @return array<string, string>
      */
-    protected $casts = [
-        'contenttype' => 'integer',
-        'status' => 'integer',
-        'ordinal' => 'integer',
-        'role' => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'contenttype' => 'integer',
+            'status' => 'integer',
+            'ordinal' => 'integer',
+            'role' => 'integer',
+        ];
+    }
 
     /**
      * Scope: Get only active content.
@@ -111,7 +115,7 @@ class Content extends Model
     public function scopeForRole(Builder $query, int $role): Builder // @phpstan-ignore missingType.generics
     {
         // Admins and moderators can see everything
-        if (\in_array($role, [User::ROLE_ADMIN, User::ROLE_MODERATOR], true)) {
+        if (\in_array($role, [UserRole::ADMIN->value, UserRole::MODERATOR->value], true)) {
             return $query;
         }
 
