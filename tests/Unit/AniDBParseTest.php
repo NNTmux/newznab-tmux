@@ -22,7 +22,6 @@ class AniDBParseTest extends TestCase
     private function invokeExtract(object $instance, string $name): array
     {
         $rm = new ReflectionMethod($instance, 'extractTitleEpisode');
-        $rm->setAccessible(true);
         /** @var array $result */
         $result = $rm->invoke($instance, $name);
 
@@ -32,7 +31,6 @@ class AniDBParseTest extends TestCase
     private function getStatus(object $instance): ?int
     {
         $rp = new ReflectionProperty($instance, 'status');
-        $rp->setAccessible(true);
         /** @var int|null $status */
         $status = $rp->getValue($instance);
 

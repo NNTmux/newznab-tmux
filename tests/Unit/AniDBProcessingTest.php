@@ -20,12 +20,10 @@ final class AniDBProcessingTest extends TestCase
         // Ensure status property exists and set to null before call.
         if ($ref->hasProperty('status')) {
             $propStatus = $ref->getProperty('status');
-            $propStatus->setAccessible(true);
             $propStatus->setValue($instance, null);
         }
 
         $method = $ref->getMethod('extractTitleEpisode');
-        $method->setAccessible(true);
         $result = $method->invoke($instance, $name);
 
         if (isset($propStatus)) {

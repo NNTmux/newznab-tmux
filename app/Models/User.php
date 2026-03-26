@@ -978,7 +978,7 @@ final class User extends Authenticatable implements MustVerifyEmailContract
             return true;
         }
 
-        $additionalDays = ($addYears ?? 0) * self::DAYS_PER_YEAR;
+        $additionalDays = self::resolveRoleDurationDays($roleModel, $addYears);
         $promotionDays = $applyPromotions
             ? RolePromotion::calculateAdditionalDays($roleModel->id)
             : 0;
@@ -1027,7 +1027,7 @@ final class User extends Authenticatable implements MustVerifyEmailContract
 
             if ($pendingRole && $pendingStartDate) {
                 // Calculate when the pending role would expire
-                $pendingRoleBaseDays = $pendingRole->addyears * self::DAYS_PER_YEAR;
+                $pendingRoleBaseDays = self::resolveRoleDurationDays($pendingRole, null);
                 $pendingRolePromotionDays = ! in_array($pendingRole->name, self::PROMOTION_EXCLUDED_ROLES, true)
                     ? RolePromotion::calculateAdditionalDays($pendingRole->id)
                     : 0;
@@ -1066,7 +1066,7 @@ final class User extends Authenticatable implements MustVerifyEmailContract
             'hadPendingRole' => $user->hasPendingRole(),
         ]);
 
-        $baseDays = ($addYears ?? $roleModel->addyears) * self::DAYS_PER_YEAR;
+        $baseDays = self::resolveRoleDurationDays($roleModel, $addYears);
         $promotionDays = ! in_array($roleModel->name, self::PROMOTION_EXCLUDED_ROLES, true) && $applyPromotions
             ? RolePromotion::calculateAdditionalDays($roleModel->id)
             : 0;
@@ -1111,7 +1111,7 @@ final class User extends Authenticatable implements MustVerifyEmailContract
         ?int $changedBy,
         bool $preserveCurrentExpiry,
     ): bool {
-        $baseDays = ($addYears ?? $roleModel->addyears) * self::DAYS_PER_YEAR;
+        $baseDays = self::resolveRoleDurationDays($roleModel, $addYears);
         $promotionDays = ! in_array($roleModel->name, self::PROMOTION_EXCLUDED_ROLES, true) && $applyPromotions
             ? RolePromotion::calculateAdditionalDays($roleModel->id)
             : 0;
@@ -1153,6 +1153,27 @@ final class User extends Authenticatable implements MustVerifyEmailContract
         }
 
         return $updated;
+    }
+
+    /**
+     * Resolve the number of role-duration days to apply.
+     */
+    private static function resolveRoleDurationDays(Role $roleModel, ?int $addYears, bool $useRoleDefaultWhenMissing = true): int
+    {
+        if ($addYears !== null) {
+            return max(0, $addYears) * self::DAYS_PER_YEAR;
+        }
+
+        if (! $useRoleDefaultWhenMissing) {
+            return 0;
+        }
+
+        $rawAddYears = Role::query()->whereKey($roleModel->id)->value('addyears');
+        $roleAddYears = is_numeric($rawAddYears)
+            ? (int) $rawAddYears
+            : (is_numeric($roleModel->addyears ?? null) ? (int) $roleModel->addyears : 0);
+
+        return max(0, $roleAddYears) * self::DAYS_PER_YEAR;
     }
 
     /**

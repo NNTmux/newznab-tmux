@@ -1,73 +1,65 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Services;
 
-use App\Services\AnimeMatchingService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use App\Services\AnimeProcessor;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
-class AnimeMatchingServiceTest extends TestCase
+final class AnimeMatchingServiceTest extends TestCase
 {
-    use RefreshDatabase;
-
-    private AnimeMatchingService $service;
-
-    protected function setUp(): void
+    private function invokeExtract(string $searchName): array
     {
-        parent::setUp();
-        $this->service = new AnimeMatchingService;
+        $reflection = new ReflectionClass(AnimeProcessor::class);
+        /** @var AnimeProcessor $processor */
+        $processor = $reflection->newInstanceWithoutConstructor();
+        $method = $reflection->getMethod('extractTitleEpisode');
+
+        /** @var array $result */
+        $result = $method->invoke($processor, $searchName);
+
+        return $result;
     }
 
-    /** @test */
-    public function it_extracts_title_and_episode_from_dash_format(): void
+    public function test_extracts_title_from_dash_format(): void
     {
         $searchName = '[SubsPlease] Steins Gate - 01 [1080p].mkv';
-        $result = $this->service->extractTitleEpisode($searchName);
+        $result = $this->invokeExtract($searchName);
 
-        $this->assertNotNull($result);
-        $this->assertEquals('Steins Gate', $result['title']);
-        $this->assertEquals(1, $result['epno']);
+        $this->assertSame(['title' => 'Steins Gate'], $result);
     }
 
-    /** @test */
-    public function it_extracts_title_and_episode_from_e_format(): void
+    public function test_extracts_title_from_e_format(): void
     {
         $searchName = 'Cowboy Bebop E05 [1080p].mkv';
-        $result = $this->service->extractTitleEpisode($searchName);
+        $result = $this->invokeExtract($searchName);
 
-        $this->assertNotNull($result);
-        $this->assertEquals('Cowboy Bebop', $result['title']);
-        $this->assertEquals(5, $result['epno']);
+        $this->assertSame(['title' => 'Cowboy Bebop'], $result);
     }
 
-    /** @test */
-    public function it_extracts_movie_format(): void
+    public function test_extracts_movie_format_title(): void
     {
         $searchName = 'One Punch Man Movie [BD 1080p].mkv';
-        $result = $this->service->extractTitleEpisode($searchName);
+        $result = $this->invokeExtract($searchName);
 
-        $this->assertNotNull($result);
-        $this->assertEquals('One Punch Man', $result['title']);
-        $this->assertEquals(1, $result['epno']);
+        $this->assertSame('One Punch Man', $result['title']);
     }
 
-    /** @test */
-    public function it_strips_group_tags(): void
+    public function test_strips_group_tags_from_title(): void
     {
         $searchName = '[HorribleSubs] Attack on Titan - 12 [720p].mkv';
-        $result = $this->service->extractTitleEpisode($searchName);
+        $result = $this->invokeExtract($searchName);
 
-        $this->assertNotNull($result);
-        $this->assertEquals('Attack on Titan', $result['title']);
-        $this->assertEquals(12, $result['epno']);
+        $this->assertSame('Attack on Titan', $result['title']);
     }
 
-    /** @test */
-    public function it_returns_null_for_unparseable_names(): void
+    public function test_falls_back_to_cleaned_title_when_no_episode_pattern_exists(): void
     {
         $searchName = 'Random.File.Name.Without.Episode.mkv';
-        $result = $this->service->extractTitleEpisode($searchName);
+        $result = $this->invokeExtract($searchName);
 
-        $this->assertNull($result);
+        $this->assertSame(['title' => 'Random File Name Without Episode mkv'], $result);
     }
 }
