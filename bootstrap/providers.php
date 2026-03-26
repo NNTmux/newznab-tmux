@@ -6,7 +6,6 @@ use App\Providers\CategorizationServiceProvider;
 use App\Providers\ForumServiceProvider;
 use App\Providers\HorizonServiceProvider;
 use App\Providers\ProcessingServiceProvider;
-use App\Providers\RouteServiceProvider;
 use App\Providers\SearchServiceProvider;
 use App\Providers\TvProcessingServiceProvider;
 use App\Providers\UserServiceProvider;
@@ -19,7 +18,6 @@ return [
     ForumServiceProvider::class,
     HorizonServiceProvider::class,
     ProcessingServiceProvider::class,
-    RouteServiceProvider::class,
     SearchServiceProvider::class,
     TvProcessingServiceProvider::class,
     UserServiceProvider::class,

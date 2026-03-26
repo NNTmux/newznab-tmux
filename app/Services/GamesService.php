@@ -9,8 +9,8 @@ use App\Models\GamesInfo;
 use App\Models\Genre;
 use App\Models\Release;
 use App\Models\Settings;
+use App\Services\IGDB\Exceptions\IgdbHttpException;
 use App\Services\Releases\ReleaseBrowseService;
-use GuzzleHttp\Exception\ClientException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -68,8 +68,6 @@ class GamesService
     protected int $cachedCount = 0;
 
     protected string $_classUsed = '';
-
-    protected mixed $igdbSleep;
 
     /**
      * @throws \Exception
@@ -461,9 +459,8 @@ class GamesService
                         return false;
                     }
                 }
-            } catch (ClientException $e) {
-                if ($e->getCode() === 429) {
-                    $this->igdbSleep = now()->endOfMonth();
+            } catch (IgdbHttpException $e) {
+                if ($e->getStatusCode() === 429) {
                     Log::warning('GamesService: IGDB rate limit exceeded');
                 }
             }

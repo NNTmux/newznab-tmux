@@ -9,7 +9,7 @@ php artisan test --compact --filter=TestName  # Run single test (PHPUnit only)
 ./vendor/bin/pint --dirty                     # Format changed files
 php artisan tmux:start                        # Start processing engine
 npm run build                                 # Required after frontend changes
-php artisan route:cache                       # Refresh cached routes if new routes seem missing
+3php artisan route:cache                       # Refresh cached routes if new routes seem missing
 ```
 
 ## Architecture

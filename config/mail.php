@@ -1,19 +1,51 @@
 <?php
 
 return [
+    'default' => env('MAIL_MAILER', env('MAIL_DRIVER', 'smtp')),
 
-    'driver' => env('MAIL_DRIVER', 'smtp'),
+    'mailers' => [
+        'smtp' => [
+            'transport' => 'smtp',
+            'url' => env('MAIL_URL'),
+            'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
+            'port' => env('MAIL_PORT', 587),
+            'encryption' => env('MAIL_ENCRYPTION', 'tls'),
+            'username' => env('MAIL_USERNAME'),
+            'password' => env('MAIL_PASSWORD'),
+            'timeout' => null,
+            'local_domain' => env('MAIL_EHLO_DOMAIN'),
+        ],
 
-    'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
+        'sendmail' => [
+            'transport' => 'sendmail',
+            'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs'),
+        ],
 
-    'port' => env('MAIL_PORT', 587),
+        'log' => [
+            'transport' => 'log',
+            'channel' => env('MAIL_LOG_CHANNEL'),
+        ],
 
-    'encryption' => env('MAIL_ENCRYPTION', 'tls'),
+        'array' => [
+            'transport' => 'array',
+        ],
 
-    'username' => env('MAIL_USERNAME'),
+        'failover' => [
+            'transport' => 'failover',
+            'mailers' => ['smtp', 'log'],
+        ],
+    ],
 
-    'password' => env('MAIL_PASSWORD'),
+    'from' => [
+        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
+        'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
+    ],
 
-    'sendmail' => '/usr/sbin/sendmail -bs',
+    'markdown' => [
+        'theme' => 'default',
+        'paths' => [
+            resource_path('views/vendor/mail'),
+        ],
+    ],
 
 ];

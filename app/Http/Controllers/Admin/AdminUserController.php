@@ -13,7 +13,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Jrean\UserVerification\Facades\UserVerification;
 use Spatie\Permission\Models\Role;
 
 class AdminUserController extends BasePageController
@@ -326,9 +325,11 @@ class AdminUserController extends BasePageController
     {
         if ($request->has('id')) {
             $user = User::find($request->input('id'));
-            UserVerification::generate($user);
+            if ($user === null) {
+                return redirect()->back()->with('error', 'User is invalid');
+            }
 
-            UserVerification::send($user, 'User email verification required');
+            $user->sendEmailVerificationNotification();
 
             return redirect()->back()->with('success', 'Email verification for '.$user->username.' sent');
         }
@@ -340,9 +341,13 @@ class AdminUserController extends BasePageController
     {
         if ($request->has('id')) {
             $user = User::find($request->input('id'));
-            User::query()->where('id', $request->input('id'))->update(['verified' => 1, 'email_verified_at' => now()]);
+            User::query()->where('id', $request->input('id'))->update([
+                'verified' => 1,
+                'email_verified_at' => now(),
+                'verification_token' => null,
+            ]);
 
-            return redirect()->back()->with('success', 'Email verification for '.$user->username.' sent');
+            return redirect()->back()->with('success', 'Email verification for '.$user->username.' completed');
         }
 
         return redirect()->back()->with('error', 'User is invalid');

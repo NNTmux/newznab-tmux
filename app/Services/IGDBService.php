@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Services\IGDB\Models\Company;
+use App\Services\IGDB\Models\Game;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
-use MarcReichel\IGDBLaravel\Models\Company;
-use MarcReichel\IGDBLaravel\Models\Game;
 
 /**
  * IGDBService - IGDB (Internet Game Database) API integration.
  *
- * Note: MarcReichel\IGDBLaravel\Models\Game and Company use dynamic properties
- * (name, id, etc.) that PHPStan cannot resolve.
+ * Note: Local IGDB resource models expose dynamic properties
+ * (name, id, etc.) that PHPStan cannot fully resolve.
  *
  * Features:
  * - Rate limiting and caching
@@ -44,13 +44,42 @@ class IGDBService
     // PC Platform IDs in IGDB
     protected const array PC_PLATFORM_IDS = [6, 13, 14, 3]; // PC Windows, DOS, Mac, Linux
 
+    protected const array PLATFORM_ALIASES = [
+        'x360' => 'xbox 360',
+        'xbox360' => 'xbox 360',
+        'xbla' => 'xbox 360',
+        'xbox one' => 'xbox one',
+        'xboxone' => 'xbox one',
+        'x-box' => 'xbox',
+        'xbox' => 'xbox',
+        'dsi' => 'nintendo ds',
+        'nds' => 'nintendo ds',
+        '3ds' => 'nintendo 3ds',
+        'ps2' => 'playstation2',
+        'ps3' => 'playstation 3',
+        'ps4' => 'playstation 4',
+        'psp' => 'sony psp',
+        'psvita' => 'playstation vita',
+        'psx' => 'playstation',
+        'psx2psp' => 'playstation',
+        'wiiu' => 'nintendo wii u',
+        'wii' => 'nintendo wii',
+        'ngc' => 'gamecube',
+        'gc' => 'gamecube',
+        'n64' => 'nintendo 64',
+        'nes' => 'nintendo nes',
+        'super nintendo' => 'snes',
+        'nintendo super nes' => 'snes',
+        'snes' => 'snes',
+    ];
+
     /**
      * Check if IGDB is configured.
      */
     public function isConfigured(): bool
     {
-        return config('config.credentials.client_id') !== ''
-            && config('config.credentials.client_secret') !== '';
+        return config('igdb.credentials.client_id') !== ''
+            && config('igdb.credentials.client_secret') !== '';
     }
 
     /**
@@ -79,7 +108,7 @@ class IGDBService
             return $cached instanceof Game ? $cached : null;
         }
 
-        $game = $this->searchWithStrategies($title);
+        $game = $this->searchWithStrategies($title, self::PC_PLATFORM_IDS);
 
         if ($game !== null) {
             Cache::put($cacheKey, $game, self::GAME_CACHE_TTL);
@@ -90,6 +119,49 @@ class IGDBService
         }
 
         return $game;
+    }
+
+    /**
+     * Search for a console game using an optional platform hint.
+     */
+    public function searchConsole(string $title, string $platformHint): ?Game
+    {
+        if (! $this->isConfigured() || $title === '') {
+            return null;
+        }
+
+        $cacheKey = 'igdb_console_search:'.md5(mb_strtolower($title.'|'.$platformHint));
+
+        if (Cache::has("igdb_console_search_failed:{$cacheKey}")) {
+            Log::debug('IGDBService: Skipping previously failed console search', [
+                'title' => $title,
+                'platform' => $platformHint,
+            ]);
+
+            return null;
+        }
+
+        $cached = Cache::get($cacheKey);
+        if ($cached instanceof Game) {
+            Log::debug('IGDBService: Using cached console search result', [
+                'title' => $title,
+                'platform' => $platformHint,
+            ]);
+
+            return $cached;
+        }
+
+        $game = $this->searchWithStrategies($title, null, $platformHint);
+
+        if ($game instanceof Game) {
+            Cache::put($cacheKey, $game, self::GAME_CACHE_TTL);
+
+            return $game;
+        }
+
+        Cache::put("igdb_console_search_failed:{$cacheKey}", true, self::FAILED_LOOKUP_CACHE_TTL);
+
+        return null;
     }
 
     /**
@@ -125,10 +197,10 @@ class IGDBService
     /**
      * Search IGDB using multiple strategies for better match rates.
      */
-    protected function searchWithStrategies(string $title): ?Game
+    protected function searchWithStrategies(string $title, ?array $platformIds = null, ?string $platformHint = null): ?Game
     {
         // Strategy 1: Exact name search with PC platform filter
-        $game = $this->searchExact($title);
+        $game = $this->searchExact($title, $platformIds, $platformHint);
         if ($game !== null) {
             Log::debug('IGDBService: Exact match found', ['title' => $title, 'matched' => $game->name]); // @phpstan-ignore property.notFound
 
@@ -136,7 +208,7 @@ class IGDBService
         }
 
         // Strategy 2: Fuzzy search using IGDB's search endpoint
-        $game = $this->searchFuzzy($title);
+        $game = $this->searchFuzzy($title, $platformIds, $platformHint);
         if ($game !== null) {
             Log::debug('IGDBService: Fuzzy match found', ['title' => $title, 'matched' => $game->name]); // @phpstan-ignore property.notFound
 
@@ -146,7 +218,7 @@ class IGDBService
         // Strategy 3: Search without special characters
         $cleanTitle = preg_replace('/[^a-zA-Z0-9\s]/', '', $title);
         if ($cleanTitle !== $title && $cleanTitle !== '') {
-            $game = $this->searchFuzzy($cleanTitle);
+            $game = $this->searchFuzzy($cleanTitle, $platformIds, $platformHint);
             if ($game !== null) {
                 Log::debug('IGDBService: Clean title match found', ['title' => $title, 'matched' => $game->name]); // @phpstan-ignore property.notFound
 
@@ -157,7 +229,7 @@ class IGDBService
         // Strategy 4: Try with common subtitle patterns removed
         $baseTitle = $this->extractBaseTitle($title);
         if ($baseTitle !== $title && $baseTitle !== $cleanTitle && $baseTitle !== '') {
-            $game = $this->searchFuzzy($baseTitle);
+            $game = $this->searchFuzzy($baseTitle, $platformIds, $platformHint);
             if ($game !== null) {
                 Log::debug('IGDBService: Base title match found', ['title' => $title, 'matched' => $game->name]); // @phpstan-ignore property.notFound
 
@@ -171,23 +243,32 @@ class IGDBService
     /**
      * Exact name search on IGDB with PC platform filter.
      */
-    protected function searchExact(string $title): ?Game
+    protected function searchExact(string $title, ?array $platformIds = null, ?string $platformHint = null): ?Game
     {
         try {
-            $result = RateLimiter::attempt(
+            $results = RateLimiter::attempt(
                 self::RATE_LIMIT_KEY,
                 self::REQUESTS_PER_MINUTE,
-                function () use ($title) {
-                    return Game::where('name', $title)
-                        ->whereIn('platforms', self::PC_PLATFORM_IDS)
+                function () use ($platformIds, $title) {
+                    $query = Game::where('name', $title)
                         ->with($this->getGameRelations())
                         ->orderByDesc('aggregated_rating_count')
-                        ->first();
+                        ->limit(10);
+
+                    if ($platformIds !== null) {
+                        $query->whereIn('platforms', $platformIds);
+                    }
+
+                    return $query->get();
                 },
                 self::DECAY_SECONDS
             );
 
-            return $result instanceof Game ? $result : null;
+            if ($results === true || empty($results)) {
+                return null;
+            }
+
+            return $this->findBestMatch($results, $title, $platformHint);
         } catch (\Exception $e) {
             Log::warning('IGDBService: Exact search error', ['error' => $e->getMessage()]);
 
@@ -198,20 +279,24 @@ class IGDBService
     /**
      * Fuzzy search on IGDB using the search endpoint.
      */
-    protected function searchFuzzy(string $title): ?Game
+    protected function searchFuzzy(string $title, ?array $platformIds = null, ?string $platformHint = null): ?Game
     {
         try {
             $results = RateLimiter::attempt(
                 self::RATE_LIMIT_KEY,
                 self::REQUESTS_PER_MINUTE,
-                function () use ($title) {
-                    return Game::search($title)
-                        ->whereIn('platforms', self::PC_PLATFORM_IDS)
+                function () use ($platformIds, $title) {
+                    $query = Game::search($title)
                         ->where('category', 0) // Main game only (not DLC, expansion, etc.)
                         ->with($this->getGameRelations())
                         ->orderByDesc('aggregated_rating_count')
-                        ->limit(10)
-                        ->get();
+                        ->limit(10);
+
+                    if ($platformIds !== null) {
+                        $query->whereIn('platforms', $platformIds);
+                    }
+
+                    return $query->get();
                 },
                 self::DECAY_SECONDS
             );
@@ -220,7 +305,7 @@ class IGDBService
                 return null;
             }
 
-            return $this->findBestMatch($results, $title);
+            return $this->findBestMatch($results, $title, $platformHint);
         } catch (\Exception $e) {
             Log::warning('IGDBService: Fuzzy search error', ['error' => $e->getMessage()]);
 
@@ -255,7 +340,7 @@ class IGDBService
     /**
      * Find the best matching game from results.
      */
-    protected function findBestMatch(mixed $results, string $title): ?Game
+    protected function findBestMatch(mixed $results, string $title, ?string $platformHint = null): ?Game
     {
         $bestMatch = null;
         $bestScore = 0;
@@ -273,6 +358,11 @@ class IGDBService
             // Boost score for games with covers (more complete data)
             if (isset($game->cover)) {
                 $score += 2;
+            }
+
+            if ($platformHint !== null && $platformHint !== '') {
+                $platformScore = $this->getPlatformMatchScore($game, $platformHint);
+                $score += $platformScore > 0 ? $platformScore : -10;
             }
 
             // Check alternative names if available
@@ -300,6 +390,33 @@ class IGDBService
         }
 
         return $bestMatch;
+    }
+
+    /**
+     * Build console-specific game data from an IGDB Game model.
+     *
+     * @return array<string, mixed>
+     */
+    public function buildConsoleData(Game $game, string $platformHint): array
+    {
+        $genres = $this->extractGenres($game);
+        $publishers = $this->extractCompanyNames($game, 'publisher');
+
+        return [
+            'title' => $game->name,
+            'asin' => (string) $game->id,
+            'review' => (string) ($game->summary ?? ''),
+            'coverurl' => $this->getImageUrl($game->cover ?? null, 'cover_big'),
+            'releasedate' => $this->getReleaseDate($game),
+            'esrb' => isset($game->aggregated_rating) && is_numeric($game->aggregated_rating)
+                ? round((float) $game->aggregated_rating).'%'
+                : $this->getAgeRating($game),
+            'url' => $game->url ?? '',
+            'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
+            'platform' => $this->resolvePlatformName($game, $platformHint),
+            'consolegenre' => ! empty($genres) ? implode(',', $genres) : 'Unknown',
+            'salesrank' => '',
+        ];
     }
 
     /**
@@ -414,6 +531,93 @@ class IGDBService
         }
 
         return array_filter($genres);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function extractCompanyNames(Game $game, string $flag): array
+    {
+        $names = [];
+        if (empty($game->involved_companies)) {
+            return $names;
+        }
+
+        $involvedCompanies = $game->involved_companies;
+        if ($involvedCompanies instanceof Collection) {
+            $involvedCompanies = $involvedCompanies->toArray();
+        }
+
+        foreach ($involvedCompanies as $company) {
+            $isMatch = is_array($company) ? ($company[$flag] ?? false) : ($company->{$flag} ?? false);
+            $companyId = is_array($company) ? ($company['company'] ?? null) : ($company->company ?? null);
+
+            if ($isMatch !== true || ! $companyId) {
+                continue;
+            }
+
+            $companyData = Company::find($companyId);
+            if ($companyData !== null && ! empty($companyData->name)) {
+                $names[] = $companyData->name;
+            }
+        }
+
+        return array_values(array_unique($names));
+    }
+
+    protected function resolvePlatformName(Game $game, string $platformHint): string
+    {
+        $normalizedHint = $this->normalizePlatformHint($platformHint);
+        $fallback = '';
+
+        foreach ((array) ($game->platforms ?? []) as $platform) {
+            $name = is_array($platform) ? (string) ($platform['name'] ?? '') : (string) ($platform->name ?? '');
+            $abbreviation = is_array($platform) ? (string) ($platform['abbreviation'] ?? '') : (string) ($platform->abbreviation ?? '');
+
+            if ($fallback === '' && $name !== '') {
+                $fallback = $name;
+            }
+
+            foreach ([$name, $abbreviation] as $candidate) {
+                if ($candidate !== '' && $this->normalizePlatformHint($candidate) === $normalizedHint) {
+                    return $name !== '' ? $name : $candidate;
+                }
+            }
+        }
+
+        return $fallback;
+    }
+
+    protected function getPlatformMatchScore(Game $game, string $platformHint): int
+    {
+        $normalizedHint = $this->normalizePlatformHint($platformHint);
+        if ($normalizedHint === '') {
+            return 0;
+        }
+
+        foreach ((array) ($game->platforms ?? []) as $platform) {
+            $name = is_array($platform) ? (string) ($platform['name'] ?? '') : (string) ($platform->name ?? '');
+            $abbreviation = is_array($platform) ? (string) ($platform['abbreviation'] ?? '') : (string) ($platform->abbreviation ?? '');
+
+            foreach ([$name, $abbreviation] as $candidate) {
+                if ($candidate === '') {
+                    continue;
+                }
+
+                if ($this->normalizePlatformHint($candidate) === $normalizedHint) {
+                    return 15;
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    protected function normalizePlatformHint(string $platform): string
+    {
+        $normalized = mb_strtolower(trim($platform));
+
+        return self::PLATFORM_ALIASES[$normalized] ?? $normalized;
     }
 
     /**

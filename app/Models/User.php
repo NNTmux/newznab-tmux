@@ -12,6 +12,9 @@ use App\Jobs\SendAccountWillExpireEmail;
 use App\Rules\ValidEmailDomain;
 use App\Services\InvitationService;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
+use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
@@ -32,7 +35,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Jrean\UserVerification\Traits\UserVerification;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -117,13 +119,13 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder|User expiringSoon(int $days = 7)
  * @method static Builder|User expired()
  */
-final class User extends Authenticatable
+final class User extends Authenticatable implements MustVerifyEmailContract
 {
     use HasFactory; // @phpstan-ignore missingType.generics
     use HasRoles;
+    use MustVerifyEmailTrait;
     use Notifiable;
     use SoftDeletes;
-    use UserVerification;
 
     /**
      * @var list<string>
@@ -343,6 +345,62 @@ final class User extends Authenticatable
     public function scopeVerified(Builder $query): Builder // @phpstan-ignore missingType.generics
     {
         return $query->where('verified', true);
+    }
+
+    /**
+     * Determine if the user has verified their email address.
+     */
+    public function hasVerifiedEmail(): bool
+    {
+        return $this->verified || $this->email_verified_at !== null;
+    }
+
+    /**
+     * Mark the user's email as verified and keep legacy columns in sync.
+     */
+    public function markEmailAsVerified(): bool
+    {
+        return $this->forceFill([
+            'email_verified_at' => now(),
+            'verified' => true,
+            'verification_token' => null,
+        ])->save();
+    }
+
+    /**
+     * Reset email verification state, typically after an email change.
+     */
+    public function resetEmailVerification(): bool
+    {
+        return $this->forceFill([
+            'email_verified_at' => null,
+            'verified' => false,
+            'verification_token' => null,
+        ])->save();
+    }
+
+    /**
+     * Send the standard Laravel email verification notification.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new VerifyEmail);
+    }
+
+    /**
+     * Legacy compatibility helper used by existing login flows.
+     */
+    public function isVerified(): bool
+    {
+        return $this->hasVerifiedEmail();
+    }
+
+    /**
+     * Legacy compatibility helper used by existing login flows.
+     */
+    public function isPendingVerification(): bool
+    {
+        return ! $this->hasVerifiedEmail();
     }
 
     /**

@@ -10,6 +10,8 @@ use App\Services\Search\Drivers\ElasticSearchDriver;
 use App\Services\Search\Drivers\ManticoreSearchDriver;
 use App\Services\Search\MediaSearchService;
 use App\Services\Search\SearchService;
+use Elasticsearch\Client;
+use Elasticsearch\ClientBuilder;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
@@ -57,6 +59,15 @@ class SearchServiceProvider extends ServiceProvider
             $config = config('search.drivers.elasticsearch', []);
 
             return new ElasticSearchDriver($config);
+        });
+
+        $this->app->singleton('elasticsearch', function (): Client {
+            $config = config('search.drivers.elasticsearch', []);
+            $clientBuilder = ClientBuilder::create();
+            $clientBuilder->setHosts($config['hosts'] ?? []);
+            $clientBuilder->setRetries($config['retries'] ?? 2);
+
+            return $clientBuilder->build();
         });
 
         // Register aliases (using prefixed names to avoid conflicts with other packages)

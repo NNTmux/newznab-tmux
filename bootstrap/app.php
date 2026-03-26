@@ -8,16 +8,17 @@ use App\Http\Middleware\Google2FAMiddleware;
 use App\Http\Middleware\NoCacheForAuthenticatedUsers;
 use App\Http\Middleware\SetUserTimezone;
 use App\Http\Middleware\TrustedDevice2FAMiddleware;
+use App\Http\Middleware\TrustProxies as AppTrustProxies;
 use Creativeorange\Gravatar\GravatarServiceProvider;
+use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode;
-use Illuminate\Http\Middleware\TrustProxies;
+use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
+use Illuminate\Http\Middleware\TrustProxies as BaseTrustProxies;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
-use Jrean\UserVerification\Middleware\IsVerified;
-use Jrean\UserVerification\UserVerificationServiceProvider;
+use Illuminate\Support\Facades\Route;
 use Laravel\Tinker\TinkerServiceProvider;
 use Sentry\Laravel\Integration;
 use Spatie\Permission\Middleware\PermissionMiddleware;
@@ -27,7 +28,6 @@ use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
         TinkerServiceProvider::class,
-        UserVerificationServiceProvider::class,
         GravatarServiceProvider::class,
     ])
     ->withRouting(
@@ -36,6 +36,11 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         channels: __DIR__.'/../routes/channels.php',
         health: '/up',
+        then: static function (): void {
+            Route::middleware('api')
+                ->prefix('rss')
+                ->group(base_path('routes/rss.php'));
+        },
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->redirectGuestsTo(fn () => route('login'));
@@ -55,14 +60,14 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->append([
-            CheckForMaintenanceMode::class,
+            PreventRequestsDuringMaintenance::class,
             ForceJsonOnAPI::class,
             BlockAbusiveServices::class, // Block AIOStreams, Oracle Cloud, UsenetStreamer, Cloudflare WARP
         ]);
 
         $middleware->replace(
-            TrustProxies::class,
-            Monicahq\Cloudflare\Http\Middleware\TrustProxies::class
+            BaseTrustProxies::class,
+            AppTrustProxies::class
         );
 
         $middleware->web([
@@ -79,7 +84,7 @@ return Application::configure(basePath: dirname(__DIR__))
             '2fa' => Google2FAMiddleware::class,
             'bindings' => SubstituteBindings::class,
             'clearance' => ClearanceMiddleware::class,
-            'isVerified' => IsVerified::class,
+            'isVerified' => EnsureEmailIsVerified::class,
             'permission' => PermissionMiddleware::class,
             'role' => RoleMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,

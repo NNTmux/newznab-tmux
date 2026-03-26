@@ -15,7 +15,7 @@ This project is a fork of [newznab plus](https://github.com/anth0/nnplus) and [n
 - Intelligent local caching of metadata (TMDB, TVDB, TVMaze, Trakt, IMDB)
 - Tmux engine for thread, database, and performance monitoring
 - Image and video sample support
-- Modern frontend stack: Vite, Tailwind CSS, Vue 3
+- Modern frontend stack: Vite, Tailwind CSS, Alpine.js, Livewire
 - Full-text search via Elasticsearch or ManticoreSearch
 - Dockerized development via Laravel Sail
 - RESTful API compatible with newznab standard
@@ -39,7 +39,7 @@ This project is a fork of [newznab plus](https://github.com/anth0/nnplus) and [n
 ## Prerequisites
 
 - System administration experience (Linux recommended)
-- PHP 8.3+ with extensions: curl, json, pdo_mysql, openssl, mbstring, xml, zip, gd, intl, pcntl
+- PHP 8.4+ with extensions: curl, json, pdo_mysql, openssl, mbstring, xml, zip, gd, intl, pcntl
 - MariaDB 10.6+ or MySQL 8+ (PostgreSQL not supported)
 - Composer 2.x
 - Node.js 18+ and npm for frontend assets

@@ -22,7 +22,6 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
-use Jrean\UserVerification\Traits\VerifiesUsers;
 use Spatie\Permission\Models\Role;
 use Throwable;
 
@@ -40,7 +39,6 @@ class RegisterController extends Controller
     */
 
     use RegistersUsers;
-    use VerifiesUsers;
 
     /**
      * Where to redirect users after registration.
@@ -52,7 +50,7 @@ class RegisterController extends Controller
     public function __construct(
         private readonly RegistrationStatusService $registrationStatusService
     ) {
-        $this->middleware('guest', ['except' => ['getVerification', 'getVerificationError']]);
+        $this->middleware('guest');
     }
 
     /**
@@ -69,6 +67,9 @@ class RegisterController extends Controller
             'notes' => $data['notes'],
             'invites' => $data['defaultinvites'],
             'api_token' => md5(Str::random(40)),
+            'verified' => false,
+            'email_verified_at' => null,
+            'verification_token' => null,
         ]);
 
         $role = Role::query()->where('id', '=', $data['roles_id'])->first();

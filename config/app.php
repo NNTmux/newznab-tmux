@@ -5,7 +5,6 @@ use App\Facades\Yenc;
 use Creativeorange\Gravatar\Facades\Gravatar;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Redis;
-use Jrean\UserVerification\Facades\UserVerification;
 
 return [
 
@@ -30,7 +29,6 @@ return [
         'Google2FA' => PragmaRX\Google2FALaravel\Facade::class,
         'Gravatar' => Gravatar::class,
         'RedisManager' => Redis::class,
-        'UserVerification' => UserVerification::class,
         'Yenc' => Yenc::class,
     ])->toArray(),
 
