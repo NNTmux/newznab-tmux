@@ -82,7 +82,12 @@ class AdminCollectionRegexesController extends BasePageController
             default:
                 if ($request->has('id')) {
                     $meta_title = $title = 'Collections Regex Edit';
-                    $regex = $regexes->getRegexByID($request->input('id'));
+                    $id = filter_var($request->input('id'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+                    if ($id === false) {
+                        abort(404);
+                    }
+
+                    $regex = $regexes->getRegexByID($id);
                 } else {
                     $meta_title = $title = 'Collections Regex Add';
                     $regex += ['status' => 1];
