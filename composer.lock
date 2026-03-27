@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "44f6f3e3d2487f1ea996039cc71f9e9e",
+    "content-hash": "423832807568cb5ae1eb02dd408d3d7d",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -519,30 +519,14 @@
                     "DariusIII\\NetNntp\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "DariusIII\\NetNntp\\Tests\\": "tests/"
-                }
-            },
-            "scripts": {
-                "test": [
-                    "phpunit"
-                ],
-                "analyse": [
-                    "phpstan analyse"
-                ],
-                "check": [
-                    "@analyse",
-                    "@test"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "W3C"
             ],
             "authors": [
                 {
-                    "email": "heino@gehlsen.dk",
                     "name": "Heino H. Gehlsen",
+                    "email": "heino@gehlsen.dk",
                     "role": "Lead"
                 }
             ],

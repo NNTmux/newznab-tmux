@@ -113,10 +113,6 @@
         "ext-xdebug": "For developement work"
     },
     "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/DariusIII/Net_NNTP"
-        }
     ],
     "minimum-stability": "dev",
     "prefer-stable": true,
