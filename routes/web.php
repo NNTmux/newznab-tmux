@@ -120,6 +120,10 @@ Route::get('api/search/assist', [SearchSuggestController::class, 'searchAssist']
 Route::match(['GET', 'POST'], 'getnzb/{guid}', [GetNzbController::class, 'getNzb'])->name('getnzb.guid');
 Route::match(['GET', 'POST'], 'getnzb', [GetNzbController::class, 'getNzb'])->name('getnzb');
 
+// Contact form must remain publicly reachable for guests.
+Route::match(['GET', 'POST'], 'contact-us', [ContactUsController::class, 'showContactForm'])->name('contact-us');
+Route::post('contact-us', [ContactUsController::class, 'contact']);
+
 Route::middleware('isVerified')->group(function () {
     Route::match(['GET', 'POST'], 'resetpassword', [ResetPasswordController::class, 'reset'])->name('resetpassword');
     Route::match(['GET', 'POST'], 'profile', [ProfileController::class, 'show'])->name('profile');
@@ -169,8 +173,6 @@ Route::middleware('isVerified')->group(function () {
 
     Route::match(['GET', 'POST'], 'nfo/{id?}', [NfoController::class, 'showNfo'])->name('nfo');
 
-    Route::match(['GET', 'POST'], 'contact-us', [ContactUsController::class, 'showContactForm'])->name('contact-us');
-    Route::post('contact-us', [ContactUsController::class, 'contact']);
     Route::match(['GET', 'POST'], 'profileedit', [ProfileController::class, 'edit'])->name('profileedit');
     Route::match(['GET', 'POST'], 'profile_delete', [ProfileController::class, 'destroy'])->name('profile_delete');
     Route::post('profile/update-theme', [ProfileController::class, 'updateTheme'])->name('profile.update-theme');

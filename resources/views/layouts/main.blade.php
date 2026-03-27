@@ -12,7 +12,7 @@
     {{-- Apply dark mode BEFORE any CSS loads to prevent white flash --}}
     @include('partials.theme-init')
 
-    <title>{{ $meta_title ?? config('app.name') }}@if(isset($meta_title) && $meta_title != '' && $site['metatitle'] != '') - @endif{{ $site['metatitle'] ?? '' }}</title>
+    <title>{{ $meta_title ?? config('app.name') }}@if(isset($meta_title) && $meta_title !== '' && (($site['metatitle'] ?? '') !== '')) - @endif{{ $site['metatitle'] ?? '' }}</title>
 
     <meta name="keywords" content="{{ $meta_keywords ?? '' }}">
     <meta name="description" content="{{ $meta_description ?? '' }}">
