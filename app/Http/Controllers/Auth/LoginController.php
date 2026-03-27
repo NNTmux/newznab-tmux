@@ -103,7 +103,7 @@ class LoginController extends Controller
 
                 $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';
 
-                if (! $user->isVerified() || $user->isPendingVerification()) {
+                if (! $user->hasVerifiedEmail()) {
                     $request->session()->flash('warning', 'You have not verified your email address!');
 
                     return redirect()->to('login');

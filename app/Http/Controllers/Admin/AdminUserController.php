@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\SignupError;
+use App\Enums\UserRole;
 use App\Http\Controllers\BasePageController;
 use App\Models\Invitation;
 use App\Models\User;
@@ -13,7 +15,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Jrean\UserVerification\Facades\UserVerification;
 use Spatie\Permission\Models\Role;
 
 class AdminUserController extends BasePageController
@@ -99,7 +100,7 @@ class AdminUserController extends BasePageController
             'username' => '',
             'email' => '',
             'password' => '',
-            'role' => User::ROLE_USER,
+            'role' => UserRole::USER->value,
             'notes' => '',
             'rate_limit' => 60,
         ];
@@ -249,11 +250,11 @@ class AdminUserController extends BasePageController
                 }
 
                 $error = match ($ret) {
-                    User::ERR_SIGNUP_BADUNAME => 'Bad username. Try a better one.',
-                    User::ERR_SIGNUP_BADPASS => 'Bad password. Try a longer one.',
-                    User::ERR_SIGNUP_BADEMAIL => 'Bad email.',
-                    User::ERR_SIGNUP_UNAMEINUSE => 'Username in use.',
-                    User::ERR_SIGNUP_EMAILINUSE => 'Email in use.',
+                    SignupError::BAD_USERNAME->value => 'Bad username. Try a better one.',
+                    SignupError::BAD_PASSWORD->value => 'Bad password. Try a longer one.',
+                    SignupError::BAD_EMAIL->value => 'Bad email.',
+                    SignupError::USERNAME_IN_USE->value => 'Username in use.',
+                    SignupError::EMAIL_IN_USE->value => 'Email in use.',
                     default => 'Unknown save error.',
                 };
                 $user += [
@@ -326,9 +327,11 @@ class AdminUserController extends BasePageController
     {
         if ($request->has('id')) {
             $user = User::find($request->input('id'));
-            UserVerification::generate($user);
+            if ($user === null) {
+                return redirect()->back()->with('error', 'User is invalid');
+            }
 
-            UserVerification::send($user, 'User email verification required');
+            $user->sendEmailVerificationNotification();
 
             return redirect()->back()->with('success', 'Email verification for '.$user->username.' sent');
         }
@@ -340,9 +343,13 @@ class AdminUserController extends BasePageController
     {
         if ($request->has('id')) {
             $user = User::find($request->input('id'));
-            User::query()->where('id', $request->input('id'))->update(['verified' => 1, 'email_verified_at' => now()]);
+            if ($user === null) {
+                return redirect()->back()->with('error', 'User is invalid');
+            }
 
-            return redirect()->back()->with('success', 'Email verification for '.$user->username.' sent');
+            $user->markEmailAsVerified();
+
+            return redirect()->back()->with('success', 'Email verification for '.$user->username.' completed');
         }
 
         return redirect()->back()->with('error', 'User is invalid');

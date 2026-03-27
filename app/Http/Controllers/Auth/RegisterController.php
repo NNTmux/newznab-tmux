@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRegisterRequest;
 use App\Models\Invitation;
@@ -22,7 +23,6 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
-use Jrean\UserVerification\Traits\VerifiesUsers;
 use Spatie\Permission\Models\Role;
 use Throwable;
 
@@ -40,7 +40,6 @@ class RegisterController extends Controller
     */
 
     use RegistersUsers;
-    use VerifiesUsers;
 
     /**
      * Where to redirect users after registration.
@@ -52,7 +51,7 @@ class RegisterController extends Controller
     public function __construct(
         private readonly RegistrationStatusService $registrationStatusService
     ) {
-        $this->middleware('guest', ['except' => ['getVerification', 'getVerificationError']]);
+        $this->middleware('guest');
     }
 
     /**
@@ -69,6 +68,8 @@ class RegisterController extends Controller
             'notes' => $data['notes'],
             'invites' => $data['defaultinvites'],
             'api_token' => md5(Str::random(40)),
+            'verified' => false,
+            'email_verified_at' => null,
         ]);
 
         $role = Role::query()->where('id', '=', $data['roles_id'])->first();
@@ -162,7 +163,7 @@ class RegisterController extends Controller
                         'password' => $password,
                         'email' => $email,
                         'host' => $request->ip(),
-                        'roles_id' => $userDefault !== null ? $userDefault['id'] : User::ROLE_USER,
+                        'roles_id' => $userDefault !== null ? $userDefault['id'] : UserRole::USER->value,
                         'notes' => '',
                         'defaultinvites' => $userDefault !== null ? $userDefault['defaultinvites'] : Invitation::DEFAULT_INVITES,
                     ];

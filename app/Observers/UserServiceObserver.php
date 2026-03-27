@@ -9,17 +9,12 @@ use App\Jobs\SendWelcomeEmail;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use Jrean\UserVerification\Exceptions\ModelNotCompliantException;
-use Jrean\UserVerification\Facades\UserVerification;
 use Spatie\Permission\Models\Role;
 
 class UserServiceObserver
 {
     /**
      * Handle the user "created" event.
-     *
-     *
-     * @throws ModelNotCompliantException
      */
     public function created(User $user): void
     {
@@ -36,9 +31,7 @@ class UserServiceObserver
         if (! empty(config('mail.from.address') && File::isFile(base_path().'/_install/install.lock'))) {
             SendNewRegisteredAccountMail::dispatch($user)->onQueue('newreg');
             SendWelcomeEmail::dispatch($user)->onQueue('welcomeemails');
-            UserVerification::generate($user);
-
-            UserVerification::send($user, 'User email verification required', config('mail.from.address'));
+            $user->sendEmailVerificationNotification();
         }
     }
 }

@@ -68,7 +68,7 @@ class ForgotPasswordController extends Controller
         }
 
         // Check users exists and send an email
-        $ret = ! empty($rssToken) ? User::getByRssToken($rssToken) : User::getByEmail($email);
+        $ret = ! empty($rssToken) ? User::findByRssToken($rssToken) : User::findByEmail($email);
         if ($ret === null) {
             return redirect()
                 ->route('forgottenpassword')

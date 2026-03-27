@@ -46,6 +46,7 @@ use App\Http\Controllers\AdultController;
 use App\Http\Controllers\AjaxController;
 use App\Http\Controllers\Api\FileListApiController;
 use App\Http\Controllers\ApiHelpController;
+use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -92,6 +93,9 @@ Route::match(['GET', 'POST'], '/', [ContentController::class, 'show'])->name('ho
 
 Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [RegisterController::class, 'register'])->name('register.post');
+Route::get('email/verify', [EmailVerificationController::class, 'show'])->middleware('auth')->name('verification.notice');
+Route::post('email/verification-notification', [EmailVerificationController::class, 'resend'])->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+Route::get('email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
 
 Route::match(['GET', 'POST'], 'forgottenpassword', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('forgottenpassword')->withoutMiddleware(['auth']);
 Route::match(['GET', 'POST'], 'password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request')->withoutMiddleware(['auth']);

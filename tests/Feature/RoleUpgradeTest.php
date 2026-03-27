@@ -4,35 +4,99 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use PDO;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 final class RoleUpgradeTest extends TestCase
 {
+    private string $databasePath = '';
+
+    /**
+     * @var array<string, string|false>
+     */
+    private array $originalEnvironment = [];
+
     private User $user;
 
     private Role $userRole;
 
     private Role $supporterRole;
 
+    public function createApplication()
+    {
+        $this->databasePath = sys_get_temp_dir().'/nntmux-role-upgrade-test.sqlite';
+
+        $this->originalEnvironment = [
+            'APP_ENV' => getenv('APP_ENV'),
+            'DB_CONNECTION' => getenv('DB_CONNECTION'),
+            'DB_DATABASE' => getenv('DB_DATABASE'),
+        ];
+
+        if (file_exists($this->databasePath)) {
+            unlink($this->databasePath);
+        }
+
+        $pdo = new PDO('sqlite:'.$this->databasePath);
+        $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
+
+        $settings = [
+            'categorizeforeign' => '0',
+            'catwebdl' => '0',
+            'delaytime' => '2',
+            'crossposttime' => '2',
+            'maxnzbsprocessed' => '1000',
+            'completionpercent' => '100',
+            'collection_timeout' => '30',
+            'maxsizetoformrelease' => '10737418240',
+            'minsizetoformrelease' => '0',
+            'minfilestoformrelease' => '1',
+            'releaseretentiondays' => '0',
+            'deletepasswordedrelease' => '0',
+            'miscotherretentionhours' => '0',
+            'mischashedretentionhours' => '0',
+            'partretentionhours' => '0',
+            'last_run_time' => '',
+        ];
+
+        $statement = $pdo->prepare('INSERT INTO settings (name, value) VALUES (:name, :value)');
+        foreach ($settings as $name => $value) {
+            $statement->execute(['name' => $name, 'value' => $value]);
+        }
+
+        $this->setEnvironmentValue('APP_ENV', 'testing');
+        $this->setEnvironmentValue('DB_CONNECTION', 'sqlite');
+        $this->setEnvironmentValue('DB_DATABASE', $this->databasePath);
+
+        $app = require __DIR__.'/../../bootstrap/app.php';
+
+        $app->make(Kernel::class)->bootstrap();
+
+        return $app;
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        // Use in-memory SQLite database for test isolation
-        config(['database.default' => 'sqlite', 'database.connections.sqlite.database' => ':memory:']);
+        config(['database.default' => 'sqlite', 'database.connections.sqlite.database' => $this->databasePath]);
         DB::purge();
         DB::reconnect();
 
         // Create minimal tables needed for testing
         $this->createTestTables();
 
-        // Create the basic User role
-        $this->userRole = Role::firstOrCreate(
-            ['name' => 'User'],
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        // Create the basic User and Supporter roles using raw inserts so custom columns
+        // are always populated consistently across mixed-suite runs.
+        DB::table('roles')->insert([
             [
+                'name' => 'User',
                 'guard_name' => 'web',
                 'addyears' => 0,
                 'apirequests' => 10,
@@ -41,12 +105,11 @@ final class RoleUpgradeTest extends TestCase
                 'isdefault' => 1,
                 'donation' => 0,
                 'canpreview' => 0,
-            ]
-        );
-        // Create the Supporter role with addyears = 1 as default
-        $this->supporterRole = Role::firstOrCreate(
-            ['name' => 'Supporter'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
             [
+                'name' => 'Supporter',
                 'guard_name' => 'web',
                 'addyears' => 1,
                 'apirequests' => 100,
@@ -55,8 +118,13 @@ final class RoleUpgradeTest extends TestCase
                 'isdefault' => 0,
                 'donation' => 10,
                 'canpreview' => 1,
-            ]
-        );
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        $this->userRole = Role::query()->where('name', 'User')->where('guard_name', 'web')->firstOrFail();
+        $this->supporterRole = Role::query()->where('name', 'Supporter')->where('guard_name', 'web')->firstOrFail();
         // Create a test user with the User role
         $this->user = $this->createTestUser($this->userRole->id);
         $this->user->assignRole($this->userRole);
@@ -66,6 +134,14 @@ final class RoleUpgradeTest extends TestCase
     {
         DB::disconnect();
         parent::tearDown();
+
+        if ($this->databasePath !== '' && file_exists($this->databasePath)) {
+            unlink($this->databasePath);
+        }
+
+        foreach ($this->originalEnvironment as $key => $value) {
+            $this->setEnvironmentValue($key, $value === false ? null : $value);
+        }
     }
 
     /**
@@ -73,8 +149,19 @@ final class RoleUpgradeTest extends TestCase
      */
     private function createTestTables(): void
     {
+        DB::statement('DROP TABLE IF EXISTS role_promotion_stats');
+        DB::statement('DROP TABLE IF EXISTS role_promotions');
+        DB::statement('DROP TABLE IF EXISTS user_activities');
+        DB::statement('DROP TABLE IF EXISTS user_role_history');
+        DB::statement('DROP TABLE IF EXISTS role_has_permissions');
+        DB::statement('DROP TABLE IF EXISTS model_has_permissions');
+        DB::statement('DROP TABLE IF EXISTS permissions');
+        DB::statement('DROP TABLE IF EXISTS model_has_roles');
+        DB::statement('DROP TABLE IF EXISTS roles');
+        DB::statement('DROP TABLE IF EXISTS users');
+
         // Users table
-        DB::statement('CREATE TABLE IF NOT EXISTS users (
+        DB::statement('CREATE TABLE users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username VARCHAR(255) NOT NULL,
             email VARCHAR(255) NOT NULL UNIQUE,
@@ -103,7 +190,7 @@ final class RoleUpgradeTest extends TestCase
         )');
 
         // Roles table (spatie/laravel-permission)
-        DB::statement('CREATE TABLE IF NOT EXISTS roles (
+        DB::statement('CREATE TABLE roles (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name VARCHAR(255) NOT NULL,
             guard_name VARCHAR(255) NOT NULL,
@@ -119,7 +206,7 @@ final class RoleUpgradeTest extends TestCase
         )');
 
         // Model has roles table (spatie/laravel-permission)
-        DB::statement('CREATE TABLE IF NOT EXISTS model_has_roles (
+        DB::statement('CREATE TABLE model_has_roles (
             role_id INTEGER NOT NULL,
             model_type VARCHAR(255) NOT NULL,
             model_id INTEGER NOT NULL,
@@ -127,7 +214,7 @@ final class RoleUpgradeTest extends TestCase
         )');
 
         // Permissions table (spatie/laravel-permission)
-        DB::statement('CREATE TABLE IF NOT EXISTS permissions (
+        DB::statement('CREATE TABLE permissions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name VARCHAR(255) NOT NULL,
             guard_name VARCHAR(255) NOT NULL,
@@ -136,7 +223,7 @@ final class RoleUpgradeTest extends TestCase
         )');
 
         // Model has permissions table (spatie/laravel-permission)
-        DB::statement('CREATE TABLE IF NOT EXISTS model_has_permissions (
+        DB::statement('CREATE TABLE model_has_permissions (
             permission_id INTEGER NOT NULL,
             model_type VARCHAR(255) NOT NULL,
             model_id INTEGER NOT NULL,
@@ -144,27 +231,30 @@ final class RoleUpgradeTest extends TestCase
         )');
 
         // Role has permissions table (spatie/laravel-permission)
-        DB::statement('CREATE TABLE IF NOT EXISTS role_has_permissions (
+        DB::statement('CREATE TABLE role_has_permissions (
             permission_id INTEGER NOT NULL,
             role_id INTEGER NOT NULL,
             PRIMARY KEY (permission_id, role_id)
         )');
 
-        // User role history table (if needed)
-        DB::statement('CREATE TABLE IF NOT EXISTS user_role_history (
+        // User role history table
+        DB::statement('CREATE TABLE user_role_history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            users_id INTEGER NOT NULL,
-            old_roles_id INTEGER NULL,
-            new_roles_id INTEGER NOT NULL,
-            old_rolechangedate DATETIME NULL,
-            new_rolechangedate DATETIME NULL,
-            changed_by_user_id INTEGER NULL,
-            reason TEXT NULL,
-            created_at DATETIME NULL
+            user_id INTEGER NOT NULL,
+            old_role_id INTEGER NULL,
+            new_role_id INTEGER NOT NULL,
+            old_expiry_date DATETIME NULL,
+            new_expiry_date DATETIME NULL,
+            effective_date DATETIME NOT NULL,
+            is_stacked INTEGER DEFAULT 0,
+            change_reason TEXT NULL,
+            changed_by INTEGER NULL,
+            created_at DATETIME NULL,
+            updated_at DATETIME NULL
         )');
 
         // User activities table
-        DB::statement('CREATE TABLE IF NOT EXISTS user_activities (
+        DB::statement('CREATE TABLE user_activities (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NULL,
             username VARCHAR(255) NOT NULL,
@@ -175,7 +265,7 @@ final class RoleUpgradeTest extends TestCase
         )');
 
         // Role promotions table
-        DB::statement('CREATE TABLE IF NOT EXISTS role_promotions (
+        DB::statement('CREATE TABLE role_promotions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name VARCHAR(255) NOT NULL,
             description TEXT NULL,
@@ -189,7 +279,7 @@ final class RoleUpgradeTest extends TestCase
         )');
 
         // Role promotion stats table
-        DB::statement('CREATE TABLE IF NOT EXISTS role_promotion_stats (
+        DB::statement('CREATE TABLE role_promotion_stats (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             role_promotion_id INTEGER NOT NULL,
@@ -201,6 +291,20 @@ final class RoleUpgradeTest extends TestCase
             created_at DATETIME NULL,
             updated_at DATETIME NULL
         )');
+    }
+
+    private function setEnvironmentValue(string $key, ?string $value): void
+    {
+        if ($value === null) {
+            putenv($key);
+            unset($_ENV[$key], $_SERVER[$key]);
+
+            return;
+        }
+
+        putenv($key.'='.$value);
+        $_ENV[$key] = $value;
+        $_SERVER[$key] = $value;
     }
 
     /**
@@ -280,11 +384,12 @@ final class RoleUpgradeTest extends TestCase
             addYears: null
         );
         $this->assertTrue($result, 'updateUserRole should return true');
-        $this->user->refresh();
+
+        $updatedUser = DB::table('users')->where('id', $this->user->id)->first();
         // The rolechangedate should be 1 year from now (365 days) - the role's default
         $expectedExpiryDate = Carbon::parse('2025-01-01 12:00:00')->addDays($this->supporterRole->addyears * 365);
-        $this->assertNotNull($this->user->rolechangedate, 'Role change date should not be null');
-        $actualExpiryDate = Carbon::parse($this->user->rolechangedate);
+        $this->assertNotNull($updatedUser?->rolechangedate, 'Role change date should not be null');
+        $actualExpiryDate = Carbon::parse($updatedUser->rolechangedate);
         $this->assertEquals(
             $expectedExpiryDate->toDateString(),
             $actualExpiryDate->toDateString(),

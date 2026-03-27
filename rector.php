@@ -26,7 +26,7 @@ return static function (RectorConfig $rectorConfig): void {
 
     // define sets of rules
     $rectorConfig->sets([
-        LaravelSetList::LARAVEL_100,
+        LaravelSetList::LARAVEL_130,
         SetList::PHP_84,
         SetList::CODE_QUALITY,
     ]);

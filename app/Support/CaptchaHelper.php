@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+use App\Rules\RecaptchaRule;
 use App\Rules\TurnstileRule;
+use App\Services\RecaptchaService;
 use App\Services\TurnstileService;
 use Illuminate\Support\Facades\Log;
 
@@ -67,7 +69,7 @@ class CaptchaHelper
         }
 
         // Default to reCAPTCHA
-        return app('captcha')->display($attributes);
+        return RecaptchaService::display($attributes);
     }
 
     /**
@@ -86,7 +88,7 @@ class CaptchaHelper
         }
 
         // Default to reCAPTCHA
-        return app('captcha')->renderJs();
+        return RecaptchaService::renderJs();
     }
 
     /**
@@ -130,7 +132,7 @@ class CaptchaHelper
         return [
             $fieldName => [
                 'required',
-                'captcha',
+                new RecaptchaRule,
             ],
         ];
     }

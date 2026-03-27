@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'base_url' => env('IGDB_BASE_URL', 'https://api.igdb.com/v4'),
+
+    'token_url' => env('TWITCH_TOKEN_URL', 'https://id.twitch.tv/oauth2/token'),
+
     /*
      * These are the credentials you got from https://dev.twitch.tv/console/apps
      */
@@ -10,25 +14,11 @@ return [
     ],
 
     /*
-     * This package caches queries automatically (for 1 hour per default).
-     * Here you can set how long each query should be cached (in seconds).
+     * The local IGDB client caches query responses for this many seconds.
      *
      * To turn cache off set this value to 0
      *
      * Recommended: 86400 (24 hours) for game data that rarely changes
      */
     'cache_lifetime' => (int) env('IGDB_CACHE_LIFETIME', 86400),
-
-    /*
-     * Path where the webhooks should be handled.
-     */
-    'webhook_path' => 'igdb-webhook/handle',
-
-    /*
-     * The webhook secret.
-     *
-     * This needs to be a string of your choice in order to use the webhook
-     * functionality.
-     */
-    'webhook_secret' => env('IGDB_WEBHOOK_SECRET'),
 ];

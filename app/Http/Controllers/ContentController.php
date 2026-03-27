@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
 use App\Models\Content;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -36,7 +36,7 @@ class ContentController extends BasePageController
          *
          * Admins and mods should be the only ones to see admin content.
          */
-        $isAdmin = \in_array($role, [User::ROLE_ADMIN, User::ROLE_MODERATOR], true);
+        $isAdmin = \in_array($role, [UserRole::ADMIN->value, UserRole::MODERATOR->value], true);
 
         $contentId = $request->input('id', 0);
         $contentPage = $request->input('page', false);

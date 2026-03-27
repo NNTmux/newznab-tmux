@@ -9,13 +9,10 @@ use App\Models\ConsoleInfo;
 use App\Models\Genre;
 use App\Models\Release;
 use App\Models\Settings;
-use GuzzleHttp\Exception\ClientException;
+use App\Services\IGDB\Exceptions\IgdbHttpException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use MarcReichel\IGDBLaravel\Models\Company;
-use MarcReichel\IGDBLaravel\Models\Game;
-use MarcReichel\IGDBLaravel\Models\Platform;
 
 /**
  * ConsoleService - Console/Game processing service.
@@ -33,19 +30,11 @@ class ConsoleService
 
     public const int CONS_NTFND = -2;
 
-    protected const int MATCH_PERCENT = 60;
-
     public bool $echoOutput;
-
-    public ?string $pubkey;
-
-    public ?string $privkey;
-
-    public ?string $asstag;
 
     public int $gameQty;
 
-    public int $sleepTime;
+    public int $lookupThrottleMs;
 
     public string $imgSavePath;
 
@@ -56,20 +45,18 @@ class ConsoleService
      */
     public array $failCache;
 
+    protected IGDBService $igdbService;
+
     protected ReleaseImageService $imageService;
 
-    protected mixed $igdbSleep;
-
-    public function __construct(?ReleaseImageService $imageService = null)
+    public function __construct(?ReleaseImageService $imageService = null, ?IGDBService $igdbService = null)
     {
         $this->echoOutput = config('nntmux.echocli');
         $this->imageService = $imageService ?? new ReleaseImageService;
+        $this->igdbService = $igdbService ?? new IGDBService;
 
-        $this->pubkey = Settings::settingValue('amazonpubkey');
-        $this->privkey = Settings::settingValue('amazonprivkey');
-        $this->asstag = Settings::settingValue('amazonassociatetag');
         $this->gameQty = (Settings::settingValue('maxgamesprocessed') !== '') ? (int) Settings::settingValue('maxgamesprocessed') : 150;
-        $this->sleepTime = (Settings::settingValue('amazonsleep') !== '') ? (int) Settings::settingValue('amazonsleep') : 1000;
+        $this->lookupThrottleMs = (Settings::settingValue('amazonsleep') !== '') ? (int) Settings::settingValue('amazonsleep') : 1000;
         $this->imgSavePath = config('nntmux_settings.covers_path').'/console/';
         $this->renamed = (int) Settings::settingValue('lookupgames') === 2;
 
@@ -369,7 +356,7 @@ class ConsoleService
     {
         $consoleId = self::CONS_NTFND;
 
-        $igdb = $this->fetchIGDBProperties($gameInfo['title'], $gameInfo['node']);
+        $igdb = $this->fetchIGDBProperties($gameInfo['title'], $gameInfo['platform']);
         if ($igdb !== false) {
             if ($igdb['coverurl'] !== '') {
                 $igdb['cover'] = 1;
@@ -402,99 +389,32 @@ class ConsoleService
      */
     public function fetchIGDBProperties(string $gameInfo, string $gamePlatform): bool|array|\StdClass
     {
-        $bestMatch = false;
-
         $gamePlatform = $this->replacePlatform($gamePlatform);
 
-        if (config('config.credentials.client_id') !== '' && config('config.credentials.client_secret') !== '') {
-            try {
-                $result = Game::where('name', $gameInfo)->get();
-                if (! empty($result)) {
-                    $bestMatchPct = 0;
-                    foreach ($result as $res) {
-                        similar_text(strtolower($gameInfo), strtolower($res->name), $percent);
-                        if ($percent >= 90 && $percent > $bestMatchPct) {
-                            $bestMatch = $res->id;
-                            $bestMatchPct = $percent;
-                        }
-                    }
+        if (! $this->igdbService->isConfigured()) {
+            return false;
+        }
 
-                    if ($bestMatch !== false) {
-                        $game = Game::with([
-                            'cover' => ['url'],
-                            'screenshots' => ['url'],
-                            'involved_companies' => ['company', 'publisher'],
-                            'themes',
-                        ])->where('id', $bestMatch)->first();
-
-                        $publishers = [];
-                        if (! empty($game->involved_companies)) {
-                            foreach ($game->involved_companies as $publisher) {
-                                if ($publisher['publisher'] === true) {
-                                    $company = Company::find($publisher['company']);
-                                    $publishers[] = $company['name'];
-                                }
-                            }
-                        }
-
-                        $genres = [];
-                        if (! empty($game->themes)) {
-                            foreach ($game->themes as $theme) {
-                                $genres[] = $theme['name'];
-                            }
-                        }
-
-                        $genreKey = $this->getGenreKey(implode(',', $genres));
-
-                        $platform = '';
-                        if (! empty($game->platforms)) {
-                            foreach ($game->platforms as $platforms) {
-                                $percentCurrent = 0;
-                                $gamePlatforms = Platform::where('id', $platforms)->get();
-                                foreach ($gamePlatforms as $gamePlat) {
-                                    similar_text($gamePlat['name'], $gamePlatform, $percent);
-                                    if ($percent >= 85 && $percent > $percentCurrent) {
-                                        $percentCurrent = $percent;
-                                        $platform = $gamePlat['name'];
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        return [
-                            'title' => $game->name,
-                            'asin' => (string) $game->id,
-                            'review' => $game->summary ?? '',
-                            'coverurl' => ! empty($game->cover->url) ? 'https:'.$game->cover->url : '',
-                            'releasedate' => ! empty($game->first_release_date) ? $game->first_release_date->format('Y-m-d') : now()->format('Y-m-d'),
-                            'esrb' => ! empty($game->aggregated_rating) ? round($game->aggregated_rating).'%' : 'Not Rated',
-                            'url' => $game->url ?? '',
-                            'publisher' => ! empty($publishers) ? implode(',', $publishers) : 'Unknown',
-                            'platform' => $platform ?? '',
-                            'consolegenre' => ! empty($genres) ? implode(',', $genres) : 'Unknown',
-                            'consolegenreid' => $genreKey,
-                            'salesrank' => '',
-                        ];
-                    }
-
-                    cli()->notice('IGDB returned no valid results');
-
-                    return false;
-                }
-
+        try {
+            $game = $this->igdbService->searchConsole($gameInfo, $gamePlatform);
+            if ($game === null) {
                 cli()->notice('IGDB found no valid results');
 
                 return false;
-            } catch (ClientException $e) {
-                if ($e->getCode() === 429) {
-                    $this->igdbSleep = now()->endOfMonth();
-                }
-            } catch (\Exception $e) {
-                cli()->error('Error fetching IGDB properties: '.$e->getMessage());
+            }
 
+            $igdb = $this->igdbService->buildConsoleData($game, $gamePlatform);
+            $igdb['consolegenreid'] = $this->getGenreKey($igdb['consolegenre']);
+
+            return $igdb;
+        } catch (IgdbHttpException $e) {
+            if ($e->getStatusCode() === 429) {
                 return false;
             }
+        } catch (\Exception $e) {
+            cli()->error('Error fetching IGDB properties: '.$e->getMessage());
+
+            return false;
         }
 
         return false;
@@ -530,7 +450,7 @@ class ConsoleService
 
             foreach ($res as $arr) {
                 $startTime = now()->timestamp;
-                $usedAmazon = false;
+                $usedExternalLookup = false;
                 $gameId = self::CONS_NTFND;
                 $gameInfo = $this->parseTitle($arr['searchname']);
 
@@ -550,7 +470,7 @@ class ConsoleService
                         $gameId = -2;
                     } elseif ($gameCheck === false) {
                         $gameId = $this->updateConsoleInfo($gameInfo);
-                        $usedAmazon = true;
+                        $usedExternalLookup = true;
                         if ($gameId === self::CONS_NTFND) {
                             $this->failCache[] = $gameInfo['title'].$gameInfo['platform'];
                         }
@@ -568,10 +488,10 @@ class ConsoleService
                 // Update release.
                 Release::query()->where('id', $arr['id'])->update(['consoleinfo_id' => $gameId]);
 
-                // Sleep to not flood amazon.
+                // Throttle external lookups using the legacy amazonsleep setting.
                 $diff = floor((now()->timestamp - $startTime) * 1000000);
-                if ($this->sleepTime * 1000 - $diff > 0 && $usedAmazon === true) {
-                    usleep((int) ($this->sleepTime * 1000 - $diff));
+                if ($this->lookupThrottleMs * 1000 - $diff > 0 && $usedExternalLookup === true) {
+                    usleep((int) ($this->lookupThrottleMs * 1000 - $diff));
                 }
             }
         } elseif ($this->echoOutput) {
@@ -637,9 +557,7 @@ class ConsoleService
                 $platform = 'XBOX360';
             }
 
-            $browseNode = $this->getBrowseNode($platform);
             $result['platform'] = $platform;
-            $result['node'] = $browseNode;
         }
 
         $result['release'] = $releaseName;
@@ -649,11 +567,11 @@ class ConsoleService
     }
 
     // ========================================
-    // Platform/Node Methods
+    // Platform Methods
     // ========================================
 
     /**
-     * Replace platform name to Amazon equivalent.
+     * Normalize a parsed release platform name to the external lookup equivalent.
      */
     public function replacePlatform(string $platform): string
     {
@@ -676,64 +594,6 @@ class ConsoleService
             'SUPER NINTENDO', 'NINTENDO SUPER NES', 'SNES' => 'SNES',
             default => $platform,
         };
-    }
-
-    /**
-     * Get Amazon browse node ID for platform.
-     */
-    public function getBrowseNode(string $platform): string
-    {
-        return match ($platform) {
-            'PS2' => '301712',
-            'PS3' => '14210751',
-            'PS4' => '6427814011',
-            'PSP' => '11075221',
-            'PSVITA' => '3010556011',
-            'PSX' => '294940',
-            'WII', 'Wii' => '14218901',
-            'WIIU', 'WiiU' => '3075112011',
-            'XBOX360', 'X360' => '14220161',
-            'XBOXONE' => '6469269011',
-            'XBOX', 'X-BOX' => '537504',
-            'NDS' => '11075831',
-            '3DS' => '2622269011',
-            'GC', 'NGC' => '541022',
-            'N64' => '229763',
-            'SNES' => '294945',
-            'NES' => '566458',
-            default => '468642',
-        };
-    }
-
-    // ========================================
-    // Genre Methods
-    // ========================================
-
-    /**
-     * Match browse node to genre name.
-     */
-    public function matchBrowseNode(string $nodeName): bool|string
-    {
-        $str = match ($nodeName) {
-            'Action_shooter', 'Action_Games', 'Action_games' => 'Action',
-            'Action/Adventure', 'Action\\Adventure', 'Adventure_games' => 'Adventure',
-            'Boxing_games', 'Sports_games' => 'Sports',
-            'Fantasy_action_games' => 'Fantasy',
-            'Fighting_action_games' => 'Fighting',
-            'Flying_simulation_games' => 'Flying',
-            'Horror_action_games' => 'Horror',
-            'Kids & Family' => 'Family',
-            'Role_playing_games' => 'Role-Playing',
-            'Shooter_action_games' => 'Shooter',
-            'Singing_games' => 'Music',
-            'Action', 'Adventure', 'Arcade', 'Board Games', 'Cards', 'Casino',
-            'Collections', 'Family', 'Fantasy', 'Fighting', 'Flying', 'Horror',
-            'Music', 'Puzzle', 'Racing', 'Rhythm', 'Role-Playing', 'Simulation',
-            'Shooter', 'Shooting', 'Sports', 'Strategy', 'Trivia' => $nodeName,
-            default => '',
-        };
-
-        return ($str !== '') ? $str : false;
     }
 
     // ========================================

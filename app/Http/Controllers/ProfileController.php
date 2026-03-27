@@ -23,7 +23,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
-use Jrean\UserVerification\Facades\UserVerification;
 use PragmaRX\Google2FALaravel\Facade as Google2FA;
 
 class ProfileController extends BasePageController
@@ -45,7 +44,7 @@ class ProfileController extends BasePageController
 
             // If both 'id' and 'name' are specified, 'id' should take precedence.
             if ($altID === false && $altUsername !== false) {
-                $user = User::getByUsername($altUsername);
+                $user = User::findByUsername($altUsername);
                 if ($user) {
                     $this->userdata = $user;
                     $altID = $user['id'];
@@ -203,12 +202,8 @@ class ProfileController extends BasePageController
                     if (! $this->userdata->hasRole('Admin')) {
                         if (! empty($request->input('email')) && $this->userdata->email !== $request->input('email')) {
                             $this->userdata->email = $request->input('email');
-
-                            $verify_user = $this->userdata;
-
-                            UserVerification::generate($verify_user);
-
-                            UserVerification::send($verify_user, 'User email verification required');
+                            $this->userdata->resetEmailVerification();
+                            $this->userdata->sendEmailVerificationNotification();
 
                             Auth::logout();
 

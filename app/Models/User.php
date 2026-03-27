@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Enums\QueueType;
 use App\Enums\SignupError;
 use App\Enums\UserRole;
 use App\Jobs\SendAccountExpiredEmail;
@@ -12,6 +11,9 @@ use App\Jobs\SendAccountWillExpireEmail;
 use App\Rules\ValidEmailDomain;
 use App\Services\InvitationService;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
+use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
@@ -32,7 +34,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Jrean\UserVerification\Traits\UserVerification;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -110,20 +111,19 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder|User whereEmail(string $value)
  * @method static Builder|User whereApiToken(string $value)
  * @method static Builder|User whereResetguid(string $value)
- * @method static Builder|User whereVerified(int $value)
  * @method static Builder|User active()
  * @method static Builder|User verified()
  * @method static Builder|User withRole(int|string $role)
  * @method static Builder|User expiringSoon(int $days = 7)
  * @method static Builder|User expired()
  */
-final class User extends Authenticatable
+final class User extends Authenticatable implements MustVerifyEmailContract
 {
     use HasFactory; // @phpstan-ignore missingType.generics
     use HasRoles;
+    use MustVerifyEmailTrait;
     use Notifiable;
     use SoftDeletes;
-    use UserVerification;
 
     /**
      * @var list<string>
@@ -342,7 +342,51 @@ final class User extends Authenticatable
      */
     public function scopeVerified(Builder $query): Builder // @phpstan-ignore missingType.generics
     {
-        return $query->where('verified', true);
+        return $query->where(function (Builder $verifiedQuery): void {
+            $verifiedQuery
+                ->where('verified', true)
+                ->orWhereNotNull('email_verified_at');
+        });
+    }
+
+    /**
+     * Determine if the user has verified their email address.
+     */
+    public function hasVerifiedEmail(): bool
+    {
+        return $this->verified || $this->email_verified_at !== null;
+    }
+
+    /**
+     * Mark the user's email as verified and keep legacy columns in sync.
+     */
+    public function markEmailAsVerified(): bool
+    {
+        return $this->forceFill([
+            'email_verified_at' => now(),
+            'verified' => true,
+            'verification_token' => null,
+        ])->save();
+    }
+
+    /**
+     * Reset email verification state, typically after an email change.
+     */
+    public function resetEmailVerification(): bool
+    {
+        return $this->forceFill([
+            'email_verified_at' => null,
+            'verified' => false,
+            'verification_token' => null,
+        ])->save();
+    }
+
+    /**
+     * Send the standard Laravel email verification notification.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new VerifyEmail);
     }
 
     /**
@@ -718,40 +762,6 @@ final class User extends Authenticatable
         return static::whereResetguid($guid)->first();
     }
 
-    // ===== Backward Compatibility Aliases =====
-
-    /**
-     * @deprecated Use findByUsername() instead
-     */
-    public static function getByUsername(string $userName): ?static
-    {
-        return static::findByUsername($userName);
-    }
-
-    /**
-     * @deprecated Use findByEmail() instead
-     */
-    public static function getByEmail(string $email): ?static
-    {
-        return static::findByEmail($email);
-    }
-
-    /**
-     * @deprecated Use findByRssToken() instead
-     */
-    public static function getByRssToken(string $rssToken): ?static
-    {
-        return static::findByRssToken($rssToken);
-    }
-
-    /**
-     * @deprecated Use findByResetGuid() instead
-     */
-    public static function getByPassResetGuid(string $guid): ?static
-    {
-        return static::findByResetGuid($guid);
-    }
-
     // ===== User Management Methods =====
 
     /**
@@ -920,7 +930,7 @@ final class User extends Authenticatable
             return true;
         }
 
-        $additionalDays = ($addYears ?? 0) * self::DAYS_PER_YEAR;
+        $additionalDays = self::resolveRoleDurationDays($roleModel, $addYears);
         $promotionDays = $applyPromotions
             ? RolePromotion::calculateAdditionalDays($roleModel->id)
             : 0;
@@ -969,7 +979,7 @@ final class User extends Authenticatable
 
             if ($pendingRole && $pendingStartDate) {
                 // Calculate when the pending role would expire
-                $pendingRoleBaseDays = $pendingRole->addyears * self::DAYS_PER_YEAR;
+                $pendingRoleBaseDays = self::resolveRoleDurationDays($pendingRole, null);
                 $pendingRolePromotionDays = ! in_array($pendingRole->name, self::PROMOTION_EXCLUDED_ROLES, true)
                     ? RolePromotion::calculateAdditionalDays($pendingRole->id)
                     : 0;
@@ -1008,7 +1018,7 @@ final class User extends Authenticatable
             'hadPendingRole' => $user->hasPendingRole(),
         ]);
 
-        $baseDays = ($addYears ?? $roleModel->addyears) * self::DAYS_PER_YEAR;
+        $baseDays = self::resolveRoleDurationDays($roleModel, $addYears);
         $promotionDays = ! in_array($roleModel->name, self::PROMOTION_EXCLUDED_ROLES, true) && $applyPromotions
             ? RolePromotion::calculateAdditionalDays($roleModel->id)
             : 0;
@@ -1053,7 +1063,7 @@ final class User extends Authenticatable
         ?int $changedBy,
         bool $preserveCurrentExpiry,
     ): bool {
-        $baseDays = ($addYears ?? $roleModel->addyears) * self::DAYS_PER_YEAR;
+        $baseDays = self::resolveRoleDurationDays($roleModel, $addYears);
         $promotionDays = ! in_array($roleModel->name, self::PROMOTION_EXCLUDED_ROLES, true) && $applyPromotions
             ? RolePromotion::calculateAdditionalDays($roleModel->id)
             : 0;
@@ -1095,6 +1105,27 @@ final class User extends Authenticatable
         }
 
         return $updated;
+    }
+
+    /**
+     * Resolve the number of role-duration days to apply.
+     */
+    private static function resolveRoleDurationDays(Role $roleModel, ?int $addYears, bool $useRoleDefaultWhenMissing = true): int
+    {
+        if ($addYears !== null) {
+            return max(0, $addYears) * self::DAYS_PER_YEAR;
+        }
+
+        if (! $useRoleDefaultWhenMissing) {
+            return 0;
+        }
+
+        $rawAddYears = Role::query()->whereKey($roleModel->id)->value('addyears');
+        $roleAddYears = is_numeric($rawAddYears)
+            ? (int) $rawAddYears
+            : (is_numeric($roleModel->addyears ?? null) ? (int) $roleModel->addyears : 0);
+
+        return max(0, $roleAddYears) * self::DAYS_PER_YEAR;
     }
 
     /**
@@ -1665,7 +1696,9 @@ final class User extends Authenticatable
      */
     public static function deleteUnVerified(): void
     {
-        static::whereVerified(0)
+        static::query()
+            ->where('verified', false)
+            ->whereNull('email_verified_at')
             ->where('created_at', '<', now()->subDays(3))
             ->delete();
     }
@@ -1685,48 +1718,4 @@ final class User extends Authenticatable
     {
         return $this->timezone ?? 'UTC';
     }
-
-    // ===== Legacy Constants (Deprecated - Use Enums) =====
-
-    /** @deprecated Use SignupError::BAD_USERNAME->value instead */
-    public const ERR_SIGNUP_BADUNAME = SignupError::BAD_USERNAME->value;
-
-    /** @deprecated Use SignupError::BAD_PASSWORD->value instead */
-    public const ERR_SIGNUP_BADPASS = SignupError::BAD_PASSWORD->value;
-
-    /** @deprecated Use SignupError::BAD_EMAIL->value instead */
-    public const ERR_SIGNUP_BADEMAIL = SignupError::BAD_EMAIL->value;
-
-    /** @deprecated Use SignupError::USERNAME_IN_USE->value instead */
-    public const ERR_SIGNUP_UNAMEINUSE = SignupError::USERNAME_IN_USE->value;
-
-    /** @deprecated Use SignupError::EMAIL_IN_USE->value instead */
-    public const ERR_SIGNUP_EMAILINUSE = SignupError::EMAIL_IN_USE->value;
-
-    /** @deprecated Use SignupError::BAD_INVITE_CODE->value instead */
-    public const ERR_SIGNUP_BADINVITECODE = SignupError::BAD_INVITE_CODE->value;
-
-    /** @deprecated Use SignupError::SUCCESS->value instead */
-    public const SUCCESS = SignupError::SUCCESS->value;
-
-    /** @deprecated Use UserRole::USER->value instead */
-    public const ROLE_USER = UserRole::USER->value;
-
-    /** @deprecated Use UserRole::ADMIN->value instead */
-    public const ROLE_ADMIN = UserRole::ADMIN->value;
-
-    /** @deprecated Use UserRole::DISABLED->value instead */
-    public const ROLE_DISABLED = UserRole::DISABLED->value;
-
-    /** @deprecated Use UserRole::MODERATOR->value instead */
-    public const ROLE_MODERATOR = UserRole::MODERATOR->value;
-
-    /** @deprecated Use QueueType::NONE->value instead */
-    public const QUEUE_NONE = QueueType::NONE->value;
-
-    /** @deprecated Use QueueType::SABNZBD->value instead */
-    public const QUEUE_SABNZBD = QueueType::SABNZBD->value;
-
-    /** @deprecated Use QueueType::NZBGET->value instead */
-    public const QUEUE_NZBGET = QueueType::NZBGET->value;
 }
