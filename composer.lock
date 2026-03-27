@@ -57,16 +57,16 @@
         },
         {
             "name": "aimeos/laravel-nestedset",
-            "version": "7.1.1",
+            "version": "7.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aimeos/laravel-nestedset.git",
-                "reference": "12a5ced6dc0da94bc3ee7aef871d20f9295db14f"
+                "reference": "fbe0fdc0fae66d526ebaac9e7847d704e8ff2601"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aimeos/laravel-nestedset/zipball/12a5ced6dc0da94bc3ee7aef871d20f9295db14f",
-                "reference": "12a5ced6dc0da94bc3ee7aef871d20f9295db14f",
+                "url": "https://api.github.com/repos/aimeos/laravel-nestedset/zipball/fbe0fdc0fae66d526ebaac9e7847d704e8ff2601",
+                "reference": "fbe0fdc0fae66d526ebaac9e7847d704e8ff2601",
                 "shasum": ""
             },
             "require": {
@@ -118,9 +118,9 @@
             ],
             "support": {
                 "issues": "https://github.com/aimeos/laravel-nestedset/issues",
-                "source": "https://github.com/aimeos/laravel-nestedset/tree/7.1.1"
+                "source": "https://github.com/aimeos/laravel-nestedset/tree/7.2.1"
             },
-            "time": "2026-03-08T17:13:37+00:00"
+            "time": "2026-03-27T14:09:39+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
