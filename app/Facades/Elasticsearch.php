@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace App\Facades;
 
-use Elasticsearch\Client;
+use Elastic\Elasticsearch\Client;
 use Illuminate\Support\Facades\Facade;
 
 /**
  * Elasticsearch Facade - provides static access to Elasticsearch client.
  *
- * @method static \Elasticsearch\Namespaces\IndicesNamespace indices()
- * @method static \Elasticsearch\Namespaces\ClusterNamespace cluster()
- * @method static array search(array $params)
- * @method static array bulk(array $params)
- * @method static array get(array $params)
- * @method static array deleteByQuery(array $params)
+ * @method static \Elastic\Elasticsearch\Endpoints\Indices indices()
+ * @method static \Elastic\Elasticsearch\Endpoints\Cluster cluster()
+ * @method static \Elastic\Elasticsearch\Response\Elasticsearch search(array $params)
+ * @method static \Elastic\Elasticsearch\Response\Elasticsearch bulk(array $params)
+ * @method static \Elastic\Elasticsearch\Response\Elasticsearch get(array $params)
+ * @method static \Elastic\Elasticsearch\Response\Elasticsearch deleteByQuery(array $params)
  *
  * @see Client
  */

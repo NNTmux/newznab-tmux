@@ -7,6 +7,8 @@ namespace App\Console\Commands;
 use App\Facades\Elasticsearch;
 use App\Facades\Search;
 use App\Models\UsenetGroup;
+use App\Services\Search\Support\ElasticsearchResponseHelper;
+use Elastic\Elasticsearch\Client as ElasticsearchClient;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -94,7 +96,10 @@ class NntmuxResetDb extends Command
             unset($value);
 
             if (config('search.default') === 'elasticsearch') {
-                if (Elasticsearch::indices()->exists(['index' => 'releases'])) {
+                /** @var ElasticsearchClient $client */
+                $client = app('elasticsearch');
+
+                if (ElasticsearchResponseHelper::boolResponse($client, fn (ElasticsearchClient $elasticClient) => $elasticClient->indices()->exists(['index' => 'releases']))) {
                     Elasticsearch::indices()->delete(['index' => 'releases']);
                 }
                 $releases_index = [
@@ -138,7 +143,7 @@ class NntmuxResetDb extends Command
 
                 Elasticsearch::indices()->create($releases_index);
 
-                if (Elasticsearch::indices()->exists(['index' => 'predb'])) {
+                if (ElasticsearchResponseHelper::boolResponse($client, fn (ElasticsearchClient $elasticClient) => $elasticClient->indices()->exists(['index' => 'predb']))) {
                     Elasticsearch::indices()->delete(['index' => 'predb']);
                 }
                 $predb_index = [
@@ -173,7 +178,7 @@ class NntmuxResetDb extends Command
                 Elasticsearch::indices()->create($predb_index);
 
                 // Delete and recreate movies index
-                if (Elasticsearch::indices()->exists(['index' => 'movies'])) {
+                if (ElasticsearchResponseHelper::boolResponse($client, fn (ElasticsearchClient $elasticClient) => $elasticClient->indices()->exists(['index' => 'movies']))) {
                     Elasticsearch::indices()->delete(['index' => 'movies']);
                 }
                 $movies_index = [
@@ -214,7 +219,7 @@ class NntmuxResetDb extends Command
                 Elasticsearch::indices()->create($movies_index);
 
                 // Delete and recreate tvshows index
-                if (Elasticsearch::indices()->exists(['index' => 'tvshows'])) {
+                if (ElasticsearchResponseHelper::boolResponse($client, fn (ElasticsearchClient $elasticClient) => $elasticClient->indices()->exists(['index' => 'tvshows']))) {
                     Elasticsearch::indices()->delete(['index' => 'tvshows']);
                 }
                 $tvshows_index = [

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Facades\Elasticsearch;
+use App\Services\Search\Support\ElasticsearchResponseHelper;
+use Elastic\Elasticsearch\Client as ElasticsearchClient;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -68,7 +70,9 @@ class NntmuxCheckIndex extends Command
     {
         try {
             // Check if index exists
-            $exists = Elasticsearch::indices()->exists(['index' => $index]);
+            /** @var ElasticsearchClient $client */
+            $client = app('elasticsearch');
+            $exists = ElasticsearchResponseHelper::boolResponse($client, fn (ElasticsearchClient $elasticClient) => $elasticClient->indices()->exists(['index' => $index]));
 
             if (! $exists) {
                 $this->error("ElasticSearch index '{$index}' does not exist.");

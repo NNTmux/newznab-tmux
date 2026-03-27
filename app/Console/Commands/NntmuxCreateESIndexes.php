@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Facades\Elasticsearch;
+use App\Services\Search\Support\ElasticsearchResponseHelper;
+use Elastic\Elasticsearch\Client;
 use Illuminate\Console\Command;
 
 class NntmuxCreateESIndexes extends Command
@@ -28,7 +30,10 @@ class NntmuxCreateESIndexes extends Command
      */
     public function handle(): void
     {
-        if (Elasticsearch::indices()->exists(['index' => 'releases'])) {
+        /** @var Client $client */
+        $client = app('elasticsearch');
+
+        if (ElasticsearchResponseHelper::boolResponse($client, fn (Client $elasticClient) => $elasticClient->indices()->exists(['index' => 'releases']))) {
             Elasticsearch::indices()->delete(['index' => 'releases']);
         }
         $releases_index = [
@@ -110,7 +115,7 @@ class NntmuxCreateESIndexes extends Command
         $response = Elasticsearch::indices()->create($releases_index);
 
         $this->info('Index releases created successfully');
-        if (Elasticsearch::indices()->exists(['index' => 'predb'])) {
+        if (ElasticsearchResponseHelper::boolResponse($client, fn (Client $elasticClient) => $elasticClient->indices()->exists(['index' => 'predb']))) {
             Elasticsearch::indices()->delete(['index' => 'predb']);
         }
         $predb_index = [

@@ -8,6 +8,8 @@ use App\Facades\Elasticsearch;
 use App\Facades\Search;
 use App\Models\Predb;
 use App\Models\Release;
+use App\Services\Search\Support\ElasticsearchResponseHelper;
+use Elastic\Elasticsearch\Client as ElasticsearchClient;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Process;
@@ -290,7 +292,9 @@ class NntmuxOffsetPopulate extends Command
         } else {
             // For ElasticSearch, just clear the data instead of recreating the index
             try {
-                $exists = Elasticsearch::indices()->exists(['index' => $index]);
+                /** @var ElasticsearchClient $client */
+                $client = app('elasticsearch');
+                $exists = ElasticsearchResponseHelper::boolResponse($client, fn (ElasticsearchClient $elasticClient) => $elasticClient->indices()->exists(['index' => $index]));
 
                 if ($exists) {
                     // Get current document count

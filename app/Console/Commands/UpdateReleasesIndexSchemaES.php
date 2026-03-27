@@ -6,6 +6,8 @@ namespace App\Console\Commands;
 
 use App\Facades\Elasticsearch;
 use App\Models\Release;
+use App\Services\Search\Support\ElasticsearchResponseHelper;
+use Elastic\Elasticsearch\Client as ElasticsearchClient;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -49,6 +51,8 @@ class UpdateReleasesIndexSchemaES extends Command
         'videos_id' => ['type' => 'integer'],
         'movieinfo_id' => ['type' => 'integer'],
     ];
+
+    private ?ElasticsearchClient $client = null;
 
     /**
      * Execute the console command.
@@ -108,6 +112,19 @@ class UpdateReleasesIndexSchemaES extends Command
         return $result;
     }
 
+    private function elasticsearchClient(): ElasticsearchClient
+    {
+        if ($this->client instanceof ElasticsearchClient) {
+            return $this->client;
+        }
+
+        /** @var ElasticsearchClient $client */
+        $client = app('elasticsearch');
+        $this->client = $client;
+
+        return $this->client;
+    }
+
     /**
      * Show current index schema information
      */
@@ -119,7 +136,7 @@ class UpdateReleasesIndexSchemaES extends Command
         try {
             $indexName = config('search.drivers.elasticsearch.indexes.releases', 'releases');
 
-            if (! Elasticsearch::indices()->exists(['index' => $indexName])) {
+            if (! ElasticsearchResponseHelper::boolResponse($this->elasticsearchClient(), fn (ElasticsearchClient $client) => $client->indices()->exists(['index' => $indexName]))) {
                 $this->warn("Index '{$indexName}' does not exist.");
                 $this->info('Run `php artisan nntmux:create-es-indexes` to create the index first.');
 
@@ -206,7 +223,7 @@ class UpdateReleasesIndexSchemaES extends Command
         try {
             $indexName = config('search.drivers.elasticsearch.indexes.releases', 'releases');
 
-            if (! Elasticsearch::indices()->exists(['index' => $indexName])) {
+            if (! ElasticsearchResponseHelper::boolResponse($this->elasticsearchClient(), fn (ElasticsearchClient $client) => $client->indices()->exists(['index' => $indexName]))) {
                 $this->error("Index '{$indexName}' does not exist. Create it first with: php artisan nntmux:create-es-indexes");
 
                 return Command::FAILURE;
@@ -287,7 +304,7 @@ class UpdateReleasesIndexSchemaES extends Command
 
         try {
             // Delete existing index if it exists
-            if (Elasticsearch::indices()->exists(['index' => $indexName])) {
+            if (ElasticsearchResponseHelper::boolResponse($this->elasticsearchClient(), fn (ElasticsearchClient $client) => $client->indices()->exists(['index' => $indexName]))) {
                 $this->info("Deleting existing '{$indexName}' index...");
                 Elasticsearch::indices()->delete(['index' => $indexName]);
             }
@@ -411,7 +428,7 @@ class UpdateReleasesIndexSchemaES extends Command
         $indexName = config('search.drivers.elasticsearch.indexes.releases', 'releases');
 
         // Check if index exists
-        if (! Elasticsearch::indices()->exists(['index' => $indexName])) {
+        if (! ElasticsearchResponseHelper::boolResponse($this->elasticsearchClient(), fn (ElasticsearchClient $client) => $client->indices()->exists(['index' => $indexName]))) {
             $this->error("Index '{$indexName}' does not exist. Create it first.");
 
             return Command::FAILURE;

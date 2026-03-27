@@ -50,7 +50,7 @@
         "dariusiii/net_nntp": "^4.0",
         "dariusiii/rarinfo": "^3.0",
         "dariusiii/tv-maze-php-api": "^2.0.0",
-        "elasticsearch/elasticsearch": "^7.17",
+        "elasticsearch/elasticsearch": "^8.19",
         "fakerphp/faker": "^1.23",
         "geoip2/geoip2": "^3.1",
         "guzzlehttp/guzzle": "^7.9",

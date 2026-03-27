@@ -8,11 +8,10 @@ use App\Models\MovieInfo;
 use App\Models\Release;
 use App\Models\Video;
 use App\Services\Search\Contracts\SearchDriverInterface;
-use Elasticsearch\Client;
-use Elasticsearch\ClientBuilder;
-use Elasticsearch\Common\Exceptions\ElasticsearchException;
-use Elasticsearch\Common\Exceptions\Missing404Exception;
-use GuzzleHttp\Ring\Client\CurlHandler;
+use App\Services\Search\Support\ElasticsearchClientFactory;
+use App\Services\Search\Support\ElasticsearchResponseHelper;
+use Elastic\Elasticsearch\Client;
+use Elastic\Elasticsearch\Exception\ElasticsearchException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -91,38 +90,17 @@ class ElasticSearchDriver implements SearchDriverInterface
     {
         if (self::$client === null) {
             try {
-                if (! extension_loaded('curl')) {
-                    throw new RuntimeException('cURL extension is not loaded');
-                }
-
                 if (empty($this->config)) {
                     throw new RuntimeException('Elasticsearch configuration not found');
                 }
 
-                $clientBuilder = ClientBuilder::create();
-                $hosts = $this->buildHostsArray($this->config['hosts'] ?? []);
-
-                if (empty($hosts)) {
-                    throw new RuntimeException('No Elasticsearch hosts configured');
-                }
-
                 if (config('app.debug')) {
                     Log::debug('Elasticsearch client initializing', [
-                        'hosts' => $hosts,
+                        'hosts' => ElasticsearchClientFactory::buildHosts($this->config['hosts'] ?? []),
                     ]);
                 }
 
-                $clientBuilder->setHosts($hosts);
-                $clientBuilder->setHandler(new CurlHandler);
-                $clientBuilder->setConnectionParams([
-                    'timeout' => $this->config['timeout'] ?? self::DEFAULT_TIMEOUT,
-                    'connect_timeout' => $this->config['connect_timeout'] ?? self::DEFAULT_CONNECT_TIMEOUT,
-                ]);
-
-                // Enable retries for better resilience
-                $clientBuilder->setRetries($this->config['retries'] ?? 2);
-
-                self::$client = $clientBuilder->build();
+                self::$client = ElasticsearchClientFactory::make($this->config);
 
                 if (config('app.debug')) {
                     Log::debug('Elasticsearch client initialized successfully');
@@ -140,42 +118,9 @@ class ElasticSearchDriver implements SearchDriverInterface
     }
 
     /**
-     * Build hosts array from configuration.
-     *
-     * @param  array<string, mixed>  $configHosts  Configuration hosts array
-     * @return array<string, mixed> Formatted hosts array for Elasticsearch client
-     */
-    private function buildHostsArray(array $configHosts): array
-    {
-        $hosts = [];
-
-        foreach ($configHosts as $host) {
-            $hostConfig = [
-                'host' => $host['host'] ?? 'localhost',
-                'port' => $host['port'] ?? 9200,
-            ];
-
-            if (! empty($host['scheme'])) {
-                $hostConfig['scheme'] = $host['scheme'];
-            }
-
-            if (! empty($host['user']) && ! empty($host['pass'])) {
-                $hostConfig['user'] = $host['user'];
-                $hostConfig['pass'] = $host['pass'];
-            }
-
-            $hosts[] = $hostConfig;
-        }
-
-        return $hosts;
-    }
-
-    /**
      * Check if Elasticsearch is available.
      *
      * Caches the availability status to avoid frequent ping requests.
-     *
-     * @return list<array<string, mixed>>
      */
     private function isElasticsearchAvailable(): bool
     {
@@ -190,7 +135,7 @@ class ElasticSearchDriver implements SearchDriverInterface
 
         try {
             $client = $this->getClient();
-            $result = $client->ping();
+            $result = ElasticsearchResponseHelper::boolResponse($client, fn (Client $elasticClient) => $elasticClient->ping());
 
             if (config('app.debug')) {
                 Log::debug('Elasticsearch ping result', ['available' => $result]);
@@ -1268,16 +1213,23 @@ class ElasticSearchDriver implements SearchDriverInterface
                 'id' => $id,
             ]);
 
-        } catch (Missing404Exception $e) {
-            // Document already deleted, not an error
-            if (config('app.debug')) {
-                Log::debug('ElasticSearch deleteRelease: document not found', ['release_id' => $id]);
-            }
-        } catch (ElasticsearchException $e) {
-            Log::error('ElasticSearch deleteRelease error: '.$e->getMessage(), [
-                'release_id' => $id,
-            ]);
         } catch (\Throwable $e) {
+            if (ElasticsearchResponseHelper::isNotFound($e)) {
+                if (config('app.debug')) {
+                    Log::debug('ElasticSearch deleteRelease: document not found', ['release_id' => $id]);
+                }
+
+                return;
+            }
+
+            if ($e instanceof ElasticsearchException) {
+                Log::error('ElasticSearch deleteRelease error: '.$e->getMessage(), [
+                    'release_id' => $id,
+                ]);
+
+                return;
+            }
+
             Log::error('ElasticSearch deleteRelease unexpected error: '.$e->getMessage(), [
                 'release_id' => $id,
             ]);
@@ -1306,15 +1258,23 @@ class ElasticSearchDriver implements SearchDriverInterface
                 'id' => $id,
             ]);
 
-        } catch (Missing404Exception $e) {
-            if (config('app.debug')) {
-                Log::debug('ElasticSearch deletePreDb: document not found', ['predb_id' => $id]);
-            }
-        } catch (ElasticsearchException $e) {
-            Log::error('ElasticSearch deletePreDb error: '.$e->getMessage(), [
-                'predb_id' => $id,
-            ]);
         } catch (\Throwable $e) {
+            if (ElasticsearchResponseHelper::isNotFound($e)) {
+                if (config('app.debug')) {
+                    Log::debug('ElasticSearch deletePreDb: document not found', ['predb_id' => $id]);
+                }
+
+                return;
+            }
+
+            if ($e instanceof ElasticsearchException) {
+                Log::error('ElasticSearch deletePreDb error: '.$e->getMessage(), [
+                    'predb_id' => $id,
+                ]);
+
+                return;
+            }
+
             Log::error('ElasticSearch deletePreDb unexpected error: '.$e->getMessage(), [
                 'predb_id' => $id,
             ]);
@@ -1474,7 +1434,7 @@ class ElasticSearchDriver implements SearchDriverInterface
         try {
             $client = $this->getClient();
 
-            return $client->indices()->exists(['index' => $index]);
+            return ElasticsearchResponseHelper::boolResponse($client, fn (Client $elasticClient) => $elasticClient->indices()->exists(['index' => $index]));
         } catch (\Throwable $e) {
             Log::error('ElasticSearch indexExists error: '.$e->getMessage(), ['index' => $index]);
 
@@ -1501,7 +1461,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                 $client = $this->getClient();
 
                 // Check if index exists
-                if (! $client->indices()->exists(['index' => $index])) {
+                if (! ElasticsearchResponseHelper::boolResponse($client, fn (Client $elasticClient) => $elasticClient->indices()->exists(['index' => $index]))) {
                     Log::info("ElasticSearch truncateIndex: index {$index} does not exist, skipping");
 
                     continue;
@@ -1577,7 +1537,7 @@ class ElasticSearchDriver implements SearchDriverInterface
         try {
             $client = $this->getClient();
 
-            return $client->cluster()->health();
+            return ElasticsearchResponseHelper::asArray($client->cluster()->health());
         } catch (\Throwable $e) {
             Log::error('ElasticSearch getClusterHealth error: '.$e->getMessage());
 
@@ -1600,7 +1560,7 @@ class ElasticSearchDriver implements SearchDriverInterface
         try {
             $client = $this->getClient();
 
-            return $client->indices()->stats(['index' => $index]);
+            return ElasticsearchResponseHelper::asArray($client->indices()->stats(['index' => $index]));
         } catch (\Throwable $e) {
             Log::error('ElasticSearch getIndexStats error: '.$e->getMessage(), ['index' => $index]);
 
@@ -1965,12 +1925,16 @@ class ElasticSearchDriver implements SearchDriverInterface
                 'index' => $this->getMoviesIndex(),
                 'id' => $id,
             ]);
-        } catch (Missing404Exception $e) {
-            // Document doesn't exist, that's fine
-        } catch (ElasticsearchException $e) {
-            Log::error('ElasticSearch deleteMovie error: '.$e->getMessage(), [
-                'id' => $id,
-            ]);
+        } catch (\Throwable $e) {
+            if (ElasticsearchResponseHelper::isNotFound($e)) {
+                return;
+            }
+
+            if ($e instanceof ElasticsearchException) {
+                Log::error('ElasticSearch deleteMovie error: '.$e->getMessage(), [
+                    'id' => $id,
+                ]);
+            }
         }
     }
 
@@ -2247,12 +2211,16 @@ class ElasticSearchDriver implements SearchDriverInterface
                 'index' => $this->getTvShowsIndex(),
                 'id' => $id,
             ]);
-        } catch (Missing404Exception $e) {
-            // Document doesn't exist, that's fine
-        } catch (ElasticsearchException $e) {
-            Log::error('ElasticSearch deleteTvShow error: '.$e->getMessage(), [
-                'id' => $id,
-            ]);
+        } catch (\Throwable $e) {
+            if (ElasticsearchResponseHelper::isNotFound($e)) {
+                return;
+            }
+
+            if ($e instanceof ElasticsearchException) {
+                Log::error('ElasticSearch deleteTvShow error: '.$e->getMessage(), [
+                    'id' => $id,
+                ]);
+            }
         }
     }
 
@@ -2513,7 +2481,6 @@ class ElasticSearchDriver implements SearchDriverInterface
      *
      * @param  array<string, mixed>  $categoryIds  Array of category IDs to filter by
      * @param  int  $limit  Maximum number of results
-     * @return list
      * @return array<string, mixed>
      */
     public function searchReleasesByCategory(array $categoryIds, int $limit = 1000): array

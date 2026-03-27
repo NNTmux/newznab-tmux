@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use Elasticsearch\ClientBuilder;
+use App\Services\Search\Support\ElasticsearchClientFactory;
+use App\Services\Search\Support\ElasticsearchResponseHelper;
+use Elastic\Elasticsearch\Client as ElasticsearchClient;
 use Illuminate\Console\Command;
-use Manticoresearch\Client;
+use Manticoresearch\Client as ManticoreClient;
 use Manticoresearch\Exceptions\ResponseException;
 
 class CreateMediaIndexes extends Command
@@ -54,7 +56,7 @@ class CreateMediaIndexes extends Command
         $host = config('search.drivers.manticore.host', '127.0.0.1');
         $port = config('search.drivers.manticore.port', 9308);
 
-        $client = new Client([
+        $client = new ManticoreClient([
             'host' => $host,
             'port' => $port,
         ]);
@@ -147,7 +149,7 @@ class CreateMediaIndexes extends Command
      *
      * @param  array<string, mixed>  $schema
      */
-    private function createManticoreIndex(Client $client, string $indexName, array $schema, bool $dropExisting): bool
+    private function createManticoreIndex(ManticoreClient $client, string $indexName, array $schema, bool $dropExisting): bool
     {
         try {
             // Check if index exists
@@ -266,20 +268,22 @@ class CreateMediaIndexes extends Command
         ];
 
         try {
-            // Create Elasticsearch client directly
             $esConfig = config('search.drivers.elasticsearch');
-            $esClient = ClientBuilder::create()
-                ->setHosts($esConfig['hosts'] ?? [['host' => 'localhost', 'port' => 9200]])
-                ->build();
+            /** @var ElasticsearchClient $esClient */
+            $esClient = ElasticsearchClientFactory::make($esConfig ?? []);
 
             // Create movies index
             $moviesIndex = config('search.drivers.elasticsearch.indexes.movies', 'movies');
-            if ($dropExisting && $esClient->indices()->exists(['index' => $moviesIndex])) {
+            if ($dropExisting && (ElasticsearchResponseHelper::boolResponse($esClient, function (ElasticsearchClient $client) use ($moviesIndex) {
+                return $client->indices()->exists(['index' => $moviesIndex]);
+            }))) {
                 $this->warn("Dropping existing index: {$moviesIndex}");
                 $esClient->indices()->delete(['index' => $moviesIndex]);
             }
 
-            if (! $esClient->indices()->exists(['index' => $moviesIndex])) {
+            if (! (ElasticsearchResponseHelper::boolResponse($esClient, function (ElasticsearchClient $client) use ($moviesIndex) {
+                return $client->indices()->exists(['index' => $moviesIndex]);
+            }))) {
                 $this->info("Creating index: {$moviesIndex}");
                 $esClient->indices()->create([
                     'index' => $moviesIndex,
@@ -292,12 +296,16 @@ class CreateMediaIndexes extends Command
 
             // Create tvshows index
             $tvshowsIndex = config('search.drivers.elasticsearch.indexes.tvshows', 'tvshows');
-            if ($dropExisting && $esClient->indices()->exists(['index' => $tvshowsIndex])) {
+            if ($dropExisting && (ElasticsearchResponseHelper::boolResponse($esClient, function (ElasticsearchClient $client) use ($tvshowsIndex) {
+                return $client->indices()->exists(['index' => $tvshowsIndex]);
+            }))) {
                 $this->warn("Dropping existing index: {$tvshowsIndex}");
                 $esClient->indices()->delete(['index' => $tvshowsIndex]);
             }
 
-            if (! $esClient->indices()->exists(['index' => $tvshowsIndex])) {
+            if (! (ElasticsearchResponseHelper::boolResponse($esClient, function (ElasticsearchClient $client) use ($tvshowsIndex) {
+                return $client->indices()->exists(['index' => $tvshowsIndex]);
+            }))) {
                 $this->info("Creating index: {$tvshowsIndex}");
                 $esClient->indices()->create([
                     'index' => $tvshowsIndex,
