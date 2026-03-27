@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Policies;
 
+use App\Models\User;
 use App\Policies\CategoryPolicy;
 use App\Policies\PostPolicy;
 use App\Policies\ThreadPolicy;
@@ -26,6 +27,15 @@ final class ForumGuestPolicyTest extends TestCase
         $this->assertFalse($policy->pinThreads(null, $category));
         $this->assertFalse($policy->moveThreadsFrom(null, $category));
         $this->assertFalse($policy->view(null, $category));
+    }
+
+    public function test_authenticated_non_staff_user_can_view_categories(): void
+    {
+        $policy = new CategoryPolicy;
+        $category = new Category;
+        $user = new User;
+
+        $this->assertTrue($policy->view($user, $category));
     }
 
     public function test_guest_thread_actions_are_denied_but_threads_remain_viewable(): void

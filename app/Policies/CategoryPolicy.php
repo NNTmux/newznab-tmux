@@ -79,6 +79,9 @@ class CategoryPolicy extends \TeamTeaTime\Forum\Policies\CategoryPolicy
 
     private function canViewCategory(mixed $user): bool
     {
-        return $user instanceof User && $user->hasAnyRole(['Admin', 'Moderator']);
+        // Forum v8 applies category view checks when filtering private category trees.
+        // Allow any authenticated forum user to see categories while keeping category
+        // management actions restricted to admins.
+        return $user instanceof User;
     }
 }
