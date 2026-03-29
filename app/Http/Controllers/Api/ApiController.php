@@ -113,8 +113,7 @@ class ApiController extends BasePageController
             // Cache user lookup for 5 minutes to avoid repeated DB hits (same pattern as API v2)
             $userCacheKey = 'api_user:'.md5((string) $apiKey);
             $res = Cache::remember($userCacheKey, 300, function () use ($apiKey) {
-                return User::query()
-                    ->where('api_token', $apiKey)
+                return User::verifiedApiTokenQuery($apiKey)
                     ->with('role')
                     ->first();
             });

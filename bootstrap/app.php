@@ -3,14 +3,15 @@
 use App\Http\Middleware\BlockAbusiveServices;
 use App\Http\Middleware\ClearanceMiddleware;
 use App\Http\Middleware\ContentSecurityPolicy;
+use App\Http\Middleware\EnsureAuthenticatedUsersAreVerified;
 use App\Http\Middleware\ForceJsonOnAPI;
 use App\Http\Middleware\Google2FAMiddleware;
 use App\Http\Middleware\NoCacheForAuthenticatedUsers;
 use App\Http\Middleware\SetUserTimezone;
+use App\Http\Middleware\ThrottleApiRequestsByToken;
 use App\Http\Middleware\TrustedDevice2FAMiddleware;
 use App\Http\Middleware\TrustProxies as AppTrustProxies;
 use Creativeorange\Gravatar\GravatarServiceProvider;
-use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -84,7 +85,8 @@ return Application::configure(basePath: dirname(__DIR__))
             '2fa' => Google2FAMiddleware::class,
             'bindings' => SubstituteBindings::class,
             'clearance' => ClearanceMiddleware::class,
-            'isVerified' => EnsureEmailIsVerified::class,
+            'apiRateLimit' => ThrottleApiRequestsByToken::class,
+            'isVerified' => EnsureAuthenticatedUsersAreVerified::class,
             'permission' => PermissionMiddleware::class,
             'role' => RoleMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,

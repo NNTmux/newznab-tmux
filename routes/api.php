@@ -24,7 +24,7 @@ Route::prefix('v2')->group(function () {
     Route::get('capabilities', [ApiV2Controller::class, 'capabilities']);
 });
 
-Route::prefix('v2')->middleware(['auth:api', 'throttle:rate_limit,1'])->group(function () {
+Route::prefix('v2')->middleware('apiRateLimit')->group(function () {
     Route::get('movies', [ApiV2Controller::class, 'movie']);
     Route::get('search', [ApiV2Controller::class, 'apiSearch']);
     Route::get('tv', [ApiV2Controller::class, 'tv']);
@@ -32,7 +32,7 @@ Route::prefix('v2')->middleware(['auth:api', 'throttle:rate_limit,1'])->group(fu
     Route::get('details', [ApiV2Controller::class, 'details']);
 });
 
-Route::prefix('inform')->middleware('auth:api')->group(function () {
+Route::prefix('inform')->group(function () {
     Route::get('release', [ApiInformController::class, 'release']);
 });
 

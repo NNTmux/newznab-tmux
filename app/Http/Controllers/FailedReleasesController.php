@@ -19,7 +19,7 @@ class FailedReleasesController extends BasePageController
             return response('Bad request, please supply all parameters!', 400)->withHeaders(['X-DNZB-RCode' => 400, 'X-DNZB-RText' => 'Bad request, please supply all parameters!']);
         }
 
-        $res = User::findByRssToken($request->input('api_token'));
+        $res = User::findVerifiedByApiToken((string) $request->input('api_token'));
         if ($res === null) {
             return response('Unauthorised, wrong rss key!', 401)->withHeaders(['X-DNZB-RCode' => 401, 'X-DNZB-RText' => 'Unauthorised, wrong rss key!']);
         }

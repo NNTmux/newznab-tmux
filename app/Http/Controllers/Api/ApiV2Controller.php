@@ -57,8 +57,7 @@ class ApiV2Controller extends BasePageController
         $userCacheKey = 'api_user:'.md5((string) $apiToken);
 
         return Cache::remember($userCacheKey, 300, function () use ($apiToken) {
-            return User::query()
-                ->where('api_token', $apiToken)
+            return User::verifiedApiTokenQuery((string) $apiToken)
                 ->with('role')
                 ->first();
         });

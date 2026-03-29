@@ -25,7 +25,7 @@ class ApiInformController extends Controller
         $releaseObName = $request->has('relo') && ! empty($request->input('relo')) ? $request->input('relo') : '';
         $releasePrName = $request->has('relp') && ! empty($request->input('relp')) ? $request->input('relp') : '';
         $apiToken = $request->has('api_token') && ! empty($request->input('api_token')) ? $request->input('api_token') : '';
-        $user = User::query()->where('api_token', $request->input('api_token'))->first();
+        $user = User::findVerifiedByApiToken((string) $request->input('api_token'));
         if (! $user) {
             return response()->json(['message' => 'Indexer inform error, wrong api key!'], 404);
         }

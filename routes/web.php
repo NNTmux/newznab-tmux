@@ -115,13 +115,7 @@ Route::get('api/search/autocomplete', [SearchSuggestController::class, 'autocomp
 Route::get('api/search/suggest', [SearchSuggestController::class, 'suggest'])->name('api.search.suggest');
 Route::get('api/search/assist', [SearchSuggestController::class, 'searchAssist'])->name('api.search.assist');
 
-// NZB downloads authenticate inside the controller via session or RSS/API token,
-// so they must remain reachable outside the verified-only web group.
-Route::match(['GET', 'POST'], 'getnzb/{guid}', [GetNzbController::class, 'getNzb'])->name('getnzb.guid');
-Route::match(['GET', 'POST'], 'getnzb', [GetNzbController::class, 'getNzb'])->name('getnzb');
-
-// Contact form must remain publicly reachable for guests.
-Route::match(['GET', 'POST'], 'contact-us', [ContactUsController::class, 'showContactForm'])->name('contact-us');
+Route::get('contact-us', [ContactUsController::class, 'showContactForm'])->name('contact-us');
 Route::post('contact-us', [ContactUsController::class, 'contact']);
 
 Route::middleware('isVerified')->group(function () {
@@ -142,6 +136,8 @@ Route::middleware('isVerified')->group(function () {
     });
 
     Route::match(['GET', 'POST'], 'details/{guid}', [DetailsController::class, 'show'])->name('details');
+    Route::match(['GET', 'POST'], 'getnzb/{guid}', [GetNzbController::class, 'getNzb'])->name('getnzb.guid');
+    Route::match(['GET', 'POST'], 'getnzb', [GetNzbController::class, 'getNzb'])->name('getnzb');
     Route::match(['GET', 'POST'], 'rsshelp', [RssController::class, 'showRssDesc'])->name('rsshelp');
     Route::match(['GET', 'POST'], 'profile', [ProfileController::class, 'show'])->name('profile');
     Route::match(['GET', 'POST'], 'apihelp', [ApiHelpController::class, 'index'])->name('apihelp');

@@ -755,6 +755,24 @@ final class User extends Authenticatable implements MustVerifyEmailContract
     }
 
     /**
+     * Build a query for a verified user resolved by API/RSS token.
+     */
+    public static function verifiedApiTokenQuery(string $token): Builder // @phpstan-ignore missingType.generics
+    {
+        return static::query()
+            ->verified()
+            ->whereApiToken($token);
+    }
+
+    /**
+     * Find a verified user by API/RSS token.
+     */
+    public static function findVerifiedByApiToken(string $token): ?static
+    {
+        return static::verifiedApiTokenQuery($token)->first();
+    }
+
+    /**
      * Find user by password reset GUID.
      */
     public static function findByResetGuid(string $guid): ?static
@@ -1665,7 +1683,9 @@ final class User extends Authenticatable implements MustVerifyEmailContract
     public static function getCategoryExclusionForApi(Request $request): array
     {
         $apiToken = $request->input('api_token') ?? $request->input('apikey');
-        $user = static::findByRssToken($apiToken);
+        $user = is_string($apiToken) && $apiToken !== ''
+            ? static::findVerifiedByApiToken($apiToken)
+            : null;
 
         return $user ? static::getCategoryExclusionById($user->id) : [];
     }

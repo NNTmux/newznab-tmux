@@ -119,7 +119,7 @@ class GetNzbController extends BasePageController
             return showApiError(200);
         }
 
-        $user = User::findByRssToken($request->input('r'));
+        $user = User::findVerifiedByApiToken((string) $request->input('r'));
         if (! $user) {
             return showApiError(100);
         }
