@@ -4,21 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Services\Cloudflare\CloudflareIpRangeService;
 use Illuminate\Http\Middleware\TrustProxies as Middleware;
 use Symfony\Component\HttpFoundation\Request;
 
 class TrustProxies extends Middleware
 {
-    /**
-     * Trust the upstream reverse proxy chain.
-     *
-     * This keeps Cloudflare / CDN deployments working without the external
-     * package while remaining compatible with Laravel 12 and 13.
-     *
-     * @var string|array<int, string>|null
-     */
-    protected $proxies = '*';
-
     /**
      * The headers used to detect proxy forwarding information.
      */
@@ -28,4 +19,17 @@ class TrustProxies extends Middleware
         | Request::HEADER_X_FORWARDED_PROTO
         | Request::HEADER_X_FORWARDED_PREFIX
         | Request::HEADER_X_FORWARDED_AWS_ELB;
+
+    /**
+     * Resolve trusted proxies from the stored Cloudflare manifest and any
+     * manually configured proxy ranges.
+     *
+     * @return array<int, string>|string|null
+     */
+    protected function proxies()
+    {
+        $proxies = app(CloudflareIpRangeService::class)->trustedProxies();
+
+        return $proxies !== [] ? $proxies : null;
+    }
 }
