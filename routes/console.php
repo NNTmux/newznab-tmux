@@ -32,7 +32,6 @@ Schedule::command('nntmux:disable-expired-promotions')->daily();
 // Automatically mark completed registration periods as done shortly after they end
 Schedule::command('nntmux:disable-expired-registration-periods')->everyFiveMinutes()->withoutOverlapping();
 Schedule::command('nntmux:remove-bad')->hourly()->withoutOverlapping();
-Schedule::command('cloudflare:reload')->daily();
 Schedule::command('cache:prune-stale-tags')->hourly();
 Schedule::command('nntmux:collect-stats')->hourly();
 Schedule::command('nntmux:populate-steam-apps')->monthly();
