@@ -34,8 +34,13 @@ class AdminGroupController extends BasePageController
         $groupmsglist = '';
 
         if ($action === 'submit') {
-            if ($request->has('groupfilter') && ! empty($request->input('groupfilter'))) {
-                $groupmsglist = UsenetGroup::addBulk($request->input('groupfilter'), $request->input('active'), $request->input('backfill'));
+            $groupFilter = $request->input('groupfilter');
+
+            if (is_string($groupFilter) && $groupFilter !== '') {
+                $active = $request->has('active') ? $request->integer('active') : 1;
+                $backfill = $request->has('backfill') ? $request->integer('backfill') : 1;
+
+                $groupmsglist = UsenetGroup::addBulk($groupFilter, $active, $backfill);
             }
         }
 
