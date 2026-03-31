@@ -26,16 +26,15 @@
                 <!-- Title -->
                 <div>
                     <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Title @if($isEditing)<span class="text-red-500">*</span>@else<span class="text-gray-400 dark:text-gray-500">(optional)</span>@endif
+                        Title <span class="text-gray-400 dark:text-gray-500">(optional)</span>
                     </label>
                     <input type="text"
                            id="title"
                            name="title"
                            value="{{ old('title', data_get($content, 'title', '')) }}"
-                           @if($isEditing) required @endif
                            class="w-full px-3 py-2 border {{ $errors->has('title') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        {{ $isEditing ? 'Required when updating existing content.' : 'Leave blank to create content without a page title.' }}
+                        Leave blank to save content without a page title.
                     </p>
                     @error('title')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>

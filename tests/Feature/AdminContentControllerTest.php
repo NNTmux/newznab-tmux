@@ -150,11 +150,38 @@ class AdminContentControllerTest extends TestCase
         $response = $this->actingAs($authenticatedAdmin)->get(route('admin.content-add', ['action' => 'add']));
 
         $response->assertOk();
-        $response->assertSee('Leave blank to create content without a page title.');
+        $response->assertSee('Leave blank to save content without a page title.');
         $response->assertDontSee('name="title" required', false);
     }
 
-    public function test_updating_existing_content_without_a_title_is_rejected(): void
+    public function test_edit_form_marks_title_as_optional(): void
+    {
+        $admin = $this->createUserWithRole('Admin');
+        /** @var Authenticatable $authenticatedAdmin */
+        $authenticatedAdmin = $admin;
+
+        $content = Content::query()->create([
+            'title' => 'Existing Content Title',
+            'url' => '/existing/',
+            'body' => '<p>Existing body</p>',
+            'metadescription' => 'Existing description',
+            'metakeywords' => 'existing',
+            'contenttype' => Content::TYPE_USEFUL,
+            'status' => Content::STATUS_ENABLED,
+            'ordinal' => 1,
+            'role' => Content::ROLE_EVERYONE,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->actingAs($authenticatedAdmin)->get(route('admin.content-add', ['id' => $content->id]));
+
+        $response->assertOk();
+        $response->assertSee('Leave blank to save content without a page title.');
+        $response->assertDontSee('name="title" required', false);
+    }
+
+    public function test_admin_can_update_existing_content_without_a_title(): void
     {
         $admin = $this->createUserWithRole('Admin');
         /** @var Authenticatable $authenticatedAdmin */
@@ -191,8 +218,10 @@ class AdminContentControllerTest extends TestCase
             ]);
 
         $response->assertRedirect(route('admin.content-add', ['id' => $content->id]));
-        $response->assertSessionHasErrors('title');
-        $this->assertSame('Existing Content Title', $content->fresh()->title);
+        $response->assertSessionHas('success', 'Content updated successfully');
+        $response->assertSessionDoesntHaveErrors();
+        $this->assertSame('', $content->fresh()->title);
+        $this->assertSame('/existing/', $content->fresh()->url);
     }
 
     public function test_admin_content_list_uses_untitled_fallback_for_blank_titles(): void

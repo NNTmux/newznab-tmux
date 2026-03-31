@@ -35,14 +35,10 @@ class AdminContentRequest extends FormRequest
             return [];
         }
 
-        $isUpdating = $this->filled('id');
-
         return [
             'action' => ['required', 'string', Rule::in(['submit'])],
-            'id' => $isUpdating ? ['required', 'integer', 'exists:content,id'] : ['nullable'],
-            'title' => $isUpdating
-                ? ['required', 'string', 'max:255']
-                : ['nullable', 'string', 'max:255'],
+            'id' => $this->filled('id') ? ['required', 'integer', 'exists:content,id'] : ['nullable'],
+            'title' => ['nullable', 'string', 'max:255'],
             'url' => ['nullable', 'string', 'max:2000'],
             'body' => ['nullable', 'string'],
             'metadescription' => ['nullable', 'string', 'max:1000'],
@@ -51,16 +47,6 @@ class AdminContentRequest extends FormRequest
             'status' => ['required', 'integer', Rule::in([Content::STATUS_ENABLED, Content::STATUS_DISABLED])],
             'ordinal' => ['nullable', 'integer', 'min:0'],
             'role' => ['required', 'integer', Rule::in([Content::ROLE_EVERYONE, Content::ROLE_LOGGED_IN, Content::ROLE_ADMIN])],
-        ];
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    public function messages(): array
-    {
-        return [
-            'title.required' => 'A title is required when updating existing content.',
         ];
     }
 }
