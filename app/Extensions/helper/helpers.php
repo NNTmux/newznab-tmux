@@ -460,6 +460,7 @@ if (! function_exists('getReleaseCover')) {
 
         // Determine cover type and ID based on category
         $imdbid = $getValue($release, 'imdbid');
+        $videos_id = $getValue($release, 'videos_id');
         $musicinfo_id = $getValue($release, 'musicinfo_id');
         $consoleinfo_id = $getValue($release, 'consoleinfo_id');
         $bookinfo_id = $getValue($release, 'bookinfo_id');
@@ -469,6 +470,9 @@ if (! function_exists('getReleaseCover')) {
         if (! empty($imdbid) && $imdbid > 0) {
             $coverType = 'movies';
             $coverId = (string) $imdbid;
+        } elseif (! empty($videos_id) && $videos_id > 0) {
+            $coverType = 'tvshows';
+            $coverId = $videos_id;
         } elseif (! empty($musicinfo_id)) {
             $coverType = 'music';
             $coverId = $musicinfo_id;
@@ -486,9 +490,11 @@ if (! function_exists('getReleaseCover')) {
             $coverId = $anidbid;
         }
 
-        // Return the cover URL if we have a type and ID
-        // The CoverController will handle serving the file or returning a placeholder
         if ($coverType && $coverId) {
+            if ($coverType === 'tvshows') {
+                return url("/covers/{$coverType}/{$coverId}.jpg");
+            }
+
             return url("/covers/{$coverType}/{$coverId}-cover.jpg");
         }
 
