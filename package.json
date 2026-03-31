@@ -10,7 +10,7 @@
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.11",
         "@tailwindcss/vite": "^4.2.1",
-        "axios": "^1.13.6",
+        "axios": "1.14.0",
         "lodash": "^4.17.23",
         "npm-check-updates": "^19.6.3",
         "prettier": "3.8.1",
