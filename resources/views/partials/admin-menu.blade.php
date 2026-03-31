@@ -43,6 +43,14 @@
         </a>
     </div>
 
+    <!-- Payments -->
+    <div class="mb-4">
+        <a href="{{ url('/admin/payment-list') }}" class="flex items-center space-x-3 text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 py-2 px-3 rounded transition">
+            <i class="fas fa-credit-card"></i>
+            <span>Payments</span>
+        </a>
+    </div>
+
     <!-- Content -->
     <div class="mb-4" x-data="adminSubmenu">
         <button type="button" @click="toggle()" class="flex items-center justify-between w-full text-left text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 py-2 px-3 rounded transition">

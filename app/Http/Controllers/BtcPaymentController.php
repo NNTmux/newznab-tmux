@@ -28,7 +28,7 @@ class BtcPaymentController extends BasePageController
         if ($payload['type'] === 'InvoicePaymentSettled') {
             $user = User::query()->where('email', '=', $payload['metadata']['buyerEmail'])->first();
             if ($user) {
-                $checkOrder = Payment::query()->where('invoice_id', '=', $payload['invoiceId'])->where('payment_status', '=', 'Settled')->first();
+                $checkOrder = Payment::query()->where('invoice_id', '=', $payload['invoiceId'])->where('payment_status', '=', Payment::PAYMENT_STATUS_SETTLED)->first();
                 if ($checkOrder !== null) {
                     Log::channel('btc_payment')->error('Duplicate BTCPay webhook: '.$payload['webhookId']);
 
@@ -59,8 +59,8 @@ class BtcPaymentController extends BasePageController
 
         if ($payload['type'] === 'InvoiceSettled') {
             // Check if we have the invoice_id in payments table and if we do, update the user account
-            $checkOrder = Payment::query()->where('invoice_id', '=', $payload['invoiceId'])->where('payment_status', '=', 'Settled')->where(function ($query) {
-                return $query->where('invoice_status', 'Pending')->orWhereNull('invoice_status');
+            $checkOrder = Payment::query()->where('invoice_id', '=', $payload['invoiceId'])->where('payment_status', '=', Payment::PAYMENT_STATUS_SETTLED)->where(function ($query) {
+                return $query->where('invoice_status', Payment::INVOICE_STATUS_PENDING)->orWhereNull('invoice_status');
             })->first();
             if ($checkOrder !== null) {
                 $user = User::query()->where('email', '=', $checkOrder->email)->first();
@@ -85,7 +85,7 @@ class BtcPaymentController extends BasePageController
                     }
 
                     User::updateUserRole($user->id, $roleName, addYears: $addYears);
-                    $checkOrder->update(['invoice_status' => 'Settled']);
+                    $checkOrder->update(['invoice_status' => Payment::INVOICE_STATUS_SETTLED]);
                     Log::channel('btc_payment')->info('User: '.$user->username.' upgraded to '.$roleName.' (+'.$addYears.' years) for BTCPay webhook: '.$checkOrder->webhook_id);
 
                     return response('OK', 200);
@@ -98,5 +98,34 @@ class BtcPaymentController extends BasePageController
         }
 
         return response('OK', 200);
+    }
+
+    /**
+     * Payment.status values from BTCPay Greenfield API (payload.payment.status). Used for admin filters.
+     *
+     * @return list<string>
+     */
+    public static function paymentStatusesForAdminFilter(): array
+    {
+        return [
+            'Pending',
+            'Processing',
+            Payment::PAYMENT_STATUS_SETTLED,
+            'Invalid',
+            'Manual',
+        ];
+    }
+
+    /**
+     * invoice_status values used in our DB (migration default Pending; webhook sets Settled after role upgrade).
+     *
+     * @return list<string>
+     */
+    public static function invoiceStatusesForAdminFilter(): array
+    {
+        return [
+            Payment::INVOICE_STATUS_PENDING,
+            Payment::INVOICE_STATUS_SETTLED,
+        ];
     }
 }

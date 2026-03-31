@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\AdminLogViewerController;
 use App\Http\Controllers\Admin\AdminMovieController;
 use App\Http\Controllers\Admin\AdminMusicController;
 use App\Http\Controllers\Admin\AdminPageController;
+use App\Http\Controllers\Admin\AdminPaymentController;
 use App\Http\Controllers\Admin\AdminPredbController;
 use App\Http\Controllers\Admin\AdminPromotionController;
 use App\Http\Controllers\Admin\AdminRegistrationController;
@@ -289,6 +290,7 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::match(['GET', 'POST'], 'movie-add', [AdminMovieController::class, 'create'])->name('admin.movie-add');
     Route::get('music-list', [AdminMusicController::class, 'index'])->name('admin.music-list');
     Route::match(['GET', 'POST'], 'music-edit', [AdminMusicController::class, 'edit'])->name('admin.music-edit');
+    Route::get('payment-list', [AdminPaymentController::class, 'index'])->name('admin.payment-list');
     Route::get('predb', [AdminPredbController::class, 'index'])->name('admin.predb');
     Route::get('group-list', [AdminGroupController::class, 'index'])->name('admin.group-list');
     Route::match(['GET', 'POST'], 'group-edit', [AdminGroupController::class, 'edit'])->name('admin.group-edit');
