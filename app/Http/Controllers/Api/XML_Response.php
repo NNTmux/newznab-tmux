@@ -641,7 +641,7 @@ class XML_Response
 
         if ((int) $this->parameters['extended'] === 1) {
             $this->writeZedAttr('files', $this->release->totalpart);
-            if (((property_exists($this->release, 'videos_id') && $this->release->videos_id > 0) || (property_exists($this->release, 'tv_episodes_id') && $this->release->tv_episodes_id > 0)) && $this->namespace === 'newznab') {
+            if (((isset($this->release->videos_id) && $this->release->videos_id > 0) || (isset($this->release->tv_episodes_id) && $this->release->tv_episodes_id > 0)) && $this->namespace === 'newznab') {
                 $this->setTvAttr();
             }
 
