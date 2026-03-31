@@ -14,8 +14,13 @@ return new class extends Migration
         Schema::dropIfExists('xxxinfo');
 
         Schema::table('releases', function (Blueprint $table) {
-            $table->dropIndex('ix_releases_xxxinfo_id');
-            $table->dropColumn('xxxinfo_id');
+            if (Schema::hasIndex('releases', 'ix_releases_xxxinfo_id')) {
+                $table->dropIndex('ix_releases_xxxinfo_id');
+            }
+
+            if (Schema::hasColumn('releases', 'xxxinfo_id')) {
+                $table->dropColumn('xxxinfo_id');
+            }
         });
     }
 
