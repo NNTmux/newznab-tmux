@@ -152,6 +152,86 @@
         </div>
     </div>
 
+    <!-- Site Status & Active Incidents -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center justify-between">
+            <span>
+                <i class="fas fa-signal mr-2 text-blue-600 dark:text-blue-400"></i>
+                Site Status
+            </span>
+            <a href="{{ route('admin.status.index') }}" class="text-xs text-blue-600 dark:text-blue-400 hover:underline font-normal">Manage &rarr;</a>
+        </h3>
+
+        @php
+            $dashBadge = static function (string $status): string {
+                $base = 'px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full';
+                return $base.' '.match ($status) {
+                    'operational' => 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200',
+                    'degraded' => 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200',
+                    'maintenance' => 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200',
+                    'partial_outage' => 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200',
+                    'major_outage' => 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200',
+                    default => 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
+                };
+            };
+        @endphp
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+            @foreach($serviceStatuses as $svc)
+                <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700">
+                    <div>
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $svc->name }}</span>
+                        <span class="block text-xs text-gray-500 dark:text-gray-400">{{ number_format((float) $svc->uptime_percentage, 2) }}% uptime</span>
+                    </div>
+                    <span class="{{ $dashBadge($svc->status->value) }}">{{ $svc->status->label() }}</span>
+                </div>
+            @endforeach
+        </div>
+
+        @if($activeIncidents->isNotEmpty())
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-3">
+                <h4 class="text-sm font-semibold text-red-600 dark:text-red-400 mb-2">
+                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                    {{ $activeIncidents->count() }} Active {{ Str::plural('Incident', $activeIncidents->count()) }}
+                </h4>
+                <div class="space-y-2">
+                    @foreach($activeIncidents->take(5) as $incident)
+                        <div class="flex items-start justify-between gap-2 text-sm py-1">
+                            <div class="min-w-0">
+                                <span class="text-gray-800 dark:text-gray-200 truncate block">{{ Str::limit($incident->title, 50) }}</span>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">
+                                    {{ $incident->services->pluck('name')->join(', ') }}
+                                    &middot; {{ $incident->started_at->diffForHumans() }}
+                                    @if($incident->is_auto)
+                                        <span class="ml-1 px-1 py-0.5 text-[10px] leading-3 font-semibold rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">Auto</span>
+                                    @endif
+                                </span>
+                            </div>
+                            <span class="px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full shrink-0 {{ match($incident->impact->value) {
+                                'critical' => 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200',
+                                'major' => 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200',
+                                'minor' => 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200',
+                                default => 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
+                            } }}">{{ $incident->impact->label() }}</span>
+                        </div>
+                    @endforeach
+                    @if($activeIncidents->count() > 5)
+                        <p class="text-xs text-gray-500 dark:text-gray-400 pt-1">
+                            + {{ $activeIncidents->count() - 5 }} more &mdash;
+                            <a href="{{ route('admin.status.index') }}" class="text-blue-600 dark:text-blue-400 hover:underline">view all</a>
+                        </p>
+                    @endif
+                </div>
+            </div>
+        @else
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-3">
+                <p class="text-sm text-green-600 dark:text-green-400">
+                    <i class="fas fa-check-circle mr-1"></i>No active incidents
+                </p>
+            </div>
+        @endif
+    </div>
+
     <!-- Registration Status Widget -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">

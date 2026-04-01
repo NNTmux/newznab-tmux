@@ -24,6 +24,7 @@
 
     <!-- Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('meta')
     @stack('styles')
 </head>
 <body class="app-shell bg-gray-100 dark:bg-gray-900 font-sans antialiased">

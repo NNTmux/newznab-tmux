@@ -12,6 +12,7 @@ use App\Models\UsenetGroup;
 use App\Models\User;
 use App\Models\UserActivity;
 use App\Services\RegistrationStatusService;
+use App\Services\SiteStatusService;
 use App\Services\SystemMetricsService;
 use App\Services\UserStatsService;
 use Illuminate\Http\JsonResponse;
@@ -25,15 +26,19 @@ class AdminPageController extends BasePageController
 
     protected RegistrationStatusService $registrationStatusService;
 
+    protected SiteStatusService $siteStatusService;
+
     public function __construct(
         UserStatsService $userStatsService,
         SystemMetricsService $systemMetricsService,
-        RegistrationStatusService $registrationStatusService
+        RegistrationStatusService $registrationStatusService,
+        SiteStatusService $siteStatusService
     ) {
         parent::__construct();
         $this->userStatsService = $userStatsService;
         $this->systemMetricsService = $systemMetricsService;
         $this->registrationStatusService = $registrationStatusService;
+        $this->siteStatusService = $siteStatusService;
     }
 
     /**
@@ -70,6 +75,8 @@ class AdminPageController extends BasePageController
             'registrationStatus' => $registrationStatus,
             'nextRegistrationPeriod' => $nextRegistrationPeriod,
             'recent_activity' => $this->getRecentUserActivity(),
+            'serviceStatuses' => $this->siteStatusService->getEnabledServices(),
+            'activeIncidents' => $this->siteStatusService->getActiveIncidents(),
         ]));
     }
 

@@ -59,3 +59,4 @@ Schedule::call(function () {
 })->name('cleanup-api-request-logs')->hourly()->withoutOverlapping();
 // Check tmux health and auto-restart if monitor pane is dead
 Schedule::command('tmux:health-check --auto-restart')->everyThirtyMinutes()->withoutOverlapping();
+Schedule::command('nntmux:check-service-health')->everyFiveMinutes()->withoutOverlapping();

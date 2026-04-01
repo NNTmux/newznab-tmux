@@ -39,6 +39,7 @@ use App\Http\Controllers\Admin\AdminReleasesController;
 use App\Http\Controllers\Admin\AdminRoleController;
 use App\Http\Controllers\Admin\AdminShowsController;
 use App\Http\Controllers\Admin\AdminSiteController;
+use App\Http\Controllers\Admin\AdminStatusController;
 use App\Http\Controllers\Admin\AdminTmuxController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminUserRoleHistoryController;
@@ -80,6 +81,7 @@ use App\Http\Controllers\RssController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SearchSuggestController;
 use App\Http\Controllers\SeriesController;
+use App\Http\Controllers\StatusPageController;
 use App\Http\Controllers\TermsController;
 
 // Serve cover images from storage - Must be public (no auth required)
@@ -118,6 +120,8 @@ Route::get('api/search/assist', [SearchSuggestController::class, 'searchAssist']
 
 Route::get('contact-us', [ContactUsController::class, 'showContactForm'])->name('contact-us');
 Route::post('contact-us', [ContactUsController::class, 'contact']);
+
+Route::get('status', [StatusPageController::class, 'showStatusPage'])->name('status');
 
 Route::middleware('isVerified')->group(function () {
     Route::match(['GET', 'POST'], 'resetpassword', [ResetPasswordController::class, 'reset'])->name('resetpassword');
@@ -232,6 +236,14 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::post('registrations/periods/{period}/toggle', [AdminRegistrationController::class, 'togglePeriod'])->name('admin.registrations.periods.toggle');
     Route::delete('registrations/periods/{period}', [AdminRegistrationController::class, 'destroyPeriod'])->name('admin.registrations.periods.destroy');
     Route::match(['GET', 'POST'], 'site-edit', [AdminSiteController::class, 'edit'])->name('admin.site-edit');
+    Route::get('status/create', [AdminStatusController::class, 'create'])->name('admin.status.create');
+    Route::post('status', [AdminStatusController::class, 'store'])->name('admin.status.store');
+    Route::get('status', [AdminStatusController::class, 'index'])->name('admin.status.index');
+    Route::get('status/{incident}/edit', [AdminStatusController::class, 'edit'])->name('admin.status.edit')->whereNumber('incident');
+    Route::put('status/{incident}', [AdminStatusController::class, 'update'])->name('admin.status.update')->whereNumber('incident');
+    Route::post('status/{incident}/resolve', [AdminStatusController::class, 'resolve'])->name('admin.status.resolve')->whereNumber('incident');
+    Route::delete('status/{incident}', [AdminStatusController::class, 'destroy'])->name('admin.status.destroy')->whereNumber('incident');
+    Route::post('status/service/{service}/update', [AdminStatusController::class, 'updateService'])->name('admin.status.update-service')->whereNumber('service');
     Route::get('site-stats', [AdminSiteController::class, 'stats'])->name('admin.site-stats');
     Route::get('logs', [AdminLogViewerController::class, 'index'])->name('admin.logs.index');
     Route::get('role-list', [AdminRoleController::class, 'index'])->name('admin.role-list');

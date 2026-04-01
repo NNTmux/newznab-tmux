@@ -104,6 +104,10 @@
                 <i class="fa fa-hands-helping fa-fw mr-2"></i>
                 <span>API V2</span>
             </a>
+            <a href="{{ route('status') }}" class="flex items-center px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition">
+                <i class="fa fa-signal fa-fw mr-2"></i>
+                <span>Site status</span>
+            </a>
             <a href="{{ route('contact-us') }}" class="flex items-center px-4 py-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition">
                 <i class="fa fa-envelope fa-fw mr-2"></i>
                 <span>Contact Us</span>

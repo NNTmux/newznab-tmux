@@ -311,6 +311,9 @@
             <a href="{{ url('/admin/site-stats') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
                 <i class="fas fa-chart-bar mr-2 text-purple-400"></i>Statistics
             </a>
+            <a href="{{ route('admin.status.index') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
+                <i class="fas fa-signal mr-2 text-emerald-400"></i>Site Status
+            </a>
             <a href="{{ route('admin.logs.index') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
                 <i class="fas fa-file-lines mr-2 text-amber-400"></i>Logs
             </a>
