@@ -52,16 +52,11 @@ class AdminUserController extends BasePageController
             $variables['email'],
             $variables['host'],
             $variables['role'],
-            true,
             $variables['created_from'],
             $variables['created_to']
         );
 
         $results = $this->paginate($result, User::getCount($variables['role'], $variables['username'], $variables['host'], $variables['email'], $variables['created_from'], $variables['created_to']), config('nntmux.items_per_page'), $page, $request->url(), $request->query());
-
-        // Note: API request counts are already included via the getRange query when $apiRequests = true
-        // Country lookups and additional counts removed to improve performance on large datasets
-        // These can be added back via individual user profile pages or AJAX calls if needed
 
         // Build order by URLs
         $orderByUrls = [];

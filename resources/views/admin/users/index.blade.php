@@ -215,18 +215,17 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                                        {{ $user->roles->first()->name ?? 'N/A' }}
+                                        {{ $user->rolename ?? 'N/A' }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if(!empty($user->pending_roles_id) && !empty($user->pending_role_start_date))
                                         @php
-                                            $pendingRole = \Spatie\Permission\Models\Role::find($user->pending_roles_id);
                                             $pendingStartDate = \Carbon\Carbon::parse($user->pending_role_start_date);
                                         @endphp
                                         <div class="flex flex-col gap-1">
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 w-fit">
-                                                <i class="fas fa-layer-group mr-1"></i>{{ $pendingRole->name ?? 'Unknown' }}
+                                                <i class="fas fa-layer-group mr-1"></i>{{ $role_names[$user->pending_roles_id] ?? 'Unknown' }}
                                             </span>
                                             <span class="text-xs text-gray-500 dark:text-gray-400">
                                                 <i class="fas fa-clock mr-1"></i>{{ $pendingStartDate->diffForHumans() }}

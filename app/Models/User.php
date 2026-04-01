@@ -1293,8 +1293,6 @@ final class User extends Authenticatable implements MustVerifyEmailContract
      * Get paginated user list with filters.
      *
      * @return Collection<int, static>
-     *
-     * @throws \Throwable
      */
     public static function getRange(
         int|false $start,
@@ -1304,47 +1302,33 @@ final class User extends Authenticatable implements MustVerifyEmailContract
         ?string $email = '',
         ?string $host = '',
         ?string $role = '',
-        bool $apiRequests = false,
         ?string $createdFrom = '',
         ?string $createdTo = '',
     ): Collection {
         $order = self::getBrowseOrder($orderBy);
 
-        if ($apiRequests) {
-            UserRequest::clearApiRequests(false);
-
-            $query = '
-                SELECT users.*, roles.name AS rolename, COUNT(user_requests.id) AS apirequests
-                FROM users
-                INNER JOIN roles ON roles.id = users.roles_id
-                LEFT JOIN user_requests ON user_requests.users_id = users.id
-                WHERE users.id != 0 %s %s %s %s %s %s
-                AND email != \'sharing@nZEDb.com\'
-                GROUP BY users.id
-                ORDER BY %s %s %s';
-        } else {
-            $query = '
-                SELECT users.*, roles.name AS rolename
-                FROM users
-                INNER JOIN roles ON roles.id = users.roles_id
-                WHERE 1=1 %s %s %s %s %s %s
-                ORDER BY %s %s %s';
-        }
-
-        return static::fromQuery(
-            sprintf(
-                $query,
-                $userName ? 'AND users.username LIKE '.escapeString("%{$userName}%") : '',
-                $email ? 'AND users.email LIKE '.escapeString("%{$email}%") : '',
-                $host ? 'AND users.host LIKE '.escapeString("%{$host}%") : '',
-                $role ? "AND users.roles_id = {$role}" : '',
-                $createdFrom ? 'AND users.created_at >= '.escapeString("{$createdFrom} 00:00:00") : '',
-                $createdTo ? 'AND users.created_at <= '.escapeString("{$createdTo} 23:59:59") : '',
-                $order[0],
-                $order[1],
-                $start === false ? '' : "LIMIT {$offset} OFFSET {$start}"
+        return self::query()
+            ->withTrashed()
+            ->select('users.*')
+            ->selectSub(
+                'SELECT name FROM roles WHERE roles.id = users.roles_id',
+                'rolename'
             )
-        );
+            ->excludeSharing()
+            ->when($userName, fn (Builder $q) => $q->where('username', 'like', "%{$userName}%"))
+            ->when($email, fn (Builder $q) => $q->where('email', 'like', "%{$email}%"))
+            ->when($host, fn (Builder $q) => $q->where('host', 'like', "%{$host}%"))
+            ->when($role, fn (Builder $q) => $q->where('roles_id', $role))
+            ->when($createdFrom, fn (Builder $q) => $q->where('created_at', '>=', "{$createdFrom} 00:00:00"))
+            ->when($createdTo, fn (Builder $q) => $q->where('created_at', '<=', "{$createdTo} 23:59:59"))
+            ->withCount([
+                'requests as daily_api_count' => fn (Builder $q) => $q->where('timestamp', '>', now()->subDay()),
+                'downloads as daily_download_count' => fn (Builder $q) => $q->where('timestamp', '>', now()->subDay()),
+            ])
+            ->with('roles:id,name')
+            ->orderBy($order[0], $order[1])
+            ->when($start !== false, fn (Builder $q) => $q->offset($start)->limit($offset))
+            ->get();
     }
 
     /**
