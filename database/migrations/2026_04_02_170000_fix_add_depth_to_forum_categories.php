@@ -1,11 +1,9 @@
 <?php
 
+use Aimeos\Nestedset\NestedSet;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
-use Aimeos\Nestedset\NestedSet;
-
 use TeamTeaTime\Forum\Models\Category;
 
 return new class extends Migration
