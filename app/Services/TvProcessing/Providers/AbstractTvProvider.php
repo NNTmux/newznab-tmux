@@ -754,15 +754,42 @@ abstract class AbstractTvProvider extends BaseVideoProvider
     /**
      * Simple function that compares two strings of text
      */
-    public function checkMatch(mixed $ourName, mixed $scrapeName, mixed $probability): float|int
+    public function checkMatch(mixed $ourName, mixed $scrapeName, mixed $probability): float
     {
-        similar_text($ourName, $scrapeName, $matchpct);
+        $normalizedOurName = $this->normalizeComparableValue($ourName);
+        $normalizedScrapeName = $this->normalizeComparableValue($scrapeName);
 
-        if ($matchpct >= $probability) {
+        if ($normalizedOurName === null || $normalizedScrapeName === null) {
+            return 0.0;
+        }
+
+        $requiredProbability = is_numeric($probability) ? (float) $probability : 0.0;
+        $matchpct = 0.0;
+
+        similar_text($normalizedOurName, $normalizedScrapeName, $matchpct);
+
+        if ($matchpct >= $requiredProbability) {
             return $matchpct;
         }
 
-        return 0;
+        return 0.0;
+    }
+
+    protected function normalizeComparableValue(mixed $value): ?string
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+
+        if (is_int($value) || is_float($value)) {
+            return (string) $value;
+        }
+
+        if ($value instanceof \Stringable) {
+            return (string) $value;
+        }
+
+        return null;
     }
 
     /**

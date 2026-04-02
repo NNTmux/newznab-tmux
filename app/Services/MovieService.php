@@ -556,7 +556,7 @@ class MovieService
 
             $title = TmdbClient::getString($tmdbLookup, 'title');
             if ($this->currentTitle !== '' && ! empty($title)) {
-                similar_text($this->currentTitle, $title, $percent);
+                $percent = $this->similarityPercent($this->currentTitle, $title);
                 if ($percent < self::MATCH_PERCENT) {
                     $tmdbId = TmdbClient::getInt($tmdbLookup, 'id');
                     $altTitles = $tmdbId > 0 ? $tmdbClient->getMovieAlternativeTitles($tmdbId) : null;
@@ -565,7 +565,7 @@ class MovieService
                     foreach ($titles as $alt) {
                         $altTitle = is_array($alt) ? ($alt['title'] ?? '') : '';
                         if ($altTitle !== '') {
-                            similar_text($this->currentTitle, $altTitle, $altPercent);
+                            $altPercent = $this->similarityPercent($this->currentTitle, $altTitle);
                             if ($altPercent >= self::MATCH_PERCENT) {
                                 $matched = true;
                                 break;
@@ -584,7 +584,7 @@ class MovieService
             if ($this->currentYear !== '' && ! empty($releaseDate)) {
                 $tmdbYear = Carbon::parse($releaseDate)->year;
 
-                similar_text($this->currentYear, (string) $tmdbYear, $percent);
+                $percent = $this->similarityPercent($this->currentYear, $tmdbYear);
                 if ($percent < self::YEAR_MATCH_PERCENT) {
                     Cache::put($cacheKey, false, $expiresAt);
 
@@ -739,14 +739,14 @@ class MovieService
                 return false;
             }
             if (! empty($this->currentTitle)) {
-                similar_text($this->currentTitle, $scraped['title'], $percent);
+                $percent = $this->similarityPercent($this->currentTitle, $scraped['title']);
                 if ($percent < self::MATCH_PERCENT) {
                     Cache::put($cacheKey, false, now()->addHours(6));
 
                     return false;
                 }
                 if (! empty($this->currentYear) && ! empty($scraped['year'])) {
-                    similar_text($this->currentYear, $scraped['year'], $yearPercent);
+                    $yearPercent = $this->similarityPercent($this->currentYear, $scraped['year']);
                     if ($yearPercent < self::YEAR_MATCH_PERCENT) {
                         Cache::put($cacheKey, false, now()->addHours(6));
 
@@ -804,7 +804,7 @@ class MovieService
             }
 
             if (! empty($this->currentTitle)) {
-                similar_text($this->currentTitle, $resp['title'], $percent);
+                $percent = $this->similarityPercent($this->currentTitle, $resp['title']);
                 if ($percent < self::MATCH_PERCENT) {
                     Cache::put($cacheKey, false, now()->addHours(6));
 
@@ -813,7 +813,7 @@ class MovieService
             }
 
             if (! empty($this->currentYear) && ! empty($resp['year'])) {
-                similar_text($this->currentYear, $resp['year'], $percent);
+                $percent = $this->similarityPercent($this->currentYear, $resp['year']);
                 if ($percent < self::YEAR_MATCH_PERCENT) {
                     Cache::put($cacheKey, false, now()->addHours(6));
 
@@ -883,7 +883,7 @@ class MovieService
             }
 
             if (! empty($this->currentTitle)) {
-                similar_text($this->currentTitle, $resp->data->Title, $percent);
+                $percent = $this->similarityPercent($this->currentTitle, $resp->data->Title);
                 if ($percent < self::MATCH_PERCENT) {
                     Cache::put($cacheKey, false, now()->addHours(6));
 
@@ -891,7 +891,7 @@ class MovieService
                 }
 
                 if (! empty($this->currentYear)) {
-                    similar_text($this->currentYear, $resp->data->Year, $percent);
+                    $percent = $this->similarityPercent($this->currentYear, $resp->data->Year);
                     if ($percent < self::YEAR_MATCH_PERCENT) {
                         Cache::put($cacheKey, false, now()->addHours(6));
 
@@ -1131,10 +1131,10 @@ class MovieService
                 if ($title === '') {
                     continue;
                 }
-                similar_text($title, $this->currentTitle, $percent);
+                $percent = $this->similarityPercent($title, $this->currentTitle);
                 $yearMatches = empty($this->currentYear) || empty($match['year']);
                 if (! $yearMatches) {
-                    similar_text($this->currentYear, $match['year'], $yearPercent);
+                    $yearPercent = $this->similarityPercent($this->currentYear, $match['year']);
                     $yearMatches = $yearPercent >= self::YEAR_MATCH_PERCENT;
                 }
                 $titleMatchThreshold = $yearMatches ? self::MATCH_PERCENT_ALT_TITLE : self::MATCH_PERCENT;
@@ -1251,10 +1251,9 @@ class MovieService
                     continue;
                 }
 
-                similar_text(
+                $percent = $this->similarityPercent(
                     $this->currentYear,
-                    (string) Carbon::parse($releaseDate)->year,
-                    $percent
+                    Carbon::parse($releaseDate)->year,
                 );
 
                 if ($percent < self::YEAR_MATCH_PERCENT) {
@@ -1310,7 +1309,7 @@ class MovieService
         }
 
         foreach ($potentialMatches as $match) {
-            similar_text($this->currentTitle, $match['title'], $percent);
+            $percent = $this->similarityPercent($this->currentTitle, $match['title']);
 
             if ($percent >= self::MATCH_PERCENT) {
                 Cache::put($cacheKey, $match['imdbid'], now()->addDays(7));
@@ -1339,6 +1338,37 @@ class MovieService
         $s = trim(preg_replace('/\s{2,}/', ' ', $s));
 
         return $s;
+    }
+
+    private function similarityPercent(mixed $left, mixed $right): float
+    {
+        $normalizedLeft = $this->normalizeComparisonValue($left);
+        $normalizedRight = $this->normalizeComparisonValue($right);
+
+        if ($normalizedLeft === null || $normalizedRight === null) {
+            return 0.0;
+        }
+
+        similar_text($normalizedLeft, $normalizedRight, $percent);
+
+        return $percent;
+    }
+
+    private function normalizeComparisonValue(mixed $value): ?string
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+
+        if (is_int($value) || is_float($value)) {
+            return (string) $value;
+        }
+
+        if ($value instanceof \Stringable) {
+            return (string) $value;
+        }
+
+        return null;
     }
 
     protected function parseMovieSearchName(string $releaseName): bool
