@@ -160,6 +160,20 @@ class TmdbClient
      */
     public function getMovie(int|string $id, array $appendToResponse = []): ?array
     {
+        if (is_string($id) && str_starts_with($id, 'tt')) {
+            $movie = $this->findMovieByExternalId($id, 'imdb_id');
+            if ($movie === null) {
+                return null;
+            }
+
+            $tmdbId = self::getInt($movie, 'id');
+            if ($tmdbId <= 0) {
+                return null;
+            }
+
+            return $this->getMovie($tmdbId, $appendToResponse);
+        }
+
         $params = [];
 
         if (! empty($appendToResponse)) {
@@ -167,6 +181,34 @@ class TmdbClient
         }
 
         return $this->get('/movie/'.$id, $params);
+    }
+
+    /**
+     * Find a movie by external ID (IMDb, etc.)
+     *
+     * @param  string  $externalId  The external ID value
+     * @param  string  $source  The source: 'imdb_id'
+     * @return array<string, mixed>|null The TMDB movie data or null if not found
+     */
+    public function findMovieByExternalId(string $externalId, string $source = 'imdb_id'): ?array
+    {
+        if (empty($externalId)) {
+            return null;
+        }
+
+        if ($source !== 'imdb_id') {
+            return null;
+        }
+
+        $result = $this->get('/find/'.$externalId, [
+            'external_source' => $source,
+        ]);
+
+        if ($result === null || empty($result['movie_results'])) {
+            return null;
+        }
+
+        return $result['movie_results'][0] ?? null;
     }
 
     /**

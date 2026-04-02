@@ -73,14 +73,17 @@ class MovieService
     public function __construct()
     {
         $this->releaseImage = new ReleaseImageService;
-        $this->traktcheck = config('nntmux_api.trakttv_api_key');
+        $traktApiKey = trim((string) config('nntmux_api.trakttv_api_key', ''));
+        $this->traktcheck = $traktApiKey !== '' ? $traktApiKey : null;
         if ($this->traktcheck !== null) {
             $this->traktTv = new TraktProvider;
         }
         $this->client = new Client;
-        $this->fanartapikey = config('nntmux_api.fanarttv_api_key');
+        $fanartApiKey = trim((string) config('nntmux_api.fanarttv_api_key', ''));
+        $this->fanartapikey = $fanartApiKey !== '' ? $fanartApiKey : null;
         $this->fanart = new FanartTvService($this->fanartapikey);
-        $this->omdbapikey = config('nntmux_api.omdb_api_key');
+        $omdbApiKey = trim((string) config('nntmux_api.omdb_api_key', ''));
+        $this->omdbapikey = $omdbApiKey !== '' ? $omdbApiKey : null;
         if ($this->omdbapikey !== null) {
             $this->omdbApi = new OMDbAPI($this->omdbapikey);
         }
@@ -696,7 +699,15 @@ class MovieService
             $scraper = app(ImdbScraper::class);
             $scraped = $scraper->fetchById($imdbId);
             if ($scraped === false || empty($scraped['title'])) {
-                Cache::put($cacheKey, false, now()->addHours(6));
+                $ttl = $scraper->wasBlockedByWaf()
+                    ? now()->addMinutes(30)
+                    : now()->addHours(6);
+
+                if ($scraper->wasBlockedByWaf()) {
+                    Log::warning('IMDb title page fetch is currently blocked by WAF for '.$imdbId.', using shorter negative cache.');
+                }
+
+                Cache::put($cacheKey, false, $ttl);
 
                 return false;
             }

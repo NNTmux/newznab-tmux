@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Example Movie - IMDb</title>
+    <meta property="og:title" content="Example Movie - IMDb">
+    <meta property="og:image" content="https://example.com/poster.jpg">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Movie",
+        "name": "Example Movie",
+        "description": "An example plot goes here.",
+        "datePublished": "2024-05-17",
+        "image": "https://example.com/poster_from_jsonld.jpg",
+        "genre": ["Action", "Adventure"],
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "7.3",
+            "ratingCount": 12345
+        },
+        "actor": [
+            {"@type": "Person", "name": "First Actor"},
+            {"@type": "Person", "name": "Second Actor"}
+        ],
+        "director": [
+            {"@type": "Person", "name": "Famous Director"}
+        ]
+    }
+    </script>
+</head>
+<body>
+    <li data-testid="title-details-languages">
+        <div>
+            <a href="/language/en">English</a>
+            <a href="/language/es">Spanish</a>
+        </div>
+    </li>
+</body>
+</html>
+

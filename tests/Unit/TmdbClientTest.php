@@ -201,14 +201,32 @@ class TmdbClientTest extends TestCase
     public function test_get_movie_with_imdb_id(): void
     {
         Http::fake([
-            'api.themoviedb.org/3/movie/tt0137523*' => Http::response([
+            'api.themoviedb.org/3/find/tt0137523*' => Http::response([
+                'movie_results' => [
+                    ['id' => 550],
+                ],
+            ]),
+            'api.themoviedb.org/3/movie/550*' => Http::response([
                 'id' => 550,
                 'title' => 'Fight Club',
+                'imdb_id' => 'tt0137523',
             ]),
         ]);
 
         $result = $this->client->getMovie('tt0137523');
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), '/find/tt0137523')
+                && str_contains($request->url(), 'external_source=imdb_id');
+        });
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), '/movie/550');
+        });
+
         $this->assertNotNull($result);
+        $this->assertSame(550, $result['id']);
+        $this->assertSame('tt0137523', $result['imdb_id']);
     }
 
     public function test_get_movie_returns_null_on_404(): void
