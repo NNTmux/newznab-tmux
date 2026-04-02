@@ -39,7 +39,7 @@ This project is a fork of [newznab plus](https://github.com/anth0/nnplus) and [n
 ## Prerequisites
 
 - System administration experience (Linux recommended)
-- PHP 8.4+ with extensions: curl, json, pdo_mysql, openssl, mbstring, xml, zip, gd, intl, pcntl
+- PHP 8.4+ with extensions: curl, json, pdo_mysql, openssl, mbstring, xml, zip, gd, intl, pcntl, bcmath
 - MariaDB 10.6+ or MySQL 8+ (PostgreSQL not supported)
 - Composer 2.x
 - Node.js 18+ and npm for frontend assets
