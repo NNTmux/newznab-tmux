@@ -1,9 +1,15 @@
+ARG NODE_VERSION=22
+ARG BUN_VERSION=1
+
+FROM node:${NODE_VERSION} AS node
+FROM oven/bun:${BUN_VERSION} AS bun
 FROM ubuntu:24.04
 
 LABEL maintainer="Fossil01"
 
 ARG WWWGROUP
-ARG NODE_VERSION=22
+ARG NODE_VERSION
+ARG BUN_VERSION
 ARG POSTGRES_VERSION=17
 ARG MYSQL_CLIENT="mariadb-client"
 
@@ -55,10 +61,15 @@ RUN wget https://mediaarea.net/repo/deb/repo-mediaarea_1.0-25_all.deb \
 # Install Composer
 RUN curl -sLS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer
 
-# Install Node.js
-RUN curl -sLS https://deb.nodesource.com/setup_$NODE_VERSION.x | bash - \
-    && apt-get install -y nodejs \
-    && npm install -g npm bun pnpm
+# Install Node.js tooling from official images
+COPY --from=node /usr/local/ /usr/local/
+COPY --from=bun /usr/local/bin/bun /usr/local/bin/bun
+RUN corepack enable pnpm \
+    && corepack prepare pnpm@latest --activate \
+    && node --version \
+    && npm --version \
+    && bun --version \
+    && pnpm --version
 
 # Install remaining packages and cleanup
 RUN apt-get install -y yarn $MYSQL_CLIENT postgresql-client-$POSTGRES_VERSION \
