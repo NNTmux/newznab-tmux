@@ -113,6 +113,10 @@
         "ext-xdebug": "For developement work"
     },
     "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/DariusIII/laravel-forum"
+        }
     ],
     "minimum-stability": "dev",
     "prefer-stable": true,

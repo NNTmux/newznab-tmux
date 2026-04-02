@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5bf8720d60aaac9e90ad0d96a87f0533",
+    "content-hash": "8d88899eb120dbdea98d2592c70d67eb",
     "packages": [
         {
             "name": "aharen/omdbapi",
@@ -754,112 +754,6 @@
                 "source": "https://github.com/dflydev/dflydev-dot-access-data/tree/v3.0.3"
             },
             "time": "2024-07-08T12:26:09+00:00"
-        },
-        {
-            "name": "doctrine/dbal",
-            "version": "4.4.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/doctrine/dbal.git",
-                "reference": "61e730f1658814821a85f2402c945f3883407dec"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/61e730f1658814821a85f2402c945f3883407dec",
-                "reference": "61e730f1658814821a85f2402c945f3883407dec",
-                "shasum": ""
-            },
-            "require": {
-                "doctrine/deprecations": "^1.1.5",
-                "php": "^8.2",
-                "psr/cache": "^1|^2|^3",
-                "psr/log": "^1|^2|^3"
-            },
-            "require-dev": {
-                "doctrine/coding-standard": "14.0.0",
-                "fig/log-test": "^1",
-                "jetbrains/phpstorm-stubs": "2023.2",
-                "phpstan/phpstan": "2.1.30",
-                "phpstan/phpstan-phpunit": "2.0.7",
-                "phpstan/phpstan-strict-rules": "^2",
-                "phpunit/phpunit": "11.5.50",
-                "slevomat/coding-standard": "8.27.1",
-                "squizlabs/php_codesniffer": "4.0.1",
-                "symfony/cache": "^6.3.8|^7.0|^8.0",
-                "symfony/console": "^5.4|^6.3|^7.0|^8.0"
-            },
-            "suggest": {
-                "symfony/console": "For helpful console commands such as SQL execution and import of files."
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Doctrine\\DBAL\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Guilherme Blanco",
-                    "email": "guilhermeblanco@gmail.com"
-                },
-                {
-                    "name": "Roman Borschel",
-                    "email": "roman@code-factory.org"
-                },
-                {
-                    "name": "Benjamin Eberlei",
-                    "email": "kontakt@beberlei.de"
-                },
-                {
-                    "name": "Jonathan Wage",
-                    "email": "jonwage@gmail.com"
-                }
-            ],
-            "description": "Powerful PHP database abstraction layer (DBAL) with many features for database schema introspection and management.",
-            "homepage": "https://www.doctrine-project.org/projects/dbal.html",
-            "keywords": [
-                "abstraction",
-                "database",
-                "db2",
-                "dbal",
-                "mariadb",
-                "mssql",
-                "mysql",
-                "oci8",
-                "oracle",
-                "pdo",
-                "pgsql",
-                "postgresql",
-                "queryobject",
-                "sasql",
-                "sql",
-                "sqlite",
-                "sqlserver",
-                "sqlsrv"
-            ],
-            "support": {
-                "issues": "https://github.com/doctrine/dbal/issues",
-                "source": "https://github.com/doctrine/dbal/tree/4.4.3"
-            },
-            "funding": [
-                {
-                    "url": "https://www.doctrine-project.org/sponsorship.html",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://www.patreon.com/phpdoctrine",
-                    "type": "patreon"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/doctrine%2Fdbal",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2026-03-20T08:52:12+00:00"
         },
         {
             "name": "doctrine/deprecations",
@@ -6710,18 +6604,17 @@
             "version": "8.x-dev",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Team-Tea-Time/laravel-forum.git",
-                "reference": "8cabd3769f8ae41c92a162606772d409cf23783b"
+                "url": "https://github.com/DariusIII/laravel-forum.git",
+                "reference": "abfdd61601749c9fd9c57e80eb52568ac93876ac"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Team-Tea-Time/laravel-forum/zipball/8cabd3769f8ae41c92a162606772d409cf23783b",
-                "reference": "8cabd3769f8ae41c92a162606772d409cf23783b",
+                "url": "https://api.github.com/repos/DariusIII/laravel-forum/zipball/abfdd61601749c9fd9c57e80eb52568ac93876ac",
+                "reference": "abfdd61601749c9fd9c57e80eb52568ac93876ac",
                 "shasum": ""
             },
             "require": {
                 "aimeos/laravel-nestedset": "^7.1",
-                "doctrine/dbal": "^4.4",
                 "laravel/framework": "^13.0",
                 "php": "^8.3"
             },
@@ -6739,11 +6632,10 @@
             "autoload": {
                 "psr-4": {
                     "TeamTeaTime\\Forum\\": "src",
-                    "TeamTeaTime\\Forum\\Database\\Seeders\\": "database/seeders",
-                    "TeamTeaTime\\Forum\\Database\\Factories\\": "database/factories"
+                    "TeamTeaTime\\Forum\\Database\\Factories\\": "database/factories",
+                    "TeamTeaTime\\Forum\\Database\\Seeders\\": "database/seeders"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -6762,13 +6654,12 @@
                 "discuss",
                 "forum",
                 "laravel",
-                "laravel-11"
+                "laravel-13"
             ],
             "support": {
-                "issues": "https://github.com/Team-Tea-Time/laravel-forum/issues",
-                "source": "https://github.com/Team-Tea-Time/laravel-forum/tree/8.x"
+                "source": "https://github.com/DariusIII/laravel-forum/tree/8.x"
             },
-            "time": "2026-03-19T15:33:20+00:00"
+            "time": "2026-04-02T15:03:05+00:00"
         },
         {
             "name": "sentry/sentry",
@@ -13497,16 +13388,16 @@
         },
         {
             "name": "justinrainbow/json-schema",
-            "version": "v6.7.2",
+            "version": "6.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jsonrainbow/json-schema.git",
-                "reference": "6fea66c7204683af437864e7c4e7abf383d14bc0"
+                "reference": "89ac92bcfe5d0a8a4433c7b89d394553ae7250cc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jsonrainbow/json-schema/zipball/6fea66c7204683af437864e7c4e7abf383d14bc0",
-                "reference": "6fea66c7204683af437864e7c4e7abf383d14bc0",
+                "url": "https://api.github.com/repos/jsonrainbow/json-schema/zipball/89ac92bcfe5d0a8a4433c7b89d394553ae7250cc",
+                "reference": "89ac92bcfe5d0a8a4433c7b89d394553ae7250cc",
                 "shasum": ""
             },
             "require": {
@@ -13566,9 +13457,9 @@
             ],
             "support": {
                 "issues": "https://github.com/jsonrainbow/json-schema/issues",
-                "source": "https://github.com/jsonrainbow/json-schema/tree/v6.7.2"
+                "source": "https://github.com/jsonrainbow/json-schema/tree/6.8.0"
             },
-            "time": "2026-02-15T15:06:22+00:00"
+            "time": "2026-04-02T12:43:11+00:00"
         },
         {
             "name": "larastan/larastan",
