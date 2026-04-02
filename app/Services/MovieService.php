@@ -703,8 +703,35 @@ class MovieService
                     ? now()->addMinutes(30)
                     : now()->addHours(6);
 
+                $failureReason = $scraper->getLastFailureReason() ?? 'unknown';
+                $fallbackFailureReason = $scraper->getLastFallbackFailureReason();
+
                 if ($scraper->wasBlockedByWaf()) {
-                    Log::warning('IMDb title page fetch is currently blocked by WAF for '.$imdbId.', using shorter negative cache.');
+                    Log::warning('IMDb title fetch failed after WAF block.', [
+                        'imdb_id' => $imdbId,
+                        'reason' => $failureReason,
+                        'fallback_reason' => $fallbackFailureReason,
+                        'source' => $scraper->getLastFetchSource(),
+                        'negative_cache' => '30m',
+                    ]);
+                } else {
+                    Log::warning('IMDb metadata fetch failed.', [
+                        'imdb_id' => $imdbId,
+                        'reason' => $failureReason,
+                        'fallback_reason' => $fallbackFailureReason,
+                        'source' => $scraper->getLastFetchSource(),
+                        'negative_cache' => '6h',
+                    ]);
+                }
+
+                if ($this->echooutput) {
+                    $message = 'IMDb fetch failed ['.$failureReason;
+                    if ($fallbackFailureReason !== null) {
+                        $message .= ' -> '.$fallbackFailureReason;
+                    }
+                    $message .= '] for tt'.$imdbId;
+
+                    cli()->warning($message);
                 }
 
                 Cache::put($cacheKey, false, $ttl);
@@ -729,7 +756,13 @@ class MovieService
             }
             Cache::put($cacheKey, $scraped, $expiresAt);
             if ($this->echooutput) {
-                cli()->info('IMDb scraped '.$scraped['title']);
+                $sourceLabel = match ($scraper->getLastFetchSource()) {
+                    'imdbapi_dev' => 'IMDb fallback (imdbapi.dev)',
+                    'imdb_html' => 'IMDb scrape',
+                    default => 'IMDb',
+                };
+
+                cli()->info($sourceLabel.' found '.$scraped['title']);
             }
 
             return $scraped;

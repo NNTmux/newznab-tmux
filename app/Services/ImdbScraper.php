@@ -16,12 +16,25 @@ class ImdbScraper
 
     protected const int HARD_FAILURE_TTL_HOURS = 6;
 
+    protected const string IMDBAPI_DEV_INTERVAL_CACHE_KEY = 'imdbapi_dev:min_interval';
+
+    protected const string IMDBAPI_DEV_COOLDOWN_CACHE_KEY = 'imdbapi_dev:cooldown';
+
     protected Client $client;
+
+    protected string $imdbApiDevBaseUrl;
 
     protected bool $lastRequestWasBlocked = false;
 
+    protected ?string $lastFetchSource = null;
+
+    protected ?string $lastFailureReason = null;
+
+    protected ?string $lastFallbackFailureReason = null;
+
     public function __construct(?Client $client = null)
     {
+        $this->imdbApiDevBaseUrl = rtrim((string) config('nntmux_api.imdbapi_dev_base_url', 'https://api.imdbapi.dev'), '/');
         $this->client = $client ?? new Client([
             'timeout' => 10,
             'connect_timeout' => 10,
@@ -41,6 +54,21 @@ class ImdbScraper
         return $this->lastRequestWasBlocked;
     }
 
+    public function getLastFetchSource(): ?string
+    {
+        return $this->lastFetchSource;
+    }
+
+    public function getLastFailureReason(): ?string
+    {
+        return $this->lastFailureReason;
+    }
+
+    public function getLastFallbackFailureReason(): ?string
+    {
+        return $this->lastFallbackFailureReason;
+    }
+
     /**
      * Fetch a movie by IMDB numeric ID.
      *
@@ -50,9 +78,14 @@ class ImdbScraper
     public function fetchById(string $id): array|false
     {
         $this->lastRequestWasBlocked = false;
+        $this->lastFetchSource = null;
+        $this->lastFailureReason = null;
+        $this->lastFallbackFailureReason = null;
 
         $id = preg_replace('/[^0-9]/', '', $id) ?? '';
         if ($id === '' || strlen($id) < 5 || strlen($id) > 8) {
+            $this->lastFailureReason = 'invalid_id';
+
             return false;
         }
 
@@ -77,31 +110,61 @@ class ImdbScraper
 
             if ($this->isWafResponse($statusCode, $html)) {
                 $this->lastRequestWasBlocked = true;
-                Cache::put($cacheKey, false, now()->addMinutes(self::SOFT_FAILURE_TTL_MINUTES));
+                $this->lastFailureReason = 'waf_block';
                 Log::notice('IMDb title fetch was challenged by WAF for tt'.$id);
-
-                return false;
             }
 
-            if ($statusCode >= 400 || trim($html) === '') {
-                Cache::put($cacheKey, false, now()->addHours(self::HARD_FAILURE_TTL_HOURS));
+            if (! $this->lastRequestWasBlocked && $statusCode < 400 && trim($html) !== '') {
+                $data = $this->parseTitleHtml($html, $id);
+                if ($data !== false) {
+                    $this->lastFetchSource = 'imdb_html';
+                    $this->lastFailureReason = null;
+                    Cache::put($cacheKey, $data, now()->addDays(7));
 
-                return false;
+                    return $data;
+                }
+
+                $this->lastFailureReason = 'html_parse_failure';
+            } elseif (! $this->lastRequestWasBlocked) {
+                $this->lastFailureReason = trim($html) === '' ? 'html_empty_response' : 'html_http_failure';
             }
 
-            $data = $this->parseTitleHtml($html, $id);
-            if ($data === false) {
-                Cache::put($cacheKey, false, now()->addHours(self::HARD_FAILURE_TTL_HOURS));
+            $fallbackData = $this->fetchFromImdbApiDev($id);
+            if ($fallbackData !== false) {
+                $this->lastFetchSource = 'imdbapi_dev';
+                $this->lastFailureReason = null;
+                $this->lastFallbackFailureReason = null;
+                Cache::put($cacheKey, $fallbackData, now()->addDays(7));
 
-                return false;
+                return $fallbackData;
             }
 
-            Cache::put($cacheKey, $data, now()->addDays(7));
+            $ttl = $this->lastRequestWasBlocked
+                ? now()->addMinutes(self::SOFT_FAILURE_TTL_MINUTES)
+                : now()->addHours(self::HARD_FAILURE_TTL_HOURS);
+            Cache::put($cacheKey, false, $ttl);
 
-            return $data;
+            return false;
         } catch (\Throwable $e) {
             Log::debug('IMDb fetch error tt'.$id.': '.$e->getMessage());
-            Cache::put($cacheKey, false, now()->addHours(self::HARD_FAILURE_TTL_HOURS));
+            if ($this->lastFailureReason === null) {
+                $this->lastFailureReason = 'html_exception';
+            }
+
+            $fallbackData = $this->fetchFromImdbApiDev($id);
+            if ($fallbackData !== false) {
+                $this->lastFetchSource = 'imdbapi_dev';
+                $this->lastFailureReason = null;
+                $this->lastFallbackFailureReason = null;
+                Cache::put($cacheKey, $fallbackData, now()->addDays(7));
+
+                return $fallbackData;
+            }
+
+            $ttl = $this->lastRequestWasBlocked
+                ? now()->addMinutes(self::SOFT_FAILURE_TTL_MINUTES)
+                : now()->addHours(self::HARD_FAILURE_TTL_HOURS);
+            Cache::put($cacheKey, false, $ttl);
 
             return false;
         }
@@ -224,6 +287,150 @@ class ImdbScraper
                 ]), 0, 10);
             }
         }
+
+        return [
+            'imdbid' => $id,
+            'title' => $title,
+            'year' => $year,
+            'plot' => $plot,
+            'rating' => $rating,
+            'cover' => $cover,
+            'genre' => $genres,
+            'director' => $directors,
+            'actors' => $actors,
+            'language' => $language,
+            'type' => $type,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function fetchFromImdbApiDev(string $id): array|false
+    {
+        if (! $this->canUseImdbApiDev()) {
+            return false;
+        }
+
+        if ($this->imdbApiDevBaseUrl === '') {
+            $this->lastFallbackFailureReason = 'fallback_disabled';
+
+            return false;
+        }
+
+        try {
+            $this->markImdbApiDevAttempt();
+
+            $response = $this->client->get($this->imdbApiDevBaseUrl.'/titles/tt'.$id, [
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
+            ]);
+
+            if ($response->getStatusCode() === 429) {
+                $this->lastFallbackFailureReason = 'fallback_rate_limited';
+                $this->activateImdbApiDevCooldown();
+
+                return false;
+            }
+
+            if ($response->getStatusCode() !== 200) {
+                $this->lastFallbackFailureReason = 'fallback_http_failure';
+                if ($response->getStatusCode() >= 500) {
+                    $this->activateImdbApiDevCooldown();
+                }
+
+                return false;
+            }
+
+            $payload = json_decode((string) $response->getBody(), true);
+            if (! is_array($payload)) {
+                $this->lastFallbackFailureReason = 'fallback_invalid_json';
+
+                return false;
+            }
+
+            $mapped = $this->mapImdbApiDevTitle($payload, $id);
+            if ($mapped === false) {
+                $this->lastFallbackFailureReason = 'fallback_invalid_payload';
+
+                return false;
+            }
+
+            return $mapped;
+        } catch (\Throwable $e) {
+            Log::debug('imdbapi.dev fetch error tt'.$id.': '.$e->getMessage());
+            $this->lastFallbackFailureReason = 'fallback_exception';
+            $this->activateImdbApiDevCooldown();
+
+            return false;
+        }
+    }
+
+    private function canUseImdbApiDev(): bool
+    {
+        if (! (bool) config('nntmux_api.imdbapi_dev_enabled', true)) {
+            $this->lastFallbackFailureReason = 'fallback_disabled';
+
+            return false;
+        }
+
+        if (Cache::has(self::IMDBAPI_DEV_COOLDOWN_CACHE_KEY)) {
+            $this->lastFallbackFailureReason = 'fallback_cooldown_active';
+
+            return false;
+        }
+
+        $minInterval = max(0, (int) config('nntmux_api.imdbapi_dev_min_interval_seconds', 15));
+        if ($minInterval > 0 && Cache::has(self::IMDBAPI_DEV_INTERVAL_CACHE_KEY)) {
+            $this->lastFallbackFailureReason = 'fallback_min_interval_active';
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private function markImdbApiDevAttempt(): void
+    {
+        $minInterval = max(0, (int) config('nntmux_api.imdbapi_dev_min_interval_seconds', 15));
+        if ($minInterval <= 0) {
+            return;
+        }
+
+        Cache::put(self::IMDBAPI_DEV_INTERVAL_CACHE_KEY, true, now()->addSeconds($minInterval));
+    }
+
+    private function activateImdbApiDevCooldown(): void
+    {
+        $cooldownSeconds = max(0, (int) config('nntmux_api.imdbapi_dev_cooldown_seconds', 300));
+        if ($cooldownSeconds <= 0) {
+            return;
+        }
+
+        Cache::put(self::IMDBAPI_DEV_COOLDOWN_CACHE_KEY, true, now()->addSeconds($cooldownSeconds));
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     * @return array<string, mixed>
+     */
+    private function mapImdbApiDevTitle(array $payload, string $id): array|false
+    {
+        $title = trim((string) ($payload['primaryTitle'] ?? $payload['title'] ?? ''));
+        if ($title === '') {
+            return false;
+        }
+
+        $year = trim((string) ($payload['startYear'] ?? $payload['year'] ?? ''));
+        $plot = trim((string) ($payload['plot'] ?? $payload['description'] ?? ''));
+        $rating = trim((string) ($payload['rating']['aggregateRating'] ?? $payload['rating'] ?? ''));
+        $cover = $this->normalizeImageUrl($payload['primaryImage'] ?? $payload['image'] ?? '');
+        $genres = $this->normalizeStringList($payload['genres'] ?? []);
+        $directors = $this->extractApiDevPeople($payload['directors'] ?? []);
+        $actors = array_slice($this->extractApiDevPeople($payload['stars'] ?? $payload['cast'] ?? []), 0, 10);
+        $language = $this->extractApiDevLanguages($payload['spokenLanguages'] ?? []);
+        $type = $this->normalizeApiDevType((string) ($payload['type'] ?? 'movie'));
 
         return [
             'imdbid' => $id,
@@ -508,6 +715,28 @@ class ImdbScraper
         return array_values(array_unique($people));
     }
 
+    /**
+     * @return array<int, string>
+     */
+    private function extractApiDevPeople(mixed $value): array
+    {
+        $people = [];
+
+        foreach ($this->normalizeValueList($value) as $item) {
+            if (is_array($item)) {
+                $name = trim((string) ($item['displayName'] ?? $item['name'] ?? ''));
+            } else {
+                $name = trim((string) $item);
+            }
+
+            if ($name !== '') {
+                $people[] = $name;
+            }
+        }
+
+        return array_values(array_unique($people));
+    }
+
     private function extractLanguage(array $jsonLd, HtmlDomParser|false $dom): string
     {
         $languages = $this->normalizeStringList($jsonLd['inLanguage'] ?? []);
@@ -530,12 +759,39 @@ class ImdbScraper
         return implode(', ', array_values(array_unique($languages)));
     }
 
+    private function extractApiDevLanguages(mixed $value): string
+    {
+        $languages = [];
+
+        foreach ($this->normalizeValueList($value) as $item) {
+            if (is_array($item)) {
+                $language = trim((string) ($item['name'] ?? $item['displayName'] ?? ''));
+            } else {
+                $language = trim((string) $item);
+            }
+
+            if ($language !== '') {
+                $languages[] = $language;
+            }
+        }
+
+        return implode(', ', array_values(array_unique($languages)));
+    }
+
     private function extractType(array $jsonLd): string
     {
         $type = strtolower((string) ($jsonLd['@type'] ?? 'movie'));
 
         return match ($type) {
             'tvseries', 'tvminiseries', 'tvepisode', 'tvmovie' => 'tv',
+            default => 'movie',
+        };
+    }
+
+    private function normalizeApiDevType(string $type): string
+    {
+        return match (strtolower(trim($type))) {
+            'tvseries', 'tv_series', 'tv mini series', 'tv_mini_series', 'tvminiseries', 'tvspecial', 'tv_special', 'tvmovie', 'tv_movie', 'tvepisode', 'tv_episode' => 'tv',
             default => 'movie',
         };
     }
