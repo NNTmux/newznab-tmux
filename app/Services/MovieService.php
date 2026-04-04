@@ -106,13 +106,21 @@ class MovieService
     /**
      * Get movie info by IMDB ID.
      */
-    public function getMovieInfo(?string $imdbId): ?MovieInfo
+    public function getMovieInfo(int|string|null $imdbId): ?MovieInfo
     {
-        if ($imdbId === null || $imdbId === '' || $imdbId === '0000000') {
+        $lookupIds = $this->movieInfoLookupIds($imdbId);
+        if ($lookupIds === []) {
             return null;
         }
 
-        return MovieInfo::query()->where('imdbid', $imdbId)->first();
+        foreach ($lookupIds as $lookupId) {
+            $movie = MovieInfo::query()->where('imdbid', $lookupId)->first();
+            if ($movie !== null) {
+                return $movie;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -121,28 +129,89 @@ class MovieService
      * @throws \Exception
      * @throws GuzzleException
      */
-    public function getTrailer(int $imdbId): string|false
+    public function getTrailer(int|string|null $imdbId): string|false
     {
-        $trailer = MovieInfo::query()->where('imdbid', $imdbId)->where('trailer', '<>', '')->first(['trailer']);
-        if ($trailer !== null) {
-            return $trailer['trailer'];
+        $lookupIds = $this->movieInfoLookupIds($imdbId);
+        if ($lookupIds === []) {
+            return false;
+        }
+
+        foreach ($lookupIds as $lookupId) {
+            $trailer = MovieInfo::query()->where('imdbid', $lookupId)->where('trailer', '<>', '')->first(['trailer']);
+            if ($trailer !== null) {
+                return $trailer['trailer'];
+            }
+        }
+
+        $canonicalImdbId = $this->canonicalImdbId($imdbId);
+        if ($canonicalImdbId === null) {
+            return false;
         }
 
         if ($this->traktcheck !== null) {
-            $data = $this->traktTv->client->getMovieSummary('tt'.$imdbId, 'full');
+            $data = $this->traktTv->client->getMovieSummary('tt'.$canonicalImdbId, 'full');
             if (($data !== false) && ! empty($data['trailer'])) {
                 return $data['trailer'];
             }
         }
 
-        $trailer = imdb_trailers($imdbId);
+        $trailer = imdb_trailers($canonicalImdbId);
         if ($trailer) {
-            MovieInfo::query()->where('imdbid', $imdbId)->update(['trailer' => $trailer]);
+            MovieInfo::query()->whereIn('imdbid', $lookupIds)->update(['trailer' => $trailer]);
 
             return $trailer;
         }
 
         return false;
+    }
+
+    private function movieInfoLookupIds(int|string|null $imdbId): array
+    {
+        $canonicalImdbId = $this->canonicalImdbId($imdbId);
+        if ($canonicalImdbId === null) {
+            return [];
+        }
+
+        $lookupIds = [$canonicalImdbId];
+        $rawImdbId = $this->sanitizeImdbId($imdbId);
+        if ($rawImdbId !== null && ! in_array($rawImdbId, $lookupIds, true)) {
+            $lookupIds[] = $rawImdbId;
+        }
+
+        $paddedImdbId = imdb_id_pad($canonicalImdbId);
+        if ($paddedImdbId !== '00000000' && ! in_array($paddedImdbId, $lookupIds, true)) {
+            $lookupIds[] = $paddedImdbId;
+        }
+
+        return $lookupIds;
+    }
+
+    private function canonicalImdbId(int|string|null $imdbId): ?string
+    {
+        $sanitizedImdbId = $this->sanitizeImdbId($imdbId);
+        if ($sanitizedImdbId === null) {
+            return null;
+        }
+
+        if (strlen($sanitizedImdbId) === 8 && str_starts_with($sanitizedImdbId, '0')) {
+            return substr($sanitizedImdbId, 1);
+        }
+
+        return $sanitizedImdbId;
+    }
+
+    private function sanitizeImdbId(int|string|null $imdbId): ?string
+    {
+        if ($imdbId === null || $imdbId === '') {
+            return null;
+        }
+
+        $sanitizedImdbId = preg_replace('/\D/', '', trim((string) $imdbId));
+        if ($sanitizedImdbId === null || $sanitizedImdbId === '' || imdb_id_pad($sanitizedImdbId) === '00000000') {
+            return null;
+        }
+
+        return $sanitizedImdbId;
     }
 
     /**
