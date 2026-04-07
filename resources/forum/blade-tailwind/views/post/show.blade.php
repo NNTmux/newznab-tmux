@@ -1,6 +1,6 @@
 @extends ('forum::layouts.main', ['breadcrumbs_append' => [trans('forum::posts.view')]])
 
-@section ('content')
+@section ('forum-content')
     <div id="post">
         <div class="flex flex-row justify-between mb-3">
             <h2 class="grow">{{ trans('forum::posts.view') }} ({{ $thread->title }})</h2>

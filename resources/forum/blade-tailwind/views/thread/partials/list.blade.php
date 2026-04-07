@@ -1,16 +1,18 @@
-<div class="bg-white dark:bg-gray-800 transition-colors" :class="{ 'ring-1 ring-blue-500 dark:ring-blue-400': state.selectedThreads.includes({{ $thread->id }}) }">
-    <div class="flex flex-col md:items-start md:flex-row md:justify-between md:gap-4 p-6">
+<div class="rounded-xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md dark:border-gray-700 dark:bg-gray-800" :class="{ 'ring-1 ring-blue-500 dark:ring-blue-400': state.selectedThreads.includes({{ $thread->id }}) }">
+    <div class="flex flex-col gap-4 p-5 md:flex-row md:items-start md:justify-between md:gap-6 sm:p-6">
         <div class="md:w-3/6 text-center md:text-left">
             <span class="lead">
-                <a href="{{ Forum::route('thread.show', $thread) }}" @if (isset($category))style="color: {{ $category->color_light_mode }};"@endif class="text-lg hover:opacity-80 transition-opacity">{{ $thread->title }}</a>
+                <a href="{{ Forum::route('thread.show', $thread) }}" @if (isset($category)) style="color: {{ $category->color_light_mode }};" @endif class="text-lg font-semibold hover:opacity-80 transition-opacity">{{ $thread->title }}</a>
             </span>
             <br>
-            <span class="text-gray-900 dark:text-gray-100">{{ $thread->authorName }}</span>
-            <span class="text-gray-500 dark:text-gray-400"> @include ('forum::partials.timestamp', ['carbon' => $thread->created_at])</span>
+            <span class="inline-flex items-center gap-2 text-sm">
+                <span class="text-gray-900 dark:text-gray-100">{{ $thread->authorName }}</span>
+                <span class="text-gray-500 dark:text-gray-400">@include ('forum::partials.timestamp', ['carbon' => $thread->created_at])</span>
+            </span>
 
             @if (!isset($category))
                 <br>
-                <a href="{{ Forum::route('category.show', $thread->category) }}" style="color: {{ $thread->category->color_light_mode }};" class="hover:opacity-80 transition-opacity">{{ $thread->category->title }}</a>
+                <a href="{{ Forum::route('category.show', $thread->category) }}" style="color: {{ $thread->category->color_light_mode }};" class="mt-2 inline-block text-sm font-medium hover:opacity-80 transition-opacity">{{ $thread->category->title }}</a>
             @endif
         </div>
 
@@ -37,11 +39,11 @@
         </div>
 
         @if ($thread->lastPost)
-            <div class="md:w-1/6 flex justify-center md:flex-col md:items-end">
+            <div class="md:w-1/6 flex justify-center md:flex-col md:items-end text-sm">
                 <a href="{{ Forum::route('thread.show', $thread->lastPost) }}" class="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">{{ trans('forum::posts.view') }} &raquo;</a>
-                <div>
+                <div class="inline-flex items-center gap-2">
                     <span class="text-gray-900 dark:text-gray-100">{{ $thread->lastPost->authorName }}</span>
-                    <span class="text-gray-500 dark:text-gray-400"> @include ('forum::partials.timestamp', ['carbon' => $thread->lastPost->created_at])</span>
+                    <span class="text-gray-500 dark:text-gray-400">@include ('forum::partials.timestamp', ['carbon' => $thread->lastPost->created_at])</span>
                 </div>
             </div>
         @endif

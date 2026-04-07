@@ -1,128 +1,90 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    @auth
-        <meta name="user-authenticated" content="true">
-        <meta name="theme-preference" content="{{ auth()->user()->theme_preference ?? 'light' }}">
-    @else
-        <meta name="user-authenticated" content="false">
-    @endauth
+@php
+    $category = $category ?? null;
+    $thread = $thread ?? null;
+    $breadcrumbs_append = $breadcrumbs_append ?? [];
+    $thread_title = $thread_title ?? null;
+
+    $meta_title = trim(collect([
+        $thread_title,
+        data_get($category, 'title'),
+        trans('forum::general.home_title'),
+    ])->filter()->join(' — '));
+@endphp
+
+@extends('layouts.main')
+
+@push('meta')
     <meta name="default-category-color" content="{{ config('forum.frontend.default_category_color') }}">
+@endpush
 
-    <title>
-        @if (isset($thread_title))
-            {{ $thread_title }} —
-        @endif
-        @if (isset($category))
-            {{ $category->title }} —
-        @endif
-        {{ trans('forum::general.home_title') }}
-    </title>
+@push('styles')
+    @vite('resources/forum/blade-tailwind/css/forum.css')
+@endpush
 
-    @vite(['resources/forum/blade-tailwind/css/forum.css', 'resources/forum/blade-tailwind/js/forum.js'])
-</head>
-<body class="forum bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
-    <nav class="v-navbar bg-white dark:bg-gray-800 shadow py-4 transition-colors duration-200">
-        <div class="container mx-auto px-4 md:flex md:items-center md:gap-4">
-            <div class="flex justify-between items-center">
-                <a class="text-lg font-semibold text-gray-900 dark:text-white" href="{{ url(config('forum.frontend.router.prefix')) }}">{{ config('app.name') }} Forum</a>
-                <button class="navbar-toggler block md:hidden border rounded-md px-2 py-1 text-gray-700 dark:text-gray-300 dark:border-gray-600" type="button" :class="{ collapsed: isCollapsed }" @click="isCollapsed = !isCollapsed">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="navbar-toggler-icon w-6 h-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                    </svg>
-                </button>
+@prepend('scripts')
+    @vite('resources/forum/blade-tailwind/js/forum.js')
+@endprepend
+
+@push('scripts')
+    @stack('forum-page-scripts')
+@endpush
+
+@section('content')
+    <div class="forum space-y-6">
+        <section class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+            <div class="border-b border-gray-200 bg-gradient-to-r from-slate-50 via-white to-blue-50 px-5 py-5 dark:border-gray-700 dark:from-gray-900 dark:via-gray-800 dark:to-gray-800 sm:px-6">
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                    <div class="space-y-2">
+                        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">Community</p>
+                        <h1 class="!my-0 text-3xl font-semibold text-gray-900 dark:text-gray-100">{{ config('app.name') }} Forum</h1>
+                        <p class="max-w-3xl text-sm text-gray-600 dark:text-gray-400">
+                            Discuss releases, ask for help, and follow staff updates without leaving the main {{ config('app.name') }} interface.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2 text-sm">
+                        @guest
+                            <a href="{{ url('/login') }}" class="inline-flex items-center rounded-full border border-gray-300 px-4 py-2 font-medium text-gray-700 transition hover:border-blue-300 hover:text-blue-600 dark:border-gray-600 dark:text-gray-300 dark:hover:border-blue-500 dark:hover:text-blue-400">Log in</a>
+                            <a href="{{ url('/register') }}" class="inline-flex items-center rounded-full bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-500">Register</a>
+                        @else
+                            <span class="inline-flex items-center rounded-full bg-gray-100 px-4 py-2 font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-200">{{ $username }}</span>
+                            <a href="{{ url('/logout') }}" class="inline-flex items-center rounded-full border border-gray-300 px-4 py-2 font-medium text-gray-700 transition hover:border-red-300 hover:text-red-600 dark:border-gray-600 dark:text-gray-300 dark:hover:border-red-500 dark:hover:text-red-400" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Log out</a>
+                            <form id="logout-form" action="{{ url('/logout') }}" method="POST" class="hidden">
+                                @csrf
+                            </form>
+                        @endguest
+                    </div>
+                </div>
+
+                <div class="v-navbar mt-5 flex flex-col gap-3">
+                    <div class="flex flex-wrap gap-2">
+                        <a href="{{ route('home') }}" class="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition {{ request()->routeIs('home') ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900' : 'bg-white text-gray-700 ring-1 ring-gray-200 hover:text-blue-600 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:text-blue-400' }}">Home</a>
+                        <a href="{{ url(config('forum.frontend.router.prefix')) }}" class="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition {{ request()->routeIs('forum.index') || request()->routeIs('forum.category.*') ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 ring-1 ring-gray-200 hover:text-blue-600 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:text-blue-400' }}">{{ trans('forum::general.index') }}</a>
+                        <a href="{{ route('forum.recent') }}" class="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition {{ request()->routeIs('forum.recent') ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 ring-1 ring-gray-200 hover:text-blue-600 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:text-blue-400' }}">{{ trans('forum::threads.recent') }}</a>
+                        @auth
+                            <a href="{{ route('forum.unread') }}" class="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition {{ request()->routeIs('forum.unread') ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 ring-1 ring-gray-200 hover:text-blue-600 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:text-blue-400' }}">{{ trans('forum::threads.unread_updated') }}</a>
+                        @endauth
+                        @can ('moveCategories')
+                            <a href="{{ route('forum.category.manage') }}" class="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition {{ request()->routeIs('forum.category.manage') ? 'bg-amber-500 text-white' : 'bg-white text-gray-700 ring-1 ring-gray-200 hover:text-amber-600 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:text-amber-400' }}">{{ trans('forum::categories.manage') }}</a>
+                        @endcan
+                        @can ('approveThreads')
+                            <a href="{{ route('forum.pending-approval.threads') }}" class="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition {{ request()->routeIs('forum.pending-approval.threads') ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 ring-1 ring-gray-200 hover:text-orange-600 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:text-orange-400' }}">{{ trans('forum::threads.pending_approval') }}</a>
+                        @endcan
+                        @can ('approvePosts')
+                            <a href="{{ route('forum.pending-approval.posts') }}" class="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition {{ request()->routeIs('forum.pending-approval.posts') ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 ring-1 ring-gray-200 hover:text-orange-600 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:text-orange-400' }}">{{ trans('forum::posts.pending_approval') }}</a>
+                        @endcan
+                    </div>
+                </div>
             </div>
-            <div class="grow justify-between navbar-collapse" :class="{ 'flex flex-col': !isCollapsed, 'hidden md:flex': isCollapsed }">
-                <ul class="flex flex-col md:flex-row gap-3 mb-4 md:mb-0">
-                    <li>
-                        <a class="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors" href="{{ route('home') }}">Home</a>
-                    </li>
-                    <li>
-                        <a class="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors" href="{{ url(config('forum.frontend.router.prefix')) }}">{{ trans('forum::general.index') }}</a>
-                    </li>
-                    <li>
-                        <a class="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors" href="{{ route('forum.recent') }}">{{ trans('forum::threads.recent') }}</a>
-                    </li>
-                    @auth
-                        <li>
-                            <a class="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors" href="{{ route('forum.unread') }}">{{ trans('forum::threads.unread_updated') }}</a>
-                        </li>
-                    @endauth
-                    @if (Gate::allows('moveCategories') || Gate::allows('approveThreads') || Gate::allows('approvePosts'))
-                        <li class="nav-item dropdown relative">
-                            <a class="dropdown-toggle text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors flex items-center gap-1" href="#" id="manageDropdownMenuLink" @click="isManageDropdownCollapsed = !isManageDropdownCollapsed">
-                                {{ trans('forum::general.manage') }}
 
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                                </svg>
-                            </a>
-                            <div class="border dark:border-gray-600 absolute z-50 left-0 bg-white dark:bg-gray-800 rounded-md w-56 divide-y dark:divide-gray-600 shadow-lg" :class="{ hidden: isManageDropdownCollapsed }" aria-labelledby="manageDropdownMenuLink">
-                                @can ('moveCategories')
-                                    <a class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" href="{{ route('forum.category.manage') }}">
-                                        {{ trans('forum::categories.manage') }}
-                                    </a>
-                                @endcan
-                                @can ('approveThreads')
-                                    <a class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" href="{{ route('forum.pending-approval.threads') }}">
-                                        {{ trans('forum::threads.pending_approval') }}
-                                    </a>
-                                @endcan
-                                @can ('approvePosts')
-                                    <a class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" href="{{ route('forum.pending-approval.posts') }}">
-                                        {{ trans('forum::posts.pending_approval') }}
-                                    </a>
-                                @endcan
-                            </div>
-                        </li>
-                    @endif
-                </ul>
-                <ul class="navbar-nav flex gap-4 flex-col md:flex-row">
-                    @if (Auth::check())
-                        <li class="nav-item dropdown relative">
-                            <a class="dropdown-toggle text-gray-500 dark:text-gray-400 flex items-center gap-1 hover:text-gray-800 dark:hover:text-gray-200 transition-colors" href="#" id="userDropdownMenuLink" @click="isUserDropdownCollapsed = !isUserDropdownCollapsed">
-                                {{ $username }}
-
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                                </svg>
-                            </a>
-                            <div class="border dark:border-gray-600 absolute z-50 left-0 bg-white dark:bg-gray-800 rounded-md w-44 divide-y dark:divide-gray-600 shadow-lg" :class="{ hidden: isUserDropdownCollapsed }" aria-labelledby="userDropdownMenuLink">
-                                <a class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" href="{{ url('/logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                    Log out
-                                </a>
-                                <form id="logout-form" action="{{ url('/logout') }}" method="POST" style="display: none;">
-                                    @csrf
-                                </form>
-                            </div>
-                        </li>
-                    @else
-                        <li class="nav-item">
-                            <a class="nav-link text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors" href="{{ url('/login') }}">Log in</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors" href="{{ url('/register') }}">Register</a>
-                        </li>
-                    @endif
-                </ul>
+            <div class="space-y-4 px-5 py-4 sm:px-6">
+                @include ('forum::partials.breadcrumbs')
+                @include ('forum::partials.alerts')
             </div>
-        </div>
-    </nav>
+        </section>
 
-    <div id="main" class="container mx-auto p-4">
-        @include ('forum::partials.breadcrumbs')
-        @include ('forum::partials.alerts')
-
-        @yield('content')
+        <section class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-6">
+            @yield('forum-content')
+        </section>
     </div>
-
-    @yield('footer')
-
-    <script>
-        window.defaultCategoryColor = '{{ config('forum.frontend.default_category_color') }}';
-    </script>
-</body>
-</html>
+@endsection

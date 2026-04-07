@@ -1,6 +1,6 @@
 @extends ('forum::layouts.main', ['breadcrumbs_append' => [trans('forum::threads.new_thread')]])
 
-@section ('content')
+@section ('forum-content')
     <div id="create-thread">
         <h2 class="text-3xl text-gray-900 dark:text-gray-100">{{ trans('forum::threads.new_thread') }} ({{ $category->title }})</h2>
 

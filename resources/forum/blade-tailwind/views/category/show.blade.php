@@ -1,7 +1,7 @@
 {{-- $thread is passed as NULL to the master layout view to prevent it from showing in the breadcrumbs --}}
 @extends('forum::layouts.main', ['thread' => null])
 
-@section('content')
+@section('forum-content')
     <div class="flex flex-row justify-between mb-2">
         <h2 class="text-3xl text-gray-900 dark:text-gray-100" style="color: {{ $category->color_light_mode }};">
             {{ $category->title }} &nbsp;
@@ -130,8 +130,8 @@
                     @endcan
                 @endif
             @else
-                <div class="card my-3">
-                    <div class="card-body">
+                <div class="my-3 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center text-gray-600 dark:border-gray-600 dark:bg-gray-900/40 dark:text-gray-300">
+                    <div>
                         {{ trans('forum::threads.none_found') }}
                         @can ('createThreads', $category)
                             <br>
@@ -141,11 +141,11 @@
                 </div>
             @endif
 
-            <div class="row">
-                <div class="col col-xs-8">
+            <div class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
                     {{ $threads->links('forum::pagination') }}
                 </div>
-                <div class="col col-xs-4 text-end">
+                <div class="text-end">
                     @if ($category->accepts_threads)
                         @can ('createThreads', $category)
                             <x-forum::button-link href="{{ Forum::route('thread.create', $category) }}">{{ trans('forum::threads.new_thread') }}</x-forum::button-link>
@@ -179,6 +179,7 @@
         @endcan
     @endcan
 
+    @push('forum-page-scripts')
     <script type="module">
     Vue.createApp({
         setup() {
@@ -245,4 +246,5 @@
         }
     }).mount('#category');
     </script>
+    @endpush
 @stop

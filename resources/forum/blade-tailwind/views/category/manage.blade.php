@@ -1,6 +1,6 @@
 @extends ('forum::layouts.main', ['category' => null, 'thread' => null, 'breadcrumbs_append' => [trans('forum::general.manage')]])
 
-@section ('content')
+@section ('forum-content')
     <div class="flex flex-row justify-between mb-2">
         <h2 class="text-3xl font-medium my-3 text-gray-900 dark:text-gray-100">{{ trans('forum::general.manage') }}</h2>
 
@@ -65,6 +65,7 @@
         </draggable>
     </script>
 
+    @push('forum-page-scripts')
     <script type="module">
     const app = Vue.createApp({
         setup() {
@@ -76,7 +77,7 @@
 
             Vue.watch(
                 () => state.categories,
-                async (newValue, oldValue) => {
+                () => {
                     state.isSavingDisabled = false;
                 },
                 { deep: true }
@@ -89,7 +90,7 @@
 
                 var payload = { categories: state.categories };
                 axios.post('{{ route('forum.bulk.category.reorder') }}', payload)
-                    .then(response => {
+                    .then(() => {
                         state.changesApplied = true;
                         setTimeout(() => state.changesApplied = false, 3000);
                     })
@@ -121,4 +122,5 @@
 
     app.mount('#manage-categories');
     </script>
+    @endpush
 @stop

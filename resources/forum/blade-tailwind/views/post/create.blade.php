@@ -1,6 +1,6 @@
 @extends ('forum::layouts.main', ['breadcrumbs_append' => [trans('forum::general.new_reply')]])
 
-@section ('content')
+@section ('forum-content')
     <div id="create-post">
         <h2 class="text-3xl font-medium my-3 text-gray-900 dark:text-gray-100">{{ trans('forum::general.new_reply') }} ({{ $thread->title }})</h2>
 

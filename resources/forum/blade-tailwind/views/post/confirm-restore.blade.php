@@ -1,6 +1,6 @@
 @extends ('forum::layouts.main', ['breadcrumbs_append' => [trans_choice('forum::posts.restore', 1)]])
 
-@section ('content')
+@section ('forum-content')
     <div id="delete-post">
         <h2 class="grow text-3xl text-gray-900 dark:text-gray-100">{{ trans_choice('forum::posts.restore', 1) }}</h2>
 

@@ -1,6 +1,6 @@
 @extends ('forum::layouts.main', ['thread' => null, 'breadcrumbs_append' => [trans('forum::threads.unread_updated')]])
 
-@section ('content')
+@section ('forum-content')
     <div id="new-posts">
         <h2 class="text-3xl text-medium my-4 text-gray-900 dark:text-gray-100">{{ trans('forum::threads.unread_updated') }}</h2>
 

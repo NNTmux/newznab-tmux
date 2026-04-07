@@ -5,7 +5,7 @@
                 <a href="{{ Forum::route('thread.show', $post) }}" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">#{{ $post->sequence }}</a>
             </span>
             <div>
-                <div>
+                <div class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
                     <strong class="text-gray-900 dark:text-gray-100">{{ $post->authorName }}</strong>
                     <span class="text-gray-500 dark:text-gray-400">{{ $post->posted }}</span>
                 </div>

@@ -1,6 +1,6 @@
 @extends ('forum::layouts.main', ['thread' => null, 'breadcrumbs_append' => [$thread->title], 'thread_title' => $thread->title])
 
-@section ('content')
+@section ('forum-content')
     <div id="thread">
         <div class="flex flex-col md:flex-row justify-between my-4">
             <h2 class="grow text-3xl font-semibold text-gray-900 dark:text-gray-100">{{ $thread->title }}</h2>
@@ -350,6 +350,7 @@
         @endcan
     @endif
 
+    @push('forum-page-scripts')
     <script type="module">
     Vue.createApp({
         setup() {
@@ -402,4 +403,5 @@
         }
     }).mount('#thread');
     </script>
+    @endpush
 @stop

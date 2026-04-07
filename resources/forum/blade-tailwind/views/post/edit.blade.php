@@ -1,6 +1,6 @@
 @extends ('forum::layouts.main', ['breadcrumbs_append' => [trans('forum::posts.edit')]])
 
-@section ('content')
+@section ('forum-content')
     <div id="edit-post">
         <h2 class="text-3xl font-medium my-3 text-gray-900 dark:text-gray-100">{{ trans('forum::posts.edit') }} ({{ $thread->title }})</h2>
 

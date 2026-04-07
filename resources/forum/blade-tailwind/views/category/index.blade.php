@@ -1,7 +1,7 @@
 {{-- $category is passed as NULL to the master layout view to prevent it from showing in the breadcrumbs --}}
 @extends ('forum::layouts.main', ['category' => null])
 
-@section ('content')
+@section ('forum-content')
     <div class="flex flex-row justify-between my-3">
         <h2 class="grow text-3xl font-medium text-gray-900 dark:text-gray-100">{{ trans('forum::general.index') }}</h2>
 
