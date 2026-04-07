@@ -9,27 +9,27 @@
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.11",
-        "@tailwindcss/vite": "^4.2.1",
+        "@tailwindcss/vite": "^4.2.2",
         "axios": "1.14.0",
-        "lodash": "^4.17.23",
-        "npm-check-updates": "^19.6.3",
+        "lodash": "^4.18.1",
+        "npm-check-updates": "^20.0.0",
         "prettier": "3.8.1",
-        "prettier-plugin-blade": "2.1.21",
+        "prettier-plugin-blade": "3.1.4",
         "prettier-plugin-tailwindcss": "^0.7.2",
-        "tailwindcss": "^4.2.1",
-        "vite": "^7.3",
-        "vue": "^3.5.29"
+        "tailwindcss": "^4.2.2",
+        "vite": "^8.0",
+        "vue": "^3.5.32"
     },
     "dependencies": {
-        "@alpinejs/csp": "^3.15.8",
+        "@alpinejs/csp": "^3.15.11",
         "@fortawesome/fontawesome-free": "^7.2.0",
         "@melloware/coloris": "^0.25.0",
         "@simonwep/pickr": "^1.9.1",
         "chart.js": "^4.5.1",
         "date-fns": "^4.1.0",
         "feather-icons": "^4.29.2",
-        "laravel-echo": "^2.3.0",
-        "laravel-vite-plugin": "^2.1",
+        "laravel-echo": "^2.3.3",
+        "laravel-vite-plugin": "^3.0",
         "nested-sort": "^5.2.0",
         "vuedraggable": "^4.1.0"
     }
