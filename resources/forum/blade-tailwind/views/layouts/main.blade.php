@@ -51,23 +51,46 @@
                             <a class="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors" href="{{ route('forum.unread') }}">{{ trans('forum::threads.unread_updated') }}</a>
                         </li>
                     @endauth
-                    @can ('moveCategories')
-                        <li>
-                            <a class="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors" href="{{ route('forum.category.manage') }}">{{ trans('forum::general.manage') }}</a>
+                    @if (Gate::allows('moveCategories') || Gate::allows('approveThreads') || Gate::allows('approvePosts'))
+                        <li class="nav-item dropdown relative">
+                            <a class="dropdown-toggle text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors flex items-center gap-1" href="#" id="manageDropdownMenuLink" @click="isManageDropdownCollapsed = !isManageDropdownCollapsed">
+                                {{ trans('forum::general.manage') }}
+
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                </svg>
+                            </a>
+                            <div class="border dark:border-gray-600 absolute z-50 left-0 bg-white dark:bg-gray-800 rounded-md w-56 divide-y dark:divide-gray-600 shadow-lg" :class="{ hidden: isManageDropdownCollapsed }" aria-labelledby="manageDropdownMenuLink">
+                                @can ('moveCategories')
+                                    <a class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" href="{{ route('forum.category.manage') }}">
+                                        {{ trans('forum::categories.manage') }}
+                                    </a>
+                                @endcan
+                                @can ('approveThreads')
+                                    <a class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" href="{{ route('forum.pending-approval.threads') }}">
+                                        {{ trans('forum::threads.pending_approval') }}
+                                    </a>
+                                @endcan
+                                @can ('approvePosts')
+                                    <a class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" href="{{ route('forum.pending-approval.posts') }}">
+                                        {{ trans('forum::posts.pending_approval') }}
+                                    </a>
+                                @endcan
+                            </div>
                         </li>
-                    @endcan
+                    @endif
                 </ul>
                 <ul class="navbar-nav flex gap-4 flex-col md:flex-row">
                     @if (Auth::check())
                         <li class="nav-item dropdown relative">
-                            <a class="dropdown-toggle text-gray-500 dark:text-gray-400 flex items-center gap-1 hover:text-gray-800 dark:hover:text-gray-200 transition-colors" href="#" id="navbarDropdownMenuLink" @click="isUserDropdownCollapsed = !isUserDropdownCollapsed">
+                            <a class="dropdown-toggle text-gray-500 dark:text-gray-400 flex items-center gap-1 hover:text-gray-800 dark:hover:text-gray-200 transition-colors" href="#" id="userDropdownMenuLink" @click="isUserDropdownCollapsed = !isUserDropdownCollapsed">
                                 {{ $username }}
 
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                                 </svg>
                             </a>
-                            <div class="border dark:border-gray-600 absolute left-0 bg-white dark:bg-gray-800 rounded-md w-44 divide-y dark:divide-gray-600 shadow-lg" :class="{ hidden: isUserDropdownCollapsed }" aria-labelledby="navbarDropdownMenuLink">
+                            <div class="border dark:border-gray-600 absolute z-50 left-0 bg-white dark:bg-gray-800 rounded-md w-44 divide-y dark:divide-gray-600 shadow-lg" :class="{ hidden: isUserDropdownCollapsed }" aria-labelledby="userDropdownMenuLink">
                                 <a class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" href="{{ url('/logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                     Log out
                                 </a>
@@ -97,5 +120,9 @@
     </div>
 
     @yield('footer')
+
+    <script>
+        window.defaultCategoryColor = '{{ config('forum.frontend.default_category_color') }}';
+    </script>
 </body>
 </html>

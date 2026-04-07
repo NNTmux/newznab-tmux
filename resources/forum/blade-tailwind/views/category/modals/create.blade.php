@@ -23,6 +23,25 @@
             <label for="is-private" class="text-gray-700 dark:text-gray-300">{{ trans('forum::categories.make_private') }}</label>
         </div>
     </div>
+
+    @if (!config('forum.general.content_approval.threads.enable_globally'))
+        <div class="mb-3">
+            <div>
+                <input type="checkbox" name="thread_approval_enabled" id="thread-approval-enabled" value="1" class="rounded border-gray-300 dark:border-gray-600 text-blue-500 dark:text-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" {{ old('thread_approval_enabled') ? 'checked' : '' }}>
+                <label for="thread-approval-enabled" class="text-gray-700 dark:text-gray-300">{{ trans('forum::categories.enable_thread_approval') }}</label>
+            </div>
+        </div>
+    @endif
+
+    @if (!config('forum.general.content_approval.posts.enable_globally'))
+        <div class="mb-3">
+            <div>
+                <input type="checkbox" name="post_approval_enabled" id="post-approval-enabled" value="1" class="rounded border-gray-300 dark:border-gray-600 text-blue-500 dark:text-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" {{ old('post_approval_enabled') ? 'checked' : '' }}>
+                <label for="post-approval-enabled" class="text-gray-700 dark:text-gray-300">{{ trans('forum::categories.enable_post_approval') }}</label>
+            </div>
+        </div>
+    @endif
+
     @include ('forum::category.partials.inputs.color')
 
     @slot('actions')

@@ -13,21 +13,25 @@
         @endcan
     </div>
 
-    <div id="manage-categories">
-        <draggable-category-list :categories="state.categories"></draggable-category-list>
+    @if ($categories->isEmpty())
+        <p class="py-4 text-center text-gray-500 dark:text-gray-400">{{ trans('forum::categories.none') }}</p>
+    @else
+        <div id="manage-categories">
+            <draggable-category-list :categories="state.categories"></draggable-category-list>
 
-        <transition name="fade">
-            <div v-show="state.changesApplied" class="bg-green-100 dark:bg-green-900/30 mb-4 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800 mt-3 px-4 py-3 rounded transition-colors" role="alert">
-                {{ trans('forum::general.changes_applied') }}
+            <transition name="fade">
+                <div v-show="state.changesApplied" class="bg-green-100 dark:bg-green-900/30 mb-4 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800 mt-3 px-4 py-3 rounded transition-colors" role="alert">
+                    {{ trans('forum::general.changes_applied') }}
+                </div>
+            </transition>
+
+            <div class="flex justify-end py-3">
+                <button type="button" class="bg-blue-500 dark:bg-blue-600 text-white rounded py-2 px-8 hover:cursor-pointer hover:bg-blue-400 dark:hover:bg-blue-500 disabled:opacity-50 transition-colors" :disabled="state.isSavingDisabled" @click="onSave">
+                    {{ trans('forum::general.save') }}
+                </button>
             </div>
-        </transition>
-
-        <div class="flex justify-end py-3">
-            <button type="button" class="bg-blue-500 dark:bg-blue-600 text-white rounded py-2 px-8 hover:cursor-pointer hover:bg-blue-400 dark:hover:bg-blue-500 disabled:opacity-50 transition-colors" :disabled="state.isSavingDisabled" @click="onSave">
-                {{ trans('forum::general.save') }}
-            </button>
         </div>
-    </div>
+    @endif
 
     <script type="text/x-template" id="draggable-category-list-template">
         <draggable
