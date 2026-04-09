@@ -24,6 +24,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class ApiV2Controller extends BasePageController
 {
@@ -133,7 +134,7 @@ class ApiV2Controller extends BasePageController
         event(new UserAccessedApi($user, $request->ip()));
 
         // Get request parameters efficiently
-        $imdbId = (int) $request->input('imdbid', -1);
+        $imdbId = (string) Str::replace('tt', '', (string) $request->input('imdbid', ''));
         $tmdbId = (int) $request->input('tmdbid', -1);
         $traktId = (int) $request->input('traktid', -1);
         $minSize = max(0, (int) $request->input('minsize', 0));

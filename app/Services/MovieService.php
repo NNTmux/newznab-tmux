@@ -108,19 +108,12 @@ class MovieService
      */
     public function getMovieInfo(int|string|null $imdbId): ?MovieInfo
     {
-        $lookupIds = $this->movieInfoLookupIds($imdbId);
-        if ($lookupIds === []) {
+        $sanitized = $this->sanitizeImdbId($imdbId);
+        if ($sanitized === null) {
             return null;
         }
 
-        foreach ($lookupIds as $lookupId) {
-            $movie = MovieInfo::query()->where('imdbid', $lookupId)->first();
-            if ($movie !== null) {
-                return $movie;
-            }
-        }
-
-        return null;
+        return MovieInfo::query()->where('imdbid', $sanitized)->first();
     }
 
     /**
@@ -131,33 +124,26 @@ class MovieService
      */
     public function getTrailer(int|string|null $imdbId): string|false
     {
-        $lookupIds = $this->movieInfoLookupIds($imdbId);
-        if ($lookupIds === []) {
+        $sanitized = $this->sanitizeImdbId($imdbId);
+        if ($sanitized === null) {
             return false;
         }
 
-        foreach ($lookupIds as $lookupId) {
-            $trailer = MovieInfo::query()->where('imdbid', $lookupId)->where('trailer', '<>', '')->first(['trailer']);
-            if ($trailer !== null) {
-                return $trailer['trailer'];
-            }
-        }
-
-        $canonicalImdbId = $this->canonicalImdbId($imdbId);
-        if ($canonicalImdbId === null) {
-            return false;
+        $trailer = MovieInfo::query()->where('imdbid', $sanitized)->where('trailer', '<>', '')->first(['trailer']);
+        if ($trailer !== null) {
+            return $trailer['trailer'];
         }
 
         if ($this->traktcheck !== null) {
-            $data = $this->traktTv->client->getMovieSummary('tt'.$canonicalImdbId, 'full');
+            $data = $this->traktTv->client->getMovieSummary('tt'.$sanitized, 'full');
             if (($data !== false) && ! empty($data['trailer'])) {
                 return $data['trailer'];
             }
         }
 
-        $trailer = imdb_trailers($canonicalImdbId);
+        $trailer = imdb_trailers($sanitized);
         if ($trailer) {
-            MovieInfo::query()->whereIn('imdbid', $lookupIds)->update(['trailer' => $trailer]);
+            MovieInfo::query()->where('imdbid', $sanitized)->update(['trailer' => $trailer]);
 
             return $trailer;
         }
@@ -165,41 +151,10 @@ class MovieService
         return false;
     }
 
-    private function movieInfoLookupIds(int|string|null $imdbId): array
-    {
-        $canonicalImdbId = $this->canonicalImdbId($imdbId);
-        if ($canonicalImdbId === null) {
-            return [];
-        }
-
-        $lookupIds = [$canonicalImdbId];
-        $rawImdbId = $this->sanitizeImdbId($imdbId);
-        if ($rawImdbId !== null && ! in_array($rawImdbId, $lookupIds, true)) {
-            $lookupIds[] = $rawImdbId;
-        }
-
-        $paddedImdbId = imdb_id_pad($canonicalImdbId);
-        if ($paddedImdbId !== '00000000' && ! in_array($paddedImdbId, $lookupIds, true)) {
-            $lookupIds[] = $paddedImdbId;
-        }
-
-        return $lookupIds;
-    }
-
-    private function canonicalImdbId(int|string|null $imdbId): ?string
-    {
-        $sanitizedImdbId = $this->sanitizeImdbId($imdbId);
-        if ($sanitizedImdbId === null) {
-            return null;
-        }
-
-        if (strlen($sanitizedImdbId) === 8 && str_starts_with($sanitizedImdbId, '0')) {
-            return substr($sanitizedImdbId, 1);
-        }
-
-        return $sanitizedImdbId;
-    }
-
+    /**
+     * Sanitize an IMDB ID to its raw numeric string, preserving leading zeros.
+     * Returns null if the ID is empty or all zeros.
+     */
     private function sanitizeImdbId(int|string|null $imdbId): ?string
     {
         if ($imdbId === null || $imdbId === '') {
@@ -207,7 +162,7 @@ class MovieService
         }
 
         $sanitizedImdbId = preg_replace('/\D/', '', trim((string) $imdbId));
-        if ($sanitizedImdbId === null || $sanitizedImdbId === '' || imdb_id_pad($sanitizedImdbId) === '00000000') {
+        if ($sanitizedImdbId === null || $sanitizedImdbId === '' || ! imdb_id_is_valid($sanitizedImdbId)) {
             return null;
         }
 
@@ -1013,12 +968,12 @@ class MovieService
     public function doMovieUpdate(string $buffer, string $service, int $id, int $processImdb = 1): string|false
     {
         $existingImdbId = Release::query()->where('id', $id)->value('imdbid');
-        if ($existingImdbId !== null && $existingImdbId !== '' && $existingImdbId !== '0000000' && $existingImdbId !== '00000000') {
+        if ($existingImdbId !== null && imdb_id_is_valid($existingImdbId)) {
             return $existingImdbId;
         }
 
         $imdbId = false;
-        if (preg_match('/(?:imdb.*?)?(?:tt|Title\?)(?P<imdbid>\d{5,8})/i', $buffer, $hits)) {
+        if (preg_match('/(?:imdb.*?)?(?:tt|Title\?)(?P<imdbid>\d{5,})/i', $buffer, $hits)) {
             $imdbId = $hits['imdbid'];
         }
 
@@ -1032,7 +987,7 @@ class MovieService
                 $movieInfoId = MovieInfo::query()->where('imdbid', $imdbId)->first(['id']);
 
                 Release::query()->where('id', $id)->update([
-                    'imdbid' => imdb_id_pad($imdbId),
+                    'imdbid' => $imdbId,
                     'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null,
                 ]);
 
@@ -1047,7 +1002,7 @@ class MovieService
                         $info = $this->updateMovieInfo($imdbId);
 
                         if ($info === false) {
-                            Release::query()->where('id', $id)->update(['imdbid' => imdb_id_pad('0000000')]);
+                            Release::query()->where('id', $id)->update(['imdbid' => '']);
                         } elseif ($info === true) {
                             $freshMovieInfo = MovieInfo::query()->where('imdbid', $imdbId)->first(['id']);
 
@@ -1084,7 +1039,10 @@ class MovieService
         $query = Release::query()
             ->select(['searchname', 'id'])
             ->whereBetween('categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER])
-            ->whereNull('imdbid');
+            ->where(function ($query): void {
+                $query->whereNull('imdbid')
+                    ->orWhereIn('imdbid', ['', '0', '0000000', '00000000']);
+            });
 
         if ($groupID !== '') {
             $query->where('groups_id', $groupID);
@@ -1135,7 +1093,13 @@ class MovieService
 
                     continue;
                 } else {
-                    $releaseCheck = Release::query()->where('id', $arr['id'])->whereNotNull('imdbid')->exists();
+                    $releaseCheck = Release::query()
+                        ->where('id', $arr['id'])
+                        ->where(function ($query): void {
+                            $query->whereNotNull('imdbid')
+                                ->whereNotIn('imdbid', ['', '0', '0000000', '00000000']);
+                        })
+                        ->exists();
                     if ($releaseCheck) {
                         if ($this->echooutput) {
                             cli()->info('Release already has IMDB ID, skipping');
@@ -1162,7 +1126,7 @@ class MovieService
                 }
 
                 foreach (array_chunk($failedIDs, 100) as $chunk) {
-                    Release::query()->whereIn('id', $chunk)->update(['imdbid' => imdb_id_pad('0000000')]);
+                    Release::query()->whereIn('id', $chunk)->update(['imdbid' => '']);
                 }
             }
         }

@@ -165,7 +165,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 'categories_id' => (int) ($parameters['categories_id'] ?? 0),
                 'filename' => $parameters['filename'] ?? '',
                 // External media IDs for efficient searching
-                'imdbid' => (int) ($parameters['imdbid'] ?? 0),
+                'imdbid' => (string) ($parameters['imdbid'] ?? ''),
                 'tmdbid' => (int) ($parameters['tmdbid'] ?? 0),
                 'traktid' => (int) ($parameters['traktid'] ?? 0),
                 'tvdb' => (int) ($parameters['tvdb'] ?? 0),
@@ -304,7 +304,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 'fromname' => (string) ($release['fromname'] ?? ''),
                 'categories_id' => (int) ($release['categories_id'] ?? 0),
                 'filename' => (string) ($release['filename'] ?? ''),
-                'imdbid' => (int) ($release['imdbid'] ?? 0),
+                'imdbid' => (string) ($release['imdbid'] ?? ''),
                 'tmdbid' => (int) ($release['tmdbid'] ?? 0),
                 'traktid' => (int) ($release['traktid'] ?? 0),
                 'tvdb' => (int) ($release['tvdb'] ?? 0),
@@ -714,7 +714,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                             'filename' => ['type' => 'text'],
                             'categories_id' => ['type' => 'integer'],
                             // External media IDs for efficient searching
-                            'imdbid' => ['type' => 'integer'],
+                            'imdbid' => ['type' => 'string'],
                             'tmdbid' => ['type' => 'integer'],
                             'traktid' => ['type' => 'integer'],
                             'tvdb' => ['type' => 'integer'],
@@ -751,7 +751,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                             'min_infix_len' => 2,
                         ],
                         'columns' => [
-                            'imdbid' => ['type' => 'integer'],
+                            'imdbid' => ['type' => 'string'],
                             'tmdbid' => ['type' => 'integer'],
                             'traktid' => ['type' => 'integer'],
                             'title' => ['type' => 'text'],
@@ -779,7 +779,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                             'trakt' => ['type' => 'integer'],
                             'tvmaze' => ['type' => 'integer'],
                             'tvrage' => ['type' => 'integer'],
-                            'imdb' => ['type' => 'integer'],
+                            'imdb' => ['type' => 'string'],
                             'tmdb' => ['type' => 'integer'],
                             'started' => ['type' => 'text'],
                             'type' => ['type' => 'integer'],
@@ -1611,7 +1611,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
         try {
             $document = [
-                'imdbid' => (int) ($parameters['imdbid'] ?? 0),
+                'imdbid' => (string) ($parameters['imdbid'] ?? ''),
                 'tmdbid' => (int) ($parameters['tmdbid'] ?? 0),
                 'traktid' => (int) ($parameters['traktid'] ?? 0),
                 'title' => (string) ($parameters['title'] ?? ''),
@@ -1713,7 +1713,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
             $documents[] = [
                 'id' => $movie['id'],
-                'imdbid' => (int) ($movie['imdbid'] ?? 0),
+                'imdbid' => (string) ($movie['imdbid'] ?? ''),
                 'tmdbid' => (int) ($movie['tmdbid'] ?? 0),
                 'traktid' => (int) ($movie['traktid'] ?? 0),
                 'title' => (string) ($movie['title'] ?? ''),
@@ -1818,7 +1818,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 'trakt' => (int) ($parameters['trakt'] ?? 0),
                 'tvmaze' => (int) ($parameters['tvmaze'] ?? 0),
                 'tvrage' => (int) ($parameters['tvrage'] ?? 0),
-                'imdb' => (int) ($parameters['imdb'] ?? 0),
+                'imdb' => (string) ($parameters['imdb'] ?? ''),
                 'tmdb' => (int) ($parameters['tmdb'] ?? 0),
                 'started' => (string) ($parameters['started'] ?? ''),
                 'type' => (int) ($parameters['type'] ?? 0),
@@ -1919,7 +1919,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 'trakt' => (int) ($tvShow['trakt'] ?? 0),
                 'tvmaze' => (int) ($tvShow['tvmaze'] ?? 0),
                 'tvrage' => (int) ($tvShow['tvrage'] ?? 0),
-                'imdb' => (int) ($tvShow['imdb'] ?? 0),
+                'imdb' => (string) ($tvShow['imdb'] ?? ''),
                 'tmdb' => (int) ($tvShow['tmdb'] ?? 0),
                 'started' => (string) ($tvShow['started'] ?? ''),
                 'type' => (int) ($tvShow['type'] ?? 0),
@@ -2026,7 +2026,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
             // Add filters for each external ID provided
             foreach ($externalIds as $field => $value) {
                 if (! empty($value) && in_array($field, ['imdbid', 'tmdbid', 'traktid', 'tvdb', 'tvmaze', 'tvrage'])) {
-                    $query->filter($field, '=', (int) $value);
+                    $query->filter($field, '=', $field === 'imdbid' ? (string) $value : (int) $value);
                 }
             }
 

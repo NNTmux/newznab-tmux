@@ -202,7 +202,7 @@ class NntmuxPopulateSearchIndexes extends Command
                     'filename' => '',
                     'videos_id' => (int) ($item->videos_id ?? 0),
                     'movieinfo_id' => (int) ($item->movieinfo_id ?? 0),
-                    'imdbid' => (int) ($item->imdbid ?? 0),
+                    'imdbid' => (string) ($item->imdbid ?? ''),
                     'tmdbid' => 0,
                     'traktid' => 0,
                     'tvdb' => 0,
@@ -287,7 +287,7 @@ class NntmuxPopulateSearchIndexes extends Command
             function ($item) {
                 return [
                     'id' => $item->id,
-                    'imdbid' => (int) ($item->imdbid ?? 0),
+                    'imdbid' => (string) ($item->imdbid ?? ''),
                     'tmdbid' => (int) ($item->tmdbid ?? 0),
                     'traktid' => (int) ($item->traktid ?? 0),
                     'title' => (string) ($item->title ?? ''),
@@ -345,7 +345,7 @@ class NntmuxPopulateSearchIndexes extends Command
                     'trakt' => (int) ($item->trakt ?? 0),
                     'tvmaze' => (int) ($item->tvmaze ?? 0),
                     'tvrage' => (int) ($item->tvrage ?? 0),
-                    'imdb' => (int) ($item->imdb ?? 0),
+                    'imdb' => (string) ($item->imdb ?? ''),
                     'tmdb' => (int) ($item->tmdb ?? 0),
                     'started' => (string) ($item->started ?? ''),
                     'type' => (int) ($item->type ?? 0),

@@ -85,7 +85,7 @@ class DetailsController extends BasePageController
         }
 
         $mov = '';
-        if (imdb_id_pad($data['imdbid']) !== '00000000') {
+        if (imdb_id_is_valid($data['imdbid'])) {
             $mov = $this->movieService->getMovieInfo($data['imdbid']);
             if (! empty($mov['title'])) {
                 $mov['title'] = str_replace(['/', '\\'], '', $mov['title']);

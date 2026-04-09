@@ -297,7 +297,11 @@ class ReleaseSearchService
         $externalIds = [];
         if (! empty($siteIdArr)) {
             foreach ($siteIdArr as $column => $id) {
-                if ($id > 0 && $column !== 'id') {
+                $hasValue = $column === 'imdb'
+                    ? ($id !== null && $id !== '' && imdb_id_is_valid((string) $id))
+                    : ($id > 0);
+
+                if ($hasValue && $column !== 'id') {
                     // Map column names to search index field names
                     $fieldName = match ($column) {
                         'tvdb' => 'tvdb',
@@ -309,7 +313,7 @@ class ReleaseSearchService
                         default => null,
                     };
                     if ($fieldName) {
-                        $externalIds[$fieldName] = (int) $id;
+                        $externalIds[$fieldName] = $column === 'imdb' ? (string) $id : (int) $id;
                     }
                 }
             }
@@ -548,7 +552,11 @@ class ReleaseSearchService
         // OPTIMIZATION: Try to find releases using search index external IDs first
         $externalIds = [];
         foreach ($siteIdArr as $column => $Id) {
-            if ($Id > 0 && $column !== 'id') {
+            $hasValue = $column === 'imdb'
+                ? ($Id !== null && $Id !== '' && imdb_id_is_valid((string) $Id))
+                : ($Id > 0);
+
+            if ($hasValue && $column !== 'id') {
                 $fieldName = match ($column) {
                     'tvdb' => 'tvdb',
                     'trakt' => 'traktid',
@@ -559,7 +567,7 @@ class ReleaseSearchService
                     default => null,
                 };
                 if ($fieldName) {
-                    $externalIds[$fieldName] = (int) $Id;
+                    $externalIds[$fieldName] = $column === 'imdb' ? (string) $Id : (int) $Id;
                 }
             }
         }
@@ -759,7 +767,7 @@ class ReleaseSearchService
      * @param  array<string, mixed>  $excludedCategories
      * @return Collection|mixed
      */
-    public function moviesSearch(int $imDbId = -1, int $tmDbId = -1, int $traktId = -1, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
+    public function moviesSearch(string $imDbId = '', int $tmDbId = -1, int $traktId = -1, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
     {
         $searchLimit = $this->determineSearchCandidateLimit($offset, $limit);
         $searchResult = [];
@@ -767,7 +775,7 @@ class ReleaseSearchService
         // OPTIMIZATION: If we have external IDs, use the search index to find releases directly
         // This avoids expensive database JOINs by using indexed external ID fields in releases_rt
         $externalIds = [];
-        if ($imDbId !== -1 && $imDbId > 0) {
+        if ($imDbId !== '' && imdb_id_is_valid($imDbId)) {
             $externalIds['imdbid'] = $imDbId;
         }
         if ($tmDbId !== -1 && $tmDbId > 0) {
@@ -822,8 +830,8 @@ class ReleaseSearchService
         $needsMovieJoin = false;
         if (empty($searchResult) && ! empty($externalIds)) {
             $needsMovieJoin = true;
-            if ($imDbId !== -1 && $imDbId > 0) {
-                $conditions[] = sprintf('r.imdbid = %d', $imDbId);
+            if ($imDbId !== '' && imdb_id_is_valid($imDbId)) {
+                $conditions[] = sprintf('r.imdbid = %s', escapeString($imDbId));
             }
             if ($tmDbId !== -1 && $tmDbId > 0) {
                 $conditions[] = sprintf('m.tmdbid = %d', $tmDbId);

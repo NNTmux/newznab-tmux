@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property int $id
  * @property int $users_id
- * @property int|null $imdbid
+ * @property string|null $imdbid
  * @property string|null $categories List of categories for user movies
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at

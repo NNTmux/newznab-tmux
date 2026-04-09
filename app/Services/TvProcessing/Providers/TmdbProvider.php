@@ -384,13 +384,13 @@ class TmdbProvider extends AbstractTvProvider
             ->first(['tmdb', 'tvdb', 'imdb']);
 
         if ($result === null) {
-            return ['tmdb' => 0, 'tvdb' => 0, 'imdb' => 0];
+            return ['tmdb' => 0, 'tvdb' => 0, 'imdb' => ''];
         }
 
         return [
             'tmdb' => (int) ($result->tmdb ?? 0),
             'tvdb' => (int) ($result->tvdb ?? 0),
-            'imdb' => (int) ($result->imdb ?? 0),
+            'imdb' => (string) ($result->imdb ?? ''),
         ];
     }
 
@@ -495,11 +495,11 @@ class TmdbProvider extends AbstractTvProvider
             ? 'https://image.tmdb.org/t/p/w500'.$posterPath
             : '';
 
-        $imdbId = 0;
+        $imdbId = '';
         $externalIds = TmdbClient::getArray($show, 'external_ids');
         if (! empty($externalIds['imdb_id'])) {
-            preg_match('/tt(?P<imdbid>\d{6,8})$/i', (string) $externalIds['imdb_id'], $imdb);
-            $imdbId = $imdb['imdbid'] ?? 0;
+            preg_match('/tt(?P<imdbid>\d{6,})$/i', (string) $externalIds['imdb_id'], $imdb);
+            $imdbId = (string) ($imdb['imdbid'] ?? '');
         }
 
         $originCountry = TmdbClient::getArray($show, 'origin_country');
@@ -558,7 +558,7 @@ class TmdbProvider extends AbstractTvProvider
             }
 
             // Try IMDB ID
-            if (! empty($imdbId) && $imdbId > 0) {
+            if (! empty($imdbId) && imdb_id_is_valid($imdbId)) {
                 $ids = $traktService->lookupShowIds($imdbId, 'imdb');
                 if ($ids !== null && ! empty($ids['trakt'])) {
                     return (int) $ids['trakt'];

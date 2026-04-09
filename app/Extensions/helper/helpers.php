@@ -217,10 +217,27 @@ if (! function_exists('runCmd')) {
     }
 }
 
+if (! function_exists('imdb_id_is_valid')) {
+    /**
+     * Check whether an IMDB ID string is a valid, non-zero numeric identifier.
+     * IMDB IDs are stored as plain digit strings (e.g. "0137523", "1375666", "14688458")
+     * exactly as provided by upstream sources — no padding, no trimming.
+     */
+    function imdb_id_is_valid(int|string|null $id): bool
+    {
+        if ($id === null || $id === '' || $id === 0) {
+            return false;
+        }
+        $s = preg_replace('/\D/', '', trim((string) $id));
+
+        return $s !== '' && $s !== '0' && ((int) $s) !== 0;
+    }
+}
+
 if (! function_exists('imdb_id_pad')) {
     /**
-     * Normalize IMDB ID to 8 zero-padded digits for storage in releases / join consistency.
-     * Enables index use on releases.imdbid; call when writing to releases.imdbid.
+     * @deprecated Use imdb_id_is_valid() instead. This function exists only for backward
+     *             compatibility during the transition period and will be removed.
      */
     function imdb_id_pad(int|string|null $id): string
     {
@@ -467,7 +484,7 @@ if (! function_exists('getReleaseCover')) {
         $gamesinfo_id = $getValue($release, 'gamesinfo_id');
         $anidbid = $getValue($release, 'anidbid');
 
-        if (! empty($imdbid) && $imdbid > 0) {
+        if (! empty($imdbid) && imdb_id_is_valid($imdbid)) {
             $coverType = 'movies';
             $coverId = (string) $imdbid;
         } elseif (! empty($videos_id) && $videos_id > 0) {

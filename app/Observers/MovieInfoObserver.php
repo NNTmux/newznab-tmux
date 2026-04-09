@@ -49,7 +49,7 @@ class MovieInfoObserver
         try {
             Search::insertMovie([
                 'id' => $movie->id,
-                'imdbid' => $movie->imdbid ?? 0,
+                'imdbid' => $movie->imdbid ?? '',
                 'tmdbid' => $movie->tmdbid ?? 0,
                 'traktid' => $movie->traktid ?? 0,
                 'title' => $movie->title ?? '',

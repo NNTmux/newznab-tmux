@@ -1059,6 +1059,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                     'releases.searchname',
                     'releases.fromname',
                     'releases.categories_id',
+                    'releases.imdbid',
                     DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename'),
                 ])
                 ->groupBy('releases.id')
@@ -1080,6 +1081,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                         'plainsearchname' => $searchNameDotless,
                         'fromname' => $release->fromname,
                         'categories_id' => $release->categories_id,
+                        'imdbid' => (string) ($release->imdbid ?? ''),
                         'filename' => $release->filename, // @phpstan-ignore property.notFound
                     ],
                     'doc_as_upsert' => true,
@@ -1681,6 +1683,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                 'plainsearchname' => $searchNameDotless,
                 'fromname' => $parameters['fromname'] ?? '',
                 'categories_id' => $parameters['categories_id'] ?? 0,
+                'imdbid' => (string) ($parameters['imdbid'] ?? ''),
                 'filename' => $parameters['filename'] ?? '',
                 'add_date' => now()->format('Y-m-d H:i:s'),
                 'post_date' => $parameters['postdate'] ?? now()->format('Y-m-d H:i:s'),
@@ -1849,7 +1852,7 @@ class ElasticSearchDriver implements SearchDriverInterface
 
             $document = [
                 'id' => $parameters['id'],
-                'imdbid' => (int) ($parameters['imdbid'] ?? 0),
+                'imdbid' => (string) ($parameters['imdbid'] ?? ''),
                 'tmdbid' => (int) ($parameters['tmdbid'] ?? 0),
                 'traktid' => (int) ($parameters['traktid'] ?? 0),
                 'title' => (string) ($parameters['title'] ?? ''),
@@ -1971,7 +1974,7 @@ class ElasticSearchDriver implements SearchDriverInterface
 
             $params['body'][] = [
                 'id' => $movie['id'],
-                'imdbid' => (int) ($movie['imdbid'] ?? 0),
+                'imdbid' => (string) ($movie['imdbid'] ?? ''),
                 'tmdbid' => (int) ($movie['tmdbid'] ?? 0),
                 'traktid' => (int) ($movie['traktid'] ?? 0),
                 'title' => (string) ($movie['title'] ?? ''),
@@ -2091,7 +2094,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                 'body' => [
                     'query' => [
                         'term' => [
-                            $field => (int) $value,
+                            $field => $field === 'imdbid' ? (string) $value : (int) $value,
                         ],
                     ],
                     'size' => 1,
@@ -2141,7 +2144,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                 'trakt' => (int) ($parameters['trakt'] ?? 0),
                 'tvmaze' => (int) ($parameters['tvmaze'] ?? 0),
                 'tvrage' => (int) ($parameters['tvrage'] ?? 0),
-                'imdb' => (int) ($parameters['imdb'] ?? 0),
+                'imdb' => (string) ($parameters['imdb'] ?? ''),
                 'tmdb' => (int) ($parameters['tmdb'] ?? 0),
                 'started' => (string) ($parameters['started'] ?? ''),
                 'type' => (int) ($parameters['type'] ?? 0),
@@ -2262,7 +2265,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                 'trakt' => (int) ($tvShow['trakt'] ?? 0),
                 'tvmaze' => (int) ($tvShow['tvmaze'] ?? 0),
                 'tvrage' => (int) ($tvShow['tvrage'] ?? 0),
-                'imdb' => (int) ($tvShow['imdb'] ?? 0),
+                'imdb' => (string) ($tvShow['imdb'] ?? ''),
                 'tmdb' => (int) ($tvShow['tmdb'] ?? 0),
                 'started' => (string) ($tvShow['started'] ?? ''),
                 'type' => (int) ($tvShow['type'] ?? 0),
@@ -2429,7 +2432,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             $shouldClauses = [];
             foreach ($externalIds as $field => $value) {
                 if (! empty($value) && in_array($field, ['imdbid', 'tmdbid', 'traktid', 'tvdb', 'tvmaze', 'tvrage'])) {
-                    $shouldClauses[] = ['term' => [$field => (int) $value]];
+                    $shouldClauses[] = ['term' => [$field => $field === 'imdbid' ? (string) $value : (int) $value]];
                 }
             }
 

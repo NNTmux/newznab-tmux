@@ -194,7 +194,7 @@ class NntmuxResetDb extends Command
                                     'type' => 'long',
                                     'index' => false,
                                 ],
-                                'imdbid' => ['type' => 'integer'],
+                                'imdbid' => ['type' => 'keyword'],
                                 'tmdbid' => ['type' => 'integer'],
                                 'traktid' => ['type' => 'integer'],
                                 'title' => [
@@ -247,7 +247,7 @@ class NntmuxResetDb extends Command
                                 'trakt' => ['type' => 'integer'],
                                 'tvmaze' => ['type' => 'integer'],
                                 'tvrage' => ['type' => 'integer'],
-                                'imdb' => ['type' => 'integer'],
+                                'imdb' => ['type' => 'keyword'],
                                 'tmdb' => ['type' => 'integer'],
                                 'started' => ['type' => 'text'],
                                 'type' => ['type' => 'integer'],

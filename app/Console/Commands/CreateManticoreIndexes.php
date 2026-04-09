@@ -76,7 +76,7 @@ class CreateManticoreIndexes extends Command
                     'filename' => ['type' => 'text'],
                     'categories_id' => ['type' => 'integer'],
                     // External media IDs for efficient searching
-                    'imdbid' => ['type' => 'integer'],
+                    'imdbid' => ['type' => 'string'],
                     'tmdbid' => ['type' => 'integer'],
                     'traktid' => ['type' => 'integer'],
                     'tvdb' => ['type' => 'integer'],
@@ -103,7 +103,7 @@ class CreateManticoreIndexes extends Command
                     'min_infix_len' => 2,
                 ],
                 'columns' => [
-                    'imdbid' => ['type' => 'integer'],
+                    'imdbid' => ['type' => 'string'],
                     'tmdbid' => ['type' => 'integer'],
                     'traktid' => ['type' => 'integer'],
                     'title' => ['type' => 'text'],
@@ -126,7 +126,7 @@ class CreateManticoreIndexes extends Command
                     'trakt' => ['type' => 'integer'],
                     'tvmaze' => ['type' => 'integer'],
                     'tvrage' => ['type' => 'integer'],
-                    'imdb' => ['type' => 'integer'],
+                    'imdb' => ['type' => 'string'],
                     'tmdb' => ['type' => 'integer'],
                     'started' => ['type' => 'text'],
                     'type' => ['type' => 'integer'],

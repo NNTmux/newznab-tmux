@@ -81,7 +81,7 @@ class CreateMediaIndexes extends Command
                     'min_infix_len' => 2,
                 ],
                 'columns' => [
-                    'imdbid' => ['type' => 'integer'],
+                    'imdbid' => ['type' => 'string'],
                     'tmdbid' => ['type' => 'integer'],
                     'traktid' => ['type' => 'integer'],
                     'title' => ['type' => 'text'],
@@ -104,7 +104,7 @@ class CreateMediaIndexes extends Command
                     'trakt' => ['type' => 'integer'],
                     'tvmaze' => ['type' => 'integer'],
                     'tvrage' => ['type' => 'integer'],
-                    'imdb' => ['type' => 'integer'],
+                    'imdb' => ['type' => 'string'],
                     'tmdb' => ['type' => 'integer'],
                     'started' => ['type' => 'text'],
                     'type' => ['type' => 'integer'],
@@ -228,7 +228,7 @@ class CreateMediaIndexes extends Command
         $moviesMapping = [
             'mappings' => [
                 'properties' => [
-                    'imdbid' => ['type' => 'integer'],
+                    'imdbid' => ['type' => 'keyword'],
                     'tmdbid' => ['type' => 'integer'],
                     'traktid' => ['type' => 'integer'],
                     'title' => ['type' => 'text', 'analyzer' => 'standard'],
@@ -255,7 +255,7 @@ class CreateMediaIndexes extends Command
                     'trakt' => ['type' => 'integer'],
                     'tvmaze' => ['type' => 'integer'],
                     'tvrage' => ['type' => 'integer'],
-                    'imdb' => ['type' => 'integer'],
+                    'imdb' => ['type' => 'keyword'],
                     'tmdb' => ['type' => 'integer'],
                     'started' => ['type' => 'keyword'],
                     'type' => ['type' => 'integer'],

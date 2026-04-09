@@ -240,7 +240,7 @@ class XML_Response
                 $attrs = array_merge($attrs, $this->buildTvAttrArray());
             }
 
-            if (isset($this->release->imdbid) && $this->release->imdbid > 0) {
+            if (isset($this->release->imdbid) && imdb_id_is_valid($this->release->imdbid)) {
                 $attrs['imdb'] = $this->release->imdbid;
             }
             if (isset($this->release->anidbid) && $this->release->anidbid > 0) {
@@ -302,7 +302,7 @@ class XML_Response
         if (isset($this->release->tvmaze) && $this->release->tvmaze > 0) {
             $attrs['tvmazeid'] = $this->release->tvmaze;
         }
-        if (isset($this->release->imdb) && $this->release->imdb > 0) {
+        if (isset($this->release->imdb) && imdb_id_is_valid($this->release->imdb)) {
             $attrs['imdbid'] = $this->release->imdb;
         }
         if (isset($this->release->tmdb) && $this->release->tmdb > 0) {
@@ -645,7 +645,7 @@ class XML_Response
                 $this->setTvAttr();
             }
 
-            if (isset($this->release->imdbid) && $this->release->imdbid > 0) {
+            if (isset($this->release->imdbid) && imdb_id_is_valid($this->release->imdbid)) {
                 $this->writeZedAttr('imdb', $this->release->imdbid);
             }
             if (isset($this->release->anidbid) && $this->release->anidbid > 0) {
@@ -706,7 +706,7 @@ class XML_Response
         if (isset($this->release->tvmaze) && $this->release->tvmaze > 0) {
             $this->writeZedAttr('tvmazeid', $this->release->tvmaze);
         }
-        if (isset($this->release->imdb) && $this->release->imdb > 0) {
+        if (isset($this->release->imdb) && imdb_id_is_valid($this->release->imdb)) {
             $this->writeZedAttr('imdbid', $this->release->imdb);
         }
         if (isset($this->release->tmdb) && $this->release->tmdb > 0) {

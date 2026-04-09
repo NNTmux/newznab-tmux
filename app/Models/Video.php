@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
  * @property string $countries_id Two character country code (FK to countries table).
  * @property string $started Date (UTC) of production's first airing.
  * @property int $anidb ID number for anidb site
- * @property int $imdb ID number for IMDB site (without the 'tt' prefix).
+ * @property string $imdb ID number for IMDB site (without the 'tt' prefix).
  * @property int $tmdb ID number for TMDB site.
  * @property int $trakt ID number for TraktTV site.
  * @property int $tvdb ID number for TVDB site

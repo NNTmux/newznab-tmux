@@ -229,7 +229,8 @@ class MovieController extends BasePageController
                     DB::raw('COUNT(DISTINCT r.id) as release_count'),
                 ])
                 ->where('m.title', '!=', '')
-                ->where('m.imdbid', '!=', '0000000')
+                ->whereNotNull('m.imdbid')
+                ->where('m.imdbid', '!=', '')
                 ->where('ud.timestamp', '>=', $fortyEightHoursAgo)
                 ->groupBy('m.imdbid', 'm.title', 'm.year', 'm.rating', 'm.plot', 'm.genre', 'm.cover', 'm.tmdbid', 'm.traktid')
                 ->havingRaw('COUNT(DISTINCT ud.id) > 0')

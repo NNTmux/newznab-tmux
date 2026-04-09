@@ -173,7 +173,8 @@ class RSS extends ApiController
                     DB::raw('COUNT(DISTINCT ud.id) as total_downloads'),
                 ])
                 ->where('m.title', '!=', '')
-                ->where('m.imdbid', '!=', '0000000')
+                ->whereNotNull('m.imdbid')
+                ->where('m.imdbid', '!=', '')
                 ->where('ud.timestamp', '>=', $fortyEightHoursAgo)
                 ->groupBy('m.imdbid')
                 ->havingRaw('COUNT(DISTINCT ud.id) > 0')

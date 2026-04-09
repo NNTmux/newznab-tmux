@@ -260,7 +260,9 @@ class ApiController extends BasePageController
                 $maxAge = $this->maxAge($request);
                 UserRequest::addApiRequest($uid, $request->getRequestUri());
 
-                $imdbId = $request->has('imdbid') && $request->filled('imdbid') ? (int) $request->input('imdbid') : -1;
+                $imdbId = $request->has('imdbid') && $request->filled('imdbid')
+                    ? (string) Str::replace('tt', '', (string) $request->input('imdbid'))
+                    : '';
                 $tmdbId = $request->has('tmdbid') && $request->filled('tmdbid') ? (int) $request->input('tmdbid') : -1;
                 $traktId = $request->has('traktid') && $request->filled('traktid') ? (int) $request->input('traktid') : -1;
 

@@ -208,7 +208,7 @@ class NfoService
         }
 
         // IMDB (movies and TV shows)
-        if (preg_match('/imdb\.com\/title\/(tt\d{7,8})/i', $str, $hits)) {
+        if (preg_match('/imdb\.com\/title\/(tt\d{7,})/i', $str, $hits)) {
             return ['showid' => trim($hits[1]), 'site' => 'imdb'];
         }
 
@@ -1174,7 +1174,7 @@ class NfoService
         $ids = [];
 
         // IMDB
-        if (preg_match_all('/imdb\.com\/title\/(tt\d{7,8})/i', $nfoContent, $matches)) {
+        if (preg_match_all('/imdb\.com\/title\/(tt\d{7,})/i', $nfoContent, $matches)) {
             foreach ($matches[1] as $id) {
                 $ids[] = ['id' => $id, 'source' => 'imdb'];
             }

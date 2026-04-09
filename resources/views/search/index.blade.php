@@ -325,7 +325,7 @@
                                         <a href="#" class="add-to-cart px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition text-sm" data-guid="{{ $result->guid }}" title="Add to Cart">
                                             <i class="icon_cart fa fa-shopping-basket"></i>
                                         </a>
-                                        @if(!empty($result->imdbid) && $result->imdbid != '0' && $result->imdbid != 0 && $result->imdbid != '0000000')
+                                        @if(!empty($result->imdbid) && imdb_id_is_valid($result->imdbid))
                                             <a href="{{ url('/mymovies?id=add&imdb=' . $result->imdbid) }}"
                                                class="px-2 py-1 bg-purple-600 dark:bg-purple-700 text-white rounded-lg hover:bg-purple-700 dark:hover:bg-purple-800 transition text-sm"
                                                title="Add to My Movies">
@@ -371,7 +371,7 @@
                                     <a href="#" class="add-to-cart px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition text-sm" data-guid="{{ $result->guid }}" title="Add to Cart">
                                         <i class="icon_cart fa fa-shopping-basket"></i>
                                     </a>
-                                    @if(!empty($result->imdbid) && $result->imdbid != '0' && $result->imdbid != 0 && $result->imdbid != '0000000')
+                                    @if(!empty($result->imdbid) && imdb_id_is_valid($result->imdbid))
                                         <a href="{{ url('/mymovies?id=add&imdb=' . $result->imdbid) }}"
                                            class="px-2 py-1 bg-purple-600 dark:bg-purple-700 text-white rounded-lg hover:bg-purple-700 dark:hover:bg-purple-800 transition text-sm"
                                            title="Add to My Movies">

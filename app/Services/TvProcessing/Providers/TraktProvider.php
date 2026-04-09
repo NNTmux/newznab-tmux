@@ -254,14 +254,14 @@ class TraktProvider extends AbstractTvProvider
             ->first(['trakt', 'tmdb', 'tvdb', 'imdb']);
 
         if ($result === null) {
-            return ['trakt' => 0, 'tmdb' => 0, 'tvdb' => 0, 'imdb' => 0];
+            return ['trakt' => 0, 'tmdb' => 0, 'tvdb' => 0, 'imdb' => ''];
         }
 
         return [
             'trakt' => (int) ($result->trakt ?? 0),
             'tmdb' => (int) ($result->tmdb ?? 0),
             'tvdb' => (int) ($result->tvdb ?? 0),
-            'imdb' => (int) ($result->imdb ?? 0),
+            'imdb' => (string) ($result->imdb ?? ''),
         ];
     }
 
@@ -387,12 +387,12 @@ class TraktProvider extends AbstractTvProvider
      */
     public function formatShowInfo(mixed $show): array
     {
-        preg_match('/tt(?P<imdbid>\d{6,8})$/i', (string) ($show['ids']['imdb'] ?? ''), $imdb);
+        preg_match('/tt(?P<imdbid>\d{6,})$/i', (string) ($show['ids']['imdb'] ?? ''), $imdb);
         $this->posterUrl = $show['images']['poster']['thumb'] ?? '';
         $this->fanartUrl = $show['images']['fanart']['thumb'] ?? '';
         $this->localizedTZ = $show['airs']['timezone'] ?? '';
 
-        $imdbId = $imdb['imdbid'] ?? 0;
+        $imdbId = (string) ($imdb['imdbid'] ?? '');
         $tvdbId = $show['ids']['tvdb'] ?? 0;
 
         // Look up TVMaze ID using TVDB or IMDB
@@ -438,8 +438,8 @@ class TraktProvider extends AbstractTvProvider
             }
 
             // Try IMDB ID as fallback
-            if (! empty($imdbId) && $imdbId > 0) {
-                $imdbFormatted = 'tt'.str_pad((string) $imdbId, 8, '0', STR_PAD_LEFT);
+            if (! empty($imdbId) && imdb_id_is_valid($imdbId)) {
+                $imdbFormatted = 'tt'.(string) $imdbId;
                 $result = $tvmazeClient->getShowBySiteID('imdb', $imdbFormatted);
                 if ($result !== null && isset($result->id)) {
                     return (int) $result->id;

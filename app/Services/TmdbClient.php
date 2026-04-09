@@ -409,12 +409,11 @@ class TmdbClient
         }
 
         // Try to find the show by IMDB ID
-        $imdbId = $ids['imdb'] ?? 0;
+        $imdbId = $ids['imdb'] ?? '';
         if (! empty($imdbId)) {
-            // Format IMDB ID with tt prefix if it's numeric
-            $imdbFormatted = is_numeric($imdbId)
-                ? 'tt'.str_pad((string) $imdbId, 8, '0', STR_PAD_LEFT)
-                : (string) $imdbId;
+            $imdbFormatted = str_starts_with((string) $imdbId, 'tt')
+                ? (string) $imdbId
+                : 'tt'.(string) $imdbId;
 
             $show = $this->findTvByExternalId($imdbFormatted, 'imdb_id');
             if ($show !== null && isset($show['id'])) {
@@ -452,9 +451,9 @@ class TmdbClient
         } elseif ($source === 'tvdb' && is_numeric($id) && (int) $id > 0) {
             $show = $this->findTvByExternalId((string) $id, 'tvdb_id');
         } elseif ($source === 'imdb') {
-            $imdbFormatted = is_numeric($id)
-                ? 'tt'.str_pad((string) $id, 8, '0', STR_PAD_LEFT)
-                : (string) $id;
+            $imdbFormatted = str_starts_with((string) $id, 'tt')
+                ? (string) $id
+                : 'tt'.(string) $id;
             $show = $this->findTvByExternalId($imdbFormatted, 'imdb_id');
         }
 
@@ -471,11 +470,11 @@ class TmdbClient
 
         $externalIds = self::getArray($show, 'external_ids');
 
-        // Parse IMDB ID to numeric
-        $imdbId = 0;
+        // Parse IMDB ID to raw numeric string
+        $imdbId = '';
         if (! empty($externalIds['imdb_id'])) {
-            preg_match('/tt(?P<imdbid>\d{6,8})$/i', $externalIds['imdb_id'], $imdb);
-            $imdbId = (int) ($imdb['imdbid'] ?? 0);
+            preg_match('/tt(?P<imdbid>\d{6,})$/i', (string) $externalIds['imdb_id'], $imdb);
+            $imdbId = (string) ($imdb['imdbid'] ?? '');
         }
 
         return [

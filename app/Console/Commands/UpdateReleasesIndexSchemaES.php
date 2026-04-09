@@ -42,7 +42,7 @@ class UpdateReleasesIndexSchemaES extends Command
      * @var array<string, mixed>
      */
     private array $mediaFields = [
-        'imdbid' => ['type' => 'integer'],
+        'imdbid' => ['type' => 'keyword'],
         'tmdbid' => ['type' => 'integer'],
         'traktid' => ['type' => 'integer'],
         'tvdb' => ['type' => 'integer'],
@@ -384,7 +384,7 @@ class UpdateReleasesIndexSchemaES extends Command
                                 'format' => 'yyyy-MM-dd HH:mm:ss',
                             ],
                             // New media-related fields
-                            'imdbid' => ['type' => 'integer'],
+                            'imdbid' => ['type' => 'keyword'],
                             'tmdbid' => ['type' => 'integer'],
                             'traktid' => ['type' => 'integer'],
                             'tvdb' => ['type' => 'integer'],
@@ -597,7 +597,7 @@ class UpdateReleasesIndexSchemaES extends Command
     private function prepareMediaData(mixed $release): array
     {
         return [
-            'imdbid' => (int) ($release->imdbid ?: 0),
+            'imdbid' => (string) ($release->imdbid ?: ''),
             'tmdbid' => (int) ($release->tmdbid ?: ($release->video_tmdb ?: 0)),
             'traktid' => (int) ($release->traktid ?: ($release->video_trakt ?: 0)),
             'tvdb' => (int) ($release->tvdb ?: 0),

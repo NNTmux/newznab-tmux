@@ -444,12 +444,12 @@ class TvMazeProvider extends AbstractTvProvider
         $this->posterUrl = (string) ($show->mediumImage ?? '');
 
         $tvdbId = (int) ($show->externalIDs['thetvdb'] ?? 0);
-        $imdbId = 0;
+        $imdbId = '';
 
         // Extract IMDB ID if available
         if (! empty($show->externalIDs['imdb'])) {
-            preg_match('/tt(?P<imdbid>\d{6,9})$/i', (string) $show->externalIDs['imdb'], $imdb);
-            $imdbId = (int) ($imdb['imdbid'] ?? 0);
+            preg_match('/tt(?P<imdbid>\d{6,})$/i', (string) $show->externalIDs['imdb'], $imdb);
+            $imdbId = (string) ($imdb['imdbid'] ?? '');
         }
 
         // Look up TMDB and Trakt IDs using available external IDs
@@ -497,7 +497,7 @@ class TvMazeProvider extends AbstractTvProvider
                     }
                 }
                 // Try IMDB ID if TMDB not found
-                if ($result['tmdb'] === 0 && ! empty($imdbId) && $imdbId > 0) {
+                if ($result['tmdb'] === 0 && ! empty($imdbId) && imdb_id_is_valid($imdbId)) {
                     $tmdbIds = $tmdbClient->lookupTvShowIds($imdbId, 'imdb');
                     if ($tmdbIds !== null) {
                         $result['tmdb'] = $tmdbIds['tmdb'] ?? 0;

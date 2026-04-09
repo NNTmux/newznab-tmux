@@ -63,7 +63,7 @@ class MovieBrowseService
         $whereAge = $maxAge > 0 ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ' : '';
         $browseBy = $this->getBrowseBy();
 
-        $baseWhere = "m.title != '' AND m.imdbid NOT IN ('0000000', '00000000') "
+        $baseWhere = "m.title != '' AND m.imdbid IS NOT NULL AND m.imdbid != '' "
             ."AND r.passwordstatus {$this->showPasswords} "
             .$browseBy.' '
             .$catFilter
@@ -85,11 +85,9 @@ class MovieBrowseService
         $totalCount = Cache::get($countCacheKey);
 
         if ($totalCount === null) {
-            // releases.imdbid is stored 8-char normalized (imdb_id_pad); only pad movieinfo
-            // so the index on r.imdbid can be used.
             $countSql = 'SELECT COUNT(DISTINCT m.imdbid) AS total '
                 .'FROM movieinfo m '
-                .'INNER JOIN releases r ON r.imdbid = LPAD(TRIM(m.imdbid), 8, \'0\') '
+                .'INNER JOIN releases r ON r.imdbid = m.imdbid '
                 .'WHERE '.$baseWhere;
 
             $totalResult = DB::select($countSql);
@@ -125,7 +123,7 @@ class MovieBrowseService
             .'FROM ('
             .'SELECT m.imdbid, MAX(r.postdate) AS latest_postdate, COUNT(r.id) AS total_releases '
             .'FROM movieinfo m '
-            .'INNER JOIN releases r ON r.imdbid = LPAD(TRIM(m.imdbid), 8, \'0\') '
+            .'INNER JOIN releases r ON r.imdbid = m.imdbid '
             .'WHERE '.$baseWhere.' '
             .'GROUP BY m.imdbid'.$innerExtraGroupBy.' '
             ."ORDER BY {$innerOrderBy} {$order[1]} "
@@ -144,11 +142,9 @@ class MovieBrowseService
         $movieImdbIds = $movies->pluck('imdbid')->toArray();
 
         // Step 3: Get top 2 releases per movie using UNION ALL with LIMIT 2 per imdbid.
-        // r.imdbid is stored 8-char normalized so index can be used.
         $unionParts = [];
         foreach ($movieImdbIds as $id) {
-            $paddedId = str_pad((string) (int) $id, 8, '0', STR_PAD_LEFT);
-            $quotedId = "'".$paddedId."'";
+            $quotedId = escapeString((string) $id);
             $unionParts[] = '(SELECT r.id, r.imdbid, r.guid, r.searchname, '
                 .'r.size, r.postdate, r.adddate, r.haspreview '
                 .'FROM releases r '
@@ -163,16 +159,15 @@ class MovieBrowseService
         $releasesSql = implode(' UNION ALL ', $unionParts);
         $releases = DB::select($releasesSql);
 
-        // Group by imdbid (already 8-char in DB)
+        // Group by imdbid
         $releasesByMovie = [];
         foreach ($releases as $release) {
             $releasesByMovie[$release->imdbid][] = $release;
         }
 
-        // Attach releases to each movie (movie imdbid may be 7/8 digit; normalize for lookup)
+        // Attach releases to each movie
         foreach ($movies as $movie) {
-            $normMovieId = str_pad((string) (int) $movie->imdbid, 8, '0', STR_PAD_LEFT);
-            $movie->releases = $releasesByMovie[$normMovieId] ?? []; // @phpstan-ignore assign.propertyReadOnly
+            $movie->releases = $releasesByMovie[$movie->imdbid] ?? []; // @phpstan-ignore assign.propertyReadOnly
         }
 
         // Set total count on first item (matches existing pattern used by controllers)
@@ -194,11 +189,11 @@ class MovieBrowseService
     public function getMovieReleases(string $imdbid, array $excludedCats = []): array
     {
         $whereExcluded = count($excludedCats) > 0 ? ' AND r.categories_id NOT IN ('.implode(',', $excludedCats).')' : '';
-        $paddedId = "'".str_pad((string) (int) $imdbid, 8, '0', STR_PAD_LEFT)."'";
+        $quotedId = escapeString($imdbid);
 
         $sql = 'SELECT r.id, r.guid, r.searchname, r.size, r.postdate, r.adddate, r.haspreview '
             .'FROM releases r '
-            .'WHERE r.imdbid = '.$paddedId.' '
+            .'WHERE r.imdbid = '.$quotedId.' '
             ."AND r.passwordstatus {$this->showPasswords} "
             .$whereExcluded.' '
             .'ORDER BY r.postdate DESC';
@@ -256,7 +251,7 @@ class MovieBrowseService
                     $bbv .= '.';
                 }
                 if ($bb === 'imdb') {
-                    $browseBy .= sprintf(' AND m.imdbid = %d', $bbv);
+                    $browseBy .= ' AND m.imdbid = '.escapeString($bbv);
                 } else {
                     $browseBy .= ' AND m.'.$bb.' '.'LIKE '.escapeString('%'.$bbv.'%');
                 }

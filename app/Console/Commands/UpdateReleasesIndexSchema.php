@@ -427,7 +427,7 @@ class UpdateReleasesIndexSchema extends Command
     private function prepareMediaData(mixed $release): array
     {
         return [
-            'imdbid' => (int) ($release->imdbid ?: 0),
+            'imdbid' => (string) ($release->imdbid ?: ''),
             'tmdbid' => (int) ($release->tmdbid ?: ($release->video_tmdb ?: 0)),
             'traktid' => (int) ($release->traktid ?: ($release->video_trakt ?: 0)),
             'tvdb' => (int) ($release->tvdb ?: 0),

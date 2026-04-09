@@ -90,7 +90,7 @@ class MovieServiceTest extends ImdbScraperTestCase
     }
 
     #[Test]
-    public function it_finds_movie_info_for_padded_release_imdb_ids(): void
+    public function it_finds_movie_info_for_imdb_ids_with_meaningful_leading_zeroes(): void
     {
         Cache::flush();
 
@@ -98,20 +98,20 @@ class MovieServiceTest extends ImdbScraperTestCase
         $service->echooutput = false;
 
         $service->update([
-            'imdbid' => '8169446',
+            'imdbid' => '0137523',
             'title' => 'Example Movie',
             'year' => '2024',
         ]);
 
-        $movie = $service->getMovieInfo('08169446');
+        $movie = $service->getMovieInfo('0137523');
 
         $this->assertNotNull($movie);
-        $this->assertSame('8169446', $movie->imdbid);
+        $this->assertSame('0137523', $movie->imdbid);
         $this->assertSame('Example Movie', $movie->title);
     }
 
     #[Test]
-    public function it_returns_existing_trailer_for_padded_release_imdb_ids(): void
+    public function it_returns_existing_trailer_for_imdb_ids_with_meaningful_leading_zeroes(): void
     {
         Cache::flush();
 
@@ -119,13 +119,13 @@ class MovieServiceTest extends ImdbScraperTestCase
         $service->echooutput = false;
 
         $service->update([
-            'imdbid' => '8169446',
+            'imdbid' => '0137523',
             'title' => 'Example Movie',
             'year' => '2024',
             'trailer' => 'https://example.test/embed/trailer',
         ]);
 
-        $this->assertSame('https://example.test/embed/trailer', $service->getTrailer('08169446'));
+        $this->assertSame('https://example.test/embed/trailer', $service->getTrailer('0137523'));
     }
 
     /**

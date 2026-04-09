@@ -305,7 +305,7 @@ class GetNzbController extends BasePageController
         ];
 
         // Add optional metadata headers
-        if (! empty($releaseData->imdbid) && $releaseData->imdbid > 0) {
+        if (! empty($releaseData->imdbid) && imdb_id_is_valid($releaseData->imdbid)) {
             $headers['X-DNZB-MoreInfo'] = "http://www.imdb.com/title/tt{$releaseData->imdbid}";
         } elseif (! empty($releaseData->tvdb) && $releaseData->tvdb > 0) {
             $headers['X-DNZB-MoreInfo'] = "http://www.thetvdb.com/?tab=series&id={$releaseData->tvdb}";

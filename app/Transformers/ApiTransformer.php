@@ -141,6 +141,6 @@ class ApiTransformer extends TransformerAbstract
      */
     protected function nullIfZero($value)
     {
-        return ($value !== null && $value !== 0) ? $value : $this->null();
+        return ($value !== null && $value !== 0 && $value !== '' && $value !== '0') ? $value : $this->null();
     }
 }

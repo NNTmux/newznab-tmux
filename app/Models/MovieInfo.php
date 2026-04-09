@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Cache;
  * App\Models\MovieInfo.
  *
  * @property int $id
- * @property int $imdbid
+ * @property string $imdbid
  * @property int $tmdbid
  * @property string $title
  * @property string $tagline

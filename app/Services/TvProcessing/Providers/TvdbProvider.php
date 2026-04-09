@@ -403,12 +403,12 @@ class TvdbProvider extends AbstractTvProvider
             }
         }
 
-        $imdbId = 0;
+        $imdbId = '';
         $imdbIdObj = null;
         try {
             $imdbIdObj = $this->client->series()->extended((int) $show->tvdb_id);
-            preg_match('/tt(?P<imdbid>\d{6,9})$/i', (string) ($imdbIdObj->getIMDBId() ?? ''), $imdb);
-            $imdbId = $imdb['imdbid'] ?? 0;
+            preg_match('/tt(?P<imdbid>\d{6,})$/i', (string) ($imdbIdObj->getIMDBId() ?? ''), $imdb);
+            $imdbId = (string) ($imdb['imdbid'] ?? '');
         } catch (ResourceNotFoundException $e) {
             cli()->error('Show ImdbId not found on TVDB');
         } catch (\Exception) {
@@ -476,7 +476,7 @@ class TvdbProvider extends AbstractTvProvider
                 }
 
                 // Try IMDB ID as fallback
-                if (! empty($imdbId) && $imdbId > 0) {
+                if (! empty($imdbId) && imdb_id_is_valid($imdbId)) {
                     $traktIds = $traktService->lookupShowIds($imdbId, 'imdb');
                     if ($traktIds !== null && ! empty($traktIds['trakt'])) {
                         $result['trakt'] = (int) $traktIds['trakt'];
