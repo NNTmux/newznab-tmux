@@ -8,6 +8,7 @@ use App\Facades\Search;
 use App\Models\Release;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
+use App\Support\ReleaseSearchIndexSync;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -103,7 +104,11 @@ class ReleaseManagementService
             'imdbid' => $imdbId,
         ];
 
-        return Release::query()->whereIn('guid', $guids)->update($update);
+        $releaseIds = Release::query()->whereIn('guid', $guids)->pluck('id');
+        $updated = Release::query()->whereIn('guid', $guids)->update($update);
+        ReleaseSearchIndexSync::forIds($releaseIds);
+
+        return $updated;
     }
 
     /**

@@ -20,6 +20,7 @@ use App\Services\Releases\ReleaseManagementService;
 use App\Support\DTOs\ProcessReleasesSettings;
 use App\Support\DTOs\ReleaseCreationResult;
 use App\Support\DTOs\ReleaseDeleteStats;
+use App\Support\ReleaseSearchIndexSync;
 use DateTimeInterface;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
@@ -291,6 +292,8 @@ final class ReleaseProcessingService
                 'iscategorized' => 0,
             ]);
         }
+
+        ReleaseSearchIndexSync::reindexMatchingWhere($where);
     }
 
     /**
@@ -333,6 +336,8 @@ final class ReleaseProcessingService
                         'categories_id' => $categoryResult['categories_id'],
                         'iscategorized' => 1,
                     ]);
+
+                ReleaseSearchIndexSync::forIds([(int) $release->id]);
 
                 $categorized++;
                 $this->outputProgress($categorized, $total, 'Categorizing');

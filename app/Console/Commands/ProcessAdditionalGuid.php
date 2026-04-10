@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Facades\Search;
 use App\Models\Release;
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use Illuminate\Console\Command;
@@ -75,6 +76,7 @@ class ProcessAdditionalGuid extends Command
                 'audiostatus' => 0,
                 'nfostatus' => -1,
             ]);
+            Search::updateRelease((int) $release->id);
             $this->info('Reset postprocessing flags for release ID '.$release->id.' (GUID '.$guid.')');
         }
 

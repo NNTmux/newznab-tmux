@@ -255,7 +255,11 @@ class Release extends Model
     {
         $updateGrabs = ((int) Settings::settingValue('grabstatus') !== 0);
         if ($updateGrabs) {
+            $id = self::whereGuid($guid)->value('id');
             self::whereGuid($guid)->increment('grabs');
+            if ($id !== null) {
+                Search::updateRelease((int) $id);
+            }
         }
     }
 
@@ -273,7 +277,11 @@ class Release extends Model
         }
         $updateGrabs = ((int) Settings::settingValue('grabstatus') !== 0);
         if ($updateGrabs) {
+            $ids = self::query()->whereIn('guid', $guids)->pluck('id');
             self::query()->whereIn('guid', $guids)->increment('grabs');
+            foreach ($ids as $id) {
+                Search::updateRelease((int) $id);
+            }
         }
     }
 
@@ -287,7 +295,13 @@ class Release extends Model
 
     public static function removeVideoIdFromReleases(mixed $videoId): int
     {
-        return self::whereVideosId($videoId)->update(['videos_id' => 0, 'tv_episodes_id' => 0]);
+        $ids = self::whereVideosId($videoId)->pluck('id');
+        $updated = self::whereVideosId($videoId)->update(['videos_id' => 0, 'tv_episodes_id' => 0]);
+        foreach ($ids as $id) {
+            Search::updateRelease((int) $id);
+        }
+
+        return $updated;
     }
 
     public static function removeAnidbIdFromReleases(mixed $anidbID): int

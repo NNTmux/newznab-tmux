@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
 use App\Models\Video;
@@ -71,6 +72,7 @@ class NntmuxResetTvShowPostProcessing extends Command
                     'videos_id' => 0,
                     'tv_episodes_id' => 0,
                 ]);
+                Search::updateRelease((int) $release->id);
                 $bar->advance();
             }
         });

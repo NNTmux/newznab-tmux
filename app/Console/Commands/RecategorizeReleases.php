@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
 use App\Services\Categorization\CategorizationService;
@@ -91,6 +92,8 @@ class RecategorizeReleases extends Command
                         'anidbid' => null,
                         'categories_id' => $catId['categories_id'],
                     ]);
+
+                    Search::updateRelease((int) $result->id);
 
                     /** @var Category|null $newCatName */
                     $newCatName = Category::query()->where('id', $catId['categories_id'])->first();

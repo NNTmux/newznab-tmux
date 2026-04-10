@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Services;
 
 use aharen\OMDbAPI;
+use App\Facades\Search;
 use App\Models\Category;
 use App\Models\MovieInfo;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\TvProcessing\Providers\TraktProvider;
+use App\Support\ReleaseSearchIndexSync;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Carbon;
@@ -991,6 +993,8 @@ class MovieService
                     'movieinfo_id' => $movieInfoId !== null ? $movieInfoId['id'] : null,
                 ]);
 
+                Search::updateRelease($id);
+
                 if ($processImdb === 1) {
                     $movCheck = $this->getMovieInfo($imdbId);
                     $thirtyDaysInSeconds = 30 * 24 * 60 * 60;
@@ -1007,6 +1011,8 @@ class MovieService
                             Release::query()->where('id', $id)->update([
                                 'movieinfo_id' => $freshMovieInfo !== null ? $freshMovieInfo['id'] : null,
                             ]);
+
+                            Search::updateRelease($id);
                         }
                     }
                 }
@@ -1126,6 +1132,7 @@ class MovieService
 
                 foreach (array_chunk($failedIDs, 100) as $chunk) {
                     Release::query()->whereIn('id', $chunk)->update(['imdbid' => '']);
+                    ReleaseSearchIndexSync::forIds($chunk);
                 }
             }
         }

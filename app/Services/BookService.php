@@ -485,6 +485,7 @@ class BookService
                     cli()->headerOver('Changing category to misc books: ').cli()->primary($releasename);
                 }
                 Release::query()->where('id', $releaseID)->update(['categories_id' => Category::BOOKS_UNKNOWN]);
+                Search::updateRelease((int) $releaseID);
 
                 return false;
             }
@@ -494,6 +495,7 @@ class BookService
                     cli()->headerOver('Changing category to magazines: ').cli()->primary($releasename);
                 }
                 Release::query()->where('id', $releaseID)->update(['categories_id' => Category::BOOKS_MAGAZINES]);
+                Search::updateRelease((int) $releaseID);
 
                 return false;
             }

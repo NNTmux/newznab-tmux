@@ -190,6 +190,8 @@ class ReleaseFileManager
             $updateRows['rarinnerfilecount'] = $releaseFilesCount;
             Release::query()->where('id', $context->release->id)->update($updateRows);
         }
+
+        Search::updateRelease((int) $context->release->id);
     }
 
     /**
@@ -220,6 +222,8 @@ class ReleaseFileManager
             'haspreview' => 0,
             'passwordstatus' => ReleaseBrowseService::PASSWD_NONE,
         ]);
+
+        Search::updateRelease((int) $release->id);
 
         Log::warning('Release '.$release->id.' skipped after post-processing timeout ('.$newCount.'/'.$maxTimeoutCount.')');
 

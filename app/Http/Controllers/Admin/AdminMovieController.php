@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Facades\Search;
 use App\Http\Controllers\BasePageController;
 use App\Models\MovieInfo;
 use App\Models\Release;
 use App\Services\MovieService;
+use App\Support\ReleaseSearchIndexSync;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -87,6 +89,7 @@ class AdminMovieController extends BasePageController
                     if ($movieInfoId !== null) {
                         foreach ($forUpdate as $rel) {
                             Release::query()->where('id', $rel->id)->update(['movieinfo_id' => $movieInfoId->id]);
+                            Search::updateRelease((int) $rel->id);
                         }
                     }
                 }
@@ -197,6 +200,9 @@ class AdminMovieController extends BasePageController
                 $movieInfo = MovieInfo::query()->where('imdbid', $id)->first(['id']);
                 if ($movieInfo !== null) {
                     Release::query()->where('imdbid', $id)->update(['movieinfo_id' => $movieInfo->id]);
+                    ReleaseSearchIndexSync::forIds(
+                        Release::query()->where('imdbid', $id)->pluck('id')
+                    );
                 }
 
                 return redirect()->to('admin/movie-list')

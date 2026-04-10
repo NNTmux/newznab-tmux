@@ -339,6 +339,7 @@ class ReleaseUpdateService
     {
         if ($column !== '' && $id !== 0) {
             Release::query()->where('id', $id)->update([$column => $status]);
+            Search::updateRelease($id);
         }
     }
 
