@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
 use App\Services\Releases\ReleaseBrowseService;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class RSS -- contains specific functions for RSS.
@@ -83,6 +85,27 @@ class RSS extends ApiController
             );
 
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+
+        if (Search::isAvailable() && $cartSearch === '' && $videosId <= 0 && $aniDbID <= 0 && $airDate <= -1) {
+            $idxCacheKey = md5('rss_search_'.serialize([$cat, $limit, $offset, Search::getCurrentDriver()]));
+            $cachedIdx = Cache::get($idxCacheKey);
+            if ($cachedIdx !== null) {
+                return $cachedIdx;
+            }
+            try {
+                $fromIndex = $this->fetchRssRowsViaSearchIndex($cat, $limit, $offset);
+                Cache::put($idxCacheKey, $fromIndex, $expiresAt);
+
+                return $fromIndex;
+            } catch (\Throwable $e) {
+                if (config('app.debug')) {
+                    Log::debug('RSS: search index path failed, falling back to SQL', [
+                        'message' => $e->getMessage(),
+                    ]);
+                }
+            }
+        }
+
         $result = Cache::get(md5($sql));
         if ($result !== null) {
             return $result;
@@ -92,6 +115,80 @@ class RSS extends ApiController
         Cache::put(md5($sql), $result, $expiresAt);
 
         return $result;
+    }
+
+    /**
+     * Hydrate RSS rows using pre-filtered release IDs from the search engine.
+     *
+     * @param  array<int|string, mixed>  $cat
+     * @return Collection<int, Release>
+     */
+    private function fetchRssRowsViaSearchIndex(array $cat, int $limit, int $offset): Collection
+    {
+        $categoryIdsRaw = Category::getCategorySearch($cat, null, true);
+        $categoryIds = null;
+        if (is_array($categoryIdsRaw)) {
+            $categoryIds = array_map(static fn ($id): int => (int) $id, $categoryIdsRaw);
+        } elseif (is_int($categoryIdsRaw) || (is_string($categoryIdsRaw) && ctype_digit((string) $categoryIdsRaw))) {
+            $categoryIds = [(int) $categoryIdsRaw];
+        }
+
+        $criteria = [
+            'phrases' => null,
+            'category_ids' => $categoryIds,
+            'excluded_category_ids' => [],
+            'min_size' => 0,
+            'max_age_days' => 0,
+            'groups_id' => null,
+            'password_allow_rar' => str_contains($this->releaseBrowseService->showPasswords(), '<='),
+            'sort_field' => 'postdate_ts',
+            'sort_dir' => 'desc',
+            'try_fuzzy' => false,
+        ];
+
+        $maxMatches = (int) config('search.drivers.manticore.max_matches', 10000);
+        $pageLimit = $limit === -1 ? min($maxMatches, 5000) : max(1, $limit);
+
+        $filtered = Search::searchReleasesFiltered($criteria, $pageLimit, max(0, $offset));
+        if ($filtered['ids'] === []) {
+            return new Collection;
+        }
+
+        $ids = array_map(static fn ($id): int => (int) $id, $filtered['ids']);
+        $idList = implode(',', $ids);
+        $fieldOrder = implode(',', $ids);
+
+        $sql = sprintf(
+            "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id,
+					m.cover, m.imdbid, m.rating, m.plot, m.year, m.genre, m.director, m.actors,
+					g.name AS group_name,
+					CONCAT(cp.title, ' > ', c.title) AS category_name,
+					COALESCE(cp.id,0) AS parentid,
+					mu.title AS mu_title, mu.url AS mu_url, mu.artist AS mu_artist,
+					mu.publisher AS mu_publisher, mu.releasedate AS mu_releasedate,
+					mu.review AS mu_review, mu.tracks AS mu_tracks, mu.cover AS mu_cover,
+					mug.title AS mu_genre, co.title AS co_title, co.url AS co_url,
+					co.publisher AS co_publisher, co.releasedate AS co_releasedate,
+					co.review AS co_review, co.cover AS co_cover, cog.title AS co_genre,
+					bo.cover AS bo_cover
+				FROM releases r
+				LEFT JOIN categories c ON c.id = r.categories_id
+				INNER JOIN root_categories cp ON cp.id = c.root_categories_id
+				LEFT JOIN usenet_groups g ON g.id = r.groups_id
+				LEFT OUTER JOIN musicinfo mu ON mu.id = r.musicinfo_id
+				LEFT OUTER JOIN genres mug ON mug.id = mu.genres_id
+				LEFT OUTER JOIN consoleinfo co ON co.id = r.consoleinfo_id
+				LEFT JOIN movieinfo m ON m.id = r.movieinfo_id
+				LEFT OUTER JOIN genres cog ON cog.id = co.genres_id
+				LEFT OUTER JOIN tv_episodes tve ON tve.id = r.tv_episodes_id
+				LEFT OUTER JOIN bookinfo bo ON bo.id = r.bookinfo_id
+				WHERE r.id IN (%s)
+				ORDER BY FIELD(r.id, %s)",
+            $idList,
+            $fieldOrder
+        );
+
+        return Release::fromQuery($sql);
     }
 
     /**

@@ -4,12 +4,19 @@ declare(strict_types=1);
 
 namespace App\Services\Search\Drivers;
 
+use App\Enums\SecondarySearchIndex;
+use App\Models\BookInfo;
+use App\Models\ConsoleInfo;
+use App\Models\GamesInfo;
 use App\Models\MovieInfo;
+use App\Models\MusicInfo;
 use App\Models\Release;
+use App\Models\SteamApp;
 use App\Models\Video;
 use App\Services\Search\Contracts\SearchDriverInterface;
 use App\Services\Search\Support\ElasticsearchClientFactory;
 use App\Services\Search\Support\ElasticsearchResponseHelper;
+use App\Support\SecondaryIndexDocuments;
 use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\Exception\ElasticsearchException;
 use Illuminate\Support\Collection;
@@ -1059,10 +1066,39 @@ class ElasticSearchDriver implements SearchDriverInterface
                     'releases.searchname',
                     'releases.fromname',
                     'releases.categories_id',
+                    'releases.size',
+                    'releases.postdate',
+                    'releases.adddate',
+                    'releases.totalpart',
+                    'releases.grabs',
+                    'releases.passwordstatus',
+                    'releases.groups_id',
+                    'releases.nzbstatus',
+                    'releases.haspreview',
                     'releases.imdbid',
+                    'releases.videos_id',
+                    'releases.movieinfo_id',
                     DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename'),
                 ])
-                ->groupBy('releases.id')
+                ->groupBy([
+                    'releases.id',
+                    'releases.name',
+                    'releases.searchname',
+                    'releases.fromname',
+                    'releases.categories_id',
+                    'releases.size',
+                    'releases.postdate',
+                    'releases.adddate',
+                    'releases.totalpart',
+                    'releases.grabs',
+                    'releases.passwordstatus',
+                    'releases.groups_id',
+                    'releases.nzbstatus',
+                    'releases.haspreview',
+                    'releases.imdbid',
+                    'releases.videos_id',
+                    'releases.movieinfo_id',
+                ])
                 ->first();
 
             if ($release === null) {
@@ -1071,27 +1107,8 @@ class ElasticSearchDriver implements SearchDriverInterface
                 return;
             }
 
-            $searchNameDotless = $this->createPlainSearchName($release->searchname);
-            $data = [
-                'body' => [
-                    'doc' => [
-                        'id' => $release->id,
-                        'name' => $release->name,
-                        'searchname' => $release->searchname,
-                        'plainsearchname' => $searchNameDotless,
-                        'fromname' => $release->fromname,
-                        'categories_id' => $release->categories_id,
-                        'imdbid' => (string) ($release->imdbid ?? ''),
-                        'filename' => $release->filename, // @phpstan-ignore property.notFound
-                    ],
-                    'doc_as_upsert' => true,
-                ],
-                'index' => $this->getReleasesIndex(),
-                'id' => $release->id,
-            ];
-
             $client = $this->getClient();
-            $client->update($data);
+            $client->index($this->buildReleaseDocument($release->toArray()));
 
         } catch (ElasticsearchException $e) {
             Log::error('ElasticSearch updateRelease error: '.$e->getMessage(), [
@@ -2068,6 +2085,72 @@ class ElasticSearchDriver implements SearchDriverInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function searchMoviesByFields(array $fieldTerms, int $limit = 5000): array
+    {
+        $allowed = ['title' => true, 'director' => true, 'actors' => true, 'genre' => true];
+        $filtered = [];
+        foreach ($fieldTerms as $key => $value) {
+            $k = (string) $key;
+            if (isset($allowed[$k]) && is_string($value) && trim($value) !== '') {
+                $filtered[$k] = trim($value);
+            }
+        }
+
+        if ($filtered === [] || ! $this->isElasticsearchAvailable()) {
+            return ['imdbids' => [], 'movieinfo_ids' => [], 'data' => []];
+        }
+
+        $must = [];
+        foreach ($filtered as $field => $value) {
+            $must[] = [
+                'match' => [
+                    $field => [
+                        'query' => $value,
+                        'operator' => 'and',
+                    ],
+                ],
+            ];
+        }
+
+        try {
+            $client = $this->getClient();
+            $response = $client->search([
+                'index' => $this->getMoviesIndex(),
+                'body' => [
+                    'query' => ['bool' => ['must' => $must]],
+                    'size' => min($limit, self::MAX_RESULTS),
+                ],
+            ]);
+
+            $imdbids = [];
+            $movieinfoIds = [];
+            $data = [];
+
+            foreach ($response['hits']['hits'] ?? [] as $hit) {
+                $movieinfoIds[] = (int) ($hit['_id'] ?? 0);
+                $src = $hit['_source'] ?? [];
+                $data[] = $src;
+                $imdb = (string) ($src['imdbid'] ?? '');
+                if ($imdb !== '') {
+                    $imdbids[] = $imdb;
+                }
+            }
+
+            return [
+                'imdbids' => array_values(array_unique($imdbids)),
+                'movieinfo_ids' => $movieinfoIds,
+                'data' => $data,
+            ];
+        } catch (\Throwable $e) {
+            Log::error('ElasticSearch searchMoviesByFields error: '.$e->getMessage());
+
+            return ['imdbids' => [], 'movieinfo_ids' => [], 'data' => []];
+        }
+    }
+
+    /**
      * Search movies by external ID (IMDB, TMDB, Trakt).
      *
      * @param  string  $field  Field name (imdbid, tmdbid, traktid)
@@ -2629,5 +2712,346 @@ class ElasticSearchDriver implements SearchDriverInterface
         }
 
         return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function searchReleasesFiltered(array $criteria, int $limit, int $offset = 0): array
+    {
+        if (! $this->isElasticsearchAvailable()) {
+            return ['ids' => [], 'total' => 0, 'fuzzy' => false];
+        }
+
+        $phrases = $criteria['phrases'] ?? null;
+        $hasText = $phrases !== null && $phrases !== '' && $phrases !== -1;
+        $tryFuzzy = (bool) ($criteria['try_fuzzy'] ?? true);
+
+        $run = function (bool $useFuzzy) use ($criteria, $limit, $offset, $hasText, $phrases): array {
+            $filter = $this->buildElasticsearchReleaseFilters($criteria);
+            $must = [];
+
+            if ($hasText) {
+                $text = is_string($phrases)
+                    ? $phrases
+                    : implode(' ', array_values(array_filter(
+                        is_array($phrases) ? $phrases : [],
+                        static fn ($v): bool => $v !== null && $v !== '' && $v !== -1
+                    )));
+                if ($text === '') {
+                    return ['ids' => [], 'total' => 0, 'fuzzy' => $useFuzzy];
+                }
+                $multi = [
+                    'query' => $text,
+                    'fields' => ['searchname^3', 'name^2', 'filename', 'plainsearchname'],
+                    'type' => 'best_fields',
+                ];
+                if ($useFuzzy && $this->isFuzzyEnabled()) {
+                    $multi['fuzziness'] = $this->getFuzzyConfig()['fuzziness'] ?? 'AUTO';
+                }
+                $must[] = ['multi_match' => $multi];
+            }
+
+            if ($must !== [] && $filter !== []) {
+                $query = ['bool' => ['must' => $must, 'filter' => $filter]];
+            } elseif ($must !== []) {
+                $query = ['bool' => ['must' => $must]];
+            } elseif ($filter !== []) {
+                $query = ['bool' => ['filter' => $filter]];
+            } else {
+                $query = ['match_all' => new \stdClass];
+            }
+
+            $sortField = (string) ($criteria['sort_field'] ?? 'postdate_ts');
+            $sortDir = strtolower((string) ($criteria['sort_dir'] ?? 'desc'));
+            $allowedSort = ['postdate_ts', 'adddate_ts', 'size', 'totalpart', 'grabs', 'categories_id', 'id'];
+            if (! in_array($sortField, $allowedSort, true)) {
+                $sortField = 'postdate_ts';
+            }
+            if ($sortField === 'id') {
+                $sortField = 'postdate_ts';
+            }
+            $order = $sortDir === 'asc' ? 'asc' : 'desc';
+
+            try {
+                $client = $this->getClient();
+                $response = $client->search([
+                    'index' => $this->getReleasesIndex(),
+                    'body' => [
+                        'query' => $query,
+                        'sort' => [
+                            [$sortField => ['order' => $order]],
+                        ],
+                        'from' => max(0, $offset),
+                        'size' => max(1, min($limit, self::MAX_RESULTS)),
+                        'track_total_hits' => true,
+                        '_source' => false,
+                    ],
+                ]);
+
+                $ids = [];
+                foreach ($response['hits']['hits'] ?? [] as $hit) {
+                    $ids[] = (int) ($hit['_id'] ?? 0);
+                }
+                $total = (int) ($response['hits']['total']['value'] ?? $response['hits']['total'] ?? 0);
+
+                return ['ids' => $ids, 'total' => $total, 'fuzzy' => $useFuzzy];
+            } catch (\Throwable $e) {
+                Log::error('ElasticSearch searchReleasesFiltered error: '.$e->getMessage());
+
+                return ['ids' => [], 'total' => 0, 'fuzzy' => $useFuzzy];
+            }
+        };
+
+        if ($hasText) {
+            $first = $run(false);
+            if ($first['ids'] !== [] || ! $tryFuzzy || ! $this->isFuzzyEnabled()) {
+                return $first;
+            }
+
+            return $run(true);
+        }
+
+        return $run(false);
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function buildElasticsearchReleaseFilters(array $criteria): array
+    {
+        $filter = [];
+
+        $releaseIds = $criteria['release_ids'] ?? null;
+        if (is_array($releaseIds) && $releaseIds !== []) {
+            $valid = array_values(array_filter(
+                array_map(static fn ($id): int => (int) $id, $releaseIds),
+                static fn (int $id): bool => $id > 0
+            ));
+            if ($valid !== []) {
+                $filter[] = ['ids' => ['values' => array_map(static fn (int $id): string => (string) $id, $valid)]];
+            }
+        }
+
+        $categoryIds = $criteria['category_ids'] ?? null;
+        if (is_array($categoryIds) && $categoryIds !== []) {
+            $valid = array_values(array_filter($categoryIds, static fn ($id): bool => (int) $id > 0));
+            if ($valid !== []) {
+                $filter[] = ['terms' => ['categories_id' => array_map(static fn ($id): int => (int) $id, $valid)]];
+            }
+        }
+
+        $excluded = $criteria['excluded_category_ids'] ?? [];
+        if ($excluded !== []) {
+            $filter[] = ['bool' => ['must_not' => [
+                ['terms' => ['categories_id' => array_map(static fn ($id): int => (int) $id, $excluded)]],
+            ]]];
+        }
+
+        $minSize = (int) ($criteria['min_size'] ?? 0);
+        if ($minSize > 0) {
+            $filter[] = ['range' => ['size' => ['gte' => $minSize]]];
+        }
+
+        $maxAge = (int) ($criteria['max_age_days'] ?? 0);
+        if ($maxAge > 0) {
+            $cutoff = time() - ($maxAge * 86400);
+            $filter[] = ['range' => ['postdate_ts' => ['gte' => $cutoff]]];
+        }
+
+        $gid = $criteria['groups_id'] ?? null;
+        if ($gid !== null && (int) $gid > 0) {
+            $filter[] = ['term' => ['groups_id' => (int) $gid]];
+        }
+
+        $allowRar = (bool) ($criteria['password_allow_rar'] ?? false);
+        if ($allowRar) {
+            $filter[] = ['range' => ['passwordstatus' => ['lte' => 1]]];
+        } else {
+            $filter[] = ['term' => ['passwordstatus' => 0]];
+        }
+
+        return $filter;
+    }
+
+    public function getSecondaryIndexName(SecondarySearchIndex $index): string
+    {
+        $configured = $this->config['indexes'][$index->value] ?? null;
+        if (is_string($configured) && $configured !== '') {
+            return $configured;
+        }
+
+        return match ($index) {
+            SecondarySearchIndex::Music => 'music',
+            SecondarySearchIndex::Books => 'books',
+            SecondarySearchIndex::Games => 'games',
+            SecondarySearchIndex::Console => 'console',
+            SecondarySearchIndex::Steam => 'steam',
+            SecondarySearchIndex::Anime => 'anime',
+        };
+    }
+
+    public function insertSecondary(SecondarySearchIndex $index, int $id, array $document): void
+    {
+        if ($id <= 0) {
+            return;
+        }
+
+        try {
+            $this->getClient()->index([
+                'index' => $this->getSecondaryIndexName($index),
+                'id' => (string) $id,
+                'body' => $document,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('ElasticSearch insertSecondary error: '.$e->getMessage(), [
+                'secondary' => $index->value,
+                'id' => $id,
+            ]);
+        }
+    }
+
+    public function updateSecondary(SecondarySearchIndex $index, int $id): void
+    {
+        if ($id <= 0) {
+            return;
+        }
+
+        try {
+            match ($index) {
+                SecondarySearchIndex::Music => $this->insertSecondary($index, $id, SecondaryIndexDocuments::music(MusicInfo::query()->findOrFail($id))),
+                SecondarySearchIndex::Books => $this->insertSecondary($index, $id, SecondaryIndexDocuments::book(BookInfo::query()->findOrFail($id))),
+                SecondarySearchIndex::Games => $this->insertSecondary($index, $id, SecondaryIndexDocuments::games(GamesInfo::query()->findOrFail($id))),
+                SecondarySearchIndex::Console => $this->insertSecondary($index, $id, SecondaryIndexDocuments::console(ConsoleInfo::query()->findOrFail($id))),
+                SecondarySearchIndex::Steam => $this->insertSecondary($index, $id, SecondaryIndexDocuments::steam(SteamApp::query()->findOrFail($id))),
+                SecondarySearchIndex::Anime => null,
+            };
+        } catch (\Throwable $e) {
+            Log::warning('ElasticSearch updateSecondary skipped: '.$e->getMessage(), [
+                'secondary' => $index->value,
+                'id' => $id,
+            ]);
+        }
+    }
+
+    public function deleteSecondary(SecondarySearchIndex $index, int $id): void
+    {
+        if ($id <= 0) {
+            return;
+        }
+
+        try {
+            $this->getClient()->delete([
+                'index' => $this->getSecondaryIndexName($index),
+                'id' => (string) $id,
+            ]);
+        } catch (\Throwable $e) {
+            Log::debug('ElasticSearch deleteSecondary: '.$e->getMessage(), [
+                'secondary' => $index->value,
+                'id' => $id,
+            ]);
+        }
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $documents
+     * @return array<string, mixed>
+     */
+    public function bulkInsertSecondary(SecondarySearchIndex $index, array $documents): array
+    {
+        if ($documents === []) {
+            return ['success' => 0, 'errors' => 0];
+        }
+
+        $success = 0;
+        $errors = 0;
+        $indexName = $this->getSecondaryIndexName($index);
+
+        foreach ($documents as $doc) {
+            $docId = (int) ($doc['id'] ?? 0);
+            if ($docId <= 0) {
+                $errors++;
+
+                continue;
+            }
+            unset($doc['id']);
+            try {
+                $this->getClient()->index([
+                    'index' => $indexName,
+                    'id' => (string) $docId,
+                    'body' => $doc,
+                ]);
+                $success++;
+            } catch (\Throwable $e) {
+                $errors++;
+                Log::error('ElasticSearch bulkInsertSecondary row error: '.$e->getMessage());
+            }
+        }
+
+        return ['success' => $success, 'errors' => $errors];
+    }
+
+    /**
+     * @return array{id: list<int>, data: list<array<string, mixed>>}
+     */
+    public function searchSecondary(SecondarySearchIndex $index, string $query, int $limit = 100): array
+    {
+        $query = trim($query);
+        if ($query === '') {
+            return ['id' => [], 'data' => []];
+        }
+
+        $fields = $index->fulltextFields();
+        $escapedSearch = self::escapeString($query);
+        if ($escapedSearch === '') {
+            return ['id' => [], 'data' => []];
+        }
+
+        try {
+            $response = $this->getClient()->search([
+                'index' => $this->getSecondaryIndexName($index),
+                'body' => [
+                    'query' => [
+                        'multi_match' => [
+                            'query' => $escapedSearch,
+                            'fields' => $fields,
+                            'operator' => 'and',
+                        ],
+                    ],
+                    'size' => max(1, min($limit, self::MAX_RESULTS)),
+                    '_source' => true,
+                ],
+            ]);
+
+            $ids = [];
+            $data = [];
+            foreach ($response['hits']['hits'] ?? [] as $hit) {
+                $ids[] = (int) ($hit['_id'] ?? 0);
+                $data[] = (array) ($hit['_source'] ?? []);
+            }
+
+            return ['id' => $ids, 'data' => $data];
+        } catch (\Throwable $e) {
+            Log::error('ElasticSearch searchSecondary error: '.$e->getMessage(), ['secondary' => $index->value]);
+
+            return ['id' => [], 'data' => []];
+        }
+    }
+
+    /**
+     * @return list<int>
+     */
+    public function searchAnimeTitle(string $query, int $limit = 100): array
+    {
+        $hits = $this->searchSecondary(SecondarySearchIndex::Anime, $query, $limit);
+        $seen = [];
+        foreach ($hits['data'] as $row) {
+            $aid = (int) ($row['anidbid'] ?? 0);
+            if ($aid > 0) {
+                $seen[$aid] = true;
+            }
+        }
+
+        return array_keys($seen);
     }
 }

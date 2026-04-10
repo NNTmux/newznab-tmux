@@ -26,6 +26,9 @@ Route::prefix('v2')->group(function () {
 
 Route::prefix('v2')->middleware('apiRateLimit')->group(function () {
     Route::get('movies', [ApiV2Controller::class, 'movie']);
+    Route::get('audio', [ApiV2Controller::class, 'audio']);
+    Route::get('books', [ApiV2Controller::class, 'books']);
+    Route::get('anime', [ApiV2Controller::class, 'anime']);
     Route::get('search', [ApiV2Controller::class, 'apiSearch']);
     Route::get('tv', [ApiV2Controller::class, 'tv']);
     Route::get('getnzb', [ApiV2Controller::class, 'getNzb']);

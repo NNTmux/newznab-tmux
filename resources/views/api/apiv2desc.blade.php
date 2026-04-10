@@ -29,6 +29,9 @@
         <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 flex items-center">
             <i class="fa fa-plug mr-2 text-gray-600 dark:text-gray-400"></i>Available Functions
         </h4>
+        <p class="text-gray-700 dark:text-gray-300 mb-4 dark:text-gray-300">
+            Beyond <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:text-gray-700 dark:text-red-400">search</code>, <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:text-gray-700 dark:text-red-400">tv</code>, and <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:text-gray-700 dark:text-red-400">movies</code>, JSON endpoints include <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:text-gray-700 dark:text-red-400">audio</code> (music), <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:text-gray-700 dark:text-red-400">books</code>, and <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:text-gray-700 dark:text-red-400">anime</code>. The <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:text-gray-700 dark:text-red-400">capabilities</code> response lists <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">audio-search</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">book-search</code>, and <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">anime-search</code>.
+        </p>
 
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -160,6 +163,77 @@
                                 </span>
                                 <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
                                     <code>movies?imdbid=1418646&amp;cat={{ $catClass::MOVIE_SD }},{{ $catClass::MOVIE_HD }}</code>
+                                </span>
+                                @endauth
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700">
+                        <td class="px-6 py-4"><strong class="text-gray-900 dark:text-gray-100 dark:text-white">Audio (music)</strong></td>
+                        <td class="px-6 py-4">
+                            <span class="text-gray-700 dark:text-gray-300">
+                                Music search: pass the text query as <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">id</code> (same pattern as <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">search</code>).
+                                Optional: <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">cat</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">maxage</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">minsize</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">group</code>, offset/limit.
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            @auth
+                            <a href="{{ url('/api/v2/audio?id=' . rawurlencode('pink floyd') . '&cat=' . $catClass::MUSIC_ROOT . '&api_token=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                <i class="fa fa-external-link-alt mr-1"></i>
+                                <code class="text-primary-700 dark:text-primary-400">audio?id=…&amp;cat={{ $catClass::MUSIC_ROOT }}</code>
+                            </a>
+                            @else
+                            <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+                                <code>audio?id=&lt;artist or title&gt;&amp;cat={{ $catClass::MUSIC_ROOT }}</code>
+                            </span>
+                            @endauth
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700">
+                        <td class="px-6 py-4"><strong class="text-gray-900 dark:text-gray-100 dark:text-white">Books</strong></td>
+                        <td class="px-6 py-4">
+                            <span class="text-gray-700 dark:text-gray-300">
+                                Book search: query text in <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">id</code>. Optional <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">cat</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">maxage</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">minsize</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">group</code>.
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            @auth
+                            <a href="{{ url('/api/v2/books?id=' . rawurlencode('science fiction') . '&cat=' . $catClass::BOOKS_ROOT . '&api_token=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                <i class="fa fa-external-link-alt mr-1"></i>
+                                <code class="text-primary-700 dark:text-primary-400">books?id=…&amp;cat={{ $catClass::BOOKS_ROOT }}</code>
+                            </a>
+                            @else
+                            <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+                                <code>books?id=&lt;author or title&gt;&amp;cat={{ $catClass::BOOKS_ROOT }}</code>
+                            </span>
+                            @endauth
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700">
+                        <td class="px-6 py-4"><strong class="text-gray-900 dark:text-gray-100 dark:text-white">Anime</strong></td>
+                        <td class="px-6 py-4">
+                            <span class="text-gray-700 dark:text-gray-300">
+                                Provide at least one of: <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">id</code> (title search), <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">anidbid</code>, or <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">anilistid</code>.
+                                Optional: <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">cat</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">maxage</code>.
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex flex-col gap-2">
+                                @auth
+                                <a href="{{ url('/api/v2/anime?id=' . rawurlencode('attack on titan') . '&api_token=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                    <i class="fa fa-external-link-alt mr-1"></i>
+                                    <code class="text-primary-700 dark:text-primary-400">anime?id=attack on titan</code>
+                                </a>
+                                <a href="{{ url('/api/v2/anime?anilistid=21&api_token=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                    <i class="fa fa-external-link-alt mr-1"></i>
+                                    <code class="text-primary-700 dark:text-primary-400">anime?anilistid=21</code>
+                                </a>
+                                @else
+                                <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+                                    <code>anime?id=&lt;title&gt;</code>
+                                </span>
+                                <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+                                    <code>anime?anidbid=&lt;id&gt;</code> or <code>anime?anilistid=&lt;id&gt;</code>
                                 </span>
                                 @endauth
                             </div>

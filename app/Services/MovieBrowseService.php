@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Facades\Search;
 use App\Models\Category;
 use App\Models\MovieInfo;
 use App\Services\Releases\ReleaseBrowseService;
@@ -61,11 +62,40 @@ class MovieBrowseService
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
 
         $whereAge = $maxAge > 0 ? 'AND r.postdate > NOW() - INTERVAL '.$maxAge.' DAY ' : '';
-        $browseBy = $this->getBrowseBy();
+
+        $skipBrowseLikeFields = [];
+        $indexImdbClause = '';
+        if (Search::isAvailable()) {
+            $fieldTerms = [];
+            foreach (['title', 'director', 'actors', 'genre'] as $field) {
+                if (request()->has($field)) {
+                    $value = request()->input($field);
+                    if (is_array($value)) {
+                        continue;
+                    }
+                    $value = stripslashes((string) $value);
+                    if ($value !== '') {
+                        $fieldTerms[$field] = $value;
+                    }
+                }
+            }
+            if ($fieldTerms !== []) {
+                $found = Search::searchMoviesByFields($fieldTerms, 8000);
+                if ($found['imdbids'] === []) {
+                    return collect();
+                }
+                $quoted = array_map(static fn (string $id): string => escapeString($id), $found['imdbids']);
+                $indexImdbClause = ' AND m.imdbid IN ('.implode(',', $quoted).') ';
+                $skipBrowseLikeFields = ['title', 'director', 'actors', 'genre'];
+            }
+        }
+
+        $browseBy = $this->getBrowseBy($skipBrowseLikeFields);
 
         $baseWhere = "m.title != '' AND m.imdbid IS NOT NULL AND m.imdbid != '' "
             ."AND r.passwordstatus {$this->showPasswords} "
             .$browseBy.' '
+            .$indexImdbClause
             .$catFilter
             .$whereAge
             .$whereExcluded;
@@ -229,11 +259,17 @@ class MovieBrowseService
         return ['title_asc', 'title_desc', 'year_asc', 'year_desc', 'rating_asc', 'rating_desc'];
     }
 
-    protected function getBrowseBy(): string
+    /**
+     * @param  array<int, string>  $skipFields  Request keys to ignore (e.g. already applied via search index).
+     */
+    protected function getBrowseBy(array $skipFields = []): string
     {
         $browseBy = ' ';
         $browseByArr = ['title', 'director', 'actors', 'genre', 'rating', 'year', 'imdb'];
         foreach ($browseByArr as $bb) {
+            if ($skipFields !== [] && in_array($bb, $skipFields, true)) {
+                continue;
+            }
             if (request()->has($bb) && ! empty(request()->input($bb))) {
                 $bbv = request()->input($bb);
                 if (is_array($bbv)) {

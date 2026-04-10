@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services\Releases;
 
+use App\Enums\SecondarySearchIndex;
 use App\Facades\Search;
+use App\Models\AnidbInfo;
 use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
@@ -153,12 +155,108 @@ class ReleaseSearchService
             ]);
         }
 
+        $hasText = $searchName !== -1 && $searchName !== '' && $searchName !== null;
+
+        if (Search::isAvailable()) {
+            $groupId = null;
+            if ((int) $groupName !== -1) {
+                $resolved = UsenetGroup::getIDByName((string) $groupName);
+                if ($resolved) {
+                    $groupId = (int) $resolved;
+                }
+            }
+
+            $categoryIdsRaw = Category::getCategorySearch($cat, null, true);
+            $categoryIds = null;
+            if (is_array($categoryIdsRaw)) {
+                $categoryIds = array_map(static fn ($id): int => (int) $id, $categoryIdsRaw);
+            } elseif (is_int($categoryIdsRaw) || (is_string($categoryIdsRaw) && ctype_digit((string) $categoryIdsRaw))) {
+                $categoryIds = [(int) $categoryIdsRaw];
+            }
+
+            $criteria = [
+                'phrases' => $hasText ? $searchName : null,
+                'category_ids' => $categoryIds,
+                'excluded_category_ids' => $excludedCats,
+                'min_size' => $minSize,
+                'max_age_days' => $maxAge,
+                'groups_id' => $groupId,
+                'password_allow_rar' => str_contains($this->showPasswords(), '<='),
+                'sort_field' => 'postdate_ts',
+                'sort_dir' => 'desc',
+                'try_fuzzy' => true,
+            ];
+
+            $filtered = Search::searchReleasesFiltered($criteria, $limit, $offset);
+
+            if ($filtered['ids'] === [] && $hasText && config('nntmux.mysql_search_fallback', false) === true) {
+                return $this->apiSearchLegacyMysql($searchName, $groupName, $offset, $limit, $maxAge, $excludedCats, $cat, $minSize);
+            }
+
+            if ($filtered['ids'] === []) {
+                return collect();
+            }
+
+            $ids = array_map(static fn (int|string $id): int => (int) $id, $filtered['ids']);
+            $idList = implode(',', $ids);
+            $fieldOrder = implode(',', $ids);
+
+            $whereSql = 'WHERE r.id IN ('.$idList.')';
+
+            $sql = sprintf(
+                "SELECT r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate,
+                    cp.title AS parent_category, c.title AS sub_category,
+                    CONCAT(cp.title, ' > ', c.title) AS category_name,
+                    g.name AS group_name,
+                    m.imdbid, m.tmdbid, m.traktid,
+                    v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
+                    tve.firstaired, tve.title, tve.series, tve.episode
+            FROM releases r
+            INNER JOIN categories c ON c.id = r.categories_id
+            INNER JOIN root_categories cp ON cp.id = c.root_categories_id
+            LEFT JOIN usenet_groups g ON g.id = r.groups_id
+            LEFT JOIN videos v ON r.videos_id = v.id AND r.videos_id > 0
+            LEFT JOIN tv_episodes tve ON r.tv_episodes_id = tve.id AND r.tv_episodes_id > 0
+            LEFT JOIN movieinfo m ON m.id = r.movieinfo_id AND r.movieinfo_id > 0
+            %s
+            ORDER BY FIELD(r.id, %s)",
+                $whereSql,
+                $fieldOrder
+            );
+
+            $cacheKey = md5($this->getCacheVersion().$sql);
+            $cachedReleases = Cache::get($cacheKey);
+            if ($cachedReleases !== null) {
+                return $cachedReleases;
+            }
+
+            $releases = Release::fromQuery($sql);
+
+            if ($releases->isNotEmpty()) {
+                $releases[0]->_totalrows = $filtered['total'];
+            }
+
+            $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+            Cache::put($cacheKey, $releases, $expiresAt);
+
+            return $releases;
+        }
+
+        return $this->apiSearchLegacyMysql($searchName, $groupName, $offset, $limit, $maxAge, $excludedCats, $cat, $minSize);
+    }
+
+    /**
+     * Original API search path (SQL filters + optional index ID list from fuzzy only).
+     *
+     * @param  array<int|string, mixed>  $cat
+     */
+    private function apiSearchLegacyMysql(mixed $searchName, mixed $groupName, int $offset, int $limit, int $maxAge, array $excludedCats, array $cat, int $minSize): mixed
+    {
         $searchLimit = $this->determineSearchCandidateLimit($offset, $limit);
 
-        // Early return if searching with no results
         $searchResult = [];
-        if ($searchName !== -1 && $searchName !== '' && $searchName !== null) {
-            // Use the unified Search facade with fuzzy fallback
+        $hasText = $searchName !== -1 && $searchName !== '' && $searchName !== null;
+        if ($hasText) {
             $fuzzyResult = Search::searchReleasesWithFuzzy($searchName, $searchLimit);
             $searchResult = $fuzzyResult['ids'] ?? [];
 
@@ -166,15 +264,14 @@ class ReleaseSearchService
                 Log::debug('apiSearch: Using fuzzy search results');
             }
 
-            // Fall back to MySQL if search engine returned no results (only if enabled)
-            if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
+            if ($searchResult === [] && config('nntmux.mysql_search_fallback', false) === true) {
                 if (config('app.debug')) {
                     Log::debug('apiSearch: Falling back to MySQL search');
                 }
                 $searchResult = $this->performMySQLSearch(['searchname' => $searchName], $searchLimit);
             }
 
-            if (empty($searchResult)) {
+            if ($searchResult === []) {
                 if (config('app.debug')) {
                     Log::debug('apiSearch: No results from any search engine');
                 }
@@ -199,17 +296,17 @@ class ReleaseSearchService
         }
 
         $catQuery = Category::getCategorySearch($cat);
-        $catQuery = preg_replace('/^(WHERE|AND)\s+/i', '', trim($catQuery));
+        $catQuery = preg_replace('/^(WHERE|AND)\s+/i', '', trim((string) $catQuery));
         if (! empty($catQuery) && $catQuery !== '1=1') {
             $conditions[] = $catQuery;
         }
 
-        if (! empty($excludedCats)) {
-            $conditions[] = sprintf('r.categories_id NOT IN (%s)', implode(',', array_map('intval', $excludedCats)));
+        if ($excludedCats !== []) {
+            $conditions[] = sprintf('r.categories_id NOT IN (%s)', implode(',', array_map(static fn ($id): int => (int) $id, $excludedCats)));
         }
 
-        if (! empty($searchResult)) {
-            $conditions[] = sprintf('r.id IN (%s)', implode(',', array_map('intval', $searchResult)));
+        if ($searchResult !== []) {
+            $conditions[] = sprintf('r.id IN (%s)', implode(',', array_map(static fn ($id): int => (int) $id, $searchResult)));
         }
 
         if ($minSize > 0) {
@@ -218,7 +315,6 @@ class ReleaseSearchService
 
         $whereSql = 'WHERE '.implode(' AND ', $conditions);
 
-        // Optimized query: remove unused columns/joins (haspreview, jpgstatus, *_id columns, nfo/video_data/failures)
         $sql = sprintf(
             "SELECT r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate,
                     cp.title AS parent_category, c.title AS sub_category,
@@ -243,6 +339,157 @@ class ReleaseSearchService
         );
 
         $cacheKey = md5($sql);
+        $cachedReleases = Cache::get($cacheKey);
+        if ($cachedReleases !== null) {
+            return $cachedReleases;
+        }
+
+        $releases = Release::fromQuery($sql);
+
+        if ($releases->isNotEmpty()) {
+            $countSql = sprintf('SELECT COUNT(*) as count FROM releases r %s', $whereSql);
+            $countResult = Release::fromQuery($countSql);
+            $releases[0]->_totalrows = $countResult[0]->count ?? 0;
+        }
+
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        Cache::put($cacheKey, $releases, $expiresAt);
+
+        return $releases;
+    }
+
+    /**
+     * API: music releases linked to rows from the music metadata index.
+     *
+     * @param  array<int|string, mixed>  $cat
+     * @param  array<int, int>  $excludedCats
+     */
+    public function apiMusicSearch(
+        string $q,
+        mixed $groupName,
+        int $offset,
+        int $limit,
+        int $maxAge,
+        array $excludedCats,
+        array $cat,
+        int $minSize
+    ): mixed {
+        $q = trim($q);
+        if ($q === '' || ! Search::isAvailable()) {
+            return collect();
+        }
+
+        $musicInfoIds = Search::searchSecondary(SecondarySearchIndex::Music, $q, 2000)['id'];
+
+        return $this->apiSearchByMetadataForeignKey($musicInfoIds, 'musicinfo_id', $groupName, $offset, $limit, $maxAge, $excludedCats, $cat, $minSize);
+    }
+
+    /**
+     * API: book releases linked to rows from the books metadata index.
+     *
+     * @param  array<int|string, mixed>  $cat
+     * @param  array<int, int>  $excludedCats
+     */
+    public function apiBookSearch(
+        string $q,
+        mixed $groupName,
+        int $offset,
+        int $limit,
+        int $maxAge,
+        array $excludedCats,
+        array $cat,
+        int $minSize
+    ): mixed {
+        $q = trim($q);
+        if ($q === '' || ! Search::isAvailable()) {
+            return collect();
+        }
+
+        $bookIds = Search::searchSecondary(SecondarySearchIndex::Books, $q, 2000)['id'];
+
+        return $this->apiSearchByMetadataForeignKey($bookIds, 'bookinfo_id', $groupName, $offset, $limit, $maxAge, $excludedCats, $cat, $minSize);
+    }
+
+    /**
+     * @param  list<int>  $metadataIds
+     * @param  array<int|string, mixed>  $cat
+     * @param  array<int, int>  $excludedCats
+     */
+    private function apiSearchByMetadataForeignKey(
+        array $metadataIds,
+        string $column,
+        mixed $groupName,
+        int $offset,
+        int $limit,
+        int $maxAge,
+        array $excludedCats,
+        array $cat,
+        int $minSize
+    ): mixed {
+        if ($metadataIds === []) {
+            return collect();
+        }
+
+        if (! in_array($column, ['musicinfo_id', 'bookinfo_id'], true)) {
+            return collect();
+        }
+
+        $conditions = [
+            sprintf('r.passwordstatus %s', $this->showPasswords()),
+            sprintf('r.%s IN (%s)', $column, implode(',', array_map(static fn (int $id): int => $id, $metadataIds))),
+        ];
+
+        if ($maxAge > 0) {
+            $conditions[] = sprintf('r.postdate > (NOW() - INTERVAL %d DAY)', $maxAge);
+        }
+
+        if ((int) $groupName !== -1) {
+            $groupId = UsenetGroup::getIDByName($groupName);
+            if ($groupId) {
+                $conditions[] = sprintf('r.groups_id = %d', $groupId);
+            }
+        }
+
+        $catQuery = Category::getCategorySearch($cat);
+        $catQuery = preg_replace('/^(WHERE|AND)\s+/i', '', trim((string) $catQuery));
+        if (! empty($catQuery) && $catQuery !== '1=1') {
+            $conditions[] = $catQuery;
+        }
+
+        if ($excludedCats !== []) {
+            $conditions[] = sprintf('r.categories_id NOT IN (%s)', implode(',', array_map(static fn ($id): int => (int) $id, $excludedCats)));
+        }
+
+        if ($minSize > 0) {
+            $conditions[] = sprintf('r.size >= %d', $minSize);
+        }
+
+        $whereSql = 'WHERE '.implode(' AND ', $conditions);
+
+        $sql = sprintf(
+            "SELECT r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate,
+                    cp.title AS parent_category, c.title AS sub_category,
+                    CONCAT(cp.title, ' > ', c.title) AS category_name,
+                    g.name AS group_name,
+                    m.imdbid, m.tmdbid, m.traktid,
+                    v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
+                    tve.firstaired, tve.title, tve.series, tve.episode
+            FROM releases r
+            INNER JOIN categories c ON c.id = r.categories_id
+            INNER JOIN root_categories cp ON cp.id = c.root_categories_id
+            LEFT JOIN usenet_groups g ON g.id = r.groups_id
+            LEFT JOIN videos v ON r.videos_id = v.id AND r.videos_id > 0
+            LEFT JOIN tv_episodes tve ON r.tv_episodes_id = tve.id AND r.tv_episodes_id > 0
+            LEFT JOIN movieinfo m ON m.id = r.movieinfo_id AND r.movieinfo_id > 0
+            %s
+            ORDER BY r.postdate DESC
+            LIMIT %d OFFSET %d",
+            $whereSql,
+            $limit,
+            $offset
+        );
+
+        $cacheKey = md5($this->getCacheVersion().$sql);
         $cachedReleases = Cache::get($cacheKey);
         if ($cachedReleases !== null) {
             return $cachedReleases;
@@ -386,6 +633,19 @@ class ReleaseSearchService
         // If search index found releases via external IDs, add them to conditions
         $hasSearchResultFromExternalIds = ! empty($searchResult);
         if ($hasSearchResultFromExternalIds) {
+            if (Search::isAvailable()) {
+                $searchResult = $this->intersectReleaseIdsWithSearchFilters(
+                    $searchResult,
+                    $cat,
+                    'tv',
+                    $maxAge,
+                    $minSize,
+                    $excludedCategories
+                );
+                if ($searchResult === []) {
+                    return collect();
+                }
+            }
             $conditions[] = sprintf('r.id IN (%s)', implode(',', array_map('intval', $searchResult)));
         }
 
@@ -425,6 +685,20 @@ class ReleaseSearchService
 
             if (empty($searchResult)) {
                 return collect();
+            }
+
+            if (Search::isAvailable()) {
+                $searchResult = $this->intersectReleaseIdsWithSearchFilters(
+                    $searchResult,
+                    $cat,
+                    'tv',
+                    $maxAge,
+                    $minSize,
+                    $excludedCategories
+                );
+                if ($searchResult === []) {
+                    return collect();
+                }
             }
 
             $conditions[] = sprintf('r.id IN (%s)', implode(',', array_map('intval', $searchResult)));
@@ -467,20 +741,24 @@ class ReleaseSearchService
             }
         }
 
+        $applySqlCategorySizeExcluded = $needsDatabaseLookup || empty($searchResult) || ! Search::isAvailable();
+
         $catQuery = Category::getCategorySearch($cat, 'tv');
         $catQuery = preg_replace('/^(WHERE|AND)\s+/i', '', trim($catQuery));
-        if (! empty($catQuery) && $catQuery !== '1=1') {
-            $conditions[] = $catQuery;
-        }
+        if ($applySqlCategorySizeExcluded) {
+            if (! empty($catQuery) && $catQuery !== '1=1') {
+                $conditions[] = $catQuery;
+            }
 
-        if ($maxAge > 0) {
-            $conditions[] = sprintf('r.postdate > (NOW() - INTERVAL %d DAY)', $maxAge);
-        }
-        if ($minSize > 0) {
-            $conditions[] = sprintf('r.size >= %d', $minSize);
-        }
-        if (! empty($excludedCategories)) {
-            $conditions[] = sprintf('r.categories_id NOT IN (%s)', implode(',', array_map('intval', $excludedCategories)));
+            if ($maxAge > 0) {
+                $conditions[] = sprintf('r.postdate > (NOW() - INTERVAL %d DAY)', $maxAge);
+            }
+            if ($minSize > 0) {
+                $conditions[] = sprintf('r.size >= %d', $minSize);
+            }
+            if (! empty($excludedCategories)) {
+                $conditions[] = sprintf('r.categories_id NOT IN (%s)', implode(',', array_map('intval', $excludedCategories)));
+            }
         }
 
         $whereSql = 'WHERE '.implode(' AND ', $conditions);
@@ -648,15 +926,33 @@ class ReleaseSearchService
                 return collect();
             }
         }
+
+        $skipSqlReleaseFilters = false;
+        if ($searchResult !== [] && Search::isAvailable()) {
+            $searchResult = $this->intersectReleaseIdsWithSearchFilters(
+                $searchResult,
+                $cat,
+                'tv',
+                $maxAge,
+                $minSize,
+                $excludedCategories
+            );
+            $skipSqlReleaseFilters = true;
+            if ($searchResult === []) {
+                return collect();
+            }
+        }
+
+        $catSearchSql = $skipSqlReleaseFilters ? '' : Category::getCategorySearch($cat, 'tv');
         $whereSql = sprintf(
             'WHERE r.passwordstatus %s %s %s %s %s %s %s',
             $this->showPasswords(),
             $showSql,
-            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
-            Category::getCategorySearch($cat, 'tv'),
-            ($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : ''),
-            ($minSize > 0 ? sprintf('AND r.size >= %d', $minSize) : ''),
-            ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : ''
+            (! empty($searchResult) ? 'AND r.id IN ('.implode(',', array_map('intval', $searchResult)).')' : ''),
+            $catSearchSql,
+            ($skipSqlReleaseFilters || $maxAge <= 0 ? '' : sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge)),
+            ($skipSqlReleaseFilters || $minSize <= 0 ? '' : sprintf('AND r.size >= %d', $minSize)),
+            ($skipSqlReleaseFilters || empty($excludedCategories) ? '' : sprintf('AND r.categories_id NOT IN(%s)', implode(',', array_map('intval', $excludedCategories))))
         );
         $baseSql = sprintf(
             "SELECT r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate,
@@ -696,33 +992,51 @@ class ReleaseSearchService
      * @param  array<string, mixed>  $excludedCategories
      * @return Collection|mixed
      */
-    public function animeSearch(mixed $aniDbID, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, array $excludedCategories = []): mixed
+    public function animeSearch(mixed $aniDbID, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, array $excludedCategories = [], int $anilistId = -1): mixed
     {
+        if ($anilistId > 0) {
+            $resolved = AnidbInfo::query()->where('anilist_id', $anilistId)->value('anidbid');
+            if ($resolved !== null) {
+                $aniDbID = (int) $resolved;
+            } elseif ($name === '' && (int) $aniDbID <= -1) {
+                // AniList id was the only selector but nothing in DB maps to it — do not fall through unfiltered.
+                return collect();
+            }
+        }
+
         $searchLimit = $this->determineSearchCandidateLimit($offset, $limit);
         $searchResult = [];
-        if (! empty($name)) {
-            // Use the unified Search facade with fuzzy fallback
-            $fuzzyResult = Search::searchReleasesWithFuzzy($name, $searchLimit);
-            $searchResult = $fuzzyResult['ids'] ?? [];
+        $anidbIdFilter = '';
+        if ($name !== '') {
+            if (Search::isAvailable()) {
+                $anidbIds = Search::searchAnimeTitle($name, $searchLimit);
+                if ($anidbIds === []) {
+                    return collect();
+                }
+                $anidbIdFilter = 'AND r.anidbid IN ('.implode(',', array_map('intval', $anidbIds)).')';
+            } else {
+                $fuzzyResult = Search::searchReleasesWithFuzzy($name, $searchLimit);
+                $searchResult = $fuzzyResult['ids'] ?? [];
 
-            // Fall back to MySQL if search engine returned no results (only if enabled)
-            if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
-                $searchResult = $this->performMySQLSearch(['searchname' => $name], $searchLimit);
-            }
+                if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
+                    $searchResult = $this->performMySQLSearch(['searchname' => $name], $searchLimit);
+                }
 
-            if (count($searchResult) === 0) {
-                return collect();
+                if (count($searchResult) === 0) {
+                    return collect();
+                }
             }
         }
 
         $whereSql = sprintf(
             'WHERE r.passwordstatus %s
-			%s %s %s %s %s',
+			%s %s %s %s %s %s',
             $this->showPasswords(),
             ($aniDbID > -1 ? sprintf(' AND r.anidbid = %d ', $aniDbID) : ''),
+            $anidbIdFilter,
             (! empty($searchResult) ? 'AND r.id IN ('.implode(',', $searchResult).')' : ''),
             ! empty($excludedCategories) ? sprintf('AND r.categories_id NOT IN('.implode(',', $excludedCategories).')') : '',
-            Category::getCategorySearch($cat),
+            Category::getCategorySearch($cat, 'anime'),
             ($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
         );
         $baseSql = sprintf(
@@ -814,6 +1128,20 @@ class ReleaseSearchService
             }
         }
 
+        if (! empty($searchResult) && Search::isAvailable()) {
+            $searchResult = $this->intersectReleaseIdsWithSearchFilters(
+                $searchResult,
+                $cat,
+                'movies',
+                $maxAge,
+                $minSize,
+                $excludedCategories
+            );
+            if ($searchResult === []) {
+                return collect();
+            }
+        }
+
         // Build the base conditions for movie search
         // Note: we don't have MOVIE_ROOT constant that marks a parent category,
         // so we'll rely on the category search logic instead
@@ -841,20 +1169,24 @@ class ReleaseSearchService
             }
         }
 
-        if (! empty($excludedCategories)) {
-            $conditions[] = sprintf('r.categories_id NOT IN (%s)', implode(',', array_map('intval', $excludedCategories)));
-        }
+        $applySqlMovieFilters = $searchResult === [] || ! Search::isAvailable();
 
-        $catQuery = Category::getCategorySearch($cat, 'movies');
-        $catQuery = preg_replace('/^(WHERE|AND)\s+/i', '', trim($catQuery));
-        if (! empty($catQuery) && $catQuery !== '1=1') {
-            $conditions[] = $catQuery;
-        }
-        if ($maxAge > 0) {
-            $conditions[] = sprintf('r.postdate > (NOW() - INTERVAL %d DAY)', $maxAge);
-        }
-        if ($minSize > 0) {
-            $conditions[] = sprintf('r.size >= %d', $minSize);
+        if ($applySqlMovieFilters) {
+            if (! empty($excludedCategories)) {
+                $conditions[] = sprintf('r.categories_id NOT IN (%s)', implode(',', array_map('intval', $excludedCategories)));
+            }
+
+            $catQuery = Category::getCategorySearch($cat, 'movies');
+            $catQuery = preg_replace('/^(WHERE|AND)\s+/i', '', trim($catQuery));
+            if (! empty($catQuery) && $catQuery !== '1=1') {
+                $conditions[] = $catQuery;
+            }
+            if ($maxAge > 0) {
+                $conditions[] = sprintf('r.postdate > (NOW() - INTERVAL %d DAY)', $maxAge);
+            }
+            if ($minSize > 0) {
+                $conditions[] = sprintf('r.size >= %d', $minSize);
+            }
         }
 
         $whereSql = 'WHERE '.implode(' AND ', $conditions);
@@ -1015,6 +1347,61 @@ class ReleaseSearchService
         );
 
         return min($bufferedRows, self::SEARCH_INDEX_MAX_CANDIDATES);
+    }
+
+    /**
+     * Narrow release IDs using the search index (category, age, size, password).
+     *
+     * @param  array<int|string, mixed>  $cat
+     * @param  array<int|string, mixed>  $excludedCategories
+     * @return list<int>
+     */
+    private function intersectReleaseIdsWithSearchFilters(
+        array $releaseIds,
+        array $cat,
+        ?string $categorySearchType,
+        int $maxAge,
+        int $minSize,
+        array $excludedCategories
+    ): array {
+        if ($releaseIds === [] || ! Search::isAvailable()) {
+            return array_values(array_unique(array_map(static fn ($id): int => (int) $id, $releaseIds)));
+        }
+
+        $unique = array_values(array_unique(array_filter(
+            array_map(static fn ($id): int => (int) $id, $releaseIds),
+            static fn (int $id): bool => $id > 0
+        )));
+
+        if ($unique === []) {
+            return [];
+        }
+
+        $categoryIdsRaw = Category::getCategorySearch($cat, $categorySearchType, true);
+        $categoryIds = null;
+        if (is_array($categoryIdsRaw)) {
+            $categoryIds = array_map(static fn ($id): int => (int) $id, $categoryIdsRaw);
+        } elseif (is_int($categoryIdsRaw) || (is_string($categoryIdsRaw) && ctype_digit((string) $categoryIdsRaw))) {
+            $categoryIds = [(int) $categoryIdsRaw];
+        }
+
+        $maxMatches = (int) config('search.drivers.manticore.max_matches', 10000);
+        $intersectLimit = min(max(count($unique), 1), max(1000, $maxMatches));
+
+        $filtered = Search::searchReleasesFiltered([
+            'phrases' => null,
+            'release_ids' => $unique,
+            'category_ids' => $categoryIds,
+            'excluded_category_ids' => array_map(static fn ($id): int => (int) $id, $excludedCategories),
+            'min_size' => $minSize,
+            'max_age_days' => $maxAge,
+            'password_allow_rar' => str_contains($this->showPasswords(), '<='),
+            'sort_field' => 'postdate_ts',
+            'sort_dir' => 'desc',
+            'try_fuzzy' => false,
+        ], $intersectLimit, 0);
+
+        return $filtered['ids'];
     }
 
     /**

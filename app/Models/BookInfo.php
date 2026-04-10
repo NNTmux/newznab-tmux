@@ -7,7 +7,6 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Laravel\Scout\Searchable;
 
 /**
  * App\Models\BookInfo.
@@ -54,8 +53,6 @@ use Laravel\Scout\Searchable;
  */
 class BookInfo extends Model
 {
-    use Searchable;
-
     /**
      * @var string
      */
@@ -67,22 +64,6 @@ class BookInfo extends Model
      * @var array<string>
      */
     protected $guarded = [];
-
-    public function searchableAs(): string
-    {
-        return 'ix_bookinfo_author_title_ft';
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function toSearchableArray(): array
-    {
-        return [
-            'author' => $this->author,
-            'title' => $this->title,
-        ];
-    }
 
     /**
      * Get the releases associated with this book.

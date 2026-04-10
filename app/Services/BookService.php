@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\SecondarySearchIndex;
+use App\Facades\Search;
 use App\Models\BookInfo;
 use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Services\Releases\ReleaseBrowseService;
+use App\Support\MetadataSearchLookup;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -90,7 +93,24 @@ class BookService
         }
         $searchWords = trim($searchWords);
 
-        return BookInfo::search($searchWords)->first();
+        if (Search::isAvailable()) {
+            $q = MetadataSearchLookup::normalizeBooleanSearchWords($searchWords);
+            if ($q !== '') {
+                $hits = Search::searchSecondary(SecondarySearchIndex::Books, $q, 25);
+                foreach ($hits['id'] as $bid) {
+                    $found = BookInfo::query()->where('id', $bid)->first();
+                    if ($found !== null) {
+                        return $found;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        return BookInfo::query()
+            ->whereRaw('MATCH (author, title) AGAINST (? IN BOOLEAN MODE)', [$searchWords])
+            ->first();
     }
 
     /**
@@ -104,7 +124,29 @@ class BookService
         $page = max(1, $page);
         $start = max(0, $start);
 
-        $browseby = $this->getBrowseBy();
+        $useIndexForAuthorTitle = Search::isAvailable()
+            && (! empty($_REQUEST['author']) || ! empty($_REQUEST['title']));
+        $bookIdsFromSearch = null;
+        if ($useIndexForAuthorTitle) {
+            $q = trim(
+                stripslashes((string) ($_REQUEST['author'] ?? '')).' '
+                .stripslashes((string) ($_REQUEST['title'] ?? ''))
+            );
+            if ($q === '') {
+                $bookIdsFromSearch = [];
+            } else {
+                $bookIdsFromSearch = Search::searchSecondary(SecondarySearchIndex::Books, $q, 5000)['id'];
+            }
+            if ($bookIdsFromSearch === []) {
+                return collect();
+            }
+        }
+
+        $browseby = $this->getBrowseBy($useIndexForAuthorTitle);
+        $bookInClause = '';
+        if (is_array($bookIdsFromSearch) && $bookIdsFromSearch !== []) {
+            $bookInClause = ' AND boo.id IN ('.implode(',', array_map('intval', $bookIdsFromSearch)).')';
+        }
         $catsrch = '';
         if (\count($cat) > 0 && $cat[0] !== -1) {
             $catsrch = Category::getCategorySearch($cat);
@@ -120,6 +162,7 @@ class BookService
         $baseWhere = "boo.cover = 1 AND boo.title != '' "
             ."AND r.passwordstatus {$showPasswords} "
             .$browseby.' '
+            .$bookInClause.' '
             .$catsrch.' '
             .$exccatlist;
 
@@ -272,10 +315,13 @@ class BookService
     /**
      * Get browse by SQL clause.
      */
-    public function getBrowseBy(): string
+    public function getBrowseBy(bool $skipAuthorTitleLike = false): string
     {
         $browseby = ' ';
         foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
+            if ($skipAuthorTitleLike && ($bbk === 'author' || $bbk === 'title')) {
+                continue;
+            }
             if (! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
                 $browseby .= ' AND boo.'.$bbv.' '.'LIKE '.escapeString('%'.$bbs.'%');

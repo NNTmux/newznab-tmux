@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\SecondarySearchIndex;
+use App\Facades\Search;
 use App\Models\SteamApp;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -490,29 +492,28 @@ class SteamService
         $seenAppIds = [];
 
         foreach ($variants as $variant) {
-            // Try Scout full-text search first
             try {
-                $results = SteamApp::search($variant)->take($limit)->get();
-                foreach ($results as $result) {
-                    $appid = $result->appid ?? null;
-                    $name = $result->name ?? null;
-
-                    if ($appid === null || $name === null || isset($seenAppIds[$appid])) {
-                        continue;
-                    }
-
-                    $score = $this->scoreTitle($name, $title);
-                    if ($score >= self::RELAXED_MATCH_THRESHOLD) {
-                        $seenAppIds[$appid] = true;
-                        $matches[] = [
-                            'appid' => (int) $appid,
-                            'name' => $name,
-                            'score' => $score,
-                        ];
+                if (Search::isAvailable()) {
+                    $hits = Search::searchSecondary(SecondarySearchIndex::Steam, $variant, $limit);
+                    foreach ($hits['data'] as $row) {
+                        $appid = $row['appid'] ?? null;
+                        $name = $row['name'] ?? null;
+                        if ($appid === null || $name === null || $name === '' || isset($seenAppIds[$appid])) {
+                            continue;
+                        }
+                        $score = $this->scoreTitle((string) $name, $title);
+                        if ($score >= self::RELAXED_MATCH_THRESHOLD) {
+                            $seenAppIds[(int) $appid] = true;
+                            $matches[] = [
+                                'appid' => (int) $appid,
+                                'name' => (string) $name,
+                                'score' => $score,
+                            ];
+                        }
                     }
                 }
             } catch (\Exception $e) {
-                Log::debug('SteamService: Scout search failed', ['error' => $e->getMessage()]);
+                Log::debug('SteamService: search index lookup failed', ['error' => $e->getMessage()]);
             }
 
             // LIKE fallback

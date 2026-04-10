@@ -260,7 +260,10 @@ class NntmuxResetDb extends Command
 
                 $this->info('All done! ElasticSearch indexes are deleted and recreated.');
             } else {
-                Search::truncateIndex(['releases_rt', 'predb_rt', 'movies_rt', 'tvshows_rt']);
+                Search::truncateIndex([
+                    'releases_rt', 'predb_rt', 'movies_rt', 'tvshows_rt',
+                    'music_rt', 'books_rt', 'games_rt', 'console_rt', 'steam_rt', 'anime_rt',
+                ]);
             }
 
             $this->info('Deleting nzbfiles subfolders.');

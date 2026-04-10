@@ -59,7 +59,6 @@
         "laravel/horizon": "^5.45",
         "laravel/pulse": "^1.7",
         "laravel/sanctum": "^4.0",
-        "laravel/scout": "^11.0",
         "laravel/tinker": "^3.0",
         "livewire/blaze": "^1.0",
         "livewire/livewire": "^3.6",

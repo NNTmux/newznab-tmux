@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\SecondarySearchIndex;
+use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Genre;
 use App\Models\MusicInfo;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Services\Releases\ReleaseBrowseService;
+use App\Support\MetadataSearchLookup;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -86,7 +89,24 @@ class MusicService
         }
         $searchwords = trim($searchwords);
 
-        return MusicInfo::search($searchwords)->first();
+        if (Search::isAvailable()) {
+            $q = MetadataSearchLookup::normalizeBooleanSearchWords($searchwords);
+            if ($q !== '') {
+                $hits = Search::searchSecondary(SecondarySearchIndex::Music, $q, 25);
+                foreach ($hits['id'] as $mid) {
+                    $found = MusicInfo::query()->with('genre')->where('id', $mid)->first();
+                    if ($found !== null) {
+                        return $found;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        return MusicInfo::query()
+            ->whereRaw('MATCH (artist, title) AGAINST (? IN BOOLEAN MODE)', [$searchwords])
+            ->first();
     }
 
     /**
@@ -100,7 +120,29 @@ class MusicService
         $page = max(1, $page);
         $start = max(0, $start);
 
-        $browseby = $this->getBrowseBy();
+        $useIndexForArtistTitle = Search::isAvailable()
+            && (! empty($_REQUEST['artist']) || ! empty($_REQUEST['title']));
+        $musicIdsFromSearch = null;
+        if ($useIndexForArtistTitle) {
+            $q = trim(
+                stripslashes((string) ($_REQUEST['artist'] ?? '')).' '
+                .stripslashes((string) ($_REQUEST['title'] ?? ''))
+            );
+            if ($q === '') {
+                $musicIdsFromSearch = [];
+            } else {
+                $musicIdsFromSearch = Search::searchSecondary(SecondarySearchIndex::Music, $q, 5000)['id'];
+            }
+            if ($musicIdsFromSearch === []) {
+                return collect();
+            }
+        }
+
+        $browseby = $this->getBrowseBy($useIndexForArtistTitle);
+        $musicInClause = '';
+        if (is_array($musicIdsFromSearch) && $musicIdsFromSearch !== []) {
+            $musicInClause = ' AND m.id IN ('.implode(',', array_map('intval', $musicIdsFromSearch)).')';
+        }
         $catsrch = '';
         if (\count($cat) > 0 && (int) $cat[0] !== -1) {
             $catsrch = Category::getCategorySearch($cat);
@@ -118,6 +160,7 @@ class MusicService
         $baseWhere = "m.title != '' AND m.cover = 1 "
             ."AND r.passwordstatus {$showPasswords} "
             .$browseby.' '
+            .$musicInClause.' '
             .$catsrch.' '
             .$exccatlist;
 
@@ -263,10 +306,13 @@ class MusicService
     /**
      * Build browse by SQL clause.
      */
-    public function getBrowseBy(): string
+    public function getBrowseBy(bool $skipArtistTitleLike = false): string
     {
         $browseby = ' ';
         foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
+            if ($skipArtistTitleLike && ($bbk === 'artist' || $bbk === 'title')) {
+                continue;
+            }
             if (! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
                 if (stripos($bbv, 'id') !== false) {

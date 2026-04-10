@@ -27,7 +27,7 @@
         <h4 class="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
             <i class="fa fa-plug mr-2 text-gray-600 dark:text-gray-400"></i>Available Functions
         </h4>
-        <p class="text-gray-700 dark:text-gray-300 mb-4 dark:text-gray-300">Use the parameter <code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">?t=</code> to specify the function being called.</p>
+        <p class="text-gray-700 dark:text-gray-300 mb-4 dark:text-gray-300">Use the parameter <code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">?t=</code> to specify the function being called. In addition to search, TV, and movies, this site supports <strong class="text-gray-900 dark:text-gray-100">music</strong> (<code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">t=music</code> or <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">t=audio</code>), <strong class="text-gray-900 dark:text-gray-100">books</strong> (<code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">t=book</code> or <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">t=b</code>), and <strong class="text-gray-900 dark:text-gray-100">anime</strong> (<code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">t=anime</code>). See <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">?t=caps</code> for capability flags.</p>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-900 dark:bg-gray-700">
@@ -147,6 +147,90 @@
                                 <code>?t=movie&amp;imdbid=1418646</code>
                             </span>
                             @endauth
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700">
+                        <td class="px-6 py-4"><strong class="text-gray-900 dark:text-gray-100 dark:text-white">Music / Audio</strong></td>
+                        <td class="px-6 py-4">
+                            <span class="text-gray-700 dark:text-gray-300">
+                                Returns NZBs in music categories matching artist/title text (<code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">q</code>).
+                                Same as general search, you may filter by category, age, size, and group.
+                            </span>
+                            <div class="mt-2">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/50 dark:text-primary-200">ALIASES</span>
+                                <div class="mt-1 ml-2 text-sm text-gray-700 dark:text-gray-300">
+                                    <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:text-gray-700 dark:text-red-400">t=music</code> or <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:text-gray-700 dark:text-red-400">t=audio</code>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            @auth
+                            <a href="{{ url('/api/v1/api?t=music&q=' . rawurlencode('pink floyd') . '&cat=' . $catClass::MUSIC_ROOT . '&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                <i class="fa fa-external-link-alt mr-1"></i>
+                                <code class="text-primary-700 dark:text-primary-400">?t=music&amp;q=…&amp;cat={{ $catClass::MUSIC_ROOT }}</code>
+                            </a>
+                            @else
+                            <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+                                <code>?t=music&amp;q=&lt;artist or title&gt;&amp;cat={{ $catClass::MUSIC_ROOT }}</code>
+                            </span>
+                            @endauth
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700">
+                        <td class="px-6 py-4"><strong class="text-gray-900 dark:text-gray-100 dark:text-white">Books</strong></td>
+                        <td class="px-6 py-4">
+                            <span class="text-gray-700 dark:text-gray-300">
+                                Returns NZBs in book categories matching author/title text (<code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">q</code>).
+                                Optional filters: category, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">maxage</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">minsize</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">group</code>.
+                            </span>
+                            <div class="mt-2">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/50 dark:text-primary-200">ALIASES</span>
+                                <div class="mt-1 ml-2 text-sm text-gray-700 dark:text-gray-300">
+                                    <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:text-gray-700 dark:text-red-400">t=book</code> or <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:text-gray-700 dark:text-red-400">t=b</code>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            @auth
+                            <a href="{{ url('/api/v1/api?t=book&q=' . rawurlencode('science fiction') . '&cat=' . $catClass::BOOKS_ROOT . '&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                <i class="fa fa-external-link-alt mr-1"></i>
+                                <code class="text-primary-700 dark:text-primary-400">?t=book&amp;q=…&amp;cat={{ $catClass::BOOKS_ROOT }}</code>
+                            </a>
+                            @else
+                            <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+                                <code>?t=book&amp;q=&lt;author or title&gt;&amp;cat={{ $catClass::BOOKS_ROOT }}</code>
+                            </span>
+                            @endauth
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700">
+                        <td class="px-6 py-4"><strong class="text-gray-900 dark:text-gray-100 dark:text-white">Anime</strong></td>
+                        <td class="px-6 py-4">
+                            <span class="text-gray-700 dark:text-gray-300">
+                                Returns NZBs in anime categories. Provide a title search (<code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">q</code>), internal <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">anidbid</code>, and/or <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">anilistid</code> (at least one required).
+                                Optional: <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">cat</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">maxage</code>.
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex flex-col gap-2">
+                                @auth
+                                <a href="{{ url('/api/v1/api?t=anime&q=' . rawurlencode('attack on titan') . '&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                    <i class="fa fa-external-link-alt mr-1"></i>
+                                    <code class="text-primary-700 dark:text-primary-400">?t=anime&amp;q=attack on titan</code>
+                                </a>
+                                <a href="{{ url('/api/v1/api?t=anime&anilistid=21&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                                    <i class="fa fa-external-link-alt mr-1"></i>
+                                    <code class="text-primary-700 dark:text-primary-400">?t=anime&amp;anilistid=21</code>
+                                </a>
+                                @else
+                                <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+                                    <code>?t=anime&amp;q=&lt;title&gt;</code>
+                                </span>
+                                <span class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+                                    <code>?t=anime&amp;anidbid=&lt;id&gt;</code> or <code>?t=anime&amp;anilistid=&lt;id&gt;</code>
+                                </span>
+                                @endauth
+                            </div>
                         </td>
                     </tr>
                     <tr class="hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700">

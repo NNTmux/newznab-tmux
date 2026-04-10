@@ -8,7 +8,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Laravel\Scout\Searchable;
 
 /**
  * App\Models\ConsoleInfo.
@@ -51,8 +50,6 @@ use Laravel\Scout\Searchable;
  */
 class ConsoleInfo extends Model
 {
-    use Searchable;
-
     /**
      * @var string
      */
@@ -64,22 +61,6 @@ class ConsoleInfo extends Model
      * @var array<string>
      */
     protected $guarded = [];
-
-    public function searchableAs(): string
-    {
-        return 'ix_consoleinfo_title_platform_ft';
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function toSearchableArray(): array
-    {
-        return [
-            'title' => $this->title,
-            'platform' => $this->platform,
-        ];
-    }
 
     // ========================================
     // Relationships

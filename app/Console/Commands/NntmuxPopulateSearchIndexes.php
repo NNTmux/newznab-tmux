@@ -4,14 +4,23 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Enums\SecondarySearchIndex;
 use App\Facades\Elasticsearch;
 use App\Facades\Search;
+use App\Models\BookInfo;
+use App\Models\ConsoleInfo;
+use App\Models\GamesInfo;
 use App\Models\MovieInfo;
+use App\Models\MusicInfo;
 use App\Models\Predb;
 use App\Models\Release;
+use App\Models\SteamApp;
 use App\Models\Video;
+use App\Support\ReleaseSearchIndexDocument;
+use App\Support\SecondaryIndexDocuments;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class NntmuxPopulateSearchIndexes extends Command
@@ -28,6 +37,13 @@ class NntmuxPopulateSearchIndexes extends Command
                                        {--predb : Populates the predb index}
                                        {--movies : Populates the movies index}
                                        {--tvshows : Populates the TV shows index}
+                                       {--music : Populates the music metadata index}
+                                       {--books : Populates the books metadata index}
+                                       {--games : Populates the games metadata index}
+                                       {--console : Populates the console metadata index}
+                                       {--steam : Populates the Steam apps index}
+                                       {--anime : Populates the anime titles index}
+                                       {--all : Populate all supported indexes for the selected engine}
                                        {--count=50000 : Sets the chunk size}
                                        {--parallel=4 : Number of parallel processes}
                                        {--batch-size=5000 : Batch size for bulk operations}
@@ -39,11 +55,14 @@ class NntmuxPopulateSearchIndexes extends Command
      *
      * @var string
      */
-    protected $description = 'Populate Manticore/Elasticsearch indexes with releases, predb, movies, or tvshows';
+    protected $description = 'Populate Manticore/Elasticsearch indexes (releases, predb, movies, tvshows, music, books, games, console, steam, anime)';
 
     private const SUPPORTED_ENGINES = ['manticore', 'elastic'];
 
-    private const SUPPORTED_INDEXES = ['releases', 'predb', 'movies', 'tvshows'];
+    private const SUPPORTED_INDEXES = [
+        'releases', 'predb', 'movies', 'tvshows',
+        'music', 'books', 'games', 'console', 'steam', 'anime',
+    ];
 
     private const GROUP_CONCAT_MAX_LEN = 16384;
 
@@ -65,16 +84,24 @@ class NntmuxPopulateSearchIndexes extends Command
             }
 
             $engine = $this->getSelectedEngine();
-            $index = $this->getSelectedIndex();
+            $indexes = $this->getSelectedIndexes();
 
-            if (! $engine || ! $index) {
-                $this->error('You must specify both an engine (--manticore or --elastic) and an index (--releases or --predb).');
+            if (! $engine || $indexes === []) {
+                $this->error('You must specify an engine (--manticore or --elastic) and at least one index (or --all).');
                 $this->info('Use --help to see all available options.');
 
                 return Command::FAILURE;
             }
 
-            return $this->populateIndex($engine, $index);
+            $exit = Command::SUCCESS;
+            foreach ($indexes as $index) {
+                $result = $this->populateIndex($engine, $index);
+                if ($result !== Command::SUCCESS) {
+                    $exit = $result;
+                }
+            }
+
+            return $exit;
 
         } catch (Exception $e) {
             $this->error("An error occurred: {$e->getMessage()}");
@@ -102,17 +129,22 @@ class NntmuxPopulateSearchIndexes extends Command
     }
 
     /**
-     * Get the selected index from options
+     * @return list<string>
      */
-    private function getSelectedIndex(): ?string
+    private function getSelectedIndexes(): array
     {
+        if ($this->option('all')) {
+            return self::SUPPORTED_INDEXES;
+        }
+
+        $selected = [];
         foreach (self::SUPPORTED_INDEXES as $index) {
             if ($this->option($index)) {
-                return $index;
+                $selected[] = $index;
             }
         }
 
-        return null;
+        return $selected;
     }
 
     /**
@@ -183,6 +215,15 @@ class NntmuxPopulateSearchIndexes extends Command
                 'releases.searchname',
                 'releases.fromname',
                 'releases.categories_id',
+                'releases.size',
+                'releases.postdate',
+                'releases.adddate',
+                'releases.totalpart',
+                'releases.grabs',
+                'releases.passwordstatus',
+                'releases.groups_id',
+                'releases.nzbstatus',
+                'releases.haspreview',
                 'releases.videos_id',
                 'releases.movieinfo_id',
                 'releases.imdbid',
@@ -193,22 +234,10 @@ class NntmuxPopulateSearchIndexes extends Command
             $total,
             $query,
             function ($item) {
-                return [
-                    'id' => (int) $item->id,
-                    'name' => (string) ($item->name ?? ''),
-                    'searchname' => (string) ($item->searchname ?? ''),
-                    'fromname' => (string) ($item->fromname ?? ''),
-                    'categories_id' => (int) ($item->categories_id ?? 0),
-                    'filename' => '',
-                    'videos_id' => (int) ($item->videos_id ?? 0),
-                    'movieinfo_id' => (int) ($item->movieinfo_id ?? 0),
-                    'imdbid' => (string) ($item->imdbid ?? ''),
-                    'tmdbid' => 0,
-                    'traktid' => 0,
-                    'tvdb' => 0,
-                    'tvmaze' => 0,
-                    'tvrage' => 0,
-                ];
+                return ReleaseSearchIndexDocument::normalize(array_merge(
+                    (array) $item->getAttributes(),
+                    ['filename' => '']
+                ));
             }
         );
     }
@@ -350,6 +379,150 @@ class NntmuxPopulateSearchIndexes extends Command
                     'started' => (string) ($item->started ?? ''),
                     'type' => (int) ($item->type ?? 0),
                 ];
+            }
+        );
+    }
+
+    private function manticoreMusic(): int
+    {
+        $indexName = 'music_rt';
+        Search::truncateIndex([$indexName]);
+        $total = MusicInfo::count();
+        if (! $total) {
+            $this->warn('MusicInfo table is empty. Nothing to do.');
+
+            return Command::SUCCESS;
+        }
+        $query = MusicInfo::query()->orderBy('id');
+
+        return $this->processManticoreData(
+            $indexName,
+            $total,
+            $query,
+            fn (MusicInfo $m): array => array_merge(['id' => $m->id], SecondaryIndexDocuments::music($m))
+        );
+    }
+
+    private function manticoreBooks(): int
+    {
+        $indexName = 'books_rt';
+        Search::truncateIndex([$indexName]);
+        $total = BookInfo::count();
+        if (! $total) {
+            $this->warn('BookInfo table is empty. Nothing to do.');
+
+            return Command::SUCCESS;
+        }
+        $query = BookInfo::query()->orderBy('id');
+
+        return $this->processManticoreData(
+            $indexName,
+            $total,
+            $query,
+            fn (BookInfo $b): array => array_merge(['id' => $b->id], SecondaryIndexDocuments::book($b))
+        );
+    }
+
+    private function manticoreGames(): int
+    {
+        $indexName = 'games_rt';
+        Search::truncateIndex([$indexName]);
+        $total = GamesInfo::count();
+        if (! $total) {
+            $this->warn('GamesInfo table is empty. Nothing to do.');
+
+            return Command::SUCCESS;
+        }
+        $query = GamesInfo::query()->orderBy('id');
+
+        return $this->processManticoreData(
+            $indexName,
+            $total,
+            $query,
+            fn (GamesInfo $g): array => array_merge(['id' => $g->id], SecondaryIndexDocuments::games($g))
+        );
+    }
+
+    private function manticoreConsole(): int
+    {
+        $indexName = 'console_rt';
+        Search::truncateIndex([$indexName]);
+        $total = ConsoleInfo::count();
+        if (! $total) {
+            $this->warn('ConsoleInfo table is empty. Nothing to do.');
+
+            return Command::SUCCESS;
+        }
+        $query = ConsoleInfo::query()->orderBy('id');
+
+        return $this->processManticoreData(
+            $indexName,
+            $total,
+            $query,
+            fn (ConsoleInfo $c): array => array_merge(['id' => $c->id], SecondaryIndexDocuments::console($c))
+        );
+    }
+
+    private function manticoreSteam(): int
+    {
+        $indexName = 'steam_rt';
+        Search::truncateIndex([$indexName]);
+        $total = SteamApp::count();
+        if (! $total) {
+            $this->warn('Steam apps table is empty. Nothing to do.');
+
+            return Command::SUCCESS;
+        }
+        $query = SteamApp::query()->orderBy('id');
+
+        return $this->processManticoreData(
+            $indexName,
+            $total,
+            $query,
+            fn (SteamApp $s): array => array_merge(['id' => (int) $s->id], SecondaryIndexDocuments::steam($s))
+        );
+    }
+
+    private function manticoreAnime(): int
+    {
+        $indexName = 'anime_rt';
+        Search::truncateIndex([$indexName]);
+        $total = (int) DB::table('anidb_titles')->count();
+        if (! $total) {
+            $this->warn('anidb_titles table is empty. Nothing to do.');
+
+            return Command::SUCCESS;
+        }
+        $query = DB::table('anidb_titles as t')
+            ->leftJoin('anidb_info as i', 't.anidbid', '=', 'i.anidbid')
+            ->orderBy('t.anidbid')
+            ->select([
+                't.anidbid', 't.type', 't.lang', 't.title',
+                'i.anilist_id', 'i.mal_id', 'i.media_type', 'i.status',
+            ]);
+
+        return $this->processManticoreData(
+            $indexName,
+            $total,
+            $query,
+            function ($row) {
+                $docId = SecondarySearchIndex::animeTitleDocumentId(
+                    (int) $row->anidbid,
+                    (string) $row->type,
+                    (string) $row->lang,
+                    (string) $row->title
+                );
+
+                return array_merge(['id' => $docId], [
+                    'title' => (string) $row->title,
+                    'anidbid' => (int) $row->anidbid,
+                    'anilist_id' => (int) ($row->anilist_id ?? 0),
+                    'mal_id' => (int) ($row->mal_id ?? 0),
+                    'lang' => (string) $row->lang,
+                    'title_type' => (string) $row->type,
+                    'media_type' => (string) ($row->media_type ?? ''),
+                    'status' => (string) ($row->status ?? ''),
+                ]);
             }
         );
     }
@@ -665,6 +838,215 @@ class NntmuxPopulateSearchIndexes extends Command
         );
     }
 
+    private function elasticMusic(): int
+    {
+        $ix = (string) config('search.drivers.elasticsearch.indexes.music', 'music');
+        Search::truncateIndex([$ix]);
+        $total = MusicInfo::count();
+        if (! $total) {
+            $this->warn('MusicInfo table is empty. Nothing to do.');
+
+            return Command::SUCCESS;
+        }
+        $query = MusicInfo::query()->orderBy('id');
+
+        return $this->processSecondaryElasticChunks(
+            SecondarySearchIndex::Music,
+            $total,
+            $query,
+            fn (MusicInfo $m): array => array_merge(['id' => $m->id], SecondaryIndexDocuments::music($m))
+        );
+    }
+
+    private function elasticBooks(): int
+    {
+        $ix = (string) config('search.drivers.elasticsearch.indexes.books', 'books');
+        Search::truncateIndex([$ix]);
+        $total = BookInfo::count();
+        if (! $total) {
+            $this->warn('BookInfo table is empty. Nothing to do.');
+
+            return Command::SUCCESS;
+        }
+        $query = BookInfo::query()->orderBy('id');
+
+        return $this->processSecondaryElasticChunks(
+            SecondarySearchIndex::Books,
+            $total,
+            $query,
+            fn (BookInfo $b): array => array_merge(['id' => $b->id], SecondaryIndexDocuments::book($b))
+        );
+    }
+
+    private function elasticGames(): int
+    {
+        $ix = (string) config('search.drivers.elasticsearch.indexes.games', 'games');
+        Search::truncateIndex([$ix]);
+        $total = GamesInfo::count();
+        if (! $total) {
+            $this->warn('GamesInfo table is empty. Nothing to do.');
+
+            return Command::SUCCESS;
+        }
+        $query = GamesInfo::query()->orderBy('id');
+
+        return $this->processSecondaryElasticChunks(
+            SecondarySearchIndex::Games,
+            $total,
+            $query,
+            fn (GamesInfo $g): array => array_merge(['id' => $g->id], SecondaryIndexDocuments::games($g))
+        );
+    }
+
+    private function elasticConsole(): int
+    {
+        $ix = (string) config('search.drivers.elasticsearch.indexes.console', 'console');
+        Search::truncateIndex([$ix]);
+        $total = ConsoleInfo::count();
+        if (! $total) {
+            $this->warn('ConsoleInfo table is empty. Nothing to do.');
+
+            return Command::SUCCESS;
+        }
+        $query = ConsoleInfo::query()->orderBy('id');
+
+        return $this->processSecondaryElasticChunks(
+            SecondarySearchIndex::Console,
+            $total,
+            $query,
+            fn (ConsoleInfo $c): array => array_merge(['id' => $c->id], SecondaryIndexDocuments::console($c))
+        );
+    }
+
+    private function elasticSteam(): int
+    {
+        $ix = (string) config('search.drivers.elasticsearch.indexes.steam', 'steam');
+        Search::truncateIndex([$ix]);
+        $total = SteamApp::count();
+        if (! $total) {
+            $this->warn('Steam apps table is empty. Nothing to do.');
+
+            return Command::SUCCESS;
+        }
+        $query = SteamApp::query()->orderBy('id');
+
+        return $this->processSecondaryElasticChunks(
+            SecondarySearchIndex::Steam,
+            $total,
+            $query,
+            fn (SteamApp $s): array => array_merge(['id' => (int) $s->id], SecondaryIndexDocuments::steam($s))
+        );
+    }
+
+    private function elasticAnime(): int
+    {
+        $ix = (string) config('search.drivers.elasticsearch.indexes.anime', 'anime');
+        Search::truncateIndex([$ix]);
+        $total = (int) DB::table('anidb_titles')->count();
+        if (! $total) {
+            $this->warn('anidb_titles table is empty. Nothing to do.');
+
+            return Command::SUCCESS;
+        }
+        $query = DB::table('anidb_titles as t')
+            ->leftJoin('anidb_info as i', 't.anidbid', '=', 'i.anidbid')
+            ->orderBy('t.anidbid')
+            ->select([
+                't.anidbid', 't.type', 't.lang', 't.title',
+                'i.anilist_id', 'i.mal_id', 'i.media_type', 'i.status',
+            ]);
+
+        return $this->processSecondaryElasticChunks(
+            SecondarySearchIndex::Anime,
+            $total,
+            $query,
+            function ($row) {
+                $docId = SecondarySearchIndex::animeTitleDocumentId(
+                    (int) $row->anidbid,
+                    (string) $row->type,
+                    (string) $row->lang,
+                    (string) $row->title
+                );
+
+                return array_merge(['id' => $docId], [
+                    'title' => (string) $row->title,
+                    'anidbid' => (int) $row->anidbid,
+                    'anilist_id' => (int) ($row->anilist_id ?? 0),
+                    'mal_id' => (int) ($row->mal_id ?? 0),
+                    'lang' => (string) $row->lang,
+                    'title_type' => (string) $row->type,
+                    'media_type' => (string) ($row->media_type ?? ''),
+                    'status' => (string) ($row->status ?? ''),
+                ]);
+            }
+        );
+    }
+
+    /**
+     * @param  Builder|\Illuminate\Database\Query\Builder  $query
+     */
+    private function processSecondaryElasticChunks(SecondarySearchIndex $enum, int $total, mixed $query, callable $transformer): int
+    {
+        $chunkSize = $this->getChunkSize();
+        $batchSize = $this->getBatchSize();
+
+        $this->optimizeDatabase();
+        $this->setGroupConcatMaxLen();
+
+        $this->info(sprintf(
+            'Populating Elasticsearch secondary index %s with %s rows.',
+            $enum->value,
+            number_format($total)
+        ));
+
+        $bar = $this->output->createProgressBar($total);
+        $bar->setFormat('verbose');
+        $bar->start();
+
+        $processedCount = 0;
+        $errorCount = 0;
+        $batchData = [];
+
+        try {
+            $query->chunk($chunkSize, function ($items) use ($enum, $transformer, $bar, &$processedCount, &$errorCount, $batchSize, &$batchData) {
+                foreach ($items as $item) {
+                    try {
+                        $batchData[] = $transformer($item);
+                        $processedCount++;
+
+                        if (count($batchData) >= $batchSize) {
+                            Search::bulkInsertSecondary($enum, $batchData);
+                            $batchData = [];
+                        }
+                    } catch (Exception $e) {
+                        $errorCount++;
+                        if ($this->output->isVerbose()) {
+                            $this->error('Error processing secondary index row: '.$e->getMessage());
+                        }
+                    }
+                    $bar->advance();
+                }
+            });
+
+            if ($batchData !== []) {
+                Search::bulkInsertSecondary($enum, $batchData);
+            }
+
+            $bar->finish();
+            $this->newLine();
+
+            return $errorCount > 0 ? Command::FAILURE : Command::SUCCESS;
+        } catch (Exception $e) {
+            $bar->finish();
+            $this->newLine();
+            $this->error('Failed to populate secondary Elasticsearch index: '.$e->getMessage());
+
+            return Command::FAILURE;
+        } finally {
+            $this->restoreDatabase();
+        }
+    }
+
     /**
      * Process data for ElasticSearch with optimizations
      */
@@ -765,6 +1147,18 @@ class NntmuxPopulateSearchIndexes extends Command
                     Search::bulkInsertReleases($data);
                 } elseif ($indexName === 'predb_rt') {
                     Search::bulkInsertPredb($data);
+                } elseif ($indexName === 'music_rt') {
+                    Search::bulkInsertSecondary(SecondarySearchIndex::Music, $data);
+                } elseif ($indexName === 'books_rt') {
+                    Search::bulkInsertSecondary(SecondarySearchIndex::Books, $data);
+                } elseif ($indexName === 'games_rt') {
+                    Search::bulkInsertSecondary(SecondarySearchIndex::Games, $data);
+                } elseif ($indexName === 'console_rt') {
+                    Search::bulkInsertSecondary(SecondarySearchIndex::Console, $data);
+                } elseif ($indexName === 'steam_rt') {
+                    Search::bulkInsertSecondary(SecondarySearchIndex::Steam, $data);
+                } elseif ($indexName === 'anime_rt') {
+                    Search::bulkInsertSecondary(SecondarySearchIndex::Anime, $data);
                 } else {
                     throw new Exception("Unknown index: {$indexName}");
                 }

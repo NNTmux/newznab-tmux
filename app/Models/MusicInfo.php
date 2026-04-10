@@ -7,7 +7,6 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Laravel\Scout\Searchable;
 
 /**
  * App\Models\MusicInfo.
@@ -54,8 +53,6 @@ use Laravel\Scout\Searchable;
  */
 class MusicInfo extends Model
 {
-    use Searchable;
-
     /**
      * @var string
      */
@@ -79,21 +76,5 @@ class MusicInfo extends Model
     public function genre(): BelongsTo
     {
         return $this->belongsTo(Genre::class, 'genres_id');
-    }
-
-    public function searchableAs(): string
-    {
-        return 'ix_musicinfo_artist_title_ft';
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function toSearchableArray(): array
-    {
-        return [
-            'artist' => $this->artist,
-            'title' => $this->title,
-        ];
     }
 }

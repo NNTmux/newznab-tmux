@@ -209,7 +209,7 @@ class UpdateReleasesIndexSchema extends Command
                 $existingFields[$field] = strtolower($props['Type'] ?? 'unknown');
             }
 
-            // Media fields that should exist
+            // Media + filter/sort fields that should exist
             $mediaFields = [
                 'imdbid' => 'int',
                 'tmdbid' => 'int',
@@ -219,6 +219,15 @@ class UpdateReleasesIndexSchema extends Command
                 'tvrage' => 'int',
                 'videos_id' => 'int',
                 'movieinfo_id' => 'int',
+                'size' => 'bigint',
+                'postdate_ts' => 'bigint',
+                'adddate_ts' => 'bigint',
+                'totalpart' => 'int',
+                'grabs' => 'int',
+                'passwordstatus' => 'int',
+                'groups_id' => 'int',
+                'nzbstatus' => 'int',
+                'haspreview' => 'int',
             ];
 
             $fieldsToAdd = [];

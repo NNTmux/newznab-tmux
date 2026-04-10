@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Search;
 
+use App\Enums\SecondarySearchIndex;
 use App\Services\Search\Contracts\SearchDriverInterface;
 use App\Services\Search\Contracts\SearchServiceInterface;
 use App\Services\Search\Drivers\ElasticSearchDriver;
@@ -371,6 +372,15 @@ class SearchService extends Manager implements SearchServiceInterface
     }
 
     /**
+     * @param  array<string, string>  $fieldTerms
+     * @return array{imdbids: list<string>, movieinfo_ids: list<int>, data: list<array<string, mixed>>}
+     */
+    public function searchMoviesByFields(array $fieldTerms, int $limit = 5000): array
+    {
+        return $this->driver()->searchMoviesByFields($fieldTerms, $limit);
+    }
+
+    /**
      * Insert a TV show into the tvshows search index.
      *
      * @param  array<string, mixed>  $parameters
@@ -462,5 +472,47 @@ class SearchService extends Manager implements SearchServiceInterface
     public function searchReleasesWithCategoryFilter(string $searchTerm, array $categoryIds = [], int $limit = 1000): array
     {
         return $this->driver()->searchReleasesWithCategoryFilter($searchTerm, $categoryIds, $limit);
+    }
+
+    /**
+     * @param  array<string, mixed>  $criteria
+     * @return array{ids: list<int>, total: int, fuzzy: bool}
+     */
+    public function searchReleasesFiltered(array $criteria, int $limit, int $offset = 0): array
+    {
+        return $this->driver()->searchReleasesFiltered($criteria, $limit, $offset);
+    }
+
+    public function insertSecondary(SecondarySearchIndex $index, int $id, array $document): void
+    {
+        $this->driver()->insertSecondary($index, $id, $document);
+    }
+
+    public function updateSecondary(SecondarySearchIndex $index, int $id): void
+    {
+        $this->driver()->updateSecondary($index, $id);
+    }
+
+    public function deleteSecondary(SecondarySearchIndex $index, int $id): void
+    {
+        $this->driver()->deleteSecondary($index, $id);
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $documents
+     */
+    public function bulkInsertSecondary(SecondarySearchIndex $index, array $documents): array
+    {
+        return $this->driver()->bulkInsertSecondary($index, $documents);
+    }
+
+    public function searchSecondary(SecondarySearchIndex $index, string $query, int $limit = 100): array
+    {
+        return $this->driver()->searchSecondary($index, $query, $limit);
+    }
+
+    public function searchAnimeTitle(string $query, int $limit = 100): array
+    {
+        return $this->driver()->searchAnimeTitle($query, $limit);
     }
 }

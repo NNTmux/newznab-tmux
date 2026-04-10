@@ -81,6 +81,17 @@ class ApiController extends BasePageController
                 case 'movie':
                     $function = 'm';
                     break;
+                case 'music':
+                case 'audio':
+                    $function = 'music';
+                    break;
+                case 'b':
+                case 'book':
+                    $function = 'book';
+                    break;
+                case 'anime':
+                    $function = 'anime';
+                    break;
                 case 'gn':
                 case 'n':
                 case 'nfo':
@@ -289,6 +300,77 @@ class ApiController extends BasePageController
                 $this->output($relData, $params, $outputXML, $offset, 'api');
                 break;
 
+            case 'music':
+                if (! $request->filled('q')) {
+                    return showApiError(200, 'Missing parameter (q)');
+                }
+                $maxAge = $this->maxAge($request);
+                if (! is_int($maxAge)) {
+                    return $maxAge;
+                }
+                $groupName = $this->group($request);
+                UserRequest::addApiRequest($uid, $request->getRequestUri());
+                $relData = $this->releaseSearchService->apiMusicSearch(
+                    (string) $request->input('q'),
+                    $groupName,
+                    $offset,
+                    $this->limit($request),
+                    $maxAge,
+                    $catExclusions,
+                    $this->categoryID($request),
+                    $minSize
+                );
+                $this->output($relData, $params, $outputXML, $offset, 'api');
+                break;
+
+            case 'book':
+                if (! $request->filled('q')) {
+                    return showApiError(200, 'Missing parameter (q)');
+                }
+                $maxAge = $this->maxAge($request);
+                if (! is_int($maxAge)) {
+                    return $maxAge;
+                }
+                $groupName = $this->group($request);
+                UserRequest::addApiRequest($uid, $request->getRequestUri());
+                $relData = $this->releaseSearchService->apiBookSearch(
+                    (string) $request->input('q'),
+                    $groupName,
+                    $offset,
+                    $this->limit($request),
+                    $maxAge,
+                    $catExclusions,
+                    $this->categoryID($request),
+                    $minSize
+                );
+                $this->output($relData, $params, $outputXML, $offset, 'api');
+                break;
+
+            case 'anime':
+                $q = (string) ($request->input('q') ?? '');
+                $anidb = $request->has('anidbid') && $request->filled('anidbid') ? (int) $request->input('anidbid') : -1;
+                $anilist = $request->has('anilistid') && $request->filled('anilistid') ? (int) $request->input('anilistid') : -1;
+                if ($q === '' && $anidb <= 0 && $anilist <= 0) {
+                    return showApiError(200, 'Missing parameter (specify q, anidbid, or anilistid)');
+                }
+                $maxAge = $this->maxAge($request);
+                if (! is_int($maxAge)) {
+                    return $maxAge;
+                }
+                UserRequest::addApiRequest($uid, $request->getRequestUri());
+                $relData = $this->releaseSearchService->animeSearch(
+                    $anidb,
+                    $offset,
+                    $this->limit($request),
+                    $q,
+                    $this->categoryID($request),
+                    $maxAge,
+                    $catExclusions,
+                    $anilist
+                );
+                $this->output($relData, $params, $outputXML, $offset, 'api');
+                break;
+
                 // Get NZB.
             case 'g':
                 $this->verifyEmptyParameter($request, 'g');
@@ -472,7 +554,9 @@ class ApiController extends BasePageController
                     'search' => ['available' => 'yes', 'supportedParams' => 'q'],
                     'tv-search' => ['available' => 'yes', 'supportedParams' => 'q,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
                     'movie-search' => ['available' => 'yes', 'supportedParams' => 'q,imdbid, tmdbid, traktid'],
-                    'audio-search' => ['available' => 'no',  'supportedParams' => ''],
+                    'audio-search' => ['available' => 'yes', 'supportedParams' => 'q,cat,minsize,maxage,group'],
+                    'book-search' => ['available' => 'yes', 'supportedParams' => 'q,cat,minsize,maxage,group'],
+                    'anime-search' => ['available' => 'yes', 'supportedParams' => 'q,anidbid,anilistid,cat,maxage'],
                 ],
             ];
         });

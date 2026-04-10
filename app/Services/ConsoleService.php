@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\SecondarySearchIndex;
+use App\Facades\Search;
 use App\Models\Category;
 use App\Models\ConsoleInfo;
 use App\Models\Genre;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Services\IGDB\Exceptions\IgdbHttpException;
+use App\Support\MetadataSearchLookup;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -99,7 +102,26 @@ class ConsoleService
         }
         $searchWords = trim($searchWords.'+'.$platform);
 
-        return ConsoleInfo::search($searchWords)->first() ?? false;
+        if (Search::isAvailable()) {
+            $q = MetadataSearchLookup::normalizeBooleanSearchWords($searchWords);
+            if ($q !== '') {
+                $hits = Search::searchSecondary(SecondarySearchIndex::Console, $q, 25);
+                foreach ($hits['id'] as $cid) {
+                    $found = ConsoleInfo::query()->where('id', $cid)->first();
+                    if ($found !== null) {
+                        return $found;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        $row = ConsoleInfo::query()
+            ->whereRaw('MATCH (title, platform) AGAINST (? IN BOOLEAN MODE)', [$searchWords])
+            ->first();
+
+        return $row ?? false;
     }
 
     // ========================================
@@ -119,7 +141,29 @@ class ConsoleService
         $page = max(1, $page);
         $start = max(0, $start);
 
-        $browseBy = $this->getBrowseBy();
+        $useIndexForTitlePlatform = Search::isAvailable()
+            && (! empty($_REQUEST['title']) || ! empty($_REQUEST['platform']));
+        $consoleIdsFromSearch = null;
+        if ($useIndexForTitlePlatform) {
+            $q = trim(
+                stripslashes((string) ($_REQUEST['title'] ?? '')).' '
+                .stripslashes((string) ($_REQUEST['platform'] ?? ''))
+            );
+            if ($q === '') {
+                $consoleIdsFromSearch = [];
+            } else {
+                $consoleIdsFromSearch = Search::searchSecondary(SecondarySearchIndex::Console, $q, 5000)['id'];
+            }
+            if ($consoleIdsFromSearch === []) {
+                return collect();
+            }
+        }
+
+        $browseBy = $this->getBrowseBy($useIndexForTitlePlatform);
+        $consoleInClause = '';
+        if (is_array($consoleIdsFromSearch) && $consoleIdsFromSearch !== []) {
+            $consoleInClause = ' AND con.id IN ('.implode(',', array_map('intval', $consoleIdsFromSearch)).')';
+        }
         $catsrch = '';
         if (\count($cat) > 0 && (int) $cat[0] !== -1) {
             $catsrch = Category::getCategorySearch($cat);
@@ -135,6 +179,7 @@ class ConsoleService
         $baseWhere = "con.title != '' AND con.cover = 1 "
             ."AND r.passwordstatus {$showPasswords} "
             .$browseBy.' '
+            .$consoleInClause.' '
             .$catsrch.' '
             .$exccatlist;
 
@@ -286,13 +331,20 @@ class ConsoleService
     /**
      * Get browse by SQL clause.
      */
-    public function getBrowseBy(): string
+    public function getBrowseBy(bool $skipTitlePlatformLike = false): string
     {
         $browseBy = ' ';
         foreach ($this->getBrowseByOptions() as $bbk => $bbv) {
+            if ($skipTitlePlatformLike && ($bbk === 'title' || $bbk === 'platform')) {
+                continue;
+            }
             if (! empty($_REQUEST[$bbk])) {
                 $bbs = stripslashes($_REQUEST[$bbk]);
-                $browseBy .= ' AND con.'.$bbv.' LIKE '.escapeString('%'.$bbs.'%');
+                if (stripos($bbv, 'id') !== false) {
+                    $browseBy .= ' AND con.'.$bbv.' = '.(int) $bbs;
+                } else {
+                    $browseBy .= ' AND con.'.$bbv.' LIKE '.escapeString('%'.$bbs.'%');
+                }
             }
         }
 

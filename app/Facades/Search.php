@@ -37,6 +37,14 @@ use Illuminate\Support\Facades\Facade;
  * @method static array searchReleasesByExternalId(array $externalIds, int $limit = 1000)
  * @method static array searchReleasesByCategory(array $categoryIds, int $limit = 1000)
  * @method static array searchReleasesWithCategoryFilter(string $searchTerm, array $categoryIds = [], int $limit = 1000)
+ * @method static array searchReleasesFiltered(array $criteria, int $limit, int $offset = 0)
+ * @method static void insertSecondary(\App\Enums\SecondarySearchIndex $index, int $id, array $document)
+ * @method static void updateSecondary(\App\Enums\SecondarySearchIndex $index, int $id)
+ * @method static void deleteSecondary(\App\Enums\SecondarySearchIndex $index, int $id)
+ * @method static array bulkInsertSecondary(\App\Enums\SecondarySearchIndex $index, array $documents)
+ * @method static array searchSecondary(\App\Enums\SecondarySearchIndex $index, string $query, int $limit = 100)
+ * @method static array searchAnimeTitle(string $query, int $limit = 100)
+ * @method static array searchMoviesByFields(array $fieldTerms, int $limit = 5000)
  *
  * @see SearchService
  */

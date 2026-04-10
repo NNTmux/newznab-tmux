@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\Search\Contracts;
 
+use App\Enums\SecondarySearchIndex;
+
 /**
  * Interface for full-text search services (ManticoreSearch, Elasticsearch).
  *
@@ -230,6 +232,14 @@ interface SearchServiceInterface
     public function searchMovieByExternalId(string $field, int|string $value): ?array;
 
     /**
+     * Search movies index by field-specific terms (title, director, actors, genre).
+     *
+     * @param  array<string, string>  $fieldTerms
+     * @return array{imdbids: list<string>, movieinfo_ids: list<int>, data: list<array<string, mixed>>}
+     */
+    public function searchMoviesByFields(array $fieldTerms, int $limit = 5000): array;
+
+    /**
      * Insert a TV show into the tvshows search index.
      *
      * @param  array<string, mixed>  $parameters  TV show data with id, title, tvdb, trakt, tvmaze, tvrage, imdb, tmdb, started, type
@@ -306,4 +316,44 @@ interface SearchServiceInterface
      * @return array<string, mixed> Array of release IDs
      */
     public function searchReleasesWithCategoryFilter(string $searchTerm, array $categoryIds = [], int $limit = 1000): array;
+
+    /**
+     * Filter/sort releases in the search index (category, age, size, group, password) with optional full-text.
+     *
+     * @param  array<string, mixed>  $criteria  Keys: phrases (string|array|null), category_ids (list<int>|null),
+     *                                          excluded_category_ids (list<int>), min_size (int), max_age_days (int),
+     *                                          groups_id (int|null), password_allow_rar (bool), sort_field (string),
+     *                                          sort_dir (string), try_fuzzy (bool), release_ids (list<int>|null)
+     * @return array{ids: list<int>, total: int, fuzzy: bool}
+     */
+    public function searchReleasesFiltered(array $criteria, int $limit, int $offset = 0): array;
+
+    /**
+     * Upsert a metadata document (music, books, games, console, steam, anime).
+     *
+     * @param  array<string, mixed>  $document  Fields for the index (no id key required)
+     */
+    public function insertSecondary(SecondarySearchIndex $index, int $id, array $document): void;
+
+    public function updateSecondary(SecondarySearchIndex $index, int $id): void;
+
+    public function deleteSecondary(SecondarySearchIndex $index, int $id): void;
+
+    /**
+     * @param  array<int, array<string, mixed>>  $documents  Each row must include int 'id'
+     * @return array<string, mixed>
+     */
+    public function bulkInsertSecondary(SecondarySearchIndex $index, array $documents): array;
+
+    /**
+     * Full-text search on a secondary index.
+     *
+     * @return array{id: list<int>, data: list<array<string, mixed>>}
+     */
+    public function searchSecondary(SecondarySearchIndex $index, string $query, int $limit = 100): array;
+
+    /**
+     * @return list<int> Distinct anidbids from anime index hits
+     */
+    public function searchAnimeTitle(string $query, int $limit = 100): array;
 }

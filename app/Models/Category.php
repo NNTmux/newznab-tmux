@@ -331,6 +331,11 @@ class Category extends Model
             $cat = self::MOVIES_GROUP;
         }
 
+        // Anime API/search: default to TV anime category when client sends cat=-1 (avoid unrestricted browse)
+        if ($searchType === 'anime' && (empty($cat) || $cat === [-1] || $cat === ['-1'])) {
+            $cat = [self::TV_ANIME];
+        }
+
         // If multiple categories were sent in a single array position, slice and add them
         if (isset($cat[0]) && is_string($cat[0]) && str_contains($cat[0], ',')) {
             $tmpcats = explode(',', $cat[0]);

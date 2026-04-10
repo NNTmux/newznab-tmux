@@ -4,10 +4,18 @@ declare(strict_types=1);
 
 namespace App\Services\Search\Drivers;
 
+use App\Enums\SecondarySearchIndex;
+use App\Models\BookInfo;
+use App\Models\ConsoleInfo;
+use App\Models\GamesInfo;
 use App\Models\MovieInfo;
+use App\Models\MusicInfo;
 use App\Models\Release;
+use App\Models\SteamApp;
 use App\Models\Video;
 use App\Services\Search\Contracts\SearchDriverInterface;
+use App\Support\ReleaseSearchIndexDocument;
+use App\Support\SecondaryIndexDocuments;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -158,22 +166,8 @@ class ManticoreSearchDriver implements SearchDriverInterface
         }
 
         try {
-            $document = [
-                'name' => $parameters['name'] ?? '',
-                'searchname' => $parameters['searchname'] ?? '',
-                'fromname' => $parameters['fromname'] ?? '',
-                'categories_id' => (int) ($parameters['categories_id'] ?? 0),
-                'filename' => $parameters['filename'] ?? '',
-                // External media IDs for efficient searching
-                'imdbid' => (string) ($parameters['imdbid'] ?? ''),
-                'tmdbid' => (int) ($parameters['tmdbid'] ?? 0),
-                'traktid' => (int) ($parameters['traktid'] ?? 0),
-                'tvdb' => (int) ($parameters['tvdb'] ?? 0),
-                'tvmaze' => (int) ($parameters['tvmaze'] ?? 0),
-                'tvrage' => (int) ($parameters['tvrage'] ?? 0),
-                'videos_id' => (int) ($parameters['videos_id'] ?? 0),
-                'movieinfo_id' => (int) ($parameters['movieinfo_id'] ?? 0),
-            ];
+            $document = ReleaseSearchIndexDocument::normalize($parameters);
+            unset($document['id']);
 
             $this->manticoreSearch->table($this->config['indexes']['releases'])
                 ->replaceDocument($document, $parameters['id']);
@@ -297,22 +291,10 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 continue;
             }
 
-            $documents[] = [
-                'id' => $release['id'],
-                'name' => (string) ($release['name'] ?? ''),
-                'searchname' => (string) ($release['searchname'] ?? ''),
-                'fromname' => (string) ($release['fromname'] ?? ''),
-                'categories_id' => (int) ($release['categories_id'] ?? 0),
-                'filename' => (string) ($release['filename'] ?? ''),
-                'imdbid' => (string) ($release['imdbid'] ?? ''),
-                'tmdbid' => (int) ($release['tmdbid'] ?? 0),
-                'traktid' => (int) ($release['traktid'] ?? 0),
-                'tvdb' => (int) ($release['tvdb'] ?? 0),
-                'tvmaze' => (int) ($release['tvmaze'] ?? 0),
-                'tvrage' => (int) ($release['tvrage'] ?? 0),
-                'videos_id' => (int) ($release['videos_id'] ?? 0),
-                'movieinfo_id' => (int) ($release['movieinfo_id'] ?? 0),
-            ];
+            $documents[] = array_merge(
+                ['id' => $release['id']],
+                ReleaseSearchIndexDocument::normalize($release)
+            );
         }
 
         if (empty($documents)) {
@@ -596,9 +578,39 @@ class ManticoreSearchDriver implements SearchDriverInterface
                     'releases.searchname',
                     'releases.fromname',
                     'releases.categories_id',
+                    'releases.size',
+                    'releases.postdate',
+                    'releases.adddate',
+                    'releases.totalpart',
+                    'releases.grabs',
+                    'releases.passwordstatus',
+                    'releases.groups_id',
+                    'releases.nzbstatus',
+                    'releases.haspreview',
+                    'releases.imdbid',
+                    'releases.videos_id',
+                    'releases.movieinfo_id',
                     DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename'),
                 ])
-                ->groupBy('releases.id')
+                ->groupBy([
+                    'releases.id',
+                    'releases.name',
+                    'releases.searchname',
+                    'releases.fromname',
+                    'releases.categories_id',
+                    'releases.size',
+                    'releases.postdate',
+                    'releases.adddate',
+                    'releases.totalpart',
+                    'releases.grabs',
+                    'releases.passwordstatus',
+                    'releases.groups_id',
+                    'releases.nzbstatus',
+                    'releases.haspreview',
+                    'releases.imdbid',
+                    'releases.videos_id',
+                    'releases.movieinfo_id',
+                ])
                 ->first();
 
             if ($release !== null) {
@@ -722,6 +734,15 @@ class ManticoreSearchDriver implements SearchDriverInterface
                             'tvrage' => ['type' => 'integer'],
                             'videos_id' => ['type' => 'integer'],
                             'movieinfo_id' => ['type' => 'integer'],
+                            'size' => ['type' => 'bigint'],
+                            'postdate_ts' => ['type' => 'bigint'],
+                            'adddate_ts' => ['type' => 'bigint'],
+                            'totalpart' => ['type' => 'integer'],
+                            'grabs' => ['type' => 'integer'],
+                            'passwordstatus' => ['type' => 'integer'],
+                            'groups_id' => ['type' => 'integer'],
+                            'nzbstatus' => ['type' => 'integer'],
+                            'haspreview' => ['type' => 'integer'],
                         ],
                     ],
                 ]);
@@ -787,6 +808,24 @@ class ManticoreSearchDriver implements SearchDriverInterface
                     ],
                 ]);
                 cli()->info('Created tvshows_rt index with infix search support');
+            } else {
+                foreach (SecondarySearchIndex::cases() as $secondary) {
+                    if ($index === $this->getSecondaryIndexName($secondary)) {
+                        $indices->create([
+                            'index' => $index,
+                            'body' => [
+                                'settings' => [
+                                    'min_prefix_len' => 0,
+                                    'min_infix_len' => 2,
+                                ],
+                                'columns' => $secondary->manticoreColumns(),
+                            ],
+                        ]);
+                        cli()->info("Created {$index} secondary metadata index");
+
+                        break;
+                    }
+                }
             }
         } catch (\Throwable $e) {
             cli()->error('Error creating index '.$index.': '.$e->getMessage());
@@ -1755,6 +1794,45 @@ class ManticoreSearchDriver implements SearchDriverInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function searchMoviesByFields(array $fieldTerms, int $limit = 5000): array
+    {
+        $allowed = ['title' => true, 'director' => true, 'actors' => true, 'genre' => true];
+        $filtered = [];
+        foreach ($fieldTerms as $key => $value) {
+            $k = (string) $key;
+            if (isset($allowed[$k]) && is_string($value) && trim($value) !== '') {
+                $filtered[$k] = trim($value);
+            }
+        }
+
+        if ($filtered === [] || ! $this->isAvailable()) {
+            return ['imdbids' => [], 'movieinfo_ids' => [], 'data' => []];
+        }
+
+        $raw = $this->searchIndexes($this->getMoviesIndex(), null, [], $filtered, $limit);
+        $imdbids = [];
+        $movieinfoIds = [];
+        $data = $raw['data'] ?? [];
+
+        foreach (($raw['id'] ?? []) as $i => $mid) {
+            $movieinfoIds[] = (int) $mid;
+            $row = $data[$i] ?? [];
+            $imdb = (string) ($row['imdbid'] ?? '');
+            if ($imdb !== '') {
+                $imdbids[] = $imdb;
+            }
+        }
+
+        return [
+            'imdbids' => array_values(array_unique($imdbids)),
+            'movieinfo_ids' => $movieinfoIds,
+            'data' => $data,
+        ];
+    }
+
+    /**
      * Search movies by external ID (IMDB, TMDB, Trakt).
      *
      * @param  string  $field  Field name (imdbid, tmdbid, traktid)
@@ -2181,5 +2259,361 @@ class ManticoreSearchDriver implements SearchDriverInterface
         }
 
         return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function searchReleasesFiltered(array $criteria, int $limit, int $offset = 0): array
+    {
+        if (! $this->isAvailable()) {
+            return ['ids' => [], 'total' => 0, 'fuzzy' => false];
+        }
+
+        $phrases = $criteria['phrases'] ?? null;
+        $hasText = $phrases !== null && $phrases !== '' && $phrases !== -1;
+        $tryFuzzy = (bool) ($criteria['try_fuzzy'] ?? true);
+
+        $execute = function (bool $useFuzzy) use ($criteria, $limit, $offset, $hasText, $phrases): array {
+            $query = (new Search($this->manticoreSearch))
+                ->setTable($this->getReleasesIndex())
+                ->stripBadUtf8(true);
+
+            if ($hasText) {
+                if ($useFuzzy && $this->isFuzzyEnabled()) {
+                    if (self::queryHasNegation($phrases)) {
+                        return ['ids' => [], 'total' => 0, 'fuzzy' => false];
+                    }
+                    $searchString = $this->phrasesToFuzzyString($phrases);
+                    if ($searchString === '') {
+                        return ['ids' => [], 'total' => 0, 'fuzzy' => false];
+                    }
+                    $query->search($searchString)
+                        ->option('fuzzy', true)
+                        ->option('distance', (int) ($this->getFuzzyConfig()['max_distance'] ?? 2));
+                } else {
+                    $searchArray = $this->phrasesToSearchArray($phrases);
+                    $terms = [];
+                    foreach ($searchArray as $key => $value) {
+                        if ($value === '' || $value === null) {
+                            continue;
+                        }
+                        $prepared = self::prepareUserSearchQuery((string) $value);
+                        if ($prepared !== '') {
+                            $terms[] = '@@relaxed @'.$key.' '.$prepared;
+                        }
+                    }
+                    if ($terms === []) {
+                        return ['ids' => [], 'total' => 0, 'fuzzy' => false];
+                    }
+                    $query->search(implode(' ', $terms))->option('ranker', 'sph04');
+                }
+            }
+
+            $this->applyManticoreReleaseIndexFilters($query, $criteria);
+
+            $sortField = (string) ($criteria['sort_field'] ?? 'postdate_ts');
+            $sortDir = strtolower((string) ($criteria['sort_dir'] ?? 'desc'));
+            $allowedSort = ['postdate_ts', 'adddate_ts', 'size', 'totalpart', 'grabs', 'categories_id', 'id'];
+            if (! in_array($sortField, $allowedSort, true)) {
+                $sortField = 'postdate_ts';
+            }
+            $query->sort($sortField, $sortDir === 'asc' ? 'asc' : 'desc');
+
+            $maxNeed = max(1000, $offset + $limit + 100);
+            $query->maxMatches(min($maxNeed, (int) ($this->config['max_matches'] ?? 10000)));
+            $query->limit(max(1, $limit));
+            if ($offset > 0) {
+                $query->offset($offset);
+            }
+
+            try {
+                $results = $query->get();
+            } catch (\Throwable $e) {
+                Log::error('ManticoreSearch searchReleasesFiltered error: '.$e->getMessage(), [
+                    'criteria' => $criteria,
+                ]);
+
+                return ['ids' => [], 'total' => 0, 'fuzzy' => $useFuzzy];
+            }
+
+            $ids = [];
+            foreach ($results as $doc) {
+                $ids[] = $doc->getId();
+            }
+
+            return [
+                'ids' => $ids,
+                'total' => (int) $results->getTotal(),
+                'fuzzy' => $useFuzzy,
+            ];
+        };
+
+        if ($hasText) {
+            $first = $execute(false);
+            if ($first['ids'] !== [] || ! $tryFuzzy || ! $this->isFuzzyEnabled() || self::queryHasNegation($phrases)) {
+                return $first;
+            }
+
+            return $execute(true);
+        }
+
+        return $execute(false);
+    }
+
+    /**
+     * @param  array<string, mixed>|string  $phrases
+     */
+    private function phrasesToSearchArray(array|string $phrases): array
+    {
+        if (is_string($phrases)) {
+            return ['searchname' => $phrases];
+        }
+        $isAssociative = count(array_filter(array_keys($phrases), 'is_string')) > 0;
+        if ($isAssociative) {
+            return $phrases;
+        }
+
+        return ['searchname' => implode(' ', $phrases)];
+    }
+
+    /**
+     * @param  array<string, mixed>|string  $phrases
+     */
+    private function phrasesToFuzzyString(array|string $phrases): string
+    {
+        $searchArray = $this->phrasesToSearchArray($phrases);
+        $searchTerms = [];
+        foreach ($searchArray as $value) {
+            if (! empty($value)) {
+                $cleanValue = preg_replace('/[^\w\s]/', ' ', (string) $value);
+                $cleanValue = preg_replace('/\s+/', ' ', trim((string) $cleanValue));
+                if ($cleanValue !== '') {
+                    $searchTerms[] = $cleanValue;
+                }
+            }
+        }
+
+        return implode(' ', $searchTerms);
+    }
+
+    /**
+     * @param  array<string, mixed>  $criteria
+     */
+    private function applyManticoreReleaseIndexFilters(Search $query, array $criteria): void
+    {
+        $releaseIds = $criteria['release_ids'] ?? null;
+        if (is_array($releaseIds) && $releaseIds !== []) {
+            $valid = array_values(array_filter(
+                array_map(static fn ($id): int => (int) $id, $releaseIds),
+                static fn (int $id): bool => $id > 0
+            ));
+            if (count($valid) === 1) {
+                $query->filter('id', '=', $valid[0]);
+            } elseif (count($valid) > 1) {
+                $query->filter('id', 'in', $valid);
+            }
+        }
+
+        $categoryIds = $criteria['category_ids'] ?? null;
+        if (is_array($categoryIds) && $categoryIds !== []) {
+            $valid = array_values(array_filter($categoryIds, static fn ($id): bool => (int) $id > 0));
+            if (count($valid) === 1) {
+                $query->filter('categories_id', '=', (int) $valid[0]);
+            } elseif (count($valid) > 1) {
+                $query->filter('categories_id', 'in', array_map(static fn ($id): int => (int) $id, $valid));
+            }
+        }
+
+        $excluded = $criteria['excluded_category_ids'] ?? [];
+        if ($excluded !== []) {
+            $query->notFilter('categories_id', 'in', array_map(static fn ($id): int => (int) $id, $excluded));
+        }
+
+        $minSize = (int) ($criteria['min_size'] ?? 0);
+        if ($minSize > 0) {
+            $query->filter('size', 'gte', $minSize);
+        }
+
+        $maxAge = (int) ($criteria['max_age_days'] ?? 0);
+        if ($maxAge > 0) {
+            $cutoff = time() - ($maxAge * 86400);
+            $query->filter('postdate_ts', 'gte', $cutoff);
+        }
+
+        $gid = $criteria['groups_id'] ?? null;
+        if ($gid !== null && (int) $gid > 0) {
+            $query->filter('groups_id', '=', (int) $gid);
+        }
+
+        $allowRar = (bool) ($criteria['password_allow_rar'] ?? false);
+        if ($allowRar) {
+            $query->filter('passwordstatus', 'lte', 1);
+        } else {
+            $query->filter('passwordstatus', '=', 0);
+        }
+    }
+
+    public function getSecondaryIndexName(SecondarySearchIndex $index): string
+    {
+        $configured = $this->config['indexes'][$index->value] ?? null;
+        if (is_string($configured) && $configured !== '') {
+            return $configured;
+        }
+
+        return match ($index) {
+            SecondarySearchIndex::Music => 'music_rt',
+            SecondarySearchIndex::Books => 'books_rt',
+            SecondarySearchIndex::Games => 'games_rt',
+            SecondarySearchIndex::Console => 'console_rt',
+            SecondarySearchIndex::Steam => 'steam_rt',
+            SecondarySearchIndex::Anime => 'anime_rt',
+        };
+    }
+
+    public function insertSecondary(SecondarySearchIndex $index, int $id, array $document): void
+    {
+        if ($id <= 0) {
+            return;
+        }
+
+        try {
+            $this->createIndexIfNotExists($this->getSecondaryIndexName($index));
+            $this->manticoreSearch->table($this->getSecondaryIndexName($index))
+                ->replaceDocument($document, $id);
+        } catch (ResponseException $e) {
+            Log::error('ManticoreSearch insertSecondary ResponseException: '.$e->getMessage(), [
+                'secondary' => $index->value,
+                'id' => $id,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch insertSecondary error: '.$e->getMessage(), [
+                'secondary' => $index->value,
+                'id' => $id,
+            ]);
+        }
+    }
+
+    public function updateSecondary(SecondarySearchIndex $index, int $id): void
+    {
+        if ($id <= 0) {
+            return;
+        }
+
+        try {
+            match ($index) {
+                SecondarySearchIndex::Music => $this->insertSecondary($index, $id, SecondaryIndexDocuments::music(MusicInfo::query()->findOrFail($id))),
+                SecondarySearchIndex::Books => $this->insertSecondary($index, $id, SecondaryIndexDocuments::book(BookInfo::query()->findOrFail($id))),
+                SecondarySearchIndex::Games => $this->insertSecondary($index, $id, SecondaryIndexDocuments::games(GamesInfo::query()->findOrFail($id))),
+                SecondarySearchIndex::Console => $this->insertSecondary($index, $id, SecondaryIndexDocuments::console(ConsoleInfo::query()->findOrFail($id))),
+                SecondarySearchIndex::Steam => $this->insertSecondary($index, $id, SecondaryIndexDocuments::steam(SteamApp::query()->findOrFail($id))),
+                SecondarySearchIndex::Anime => null,
+            };
+        } catch (\Throwable $e) {
+            Log::warning('ManticoreSearch updateSecondary skipped: '.$e->getMessage(), [
+                'secondary' => $index->value,
+                'id' => $id,
+            ]);
+        }
+    }
+
+    public function deleteSecondary(SecondarySearchIndex $index, int $id): void
+    {
+        if ($id <= 0) {
+            return;
+        }
+
+        try {
+            $this->manticoreSearch->table($this->getSecondaryIndexName($index))
+                ->deleteDocument($id);
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch deleteSecondary error: '.$e->getMessage(), [
+                'secondary' => $index->value,
+                'id' => $id,
+            ]);
+        }
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $documents
+     * @return array<string, mixed>
+     */
+    public function bulkInsertSecondary(SecondarySearchIndex $index, array $documents): array
+    {
+        if ($documents === []) {
+            return ['success' => 0, 'errors' => 0];
+        }
+
+        $success = 0;
+        $errors = 0;
+        $rows = [];
+        $table = $this->getSecondaryIndexName($index);
+
+        foreach ($documents as $doc) {
+            $docId = (int) ($doc['id'] ?? 0);
+            if ($docId <= 0) {
+                $errors++;
+
+                continue;
+            }
+            unset($doc['id']);
+            $rows[] = array_merge(['id' => $docId], $doc);
+        }
+
+        if ($rows === []) {
+            return ['success' => 0, 'errors' => $errors];
+        }
+
+        try {
+            $this->createIndexIfNotExists($table);
+            $this->manticoreSearch->table($table)->replaceDocuments($rows);
+            $success = count($rows);
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch bulkInsertSecondary error: '.$e->getMessage(), ['secondary' => $index->value]);
+            $errors += count($rows);
+        }
+
+        return ['success' => $success, 'errors' => $errors];
+    }
+
+    /**
+     * @return array{id: list<int>, data: list<array<string, mixed>>}
+     */
+    public function searchSecondary(SecondarySearchIndex $index, string $query, int $limit = 100): array
+    {
+        $query = trim($query);
+        if ($query === '') {
+            return ['id' => [], 'data' => []];
+        }
+
+        $result = $this->searchIndexes(
+            $this->getSecondaryIndexName($index),
+            $query,
+            $index->fulltextFields(),
+            [],
+            $this->normalizeSearchLimit($limit)
+        );
+
+        return [
+            'id' => array_map(static fn ($v): int => (int) $v, $result['id'] ?? []),
+            'data' => $result['data'] ?? [],
+        ];
+    }
+
+    /**
+     * @return list<int>
+     */
+    public function searchAnimeTitle(string $query, int $limit = 100): array
+    {
+        $hits = $this->searchSecondary(SecondarySearchIndex::Anime, $query, $limit);
+        $seen = [];
+        foreach ($hits['data'] as $row) {
+            $aid = (int) ($row['anidbid'] ?? 0);
+            if ($aid > 0) {
+                $seen[$aid] = true;
+            }
+        }
+
+        return array_keys($seen);
     }
 }

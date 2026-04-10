@@ -8,7 +8,6 @@ use App\Facades\Search;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Cache;
-use Laravel\Scout\Searchable;
 
 /**
  * App\Models\Predb.
@@ -53,8 +52,6 @@ use Laravel\Scout\Searchable;
  */
 class Predb extends Model
 {
-    use Searchable;
-
     // Nuke status.
     public const PRE_NONUKE = 0; // Pre is not nuked.
 
@@ -228,20 +225,5 @@ class Predb extends Model
     public static function getOne(mixed $preID)
     {
         return self::query()->where('id', $preID)->first();
-    }
-
-    public function searchableAs(): string
-    {
-        return 'ft_predb_filename';
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function toSearchableArray(): array
-    {
-        return [
-            'filename' => $this->filename,
-        ];
     }
 }

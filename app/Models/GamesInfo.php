@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Laravel\Scout\Searchable;
 
 /**
  * App\Models\GamesInfo.
@@ -56,8 +55,6 @@ use Laravel\Scout\Searchable;
  */
 class GamesInfo extends Model
 {
-    use Searchable;
-
     /**
      * @var string
      */
@@ -98,21 +95,6 @@ class GamesInfo extends Model
     public function releases(): HasMany
     {
         return $this->hasMany(Release::class, 'gamesinfo_id');
-    }
-
-    public function searchableAs(): string
-    {
-        return 'ix_title_ft';
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function toSearchableArray(): array
-    {
-        return [
-            'title' => $this->title,
-        ];
     }
 
     /**

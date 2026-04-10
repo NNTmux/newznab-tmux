@@ -23,7 +23,15 @@ class NntmuxCheckIndex extends Command
                                        {--manticore : Check ManticoreSearch}
                                        {--elastic : Check ElasticSearch}
                                        {--releases : Check the releases index}
-                                       {--predb : Check the predb index}';
+                                       {--predb : Check the predb index}
+                                       {--movies : Check the movies index}
+                                       {--tvshows : Check the TV shows index}
+                                       {--music : Check the music index}
+                                       {--books : Check the books index}
+                                       {--games : Check the games index}
+                                       {--console : Check the console index}
+                                       {--steam : Check the steam index}
+                                       {--anime : Check the anime index}';
 
     /**
      * The console command description.
@@ -41,7 +49,7 @@ class NntmuxCheckIndex extends Command
         $index = $this->getSelectedIndex();
 
         if (! $engine || ! $index) {
-            $this->error('You must specify both an engine (--manticore or --elastic) and an index (--releases or --predb).');
+            $this->error('You must specify both an engine (--manticore or --elastic) and an index option (e.g. --releases, --predb, --movies, --music, ...).');
 
             return Command::FAILURE;
         }
@@ -68,6 +76,8 @@ class NntmuxCheckIndex extends Command
      */
     private function checkElasticIndex(string $index): void
     {
+        $index = $this->elasticIndexName($index);
+
         try {
             // Check if index exists
             /** @var ElasticsearchClient $client */
@@ -117,7 +127,19 @@ class NntmuxCheckIndex extends Command
     private function checkManticoreIndex(string $index): void
     {
         try {
-            $indexName = $index === 'releases' ? 'releases_rt' : 'predb_rt';
+            $indexName = match ($index) {
+                'releases' => 'releases_rt',
+                'predb' => 'predb_rt',
+                'movies' => 'movies_rt',
+                'tvshows' => 'tvshows_rt',
+                'music' => 'music_rt',
+                'books' => 'books_rt',
+                'games' => 'games_rt',
+                'console' => 'console_rt',
+                'steam' => 'steam_rt',
+                'anime' => 'anime_rt',
+                default => 'releases_rt',
+            };
             $host = config('nntmux.manticore.host', '127.0.0.1');
             $port = config('nntmux.manticore.port', 9308);
 
@@ -273,6 +295,25 @@ class NntmuxCheckIndex extends Command
      */
     private function getSelectedIndex(): ?string
     {
-        return $this->option('releases') ? 'releases' : ($this->option('predb') ? 'predb' : null);
+        $options = [
+            'releases', 'predb', 'movies', 'tvshows', 'music', 'books', 'games', 'console', 'steam', 'anime',
+        ];
+        foreach ($options as $opt) {
+            if ($this->option($opt)) {
+                return $opt;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolve ElasticSearch index name for logical keys.
+     */
+    private function elasticIndexName(string $index): string
+    {
+        $configured = config('search.drivers.elasticsearch.indexes.'.$index);
+
+        return is_string($configured) && $configured !== '' ? $configured : $index;
     }
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\SecondarySearchIndex;
+use App\Facades\Search;
 use App\Models\Category;
 use App\Models\GamesInfo;
 use App\Models\Genre;
@@ -119,18 +121,24 @@ class GamesService
             return false;
         }
 
-        $results = GamesInfo::search($title)->get();
-
-        if ($results instanceof \Traversable) {
+        if (Search::isAvailable()) {
+            $hits = Search::searchSecondary(SecondarySearchIndex::Games, $title, 80);
             $bestMatchPct = 0;
             $normQuery = $this->titleParser->normalizeForMatch($title);
 
-            foreach ($results as $result) {
-                $candidate = is_array($result) ? ($result['title'] ?? '') : ($result->title ?? '');
+            foreach ($hits['id'] as $gid) {
+                $result = GamesInfo::query()
+                    ->where('gamesinfo.id', $gid)
+                    ->leftJoin('genres as g', 'g.id', '=', 'gamesinfo.genres_id')
+                    ->select(['gamesinfo.*', 'g.title as genres'])
+                    ->first();
+                if ($result === null) {
+                    continue;
+                }
+                $candidate = (string) $result->title;
                 if ($candidate === '') {
                     continue;
                 }
-                // Exact match fast-path
                 if ($candidate === $title) {
                     $bestMatch = $result;
                     break;
@@ -140,6 +148,31 @@ class GamesService
                     $bestMatch = $result;
                     $bestMatchPct = $score;
                 }
+            }
+
+            return $bestMatch;
+        }
+
+        $results = GamesInfo::query()
+            ->whereRaw('MATCH (title) AGAINST (? IN NATURAL LANGUAGE MODE)', [$title])
+            ->get();
+
+        $bestMatchPct = 0;
+        $normQuery = $this->titleParser->normalizeForMatch($title);
+
+        foreach ($results as $result) {
+            $candidate = (string) $result->title;
+            if ($candidate === '') {
+                continue;
+            }
+            if ($candidate === $title) {
+                $bestMatch = $result;
+                break;
+            }
+            $score = $this->titleParser->computeSimilarity($normQuery, $this->titleParser->normalizeForMatch($candidate));
+            if ($score >= self::GAME_MATCH_PERCENTAGE && $score > $bestMatchPct) {
+                $bestMatch = $result;
+                $bestMatchPct = $score;
             }
         }
 
@@ -157,7 +190,15 @@ class GamesService
             ->join('genres as g', 'gi.genres_id', '=', 'g.id');
 
         if (! empty($search)) {
-            $query->where('gi.title', 'like', '%'.$search.'%');
+            if (Search::isAvailable()) {
+                $ids = Search::searchSecondary(SecondarySearchIndex::Games, $search, 3000)['id'];
+                if ($ids === []) {
+                    return $query->whereRaw('1 = 0')->paginate(config('nntmux.items_per_page'));
+                }
+                $query->whereIn('gi.id', $ids);
+            } else {
+                $query->where('gi.title', 'like', '%'.$search.'%');
+            }
         }
 
         return $query->orderByDesc('created_at')

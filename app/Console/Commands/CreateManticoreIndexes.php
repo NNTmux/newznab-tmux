@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Enums\SecondarySearchIndex;
 use Illuminate\Console\Command;
 use Manticoresearch\Client;
 use Manticoresearch\Exceptions\ResponseException;
@@ -84,6 +85,15 @@ class CreateManticoreIndexes extends Command
                     'tvrage' => ['type' => 'integer'],
                     'videos_id' => ['type' => 'integer'],
                     'movieinfo_id' => ['type' => 'integer'],
+                    'size' => ['type' => 'bigint'],
+                    'postdate_ts' => ['type' => 'bigint'],
+                    'adddate_ts' => ['type' => 'bigint'],
+                    'totalpart' => ['type' => 'integer'],
+                    'grabs' => ['type' => 'integer'],
+                    'passwordstatus' => ['type' => 'integer'],
+                    'groups_id' => ['type' => 'integer'],
+                    'nzbstatus' => ['type' => 'integer'],
+                    'haspreview' => ['type' => 'integer'],
                 ],
             ],
             'predb_rt' => [
@@ -131,6 +141,48 @@ class CreateManticoreIndexes extends Command
                     'started' => ['type' => 'text'],
                     'type' => ['type' => 'integer'],
                 ],
+            ],
+            'music_rt' => [
+                'settings' => [
+                    'min_prefix_len' => 0,
+                    'min_infix_len' => 2,
+                ],
+                'columns' => SecondarySearchIndex::Music->manticoreColumns(),
+            ],
+            'books_rt' => [
+                'settings' => [
+                    'min_prefix_len' => 0,
+                    'min_infix_len' => 2,
+                ],
+                'columns' => SecondarySearchIndex::Books->manticoreColumns(),
+            ],
+            'games_rt' => [
+                'settings' => [
+                    'min_prefix_len' => 0,
+                    'min_infix_len' => 2,
+                ],
+                'columns' => SecondarySearchIndex::Games->manticoreColumns(),
+            ],
+            'console_rt' => [
+                'settings' => [
+                    'min_prefix_len' => 0,
+                    'min_infix_len' => 2,
+                ],
+                'columns' => SecondarySearchIndex::Console->manticoreColumns(),
+            ],
+            'steam_rt' => [
+                'settings' => [
+                    'min_prefix_len' => 0,
+                    'min_infix_len' => 2,
+                ],
+                'columns' => SecondarySearchIndex::Steam->manticoreColumns(),
+            ],
+            'anime_rt' => [
+                'settings' => [
+                    'min_prefix_len' => 0,
+                    'min_infix_len' => 2,
+                ],
+                'columns' => SecondarySearchIndex::Anime->manticoreColumns(),
             ],
         ];
 

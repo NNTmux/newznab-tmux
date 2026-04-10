@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Scout\Searchable;
 
 /**
  * App\Models\SteamApp.
  *
+ * @property int $id
  * @property string $name Steam application name
  * @property int $appid Steam application id
  *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SteamApp whereAppid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SteamApp whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SteamApp whereName($value)
  *
  * @mixin \Eloquent
@@ -24,13 +25,6 @@ use Laravel\Scout\Searchable;
  */
 class SteamApp extends Model
 {
-    use Searchable;
-
-    /**
-     * @var bool
-     */
-    public $incrementing = false;
-
     protected $dateFormat = false;
 
     /**
@@ -42,19 +36,4 @@ class SteamApp extends Model
      * @var array<string>
      */
     protected $guarded = [];
-
-    public function searchableAs(): string
-    {
-        return 'ix_name_ft';
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function toSearchableArray(): array
-    {
-        return [
-            'name' => $this->name,
-        ];
-    }
 }

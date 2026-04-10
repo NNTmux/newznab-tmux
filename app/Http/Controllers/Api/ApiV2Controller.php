@@ -17,11 +17,9 @@ use App\Services\Releases\ReleaseSearchService;
 use App\Transformers\ApiTransformer;
 use App\Transformers\CategoryTransformer;
 use App\Transformers\DetailsTransformer;
-use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Redirector;
+use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -105,7 +103,9 @@ class ApiV2Controller extends BasePageController
                     'search' => ['available' => 'yes', 'supportedParams' => 'id'],
                     'tv-search' => ['available' => 'yes', 'supportedParams' => 'id,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
                     'movie-search' => ['available' => 'yes', 'supportedParams' => 'id, imdbid, tmdbid, traktid'],
-                    'audio-search' => ['available' => 'no',  'supportedParams' => ''],
+                    'audio-search' => ['available' => 'yes', 'supportedParams' => 'id,cat,minsize,maxage,group'],
+                    'book-search' => ['available' => 'yes', 'supportedParams' => 'id,cat,minsize,maxage,group'],
+                    'anime-search' => ['available' => 'yes', 'supportedParams' => 'id,anidbid,anilistid,cat,maxage'],
                 ],
                 'categories' => fractal($category, new CategoryTransformer),
             ];
@@ -169,6 +169,147 @@ class ApiV2Controller extends BasePageController
                 $catExclusions
             );
         });
+
+        $response = array_merge(
+            ['Total' => $relData[0]->_totalrows ?? 0],
+            $this->buildUserStatsResponse($user),
+            ['Results' => fractal($relData, new ApiTransformer($user))]
+        );
+
+        return response()->json($response);
+    }
+
+    public function audio(Request $request): JsonResponse|Response
+    {
+        $user = $this->resolveUser($request);
+        if (! $user) {
+            return response()->json(['error' => 'Missing or invalid API key'], 403);
+        }
+
+        UserRequest::addApiRequest($user->id, $request->getRequestUri());
+        event(new UserAccessedApi($user, $request->ip()));
+
+        $q = (string) $request->input('id', '');
+        if ($q === '') {
+            return response()->json(['error' => 'Missing id (search query)'], 400);
+        }
+
+        $offset = $this->api->offset($request);
+        $limit = $this->api->limit($request);
+        $categoryID = $this->api->categoryID($request);
+        $maxAge = $this->api->maxAge($request);
+        if (! is_int($maxAge)) {
+            return $maxAge;
+        }
+
+        $minSize = max(0, (int) $request->input('minsize', 0));
+        $catExclusions = User::getCategoryExclusionById($user->id);
+        $groupName = $this->api->group($request);
+
+        $relData = $this->releaseSearchService->apiMusicSearch(
+            $q,
+            $groupName,
+            $offset,
+            $limit,
+            $maxAge,
+            $catExclusions,
+            $categoryID,
+            $minSize
+        );
+
+        $response = array_merge(
+            ['Total' => $relData[0]->_totalrows ?? 0],
+            $this->buildUserStatsResponse($user),
+            ['Results' => fractal($relData, new ApiTransformer($user))]
+        );
+
+        return response()->json($response);
+    }
+
+    public function books(Request $request): JsonResponse|Response
+    {
+        $user = $this->resolveUser($request);
+        if (! $user) {
+            return response()->json(['error' => 'Missing or invalid API key'], 403);
+        }
+
+        UserRequest::addApiRequest($user->id, $request->getRequestUri());
+        event(new UserAccessedApi($user, $request->ip()));
+
+        $q = (string) $request->input('id', '');
+        if ($q === '') {
+            return response()->json(['error' => 'Missing id (search query)'], 400);
+        }
+
+        $offset = $this->api->offset($request);
+        $limit = $this->api->limit($request);
+        $categoryID = $this->api->categoryID($request);
+        $maxAge = $this->api->maxAge($request);
+        if (! is_int($maxAge)) {
+            return $maxAge;
+        }
+
+        $minSize = max(0, (int) $request->input('minsize', 0));
+        $catExclusions = User::getCategoryExclusionById($user->id);
+        $groupName = $this->api->group($request);
+
+        $relData = $this->releaseSearchService->apiBookSearch(
+            $q,
+            $groupName,
+            $offset,
+            $limit,
+            $maxAge,
+            $catExclusions,
+            $categoryID,
+            $minSize
+        );
+
+        $response = array_merge(
+            ['Total' => $relData[0]->_totalrows ?? 0],
+            $this->buildUserStatsResponse($user),
+            ['Results' => fractal($relData, new ApiTransformer($user))]
+        );
+
+        return response()->json($response);
+    }
+
+    public function anime(Request $request): JsonResponse|Response
+    {
+        $user = $this->resolveUser($request);
+        if (! $user) {
+            return response()->json(['error' => 'Missing or invalid API key'], 403);
+        }
+
+        UserRequest::addApiRequest($user->id, $request->getRequestUri());
+        event(new UserAccessedApi($user, $request->ip()));
+
+        $q = (string) $request->input('id', '');
+        $anidb = (int) $request->input('anidbid', -1);
+        $anilist = (int) $request->input('anilistid', -1);
+        if ($q === '' && $anidb <= 0 && $anilist <= 0) {
+            return response()->json(['error' => 'Specify id (query), anidbid, or anilistid'], 400);
+        }
+
+        $offset = $this->api->offset($request);
+        $limit = $this->api->limit($request);
+        $categoryID = $this->api->categoryID($request);
+        $maxAge = $this->api->maxAge($request);
+        if (! is_int($maxAge)) {
+            return $maxAge;
+        }
+
+        $catExclusions = User::getCategoryExclusionById($user->id);
+
+        $relData = $this->releaseSearchService->animeSearch(
+            $anidb,
+            $offset,
+            $limit,
+            $q,
+            $categoryID,
+            $maxAge,
+            $catExclusions,
+            $anilist
+        );
 
         $response = array_merge(
             ['Total' => $relData[0]->_totalrows ?? 0],

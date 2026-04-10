@@ -8,6 +8,7 @@ use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
+use App\Models\UsenetGroup;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -70,23 +71,77 @@ class ReleaseBrowseService
 
         $orderBy = $this->getBrowseOrder($orderBy);
 
+        if ($searchTerm === null && $purpose === 'api' && Search::isAvailable()) {
+            $indexSort = $this->browseOrderToIndexSortField($orderBy[0]); // @phpstan-ignore offsetAccess.notFound
+            if ($indexSort !== null) {
+                return $this->executeApiBrowseViaSearchIndex(
+                    $cat,
+                    $start,
+                    $num,
+                    $orderBy,
+                    $maxAge,
+                    $excludedCats,
+                    $groupName,
+                    $minSize,
+                    $indexSort,
+                    $page
+                );
+            }
+        }
+
         // Use search index filtering when a search term is provided
         $searchIndexFilter = '';
         $searchIndexIds = [];
+        $searchIndexTotal = null;
         if (! empty($searchTerm) && Search::isAvailable()) {
-            $searchResult = Search::searchReleasesWithFuzzy(['searchname' => $searchTerm], $num * 10);
-            $searchIndexIds = $searchResult['ids'] ?? [];
+            $indexSort = $this->browseOrderToIndexSortField($orderBy[0]); // @phpstan-ignore offsetAccess.notFound
+            if ($indexSort !== null) {
+                $categoryIdsRaw = Category::getCategorySearch(\is_array($cat) ? $cat : [], null, true);
+                $categoryIds = null;
+                if (is_array($categoryIdsRaw)) {
+                    $categoryIds = array_map(static fn ($id): int => (int) $id, $categoryIdsRaw);
+                } elseif (is_int($categoryIdsRaw) || (is_string($categoryIdsRaw) && ctype_digit((string) $categoryIdsRaw))) {
+                    $categoryIds = [(int) $categoryIdsRaw];
+                }
+                $groupId = null;
+                if ((int) $groupName !== -1) {
+                    $resolved = UsenetGroup::getIDByName((string) $groupName);
+                    if ($resolved) {
+                        $groupId = (int) $resolved;
+                    }
+                }
+                $filtered = Search::searchReleasesFiltered([
+                    'phrases' => ['searchname' => $searchTerm],
+                    'category_ids' => $categoryIds,
+                    'excluded_category_ids' => $excludedCats,
+                    'min_size' => $minSize,
+                    'max_age_days' => $maxAge,
+                    'groups_id' => $groupId,
+                    'password_allow_rar' => str_contains($this->showPasswords(), '<='),
+                    'sort_field' => $indexSort,
+                    'sort_dir' => $orderBy[1] ?? 'desc', // @phpstan-ignore offsetAccess.notFound
+                    'try_fuzzy' => true,
+                ], (int) $num, (int) $start);
+                $searchIndexIds = $filtered['ids'];
+                $searchIndexTotal = $filtered['total'];
+                if ($searchIndexIds === []) {
+                    return [];
+                }
+                $searchIndexFilter = sprintf(' AND r.id IN (%s)', implode(',', array_map(static fn ($id): int => (int) $id, $searchIndexIds)));
+            } else {
+                $searchResult = Search::searchReleasesWithFuzzy(['searchname' => $searchTerm], $num * 10);
+                $searchIndexIds = $searchResult['ids'] ?? [];
 
-            if (config('app.debug') && ($searchResult['fuzzy'] ?? false)) {
-                Log::debug('getBrowseRange: Using fuzzy search results for browse filtering');
+                if (config('app.debug') && ($searchResult['fuzzy'] ?? false)) {
+                    Log::debug('getBrowseRange: Using fuzzy search results for browse filtering');
+                }
+
+                if ($searchIndexIds === []) {
+                    return [];
+                }
+
+                $searchIndexFilter = sprintf(' AND r.id IN (%s)', implode(',', array_map(static fn ($id): int => (int) $id, $searchIndexIds)));
             }
-
-            if (empty($searchIndexIds)) {
-                // No results from search index, return empty result
-                return [];
-            }
-
-            $searchIndexFilter = sprintf(' AND r.id IN (%s)', implode(',', array_map('intval', $searchIndexIds)));
         }
 
         // Build SELECT and JOINs based on purpose
@@ -160,7 +215,7 @@ class ReleaseBrowseService
         if (\count($sql) > 0) {
             // When using search index, use the ID count for total rows
             if (! empty($searchIndexIds)) {
-                $sql[0]->_totalcount = $sql[0]->_totalrows = count($searchIndexIds);
+                $sql[0]->_totalcount = $sql[0]->_totalrows = $searchIndexTotal ?? count($searchIndexIds);
             } else {
                 $possibleRows = $this->getBrowseCount($cat, $maxAge, $excludedCats, $groupName);
                 $sql[0]->_totalcount = $sql[0]->_totalrows = $possibleRows;
@@ -248,6 +303,123 @@ class ReleaseBrowseService
 
             return 0;
         }
+    }
+
+    /**
+     * Map SQL browse order column to a numeric field stored in the search index.
+     */
+    private function browseOrderToIndexSortField(string $field): ?string
+    {
+        return match ($field) {
+            'postdate' => 'postdate_ts',
+            'adddate' => 'adddate_ts',
+            'size' => 'size',
+            'totalpart' => 'totalpart',
+            'grabs' => 'grabs',
+            'categories_id' => 'categories_id',
+            default => null,
+        };
+    }
+
+    /**
+     * API browse without text: filter and sort via search engine, hydrate rows from SQL.
+     *
+     * @param  array<string, mixed>  $cat
+     * @param  array<string, mixed>  $excludedCats
+     * @param  array{0: string, 1: string}  $orderBy
+     */
+    private function executeApiBrowseViaSearchIndex(
+        mixed $cat,
+        mixed $start,
+        mixed $num,
+        array $orderBy,
+        int $maxAge,
+        array $excludedCats,
+        int|string $groupName,
+        int $minSize,
+        string $indexSortField,
+        mixed $page
+    ): mixed {
+        $cacheVersion = $this->getCacheVersion();
+
+        $categoryIdsRaw = Category::getCategorySearch(is_array($cat) ? $cat : [], null, true);
+        $categoryIds = null;
+        if (is_array($categoryIdsRaw)) {
+            $categoryIds = array_map(static fn ($id): int => (int) $id, $categoryIdsRaw);
+        } elseif (is_int($categoryIdsRaw) || (is_string($categoryIdsRaw) && ctype_digit((string) $categoryIdsRaw))) {
+            $categoryIds = [(int) $categoryIdsRaw];
+        }
+
+        $groupId = null;
+        if ((int) $groupName !== -1) {
+            $resolved = UsenetGroup::getIDByName((string) $groupName);
+            if ($resolved) {
+                $groupId = (int) $resolved;
+            }
+        }
+
+        $criteria = [
+            'phrases' => null,
+            'category_ids' => $categoryIds,
+            'excluded_category_ids' => $excludedCats,
+            'min_size' => $minSize,
+            'max_age_days' => $maxAge,
+            'groups_id' => $groupId,
+            'password_allow_rar' => str_contains($this->showPasswords(), '<='),
+            'sort_field' => $indexSortField,
+            'sort_dir' => $orderBy[1] ?? 'desc',
+            'try_fuzzy' => false,
+        ];
+
+        $filtered = Search::searchReleasesFiltered($criteria, (int) $num, (int) $start);
+        if ($filtered['ids'] === []) {
+            return [];
+        }
+
+        $ids = array_map(static fn (int|string $id): int => (int) $id, $filtered['ids']);
+        $idList = implode(',', $ids);
+        $fieldOrder = implode(',', $ids);
+
+        $sql = sprintf(
+            "SELECT r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.haspreview, r.nfostatus, r.group_name,
+				CONCAT(cp.title, ' > ', c.title) AS category_name,
+				rn.releases_id AS nfoid,
+				v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
+				m.imdbid, m.tmdbid, m.traktid,
+				tve.title, tve.series, tve.episode, tve.firstaired
+			FROM (
+				SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.tv_episodes_id, r.haspreview, r.nfostatus, g.name AS group_name, r.movieinfo_id
+				FROM releases r
+				LEFT JOIN usenet_groups g ON g.id = r.groups_id
+				WHERE r.id IN (%s)
+			) r
+			LEFT JOIN categories c ON c.id = r.categories_id
+			LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
+			LEFT OUTER JOIN videos v ON r.videos_id = v.id
+			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
+			LEFT OUTER JOIN movieinfo m ON m.id = r.movieinfo_id
+			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
+			GROUP BY r.id
+			ORDER BY FIELD(r.id, %s)",
+            $idList,
+            $fieldOrder
+        );
+
+        $cacheKey = md5($cacheVersion.$sql.$page);
+        $releases = Cache::get($cacheKey);
+        if ($releases !== null) {
+            return $releases;
+        }
+
+        $sqlResult = DB::select($sql);
+        if (count($sqlResult) > 0) {
+            $sqlResult[0]->_totalcount = $sqlResult[0]->_totalrows = $filtered['total'];
+        }
+
+        $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+        Cache::put($cacheKey, $sqlResult, $expiresAt);
+
+        return $sqlResult;
     }
 
     /**

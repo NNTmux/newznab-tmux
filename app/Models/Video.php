@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Facades\Search;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -149,6 +151,18 @@ class Video extends Model
      */
     public static function getSeriesList(mixed $uid, string $letter = '', string $showname = ''): array
     {
+        $cacheKey = 'video_series_list:'.md5(serialize([(string) $uid, $letter, $showname]));
+
+        return Cache::remember($cacheKey, now()->addMinutes((int) config('nntmux.cache_expiry_medium', 60)), function () use ($uid, $letter, $showname): array {
+            return self::getSeriesListUncached($uid, $letter, $showname);
+        });
+    }
+
+    /**
+     * @internal Used by {@see getSeriesList} with cache wrapper.
+     */
+    private static function getSeriesListUncached(mixed $uid, string $letter = '', string $showname = ''): array
+    {
         $params = [
             'uid' => $uid,
             'tv_root' => Category::TV_ROOT,
@@ -168,8 +182,17 @@ class Video extends Model
 
         $shownameCondition = '';
         if ($showname !== '') {
-            $shownameCondition = 'AND videos.title LIKE :showname';
-            $params['showname'] = '%'.$showname.'%';
+            if (Search::isAvailable()) {
+                $hits = Search::searchTvShows($showname, 800);
+                $vids = array_values(array_filter(array_map(static fn ($id): int => (int) $id, $hits['id'] ?? [])));
+                if ($vids === []) {
+                    return [];
+                }
+                $shownameCondition = 'AND videos.id IN ('.implode(',', $vids).')';
+            } else {
+                $shownameCondition = 'AND videos.title LIKE :showname';
+                $params['showname'] = '%'.$showname.'%';
+            }
         }
 
         $sql = "
