@@ -1060,6 +1060,8 @@ class ElasticSearchDriver implements SearchDriverInterface
             $release = Release::query()
                 ->where('releases.id', $releaseID)
                 ->leftJoin('release_files as rf', 'releases.id', '=', 'rf.releases_id')
+                ->leftJoin('movieinfo as mi', 'releases.movieinfo_id', '=', 'mi.id')
+                ->leftJoin('videos as v', 'releases.videos_id', '=', 'v.id')
                 ->select([
                     'releases.id',
                     'releases.name',
@@ -1078,6 +1080,11 @@ class ElasticSearchDriver implements SearchDriverInterface
                     'releases.imdbid',
                     'releases.videos_id',
                     'releases.movieinfo_id',
+                    DB::raw('IFNULL(mi.tmdbid, 0) AS tmdbid'),
+                    DB::raw('IFNULL(mi.traktid, 0) AS traktid'),
+                    DB::raw('IFNULL(v.tvdb, 0) AS tvdb'),
+                    DB::raw('IFNULL(v.tvmaze, 0) AS tvmaze'),
+                    DB::raw('IFNULL(v.tvrage, 0) AS tvrage'),
                     DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename'),
                 ])
                 ->groupBy([
@@ -1098,6 +1105,11 @@ class ElasticSearchDriver implements SearchDriverInterface
                     'releases.imdbid',
                     'releases.videos_id',
                     'releases.movieinfo_id',
+                    'mi.tmdbid',
+                    'mi.traktid',
+                    'v.tvdb',
+                    'v.tvmaze',
+                    'v.tvrage',
                 ])
                 ->first();
 

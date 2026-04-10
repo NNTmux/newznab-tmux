@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Observers;
 
 use App\Facades\Search;
-use App\Models\MovieInfo;
 use App\Models\Release;
-use App\Models\Video;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
 use Illuminate\Support\Facades\Log;
@@ -15,9 +13,8 @@ use Illuminate\Support\Facades\Log;
 /**
  * Observer for Release model to keep search indexes in sync.
  *
- * This observer ensures that when releases are updated with movie/TV information
- * during post-processing, the search index is updated with the external IDs
- * (imdbid, tmdbid, tvdb, etc.) for efficient searching.
+ * Delegates document building to Search::updateRelease(), which loads the full
+ * row (including movieinfo/videos joins and release_files filenames).
  */
 class ReleaseObserver
 {
@@ -39,21 +36,27 @@ class ReleaseObserver
      */
     public function updated(Release $release): void
     {
-        // Check if any of the external ID fields were changed
-        $externalIdFields = [
+        $indexedFields = [
+            'name',
+            'searchname',
+            'fromname',
+            'categories_id',
             'imdbid',
             'movieinfo_id',
             'videos_id',
-            'tv_episodes_id',
-            'anidbid',
-            'searchname',
-            'name',
-            'fromname',
-            'categories_id',
+            'size',
+            'totalpart',
+            'grabs',
+            'passwordstatus',
+            'groups_id',
+            'nzbstatus',
+            'haspreview',
+            'postdate',
+            'adddate',
         ];
 
         $changed = false;
-        foreach ($externalIdFields as $field) {
+        foreach ($indexedFields as $field) {
             if ($release->isDirty($field)) {
                 $changed = true;
                 break;
@@ -114,49 +117,16 @@ class ReleaseObserver
     }
 
     /**
-     * Sync the release to the search index with all external IDs.
+     * Sync the release to the search index (full document from DB + joins).
      */
     private function syncToSearchIndex(Release $release): void
     {
         try {
-            // Load related models if needed
-            $movieInfo = null;
-            $video = null;
-
-            if ($release->movieinfo_id > 0) {
-                $movieInfo = MovieInfo::find($release->movieinfo_id);
-            }
-
-            if ($release->videos_id > 0) {
-                $video = Video::find($release->videos_id);
-            }
-
-            $parameters = [
-                'id' => $release->id,
-                'name' => $release->name ?? '',
-                'searchname' => $release->searchname ?? '',
-                'fromname' => $release->fromname ?? '',
-                'categories_id' => $release->categories_id ?? 0,
-                'filename' => '', // Not available from model
-                // Movie external IDs
-                'imdbid' => $release->imdbid ?? ($movieInfo?->imdbid ?? 0), // @phpstan-ignore nullsafe.neverNull
-                'tmdbid' => $movieInfo?->tmdbid ?? 0, // @phpstan-ignore nullsafe.neverNull
-                'traktid' => $movieInfo?->traktid ?? 0, // @phpstan-ignore nullsafe.neverNull
-                // TV show external IDs
-                'tvdb' => $video?->tvdb ?? 0, // @phpstan-ignore nullsafe.neverNull
-                'tvmaze' => $video?->tvmaze ?? 0, // @phpstan-ignore nullsafe.neverNull
-                'tvrage' => $video?->tvrage ?? 0, // @phpstan-ignore nullsafe.neverNull
-                'videos_id' => $release->videos_id ?? 0,
-                'movieinfo_id' => $release->movieinfo_id ?? 0,
-            ];
-
-            Search::insertRelease($parameters);
+            Search::updateRelease($release->id);
 
             if (config('app.debug')) {
                 Log::debug('ReleaseObserver: Updated search index for release', [
                     'release_id' => $release->id,
-                    'imdbid' => $parameters['imdbid'],
-                    'videos_id' => $parameters['videos_id'],
                 ]);
             }
         } catch (\Throwable $e) {

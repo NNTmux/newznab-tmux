@@ -212,7 +212,7 @@ class Release extends Model
                 ]
             );
 
-        Search::insertRelease($parameters);
+        Search::updateRelease($parameters['id']);
 
         return $parameters['id'];
     }
