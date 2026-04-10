@@ -44,8 +44,10 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->redirectGuestsTo(fn () => route('login'));
-        $middleware->redirectUsersTo('/');
+        $middleware->redirectTo(
+            guests: fn () => route('login'),
+            users: '/',
+        );
 
         $middleware->validateCsrfTokens(except: [
             'failed',
