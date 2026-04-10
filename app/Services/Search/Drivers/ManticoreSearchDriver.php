@@ -43,6 +43,9 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
     public Search $search;
 
+    /** @var array<string, true> Tables already confirmed to exist (avoids repeated CREATE TABLE attempts). */
+    private array $verifiedTables = [];
+
     /**
      * Establishes a connection to ManticoreSearch HTTP port.
      *
@@ -715,12 +718,18 @@ class ManticoreSearchDriver implements SearchDriverInterface
     }
 
     /**
-     * Create index if it doesn't exist
+     * Create index if it doesn't exist.
+     *
+     * Uses an in-memory set so the expensive CREATE TABLE round-trip is attempted
+     * at most once per table per process lifetime.
      */
     private function createIndexIfNotExists(string $index): void
     {
+        if (isset($this->verifiedTables[$index])) {
+            return;
+        }
+
         try {
-            // Use the tables() API which properly handles settings
             $indices = $this->manticoreSearch->tables();
 
             if ($index === 'releases_rt') {
@@ -737,7 +746,6 @@ class ManticoreSearchDriver implements SearchDriverInterface
                             'fromname' => ['type' => 'text'],
                             'filename' => ['type' => 'text'],
                             'categories_id' => ['type' => 'integer'],
-                            // External media IDs for efficient searching
                             'imdbid' => ['type' => 'string'],
                             'tmdbid' => ['type' => 'integer'],
                             'traktid' => ['type' => 'integer'],
@@ -840,8 +848,12 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 }
             }
         } catch (\Throwable $e) {
-            cli()->error('Error creating index '.$index.': '.$e->getMessage());
+            if (! str_contains($e->getMessage(), 'already exists')) {
+                cli()->error('Error creating index '.$index.': '.$e->getMessage());
+            }
         }
+
+        $this->verifiedTables[$index] = true;
     }
 
     /**
