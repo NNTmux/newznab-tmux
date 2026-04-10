@@ -270,7 +270,7 @@ class ReleaseUpdateService
             $updateColumns = [
                 'videos_id' => 0,
                 'tv_episodes_id' => 0,
-                'imdbid' => '',
+                'imdbid' => null,
                 'musicinfo_id' => '',
                 'consoleinfo_id' => '',
                 'bookinfo_id' => '',

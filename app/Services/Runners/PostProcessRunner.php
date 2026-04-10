@@ -131,7 +131,7 @@ class PostProcessRunner extends BaseRunner
             SELECT id
             FROM releases
             WHERE categories_id BETWEEN 2000 AND 2999
-            AND (imdbid IS NULL OR imdbid IN (\'\', \'0\', \'0000000\', \'00000000\'))
+            AND '.imdb_id_needs_lookup_sql('imdbid').'
             '.$condLookup.' '.$condRenamedOnly.'
             LIMIT 1';
         if (count(DB::select($checkSql)) === 0) {
@@ -145,7 +145,7 @@ class PostProcessRunner extends BaseRunner
             SELECT DISTINCT LEFT(leftguid, 1) AS id, '.$renamedFlag.' AS renamed
             FROM releases
             WHERE categories_id BETWEEN 2000 AND 2999
-            AND (imdbid IS NULL OR imdbid IN (\'\', \'0\', \'0000000\', \'00000000\'))
+            AND '.imdb_id_needs_lookup_sql('imdbid').'
             '.$condLookup.' '.$condRenamedOnly.'
             LIMIT 16';
         $queue = DB::select($sql);

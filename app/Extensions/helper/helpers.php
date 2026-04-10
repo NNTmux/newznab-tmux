@@ -234,6 +234,49 @@ if (! function_exists('imdb_id_is_valid')) {
     }
 }
 
+if (! function_exists('imdb_id_pending_values')) {
+    /**
+     * IMDb values that mean "queued/pending lookup" in legacy release rows.
+     *
+     * @return list<string>
+     */
+    function imdb_id_pending_values(): array
+    {
+        return ['0', '0000000', '00000000'];
+    }
+}
+
+if (! function_exists('imdb_id_needs_lookup')) {
+    /**
+     * Determine whether a release should still be queued for IMDb lookup.
+     *
+     * NULL means never attempted. Legacy zero-like sentinels also mean pending.
+     * Empty string means lookup already attempted and failed, so do not requeue.
+     */
+    function imdb_id_needs_lookup(int|string|null $id): bool
+    {
+        if ($id === null) {
+            return true;
+        }
+
+        $value = trim((string) $id);
+
+        return in_array($value, imdb_id_pending_values(), true);
+    }
+}
+
+if (! function_exists('imdb_id_needs_lookup_sql')) {
+    /**
+     * Build a reusable SQL predicate for releases that still need IMDb lookup.
+     */
+    function imdb_id_needs_lookup_sql(string $column = 'imdbid'): string
+    {
+        $pendingValues = implode(', ', array_map(static fn (string $value): string => escapeString($value), imdb_id_pending_values()));
+
+        return sprintf('(%s IS NULL OR %s IN (%s))', $column, $column, $pendingValues);
+    }
+}
+
 if (! function_exists('imdb_id_pad')) {
     /**
      * @deprecated Use imdb_id_is_valid() instead. This function exists only for backward

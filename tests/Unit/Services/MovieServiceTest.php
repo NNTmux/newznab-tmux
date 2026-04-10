@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
+use App\Models\Release;
 use App\Services\MovieService;
 use App\Services\TraktService;
 use App\Services\TvProcessing\Providers\TraktProvider;
@@ -40,6 +41,15 @@ class MovieServiceTest extends ImdbScraperTestCase
             $table->boolean('backdrop')->default(false);
             $table->string('trailer')->default('');
             $table->timestamps();
+        });
+
+        Schema::dropIfExists('releases');
+        Schema::create('releases', function (Blueprint $table): void {
+            $table->id();
+            $table->string('searchname')->default('');
+            $table->unsignedInteger('categories_id')->default(0);
+            $table->string('imdbid')->nullable();
+            $table->unsignedBigInteger('movieinfo_id')->nullable();
         });
     }
 
@@ -126,6 +136,46 @@ class MovieServiceTest extends ImdbScraperTestCase
         ]);
 
         $this->assertSame('https://example.test/embed/trailer', $service->getTrailer('0137523'));
+    }
+
+    #[Test]
+    public function it_distinguishes_pending_movie_lookup_sentinels_from_failed_empty_values(): void
+    {
+        $this->assertTrue(imdb_id_needs_lookup(null));
+        $this->assertTrue(imdb_id_needs_lookup('0'));
+        $this->assertTrue(imdb_id_needs_lookup('0000000'));
+        $this->assertTrue(imdb_id_needs_lookup('00000000'));
+        $this->assertFalse(imdb_id_needs_lookup(''));
+        $this->assertFalse(imdb_id_needs_lookup('0137523'));
+    }
+
+    #[Test]
+    public function it_keeps_a_found_imdb_id_when_metadata_refresh_fails(): void
+    {
+        Cache::flush();
+
+        $service = new class extends MovieService
+        {
+            public function updateMovieInfo(string $imdbId): bool
+            {
+                return false;
+            }
+        };
+        $service->echooutput = false;
+
+        Release::query()->insert([
+            'id' => 2,
+            'searchname' => 'Example.Movie.2024',
+            'categories_id' => 2000,
+            'imdbid' => null,
+            'movieinfo_id' => null,
+        ]);
+
+        $result = $service->doMovieUpdate('tt0137523', 'IMDb(scrape)', 2);
+
+        $this->assertSame('0137523', $result);
+        $this->assertSame('0137523', Release::query()->whereKey(2)->value('imdbid'));
+        $this->assertNull(Release::query()->whereKey(2)->value('movieinfo_id'));
     }
 
     /**

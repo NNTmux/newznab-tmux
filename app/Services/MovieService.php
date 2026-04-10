@@ -1001,9 +1001,7 @@ class MovieService
 
                         $info = $this->updateMovieInfo($imdbId);
 
-                        if ($info === false) {
-                            Release::query()->where('id', $id)->update(['imdbid' => '']);
-                        } elseif ($info === true) {
+                        if ($info === true) {
                             $freshMovieInfo = MovieInfo::query()->where('imdbid', $imdbId)->first(['id']);
 
                             Release::query()->where('id', $id)->update([
@@ -1041,7 +1039,7 @@ class MovieService
             ->whereBetween('categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER])
             ->where(function ($query): void {
                 $query->whereNull('imdbid')
-                    ->orWhereIn('imdbid', ['', '0', '0000000', '00000000']);
+                    ->orWhereIn('imdbid', imdb_id_pending_values());
             });
 
         if ($groupID !== '') {
@@ -1097,7 +1095,8 @@ class MovieService
                         ->where('id', $arr['id'])
                         ->where(function ($query): void {
                             $query->whereNotNull('imdbid')
-                                ->whereNotIn('imdbid', ['', '0', '0000000', '00000000']);
+                                ->where('imdbid', '<>', '')
+                                ->whereNotIn('imdbid', imdb_id_pending_values());
                         })
                         ->exists();
                     if ($releaseCheck) {

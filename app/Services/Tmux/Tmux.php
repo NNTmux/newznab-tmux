@@ -302,12 +302,21 @@ class Tmux
 
         switch ((int) $qry) {
             case 1:
+                $movieLookupSql = imdb_id_needs_lookup_sql('imdbid');
+                $lookupMovies = (int) Settings::settingValue('lookupimdb');
+
+                if ($lookupMovies <= 0) {
+                    $movieLookupSql = '0 = 1';
+                } elseif ($lookupMovies === 2) {
+                    $movieLookupSql .= ' AND isrenamed = 1';
+                }
+
                 return sprintf(
                     '
 					SELECT
 					SUM(IF(categories_id BETWEEN %d AND %d AND categories_id != %d AND videos_id = 0 AND tv_episodes_id BETWEEN -3 AND 0 AND size > 1048576,1,0)) AS processtv,
 					SUM(IF(categories_id = %d AND anidbid IS NULL,1,0)) AS processanime,
-                    SUM(IF(categories_id BETWEEN %d AND %d AND (imdbid IS NULL OR imdbid IN (\'\', \'0\', \'0000000\', \'00000000\')),1,0)) AS processmovies,
+                      SUM(IF(categories_id BETWEEN %d AND %d AND '.$movieLookupSql.',1,0)) AS processmovies,
 					SUM(IF(categories_id IN (%d, %d, %d) AND musicinfo_id IS NULL,1,0)) AS processmusic,
 					SUM(IF(categories_id BETWEEN %d AND %d AND consoleinfo_id IS NULL,1,0)) AS processconsole,
 					SUM(IF(categories_id IN (%s) AND bookinfo_id IS NULL,1,0)) AS processbooks,
@@ -316,7 +325,7 @@ class Tmux
 					SUM(IF(isrenamed = %d AND predb_id = 0 AND passwordstatus >= 0 AND nfostatus > %d
 						AND ((nfostatus = %d AND proc_nfo = %d) OR proc_files = %d OR proc_par2 = %d) AND categories_id IN (%s),1,0)) AS processrenames,
 					SUM(IF(isrenamed = %d,1,0)) AS renamed,
-					SUM(IF(nfostatus = %19$d,1,0)) AS nfo,
+          SUM(IF(nfostatus = %d,1,0)) AS nfo,
 					SUM(IF(predb_id > 0,1,0)) AS predb_matched,
 					COUNT(DISTINCT(predb_id)) AS distinct_predb_matched
 					FROM releases r',
@@ -341,7 +350,8 @@ class Tmux
                     NameFixingService::PROC_FILES_NONE,
                     NameFixingService::PROC_PAR2_NONE,
                     Category::getCategoryOthersGroup(),
-                    NameFixingService::IS_RENAMED_DONE
+                    NameFixingService::IS_RENAMED_DONE,
+                    NfoService::NFO_FOUND
                 );
 
             case 2:
