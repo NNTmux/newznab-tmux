@@ -55,15 +55,6 @@ return [
             'sslmode' => 'prefer',
         ],
 
-        'sphinx' => [
-            'driver' => 'mysql',
-            'host' => env('MANTICORESEARCH_HOST', '127.0.0.1'),
-            'port' => env('MANTICORESEARCH_PORT', 9306),
-            'database' => '',
-            'unix_socket' => '',
-            'charset' => 'utf8',
-        ],
-
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),

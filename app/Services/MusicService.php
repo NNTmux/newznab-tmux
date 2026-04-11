@@ -93,10 +93,21 @@ class MusicService
             $q = MetadataSearchLookup::normalizeBooleanSearchWords($searchwords);
             if ($q !== '') {
                 $hits = Search::searchSecondary(SecondarySearchIndex::Music, $q, 25);
-                foreach ($hits['id'] as $mid) {
-                    $found = MusicInfo::query()->with('genre')->where('id', $mid)->first();
-                    if ($found !== null) {
-                        return $found;
+                $musicIds = array_values(array_map('intval', $hits['id'] ?? []));
+                if ($musicIds !== []) {
+                    $rowsById = MusicInfo::query()
+                        ->with('genre')
+                        ->whereIn('id', $musicIds)
+                        ->get()
+                        ->keyBy('id');
+
+                    foreach ($musicIds as $musicId) {
+                        if ($rowsById->has($musicId)) {
+                            /** @var MusicInfo $music */
+                            $music = $rowsById->get($musicId);
+
+                            return $music;
+                        }
                     }
                 }
             }

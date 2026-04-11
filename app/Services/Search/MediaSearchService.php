@@ -32,16 +32,7 @@ class MediaSearchService
      */
     public function findMovie(array $externalIds): ?array
     {
-        foreach (['imdbid', 'tmdbid', 'traktid'] as $field) {
-            if (! empty($externalIds[$field])) {
-                $result = Search::searchMovieByExternalId($field, $externalIds[$field]);
-                if ($result !== null) {
-                    return $result;
-                }
-            }
-        }
-
-        return null;
+        return Search::searchMovieByExternalIds($externalIds);
     }
 
     /**
@@ -52,16 +43,7 @@ class MediaSearchService
      */
     public function findTvShow(array $externalIds): ?array
     {
-        foreach (['tvdb', 'trakt', 'tvmaze', 'tvrage', 'imdb', 'tmdb'] as $field) {
-            if (! empty($externalIds[$field])) {
-                $result = Search::searchTvShowByExternalId($field, $externalIds[$field]);
-                if ($result !== null) {
-                    return $result;
-                }
-            }
-        }
-
-        return null;
+        return Search::searchTvShowByExternalIds($externalIds);
     }
 
     /**
@@ -90,7 +72,7 @@ class MediaSearchService
         }
 
         // Collect all external IDs from matched movies
-        $allReleaseIds = [];
+        $externalIdSets = [];
 
         foreach ($movieResults['data'] ?? [] as $movie) {
             $externalIds = [];
@@ -106,10 +88,11 @@ class MediaSearchService
             }
 
             if (! empty($externalIds)) {
-                $releaseIds = Search::searchReleasesByExternalId($externalIds, $limit);
-                $allReleaseIds = array_merge($allReleaseIds, $releaseIds);
+                $externalIdSets[] = $externalIds;
             }
         }
+
+        $allReleaseIds = Search::searchReleasesByMultipleExternalIds($externalIdSets, $limit);
 
         // Remove duplicates and limit results
         $allReleaseIds = array_unique($allReleaseIds);
@@ -148,7 +131,7 @@ class MediaSearchService
         }
 
         // Collect all external IDs from matched TV shows
-        $allReleaseIds = [];
+        $externalIdSets = [];
 
         foreach ($tvResults['data'] ?? [] as $tvShow) {
             $externalIds = [];
@@ -167,10 +150,11 @@ class MediaSearchService
             }
 
             if (! empty($externalIds)) {
-                $releaseIds = Search::searchReleasesByExternalId($externalIds, $limit);
-                $allReleaseIds = array_merge($allReleaseIds, $releaseIds);
+                $externalIdSets[] = $externalIds;
             }
         }
+
+        $allReleaseIds = Search::searchReleasesByMultipleExternalIds($externalIdSets, $limit);
 
         // Remove duplicates and limit results
         $allReleaseIds = array_unique($allReleaseIds);

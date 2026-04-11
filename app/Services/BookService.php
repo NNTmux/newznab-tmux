@@ -97,10 +97,20 @@ class BookService
             $q = MetadataSearchLookup::normalizeBooleanSearchWords($searchWords);
             if ($q !== '') {
                 $hits = Search::searchSecondary(SecondarySearchIndex::Books, $q, 25);
-                foreach ($hits['id'] as $bid) {
-                    $found = BookInfo::query()->where('id', $bid)->first();
-                    if ($found !== null) {
-                        return $found;
+                $bookIds = array_values(array_map('intval', $hits['id'] ?? []));
+                if ($bookIds !== []) {
+                    $rowsById = BookInfo::query()
+                        ->whereIn('id', $bookIds)
+                        ->get()
+                        ->keyBy('id');
+
+                    foreach ($bookIds as $bookId) {
+                        if ($rowsById->has($bookId)) {
+                            /** @var BookInfo $book */
+                            $book = $rowsById->get($bookId);
+
+                            return $book;
+                        }
                     }
                 }
             }

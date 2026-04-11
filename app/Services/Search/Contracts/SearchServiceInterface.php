@@ -232,6 +232,14 @@ interface SearchServiceInterface
     public function searchMovieByExternalId(string $field, int|string $value): ?array;
 
     /**
+     * Search movies by any provided external IDs in one call.
+     *
+     * @param  array<string, mixed>  $externalIds  Keys: imdbid, tmdbid, traktid
+     * @return array<string, mixed>|null Movie data or null if not found
+     */
+    public function searchMovieByExternalIds(array $externalIds): ?array;
+
+    /**
      * Search movies index by field-specific terms (title, director, actors, genre).
      *
      * @param  array<string, string>  $fieldTerms
@@ -287,6 +295,14 @@ interface SearchServiceInterface
     public function searchTvShowByExternalId(string $field, int|string $value): ?array;
 
     /**
+     * Search TV shows by any provided external IDs in one call.
+     *
+     * @param  array<string, mixed>  $externalIds  Keys: tvdb, trakt, tvmaze, tvrage, imdb, tmdb
+     * @return array<string, mixed>|null TV show data or null if not found
+     */
+    public function searchTvShowByExternalIds(array $externalIds): ?array;
+
+    /**
      * Search releases by external media IDs.
      * Used to find releases associated with a specific movie or TV show.
      *
@@ -295,6 +311,14 @@ interface SearchServiceInterface
      * @return array<string, mixed> Array of release IDs
      */
     public function searchReleasesByExternalId(array $externalIds, int $limit = 1000): array;
+
+    /**
+     * Search releases by multiple external-ID sets in a single call.
+     *
+     * @param  array<int, array<string, mixed>>  $externalIdSets
+     * @return array<string, mixed> Array of release IDs
+     */
+    public function searchReleasesByMultipleExternalIds(array $externalIdSets, int $limit = 1000): array;
 
     /**
      * Search releases by category ID using the search index.

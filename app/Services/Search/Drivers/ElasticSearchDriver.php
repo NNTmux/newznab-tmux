@@ -1663,7 +1663,8 @@ class ElasticSearchDriver implements SearchDriverInterface
         array $fields,
         int $limit,
         array $options = [],
-        bool $includeDateSort = true
+        bool $includeDateSort = true,
+        bool $useScroll = false
     ): array {
         $queryString = array_merge([
             'query' => $keywords,
@@ -1679,8 +1680,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             $sort[] = ['post_date' => ['order' => 'desc', 'unmapped_type' => 'date', 'missing' => '_last']];
         }
 
-        return [
-            'scroll' => self::SCROLL_TIMEOUT,
+        $search = [
             'index' => $index,
             'body' => [
                 'query' => [
@@ -1692,6 +1692,12 @@ class ElasticSearchDriver implements SearchDriverInterface
                 'track_total_hits' => true,
             ],
         ];
+
+        if ($useScroll) {
+            $search['scroll'] = self::SCROLL_TIMEOUT;
+        }
+
+        return $search;
     }
 
     /**
@@ -1746,6 +1752,7 @@ class ElasticSearchDriver implements SearchDriverInterface
         }
 
         $scrollId = null;
+        $useScroll = isset($search['scroll']) && is_string($search['scroll']) && $search['scroll'] !== '';
 
         try {
             $client = $this->getClient();
@@ -1771,14 +1778,19 @@ class ElasticSearchDriver implements SearchDriverInterface
 
             $searchResult = [];
 
-            while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
-                foreach ($results['hits']['hits'] as $result) {
-                    if ($fullResults) {
-                        $searchResult[] = $result['_source'];
-                    } else {
-                        $searchResult[] = $result['_source']['id'] ?? $result['_id'];
-                    }
+            foreach ($results['hits']['hits'] ?? [] as $result) {
+                if ($fullResults) {
+                    $searchResult[] = $result['_source'];
+                } else {
+                    $searchResult[] = $result['_source']['id'] ?? $result['_id'];
                 }
+            }
+
+            if (! $useScroll) {
+                return $searchResult;
+            }
+
+            while (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
 
                 // Handle scrolling for large result sets
                 if (! isset($results['_scroll_id'])) {
@@ -1790,6 +1802,14 @@ class ElasticSearchDriver implements SearchDriverInterface
                     'scroll_id' => $scrollId,
                     'scroll' => self::SCROLL_TIMEOUT,
                 ]);
+
+                foreach ($results['hits']['hits'] ?? [] as $result) {
+                    if ($fullResults) {
+                        $searchResult[] = $result['_source'];
+                    } else {
+                        $searchResult[] = $result['_source']['id'] ?? $result['_id'];
+                    }
+                }
             }
 
             return $searchResult; // @phpstan-ignore return.type
@@ -2171,11 +2191,43 @@ class ElasticSearchDriver implements SearchDriverInterface
      */
     public function searchMovieByExternalId(string $field, int|string $value): ?array
     {
-        if (empty($value) || ! in_array($field, ['imdbid', 'tmdbid', 'traktid'])) {
+        if (empty($value)) {
             return null;
         }
 
-        $cacheKey = 'es:movie:'.$field.':'.$value;
+        return $this->searchMovieByExternalIds([$field => $value]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $externalIds
+     * @return array<string, mixed>|null
+     */
+    public function searchMovieByExternalIds(array $externalIds): ?array
+    {
+        $allowedFields = ['imdbid', 'tmdbid', 'traktid'];
+        $shouldClauses = [];
+        $cacheableValues = [];
+
+        foreach ($allowedFields as $field) {
+            $value = $externalIds[$field] ?? null;
+            if (empty($value)) {
+                continue;
+            }
+
+            $typedValue = $field === 'imdbid' ? (string) $value : (int) $value;
+            if ($typedValue === '' || $typedValue === 0) {
+                continue;
+            }
+
+            $shouldClauses[] = ['term' => [$field => $typedValue]];
+            $cacheableValues[$field] = $typedValue;
+        }
+
+        if ($shouldClauses === []) {
+            return null;
+        }
+
+        $cacheKey = 'es:movie:any:'.md5(serialize($cacheableValues));
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
@@ -2188,8 +2240,9 @@ class ElasticSearchDriver implements SearchDriverInterface
                 'index' => $this->getMoviesIndex(),
                 'body' => [
                     'query' => [
-                        'term' => [
-                            $field => $field === 'imdbid' ? (string) $value : (int) $value,
+                        'bool' => [
+                            'should' => $shouldClauses,
+                            'minimum_should_match' => 1,
                         ],
                     ],
                     'size' => 1,
@@ -2207,9 +2260,8 @@ class ElasticSearchDriver implements SearchDriverInterface
             }
 
         } catch (\Throwable $e) {
-            Log::error('ElasticSearch searchMovieByExternalId error: '.$e->getMessage(), [
-                'field' => $field,
-                'value' => $value,
+            Log::error('ElasticSearch searchMovieByExternalIds error: '.$e->getMessage(), [
+                'externalIds' => $externalIds,
             ]);
         }
 
@@ -2456,11 +2508,43 @@ class ElasticSearchDriver implements SearchDriverInterface
      */
     public function searchTvShowByExternalId(string $field, int|string $value): ?array
     {
-        if (empty($value) || ! in_array($field, ['tvdb', 'trakt', 'tvmaze', 'tvrage', 'imdb', 'tmdb'])) {
+        if (empty($value)) {
             return null;
         }
 
-        $cacheKey = 'es:tvshow:'.$field.':'.$value;
+        return $this->searchTvShowByExternalIds([$field => $value]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $externalIds
+     * @return array<string, mixed>|null
+     */
+    public function searchTvShowByExternalIds(array $externalIds): ?array
+    {
+        $allowedFields = ['tvdb', 'trakt', 'tvmaze', 'tvrage', 'imdb', 'tmdb'];
+        $shouldClauses = [];
+        $cacheableValues = [];
+
+        foreach ($allowedFields as $field) {
+            $value = $externalIds[$field] ?? null;
+            if (empty($value)) {
+                continue;
+            }
+
+            $typedValue = $field === 'imdb' ? (string) $value : (int) $value;
+            if ($typedValue === '' || $typedValue === 0) {
+                continue;
+            }
+
+            $shouldClauses[] = ['term' => [$field => $typedValue]];
+            $cacheableValues[$field] = $typedValue;
+        }
+
+        if ($shouldClauses === []) {
+            return null;
+        }
+
+        $cacheKey = 'es:tvshow:any:'.md5(serialize($cacheableValues));
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
@@ -2473,8 +2557,9 @@ class ElasticSearchDriver implements SearchDriverInterface
                 'index' => $this->getTvShowsIndex(),
                 'body' => [
                     'query' => [
-                        'term' => [
-                            $field => (int) $value,
+                        'bool' => [
+                            'should' => $shouldClauses,
+                            'minimum_should_match' => 1,
                         ],
                     ],
                     'size' => 1,
@@ -2492,9 +2577,8 @@ class ElasticSearchDriver implements SearchDriverInterface
             }
 
         } catch (\Throwable $e) {
-            Log::error('ElasticSearch searchTvShowByExternalId error: '.$e->getMessage(), [
-                'field' => $field,
-                'value' => $value,
+            Log::error('ElasticSearch searchTvShowByExternalIds error: '.$e->getMessage(), [
+                'externalIds' => $externalIds,
             ]);
         }
 
@@ -2511,11 +2595,42 @@ class ElasticSearchDriver implements SearchDriverInterface
      */
     public function searchReleasesByExternalId(array $externalIds, int $limit = 1000): array
     {
-        if (empty($externalIds)) {
+        return $this->searchReleasesByMultipleExternalIds([$externalIds], $limit);
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $externalIdSets
+     * @return array<string, mixed>
+     */
+    public function searchReleasesByMultipleExternalIds(array $externalIdSets, int $limit = 1000): array
+    {
+        if ($externalIdSets === []) {
             return [];
         }
 
-        $cacheKey = 'es:releases:extid:'.md5(serialize($externalIds));
+        $shouldClauses = [];
+        $cachePayload = [];
+
+        foreach ($externalIdSets as $externalIds) {
+            $setClauses = $this->buildReleaseExternalIdShouldClauses($externalIds);
+            if ($setClauses === []) {
+                continue;
+            }
+
+            $shouldClauses[] = [
+                'bool' => [
+                    'should' => $setClauses,
+                    'minimum_should_match' => 1,
+                ],
+            ];
+            $cachePayload[] = $externalIds;
+        }
+
+        if ($shouldClauses === []) {
+            return [];
+        }
+
+        $cacheKey = 'es:releases:extid_sets:'.md5(serialize([$cachePayload, $limit]));
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
@@ -2523,17 +2638,6 @@ class ElasticSearchDriver implements SearchDriverInterface
 
         try {
             $client = $this->getClient();
-
-            $shouldClauses = [];
-            foreach ($externalIds as $field => $value) {
-                if (! empty($value) && in_array($field, ['imdbid', 'tmdbid', 'traktid', 'tvdb', 'tvmaze', 'tvrage'])) {
-                    $shouldClauses[] = ['term' => [$field => $field === 'imdbid' ? (string) $value : (int) $value]];
-                }
-            }
-
-            if (empty($shouldClauses)) {
-                return [];
-            }
 
             $searchParams = [
                 'index' => $this->getReleasesIndex(),
@@ -2552,25 +2656,40 @@ class ElasticSearchDriver implements SearchDriverInterface
             $response = $client->search($searchParams);
 
             $resultIds = [];
-            if (isset($response['hits']['hits'])) {
-                foreach ($response['hits']['hits'] as $hit) {
-                    $resultIds[] = $hit['_id'];
-                }
+            foreach ($response['hits']['hits'] ?? [] as $hit) {
+                $resultIds[] = $hit['_id'];
             }
 
-            if (! empty($resultIds)) {
+            if ($resultIds !== []) {
                 Cache::put($cacheKey, $resultIds, now()->addMinutes(self::CACHE_TTL_MINUTES));
             }
 
             return $resultIds; // @phpstan-ignore return.type
-
         } catch (\Throwable $e) {
-            Log::error('ElasticSearch searchReleasesByExternalId error: '.$e->getMessage(), [
-                'externalIds' => $externalIds,
+            Log::error('ElasticSearch searchReleasesByMultipleExternalIds error: '.$e->getMessage(), [
+                'externalIdSets' => $externalIdSets,
             ]);
         }
 
         return [];
+    }
+
+    /**
+     * @param  array<string, mixed>  $externalIds
+     * @return list<array<string, mixed>>
+     */
+    private function buildReleaseExternalIdShouldClauses(array $externalIds): array
+    {
+        $clauses = [];
+        foreach ($externalIds as $field => $value) {
+            if (empty($value) || ! in_array($field, ['imdbid', 'tmdbid', 'traktid', 'tvdb', 'tvmaze', 'tvrage'], true)) {
+                continue;
+            }
+
+            $clauses[] = ['term' => [$field => $field === 'imdbid' ? (string) $value : (int) $value]];
+        }
+
+        return $clauses;
     }
 
     /**
@@ -2646,7 +2765,6 @@ class ElasticSearchDriver implements SearchDriverInterface
      * @param  string  $searchTerm  Search text
      * @param  array<string, mixed>  $categoryIds  Array of category IDs to filter by (empty for all categories)
      * @param  int  $limit  Maximum number of results
-     * @return array<string, mixed>
      * @return array<string, mixed>
      */
     public function searchReleasesWithCategoryFilter(string $searchTerm, array $categoryIds = [], int $limit = 1000): array
@@ -2975,7 +3093,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             return ['success' => 0, 'errors' => 0];
         }
 
-        $success = 0;
+        $validDocs = [];
         $errors = 0;
         $indexName = $this->getSecondaryIndexName($index);
 
@@ -2986,18 +3104,33 @@ class ElasticSearchDriver implements SearchDriverInterface
 
                 continue;
             }
+
             unset($doc['id']);
-            try {
-                $this->getClient()->index([
-                    'index' => $indexName,
-                    'id' => (string) $docId,
-                    'body' => $doc,
-                ]);
-                $success++;
-            } catch (\Throwable $e) {
-                $errors++;
-                Log::error('ElasticSearch bulkInsertSecondary row error: '.$e->getMessage());
-            }
+            $validDocs[] = ['id' => $docId, 'body' => $doc];
+        }
+
+        if ($validDocs === []) {
+            return ['success' => 0, 'errors' => $errors];
+        }
+
+        $params = ['body' => []];
+        foreach ($validDocs as $doc) {
+            $params['body'][] = [
+                'index' => [
+                    '_index' => $indexName,
+                    '_id' => (string) $doc['id'],
+                ],
+            ];
+            $params['body'][] = $doc['body'];
+        }
+
+        $success = count($validDocs);
+        try {
+            $this->executeBulk($params);
+        } catch (\Throwable $e) {
+            Log::error('ElasticSearch bulkInsertSecondary error: '.$e->getMessage(), ['secondary' => $index->value]);
+            $errors += $success;
+            $success = 0;
         }
 
         return ['success' => $success, 'errors' => $errors];

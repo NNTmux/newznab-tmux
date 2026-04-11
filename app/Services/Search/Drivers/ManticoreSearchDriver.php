@@ -1865,35 +1865,61 @@ class ManticoreSearchDriver implements SearchDriverInterface
      */
     public function searchMovieByExternalId(string $field, int|string $value): ?array
     {
-        if (empty($value) || ! in_array($field, ['imdbid', 'tmdbid', 'traktid'])) {
+        if (empty($value)) {
             return null;
         }
 
-        $cacheKey = 'manticore:movie:'.$field.':'.$value;
+        return $this->searchMovieByExternalIds([$field => $value]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $externalIds
+     * @return array<string, mixed>|null
+     */
+    public function searchMovieByExternalIds(array $externalIds): ?array
+    {
+        $allowedFields = ['imdbid', 'tmdbid', 'traktid'];
+        $normalized = [];
+
+        foreach ($allowedFields as $field) {
+            $value = $externalIds[$field] ?? null;
+            if (empty($value)) {
+                continue;
+            }
+
+            $normalized[$field] = $field === 'imdbid' ? (string) $value : (int) $value;
+        }
+
+        if ($normalized === []) {
+            return null;
+        }
+
+        $cacheKey = 'manticore:movie:any:'.md5(serialize($normalized));
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
         }
 
         try {
-            $query = (new Search($this->manticoreSearch))
-                ->setTable($this->getMoviesIndex())
-                ->filter($field, '=', (int) $value)
-                ->limit(1);
+            foreach ($normalized as $field => $value) {
+                $query = (new Search($this->manticoreSearch))
+                    ->setTable($this->getMoviesIndex())
+                    ->filter($field, '=', $value)
+                    ->limit(1);
 
-            $results = $query->get();
+                $results = $query->get();
 
-            foreach ($results as $doc) {
-                $data = $doc->getData();
-                $data['id'] = $doc->getId();
-                Cache::put($cacheKey, $data, now()->addMinutes($this->config['cache_minutes'] ?? 5));
+                foreach ($results as $doc) {
+                    $data = $doc->getData();
+                    $data['id'] = $doc->getId();
+                    Cache::put($cacheKey, $data, now()->addMinutes($this->config['cache_minutes'] ?? 5));
 
-                return $data;
+                    return $data;
+                }
             }
         } catch (\Throwable $e) {
-            Log::error('ManticoreSearch searchMovieByExternalId error: '.$e->getMessage(), [
-                'field' => $field,
-                'value' => $value,
+            Log::error('ManticoreSearch searchMovieByExternalIds error: '.$e->getMessage(), [
+                'externalIds' => $externalIds,
             ]);
         }
 
@@ -2065,35 +2091,61 @@ class ManticoreSearchDriver implements SearchDriverInterface
      */
     public function searchTvShowByExternalId(string $field, int|string $value): ?array
     {
-        if (empty($value) || ! in_array($field, ['tvdb', 'trakt', 'tvmaze', 'tvrage', 'imdb', 'tmdb'])) {
+        if (empty($value)) {
             return null;
         }
 
-        $cacheKey = 'manticore:tvshow:'.$field.':'.$value;
+        return $this->searchTvShowByExternalIds([$field => $value]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $externalIds
+     * @return array<string, mixed>|null
+     */
+    public function searchTvShowByExternalIds(array $externalIds): ?array
+    {
+        $allowedFields = ['tvdb', 'trakt', 'tvmaze', 'tvrage', 'imdb', 'tmdb'];
+        $normalized = [];
+
+        foreach ($allowedFields as $field) {
+            $value = $externalIds[$field] ?? null;
+            if (empty($value)) {
+                continue;
+            }
+
+            $normalized[$field] = $field === 'imdb' ? (string) $value : (int) $value;
+        }
+
+        if ($normalized === []) {
+            return null;
+        }
+
+        $cacheKey = 'manticore:tvshow:any:'.md5(serialize($normalized));
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
         }
 
         try {
-            $query = (new Search($this->manticoreSearch))
-                ->setTable($this->getTvShowsIndex())
-                ->filter($field, '=', (int) $value)
-                ->limit(1);
+            foreach ($normalized as $field => $value) {
+                $query = (new Search($this->manticoreSearch))
+                    ->setTable($this->getTvShowsIndex())
+                    ->filter($field, '=', $value)
+                    ->limit(1);
 
-            $results = $query->get();
+                $results = $query->get();
 
-            foreach ($results as $doc) {
-                $data = $doc->getData();
-                $data['id'] = $doc->getId();
-                Cache::put($cacheKey, $data, now()->addMinutes($this->config['cache_minutes'] ?? 5));
+                foreach ($results as $doc) {
+                    $data = $doc->getData();
+                    $data['id'] = $doc->getId();
+                    Cache::put($cacheKey, $data, now()->addMinutes($this->config['cache_minutes'] ?? 5));
 
-                return $data;
+                    return $data;
+                }
             }
         } catch (\Throwable $e) {
-            Log::error('ManticoreSearch searchTvShowByExternalId error: '.$e->getMessage(), [
-                'field' => $field,
-                'value' => $value,
+            Log::error('ManticoreSearch searchTvShowByExternalIds error: '.$e->getMessage(), [
+                'externalIds' => $externalIds,
             ]);
         }
 
@@ -2110,47 +2162,83 @@ class ManticoreSearchDriver implements SearchDriverInterface
      */
     public function searchReleasesByExternalId(array $externalIds, int $limit = 1000): array
     {
-        if (empty($externalIds)) {
+        return $this->searchReleasesByMultipleExternalIds([$externalIds], $limit);
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $externalIdSets
+     * @return array<string, mixed>
+     */
+    public function searchReleasesByMultipleExternalIds(array $externalIdSets, int $limit = 1000): array
+    {
+        if ($externalIdSets === []) {
             return [];
         }
 
-        $cacheKey = 'manticore:releases:extid:'.md5(serialize($externalIds));
+        $normalizedLimit = min($limit, 10000);
+        $cacheKey = 'manticore:releases:extid_sets:'.md5(serialize([$externalIdSets, $normalizedLimit]));
         $cached = Cache::get($cacheKey);
         if ($cached !== null) {
             return $cached;
         }
 
-        try {
-            $query = (new Search($this->manticoreSearch))
-                ->setTable($this->getReleasesIndex())
-                ->limit(min($limit, 10000));
-
-            // Add filters for each external ID provided
+        $queries = [];
+        foreach ($externalIdSets as $externalIds) {
             foreach ($externalIds as $field => $value) {
-                if (! empty($value) && in_array($field, ['imdbid', 'tmdbid', 'traktid', 'tvdb', 'tvmaze', 'tvrage'])) {
-                    $query->filter($field, '=', $field === 'imdbid' ? (string) $value : (int) $value);
+                if (empty($value) || ! in_array($field, ['imdbid', 'tmdbid', 'traktid', 'tvdb', 'tvmaze', 'tvrage'], true)) {
+                    continue;
                 }
+
+                $typedValue = $field === 'imdbid' ? (string) $value : (int) $value;
+                $key = $field.':'.$typedValue;
+                $queries[$key] = [
+                    'field' => $field,
+                    'value' => $typedValue,
+                ];
             }
-
-            $results = $query->get();
-
-            $resultIds = [];
-            foreach ($results as $doc) {
-                $resultIds[] = $doc->getId();
-            }
-
-            if (! empty($resultIds)) {
-                Cache::put($cacheKey, $resultIds, now()->addMinutes($this->config['cache_minutes'] ?? 5));
-            }
-
-            return $resultIds;
-        } catch (\Throwable $e) {
-            Log::error('ManticoreSearch searchReleasesByExternalId error: '.$e->getMessage(), [
-                'externalIds' => $externalIds,
-            ]);
         }
 
-        return [];
+        if ($queries === []) {
+            return [];
+        }
+
+        $resultIds = [];
+        $seen = [];
+
+        try {
+            foreach ($queries as $queryData) {
+                $query = (new Search($this->manticoreSearch))
+                    ->setTable($this->getReleasesIndex())
+                    ->filter($queryData['field'], '=', $queryData['value'])
+                    ->limit($normalizedLimit);
+
+                $results = $query->get();
+                foreach ($results as $doc) {
+                    $docId = (int) $doc->getId();
+                    if (isset($seen[$docId])) {
+                        continue;
+                    }
+
+                    $seen[$docId] = true;
+                    $resultIds[] = $docId;
+                    if (count($resultIds) >= $normalizedLimit) {
+                        break 2;
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::error('ManticoreSearch searchReleasesByMultipleExternalIds error: '.$e->getMessage(), [
+                'externalIdSets' => $externalIdSets,
+            ]);
+
+            return [];
+        }
+
+        if ($resultIds !== []) {
+            Cache::put($cacheKey, $resultIds, now()->addMinutes($this->config['cache_minutes'] ?? 5));
+        }
+
+        return $resultIds;
     }
 
     /**

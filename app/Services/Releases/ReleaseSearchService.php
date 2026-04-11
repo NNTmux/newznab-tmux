@@ -338,7 +338,7 @@ class ReleaseSearchService
             $offset
         );
 
-        $cacheKey = md5($sql);
+        $cacheKey = md5($this->getCacheVersion().$sql);
         $cachedReleases = Cache::get($cacheKey);
         if ($cachedReleases !== null) {
             return $cachedReleases;
@@ -969,7 +969,8 @@ class ReleaseSearchService
             $whereSql
         );
         $sql = sprintf('%s ORDER BY postdate DESC LIMIT %d OFFSET %d', $baseSql, $limit, $offset);
-        $releases = Cache::get(md5($sql));
+        $cacheKey = md5($this->getCacheVersion().$sql);
+        $releases = Cache::get($cacheKey);
         if ($releases !== null) {
             return $releases;
         }
@@ -980,7 +981,7 @@ class ReleaseSearchService
             );
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($sql), $releases, $expiresAt);
+        Cache::put($cacheKey, $releases, $expiresAt);
 
         return $releases;
     }
@@ -1060,7 +1061,8 @@ class ReleaseSearchService
             $limit,
             $offset
         );
-        $releases = Cache::get(md5($sql));
+        $cacheKey = md5($this->getCacheVersion().$sql);
+        $releases = Cache::get($cacheKey);
         if ($releases !== null) {
             return $releases;
         }
@@ -1069,7 +1071,7 @@ class ReleaseSearchService
             $releases[0]->_totalrows = $this->getPagerCount($baseSql);
         }
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        Cache::put(md5($sql), $releases, $expiresAt);
+        Cache::put($cacheKey, $releases, $expiresAt);
 
         return $releases;
     }

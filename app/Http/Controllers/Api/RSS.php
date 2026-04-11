@@ -106,13 +106,14 @@ class RSS extends ApiController
             }
         }
 
-        $result = Cache::get(md5($sql));
+        $cacheKey = $this->buildVersionedCacheKey($sql);
+        $result = Cache::get($cacheKey);
         if ($result !== null) {
             return $result;
         }
 
         $result = Release::fromQuery($sql);
-        Cache::put(md5($sql), $result, $expiresAt);
+        Cache::put($cacheKey, $result, $expiresAt);
 
         return $result;
     }
@@ -209,13 +210,14 @@ class RSS extends ApiController
         );
 
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        $result = Cache::get(md5($sql));
+        $cacheKey = $this->buildVersionedCacheKey($sql);
+        $result = Cache::get($cacheKey);
         if ($result !== null) {
             return $result;
         }
 
         $result = Release::fromQuery($sql);
-        Cache::put(md5($sql), $result, $expiresAt);
+        Cache::put($cacheKey, $result, $expiresAt);
 
         return $result;
     }
@@ -238,13 +240,14 @@ class RSS extends ApiController
         );
 
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
-        $result = Cache::get(md5($sql));
+        $cacheKey = $this->buildVersionedCacheKey($sql);
+        $result = Cache::get($cacheKey);
         if ($result !== null) {
             return $result;
         }
         $result = Release::fromQuery($sql);
 
-        Cache::put(md5($sql), $result, $expiresAt);
+        Cache::put($cacheKey, $result, $expiresAt);
 
         return $result;
     }
@@ -379,6 +382,13 @@ class RSS extends ApiController
 
             return Release::fromQuery($sql);
         });
+    }
+
+    private function buildVersionedCacheKey(string $sql): string
+    {
+        $cacheVersion = (int) Cache::get('release_search_cache_version', 1);
+
+        return md5($cacheVersion.$sql);
     }
 
     /**

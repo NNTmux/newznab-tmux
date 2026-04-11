@@ -140,8 +140,8 @@ class NntmuxCheckIndex extends Command
                 'anime' => 'anime_rt',
                 default => 'releases_rt',
             };
-            $host = config('nntmux.manticore.host', '127.0.0.1');
-            $port = config('nntmux.manticore.port', 9308);
+            $host = (string) config('search.drivers.manticore.host', '127.0.0.1');
+            $port = (int) config('search.drivers.manticore.port', 9308);
 
             // Use HTTP API endpoint
             $baseUrl = "http://{$host}:{$port}";

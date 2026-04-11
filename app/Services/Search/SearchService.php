@@ -372,6 +372,15 @@ class SearchService extends Manager implements SearchServiceInterface
     }
 
     /**
+     * @param  array<string, mixed>  $externalIds
+     * @return array<string, mixed>|null
+     */
+    public function searchMovieByExternalIds(array $externalIds): ?array
+    {
+        return $this->driver()->searchMovieByExternalIds($externalIds);
+    }
+
+    /**
      * @param  array<string, string>  $fieldTerms
      * @return array{imdbids: list<string>, movieinfo_ids: list<int>, data: list<array<string, mixed>>}
      */
@@ -439,6 +448,15 @@ class SearchService extends Manager implements SearchServiceInterface
     }
 
     /**
+     * @param  array<string, mixed>  $externalIds
+     * @return array<string, mixed>|null
+     */
+    public function searchTvShowByExternalIds(array $externalIds): ?array
+    {
+        return $this->driver()->searchTvShowByExternalIds($externalIds);
+    }
+
+    /**
      * Search releases by external media IDs.
      * Used to find releases associated with a specific movie or TV show.
      *
@@ -448,6 +466,15 @@ class SearchService extends Manager implements SearchServiceInterface
     public function searchReleasesByExternalId(array $externalIds, int $limit = 1000): array
     {
         return $this->driver()->searchReleasesByExternalId($externalIds, $limit);
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $externalIdSets
+     * @return array<string, mixed>
+     */
+    public function searchReleasesByMultipleExternalIds(array $externalIdSets, int $limit = 1000): array
+    {
+        return $this->driver()->searchReleasesByMultipleExternalIds($externalIdSets, $limit);
     }
 
     /**

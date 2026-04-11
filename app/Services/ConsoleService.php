@@ -106,10 +106,20 @@ class ConsoleService
             $q = MetadataSearchLookup::normalizeBooleanSearchWords($searchWords);
             if ($q !== '') {
                 $hits = Search::searchSecondary(SecondarySearchIndex::Console, $q, 25);
-                foreach ($hits['id'] as $cid) {
-                    $found = ConsoleInfo::query()->where('id', $cid)->first();
-                    if ($found !== null) {
-                        return $found;
+                $consoleIds = array_values(array_map('intval', $hits['id'] ?? []));
+                if ($consoleIds !== []) {
+                    $rowsById = ConsoleInfo::query()
+                        ->whereIn('id', $consoleIds)
+                        ->get()
+                        ->keyBy('id');
+
+                    foreach ($consoleIds as $consoleId) {
+                        if ($rowsById->has($consoleId)) {
+                            /** @var ConsoleInfo $console */
+                            $console = $rowsById->get($consoleId);
+
+                            return $console;
+                        }
                     }
                 }
             }

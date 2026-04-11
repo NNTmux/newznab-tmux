@@ -488,64 +488,75 @@ class SteamService
     protected function findMatches(string $title, int $limit = 25): array
     {
         $variants = $this->generateQueryVariants($title);
+        $variants = array_values(array_unique(array_filter(array_map('trim', $variants), static fn (string $variant): bool => $variant !== '')));
         $matches = [];
         $seenAppIds = [];
 
-        foreach ($variants as $variant) {
-            try {
-                if (Search::isAvailable()) {
-                    $hits = Search::searchSecondary(SecondarySearchIndex::Steam, $variant, $limit);
-                    foreach ($hits['data'] as $row) {
-                        $appid = $row['appid'] ?? null;
-                        $name = $row['name'] ?? null;
-                        if ($appid === null || $name === null || $name === '' || isset($seenAppIds[$appid])) {
-                            continue;
-                        }
-                        $score = $this->scoreTitle((string) $name, $title);
-                        if ($score >= self::RELAXED_MATCH_THRESHOLD) {
-                            $seenAppIds[(int) $appid] = true;
-                            $matches[] = [
-                                'appid' => (int) $appid,
-                                'name' => (string) $name,
-                                'score' => $score,
-                            ];
-                        }
-                    }
-                }
-            } catch (\Exception $e) {
-                Log::debug('SteamService: search index lookup failed', ['error' => $e->getMessage()]);
-            }
-
-            // LIKE fallback
-            $likeTerm = $this->buildLikePattern($variant);
-            try {
-                $fallbacks = SteamApp::query()
-                    ->select(['appid', 'name'])
-                    ->where('name', 'like', $likeTerm)
-                    ->limit($limit)
-                    ->get();
-
-                foreach ($fallbacks as $row) {
-                    $appid = $row->appid;
-                    $name = $row->name;
-
-                    if (isset($seenAppIds[$appid])) {
+        try {
+            if (Search::isAvailable() && $variants !== []) {
+                $orQuery = implode(' | ', $variants);
+                $hits = Search::searchSecondary(SecondarySearchIndex::Steam, $orQuery, $limit);
+                foreach ($hits['data'] as $row) {
+                    $appid = $row['appid'] ?? null;
+                    $name = $row['name'] ?? null;
+                    if ($appid === null || $name === null || $name === '' || isset($seenAppIds[$appid])) {
                         continue;
                     }
-
-                    $score = $this->scoreTitle($name, $title);
+                    $score = $this->scoreTitle((string) $name, $title);
                     if ($score >= self::RELAXED_MATCH_THRESHOLD) {
-                        $seenAppIds[$appid] = true;
+                        $seenAppIds[(int) $appid] = true;
                         $matches[] = [
                             'appid' => (int) $appid,
-                            'name' => $name,
+                            'name' => (string) $name,
                             'score' => $score,
                         ];
                     }
                 }
-            } catch (\Exception $e) {
-                Log::debug('SteamService: LIKE search failed', ['error' => $e->getMessage()]);
             }
+        } catch (\Exception $e) {
+            Log::debug('SteamService: search index lookup failed', ['error' => $e->getMessage()]);
+        }
+
+        // LIKE fallback
+        try {
+            $fallbackQuery = SteamApp::query()->select(['appid', 'name']);
+            if ($variants !== []) {
+                $fallbackQuery->where(function ($query) use ($variants): void {
+                    foreach ($variants as $index => $variant) {
+                        $likeTerm = $this->buildLikePattern($variant);
+                        if ($index === 0) {
+                            $query->where('name', 'like', $likeTerm);
+                        } else {
+                            $query->orWhere('name', 'like', $likeTerm);
+                        }
+                    }
+                });
+            } else {
+                $fallbackQuery->where('name', 'like', $this->buildLikePattern($title));
+            }
+
+            $fallbacks = $fallbackQuery->limit($limit)->get();
+
+            foreach ($fallbacks as $row) {
+                $appid = $row->appid;
+                $name = $row->name;
+
+                if (isset($seenAppIds[$appid])) {
+                    continue;
+                }
+
+                $score = $this->scoreTitle($name, $title);
+                if ($score >= self::RELAXED_MATCH_THRESHOLD) {
+                    $seenAppIds[$appid] = true;
+                    $matches[] = [
+                        'appid' => (int) $appid,
+                        'name' => $name,
+                        'score' => $score,
+                    ];
+                }
+            }
+        } catch (\Exception $e) {
+            Log::debug('SteamService: LIKE search failed', ['error' => $e->getMessage()]);
         }
 
         // Sort by score descending
