@@ -287,34 +287,84 @@ abstract class AbstractTvProvider extends BaseVideoProvider
             $show['country'] = countryCode($show['country']);
         }
 
-        $ifStringID = 'IF(%s = 0, %s, %s)';
-        $ifStringInfo = "IF(%s = '', %s, %s)";
+        DB::update($this->buildUpdateQuery($videoId, $show));
+        if (! empty($show['aliases'])) {
+            $this->addAliases($videoId, $show['aliases']);
+        }
+    }
 
-        DB::update(
-            sprintf(
-                '
+    /**
+     * @param  array<string, mixed>  $show
+     */
+    private function buildUpdateQuery(int $videoId, array $show): string
+    {
+        return sprintf(
+            '
 				UPDATE videos v
 				LEFT JOIN tv_info tvi ON v.id = tvi.videos_id
 				SET v.countries_id = %s, v.tvdb = %s, v.trakt = %s, v.tvrage = %s,
 					v.tvmaze = %s, v.imdb = %s, v.tmdb = %s,
 					tvi.summary = %s, tvi.publisher = %s, tvi.localzone = %s
 				WHERE v.id = %d',
-                sprintf($ifStringInfo, 'v.countries_id', escapeString($show['country']), 'v.countries_id'),
-                sprintf($ifStringID, 'v.tvdb', $show['tvdb'], 'v.tvdb'),
-                sprintf($ifStringID, 'v.trakt', $show['trakt'], 'v.trakt'),
-                sprintf($ifStringID, 'v.tvrage', $show['tvrage'], 'v.tvrage'),
-                sprintf($ifStringID, 'v.tvmaze', $show['tvmaze'], 'v.tvmaze'),
-                sprintf($ifStringID, 'v.imdb', $show['imdb'], 'v.imdb'),
-                sprintf($ifStringID, 'v.tmdb', $show['tmdb'], 'v.tmdb'),
-                sprintf($ifStringInfo, 'tvi.summary', escapeString($show['summary']), 'tvi.summary'),
-                sprintf($ifStringInfo, 'tvi.publisher', escapeString($show['publisher']), 'tvi.publisher'),
-                sprintf($ifStringInfo, 'tvi.localzone', escapeString($show['localzone']), 'tvi.localzone'),
-                $videoId
-            )
+            $this->buildEmptyStringUpdateExpression('v.countries_id', $show['country'] ?? ''),
+            $this->buildNumericIdUpdateExpression('v.tvdb', $show['tvdb'] ?? 0),
+            $this->buildNumericIdUpdateExpression('v.trakt', $show['trakt'] ?? 0),
+            $this->buildNumericIdUpdateExpression('v.tvrage', $show['tvrage'] ?? 0),
+            $this->buildNumericIdUpdateExpression('v.tvmaze', $show['tvmaze'] ?? 0),
+            $this->buildImdbUpdateExpression('v.imdb', $show['imdb'] ?? ''),
+            $this->buildNumericIdUpdateExpression('v.tmdb', $show['tmdb'] ?? 0),
+            $this->buildEmptyStringUpdateExpression('tvi.summary', $show['summary'] ?? ''),
+            $this->buildEmptyStringUpdateExpression('tvi.publisher', $show['publisher'] ?? ''),
+            $this->buildEmptyStringUpdateExpression('tvi.localzone', $show['localzone'] ?? ''),
+            $videoId
         );
-        if (! empty($show['aliases'])) {
-            $this->addAliases($videoId, $show['aliases']);
+    }
+
+    private function buildNumericIdUpdateExpression(string $column, mixed $value): string
+    {
+        return sprintf('IF(%s = 0, %d, %s)', $column, is_numeric($value) ? (int) $value : 0, $column);
+    }
+
+    private function buildEmptyStringUpdateExpression(string $column, mixed $value): string
+    {
+        return sprintf("IF(%s = '', %s, %s)", $column, escapeString($this->normalizeOptionalString($value)), $column);
+    }
+
+    private function buildImdbUpdateExpression(string $column, mixed $value): string
+    {
+        $normalizedValue = $this->normalizeImdbValue($value);
+
+        if ($normalizedValue === '') {
+            return $column;
         }
+
+        return sprintf("IF(%s IN ('', '0'), %s, %s)", $column, escapeString($normalizedValue), $column);
+    }
+
+    private function normalizeImdbValue(mixed $value): string
+    {
+        $normalizedValue = $this->normalizeOptionalString($value);
+
+        if ($normalizedValue === '' || $normalizedValue === '0') {
+            return '';
+        }
+
+        if (preg_match('/^(?:tt)?(?P<imdbid>\d{6,})$/i', $normalizedValue, $matches) === 1) {
+            return $matches['imdbid'];
+        }
+
+        return $normalizedValue;
+    }
+
+    private function normalizeOptionalString(mixed $value): string
+    {
+        if (is_string($value) || is_int($value) || is_float($value) || $value instanceof \Stringable) {
+            $normalizedValue = trim((string) $value);
+
+            return $normalizedValue === "''" ? '' : $normalizedValue;
+        }
+
+        return '';
     }
 
     /**
