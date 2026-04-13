@@ -87,6 +87,8 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => env('REDIS_DB', 0),
+            'timeout' => (float) env('REDIS_CONNECT_TIMEOUT', 2.0),
+            'read_timeout' => (float) env('REDIS_READ_TIMEOUT', 2.0),
         ],
         'cache' => [
             'url' => env('REDIS_URL'),
@@ -95,6 +97,8 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => env('REDIS_CACHE_DB', 1),
+            'timeout' => (float) env('REDIS_CONNECT_TIMEOUT', 2.0),
+            'read_timeout' => (float) env('REDIS_READ_TIMEOUT', 2.0),
         ],
         'session' => [
             'url' => env('REDIS_URL'),
@@ -103,6 +107,8 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => env('REDIS_CACHE_DB', 2),
+            'timeout' => (float) env('REDIS_CONNECT_TIMEOUT', 2.0),
+            'read_timeout' => (float) env('REDIS_READ_TIMEOUT', 2.0),
         ],
     ],
 

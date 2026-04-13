@@ -14,6 +14,8 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property string $slug
  * @property string|null $endpoint_url
+ * @property string $check_type
+ * @property string|null $probe_identifier
  * @property ServiceStatusEnum $status
  * @property Carbon|null $last_checked_at
  * @property string $uptime_percentage
@@ -32,6 +34,8 @@ class ServiceStatus extends Model
         'name',
         'slug',
         'endpoint_url',
+        'check_type',
+        'probe_identifier',
         'status',
         'last_checked_at',
         'uptime_percentage',

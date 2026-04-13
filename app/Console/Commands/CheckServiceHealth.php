@@ -29,7 +29,20 @@ class CheckServiceHealth extends Command
 
         foreach ($services as $service) {
             if ($service->endpoint_url === null || $service->endpoint_url === '') {
-                $rows[] = [$service->name, '—', '—', 'Skipped (no endpoint)'];
+                if ($service->check_type === 'probe') {
+                    $result = $statusService->checkServiceHealth($service);
+                    $statusService->handleHealthCheckResult($service, $result);
+
+                    $rows[] = [
+                        $service->name,
+                        strtoupper($service->check_type),
+                        $result['status_code'] ?: '—',
+                        $result['response_time_ms'] ? $result['response_time_ms'].'ms' : '—',
+                        $result['ok'] ? 'Healthy' : $result['reason'],
+                    ];
+                } else {
+                    $rows[] = [$service->name, strtoupper($service->check_type), '—', '—', 'Skipped (no endpoint)'];
+                }
 
                 continue;
             }
@@ -39,6 +52,7 @@ class CheckServiceHealth extends Command
 
             $rows[] = [
                 $service->name,
+                strtoupper($service->check_type),
                 $result['status_code'] ?: '—',
                 $result['response_time_ms'] ? $result['response_time_ms'].'ms' : '—',
                 $result['ok'] ? 'Healthy' : $result['reason'],
@@ -47,7 +61,7 @@ class CheckServiceHealth extends Command
 
         $statusService->refreshAllServiceUptime($days);
 
-        $this->table(['Service', 'HTTP', 'Response', 'Result'], $rows);
+        $this->table(['Service', 'Type', 'HTTP', 'Response', 'Result'], $rows);
 
         $services = $statusService->getEnabledServices();
         $summary = $services->map(fn ($s) => [

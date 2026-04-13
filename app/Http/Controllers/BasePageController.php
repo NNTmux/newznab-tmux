@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class BasePageController extends Controller
@@ -59,7 +60,7 @@ class BasePageController extends Controller
         $this->middleware(['auth', 'web', '2fa'])->except('api', 'contact', 'showContactForm', 'callback', 'btcPayCallback', 'getNzb', 'terms', 'privacyPolicy', 'capabilities', 'movie', 'apiSearch', 'tv', 'details', 'failed', 'showRssDesc', 'fullFeedRss', 'categoryFeedRss', 'cartRss', 'myMoviesRss', 'myShowsRss', 'trendingMoviesRss', 'trendingShowsRss', 'release', 'reset', 'showLinkRequestForm', 'showStatusPage');
 
         // Load settings as collection with caching (5 minutes)
-        $this->settings = Cache::remember('site_settings', 300, function () {
+        $this->settings = $this->rememberWithCacheFallback('site_settings', 300, function () {
             return Settings::query()->pluck('value', 'name');
         });
 
@@ -69,7 +70,7 @@ class BasePageController extends Controller
         ];
 
         // Then add the converted settings array as 'site' with caching
-        $this->viewData['site'] = Cache::remember('site_settings_converted', 300, function () {
+        $this->viewData['site'] = $this->rememberWithCacheFallback('site_settings_converted', 300, function () {
             return $this->settings->map(function ($value) {
                 return Settings::convertValue($value);
             })->all();
@@ -81,7 +82,7 @@ class BasePageController extends Controller
                 $userId = Auth::id();
                 $this->userdata = User::find($userId);
                 // Cache category exclusions per user (5 minutes)
-                $this->userdata->categoryexclusions = Cache::remember(
+                $this->userdata->categoryexclusions = $this->rememberWithCacheFallback(
                     'user_category_exclusions_'.$userId,
                     300,
                     fn () => User::getCategoryExclusionById($userId)
@@ -90,6 +91,24 @@ class BasePageController extends Controller
 
             return $next($request);
         });
+    }
+
+    /**
+     * Use the cache when available; if the store is unreachable (e.g. Redis down), run the callback directly.
+     *
+     * @param  callable(): mixed  $callback
+     */
+    private function rememberWithCacheFallback(string $key, int|\DateInterval $ttl, callable $callback): mixed
+    {
+        try {
+            return Cache::remember($key, $ttl, $callback);
+        } catch (\Throwable $e) {
+            if (config('app.debug')) {
+                Log::debug('BasePageController cache bypassed: '.$e->getMessage());
+            }
+
+            return $callback();
+        }
     }
 
     /**

@@ -11,6 +11,7 @@ use App\Models\Settings;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class GlobalDataComposer
@@ -48,7 +49,7 @@ class GlobalDataComposer
     private function resolveData(): array
     {
         // Cached site settings (shared across all requests)
-        $siteArray = Cache::remember('site_settings_array', self::CACHE_TTL, function () {
+        $siteArray = $this->rememberWithCacheFallback('site_settings_array', self::CACHE_TTL, function () {
             return Settings::query()
                 ->pluck('value', 'name')
                 ->map(fn ($value) => Settings::convertValue($value))
@@ -61,7 +62,7 @@ class GlobalDataComposer
         ];
 
         // Cached useful links for sidebar
-        $viewData['usefulLinks'] = Cache::remember('content_useful_links', self::CACHE_TTL, function () {
+        $viewData['usefulLinks'] = $this->rememberWithCacheFallback('content_useful_links', self::CACHE_TTL, function () {
             return Content::active()
                 ->ofType(Content::TYPE_USEFUL)
                 ->ordered() // @phpstan-ignore method.notFound
@@ -72,7 +73,7 @@ class GlobalDataComposer
             $userId = Auth::id();
 
             // User data with category exclusions (short cache per user)
-            $userdata = Cache::remember('composer_user_'.$userId, self::CACHE_TTL, function () use ($userId) {
+            $userdata = $this->rememberWithCacheFallback('composer_user_'.$userId, self::CACHE_TTL, function () use ($userId) {
                 $user = User::find($userId);
                 $user->categoryexclusions = User::getCategoryExclusionById($userId);
 
@@ -85,7 +86,7 @@ class GlobalDataComposer
             }
 
             // Cached menu categories per user (depends on their exclusions)
-            $parentcatlist = Cache::remember('menu_user_'.$userId, self::CACHE_TTL, function () use ($userdata) {
+            $parentcatlist = $this->rememberWithCacheFallback('menu_user_'.$userId, self::CACHE_TTL, function () use ($userdata) {
                 return Category::getForMenu($userdata->categoryexclusions);
             });
 
@@ -106,5 +107,21 @@ class GlobalDataComposer
         }
 
         return $viewData;
+    }
+
+    /**
+     * @param  callable(): mixed  $callback
+     */
+    private function rememberWithCacheFallback(string $key, int|\DateInterval $ttl, callable $callback): mixed
+    {
+        try {
+            return Cache::remember($key, $ttl, $callback);
+        } catch (\Throwable $e) {
+            if (config('app.debug')) {
+                Log::debug('GlobalDataComposer cache bypassed: '.$e->getMessage());
+            }
+
+            return $callback();
+        }
     }
 }

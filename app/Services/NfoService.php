@@ -108,24 +108,24 @@ class NfoService
     protected const SETTINGS_CACHE_TTL = 300;
 
     /**
-     * @var int Number of NFOs to process per batch.
+     * Lazily loaded from settings + cache when NFO processing runs (see getters).
      */
-    private int $nzbs;
+    private ?int $nzbs = null;
 
     /**
-     * @var int Maximum release size to process NFO (in GB).
+     * Lazily loaded from settings + cache when NFO processing runs.
      */
-    protected int $maxSize;
+    protected ?int $maxSize = null;
 
     /**
-     * @var int Maximum retry attempts for failed NFO fetches.
+     * Lazily loaded from settings + cache when NFO processing runs.
      */
-    private int $maxRetries;
+    private ?int $maxRetries = null;
 
     /**
-     * @var int Minimum release size to process NFO (in MB).
+     * Lazily loaded from settings + cache when NFO processing runs.
      */
-    protected int $minSize;
+    protected ?int $minSize = null;
 
     /**
      * @var string Temporary path for processing files.
@@ -156,40 +156,84 @@ class NfoService
     /**
      * Default constructor.
      *
-     * Initializes NFO processing settings from database/config with caching.
-     *
-     * @throws \Exception
+     * Heavy settings (batch limits, sizes, retries) load on first NFO processing use via getters,
+     * so constructing this service does not hit the cache or database.
      */
     public function __construct()
     {
         $this->echo = (bool) config('nntmux.echocli');
 
-        // Cache settings to reduce database queries
-        // Note: Cast after Cache::remember as cached values may be stored as strings
-        $this->nzbs = (int) Cache::remember('nfo_maxnfoprocessed', self::SETTINGS_CACHE_TTL, function () {
-            $value = Settings::settingValue('maxnfoprocessed');
-
-            return $value !== '' ? (int) $value : 100;
-        });
-
-        $maxRetries = (int) Cache::remember('nfo_maxnforetries', self::SETTINGS_CACHE_TTL, function () {
-            return (int) Settings::settingValue('maxnforetries');
-        });
-        $this->maxRetries = $maxRetries >= 0 ? -($maxRetries + 1) : self::NFO_UNPROC;
-        $this->maxRetries = max($this->maxRetries, -8);
-
-        $this->maxSize = (int) Cache::remember('nfo_maxsizetoprocessnfo', self::SETTINGS_CACHE_TTL, function () {
-            return (int) Settings::settingValue('maxsizetoprocessnfo');
-        });
-
-        $this->minSize = (int) Cache::remember('nfo_minsizetoprocessnfo', self::SETTINGS_CACHE_TTL, function () {
-            return (int) Settings::settingValue('minsizetoprocessnfo');
-        });
-
         $this->tmpPath = rtrim((string) config('nntmux.tmp_unrar_path'), '/\\').'/';
         $this->unrarPath = config('nntmux_settings.unrar_path') ?: false;
         $this->timeoutPath = config('nntmux_settings.timeout_path') ?: false;
         $this->timeoutSeconds = (int) (Settings::settingValue('timeoutseconds') ?: 60);
+    }
+
+    private function getNzbs(): int
+    {
+        if ($this->nzbs === null) {
+            $this->nzbs = (int) $this->rememberNfoSetting('nfo_maxnfoprocessed', function () {
+                $value = Settings::settingValue('maxnfoprocessed');
+
+                return $value !== '' ? (int) $value : 100;
+            });
+        }
+
+        return $this->nzbs;
+    }
+
+    private function getMaxRetries(): int
+    {
+        if ($this->maxRetries === null) {
+            $maxRetries = (int) $this->rememberNfoSetting('nfo_maxnforetries', function () {
+                return (int) Settings::settingValue('maxnforetries');
+            });
+            $computed = $maxRetries >= 0 ? -($maxRetries + 1) : self::NFO_UNPROC;
+            $this->maxRetries = max($computed, -8);
+        }
+
+        return $this->maxRetries;
+    }
+
+    private function getMaxSize(): int
+    {
+        if ($this->maxSize === null) {
+            $this->maxSize = (int) $this->rememberNfoSetting('nfo_maxsizetoprocessnfo', function () {
+                return (int) Settings::settingValue('maxsizetoprocessnfo');
+            });
+        }
+
+        return $this->maxSize;
+    }
+
+    private function getMinSize(): int
+    {
+        if ($this->minSize === null) {
+            $this->minSize = (int) $this->rememberNfoSetting('nfo_minsizetoprocessnfo', function () {
+                return (int) Settings::settingValue('minsizetoprocessnfo');
+            });
+        }
+
+        return $this->minSize;
+    }
+
+    /**
+     * Read a setting through the cache when available; fall back to the callback if the
+     * cache store is unreachable (e.g. Redis down while CACHE_STORE=redis).
+     *
+     * @param  callable(): mixed  $callback
+     */
+    private function rememberNfoSetting(string $key, callable $callback): mixed
+    {
+        try {
+            return Cache::remember($key, self::SETTINGS_CACHE_TTL, $callback);
+        } catch (Throwable $e) {
+            if (config('app.debug')) {
+                Log::debug('NfoService cache bypassed: '.$e->getMessage());
+            }
+
+            return $callback();
+        }
     }
 
     /**
@@ -688,7 +732,7 @@ class NfoService
         $releases = $baseQuery->clone()
             ->orderBy('nfostatus')
             ->orderByDesc('postdate')
-            ->limit($this->nzbs)
+            ->limit($this->getNzbs())
             ->get(['id', 'guid', 'groups_id', 'name']);
 
         $nfoCount = $releases->count();
@@ -775,7 +819,7 @@ class NfoService
     private function buildNfoProcessingQuery(string $groupID, string $guidChar): \Illuminate\Database\Eloquent\Builder // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
     {
         $query = Release::query()
-            ->whereBetween('nfostatus', [$this->maxRetries, self::NFO_UNPROC]);
+            ->whereBetween('nfostatus', [$this->getMaxRetries(), self::NFO_UNPROC]);
 
         if ($guidChar !== '') {
             $query->where('leftguid', $guidChar);
@@ -785,12 +829,12 @@ class NfoService
             $query->where('groups_id', $groupID);
         }
 
-        if ($this->maxSize > 0) {
-            $query->where('size', '<', $this->maxSize * 1073741824);
+        if ($this->getMaxSize() > 0) {
+            $query->where('size', '<', $this->getMaxSize() * 1073741824);
         }
 
-        if ($this->minSize > 0) {
-            $query->where('size', '>', $this->minSize * 1048576);
+        if ($this->getMinSize() > 0) {
+            $query->where('size', '>', $this->getMinSize() * 1048576);
         }
 
         return $query;
@@ -806,7 +850,7 @@ class NfoService
             ($guidChar === '' ? '' : '['.$guidChar.'] ').
             ($groupID === '' ? '' : '['.$groupID.'] ').
             'Processing '.$nfoCount.
-            ' NFO(s), starting at '.$this->nzbs.
+            ' NFO(s), starting at '.$this->getNzbs().
             ' * = hidden NFO, + = NFO, - = no NFO, f = download failed.'
         );
     }
@@ -862,7 +906,7 @@ class NfoService
             $query->where('groups_id', $groupID);
         }
 
-        $releases = $query->limit($this->nzbs)
+        $releases = $query->limit($this->getNzbs())
             ->get(['id', 'guid', 'groups_id', 'name']);
 
         if ($releases->isEmpty()) {
@@ -1694,5 +1738,10 @@ class NfoService
         Cache::forget('nfo_maxnforetries');
         Cache::forget('nfo_maxsizetoprocessnfo');
         Cache::forget('nfo_minsizetoprocessnfo');
+
+        $this->nzbs = null;
+        $this->maxRetries = null;
+        $this->maxSize = null;
+        $this->minSize = null;
     }
 }

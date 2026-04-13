@@ -3,6 +3,7 @@
 use App\Http\Middleware\BlockAbusiveServices;
 use App\Http\Middleware\ClearanceMiddleware;
 use App\Http\Middleware\ContentSecurityPolicy;
+use App\Http\Middleware\DegradeWhenRedisUnreachable;
 use App\Http\Middleware\EnsureAuthenticatedUsersAreVerified;
 use App\Http\Middleware\ForceJsonOnAPI;
 use App\Http\Middleware\Google2FAMiddleware;
@@ -61,6 +62,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'cart',
             'cart/*',
         ]);
+
+        $middleware->prepend(DegradeWhenRedisUnreachable::class);
 
         $middleware->append([
             PreventRequestsDuringMaintenance::class,

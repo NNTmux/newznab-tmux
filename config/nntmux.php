@@ -25,4 +25,6 @@ return [
     'tmp_unzip_path' => env('TEMP_UNZIP_PATH', storage_path('tmp/unzip/')),
     'nzb_import_folder' => env('NZB_IMPORT_FOLDER'),
     'nzb_upload_folder' => env('NZB_UPLOAD_FOLDER'),
+    'redis_fast_degrade' => (bool) env('REDIS_FAST_DEGRADE', true),
+    'redis_tcp_check_seconds' => (float) env('REDIS_TCP_CHECK_SECONDS', 0.2),
 ];

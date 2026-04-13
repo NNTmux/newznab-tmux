@@ -10,6 +10,8 @@ use App\Enums\ServiceStatusEnum;
 use App\Mail\IncidentDetected;
 use App\Models\ServiceIncident;
 use App\Models\ServiceStatus;
+use App\Services\StatusProbes\ProbeResult;
+use App\Services\StatusProbes\ServiceProbeRegistry;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
@@ -18,6 +20,10 @@ use Illuminate\Support\Facades\Mail;
 
 class SiteStatusService
 {
+    public function __construct(
+        private readonly ServiceProbeRegistry $probeRegistry,
+    ) {}
+
     /**
      * @return \Illuminate\Database\Eloquent\Collection<int, ServiceStatus>
      */
@@ -149,8 +155,14 @@ class SiteStatusService
         }
 
         $uptime = (($totalMinutes - $downtimeMinutes) / $totalMinutes) * 100.0;
+        $rounded = round(max(0.0, min(100.0, $uptime)), 2);
 
-        return round(max(0.0, min(100.0, $uptime)), 2);
+        // Preserve visibility of brief outages in long windows (e.g. 30-day SLA).
+        if ($downtimeMinutes > 0.0 && $rounded >= 100.0) {
+            return 99.99;
+        }
+
+        return $rounded;
     }
 
     /**
@@ -329,6 +341,16 @@ class SiteStatusService
      */
     public function checkServiceHealth(ServiceStatus $service): array
     {
+        if ($service->check_type === 'probe') {
+            if ($service->probe_identifier === null || $service->probe_identifier === '') {
+                return ['ok' => false, 'status_code' => 0, 'response_time_ms' => 0, 'impact' => IncidentImpactEnum::Major, 'reason' => 'Probe identifier not configured'];
+            }
+
+            return $this->probeResultToHealthArray(
+                $this->probeRegistry->run($service->probe_identifier)
+            );
+        }
+
         $baseUrl = rtrim((string) config('app.url'), '/');
 
         if ($baseUrl === '' || ! str_starts_with($baseUrl, 'http')) {
@@ -358,6 +380,20 @@ class SiteStatusService
         }
 
         return $worstResult ?? ['ok' => false, 'status_code' => 0, 'response_time_ms' => 0, 'impact' => IncidentImpactEnum::Critical, 'reason' => 'All endpoints unreachable'];
+    }
+
+    /**
+     * @return array{ok: bool, status_code: int, response_time_ms: int, impact: IncidentImpactEnum|null, reason: string}
+     */
+    private function probeResultToHealthArray(ProbeResult $result): array
+    {
+        return [
+            'ok' => $result->ok,
+            'status_code' => 0,
+            'response_time_ms' => $result->responseTimeMs,
+            'impact' => $result->impact,
+            'reason' => $result->reason,
+        ];
     }
 
     /**

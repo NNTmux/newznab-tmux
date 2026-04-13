@@ -640,29 +640,26 @@
         <!-- System Status -->
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
             <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">System Status</h3>
+            @php
+                $systemServiceSlugs = ['database', 'redis', 'queue', 'disk'];
+                $systemServices = $serviceStatuses->keyBy('slug');
+            @endphp
             <div class="space-y-3">
-                <div class="flex items-center justify-between">
-                    <span class="text-gray-600 dark:text-gray-400">Database</span>
-                    <span class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-sm">
-                        <i class="fas fa-check-circle"></i> Connected
-                    </span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span class="text-gray-600 dark:text-gray-400">Cache</span>
-                    <span class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-sm">
-                        <i class="fas fa-check-circle"></i> Active
-                    </span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span class="text-gray-600">Queue</span>
-                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-                        <i class="fas fa-check-circle"></i> Running
-                    </span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span class="text-gray-600">Disk Space</span>
-                    <span class="text-sm text-gray-600">{{ $stats['disk_free'] ?? 'N/A' }} available</span>
-                </div>
+                @foreach($systemServiceSlugs as $slug)
+                    @php $svc = $systemServices->get($slug); @endphp
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600 dark:text-gray-400">{{ $svc?->name ?? ucfirst($slug) }}</span>
+                        @if($svc)
+                            <span class="{{ $dashBadge($svc->status->value) }}">
+                                {{ $svc->status->label() }}
+                            </span>
+                        @else
+                            <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full text-sm">
+                                Not configured
+                            </span>
+                        @endif
+                    </div>
+                @endforeach
             </div>
         </div>
 
