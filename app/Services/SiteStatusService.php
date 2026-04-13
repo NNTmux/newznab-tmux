@@ -57,8 +57,34 @@ class SiteStatusService
 
     public function getOverallStatus(): ServiceStatusEnum
     {
-        $services = $this->getEnabledServices();
+        return $this->aggregateWorstStatus($this->getEnabledServices());
+    }
 
+    /**
+     * Enabled HTTP endpoint rows only (excludes internal infrastructure probes from the public status page).
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, ServiceStatus>
+     */
+    public function getPublicEnabledServices(): \Illuminate\Database\Eloquent\Collection
+    {
+        return ServiceStatus::query()
+            ->where('is_enabled', true)
+            ->where('check_type', 'http')
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get();
+    }
+
+    public function getOverallPublicStatus(): ServiceStatusEnum
+    {
+        return $this->aggregateWorstStatus($this->getPublicEnabledServices());
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Collection<int, ServiceStatus>  $services
+     */
+    private function aggregateWorstStatus(\Illuminate\Database\Eloquent\Collection $services): ServiceStatusEnum
+    {
         if ($services->isEmpty()) {
             return ServiceStatusEnum::Operational;
         }
@@ -88,6 +114,18 @@ class SiteStatusService
     }
 
     /**
+     * Active incidents that affect at least one public (HTTP) service — hides internal probe-only outages.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, ServiceIncident>
+     */
+    public function getActiveIncidentsForPublic(): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->getActiveIncidents()
+            ->filter(fn (ServiceIncident $incident): bool => $this->incidentTouchesPublicService($incident))
+            ->values();
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Collection<int, ServiceIncident>
      */
     public function getRecentResolvedIncidents(int $days = 30): \Illuminate\Database\Eloquent\Collection
@@ -101,6 +139,23 @@ class SiteStatusService
             ->where('resolved_at', '>=', $since)
             ->orderByDesc('resolved_at')
             ->get();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, ServiceIncident>
+     */
+    public function getRecentResolvedIncidentsForPublic(int $days = 30): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->getRecentResolvedIncidents($days)
+            ->filter(fn (ServiceIncident $incident): bool => $this->incidentTouchesPublicService($incident))
+            ->values();
+    }
+
+    private function incidentTouchesPublicService(ServiceIncident $incident): bool
+    {
+        return $incident->services->contains(
+            fn (ServiceStatus $service): bool => $service->check_type === 'http'
+        );
     }
 
     /**
