@@ -1283,40 +1283,25 @@ class NameFixingService
                 continue;
             }
 
-            $preMatch = $this->preMatch($cleanedFileName);
-            if ($preMatch[0] === true) {
-                $results = Search::searchPredb($preMatch[1]);
+            $results = Search::searchPredb($cleanedFileName);
 
-                if (! empty($results)) {
-                    $bestMatch = $this->predbMatchSelector->selectBestMatch($cleanedFileName, $results);
+            if (! empty($results)) {
+                $bestMatch = $this->predbMatchSelector->selectBestMatch($cleanedFileName, $results);
 
-                    if ($bestMatch !== null) {
-                        if ($bestMatch['title'] !== $release->searchname) {
-                            $this->updateService->updateRelease($release, $bestMatch['title'], 'file matched source: '.($bestMatch['source'] ?? ''), $echo, 'PreDB file match, ', $nameStatus, $show);
-                        } else {
-                            $this->updateService->updateSingleColumn('predb_id', $bestMatch['id'] ?? 0, $release->releases_id);
-                        }
-                        $matching++;
-
-                        return $matching;
+                if ($bestMatch !== null) {
+                    if ($bestMatch['title'] !== $release->searchname) {
+                        $this->updateService->updateRelease($release, $bestMatch['title'], 'file matched source: '.($bestMatch['source'] ?? ''), $echo, 'PreDB file match, ', $nameStatus, $show);
+                    } else {
+                        $this->updateService->updateSingleColumn('predb_id', $bestMatch['id'] ?? 0, $release->releases_id);
                     }
+                    $matching++;
+
+                    return $matching;
                 }
             }
         }
 
         return $matching;
-    }
-
-    /**
-     * Pre-match check for filename patterns.
-     *
-     * @return array<int, bool|string>
-     */
-    protected function preMatch(string $fileName): array
-    {
-        $result = preg_match('/(\d{2}\.\d{2}\.\d{2})+([\w\-.]+[\w]$)/i', $fileName, $hit);
-
-        return [$result === 1, $hit[0] ?? ''];
     }
 
     /**
