@@ -60,4 +60,22 @@ class BookMatchScorerTest extends TestCase
 
         $this->assertGreaterThan($bad, $good);
     }
+
+    public function test_unrelated_title_without_author_scores_below_threshold(): void
+    {
+        $parsed = new BookParseResult(
+            rawName: 'El verano en que me enamore',
+            title: 'El verano en que me enamore',
+        );
+
+        $score = (new BookMatchScorer)->score([
+            'title' => 'Aquellos veranos de pileta',
+            'author' => 'Ignacio Pomi & Lucas Enrique Sastre',
+            'publishdate' => '',
+            'publisher' => '',
+            'cover' => 1,
+        ], $parsed);
+
+        $this->assertLessThan(0.55, $score, 'Unrelated book with partial word overlap should not reach match threshold');
+    }
 }

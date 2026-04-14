@@ -30,4 +30,44 @@ class BookServiceTest extends TestCase
 
         $this->assertTrue($parsed->isJunk);
     }
+
+    public function test_parse_release_name_flags_tv_season_as_junk(): void
+    {
+        /** @var BookService $service */
+        $service = (new \ReflectionClass(BookService::class))->newInstanceWithoutConstructor();
+
+        $tvReleases = [
+            'El verano en que me enamore Temporada 01 PAR2',
+            'Breaking.Bad.S05E16.720p.BluRay.x264',
+            'The.Last.of.Us.Season.1.WEBRip.x265',
+            'La.Casa.de.Papel.Saison.03.HDTV',
+            'Dark.Staffel.02.German.WEB-DL',
+            'Game.of.Thrones.S08E06.1080p.AMZN.WEB-DL',
+        ];
+
+        foreach ($tvReleases as $release) {
+            $parsed = $service->parseReleaseName($release, 'ebook');
+            $this->assertTrue($parsed->isJunk, "Expected '{$release}' to be flagged as junk");
+        }
+    }
+
+    public function test_parse_release_name_flags_par2_repair_files_as_junk(): void
+    {
+        /** @var BookService $service */
+        $service = (new \ReflectionClass(BookService::class))->newInstanceWithoutConstructor();
+
+        $parsed = $service->parseReleaseName('Some.Release.Name.PAR2', 'ebook');
+        $this->assertTrue($parsed->isJunk);
+    }
+
+    public function test_parse_release_name_strips_video_terms_from_title(): void
+    {
+        /** @var BookService $service */
+        $service = (new \ReflectionClass(BookService::class))->newInstanceWithoutConstructor();
+
+        $parsed = $service->parseReleaseName('El verano en que me enamore Temporada 01 PAR2', 'ebook');
+
+        $this->assertStringNotContainsString('Temporada', $parsed->title);
+        $this->assertStringNotContainsString('PAR2', $parsed->title);
+    }
 }

@@ -20,19 +20,26 @@ class BookMatchScorer
             return 1.0;
         }
 
-        $titleScore = $this->similarity($parsed->title, (string) ($candidate['title'] ?? ''));
+        $titleScore = $this->titleSimilarity($parsed->title, (string) ($candidate['title'] ?? ''));
         $authorScore = $parsed->hasAuthor()
             ? $this->similarity((string) $parsed->author, (string) ($candidate['author'] ?? ''))
-            : 0.5;
+            : 0.0;
         $yearScore = $this->yearScore($parsed->year, (string) ($candidate['publishdate'] ?? ''));
         $publisherScore = ! empty($candidate['publisher']) ? 1.0 : 0.0;
         $coverScore = (int) ($candidate['cover'] ?? 0) === 1 ? 1.0 : 0.0;
 
-        return (0.4 * $titleScore)
-            + (0.3 * $authorScore)
-            + (0.1 * $yearScore)
-            + (0.1 * $publisherScore)
-            + (0.1 * $coverScore);
+        if ($parsed->hasAuthor()) {
+            return (0.45 * $titleScore)
+                + (0.30 * $authorScore)
+                + (0.10 * $yearScore)
+                + (0.08 * $publisherScore)
+                + (0.07 * $coverScore);
+        }
+
+        return (0.65 * $titleScore)
+            + (0.15 * $yearScore)
+            + (0.10 * $publisherScore)
+            + (0.10 * $coverScore);
     }
 
     public function scoreBookInfo(BookInfo $book, BookParseResult $parsed): float
@@ -45,6 +52,37 @@ class BookMatchScorer
             'publisher' => $book->publisher,
             'cover' => $book->cover ? 1 : 0,
         ], $parsed);
+    }
+
+    private function titleSimilarity(string $left, string $right): float
+    {
+        $left = $this->normalizeText($left);
+        $right = $this->normalizeText($right);
+        if ($left === '' || $right === '') {
+            return 0.0;
+        }
+
+        if ($left === $right) {
+            return 1.0;
+        }
+
+        $leftWords = array_filter(explode(' ', $left), fn (string $w): bool => mb_strlen($w) > 1);
+        $rightWords = array_filter(explode(' ', $right), fn (string $w): bool => mb_strlen($w) > 1);
+        if ($leftWords === [] || $rightWords === []) {
+            return 0.0;
+        }
+
+        $shared = array_intersect($leftWords, $rightWords);
+        $total = max(count($leftWords), count($rightWords));
+        $jaccardScore = count($shared) / $total;
+
+        similar_text($left, $right, $percent);
+        $simTextScore = max(0.0, min(1.0, $percent / 100));
+
+        $lengthRatio = min(mb_strlen($left), mb_strlen($right)) / max(mb_strlen($left), mb_strlen($right));
+        $lengthPenalty = $lengthRatio < 0.5 ? 0.7 : 1.0;
+
+        return min(1.0, ((0.5 * $jaccardScore) + (0.5 * $simTextScore)) * $lengthPenalty);
     }
 
     private function similarity(string $left, string $right): float
@@ -84,7 +122,7 @@ class BookMatchScorer
 
     private function normalizeText(string $value): string
     {
-        $value = strtolower($value);
+        $value = mb_strtolower($value);
         $value = (string) preg_replace('/[._-]+/', ' ', $value);
         $value = (string) preg_replace('/[^\p{L}\p{N}\s]+/u', ' ', $value);
         $value = (string) preg_replace('/\s+/', ' ', $value);

@@ -486,16 +486,20 @@ class BookService
                 return false;
             }
             if (! empty($releasename) && ! preg_match('/^[a-z0-9]+$|^([0-9]+ ){1,}$|Part \d+/i', $releasename)) {
-                return $parsed->searchQuery();
+                $wordCount = count(preg_split('/\s+/', trim($releasename)) ?: []);
+                if ($wordCount >= 2) {
+                    return $parsed->searchQuery();
+                }
             }
 
             return false;
         }
         if ($releasetype === 'audiobook') {
             if (! empty($releasename) && ! preg_match('/^[a-z0-9]+$|^([0-9]+ ){1,}$|Part \d+/i', $releasename)) {
-                // We can skip category checks for audiobooks since the category is known.
-                // As long as the release name is valid, it should still be post-processed.
-                return $parsed->searchQuery();
+                $wordCount = count(preg_split('/\s+/', trim($releasename)) ?: []);
+                if ($wordCount >= 2) {
+                    return $parsed->searchQuery();
+                }
             }
 
             return false;
@@ -514,6 +518,7 @@ class BookService
         $normalized = trim((string) preg_replace('/\s\s+/i', ' ', (string) $d));
         $normalized = (string) preg_replace('/[._]+/', ' ', $normalized);
         $normalized = (string) preg_replace('/\b97[89](?:[-\s]?\d){10}\b|\b\d(?:[-\s]?\d){8}[-\s]?[\dXx]\b/', '', $normalized);
+        $normalized = (string) preg_replace('/\b(S\d{1,3}E\d{1,3}|Season\s*\d+|Temporada\s*\d+|Saison\s*\d+|Staffel\s*\d+|Episode\s*\d+|HDTV|WEB[\s-]?DL|WEBRip|BluRay|BDRip|DVDRip|BRRip|XviD|[xh][\s.]?26[45]|HEVC|10bit|1080[pi]|720p|2160p|4K|UHD|HDR|REMUX|AAC5?\s*\d|DDP?5\s*\d|ATMOS|PAR2?|vol\d+\+\d+|NTb|FLUX|PSA|RARBG|YTS|YIFY|AMZN|DSNP|NF|ATVP|HMAX)\b/i', '', $normalized);
         $normalized = trim((string) preg_replace('/\s+/', ' ', $normalized));
 
         $year = null;
@@ -550,6 +555,18 @@ class BookService
             $isJunk = true;
         }
         if ($releaseType === 'ebook' && preg_match('/\b(WEB[\.\-_ ]?FLAC|MP3|320kbps|FALCON|discography)\b/i', $releaseName) === 1) {
+            $isJunk = true;
+        }
+        if (preg_match('/\b(S\d{1,3}[\.\-_ ]?E\d{1,3}|Season[\.\-_ ]?\d+|Temporada[\.\-_ ]?\d+|Saison[\.\-_ ]?\d+|Staffel[\.\-_ ]?\d+|Episode[\.\-_ ]?\d+|[12]\d{3}[\.\-_ ]?S\d{2}|HDTV|WEB[\.\-_ ]?DL|WEBRip|BluRay|BDRip|BRRip|DVDRip|XviD|x26[45]|H[\.\-_ ]?26[45]|HEVC|10bit|AAC5[\.\-]1|DDP?5[\.\-]1|ATMOS|NTb|FLUX|PSA|RARBG|YTS|YIFY|AMZN|DSNP|HMAX|NF[\.\-_ ]|ATVP)\b/i', $releaseName) === 1) {
+            $isJunk = true;
+        }
+        if (preg_match('/\b(PAR2|PAR[\.\-_ ]?Files?|vol\d+\+\d+|\.nzb|\.part\d+\.rar|\.r\d{2,}|sample|subs?pack|subtitle|nfo[\.\-_ ]?only)\b/i', $releaseName) === 1) {
+            $isJunk = true;
+        }
+        if (preg_match('/\b(1080[pi]|720p|2160p|4K[\.\-_ ]?UHD|UHD|HDR|SDR|REMUX|mHD|mSD)\b/i', $releaseName) === 1) {
+            $isJunk = true;
+        }
+        if ($releaseType === 'ebook' && preg_match('/\b(keygen|activat(or|ion)|licen[sc]e[\.\-_ ]?key|serial[\.\-_ ]?number|nulled|warez|regged|incl[\.\-_ ]?crack)\b/i', $releaseName) === 1) {
             $isJunk = true;
         }
 
@@ -793,7 +810,7 @@ class BookService
             }
         }
 
-        return $bestScore >= 0.4 ? $best : null;
+        return $bestScore >= 0.55 ? $best : null;
     }
 
     /**
@@ -816,7 +833,7 @@ class BookService
             }
         }
 
-        if ($best === null || $bestScore < 0.4) {
+        if ($best === null || $bestScore < 0.55) {
             return null;
         }
 
