@@ -80,7 +80,7 @@
                                     <a href="{{ $book->url }}"
                                        target="_blank"
                                        class="ml-3 text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
-                                       title="View on Amazon">
+                                       title="View Source">
                                         <i class="fas fa-external-link-alt"></i>
                                     </a>
                                 @endif

@@ -130,7 +130,7 @@
                                                 <div class="mt-2">
                                                     <a target="_blank" href="{{ $site['dereferrer_link'] }}{{ $result->url }}"
                                                        title="View Game page" class="inline-flex items-center px-2 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700">
-                                                       <i class="fa fa-shopping-cart mr-1"></i>Amazon
+                                                       <i class="fa fa-shopping-cart mr-1"></i>Source
                                                     </a>
                                                 </div>
                                             @endif

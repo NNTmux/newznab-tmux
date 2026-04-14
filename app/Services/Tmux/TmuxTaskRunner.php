@@ -713,7 +713,7 @@ class TmuxTaskRunner
     }
 
     /**
-     * Run Amazon post-processing (Books, Music, Games, Console)
+     * Run metadata post-processing (Books, Music, Games, Console)
      *
      * @param  array<string, mixed>  $runVar
      */
@@ -723,7 +723,7 @@ class TmuxTaskRunner
         $pane = '2.2';
 
         if ($enabled !== 1) {
-            return $this->disablePane($pane, 'Post-process Amazon', 'disabled in settings');
+            return $this->disablePane($pane, 'Post-process Metadata', 'disabled in settings');
         }
 
         $hasWork = (int) ($runVar['counts']['now']['processmusic'] ?? 0) > 0
@@ -732,7 +732,7 @@ class TmuxTaskRunner
             || (int) ($runVar['counts']['now']['processgames'] ?? 0) > 0;
 
         if (! $hasWork) {
-            return $this->disablePane($pane, 'Post-process Amazon', 'no music/books/games to process');
+            return $this->disablePane($pane, 'Post-process Metadata', 'no music/books/games to process');
         }
 
         $niceness = Settings::settingValue('niceness') ?? 2;
@@ -770,7 +770,7 @@ class TmuxTaskRunner
 
         // If no commands were added (no work available), disable the pane
         if (empty($commands)) {
-            return $this->disablePane($pane, 'Post-process Amazon', 'no work available for any enabled type');
+            return $this->disablePane($pane, 'Post-process Metadata', 'no work available for any enabled type');
         }
 
         $sleep = (int) ($runVar['settings']['post_timer_amazon'] ?? 300);

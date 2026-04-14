@@ -89,7 +89,7 @@
                         <!-- URL -->
                         <div>
                             <label for="url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Amazon URL
+                                Source URL
                             </label>
                             <input type="url"
                                    id="url"
@@ -98,7 +98,7 @@
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
                             @if(!empty($book['url']))
                                 <a href="{{ $book['url'] }}" target="_blank" class="text-sm text-blue-600 dark:text-blue-400 hover:underline mt-1 inline-block">
-                                    <i class="fas fa-external-link-alt mr-1"></i>View on Amazon
+                                    <i class="fas fa-external-link-alt mr-1"></i>View Source
                                 </a>
                             @endif
                         </div>

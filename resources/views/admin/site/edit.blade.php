@@ -379,7 +379,7 @@
                                     </option>
                                 @endforeach
                             </select>
-                            <p class="mt-1 text-sm text-gray-500">Whether to attempt to lookup music information from Amazon.</p>
+                            <p class="mt-1 text-sm text-gray-500">Whether to attempt to lookup music information from metadata providers.</p>
                         </div>
 
                         <div>
@@ -407,7 +407,7 @@
                                     </option>
                                 @endforeach
                             </select>
-                            <p class="mt-1 text-sm text-gray-500">Whether to attempt to lookup game information from Amazon.</p>
+                            <p class="mt-1 text-sm text-gray-500">Whether to attempt to lookup game information from metadata providers.</p>
                         </div>
                     </div>
                 </div>
@@ -789,7 +789,7 @@
                             </label>
                             <input type="text" id="maxaddprocessed" name="maxaddprocessed" value="{{ $site['maxaddprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                            <p class="mt-1 text-sm text-gray-500">The maximum amount of releases to process for passwords/previews/mediainfo per run. Every release gets processed here. This uses NNTP an connection, 1 per thread. This does not query Amazon.</p>
+                            <p class="mt-1 text-sm text-gray-500">The maximum amount of releases to process for passwords/previews/mediainfo per run. Every release gets processed here. This uses NNTP an connection, 1 per thread. This does not query external metadata providers.</p>
                         </div>
 
                         <div>
@@ -843,7 +843,7 @@
                             </label>
                             <input type="text" id="maxmusicprocessed" name="maxmusicprocessed" value="{{ $site['maxmusicprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                            <p class="mt-1 text-sm text-gray-500">The maximum amount of music to process with amazon per run. This does not use an NNTP connection.</p>
+                            <p class="mt-1 text-sm text-gray-500">The maximum amount of music to process with metadata lookups per run. This does not use an NNTP connection.</p>
                         </div>
 
                         <div>
@@ -852,7 +852,7 @@
                             </label>
                             <input type="text" id="maxgamesprocessed" name="maxgamesprocessed" value="{{ $site['maxgamesprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                            <p class="mt-1 text-sm text-gray-500">The maximum amount of games to process with amazon per run. This does not use an NNTP connection.</p>
+                            <p class="mt-1 text-sm text-gray-500">The maximum amount of games to process with metadata lookups per run. This does not use an NNTP connection.</p>
                         </div>
 
                         <div>
@@ -861,7 +861,7 @@
                             </label>
                             <input type="text" id="maxbooksprocessed" name="maxbooksprocessed" value="{{ $site['maxbooksprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                            <p class="mt-1 text-sm text-gray-500">The maximum amount of books to process with amazon per run. This does not use an NNTP connection</p>
+                            <p class="mt-1 text-sm text-gray-500">The maximum amount of books to process with metadata lookups per run. This does not use an NNTP connection</p>
                         </div>
 
                         <div>
@@ -875,14 +875,14 @@
 
                         <div>
                             <label for="amazonsleep" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fas fa-hourglass mr-1"></i>Amazon Sleep Time
+                                <i class="fas fa-hourglass mr-1"></i>Metadata Lookup Sleep Time
                             </label>
                             <div class="flex gap-2">
                                 <input type="text" id="amazonsleep" name="amazonsleep" value="{{ $site['amazonsleep'] ?? '' }}"
                                        class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">ms</span>
                             </div>
-                            <p class="mt-1 text-sm text-gray-500">Sleep time in milliseconds to wait in between amazon requests. If you thread post-proc, multiply by the number of threads. ie Postprocessing Threads = 12, Amazon sleep time = 12000</p>
+                            <p class="mt-1 text-sm text-gray-500">Sleep time in milliseconds to wait between external metadata requests. If you thread post-proc, multiply by the number of threads. ie Postprocessing Threads = 12, sleep time = 12000</p>
                         </div>
                     </div>
                 </div>
@@ -912,7 +912,7 @@
                             </label>
                             <input type="text" id="maxnfoprocessed" name="maxnfoprocessed" value="{{ $site['maxnfoprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                            <p class="mt-1 text-sm text-gray-500">The maximum amount of NFO files to process per run. This uses NNTP an connection, 1 per thread. This does not query Amazon.</p>
+                            <p class="mt-1 text-sm text-gray-500">The maximum amount of NFO files to process per run. This uses NNTP an connection, 1 per thread. This does not query external metadata providers.</p>
                         </div>
 
                         <div>
@@ -1060,11 +1060,11 @@
 
                         <div>
                             <label for="postthreadsnon" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fas fa-tasks mr-1"></i>Postprocessing Non-Amazon Threads
+                                <i class="fas fa-tasks mr-1"></i>Postprocessing Video Metadata Threads
                             </label>
                             <input type="text" id="postthreadsnon" name="postthreadsnon" value="{{ $site['postthreadsnon'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                            <p class="mt-1 text-sm text-gray-500">The number of threads for non-amazon postprocessing. This includes movies, anime and tv lookups.</p>
+                            <p class="mt-1 text-sm text-gray-500">The number of threads for video metadata postprocessing. This includes movies, anime and tv lookups.</p>
                         </div>
 
                         <div>

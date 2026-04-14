@@ -41,7 +41,7 @@ class TmuxLayoutBuilder
         // Postprocessing
         'postprocessing_additional' => ' Additional',
         'postprocessing_tv' => '󰟴 TV/Anime',
-        'postprocessing_amazon' => ' Amazon',
+        'postprocessing_amazon' => ' Metadata',
         'postprocessing_movies' => ' Movies',
 
         // IRC
@@ -112,14 +112,14 @@ class TmuxLayoutBuilder
         $this->paneManager->selectPane('1.0');
         $this->paneManager->splitHorizontal('1', '50%', $this->getPaneDisplayName('removeCrapReleases'));
 
-        // Window 2: Postprocessing (Left: Additional + TV + Amazon, Right: Movies + XXX)
+        // Window 2: Postprocessing (Left: Additional + TV + Metadata, Right: Movies + XXX)
         $this->paneManager->createWindow(2, ' Post');
         $this->paneManager->setPaneTitle('2.0', $this->getPaneDisplayName('postprocessing_additional'));
 
         // Split horizontally to create left and right halves (don't set title yet)
         $this->paneManager->splitHorizontal('2', '50%', '');
 
-        // Left side (2.0): split vertically for TV and Amazon
+        // Left side (2.0): split vertically for TV and Metadata
         $this->paneManager->selectPane('2.0');
         $this->paneManager->splitVertical('2', '67%', $this->getPaneDisplayName('postprocessing_tv'));
         $this->paneManager->splitVertical('2', '50%', $this->getPaneDisplayName('postprocessing_amazon'));
@@ -157,14 +157,14 @@ class TmuxLayoutBuilder
         $this->paneManager->selectPane('1.0');
         $this->paneManager->splitHorizontal('1', '50%', $this->getPaneDisplayName('removeCrapReleases'));
 
-        // Window 2: Postprocessing (Left: Additional + TV + Amazon, Right: Movies + XXX)
+        // Window 2: Postprocessing (Left: Additional + TV + Metadata, Right: Movies + XXX)
         $this->paneManager->createWindow(2, ' Post');
         $this->paneManager->setPaneTitle('2.0', $this->getPaneDisplayName('postprocessing_additional'));
 
         // Split horizontally to create left and right halves (don't set title yet)
         $this->paneManager->splitHorizontal('2', '50%', '');
 
-        // Left side (2.0): split vertically for TV and Amazon
+        // Left side (2.0): split vertically for TV and Metadata
         $this->paneManager->selectPane('2.0');
         $this->paneManager->splitVertical('2', '67%', $this->getPaneDisplayName('postprocessing_tv'));
         $this->paneManager->splitVertical('2', '50%', $this->getPaneDisplayName('postprocessing_amazon'));
@@ -195,7 +195,7 @@ class TmuxLayoutBuilder
         $this->paneManager->selectPane('0.0');
         $this->paneManager->splitHorizontal('0', '67%', $this->getPaneDisplayName('sequential'));
 
-        // Window 1: Amazon postprocessing
+        // Window 1: Metadata postprocessing
         $this->paneManager->createWindow(1, ' Utils');
         $this->paneManager->setPaneTitle('1.0', $this->getPaneDisplayName('fixReleaseNames'));
         $this->paneManager->selectPane('1.0');
@@ -229,7 +229,7 @@ class TmuxLayoutBuilder
      * Window layout:
      * - Window 0: Monitor + Processing panes (binaries/backfill/releases)
      * - Window 1: Utilities (fix names, remove crap)
-     * - Window 2: Postprocessing (additional, tv/anime, movies, amazon)
+     * - Window 2: Postprocessing (additional, tv/anime, movies, metadata)
      * - Window 3: IRC Scraper
      * - Window 4+: Monitoring tools (htop, nmon, vnstat, tcptrack, bwm-ng, mytop, redis, console)
      */

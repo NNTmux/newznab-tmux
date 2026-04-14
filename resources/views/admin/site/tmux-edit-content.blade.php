@@ -239,7 +239,7 @@
                             </div>
                         </x-form.group>
 
-                        <x-form.group label="Postprocess Amazon" for="post_amazon" help="Books, music and games lookups.">
+                        <x-form.group label="Postprocess Metadata" for="post_amazon" help="Books, music and games lookups.">
                             <x-select id="post_amazon" name="post_amazon" class="w-full">
                                 @foreach($yesno_ids as $index => $val)
                                     <option value="{{ $val }}" {{ ($site['post_amazon'] ?? '') == $val ? 'selected' : '' }}>
@@ -249,14 +249,14 @@
                             </x-select>
                         </x-form.group>
 
-                        <x-form.group label="Postprocess Amazon Sleep Timer" for="post_timer_amazon">
+                        <x-form.group label="Postprocess Metadata Sleep Timer" for="post_timer_amazon">
                             <div class="flex gap-2">
                                 <x-input id="post_timer_amazon" name="post_timer_amazon" type="number" value="{{ $site['post_timer_amazon'] ?? 300 }}" class="flex-1" />
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
                             </div>
                         </x-form.group>
 
-                        <x-form.group label="Postprocess Non-Amazon" for="post_non" help="Movies, anime and TV lookups.">
+                        <x-form.group label="Postprocess Video Metadata" for="post_non" help="Movies, anime and TV lookups.">
                             <x-select id="post_non" name="post_non" class="w-full">
                                 @foreach($yesno_ids as $index => $val)
                                     <option value="{{ $val }}" {{ ($site['post_non'] ?? '') == $val ? 'selected' : '' }}>
@@ -266,7 +266,7 @@
                             </x-select>
                         </x-form.group>
 
-                        <x-form.group label="Postprocess Non-Amazon Sleep Timer" for="post_timer_non">
+                        <x-form.group label="Postprocess Video Metadata Sleep Timer" for="post_timer_non">
                             <div class="flex gap-2">
                                 <x-input id="post_timer_non" name="post_timer_non" type="number" value="{{ $site['post_timer_non'] ?? 300 }}" class="flex-1" />
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>
