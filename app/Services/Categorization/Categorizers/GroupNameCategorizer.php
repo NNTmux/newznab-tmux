@@ -42,7 +42,7 @@ class GroupNameCategorizer extends AbstractCategorizer
             return $this->matched(Category::PC_0DAY, 0.6, 'group_pc');
         }
         if (preg_match('/alt\.binaries\..*?(e-?book|ebook|comics?)/i', $groupName)) {
-            return $this->matched(Category::BOOKS_EBOOK, 0.6, 'group_book');
+            return $this->matched(Category::BOOKS_EBOOK, 0.5, 'group_book');
         }
 
         return $this->noMatch();

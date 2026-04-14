@@ -19,29 +19,57 @@ class BookCategorizer extends AbstractCategorizer
 
     public function shouldSkip(ReleaseContext $context): bool
     {
+        $name = $context->releaseName;
+
         if ($context->hasAdultMarkers()) {
             return true;
         }
-        if (preg_match('/\.PS4-[A-Z0-9]+$/i', $context->releaseName)) {
+        if (preg_match('/\.PS4-[A-Z0-9]+$/i', $name)) {
             return true;
         }
-        if (preg_match('/\b(?:PS[1-5]|PlayStation|Xbox|Switch|Nintendo|Wii|3DS|GameCube)\b/i', $context->releaseName)) {
+        if (preg_match('/\b(?:PS[1-5]|PlayStation|Xbox|Switch|Nintendo|Wii|3DS|GameCube)\b/i', $name)) {
+            return true;
+        }
+        if (preg_match('/\b(?:PPSA\d{4,6}|CUSA\d{5}|XCI|NSP|PKG)\b/i', $name)) {
             return true;
         }
         // Skip software and utility release naming patterns.
-        if (preg_match('/\bv?\d+\.\d+\.\d+(?:\.\d+)?\b.*\b(?:Multilingual|x64|x86|Portable|Setup|Patch)\b/i', $context->releaseName)) {
+        if (preg_match('/\bv?\d+(?:\.\d+){1,4}\b.*\b(?:Multilingual|x64|x86|Portable|Setup|Patch|Install(?:er)?|Crack(?:ed)?|Keygen|Serial|Regged|Pre-?Activated)\b/i', $name)) {
+            return true;
+        }
+        if ($this->hasSoftwareMarkers($name)) {
             return true;
         }
         // Skip music-style release names that are often misfiled as books.
-        if (preg_match('/\b(?:WEB[\.\-_ ]?FLAC|MP3|320kbps|discography|FALCON)\b/i', $context->releaseName)) {
+        if (preg_match('/\b(?:WEB[\.\-_ ]?FLAC|FLAC|MP3|M4A|M4B|AAC|OGG|ALAC|WAV|LOSSLESS|320kbps|256kbps|192kbps|128kbps|VBR|CBR|discography|FALCON|OST|Soundtrack|Vinyl[._ -]?Rip|CD[._ -]?Rip)\b/i', $name)) {
+            return true;
+        }
+        // Skip video course/training releases that often include "tutorial" language.
+        if (preg_match('/\b(?:Udemy|Pluralsight|Lynda\.?com|Coursera|LinkedIn[._ -]?Learning|Skillshare|MasterClass|CBT[._ -]?Nuggets|Digital-?Tutors)\b/i', $name)) {
+            return true;
+        }
+        // Skip video media signatures.
+        if ($this->hasVideoReleaseMarkers($name)) {
+            return true;
+        }
+        // Skip distro/iso images and generic media images.
+        if (preg_match('/\b(?:Ubuntu|Debian|Fedora|Kali|Arch(?:Linux)?|CentOS|OpenSUSE|LinuxMint)\b.*\b(?:ISO|img|amd64|x86_64|installer)\b/i', $name)) {
+            return true;
+        }
+        if (preg_match('/\b(?:ISO|IMG|DMG|bootable)\b/i', $name)) {
+            return true;
+        }
+        // Skip font packs and typeface archives.
+        if (preg_match('/\b(?:Font(?:s)?|Typeface|OpenType|TrueType)\b/i', $name) ||
+            preg_match('/\.(?:otf|ttf|woff2?)$/i', $name)) {
             return true;
         }
         // Skip TV shows (season patterns)
-        if (preg_match('/[._ -]S\d{1,3}[._ -]?(E\d|Complete|Full|1080|720|480|2160|WEB|HDTV|BluRay)/i', $context->releaseName)) {
+        if (preg_match('/[._ -]S\d{1,3}[._ -]?(E\d|Complete|Full|1080|720|480|2160|WEB|HDTV|BluRay)/i', $name)) {
             return true;
         }
         // Skip movies (year + quality patterns)
-        if (preg_match('/\b(19|20)\d{2}\b.*\b(1080p|720p|2160p|BluRay|WEB-DL|BDRip|DVDRip)\b/i', $context->releaseName)) {
+        if (preg_match('/\b(19|20)\d{2}\b.*\b(1080p|720p|2160p|BluRay|WEB-DL|BDRip|DVDRip)\b/i', $name)) {
             return true;
         }
 
@@ -85,12 +113,19 @@ class BookCategorizer extends AbstractCategorizer
 
     protected function checkTechnical(string $name): ?CategorizationResult
     {
-        $publishers = 'Apress|Addison[._ -]Wesley|Manning|No[._ -]Starch|OReilly|Packt|Pragmatic|Wiley|Wrox';
+        if ($this->hasSoftwareMarkers($name) || $this->hasVideoCourseMarkers($name)) {
+            return null;
+        }
+
+        $publishers = 'Apress|Addison[._ -]Wesley|Manning|No[._ -]Starch|O[\'’]?Reilly|Packt|Pragmatic|Wiley|Wrox';
         if (preg_match('/\b('.$publishers.')\b/i', $name)) {
             return $this->matched(Category::BOOKS_TECHNICAL, 0.9, 'technical_publisher');
         }
         $subjects = 'Programming|Python|JavaScript|Java|Database|Linux|DevOps|Machine[._ -]Learning|Data[._ -]Science';
-        if (preg_match('/\b('.$subjects.')\b/i', $name) && preg_match('/\b(Book|Guide|Tutorial|Learn)\b/i', $name)) {
+        $bookSignals = '\b(?:Book|Guide|Tutorial|Learn|Handbook|Cookbook|Reference)\b';
+        if (preg_match('/\b('.$subjects.')\b/i', $name) &&
+            preg_match('/'.$bookSignals.'/i', $name) &&
+            $this->hasBookCorroborator($name)) {
             return $this->matched(Category::BOOKS_TECHNICAL, 0.85, 'technical_subject');
         }
 
@@ -99,11 +134,17 @@ class BookCategorizer extends AbstractCategorizer
 
     protected function checkMagazine(string $name): ?CategorizationResult
     {
-        if (preg_match('/[._ -](Monthly|Weekly|Annual|Quarterly|Issue)[._ -]/i', $name)) {
+        $magazines = 'Forbes|Fortune|GQ|National[._ -]Geographic|Newsweek|Vogue|Wired|The[._ -]?Economist|New[._ -]?Yorker|Scientific[._ -]?American|Popular[._ -]?Mechanics|Cosmopolitan|Elle|Esquire|Vanity[._ -]?Fair|Rolling[._ -]?Stone|Entertainment[._ -]?Weekly|People|Playboy';
+        $hasTitle = preg_match('/\b('.$magazines.')\b/i', $name) === 1;
+        $hasIssueNumber = preg_match('/(?:^|[._ -])Issue[._ -]?\d{1,4}(?:$|[._ -])/i', $name) === 1;
+        $hasDateSignal = preg_match('/\b(?:19|20)\d{2}\b|(?:^|[._ -])(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[._ -]?(?:19|20)?\d{2}\b/i', $name) === 1;
+        $hasFrequency = preg_match('/[._ -](Monthly|Weekly|Quarterly|Annual)[._ -]/i', $name) === 1;
+
+        if (($hasFrequency && ($hasIssueNumber || $hasDateSignal || $hasTitle)) ||
+            ($hasIssueNumber && ($hasDateSignal || $hasTitle))) {
             return $this->matched(Category::BOOKS_MAGAZINES, 0.9, 'magazine_frequency');
         }
-        $magazines = 'Forbes|Fortune|GQ|National[._ -]Geographic|Newsweek|Time|Vogue|Wired|PC[._ -]Gamer';
-        if (preg_match('/\b('.$magazines.')\b/i', $name)) {
+        if ($hasTitle) {
             return $this->matched(Category::BOOKS_MAGAZINES, 0.85, 'magazine_title');
         }
 
@@ -112,17 +153,58 @@ class BookCategorizer extends AbstractCategorizer
 
     protected function checkEbook(string $name): ?CategorizationResult
     {
-        $formats = 'EPUB|MOBI|AZW\d?|PDF|FB2|DJVU|LIT';
-        if (preg_match('/\.('.$formats.')$/i', $name)) {
+        if ($this->hasSoftwareMarkers($name)) {
+            return null;
+        }
+
+        $strictFormats = 'EPUB|MOBI|AZW\d?|FB2|DJVU|LIT';
+        if (preg_match('/\.('.$strictFormats.')$/i', $name)) {
             return $this->matched(Category::BOOKS_EBOOK, 0.9, 'ebook_format');
         }
-        if (preg_match('/\b('.$formats.')\b/i', $name)) {
+        if (preg_match('/\b('.$strictFormats.')\b/i', $name)) {
             return $this->matched(Category::BOOKS_EBOOK, 0.85, 'ebook_indicator');
+        }
+        if (preg_match('/\.PDF$/i', $name) && $this->hasBookCorroborator($name)) {
+            return $this->matched(Category::BOOKS_EBOOK, 0.75, 'ebook_pdf_format');
+        }
+        if (preg_match('/\bPDF\b/i', $name) && $this->hasBookCorroborator($name)) {
+            return $this->matched(Category::BOOKS_EBOOK, 0.65, 'ebook_pdf_indicator');
         }
         if (preg_match('/\b(E-?book|Kindle|Kobo|Nook)\b/i', $name)) {
             return $this->matched(Category::BOOKS_EBOOK, 0.8, 'ebook_platform');
         }
 
         return null;
+    }
+
+    protected function hasBookCorroborator(string $name): bool
+    {
+        return preg_match('/\b(?:ISBN(?:-1[03])?|Edition|Ed\.|Author|Novel|Volume|Vol\.|Chapter|Press|Paperback|Hardcover|E-?book|Kindle|Kobo)\b/i', $name) === 1
+            || preg_match('/\b(?:Apress|Addison[._ -]Wesley|Manning|No[._ -]Starch|O[\'’]?Reilly|Packt|Pragmatic|Wiley|Wrox)\b/i', $name) === 1
+            || preg_match('/\.(?:epub|mobi|azw\d?|fb2|djvu|lit|pdf)$/i', $name) === 1;
+    }
+
+    protected function hasSoftwareMarkers(string $name): bool
+    {
+        if (preg_match('/\b(?:Setup|Install(?:er)?|Portable|Crack(?:ed)?|Keygen|Serial|Regged|Pre-?Activated|Patch(?:ed)?|NFO|ReadNFO|Win(?:dows)?|macOS|Linux|x64|x86|amd64|AIO|Retail|Incl)\b/i', $name)) {
+            return true;
+        }
+
+        if (preg_match('/\b(?:Adobe|Foxit|Autodesk|AutoCAD|Corel|Microsoft[._ -]Office|Office(?:365)?|Visual[._ -]Studio|IntelliJ|PyCharm|VMware|VirtualBox)\b/i', $name)) {
+            return true;
+        }
+
+        return preg_match('/\.(?:exe|msi|dmg|pkg)$/i', $name) === 1;
+    }
+
+    protected function hasVideoCourseMarkers(string $name): bool
+    {
+        return preg_match('/\b(?:Udemy|Pluralsight|Lynda\.?com|Coursera|LinkedIn[._ -]?Learning|Skillshare|MasterClass|CBT[._ -]?Nuggets|Digital-?Tutors)\b/i', $name) === 1;
+    }
+
+    protected function hasVideoReleaseMarkers(string $name): bool
+    {
+        return preg_match('/\b(?:720p|1080p|2160p|4k)\b/i', $name) === 1
+            && preg_match('/\b(?:WEB[._ -]?DL|WEBRip|HDTV|BluRay|BDRip|DVDRip|x264|x265|HEVC|HDR|Remux|AVC)\b/i', $name) === 1;
     }
 }
