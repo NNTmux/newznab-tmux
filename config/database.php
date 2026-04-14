@@ -3,6 +3,12 @@
 use Illuminate\Support\Str;
 use PDO\MYSQL;
 
+$redisClient = env('REDIS_CLIENT', 'phpredis');
+
+if ($redisClient === 'predis' && ! class_exists('Predis\\Client')) {
+    $redisClient = 'phpredis';
+}
+
 return [
 
     'default' => env('DB_CONNECTION', 'mysql'),
@@ -75,7 +81,7 @@ return [
     ],
 
     'redis' => [
-        'client' => env('REDIS_CLIENT', 'phpredis'),
+        'client' => $redisClient,
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
             'prefix' => Str::slug(env('APP_NAME', 'laravel'), '_').'_database_',

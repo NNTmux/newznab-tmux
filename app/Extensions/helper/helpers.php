@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use sspat\ESQuerySanitizer\Sanitizer;
 use STS\ZipStream\Builder;
 use STS\ZipStream\Facades\Zip as ZipStream;
 use Symfony\Component\Process\Process;
@@ -586,7 +585,9 @@ if (! function_exists('sanitize')) {
                 } elseif (Str::endsWith($st, ['+', '-', '?', '*']) && Str::length($st) > 1 && ! preg_match('/([!+?\-*]){2,}/', $st)) {
                     $str = $st;
                 } else {
-                    $str = Sanitizer::escape($st, $doNotSanitize);
+                    $str = in_array($st, $doNotSanitize, true)
+                        ? $st
+                        : (preg_replace('/([+\-=&|><!(){}\[\]^"~*?:\\\\\\/])/', '\\\\$1', $st) ?? $st);
                 }
                 $tempWords[] = $str;
             }

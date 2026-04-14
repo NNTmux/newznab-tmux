@@ -49,7 +49,8 @@
                 </div>
             </div>
 
-            {{ html()->form()->method('POST')->action(url("mymovies?id=do{$type}"))->id('mymovies')->class('space-y-6')->open() }}
+            <form method="POST" action="{{ url("mymovies?id=do{$type}") }}" id="mymovies" class="space-y-6">
+                @csrf
                 <input type="hidden" name="imdb" value="{{ $imdbid }}"/>
                 @if(!empty($from))
                     <input type="hidden" name="from" value="{{ $from }}" />
@@ -82,7 +83,7 @@
                         <i class="fa fa-arrow-left mr-2"></i>Back to My Movies
                     </a>
                 </div>
-            {{ html()->form()->close() }}
+            </form>
         </div>
     </div>
 </div>

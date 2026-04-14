@@ -12,7 +12,6 @@ use App\Http\Middleware\SetUserTimezone;
 use App\Http\Middleware\ThrottleApiRequestsByToken;
 use App\Http\Middleware\TrustedDevice2FAMiddleware;
 use App\Http\Middleware\TrustProxies as AppTrustProxies;
-use Creativeorange\Gravatar\GravatarServiceProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -30,7 +29,6 @@ use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
         TinkerServiceProvider::class,
-        GravatarServiceProvider::class,
     ])
     ->withRouting(
         web: __DIR__.'/../routes/web.php',

@@ -2,7 +2,6 @@
 
 use App\Facades\Elasticsearch;
 use App\Facades\Yenc;
-use Creativeorange\Gravatar\Facades\Gravatar;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Redis;
 
@@ -27,7 +26,6 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         'Elasticsearch' => Elasticsearch::class,
         'Google2FA' => PragmaRX\Google2FALaravel\Facade::class,
-        'Gravatar' => Gravatar::class,
         'RedisManager' => Redis::class,
         'Yenc' => Yenc::class,
     ])->toArray(),

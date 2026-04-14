@@ -44,7 +44,8 @@
                 <p class="text-gray-600 dark:text-gray-400">Don't hesitate to send us a message. Our team will be happy to help you.</p>
             </div>
 
-            {{ html()->form()->method('POST')->action(route('contact-us'))->open() }}
+            <form method="POST" action="{{ route('contact-us') }}">
+                @csrf
                 <div class="mb-6">
                     <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Name <span class="text-red-500">*</span>
@@ -113,7 +114,7 @@
                         <i class="fas fa-paper-plane mr-2"></i>Send Message
                     </button>
                 </div>
-            {{ html()->form()->close() }}
+            </form>
         </div>
 
         <div class="surface-panel-alt px-6 py-4 border-t rounded-b-lg text-center">

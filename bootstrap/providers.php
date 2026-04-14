@@ -9,7 +9,6 @@ use App\Providers\ProcessingServiceProvider;
 use App\Providers\SearchServiceProvider;
 use App\Providers\TvProcessingServiceProvider;
 use App\Providers\UserServiceProvider;
-use App\Providers\VoltServiceProvider;
 
 return [
     AdditionalProcessingServiceProvider::class,
@@ -21,5 +20,4 @@ return [
     SearchServiceProvider::class,
     TvProcessingServiceProvider::class,
     UserServiceProvider::class,
-    VoltServiceProvider::class,
 ];
