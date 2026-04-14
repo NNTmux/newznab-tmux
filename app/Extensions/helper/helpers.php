@@ -550,11 +550,11 @@ if (! function_exists('getReleaseCover')) {
         }
 
         if ($coverType && $coverId) {
-            if ($coverType === 'tvshows') {
-                return url("/covers/{$coverType}/{$coverId}.jpg");
+            if (in_array($coverType, ['movies', 'anime'], true)) {
+                return url("/covers/{$coverType}/{$coverId}-cover.jpg");
             }
 
-            return url("/covers/{$coverType}/{$coverId}-cover.jpg");
+            return url("/covers/{$coverType}/{$coverId}.jpg");
         }
 
         // Return placeholder image if no cover type/ID found
