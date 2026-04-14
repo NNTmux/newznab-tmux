@@ -718,7 +718,7 @@ class BookService
                 }
             }
 
-            $book['cover'] = $ri->saveImage($bookId, $book['coverurl'], $this->imgSavePath, 250, 250);
+            $book['cover'] = $ri->saveImage((string) $bookId, $book['coverurl'], $this->imgSavePath, 250, 250);
         } elseif ($this->echooutput) {
             cli()->header('Nothing to update: ').
             cli()->header($book['author'].
