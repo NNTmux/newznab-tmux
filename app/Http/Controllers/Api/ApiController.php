@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Events\UserAccessedApi;
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
+use App\Models\Genre;
 use App\Models\Release;
 use App\Models\ReleaseNfo;
 use App\Models\Settings;
@@ -27,6 +28,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -181,6 +183,13 @@ class ApiController extends BasePageController
             case 's':
                 $this->verifyEmptyParameter($request, 'q');
                 $maxAge = $this->maxAge($request);
+                if (! is_int($maxAge)) {
+                    return $maxAge;
+                }
+                $sort = $this->sort($request);
+                if (! is_string($sort)) {
+                    return $sort;
+                }
                 $groupName = $this->group($request);
                 UserRequest::addApiRequest($uid, $request->getRequestUri());
                 $categoryID = $this->categoryID($request);
@@ -195,7 +204,8 @@ class ApiController extends BasePageController
                         $maxAge,
                         $catExclusions,
                         $categoryID,
-                        $minSize
+                        $minSize,
+                        $sort
                     );
                 } else {
                     $relData = $this->releaseBrowseService->getBrowseRangeForApi(
@@ -203,7 +213,7 @@ class ApiController extends BasePageController
                         $categoryID,
                         $offset,
                         $limit,
-                        '',
+                        $sort,
                         $maxAge,
                         $catExclusions,
                         $groupName,
@@ -225,6 +235,13 @@ class ApiController extends BasePageController
                 $this->verifyEmptyParameter($request, 'season');
                 $this->verifyEmptyParameter($request, 'ep');
                 $maxAge = $this->maxAge($request);
+                if (! is_int($maxAge)) {
+                    return $maxAge;
+                }
+                $sort = $this->sort($request);
+                if (! is_string($sort)) {
+                    return $sort;
+                }
                 UserRequest::addApiRequest($uid, $request->getRequestUri());
 
                 $siteIdArr = [
@@ -258,7 +275,8 @@ class ApiController extends BasePageController
                     $this->categoryID($request),
                     $maxAge,
                     $minSize,
-                    $catExclusions
+                    $catExclusions,
+                    $sort
                 );
 
                 $this->output($relData, $params, $outputXML, $offset, 'api');
@@ -269,6 +287,13 @@ class ApiController extends BasePageController
                 $this->verifyEmptyParameter($request, 'q');
                 $this->verifyEmptyParameter($request, 'imdbid');
                 $maxAge = $this->maxAge($request);
+                if (! is_int($maxAge)) {
+                    return $maxAge;
+                }
+                $sort = $this->sort($request);
+                if (! is_string($sort)) {
+                    return $sort;
+                }
                 UserRequest::addApiRequest($uid, $request->getRequestUri());
 
                 $imdbId = $request->has('imdbid') && $request->filled('imdbid')
@@ -287,7 +312,8 @@ class ApiController extends BasePageController
                     $this->categoryID($request),
                     $maxAge,
                     $minSize,
-                    $catExclusions
+                    $catExclusions,
+                    $sort
                 );
 
                 $this->addCoverURL(
@@ -308,6 +334,10 @@ class ApiController extends BasePageController
                 if (! is_int($maxAge)) {
                     return $maxAge;
                 }
+                $sort = $this->sort($request);
+                if (! is_string($sort)) {
+                    return $sort;
+                }
                 $groupName = $this->group($request);
                 UserRequest::addApiRequest($uid, $request->getRequestUri());
                 $relData = $this->releaseSearchService->apiMusicSearch(
@@ -318,7 +348,8 @@ class ApiController extends BasePageController
                     $maxAge,
                     $catExclusions,
                     $this->categoryID($request),
-                    $minSize
+                    $minSize,
+                    $sort
                 );
                 $this->output($relData, $params, $outputXML, $offset, 'api');
                 break;
@@ -331,6 +362,10 @@ class ApiController extends BasePageController
                 if (! is_int($maxAge)) {
                     return $maxAge;
                 }
+                $sort = $this->sort($request);
+                if (! is_string($sort)) {
+                    return $sort;
+                }
                 $groupName = $this->group($request);
                 UserRequest::addApiRequest($uid, $request->getRequestUri());
                 $relData = $this->releaseSearchService->apiBookSearch(
@@ -341,7 +376,8 @@ class ApiController extends BasePageController
                     $maxAge,
                     $catExclusions,
                     $this->categoryID($request),
-                    $minSize
+                    $minSize,
+                    $sort
                 );
                 $this->output($relData, $params, $outputXML, $offset, 'api');
                 break;
@@ -357,6 +393,10 @@ class ApiController extends BasePageController
                 if (! is_int($maxAge)) {
                     return $maxAge;
                 }
+                $sort = $this->sort($request);
+                if (! is_string($sort)) {
+                    return $sort;
+                }
                 UserRequest::addApiRequest($uid, $request->getRequestUri());
                 $relData = $this->releaseSearchService->animeSearch(
                     $anidb,
@@ -366,7 +406,8 @@ class ApiController extends BasePageController
                     $this->categoryID($request),
                     $maxAge,
                     $catExclusions,
-                    $anilist
+                    $anilist,
+                    $sort
                 );
                 $this->output($relData, $params, $outputXML, $offset, 'api');
                 break;
@@ -426,18 +467,18 @@ class ApiController extends BasePageController
                 //
             case 'nzbAdd':
                 if (! User::canPost($uid)) {
-                    return response('User does not have permission to post', 403);
+                    return showApiError(102, 'Insufficient privileges/not authorized');
                 }
 
                 if ($request->missing('file')) {
-                    return response('Missing parameter (file is required for adding an NZB)', 400);
+                    return showApiError(200, 'Missing parameter (file is required for adding an NZB)');
                 }
                 if ($request->missing('apikey')) {
-                    return response('Missing parameter (apikey is required for adding an NZB)', 400);
+                    return showApiError(200, 'Missing parameter (apikey is required for adding an NZB)');
                 }
 
                 if (! $request->hasFile('file')) {
-                    return response('Missing parameter (file is required for adding an NZB)', 400);
+                    return showApiError(600, 'Failed to load NZB');
                 }
 
                 UserRequest::addApiRequest($uid, $request->getRequestUri());
@@ -448,11 +489,11 @@ class ApiController extends BasePageController
                 if ($nzbFile !== null) {
                     // We need to check if file is an actual nzb file.
                     if ($nzbFile->getClientOriginalExtension() !== 'nzb') {
-                        return response('File is not an NZB file', 400);
+                        return showApiError(600, 'Failed to load NZB (file is not an NZB file)');
                     }
                     // Check if the file is proper xml nzb file.
                     if (! isValidNewznabNzb($nzbFile->getContent())) {
-                        return response('File is not a valid Newznab NZB file', 400);
+                        return showApiError(600, 'Failed to load NZB (invalid NZB payload)');
                     }
                     if (! File::isDirectory(config('nntmux.nzb_upload_folder'))) {
                         @File::makeDirectory(config('nntmux.nzb_upload_folder'), 0775, true);
@@ -461,15 +502,23 @@ class ApiController extends BasePageController
                     if (File::put(config('nntmux.nzb_upload_folder').$nzbFile->getClientOriginalName(), $nzbFile->getContent())) {
                         Log::channel('nzb_upload')->info('NZB file uploaded by API: '.$nzbFile->getClientOriginalName());
 
-                        return response('NZB file uploaded successfully', 200);
+                        $successXml = sprintf(
+                            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<success id=\"0\" guid=\"\" categoryid=\"%s\" name=\"%s\" />\n",
+                            (string) $request->input('cat', ''),
+                            htmlspecialchars(pathinfo($nzbFile->getClientOriginalName(), PATHINFO_FILENAME), ENT_QUOTES, 'UTF-8')
+                        );
+
+                        return response($successXml, 200)->header('Content-type', 'text/xml');
                     }
 
                     Log::channel('nzb_upload')->warning('NZB file uploaded by API failed: '.$nzbFile->getClientOriginalName());
                 } else {
                     Log::channel('nzb_upload')->warning('NZB file uploaded by API failed: no file provided');
 
-                    return response('NZB file upload failed', 500);
+                    return showApiError(603, 'NZB failed to write to disk');
                 }
+
+                return showApiError(603, 'NZB failed to write to disk');
 
                 break;
 
@@ -551,12 +600,12 @@ class ApiController extends BasePageController
                     'default' => 100,
                 ],
                 'searching' => [
-                    'search' => ['available' => 'yes', 'supportedParams' => 'q'],
-                    'tv-search' => ['available' => 'yes', 'supportedParams' => 'q,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
-                    'movie-search' => ['available' => 'yes', 'supportedParams' => 'q,imdbid, tmdbid, traktid'],
-                    'audio-search' => ['available' => 'yes', 'supportedParams' => 'q,cat,minsize,maxage,group'],
-                    'book-search' => ['available' => 'yes', 'supportedParams' => 'q,cat,minsize,maxage,group'],
-                    'anime-search' => ['available' => 'yes', 'supportedParams' => 'q,anidbid,anilistid,cat,maxage'],
+                    'search' => ['available' => 'yes', 'supportedParams' => 'q,group,minsize,maxsize,maxage,cat,limit,offset,attrs,extended,del,sort'],
+                    'tv-search' => ['available' => 'yes', 'supportedParams' => 'q,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep,cat,minsize,maxsize,maxage,limit,offset,attrs,extended,del,sort'],
+                    'movie-search' => ['available' => 'yes', 'supportedParams' => 'q,imdbid,tmdbid,traktid,genre,cat,minsize,maxsize,maxage,limit,offset,attrs,extended,del,sort'],
+                    'audio-search' => ['available' => 'yes', 'supportedParams' => 'q,cat,minsize,maxsize,maxage,group,limit,offset,attrs,extended,del,sort'],
+                    'book-search' => ['available' => 'yes', 'supportedParams' => 'q,title,author,cat,minsize,maxsize,maxage,group,limit,offset,attrs,extended,del,sort'],
+                    'anime-search' => ['available' => 'yes', 'supportedParams' => 'q,anidbid,anilistid,cat,minsize,maxsize,maxage,limit,offset,attrs,extended,del,sort'],
                 ],
             ];
         });
@@ -569,6 +618,34 @@ class ApiController extends BasePageController
 
         // Only load categories for caps requests (also cached via Category::getForMenu)
         $serverInfo['categories'] = $includeCats ? Category::getForMenu() : null;
+        $serverInfo['groups'] = $includeCats
+            ? (Schema::hasTable('usenet_groups')
+                ? UsenetGroup::query()
+                    ->where('active', 1)
+                    ->orderBy('name')
+                    ->get(['name', 'description', 'last_updated'])
+                    ->map(static fn (UsenetGroup $group): array => [
+                        'name' => $group->name,
+                        'description' => (string) ($group->description ?? ''),
+                        'lastupdate' => $group->last_updated ? Carbon::parse($group->last_updated)->toRfc2822String() : '',
+                    ])
+                    ->all()
+                : [])
+            : null;
+        $serverInfo['genres'] = $includeCats
+            ? (Schema::hasTable('genres')
+                ? Genre::query()
+                    ->enabled()
+                    ->orderBy('title')
+                    ->get(['id', 'title', 'type'])
+                    ->map(static fn (Genre $genre): array => [
+                        'id' => $genre->id,
+                        'name' => $genre->title,
+                        'categoryid' => (int) ($genre->type ?? 0),
+                    ])
+                    ->all()
+                : [])
+            : null;
 
         return $serverInfo;
     }
@@ -672,6 +749,30 @@ class ApiController extends BasePageController
         }
 
         return $offset;
+    }
+
+    /**
+     * Validate and normalize the API sort parameter.
+     *
+     * @return Application|ResponseFactory|\Illuminate\Foundation\Application|Response|string
+     */
+    public function sort(Request $request)
+    {
+        $defaultSort = 'posted_desc';
+        if (! $request->has('sort')) {
+            return $defaultSort;
+        }
+
+        $sort = strtolower(trim((string) $request->input('sort')));
+        if ($sort === '') {
+            return showApiError(201, 'Incorrect parameter (sort must not be empty)');
+        }
+
+        if (! preg_match('/^(cat|name|size|files|stats|posted)_(asc|desc)$/', $sort)) {
+            return showApiError(201, 'Incorrect parameter (sort must be one of: cat_asc/desc, name_asc/desc, size_asc/desc, files_asc/desc, stats_asc/desc, posted_asc/desc)');
+        }
+
+        return $sort;
     }
 
     /**

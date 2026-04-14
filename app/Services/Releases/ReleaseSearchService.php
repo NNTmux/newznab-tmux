@@ -144,7 +144,7 @@ class ReleaseSearchService
      * @param  array<string, mixed>  $excludedCats
      * @return Collection|mixed
      */
-    public function apiSearch(mixed $searchName, mixed $groupName, int $offset = 0, int $limit = 1000, int $maxAge = -1, array $excludedCats = [], array $cat = [-1], int $minSize = 0): mixed
+    public function apiSearch(mixed $searchName, mixed $groupName, int $offset = 0, int $limit = 1000, int $maxAge = -1, array $excludedCats = [], array $cat = [-1], int $minSize = 0, string $orderBy = 'posted_desc'): mixed
     {
         if (config('app.debug')) {
             Log::debug('ReleaseSearchService::apiSearch called', [
@@ -156,6 +156,7 @@ class ReleaseSearchService
         }
 
         $hasText = $searchName !== -1 && $searchName !== '' && $searchName !== null;
+        [$orderField, $orderDir] = $this->getBrowseOrder($orderBy);
 
         if (Search::isAvailable()) {
             $groupId = null;
@@ -182,15 +183,15 @@ class ReleaseSearchService
                 'max_age_days' => $maxAge,
                 'groups_id' => $groupId,
                 'password_allow_rar' => str_contains($this->showPasswords(), '<='),
-                'sort_field' => 'postdate_ts',
-                'sort_dir' => 'desc',
+                'sort_field' => $this->browseOrderToIndexSortField($orderField),
+                'sort_dir' => $orderDir,
                 'try_fuzzy' => true,
             ];
 
             $filtered = Search::searchReleasesFiltered($criteria, $limit, $offset);
 
             if ($filtered['ids'] === [] && $hasText && config('nntmux.mysql_search_fallback', false) === true) {
-                return $this->apiSearchLegacyMysql($searchName, $groupName, $offset, $limit, $maxAge, $excludedCats, $cat, $minSize);
+                return $this->apiSearchLegacyMysql($searchName, $groupName, $offset, $limit, $maxAge, $excludedCats, $cat, $minSize, $orderBy);
             }
 
             if ($filtered['ids'] === []) {
@@ -199,8 +200,6 @@ class ReleaseSearchService
 
             $ids = array_map(static fn (int|string $id): int => (int) $id, $filtered['ids']);
             $idList = implode(',', $ids);
-            $fieldOrder = implode(',', $ids);
-
             $whereSql = 'WHERE r.id IN ('.$idList.')';
 
             $sql = sprintf(
@@ -219,9 +218,10 @@ class ReleaseSearchService
             LEFT JOIN tv_episodes tve ON r.tv_episodes_id = tve.id AND r.tv_episodes_id > 0
             LEFT JOIN movieinfo m ON m.id = r.movieinfo_id AND r.movieinfo_id > 0
             %s
-            ORDER BY FIELD(r.id, %s)",
+            ORDER BY r.%s %s",
                 $whereSql,
-                $fieldOrder
+                $orderField,
+                $orderDir
             );
 
             $cacheKey = md5($this->getCacheVersion().$sql);
@@ -242,7 +242,7 @@ class ReleaseSearchService
             return $releases;
         }
 
-        return $this->apiSearchLegacyMysql($searchName, $groupName, $offset, $limit, $maxAge, $excludedCats, $cat, $minSize);
+        return $this->apiSearchLegacyMysql($searchName, $groupName, $offset, $limit, $maxAge, $excludedCats, $cat, $minSize, $orderBy);
     }
 
     /**
@@ -250,8 +250,9 @@ class ReleaseSearchService
      *
      * @param  array<int|string, mixed>  $cat
      */
-    private function apiSearchLegacyMysql(mixed $searchName, mixed $groupName, int $offset, int $limit, int $maxAge, array $excludedCats, array $cat, int $minSize): mixed
+    private function apiSearchLegacyMysql(mixed $searchName, mixed $groupName, int $offset, int $limit, int $maxAge, array $excludedCats, array $cat, int $minSize, string $orderBy = 'posted_desc'): mixed
     {
+        [$orderField, $orderDir] = $this->getBrowseOrder($orderBy);
         $searchLimit = $this->determineSearchCandidateLimit($offset, $limit);
 
         $searchResult = [];
@@ -331,9 +332,11 @@ class ReleaseSearchService
             LEFT JOIN tv_episodes tve ON r.tv_episodes_id = tve.id AND r.tv_episodes_id > 0
             LEFT JOIN movieinfo m ON m.id = r.movieinfo_id AND r.movieinfo_id > 0
             %s
-            ORDER BY r.postdate DESC
+            ORDER BY r.%s %s
             LIMIT %d OFFSET %d",
             $whereSql,
+            $orderField,
+            $orderDir,
             $limit,
             $offset
         );
@@ -372,7 +375,8 @@ class ReleaseSearchService
         int $maxAge,
         array $excludedCats,
         array $cat,
-        int $minSize
+        int $minSize,
+        string $orderBy = 'posted_desc'
     ): mixed {
         $q = trim($q);
         if ($q === '' || ! Search::isAvailable()) {
@@ -381,7 +385,7 @@ class ReleaseSearchService
 
         $musicInfoIds = Search::searchSecondary(SecondarySearchIndex::Music, $q, 2000)['id'];
 
-        return $this->apiSearchByMetadataForeignKey($musicInfoIds, 'musicinfo_id', $groupName, $offset, $limit, $maxAge, $excludedCats, $cat, $minSize);
+        return $this->apiSearchByMetadataForeignKey($musicInfoIds, 'musicinfo_id', $groupName, $offset, $limit, $maxAge, $excludedCats, $cat, $minSize, $orderBy);
     }
 
     /**
@@ -398,7 +402,8 @@ class ReleaseSearchService
         int $maxAge,
         array $excludedCats,
         array $cat,
-        int $minSize
+        int $minSize,
+        string $orderBy = 'posted_desc'
     ): mixed {
         $q = trim($q);
         if ($q === '' || ! Search::isAvailable()) {
@@ -407,7 +412,7 @@ class ReleaseSearchService
 
         $bookIds = Search::searchSecondary(SecondarySearchIndex::Books, $q, 2000)['id'];
 
-        return $this->apiSearchByMetadataForeignKey($bookIds, 'bookinfo_id', $groupName, $offset, $limit, $maxAge, $excludedCats, $cat, $minSize);
+        return $this->apiSearchByMetadataForeignKey($bookIds, 'bookinfo_id', $groupName, $offset, $limit, $maxAge, $excludedCats, $cat, $minSize, $orderBy);
     }
 
     /**
@@ -424,8 +429,10 @@ class ReleaseSearchService
         int $maxAge,
         array $excludedCats,
         array $cat,
-        int $minSize
+        int $minSize,
+        string $orderBy = 'posted_desc'
     ): mixed {
+        [$orderField, $orderDir] = $this->getBrowseOrder($orderBy);
         if ($metadataIds === []) {
             return collect();
         }
@@ -482,9 +489,11 @@ class ReleaseSearchService
             LEFT JOIN tv_episodes tve ON r.tv_episodes_id = tve.id AND r.tv_episodes_id > 0
             LEFT JOIN movieinfo m ON m.id = r.movieinfo_id AND r.movieinfo_id > 0
             %s
-            ORDER BY r.postdate DESC
+            ORDER BY r.%s %s
             LIMIT %d OFFSET %d",
             $whereSql,
+            $orderField,
+            $orderDir,
             $limit,
             $offset
         );
@@ -517,8 +526,9 @@ class ReleaseSearchService
      * @param  array<string, mixed>  $siteIdArr
      * @return array|Collection|\Illuminate\Support\Collection|mixed
      */
-    public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
+    public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], string $orderBy = 'posted_desc'): mixed
     {
+        [$orderField, $orderDir] = $this->getBrowseOrder($orderBy);
         $shouldCache = ! (isset($siteIdArr['id']) && (int) $siteIdArr['id'] > 0);
         $rawCacheKey = md5(serialize(func_get_args()).'tvSearch');
         $cacheKey = null;
@@ -793,7 +803,7 @@ class ReleaseSearchService
             $limitClause = sprintf(' LIMIT %d OFFSET %d', $limit, $offset);
         }
 
-        $sql = sprintf('%s ORDER BY r.postdate DESC%s', $baseSql, $limitClause);
+        $sql = sprintf('%s ORDER BY r.%s %s%s', $baseSql, $orderField, $orderDir, $limitClause);
         $releases = Release::fromQuery($sql);
 
         if ($releases->isNotEmpty()) {
@@ -823,8 +833,9 @@ class ReleaseSearchService
      * @param  array<string, mixed>  $siteIdArr
      * @return Collection|mixed
      */
-    public function apiTvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
+    public function apiTvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], string $orderBy = 'posted_desc'): mixed
     {
+        [$orderField, $orderDir] = $this->getBrowseOrder($orderBy);
         $searchLimit = $this->determineSearchCandidateLimit($offset, $limit);
 
         // OPTIMIZATION: Try to find releases using search index external IDs first
@@ -968,7 +979,7 @@ class ReleaseSearchService
             %s",
             $whereSql
         );
-        $sql = sprintf('%s ORDER BY postdate DESC LIMIT %d OFFSET %d', $baseSql, $limit, $offset);
+        $sql = sprintf('%s ORDER BY r.%s %s LIMIT %d OFFSET %d', $baseSql, $orderField, $orderDir, $limit, $offset);
         $cacheKey = md5($this->getCacheVersion().$sql);
         $releases = Cache::get($cacheKey);
         if ($releases !== null) {
@@ -993,8 +1004,9 @@ class ReleaseSearchService
      * @param  array<string, mixed>  $excludedCategories
      * @return Collection|mixed
      */
-    public function animeSearch(mixed $aniDbID, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, array $excludedCategories = [], int $anilistId = -1): mixed
+    public function animeSearch(mixed $aniDbID, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, array $excludedCategories = [], int $anilistId = -1, string $orderBy = 'posted_desc'): mixed
     {
+        [$orderField, $orderDir] = $this->getBrowseOrder($orderBy);
         if ($anilistId > 0) {
             $resolved = AnidbInfo::query()->where('anilist_id', $anilistId)->value('anidbid');
             if ($resolved !== null) {
@@ -1055,9 +1067,11 @@ class ReleaseSearchService
         );
         $sql = sprintf(
             '%s
-			ORDER BY postdate DESC
+			ORDER BY %s %s
 			LIMIT %d OFFSET %d',
             $baseSql,
+            $orderField,
+            $orderDir,
             $limit,
             $offset
         );
@@ -1083,8 +1097,9 @@ class ReleaseSearchService
      * @param  array<string, mixed>  $excludedCategories
      * @return Collection|mixed
      */
-    public function moviesSearch(string $imDbId = '', int $tmDbId = -1, int $traktId = -1, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = []): mixed
+    public function moviesSearch(string $imDbId = '', int $tmDbId = -1, int $traktId = -1, int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], string $orderBy = 'posted_desc'): mixed
     {
+        [$orderField, $orderDir] = $this->getBrowseOrder($orderBy);
         $searchLimit = $this->determineSearchCandidateLimit($offset, $limit);
         $searchResult = [];
 
@@ -1217,7 +1232,7 @@ class ReleaseSearchService
             $whereSql
         );
 
-        $sql = sprintf('%s ORDER BY r.postdate DESC LIMIT %d OFFSET %d', $baseSql, $limit, $offset);
+        $sql = sprintf('%s ORDER BY r.%s %s LIMIT %d OFFSET %d', $baseSql, $orderField, $orderDir, $limit, $offset);
         $cacheKey = md5($sql.serialize(func_get_args()));
         if (($releases = Cache::get($cacheKey)) !== null) {
             return $releases;
@@ -1665,6 +1680,20 @@ class ReleaseSearchService
         };
 
         return [$orderField, isset($orderArr[1]) && preg_match('/^(asc|desc)$/i', $orderArr[1]) ? $orderArr[1] : 'desc']; // @phpstan-ignore return.type
+    }
+
+    private function browseOrderToIndexSortField(string $orderField): string
+    {
+        return match ($orderField) {
+            'postdate' => 'postdate_ts',
+            'adddate' => 'adddate_ts',
+            'categories_id' => 'categories_id',
+            'searchname' => 'searchname',
+            'size' => 'size',
+            'totalpart' => 'totalpart',
+            'grabs' => 'grabs',
+            default => 'postdate_ts',
+        };
     }
 
     private function getCacheVersion(): int

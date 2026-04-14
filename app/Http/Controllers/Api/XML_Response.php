@@ -154,6 +154,8 @@ class XML_Response
             'registration' => $this->server['registration'],
             'searching' => $this->server['searching'],
             'categories' => $this->server['categories'] ?? [],
+            'groups' => $this->server['groups'] ?? [],
+            'genres' => $this->server['genres'] ?? [],
         ];
     }
 
@@ -340,6 +342,8 @@ class XML_Response
         $this->addNode(['name' => 'registration', 'data' => $this->server['registration']]);
         $this->addNodes(['name' => 'searching', 'data' => $this->server['searching']]);
         $this->writeCategoryListing();
+        $this->writeGroupListing();
+        $this->writeGenreListing();
         $this->xml->endElement();
         $this->xml->endDocument();
 
@@ -461,6 +465,35 @@ class XML_Response
             }
             $this->xml->endElement();
         }
+        $this->xml->endElement();
+    }
+
+    protected function writeGroupListing(): void
+    {
+        $this->xml->startElement('groups');
+        foreach (($this->server['groups'] ?? []) as $group) {
+            $this->xml->startElement('group');
+            $this->xml->writeAttribute('name', (string) ($group['name'] ?? ''));
+            $this->xml->writeAttribute('description', (string) ($group['description'] ?? ''));
+            if (! empty($group['lastupdate'])) {
+                $this->xml->writeAttribute('lastupdate', (string) $group['lastupdate']);
+            }
+            $this->xml->endElement();
+        }
+        $this->xml->endElement();
+    }
+
+    protected function writeGenreListing(): void
+    {
+        $this->xml->startElement('genres');
+        foreach (($this->server['genres'] ?? []) as $genre) {
+            $this->xml->startElement('genre');
+            $this->xml->writeAttribute('id', (string) ($genre['id'] ?? ''));
+            $this->xml->writeAttribute('name', (string) ($genre['name'] ?? ''));
+            $this->xml->writeAttribute('categoryid', (string) ($genre['categoryid'] ?? '0'));
+            $this->xml->endElement();
+        }
+        $this->xml->endElement();
     }
 
     /**

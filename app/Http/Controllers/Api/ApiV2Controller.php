@@ -7,8 +7,10 @@ namespace App\Http\Controllers\Api;
 use App\Events\UserAccessedApi;
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
+use App\Models\Genre;
 use App\Models\Release;
 use App\Models\Settings;
+use App\Models\UsenetGroup;
 use App\Models\User;
 use App\Models\UserRequest;
 use App\Services\RegistrationStatusService;
@@ -17,11 +19,16 @@ use App\Services\Releases\ReleaseSearchService;
 use App\Transformers\ApiTransformer;
 use App\Transformers\CategoryTransformer;
 use App\Transformers\DetailsTransformer;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class ApiV2Controller extends BasePageController
@@ -82,6 +89,38 @@ class ApiV2Controller extends BasePageController
         ];
     }
 
+    private function parseMaxAge(Request $request): int|JsonResponse
+    {
+        if (! $request->has('maxage')) {
+            return -1;
+        }
+        if ($request->isNotFilled('maxage')) {
+            return response()->json(['error' => 'Incorrect parameter (maxage must not be empty)'], 400);
+        }
+        if (! is_numeric($request->input('maxage'))) {
+            return response()->json(['error' => 'Incorrect parameter (maxage must be numeric)'], 400);
+        }
+
+        return (int) $request->input('maxage');
+    }
+
+    private function parseSort(Request $request): string|JsonResponse
+    {
+        if (! $request->has('sort')) {
+            return 'posted_desc';
+        }
+
+        $sort = strtolower(trim((string) $request->input('sort')));
+        if ($sort === '') {
+            return response()->json(['error' => 'Incorrect parameter (sort must not be empty)'], 400);
+        }
+        if (! preg_match('/^(cat|name|size|files|stats|posted)_(asc|desc)$/', $sort)) {
+            return response()->json(['error' => 'Incorrect parameter (sort must be one of: cat_asc/desc, name_asc/desc, size_asc/desc, files_asc/desc, stats_asc/desc, posted_asc/desc)'], 400);
+        }
+
+        return $sort;
+    }
+
     public function capabilities(): JsonResponse
     {
         // Cache the full capabilities response for 10 minutes
@@ -100,14 +139,38 @@ class ApiV2Controller extends BasePageController
                     'default' => 100,
                 ],
                 'searching' => [
-                    'search' => ['available' => 'yes', 'supportedParams' => 'id'],
-                    'tv-search' => ['available' => 'yes', 'supportedParams' => 'id,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
-                    'movie-search' => ['available' => 'yes', 'supportedParams' => 'id, imdbid, tmdbid, traktid'],
-                    'audio-search' => ['available' => 'yes', 'supportedParams' => 'id,cat,minsize,maxage,group'],
-                    'book-search' => ['available' => 'yes', 'supportedParams' => 'id,cat,minsize,maxage,group'],
-                    'anime-search' => ['available' => 'yes', 'supportedParams' => 'id,anidbid,anilistid,cat,maxage'],
+                    'search' => ['available' => 'yes', 'supportedParams' => 'id,group,minsize,maxsize,maxage,cat,limit,offset,sort'],
+                    'tv-search' => ['available' => 'yes', 'supportedParams' => 'id,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep,cat,minsize,maxsize,maxage,limit,offset,sort'],
+                    'movie-search' => ['available' => 'yes', 'supportedParams' => 'id,imdbid,tmdbid,traktid,genre,cat,minsize,maxsize,maxage,limit,offset,sort'],
+                    'audio-search' => ['available' => 'yes', 'supportedParams' => 'id,cat,minsize,maxsize,maxage,group,limit,offset,sort'],
+                    'book-search' => ['available' => 'yes', 'supportedParams' => 'id,cat,minsize,maxsize,maxage,group,limit,offset,sort'],
+                    'anime-search' => ['available' => 'yes', 'supportedParams' => 'id,anidbid,anilistid,cat,minsize,maxsize,maxage,limit,offset,sort'],
                 ],
                 'categories' => fractal($category, new CategoryTransformer),
+                'groups' => Schema::hasTable('usenet_groups')
+                    ? UsenetGroup::query()
+                        ->where('active', 1)
+                        ->orderBy('name')
+                        ->get(['name', 'description', 'last_updated'])
+                        ->map(static fn (UsenetGroup $group): array => [
+                            'name' => $group->name,
+                            'description' => (string) ($group->description ?? ''),
+                            'lastupdate' => $group->last_updated ? Carbon::parse($group->last_updated)->toRfc2822String() : '',
+                        ])
+                        ->values()
+                    : collect(),
+                'genres' => Schema::hasTable('genres')
+                    ? Genre::query()
+                        ->enabled()
+                        ->orderBy('title')
+                        ->get(['id', 'title', 'type'])
+                        ->map(static fn (Genre $genre): array => [
+                            'id' => $genre->id,
+                            'name' => $genre->title,
+                            'categoryid' => (int) ($genre->type ?? 0),
+                        ])
+                        ->values()
+                    : collect(),
             ];
         });
 
@@ -142,18 +205,25 @@ class ApiV2Controller extends BasePageController
         $offset = $this->api->offset($request);
         $limit = $this->api->limit($request);
         $categoryID = $this->api->categoryID($request);
-        $maxAge = $this->api->maxAge($request);
+        $maxAge = $this->parseMaxAge($request);
+        if (! is_int($maxAge)) {
+            return $maxAge;
+        }
+        $sort = $this->parseSort($request);
+        if (! is_string($sort)) {
+            return $sort;
+        }
         $catExclusions = User::getCategoryExclusionById($user->id);
 
         // Create cache key for movie search results
         $searchCacheKey = 'api_movie_search:'.md5(serialize([
-            $imdbId, $tmdbId, $traktId, $offset, $limit, $searchName,
+            $imdbId, $tmdbId, $traktId, $offset, $limit, $searchName, $sort,
             $categoryID, $maxAge, $minSize, $catExclusions,
         ]));
 
         // Cache search results for 10 minutes
         $relData = Cache::remember($searchCacheKey, 600, function () use (
-            $imdbId, $tmdbId, $traktId, $offset, $limit, $searchName,
+            $imdbId, $tmdbId, $traktId, $offset, $limit, $searchName, $sort,
             $categoryID, $maxAge, $minSize, $catExclusions
         ) {
             return $this->releaseSearchService->moviesSearch(
@@ -166,7 +236,8 @@ class ApiV2Controller extends BasePageController
                 $categoryID,
                 $maxAge,
                 $minSize,
-                $catExclusions
+                $catExclusions,
+                $sort
             );
         });
 
@@ -197,9 +268,13 @@ class ApiV2Controller extends BasePageController
         $offset = $this->api->offset($request);
         $limit = $this->api->limit($request);
         $categoryID = $this->api->categoryID($request);
-        $maxAge = $this->api->maxAge($request);
+        $maxAge = $this->parseMaxAge($request);
         if (! is_int($maxAge)) {
             return $maxAge;
+        }
+        $sort = $this->parseSort($request);
+        if (! is_string($sort)) {
+            return $sort;
         }
 
         $minSize = max(0, (int) $request->input('minsize', 0));
@@ -214,7 +289,8 @@ class ApiV2Controller extends BasePageController
             $maxAge,
             $catExclusions,
             $categoryID,
-            $minSize
+            $minSize,
+            $sort
         );
 
         $response = array_merge(
@@ -244,9 +320,13 @@ class ApiV2Controller extends BasePageController
         $offset = $this->api->offset($request);
         $limit = $this->api->limit($request);
         $categoryID = $this->api->categoryID($request);
-        $maxAge = $this->api->maxAge($request);
+        $maxAge = $this->parseMaxAge($request);
         if (! is_int($maxAge)) {
             return $maxAge;
+        }
+        $sort = $this->parseSort($request);
+        if (! is_string($sort)) {
+            return $sort;
         }
 
         $minSize = max(0, (int) $request->input('minsize', 0));
@@ -261,7 +341,8 @@ class ApiV2Controller extends BasePageController
             $maxAge,
             $catExclusions,
             $categoryID,
-            $minSize
+            $minSize,
+            $sort
         );
 
         $response = array_merge(
@@ -293,9 +374,13 @@ class ApiV2Controller extends BasePageController
         $offset = $this->api->offset($request);
         $limit = $this->api->limit($request);
         $categoryID = $this->api->categoryID($request);
-        $maxAge = $this->api->maxAge($request);
+        $maxAge = $this->parseMaxAge($request);
         if (! is_int($maxAge)) {
             return $maxAge;
+        }
+        $sort = $this->parseSort($request);
+        if (! is_string($sort)) {
+            return $sort;
         }
 
         $catExclusions = User::getCategoryExclusionById($user->id);
@@ -308,7 +393,8 @@ class ApiV2Controller extends BasePageController
             $categoryID,
             $maxAge,
             $catExclusions,
-            $anilist
+            $anilist,
+            $sort
         );
 
         $response = array_merge(
@@ -337,7 +423,14 @@ class ApiV2Controller extends BasePageController
         $offset = $this->api->offset($request);
         $catExclusions = User::getCategoryExclusionById($user->id);
         $minSize = $request->has('minsize') && $request->input('minsize') > 0 ? $request->input('minsize') : 0;
-        $maxAge = $this->api->maxAge($request);
+        $maxAge = $this->parseMaxAge($request);
+        if (! is_int($maxAge)) {
+            return $maxAge;
+        }
+        $sort = $this->parseSort($request);
+        if (! is_string($sort)) {
+            return $sort;
+        }
         $groupName = $this->api->group($request);
         if (is_array($groupName)) {
             $groupName = $groupName[0] ?? -1;
@@ -354,7 +447,8 @@ class ApiV2Controller extends BasePageController
                 $maxAge,
                 $catExclusions,
                 $categoryID,
-                $minSize
+                $minSize,
+                $sort
             );
         } else {
             $relData = $this->releaseBrowseService->getBrowseRangeForApi(
@@ -362,7 +456,7 @@ class ApiV2Controller extends BasePageController
                 $categoryID,
                 $offset,
                 $limit,
-                '',
+                $sort,
                 $maxAge,
                 $catExclusions,
                 $groupName,
@@ -402,7 +496,14 @@ class ApiV2Controller extends BasePageController
         $this->api->verifyEmptyParameter($request, 'tmdbid');
         $this->api->verifyEmptyParameter($request, 'season');
         $this->api->verifyEmptyParameter($request, 'ep');
-        $maxAge = $this->api->maxAge($request);
+        $maxAge = $this->parseMaxAge($request);
+        if (! is_int($maxAge)) {
+            return $maxAge;
+        }
+        $sort = $this->parseSort($request);
+        if (! is_string($sort)) {
+            return $sort;
+        }
         UserRequest::addApiRequest($user->id, $request->getRequestUri());
         event(new UserAccessedApi($user, $request->ip()));
 
@@ -436,7 +537,8 @@ class ApiV2Controller extends BasePageController
             $this->api->categoryID($request),
             $maxAge,
             $minSize,
-            $catExclusions
+            $catExclusions,
+            $sort
         );
 
         $response = array_merge(
@@ -448,7 +550,7 @@ class ApiV2Controller extends BasePageController
         return response()->json($response);
     }
 
-    public function getNzb(Request $request): Application|JsonResponse|Redirector|RedirectResponse|\Illuminate\Contracts\Foundation\Application
+    public function getNzb(Request $request): Application|ResponseFactory|JsonResponse|Redirector|RedirectResponse
     {
         $user = $this->resolveUser($request);
         if (! $user) {

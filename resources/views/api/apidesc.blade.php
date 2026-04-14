@@ -289,6 +289,52 @@
             </table>
         </div>
         <h4 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
+            <i class="fa fa-sort-amount-down mr-2 text-gray-600 dark:text-gray-400"></i>Sorting Results (v1)
+        </h4>
+        <p class="text-gray-700 dark:text-gray-300 mb-4 dark:text-gray-300">
+            Search-style endpoints support <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs text-red-600 dark:bg-gray-700 dark:text-red-400">sort=field_direction</code>.
+            Allowed fields: <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">cat</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">name</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">size</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">files</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">stats</code>, <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">posted</code>. Direction is <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">asc</code> or <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">desc</code>.
+        </p>
+        <div class="surface-panel-alt rounded-lg border shadow-sm mb-4">
+            <div class="p-6">
+                <h5 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100 dark:text-white">Sort request examples</h5>
+                <div class="flex flex-col gap-2">
+                    @auth
+                        <a href="{{ url('/api/v1/api?t=search&q=ubuntu&sort=posted_desc&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                            <i class="fa fa-external-link-alt mr-1"></i>
+                            <code class="text-primary-700 dark:text-primary-400">?t=search&amp;q=ubuntu&amp;sort=posted_desc</code>
+                        </a>
+                        <a href="{{ url('/api/v1/api?t=search&q=ubuntu&sort=name_asc&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                            <i class="fa fa-external-link-alt mr-1"></i>
+                            <code class="text-primary-700 dark:text-primary-400">?t=search&amp;q=ubuntu&amp;sort=name_asc</code>
+                        </a>
+                        <a href="{{ url('/api/v1/api?t=search&q=ubuntu&sort=size_desc&limit=50&offset=0&apikey=' . auth()->user()->api_token) }}" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
+                            <i class="fa fa-external-link-alt mr-1"></i>
+                            <code class="text-primary-700 dark:text-primary-400">?t=search&amp;q=ubuntu&amp;sort=size_desc&amp;limit=50</code>
+                        </a>
+                    @else
+                        <code class="block bg-gray-100 dark:bg-gray-800 p-2 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">?t=search&amp;q=ubuntu&amp;sort=posted_desc</code>
+                        <code class="block bg-gray-100 dark:bg-gray-800 p-2 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">?t=search&amp;q=ubuntu&amp;sort=name_asc</code>
+                        <code class="block bg-gray-100 dark:bg-gray-800 p-2 rounded text-sm text-red-600 dark:bg-gray-700 dark:text-red-400">?t=search&amp;q=ubuntu&amp;sort=size_desc&amp;limit=50&amp;offset=0</code>
+                    @endauth
+                </div>
+            </div>
+        </div>
+        <div class="surface-panel-alt rounded-lg border shadow-sm mb-4">
+            <div class="p-6">
+                <h5 class="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100 dark:text-white">XML sort response snippet (<code class="text-xs">sort=size_desc</code>)</h5>
+                <pre class="bg-gray-100 dark:bg-gray-800 p-3 rounded text-xs text-gray-800 dark:text-gray-200 overflow-x-auto"><code>&lt;item&gt;
+  &lt;title&gt;Ubuntu ISO x64&lt;/title&gt;
+  &lt;newznab:attr name="size" value="734003200"/&gt;
+&lt;/item&gt;
+&lt;item&gt;
+  &lt;title&gt;Ubuntu ISO x86&lt;/title&gt;
+  &lt;newznab:attr name="size" value="367001600"/&gt;
+&lt;/item&gt;</code></pre>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-2 mb-0">Larger release appears first because <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">size_desc</code> sorts descending.</p>
+            </div>
+        </div>
+        <h4 class="text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
             <i class="fa fa-file-code mr-2 text-gray-600 dark:text-gray-400"></i>Output Format
         </h4>
         <p class="text-gray-700 dark:text-gray-300 mb-4 dark:text-gray-300">Select your preferred output format (not applicable to functions which return an NZB/NFO file).</p>

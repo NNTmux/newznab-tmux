@@ -1,6 +1,8 @@
 # NNTmux API v2 Specification
 
-This document is a code-first reference for the JSON API under `/api/v2`, based on:
+Code-first reference for the JSON API under `/api/v2`.
+
+Primary sources:
 
 - `routes/api.php`
 - `app/Http/Controllers/Api/ApiV2Controller.php`
@@ -17,9 +19,9 @@ https://<host>/api/v2
 ## Authentication and Rate Limits
 
 - `GET /capabilities` is public.
-- All other v2 routes are behind `auth:api` and `throttle:rate_limit,1` middleware.
-- Controller-level validation also requires `api_token` in request input/query.
-- Invalid or missing token at controller level returns:
+- All other v2 routes require `api_token`.
+- Route-level middleware uses token-aware throttling (`apiRateLimit`).
+- Controller-level auth errors return:
 
 ```json
 {
@@ -29,163 +31,143 @@ https://<host>/api/v2
 
 with HTTP `403`.
 
-> Note: If middleware rejects first, response shape may differ from controller responses depending on your auth guard configuration.
-
 ## Common Query Parameters
 
 | Parameter | Type | Default | Notes |
 |---|---|---:|---|
-| `api_token` | string | - | Required for all endpoints except `capabilities`. |
-| `limit` | int | `100` | Read from request as numeric value; not hard-clamped in `ApiV2Controller`. |
+| `api_token` | string | - | Required except `capabilities`. |
+| `id` | string | `""` | Search text/fallback identifier on search endpoints. |
+| `limit` | int | `100` | Max rows in page. |
 | `offset` | int | `0` | Zero-based pagination offset. |
-| `cat` | csv string | `-1` | Comma-separated category IDs. If `TV_HD` is present and `catwebdl=0`, `TV_WEBDL` is auto-added. |
-| `maxage` | int | `-1` | Max age in days (`-1` disables age filtering). |
-| `minsize` | int | `0` | Minimum release size in bytes. |
+| `cat` | csv string | `-1` | Category filter; `TV_WEBDL` auto-add can apply when `TV_HD` is requested. |
+| `group` | string | `-1` | Usenet group filter (where supported). |
+| `maxage` | int | `-1` | Max post age in days. Invalid values return JSON `400`. |
+| `minsize` | int | `0` | Min release size in bytes. |
+| `maxsize` | int | - | Accepted for compatibility; currently not enforced in query layer. |
+| `sort` | string | `posted_desc` | `cat|name|size|files|stats|posted` + `_asc|_desc`. |
 
-## Endpoints
+Sorting examples:
 
-### 1) Capabilities
+- `/api/v2/search?api_token=<token>&id=ubuntu&sort=posted_desc`
+- `/api/v2/search?api_token=<token>&id=ubuntu&sort=name_asc`
+- `/api/v2/tv?api_token=<token>&id=last+week+tonight&season=2025&ep=11/10&sort=posted_desc`
+- `/api/v2/movies?api_token=<token>&imdbid=tt0816692&sort=size_desc`
 
-- `GET /capabilities`
-- Auth: none
-- Returns server metadata, declared limits, searching capabilities, registration flags, and category tree.
-
-Example response (abbreviated):
+JSON sorting response snippet (`sort=size_desc`):
 
 ```json
 {
-  "server": {
-    "title": "NNTmux",
-    "strapline": "<site strapline>",
-    "email": "admin@example.com",
-    "url": "https://example.com"
-  },
-  "limits": {
-    "max": 100,
-    "default": 100
-  },
-  "searching": {
-    "search": {
-      "available": "yes",
-      "supportedParams": "id"
-    },
-    "tv-search": {
-      "available": "yes",
-      "supportedParams": "id,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep"
-    },
-    "movie-search": {
-      "available": "yes",
-      "supportedParams": "id, imdbid, tmdbid, traktid"
-    },
-    "audio-search": {
-      "available": "no",
-      "supportedParams": ""
-    }
-  },
-  "registration": {
-    "available": "no",
-    "open": "yes"
-  },
-  "categories": [
-    {
-      "id": 2000,
-      "name": "Movies",
-      "subcategories": {
-        "2030": "SD",
-        "2040": "HD"
-      }
-    }
+  "Total": 2,
+  "Results": [
+    { "title": "Ubuntu ISO x64", "size": 734003200 },
+    { "title": "Ubuntu ISO x86", "size": 367001600 }
   ]
 }
 ```
 
-### 2) Search
+`Results` are ordered largest-to-smallest because `sort=size_desc`.
+
+## Endpoints
+
+## 1) Capabilities
+
+- `GET /capabilities`
+- Auth: none
+
+Returns:
+
+- `server`
+- `limits`
+- `searching`
+- `registration`
+- `categories`
+- `groups`
+- `genres`
+
+## 2) Search
 
 - `GET /search`
 - Auth: required
 
-Parameters:
+Behavior:
 
-- `id` (optional): search term or GUID-like string
-- `group` (optional): Usenet group name
-- common parameters: `api_token`, `cat`, `offset`, `limit`, `maxage`, `minsize`
+- If `id` is present: text search.
+- If `id` is omitted: browse mode.
+- Includes API usage counters in response (`apiCurrent`, `apiMax`, `grabCurrent`, `grabMax`, `apiOldestTime`, `grabOldestTime`).
 
-If `id` is omitted, endpoint returns newest browse results scoped by filters.
-
-### 3) TV Search
+## 3) TV Search
 
 - `GET /tv`
 - Auth: required
 
-Parameters:
+Identifiers:
 
-- identifiers: `vid`, `tvdbid`, `traktid`, `rid`, `tvmazeid`, `imdbid`, `tmdbid`
-- title fallback: `id`
-- episode filters: `season`, `ep`
-- common parameters
+- `vid`, `tvdbid`, `traktid`, `rid`, `tvmazeid`, `imdbid`, `tmdbid`
 
-Daily episode behavior:
+Optional filters:
 
-- if `season` is a 4-digit year and `ep` contains `/`, airdate is inferred as `YYYY-MM-DD`.
+- `season`, `ep`, `cat`, `maxage`, `minsize`, `sort`, `offset`, `limit`
 
-### 4) Movie Search
+Daily parsing:
+
+- `season=YYYY` and `ep=MM/DD` infers an airdate query.
+
+## 4) Movie Search
 
 - `GET /movies`
 - Auth: required
 
-Parameters:
+Identifiers:
 
-- identifiers: `imdbid`, `tmdbid`, `traktid` (default `-1` when not set)
-- title fallback: `id`
-- common parameters
+- `imdbid`, `tmdbid`, `traktid`
 
-Implementation note:
+Optional filters:
 
-- movie search result sets are cached for 10 minutes by filter signature.
+- `id`, `cat`, `maxage`, `minsize`, `sort`, `offset`, `limit`
 
-### 5) Get NZB
+## 5) Audio Search
+
+- `GET /audio`
+- Auth: required
+
+Required:
+
+- `id` (query string)
+
+## 6) Book Search
+
+- `GET /books`
+- Auth: required
+
+Required:
+
+- `id` (query string)
+
+## 7) Anime Search
+
+- `GET /anime`
+- Auth: required
+
+Selectors:
+
+- `id` and/or `anidbid` and/or `anilistid`
+
+## 8) Get NZB
 
 - `GET /getnzb`
 - Auth: required
+- Valid GUID redirects to `/getnzb?r=<api_token>&id=<guid>[&del=1]`
+- Not found returns HTTP `404` JSON.
 
-Parameters:
-
-- `id` (GUID, required for success)
-- `del=1` (optional): forwards delete flag in downstream redirect
-
-Behavior:
-
-- valid GUID: HTTP `302` redirect to `/getnzb?r=<api_token>&id=<guid>[&del=1]`
-- missing/invalid GUID: HTTP `404`
-
-```json
-{
-  "data": "No such item (the guid you provided has no release in our database)"
-}
-```
-
-### 6) Details
+## 9) Details
 
 - `GET /details`
 - Auth: required
-
-Parameters:
-
-- `id` (GUID, required)
-
-Errors:
-
-- missing `id`: HTTP `400`
-
-```json
-{
-  "error": "Missing parameter (guid is required for single release details)"
-}
-```
+- Requires `id` (GUID)
 
 ## Response Models
 
-### Search Envelope (`/search`, `/tv`, `/movies`)
+### Search Envelope (`/search`, `/tv`, `/movies`, `/audio`, `/books`, `/anime`)
 
 ```json
 {
@@ -196,93 +178,36 @@ Errors:
   "grabMax": 100,
   "apiOldestTime": "Wed, 20 Nov 2024 12:00:00 +0000",
   "grabOldestTime": "",
-  "Results": [
-    {
-      "title": "Some.Release.2024.1080p",
-      "details": "https://example.com/details/<guid>",
-      "url": "https://example.com/getnzb?id=<guid>.nzb&r=<api_token>",
-      "category": 2040,
-      "category_name": "Movies > HD",
-      "added": "Wed, 20 Nov 2024 12:00:00 +0000",
-      "size": 734003200,
-      "files": 55,
-      "grabs": null,
-      "comments": null,
-      "password": 0,
-      "usenetdate": "Wed, 20 Nov 2024 10:00:00 +0000"
-    }
-  ]
+  "Results": []
 }
 ```
-
-### Additional Movie Fields in `Results`
-
-- `imdbid`
-- `tmdbid`
-- `traktid`
-
-All three are `null` when source value is zero.
-
-### Additional TV Fields in `Results`
-
-- `episode_title`
-- `season`
-- `episode`
-- `tvairdate`
-- `tvdbid`
-- `traktid`
-- `tvrageid`
-- `tvmazeid`
-- `imdbid`
-- `tmdbid`
 
 ### Details Object (`/details`)
 
-Returns one release object (not envelope). Key difference from search results: download field is named `link` instead of `url`.
+Returns a single release object (not envelope). Download field name is `link` (not `url`).
 
-```json
-{
-  "title": "Some.Show.S01E01.720p",
-  "details": "https://example.com/details/<guid>",
-  "link": "https://example.com/getnzb?id=<guid>.nzb&r=<api_token>",
-  "category": 5030,
-  "category_name": "TV > SD",
-  "added": "Wed, 20 Nov 2024 12:00:00 +0000",
-  "size": 450971565,
-  "files": 44,
-  "grabs": 3,
-  "comments": 0,
-  "password": 0,
-  "usenetdate": "Wed, 20 Nov 2024 10:00:00 +0000",
-  "tvairdate": "2024-11-19",
-  "tvdbid": 12345,
-  "traktid": 67890,
-  "tvrageid": null,
-  "tvmazeid": null,
-  "imdbid": 1234567,
-  "tmdbid": 98765
-}
-```
+## Error Response Conventions
 
-## Status Codes and Error Body Cheat Sheet
+- Missing/invalid token: JSON `403`
+- Invalid `maxage`: JSON `400`
+- Invalid `sort`: JSON `400`
+- Missing required endpoint parameter (`id`, etc.): JSON `400`
+- Missing GUID in `/getnzb`: JSON `404`
 
-| Endpoint(s) | HTTP | Body |
-|---|---:|---|
-| `/movies`, `/search`, `/tv`, `/getnzb`, `/details` (token failure in controller) | 403 | `{ "error": "Missing or invalid API key" }` |
-| `/details` (missing `id`) | 400 | `{ "error": "Missing parameter (guid is required for single release details)" }` |
-| `/getnzb` (GUID not found) | 404 | `{ "data": "No such item (the guid you provided has no release in our database)" }` |
+## Unsupported in v2
 
-## Postman / Documenter Sync Source
+The following are intentionally not part of v2 JSON API:
 
-If you maintain the public Postman page, use this markdown as the source of truth and mirror:
+- `register`
+- `user`
+- `comments`
+- `commentadd`
+- `cartadd`
+- `cartdel`
+- `nzbadd`
 
-1. endpoint auth requirements
-2. request parameter descriptions
-3. response envelope vs details-object differences
-4. exact error messages
+NZB upload remains in v1 (`/api/v1/api?t=nzbadd`).
 
-Starter collection (import into Postman, then publish with Documenter):
+## Postman Collection
 
 - `docs/postman/nntmux_api_v2.postman_collection.json`
-
-This prevents drift between code and `https://documenter.getpostman.com/view/3059471/RW8FGS9E`.

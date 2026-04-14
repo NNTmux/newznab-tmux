@@ -929,8 +929,13 @@ if (! function_exists('showApiError')) {
                 202 => ['No such function', 'HTTP 1.1 404 Not Found'],
                 203 => ['Function not available', 'HTTP 1.1 400 Bad Request'],
                 300 => ['No such item', 'HTTP 1.1 404 Not Found'],
+                310 => ['Item already exists', 'HTTP 1.1 409 Conflict'],
                 500 => ['Request limit reached', 'HTTP 1.1 429 Too Many Requests'],
                 501 => ['Download limit reached', 'HTTP 1.1 429 Too Many Requests'],
+                600 => ['Failed to load NZB', 'HTTP 1.1 400 Bad Request'],
+                601 => ['NZB is duplicate', 'HTTP 1.1 409 Conflict'],
+                602 => ['NZB is for a non-existent group', 'HTTP 1.1 400 Bad Request'],
+                603 => ['NZB failed to write to disk', 'HTTP 1.1 500 Internal Server Error'],
                 910 => ['API disabled', 'HTTP 1.1 401 Unauthorized'],
                 default => ['Unknown error', 'HTTP 1.1 400 Bad Request'],
             };
