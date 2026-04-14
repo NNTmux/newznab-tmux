@@ -23,12 +23,6 @@ class BookService
 {
     public bool $echooutput;
 
-    public ?string $pubkey;
-
-    public ?string $privkey;
-
-    public ?string $asstag;
-
     public int $bookqty;
 
     public int $sleeptime;
@@ -44,6 +38,8 @@ class BookService
      */
     public array $failCache;
 
+    public ?string $parsedIsbn;
+
     /**
      * @throws \Exception
      */
@@ -51,9 +47,6 @@ class BookService
     {
         $this->echooutput = config('nntmux.echocli');
 
-        $this->pubkey = Settings::settingValue('amazonpubkey');
-        $this->privkey = Settings::settingValue('amazonprivkey');
-        $this->asstag = Settings::settingValue('amazonassociatetag');
         $this->bookqty = Settings::settingValue('maxbooksprocessed') !== '' ? (int) Settings::settingValue('maxbooksprocessed') : 300;
         $this->sleeptime = Settings::settingValue('amazonsleep') !== '' ? (int) Settings::settingValue('amazonsleep') : 1000;
         $this->imgSavePath = storage_path('covers/book/');
@@ -62,6 +55,7 @@ class BookService
         $this->renamed = (int) Settings::settingValue('lookupbooks') === 2 ? 'AND isrenamed = 1' : '';
 
         $this->failCache = [];
+        $this->parsedIsbn = null;
     }
 
     /**
@@ -418,7 +412,7 @@ class BookService
             $bookId = -2;
             foreach ($res as $arr) {
                 $startTime = now()->timestamp;
-                $usedAmazon = false;
+                $usedExternalApi = false;
                 // audiobooks are also books and should be handled in an identical manor, even though it falls under a music category
                 if ($arr['categories_id'] === (int) Category::MUSIC_AUDIOBOOK) {
                     // audiobook
@@ -443,8 +437,8 @@ class BookService
                         }
                         $bookId = -2;
                     } elseif ($bookCheck === null) {
-                        $bookId = $this->updateBookInfo($bookInfo);
-                        $usedAmazon = true;
+                        $bookId = $this->updateBookInfo($bookInfo, $this->parsedIsbn);
+                        $usedExternalApi = true;
                         if ($bookId === -2) {
                             $this->failCache[] = $bookInfo;
                         }
@@ -460,9 +454,9 @@ class BookService
                         echo '.';
                     }
                 }
-                // Sleep to not flood amazon.
+                // Sleep to avoid flooding external book metadata providers.
                 $diff = floor((now()->timestamp - $startTime) * 1000000);
-                if ($this->sleeptime * 1000 - $diff > 0 && $usedAmazon === true) {
+                if ($this->sleeptime * 1000 - $diff > 0 && $usedExternalApi === true) {
                     usleep((int) ($this->sleeptime * 1000 - $diff));
                 }
             }
@@ -478,10 +472,12 @@ class BookService
      */
     public function parseTitle(mixed $release_name, mixed $releaseID, mixed $releasetype)
     {
+        $this->parsedIsbn = $this->extractIsbn((string) $release_name);
+
         $a = preg_replace('/\d{1,2} \d{1,2} \d{2,4}|(19|20)\d\d|anybody got .+?[a-z]\? |[ ._-](Novel|TIA)([ ._-]|$)|([ \.])HQ([-\. ])|[\(\)\.\-_ ](AVI|AZW3?|DOC|EPUB|LIT|MOBI|NFO|RETAIL|(si)?PDF|RTF|TXT)[\)\]\.\-_ ](?![a-z0-9])|compleet|DAGSTiDNiNGEN|DiRFiX|\+ extra|r?e ?Books?([\.\-_ ]English|ers)?|azw3?|ePu([bp])s?|html|mobi|^NEW[\.\-_ ]|PDF([\.\-_ ]English)?|Please post more|Post description|Proper|Repack(fix)?|[\.\-_ ](Chinese|English|French|German|Italian|Retail|Scan|Swedish)|^R4 |Repost|Skytwohigh|TIA!+|TruePDF|V413HAV|(would someone )?please (re)?post.+? "|with the authors name right/i', '', $release_name);
         $b = preg_replace('/^(As Req |conversion |eq |Das neue Abenteuer \d+|Fixed version( ignore previous post)?|Full |Per Req As Found|(\s+)?R4 |REQ |revised |version |\d+(\s+)?$)|(COMPLETE|INTERNAL|RELOADED| (AZW3|eB|docx|ENG?|exe|FR|Fix|gnv64|MU|NIV|R\d\s+\d{1,2} \d{1,2}|R\d|Req|TTL|UC|v(\s+)?\d))(\s+)?$/i', '', $a);
 
-        // remove book series from title as this gets more matches on amazon
+        // Remove book series from title to improve metadata matching.
         $c = preg_replace('/ - \[.+\]|\[.+\]/', '', $b);
 
         // remove any brackets left behind
@@ -517,7 +513,8 @@ class BookService
         }
         if ($releasetype === 'audiobook') {
             if (! empty($releasename) && ! preg_match('/^[a-z0-9]+$|^([0-9]+ ){1,}$|Part \d+/i', $releasename)) {
-                // we can skip category for audiobooks, since we already know it, so as long as the release name is valid return it so that it is postprocessed by amazon.  In the future, determining the type of audiobook could be added (Lecture or book), since we can skip lookups on lectures, but for now handle them all the same way
+                // We can skip category checks for audiobooks since the category is known.
+                // As long as the release name is valid, it should still be post-processed.
                 return $releasename;
             }
 
@@ -527,6 +524,25 @@ class BookService
         return false;
     }
 
+    public function extractIsbn(string $releaseName): ?string
+    {
+        if (preg_match('/\b(97[89](?:[-\s]?\d){10})\b/', $releaseName, $matches) === 1) {
+            $isbn = preg_replace('/[^0-9]/', '', $matches[1]);
+            if (is_string($isbn) && strlen($isbn) === 13) {
+                return $isbn;
+            }
+        }
+
+        if (preg_match('/\b(\d(?:[-\s]?\d){8}[-\s]?[\dXx])\b/', $releaseName, $matches) === 1) {
+            $isbn = strtoupper((string) preg_replace('/[^0-9X]/i', '', $matches[1]));
+            if (strlen($isbn) === 10) {
+                return $isbn;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Update book info from external sources.
      *
@@ -534,23 +550,41 @@ class BookService
      *
      * @throws \Exception
      */
-    public function updateBookInfo(string $bookInfo = '', mixed $amazdata = null)
+    public function updateBookInfo(string $bookInfo = '', ?string $isbn = null)
     {
         $ri = new ReleaseImageService;
+        $isbnDb = new IsbnDbService;
 
         $bookId = -2;
 
         $book = false;
         if ($bookInfo !== '') {
-            cli()->info('Fetching data from iTunes for '.$bookInfo);
-            $book = $this->fetchItunesBookProperties($bookInfo);
+            if ($isbnDb->isConfigured()) {
+                if ($isbn !== null && $isbn !== '') {
+                    cli()->info('Fetching data from ISBNdb by ISBN '.$isbn);
+                    $book = $isbnDb->findByIsbn($isbn);
+                }
+
+                if ($book === false || $book === null) {
+                    cli()->info('Fetching data from ISBNdb for '.$bookInfo);
+                    $book = $isbnDb->searchBook($bookInfo);
+                }
+            }
+
+            if ($book === false || $book === null) {
+                cli()->info('Fetching data from iTunes for '.$bookInfo);
+                $book = $this->fetchItunesBookProperties($bookInfo);
+            }
         }
 
         if (empty($book)) {
-            return false;
+            return -2;
         }
 
         $check = BookInfo::query()->where('asin', $book['asin'])->first();
+        if ($check === null && ! empty($book['isbn'])) {
+            $check = BookInfo::query()->where('isbn', $book['isbn'])->first();
+        }
         if ($check === null) {
             $bookId = BookInfo::query()->insertGetId(
                 [
@@ -599,7 +633,7 @@ class BookService
                     cli()->alternateOver('   Author: ').cli()->primary($book['author']);
                 }
                 cli()->alternateOver('   Title: ').cli()->primary(' '.$book['title']);
-                if ($book['genre'] !== 'null') {
+                if ($book['genre'] !== '') {
                     cli()->alternateOver('   Genre: ').cli()->primary(' '.$book['genre']);
                 }
             }
@@ -637,8 +671,8 @@ class BookService
             'title' => $iTunesBook['name'],
             'author' => $iTunesBook['author'],
             'asin' => $iTunesBook['id'],
-            'isbn' => 'null',
-            'ean' => 'null',
+            'isbn' => null,
+            'ean' => null,
             'url' => $iTunesBook['store_url'],
             'salesrank' => '',
             'publisher' => '',

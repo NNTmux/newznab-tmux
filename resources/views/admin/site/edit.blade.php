@@ -323,7 +323,7 @@
                                     </option>
                                 @endforeach
                             </select>
-                            <p class="mt-1 text-sm text-gray-500">Whether to attempt to lookup book information from Amazon.</p>
+                            <p class="mt-1 text-sm text-gray-500">Whether to attempt to lookup book information from ISBNdb, with iTunes fallback.</p>
                         </div>
 
                         <div>
