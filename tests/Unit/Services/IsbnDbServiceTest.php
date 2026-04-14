@@ -50,8 +50,10 @@ class IsbnDbServiceTest extends TestCase
         );
 
         $book = $service->searchBook('domain driven design');
+        $books = $service->searchBooks('domain driven design');
 
         $this->assertNotNull($book);
+        $this->assertCount(1, $books);
         $this->assertSame('Domain-Driven Design', $book['title']);
         $this->assertSame('Eric Evans', $book['author']);
         $this->assertSame('9780321125217', $book['isbn']);

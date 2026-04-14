@@ -31,10 +31,6 @@ class SettingsTableSeeder extends Seeder
                 'name' => 'binarythreads',
                 'value' => '1',
             ],
-            6 => [
-                'name' => 'book_reqids',
-                'value' => '7010',
-            ],
             7 => [
                 'name' => 'checkpasswordedrar',
                 'value' => '0',

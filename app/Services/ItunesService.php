@@ -206,13 +206,31 @@ class ItunesService
      */
     public function findEbook(string $term): ?array
     {
-        $results = $this->searchEbooks($term);
+        $results = $this->findEbooks($term);
 
+        return $results[0] ?? null;
+    }
+
+    /**
+     * Get normalized ebook results for a search term.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function findEbooks(string $term): array
+    {
+        $results = $this->searchEbooks($term);
         if (empty($results)) {
-            return null;
+            return [];
         }
 
-        return $this->normalizeEbookResult($results[0]); // @phpstan-ignore offsetAccess.notFound
+        $normalized = [];
+        foreach ($results as $result) {
+            if (is_array($result)) {
+                $normalized[] = $this->normalizeEbookResult($result);
+            }
+        }
+
+        return $normalized;
     }
 
     /**

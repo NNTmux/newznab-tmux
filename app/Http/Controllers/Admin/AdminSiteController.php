@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
-use App\Models\Category;
 use App\Models\GrabStat;
 use App\Models\ReleaseStat;
 use App\Models\RoleStat;
@@ -33,9 +32,6 @@ class AdminSiteController extends BasePageController
 
         switch ($action) {
             case 'submit':
-                if ($request->missing('book_reqids')) {
-                    $request->merge(['book_reqids' => []]);
-                }
                 Settings::settingsUpdate($request->all());
 
                 return redirect()->to('admin/site-edit')->with('success', 'Settings updated successfully');
@@ -44,27 +40,6 @@ class AdminSiteController extends BasePageController
             default:
                 break;
         }
-
-        // return a list of audiobooks, mags, ebooks, technical and foreign books
-        $result = Category::query()->whereIn('id', [Category::MUSIC_AUDIOBOOK, Category::BOOKS_MAGAZINES, Category::BOOKS_TECHNICAL, Category::BOOKS_FOREIGN])->get(['id', 'title']);
-
-        // setup the display lists for these categories
-        $book_reqids_ids = [];
-        $book_reqids_names = [];
-        foreach ($result as $bookcategory) {
-            $book_reqids_ids[] = $bookcategory['id'];
-            $book_reqids_names[] = $bookcategory['title'];
-        }
-
-        // convert from a string array to an int array as we want to use int
-        $book_reqids_ids = array_map(fn ($value) => (int) $value, $book_reqids_ids);
-
-        // convert from a list to an array as we need to use an array, but the Settings table only saves strings
-        $bookReqidsValue = Settings::settingValue('book_reqids') ?? '';
-        $books_selected = $bookReqidsValue !== '' ? explode(',', (string) $bookReqidsValue) : [];
-
-        // convert from a string array to an int array, filtering out empty values
-        $books_selected = array_map(fn ($value) => (int) trim($value), array_filter($books_selected));
 
         $compress_headers_warning = ! str_contains(config('settings.nntp_server'), 'astra') ? 'compress_headers_warning' : '';
 
@@ -126,11 +101,6 @@ class AdminSiteController extends BasePageController
             'lookup_reqids' => [
                 'ids' => [0, 1, 2],
                 'names' => ['Disabled', 'Lookup Request IDs', 'Lookup Request IDs Threaded'],
-            ],
-            'book_reqids' => [
-                'ids' => $book_reqids_ids,
-                'names' => $book_reqids_names,
-                'selected' => $books_selected,
             ],
             'compress_headers_warning' => $compress_headers_warning,
             'title' => $title,

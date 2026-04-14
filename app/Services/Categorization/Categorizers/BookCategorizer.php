@@ -28,6 +28,14 @@ class BookCategorizer extends AbstractCategorizer
         if (preg_match('/\b(?:PS[1-5]|PlayStation|Xbox|Switch|Nintendo|Wii|3DS|GameCube)\b/i', $context->releaseName)) {
             return true;
         }
+        // Skip software and utility release naming patterns.
+        if (preg_match('/\bv?\d+\.\d+\.\d+(?:\.\d+)?\b.*\b(?:Multilingual|x64|x86|Portable|Setup|Patch)\b/i', $context->releaseName)) {
+            return true;
+        }
+        // Skip music-style release names that are often misfiled as books.
+        if (preg_match('/\b(?:WEB[\.\-_ ]?FLAC|MP3|320kbps|discography|FALCON)\b/i', $context->releaseName)) {
+            return true;
+        }
         // Skip TV shows (season patterns)
         if (preg_match('/[._ -]S\d{1,3}[._ -]?(E\d|Complete|Full|1080|720|480|2160|WEB|HDTV|BluRay)/i', $context->releaseName)) {
             return true;

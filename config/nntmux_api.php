@@ -3,6 +3,7 @@
 return [
     'anidb_api_key' => env('ANIDB_APIKEY', ''),
     'fanarttv_api_key' => env('FANARTTV_APIKEY', ''),
+    'google_books_api_key' => env('GOOGLE_BOOKS_API_KEY', ''),
     'isbndb_api_key' => env('ISBNDB_API_KEY', ''),
     'imdbapi_dev_enabled' => env('IMDBAPI_DEV_ENABLED', true),
     'imdbapi_dev_base_url' => env('IMDBAPI_DEV_BASE_URL', 'https://api.imdbapi.dev'),

@@ -47,9 +47,19 @@ class IsbnDbService
      */
     public function searchBook(string $query): ?array
     {
+        $books = $this->searchBooks($query);
+
+        return $books[0] ?? null;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function searchBooks(string $query): array
+    {
         $query = trim($query);
         if ($query === '' || ! $this->isConfigured()) {
-            return null;
+            return [];
         }
 
         $cacheKey = 'isbndb_search_'.md5($query.'_'.$this->pageSize);
@@ -64,14 +74,20 @@ class IsbnDbService
         ]);
 
         $books = $response['data'] ?? null;
-        if (! is_array($books) || $books === [] || ! isset($books[0]) || ! is_array($books[0])) {
-            return null;
+        if (! is_array($books) || $books === []) {
+            return [];
         }
 
-        $book = $this->normalizeBookResult($books[0]);
-        Cache::put($cacheKey, $book, now()->addHours(24));
+        $normalized = [];
+        foreach ($books as $book) {
+            if (is_array($book)) {
+                $normalized[] = $this->normalizeBookResult($book);
+            }
+        }
 
-        return $book;
+        Cache::put($cacheKey, $normalized, now()->addHours(24));
+
+        return $normalized;
     }
 
     /**

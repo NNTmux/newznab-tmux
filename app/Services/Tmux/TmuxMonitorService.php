@@ -215,10 +215,9 @@ class TmuxMonitorService
         $timer = time();
 
         try {
-            $bookReqIds = $this->runVar['settings']['book_reqids'] ?? Category::BOOKS_ROOT;
             $dbName = config('nntmux.db_name');
 
-            $proc1Query = $this->tmux->proc_query(1, $bookReqIds, $dbName);
+            $proc1Query = $this->tmux->proc_query(1, $dbName, '');
             $proc1Result = DB::selectOne($proc1Query);
 
             if ($proc1Result) {
@@ -234,7 +233,7 @@ class TmuxMonitorService
             $maxSize = $this->runVar['settings']['maxsize_pp'] ?? '';
             $minSize = $this->runVar['settings']['minsize_pp'] ?? '';
 
-            $proc2Query = $this->tmux->proc_query(2, $bookReqIds, $dbName, (string) $maxSize, (string) $minSize);
+            $proc2Query = $this->tmux->proc_query(2, $dbName, (string) $maxSize, (string) $minSize);
             $proc2Result = DB::selectOne($proc2Query);
 
             if ($proc2Result) {
@@ -285,8 +284,7 @@ class TmuxMonitorService
 
             // Get additional table counts (query 4)
             $timer4 = time();
-            $bookReqIds = $this->runVar['settings']['book_reqids'] ?? Category::BOOKS_ROOT;
-            $proc4Query = $this->tmux->proc_query(4, $bookReqIds, $dbName);
+            $proc4Query = $this->tmux->proc_query(4, $dbName, '');
             $proc4Result = DB::selectOne($proc4Query);
 
             if ($proc4Result) {
@@ -297,7 +295,7 @@ class TmuxMonitorService
 
             // Get newest/oldest data (query 6)
             $timer6 = time();
-            $proc6Query = $this->tmux->proc_query(6, $bookReqIds, $dbName);
+            $proc6Query = $this->tmux->proc_query(6, $dbName, '');
             $proc6Result = DB::selectOne($proc6Query);
 
             if ($proc6Result) {

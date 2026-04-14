@@ -294,7 +294,7 @@ class Tmux
     /**
      * @throws \Exception
      */
-    public function proc_query(mixed $qry, mixed $bookreqids, string $db_name, ?string $ppmax = '', ?string $ppmin = ''): bool|string
+    public function proc_query(mixed $qry, string $db_name, ?string $ppmax = '', ?string $ppmin = ''): bool|string
     {
         // Convert null to empty string for backward compatibility
         $ppmax = $ppmax ?? '';
@@ -319,7 +319,7 @@ class Tmux
                       SUM(IF(categories_id BETWEEN %d AND %d AND '.$movieLookupSql.',1,0)) AS processmovies,
 					SUM(IF(categories_id IN (%d, %d, %d) AND musicinfo_id IS NULL,1,0)) AS processmusic,
 					SUM(IF(categories_id BETWEEN %d AND %d AND consoleinfo_id IS NULL,1,0)) AS processconsole,
-					SUM(IF(categories_id IN (%s) AND bookinfo_id IS NULL,1,0)) AS processbooks,
+					SUM(IF(categories_id BETWEEN %d AND %d AND bookinfo_id IS NULL,1,0)) AS processbooks,
 					SUM(IF(categories_id = %d AND gamesinfo_id = 0,1,0)) AS processgames,
 					SUM(IF(1=1 %s,1,0)) AS processnfo,
 					SUM(IF(isrenamed = %d AND predb_id = 0 AND passwordstatus >= 0 AND nfostatus > %d
@@ -340,7 +340,8 @@ class Tmux
                     Category::MUSIC_OTHER,
                     Category::GAME_ROOT,
                     Category::GAME_OTHER,
-                    $bookreqids,
+                    Category::BOOKS_ROOT,
+                    Category::BOOKS_UNKNOWN,
                     Category::PC_GAMES,
                     NfoService::NfoQueryString(),
                     NameFixingService::IS_RENAMED_NONE,

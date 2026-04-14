@@ -327,20 +327,6 @@
                         </div>
 
                         <div>
-                            <label for="book_reqids" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                <i class="fas fa-list mr-1"></i>Type of Books to Look Up
-                            </label>
-                            <select id="book_reqids" name="book_reqids[]" multiple class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" size="4">
-                                @foreach($book_reqids['ids'] as $index => $bookReqId)
-                                    <option value="{{ $bookReqId }}" {{ in_array($bookReqId, $book_reqids['selected'] ?? []) ? 'selected' : '' }}>
-                                        {{ $book_reqids['names'][$index] }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <p class="mt-1 text-sm text-gray-500">Categories of Books to lookup information for (only work if Lookup Books is set to yes).</p>
-                        </div>
-
-                        <div>
                             <label for="lookupimdb" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 <i class="fas fa-film mr-1"></i>Lookup Movies
                             </label>
