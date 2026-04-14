@@ -80,4 +80,55 @@ class PredbMatchSelectorTest extends TestCase
         $this->assertNotNull($bestMatch);
         $this->assertSame(2, $bestMatch['id']);
     }
+
+    public function test_it_rejects_unrelated_release_sharing_only_date_and_resolution(): void
+    {
+        $selector = new PredbMatchSelector;
+
+        $bestMatch = $selector->selectBestMatch(
+            'NubileFilms.Molly.Little.My.Little.Seductress.S50E7.26.04.07.2160p',
+            [
+                [
+                    'id' => 1,
+                    'title' => 'Private.26.04.07.Alice.Ross.And.Nata.Gold.XXX.2160p.MP4-WRB',
+                    'filename' => 'Private.26.04.07.Alice.Ross.And.Nata.Gold.XXX.2160p.MP4-WRB.mp4',
+                    'source' => 'srrdb',
+                ],
+                [
+                    'id' => 2,
+                    'title' => 'SomeOther.26.04.07.Random.Title.XXX.2160p.MP4-GRP',
+                    'filename' => 'SomeOther.26.04.07.Random.Title.XXX.2160p.MP4-GRP.mp4',
+                    'source' => 'srrdb',
+                ],
+            ]
+        );
+
+        $this->assertNull($bestMatch, 'Should reject all results when none share meaningful tokens with the query');
+    }
+
+    public function test_it_selects_correct_match_when_date_overlaps_with_unrelated_results(): void
+    {
+        $selector = new PredbMatchSelector;
+
+        $bestMatch = $selector->selectBestMatch(
+            'NubileFilms.Molly.Little.My.Little.Seductress.S50E7.26.04.07.2160p',
+            [
+                [
+                    'id' => 1,
+                    'title' => 'Private.26.04.07.Alice.Ross.And.Nata.Gold.XXX.2160p.MP4-WRB',
+                    'filename' => 'Private.26.04.07.Alice.Ross.And.Nata.Gold.XXX.2160p.MP4-WRB.mp4',
+                    'source' => 'srrdb',
+                ],
+                [
+                    'id' => 2,
+                    'title' => 'NubileFilms.Molly.Little.My.Little.Seductress.S50E7.26.04.07.2160p-GRP',
+                    'filename' => 'NubileFilms.Molly.Little.My.Little.Seductress.S50E7.26.04.07.2160p.mp4',
+                    'source' => 'srrdb',
+                ],
+            ]
+        );
+
+        $this->assertNotNull($bestMatch);
+        $this->assertSame(2, $bestMatch['id'], 'Should select the result that shares meaningful tokens with the query');
+    }
 }
