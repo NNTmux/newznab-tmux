@@ -495,6 +495,10 @@ class BookService
             return false;
         }
         if ($releasetype === 'audiobook') {
+            if ($parsed->isJunk) {
+                return false;
+            }
+
             if (! empty($releasename) && ! preg_match('/^[a-z0-9]+$|^([0-9]+ ){1,}$|Part \d+/i', $releasename)) {
                 $wordCount = count(preg_split('/\s+/', trim($releasename)) ?: []);
                 if ($wordCount >= 2) {
