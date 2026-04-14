@@ -1,6 +1,6 @@
 # AGENTS.md
 
-> AI coding agent guidelines for NNTmux - a Laravel 12 Usenet indexer.
+> AI coding agent guidelines for NNTmux - a Laravel 13 Usenet indexer.
 
 ## Quick Reference
 
@@ -30,6 +30,8 @@ NNTP → NNTPService → BinariesRunner → ReleaseCreationService → ReleasePr
 | **Runners** | `Runners/` | `BinariesRunner`, `ReleasesRunner`, `BackfillRunner`, `PostProcessRunner` |
 | **DTO** | `*/DTO/`, `app/Support/DTOs/` | `NameFixResult`, `ReleaseProcessingContext`, `ReleaseCreationResult` |
 | **Enum** | `app/Enums/` | `UserRole`, `QueueType`, `FileCompletionStatus` |
+| **Observer** | `app/Observers/`, `AppServiceProvider` | `ReleaseObserver`, `MovieInfoObserver`, `RolePromotionObserver` |
+| **View Composer** | `app/View/Composers/`, `AppServiceProvider` | `GlobalDataComposer` shared across `layouts.*` and `admin.*` |
 
 ## Tmux Processing Engine
 
@@ -51,6 +53,7 @@ PHPUnit only (no Pest). Create tests: `php artisan make:test --phpunit {name}`
 - In-memory SQLite (`DB_CONNECTION=testing`)
 - App boot can hit `Settings::settingValue()` via `CategorizationPipeline` (`app/Providers/CategorizationServiceProvider.php` → `app/Services/Categorization/CategorizationPipeline.php`), even in focused controller tests
 - For isolated tests that bypass the normal app test DB setup, seed a minimal `settings` table before app bootstrap; `categorizeforeign` and `catwebdl` are the minimum keys needed for this path, and `tests/Feature/AdminContentControllerTest.php` shows the file-backed SQLite workaround when `php artisan test` would otherwise fail during startup
+- Feature tests that render shared layouts or admin pages may need to clear `App\View\Composers\GlobalDataComposer::$resolvedData`; see `resetGlobalComposerState()` helpers in `tests/Feature/AdminContentControllerTest.php`, `AdminGroupControllerTest.php`, and `NzbAndRssAccessTest.php`
 - All HTTP mocked - no real API calls
 - Suites: `Install`, `Unit`, `Feature` (also `tests/Integration/` for live API tests, not in CI)
 - Use model factories; check for custom states first
@@ -68,16 +71,20 @@ PHPUnit only (no Pest). Create tests: `php artisan make:test --phpunit {name}`
 ### API (`app/Http/Controllers/Api/`)
 - v1: XML (newznab compat) - `ApiController.php`
 - v2: JSON REST - `ApiV2Controller.php`
+- RSS feeds are separate from `/api`: edit `routes/rss.php` + `App\Http\Controllers\RssController`; `/rss/*` is mounted from `bootstrap/app.php` and `RssController::userCheck()` validates `api_token`
 
 ### Config
 - App configs: `config/nntmux*.php`, `config/tmux.php`, `config/search.php`
 - Never `env()` outside config - use `config('key')`
 - Runtime settings: `Settings::settingValue()`
+- Laravel 13 route/middleware wiring lives in `bootstrap/app.php`; use that file when adding route groups, aliases, or middleware (for example the `/rss` mount)
+- In Docker/Sail, `Makefile` exports `.env` `SEARCH_DRIVER` as `COMPOSE_PROFILES`, so only the matching Manticore/Elasticsearch service starts
 
 ### Commands
 - 80+ auto-registered in `app/Console/Commands/`
 - Create with `php artisan make:` + `--no-interaction`
-- This workspace may have cached routes (`bootstrap/cache/routes-v7.php`); after adding/changing routes, refresh with `php artisan route:cache` if a route appears missing
+- Docker/Sail convenience targets live in `Makefile`; prefer `make artisan cmd="..."`, `make test filter=TestName`, `make pint`, and `make npm-build` when working inside containers
+- This workspace may have cached routes under `bootstrap/cache/routes-*.php`; after adding/changing routes, refresh with `php artisan route:cache` if a route appears missing
 
 ### Admin Content
 - Admin content ordering is scoped by `contenttype`, not global: Homepage rows only reorder Homepage rows, Useful Links only reorder Useful Links
@@ -126,6 +133,6 @@ Blade + TailwindCSS v4 + Vite bundling. Run `npm run build` after changes.
   - Lazy-loaded pages must declare an `x-data` name that matches a key in `alpine/lazy-loader.js`, or the component JS will never load; example: `resources/views/admin/content/index.blade.php` uses `x-data="contentToggle"` so delete/toggle handlers from `resources/js/alpine/components/content-toggle.js` are available
   - Stores in `alpine/stores/`, components in `alpine/components/`
 - **CSS**: Main entry is `resources/css/app.css` (imports `csp-safe.css` for component styles)
-- **Vite entry points**: `resources/js/app.js`, `resources/css/app.css`, plus forum assets
+- **Vite entry points**: `resources/js/app.js`, `resources/css/app.css`, `resources/forum/blade-tailwind/js/forum.js`, `resources/forum/blade-tailwind/css/forum.css`
 
 This structure ensures Content Security Policy (CSP) compliance by using Alpine.js CSP-safe build and keeping scripts and styles in external files.
