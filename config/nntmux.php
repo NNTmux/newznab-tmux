@@ -16,6 +16,7 @@ return [
     'admin_email' => env('ADMIN_EMAIL', 'admin@example.com'),
     'crc_token' => env('CRC_TOKEN', null),
     'multiprocessing_max_child_time' => env('NN_MULTIPROCESSING_MAX_CHILD_TIME', 1800),
+    'concurrency_timeout' => env('NN_CONCURRENCY_TIMEOUT'),
     'stream_fork_output' => env('STREAM_FORK_OUTPUT', false),
     'purge_inactive_users' => env('PURGE_INACTIVE_USERS', false),
     'purge_inactive_users_days' => env('PURGE_INACTIVE_USERS_DAYS', 180),
