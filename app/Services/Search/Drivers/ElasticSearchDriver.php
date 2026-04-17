@@ -2911,6 +2911,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                         'query' => $query,
                         'sort' => [
                             [$sortField => ['order' => $order]],
+                            ['id' => ['order' => $order]],
                         ],
                         'from' => max(0, $offset),
                         'size' => max(1, min($limit, self::MAX_RESULTS)),

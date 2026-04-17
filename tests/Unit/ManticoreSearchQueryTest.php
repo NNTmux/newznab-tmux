@@ -207,4 +207,22 @@ class ManticoreSearchQueryTest extends TestCase
         $this->assertSame(500, $method->invoke($driver, 750));
         $this->assertSame(1, $method->invoke($driver, 0));
     }
+
+    #[Test]
+    public function search_releases_filtered_uses_stable_id_tiebreak_sort_for_manticore(): void
+    {
+        $driverSource = file_get_contents(__DIR__.'/../../app/Services/Search/Drivers/ManticoreSearchDriver.php');
+
+        $this->assertIsString($driverSource);
+        $this->assertStringContainsString("\$query->sort('id', \$order);", $driverSource);
+    }
+
+    #[Test]
+    public function search_releases_filtered_uses_stable_id_tiebreak_sort_for_elasticsearch(): void
+    {
+        $driverSource = file_get_contents(__DIR__.'/../../app/Services/Search/Drivers/ElasticSearchDriver.php');
+
+        $this->assertIsString($driverSource);
+        $this->assertStringContainsString("['id' => ['order' => \$order]],", $driverSource);
+    }
 }

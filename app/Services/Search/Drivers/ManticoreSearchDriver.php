@@ -2430,7 +2430,12 @@ class ManticoreSearchDriver implements SearchDriverInterface
             if (! in_array($sortField, $allowedSort, true)) {
                 $sortField = 'postdate_ts';
             }
-            $query->sort($sortField, $sortDir === 'asc' ? 'asc' : 'desc');
+            $order = $sortDir === 'asc' ? 'asc' : 'desc';
+            $query->sort($sortField, $order);
+            if ($sortField !== 'id') {
+                // Stabilize ordering across pages when primary sort values are equal.
+                $query->sort('id', $order);
+            }
 
             $maxNeed = max(1000, $offset + $limit + 100);
             $query->maxMatches(min($maxNeed, (int) ($this->config['max_matches'] ?? 10000)));
