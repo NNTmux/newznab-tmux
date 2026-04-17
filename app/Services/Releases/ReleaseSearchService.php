@@ -69,10 +69,92 @@ class ReleaseSearchService
             ]);
         }
 
-        $searchLimit = $this->determineSearchCandidateLimit($offset, $limit);
+        // Filter out -1 values and empty strings
+        $searchFields = Arr::where($searchArr, static function ($value) {
+            return $value !== -1 && $value !== '' && $value !== null;
+        });
 
-        // Get search results from index
-        $searchResult = $this->performIndexSearch($searchArr, $searchLimit);
+        if (empty($searchFields)) {
+            return collect();
+        }
+
+        $orderBy = $this->getBrowseOrder($orderBy === '' ? 'posted_desc' : $orderBy);
+
+        if (Search::isAvailable()) {
+            $groupId = null;
+            if ((int) $groupName !== -1) {
+                $resolved = UsenetGroup::getIDByName((string) $groupName);
+                if ($resolved) {
+                    $groupId = (int) $resolved;
+                }
+            }
+
+            $categoryIdsRaw = $type === 'basic'
+                ? Category::getCategorySearch($cat, null, true)
+                : (((int) ($cat[0] ?? -1) !== -1) ? [(int) $cat[0]] : null);
+
+            $categoryIds = null;
+            if (is_array($categoryIdsRaw)) {
+                $categoryIds = array_values(array_filter(
+                    array_map(static fn ($id): int => (int) $id, $categoryIdsRaw),
+                    static fn (int $id): bool => $id > 0
+                ));
+            } elseif (is_int($categoryIdsRaw) || (is_string($categoryIdsRaw) && ctype_digit((string) $categoryIdsRaw))) {
+                $categoryIds = [(int) $categoryIdsRaw];
+            }
+
+            [$sizeMinFromRange, $sizeMaxFromRange] = $this->resolveSizeRangeBounds($sizeFrom, $sizeTo);
+            $minSizeCriteria = max((int) $minSize, $sizeMinFromRange);
+            $maxSizeCriteria = $sizeMaxFromRange;
+            [$minDateCriteria, $maxDateCriteria] = $this->resolvePostdateBounds($daysNew, $daysOld);
+
+            $criteria = [
+                'phrases' => $searchFields,
+                'category_ids' => $categoryIds,
+                'excluded_category_ids' => $excludedCats,
+                'min_size' => $minSizeCriteria,
+                'max_size' => $maxSizeCriteria,
+                'max_age_days' => $maxAge,
+                'min_date' => $minDateCriteria,
+                'max_date' => $maxDateCriteria,
+                'groups_id' => $groupId,
+                'password_allow_rar' => str_contains($this->showPasswords(), '<='),
+                'sort_field' => $this->browseOrderToIndexSortField((string) $orderBy[0]),
+                'sort_dir' => $orderBy[1] ?? 'desc',
+                'try_fuzzy' => true,
+            ];
+
+            $filtered = Search::searchReleasesFiltered($criteria, $limit, $offset);
+
+            if ($filtered['ids'] !== []) {
+                $ids = array_map(static fn (int|string $id): int => (int) $id, $filtered['ids']);
+                $idList = implode(',', $ids);
+                $baseSql = $this->buildSearchBaseSql(sprintf('WHERE r.id IN (%s)', $idList));
+                $sql = sprintf('SELECT * FROM (%s) r ORDER BY FIELD(r.id, %s)', $baseSql, $idList);
+                $cacheKey = md5($this->getCacheVersion().$sql);
+                $cachedReleases = Cache::get($cacheKey);
+                if ($cachedReleases !== null) {
+                    return $cachedReleases;
+                }
+
+                $releases = Release::fromQuery($sql);
+                if ($releases->isNotEmpty()) {
+                    $releases[0]->_totalrows = (int) $filtered['total'];
+                }
+
+                $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
+                Cache::put($cacheKey, $releases, $expiresAt);
+
+                return $releases;
+            }
+
+            if (config('nntmux.mysql_search_fallback', false) !== true) {
+                return collect();
+            }
+        }
+
+        $searchLimit = $this->determineSearchCandidateLimit($offset, $limit);
+        $searchResult = $this->performIndexSearch($searchFields, $searchLimit);
 
         if (config('app.debug')) {
             Log::debug('ReleaseSearchService::search after performIndexSearch', [
@@ -101,9 +183,6 @@ class ReleaseSearchService
 
         // Build base SQL
         $baseSql = $this->buildSearchBaseSql($whereSql);
-
-        // Get order by clause
-        $orderBy = $this->getBrowseOrder($orderBy === '' ? 'posted_desc' : $orderBy);
 
         // Build final SQL with pagination
         $sql = sprintf(
@@ -1539,6 +1618,25 @@ class ReleaseSearchService
      */
     private function buildSizeConditions(mixed $sizeFrom, mixed $sizeTo): array
     {
+        $conditions = [];
+        [$sizeMin, $sizeMax] = $this->resolveSizeRangeBounds($sizeFrom, $sizeTo);
+        if ($sizeMin > 0) {
+            $conditions[] = sprintf('r.size > %d', $sizeMin);
+        }
+        if ($sizeMax > 0) {
+            $conditions[] = sprintf('r.size < %d', $sizeMax);
+        }
+
+        return $conditions;
+    }
+
+    /**
+     * Resolve UI size bucket inputs into byte bounds used by SQL/index filters.
+     *
+     * @return array{0:int,1:int}
+     */
+    private function resolveSizeRangeBounds(mixed $sizeFrom, mixed $sizeTo): array
+    {
         $sizeRange = [
             1 => 1,
             2 => 2.5,
@@ -1553,17 +1651,36 @@ class ReleaseSearchService
             11 => 640,
         ];
 
-        $conditions = [];
-
+        $sizeMin = 0;
+        $sizeMax = 0;
         if (array_key_exists($sizeFrom, $sizeRange)) {
-            $conditions[] = sprintf('r.size > %d', 104857600 * (int) $sizeRange[$sizeFrom]);
+            $sizeMin = 104857600 * (int) $sizeRange[$sizeFrom];
         }
-
         if (array_key_exists($sizeTo, $sizeRange)) {
-            $conditions[] = sprintf('r.size < %d', 104857600 * (int) $sizeRange[$sizeTo]);
+            $sizeMax = 104857600 * (int) $sizeRange[$sizeTo];
         }
 
-        return $conditions;
+        return [$sizeMin, $sizeMax];
+    }
+
+    /**
+     * Resolve day-based age inputs to unix timestamps used by indexed filtering.
+     *
+     * @return array{0:int,1:int}
+     */
+    private function resolvePostdateBounds(mixed $daysNew, mixed $daysOld): array
+    {
+        $minDate = 0;
+        $maxDate = 0;
+
+        if ((int) $daysOld !== -1 && (int) $daysOld >= 0) {
+            $minDate = time() - ((int) $daysOld * 86400);
+        }
+        if ((int) $daysNew !== -1 && (int) $daysNew >= 0) {
+            $maxDate = time() - ((int) $daysNew * 86400);
+        }
+
+        return [$minDate, $maxDate];
     }
 
     /**

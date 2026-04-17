@@ -132,6 +132,39 @@ class ReleaseSearchServiceOrderingTest extends TestCase
     }
 
     /**
+     * Test that size bucket filters resolve to byte bounds used by indexed criteria.
+     */
+    public function test_resolve_size_range_bounds_maps_ui_buckets_to_bytes(): void
+    {
+        $reflection = new ReflectionClass(ReleaseSearchService::class);
+        $method = $reflection->getMethod('resolveSizeRangeBounds');
+
+        /** @var array{0:int,1:int} $bounds */
+        $bounds = $method->invoke($this->service, 2, 4);
+
+        $this->assertSame(209715200, $bounds[0]);
+        $this->assertSame(1048576000, $bounds[1]);
+    }
+
+    /**
+     * Test that postdate bounds map days-old/new inputs into sane unix timestamps.
+     */
+    public function test_resolve_postdate_bounds_maps_day_filters_to_timestamps(): void
+    {
+        $reflection = new ReflectionClass(ReleaseSearchService::class);
+        $method = $reflection->getMethod('resolvePostdateBounds');
+
+        /** @var array{0:int,1:int} $bounds */
+        $bounds = $method->invoke($this->service, 2, 10);
+        $now = time();
+
+        $this->assertGreaterThanOrEqual($now - (10 * 86400) - 5, $bounds[0]);
+        $this->assertLessThanOrEqual($now - (10 * 86400) + 5, $bounds[0]);
+        $this->assertGreaterThanOrEqual($now - (2 * 86400) - 5, $bounds[1]);
+        $this->assertLessThanOrEqual($now - (2 * 86400) + 5, $bounds[1]);
+    }
+
+    /**
      * Test that the paged ID query only selects release IDs from the releases table.
      */
     public function test_build_search_page_ids_sql_uses_releases_only(): void

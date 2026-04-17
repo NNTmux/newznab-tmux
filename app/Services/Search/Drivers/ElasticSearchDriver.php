@@ -2983,10 +2983,25 @@ class ElasticSearchDriver implements SearchDriverInterface
             $filter[] = ['range' => ['size' => ['gte' => $minSize]]];
         }
 
+        $maxSize = (int) ($criteria['max_size'] ?? 0);
+        if ($maxSize > 0) {
+            $filter[] = ['range' => ['size' => ['lte' => $maxSize]]];
+        }
+
         $maxAge = (int) ($criteria['max_age_days'] ?? 0);
         if ($maxAge > 0) {
             $cutoff = time() - ($maxAge * 86400);
             $filter[] = ['range' => ['postdate_ts' => ['gte' => $cutoff]]];
+        }
+
+        $minDate = (int) ($criteria['min_date'] ?? 0);
+        if ($minDate > 0) {
+            $filter[] = ['range' => ['postdate_ts' => ['gte' => $minDate]]];
+        }
+
+        $maxDate = (int) ($criteria['max_date'] ?? 0);
+        if ($maxDate > 0) {
+            $filter[] = ['range' => ['postdate_ts' => ['lte' => $maxDate]]];
         }
 
         $gid = $criteria['groups_id'] ?? null;
