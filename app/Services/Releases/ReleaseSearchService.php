@@ -736,6 +736,14 @@ class ReleaseSearchService
                 }
             }
             $conditions[] = sprintf('r.id IN (%s)', implode(',', array_map('intval', $searchResult)));
+
+            $episodePredicates = $this->buildEpisodeJoinPredicates($series, $episode, $airDate);
+            if ($episodePredicates !== []) {
+                foreach ($episodePredicates as $predicate) {
+                    $conditions[] = $predicate;
+                }
+                $needsEpisodeJoin = true;
+            }
         }
 
         // Only do name-based search if we don't already have results from external IDs
@@ -796,17 +804,7 @@ class ReleaseSearchService
             // This will filter results to only those with matching episode data in tv_episodes table
             // If this results in no matches, we'll fall back to results without episode conditions
             if (! $hasValidSiteIds && (! empty($series) || ! empty($airDate))) {
-                $episodeConditions = [];
-                if (! empty($series) && (int) $series < 1900) {
-                    $seriesNum = (int) preg_replace('/^s0*/i', '', $series);
-                    $episodeConditions[] = sprintf('tve.series = %d', $seriesNum);
-                    if (! empty($episode) && ! str_contains($episode, '/')) {
-                        $episodeNum = (int) preg_replace('/^e0*/i', '', $episode);
-                        $episodeConditions[] = sprintf('tve.episode = %d', $episodeNum);
-                    }
-                } elseif (! empty($airDate)) {
-                    $episodeConditions[] = sprintf('DATE(tve.firstaired) = %s', escapeString($airDate));
-                }
+                $episodeConditions = $this->buildEpisodeJoinPredicates($series, $episode, $airDate);
 
                 if (! empty($episodeConditions)) {
                     // Check if any of the found releases have matching episode data
@@ -953,39 +951,27 @@ class ReleaseSearchService
             }
         }
 
-        // Fall back to database lookup if index search didn't return results
-        $siteSQL = [];
+        // Resolve show / episode filters from videos + tv_episodes when the index missed, or
+        // when the index hit but the client narrowed by season/episode/airdate (index has no S/E).
+        $siteSQL = $this->buildApiTvSiteSqlArray($siteIdArr);
         $showSql = '';
-        if (empty($indexSearchResult)) {
-            foreach ($siteIdArr as $column => $Id) {
-                if ($Id > 0) {
-                    $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
-                }
-            }
-
-            if (\count($siteSQL) > 0) {
-                $showQry = sprintf(
-                    "\n\t\t\t\tSELECT v.id AS video, GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes FROM videos v LEFT JOIN tv_episodes tve ON v.id = tve.videos_id WHERE (%s) %s %s %s GROUP BY v.id LIMIT 1",
-                    implode(' OR ', $siteSQL),
-                    ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
-                    ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
-                    ($airDate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : '')
+        if (\count($siteSQL) > 0) {
+            $shouldLookupShow = empty($indexSearchResult)
+                || $this->tvApiRequestTargetsEpisode($series, $episode, $airDate);
+            if ($shouldLookupShow) {
+                $strictEpisodeResolution = ! empty($indexSearchResult)
+                    && $this->tvApiRequestTargetsEpisode($series, $episode, $airDate);
+                $fragment = $this->lookupApiTvShowSqlFragment(
+                    $siteSQL,
+                    $series,
+                    $episode,
+                    $airDate,
+                    $strictEpisodeResolution
                 );
-                $show = Release::fromQuery($showQry);
-                if ($show->isNotEmpty()) {
-                    if ((! empty($episode) && ! empty($series)) && $show[0]->episodes !== '') {
-                        $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
-                    } elseif (! empty($episode) && $show[0]->episodes !== '') {
-                        $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
-                    } elseif (! empty($series) && empty($episode)) {
-                        $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
-                    }
-                    if ((int) ($show[0]->video ?? 0) > 0) {
-                        $showSql .= ' AND r.videos_id = '.$show[0]->video;
-                    }
-                } else {
-                    return [];
+                if ($fragment === null) {
+                    return empty($indexSearchResult) ? [] : collect();
                 }
+                $showSql = $fragment;
             }
         }
         if (! empty($name) && $showSql === '' && empty($indexSearchResult)) {
@@ -1426,6 +1412,105 @@ class ReleaseSearchService
         }
 
         return [];
+    }
+
+    /**
+     * SQL predicates on tv_episodes (alias tve) for season / episode / airdate, matching
+     * newznab-style tvsearch parameters. Empty array means no narrowing.
+     *
+     * @return list<string>
+     */
+    private function buildEpisodeJoinPredicates(string $series, string $episode, string $airDate): array
+    {
+        $predicates = [];
+        if (! empty($series) && (int) $series < 1900) {
+            $seriesNum = (int) preg_replace('/^s0*/i', '', $series);
+            $predicates[] = sprintf('tve.series = %d', $seriesNum);
+            if (! empty($episode) && ! str_contains($episode, '/')) {
+                $episodeNum = (int) preg_replace('/^e0*/i', '', $episode);
+                $predicates[] = sprintf('tve.episode = %d', $episodeNum);
+            }
+        } elseif (! empty($airDate)) {
+            $predicates[] = sprintf('DATE(tve.firstaired) = %s', escapeString($airDate));
+        }
+
+        return $predicates;
+    }
+
+    /**
+     * @param  array<string, mixed>  $siteIdArr
+     * @return list<string>
+     */
+    private function buildApiTvSiteSqlArray(array $siteIdArr): array
+    {
+        $siteSQL = [];
+        foreach ($siteIdArr as $column => $Id) {
+            if ($Id > 0) {
+                $siteSQL[] = sprintf('v.%s = %d', $column, $Id);
+            }
+        }
+
+        return $siteSQL;
+    }
+
+    private function tvApiRequestTargetsEpisode(string $series, string $episode, string $airDate): bool
+    {
+        if ($airDate !== '') {
+            return true;
+        }
+        if ($series !== '' && (int) $series < 1900) {
+            return true;
+        }
+        if ($episode !== '' && ! str_contains($episode, '/')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Build the extra WHERE fragment for API TV search (r.tv_episodes_id / r.videos_id / tve.series).
+     *
+     * @param  list<string>  $siteSQL
+     */
+    private function lookupApiTvShowSqlFragment(
+        array $siteSQL,
+        string $series,
+        string $episode,
+        string $airDate,
+        bool $strictEpisodeResolution
+    ): ?string {
+        $showQry = sprintf(
+            "\n\t\t\t\tSELECT v.id AS video, GROUP_CONCAT(tve.id SEPARATOR ',') AS episodes FROM videos v LEFT JOIN tv_episodes tve ON v.id = tve.videos_id WHERE (%s) %s %s %s GROUP BY v.id LIMIT 1",
+            implode(' OR ', $siteSQL),
+            ($series !== '' ? sprintf('AND tve.series = %d', (int) preg_replace('/^s0*/i', '', $series)) : ''),
+            ($episode !== '' ? sprintf('AND tve.episode = %d', (int) preg_replace('/^e0*/i', '', $episode)) : ''),
+            ($airDate !== '' ? sprintf('AND DATE(tve.firstaired) = %s', escapeString($airDate)) : '')
+        );
+        $show = Release::fromQuery($showQry);
+        if ($show->isEmpty()) {
+            return null;
+        }
+
+        $showSql = '';
+        if ((! empty($episode) && ! empty($series)) && $show[0]->episodes !== '') {
+            $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
+        } elseif (! empty($episode) && $show[0]->episodes !== '') {
+            $showSql = sprintf('AND r.tv_episodes_id IN (%s)', $show[0]->episodes);
+        } elseif (! empty($series) && empty($episode)) {
+            $showSql .= ' AND r.tv_episodes_id IN ('.$show[0]->episodes.') AND tve.series = '.$series;
+        }
+        if ((int) ($show[0]->video ?? 0) > 0) {
+            $showSql .= ' AND r.videos_id = '.$show[0]->video;
+        }
+
+        if ($strictEpisodeResolution
+            && $this->tvApiRequestTargetsEpisode($series, $episode, $airDate)
+            && ($show[0]->episodes === '' || $show[0]->episodes === null)) {
+            return null;
+        }
+
+        return $showSql;
     }
 
     /**
