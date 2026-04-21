@@ -132,6 +132,21 @@ class HashedReleaseCategorizationTest extends TestCase
             'TV episode' => ['Show.Name.S03E05.720p.HDTV.x264-GROUP', 'alt.binaries.hdtv'],
             'Music album' => ['Artist.Name-Album.Title-2024-FLAC-GROUP', 'alt.binaries.sounds.mp3'],
             'Game release' => ['Starfield-RUNE', 'alt.binaries.games'],
+            'Readable software package' => ['Microsoft Office Suite Installer', 'alt.binaries.warez'],
+            'Adobe msix bundle' => ['Adobe Express Photos.Msixbundle', 'alt.binaries.erotica.divx'],
+        ];
+    }
+
+    /**
+     * Readable software-like names that must not be classified as hashed by the misc categorizer.
+     *
+     * @return array<string, array{0: string}>
+     */
+    public static function readableSoftwareNamesProvider(): array
+    {
+        return [
+            'Adobe msix bundle' => ['Adobe Express Photos.Msixbundle'],
+            'Office installer words' => ['Microsoft Office Suite Installer'],
         ];
     }
 
@@ -200,6 +215,18 @@ class HashedReleaseCategorizationTest extends TestCase
         $this->assertTrue($result->isSuccessful(), "Expected successful match for: $name");
         $this->assertSame($expectedMatchedBy, $result->matchedBy, "Wrong matchedBy tag for: $name");
         $this->assertSame(Category::OTHER_HASHED, $result->categoryId, "Expected OTHER_HASHED for: $name");
+    }
+
+    #[DataProvider('readableSoftwareNamesProvider')]
+    public function test_misc_categorizer_does_not_hash_readable_software_names(string $name): void
+    {
+        $categorizer = new MiscCategorizer;
+        $context = new ReleaseContext(releaseName: $name, groupId: 0);
+        $result = $categorizer->categorize($context);
+
+        $this->assertFalse($result->isSuccessful(), "Readable software name '$name' should not be matched by misc hash heuristics");
+        $this->assertSame(Category::OTHER_MISC, $result->categoryId);
+        $this->assertSame('no_match', $result->matchedBy);
     }
 
     // ------------------------------------------------------------------
@@ -287,6 +314,15 @@ class HashedReleaseCategorizationTest extends TestCase
             $passable->bestResult->categoryId,
             "Legitimate release '$name' should NOT be in OTHER_HASHED"
         );
+    }
+
+    public function test_adobe_msix_bundle_reaches_pc_0day_in_full_pipeline(): void
+    {
+        $passable = $this->runPipeline('Adobe Express Photos.Msixbundle', 'alt.binaries.erotica.divx');
+
+        $this->assertFalse($passable->lockedToMisc);
+        $this->assertSame(Category::PC_0DAY, $passable->bestResult->categoryId);
+        $this->assertSame('0day_msix_installer', $passable->bestResult->matchedBy);
     }
 
     // ------------------------------------------------------------------

@@ -7,10 +7,23 @@ namespace Tests\Unit;
 use App\Models\Category;
 use App\Services\Categorization\Categorizers\PcCategorizer;
 use App\Services\Categorization\ReleaseContext;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class CategorizePcGameTest extends TestCase
 {
+    /**
+     * @return array<string, array{0: string}>
+     */
+    public static function installerPackageProvider(): array
+    {
+        return [
+            'msix bundle' => ['Adobe Express Photos.Msixbundle'],
+            'appx bundle' => ['Microsoft.To.Do.appxbundle'],
+            'msi package' => ['Utility Installer.msi'],
+        ];
+    }
+
     private PcCategorizer $categorizer;
 
     protected function setUp(): void
@@ -95,5 +108,22 @@ class CategorizePcGameTest extends TestCase
                 $this->assertNotSame(Category::PC_GAMES, $result->categoryId, "Did not expect PC_GAMES for console/Mac: $name");
             }
         }
+    }
+
+    #[DataProvider('installerPackageProvider')]
+    public function test_installer_packages_are_classified_as_pc_0day(string $name): void
+    {
+        $context = new ReleaseContext(
+            releaseName: $name,
+            groupId: 0,
+            groupName: '',
+            poster: ''
+        );
+
+        $result = $this->categorizer->categorize($context);
+
+        $this->assertTrue($result->isSuccessful(), "Expected PC 0day match for installer package: $name");
+        $this->assertSame(Category::PC_0DAY, $result->categoryId, "Expected PC_0DAY for installer package: $name");
+        $this->assertSame('0day_msix_installer', $result->matchedBy);
     }
 }

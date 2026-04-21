@@ -148,6 +148,10 @@ class PcCategorizer extends AbstractCategorizer
 
     protected function check0day(string $name): ?CategorizationResult
     {
+        if (preg_match('/\.(msix|msixbundle|appx|appxbundle|msi)$/i', $name)) {
+            return $this->matched(Category::PC_0DAY, 0.9, '0day_msix_installer');
+        }
+
         // Explicit 0day indicators
         if (preg_match('/[._ -]exe$|[._ -](utorrent|Virtualbox)[._ -]|\b0DAY\b|incl.+crack| DRM$|>DRM</i', $name)) {
             return $this->matched(Category::PC_0DAY, 0.9, '0day_explicit');

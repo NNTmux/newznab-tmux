@@ -100,7 +100,10 @@ class MiscCategorizer extends AbstractCategorizer
 
         $signalScore = count($markers);
         $isCoreToken = preg_match('/^[A-Za-z0-9+\/_=-]+$/', $coreName) === 1;
-        $lowSignal = $signalScore === 0 && $isCoreToken && strlen($coreName) >= 12;
+        $lowSignal = $signalScore === 0
+            && $isCoreToken
+            && strlen($coreName) >= 12
+            && ! $this->hasStrongWordStructure($name, $coreName);
 
         return [
             'coreName' => $coreName,
@@ -226,6 +229,10 @@ class MiscCategorizer extends AbstractCategorizer
     {
         $analysis = $this->inspectSignals($name);
 
+        if ($this->hasStrongWordStructure($name, $analysis['coreName'])) {
+            return null;
+        }
+
         if ($this->isZeroVowelLongToken($analysis['coreName'])) {
             return null;
         }
@@ -244,6 +251,23 @@ class MiscCategorizer extends AbstractCategorizer
         }
 
         return null;
+    }
+
+    protected function hasStrongWordStructure(string $name, string $coreName): bool
+    {
+        return $this->getMaxConsecutiveLetters($coreName) >= 5
+            && $this->hasNormalVowelRatio($coreName)
+            && $this->countAlphabeticWordTokens($name) >= 2;
+    }
+
+    protected function countAlphabeticWordTokens(string $name): int
+    {
+        $tokens = preg_split('/[.\s_-]+/', $this->stripExtensionsForAnalysis($name)) ?: [];
+
+        return count(array_filter(
+            $tokens,
+            static fn (string $token): bool => preg_match('/[a-z]{3,}/i', $token) === 1
+        ));
     }
 
     protected function checkArchive(string $name): ?CategorizationResult

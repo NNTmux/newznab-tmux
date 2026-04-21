@@ -265,6 +265,23 @@ trait DetectsHashedNames
     }
 
     /**
+     * Check whether the letter-only portion of a token has a normal vowel ratio.
+     */
+    protected function hasNormalVowelRatio(string $str, float $min = 0.2): bool
+    {
+        $letters = preg_replace('/[^a-z]/i', '', $str);
+
+        if ($letters === '' || strlen($letters) < 5) {
+            return false;
+        }
+
+        preg_match_all('/[aeiou]/i', $letters, $matches);
+        $vowelCount = count($matches[0]);
+
+        return ($vowelCount / strlen($letters)) >= $min;
+    }
+
+    /**
      * Check if a string looks like a random/obfuscated string rather than a real title.
      *
      * Uses multiple heuristics: character-type transitions, consonant clusters,
@@ -315,7 +332,7 @@ trait DetectsHashedNames
     protected function stripExtensionsForAnalysis(string $name): string
     {
         return preg_replace(
-            '/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx|par2?|nfo|sfv|nzb|rar|r\d{2,3}|zip|7z|gz|tar|001)$/i',
+            '/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx|par2?|nfo|sfv|nzb|rar|r\d{2,3}|zip|7z|gz|tar|001|msix|msixbundle|appx|appxbundle|apk|xap|ipa|deb|rpm|pkg|dmg|exe|msi)$/i',
             '',
             trim($name)
         );
