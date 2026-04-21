@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Nzb;
 
+use App\Enums\NzbImportStatus;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
@@ -95,7 +96,7 @@ class NzbImportService
         }
 
         $start = now()->toImmutable()->format('Y-m-d H:i:s');
-        $nzbsImported = $nzbsSkipped = 0;
+        $nzbsImported = $nzbsSkipped = $nzbsDuplicate = 0;
 
         // Convert all files to string paths and filter to only process NZB files
         $nzbFiles = [];
@@ -160,13 +161,13 @@ class NzbImportService
                 // Try to insert the NZB details into the DB.
                 $nzbFileName = $useNzbName === true ? str_ireplace('.nzb', '', basename($nzbFilePath)) : '';
                 try {
-                    $inserted = $this->scanNZBFile($nzbXML, $nzbFileName, $source);
+                    $importStatus = $this->scanNZBFile($nzbXML, $nzbFileName, $source);
                 } catch (\Exception $e) {
                     $this->echoOut('ERROR: Problem inserting: '.$nzbFilePath);
-                    $inserted = false;
+                    $importStatus = NzbImportStatus::Failed;
                 }
 
-                if ($inserted) {
+                if ($importStatus === NzbImportStatus::Inserted) {
                     // Try to copy the NZB to the NZB folder.
                     $path = $this->nzb->getNzbPath($this->relGuid, 0, true);
 
@@ -195,11 +196,26 @@ class NzbImportService
                         $nzbsImported++;
                     }
                 } else {
-                    $this->echoOut('ERROR: Failed to insert NZB!');
-                    if ($deleteFailed) {
-                        File::delete($nzbFilePath);
+                    if ($importStatus === NzbImportStatus::Duplicate) {
+                        $nzbsDuplicate++;
+
+                        if ($delete || $deleteFailed) {
+                            File::delete($nzbFilePath);
+                        }
+                    } else {
+                        if (in_array($importStatus, [NzbImportStatus::Blacklisted, NzbImportStatus::NoGroup], true)) {
+                            if ($delete || $deleteFailed) {
+                                File::delete($nzbFilePath);
+                            }
+                        } else {
+                            $this->echoOut('ERROR: Failed to insert NZB!');
+                            if ($deleteFailed) {
+                                File::delete($nzbFilePath);
+                            }
+                        }
+
+                        $nzbsSkipped++;
                     }
-                    $nzbsSkipped++;
                 }
             } else {
                 $this->echoOut('ERROR: Unable to fetch: '.$nzbFilePath);
@@ -207,12 +223,14 @@ class NzbImportService
             }
         }
         $this->echoOut(
-            'Proccessed '.
+            'Processed '.
             $nzbsImported.
             ' NZBs in '.
             now()->diffInSeconds($start, true).' seconds, '.
             $nzbsSkipped.
-            ' NZBs were skipped.'
+            ' NZBs were skipped, '.
+            $nzbsDuplicate.
+            ' were duplicates.'
         );
 
         if ($this->browser) {
@@ -227,7 +245,7 @@ class NzbImportService
      *
      * @throws \Exception
      */
-    protected function scanNZBFile(mixed &$nzbXML, mixed $nzbFileName = '', mixed $source = ''): bool
+    protected function scanNZBFile(mixed &$nzbXML, mixed $nzbFileName = '', mixed $source = ''): NzbImportStatus
     {
         $binary_names = [];
         $totalFiles = $totalSize = $groupID = 0;
@@ -314,7 +332,7 @@ class NzbImportService
                 // Persist blacklist usage stats if we matched any rule during this NZB processing
                 $this->blacklistService->updateBlacklistUsage($this->blacklistService->getAndClearIdsToUpdate()); // @phpstan-ignore argument.type
 
-                return false;
+                return $isBlackListed ? NzbImportStatus::Blacklisted : NzbImportStatus::NoGroup;
             }
         }
 
@@ -352,7 +370,7 @@ class NzbImportService
      *
      * @throws \Exception
      */
-    protected function insertNZB(mixed $nzbDetails): bool
+    protected function insertNZB(mixed $nzbDetails): NzbImportStatus
     {
         // Make up a GUID for the release.
         $this->relGuid = Str::uuid()->toString();
@@ -405,16 +423,16 @@ class NzbImportService
         } else {
             $this->echoOut('This release is already in our DB so skipping: '.$subject);
 
-            return false;
+            return NzbImportStatus::Duplicate;
         }
 
         if ($relID === null) {
             $this->echoOut('ERROR: Problem inserting: '.$subject);
 
-            return false;
+            return NzbImportStatus::Failed;
         }
 
-        return true;
+        return NzbImportStatus::Inserted;
     }
 
     /**
