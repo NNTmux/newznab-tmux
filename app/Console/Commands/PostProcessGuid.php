@@ -80,7 +80,11 @@ class PostProcessGuid extends Command
      */
     private function processAdditional(string $guid): void
     {
-        $this->additionalProcessor->start('', $guid);
+        try {
+            $this->additionalProcessor->start('', $guid);
+        } finally {
+            $this->additionalProcessor->finish();
+        }
     }
 
     /**

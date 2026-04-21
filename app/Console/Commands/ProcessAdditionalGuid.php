@@ -85,7 +85,12 @@ class ProcessAdditionalGuid extends Command
         }
 
         $processor = app(AdditionalProcessingOrchestrator::class);
-        $ok = $processor->processSingleGuid($guid);
+
+        try {
+            $ok = $processor->processSingleGuid($guid);
+        } finally {
+            $processor->finish();
+        }
 
         if (! $ok) {
             $this->error('Processing failed or nothing processed for '.($idOpt ? 'ID '.$idOpt : 'GUID '.$guid).'.');

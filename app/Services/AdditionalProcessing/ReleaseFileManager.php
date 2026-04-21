@@ -175,7 +175,7 @@ class ReleaseFileManager
         // Get file count
         $releaseFilesCount = ReleaseFile::whereReleasesId($context->release->id)->count('releases_id') ?? 0;
 
-        $passwordStatus = max([$context->passwordStatus]);
+        $passwordStatus = $context->passwordStatus;
 
         // Set to no password if processing is off
         if (! $processPasswords) {
@@ -514,8 +514,8 @@ class ReleaseFileManager
 
         if ($extractedName !== null) {
             $preCheck = Predb::whereTitle($extractedName)->first();
-            $context->release->preid = $preCheck !== null ? $preCheck->value('id') : 0;
-            $candidate = $preCheck->title ?? $extractedName;
+            $context->release->preid = $preCheck?->id ?? 0;
+            $candidate = $preCheck?->title ?? $extractedName;
             $candidate = $this->normalizeCandidateTitle($candidate);
 
             if ($this->isPlausibleReleaseTitle($candidate)) {
@@ -540,8 +540,8 @@ class ReleaseFileManager
 
             if ($extractedName !== null) {
                 $preCheck = Predb::whereTitle($extractedName)->first();
-                $context->release->preid = $preCheck !== null ? $preCheck->value('id') : 0;
-                $candidate = $preCheck->title ?? $extractedName;
+                $context->release->preid = $preCheck?->id ?? 0;
+                $candidate = $preCheck?->title ?? $extractedName;
                 $candidate = $this->normalizeCandidateTitle($candidate);
 
                 if ($this->isPlausibleReleaseTitle($candidate)) {

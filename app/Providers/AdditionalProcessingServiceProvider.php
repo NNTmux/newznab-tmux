@@ -11,6 +11,8 @@ use App\Services\AdditionalProcessing\ConsoleOutputService;
 use App\Services\AdditionalProcessing\MediaExtractionService;
 use App\Services\AdditionalProcessing\NzbContentParser;
 use App\Services\AdditionalProcessing\ReleaseFileManager;
+use App\Services\AdditionalProcessing\ReleaseFilesArchiveFallback;
+use App\Services\AdditionalProcessing\ReleaseProcessor;
 use App\Services\AdditionalProcessing\UsenetDownloadService;
 use App\Services\Categorization\CategorizationService;
 use App\Services\NameFixing\NameFixingService;
@@ -97,6 +99,31 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
             );
         });
 
+        $this->app->singleton(ReleaseFilesArchiveFallback::class, function ($app) {
+            return new ReleaseFilesArchiveFallback(
+                $app->make(ProcessingConfiguration::class),
+                $app->make(ArchiveExtractionService::class),
+                $app->make(MediaExtractionService::class),
+                $app->make(UsenetDownloadService::class),
+                $app->make(ReleaseFileManager::class),
+                $app->make(ConsoleOutputService::class)
+            );
+        });
+
+        $this->app->singleton(ReleaseProcessor::class, function ($app) {
+            return new ReleaseProcessor(
+                $app->make(ProcessingConfiguration::class),
+                $app->make(NzbContentParser::class),
+                $app->make(ArchiveExtractionService::class),
+                $app->make(MediaExtractionService::class),
+                $app->make(UsenetDownloadService::class),
+                $app->make(ReleaseFileManager::class),
+                $app->make(ReleaseFilesArchiveFallback::class),
+                $app->make(TempWorkspaceService::class),
+                $app->make(ConsoleOutputService::class)
+            );
+        });
+
         // Temp workspace service (might already be registered elsewhere)
         $this->app->singleton(TempWorkspaceService::class, function () {
             return new TempWorkspaceService;
@@ -106,11 +133,7 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
         $this->app->singleton(AdditionalProcessingOrchestrator::class, function ($app) {
             return new AdditionalProcessingOrchestrator(
                 $app->make(ProcessingConfiguration::class),
-                $app->make(NzbContentParser::class),
-                $app->make(ArchiveExtractionService::class),
-                $app->make(MediaExtractionService::class),
-                $app->make(UsenetDownloadService::class),
-                $app->make(ReleaseFileManager::class),
+                $app->make(ReleaseProcessor::class),
                 $app->make(TempWorkspaceService::class),
                 $app->make(ConsoleOutputService::class)
             );
@@ -122,6 +145,10 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        $this->app->terminating(function (): void {
+            if ($this->app->bound(AdditionalProcessingOrchestrator::class)) {
+                $this->app->make(AdditionalProcessingOrchestrator::class)->finish();
+            }
+        });
     }
 }

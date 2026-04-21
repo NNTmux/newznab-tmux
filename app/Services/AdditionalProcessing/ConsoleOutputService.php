@@ -56,6 +56,13 @@ class ConsoleOutputService
         $this->echo(PHP_EOL.'['.$releaseId.']['.human_filesize($size, 1).']', 'primaryOver');
     }
 
+    public function setProcessTitle(int $releaseId): void
+    {
+        if (function_exists('cli_set_process_title')) {
+            @cli_set_process_title(PHP_BINARY.' '.__DIR__.'/AdditionalProcessingOrchestrator.php ReleaseID: '.$releaseId);
+        }
+    }
+
     public function echoCompressedDownload(): void
     {
         $this->echo('(cB)', 'primaryOver');

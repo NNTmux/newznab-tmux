@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\AdditionalProcessing;
 
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
+use App\Services\AdditionalProcessing\Enums\DownloadKind;
 use App\Services\NNTP\NNTPService;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -18,9 +19,10 @@ class UsenetDownloadService
     private NNTPService $nntp;
 
     public function __construct(
-        private readonly ProcessingConfiguration $config
+        private readonly ProcessingConfiguration $config,
+        ?NNTPService $nntp = null
     ) {
-        $this->nntp = new NNTPService;
+        $this->nntp = $nntp ?? new NNTPService;
     }
 
     /**
@@ -108,80 +110,21 @@ class UsenetDownloadService
     }
 
     /**
-     * Download sample video content.
+     * Download content for a specific processing step.
      *
-     * @param  array<string, mixed>  $messageIDs
-     * @return array<string, mixed>
-     */
-    public function downloadSample(
-        array $messageIDs,
-        string $groupName = '',
-        ?int $releaseId = null
-    ): array {
-        return $this->downloadByMessageIDs($messageIDs, $groupName, $releaseId);
-    }
-
-    /**
-     * Download media info video content.
-     *
-     * @param  array<string, mixed>  $messageID
-     * @return array<string, mixed>
-     */
-    public function downloadMediaInfo(
-        string|array $messageID,
-        string $groupName = '',
-        ?int $releaseId = null
-    ): array {
-        return $this->downloadByMessageIDs($messageID, $groupName, $releaseId);
-    }
-
-    /**
-     * Download audio content.
-     *
-     * @param  array<string, mixed>  $messageID
-     * @return array<string, mixed>
-     */
-    public function downloadAudio(
-        string|array $messageID,
-        string $groupName = '',
-        ?int $releaseId = null
-    ): array {
-        return $this->downloadByMessageIDs($messageID, $groupName, $releaseId);
-    }
-
-    /**
-     * Download JPG content.
-     *
-     * @param  array<string, mixed>  $messageIDs
-     * @return array<string, mixed>
-     */
-    public function downloadJPG(
-        array $messageIDs,
-        string $groupName = '',
-        ?int $releaseId = null
-    ): array {
-        return $this->downloadByMessageIDs($messageIDs, $groupName, $releaseId);
-    }
-
-    /**
-     * Download compressed file content (RAR, ZIP, etc.).
-     *
-     * @param  array<string, mixed>  $messageIDs  Message IDs to download
-     * @param  string  $groupName  Group name for logging
-     * @param  int|null  $releaseId  Release ID for logging
-     * @param  string|null  $fileTitle  File title for logging
+     * @param  array<string, mixed>|string  $messageIDs
      * @return array{success: bool, data: string|null, groupUnavailable: bool, error: string|null}
-     *
-     * @throws Exception
      */
-    public function downloadCompressedFile(
-        array $messageIDs,
+    public function download(
+        DownloadKind $kind,
+        array|string $messageIDs,
         string $groupName = '',
         ?int $releaseId = null,
         ?string $fileTitle = null
     ): array {
         if ($this->config->debugMode) {
-            Log::debug('Attempting compressed fetch', [
+            Log::debug('Attempting download', [
+                'kind' => $kind->value,
                 'release_id' => $releaseId,
                 'file_title' => $fileTitle,
                 'message_ids' => $messageIDs,
@@ -192,7 +135,8 @@ class UsenetDownloadService
         $result = $this->downloadByMessageIDs($messageIDs, $groupName, $releaseId);
 
         if (! $result['success'] && $this->config->debugMode) {
-            Log::debug('Compressed fetch failed', [
+            Log::debug('Download failed', [
+                'kind' => $kind->value,
                 'release_id' => $releaseId,
                 'file_title' => $fileTitle,
                 'message_ids' => $messageIDs,

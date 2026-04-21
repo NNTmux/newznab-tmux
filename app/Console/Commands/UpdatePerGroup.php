@@ -77,7 +77,12 @@ class UpdatePerGroup extends Command
 
             // Post process the releases
             $this->info("Post-processing additional for group: {$groupMySQL['name']}");
-            app(AdditionalProcessingOrchestrator::class)->start($groupId);
+            $orchestrator = app(AdditionalProcessingOrchestrator::class);
+            try {
+                $orchestrator->start($groupId);
+            } finally {
+                $orchestrator->finish();
+            }
 
             $this->info("Processing NFO files for group: {$groupMySQL['name']}");
             (new NfoService)->processNfoFiles(

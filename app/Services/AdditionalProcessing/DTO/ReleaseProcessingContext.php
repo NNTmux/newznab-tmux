@@ -47,33 +47,33 @@ class ReleaseProcessingContext
     public bool $nzbHasCompressedFile = false;
 
     /**
-     * @var array<string, mixed>
+     * @var list<array<string, mixed>>
      */
     public array $nzbContents = [];
 
     // Message IDs for downloading
     /**
-     * @var array<string, mixed>
+     * @var list<string>
      */
     public array $sampleMessageIDs = [];
 
     /**
-     * @var array<string, mixed>
+     * @var list<string>
      */
     public array $jpgMessageIDs = [];
 
     /**
-     * @var array<string, mixed>
+     * @var list<string>|string
      */
     public string|array $mediaInfoMessageIDs = [];
 
     /**
-     * @var array<string, mixed>
+     * @var list<string>|string
      */
     public string|array $audioInfoMessageIDs = [];
 
     /**
-     * @var array<string, mixed>
+     * @var list<string>
      */
     public array $rarFileMessageIDs = [];
 
@@ -153,6 +153,23 @@ class ReleaseProcessingContext
         $this->groupUnavailable = false;
         $this->resetMessageIDs();
         $this->resetCounters();
+    }
+
+    /**
+     * Mark a processing artifact as found.
+     */
+    public function markFound(string $type): void
+    {
+        match ($type) {
+            'video' => $this->foundVideo = true,
+            'mediaInfo' => $this->foundMediaInfo = true,
+            'audioInfo' => $this->foundAudioInfo = true,
+            'audioSample' => $this->foundAudioSample = true,
+            'jpgSample' => $this->foundJPGSample = true,
+            'sample' => $this->foundSample = true,
+            'par2Info' => $this->foundPAR2Info = true,
+            default => null,
+        };
     }
 
     /**

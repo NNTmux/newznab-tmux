@@ -23,10 +23,12 @@ class ArchiveExtractionService
     private Par2Info $par2Info;
 
     public function __construct(
-        private readonly ProcessingConfiguration $config
+        private readonly ProcessingConfiguration $config,
+        ?ArchiveInfo $archiveInfo = null,
+        ?Par2Info $par2Info = null
     ) {
-        $this->archiveInfo = new ArchiveInfo;
-        $this->par2Info = new Par2Info;
+        $this->archiveInfo = $archiveInfo ?? new ArchiveInfo;
+        $this->par2Info = $par2Info ?? new Par2Info;
 
         // Configure external clients for ArchiveInfo
         if ($this->config->unrarPath) {
@@ -341,7 +343,14 @@ class ArchiveExtractionService
 
         // Try using unrar for RAR files
         if ($this->config->unrarPath) {
-            $extracted = $this->extractFileViaUnrar($compressedData, $filename, $tmpPath);
+            $extracted = $this->extractFileViaExternalTool(
+                $compressedData,
+                $filename,
+                $tmpPath,
+                'rar',
+                fn (string $archiveFile, string $extractDir): string => $this->config->getKillString().
+                    $this->config->unrarPath.'" e -y -c- -inul -p- "'.$archiveFile.'" "'.$filename.'" "'.$extractDir.'"'
+            );
             if ($extracted !== null) {
                 return $extracted;
             }
@@ -349,7 +358,14 @@ class ArchiveExtractionService
 
         // Try using unzip for ZIP files
         if ($this->config->unzipPath) {
-            $extracted = $this->extractFileViaUnzip($compressedData, $filename, $tmpPath);
+            $extracted = $this->extractFileViaExternalTool(
+                $compressedData,
+                $filename,
+                $tmpPath,
+                'zip',
+                fn (string $archiveFile, string $extractDir): string => $this->config->unzipPath.
+                    ' -j "'.$archiveFile.'" "'.$filename.'" -d "'.$extractDir.'"'
+            );
             if ($extracted !== null) {
                 return $extracted;
             }
@@ -361,20 +377,23 @@ class ArchiveExtractionService
     /**
      * Extract a specific file using unrar.
      */
-    private function extractFileViaUnrar(string $compressedData, string $filename, string $tmpPath): ?string
-    {
+    private function extractFileViaExternalTool(
+        string $compressedData,
+        string $filename,
+        string $tmpPath,
+        string $archiveExtension,
+        callable $commandBuilder
+    ): ?string {
         try {
             $extractDir = $tmpPath.'extract_'.uniqid('', true).'/';
             if (! File::isDirectory($extractDir)) {
                 File::makeDirectory($extractDir, 0777, true, true);
             }
 
-            $archiveFile = $tmpPath.'archive_'.uniqid('', true).'.rar';
+            $archiveFile = $tmpPath.'archive_'.uniqid('', true).'.'.$archiveExtension;
             File::put($archiveFile, $compressedData);
 
-            // Extract specific file using unrar
-            $killString = $this->config->getKillString();
-            runCmd($killString.$this->config->unrarPath.'" e -y -c- -inul -p- "'.$archiveFile.'" "'.$filename.'" "'.$extractDir.'"');
+            runCmd($commandBuilder($archiveFile, $extractDir));
 
             File::delete($archiveFile);
 
@@ -401,56 +420,7 @@ class ArchiveExtractionService
             File::deleteDirectory($extractDir);
         } catch (\Throwable $e) {
             if ($this->config->debugMode) {
-                Log::debug('Unrar extraction failed: '.$e->getMessage());
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Extract a specific file using unzip.
-     */
-    private function extractFileViaUnzip(string $compressedData, string $filename, string $tmpPath): ?string
-    {
-        try {
-            $extractDir = $tmpPath.'extract_'.uniqid('', true).'/';
-            if (! File::isDirectory($extractDir)) {
-                File::makeDirectory($extractDir, 0777, true, true);
-            }
-
-            $archiveFile = $tmpPath.'archive_'.uniqid('', true).'.zip';
-            File::put($archiveFile, $compressedData);
-
-            // Extract specific file using unzip
-            runCmd($this->config->unzipPath.' -j "'.$archiveFile.'" "'.$filename.'" -d "'.$extractDir.'"');
-
-            File::delete($archiveFile);
-
-            // Look for extracted file
-            $extractedPath = $extractDir.basename($filename);
-            if (File::isFile($extractedPath)) {
-                $content = File::get($extractedPath);
-                File::deleteDirectory($extractDir);
-
-                return $content;
-            }
-
-            // Try to find it with glob
-            $files = File::allFiles($extractDir);
-            foreach ($files as $file) {
-                if (strtolower($file->getFilename()) === strtolower(basename($filename))) {
-                    $content = File::get($file->getPathname());
-                    File::deleteDirectory($extractDir);
-
-                    return $content;
-                }
-            }
-
-            File::deleteDirectory($extractDir);
-        } catch (\Throwable $e) {
-            if ($this->config->debugMode) {
-                Log::debug('Unzip extraction failed: '.$e->getMessage());
+                Log::debug('External extraction failed: '.$e->getMessage());
             }
         }
 

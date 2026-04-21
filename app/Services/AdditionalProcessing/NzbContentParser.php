@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\AdditionalProcessing;
 
+use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\Nzb\NzbParserService;
 use App\Services\Nzb\NzbService;
 use Illuminate\Support\Facades\File;
@@ -160,15 +161,7 @@ class NzbContentParser
     public function extractMessageIDs(
         array $nzbContents,
         string $groupName,
-        int $segmentsToDownload,
-        bool $processThumbnails,
-        bool $processJPGSample,
-        bool $processMediaInfo,
-        bool $processAudioInfo,
-        string $audioFileRegex,
-        string $videoFileRegex,
-        string $supportFileRegex,
-        string $ignoreBookRegex
+        ProcessingConfiguration $config
     ): array {
         $result = [
             'hasCompressedFile' => false,
@@ -186,7 +179,7 @@ class NzbContentParser
                 $segments = $file['segments'] ?? [];
 
                 // Skip support/nfo files
-                if (preg_match('/(?:'.$supportFileRegex.'|nfo\\b|inf\\b|ofn\\b)($|[ ")]|-])(?!.{20,})/i', $title)) {
+                if (preg_match('/(?:'.$config->supportFileRegex.'|nfo\\b|inf\\b|ofn\\b)($|[ ")]|-])(?!.{20,})/i', $title)) {
                     continue;
                 }
 
@@ -199,39 +192,39 @@ class NzbContentParser
                 }
 
                 // Look for a video sample (not an image)
-                if ($processThumbnails && empty($result['sampleMessageIDs']) && ! empty($segments)
+                if ($config->processThumbnails && empty($result['sampleMessageIDs']) && ! empty($segments)
                     && stripos($title, 'sample') !== false
                     && ! preg_match('/\.jpe?g$/i', $title)
                 ) {
-                    $result['sampleMessageIDs'] = $this->extractSegments($segments, $segmentsToDownload);
+                    $result['sampleMessageIDs'] = $this->extractSegments($segments, $config->segmentsToDownload);
                 }
 
                 // Look for a JPG picture (not a CD cover)
-                if ($processJPGSample && empty($result['jpgMessageIDs']) && ! empty($segments)
+                if ($config->processJPGSample && empty($result['jpgMessageIDs']) && ! empty($segments)
                     && ! preg_match('/flac|lossless|mp3|music|inner-sanctum|sound/i', $groupName)
                     && preg_match('/\.jpe?g[. ")\]]/i', $title)
                 ) {
-                    $result['jpgMessageIDs'] = $this->extractSegments($segments, $segmentsToDownload);
+                    $result['jpgMessageIDs'] = $this->extractSegments($segments, $config->segmentsToDownload);
                 }
 
                 // Look for a video file for MediaInfo (sample video)
-                if ($processMediaInfo && empty($result['mediaInfoMessageID']) && ! empty($segments[0])
+                if ($config->processMediaInfo && empty($result['mediaInfoMessageID']) && ! empty($segments[0])
                     && stripos($title, 'sample') !== false
-                    && preg_match('/'.$videoFileRegex.'[. ")\]]/i', $title)
+                    && preg_match('/'.$config->videoFileRegex.'[. ")\]]/i', $title)
                 ) {
                     $result['mediaInfoMessageID'] = (string) $segments[0];
                 }
 
                 // Look for an audio file
-                if ($processAudioInfo && empty($result['audioInfoMessageID']) && ! empty($segments)
-                    && preg_match('/'.$audioFileRegex.'[. ")\]]/i', $title, $type)
+                if ($config->processAudioInfo && empty($result['audioInfoMessageID']) && ! empty($segments)
+                    && preg_match('/'.$config->audioFileRegex.'[. ")\]]/i', $title, $type)
                 ) {
                     $result['audioInfoExtension'] = $type[1];
                     $result['audioInfoMessageID'] = (string) $segments[0];
                 }
 
                 // Count book files
-                if (preg_match($ignoreBookRegex, $title)) {
+                if (preg_match($config->ignoreBookRegex, $title)) {
                     $result['bookFileCount']++;
                 }
             } catch (\ErrorException $e) {
@@ -264,8 +257,6 @@ class NzbContentParser
 
     /**
      * Get the NZB path for a GUID.
-     *
-     * @return list<string>
      */
     public function getNzbPath(string $guid): string|false
     {

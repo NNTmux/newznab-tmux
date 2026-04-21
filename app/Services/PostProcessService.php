@@ -235,7 +235,13 @@ final class PostProcessService
      */
     public function processAdditional(int|string $groupID = '', string $guidChar = ''): void
     {
-        app(AdditionalProcessingOrchestrator::class)->start($groupID, $guidChar);
+        $orchestrator = app(AdditionalProcessingOrchestrator::class);
+
+        try {
+            $orchestrator->start($groupID, $guidChar);
+        } finally {
+            $orchestrator->finish();
+        }
     }
 
     /**
