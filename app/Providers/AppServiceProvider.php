@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Events\ReleaseNameFixed;
+use App\Listeners\RecategorizeReleaseAfterNameFix;
 use App\Models\AnidbInfo;
 use App\Models\AnidbTitle;
 use App\Models\BookInfo;
@@ -59,6 +61,7 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole('Admin');
         });
         Event::listen(Login::class, LoginViaRemember::class);
+        Event::listen(ReleaseNameFixed::class, RecategorizeReleaseAfterNameFix::class);
 
         // Register observers
         RolePromotion::observe(RolePromotionObserver::class);

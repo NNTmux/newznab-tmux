@@ -7,10 +7,12 @@ namespace Tests\Unit;
 use App\Models\Category;
 use App\Services\Categorization\CategorizationResult;
 use App\Services\Categorization\Categorizers\MiscCategorizer;
+use App\Services\Categorization\Pipes\BookPipe;
 use App\Services\Categorization\Pipes\CategorizationPassable;
 use App\Services\Categorization\Pipes\ConsolePipe;
 use App\Services\Categorization\Pipes\GroupNamePipe;
 use App\Services\Categorization\Pipes\MiscPipe;
+use App\Services\Categorization\Pipes\MiscSafetyNetPipe;
 use App\Services\Categorization\Pipes\MoviePipe;
 use App\Services\Categorization\Pipes\MusicPipe;
 use App\Services\Categorization\Pipes\PcPipe;
@@ -25,7 +27,7 @@ class HashedReleaseCategorizationTest extends TestCase
     /**
      * The ordered list of pipes that matches CategorizationPipeline::createDefault().
      * Sorted by priority: MiscPipe(1), GroupNamePipe(5), XxxPipe(10), TvPipe(20),
-     * MoviePipe(25), BookPipe, MusicPipe, PcPipe, ConsolePipe.
+     * MoviePipe(25), BookPipe, MusicPipe, PcPipe, ConsolePipe, MiscSafetyNetPipe.
      *
      * @return list<object>
      */
@@ -37,9 +39,11 @@ class HashedReleaseCategorizationTest extends TestCase
             new XxxPipe,
             new TvPipe,
             new MoviePipe,
+            new BookPipe,
             new MusicPipe,
             new PcPipe,
             new ConsolePipe,
+            new MiscSafetyNetPipe,
         ];
     }
 
@@ -87,6 +91,7 @@ class HashedReleaseCategorizationTest extends TestCase
             'All uppercase 20 chars' => ['ABCDEFGH1234567890XY', 'obfuscated_uppercase'],
             'Mixed alphanumeric random' => ['AA7Jl2toE8Q53yNZmQ5R6G', 'obfuscated_mixed_alphanumeric'],
             'Usenet obfuscated filename' => ['[01/10] - "xK9mR2pL4qW7nT3vB.part01.rar"', 'obfuscated_usenet_filename'],
+            'Base64-like token' => ['VGhpc0lzTm90QVNob3dOYW1lMTIzNDU2Nzg5MA==', 'hash_base64_like'],
         ];
     }
 
@@ -106,10 +111,12 @@ class HashedReleaseCategorizationTest extends TestCase
             // Lowercase with dots and digits — bypasses all obfuscated checks.
             // After stripping, coreName ≥20 with maxConsecutiveLetters < 5 but low transition rate.
             // Grouped letter/digit runs keep transition rate ≤ 0.35.
-            'No word structure long' => ['xyz.1234.wvut.5678.srqp.9012', 'gibberish_no_word_structure'],
+            'No word structure long' => ['xyz.1234.wvut.5678.srqp.9012.rar', 'gibberish_no_word_structure'],
             // Lowercase with dots and digits — bypasses all obfuscated checks.
             // After stripping, coreName matches digit-heavy pattern (1-3 letters + 6+ digits).
             'Digit-heavy pattern' => ['xz.123456789012', 'gibberish_random_digits'],
+            'Zero vowel core' => ['xkcdqwrtypsdfghjklmnbvcxz', 'gibberish_zero_vowels'],
+            'No signal long token' => ['A1b2.C3d4.E5f6.G7h8.I9j0', 'gibberish_no_signal'],
         ];
     }
 
@@ -144,6 +151,22 @@ class HashedReleaseCategorizationTest extends TestCase
             'Gibberish in games group' => ['aB3cD4eF5gH6iJ7kL8m', 'alt.binaries.games'],
             'Hex in warez group' => ['aabbccdd0011223344ff', 'alt.binaries.warez'],
             'Random digits in ebook group' => ['ab12345678901234', 'alt.binaries.e-book'],
+            'Base64-like token in TV group' => ['VGhpc0lzTm90QVNob3dOYW1lMTIzNDU2Nzg5MA==', 'alt.binaries.hdtv'],
+            'Zero vowel token in movie group' => ['xkcdqwrtypsdfghjklmnbvcxz', 'alt.binaries.movies'],
+        ];
+    }
+
+    /**
+     * Low-signal names that are not strong enough for an early lock but should
+     * still be kept out of content categories when only the group matched.
+     *
+     * @return array<string, array{0: string, 1: string}>
+     */
+    public static function lowSignalGroupOnlyProvider(): array
+    {
+        return [
+            'Short low-signal token in TV group' => ['ab12.cd34.ef56', 'alt.binaries.hdtv'],
+            'Short low-signal token in movies group' => ['zx90.cv78.bn56', 'alt.binaries.movies'],
         ];
     }
 
@@ -235,6 +258,16 @@ class HashedReleaseCategorizationTest extends TestCase
             ],
             "Hashed release '$name' should NOT be in content category, but got: {$passable->bestResult->categoryId}"
         );
+    }
+
+    #[DataProvider('lowSignalGroupOnlyProvider')]
+    public function test_group_only_low_signal_releases_fall_back_to_other_misc(string $name, string $groupName): void
+    {
+        $passable = $this->runPipeline($name, $groupName);
+
+        $this->assertTrue($passable->lockedToMisc, "Expected lockedToMisc for low-signal release: $name");
+        $this->assertSame(Category::OTHER_MISC, $passable->bestResult->categoryId);
+        $this->assertSame('group_only_low_signal', $passable->bestResult->matchedBy);
     }
 
     // ------------------------------------------------------------------

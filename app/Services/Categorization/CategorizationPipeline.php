@@ -10,6 +10,7 @@ use App\Services\Categorization\Pipes\AbstractCategorizationPipe;
 use App\Services\Categorization\Pipes\CategorizationPassable;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Pipeline-based categorization service using Laravel Pipeline.
@@ -88,7 +89,32 @@ class CategorizationPipeline
             ->through($this->pipes->values()->all())
             ->thenReturn();
 
+        $this->logCategorization($result);
+
         return $result->toArray();
+    }
+
+    protected function logCategorization(CategorizationPassable $result): void
+    {
+        if (! config('nntmux.categorization.log', false)) {
+            return;
+        }
+
+        $payload = [
+            'release_name' => $result->context->releaseName,
+            'group_name' => $result->context->groupName,
+            'category_id' => $result->bestResult->categoryId,
+            'matched_by' => $result->bestResult->matchedBy,
+            'confidence' => $result->bestResult->confidence,
+            'locked_to_misc' => $result->lockedToMisc,
+            'misc_analysis' => $result->miscAnalysis,
+        ];
+
+        if ($result->lockedToMisc || $result->bestResult->matchedBy === 'group_only_low_signal') {
+            Log::info('categorization.decision', $payload);
+        }
+
+        Log::debug('categorization.trace', $payload + ['all_results' => $result->allResults]);
     }
 
     /**
@@ -107,6 +133,7 @@ class CategorizationPipeline
     public static function createDefault(): self
     {
         return new self([
+            new Pipes\MiscPipe,
             new Pipes\GroupNamePipe,
             new Pipes\XxxPipe,
             new Pipes\TvPipe,
@@ -115,7 +142,7 @@ class CategorizationPipeline
             new Pipes\MusicPipe,
             new Pipes\PcPipe,
             new Pipes\ConsolePipe,
-            new Pipes\MiscPipe,
+            new Pipes\MiscSafetyNetPipe,
         ]);
     }
 }

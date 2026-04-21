@@ -50,6 +50,7 @@ class MiscPipe extends AbstractCategorizationPipe
     public function handle(CategorizationPassable $passable, Closure $next): CategorizationPassable
     {
         // MiscPipe always runs regardless of shouldStopProcessing — it IS the first pipe.
+        $passable->miscAnalysis = $this->categorizer->inspectSignals($passable->context);
         $result = $this->categorize($passable->context);
 
         // Record the result for debug

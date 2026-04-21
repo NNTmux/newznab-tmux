@@ -29,6 +29,13 @@ class CategorizationPassable
      */
     public array $allResults = [];
 
+    /**
+     * Misc signal analysis captured by MiscPipe for downstream safety-net decisions.
+     *
+     * @var array<string, mixed>
+     */
+    public array $miscAnalysis = [];
+
     public function __construct(ReleaseContext $context, bool $debug = false)
     {
         $this->context = $context;
@@ -90,6 +97,7 @@ class CategorizationPassable
                 'locked_to_misc' => $this->lockedToMisc,
                 'release_name' => $this->context->releaseName,
                 'group_name' => $this->context->groupName,
+                'misc_analysis' => $this->miscAnalysis,
                 'all_results' => $this->allResults,
                 'categorizer_details' => $this->bestResult->debug,
             ];

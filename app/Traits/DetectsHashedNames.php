@@ -29,11 +29,13 @@ trait DetectsHashedNames
             || $this->isBoundedSha1Hash($name)
             || $this->isBoundedSha256Hash($name)
             || $this->isBoundedGenericHash($name)
+            || $this->isBase64LikeToken($name)
             || $this->isObfuscatedUppercaseString($name)
             || $this->isObfuscatedMixedAlphanumeric($name)
             || $this->isObfuscatedUsenetFilename($name)
             || $this->isRandomByCharacterAnalysis($coreName, $name)
             || $this->hasInsufficientWordStructure($coreName)
+            || $this->isZeroVowelLongToken($coreName)
             || $this->isRandomDigitPattern($coreName);
     }
 
@@ -70,7 +72,40 @@ trait DetectsHashedNames
      */
     protected function isBoundedGenericHash(string $name): bool
     {
-        return (bool) preg_match('/(?:^|["\'\s\[\]\/\-])([a-f0-9]{32,128})(?:["\'\s\[\]\/.\-]|$)/i', $name);
+        if (! preg_match('/(?:^|["\'\s\[\]\/\-])([a-z0-9]{24,128})(?:["\'\s\[\]\/.\-]|$)/i', $name, $matches)) {
+            return false;
+        }
+
+        $token = $matches[1];
+
+        if (preg_match('/\b(19|20)\d{2}\b/', $token)) {
+            return false;
+        }
+
+        return preg_match('/\d/', $token) === 1
+            && $this->looksLikeRandomString($token);
+    }
+
+    /**
+     * Detect base64/base64url-like tokens that commonly appear in obfuscated subjects.
+     */
+    protected function isBase64LikeToken(string $name): bool
+    {
+        if (! preg_match('/(?:^|["\'\s\[\]\/\-])([A-Za-z0-9+\/_=-]{24,})(?:["\'\s\[\]\/.\-]|$)/', $name, $matches)) {
+            return false;
+        }
+
+        $token = rtrim($matches[1], '=');
+
+        if (strlen($token) < 24 || preg_match('/\b(19|20)\d{2}\b/', $token)) {
+            return false;
+        }
+
+        if (! preg_match('/[A-Z]/', $token) || ! preg_match('/[a-z]/', $token) || ! preg_match('/\d/', $token)) {
+            return false;
+        }
+
+        return $this->looksLikeRandomString($token);
     }
 
     // ---------------------------------------------------------------
@@ -205,6 +240,28 @@ trait DetectsHashedNames
             preg_match('/^[a-zA-Z]{1,3}\d{6,}[a-zA-Z]*$/i', $coreName)
             || preg_match('/^[a-zA-Z0-9]{2,4}\d{8,}$/i', $coreName)
         );
+    }
+
+    /**
+     * Detect long alphanumeric tokens with effectively no vowel structure.
+     */
+    protected function isZeroVowelLongToken(string $coreName, int $minLength = 20): bool
+    {
+        if (strlen($coreName) < $minLength || ! preg_match('/^[a-zA-Z0-9]+$/', $coreName)) {
+            return false;
+        }
+
+        if (preg_match('/\b(19|20)\d{2}\b/', $coreName)) {
+            return false;
+        }
+
+        $letterOnly = preg_replace('/\d+/', '', $coreName);
+
+        if ($letterOnly === '' || strlen($letterOnly) < 10) {
+            return false;
+        }
+
+        return preg_match('/[aeiou]/i', $letterOnly) !== 1;
     }
 
     /**

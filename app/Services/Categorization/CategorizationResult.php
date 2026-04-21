@@ -51,6 +51,11 @@ class CategorizationResult
      */
     public function shouldOverride(CategorizationResult $other): bool
     {
+        if ($this->categoryId !== Category::OTHER_MISC && $this->categoryId !== Category::OTHER_HASHED &&
+            $other->isProtectedMiscResult() && $this->confidence < 0.6) {
+            return false;
+        }
+
         // Higher confidence always wins
         if ($this->confidence > $other->confidence) {
             return true;
@@ -62,6 +67,25 @@ class CategorizationResult
         }
 
         return false;
+    }
+
+    /**
+     * Determine whether this result should resist weak downstream overrides.
+     */
+    public function isProtectedMiscResult(): bool
+    {
+        if ($this->categoryId === Category::OTHER_HASHED) {
+            return true;
+        }
+
+        if ($this->categoryId !== Category::OTHER_MISC) {
+            return false;
+        }
+
+        return str_starts_with($this->matchedBy, 'hash_')
+            || str_starts_with($this->matchedBy, 'obfuscated_')
+            || str_starts_with($this->matchedBy, 'gibberish_')
+            || $this->matchedBy === 'group_only_low_signal';
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\NameFixing;
 
+use App\Events\ReleaseNameFixed;
 use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Predb;
@@ -12,6 +13,7 @@ use App\Models\UsenetGroup;
 use App\Services\Categorization\CategorizationService;
 use App\Services\ReleaseCleaningService;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Service for updating releases with new names.
@@ -153,12 +155,6 @@ class ReleaseUpdateService
                 $this->matched = true;
                 $this->relid = (int) $release->releases_id;
 
-                $determinedCategory = $this->category->determineCategory(
-                    $release->groups_id,
-                    $newName,
-                    ! empty($release->fromname) ? $release->fromname : ''
-                );
-
                 if ($type === 'PAR2, ') {
                     $newName = ucwords($newName);
                     if (preg_match('/(.+?)\.[a-z0-9]{2,3}(PAR2)?$/i', $name, $hit)) {
@@ -172,14 +168,21 @@ class ReleaseUpdateService
                 $newName = explode('\\', $newName);
                 $newName = preg_replace(['/^[=_.:\s-]+/', '/[=_.:\s-]+$/'], '', $newName[0]);
 
-                if ($this->echoOutput && $show) {
-                    $this->echoReleaseInfo($release, $newName, $determinedCategory, $type, $method);
-                }
-
                 $newTitle = substr($newName, 0, 299);
 
+                $determinedCategory = null;
+                if ($this->echoOutput && $show) {
+                    $determinedCategory = $this->category->determineCategory(
+                        $release->groups_id,
+                        $newTitle,
+                        ! empty($release->fromname) ? $release->fromname : ''
+                    );
+
+                    $this->echoReleaseInfo($release, $newTitle, $determinedCategory, $type, $method);
+                }
+
                 if ($echo === true) {
-                    $this->performDatabaseUpdate($release, $newTitle, $determinedCategory, $type, $nameStatus, $preId);
+                    $this->performDatabaseUpdate($release, $newTitle, $type, $nameStatus, $preId);
                 }
             }
         }
@@ -253,59 +256,65 @@ class ReleaseUpdateService
 
     /**
      * Perform the actual database update.
-     *
-     * @param  array<string, mixed>  $determinedCategory
      */
     protected function performDatabaseUpdate(
         object $release,
         string $newTitle,
-        array $determinedCategory,
         string $type,
         bool $nameStatus,
         int $preId
     ): void {
-        if ($nameStatus === true) {
-            $status = $this->getStatusColumnsForType($type);
+        DB::transaction(function () use ($release, $newTitle, $type, $nameStatus, $preId): void {
+            if ($nameStatus === true) {
+                $status = $this->getStatusColumnsForType($type);
 
-            $updateColumns = [
-                'videos_id' => 0,
-                'tv_episodes_id' => 0,
-                'imdbid' => null,
-                'musicinfo_id' => '',
-                'consoleinfo_id' => '',
-                'bookinfo_id' => '',
-                'anidbid' => '',
-                'predb_id' => $preId,
-                'searchname' => $newTitle,
-                'categories_id' => $determinedCategory['categories_id'],
-            ];
-
-            if (! empty($status)) {
-                foreach ($status as $key => $stat) {
-                    $updateColumns = Arr::add($updateColumns, $key, $stat);
-                }
-            }
-
-            Release::query()
-                ->where('id', $release->releases_id)
-                ->update($updateColumns);
-        } else {
-            Release::query()
-                ->where('id', $release->releases_id)
-                ->update([
+                $updateColumns = [
                     'videos_id' => 0,
                     'tv_episodes_id' => 0,
                     'imdbid' => null,
-                    'musicinfo_id' => null,
-                    'consoleinfo_id' => null,
-                    'bookinfo_id' => null,
-                    'anidbid' => null,
+                    'musicinfo_id' => '',
+                    'consoleinfo_id' => '',
+                    'bookinfo_id' => '',
+                    'anidbid' => '',
                     'predb_id' => $preId,
                     'searchname' => $newTitle,
-                    'categories_id' => $determinedCategory['categories_id'],
-                    'iscategorized' => 1,
-                ]);
-        }
+                ];
+
+                if (! empty($status)) {
+                    foreach ($status as $key => $stat) {
+                        $updateColumns = Arr::add($updateColumns, $key, $stat);
+                    }
+                }
+
+                Release::query()
+                    ->where('id', $release->releases_id)
+                    ->update($updateColumns);
+            } else {
+                Release::query()
+                    ->where('id', $release->releases_id)
+                    ->update([
+                        'videos_id' => 0,
+                        'tv_episodes_id' => 0,
+                        'imdbid' => null,
+                        'musicinfo_id' => null,
+                        'consoleinfo_id' => null,
+                        'bookinfo_id' => null,
+                        'anidbid' => null,
+                        'predb_id' => $preId,
+                        'searchname' => $newTitle,
+                        'iscategorized' => 1,
+                    ]);
+            }
+
+            event(new ReleaseNameFixed(
+                (int) $release->releases_id,
+                (string) $release->searchname,
+                $newTitle,
+                (int) $release->categories_id,
+                $release->groups_id,
+                (string) ($release->fromname ?? '')
+            ));
+        });
 
         // Update search index
         Search::updateRelease($release->releases_id);
@@ -350,7 +359,7 @@ class ReleaseUpdateService
      */
     public function checkPreDbMatch(object $release, string $textstring): ?array
     {
-        if (preg_match_all(self::PREDB_REGEX, $textstring, $hits) && ! preg_match('/Source\s\:/i', $textstring)) {
+        if (preg_match_all(self::PREDB_REGEX, $textstring, $hits) && ! preg_match('/Source\s:/i', $textstring)) {
             foreach ($hits as $hit) {
                 foreach ($hit as $val) {
                     $title = Predb::query()->where('title', trim($val))->select(['title', 'id'])->first();
