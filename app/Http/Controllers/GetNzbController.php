@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UsersRelease;
 use App\Services\Nzb\NzbService;
+use App\Support\FilenameSanitizer;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use STS\ZipStream\Builder;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class GetNzbController extends BasePageController
@@ -248,8 +250,8 @@ class GetNzbController extends BasePageController
         string $releaseId
     ): Response|StreamedResponse {
         // Get NZB file path and validate
-        $nzbPath = app(NzbService::class)->getNzbPath($releaseId);
-        if (! File::exists($nzbPath)) {
+        $nzbPath = app(NzbService::class)->nzbPath($releaseId);
+        if ($nzbPath === false) {
             return showApiError(300, 'NZB file not found!');
         }
 
@@ -266,13 +268,25 @@ class GetNzbController extends BasePageController
         $headers = $this->buildNzbHeaders($releaseId, $uid, $rssToken, $releaseData);
 
         // Stream modified NZB content
-        $cleanName = $this->sanitizeFilename($releaseData->searchname);
+        $cleanName = FilenameSanitizer::sanitize($releaseData->searchname, "release-{$releaseId}");
+        $asciiFallbackName = FilenameSanitizer::asciiFallback($cleanName, "release-{$releaseId}");
 
-        return response()->streamDownload(
+        $response = response()->stream(
             fn () => $this->streamModifiedNzbContent($nzbPath, $uid),
-            $cleanName.self::NZB_SUFFIX,
+            200,
             $headers
         );
+
+        $response->headers->set(
+            'Content-Disposition',
+            HeaderUtils::makeDisposition(
+                'attachment',
+                $cleanName.self::NZB_SUFFIX,
+                $asciiFallbackName.self::NZB_SUFFIX
+            )
+        );
+
+        return $response;
     }
 
     /**
@@ -377,13 +391,5 @@ class GetNzbController extends BasePageController
         }
 
         gzclose($fileHandle);
-    }
-
-    /**
-     * Sanitize filename for download
-     */
-    private function sanitizeFilename(string $filename): string
-    {
-        return str_replace([',', ' ', '/', '\\'], '_', $filename);
     }
 }

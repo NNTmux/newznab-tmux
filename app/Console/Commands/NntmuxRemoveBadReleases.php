@@ -10,7 +10,6 @@ use App\Models\ReleaseFile;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
 
 class NntmuxRemoveBadReleases extends Command
 {
@@ -49,8 +48,7 @@ class NntmuxRemoveBadReleases extends Command
         // Select releases with password status -2 and smaller and delete them. Also delete the files from the filesystem.
         $badReleases = Release::query()->where('passwordstatus', '<=', -2)->get();
         foreach ($badReleases as $badRelease) {
-            $nzbPath = app(NzbService::class)->getNzbPath($badRelease->guid);
-            File::delete($nzbPath);
+            app(NzbService::class)->deleteNzb($badRelease->guid);
             (new ReleaseImageService)->delete($badRelease->guid);
             // Delete from search index
             Search::deleteRelease($badRelease->id);

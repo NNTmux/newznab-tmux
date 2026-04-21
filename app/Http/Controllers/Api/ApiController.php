@@ -17,6 +17,7 @@ use App\Models\UserRequest;
 use App\Services\RegistrationStatusService;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\Releases\ReleaseSearchService;
+use App\Support\FilenameSanitizer;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\RedirectResponse;
@@ -30,6 +31,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ApiController extends BasePageController
@@ -448,9 +450,23 @@ class ApiController extends BasePageController
                     $data = ReleaseNfo::getReleaseNfo($rel->id);
                     if (! empty($data)) {
                         if ($request->has('o') && $request->input('o') === 'file') {
-                            return response()->streamDownload(function () use ($data) {
+                            $filename = FilenameSanitizer::sanitize($rel->searchname, "nfo-{$rel->id}");
+                            $asciiFallback = FilenameSanitizer::asciiFallback($filename, "nfo-{$rel->id}");
+
+                            $response = response()->stream(function () use ($data) {
                                 echo $data['nfo'];
-                            }, $rel['searchname'].'.nfo', ['Content-type:' => 'application/octet-stream']);
+                            }, 200, ['Content-Type' => 'application/octet-stream']);
+
+                            $response->headers->set(
+                                'Content-Disposition',
+                                HeaderUtils::makeDisposition(
+                                    'attachment',
+                                    $filename.'.nfo',
+                                    $asciiFallback.'.nfo'
+                                )
+                            );
+
+                            return $response;
                         }
 
                         echo nl2br(cp437toUTF($data['nfo']));
