@@ -90,6 +90,67 @@ final class TvSearchApiTest extends TestCase
         $this->assertSame(24, (int) $results[0]->episode);
     }
 
+    #[Test]
+    public function tv_search_does_not_fallback_to_name_when_external_id_lookup_has_no_matches(): void
+    {
+        $mock = Mockery::mock(SearchService::class, [$this->app]);
+        $mock->shouldReceive('searchReleasesByExternalId')->once()->andReturn([]);
+        $mock->shouldReceive('searchReleases')->never();
+        $mock->shouldReceive('searchReleasesWithFuzzy')->never();
+        $mock->shouldReceive('isAvailable')->andReturn(false);
+
+        $this->app->instance(SearchService::class, $mock);
+
+        $service = new ReleaseSearchService;
+        $results = $service->tvSearch(
+            ['tvdb' => 999999],
+            '',
+            '',
+            '',
+            0,
+            100,
+            'Some Other Show 2025',
+            [5030],
+            -1,
+            0,
+            [],
+            'posted_desc'
+        );
+
+        $this->assertCount(0, $results);
+    }
+
+    #[Test]
+    public function tv_search_name_queries_use_exact_search_without_fuzzy_fallback(): void
+    {
+        $mock = Mockery::mock(SearchService::class, [$this->app]);
+        $mock->shouldReceive('searchReleasesByExternalId')->never();
+        $mock->shouldReceive('searchReleases')->once()->with(['searchname' => 'Simpsons'], 1000)->andReturn([1]);
+        $mock->shouldReceive('searchReleasesWithFuzzy')->never();
+        $mock->shouldReceive('isAvailable')->andReturn(false);
+
+        $this->app->instance(SearchService::class, $mock);
+
+        $service = new ReleaseSearchService;
+        $results = $service->tvSearch(
+            [],
+            '',
+            '',
+            '',
+            0,
+            100,
+            'Simpsons',
+            [5030],
+            -1,
+            0,
+            [],
+            'posted_desc'
+        );
+
+        $this->assertCount(1, $results);
+        $this->assertSame('Simpsons.S06E24.Test', $results[0]->searchname);
+    }
+
     private function bindSearchIndexMockReturningBothReleases(): void
     {
         $mock = Mockery::mock(SearchService::class, [$this->app]);

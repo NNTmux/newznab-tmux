@@ -236,6 +236,9 @@ class ApiController extends BasePageController
                 $this->verifyEmptyParameter($request, 'tmdbid');
                 $this->verifyEmptyParameter($request, 'season');
                 $this->verifyEmptyParameter($request, 'ep');
+                if (! $this->hasTvSearchParameters($request)) {
+                    return showApiError(200, 'Missing parameter (q, vid, tvdbid, traktid, rid, tvmazeid, imdbid or tmdbid)');
+                }
                 $maxAge = $this->maxAge($request);
                 if (! is_int($maxAge)) {
                     return $maxAge;
@@ -288,6 +291,11 @@ class ApiController extends BasePageController
             case 'm':
                 $this->verifyEmptyParameter($request, 'q');
                 $this->verifyEmptyParameter($request, 'imdbid');
+                $this->verifyEmptyParameter($request, 'tmdbid');
+                $this->verifyEmptyParameter($request, 'traktid');
+                if (! $this->hasMovieSearchParameters($request)) {
+                    return showApiError(200, 'Missing parameter (q, imdbid, tmdbid or traktid)');
+                }
                 $maxAge = $this->maxAge($request);
                 if (! is_int($maxAge)) {
                     return $maxAge;
@@ -801,6 +809,26 @@ class ApiController extends BasePageController
         if ($request->has($parameter) && $request->isNotFilled($parameter)) {
             return showApiError(201, 'Incorrect parameter ('.$parameter.' must not be empty)');
         }
+    }
+
+    private function hasMovieSearchParameters(Request $request): bool
+    {
+        return $request->filled('q')
+            || $request->filled('imdbid')
+            || $request->filled('tmdbid')
+            || $request->filled('traktid');
+    }
+
+    private function hasTvSearchParameters(Request $request): bool
+    {
+        return $request->filled('q')
+            || $request->filled('vid')
+            || $request->filled('tvdbid')
+            || $request->filled('traktid')
+            || $request->filled('rid')
+            || $request->filled('tvmazeid')
+            || $request->filled('imdbid')
+            || $request->filled('tmdbid');
     }
 
     /**

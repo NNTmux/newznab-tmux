@@ -74,6 +74,46 @@ class ApiRequestMatrixTest extends TestCase
             ->assertJsonPath('error', 'Incorrect parameter (maxage must be numeric)');
     }
 
+    public function test_v1_movie_requires_query_or_external_id(): void
+    {
+        $token = (string) DB::table('users')->value('api_token');
+
+        $response = $this->get('/api/v1/api?t=m&apikey='.$token);
+
+        $response->assertOk();
+        $response->assertSee('<error code="200"', false);
+        $response->assertSee('Missing parameter (q, imdbid, tmdbid or traktid)', false);
+    }
+
+    public function test_v1_tv_requires_query_or_external_id(): void
+    {
+        $token = (string) DB::table('users')->value('api_token');
+
+        $response = $this->get('/api/v1/api?t=tv&apikey='.$token);
+
+        $response->assertOk();
+        $response->assertSee('<error code="200"', false);
+        $response->assertSee('Missing parameter (q, vid, tvdbid, traktid, rid, tvmazeid, imdbid or tmdbid)', false);
+    }
+
+    public function test_v2_movie_requires_query_or_external_id(): void
+    {
+        $token = (string) DB::table('users')->value('api_token');
+
+        $this->getJson('/api/v2/movies?api_token='.$token)
+            ->assertStatus(400)
+            ->assertJsonPath('error', 'Specify id (query), imdbid, tmdbid, or traktid');
+    }
+
+    public function test_v2_tv_requires_query_or_external_id(): void
+    {
+        $token = (string) DB::table('users')->value('api_token');
+
+        $this->getJson('/api/v2/tv?api_token='.$token)
+            ->assertStatus(400)
+            ->assertJsonPath('error', 'Specify id (query), vid, tvdbid, traktid, rid, tvmazeid, imdbid, or tmdbid');
+    }
+
     public function test_v1_caps_menu_data_includes_groups_and_genres(): void
     {
         $apiController = app(ApiController::class);

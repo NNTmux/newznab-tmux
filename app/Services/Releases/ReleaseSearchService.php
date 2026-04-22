@@ -608,12 +608,13 @@ class ReleaseSearchService
     public function tvSearch(array $siteIdArr = [], string $series = '', string $episode = '', string $airDate = '', int $offset = 0, int $limit = 100, string $name = '', array $cat = [-1], int $maxAge = -1, int $minSize = 0, array $excludedCategories = [], string $orderBy = 'posted_desc'): mixed
     {
         [$orderField, $orderDir] = $this->getBrowseOrder($orderBy);
+        $hasStrictTvSelector = $this->hasTvLookupIdentifiers($siteIdArr);
         $shouldCache = ! (isset($siteIdArr['id']) && (int) $siteIdArr['id'] > 0);
         $rawCacheKey = md5(serialize(func_get_args()).'tvSearch');
         $cacheKey = null;
         $searchLimit = $this->determineSearchCandidateLimit($offset, $limit);
         if ($shouldCache) {
-            $cacheKey = md5($this->getCacheVersion().$rawCacheKey);
+            $cacheKey = md5($this->getCacheVersion().'tvSearch:v2:'.$rawCacheKey);
             $cached = Cache::get($cacheKey);
             if ($cached !== null) {
                 return $cached;
@@ -669,7 +670,7 @@ class ReleaseSearchService
         }
 
         // If search index didn't return results, fall back to database lookup
-        if (empty($searchResult) && ! empty($siteIdArr)) {
+        if (empty($searchResult) && $hasStrictTvSelector) {
             $siteConditions = [];
             foreach ($siteIdArr as $column => $id) {
                 if ($id > 0) {
@@ -696,6 +697,12 @@ class ReleaseSearchService
                 $results = Release::fromQuery($lookupSql);
 
                 if ($results->isEmpty()) {
+                    $this->logStrictExternalLookupMiss('tvSearch database lookup', $siteIdArr, [
+                        'series' => $series,
+                        'episode' => $episode,
+                        'airDate' => $airDate,
+                    ]);
+
                     return collect();
                 }
 
@@ -747,7 +754,7 @@ class ReleaseSearchService
         }
 
         // Only do name-based search if we don't already have results from external IDs
-        if (! $hasSearchResultFromExternalIds && ! empty($name)) {
+        if (! $hasSearchResultFromExternalIds && ! $hasStrictTvSelector && ! empty($name)) {
             $searchName = $name;
             $hasValidSiteIds = false;
             foreach ($siteIdArr as $column => $id) {
@@ -771,9 +778,7 @@ class ReleaseSearchService
                 }
             }
 
-            // Use the unified Search facade with fuzzy fallback
-            $fuzzyResult = Search::searchReleasesWithFuzzy(['searchname' => $searchName], $searchLimit);
-            $searchResult = $fuzzyResult['ids'] ?? [];
+            $searchResult = Search::searchReleases(['searchname' => $searchName], $searchLimit);
 
             // Fall back to MySQL if search engine failed (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
@@ -883,6 +888,14 @@ class ReleaseSearchService
         $sql = sprintf('%s ORDER BY r.%s %s%s', $baseSql, $orderField, $orderDir, $limitClause);
         $releases = Release::fromQuery($sql);
 
+        if ($hasStrictTvSelector && $releases->isEmpty()) {
+            $this->logStrictExternalLookupMiss('tvSearch release lookup', $siteIdArr, [
+                'series' => $series,
+                'episode' => $episode,
+                'airDate' => $airDate,
+            ]);
+        }
+
         if ($releases->isNotEmpty()) {
             $countSql = sprintf(
                 'SELECT COUNT(*) as count FROM releases r %s %s %s',
@@ -914,6 +927,7 @@ class ReleaseSearchService
     {
         [$orderField, $orderDir] = $this->getBrowseOrder($orderBy);
         $searchLimit = $this->determineSearchCandidateLimit($offset, $limit);
+        $hasStrictTvSelector = $this->hasTvLookupIdentifiers($siteIdArr);
 
         // OPTIMIZATION: Try to find releases using search index external IDs first
         $externalIds = [];
@@ -969,12 +983,18 @@ class ReleaseSearchService
                     $strictEpisodeResolution
                 );
                 if ($fragment === null) {
+                    $this->logStrictExternalLookupMiss('apiTvSearch show lookup', $siteIdArr, [
+                        'series' => $series,
+                        'episode' => $episode,
+                        'airDate' => $airDate,
+                    ]);
+
                     return empty($indexSearchResult) ? [] : collect();
                 }
                 $showSql = $fragment;
             }
         }
-        if (! empty($name) && $showSql === '' && empty($indexSearchResult)) {
+        if (! $hasStrictTvSelector && ! empty($name) && $showSql === '' && empty($indexSearchResult)) {
             if (! empty($series) && (int) $series < 1900) {
                 $name .= sprintf(' S%s', str_pad($series, 2, '0', STR_PAD_LEFT));
                 if (! empty($episode) && ! str_contains($episode, '/')) {
@@ -988,10 +1008,8 @@ class ReleaseSearchService
             }
         }
         $searchResult = $indexSearchResult; // Use index search result if we have it
-        if (empty($searchResult) && ! empty($name)) {
-            // Use the unified Search facade with fuzzy fallback
-            $fuzzyResult = Search::searchReleasesWithFuzzy(['searchname' => $name], $searchLimit);
-            $searchResult = $fuzzyResult['ids'] ?? [];
+        if (! $hasStrictTvSelector && empty($searchResult) && ! empty($name)) {
+            $searchResult = Search::searchReleases(['searchname' => $name], $searchLimit);
 
             // Fall back to MySQL if search engine failed (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
@@ -1045,12 +1063,19 @@ class ReleaseSearchService
             $whereSql
         );
         $sql = sprintf('%s ORDER BY r.%s %s LIMIT %d OFFSET %d', $baseSql, $orderField, $orderDir, $limit, $offset);
-        $cacheKey = md5($this->getCacheVersion().$sql);
+        $cacheKey = md5($this->getCacheVersion().'apiTvSearch:v2:'.$sql);
         $releases = Cache::get($cacheKey);
         if ($releases !== null) {
             return $releases;
         }
         $releases = Release::fromQuery($sql);
+        if ($hasStrictTvSelector && $releases->isEmpty()) {
+            $this->logStrictExternalLookupMiss('apiTvSearch release lookup', $siteIdArr, [
+                'series' => $series,
+                'episode' => $episode,
+                'airDate' => $airDate,
+            ]);
+        }
         if ($releases->isNotEmpty()) {
             $releases[0]->_totalrows = $this->getPagerCount(
                 preg_replace('#LEFT(\s+OUTER)?\s+JOIN\s+(?!tv_episodes)\s+.*ON.*=.*\n#i', ' ', $baseSql)
@@ -1180,9 +1205,10 @@ class ReleaseSearchService
         if ($traktId !== -1 && $traktId > 0) {
             $externalIds['traktid'] = $traktId;
         }
+        $hasExternalIds = $externalIds !== [];
 
         // Use search index for external ID lookups (much faster than database JOINs)
-        if (! empty($externalIds)) {
+        if ($hasExternalIds) {
             $searchResult = Search::searchReleasesByExternalId($externalIds, $searchLimit);
 
             if (config('app.debug') && ! empty($searchResult)) {
@@ -1193,11 +1219,9 @@ class ReleaseSearchService
             }
         }
 
-        // If no external IDs provided or index search failed, search by name
-        if (empty($searchResult) && ! empty($name)) {
-            // Use the unified Search facade with fuzzy fallback
-            $fuzzyResult = Search::searchReleasesWithFuzzy($name, $searchLimit);
-            $searchResult = $fuzzyResult['ids'] ?? [];
+        // Only perform name searches when the request does not already target a specific external ID.
+        if (! $hasExternalIds && ! empty($name)) {
+            $searchResult = Search::searchReleases(['searchname' => $name], $searchLimit);
 
             // Fall back to MySQL if search engine returned no results (only if enabled)
             if (empty($searchResult) && config('nntmux.mysql_search_fallback', false) === true) {
@@ -1298,12 +1322,18 @@ class ReleaseSearchService
         );
 
         $sql = sprintf('%s ORDER BY r.%s %s LIMIT %d OFFSET %d', $baseSql, $orderField, $orderDir, $limit, $offset);
-        $cacheKey = md5($sql.serialize(func_get_args()));
+        $cacheKey = md5('moviesSearch:v2:'.$sql.serialize(func_get_args()));
         if (($releases = Cache::get($cacheKey)) !== null) {
             return $releases;
         }
 
         $releases = Release::fromQuery($sql);
+
+        if ($hasExternalIds && $releases->isEmpty()) {
+            $this->logStrictExternalLookupMiss('moviesSearch release lookup', $externalIds, [
+                'name' => $name,
+            ]);
+        }
 
         if ($releases->isNotEmpty()) {
             // Optimize: Execute count query using same WHERE clause
@@ -1623,6 +1653,39 @@ class ReleaseSearchService
 
             return [];
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $siteIdArr
+     */
+    private function hasTvLookupIdentifiers(array $siteIdArr): bool
+    {
+        foreach ($siteIdArr as $column => $id) {
+            if ($column === 'imdb' && imdb_id_is_valid((string) $id)) {
+                return true;
+            }
+
+            if ((int) $id > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param  array<string, mixed>  $identifiers
+     * @param  array<string, mixed>  $context
+     */
+    private function logStrictExternalLookupMiss(string $operation, array $identifiers, array $context = []): void
+    {
+        if (! config('app.debug')) {
+            return;
+        }
+
+        Log::debug($operation.' returned no releases', array_merge([
+            'identifiers' => $identifiers,
+        ], $context));
     }
 
     /**

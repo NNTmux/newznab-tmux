@@ -202,6 +202,9 @@ class ApiV2Controller extends BasePageController
         $traktId = (int) $request->input('traktid', -1);
         $minSize = max(0, (int) $request->input('minsize', 0));
         $searchName = $request->input('id', '');
+        if ($searchName === '' && ! imdb_id_is_valid($imdbId) && $tmdbId <= 0 && $traktId <= 0) {
+            return response()->json(['error' => 'Specify id (query), imdbid, tmdbid, or traktid'], 400);
+        }
         $offset = $this->api->offset($request);
         $limit = $this->api->limit($request);
         $categoryID = $this->api->categoryID($request);
@@ -496,6 +499,9 @@ class ApiV2Controller extends BasePageController
         $this->api->verifyEmptyParameter($request, 'tmdbid');
         $this->api->verifyEmptyParameter($request, 'season');
         $this->api->verifyEmptyParameter($request, 'ep');
+        if (! $this->hasTvSearchParameters($request)) {
+            return response()->json(['error' => 'Specify id (query), vid, tvdbid, traktid, rid, tvmazeid, imdbid, or tmdbid'], 400);
+        }
         $maxAge = $this->parseMaxAge($request);
         if (! is_int($maxAge)) {
             return $maxAge;
@@ -584,5 +590,17 @@ class ApiV2Controller extends BasePageController
         $relData = fractal($relData, new DetailsTransformer($user));
 
         return response()->json($relData);
+    }
+
+    private function hasTvSearchParameters(Request $request): bool
+    {
+        return $request->filled('id')
+            || $request->filled('vid')
+            || $request->filled('tvdbid')
+            || $request->filled('traktid')
+            || $request->filled('rid')
+            || $request->filled('tvmazeid')
+            || $request->filled('imdbid')
+            || $request->filled('tmdbid');
     }
 }
