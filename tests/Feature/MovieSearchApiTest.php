@@ -102,6 +102,39 @@ final class MovieSearchApiTest extends TestCase
         $this->assertSame('Resurrection.2025.1080p.WEB-DL.TEST', $results[0]->searchname);
     }
 
+    #[Test]
+    public function movies_search_mysql_fallback_excludes_unrelated_2025_and_resurrection_releases(): void
+    {
+        config(['nntmux.mysql_search_fallback' => true]);
+
+        $mock = Mockery::mock(SearchService::class, [$this->app]);
+        $mock->shouldReceive('searchReleasesByExternalId')->never();
+        $mock->shouldReceive('searchReleases')->once()->with(['searchname' => 'Resurrection 2025'], 1000)->andReturn([]);
+        $mock->shouldReceive('searchReleasesWithFuzzy')->never();
+        $mock->shouldReceive('isAvailable')->andReturn(false);
+
+        $this->app->instance(SearchService::class, $mock);
+
+        $service = new ReleaseSearchService;
+        $results = $service->moviesSearch(
+            '',
+            -1,
+            -1,
+            0,
+            100,
+            'Resurrection 2025',
+            [2030],
+            -1,
+            0,
+            [],
+            'posted_desc'
+        );
+
+        $this->assertCount(1, $results);
+        $this->assertSame(['Resurrection.2025.1080p.WEB-DL.TEST'], $results->pluck('searchname')->all());
+        $this->assertNotContains('Titanic.The.Digital.Resurrection.2025.720p.WEBRip-LAMA', $results->pluck('searchname')->all());
+    }
+
     private function registerSqliteConcatIfNeeded(): void
     {
         if (DB::getDriverName() !== 'sqlite') {
@@ -215,6 +248,20 @@ final class MovieSearchApiTest extends TestCase
                 'traktid' => 2002,
                 'title' => 'Resurrection Road',
             ],
+            [
+                'id' => 3,
+                'imdbid' => '2468135',
+                'tmdbid' => 1003,
+                'traktid' => 2003,
+                'title' => 'Drop',
+            ],
+            [
+                'id' => 4,
+                'imdbid' => '1123581',
+                'tmdbid' => 1004,
+                'traktid' => 2004,
+                'title' => 'Titanic: The Digital Resurrection',
+            ],
         ]);
 
         $now = now()->toDateTimeString();
@@ -251,6 +298,38 @@ final class MovieSearchApiTest extends TestCase
                 'comments' => 0,
                 'imdbid' => '7654321',
                 'movieinfo_id' => 2,
+            ],
+            [
+                'id' => 3,
+                'searchname' => 'Drop.2025.2160p.BluRay.TEST',
+                'guid' => 'movie-guid-3',
+                'postdate' => $now,
+                'adddate' => $now,
+                'categories_id' => 2030,
+                'groups_id' => 1,
+                'size' => 1000,
+                'totalpart' => 1,
+                'passwordstatus' => 0,
+                'grabs' => 0,
+                'comments' => 0,
+                'imdbid' => '2468135',
+                'movieinfo_id' => 3,
+            ],
+            [
+                'id' => 4,
+                'searchname' => 'Titanic.The.Digital.Resurrection.2025.720p.WEBRip-LAMA',
+                'guid' => 'movie-guid-4',
+                'postdate' => $now,
+                'adddate' => $now,
+                'categories_id' => 2030,
+                'groups_id' => 1,
+                'size' => 1000,
+                'totalpart' => 1,
+                'passwordstatus' => 0,
+                'grabs' => 0,
+                'comments' => 0,
+                'imdbid' => '1123581',
+                'movieinfo_id' => 4,
             ],
         ]);
 

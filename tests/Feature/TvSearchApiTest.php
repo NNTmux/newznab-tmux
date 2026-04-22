@@ -151,6 +151,40 @@ final class TvSearchApiTest extends TestCase
         $this->assertSame('Simpsons.S06E24.Test', $results[0]->searchname);
     }
 
+    #[Test]
+    public function tv_search_mysql_fallback_excludes_mid_title_false_positives_for_multi_word_queries(): void
+    {
+        config(['nntmux.mysql_search_fallback' => true]);
+
+        $mock = Mockery::mock(SearchService::class, [$this->app]);
+        $mock->shouldReceive('searchReleasesByExternalId')->never();
+        $mock->shouldReceive('searchReleases')->once()->with(['searchname' => 'The Simpsons'], 1000)->andReturn([]);
+        $mock->shouldReceive('searchReleasesWithFuzzy')->never();
+        $mock->shouldReceive('isAvailable')->andReturn(false);
+
+        $this->app->instance(SearchService::class, $mock);
+
+        $service = new ReleaseSearchService;
+        $results = $service->tvSearch(
+            [],
+            '',
+            '',
+            '',
+            0,
+            100,
+            'The Simpsons',
+            [5030],
+            -1,
+            0,
+            [],
+            'posted_desc'
+        );
+
+        $this->assertCount(1, $results);
+        $this->assertSame(['The.Simpsons.S06E24.Test'], $results->pluck('searchname')->all());
+        $this->assertNotContains('Titanic.The.Digital.The.Simpsons.2025.Special', $results->pluck('searchname')->all());
+    }
+
     private function bindSearchIndexMockReturningBothReleases(): void
     {
         $mock = Mockery::mock(SearchService::class, [$this->app]);
@@ -455,6 +489,38 @@ final class TvSearchApiTest extends TestCase
                 'categories_id' => 5030,
                 'groups_id' => 1,
                 'size' => 2000,
+                'totalpart' => 1,
+                'passwordstatus' => 0,
+                'grabs' => 0,
+                'comments' => 0,
+                'videos_id' => 1,
+                'tv_episodes_id' => 2,
+            ],
+            [
+                'id' => 3,
+                'searchname' => 'The.Simpsons.S06E24.Test',
+                'guid' => 'guid-the-s06e24',
+                'postdate' => $now,
+                'adddate' => $now,
+                'categories_id' => 5030,
+                'groups_id' => 1,
+                'size' => 1500,
+                'totalpart' => 1,
+                'passwordstatus' => 0,
+                'grabs' => 0,
+                'comments' => 0,
+                'videos_id' => 1,
+                'tv_episodes_id' => 1,
+            ],
+            [
+                'id' => 4,
+                'searchname' => 'Titanic.The.Digital.The.Simpsons.2025.Special',
+                'guid' => 'guid-titanic-simpsons-special',
+                'postdate' => $now,
+                'adddate' => $now,
+                'categories_id' => 5030,
+                'groups_id' => 1,
+                'size' => 2500,
                 'totalpart' => 1,
                 'passwordstatus' => 0,
                 'grabs' => 0,

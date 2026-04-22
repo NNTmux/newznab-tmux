@@ -1636,6 +1636,16 @@ class ReleaseSearchService
                             $query->where($field, 'LIKE', '%'.$term.'%');
                         }
                     }
+
+                    if ($field === 'searchname' && count($terms) > 1) {
+                        $normalizedPhrase = $this->normalizeMysqlFallbackPhrase($value);
+                        if ($normalizedPhrase !== '') {
+                            $query->whereRaw(
+                                "LOWER(REPLACE(REPLACE(REPLACE($field, '.', ' '), '-', ' '), '_', ' ')) LIKE ?",
+                                [$normalizedPhrase.'%']
+                            );
+                        }
+                    }
                 }
             }
 
@@ -1653,6 +1663,15 @@ class ReleaseSearchService
 
             return [];
         }
+    }
+
+    private function normalizeMysqlFallbackPhrase(string $value): string
+    {
+        $normalized = strtolower(trim($value));
+        $normalized = str_replace(['.', '-', '_'], ' ', $normalized);
+        $normalized = preg_replace('/\s+/', ' ', $normalized);
+
+        return trim((string) $normalized);
     }
 
     /**
