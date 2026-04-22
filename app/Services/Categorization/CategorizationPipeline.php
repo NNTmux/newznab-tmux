@@ -8,6 +8,7 @@ use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\Categorization\Pipes\AbstractCategorizationPipe;
 use App\Services\Categorization\Pipes\CategorizationPassable;
+use App\Services\NameFixing\NzbSplitUnwrapper;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -31,10 +32,12 @@ class CategorizationPipeline
 
     protected bool $catWebDL;
 
+    protected NzbSplitUnwrapper $nzbSplitUnwrapper;
+
     /**
      * @param  iterable<AbstractCategorizationPipe>  $pipes
      */
-    public function __construct(iterable $pipes = [])
+    public function __construct(iterable $pipes = [], ?NzbSplitUnwrapper $nzbSplitUnwrapper = null)
     {
         /** @phpstan-ignore argument.templateType */
         $this->pipes = collect($pipes)
@@ -42,6 +45,7 @@ class CategorizationPipeline
 
         $this->categorizeForeign = (bool) Settings::settingValue('categorizeforeign');
         $this->catWebDL = (bool) Settings::settingValue('catwebdl');
+        $this->nzbSplitUnwrapper = $nzbSplitUnwrapper ?? new NzbSplitUnwrapper;
     }
 
     /**
@@ -70,6 +74,8 @@ class CategorizationPipeline
         ?string $poster = '',
         bool $debug = false
     ): array {
+        $releaseName = $this->nzbSplitUnwrapper->unwrap($releaseName) ?? $releaseName;
+
         $groupName = UsenetGroup::whereId($groupId)->value('name') ?? '';
 
         $context = new ReleaseContext(

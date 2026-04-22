@@ -16,6 +16,13 @@ class FileNameCleaner
 {
     use DetectsHashedNames;
 
+    protected NzbSplitUnwrapper $nzbSplitUnwrapper;
+
+    public function __construct(?NzbSplitUnwrapper $nzbSplitUnwrapper = null)
+    {
+        $this->nzbSplitUnwrapper = $nzbSplitUnwrapper ?? new NzbSplitUnwrapper;
+    }
+
     /**
      * Generic DVD structure filenames and similarly low-information names.
      *
@@ -92,6 +99,8 @@ class FileNameCleaner
         // Extract filename from path
         $fileName = $this->extractFilenameFromPath($fileName);
 
+        $fileName = $this->extractNzbSplitName($fileName) ?? $fileName;
+
         if ($this->isIgnorableForMatching($fileName)) {
             return false;
         }
@@ -152,6 +161,8 @@ class FileNameCleaner
     public function normalizeCandidateTitle(string $title): string
     {
         $t = trim($title);
+
+        $t = $this->extractNzbSplitName($t) ?? $t;
 
         // Remove common video file extensions
         $t = preg_replace('/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx)$/i', '', $t) ?? $t;
@@ -231,6 +242,8 @@ class FileNameCleaner
      */
     public function cleanForTitleMatch(string $filename): string
     {
+        $filename = $this->extractNzbSplitName($filename) ?? $filename;
+
         // Remove file extension
         $clean = preg_replace('/\.(mkv|avi|mp4|m4v|wmv|mpg|mpeg|mov|ts|m2ts|vob|divx|flv|nfo|sfv|nzb|srr|srs|rar|r\d{2,4}|zip|7z|par2?|vol\d+[\+\-]\d+|\d{3})$/i', '', $filename);
 
@@ -271,6 +284,8 @@ class FileNameCleaner
      */
     public function looksLikeSceneRelease(string $filename): bool
     {
+        $filename = $this->extractNzbSplitName($filename) ?? $filename;
+
         $baseName = preg_replace('/\.[a-z0-9]{2,4}$/i', '', $filename);
 
         // Check for group suffix
@@ -311,6 +326,11 @@ class FileNameCleaner
         }
 
         return false;
+    }
+
+    public function extractNzbSplitName(string $value): ?string
+    {
+        return $this->nzbSplitUnwrapper->unwrap($value);
     }
 
     /**

@@ -13,6 +13,10 @@ use App\Services\Categorization\ReleaseContext;
  */
 class TvCategorizer extends AbstractCategorizer
 {
+    private const string SPORTS_MARKER_REGEX = '/\b(NFL|NBA|NHL|MLB|MLS|EPL|UFC|WWE|Boxing|F1|Formula[._ -]?1|NASCAR|PGA|Tennis|Golf|Soccer|Football|Cricket|Rugby|Olympics?|Olympic[._ -]?Games?|Paralympics?)\b/i';
+
+    private const string SPORTS_EVENT_CONTEXT_REGEX = '/\d{4}|\b(Season|Week|Round|Match|Game|vs|Playoffs?|Finals?|Qualifying|Opening|Closing|Ceremony|Championship)\b/i';
+
     protected int $priority = 20;
 
     public function getName(): string
@@ -97,6 +101,10 @@ class TvCategorizer extends AbstractCategorizer
         if (preg_match('/[._ -](19|20)\d{2}[._ -]\d{2}[._ -]\d{2}[._ -]/i', $name)) {
             return true;
         }
+        // Sports events are TV-like even without SxxExx markers.
+        if ($this->isSportEvent($name)) {
+            return true;
+        }
         // Known anime release groups (should be treated as TV)
         if (preg_match('/(?:^|[.\-_ \[])(URANiME|ANiHLS|HaiKU|ANiURL|SkyAnime|Erai-raws|LostYears|Vodes|SubsPlease|Judas|Ember|EMBER|YuiSubs|ASW|Tsundere-Raws|Anime-Raws|Kekkan)(?:[.\-_ \]]|$)/i', $name)) {
             return true;
@@ -148,8 +156,7 @@ class TvCategorizer extends AbstractCategorizer
 
     protected function checkSport(string $name): ?CategorizationResult
     {
-        if (preg_match('/\b(NFL|NBA|NHL|MLB|MLS|UFC|WWE|Boxing|F1|Formula[._ -]?1|NASCAR|PGA|Tennis|Golf|Soccer|Football|Cricket|Rugby)\b/i', $name) &&
-            preg_match('/\d{4}|\b(Season|Week|Round|Match|Game)\b/i', $name)) {
+        if ($this->isSportEvent($name)) {
             return $this->matched(Category::TV_SPORT, 0.85, 'sport');
         }
 
@@ -249,5 +256,11 @@ class TvCategorizer extends AbstractCategorizer
         }
 
         return null;
+    }
+
+    protected function isSportEvent(string $name): bool
+    {
+        return preg_match(self::SPORTS_MARKER_REGEX, $name) === 1
+            && preg_match(self::SPORTS_EVENT_CONTEXT_REGEX, $name) === 1;
     }
 }

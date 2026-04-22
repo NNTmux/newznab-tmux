@@ -37,6 +37,16 @@ class FileNameExtractor
 
         // Try each pattern in order of specificity
 
+        if (str_contains($filename, '__NZBSPLIT__')) {
+            $unwrapped = $this->cleaner->extractNzbSplitName($filename);
+
+            if ($unwrapped !== null && $this->cleaner->isPlausibleReleaseTitle($unwrapped)) {
+                return NameFixResult::fromMatch($unwrapped, 'NZBSPLIT wrapper', 'File');
+            }
+
+            return null;
+        }
+
         // Scene TV release with group suffix
         if (preg_match('/^(.+?(x264|x265|HEVC|XviD|H\.?264|H\.?265)\-[A-Za-z0-9]+)\\\\/i', $filename, $result)) {
             return NameFixResult::fromMatch($result[1], 'Scene release with group', 'File');

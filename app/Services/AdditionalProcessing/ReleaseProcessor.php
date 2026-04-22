@@ -59,6 +59,7 @@ class ReleaseProcessor
             }
 
             $this->initializeContext($context);
+            $this->releaseManager->processReleaseNameFromNzbContents($context->nzbContents, $context);
             $messageIds = $this->nzbParser->extractMessageIDs($context->nzbContents, $context->releaseGroupName, $this->config);
 
             $context->nzbHasCompressedFile = $messageIds['hasCompressedFile'];

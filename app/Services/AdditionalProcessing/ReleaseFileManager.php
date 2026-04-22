@@ -12,6 +12,7 @@ use App\Models\Release;
 use App\Models\ReleaseFile;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
+use App\Services\NameFixing\FileNameCleaner;
 use App\Services\NameFixing\NameFixingService;
 use App\Services\NameFixing\ReleaseUpdateService;
 use App\Services\NfoService;
@@ -31,13 +32,22 @@ use Illuminate\Support\Facades\Log;
  */
 class ReleaseFileManager
 {
+    private readonly ReleaseUpdateService $releaseUpdateService;
+
+    private readonly FileNameCleaner $fileNameCleaner;
+
     public function __construct(
         private readonly ProcessingConfiguration $config,
         private readonly ReleaseImageService $releaseImage,
         private readonly NfoService $nfo,
         private readonly NzbService $nzb,
-        private readonly NameFixingService $nameFixingService
-    ) {}
+        private readonly NameFixingService $nameFixingService,
+        ?ReleaseUpdateService $releaseUpdateService = null,
+        ?FileNameCleaner $fileNameCleaner = null
+    ) {
+        $this->releaseUpdateService = $releaseUpdateService ?? new ReleaseUpdateService;
+        $this->fileNameCleaner = $fileNameCleaner ?? new FileNameCleaner;
+    }
 
     /**
      * Add file information to the database.
@@ -150,6 +160,50 @@ class ReleaseFileManager
     public function updateSearchIndex(int $releaseId): void
     {
         Search::updateRelease($releaseId);
+    }
+
+    /**
+     * Rename NZBSPLIT-wrapped releases directly from parsed NZB titles.
+     *
+     * @param  list<array<string, mixed>>  $nzbContents
+     */
+    public function processReleaseNameFromNzbContents(array $nzbContents, ReleaseProcessingContext $context): bool
+    {
+        foreach ($nzbContents as $nzbFile) {
+            $title = (string) ($nzbFile['title'] ?? '');
+
+            if ($title === '' || ! str_contains($title, '__NZBSPLIT__')) {
+                continue;
+            }
+
+            $candidate = $this->fileNameCleaner->extractNzbSplitName($title);
+
+            if ($candidate === null) {
+                continue;
+            }
+
+            $candidate = $this->fileNameCleaner->normalizeCandidateTitle($candidate);
+
+            if (! $this->fileNameCleaner->isPlausibleReleaseTitle($candidate)) {
+                continue;
+            }
+
+            $this->releaseUpdateService->updateRelease(
+                $context->release,
+                $candidate,
+                'NZBSPLIT wrapper',
+                true,
+                'Filenames, ',
+                true,
+                true
+            );
+
+            $context->release->searchname = $candidate;
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -519,7 +573,7 @@ class ReleaseFileManager
             $candidate = $this->normalizeCandidateTitle($candidate);
 
             if ($this->isPlausibleReleaseTitle($candidate)) {
-                (new ReleaseUpdateService)->updateRelease(
+                $this->releaseUpdateService->updateRelease(
                     $context->release,
                     $candidate,
                     'RarInfo FileName Match',
@@ -545,7 +599,7 @@ class ReleaseFileManager
                 $candidate = $this->normalizeCandidateTitle($candidate);
 
                 if ($this->isPlausibleReleaseTitle($candidate)) {
-                    (new ReleaseUpdateService)->updateRelease(
+                    $this->releaseUpdateService->updateRelease(
                         $context->release,
                         $candidate,
                         'RarInfo FileName Match',
@@ -566,6 +620,12 @@ class ReleaseFileManager
     private function extractReleaseNameFromFile(string $filename): ?string
     {
         $basename = basename($filename);
+
+        $unwrapped = $this->fileNameCleaner->extractNzbSplitName($basename);
+        if ($unwrapped !== null) {
+            return $unwrapped;
+        }
+
         $cleaned = preg_replace(
             '/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx|par2?|nfo|sfv|nzb|rar|zip|r\d{2,3}|pkg|exe|msi)$/i',
             '',
@@ -588,13 +648,7 @@ class ReleaseFileManager
      */
     private function normalizeCandidateTitle(string $title): string
     {
-        $t = trim($title);
-        $t = preg_replace('/\.(mkv|avi|mp4|m4v|mpg|mpeg|wmv|flv|mov|ts|vob|iso|divx)$/i', '', $t) ?? $t;
-        $t = preg_replace('/\.(par2?|nfo|sfv|nzb|rar|zip|r\d{2,3}|pkg|exe|msi|jpe?g|png|gif|bmp)$/i', '', $t) ?? $t;
-        $t = preg_replace('/[.\-_ ](?:part|vol|r)\d+(?:\+\d+)?$/i', '', $t) ?? $t;
-        $t = preg_replace('/[\s_]+/', ' ', $t) ?? $t;
-
-        return trim($t, " .-_\t\r\n");
+        return $this->fileNameCleaner->normalizeCandidateTitle($title);
     }
 
     /**
@@ -602,30 +656,6 @@ class ReleaseFileManager
      */
     private function isPlausibleReleaseTitle(string $title): bool
     {
-        $t = trim($title);
-        if ($t === '' || strlen($t) < 12) {
-            return false;
-        }
-
-        $wordCount = preg_match_all('/[A-Za-z0-9]{3,}/', $t);
-        if ($wordCount < 2) {
-            return false;
-        }
-
-        if (preg_match('/(?:^|[.\-_ ])(?:part|vol|r)\d+(?:\+\d+)?$/i', $t)) {
-            return false;
-        }
-
-        if (preg_match('/^(setup|install|installer|patch|update|crack|keygen)\d*[\s._-]/i', $t)) {
-            return false;
-        }
-
-        $hasGroupSuffix = (bool) preg_match('/[-.][A-Za-z0-9]{2,}$/', $t);
-        $hasYear = (bool) preg_match('/\b(19|20)\d{2}\b/', $t);
-        $hasQuality = (bool) preg_match('/\b(480p|720p|1080p|2160p|4k|webrip|web[ .-]?dl|bluray|bdrip|dvdrip|hdtv|hdrip|xvid|x264|x265|hevc|h\.?264|ts|cam|r5|proper|repack)\b/i', $t);
-        $hasTV = (bool) preg_match('/\bS\d{1,2}[Eex]\d{1,3}\b/i', $t);
-        $hasXXX = (bool) preg_match('/\bXXX\b/i', $t);
-
-        return $hasGroupSuffix || ($hasTV && $hasQuality) || ($hasYear && ($hasQuality || $hasTV)) || $hasXXX;
+        return $this->fileNameCleaner->isPlausibleReleaseTitle($title);
     }
 }

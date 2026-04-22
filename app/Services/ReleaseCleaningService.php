@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Predb;
+use App\Services\NameFixing\NzbSplitUnwrapper;
 
 /**
  * Cleans names for releases/imports/namefixer.
@@ -48,6 +49,8 @@ class ReleaseCleaningService
 
     protected RegexService $_regexes;
 
+    protected NzbSplitUnwrapper $nzbSplitUnwrapper;
+
     /**
      * ReleaseCleaningService constructor.
      *
@@ -60,6 +63,7 @@ class ReleaseCleaningService
         $this->e1 = CollectionsCleaningService::REGEX_FILE_EXTENSIONS.CollectionsCleaningService::REGEX_END;
         $this->e2 = CollectionsCleaningService::REGEX_FILE_EXTENSIONS.CollectionsCleaningService::REGEX_SUBJECT_SIZE.CollectionsCleaningService::REGEX_END;
         $this->_regexes = new RegexService('release_naming_regexes');
+        $this->nzbSplitUnwrapper = new NzbSplitUnwrapper;
     }
 
     /**
@@ -72,6 +76,19 @@ class ReleaseCleaningService
         $this->subject = $subject;
         $this->fromName = $fromName;
         $this->groupName = $groupName;
+
+        $unwrappedSubject = $this->nzbSplitUnwrapper->unwrap($subject);
+        if ($unwrappedSubject !== null) {
+            $this->subject = $unwrappedSubject;
+
+            return [
+                'cleansubject' => $unwrappedSubject,
+                'properlynamed' => true,
+                'increment' => false,
+                'predb' => 0,
+                'requestid' => false,
+            ];
+        }
 
         $hit = $hits = [];
         // Get pre style name from releases.name
@@ -429,7 +446,7 @@ class ReleaseCleaningService
      */
     public function fixerCleaner(string $name)
     {
-        $cleanerName = $name;
+        $cleanerName = $this->nzbSplitUnwrapper->unwrap($name) ?? $name;
 
         // Remove sample/proof/thumbs markers from the end
         $cleanerName = preg_replace('/[.\-_](sample|proof|thumbs?)$/i', '', $cleanerName);

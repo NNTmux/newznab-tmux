@@ -131,6 +131,54 @@ class ReleaseNameFixedRecategorizationTest extends TestCase
         $this->assertSame(1, (int) $release->isrenamed);
     }
 
+    public function test_renaming_olympic_webdl_release_recategorizes_it_from_movie_webdl_to_tv_sport(): void
+    {
+        Search::shouldReceive('updateRelease')->twice();
+
+        $group = UsenetGroup::query()->create([
+            'name' => 'alt.binaries.hdtv',
+            'active' => 1,
+            'backfill' => 0,
+        ]);
+
+        $oldName = 'WinterOlympics2026__NZBSPLIT__0456f274737cea074abd86a89144cc7b__NZBSPLIT__Winter_Olympic_Games_Milano_Cortina_2026_Closing_Ceremony_1080p25_WEB-DL_(MultiAudio).7z.065';
+        $newName = 'Winter.Olympic.Games.Milano.Cortina.2026.Closing.Ceremony.1080p25.WEB-DL.(MultiAudio)';
+
+        $release = Release::factory()->create([
+            'name' => $oldName,
+            'searchname' => $oldName,
+            'fromname' => 'poster@example.com',
+            'groups_id' => $group->id,
+            'categories_id' => Category::MOVIE_WEBDL,
+            'iscategorized' => 1,
+            'isrenamed' => 0,
+            'guid' => str_repeat('b', 40),
+            'leftguid' => 'b',
+            'nzb_guid' => 'test-olympics',
+            'size' => 1,
+            'postdate' => now(),
+            'adddate' => now(),
+        ]);
+
+        $service = app(ReleaseUpdateService::class);
+        $service->updateRelease(
+            $release->fresh(),
+            $newName,
+            'NZBSPLIT wrapper',
+            true,
+            'Filenames, ',
+            true,
+            false,
+        );
+
+        $release->refresh();
+
+        $this->assertSame($newName, $release->searchname);
+        $this->assertSame(Category::TV_SPORT, $release->categories_id);
+        $this->assertSame(1, (int) $release->iscategorized);
+        $this->assertSame(1, (int) $release->isrenamed);
+    }
+
     private function setEnvironmentValue(string $key, ?string $value): void
     {
         if ($value === null) {
