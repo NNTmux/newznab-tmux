@@ -123,6 +123,26 @@ class ManticoreSearchQueryTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    #[Test]
+    public function it_scopes_multi_word_queries_to_the_requested_field(): void
+    {
+        $reflection = new ReflectionClass(ManticoreSearchDriver::class);
+        $method = $reflection->getMethod('scopePreparedQueryToField');
+
+        $this->assertSame(
+            '@searchname (Resurrection 2025)',
+            $method->invoke(null, 'Resurrection 2025', '@searchname')
+        );
+        $this->assertSame(
+            '@(searchname,plainsearchname) (Resurrection 2025)',
+            $method->invoke(null, 'Resurrection 2025', '@(searchname,plainsearchname)')
+        );
+        $this->assertSame(
+            '(Resurrection 2025)',
+            $method->invoke(null, 'Resurrection 2025')
+        );
+    }
+
     public static function edgeCaseQueriesProvider(): array
     {
         return [

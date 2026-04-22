@@ -531,6 +531,22 @@ class ManticoreSearchDriver implements SearchDriverInterface
         return trim($result);
     }
 
+    private static function scopePreparedQueryToField(string $preparedQuery, string $fieldSelector = ''): string
+    {
+        $preparedQuery = trim($preparedQuery);
+        if ($preparedQuery === '') {
+            return '';
+        }
+
+        $scopedQuery = '('.$preparedQuery.')';
+
+        if ($fieldSelector === '') {
+            return $scopedQuery;
+        }
+
+        return $fieldSelector.' '.$scopedQuery;
+    }
+
     /**
      * Check if a search query contains negation operators (! or - prefix on words).
      *
@@ -1223,7 +1239,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 if (! empty($value)) {
                     $preparedValue = self::prepareUserSearchQuery($value);
                     if (! empty($preparedValue)) {
-                        $terms[] = '@@relaxed @'.$key.' '.$preparedValue;
+                        $terms[] = '@@relaxed '.self::scopePreparedQueryToField($preparedValue, '@'.$key);
                     }
                 }
             }
@@ -1255,7 +1271,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 }
             }
 
-            $searchExpr = '@@relaxed '.$searchColumns.' '.$preparedSearch;
+            $searchExpr = '@@relaxed '.self::scopePreparedQueryToField($preparedSearch, $searchColumns);
         } else {
             return [];
         }
