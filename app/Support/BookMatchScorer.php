@@ -36,10 +36,12 @@ class BookMatchScorer
                 + (0.07 * $coverScore);
         }
 
-        return (0.65 * $titleScore)
-            + (0.15 * $yearScore)
-            + (0.10 * $publisherScore)
-            + (0.10 * $coverScore);
+        // When the release has no reliable author, avoid over-trusting
+        // "has cover/publisher" signals for weak title matches.
+        return (0.80 * $titleScore)
+            + (0.10 * $yearScore)
+            + (0.05 * $publisherScore)
+            + (0.05 * $coverScore);
     }
 
     public function scoreBookInfo(BookInfo $book, BookParseResult $parsed): float

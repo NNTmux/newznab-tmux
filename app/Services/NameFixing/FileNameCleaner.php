@@ -185,6 +185,44 @@ class FileNameCleaner
     }
 
     /**
+     * Format a candidate for storage in searchname.
+     */
+    public function formatSearchName(string $title, ?string $normalizedFallback = null): string
+    {
+        $formatted = trim($title);
+
+        $formatted = $this->extractNzbSplitName($formatted) ?? $formatted;
+
+        // Remove common media/archive extensions while keeping scene separators.
+        $formatted = preg_replace(self::VIDEO_EXTENSIONS, '', $formatted) ?? $formatted;
+        $formatted = preg_replace(self::AUDIO_EXTENSIONS, '', $formatted) ?? $formatted;
+        $formatted = preg_replace(self::IMAGE_EXTENSIONS, '', $formatted) ?? $formatted;
+        $formatted = preg_replace(self::EBOOK_EXTENSIONS, '', $formatted) ?? $formatted;
+        $formatted = preg_replace(self::GAMEAPP_EXTENSIONS, '', $formatted) ?? $formatted;
+        $formatted = preg_replace(self::SUBTITLE_EXTENSIONS, '', $formatted) ?? $formatted;
+
+        foreach (self::ARCHIVE_PATTERNS as $pattern) {
+            $formatted = preg_replace($pattern, '', $formatted) ?? $formatted;
+        }
+
+        $formatted = preg_replace('/[.\-_ ](?:part|vol|r)\d+(?:\+\d+)?$/i', '', $formatted) ?? $formatted;
+        $formatted = trim($formatted, " .-_\t\r\n");
+
+        if ($formatted === '') {
+            return $normalizedFallback ?? $this->normalizeCandidateTitle($title);
+        }
+
+        if (! $this->looksLikeSceneRelease($formatted)) {
+            return $normalizedFallback ?? $this->normalizeCandidateTitle($title);
+        }
+
+        $formatted = preg_replace('/[ _]+/', '.', $formatted) ?? $formatted;
+        $formatted = preg_replace('/\.{2,}/', '.', $formatted) ?? $formatted;
+
+        return trim($formatted, " .-_\t\r\n");
+    }
+
+    /**
      * Check if a title is plausible for a release.
      *
      * @param  string  $title  The title to check

@@ -38,4 +38,14 @@ class FileNameCleanerTest extends TestCase
 
         $this->assertSame('WOB Klassik 4.25', $cleaner->normalizeCandidateTitle('WOB Klassik 4.25.Pdf'));
     }
+
+    public function test_format_search_name_keeps_scene_titles_dotted(): void
+    {
+        $cleaner = new FileNameCleaner;
+
+        $this->assertSame(
+            'Southern.Charm.S11E12.Even.Further.South.720p.AMZN.WEB-DL.DDP2.0.H.264-NTb',
+            $cleaner->formatSearchName('Southern Charm S11E12 Even Further South 720p AMZN WEB-DL DDP2 0 H 264-NTb.mkv')
+        );
+    }
 }

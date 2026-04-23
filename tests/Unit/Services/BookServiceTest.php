@@ -126,4 +126,33 @@ class BookServiceTest extends TestCase
         $this->assertSame('History of War - Issue 158,', $parsed->title);
         $this->assertTrue($parsed->isMagazine);
     }
+
+    public function test_parse_release_name_marks_mcn_hybrid_magazine_as_magazine(): void
+    {
+        $service = $this->makeService();
+
+        $parsed = $service->parseReleaseName('MCN.April.22.2026.HYBRID.MAGAZINE.eBook-21A1', 'ebook');
+
+        $this->assertTrue($parsed->isMagazine);
+        $this->assertSame('MCN - April 22, 2026', $parsed->title);
+    }
+
+    public function test_parse_release_name_marks_normalized_mcn_date_as_magazine(): void
+    {
+        $service = $this->makeService();
+
+        $parsed = $service->parseReleaseName('MCN April 22, 2026', 'ebook');
+
+        $this->assertTrue($parsed->isMagazine);
+    }
+
+    public function test_parse_release_name_keeps_mcn_prefix_in_title_for_magazine(): void
+    {
+        $service = $this->makeService();
+
+        $parsed = $service->parseReleaseName('MCN - April 22, 2026', 'ebook');
+
+        $this->assertTrue($parsed->isMagazine);
+        $this->assertStringStartsWith('MCN', $parsed->title);
+    }
 }

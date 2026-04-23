@@ -169,10 +169,14 @@ class ReleaseFileManager
      */
     public function processReleaseNameFromNzbContents(array $nzbContents, ReleaseProcessingContext $context): bool
     {
+        if (! $this->releaseHasNzbSplitWrapper($context->release)) {
+            return false;
+        }
+
         foreach ($nzbContents as $nzbFile) {
             $title = (string) ($nzbFile['title'] ?? '');
 
-            if ($title === '' || ! str_contains($title, '__NZBSPLIT__')) {
+            if ($title === '') {
                 continue;
             }
 
@@ -184,7 +188,8 @@ class ReleaseFileManager
 
             $candidate = $this->fileNameCleaner->normalizeCandidateTitle($candidate);
 
-            if (! $this->fileNameCleaner->isPlausibleReleaseTitle($candidate)) {
+            $isPlausible = $this->fileNameCleaner->isPlausibleReleaseTitle($candidate);
+            if (! $isPlausible) {
                 continue;
             }
 
@@ -649,6 +654,15 @@ class ReleaseFileManager
     private function normalizeCandidateTitle(string $title): string
     {
         return $this->fileNameCleaner->normalizeCandidateTitle($title);
+    }
+
+    private function releaseHasNzbSplitWrapper(Release $release): bool
+    {
+        $name = (string) ($release->name ?? '');
+        $searchName = (string) ($release->searchname ?? '');
+
+        return str_contains(strtoupper($name), 'NZBSPLIT')
+            || str_contains(strtoupper($searchName), 'NZBSPLIT');
     }
 
     /**

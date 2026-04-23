@@ -191,13 +191,13 @@ class BookService
         }
 
         // Step 2: Get paginated book entity list with only needed columns
-        $bookSql = 'SELECT boo.id, boo.title, boo.author, boo.cover, boo.publisher, boo.publishdate, boo.review, boo.url, '
+        $bookSql = 'SELECT boo.id, boo.title, boo.author, boo.cover, boo.publisher, boo.publishdate, boo.overview, boo.url, '
             .'MAX(r.postdate) AS latest_postdate, '
             .'COUNT(r.id) AS total_releases '
             .'FROM bookinfo boo '
             .'INNER JOIN releases r ON boo.id = r.bookinfo_id '
             .'WHERE '.$baseWhere.' '
-            .'GROUP BY boo.id, boo.title, boo.author, boo.cover, boo.publisher, boo.publishdate, boo.review, boo.url '
+            .'GROUP BY boo.id, boo.title, boo.author, boo.cover, boo.publisher, boo.publishdate, boo.overview, boo.url '
             ."ORDER BY {$order[0]} {$order[1]} "
             ."LIMIT {$num} OFFSET {$start}";
 
@@ -366,6 +366,8 @@ class BookService
      */
     public function processBookReleases(string $groupID = '', string $guidChar = ''): void
     {
+        $this->normalizeBookSearchNames($groupID, $guidChar);
+
         $query = Release::query()
             ->whereNull('bookinfo_id')
             ->where(static function ($builder): void {
@@ -392,6 +394,50 @@ class BookService
                 Category::MUSIC_AUDIOBOOK
             )
         );
+    }
+
+    protected function normalizeBookSearchNames(string $groupID = '', string $guidChar = ''): void
+    {
+        $query = Release::query()
+            ->select(['id', 'name', 'searchname', 'categories_id', 'isrenamed'])
+            ->where(static function ($builder): void {
+                $builder->whereBetween('categories_id', [Category::BOOKS_ROOT, Category::BOOKS_UNKNOWN])
+                    ->orWhere('categories_id', Category::MUSIC_AUDIOBOOK);
+            })
+            ->where(function ($builder): void {
+                $builder->where('isrenamed', 0)
+                    ->orWhere('searchname', 'like', 'N:/NZB%')
+                    ->orWhere('searchname', 'like', 'N_NZB_%')
+                    ->orWhere('name', 'like', 'N:/NZB%')
+                    ->orWhere('name', 'like', 'N_NZB_%');
+            })
+            ->orderByDesc('postdate')
+            ->limit($this->bookqty);
+
+        if ($guidChar !== '') {
+            $query->where('leftguid', 'like', $guidChar.'%');
+        }
+
+        if ($groupID !== '') {
+            $query->where('groups_id', $groupID);
+        }
+
+        foreach ($query->get() as $release) {
+            $releaseType = (int) $release->categories_id === Category::MUSIC_AUDIOBOOK ? 'audiobook' : 'ebook';
+            $sourceName = $this->preferredBookSourceName((string) $release->searchname, (string) $release->name);
+            $parsed = $this->parseReleaseName($sourceName, $releaseType);
+            $normalizedSearchName = $this->determineReadableBookSearchName($sourceName, $parsed);
+
+            if ($normalizedSearchName === null || $normalizedSearchName === $release->searchname) {
+                continue;
+            }
+
+            Release::query()->where('id', (int) $release->id)->update([
+                'searchname' => $normalizedSearchName,
+                'isrenamed' => 1,
+            ]);
+            Search::updateRelease((int) $release->id);
+        }
     }
 
     /**
@@ -472,8 +518,16 @@ class BookService
      */
     public function parseTitle(mixed $release_name, mixed $releaseID, mixed $releasetype)
     {
-        $normalizedReleaseName = $this->obfuscatedSubjectExtractor->extract((string) $release_name) ?? (string) $release_name;
-        $parsed = $this->parseReleaseName($normalizedReleaseName, (string) $releasetype);
+        $rawReleaseName = (string) $release_name;
+        $parsed = $this->parseReleaseName($rawReleaseName, (string) $releasetype);
+        $normalizedReleaseName = $this->determineReadableBookSearchName($rawReleaseName, $parsed) ?? $rawReleaseName;
+        if ($normalizedReleaseName !== $rawReleaseName) {
+            Release::query()->where('id', (int) $releaseID)->update([
+                'searchname' => $normalizedReleaseName,
+                'isrenamed' => 1,
+            ]);
+            Search::updateRelease((int) $releaseID);
+        }
         $this->parsedBookResult = $parsed;
         $this->parsedIsbn = $parsed->isbn;
         $releasename = $parsed->title;
@@ -528,6 +582,7 @@ class BookService
 
     public function parseReleaseName(string $releaseName, string $releaseType = 'ebook'): BookParseResult
     {
+        $rawReleaseName = $releaseName;
         $releaseName = $this->obfuscatedSubjectExtractor->extract($releaseName) ?? $releaseName;
         if (preg_match('/"([^"]{3,240})"/', $releaseName, $quotedMatch) === 1) {
             $releaseName = $quotedMatch[1];
@@ -544,6 +599,13 @@ class BookService
         $normalized = trim((string) preg_replace('/\s+/', ' ', $normalized));
 
         $year = null;
+        $specialMagazineTitle = null;
+        if (preg_match('/^MCN[._ -](?<month>[A-Za-z]+)[._ -](?<day>\d{1,2})[._ -](?<year>(?:19|20)\d{2})/i', $rawReleaseName, $mcnMatch) === 1) {
+            $month = ucfirst(strtolower($mcnMatch['month']));
+            $day = ltrim($mcnMatch['day'], '0');
+            $specialMagazineTitle = sprintf('MCN - %s %s, %s', $month, $day === '' ? $mcnMatch['day'] : $day, $mcnMatch['year']);
+            $year = (int) $mcnMatch['year'];
+        }
         if (preg_match('/\b(19|20)\d{2}\b/', $normalized, $yearMatch) === 1) {
             $year = (int) $yearMatch[0];
         }
@@ -554,11 +616,13 @@ class BookService
         }
 
         $author = null;
-        $title = $normalized;
-        if (preg_match('/^(?<author>[A-Za-z0-9&\'\.\-\s]{3,80})\s-\s(?<title>.+)$/', $normalized, $matches) === 1) {
+        $title = $specialMagazineTitle ?? $normalized;
+        if ($specialMagazineTitle === null && preg_match('/^(?<author>[A-Za-z0-9&\'\.\-\s]{3,80})\s-\s(?<title>.+)$/', $normalized, $matches) === 1) {
             $candidateAuthor = trim($matches['author']);
             $candidateTitle = trim($matches['title']);
-            if (preg_match('/^(Issue\s+\d+|\d+\w*\s+Edition\b)/i', $candidateTitle) !== 1) {
+            $isMcnMagazineSplit = preg_match('/^MCN$/i', $candidateAuthor) === 1
+                && preg_match('/^\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\w*\b/i', $candidateTitle) === 1;
+            if ($isMcnMagazineSplit === false && preg_match('/^(Issue\s+\d+|\d+\w*\s+Edition\b)/i', $candidateTitle) !== 1) {
                 $author = $candidateAuthor;
                 $title = $candidateTitle;
             }
@@ -606,6 +670,11 @@ class BookService
             preg_match('/^([a-z0-9ü!]+ ){1,2}(N|Vol)?\d{1,4}([abc])?$|^([a-z0-9]+ ){1,2}(Jan( |unar|$)|Feb( |ruary|$)|Mar( |ch|$)|Apr( |il|$)|May(?![a-z0-9])|Jun([ e$])|Jul([ y$])|Aug( |ust|$)|Sep( |tember|$)|O([ck])t( |ober|$)|Nov( |ember|$)|De([cz])( |ember|$))/ui', $normalized) === 1
             || preg_match('/\bIssue[\._\- ]?\d{1,4}\b.*\b(19|20)\d{2}\b/i', $normalized) === 1
             || preg_match('/\bIssue[\._\- ]?\d{1,4}\b/i', $normalized) === 1
+            || (preg_match('/\bMCN[._ -]/i', $rawReleaseName) === 1
+                && preg_match('/\bMAGAZINE\b/i', $rawReleaseName) === 1)
+            || (preg_match('/^MCN\b/i', $normalized) === 1
+                && preg_match('/\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\w*\b/i', $normalized) === 1
+                && preg_match('/\b\d{1,2}\b/', $normalized) === 1)
         ) && preg_match('/Part \d+/i', $normalized) !== 1;
 
         return new BookParseResult(
@@ -637,6 +706,39 @@ class BookService
         }
 
         return null;
+    }
+
+    protected function determineReadableBookSearchName(string $rawReleaseName, BookParseResult $parsed): ?string
+    {
+        if ($this->looksLikeObfuscatedBookSubject($rawReleaseName)) {
+            $normalized = $this->obfuscatedSubjectExtractor->extract($rawReleaseName);
+            if ($normalized !== null) {
+                return $normalized;
+            }
+        }
+
+        if ($parsed->isJunk) {
+            return null;
+        }
+
+        $candidate = trim($parsed->searchQuery());
+        if ($candidate === '' || preg_match('/^[a-z0-9]+$|^([0-9]+ ){1,}$|Part \d+/i', $candidate)) {
+            return null;
+        }
+
+        $wordCount = count(preg_split('/\s+/', $candidate) ?: []);
+
+        return $wordCount >= 2 ? $candidate : null;
+    }
+
+    protected function preferredBookSourceName(string $searchName, string $originalName): string
+    {
+        return trim($searchName) !== '' ? $searchName : $originalName;
+    }
+
+    protected function looksLikeObfuscatedBookSubject(string $value): bool
+    {
+        return preg_match('/^\s*(?:N:\/NZB\b|N[\s._:-]*NZB[\s._-]*\[|(?:re\s*)?posted\s+by\b)/i', $value) === 1;
     }
 
     /**
@@ -883,7 +985,7 @@ class BookService
             }
         }
 
-        return $bestScore >= 0.55 ? $best : null;
+        return $bestScore >= $this->minimumMatchScore($parsed) ? $best : null;
     }
 
     /**
@@ -906,10 +1008,20 @@ class BookService
             }
         }
 
-        if ($best === null || $bestScore < 0.55) {
+        if ($best === null || $bestScore < $this->minimumMatchScore($parsed)) {
             return null;
         }
 
         return $best;
+    }
+
+    private function minimumMatchScore(?BookParseResult $parsed): float
+    {
+        if ($parsed === null) {
+            return 0.55;
+        }
+
+        // No-author parses are more ambiguous and need a stricter cutoff.
+        return $parsed->hasAuthor() ? 0.55 : 0.68;
     }
 }

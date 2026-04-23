@@ -11,6 +11,7 @@ final class ObfuscatedSubjectExtractor
      */
     private const array PREFIX_PATTERNS = [
         '/^\s*N:\/NZB\s*\[\d+\/\d+\]\s*-\s*/i',
+        '/^\s*N[\s._:-]*NZB[\s._-]*\[\d+(?:[\/_]\d+)?\][\s._-]*-\s*/i',
         '/^\s*\[[^\]]{2,80}\]\s*/',
         '/^\s*(?:re\s*)?posted\s+by\s+[^-]{2,120}\s*-\s*/i',
     ];
@@ -25,6 +26,7 @@ final class ObfuscatedSubjectExtractor
         '/\.7z$/i',
         '/\.rar$/i',
         '/\.par2?$/i',
+        '/\.part$/i',
         '/\.vol\d+[+\-]\d+\.par2?$/i',
         '/\.\d{3}$/',
     ];
@@ -64,11 +66,23 @@ final class ObfuscatedSubjectExtractor
         $normalized = preg_replace('/\.(?=[A-Za-z0-9])/', ' ', $normalized) ?? $normalized;
         $normalized = preg_replace('/\s{2,}/', ' ', $normalized) ?? $normalized;
         $normalized = trim($normalized, " \t\n\r\0\x0B\"'`-_.");
+        $normalized = $this->toReadableTitle($normalized);
 
         if ($normalized === '' || $normalized === $original) {
             return null;
         }
 
         return $normalized;
+    }
+
+    private function toReadableTitle(string $value): string
+    {
+        // If the candidate looks fully lowercase, present a cleaner title-cased
+        // variant for UI/searchname while preserving separators and numbers.
+        if (preg_match('/\p{Lu}/u', $value) === 1) {
+            return $value;
+        }
+
+        return mb_convert_case($value, MB_CASE_TITLE, 'UTF-8');
     }
 }

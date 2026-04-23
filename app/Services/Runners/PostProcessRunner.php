@@ -12,6 +12,13 @@ use Illuminate\Support\Facades\Log;
 
 class PostProcessRunner extends BaseRunner
 {
+    private function guidBucketExpression(string $column = 'leftguid'): string
+    {
+        return DB::getDriverName() === 'sqlite'
+            ? 'substr('.$column.', 1, 1)'
+            : 'LEFT('.$column.', 1)';
+    }
+
     /**
      * @param  array<string, mixed>  $releases
      */
@@ -39,6 +46,17 @@ class PostProcessRunner extends BaseRunner
 
         $count = count($releases);
         $this->headerStart('postprocess: '.$desc, $count, $maxProcesses);
+
+        if ($count <= 1 || $maxProcesses <= 1) {
+            foreach ($releases as $release) {
+                $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
+                $command = PHP_BINARY.' artisan postprocess:guid '.$type.' '.$char;
+                echo $this->executeCommand($command);
+                cli()->primary('Finished task for '.$desc);
+            }
+
+            return;
+        }
 
         // Process in batches using Laravel's native Concurrency facade
         $batches = array_chunk($releases, max(1, $maxProcesses));
@@ -68,13 +86,14 @@ class PostProcessRunner extends BaseRunner
 
     public function processAdditional(): void
     {
+        $bucketExpr = $this->guidBucketExpression('r.leftguid');
         $ppAddMinSize = Settings::settingValue('minsizetopostprocess') !== '' ? (int) Settings::settingValue('minsizetopostprocess') : 1;
         $ppAddMinSize = ($ppAddMinSize > 0 ? ('AND r.size > '.($ppAddMinSize * 1048576)) : '');
         $ppAddMaxSize = (Settings::settingValue('maxsizetopostprocess') !== '') ? (int) Settings::settingValue('maxsizetopostprocess') : 100;
         $ppAddMaxSize = ($ppAddMaxSize > 0 ? ('AND r.size < '.($ppAddMaxSize * 1073741824)) : '');
 
         $sql = '
-            SELECT DISTINCT LEFT(r.leftguid, 1) AS id
+            SELECT DISTINCT '.$bucketExpr.' AS id
             FROM releases r
             LEFT JOIN categories c ON c.id = r.categories_id
             WHERE r.passwordstatus = -1
@@ -105,8 +124,9 @@ class PostProcessRunner extends BaseRunner
             return;
         }
 
+        $bucketExpr = $this->guidBucketExpression('r.leftguid');
         $sql = '
-            SELECT DISTINCT LEFT(r.leftguid, 1) AS id
+            SELECT DISTINCT '.$bucketExpr.' AS id
             FROM releases r
             WHERE 1=1 '.$nfoQuery.'
             LIMIT 16';
@@ -141,8 +161,9 @@ class PostProcessRunner extends BaseRunner
         }
 
         $renamedFlag = ($renamedOnly ? 2 : 1);
+        $bucketExpr = $this->guidBucketExpression();
         $sql = '
-            SELECT DISTINCT LEFT(leftguid, 1) AS id, '.$renamedFlag.' AS renamed
+            SELECT DISTINCT '.$bucketExpr.' AS id, '.$renamedFlag.' AS renamed
             FROM releases
             WHERE categories_id BETWEEN 2000 AND 2999
             AND '.imdb_id_needs_lookup_sql('imdbid').'
@@ -182,8 +203,9 @@ class PostProcessRunner extends BaseRunner
         }
 
         $renamedFlag = ($renamedOnly ? 2 : 1);
+        $bucketExpr = $this->guidBucketExpression();
         $sql = '
-            SELECT DISTINCT LEFT(leftguid, 1) AS id, '.$renamedFlag.' AS renamed
+            SELECT DISTINCT '.$bucketExpr.' AS id, '.$renamedFlag.' AS renamed
             FROM releases
             WHERE categories_id BETWEEN 5000 AND 5999
             AND categories_id != 5070
@@ -304,8 +326,9 @@ class PostProcessRunner extends BaseRunner
             return;
         }
 
+        $bucketExpr = $this->guidBucketExpression();
         $sql = '
-            SELECT DISTINCT LEFT(leftguid, 1) AS id
+            SELECT DISTINCT '.$bucketExpr.' AS id
             FROM releases
             WHERE categories_id = 5070
             AND anidbid IS NULL
@@ -327,8 +350,17 @@ class PostProcessRunner extends BaseRunner
         $checkSql = '
             SELECT id
             FROM releases
-            WHERE categories_id BETWEEN 7000 AND 7999
-            AND bookinfo_id IS NULL
+            WHERE (
+                categories_id BETWEEN 7000 AND 7999
+                OR categories_id = 3030
+            )
+            AND (
+                bookinfo_id IS NULL
+                OR searchname LIKE "N:/NZB%"
+                OR searchname LIKE "N_NZB_%"
+                OR name LIKE "N:/NZB%"
+                OR name LIKE "N_NZB_%"
+            )
             LIMIT 1';
         if (count(DB::select($checkSql)) === 0) {
             $this->headerNone();
@@ -336,11 +368,21 @@ class PostProcessRunner extends BaseRunner
             return;
         }
 
+        $bucketExpr = $this->guidBucketExpression();
         $sql = '
-            SELECT DISTINCT LEFT(leftguid, 1) AS id
+            SELECT DISTINCT '.$bucketExpr.' AS id
             FROM releases
-            WHERE categories_id BETWEEN 7000 AND 7999
-            AND bookinfo_id IS NULL
+            WHERE (
+                categories_id BETWEEN 7000 AND 7999
+                OR categories_id = 3030
+            )
+            AND (
+                bookinfo_id IS NULL
+                OR searchname LIKE "N:/NZB%"
+                OR searchname LIKE "N_NZB_%"
+                OR name LIKE "N:/NZB%"
+                OR name LIKE "N_NZB_%"
+            )
             LIMIT 16';
         $queue = DB::select($sql);
 

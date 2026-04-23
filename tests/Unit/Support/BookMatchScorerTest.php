@@ -78,4 +78,23 @@ class BookMatchScorerTest extends TestCase
 
         $this->assertLessThan(0.55, $score, 'Unrelated book with partial word overlap should not reach match threshold');
     }
+
+    public function test_diabetes_title_collision_scores_below_no_author_cutoff(): void
+    {
+        $parsed = new BookParseResult(
+            rawName: 'Living With Diabetes - 1st Edition 2026',
+            title: 'Living With Diabetes - 1st Edition 2026',
+            year: 2026
+        );
+
+        $score = (new BookMatchScorer)->score([
+            'title' => 'Healthy Lifestyle Against Diabetes 1st Edition',
+            'author' => 'Amie Armstrong',
+            'publishdate' => '2018-11-04',
+            'publisher' => 'Independently Published',
+            'cover' => 1,
+        ], $parsed);
+
+        $this->assertLessThan(0.68, $score, 'Ambiguous no-author title collision should stay below stricter cutoff');
+    }
 }

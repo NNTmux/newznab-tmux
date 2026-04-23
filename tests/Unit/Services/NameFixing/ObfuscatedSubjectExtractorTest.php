@@ -49,4 +49,34 @@ class ObfuscatedSubjectExtractorTest extends TestCase
 
         $this->assertNull($result);
     }
+
+    #[Test]
+    public function it_extracts_underscore_nzb_prefix_without_quotes(): void
+    {
+        $extractor = new ObfuscatedSubjectExtractor;
+
+        $result = $extractor->extract('N_NZB_[6]_-_Woman\'s_Day_New_Zealand_-_Issue_45_April_27_2026.par2');
+
+        $this->assertSame('Woman\'s Day New Zealand - Issue 45 April 27 2026', $result);
+    }
+
+    #[Test]
+    public function it_extracts_underscore_fraction_nzb_prefix_without_quotes(): void
+    {
+        $extractor = new ObfuscatedSubjectExtractor;
+
+        $result = $extractor->extract('N_NZB_[1_6]_-_Woman\'s_Day_New_Zealand_-_Issue_45_April_27_2026.par2');
+
+        $this->assertSame('Woman\'s Day New Zealand - Issue 45 April 27 2026', $result);
+    }
+
+    #[Test]
+    public function it_title_cases_lowercase_obfuscated_candidates(): void
+    {
+        $extractor = new ObfuscatedSubjectExtractor;
+
+        $result = $extractor->extract('N:/NZB [02/11] - "landscape.garden.design.issue.2.2026.part1.rar" yEnc');
+
+        $this->assertSame('Landscape Garden Design Issue 2 2026', $result);
+    }
 }

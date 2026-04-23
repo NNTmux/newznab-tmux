@@ -179,6 +179,52 @@ class ReleaseNameFixedRecategorizationTest extends TestCase
         $this->assertSame(1, (int) $release->isrenamed);
     }
 
+    public function test_renaming_space_separated_scene_title_does_not_overwrite_dotted_searchname(): void
+    {
+        Search::shouldReceive('updateRelease')->once();
+
+        $group = UsenetGroup::query()->create([
+            'name' => 'alt.binaries.multimedia',
+            'active' => 1,
+            'backfill' => 0,
+        ]);
+
+        $oldName = 'Southern.Charm.S11E12.Even.Further.South.720p.AMZN.WEB-DL.DDP2.0.H.264-NTb';
+        $release = Release::factory()->create([
+            'name' => '[1/25] - "Southern.Charm.S11E12.Even.Further.South.720p.AMZN.WEB-DL.DDP2.0.H.264-NTb.par2" yEnc',
+            'searchname' => $oldName,
+            'fromname' => 'poster@example.com',
+            'groups_id' => $group->id,
+            'categories_id' => Category::TV_HD,
+            'iscategorized' => 1,
+            'isrenamed' => 1,
+            'guid' => str_repeat('c', 40),
+            'leftguid' => 'c',
+            'nzb_guid' => 'test-southern-charm',
+            'size' => 1,
+            'postdate' => now(),
+            'adddate' => now(),
+        ]);
+
+        $service = app(ReleaseUpdateService::class);
+        $service->updateRelease(
+            $release->fresh(),
+            'Southern Charm S11E12 Even Further South 720p AMZN WEB-DL DDP2 0 H 264-NTb',
+            'RarInfo FileName Match',
+            true,
+            'Filenames, ',
+            true,
+            false,
+        );
+
+        $release->refresh();
+
+        $this->assertSame($oldName, $release->searchname);
+        $this->assertSame(Category::TV_HD, $release->categories_id);
+        $this->assertSame(1, (int) $release->iscategorized);
+        $this->assertSame(1, (int) $release->isrenamed);
+    }
+
     private function setEnvironmentValue(string $key, ?string $value): void
     {
         if ($value === null) {

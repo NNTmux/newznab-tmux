@@ -59,6 +59,35 @@ class AdditionalProcessingNzbSplitRenameTest extends TestCase
         $this->assertSame($expected, $context->release->searchname);
     }
 
+    public function test_additional_postprocessing_skips_non_nzbsplit_wrapped_titles(): void
+    {
+        $wrapped = "N_NZB_[1_6]_-_Woman's_Day_New_Zealand_-_Issue_45_April_27_2026.par2";
+
+        $release = new Release([
+            'id' => 125,
+            'releases_id' => 125,
+            'name' => $wrapped,
+            'searchname' => $wrapped,
+            'fromname' => 'poster@example.com',
+            'guid' => str_repeat('b', 40),
+            'groups_id' => 1,
+            'categories_id' => Category::OTHER_HASHED,
+        ]);
+
+        $context = new ReleaseProcessingContext($release);
+        $updateService = $this->createMock(ReleaseUpdateService::class);
+        $updateService->expects($this->never())->method('updateRelease');
+
+        $manager = $this->makeReleaseFileManager($updateService);
+
+        $renamed = $manager->processReleaseNameFromNzbContents([
+            ['title' => $wrapped],
+        ], $context);
+
+        $this->assertFalse($renamed);
+        $this->assertSame($wrapped, $context->release->searchname);
+    }
+
     public function test_additional_postprocessing_skips_low_information_nzb_split_payloads(): void
     {
         $wrapped = 'TEST__NZBSPLIT__1234567890abcdef__NZBSPLIT__setup.7z.001';
@@ -83,6 +112,33 @@ class AdditionalProcessingNzbSplitRenameTest extends TestCase
 
         $this->assertFalse($renamed);
         $this->assertSame($wrapped, $context->release->searchname);
+    }
+
+    public function test_additional_postprocessing_does_not_rename_movie_style_obfuscated_subjects(): void
+    {
+        $wrapped = '[1/6] - "Yoh! Bestie 2026 1080p NF WEB-DL H 264 DDP5 1-UBWEB.par2" yEnc';
+        $existingName = 'Yoh!_Bestie_2026_1080p_NF_WEB-DL_H_264_DDP5_1-UBWEB';
+        $release = new Release([
+            'id' => 126,
+            'releases_id' => 126,
+            'name' => $wrapped,
+            'searchname' => $existingName,
+            'groups_id' => 1,
+            'categories_id' => Category::MOVIE_HD,
+        ]);
+
+        $context = new ReleaseProcessingContext($release);
+        $updateService = $this->createMock(ReleaseUpdateService::class);
+        $updateService->expects($this->never())->method('updateRelease');
+
+        $manager = $this->makeReleaseFileManager($updateService);
+
+        $renamed = $manager->processReleaseNameFromNzbContents([
+            ['title' => $wrapped],
+        ], $context);
+
+        $this->assertFalse($renamed);
+        $this->assertSame($existingName, $context->release->searchname);
     }
 
     public function test_archive_name_extractor_unwraps_nzb_split_file_names(): void

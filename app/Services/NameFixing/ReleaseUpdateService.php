@@ -137,14 +137,15 @@ class ReleaseUpdateService
         }
 
         if ($this->relid !== $release->releases_id) {
-            $newName = (new ReleaseCleaningService)->fixerCleaner($name);
+            $cleanedName = (new ReleaseCleaningService)->fixerCleaner($name);
             // Normalize and sanity-check candidate for non-trusted sources
-            $newName = $this->fileNameCleaner->normalizeCandidateTitle($newName);
+            $normalizedName = $this->fileNameCleaner->normalizeCandidateTitle($cleanedName);
+            $newName = $this->fileNameCleaner->formatSearchName($cleanedName, $normalizedName);
 
             // Determine if the source is trusted enough to bypass plausibility checks
             $trustedSource = $this->isTrustedSource($type, $method, $preId);
 
-            if (! $trustedSource && ! $this->fileNameCleaner->isPlausibleReleaseTitle($newName)) {
+            if (! $trustedSource && ! $this->fileNameCleaner->isPlausibleReleaseTitle($normalizedName)) {
                 // Skip low-quality rename candidates for untrusted sources
                 $this->done = true;
 
