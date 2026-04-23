@@ -13,12 +13,15 @@ use Illuminate\Console\Command;
 class FixNzbSplitNames extends Command
 {
     protected $signature = 'releases:fix-nzbsplit
-                            {--dry-run : Preview changes without updating the database}';
+                            {--dry-run : Preview changes without updating the database}
+                            {--include-renamed : Include releases already marked as renamed}';
 
-    protected $description = 'Fix NZBSPLIT-wrapped release names and recategorize the affected releases.';
+    protected $description = 'Fix NZBSPLIT-wrapped release names for unrenamed releases by default and recategorize the affected releases.';
 
     public function handle(CategorizationService $categorizationService, NzbSplitUnwrapper $nzbSplitUnwrapper): int
     {
+        $includeRenamed = (bool) $this->option('include-renamed');
+
         $query = Release::query()
             ->select(['id', 'name', 'searchname', 'fromname', 'groups_id', 'categories_id'])
             ->where(function ($builder): void {
@@ -28,10 +31,17 @@ class FixNzbSplitNames extends Command
             })
             ->orderBy('id');
 
+        if (! $includeRenamed) {
+            $query->where('isrenamed', 0);
+        }
+
         $count = (clone $query)->count();
 
         if ($count === 0) {
-            $this->info('No NZBSPLIT-wrapped releases found.');
+            $this->info($includeRenamed
+                ? 'No NZBSPLIT-wrapped releases found.'
+                : 'No unrenamed NZBSPLIT-wrapped releases found.'
+            );
 
             return self::SUCCESS;
         }
