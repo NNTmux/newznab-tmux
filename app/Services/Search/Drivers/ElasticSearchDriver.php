@@ -51,6 +51,13 @@ class ElasticSearchDriver implements SearchDriverInterface
 
     private const AUTOCOMPLETE_MIN_LENGTH = 2;
 
+    /**
+     * Keep release text searches scoped to release title variants only.
+     *
+     * @var list<string>
+     */
+    private const RELEASE_TEXT_FIELDS = ['searchname^3', 'plainsearchname^2'];
+
     private static ?Client $client = null;
 
     private static ?bool $availabilityCache = null;
@@ -844,7 +851,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             $search = $this->buildSearchQuery(
                 index: $this->getReleasesIndex(),
                 keywords: $keywords,
-                fields: ['searchname^2', 'plainsearchname^1.5', 'fromname', 'filename', 'name^1.2'], // @phpstan-ignore argument.type
+                fields: self::RELEASE_TEXT_FIELDS, // @phpstan-ignore argument.type
                 limit: $limit
             );
 
@@ -891,7 +898,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             $search = $this->buildSearchQuery(
                 index: $this->getReleasesIndex(),
                 keywords: $keywords,
-                fields: ['searchname^2', 'plainsearchname^1.5', 'fromname', 'filename', 'name^1.2'], // @phpstan-ignore argument.type
+                fields: self::RELEASE_TEXT_FIELDS, // @phpstan-ignore argument.type
                 limit: $limit
             );
 
@@ -938,7 +945,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             $search = $this->buildSearchQuery(
                 index: $this->getReleasesIndex(),
                 keywords: $keywords,
-                fields: ['searchname^2', 'plainsearchname^1.5'], // @phpstan-ignore argument.type
+                fields: self::RELEASE_TEXT_FIELDS, // @phpstan-ignore argument.type
                 limit: $limit,
                 options: [
                     'boost' => 1.2,
@@ -2792,8 +2799,9 @@ class ElasticSearchDriver implements SearchDriverInterface
                         [
                             'multi_match' => [
                                 'query' => $searchTerm,
-                                'fields' => ['searchname^3', 'name^2', 'filename'],
-                                'type' => 'best_fields',
+                                'fields' => self::RELEASE_TEXT_FIELDS,
+                                'type' => 'cross_fields',
+                                'operator' => 'and',
                                 'fuzziness' => 'AUTO',
                             ],
                         ],
@@ -2862,24 +2870,46 @@ class ElasticSearchDriver implements SearchDriverInterface
             $must = [];
 
             if ($hasText) {
-                $text = is_string($phrases)
-                    ? $phrases
-                    : implode(' ', array_values(array_filter(
+                if (is_string($phrases)) {
+                    $text = trim($phrases);
+                    if ($text === '') {
+                        return ['ids' => [], 'total' => 0, 'fuzzy' => $useFuzzy];
+                    }
+                    $multi = [
+                        'query' => $text,
+                        'fields' => self::RELEASE_TEXT_FIELDS,
+                        'type' => 'cross_fields',
+                        'operator' => 'and',
+                    ];
+                    if ($useFuzzy && $this->isFuzzyEnabled()) {
+                        $multi['fuzziness'] = $this->getFuzzyConfig()['fuzziness'] ?? 'AUTO';
+                    }
+                    $must[] = ['multi_match' => $multi];
+                } elseif (is_array($phrases) && $this->isAssociativeStringArray($phrases)) {
+                    $must = $this->buildReleaseFieldSpecificMustClauses($phrases, $useFuzzy);
+                    if ($must === []) {
+                        return ['ids' => [], 'total' => 0, 'fuzzy' => $useFuzzy];
+                    }
+                } else {
+                    $text = implode(' ', array_values(array_filter(
                         is_array($phrases) ? $phrases : [],
                         static fn ($v): bool => $v !== null && $v !== '' && $v !== -1
                     )));
-                if ($text === '') {
-                    return ['ids' => [], 'total' => 0, 'fuzzy' => $useFuzzy];
+                    $text = trim($text);
+                    if ($text === '') {
+                        return ['ids' => [], 'total' => 0, 'fuzzy' => $useFuzzy];
+                    }
+                    $multi = [
+                        'query' => $text,
+                        'fields' => self::RELEASE_TEXT_FIELDS,
+                        'type' => 'cross_fields',
+                        'operator' => 'and',
+                    ];
+                    if ($useFuzzy && $this->isFuzzyEnabled()) {
+                        $multi['fuzziness'] = $this->getFuzzyConfig()['fuzziness'] ?? 'AUTO';
+                    }
+                    $must[] = ['multi_match' => $multi];
                 }
-                $multi = [
-                    'query' => $text,
-                    'fields' => ['searchname^3', 'name^2', 'filename', 'plainsearchname'],
-                    'type' => 'best_fields',
-                ];
-                if ($useFuzzy && $this->isFuzzyEnabled()) {
-                    $multi['fuzziness'] = $this->getFuzzyConfig()['fuzziness'] ?? 'AUTO';
-                }
-                $must[] = ['multi_match' => $multi];
             }
 
             if ($must !== [] && $filter !== []) {
@@ -2944,6 +2974,69 @@ class ElasticSearchDriver implements SearchDriverInterface
         }
 
         return $run(false);
+    }
+
+    /**
+     * @param  array<string, mixed>  $phrases
+     * @return list<array<string, mixed>>
+     */
+    private function buildReleaseFieldSpecificMustClauses(array $phrases, bool $useFuzzy): array
+    {
+        $fieldMap = [
+            'searchname' => self::RELEASE_TEXT_FIELDS,
+            'plainsearchname' => ['plainsearchname'],
+            'name' => ['name'],
+            'fromname' => ['fromname'],
+            'filename' => ['filename'],
+        ];
+
+        $must = [];
+        foreach ($phrases as $field => $rawValue) {
+            if (! is_string($field) || ! isset($fieldMap[$field])) {
+                continue;
+            }
+
+            $value = is_scalar($rawValue) ? trim((string) $rawValue) : '';
+            if ($value === '' || $value === '-1') {
+                continue;
+            }
+
+            $fields = $fieldMap[$field];
+            if (count($fields) > 1) {
+                $multi = [
+                    'query' => $value,
+                    'fields' => $fields,
+                    'type' => 'cross_fields',
+                    'operator' => 'and',
+                ];
+                if ($useFuzzy && $this->isFuzzyEnabled()) {
+                    $multi['fuzziness'] = $this->getFuzzyConfig()['fuzziness'] ?? 'AUTO';
+                }
+                $must[] = ['multi_match' => $multi];
+
+                continue;
+            }
+
+            $fieldName = $fields[0];
+            $match = [
+                'query' => $value,
+                'operator' => 'and',
+            ];
+            if ($useFuzzy && $this->isFuzzyEnabled()) {
+                $match['fuzziness'] = $this->getFuzzyConfig()['fuzziness'] ?? 'AUTO';
+            }
+            $must[] = ['match' => [$fieldName => $match]];
+        }
+
+        return $must;
+    }
+
+    /**
+     * @param  array<string|int, mixed>  $phrases
+     */
+    private function isAssociativeStringArray(array $phrases): bool
+    {
+        return count(array_filter(array_keys($phrases), 'is_string')) > 0;
     }
 
     /**

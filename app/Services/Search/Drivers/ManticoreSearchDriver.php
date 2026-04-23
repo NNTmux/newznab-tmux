@@ -2349,7 +2349,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                 return $this->searchReleasesByCategory($categoryIds, $limit);
             }
 
-            $searchExpr = '@@relaxed @searchname '.$preparedSearch;
+            $searchExpr = '@@relaxed '.self::scopePreparedQueryToField($preparedSearch, '@searchname');
 
             $query = (new Search($this->manticoreSearch))
                 ->setTable($this->getReleasesIndex())
@@ -2428,7 +2428,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                         }
                         $prepared = self::prepareUserSearchQuery((string) $value);
                         if ($prepared !== '') {
-                            $terms[] = '@@relaxed @'.$key.' '.$prepared;
+                            $terms[] = '@@relaxed '.self::scopePreparedQueryToField($prepared, '@'.$key);
                         }
                     }
                     if ($terms === []) {

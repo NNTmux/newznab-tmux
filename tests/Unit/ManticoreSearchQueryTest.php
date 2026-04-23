@@ -238,6 +238,38 @@ class ManticoreSearchQueryTest extends TestCase
     }
 
     #[Test]
+    public function search_releases_filtered_scopes_field_queries_with_grouping_parentheses(): void
+    {
+        $driverSource = file_get_contents(__DIR__.'/../../app/Services/Search/Drivers/ManticoreSearchDriver.php');
+
+        $this->assertIsString($driverSource);
+        $this->assertStringContainsString(
+            "\$terms[] = '@@relaxed '.self::scopePreparedQueryToField(\$prepared, '@'.\$key);",
+            $driverSource
+        );
+        $this->assertStringNotContainsString(
+            "\$terms[] = '@@relaxed @'.\$key.' '.\$prepared;",
+            $driverSource
+        );
+    }
+
+    #[Test]
+    public function search_releases_with_category_filter_scopes_searchname_with_grouping_parentheses(): void
+    {
+        $driverSource = file_get_contents(__DIR__.'/../../app/Services/Search/Drivers/ManticoreSearchDriver.php');
+
+        $this->assertIsString($driverSource);
+        $this->assertStringContainsString(
+            "\$searchExpr = '@@relaxed '.self::scopePreparedQueryToField(\$preparedSearch, '@searchname');",
+            $driverSource
+        );
+        $this->assertStringNotContainsString(
+            "\$searchExpr = '@@relaxed @searchname '.\$preparedSearch;",
+            $driverSource
+        );
+    }
+
+    #[Test]
     public function search_releases_filtered_uses_stable_id_tiebreak_sort_for_elasticsearch(): void
     {
         $driverSource = file_get_contents(__DIR__.'/../../app/Services/Search/Drivers/ElasticSearchDriver.php');

@@ -135,6 +135,43 @@ final class MovieSearchApiTest extends TestCase
         $this->assertNotContains('Titanic.The.Digital.Resurrection.2025.720p.WEBRip-LAMA', $results->pluck('searchname')->all());
     }
 
+    #[Test]
+    public function api_search_uses_search_releases_filtered_with_search_phrase(): void
+    {
+        $mock = Mockery::mock(SearchService::class, [$this->app]);
+        $mock->shouldReceive('isAvailable')->andReturn(true);
+        $mock->shouldReceive('searchReleasesFiltered')
+            ->once()
+            ->withArgs(function (array $criteria, int $limit, int $offset): bool {
+                return ($criteria['phrases'] ?? null) === 'Resurrection 2025'
+                    && ($criteria['try_fuzzy'] ?? null) === true
+                    && $limit === 100
+                    && $offset === 0;
+            })
+            ->andReturn([
+                'ids' => [],
+                'total' => 0,
+                'fuzzy' => false,
+            ]);
+
+        $this->app->instance(SearchService::class, $mock);
+
+        $service = new ReleaseSearchService;
+        $results = $service->apiSearch(
+            'Resurrection 2025',
+            -1,
+            0,
+            100,
+            -1,
+            [],
+            [2030],
+            0,
+            'posted_desc'
+        );
+
+        $this->assertCount(0, $results);
+    }
+
     private function registerSqliteConcatIfNeeded(): void
     {
         if (DB::getDriverName() !== 'sqlite') {
