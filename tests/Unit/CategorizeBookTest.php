@@ -35,7 +35,10 @@ class CategorizeBookTest extends TestCase
             'comic cbz' => ['Batman.Vol.3.Issue.145.2024.DC.Comics.CBZ', Category::BOOKS_COMICS],
             'technical publisher ebook' => ['The.Pragmatic.Programmer.20th.Anniversary.Edition.OReilly.2019.EPUB', Category::BOOKS_TECHNICAL],
             'magazine issue date' => ['Vegan_Food_and_Living_Monthly_May_2026_Issue_352', Category::BOOKS_MAGAZINES],
+            'magazine issue with year' => ['History of War - Issue 158, 2026', Category::BOOKS_MAGAZINES],
+            'mcn magazine pattern' => ['MCN.April.22.2026.HYBRID.MAGAZINE.eBook-21A1', Category::BOOKS_MAGAZINES],
             'ebook pdf with book context' => ['George.Orwell.1984.Novel.PDF', Category::BOOKS_EBOOK],
+            'ebook part rar style after normalize' => ['Harry Styles Songbook - 1st Edition 2026', Category::BOOKS_EBOOK],
         ];
     }
 
@@ -122,7 +125,7 @@ class CategorizeBookTest extends TestCase
 
         $this->assertSame(Category::BOOKS_EBOOK, $result->categoryId);
         $this->assertSame(0.5, $result->confidence);
-        $this->assertSame('group_book', $result->matchedBy);
+        $this->assertSame('group_name_book', $result->matchedBy);
     }
 
     /**

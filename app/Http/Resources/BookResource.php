@@ -48,7 +48,7 @@ class BookResource extends JsonResource
      */
     protected function getCoverUrl(): ?string
     {
-        if (! $this->cover) {
+        if ((int) $this->id <= 0 || ! $this->cover) {
             return null;
         }
 

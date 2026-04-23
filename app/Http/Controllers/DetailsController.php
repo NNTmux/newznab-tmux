@@ -108,22 +108,22 @@ class DetailsController extends BasePageController
         }
 
         $game = '';
-        if (! empty($data['gamesinfo_id'])) {
+        if ((int) $data['gamesinfo_id'] > 0) {
             $game = (new GamesService)->getGamesInfoById($data['gamesinfo_id']);
         }
 
         $mus = '';
-        if (! empty($data['musicinfo_id'])) {
+        if ((int) $data['musicinfo_id'] > 0) {
             $mus = (new MusicService)->getMusicInfo($data['musicinfo_id']);
         }
 
         $book = '';
-        if (! empty($data['bookinfo_id'])) {
+        if ((int) $data['bookinfo_id'] > 0) {
             $book = (new BookService)->getBookInfo($data['bookinfo_id']);
         }
 
         $con = '';
-        if (! empty($data['consoleinfo_id'])) {
+        if ((int) $data['consoleinfo_id'] > 0) {
             $con = (new ConsoleService)->getConsoleInfo($data['consoleinfo_id']);
         }
 

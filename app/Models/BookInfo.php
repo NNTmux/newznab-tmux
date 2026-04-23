@@ -80,6 +80,10 @@ class BookInfo extends Model
      */
     public function getCoverPath(): string
     {
+        if ((int) $this->id <= 0) {
+            return '';
+        }
+
         return storage_path('covers/book/'.$this->id.'.jpg');
     }
 
@@ -88,7 +92,9 @@ class BookInfo extends Model
      */
     public function hasCoverImage(): bool
     {
-        return file_exists($this->getCoverPath());
+        $coverPath = $this->getCoverPath();
+
+        return $coverPath !== '' && file_exists($coverPath);
     }
 
     /**
@@ -96,7 +102,7 @@ class BookInfo extends Model
      */
     public function getCoverUrl(): ?string
     {
-        if (! $this->cover || ! $this->hasCoverImage()) {
+        if ((int) $this->id <= 0 || ! $this->cover || ! $this->hasCoverImage()) {
             return null;
         }
 

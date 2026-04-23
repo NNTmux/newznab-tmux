@@ -31,4 +31,11 @@ class FileNameCleanerTest extends TestCase
 
         $this->assertSame('cover the fisher king', $cleaner->cleanForMatching('Film ;-)/cover the fisher king.jpg'));
     }
+
+    public function test_normalize_candidate_title_removes_pdf_extension(): void
+    {
+        $cleaner = new FileNameCleaner;
+
+        $this->assertSame('WOB Klassik 4.25', $cleaner->normalizeCandidateTitle('WOB Klassik 4.25.Pdf'));
+    }
 }

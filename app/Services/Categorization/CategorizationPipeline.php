@@ -8,6 +8,7 @@ use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\Categorization\Pipes\AbstractCategorizationPipe;
 use App\Services\Categorization\Pipes\CategorizationPassable;
+use App\Services\NameFixing\Extractors\ObfuscatedSubjectExtractor;
 use App\Services\NameFixing\NzbSplitUnwrapper;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
@@ -34,11 +35,16 @@ class CategorizationPipeline
 
     protected NzbSplitUnwrapper $nzbSplitUnwrapper;
 
+    protected ObfuscatedSubjectExtractor $obfuscatedSubjectExtractor;
+
     /**
      * @param  iterable<AbstractCategorizationPipe>  $pipes
      */
-    public function __construct(iterable $pipes = [], ?NzbSplitUnwrapper $nzbSplitUnwrapper = null)
-    {
+    public function __construct(
+        iterable $pipes = [],
+        ?NzbSplitUnwrapper $nzbSplitUnwrapper = null,
+        ?ObfuscatedSubjectExtractor $obfuscatedSubjectExtractor = null
+    ) {
         /** @phpstan-ignore argument.templateType */
         $this->pipes = collect($pipes)
             ->sortBy(fn (AbstractCategorizationPipe $p) => $p->getPriority());
@@ -46,6 +52,7 @@ class CategorizationPipeline
         $this->categorizeForeign = (bool) Settings::settingValue('categorizeforeign');
         $this->catWebDL = (bool) Settings::settingValue('catwebdl');
         $this->nzbSplitUnwrapper = $nzbSplitUnwrapper ?? new NzbSplitUnwrapper;
+        $this->obfuscatedSubjectExtractor = $obfuscatedSubjectExtractor ?? new ObfuscatedSubjectExtractor;
     }
 
     /**
@@ -75,6 +82,7 @@ class CategorizationPipeline
         bool $debug = false
     ): array {
         $releaseName = $this->nzbSplitUnwrapper->unwrap($releaseName) ?? $releaseName;
+        $releaseName = $this->obfuscatedSubjectExtractor->extract($releaseName) ?? $releaseName;
 
         $groupName = UsenetGroup::whereId($groupId)->value('name') ?? '';
 

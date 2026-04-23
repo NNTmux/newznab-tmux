@@ -10,6 +10,7 @@ use App\Models\BookInfo;
 use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
+use App\Services\NameFixing\Extractors\ObfuscatedSubjectExtractor;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Support\BookMatchScorer;
 use App\Support\DTOs\BookParseResult;
@@ -17,6 +18,7 @@ use App\Support\MetadataSearchLookup;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Service class for book data fetching and processing.
@@ -37,6 +39,8 @@ class BookService
 
     public ?BookParseResult $parsedBookResult;
 
+    private ObfuscatedSubjectExtractor $obfuscatedSubjectExtractor;
+
     /**
      * @throws \Exception
      */
@@ -52,6 +56,7 @@ class BookService
 
         $this->parsedIsbn = null;
         $this->parsedBookResult = null;
+        $this->obfuscatedSubjectExtractor = new ObfuscatedSubjectExtractor;
     }
 
     /**
@@ -363,7 +368,10 @@ class BookService
     {
         $query = Release::query()
             ->whereNull('bookinfo_id')
-            ->whereBetween('categories_id', [Category::BOOKS_ROOT, Category::BOOKS_UNKNOWN])
+            ->where(static function ($builder): void {
+                $builder->whereBetween('categories_id', [Category::BOOKS_ROOT, Category::BOOKS_UNKNOWN])
+                    ->orWhere('categories_id', Category::MUSIC_AUDIOBOOK);
+            })
             ->orderByDesc('postdate')
             ->limit($this->bookqty);
 
@@ -377,7 +385,12 @@ class BookService
 
         $this->processBookReleasesHelper(
             $query->get(['searchname', 'id', 'categories_id']),
-            sprintf('%d-%d', Category::BOOKS_ROOT, Category::BOOKS_UNKNOWN)
+            sprintf(
+                '%d-%d,%d',
+                Category::BOOKS_ROOT,
+                Category::BOOKS_UNKNOWN,
+                Category::MUSIC_AUDIOBOOK
+            )
         );
     }
 
@@ -459,7 +472,8 @@ class BookService
      */
     public function parseTitle(mixed $release_name, mixed $releaseID, mixed $releasetype)
     {
-        $parsed = $this->parseReleaseName((string) $release_name, (string) $releasetype);
+        $normalizedReleaseName = $this->obfuscatedSubjectExtractor->extract((string) $release_name) ?? (string) $release_name;
+        $parsed = $this->parseReleaseName($normalizedReleaseName, (string) $releasetype);
         $this->parsedBookResult = $parsed;
         $this->parsedIsbn = $parsed->isbn;
         $releasename = $parsed->title;
@@ -514,6 +528,10 @@ class BookService
 
     public function parseReleaseName(string $releaseName, string $releaseType = 'ebook'): BookParseResult
     {
+        $releaseName = $this->obfuscatedSubjectExtractor->extract($releaseName) ?? $releaseName;
+        if (preg_match('/"([^"]{3,240})"/', $releaseName, $quotedMatch) === 1) {
+            $releaseName = $quotedMatch[1];
+        }
         $isbn = $this->extractIsbn($releaseName);
         $a = preg_replace('/\d{1,2} \d{1,2} \d{2,4}|(19|20)\d\d|anybody got .+?[a-z]\? |[ ._-](Novel|TIA)([ ._-]|$)|([ \.])HQ([-\. ])|[\(\)\.\-_ ](AVI|AZW3?|DOC|EPUB|LIT|MOBI|NFO|RETAIL|(si)?PDF|RTF|TXT)[\)\]\.\-_ ](?![a-z0-9])|compleet|DAGSTiDNiNGEN|DiRFiX|\+ extra|r?e ?Books?([\.\-_ ]English|ers)?|azw3?|ePu([bp])s?|html|mobi|^NEW[\.\-_ ]|PDF([\.\-_ ]English)?|Please post more|Post description|Proper|Repack(fix)?|[\.\-_ ](Chinese|English|French|German|Italian|Retail|Scan|Swedish|Multilingual)|^R4 |Repost|Skytwohigh|TIA!+|TruePDF|V413HAV|(would someone )?please (re)?post.+? "|with the authors name right/i', '', $releaseName);
         $b = preg_replace('/^(As Req |conversion |eq |Das neue Abenteuer \d+|Fixed version( ignore previous post)?|Full |Per Req As Found|(\s+)?R4 |REQ |revised |version |\d+(\s+)?$)|(COMPLETE|INTERNAL|RELOADED| (AZW3|eB|docx|ENG?|exe|FR|Fix|gnv64|MU|NIV|R\d\s+\d{1,2} \d{1,2}|R\d|Req|TTL|UC|v(\s+)?\d))(\s+)?$/i', '', (string) $a);
@@ -538,8 +556,12 @@ class BookService
         $author = null;
         $title = $normalized;
         if (preg_match('/^(?<author>[A-Za-z0-9&\'\.\-\s]{3,80})\s-\s(?<title>.+)$/', $normalized, $matches) === 1) {
-            $author = trim($matches['author']);
-            $title = trim($matches['title']);
+            $candidateAuthor = trim($matches['author']);
+            $candidateTitle = trim($matches['title']);
+            if (preg_match('/^(Issue\s+\d+|\d+\w*\s+Edition\b)/i', $candidateTitle) !== 1) {
+                $author = $candidateAuthor;
+                $title = $candidateTitle;
+            }
         } elseif (preg_match('/^(?<author>[A-Za-z0-9&\'\.\-\s]{3,80})\s+by\s+(?<title>.+)$/i', $normalized, $matches) === 1) {
             $author = trim($matches['author']);
             $title = trim($matches['title']);
@@ -549,6 +571,12 @@ class BookService
         }
 
         $title = trim((string) preg_replace('/\s+/', ' ', (string) preg_replace('/\((Book|Series)\s*\d+\)/i', '', $title)));
+        if ($author === null && preg_match('/^(?<title>.+?)[\s._-]+(?<year>(19|20)\d{2})[\s._-]+(?<format>EPUB|MOBI|AZW3?|PDF|FB2|DJVU|LIT)$/i', $normalized, $matches) === 1) {
+            $title = trim(str_replace(['.', '_'], ' ', $matches['title']));
+        }
+        if ($author === null && preg_match('/^(?<title>.+?)\s+Vol\.?\s*\d{1,3}$/i', $title, $matches) === 1) {
+            $title = trim($matches['title']);
+        }
 
         $isJunk = false;
         $junkPattern = '/^([a-z0-9] )+$|ArtofUsenet|ekiosk|(ebook|mobi).+collection|erotica|Full Video|ImwithJamie|linkoff org|Mega.+pack|^[a-z0-9]+ (?!((January|February|March|April|May|June|July|August|September|O([ck])tober|November|De([cz])ember)))[a-z]+( (ebooks?|The))?$|NY Times|(Book|Massive) Dump|Sexual/i';
@@ -574,8 +602,11 @@ class BookService
             $isJunk = true;
         }
 
-        $isMagazine = preg_match('/^([a-z0-9ü!]+ ){1,2}(N|Vol)?\d{1,4}([abc])?$|^([a-z0-9]+ ){1,2}(Jan( |unar|$)|Feb( |ruary|$)|Mar( |ch|$)|Apr( |il|$)|May(?![a-z0-9])|Jun([ e$])|Jul([ y$])|Aug( |ust|$)|Sep( |tember|$)|O([ck])t( |ober|$)|Nov( |ember|$)|De([cz])( |ember|$))/ui', $normalized) === 1
-            && preg_match('/Part \d+/i', $normalized) !== 1;
+        $isMagazine = (
+            preg_match('/^([a-z0-9ü!]+ ){1,2}(N|Vol)?\d{1,4}([abc])?$|^([a-z0-9]+ ){1,2}(Jan( |unar|$)|Feb( |ruary|$)|Mar( |ch|$)|Apr( |il|$)|May(?![a-z0-9])|Jun([ e$])|Jul([ y$])|Aug( |ust|$)|Sep( |tember|$)|O([ck])t( |ober|$)|Nov( |ember|$)|De([cz])( |ember|$))/ui', $normalized) === 1
+            || preg_match('/\bIssue[\._\- ]?\d{1,4}\b.*\b(19|20)\d{2}\b/i', $normalized) === 1
+            || preg_match('/\bIssue[\._\- ]?\d{1,4}\b/i', $normalized) === 1
+        ) && preg_match('/Part \d+/i', $normalized) !== 1;
 
         return new BookParseResult(
             rawName: $releaseName,
@@ -627,19 +658,40 @@ class BookService
         $bookId = -2;
         $book = null;
         if ($bookInfo !== '') {
+            $wordCount = count(array_filter(preg_split('/\s+/', trim($bookInfo)) ?: []));
+            if ($wordCount < 3) {
+                return -2;
+            }
+
             $parsed = $this->parsedBookResult ?? $this->parseReleaseName($bookInfo);
             $candidates = [];
+            $resolvedSource = null;
             if ($isbnDb->isConfigured()) {
                 if ($isbn !== null && $isbn !== '') {
                     cli()->info('Fetching data from ISBNdb by ISBN '.$isbn);
                     $candidate = $isbnDb->findByIsbn($isbn);
                     if (is_array($candidate)) {
                         $candidates[] = $candidate;
+                        $resolvedSource = 'isbndb_isbn';
                     }
                 }
                 if ($candidates === []) {
                     cli()->info('Fetching data from ISBNdb for '.$bookInfo);
                     $candidates = array_merge($candidates, $isbnDb->searchBooks($bookInfo));
+                    if ($candidates !== []) {
+                        $resolvedSource = 'isbndb_search';
+                    }
+                }
+            }
+
+            if ($candidates === []) {
+                if ($isbn !== null && $isbn !== '') {
+                    cli()->info('Fetching data from Google Books by ISBN '.$isbn);
+                    $candidate = $googleBooks->findByIsbn($isbn);
+                    if (is_array($candidate)) {
+                        $candidates[] = $candidate;
+                        $resolvedSource = 'google_books_isbn';
+                    }
                 }
             }
 
@@ -654,11 +706,17 @@ class BookService
                         $isbn
                     )
                 );
+                if ($candidates !== []) {
+                    $resolvedSource = 'google_books_search';
+                }
             }
 
             if ($candidates === []) {
                 cli()->info('Fetching data from iTunes for '.$bookInfo);
                 $candidates = array_merge($candidates, $this->fetchItunesBookProperties($bookInfo, $itunes));
+                if ($candidates !== []) {
+                    $resolvedSource = 'itunes_search';
+                }
             }
 
             if ($candidates === []) {
@@ -667,15 +725,26 @@ class BookService
                     $candidate = $openLibrary->findByIsbn($isbn);
                     if (is_array($candidate)) {
                         $candidates[] = $candidate;
+                        $resolvedSource = 'open_library_isbn';
                     }
                 }
 
                 if ($candidates === []) {
                     $candidates = array_merge($candidates, $openLibrary->searchBooks($bookInfo));
+                    if ($candidates !== []) {
+                        $resolvedSource = 'open_library_search';
+                    }
                 }
             }
 
             $book = $this->pickBestCandidate($candidates, $parsed, $scorer);
+            if (is_array($book)) {
+                Log::debug('Book metadata source resolved', [
+                    'book_info' => $bookInfo,
+                    'source' => $resolvedSource,
+                    'isbn' => $isbn,
+                ]);
+            }
         }
 
         if (empty($book)) {

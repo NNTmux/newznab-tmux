@@ -11,6 +11,11 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class CoverController extends Controller
 {
     /**
+     * @var array<int, string>
+     */
+    private const array NUMERIC_ID_TYPES = ['anime', 'book', 'console', 'games', 'music', 'tvshows'];
+
+    /**
      * Serve cover images from storage
      *
      * @param  string  $type  The type of cover (movies, console, music, etc.)
@@ -24,6 +29,10 @@ class CoverController extends Controller
 
         if (! in_array($type, $validTypes)) {
             abort(404);
+        }
+
+        if (in_array($type, self::NUMERIC_ID_TYPES, true) && $this->isInvalidNumericCoverFilename($filename)) {
+            return $this->respondWithPlaceholder();
         }
 
         // Build the file path
@@ -40,20 +49,6 @@ class CoverController extends Controller
                 $filePath = storage_path("covers/{$type}/{$filename}");
             }
         } elseif ($type === 'anime') {
-            // For anime, check if the ID is valid (must be > 0)
-            // Reject covers for anidbid <= 0 (failed processing, no match, etc.)
-            if (preg_match('/^(-?\d+)(?:-cover)?\.jpg$/', $filename, $matches)) {
-                $anidbid = (int) $matches[1];
-                if ($anidbid <= 0) {
-                    // Return placeholder for invalid IDs
-                    $placeholderPath = public_path('assets/images/no-cover.png');
-                    if (file_exists($placeholderPath)) {
-                        return response()->file($placeholderPath);
-                    }
-                    abort(404);
-                }
-            }
-
             // For anime, try the requested filename first, then fall back to old format (without -cover)
             $filePath = storage_path("covers/{$type}/{$filename}");
 
@@ -93,5 +88,24 @@ class CoverController extends Controller
             'Content-Type' => $contentType,
             'Cache-Control' => 'public, max-age=31536000', // Cache for 1 year
         ]);
+    }
+
+    private function isInvalidNumericCoverFilename(string $filename): bool
+    {
+        if (preg_match('/^(-?\d+)(?:-cover)?\.jpg$/', $filename, $matches) !== 1) {
+            return false;
+        }
+
+        return (int) $matches[1] <= 0;
+    }
+
+    private function respondWithPlaceholder(): Response|BinaryFileResponse
+    {
+        $placeholderPath = public_path('assets/images/no-cover.png');
+        if (file_exists($placeholderPath)) {
+            return response()->file($placeholderPath);
+        }
+
+        abort(404);
     }
 }

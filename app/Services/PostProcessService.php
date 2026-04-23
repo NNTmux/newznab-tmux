@@ -123,7 +123,7 @@ final class PostProcessService
     }
 
     /**
-     * Process book releases using Amazon.
+     * Process book releases using ISBNdb, Google Books, iTunes, and Open Library.
      *
      * @param  string  $groupID  Optional group ID filter
      * @param  string  $guidChar  Optional GUID character filter

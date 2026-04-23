@@ -517,6 +517,10 @@ if (! function_exists('getReleaseCover')) {
             return null;
         };
 
+        $isPositiveId = static function (mixed $value): bool {
+            return is_numeric($value) && (int) $value > 0;
+        };
+
         // Determine cover type and ID based on category
         $imdbid = $getValue($release, 'imdbid');
         $videos_id = $getValue($release, 'videos_id');
@@ -529,22 +533,22 @@ if (! function_exists('getReleaseCover')) {
         if (! empty($imdbid) && imdb_id_is_valid($imdbid)) {
             $coverType = 'movies';
             $coverId = (string) $imdbid;
-        } elseif (! empty($videos_id) && $videos_id > 0) {
+        } elseif ($isPositiveId($videos_id)) {
             $coverType = 'tvshows';
             $coverId = $videos_id;
-        } elseif (! empty($musicinfo_id)) {
+        } elseif ($isPositiveId($musicinfo_id)) {
             $coverType = 'music';
             $coverId = $musicinfo_id;
-        } elseif (! empty($consoleinfo_id)) {
+        } elseif ($isPositiveId($consoleinfo_id)) {
             $coverType = 'console';
             $coverId = $consoleinfo_id;
-        } elseif (! empty($bookinfo_id)) {
+        } elseif ($isPositiveId($bookinfo_id)) {
             $coverType = 'book';
             $coverId = $bookinfo_id;
-        } elseif (! empty($gamesinfo_id)) {
+        } elseif ($isPositiveId($gamesinfo_id)) {
             $coverType = 'games';
             $coverId = $gamesinfo_id;
-        } elseif (! empty($anidbid) && $anidbid > 0) {
+        } elseif ($isPositiveId($anidbid)) {
             $coverType = 'anime';
             $coverId = $anidbid;
         }

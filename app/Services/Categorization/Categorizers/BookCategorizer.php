@@ -136,12 +136,16 @@ class BookCategorizer extends AbstractCategorizer
     {
         $magazines = 'Forbes|Fortune|GQ|National[._ -]Geographic|Newsweek|Vogue|Wired|The[._ -]?Economist|New[._ -]?Yorker|Scientific[._ -]?American|Popular[._ -]?Mechanics|Cosmopolitan|Elle|Esquire|Vanity[._ -]?Fair|Rolling[._ -]?Stone|Entertainment[._ -]?Weekly|People|Playboy';
         $hasTitle = preg_match('/\b('.$magazines.')\b/i', $name) === 1;
-        $hasIssueNumber = preg_match('/(?:^|[._ -])Issue[._ -]?\d{1,4}(?:$|[._ -])/i', $name) === 1;
+        $hasIssueNumber = preg_match('/(?:^|[._ -])Issue[._ -]?\d{1,4}(?:$|[._ -,])/i', $name) === 1;
         $hasDateSignal = preg_match('/\b(?:19|20)\d{2}\b|(?:^|[._ -])(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[._ -]?(?:19|20)?\d{2}\b/i', $name) === 1;
         $hasFrequency = preg_match('/[._ -](Monthly|Weekly|Quarterly|Annual)[._ -]/i', $name) === 1;
+        $hasIssueStyleTitle = preg_match('/\b([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*)\s*-\s*Issue\s+\d+/i', $name) === 1;
+        $hasMcnMagazineSignal = preg_match('/\bMCN[._ -](?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|January|February|March|April|June|July|August|September|October|November|December)[._ -]\d{1,2}[._ -](?:19|20)\d{2}\b/i', $name) === 1
+            && preg_match('/\bMAGAZINE\b/i', $name) === 1;
 
         if (($hasFrequency && ($hasIssueNumber || $hasDateSignal || $hasTitle)) ||
-            ($hasIssueNumber && ($hasDateSignal || $hasTitle))) {
+            ($hasIssueNumber && ($hasDateSignal || $hasTitle || $hasIssueStyleTitle)) ||
+            $hasMcnMagazineSignal) {
             return $this->matched(Category::BOOKS_MAGAZINES, 0.9, 'magazine_frequency');
         }
         if ($hasTitle) {
@@ -172,6 +176,9 @@ class BookCategorizer extends AbstractCategorizer
         }
         if (preg_match('/\b(E-?book|Kindle|Kobo|Nook)\b/i', $name)) {
             return $this->matched(Category::BOOKS_EBOOK, 0.8, 'ebook_platform');
+        }
+        if ($this->hasBookCorroborator($name) && preg_match('/\b(19|20)\d{2}\b/', $name) === 1) {
+            return $this->matched(Category::BOOKS_EBOOK, 0.6, 'ebook_book_signals');
         }
 
         return null;
