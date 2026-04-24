@@ -5,11 +5,16 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Http\Controllers\Api\ApiController;
+use App\Services\Releases\ReleaseBrowseService;
+use App\Services\Releases\ReleaseSearchService;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Mockery;
 use ReflectionClass;
 use Tests\TestCase;
 
@@ -85,15 +90,43 @@ class ApiRequestMatrixTest extends TestCase
         $response->assertSee('Missing parameter (q, imdbid, tmdbid or traktid)', false);
     }
 
-    public function test_v1_tv_requires_query_or_external_id(): void
+    public function test_v1_tv_without_search_params_returns_recent_tv_feed(): void
     {
         $token = (string) DB::table('users')->value('api_token');
+        $request = Request::create('/api/v1/api', 'GET', [
+            't' => 'tv',
+            'apikey' => $token,
+        ]);
 
-        $response = $this->get('/api/v1/api?t=tv&apikey='.$token);
+        $releaseSearchService = Mockery::mock(ReleaseSearchService::class);
+        $releaseBrowseService = Mockery::mock(ReleaseBrowseService::class);
+        $releaseBrowseService->shouldReceive('getBrowseRangeForApi')
+            ->once()
+            ->andReturn(collect());
 
-        $response->assertOk();
-        $response->assertSee('<error code="200"', false);
-        $response->assertSee('Missing parameter (q, vid, tvdbid, traktid, rid, tvmazeid, imdbid or tmdbid)', false);
+        $controller = new class($releaseSearchService, $releaseBrowseService) extends ApiController
+        {
+            /**
+             * @var array{data:mixed,params:array<string,mixed>,xml:bool,offset:int,type:string}|null
+             */
+            public ?array $capturedOutput = null;
+
+            public function output(mixed $data, array $params, bool $xml, int $offset, string $type = '')
+            {
+                $this->capturedOutput = [
+                    'data' => $data,
+                    'params' => $params,
+                    'xml' => $xml,
+                    'offset' => $offset,
+                    'type' => $type,
+                ];
+            }
+        };
+
+        $controller->api($request);
+        $this->assertNotNull($controller->capturedOutput);
+        $this->assertSame('api', $controller->capturedOutput['type']);
+        $this->assertInstanceOf(Collection::class, $controller->capturedOutput['data']);
     }
 
     public function test_v2_movie_requires_query_or_external_id(): void
