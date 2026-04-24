@@ -313,9 +313,6 @@ class ApiController extends BasePageController
                 $this->verifyEmptyParameter($request, 'imdbid');
                 $this->verifyEmptyParameter($request, 'tmdbid');
                 $this->verifyEmptyParameter($request, 'traktid');
-                if (! $this->hasMovieSearchParameters($request)) {
-                    return showApiError(200, 'Missing parameter (q, imdbid, tmdbid or traktid)');
-                }
                 $maxAge = $this->maxAge($request);
                 if (! is_int($maxAge)) {
                     return $maxAge;
@@ -325,6 +322,28 @@ class ApiController extends BasePageController
                     return $sort;
                 }
                 UserRequest::addApiRequest($uid, $request->getRequestUri());
+                $categoryID = $this->categoryID($request);
+                $limit = $this->limit($request);
+
+                if (! $this->hasMovieSearchParameters($request)) {
+                    if ($categoryID === [-1]) {
+                        $categoryID = Category::MOVIES_GROUP;
+                    }
+
+                    $relData = $this->releaseBrowseService->getBrowseRangeForApi(
+                        1,
+                        $categoryID,
+                        $offset,
+                        $limit,
+                        $sort,
+                        $maxAge,
+                        $catExclusions,
+                        -1,
+                        $minSize
+                    );
+                    $this->output($relData, $params, $outputXML, $offset, 'api');
+                    break;
+                }
 
                 $imdbId = $request->has('imdbid') && $request->filled('imdbid')
                     ? (string) Str::replace('tt', '', (string) $request->input('imdbid'))
@@ -337,9 +356,9 @@ class ApiController extends BasePageController
                     $tmdbId,
                     $traktId,
                     $this->offset($request),
-                    $this->limit($request),
+                    $limit,
                     $request->input('q') ?? '',
-                    $this->categoryID($request),
+                    $categoryID,
                     $maxAge,
                     $minSize,
                     $catExclusions,
