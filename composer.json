@@ -69,6 +69,7 @@
         "spatie/laravel-directory-cleanup": "^1.10",
         "spatie/laravel-fractal": "^6.3",
         "spatie/laravel-image-optimizer": "^1.8",
+        "spatie/laravel-passkeys": "^1.7",
         "spatie/laravel-permission": "^7.0.0",
         "stechstudio/laravel-zipstream": "^5.4",
         "symfony/process": "^7.0",

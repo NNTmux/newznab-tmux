@@ -135,6 +135,8 @@
                         </button>
                     </div>
                 </form>
+
+                @include('partials.passkey-authenticate')
             </div>
 
             <!-- Card Footer -->

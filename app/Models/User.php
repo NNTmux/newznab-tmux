@@ -34,6 +34,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Spatie\LaravelPasskeys\Models\Concerns\HasPasskeys;
+use Spatie\LaravelPasskeys\Models\Concerns\InteractsWithPasskeys;
+use Spatie\LaravelPasskeys\Models\Passkey;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -104,6 +107,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read Collection<int, UserSerie> $series
  * @property-read Collection<int, RolePromotionStat> $promotionStats
  * @property-read Collection<int, UserRoleHistory> $roleHistory
+ * @property-read Collection<int, Passkey> $passkeys
  * @property-read Role|null $role
  * @property-read PasswordSecurity|null $passwordSecurity
  *
@@ -117,10 +121,11 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder|User expiringSoon(int $days = 7)
  * @method static Builder|User expired()
  */
-final class User extends Authenticatable implements MustVerifyEmailContract
+final class User extends Authenticatable implements HasPasskeys, MustVerifyEmailContract
 {
     use HasFactory; // @phpstan-ignore missingType.generics
     use HasRoles;
+    use InteractsWithPasskeys;
     use MustVerifyEmailTrait;
     use Notifiable;
     use SoftDeletes;
@@ -190,6 +195,21 @@ final class User extends Authenticatable implements MustVerifyEmailContract
             'pending_roles_id' => 'integer',
             'invitedby' => 'integer',
         ];
+    }
+
+    public function getPasskeyName(): string
+    {
+        return $this->email ?: $this->username;
+    }
+
+    public function getPasskeyId(): string
+    {
+        return (string) $this->id;
+    }
+
+    public function getPasskeyDisplayName(): string
+    {
+        return $this->full_name ?: $this->username;
     }
 
     protected function getDefaultGuardName(): string

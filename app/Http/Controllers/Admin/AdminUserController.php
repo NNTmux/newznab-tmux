@@ -12,9 +12,12 @@ use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UserRequest;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Spatie\LaravelPasskeys\Models\Passkey;
 use Spatie\Permission\Models\Role;
 
 class AdminUserController extends BasePageController
@@ -148,7 +151,7 @@ class AdminUserController extends BasePageController
                     // Check if role is changing and get stack preference
                     $roleChanged = $editedUser->roles_id != $request->input('role');
                     $stackRole = $request->input('stack_role') ? true : false; // Check if checkbox is checked
-                    $changedBy = auth()->check() ? auth()->id() : null;
+                    $changedBy = Auth::check() ? Auth::id() : null;
 
                     // CRITICAL: Capture the ORIGINAL rolechangedate BEFORE any updates
                     // This is needed for accurate role history tracking
@@ -269,6 +272,8 @@ class AdminUserController extends BasePageController
 
                     // Add daily API and download counts
                     if ($user) {
+                        $user->load('passkeys');
+
                         try {
                             $user->daily_api_count = UserRequest::getApiRequests($user->id);
                             $user->daily_download_count = UserDownload::getDownloadRequests($user->id);
@@ -348,5 +353,64 @@ class AdminUserController extends BasePageController
         }
 
         return redirect()->back()->with('error', 'User is invalid');
+    }
+
+    public function destroyPasskey(Request $request, Passkey $passkey): RedirectResponse|JsonResponse
+    {
+        $targetUser = $passkey->authenticatable;
+        $targetUserId = $targetUser?->id;
+        $targetUsername = $targetUser?->username;
+        $passkeyName = $passkey->name;
+
+        $passkey->delete();
+
+        Log::channel('admin')->info('Admin deleted user passkey', [
+            'admin_user_id' => Auth::id(),
+            'target_user_id' => $targetUserId,
+            'target_username' => $targetUsername,
+            'passkey_id' => $passkey->id,
+            'passkey_name' => $passkeyName,
+        ]);
+
+        if ($request->expectsJson()) {
+            return response()->json(['ok' => true]);
+        }
+
+        $redirectUrl = $targetUserId
+            ? 'admin/user-edit?id='.$targetUserId
+            : 'admin/user-list';
+
+        return redirect()->to($redirectUrl)->with('success', 'Passkey deleted successfully.');
+    }
+
+    public function wipePasskeys(Request $request): RedirectResponse|JsonResponse
+    {
+        $validated = $request->validate([
+            'user_id' => ['required', 'integer', 'exists:users,id'],
+            'confirmation' => ['required', 'string', 'in:WIPE'],
+        ]);
+
+        $target = User::findOrFail((int) $validated['user_id']);
+        $wipedCount = $target->passkeys()->count();
+        $target->passkeys()->delete();
+
+        Log::channel('admin')->warning('Admin wiped user passkeys', [
+            'admin_user_id' => Auth::id(),
+            'target_user_id' => $target->id,
+            'target_username' => $target->username,
+            'wiped_count' => $wipedCount,
+        ]);
+
+        $message = "{$wipedCount} passkeys removed from {$target->username}. They can now regain access with their password or an admin-issued reset.";
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok' => true,
+                'wiped_count' => $wipedCount,
+                'message' => $message,
+            ]);
+        }
+
+        return redirect()->to('admin/user-edit?id='.$target->id)->with('success', $message);
     }
 }

@@ -467,6 +467,15 @@
                 </p>
             </div>
         </div>
+
+        <div class="p-6 border-t border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                <i class="fas fa-fingerprint mr-2 text-primary-600"></i>Passkeys
+            </h3>
+            <div class="mt-4">
+                @include('partials.passkeys-manage')
+            </div>
+        </div>
     </div>
 </div>
 @endsection

@@ -39,6 +39,9 @@ const lazyComponentMap = {
     'releaseMultiOps': () => import('./components/cart-page.js'),  // same file
     'authPage':        () => import('./components/auth-page.js'),
     'otpInput':        () => import('./components/auth-page.js'),       // same file
+    'passkeyLogin':    () => import('./components/passkey-login.js'),
+    'passkeyManage':   () => import('./components/passkey-manage.js'),
+    'adminUserPasskeys': () => import('./components/admin-user-passkeys.js'),
 
     // --- Admin components (includes Chart.js — heavy) ---
     'adminDashboard':  () => import('./components/admin/dashboard.js'),

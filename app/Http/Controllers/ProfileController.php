@@ -112,6 +112,7 @@ class ProfileController extends BasePageController
         $action = $request->input('action') ?? 'view';
 
         $userid = $this->userdata->id;
+        $this->userdata->loadMissing('passkeys');
 
         $errorStr = '';
         $success_2fa = $request->session()->get('success');

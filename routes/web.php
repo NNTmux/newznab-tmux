@@ -51,6 +51,8 @@ use App\Http\Controllers\ApiHelpController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\PasskeyLoginController;
+use App\Http\Controllers\Auth\PasskeyManagementController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\BooksController;
@@ -83,6 +85,7 @@ use App\Http\Controllers\SearchSuggestController;
 use App\Http\Controllers\SeriesController;
 use App\Http\Controllers\StatusPageController;
 use App\Http\Controllers\TermsController;
+use Spatie\LaravelPasskeys\Http\Controllers\GeneratePasskeyAuthenticationOptionsController;
 
 // Serve cover images from storage - Must be public (no auth required)
 Route::get('/covers/{type}/{filename}', [CoverController::class, 'show'])
@@ -108,6 +111,9 @@ Route::match(['GET', 'POST'], 'privacy-policy', [PrivacyPolicyController::class,
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login'])->name('login.post');
 Route::match(['GET', 'POST'], 'logout', [LoginController::class, 'logout'])->name('logout');
+Route::get('passkeys/authentication-options', GeneratePasskeyAuthenticationOptionsController::class)
+    ->name('passkeys.authentication_options');
+Route::post('passkeys/authenticate', PasskeyLoginController::class)->name('passkeys.login');
 
 Route::get('2fa/verify', [PasswordSecurityController::class, 'getVerify2fa'])->name('2fa.verify');
 Route::post('2fa/verify', [PasswordSecurityController::class, 'verify2fa'])->name('2fa.post');
@@ -123,7 +129,14 @@ Route::post('contact-us', [ContactUsController::class, 'contact']);
 
 Route::get('status', [StatusPageController::class, 'showStatusPage'])->name('status');
 
-Route::middleware('isVerified')->group(function () {
+Route::middleware(['auth', 'isVerified'])->group(function () {
+    Route::post('passkeys/register-options', [PasskeyManagementController::class, 'options'])
+        ->name('passkeys.register_options');
+    Route::post('passkeys', [PasskeyManagementController::class, 'store'])
+        ->name('passkeys.store');
+    Route::delete('passkeys/{passkey}', [PasskeyManagementController::class, 'destroy'])
+        ->name('passkeys.destroy');
+
     Route::match(['GET', 'POST'], 'resetpassword', [ResetPasswordController::class, 'reset'])->name('resetpassword');
     Route::match(['GET', 'POST'], 'profile', [ProfileController::class, 'show'])->name('profile');
 
@@ -224,6 +237,8 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::get('category-delete', [AdminCategoryController::class, 'destroy'])->name('admin.category-delete');
     Route::get('user-list', [AdminUserController::class, 'index'])->name('admin.user-list');
     Route::match(['GET', 'POST'], 'user-edit', [AdminUserController::class, 'edit'])->name('admin.user-edit');
+    Route::delete('user-passkey/{passkey}', [AdminUserController::class, 'destroyPasskey'])->name('admin.user-passkey.destroy');
+    Route::post('user-passkeys/wipe', [AdminUserController::class, 'wipePasskeys'])->name('admin.user-passkeys.wipe');
     Route::post('user-delete', [AdminUserController::class, 'destroy'])->name('admin.user-delete');
     Route::post('verify', [AdminUserController::class, 'verify'])->name('admin.verify');
     Route::post('resendverification', [AdminUserController::class, 'resendVerification'])->name('admin.resend-verification');
