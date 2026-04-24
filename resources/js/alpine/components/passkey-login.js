@@ -5,6 +5,7 @@ Alpine.data('passkeyLogin', () => ({
     busy: false,
     error: '',
     showCreateHint: false,
+    hasAutoPrompted: false,
 
     init() {
         this.supported = typeof window.browserSupportsWebAuthn === 'function'
@@ -13,6 +14,18 @@ Alpine.data('passkeyLogin', () => ({
         // If backend already reported an invalid passkey login attempt,
         // immediately show the "sign in first, then create passkey" guidance.
         this.showCreateHint = this.$el.dataset.serverPasskeyError === '1';
+
+        const shouldAutoPrompt = this.$el.dataset.autoPrompt === '1';
+        if (this.supported && shouldAutoPrompt && !this.showCreateHint) {
+            window.requestAnimationFrame(() => {
+                if (this.hasAutoPrompted || this.busy) {
+                    return;
+                }
+
+                this.hasAutoPrompted = true;
+                void this.authenticate();
+            });
+        }
     },
 
     async authenticate() {

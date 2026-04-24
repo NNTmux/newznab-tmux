@@ -3,6 +3,7 @@
     x-cloak
     data-options-url="{{ route('passkeys.authentication_options') }}"
     data-server-passkey-error="{{ session('authenticatePasskey::reason') === 'invalid_passkey' ? '1' : '0' }}"
+    data-auto-prompt="{{ ($autoPromptPasskey ?? true) ? '1' : '0' }}"
     data-captcha-enabled="{{ \App\Support\CaptchaHelper::isEnabled() ? '1' : '0' }}"
     data-captcha-field="{{ \App\Support\CaptchaHelper::isEnabled() ? \App\Support\CaptchaHelper::getResponseFieldName() : '' }}"
     class="mt-6"

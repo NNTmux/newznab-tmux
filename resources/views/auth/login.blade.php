@@ -43,7 +43,7 @@
                 @endif
 
                 <div x-show="!showPassword" x-cloak>
-                    @include('partials.passkey-authenticate')
+                    @include('partials.passkey-authenticate', ['autoPromptPasskey' => ! $errors->any()])
 
                     <button
                         type="button"
