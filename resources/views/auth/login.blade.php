@@ -20,7 +20,12 @@
 
         <!-- Login Card -->
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
-            <div class="px-5 py-5 sm:px-8 sm:py-6">
+            <div
+                x-data="loginMode"
+                x-on:use-password-login.stop="usePassword()"
+                data-prefers-password="{{ $errors->any() ? '1' : '0' }}"
+                class="px-5 py-5 sm:px-8 sm:py-6"
+            >
                 @if($errors->any())
                     <div class="mb-4 p-4 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700">
                         <div class="flex items-start">
@@ -37,106 +42,130 @@
                     </div>
                 @endif
 
-                <!-- Login Form -->
-                <form method="POST" action="{{ route('login') }}" class="space-y-6">
-                    @csrf
+                <div x-show="!showPassword" x-cloak>
+                    @include('partials.passkey-authenticate')
 
-                    <!-- Username/Email Field -->
-                    <div>
-                        <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Username or Email
-                        </label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-user text-gray-400"></i>
+                    <button
+                        type="button"
+                        x-show="supported"
+                        @click="usePassword()"
+                        class="mt-4 inline-flex items-center text-sm font-medium text-blue-600 transition hover:text-blue-500 dark:text-blue-400"
+                    >
+                        Sign in with password instead
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+
+                <div x-show="showPassword" x-cloak>
+                    <button
+                        type="button"
+                        x-show="supported"
+                        @click="usePasskey()"
+                        class="mb-4 inline-flex items-center text-sm font-medium text-blue-600 transition hover:text-blue-500 dark:text-blue-400"
+                    >
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Sign in with passkey
+                    </button>
+
+                    <!-- Login Form -->
+                    <form method="POST" action="{{ route('login') }}" class="space-y-6">
+                        @csrf
+
+                        <!-- Username/Email Field -->
+                        <div>
+                            <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Username or Email
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-user text-gray-400"></i>
+                                </div>
+                                <input
+                                    id="username"
+                                    type="text"
+                                    name="username"
+                                    value="{{ old('username') }}"
+                                    required
+                                    autofocus
+                                    class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @error('username') border-red-500 @enderror"
+                                    placeholder="Enter your username or email"
+                                >
                             </div>
-                            <input
-                                id="username"
-                                type="text"
-                                name="username"
-                                value="{{ old('username') }}"
-                                required
-                                autofocus
-                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @error('username') border-red-500 @enderror"
-                                placeholder="Enter your username or email"
-                            >
+                            @error('username')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
-                        @error('username')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
 
-                    <!-- Password Field -->
-                    <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Password
-                        </label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fas fa-lock text-gray-400"></i>
+                        <!-- Password Field -->
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Password
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-lock text-gray-400"></i>
+                                </div>
+                                <input
+                                    id="password"
+                                    type="password"
+                                    name="password"
+                                    required
+                                    class="block w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @error('password') border-red-500 @enderror"
+                                    placeholder="Enter your password"
+                                >
+                                <button type="button" class="password-toggle-btn absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" data-field-id="password">
+                                    <i class="fas fa-eye" id="password-eye"></i>
+                                </button>
                             </div>
-                            <input
-                                id="password"
-                                type="password"
-                                name="password"
-                                required
-                                class="block w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @error('password') border-red-500 @enderror"
-                                placeholder="Enter your password"
+                            @error('password')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Remember Me -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input
+                                    id="rememberme"
+                                    name="rememberme"
+                                    type="checkbox"
+                                    {{ old('rememberme') ? 'checked' : '' }}
+                                    class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
+                                >
+                                <label for="rememberme" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                                    Remember me
+                                </label>
+                            </div>
+
+                            @if(Route::has('forgottenpassword'))
+                                <a href="{{ route('forgottenpassword') }}" class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 transition">
+                                    Forgot password?
+                                </a>
+                            @endif
+                        </div>
+
+                        <!-- CAPTCHA (reCAPTCHA or Turnstile) -->
+                        @if(\App\Support\CaptchaHelper::isEnabled())
+                            <div>
+                                {!! \App\Support\CaptchaHelper::display() !!}
+                            </div>
+                            @error(\App\Support\CaptchaHelper::getResponseFieldName())
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+                        @endif
+
+                        <!-- Submit Button -->
+                        <div>
+                            <button
+                                type="submit"
+                                class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
                             >
-                            <button type="button" class="password-toggle-btn absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" data-field-id="password">
-                                <i class="fas fa-eye" id="password-eye"></i>
+                                <i class="fas fa-sign-in-alt mr-2"></i>
+                                Sign In
                             </button>
                         </div>
-                        @error('password')
-                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Remember Me -->
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <input
-                                id="rememberme"
-                                name="rememberme"
-                                type="checkbox"
-                                {{ old('rememberme') ? 'checked' : '' }}
-                                class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
-                            >
-                            <label for="rememberme" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-                                Remember me
-                            </label>
-                        </div>
-
-                        @if(Route::has('forgottenpassword'))
-                            <a href="{{ route('forgottenpassword') }}" class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 transition">
-                                Forgot password?
-                            </a>
-                        @endif
-                    </div>
-
-                    <!-- CAPTCHA (reCAPTCHA or Turnstile) -->
-                    @if(\App\Support\CaptchaHelper::isEnabled())
-                        <div>
-                            {!! \App\Support\CaptchaHelper::display() !!}
-                        </div>
-                        @error(\App\Support\CaptchaHelper::getResponseFieldName())
-                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                        @enderror
-                    @endif
-
-                    <!-- Submit Button -->
-                    <div>
-                        <button
-                            type="submit"
-                            class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
-                        >
-                            <i class="fas fa-sign-in-alt mr-2"></i>
-                            Sign In
-                        </button>
-                    </div>
-                </form>
-
-                @include('partials.passkey-authenticate')
+                    </form>
+                </div>
             </div>
 
             <!-- Card Footer -->

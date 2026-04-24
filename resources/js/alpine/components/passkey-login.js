@@ -88,17 +88,4 @@ Alpine.data('passkeyLogin', () => ({
 
         return '';
     },
-
-    focusPasswordLogin() {
-        const username = document.getElementById('username');
-        if (username) {
-            username.focus();
-            return;
-        }
-
-        const password = document.getElementById('password');
-        if (password) {
-            password.focus();
-        }
-    },
 }));

@@ -1,18 +1,12 @@
 <div
     x-data="passkeyLogin"
     x-cloak
-    x-show="supported"
     data-options-url="{{ route('passkeys.authentication_options') }}"
     data-server-passkey-error="{{ session('authenticatePasskey::reason') === 'invalid_passkey' ? '1' : '0' }}"
     data-captcha-enabled="{{ \App\Support\CaptchaHelper::isEnabled() ? '1' : '0' }}"
     data-captcha-field="{{ \App\Support\CaptchaHelper::isEnabled() ? \App\Support\CaptchaHelper::getResponseFieldName() : '' }}"
     class="mt-6"
 >
-    <div class="relative flex items-center">
-        <div class="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
-        <span class="mx-4 flex-shrink text-xs uppercase text-gray-500 dark:text-gray-400">or</span>
-        <div class="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
-    </div>
     <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
         On managed/company devices, platform passkeys may be unavailable due to policy. Use a FIDO2 security key if prompted.
     </p>
@@ -58,7 +52,7 @@
         <div class="mt-2 flex flex-wrap gap-2">
             <button
                 type="button"
-                @click="focusPasswordLogin()"
+                @click="$dispatch('use-password-login')"
                 class="rounded-md border border-blue-300 px-3 py-1.5 text-xs font-medium text-blue-800 hover:bg-blue-100 dark:border-blue-600 dark:text-blue-200 dark:hover:bg-blue-900/40"
             >
                 Use password login
