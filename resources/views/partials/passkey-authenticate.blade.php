@@ -13,6 +13,9 @@
         <span class="mx-4 flex-shrink text-xs uppercase text-gray-500 dark:text-gray-400">or</span>
         <div class="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
     </div>
+    <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+        On managed/company devices, platform passkeys may be unavailable due to policy. Use a FIDO2 security key if prompted.
+    </p>
 
     @if($message = session('authenticatePasskey::message'))
         <div class="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-700 dark:bg-red-900/20 dark:text-red-300" role="alert">

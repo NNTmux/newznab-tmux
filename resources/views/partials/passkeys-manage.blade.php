@@ -20,6 +20,9 @@
     <p class="text-sm text-gray-600 dark:text-gray-300">
         Register a passkey from your security key, browser, or password manager.
     </p>
+    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+        On managed/company devices, platform passkeys (Windows Hello/PIN) may be disabled by policy. In that case, use a FIDO2 security key or another allowed passkey provider.
+    </p>
 
     <template x-if="!supported">
         <div class="mt-4 rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800 dark:border-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-200">

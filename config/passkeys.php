@@ -37,7 +37,10 @@ return [
         'name' => config('app.name'),
         'id' => env(
             'PASSKEY_RELYING_PARTY_ID',
-            parse_url(config('app.url', 'http://localhost'), PHP_URL_HOST) ?: 'localhost'
+            env(
+                'PASSKEY_RELAYING_PARTY_ID',
+                parse_url(config('app.url', 'http://localhost'), PHP_URL_HOST) ?: 'localhost'
+            )
         ),
         'icon' => null,
     ],
