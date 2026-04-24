@@ -27,7 +27,8 @@
         @endif
 
         <!-- User Form -->
-        <form method="post" action="{{ url('admin/user-edit') }}" class="p-6" x-data="adminUserEdit">
+        <div class="p-6" x-data="adminUserEdit">
+        <form id="admin-user-edit-form" method="post" action="{{ url('admin/user-edit') }}">
             @csrf
             <input type="hidden" name="action" value="submit">
             @if(!empty($user['id']))
@@ -605,9 +606,11 @@
                         </div>
                     </div>
                 @endif
+            </div>
+        </form>
 
                 @if(!is_array($user))
-                    <div class="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900" x-data="adminUserPasskeys">
+                    <div class="mt-6 rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900" @if($user->passkeys->isNotEmpty()) x-data="adminUserPasskeys" @endif>
                         <div class="flex items-center justify-between">
                             <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-200">
                                 <i class="fas fa-fingerprint mr-2 text-blue-600 dark:text-blue-400"></i>Passkeys (WebAuthn)
@@ -658,6 +661,7 @@
                             </div>
                         @endif
 
+                        @if($user->passkeys->isNotEmpty())
                         <div class="mt-4 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
                             <button
                                 type="button"
@@ -698,20 +702,20 @@
                                 </form>
                             </div>
                         </div>
+                        @endif
                     </div>
                 @endif
 
                 <!-- Action Buttons -->
                 <div class="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
+                    <button type="submit" form="admin-user-edit-form" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
                         <i class="fas fa-save mr-2"></i>Save User
                     </button>
                     <a href="{{ url('admin/user-list') }}" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
                         <i class="fas fa-times mr-2"></i>Cancel
                     </a>
                 </div>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 @endsection
