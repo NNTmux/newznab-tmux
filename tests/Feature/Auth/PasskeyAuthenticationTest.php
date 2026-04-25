@@ -70,6 +70,36 @@ class PasskeyAuthenticationTest extends TestCase
         Event::assertDispatched(UserLoggedIn::class);
     }
 
+    public function test_passkey_authentication_with_remember_sets_remember_token(): void
+    {
+        Event::fake([UserLoggedIn::class]);
+        $user = $this->createUser('passkey-remember@example.test');
+
+        $passkey = new Passkey;
+        $passkey->setRawAttributes([
+            'id' => 3,
+            'authenticatable_id' => $user->id,
+            'name' => 'Desktop',
+            'credential_id' => 'credential-3',
+            'data' => '{}',
+        ], true);
+        $passkey->setRelation('authenticatable', $user);
+
+        FakeFindPasskeyAction::$passkey = $passkey;
+        config()->set('passkeys.actions.find_passkey', FakeFindPasskeyAction::class);
+
+        $this
+            ->withSession(['passkey-authentication-options' => '{}'])
+            ->post(route('passkeys.login'), [
+                'start_authentication_response' => json_encode(['id' => 'credential-3'], JSON_THROW_ON_ERROR),
+                'remember' => true,
+            ])
+            ->assertRedirect('/');
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertNotNull($user->fresh()?->remember_token);
+    }
+
     public function test_unverified_users_cannot_authenticate_with_passkeys(): void
     {
         $user = $this->createUser('unverified@example.test', false);

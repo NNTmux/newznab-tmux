@@ -4,6 +4,7 @@
     data-options-url="{{ route('passkeys.authentication_options') }}"
     data-server-passkey-error="{{ session('authenticatePasskey::reason') === 'invalid_passkey' ? '1' : '0' }}"
     data-auto-prompt="{{ ($autoPromptPasskey ?? true) ? '1' : '0' }}"
+    data-remember-default="{{ old('rememberme') ? '1' : '0' }}"
     data-captcha-enabled="{{ \App\Support\CaptchaHelper::isEnabled() ? '1' : '0' }}"
     data-captcha-field="{{ \App\Support\CaptchaHelper::isEnabled() ? \App\Support\CaptchaHelper::getResponseFieldName() : '' }}"
     class="mt-6"
@@ -25,6 +26,18 @@
         <input type="hidden" name="cf-turnstile-response" x-ref="turnstileResponse" value="">
         <input type="hidden" name="g-recaptcha-response" x-ref="recaptchaResponse" value="">
     </form>
+
+    <div class="mt-4 flex items-center">
+        <input
+            id="passkey-remember"
+            x-model="remember"
+            type="checkbox"
+            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:text-blue-400"
+        >
+        <label for="passkey-remember" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+            Remember me
+        </label>
+    </div>
 
     <button
         type="button"

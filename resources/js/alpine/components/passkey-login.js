@@ -4,6 +4,7 @@ Alpine.data('passkeyLogin', () => ({
     supported: false,
     busy: false,
     error: '',
+    remember: false,
     showCreateHint: false,
     hasAutoPrompted: false,
 
@@ -14,6 +15,7 @@ Alpine.data('passkeyLogin', () => ({
         // If backend already reported an invalid passkey login attempt,
         // immediately show the "sign in first, then create passkey" guidance.
         this.showCreateHint = this.$el.dataset.serverPasskeyError === '1';
+        this.remember = this.$el.dataset.rememberDefault === '1';
 
         const shouldAutoPrompt = this.$el.dataset.autoPrompt === '1';
         if (this.supported && shouldAutoPrompt && !this.showCreateHint) {
@@ -57,6 +59,7 @@ Alpine.data('passkeyLogin', () => ({
                 optionsJSON: optionsJson,
             });
 
+            this.$refs.remember.value = this.remember ? '1' : '0';
             this.$refs.response.value = JSON.stringify(startAuthenticationResponse);
             document.getElementById('passkey-login-form')?.submit();
         } catch (error) {
