@@ -8,8 +8,14 @@
     </div>
     <div class="p-6">
         <p class="text-lg text-gray-700 dark:text-gray-300 mb-6 dark:text-gray-300">
-            Here lives the documentation for the API for accessing NZB and index data. API functions can be called by either
-            logged in users, or by providing an API key.
+            Here lives the documentation for the API for accessing NZB and index data. API functions require your API key
+            except public capabilities; direct <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">/getnzb</code>
+            downloads may also use your logged-in browser session.
+        </p>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            XML error responses include a <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">&lt;error code="..."&gt;</code>
+            body and use matching HTTP statuses such as 400 for missing/incorrect parameters, 401 for invalid credentials,
+            403 for suspended accounts, 404 for missing functions/items, and 429 for request or download limits.
         </p>
         @auth
             <div class="surface-panel-alt rounded-lg p-6 mb-6 border">

@@ -17,7 +17,7 @@ use Illuminate\View\View;
 class BasePageController extends Controller
 {
     /**
-     * @var Collection<int, mixed>
+     * @var \Illuminate\Support\Collection<int, mixed>
      */
     public \Illuminate\Support\Collection $settings; // @phpstan-ignore property.phpDocType, class.notFound, missingType.generics
 
@@ -81,6 +81,10 @@ class BasePageController extends Controller
             if (Auth::check()) {
                 $userId = Auth::id();
                 $this->userdata = User::find($userId);
+                if (! $this->userdata?->hasVerifiedEmail()) {
+                    return $next($request);
+                }
+
                 // Cache category exclusions per user (5 minutes)
                 $this->userdata->categoryexclusions = $this->rememberWithCacheFallback(
                     'user_category_exclusions_'.$userId,

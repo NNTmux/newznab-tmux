@@ -34,8 +34,12 @@ newznab-tmux https://github.com/NNTmux/newznab-tmux
    implemented by NNTmux. It merges upstream newznab additions with
    NNTmux-specific compatibility extensions.
 
-   All API endpoints return HTTP 200 on protocol success and report semantic
-   errors in the body (`<error code="...">`), unless otherwise noted.
+   API endpoints return HTTP 200 on protocol success and report semantic
+   errors in the body (`<error code="...">`). Error responses use the HTTP
+   status that matches the XML error code (for example 400 for missing or
+   incorrect parameters, 401 for invalid credentials, 403 for suspended
+   accounts, 404 for missing functions/items, and 429 for request/download
+   limits).
 
 1.1 Notation
 
@@ -299,6 +303,15 @@ newznab-tmux https://github.com/NNTmux/newznab-tmux
    tmdbid, title, firstaired, anidbid.
 
 6. Error Codes
+
+   HTTP status mapping:
+   - 100, 102, 910: 401 Unauthorized
+   - 101, 103, 104, 105, 106: 403 Forbidden
+   - 107, 200, 201, 203, 600, 602, 900: 400 Bad Request
+   - 202, 300: 404 Not Found
+   - 310, 601: 409 Conflict
+   - 500, 501: 429 Too Many Requests
+   - 603: 500 Internal Server Error
 
    100 Incorrect user credentials
    101 Account suspended

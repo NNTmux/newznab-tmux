@@ -98,7 +98,11 @@ class GetNzbController extends BasePageController
      */
     private function getUserDataFromSession(): array|Response
     {
-        if ($this->userdata->hasRole('Disabled')) {
+        if (! $this->userdata->hasVerifiedEmail()) {
+            return showApiError(100);
+        }
+
+        if ($this->userdata->is_disabled || $this->userdata->hasRole('Disabled')) {
             return showApiError(101);
         }
 
@@ -126,7 +130,7 @@ class GetNzbController extends BasePageController
             return showApiError(100);
         }
 
-        if ($user->hasRole('Disabled')) {
+        if ($user->is_disabled || $user->hasRole('Disabled')) {
             return showApiError(101);
         }
 

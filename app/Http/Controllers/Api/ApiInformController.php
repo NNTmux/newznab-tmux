@@ -27,7 +27,11 @@ class ApiInformController extends Controller
         $apiToken = $request->has('api_token') && ! empty($request->input('api_token')) ? $request->input('api_token') : '';
         $user = User::findVerifiedByApiToken((string) $request->input('api_token'));
         if (! $user) {
-            return response()->json(['message' => 'Indexer inform error, wrong api key!'], 404);
+            return apiJsonError(100);
+        }
+
+        if ($user->is_disabled || $user->hasRole('Disabled')) {
+            return apiJsonError(101);
         }
 
         if (! empty($releaseObName) && ! empty($releasePrName) && ! empty($apiToken)) {

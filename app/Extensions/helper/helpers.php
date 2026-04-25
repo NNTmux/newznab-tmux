@@ -755,7 +755,7 @@ if (! function_exists('unzipGzipFile')) {
     function unzipGzipFile(string $filePath): false|string
     {
         $string = '';
-        $gzFile = @gzopen($filePath, 'rb', false);
+        $gzFile = @gzopen($filePath, 'rb', 0);
         if ($gzFile) {
             while (! gzeof($gzFile)) {
                 $temp = gzread($gzFile, 1024);
@@ -914,42 +914,68 @@ if (! function_exists('imdb_trailers')) {
     }
 }
 
+if (! function_exists('apiErrorDetails')) {
+    /**
+     * @return array{code:int,message:string,status:int,header:string}
+     */
+    function apiErrorDetails(int $errorCode = 900, string $errorText = ''): array
+    {
+        [$defaultText, $status, $errorHeader] = match ($errorCode) {
+            100 => ['Incorrect user credentials', 401, 'HTTP/1.1 401 Unauthorized'],
+            101 => ['Account suspended', 403, 'HTTP/1.1 403 Forbidden'],
+            102 => ['Insufficient privileges/not authorized', 401, 'HTTP/1.1 401 Unauthorized'],
+            103 => ['Registration denied', 403, 'HTTP/1.1 403 Forbidden'],
+            104 => ['Registrations are closed', 403, 'HTTP/1.1 403 Forbidden'],
+            105 => ['Invalid registration (Email Address Taken)', 403, 'HTTP/1.1 403 Forbidden'],
+            106 => ['Invalid registration (Email Address Bad Format)', 403, 'HTTP/1.1 403 Forbidden'],
+            107 => ['Registration Failed (Data error)', 400, 'HTTP/1.1 400 Bad Request'],
+            200 => ['Missing parameter', 400, 'HTTP/1.1 400 Bad Request'],
+            201 => ['Incorrect parameter', 400, 'HTTP/1.1 400 Bad Request'],
+            202 => ['No such function', 404, 'HTTP/1.1 404 Not Found'],
+            203 => ['Function not available', 400, 'HTTP/1.1 400 Bad Request'],
+            300 => ['No such item', 404, 'HTTP/1.1 404 Not Found'],
+            310 => ['Item already exists', 409, 'HTTP/1.1 409 Conflict'],
+            500 => ['Request limit reached', 429, 'HTTP/1.1 429 Too Many Requests'],
+            501 => ['Download limit reached', 429, 'HTTP/1.1 429 Too Many Requests'],
+            600 => ['Failed to load NZB', 400, 'HTTP/1.1 400 Bad Request'],
+            601 => ['NZB is duplicate', 409, 'HTTP/1.1 409 Conflict'],
+            602 => ['NZB is for a non-existent group', 400, 'HTTP/1.1 400 Bad Request'],
+            603 => ['NZB failed to write to disk', 500, 'HTTP/1.1 500 Internal Server Error'],
+            910 => ['API disabled', 401, 'HTTP/1.1 401 Unauthorized'],
+            default => ['Unknown error', 400, 'HTTP/1.1 400 Bad Request'],
+        };
+
+        return [
+            'code' => $errorCode,
+            'message' => $errorText !== '' ? $errorText : $defaultText,
+            'status' => $status,
+            'header' => $errorHeader,
+        ];
+    }
+}
+
+if (! function_exists('apiJsonError')) {
+    function apiJsonError(int $errorCode = 900, string $errorText = ''): mixed
+    {
+        $error = apiErrorDetails($errorCode, $errorText);
+
+        return response()
+            ->json(['error' => $error['message']], $error['status'])
+            ->header('X-NNTmux', 'API ERROR ['.$error['code'].'] '.$error['message']);
+    }
+}
+
 if (! function_exists('showApiError')) {
     function showApiError(int $errorCode = 900, string $errorText = ''): mixed
     {
-        $errorHeader = 'HTTP 1.1 400 Bad Request';
-        if ($errorText === '') {
-            [$errorText, $errorHeader] = match ($errorCode) {
-                100 => ['Incorrect user credentials', 'HTTP 1.1 401 Unauthorized'],
-                101 => ['Account suspended', 'HTTP 1.1 403 Forbidden'],
-                102 => ['Insufficient privileges/not authorized', 'HTTP 1.1 401 Unauthorized'],
-                103 => ['Registration denied', 'HTTP 1.1 403 Forbidden'],
-                104 => ['Registrations are closed', 'HTTP 1.1 403 Forbidden'],
-                105 => ['Invalid registration (Email Address Taken)', 'HTTP 1.1 403 Forbidden'],
-                106 => ['Invalid registration (Email Address Bad Format)', 'HTTP 1.1 403 Forbidden'],
-                107 => ['Registration Failed (Data error)', 'HTTP 1.1 400 Bad Request'],
-                200 => ['Missing parameter', 'HTTP 1.1 400 Bad Request'],
-                201 => ['Incorrect parameter', 'HTTP 1.1 400 Bad Request'],
-                202 => ['No such function', 'HTTP 1.1 404 Not Found'],
-                203 => ['Function not available', 'HTTP 1.1 400 Bad Request'],
-                300 => ['No such item', 'HTTP 1.1 404 Not Found'],
-                310 => ['Item already exists', 'HTTP 1.1 409 Conflict'],
-                500 => ['Request limit reached', 'HTTP 1.1 429 Too Many Requests'],
-                501 => ['Download limit reached', 'HTTP 1.1 429 Too Many Requests'],
-                600 => ['Failed to load NZB', 'HTTP 1.1 400 Bad Request'],
-                601 => ['NZB is duplicate', 'HTTP 1.1 409 Conflict'],
-                602 => ['NZB is for a non-existent group', 'HTTP 1.1 400 Bad Request'],
-                603 => ['NZB failed to write to disk', 'HTTP 1.1 500 Internal Server Error'],
-                910 => ['API disabled', 'HTTP 1.1 401 Unauthorized'],
-                default => ['Unknown error', 'HTTP 1.1 400 Bad Request'],
-            };
-        }
+        $error = apiErrorDetails($errorCode, $errorText);
+        $errorText = $error['message'];
 
         $response =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".
             '<error code="'.$errorCode.'" description="'.$errorText."\"/>\n";
 
-        return response($response)->header('Content-type', 'text/xml')->header('Content-Length', (string) strlen($response))->header('X-NNTmux', 'API ERROR ['.$errorCode.'] '.$errorText)->header('HTTP/1.1', $errorHeader);
+        return response($response, $error['status'])->header('Content-type', 'text/xml')->header('Content-Length', (string) strlen($response))->header('X-NNTmux', 'API ERROR ['.$errorCode.'] '.$errorText)->header('HTTP/1.1', $error['header']);
     }
 }
 

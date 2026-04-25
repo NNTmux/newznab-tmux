@@ -12,6 +12,10 @@
             Here you can find RSS feeds for various categories and content types. These feeds provide either descriptions or
             direct NZB downloads based on your preferences.
         </p>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            RSS feed URLs require <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">api_token</code> for access by feed readers or other non-browser clients. Token errors return JSON with matching HTTP statuses:
+            400 for a missing token, 401 for invalid or unverified tokens, 403 for suspended accounts, and 429 for request limits.
+        </p>
 
         @auth
             <div class="surface-panel-alt rounded-lg p-6 mb-6 border">

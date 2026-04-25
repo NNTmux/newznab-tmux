@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Closure;
 use Illuminate\Cache\RateLimiter;
@@ -53,17 +54,23 @@ class ThrottleApiRequestsByToken
 
     private function resolveUser(Request $request): ?User
     {
-        $apiToken = $request->input('api_token');
+        $apiToken = $request->input('api_token') ?? $request->input('apikey');
 
         if (! is_string($apiToken) || $apiToken === '') {
             return null;
         }
 
-        return Cache::remember('api_rate_limit_user:'.md5($apiToken), 300, static function () use ($apiToken) {
+        $user = Cache::remember('api_rate_limit_user:'.md5($apiToken), 300, static function () use ($apiToken) {
             return User::verifiedApiTokenQuery($apiToken)
-                ->select(['id', 'api_token', 'rate_limit'])
+                ->select(['id', 'roles_id', 'api_token', 'rate_limit'])
                 ->first();
         });
+
+        if ($user?->roles_id === UserRole::DISABLED->value) {
+            return null;
+        }
+
+        return $user;
     }
 
     private function rateLimitKey(int $userId): string
@@ -74,14 +81,16 @@ class ThrottleApiRequestsByToken
     private function buildTooManyRequestsResponse(string $rateLimitKey, int $maxAttempts): JsonResponse
     {
         $retryAfter = max(1, $this->limiter->availableIn($rateLimitKey));
+        $error = apiErrorDetails(500, 'Request limit reached');
 
         return response()->json([
-            'error' => 'API rate limit exceeded.',
+            'error' => $error['message'],
             'retry_after' => $retryAfter,
-        ], 429, [
+        ], $error['status'], [
             'Retry-After' => (string) $retryAfter,
             'X-RateLimit-Limit' => (string) $maxAttempts,
             'X-RateLimit-Remaining' => '0',
+            'X-NNTmux' => 'API ERROR ['.$error['code'].'] '.$error['message'],
         ]);
     }
 }

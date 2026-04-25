@@ -20,16 +20,23 @@ https://<host>/api/v2
 
 - `GET /capabilities` is public.
 - All other v2 routes require `api_token`.
-- Route-level middleware uses token-aware throttling (`apiRateLimit`).
-- Controller-level auth errors return:
+- Route-level middleware uses token-aware throttling (`apiRateLimit`) and accepts `api_token` or the legacy `apikey` alias when that middleware is reused.
+- Controller-level auth errors return a JSON error envelope:
 
 ```json
 {
-  "error": "Missing or invalid API key"
+  "error": "Missing parameter (api_token)"
 }
 ```
 
-with HTTP `403`.
+Common auth/rate-limit statuses:
+
+| HTTP | Error |
+|---:|---|
+| 400 | `Missing parameter (api_token)` |
+| 401 | `Incorrect user credentials` |
+| 403 | `Account suspended` |
+| 429 | `Request limit reached` |
 
 ## Common Query Parameters
 

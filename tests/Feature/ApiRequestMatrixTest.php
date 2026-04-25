@@ -45,7 +45,7 @@ class ApiRequestMatrixTest extends TestCase
 
         $response = $this->get('/api/v1/api?t=search&apikey='.$token.'&q=test&sort=bad_value');
 
-        $response->assertOk();
+        $response->assertBadRequest();
         $response->assertSee('<error code="201"', false);
         $response->assertSee('Incorrect parameter (sort', false);
     }
@@ -56,9 +56,46 @@ class ApiRequestMatrixTest extends TestCase
 
         $response = $this->get('/api/v1/api?t=search&apikey='.$token.'&q=test&maxage=abc');
 
-        $response->assertOk();
+        $response->assertBadRequest();
         $response->assertSee('<error code="201"', false);
         $response->assertSee('maxage must be numeric', false);
+    }
+
+    public function test_v1_invalid_apikey_returns_xml_401_error(): void
+    {
+        $response = $this->get('/api/v1/api?t=search&apikey=invalid-token&q=test');
+
+        $response->assertUnauthorized();
+        $response->assertSee('<error code="100" description="Incorrect user credentials (wrong API key)"/>', false);
+    }
+
+    public function test_v2_invalid_api_token_returns_json_401_error(): void
+    {
+        $this->getJson('/api/v2/search?api_token=invalid-token&id=test')
+            ->assertUnauthorized()
+            ->assertJsonPath('error', 'Incorrect user credentials');
+    }
+
+    public function test_v2_disabled_user_is_rejected_before_request_is_recorded(): void
+    {
+        DB::table('users')->insert([
+            'username' => 'disabled_matrix_user',
+            'email' => 'disabled-matrix@example.test',
+            'password' => bcrypt('secret'),
+            'roles_id' => 3,
+            'api_token' => 'disabled-matrix-token',
+            'verified' => 1,
+            'email_verified_at' => now(),
+            'rate_limit' => 60,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->getJson('/api/v2/search?api_token=disabled-matrix-token&id=test')
+            ->assertForbidden()
+            ->assertJsonPath('error', 'Account suspended');
+
+        $this->assertSame(0, DB::table('user_requests')->count());
     }
 
     public function test_v2_invalid_sort_returns_json_400_error(): void
@@ -331,15 +368,28 @@ class ApiRequestMatrixTest extends TestCase
         ]);
 
         DB::table('roles')->insert([
-            'id' => 1,
-            'name' => 'User',
-            'guard_name' => 'web',
-            'rate_limit' => 60,
-            'apirequests' => 1000,
-            'downloadrequests' => 100,
-            'addyears' => 0,
-            'created_at' => now(),
-            'updated_at' => now(),
+            [
+                'id' => 1,
+                'name' => 'User',
+                'guard_name' => 'web',
+                'rate_limit' => 60,
+                'apirequests' => 1000,
+                'downloadrequests' => 100,
+                'addyears' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'id' => 3,
+                'name' => 'Disabled',
+                'guard_name' => 'web',
+                'rate_limit' => 60,
+                'apirequests' => 0,
+                'downloadrequests' => 0,
+                'addyears' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
 
         DB::table('users')->insert([

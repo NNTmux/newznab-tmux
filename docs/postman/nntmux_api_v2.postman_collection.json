@@ -183,8 +183,8 @@
               ]
             }
           },
-          "status": "Forbidden",
-          "code": 403,
+          "status": "Bad Request",
+          "code": 400,
           "_postman_previewlanguage": "json",
           "header": [
             {
@@ -193,7 +193,7 @@
             }
           ],
           "cookie": [],
-          "body": "{\n  \"error\": \"Missing or invalid API key\"\n}"
+          "body": "{\n  \"error\": \"Missing parameter (api_token)\"\n}"
         }
       ]
     },
@@ -439,8 +439,8 @@
               ]
             }
           },
-          "status": "Forbidden",
-          "code": 403,
+          "status": "Bad Request",
+          "code": 400,
           "_postman_previewlanguage": "json",
           "header": [
             {
@@ -449,7 +449,7 @@
             }
           ],
           "cookie": [],
-          "body": "{\n  \"error\": \"Missing or invalid API key\"\n}"
+          "body": "{\n  \"error\": \"Missing parameter (api_token)\"\n}"
         }
       ]
     },
@@ -561,8 +561,8 @@
               ]
             }
           },
-          "status": "Forbidden",
-          "code": 403,
+          "status": "Bad Request",
+          "code": 400,
           "_postman_previewlanguage": "json",
           "header": [
             {
@@ -571,7 +571,7 @@
             }
           ],
           "cookie": [],
-          "body": "{\n  \"error\": \"Missing or invalid API key\"\n}"
+          "body": "{\n  \"error\": \"Missing parameter (api_token)\"\n}"
         }
       ]
     }

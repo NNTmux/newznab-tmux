@@ -50,23 +50,35 @@ class ApiV2Controller extends BasePageController
     }
 
     /**
-     * Validate API token and return cached user, or null on failure.
+     * Validate API token and return cached user, or a normalized JSON API error on failure.
      * Caches user lookup for 5 minutes to reduce DB hits.
      */
-    private function resolveUser(Request $request): ?User
+    private function resolveUser(Request $request): User|JsonResponse
     {
         if ($request->missing('api_token') || $request->isNotFilled('api_token')) {
-            return null;
+            return apiJsonError(200, 'Missing parameter (api_token)');
         }
 
         $apiToken = $request->input('api_token');
         $userCacheKey = 'api_user:'.md5((string) $apiToken);
 
-        return Cache::remember($userCacheKey, 300, function () use ($apiToken) {
-            return User::verifiedApiTokenQuery((string) $apiToken)
-                ->with('role')
+        $user = Cache::remember($userCacheKey, 300, function () use ($apiToken) {
+            return User::query()
+                ->whereApiToken((string) $apiToken)
                 ->first();
         });
+
+        if (! $user || ! $user->hasVerifiedEmail()) {
+            return apiJsonError(100);
+        }
+
+        if ($user->is_disabled || $user->hasRole('Disabled')) {
+            return apiJsonError(101);
+        }
+
+        $user->loadMissing('role');
+
+        return $user;
     }
 
     /**
@@ -189,8 +201,8 @@ class ApiV2Controller extends BasePageController
     public function movie(Request $request): JsonResponse
     {
         $user = $this->resolveUser($request);
-        if (! $user) {
-            return response()->json(['error' => 'Missing or invalid API key'], 403);
+        if ($user instanceof JsonResponse) {
+            return $user;
         }
 
         UserRequest::addApiRequest($user->id, $request->getRequestUri());
@@ -256,8 +268,8 @@ class ApiV2Controller extends BasePageController
     public function audio(Request $request): JsonResponse|Response
     {
         $user = $this->resolveUser($request);
-        if (! $user) {
-            return response()->json(['error' => 'Missing or invalid API key'], 403);
+        if ($user instanceof JsonResponse) {
+            return $user;
         }
 
         UserRequest::addApiRequest($user->id, $request->getRequestUri());
@@ -308,8 +320,8 @@ class ApiV2Controller extends BasePageController
     public function books(Request $request): JsonResponse|Response
     {
         $user = $this->resolveUser($request);
-        if (! $user) {
-            return response()->json(['error' => 'Missing or invalid API key'], 403);
+        if ($user instanceof JsonResponse) {
+            return $user;
         }
 
         UserRequest::addApiRequest($user->id, $request->getRequestUri());
@@ -360,8 +372,8 @@ class ApiV2Controller extends BasePageController
     public function anime(Request $request): JsonResponse|Response
     {
         $user = $this->resolveUser($request);
-        if (! $user) {
-            return response()->json(['error' => 'Missing or invalid API key'], 403);
+        if ($user instanceof JsonResponse) {
+            return $user;
         }
 
         UserRequest::addApiRequest($user->id, $request->getRequestUri());
@@ -416,8 +428,8 @@ class ApiV2Controller extends BasePageController
     public function apiSearch(Request $request): JsonResponse
     {
         $user = $this->resolveUser($request);
-        if (! $user) {
-            return response()->json(['error' => 'Missing or invalid API key'], 403);
+        if ($user instanceof JsonResponse) {
+            return $user;
         }
 
         UserRequest::addApiRequest($user->id, $request->getRequestUri());
@@ -483,8 +495,8 @@ class ApiV2Controller extends BasePageController
     public function tv(Request $request): JsonResponse
     {
         $user = $this->resolveUser($request);
-        if (! $user) {
-            return response()->json(['error' => 'Missing or invalid API key'], 403);
+        if ($user instanceof JsonResponse) {
+            return $user;
         }
 
         $catExclusions = User::getCategoryExclusionById($user->id);
@@ -559,8 +571,8 @@ class ApiV2Controller extends BasePageController
     public function getNzb(Request $request): Application|ResponseFactory|JsonResponse|Redirector|RedirectResponse
     {
         $user = $this->resolveUser($request);
-        if (! $user) {
-            return response()->json(['error' => 'Missing or invalid API key'], 403);
+        if ($user instanceof JsonResponse) {
+            return $user;
         }
 
         event(new UserAccessedApi($user, $request->ip()));
@@ -576,8 +588,8 @@ class ApiV2Controller extends BasePageController
     public function details(Request $request): JsonResponse
     {
         $user = $this->resolveUser($request);
-        if (! $user) {
-            return response()->json(['error' => 'Missing or invalid API key'], 403);
+        if ($user instanceof JsonResponse) {
+            return $user;
         }
         if ($request->missing('id')) {
             return response()->json(['error' => 'Missing parameter (guid is required for single release details)'], 400);

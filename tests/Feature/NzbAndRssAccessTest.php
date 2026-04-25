@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use App\View\Composers\GlobalDataComposer;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Schema\Blueprint;
@@ -95,7 +96,7 @@ class NzbAndRssAccessTest extends TestCase
     {
         $response = $this->get('/getnzb?id=test-guid');
 
-        $response->assertOk();
+        $response->assertBadRequest();
         $response->assertSee('<error code="200" description="Missing parameter"/>', false);
         $response->assertDontSee('name="login"', false);
         $response->assertDontSee('<title>Login', false);
@@ -105,7 +106,7 @@ class NzbAndRssAccessTest extends TestCase
     {
         $response = $this->get('/api/v1/api?t=get&id=test-guid');
 
-        $response->assertOk();
+        $response->assertBadRequest();
         $response->assertSee('<error code="200" description="Missing parameter (apikey)"/>', false);
         $response->assertDontSee('name="login"', false);
         $response->assertDontSee('<title>Login', false);
@@ -115,9 +116,9 @@ class NzbAndRssAccessTest extends TestCase
     {
         $response = $this->getJson('/api/v2/getnzb?id=test-guid');
 
-        $response->assertForbidden();
+        $response->assertBadRequest();
         $response->assertJson([
-            'error' => 'Missing or invalid API key',
+            'error' => 'Missing parameter (api_token)',
         ]);
         $response->assertDontSee('name="login"', false);
         $response->assertDontSee('<title>Login', false);
@@ -136,10 +137,47 @@ class NzbAndRssAccessTest extends TestCase
 
         $response = $this->get('/getnzb?r=unverified-nzb-token&id=test-guid');
 
-        $response->assertOk();
+        $response->assertUnauthorized();
         $response->assertSee('<error code="100" description="Incorrect user credentials"/>', false);
         $response->assertDontSee('name="login"', false);
         $response->assertDontSee('<title>Login', false);
+    }
+
+    public function test_logged_in_unverified_user_cannot_download_nzb_via_session(): void
+    {
+        $userId = DB::table('users')->insertGetId([
+            'username' => 'unverified-session-nzb-user',
+            'email' => 'unverified-session-nzb@example.test',
+            'password' => 'secret',
+            'api_token' => 'unverified-session-nzb-token',
+            'verified' => 0,
+            'email_verified_at' => null,
+        ]);
+        $user = User::query()->findOrFail($userId);
+
+        $response = $this->actingAs($user)->get('/getnzb?id=test-guid');
+
+        $response->assertUnauthorized();
+        $response->assertSee('<error code="100" description="Incorrect user credentials"/>', false);
+        $response->assertDontSee('name="login"', false);
+        $response->assertDontSee('<title>Login', false);
+    }
+
+    public function test_logged_in_unverified_user_is_redirected_away_from_site_pages(): void
+    {
+        $userId = DB::table('users')->insertGetId([
+            'username' => 'unverified-site-user',
+            'email' => 'unverified-site@example.test',
+            'password' => 'secret',
+            'api_token' => 'unverified-site-token',
+            'verified' => 0,
+            'email_verified_at' => null,
+        ]);
+        $user = User::query()->findOrFail($userId);
+
+        $this->actingAs($user)
+            ->get('/profile')
+            ->assertRedirect(route('verification.notice'));
     }
 
     public function test_legacy_api_rejects_unverified_users(): void
@@ -155,7 +193,7 @@ class NzbAndRssAccessTest extends TestCase
 
         $response = $this->get('/api/v1/api?t=search&apikey=unverified-api-token');
 
-        $response->assertOk();
+        $response->assertUnauthorized();
         $response->assertSee('<error code="100" description="Incorrect user credentials (wrong API key)"/>', false);
         $response->assertDontSee('name="login"', false);
         $response->assertDontSee('<title>Login', false);
@@ -174,21 +212,37 @@ class NzbAndRssAccessTest extends TestCase
 
         $response = $this->getJson('/api/v2/search?api_token=unverified-api-v2-token&id=test');
 
-        $response->assertForbidden();
+        $response->assertUnauthorized();
         $response->assertJson([
-            'error' => 'Missing or invalid API key',
+            'error' => 'Incorrect user credentials',
         ]);
         $response->assertDontSee('name="login"', false);
         $response->assertDontSee('<title>Login', false);
+    }
+
+    public function test_api_inform_rejects_unverified_users(): void
+    {
+        DB::table('users')->insert([
+            'username' => 'unverified-inform-user',
+            'email' => 'unverified-inform@example.test',
+            'password' => 'secret',
+            'api_token' => 'unverified-inform-token',
+            'verified' => 0,
+            'email_verified_at' => null,
+        ]);
+
+        $this->getJson('/api/inform/release?api_token=unverified-inform-token&relo=old.name&relp=new.name')
+            ->assertUnauthorized()
+            ->assertJsonPath('error', 'Incorrect user credentials');
     }
 
     public function test_rss_feed_without_api_token_returns_403_error_instead_of_login_redirect(): void
     {
         $response = $this->get('/rss/full-feed');
 
-        $response->assertForbidden();
+        $response->assertBadRequest();
         $response->assertJson([
-            'error' => 'API key is required for viewing the RSS!',
+            'error' => 'Missing parameter (api_token)',
         ]);
         $response->assertDontSee('name="login"', false);
         $response->assertDontSee('<title>Login', false);
@@ -207,9 +261,9 @@ class NzbAndRssAccessTest extends TestCase
 
         $response = $this->get('/rss/full-feed?api_token=unverified-rss-token');
 
-        $response->assertForbidden();
+        $response->assertUnauthorized();
         $response->assertJson([
-            'error' => 'Invalid RSS token',
+            'error' => 'Incorrect user credentials',
         ]);
         $response->assertDontSee('name="login"', false);
         $response->assertDontSee('<title>Login', false);
@@ -253,7 +307,7 @@ class NzbAndRssAccessTest extends TestCase
 
         $this->getJson('/api/test-rate-limit?api_token=low-limit-token')
             ->assertStatus(429)
-            ->assertJsonPath('error', 'API rate limit exceeded.');
+            ->assertJsonPath('error', 'Request limit reached');
 
         $this->getJson('/api/test-rate-limit?api_token=high-limit-token')
             ->assertOk()
@@ -270,7 +324,28 @@ class NzbAndRssAccessTest extends TestCase
 
         $this->getJson('/api/test-rate-limit?api_token=high-limit-token')
             ->assertStatus(429)
-            ->assertJsonPath('error', 'API rate limit exceeded.');
+            ->assertJsonPath('error', 'Request limit reached');
+    }
+
+    public function test_api_rate_limit_accepts_legacy_apikey_parameter(): void
+    {
+        DB::table('users')->insert([
+            'username' => 'legacy-low-limit-user',
+            'email' => 'legacy-low@example.test',
+            'password' => 'secret',
+            'api_token' => 'legacy-low-limit-token',
+            'rate_limit' => 1,
+            'verified' => 1,
+        ]);
+
+        $this->getJson('/api/test-rate-limit?apikey=legacy-low-limit-token')
+            ->assertOk()
+            ->assertHeader('X-RateLimit-Limit', '1')
+            ->assertHeader('X-RateLimit-Remaining', '0');
+
+        $this->getJson('/api/test-rate-limit?apikey=legacy-low-limit-token')
+            ->assertStatus(429)
+            ->assertJsonPath('error', 'Request limit reached');
     }
 
     private function setEnvironmentValue(string $key, ?string $value): void
@@ -311,6 +386,7 @@ class NzbAndRssAccessTest extends TestCase
                 $table->string('username')->unique();
                 $table->string('email')->unique();
                 $table->string('password');
+                $table->unsignedInteger('roles_id')->default(1);
                 $table->string('api_token')->nullable()->index();
                 $table->integer('rate_limit')->default(60);
                 $table->boolean('verified')->default(true);

@@ -11,6 +11,11 @@
         <p class="text-lg text-gray-700 dark:text-gray-300 mb-6 dark:text-gray-300">
             Here lives the documentation for the API v2 for accessing NZB and index data. API functions can be called by providing an API token.
         </p>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            The <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">capabilities</code> endpoint is public. Other v2 endpoints return JSON errors with matching HTTP statuses:
+            400 for missing <code class="px-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">api_token</code>, 401 for invalid or unverified tokens,
+            403 for suspended accounts, and 429 for request limits.
+        </p>
 
         @auth
             <div class="surface-panel-alt rounded-lg p-6 mb-6 border">

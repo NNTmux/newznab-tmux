@@ -214,13 +214,13 @@ class RssController extends BasePageController
     private function userCheck(Request $request): JsonResponse|array
     {
         if ($request->missing('api_token')) {
-            return response()->json(['error' => 'API key is required for viewing the RSS!'], 403);
+            return apiJsonError(200, 'Missing parameter (api_token)');
         }
 
         $res = User::findVerifiedByApiToken((string) $request->input('api_token'));
 
         if ($res === null) {
-            return response()->json(['error' => 'Invalid RSS token'], 403);
+            return apiJsonError(100);
         }
 
         $uid = $res['id'];
@@ -233,12 +233,12 @@ class RssController extends BasePageController
         $grabTime = UserDownload::whereUsersId($uid)->min('timestamp');
         $oldestGrabTime = $grabTime !== null ? Carbon::createFromTimeString($grabTime)->toRfc2822String() : '';
 
-        if ($res->hasRole('Disabled')) {
-            return response()->json(['error' => 'Your account is disabled'], 403);
+        if ($res->is_disabled || $res->hasRole('Disabled')) {
+            return apiJsonError(101);
         }
 
         if ($usedRequests > $maxRequests) {
-            return response()->json(['error' => 'You have reached your daily limit for API requests!'], 403);
+            return apiJsonError(500, 'Request limit reached ('.$usedRequests.'/'.$maxRequests.')');
         }
 
         UserRequest::addApiRequest($rssToken, $request->getRequestUri());

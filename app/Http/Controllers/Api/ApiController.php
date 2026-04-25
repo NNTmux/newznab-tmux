@@ -137,7 +137,7 @@ class ApiController extends BasePageController
                 return showApiError(100, 'Incorrect user credentials (wrong API key)');
             }
 
-            if ($res->hasRole('Disabled')) {
+            if ($res->is_disabled || $res->hasRole('Disabled')) {
                 return showApiError(101);
             }
 
