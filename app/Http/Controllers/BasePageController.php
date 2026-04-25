@@ -9,6 +9,7 @@ use App\Models\Settings;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -17,9 +18,9 @@ use Illuminate\View\View;
 class BasePageController extends Controller
 {
     /**
-     * @var \Illuminate\Support\Collection<int, mixed>
+     * @var Collection<int, mixed>
      */
-    public \Illuminate\Support\Collection $settings; // @phpstan-ignore property.phpDocType, class.notFound, missingType.generics
+    public Collection $settings; // @phpstan-ignore property.phpDocType, class.notFound, missingType.generics
 
     public string $title = '';
 
