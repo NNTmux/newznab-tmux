@@ -221,4 +221,3 @@ class AdminUserControllerTest extends TestCase
         return $user->fresh();
     }
 }
-
