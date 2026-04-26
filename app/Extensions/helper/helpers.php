@@ -755,7 +755,7 @@ if (! function_exists('unzipGzipFile')) {
     function unzipGzipFile(string $filePath): false|string
     {
         $string = '';
-        $gzFile = @gzopen($filePath, 'rb', 0);
+        $gzFile = @gzopen($filePath, 'rb');
         if ($gzFile) {
             while (! gzeof($gzFile)) {
                 $temp = gzread($gzFile, 1024);

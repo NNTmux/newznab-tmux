@@ -108,10 +108,18 @@ class AdminUserController extends BasePageController
         // set the current action
         $action = $request->input('action') ?? 'view';
 
+        $roleId = null;
+        if ($action === 'submit') {
+            $validated = $request->validate([
+                'role' => ['required', 'integer', 'exists:roles,id'],
+            ]);
+            $roleId = (int) $validated['role'];
+        }
+
         // get the user roles
         $userRoles = Role::cursor()->remember();
         $roles = [];
-        $defaultRole = 'User';
+        $defaultRole = UserRole::USER->value;
         $defaultInvites = Invitation::DEFAULT_INVITES;
         foreach ($userRoles as $r) {
             $roles[$r->id] = $r->name;
@@ -140,16 +148,16 @@ class AdminUserController extends BasePageController
                 if (empty($request->input('id'))) {
                     $invites = $defaultInvites;
                     foreach ($userRoles as $role) {
-                        if ($role['id'] === $request->input('role')) {
+                        if ((int) $role['id'] === $roleId) {
                             $invites = $role['defaultinvites'];
                         }
                     }
-                    $ret = User::signUp($request->input('username'), $request->input('password'), $request->input('email'), '', $request->input('notes'), $invites, '', true, $request->input('role'), false);
+                    $ret = User::signUp($request->input('username'), $request->input('password'), $request->input('email'), '', $request->input('notes'), $invites, '', true, $roleId, false);
                 } else {
                     $editedUser = User::find($request->input('id'));
 
                     // Check if role is changing and get stack preference
-                    $roleChanged = $editedUser->roles_id != $request->input('role');
+                    $roleChanged = (int) $editedUser->roles_id !== $roleId;
                     $stackRole = $request->input('stack_role') ? true : false; // Check if checkbox is checked
                     $changedBy = Auth::check() ? Auth::id() : null;
 
@@ -164,7 +172,7 @@ class AdminUserController extends BasePageController
                         'user_id' => $editedUser->id,
                         'originalRoleChangeDate' => $originalRoleChangeDate,
                         'current_roles_id' => $editedUser->roles_id,
-                        'requested_role' => $request->input('role'),
+                        'requested_role' => $roleId,
                         'roleChanged' => $roleChanged,
                         'stackRole' => $stackRole,
                         'form_rolechangedate' => $request->input('rolechangedate'),
@@ -198,17 +206,17 @@ class AdminUserController extends BasePageController
 
                     // If role is changing, handle it with stacking logic
                     // Pass the original expiry so history records the correct old_expiry_date
-                    if ($roleChanged && $request->input('role') !== null) {
+                    if ($roleChanged) {
                         Log::info('AdminUserController - About to call updateUserRole', [
                             'user_id' => $editedUser->id,
-                            'new_role' => (int) $request->input('role'),
+                            'new_role' => $roleId,
                             'originalRoleChangeDate_passed' => $originalRoleChangeDate,
                             'current_user_rolechangedate' => $editedUser->rolechangedate,
                         ]);
 
                         User::updateUserRole(
                             $editedUser->id,
-                            (int) $request->input('role'), // Cast to integer
+                            $roleId,
                             ! $adminManuallySetExpiry, // Only apply promotions if admin didn't set custom expiry
                             $stackRole, // Stack role if requested
                             $changedBy,
@@ -259,7 +267,7 @@ class AdminUserController extends BasePageController
                     'id' => $request->input('id'),
                     'username' => $request->input('username'),
                     'email' => $request->input('email'),
-                    'role' => $request->input('role'),
+                    'role' => $roleId,
                     'notes' => $request->input('notes'),
                 ];
                 break;
