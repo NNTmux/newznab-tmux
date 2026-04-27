@@ -56,4 +56,3 @@ final class ApproximateRowCount
         return in_array($driver, ['mysql', 'mariadb'], true);
     }
 }
-

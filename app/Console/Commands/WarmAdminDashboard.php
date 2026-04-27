@@ -24,4 +24,3 @@ class WarmAdminDashboard extends Command
         return self::SUCCESS;
     }
 }
-

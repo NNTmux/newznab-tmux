@@ -62,9 +62,8 @@ return new class extends Migration
             $rows = DB::select("SHOW INDEX FROM {$table} WHERE Key_name = ?", [$indexName]);
 
             return count($rows) > 0;
-        } catch (\Throwable) {
+        } catch (Throwable) {
             return false;
         }
     }
 };
-

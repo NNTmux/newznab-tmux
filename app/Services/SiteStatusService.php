@@ -135,7 +135,7 @@ class SiteStatusService
     {
         Cache::forget(self::CACHE_KEY_ENABLED_SERVICES);
         Cache::forget(self::CACHE_KEY_ACTIVE_INCIDENTS);
-        Cache::forget(\App\Services\AdminDashboardSnapshotService::CACHE_KEY);
+        Cache::forget(AdminDashboardSnapshotService::CACHE_KEY);
     }
 
     /**

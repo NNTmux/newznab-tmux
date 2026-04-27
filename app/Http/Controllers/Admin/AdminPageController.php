@@ -186,4 +186,3 @@ class AdminPageController extends BasePageController
         ]);
     }
 }
-

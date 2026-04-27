@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\DnzbFailure;
 use App\Models\Release;
 use App\Models\ReleaseReport;
 use App\Models\UsenetGroup;
@@ -205,4 +204,3 @@ class AdminDashboardSnapshotService
         })->all();
     }
 }
-
