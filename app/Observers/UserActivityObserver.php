@@ -145,6 +145,7 @@ class UserActivityObserver
             'username' => $user->username,
             'activity_type' => 'deleted',
             'description' => "User permanently deleted: {$user->username}",
+            'is_permanent' => true,
             'metadata' => [
                 'email' => $user->email,
                 'deleted_by' => $deletedBy,

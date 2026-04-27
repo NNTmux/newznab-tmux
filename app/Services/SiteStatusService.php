@@ -14,12 +14,26 @@ use App\Services\StatusProbes\ProbeResult;
 use App\Services\StatusProbes\ServiceProbeRegistry;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class SiteStatusService
 {
+    public const CACHE_KEY_ENABLED_SERVICES = 'admin:site-status:enabled-services';
+
+    public const CACHE_KEY_ACTIVE_INCIDENTS = 'admin:site-status:active-incidents';
+
+    /**
+     * Cache freshness/stale window in seconds for the dashboard-facing reads.
+     * 60s fresh + 600s stale-while-revalidate keeps reads hot without
+     * blocking the request when health-check writes invalidate the keys.
+     *
+     * @var array{0: int, 1: int}
+     */
+    private const CACHE_TTL = [60, 600];
+
     public function __construct(
         private readonly ServiceProbeRegistry $probeRegistry,
     ) {}
@@ -37,11 +51,11 @@ class SiteStatusService
      */
     public function getEnabledServices(): \Illuminate\Database\Eloquent\Collection
     {
-        return ServiceStatus::query()
+        return Cache::flexible(self::CACHE_KEY_ENABLED_SERVICES, self::CACHE_TTL, fn () => ServiceStatus::query()
             ->where('is_enabled', true)
             ->orderBy('sort_order')
             ->orderBy('id')
-            ->get();
+            ->get());
     }
 
     /**
@@ -106,11 +120,22 @@ class SiteStatusService
      */
     public function getActiveIncidents(): \Illuminate\Database\Eloquent\Collection
     {
-        return ServiceIncident::query()
-            ->with('services')
+        return Cache::flexible(self::CACHE_KEY_ACTIVE_INCIDENTS, self::CACHE_TTL, fn () => ServiceIncident::query()
+            ->with(['services:id,name,slug,check_type'])
             ->where('status', '!=', IncidentStatusEnum::Resolved->value)
             ->orderByDesc('started_at')
-            ->get();
+            ->get());
+    }
+
+    /**
+     * Forget cached service-status / incident reads. Call this from any code
+     * path that mutates ServiceStatus or ServiceIncident rows.
+     */
+    public function forgetDashboardCaches(): void
+    {
+        Cache::forget(self::CACHE_KEY_ENABLED_SERVICES);
+        Cache::forget(self::CACHE_KEY_ACTIVE_INCIDENTS);
+        Cache::forget(\App\Services\AdminDashboardSnapshotService::CACHE_KEY);
     }
 
     /**
@@ -238,6 +263,8 @@ class SiteStatusService
 
             $this->recomputeServiceHealth($service);
         }
+
+        $this->forgetDashboardCaches();
     }
 
     /**
@@ -299,6 +326,8 @@ class SiteStatusService
             $this->recomputeServiceHealth($service);
         }
 
+        $this->forgetDashboardCaches();
+
         return $incident->fresh(['services']);
     }
 
@@ -332,6 +361,8 @@ class SiteStatusService
             $this->recomputeServiceHealth($service);
         }
 
+        $this->forgetDashboardCaches();
+
         return $incident->fresh(['services']);
     }
 
@@ -348,6 +379,8 @@ class SiteStatusService
             $this->recomputeServiceHealth($service);
         }
 
+        $this->forgetDashboardCaches();
+
         return $incident->fresh(['services']);
     }
 
@@ -357,6 +390,8 @@ class SiteStatusService
             'status' => $status,
             'last_checked_at' => Carbon::now(),
         ]);
+
+        $this->forgetDashboardCaches();
     }
 
     public function recomputeServiceHealth(ServiceStatus $service): void
@@ -370,6 +405,7 @@ class SiteStatusService
 
         if ($active->isEmpty()) {
             $service->update(['status' => ServiceStatusEnum::Operational]);
+            $this->forgetDashboardCaches();
 
             return;
         }
@@ -383,6 +419,7 @@ class SiteStatusService
         }
 
         $service->update(['status' => $worst]);
+        $this->forgetDashboardCaches();
     }
 
     private const int SLOW_THRESHOLD_MS = 5000;
@@ -541,10 +578,14 @@ class SiteStatusService
                 $this->sendIncidentEmail($existing->fresh(['services']), resolved: true);
             }
 
+            $this->forgetDashboardCaches();
+
             return;
         }
 
         if ($existing !== null) {
+            $this->forgetDashboardCaches();
+
             return;
         }
 
@@ -564,6 +605,7 @@ class SiteStatusService
 
         $this->recomputeServiceHealth($service);
         $this->sendIncidentEmail($incident, resolved: false);
+        $this->forgetDashboardCaches();
     }
 
     private function sendIncidentEmail(ServiceIncident $incident, bool $resolved): void

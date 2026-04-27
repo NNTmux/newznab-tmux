@@ -129,17 +129,18 @@ class UserStatsService
             ->where('timestamp', '>=', $startTime)
             ->groupBy(DB::raw('DATE_FORMAT(timestamp, "%Y-%m-%d %H:%i:00")'))
             ->orderBy('minute', 'asc')
-            ->get();
+            ->get()
+            ->keyBy('minute');
 
-        // Fill in missing minutes with zero counts
+        // Fill in missing minutes with zero counts (O(n) instead of firstWhere O(n^2))
         $result = [];
         for ($i = $minutes - 1; $i >= 0; $i--) {
             $time = Carbon::now()->subMinutes($i);
             $minuteKey = $time->format('Y-m-d H:i:00');
-            $found = $downloads->firstWhere('minute', $minuteKey);
+            $found = $downloads->get($minuteKey);
             $result[] = [
                 'time' => $time->format('H:i'),
-                'count' => $found ? $found->count : 0,
+                'count' => $found ? (int) $found->count : 0,
             ];
         }
 
@@ -241,17 +242,18 @@ class UserStatsService
             ->where('timestamp', '>=', $startTime)
             ->groupBy(DB::raw('DATE_FORMAT(timestamp, "%Y-%m-%d %H:%i:00")'))
             ->orderBy('minute', 'asc')
-            ->get();
+            ->get()
+            ->keyBy('minute');
 
-        // Fill in missing minutes with zero counts
+        // Fill in missing minutes with zero counts (O(n) instead of firstWhere O(n^2))
         $result = [];
         for ($i = $minutes - 1; $i >= 0; $i--) {
             $time = Carbon::now()->subMinutes($i);
             $minuteKey = $time->format('Y-m-d H:i:00');
-            $found = $apiHits->firstWhere('minute', $minuteKey);
+            $found = $apiHits->get($minuteKey);
             $result[] = [
                 'time' => $time->format('H:i'),
-                'count' => $found ? $found->count : 0,
+                'count' => $found ? (int) $found->count : 0,
             ];
         }
 
@@ -270,31 +272,36 @@ class UserStatsService
         $twoDaysAgo = Carbon::now()->subDays(2)->startOfDay();
         $sevenDaysAgo = Carbon::now()->subDays(7)->startOfDay();
 
-        // For weekly stats, combine aggregated historical data + live recent data
-        $historicalDownloads = UserActivityStat::query()
+        // Combine weekly historical totals + today/2-day live counts in a single
+        // query per source table using conditional aggregation.
+        $historical = UserActivityStat::query()
             ->where('stat_date', '>=', $sevenDaysAgo->format('Y-m-d'))
             ->where('stat_date', '<', $twoDaysAgo->format('Y-m-d'))
-            ->sum('downloads_count');
+            ->selectRaw('COALESCE(SUM(downloads_count), 0) as downloads, COALESCE(SUM(api_hits_count), 0) as api_hits')
+            ->first();
 
-        $recentDownloads = UserDownload::query()
+        $downloadAgg = UserDownload::query()
             ->where('timestamp', '>=', $twoDaysAgo)
-            ->count();
+            ->selectRaw(
+                'SUM(CASE WHEN timestamp >= ? THEN 1 ELSE 0 END) as today_count, COUNT(*) as recent_count',
+                [$today]
+            )
+            ->first();
 
-        $historicalApiHits = UserActivityStat::query()
-            ->where('stat_date', '>=', $sevenDaysAgo->format('Y-m-d'))
-            ->where('stat_date', '<', $twoDaysAgo->format('Y-m-d'))
-            ->sum('api_hits_count');
-
-        $recentApiHits = UserRequest::query()
+        $apiAgg = UserRequest::query()
             ->where('timestamp', '>=', $twoDaysAgo)
-            ->count();
+            ->selectRaw(
+                'SUM(CASE WHEN timestamp >= ? THEN 1 ELSE 0 END) as today_count, COUNT(*) as recent_count',
+                [$today]
+            )
+            ->first();
 
         return [
             'total_users' => User::whereNull('deleted_at')->count(),
-            'downloads_today' => UserDownload::where('timestamp', '>=', $today)->count(),
-            'downloads_week' => $historicalDownloads + $recentDownloads,
-            'api_hits_today' => UserRequest::query()->where('timestamp', '>=', $today)->count(),
-            'api_hits_week' => $historicalApiHits + $recentApiHits,
+            'downloads_today' => (int) ($downloadAgg->today_count ?? 0),
+            'downloads_week' => (int) ($historical->downloads ?? 0) + (int) ($downloadAgg->recent_count ?? 0),
+            'api_hits_today' => (int) ($apiAgg->today_count ?? 0),
+            'api_hits_week' => (int) ($historical->api_hits ?? 0) + (int) ($apiAgg->recent_count ?? 0),
         ];
     }
 

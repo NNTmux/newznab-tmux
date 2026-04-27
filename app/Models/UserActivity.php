@@ -16,11 +16,13 @@ class UserActivity extends Model
         'activity_type',
         'description',
         'metadata',
+        'is_permanent',
     ];
 
     protected $casts = [
         'metadata' => 'array',
         'created_at' => 'datetime',
+        'is_permanent' => 'boolean',
     ];
 
     /**

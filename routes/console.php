@@ -60,3 +60,6 @@ Schedule::call(function () {
 // Check tmux health and auto-restart if monitor pane is dead
 Schedule::command('tmux:health-check --auto-restart')->everyThirtyMinutes()->withoutOverlapping();
 Schedule::command('nntmux:check-service-health')->everyMinute()->withoutOverlapping();
+// Keep the admin dashboard snapshot (Cache::flexible) hot so admins never pay
+// the cold-cache cost when opening /admin/index.
+Schedule::command('admin:warm-dashboard')->everyMinute()->withoutOverlapping();

@@ -216,6 +216,10 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
 Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::get('index', [AdminPageController::class, 'index'])->name('admin.index');
 
+    // Aggregated JSON payload consumed by the admin dashboard's deferred widgets
+    // (User Statistics, System Resources history, Recent Activity, Site Status).
+    Route::get('api/dashboard-data', [AdminPageController::class, 'getDashboardData'])->name('admin.api.dashboard-data');
+
     // System Metrics API endpoints
     Route::get('api/system-metrics/current', [AdminPageController::class, 'getCurrentMetrics'])->name('admin.api.metrics.current');
     Route::get('api/system-metrics/historical', [AdminPageController::class, 'getHistoricalMetrics'])->name('admin.api.metrics.historical');
