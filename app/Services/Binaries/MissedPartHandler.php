@@ -50,10 +50,19 @@ final class MissedPartHandler
      */
     private function addMissingPartsSqlite(array $numbers, int $groupId): void
     {
-        foreach ($numbers as $number) {
+        foreach (array_chunk(array_unique($numbers), 1000) as $chunk) {
+            $placeholders = [];
+            $bindings = [];
+
+            foreach ($chunk as $number) {
+                $placeholders[] = '(?, ?, 1)';
+                $bindings[] = $number;
+                $bindings[] = $groupId;
+            }
+
             DB::statement(
-                'INSERT INTO missed_parts (numberid, groups_id, attempts) VALUES (?, ?, 1) ON CONFLICT(numberid, groups_id) DO UPDATE SET attempts = attempts + 1',
-                [$number, $groupId]
+                'INSERT INTO missed_parts (numberid, groups_id, attempts) VALUES '.implode(',', $placeholders).' ON CONFLICT(numberid, groups_id) DO UPDATE SET attempts = attempts + 1',
+                $bindings
             );
         }
     }
@@ -68,13 +77,13 @@ final class MissedPartHandler
             $bindings = [];
 
             foreach ($chunk as $number) {
-                $placeholders[] = '(?, ?)';
+                $placeholders[] = '(?, ?, 1)';
                 $bindings[] = $number;
                 $bindings[] = $groupId;
             }
 
             DB::insert(
-                'INSERT INTO missed_parts (numberid, groups_id) VALUES '.implode(',', $placeholders).' ON DUPLICATE KEY UPDATE attempts = attempts + 1',
+                'INSERT INTO missed_parts (numberid, groups_id, attempts) VALUES '.implode(',', $placeholders).' ON DUPLICATE KEY UPDATE attempts = attempts + 1',
                 $bindings
             );
         }
