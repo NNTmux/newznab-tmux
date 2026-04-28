@@ -6,7 +6,7 @@ namespace App\Services\AdditionalProcessing;
 
 use App\Models\UsenetGroup;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
-use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
+use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use App\Services\AdditionalProcessing\Enums\DownloadKind;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\TempWorkspaceService;

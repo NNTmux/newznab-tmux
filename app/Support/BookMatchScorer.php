@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Support;
 
 use App\Models\BookInfo;
-use App\Support\DTOs\BookParseResult;
+use App\Support\Data\BookParseResult;
 
 class BookMatchScorer
 {

@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Services\NameFixing\DTO;
+namespace App\Services\NameFixing\Data;
+
+use Spatie\LaravelData\Data;
+use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 /**
  * Data Transfer Object for name fix results.
@@ -10,18 +13,19 @@ namespace App\Services\NameFixing\DTO;
  * Encapsulates the result of a name fixing operation, including the new name,
  * method used, and optional metadata.
  */
-final class NameFixResult
+#[TypeScript]
+final class NameFixResult extends Data
 {
     /**
      * @param  array<string, mixed>  $metadata
      */
     public function __construct(
-        public readonly string $newName,
-        public readonly string $method,
-        public readonly string $checkerName,
-        public readonly int $preDbId = 0,
-        public readonly float $confidence = 1.0,
-        public readonly array $metadata = [],
+        public string $newName,
+        public string $method,
+        public string $checkerName,
+        public int $preDbId = 0,
+        public float $confidence = 1.0,
+        public array $metadata = [],
     ) {}
 
     /**

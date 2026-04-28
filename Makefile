@@ -125,6 +125,20 @@ npm-build: ## Run npm install and build inside the container
 npm-dev: ## Start Vite dev server inside the container
 	@$(SAIL) npm run dev
 
+.PHONY: ts-types
+ts-types: ## Regenerate TypeScript types from PHP DTOs/Enums
+	@$(SAIL) artisan typescript:transform
+
+.PHONY: ts-types-check
+ts-types-check: ## CI: regenerate TS types and fail if working tree drifts
+	@$(SAIL) artisan typescript:transform --quiet
+	@git diff --exit-code resources/js/types/generated.d.ts \
+		|| (echo "❌ resources/js/types/generated.d.ts is out of date — run 'make ts-types' and commit." && exit 1)
+
+.PHONY: data-cache
+data-cache: ## Cache spatie/laravel-data structures (run on deploy)
+	@$(SAIL) artisan data:cache-structures
+
 # ── Dependencies ─────────────────────────────────────────────
 
 .PHONY: composer-install

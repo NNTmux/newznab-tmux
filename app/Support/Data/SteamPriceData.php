@@ -2,24 +2,29 @@
 
 declare(strict_types=1);
 
-namespace App\Support\DTOs;
+namespace App\Support\Data;
+
+use Spatie\LaravelData\Attributes\MapOutputName;
+use Spatie\LaravelData\Data;
+use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 /**
  * Data Transfer Object for Steam Price information.
  */
-final readonly class SteamPriceData
+#[TypeScript]
+final class SteamPriceData extends Data
 {
     public function __construct(
         public string $currency,
         public float $initial,
         public float $final,
+        #[MapOutputName('discount_percent')]
         public int $discountPercent,
+        #[MapOutputName('formatted')]
         public ?string $formattedPrice = null,
     ) {}
 
     /**
-     * Create from Steam API price_overview response.
-     *
      * @param  array<string, mixed>  $data
      */
     public static function fromApiResponse(array $data): self
@@ -33,9 +38,6 @@ final readonly class SteamPriceData
         );
     }
 
-    /**
-     * Create a free price instance.
-     */
     public static function free(): self
     {
         return new self(
@@ -47,59 +49,30 @@ final readonly class SteamPriceData
         );
     }
 
-    /**
-     * Check if currently on sale.
-     */
     public function isOnSale(): bool
     {
         return $this->discountPercent > 0;
     }
 
-    /**
-     * Check if free.
-     */
     public function isFree(): bool
     {
         return $this->final <= 0;
     }
 
-    /**
-     * Get savings amount.
-     */
     public function getSavings(): float
     {
         return max(0, $this->initial - $this->final);
     }
 
-    /**
-     * Get formatted display price.
-     */
     public function getDisplayPrice(): string
     {
         if ($this->formattedPrice !== null) {
             return $this->formattedPrice;
         }
-
         if ($this->isFree()) {
             return 'Free';
         }
 
         return sprintf('%s %.2f', $this->currency, $this->final);
-    }
-
-    /**
-     * Convert to array.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(): array
-    {
-        return [
-            'currency' => $this->currency,
-            'initial' => $this->initial,
-            'final' => $this->final,
-            'discount_percent' => $this->discountPercent,
-            'formatted' => $this->formattedPrice,
-        ];
     }
 }

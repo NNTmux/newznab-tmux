@@ -9,7 +9,7 @@ use App\Services\NameFixing\Checkers\GameNameChecker;
 use App\Services\NameFixing\Checkers\MovieNameChecker;
 use App\Services\NameFixing\Checkers\TvNameChecker;
 use App\Services\NameFixing\Contracts\NameCheckerInterface;
-use App\Services\NameFixing\DTO\NameFixResult;
+use App\Services\NameFixing\Data\NameFixResult;
 use Illuminate\Support\Collection;
 
 /**

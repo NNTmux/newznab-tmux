@@ -2,13 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Services\AdditionalProcessing\DTO;
+namespace App\Services\AdditionalProcessing\State;
 
 use App\Models\Release;
 
 /**
  * Mutable context object that holds the processing state for a single release.
  * Passed between services during processing to share state.
+ *
+ * NOTE: Intentionally NOT a `spatie/laravel-data` Data object. This class is
+ * mutated heavily during the additional-processing pipeline (counters, found
+ * flags, accumulating message IDs) and holds an Eloquent {@see Release} model,
+ * neither of which fits the immutable, serialisable design of `Data` DTOs.
  */
 class ReleaseProcessingContext
 {

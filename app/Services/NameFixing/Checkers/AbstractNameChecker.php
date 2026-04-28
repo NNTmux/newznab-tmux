@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\NameFixing\Checkers;
 
 use App\Services\NameFixing\Contracts\NameCheckerInterface;
-use App\Services\NameFixing\DTO\NameFixResult;
+use App\Services\NameFixing\Data\NameFixResult;
 
 /**
  * Abstract base class for name checkers.

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\NameFixing\Extractors;
 
-use App\Services\NameFixing\DTO\NameFixResult;
+use App\Services\NameFixing\Data\NameFixResult;
 
 /**
  * Extracts release names from NFO content.

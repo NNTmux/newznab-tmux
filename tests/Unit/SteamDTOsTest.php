@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use App\Support\DTOs\SteamGameData;
-use App\Support\DTOs\SteamPriceData;
-use PHPUnit\Framework\TestCase;
+use App\Support\Data\SteamGameData;
+use App\Support\Data\SteamPriceData;
+use Tests\TestCase;
 
 /**
  * Unit tests for Steam DTOs.

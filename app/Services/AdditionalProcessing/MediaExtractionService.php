@@ -8,7 +8,7 @@ use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
-use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
+use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use App\Services\Categorization\CategorizationService;
 use App\Services\NameFixing\ReleaseUpdateService;
 use App\Services\ReleaseExtraService;

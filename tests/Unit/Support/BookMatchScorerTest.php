@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Support;
 
 use App\Support\BookMatchScorer;
-use App\Support\DTOs\BookParseResult;
+use App\Support\Data\BookParseResult;
 use Tests\TestCase;
 
 class BookMatchScorerTest extends TestCase

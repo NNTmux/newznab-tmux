@@ -11,7 +11,7 @@ use App\Models\Predb;
 use App\Models\Release;
 use App\Models\ReleaseFile;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
-use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
+use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use App\Services\NameFixing\FileNameCleaner;
 use App\Services\NameFixing\NameFixingService;
 use App\Services\NameFixing\ReleaseUpdateService;

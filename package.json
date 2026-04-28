@@ -3,7 +3,8 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build",
+        "build": "php artisan typescript:transform --quiet && vite build",
+        "types": "php artisan typescript:transform",
         "format": "prettier --write 'resources/**/*.{css,js,vue}'",
         "package-update": "ncu -u -x pnotify,tinymce"
     },

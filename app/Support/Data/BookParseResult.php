@@ -2,9 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Support\DTOs;
+namespace App\Support\Data;
 
-final readonly class BookParseResult
+use Spatie\LaravelData\Data;
+use Spatie\TypeScriptTransformer\Attributes\TypeScript;
+
+#[TypeScript]
+final class BookParseResult extends Data
 {
     public function __construct(
         public string $rawName,

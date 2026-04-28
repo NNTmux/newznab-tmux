@@ -13,7 +13,7 @@ use App\Models\Settings;
 use App\Services\NameFixing\Extractors\ObfuscatedSubjectExtractor;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Support\BookMatchScorer;
-use App\Support\DTOs\BookParseResult;
+use App\Support\Data\BookParseResult;
 use App\Support\MetadataSearchLookup;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;

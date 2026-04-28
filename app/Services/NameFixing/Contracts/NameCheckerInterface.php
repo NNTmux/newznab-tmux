@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\NameFixing\Contracts;
 
-use App\Services\NameFixing\DTO\NameFixResult;
+use App\Services\NameFixing\Data\NameFixResult;
 
 /**
  * Interface for name checker strategies.

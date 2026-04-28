@@ -1,6 +1,12 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Parameter \#2 \$authenticatorAssertionResponse of method Webauthn\\AuthenticatorAssertionResponseValidator\:\:check\(\) expects Webauthn\\AuthenticatorAssertionResponse, Webauthn\\AuthenticatorResponse given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Actions/Passkeys/FindPasskeyToAuthenticateAction.php
+
+		-
 			message: '#^Method App\\Console\\Commands\\NntmuxOffsetPopulate\:\:createOffsetRanges\(\) should return array\<string, mixed\> but returns list\<array\<string, float\|int\<0, max\>\>\>\.$#'
 			identifier: return.type
 			count: 1
@@ -11,6 +17,12 @@ parameters:
 			identifier: return.phpDocType
 			count: 1
 			path: app/Console/Commands/NntmuxOffsetPopulate.php
+
+		-
+			message: '#^Method App\\Console\\Commands\\NntmuxPopulateSearchIndexes\:\:processSecondaryElasticChunks\(\) has parameter \$query with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Console/Commands/NntmuxPopulateSearchIndexes.php
 
 		-
 			message: '#^Method App\\Console\\Commands\\NntmuxResetPostProcessing\:\:normalizeCategories\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
@@ -25,37 +37,13 @@ parameters:
 			path: app/Facades/Elasticsearch.php
 
 		-
-			message: '#^Class App\\Facades\\Elasticsearch has PHPDoc tag @method for method bulk\(\) return type with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Facades/Elasticsearch.php
-
-		-
 			message: '#^Class App\\Facades\\Elasticsearch has PHPDoc tag @method for method deleteByQuery\(\) parameter \#1 \$params with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/Facades/Elasticsearch.php
 
 		-
-			message: '#^Class App\\Facades\\Elasticsearch has PHPDoc tag @method for method deleteByQuery\(\) return type with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Facades/Elasticsearch.php
-
-		-
 			message: '#^Class App\\Facades\\Elasticsearch has PHPDoc tag @method for method get\(\) parameter \#1 \$params with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Facades/Elasticsearch.php
-
-		-
-			message: '#^Class App\\Facades\\Elasticsearch has PHPDoc tag @method for method get\(\) return type with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/Facades/Elasticsearch.php
-
-		-
-			message: '#^Class App\\Facades\\Elasticsearch has PHPDoc tag @method for method search\(\) return type with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/Facades/Elasticsearch.php
@@ -74,6 +62,18 @@ parameters:
 
 		-
 			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method bulkInsertReleases\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method bulkInsertSecondary\(\) parameter \#2 \$documents with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method bulkInsertSecondary\(\) return type with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/Facades/Search.php
@@ -98,6 +98,30 @@ parameters:
 
 		-
 			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method insertPredb\(\) parameter \#1 \$parameters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method insertSecondary\(\) parameter \#3 \$document with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchAnimeTitle\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchMoviesByFields\(\) parameter \#1 \$fieldTerms with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchMoviesByFields\(\) return type with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/Facades/Search.php
@@ -151,6 +175,18 @@ parameters:
 			path: app/Facades/Search.php
 
 		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchReleasesFiltered\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchReleasesFiltered\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
 			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchReleasesWithCategoryFilter\(\) parameter \#2 \$categoryIds with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -170,6 +206,12 @@ parameters:
 
 		-
 			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchReleasesWithFuzzy\(\) return type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Facades/Search.php
+
+		-
+			message: '#^Class App\\Facades\\Search has PHPDoc tag @method for method searchSecondary\(\) return type with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/Facades/Search.php
@@ -205,29 +247,232 @@ parameters:
 			path: app/Facades/TvProcessing.php
 
 		-
+			message: '#^Unable to resolve the template type TKey in call to function collect$#'
+			identifier: argument.templateType
+			count: 2
+			path: app/Http/Controllers/Admin/AdminPageController.php
+
+		-
+			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			identifier: argument.templateType
+			count: 2
+			path: app/Http/Controllers/Admin/AdminPageController.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type Carbon\\Carbon\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: app/Http/Controllers/Admin/AdminRegistrationController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/AdminUserController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$username\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/AdminUserController.php
+
+		-
 			message: '#^Offset 1 does not exist on array\<string, mixed\>\.$#'
 			identifier: offsetAccess.notFound
 			count: 1
 			path: app/Http/Controllers/Admin/DeletedUsersController.php
 
 		-
-			message: '#^Method App\\Http\\Controllers\\Api\\ApiController\:\:categoryID\(\) should return array\<string, mixed\> but returns list\<int\|string\>\.$#'
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/ApiController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_disabled\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/ApiController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$role\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Api/ApiController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:hasRole\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Api/ApiController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Api\\ApiController\:\:categoryID\(\) should return array\<string, mixed\> but returns array\<int, int\>\.$#'
+			identifier: return.type
+			count: 3
+			path: app/Http/Controllers/Api/ApiController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Api\\ApiController\:\:categoryID\(\) should return array\<string, mixed\> but returns list\<string\>\.$#'
 			identifier: return.type
 			count: 1
 			path: app/Http/Controllers/Api/ApiController.php
 
 		-
-			message: '#^PHPDoc tag @return with type list\<int\|string\> is incompatible with native type bool\|int\|string\.$#'
-			identifier: return.phpDocType
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
 			count: 1
 			path: app/Http/Controllers/Api/ApiController.php
 
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$is_disabled\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/ApiInformController.php
 
 		-
-			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$is_disabled\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/ApiV2Controller.php
+
+		-
+			message: '#^Call to function is_array\(\) with bool\|int\|string will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: app/Http/Controllers/Api/ApiV2Controller.php
+
+		-
+			message: '#^Cannot call method map\(\) on list\<mixed\>\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Api/ApiV2Controller.php
+
+		-
+			message: '#^Offset 0 on \*NEVER\* on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Http/Controllers/Api/ApiV2Controller.php
+
+		-
+			message: '#^Call to function is_int\(\) with string\|null will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: app/Http/Controllers/Api/RSS.php
+
+		-
+			message: '#^Property App\\Http\\Controllers\\Auth\\LoginController\:\:\$decayMinutes \(int\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: app/Http/Controllers/Auth/LoginController.php
+
+		-
+			message: '#^Property App\\Http\\Controllers\\Auth\\LoginController\:\:\$maxAttempts \(int\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: app/Http/Controllers/Auth/LoginController.php
+
+		-
+			message: '#^Property App\\Http\\Controllers\\Auth\\LoginController\:\:\$redirectTo \(string\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: app/Http/Controllers/Auth/LoginController.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Auth/PasskeyManagementController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Auth\\PasskeyManagementController\:\:store\(\) never returns Illuminate\\Http\\RedirectResponse so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: app/Http/Controllers/Auth/PasskeyManagementController.php
+
+		-
+			message: '#^Using nullsafe property access on non\-nullable type Spatie\\LaravelPasskeys\\Models\\Passkey\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 4
+			path: app/Http/Controllers/Auth/PasskeyManagementController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Auth\\RegisterController\:\:rejectUnavailableRegistration\(\) has parameter \$status with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Controllers/Auth/RegisterController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Auth\\RegisterController\:\:rejectUnavailableRegistration\(\) never returns Illuminate\\Routing\\Redirector so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: app/Http/Controllers/Auth/RegisterController.php
+
+		-
+			message: '#^Property App\\Http\\Controllers\\Auth\\RegisterController\:\:\$redirectTo \(string\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: app/Http/Controllers/Auth/RegisterController.php
+
+		-
+			message: '#^Property App\\Http\\Controllers\\Auth\\ResetPasswordController\:\:\$redirectTo \(string\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: app/Http/Controllers/Auth/ResetPasswordController.php
+
+		-
+			message: '#^Unable to resolve the template type TCacheValue in call to static method Illuminate\\Cache\\Repository\:\:remember\(\)$#'
 			identifier: argument.templateType
 			count: 1
-			path: app/Http/Controllers/SeriesController.php
+			path: app/Http/Controllers/BasePageController.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type App\\Models\\User\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Controllers/BasePageController.php
+
+		-
+			message: '#^Type mixed in generic type Illuminate\\Database\\Eloquent\\Collection\<int, mixed\> in PHPDoc tag @return is not subtype of template type TModel of Illuminate\\Database\\Eloquent\\Model of class Illuminate\\Database\\Eloquent\\Collection\.$#'
+			identifier: generics.notSubtype
+			count: 3
+			path: app/Http/Controllers/ContentController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\CoverController\:\:respondWithPlaceholder\(\) never returns Illuminate\\Http\\Response so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: app/Http/Controllers/CoverController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$is_disabled\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/GetNzbController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$is_disabled\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/RssController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$roles_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Middleware/ThrottleApiRequestsByToken.php
+
+		-
+			message: '#^Method App\\Http\\Middleware\\ThrottleApiRequestsByToken\:\:resolveUser\(\) should return App\\Models\\User\|null but returns Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Http/Middleware/ThrottleApiRequestsByToken.php
+
+		-
+			message: '#^Method App\\Http\\Requests\\Admin\\RegistrationPeriodRequest\:\:after\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Requests/Admin/RegistrationPeriodRequest.php
 
 		-
 			message: '#^Method App\\Models\\Category\:\:getForApi\(\) should return list\<mixed\> but returns Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\RootCategory\>\.$#'
@@ -267,6 +512,12 @@ parameters:
 
 		-
 			message: '#^Method App\\Models\\Content\:\:scopeOfType\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Content.php
+
+		-
+			message: '#^Method App\\Models\\Content\:\:scopeOrdered\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
 			identifier: missingType.generics
 			count: 1
 			path: app/Models/Content.php
@@ -320,6 +571,30 @@ parameters:
 			path: app/Models/Invitation.php
 
 		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\:\:enabled\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/RegistrationPeriod.php
+
+		-
+			message: '#^Method App\\Models\\RegistrationPeriod\:\:scopeActiveAt\(\) has parameter \$query with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/RegistrationPeriod.php
+
+		-
+			message: '#^Method App\\Models\\RegistrationPeriod\:\:scopeEnabled\(\) has parameter \$query with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/RegistrationPeriod.php
+
+		-
+			message: '#^Method App\\Models\\RegistrationPeriod\:\:scopeUpcoming\(\) has parameter \$query with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/RegistrationPeriod.php
+
+		-
 			message: '#^Property App\\Models\\Release\:\:\$image \(string\|null\) does not accept bool\|null\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -330,6 +605,18 @@ parameters:
 			identifier: assign.propertyType
 			count: 1
 			path: app/Models/Release.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$full_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:findVerifiedByApiToken\(\) should return App\\Models\\User\|null but returns Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/User.php
 
 		-
 			message: '#^Method App\\Models\\User\:\:scopeActive\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
@@ -379,6 +666,35 @@ parameters:
 			count: 1
 			path: app/Models/UserActivityStat.php
 
+		-
+			message: '#^Method App\\Models\\Video\:\:getSeriesListUncached\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/Video.php
+
+		-
+			message: '#^Access to an undefined property TeamTeaTime\\Forum\\Models\\Post\:\:\$author_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Policies/PostPolicy.php
+
+		-
+			message: '#^Access to an undefined property TeamTeaTime\\Forum\\Models\\Thread\:\:\$author_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Policies/ThreadPolicy.php
+
+		-
+			message: '#^Parameter \#1 \$categories of method App\\Support\\Forum\\CategoryTreeBuilder\:\:build\(\) expects Illuminate\\Database\\Eloquent\\Collection\<int, TeamTeaTime\\Forum\\Models\\Category\>, Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Providers/ForumServiceProvider.php
+
+		-
+			message: '#^Parameter \#3 \$fail \(Closure\(string\)\: void\) of method App\\Rules\\RecaptchaRule\:\:validate\(\) should be compatible with parameter \$fail \(Closure\(string, string\|null\=\)\: Illuminate\\Translation\\PotentiallyTranslatedString\) of method Illuminate\\Contracts\\Validation\\ValidationRule\:\:validate\(\)$#'
+			identifier: method.childParameterType
+			count: 1
+			path: app/Rules/RecaptchaRule.php
 
 		-
 			message: '#^Method App\\Services\\AdditionalProcessing\\ArchiveExtractionService\:\:sortFilesWithNfoPriority\(\) should return array\<string, mixed\> but returns list\<mixed\>\.$#'
@@ -399,11 +715,46 @@ parameters:
 			path: app/Services/AdditionalProcessing/NzbContentParser.php
 
 		-
-			message: '#^PHPDoc tag @return with type list\<string\> is incompatible with native type string\|false\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: app/Services/AdditionalProcessing/NzbContentParser.php
+			message: '#^Using nullsafe property access "\?\-\>id" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: app/Services/AdditionalProcessing/ReleaseFileManager.php
 
+		-
+			message: '#^Using nullsafe property access "\?\-\>title" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: app/Services/AdditionalProcessing/ReleaseFileManager.php
+
+		-
+			message: '#^Parameter \#2 \$messageIDs of method App\\Services\\AdditionalProcessing\\UsenetDownloadService\:\:download\(\) expects array\<string, mixed\>\|string, list\<string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/AdditionalProcessing/ReleaseFilesArchiveFallback.php
+
+		-
+			message: '#^Parameter \#1 \$nzbContents of method App\\Services\\AdditionalProcessing\\NzbContentParser\:\:extractMessageIDs\(\) expects array\<string, mixed\>, list\<array\<string, mixed\>\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/AdditionalProcessing/ReleaseProcessor.php
+
+		-
+			message: '#^Parameter \#2 \$messageIDs of method App\\Services\\AdditionalProcessing\\UsenetDownloadService\:\:download\(\) expects array\<string, mixed\>\|string, list\<string\> given\.$#'
+			identifier: argument.type
+			count: 3
+			path: app/Services/AdditionalProcessing/ReleaseProcessor.php
+
+		-
+			message: '#^Right side of \|\| is always false\.$#'
+			identifier: booleanOr.rightAlwaysFalse
+			count: 2
+			path: app/Services/AdditionalProcessing/ReleaseProcessor.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between non\-empty\-string and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: app/Services/AdditionalProcessing/ReleaseProcessor.php
 
 		-
 			message: '#^Method App\\Services\\Binaries\\BinariesService\:\:groupMissingPartsIntoRanges\(\) should return array\<string, mixed\> but returns list\<array\<string, mixed\>\>\.$#'
@@ -417,6 +768,11 @@ parameters:
 			count: 1
 			path: app/Services/Binaries/BinariesService.php
 
+		-
+			message: '#^Strict comparison using \!\=\= between non\-empty\-array\<mixed, mixed\> and array\{\} will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: app/Services/BookService.php
 
 		-
 			message: '#^Method App\\Services\\Categorization\\CategorizationService\:\:batchCategorize\(\) should return array\<string, mixed\> but returns list\<array\<string, mixed\>\>\.$#'
@@ -430,13 +786,29 @@ parameters:
 			count: 1
 			path: app/Services/Categorization/CategorizationService.php
 
+		-
+			message: '#^Method App\\Services\\Concurrency\\TimeoutAwareProcessDriver\:\:run\(\) has parameter \$tasks with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/Concurrency/TimeoutAwareProcessDriver.php
+
+		-
+			message: '#^Method App\\Services\\Concurrency\\TimeoutAwareProcessDriver\:\:run\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/Concurrency/TimeoutAwareProcessDriver.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between non\-empty\-array\<mixed, mixed\> and array\{\} will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: app/Services/ConsoleService.php
 
 		-
 			message: '#^Unable to resolve the template type TValue in call to function collect$#'
 			identifier: argument.templateType
 			count: 6
 			path: app/Services/FanartTvService.php
-
 
 		-
 			message: '#^Method App\\Services\\GenreService\:\:loadGenres\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
@@ -451,8 +823,122 @@ parameters:
 			path: app/Services/GenreService.php
 
 		-
+			message: '#^Class App\\Services\\IGDB\\DataNode implements generic interface ArrayAccess but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/IGDB/DataNode.php
+
+		-
+			message: '#^Class App\\Services\\IGDB\\DataNode implements generic interface Illuminate\\Contracts\\Support\\Arrayable but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/IGDB/DataNode.php
+
+		-
+			message: '#^Method App\\Services\\IGDB\\Models\\BaseModel\:\:__callStatic\(\) has parameter \$parameters with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/IGDB/Models/BaseModel.php
+
+		-
+			message: '#^Method App\\Services\\IGDB\\Models\\BaseModel\:\:query\(\) return type with generic class App\\Services\\IGDB\\QueryBuilder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/IGDB/Models/BaseModel.php
+
+		-
+			message: '#^Method App\\Services\\IGDB\\QueryBuilder\:\:limit\(\) return type with generic class App\\Services\\IGDB\\QueryBuilder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/IGDB/QueryBuilder.php
+
+		-
+			message: '#^Method App\\Services\\IGDB\\QueryBuilder\:\:orderBy\(\) return type with generic class App\\Services\\IGDB\\QueryBuilder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/IGDB/QueryBuilder.php
+
+		-
+			message: '#^Method App\\Services\\IGDB\\QueryBuilder\:\:orderByDesc\(\) return type with generic class App\\Services\\IGDB\\QueryBuilder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/IGDB/QueryBuilder.php
+
+		-
+			message: '#^Method App\\Services\\IGDB\\QueryBuilder\:\:search\(\) return type with generic class App\\Services\\IGDB\\QueryBuilder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/IGDB/QueryBuilder.php
+
+		-
+			message: '#^Method App\\Services\\IGDB\\QueryBuilder\:\:where\(\) return type with generic class App\\Services\\IGDB\\QueryBuilder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/IGDB/QueryBuilder.php
+
+		-
+			message: '#^Method App\\Services\\IGDB\\QueryBuilder\:\:whereIn\(\) return type with generic class App\\Services\\IGDB\\QueryBuilder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/IGDB/QueryBuilder.php
+
+		-
+			message: '#^Method App\\Services\\IGDB\\QueryBuilder\:\:with\(\) return type with generic class App\\Services\\IGDB\\QueryBuilder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/IGDB/QueryBuilder.php
+
+		-
+			message: '#^Access to an undefined property App\\Services\\IGDB\\Models\\Game\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/IGDBService.php
+
+		-
+			message: '#^Access to an undefined property App\\Services\\IGDB\\Models\\Game\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/IGDBService.php
+
+		-
+			message: '#^Call to an undefined static method App\\Services\\IGDB\\Models\\Company\:\:find\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 3
+			path: app/Services/IGDBService.php
+
+		-
+			message: '#^Call to an undefined static method App\\Services\\IGDB\\Models\\Game\:\:search\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Services/IGDBService.php
+
+		-
+			message: '#^Call to an undefined static method App\\Services\\IGDB\\Models\\Game\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Services/IGDBService.php
+
+		-
 			message: '#^Method App\\Services\\IGDBService\:\:extractGenres\(\) should return array\<string, mixed\> but returns array\<int\<0, max\>, mixed\>\.$#'
 			identifier: return.type
+			count: 1
+			path: app/Services/IGDBService.php
+
+		-
+			message: '#^Method App\\Services\\IGDBService\:\:searchExact\(\) has parameter \$platformIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/IGDBService.php
+
+		-
+			message: '#^Method App\\Services\\IGDBService\:\:searchFuzzy\(\) has parameter \$platformIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/IGDBService.php
+
+		-
+			message: '#^Method App\\Services\\IGDBService\:\:searchWithStrategies\(\) has parameter \$platformIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
 			count: 1
 			path: app/Services/IGDBService.php
 
@@ -462,6 +948,89 @@ parameters:
 			count: 1
 			path: app/Services/IGDBService.php
 
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 7
+			path: app/Services/ImdbScraper.php
+
+		-
+			message: '#^Method App\\Services\\ImdbScraper\:\:extractCover\(\) has parameter \$jsonLd with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/ImdbScraper.php
+
+		-
+			message: '#^Method App\\Services\\ImdbScraper\:\:extractGenres\(\) has parameter \$jsonLd with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/ImdbScraper.php
+
+		-
+			message: '#^Method App\\Services\\ImdbScraper\:\:extractLanguage\(\) has parameter \$jsonLd with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/ImdbScraper.php
+
+		-
+			message: '#^Method App\\Services\\ImdbScraper\:\:extractPlot\(\) has parameter \$jsonLd with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/ImdbScraper.php
+
+		-
+			message: '#^Method App\\Services\\ImdbScraper\:\:extractRating\(\) has parameter \$jsonLd with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/ImdbScraper.php
+
+		-
+			message: '#^Method App\\Services\\ImdbScraper\:\:extractTitle\(\) has parameter \$jsonLd with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/ImdbScraper.php
+
+		-
+			message: '#^Method App\\Services\\ImdbScraper\:\:extractType\(\) has parameter \$jsonLd with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/ImdbScraper.php
+
+		-
+			message: '#^Method App\\Services\\ImdbScraper\:\:extractYearFromEntity\(\) has parameter \$jsonLd with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/ImdbScraper.php
+
+		-
+			message: '#^Ternary operator condition is always false\.$#'
+			identifier: ternary.alwaysFalse
+			count: 1
+			path: app/Services/ImdbScraper.php
+
+		-
+			message: '#^Ternary operator condition is always true\.$#'
+			identifier: ternary.alwaysTrue
+			count: 2
+			path: app/Services/ImdbScraper.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type voku\\helper\\SimpleHtmlDomInterface\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 7
+			path: app/Services/ImdbScraper.php
+
+		-
+			message: '#^Method App\\Services\\LogViewerService\:\:searchLog\(\) return type with generic class Illuminate\\Pagination\\LengthAwarePaginator does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Services/LogViewerService.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between non\-empty\-array\<mixed, mixed\> and array\{\} will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: app/Services/MusicService.php
 
 		-
 			message: '#^Method App\\Services\\NfoService\:\:extractAllMediaIds\(\) should return array\<string, mixed\> but returns list\<array\<string, string\>\>\.$#'
@@ -506,13 +1075,91 @@ parameters:
 			path: app/Services/NfoService.php
 
 		-
+			message: '#^Unable to resolve the template type TCacheValue in call to static method Illuminate\\Cache\\Repository\:\:remember\(\)$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/Services/NfoService.php
+
+		-
+			message: '#^Using nullsafe method call on non\-nullable type Carbon\\Carbon\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: app/Services/RegistrationStatusService.php
+
+		-
+			message: '#^Call to an undefined static method App\\Support\\Data\\ReleaseCreationResult\:\:fromArray\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Services/ReleaseProcessingService.php
+
+		-
+			message: '#^Call to function is_int\(\) with string\|null will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 2
+			path: app/Services/Releases/ReleaseBrowseService.php
+
+		-
 			message: '#^Method App\\Services\\Releases\\ReleaseBrowseService\:\:getBrowseOrder\(\) should return array\<string, mixed\> but returns array\<int, string\>\.$#'
 			identifier: return.type
 			count: 1
 			path: app/Services/Releases/ReleaseBrowseService.php
 
 		-
-			message: '#^Method App\\Services\\Search\\Drivers\\ElasticSearchDriver\:\:buildHostsArray\(\) should return array\<string, mixed\> but returns list\<array\<string, mixed\>\>\.$#'
+			message: '#^Parameter \#4 \$orderBy of method App\\Services\\Releases\\ReleaseBrowseService\:\:executeApiBrowseViaSearchIndex\(\) expects array\{string, string\}, array\<string, mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/Releases/ReleaseBrowseService.php
+
+		-
+			message: '#^Call to function is_int\(\) with string\|null will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 3
+			path: app/Services/Releases/ReleaseSearchService.php
+
+		-
+			message: '#^Method App\\Services\\Releases\\ReleaseSearchService\:\:apiSearchLegacyMysql\(\) has parameter \$excludedCats with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/Releases/ReleaseSearchService.php
+
+		-
+			message: '#^Method App\\Services\\Releases\\ReleaseSearchService\:\:intersectReleaseIdsWithSearchFilters\(\) has parameter \$releaseIds with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/Releases/ReleaseSearchService.php
+
+		-
+			message: '#^Offset 0 does not exist on array\<string, mixed\>\.$#'
+			identifier: offsetAccess.notFound
+			count: 8
+			path: app/Services/Releases/ReleaseSearchService.php
+
+		-
+			message: '#^Offset 1 does not exist on array\<string, mixed\>\.$#'
+			identifier: offsetAccess.notFound
+			count: 7
+			path: app/Services/Releases/ReleaseSearchService.php
+
+		-
+			message: '#^Constant App\\Services\\Search\\Drivers\\ElasticSearchDriver\:\:DEFAULT_CONNECT_TIMEOUT is unused\.$#'
+			identifier: classConstant.unused
+			count: 1
+			path: app/Services/Search/Drivers/ElasticSearchDriver.php
+
+		-
+			message: '#^Constant App\\Services\\Search\\Drivers\\ElasticSearchDriver\:\:DEFAULT_TIMEOUT is unused\.$#'
+			identifier: classConstant.unused
+			count: 1
+			path: app/Services/Search/Drivers/ElasticSearchDriver.php
+
+		-
+			message: '#^Method App\\Services\\Search\\Drivers\\ElasticSearchDriver\:\:buildElasticsearchReleaseFilters\(\) has parameter \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/Search/Drivers/ElasticSearchDriver.php
+
+		-
+			message: '#^Method App\\Services\\Search\\Drivers\\ElasticSearchDriver\:\:executeSearch\(\) should return array\<string, mixed\> but returns list\.$#'
 			identifier: return.type
 			count: 1
 			path: app/Services/Search/Drivers/ElasticSearchDriver.php
@@ -524,16 +1171,40 @@ parameters:
 			path: app/Services/Search/Drivers/ElasticSearchDriver.php
 
 		-
-			message: '#^PHPDoc tag @return with type list\<array\<string, mixed\>\> is incompatible with native type bool\.$#'
-			identifier: return.phpDocType
-			count: 1
+			message: '#^Parameter \#1 \$params of method Elastic\\Elasticsearch\\Client\:\:delete\(\) expects array\{id\: string, index\: string, wait_for_active_shards\?\: string, refresh\?\: string, routing\?\: string, timeout\?\: int\|string, if_seq_no\?\: int, if_primary_term\?\: int, \.\.\.\}\|null, array\{index\: string, id\: int\<min, \-1\>\|int\<1, max\>\} given\.$#'
+			identifier: argument.type
+			count: 4
 			path: app/Services/Search/Drivers/ElasticSearchDriver.php
 
 		-
-			message: '#^Method App\\Services\\Search\\Drivers\\ManticoreSearchDriver\:\:searchReleasesByExternalId\(\) should return array\<string, mixed\> but returns list\.$#'
+			message: '#^Strict comparison using \=\=\= between int\|non\-falsy\-string and '''' will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 2
+			path: app/Services/Search/Drivers/ElasticSearchDriver.php
+
+		-
+			message: '#^Method App\\Services\\Search\\Drivers\\ManticoreSearchDriver\:\:phrasesToSearchArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/Search/Drivers/ManticoreSearchDriver.php
+
+		-
+			message: '#^Method App\\Services\\Search\\Drivers\\ManticoreSearchDriver\:\:searchReleasesByMultipleExternalIds\(\) should return array\<string, mixed\> but returns list\<int\>\.$#'
 			identifier: return.type
 			count: 1
 			path: app/Services/Search/Drivers/ManticoreSearchDriver.php
+
+		-
+			message: '#^Parameter \#3 \$column of method App\\Services\\Search\\Drivers\\ManticoreSearchDriver\:\:searchIndexes\(\) expects array\<string, mixed\>, list\<string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/Search/Drivers/ManticoreSearchDriver.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>value" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: app/Services/SiteStatusService.php
 
 		-
 			message: '#^Method App\\Services\\SteamService\:\:getDLCList\(\) should return array\<string, mixed\> but returns list\<array\<string, mixed\>\>\.$#'
@@ -590,13 +1261,7 @@ parameters:
 			path: app/Services/SystemMetricsService.php
 
 		-
-			message: '#^PHPDoc tag @return with type array\<string, mixed\> is incompatible with native type float\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: app/Services/SystemMetricsService.php
-
-		-
-			message: '#^Method App\\Services\\UserStatsService\:\:getApiHitsPerMinute\(\) should return array\<string, mixed\> but returns list\<array\<string, int\|string\|null\>\>\.$#'
+			message: '#^Method App\\Services\\UserStatsService\:\:getApiHitsPerMinute\(\) should return array\<string, mixed\> but returns list\<array\<string, int\|string\>\>\.$#'
 			identifier: return.type
 			count: 1
 			path: app/Services/UserStatsService.php
@@ -614,13 +1279,13 @@ parameters:
 			path: app/Services/UserStatsService.php
 
 		-
-			message: '#^Method App\\Services\\UserStatsService\:\:getDownloadsPerMinute\(\) should return array\<string, mixed\> but returns list\<array\<string, int\|string\|null\>\>\.$#'
+			message: '#^Method App\\Services\\UserStatsService\:\:getDownloadsPerMinute\(\) should return array\<string, mixed\> but returns list\<array\<string, int\|string\>\>\.$#'
 			identifier: return.type
 			count: 1
 			path: app/Services/UserStatsService.php
 
 		-
-			message: '#^Method App\\Services\\UserStatsService\:\:getSummaryStats\(\) should return list\<array\<string, int\|string\|null\>\> but returns array\{total_users\: int\<0, max\>, downloads_today\: int\<0, max\>, downloads_week\: float\|int, api_hits_today\: int\<0, max\>, api_hits_week\: float\|int\}\.$#'
+			message: '#^Method App\\Services\\UserStatsService\:\:getSummaryStats\(\) should return list\<array\<string, int\|string\|null\>\> but returns array\{total_users\: int\<0, max\>, downloads_today\: int, downloads_week\: int, api_hits_today\: int, api_hits_week\: int\}\.$#'
 			identifier: return.type
 			count: 1
 			path: app/Services/UserStatsService.php
@@ -630,6 +1295,78 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: app/Services/XrefService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>approx" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Support/ApproximateRowCount.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Collection\<int, TeamTeaTime\\Forum\\Models\\Category\>\:\:linkNodes\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Support/Forum/CategoryTreeBuilder.php
+
+		-
+			message: '#^Parameter \#1 \$categories of method App\\Support\\Forum\\CategoryTreeBuilder\:\:build\(\) expects Illuminate\\Database\\Eloquent\\Collection\<int, TeamTeaTime\\Forum\\Models\\Category\>, Aimeos\\Nestedset\\Collection given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Support/Forum/CategoryTreeBuilder.php
+
+		-
+			message: '#^Method App\\Support\\SecondaryIndexDocuments\:\:book\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Support/SecondaryIndexDocuments.php
+
+		-
+			message: '#^Method App\\Support\\SecondaryIndexDocuments\:\:console\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Support/SecondaryIndexDocuments.php
+
+		-
+			message: '#^Method App\\Support\\SecondaryIndexDocuments\:\:games\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Support/SecondaryIndexDocuments.php
+
+		-
+			message: '#^Method App\\Support\\SecondaryIndexDocuments\:\:music\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Support/SecondaryIndexDocuments.php
+
+		-
+			message: '#^Method App\\Support\\SecondaryIndexDocuments\:\:steam\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Support/SecondaryIndexDocuments.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>anilist_id" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Support/SecondaryIndexDocuments.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>mal_id" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Support/SecondaryIndexDocuments.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>media_type" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Support/SecondaryIndexDocuments.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>status" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Support/SecondaryIndexDocuments.php
 
 		-
 			message: '#^Method App\\Support\\UpdatePerformanceHelper\:\:checkSystemResources\(\) should return array\<string, mixed\> but returns list\<string\>\.$#'
@@ -648,3 +1385,15 @@ parameters:
 			identifier: return.phpDocType
 			count: 1
 			path: app/Support/UpdatePerformanceHelper.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/View/Components/AppLayout.php
+
+		-
+			message: '#^Unable to resolve the template type TCacheValue in call to static method Illuminate\\Cache\\Repository\:\:remember\(\)$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/View/Composers/GlobalDataComposer.php

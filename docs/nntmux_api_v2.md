@@ -62,17 +62,35 @@ Sorting examples:
 
 JSON sorting response snippet (`sort=size_desc`):
 
-```json
-{
-  "Total": 2,
-  "Results": [
-    { "title": "Ubuntu ISO x64", "size": 734003200 },
-    { "title": "Ubuntu ISO x86", "size": 367001600 }
-  ]
-}
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+X-Total-Count: 2
+X-Api-Current: 0
+X-Api-Max: 100
+X-Grab-Current: 0
+X-Grab-Max: 100
+X-Api-Oldest-Time:
+X-Grab-Oldest-Time:
+
+[
+  { "title": "Ubuntu ISO x64", "size": 734003200 },
+  { "title": "Ubuntu ISO x86", "size": 367001600 }
+]
 ```
 
-`Results` are ordered largest-to-smallest because `sort=size_desc`.
+Releases are ordered largest-to-smallest because `sort=size_desc`.
+
+> **Breaking change (April 2026):** the legacy `Results` (capital R) JSON
+> envelope — previously produced by `spatie/laravel-fractal` — has been
+> removed entirely. Search endpoints now return a bare top-level JSON array of
+> `App\Data\Api\ReleaseData` payloads. Pagination total and per-user API/grab
+> quotas have moved to response headers (`X-Total-Count`, `X-Api-Current`,
+> `X-Api-Max`, `X-Grab-Current`, `X-Grab-Max`, `X-Api-Oldest-Time`,
+> `X-Grab-Oldest-Time`). Movie/TV-only fields (`tvdbid`, `imdbid`, `season`, …)
+> are omitted from each release object when not applicable to its category,
+> instead of being emitted as `null`. TypeScript definitions are auto-generated
+> to `resources/js/types/generated.d.ts`.
 
 ## Endpoints
 
@@ -100,7 +118,7 @@ Behavior:
 
 - If `id` is present: text search.
 - If `id` is omitted: browse mode.
-- Includes API usage counters in response (`apiCurrent`, `apiMax`, `grabCurrent`, `grabMax`, `apiOldestTime`, `grabOldestTime`).
+- Includes API usage counters via response headers (`X-Api-Current`, `X-Api-Max`, `X-Grab-Current`, `X-Grab-Max`, `X-Api-Oldest-Time`, `X-Grab-Oldest-Time`).
 
 ## 3) TV Search
 
@@ -185,7 +203,7 @@ Selectors:
   "grabMax": 100,
   "apiOldestTime": "Wed, 20 Nov 2024 12:00:00 +0000",
   "grabOldestTime": "",
-  "Results": []
+  "results": []
 }
 ```
 

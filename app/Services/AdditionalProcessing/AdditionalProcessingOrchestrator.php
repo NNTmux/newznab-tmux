@@ -6,7 +6,7 @@ namespace App\Services\AdditionalProcessing;
 
 use App\Models\Release;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
-use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
+use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use App\Services\TempWorkspaceService;
 use Exception;
 use Illuminate\Support\Collection;

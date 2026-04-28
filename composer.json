@@ -66,11 +66,12 @@
         "riari/laravel-forum": "8.x-dev",
         "sentry/sentry": "^4.21",
         "sentry/sentry-laravel": "^4.13",
+        "spatie/laravel-data": "^4",
         "spatie/laravel-directory-cleanup": "^1.10",
-        "spatie/laravel-fractal": "^6.3",
         "spatie/laravel-image-optimizer": "^1.8",
         "spatie/laravel-passkeys": "^1.7",
         "spatie/laravel-permission": "^7.0.0",
+        "spatie/laravel-typescript-transformer": "^2",
         "stechstudio/laravel-zipstream": "^5.4",
         "symfony/process": "^7.0",
         "voku/simple_html_dom": "^4.8"

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Data\Api\CategoryData;
+use App\Data\Api\DetailsData;
+use App\Data\Api\ReleaseData;
 use App\Events\UserAccessedApi;
 use App\Http\Controllers\BasePageController;
 use App\Models\Category;
@@ -16,9 +19,6 @@ use App\Models\UserRequest;
 use App\Services\RegistrationStatusService;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\Releases\ReleaseSearchService;
-use App\Transformers\ApiTransformer;
-use App\Transformers\CategoryTransformer;
-use App\Transformers\DetailsTransformer;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\JsonResponse;
@@ -101,6 +101,34 @@ class ApiV2Controller extends BasePageController
         ];
     }
 
+    /**
+     * Build the standard search-results JSON response.
+     *
+     * Replaces the legacy Fractal `['Results' => fractal(...)]` envelope with a
+     * lower-case `results` array of {@see ReleaseData} payloads. Pagination
+     * total and per-user API/grab quotas are kept inline alongside the array
+     * because a JSON object cannot carry both top-level metadata fields and a
+     * bare array body.
+     *
+     * @param  iterable<int, Release|\stdClass>  $rows
+     */
+    private function buildSearchResponse(iterable $rows, User $user): JsonResponse
+    {
+        $rowsArray = is_array($rows) ? $rows : iterator_to_array($rows, false);
+        $total = (int) ($rowsArray[0]->_totalrows ?? 0);
+
+        $results = array_map(
+            static fn ($row): array => ReleaseData::fromRelease($row, $user)->toArray(),
+            $rowsArray,
+        );
+
+        return response()->json(array_merge(
+            ['Total' => $total],
+            $this->buildUserStatsResponse($user),
+            ['results' => $results],
+        ));
+    }
+
     private function parseMaxAge(Request $request): int|JsonResponse
     {
         if (! $request->has('maxage')) {
@@ -158,7 +186,7 @@ class ApiV2Controller extends BasePageController
                     'book-search' => ['available' => 'yes', 'supportedParams' => 'id,cat,minsize,maxsize,maxage,group,limit,offset,sort'],
                     'anime-search' => ['available' => 'yes', 'supportedParams' => 'id,anidbid,anilistid,cat,minsize,maxsize,maxage,limit,offset,sort'],
                 ],
-                'categories' => fractal($category, new CategoryTransformer),
+                'categories' => $category->map(static fn ($c) => CategoryData::fromCategory($c))->values(),
                 'groups' => Schema::hasTable('usenet_groups')
                     ? UsenetGroup::query()
                         ->where('active', 1)
@@ -256,13 +284,7 @@ class ApiV2Controller extends BasePageController
             );
         });
 
-        $response = array_merge(
-            ['Total' => $relData[0]->_totalrows ?? 0],
-            $this->buildUserStatsResponse($user),
-            ['Results' => fractal($relData, new ApiTransformer($user))]
-        );
-
-        return response()->json($response);
+        return $this->buildSearchResponse($relData, $user);
     }
 
     public function audio(Request $request): JsonResponse|Response
@@ -308,13 +330,7 @@ class ApiV2Controller extends BasePageController
             $sort
         );
 
-        $response = array_merge(
-            ['Total' => $relData[0]->_totalrows ?? 0],
-            $this->buildUserStatsResponse($user),
-            ['Results' => fractal($relData, new ApiTransformer($user))]
-        );
-
-        return response()->json($response);
+        return $this->buildSearchResponse($relData, $user);
     }
 
     public function books(Request $request): JsonResponse|Response
@@ -360,13 +376,7 @@ class ApiV2Controller extends BasePageController
             $sort
         );
 
-        $response = array_merge(
-            ['Total' => $relData[0]->_totalrows ?? 0],
-            $this->buildUserStatsResponse($user),
-            ['Results' => fractal($relData, new ApiTransformer($user))]
-        );
-
-        return response()->json($response);
+        return $this->buildSearchResponse($relData, $user);
     }
 
     public function anime(Request $request): JsonResponse|Response
@@ -412,13 +422,7 @@ class ApiV2Controller extends BasePageController
             $sort
         );
 
-        $response = array_merge(
-            ['Total' => $relData[0]->_totalrows ?? 0],
-            $this->buildUserStatsResponse($user),
-            ['Results' => fractal($relData, new ApiTransformer($user))]
-        );
-
-        return response()->json($response);
+        return $this->buildSearchResponse($relData, $user);
     }
 
     /**
@@ -479,13 +483,7 @@ class ApiV2Controller extends BasePageController
             );
         }
 
-        $response = array_merge(
-            ['Total' => $relData[0]->_totalrows ?? 0],
-            $this->buildUserStatsResponse($user),
-            ['Results' => fractal($relData, new ApiTransformer($user))]
-        );
-
-        return response()->json($response);
+        return $this->buildSearchResponse($relData, $user);
     }
 
     /**
@@ -559,13 +557,7 @@ class ApiV2Controller extends BasePageController
             $sort
         );
 
-        $response = array_merge(
-            ['Total' => $relData[0]->_totalrows ?? 0],
-            $this->buildUserStatsResponse($user),
-            ['Results' => fractal($relData, new ApiTransformer($user))]
-        );
-
-        return response()->json($response);
+        return $this->buildSearchResponse($relData, $user);
     }
 
     public function getNzb(Request $request): Application|ResponseFactory|JsonResponse|Redirector|RedirectResponse
@@ -599,9 +591,11 @@ class ApiV2Controller extends BasePageController
         event(new UserAccessedApi($user, $request->ip()));
         $relData = Release::getByGuidForApi($request->input('id'));
 
-        $relData = fractal($relData, new DetailsTransformer($user));
+        if ($relData === null) {
+            return response()->json(['error' => 'No such item'], 404);
+        }
 
-        return response()->json($relData);
+        return response()->json(DetailsData::fromRelease($relData, $user)->toArray());
     }
 
     private function hasTvSearchParameters(Request $request): bool

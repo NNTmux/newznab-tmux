@@ -5,7 +5,7 @@ namespace Tests\Unit\AdditionalProcessing;
 use App\Models\Release;
 use App\Services\AdditionalProcessing\ArchiveExtractionService;
 use App\Services\AdditionalProcessing\ConsoleOutputService;
-use App\Services\AdditionalProcessing\DTO\ReleaseProcessingContext;
+use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use App\Services\AdditionalProcessing\MediaExtractionService;
 use App\Services\AdditionalProcessing\NzbContentParser;
 use App\Services\AdditionalProcessing\ReleaseFileManager;

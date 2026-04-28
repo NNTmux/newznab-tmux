@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\NameFixing\Checkers;
 
-use App\Services\NameFixing\DTO\NameFixResult;
+use App\Services\NameFixing\Data\NameFixResult;
 use App\Services\NameFixing\Patterns\MoviePatterns;
 
 /**

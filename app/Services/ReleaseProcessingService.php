@@ -17,9 +17,9 @@ use App\Services\NNTP\NNTPService;
 use App\Services\Nzb\NzbService;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\Releases\ReleaseManagementService;
-use App\Support\DTOs\ProcessReleasesSettings;
-use App\Support\DTOs\ReleaseCreationResult;
-use App\Support\DTOs\ReleaseDeleteStats;
+use App\Support\Data\ProcessReleasesSettings;
+use App\Support\Data\ReleaseCreationResult;
+use App\Support\Data\ReleaseDeleteStats;
 use App\Support\ReleaseSearchIndexSync;
 use DateTimeInterface;
 use Illuminate\Database\QueryException;
@@ -114,7 +114,7 @@ final class ReleaseProcessingService
             $dbSettings[$key] = Settings::settingValue($key);
         }
 
-        return ProcessReleasesSettings::fromDatabase($dbSettings);
+        return ProcessReleasesSettings::forDatabase($dbSettings);
     }
 
     /**

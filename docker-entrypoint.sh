@@ -73,6 +73,9 @@ if [ "$1" != 'php' ] && [ "$1" != 'sh' ]; then
         php artisan config:cache
         php artisan route:cache
 
+        echo "Caching spatie/laravel-data structures..."
+        php artisan data:cache-structures || true
+
         # Run Laravel-specific post-installation commands
         echo "NNTmux installation..."
         php artisan nntmux:install --yes
