@@ -139,14 +139,22 @@ final class BinaryHandler
         }
 
         try {
-            $idsByKey = $this->bulkInsertAndResolve($pending);
+            $result = $this->bulkInsertAndResolve($pending);
+            $idsByKey = $result['ids'];
+            $existingKeys = $result['existing'];
+            $driver = DB::getDriverName();
             foreach ($pending as $articleKey => $row) {
-                $binaryId = $idsByKey[$this->binaryLookupKey($row['hash'], (int) $row['collections_id'])] ?? 0;
+                $lookupKey = $this->binaryLookupKey($row['hash'], (int) $row['collections_id']);
+                $binaryId = $idsByKey[$lookupKey] ?? 0;
                 if ($binaryId <= 0) {
                     continue;
                 }
 
                 $this->binariesUpdate[$binaryId] = $this->binariesUpdate[$binaryId] ?? ['Size' => 0, 'Parts' => 0];
+                if ($driver === 'sqlite' && isset($existingKeys[$lookupKey])) {
+                    $this->binariesUpdate[$binaryId]['Size'] += (int) $row['partsize'];
+                    $this->binariesUpdate[$binaryId]['Parts']++;
+                }
                 if (isset($extraUpdatesByArticleKey[$articleKey])) {
                     $this->binariesUpdate[$binaryId]['Size'] += $extraUpdatesByArticleKey[$articleKey]['Size'];
                     $this->binariesUpdate[$binaryId]['Parts'] += $extraUpdatesByArticleKey[$articleKey]['Parts'];
@@ -172,7 +180,7 @@ final class BinaryHandler
 
     /**
      * @param  array<string, array<string, mixed>>  $rowsByArticleKey
-     * @return array<string, int> Binary ids keyed by hash:collectionId
+     * @return array{ids: array<string, int>, existing: array<string, true>}
      */
     private function bulkInsertAndResolve(array $rowsByArticleKey): array
     {
@@ -192,7 +200,7 @@ final class BinaryHandler
             }
         }
 
-        return $idsByKey;
+        return ['ids' => $idsByKey, 'existing' => $existingKeys];
     }
 
     /**

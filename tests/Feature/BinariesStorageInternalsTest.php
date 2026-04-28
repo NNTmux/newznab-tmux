@@ -165,6 +165,28 @@ class BinariesStorageInternalsTest extends TestCase
         $this->assertSame(325, (int) $binary->partsize);
     }
 
+    public function test_header_storage_batch_updates_binary_that_exists_before_chunk(): void
+    {
+        $this->createHeaderStorageTables();
+
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(partsChunkSize: 10));
+        $this->assertSame([], $service->store([
+            $this->parsedHeader(501, 1, 'Existing.Batch.Release', 100),
+        ], ['id' => 1, 'name' => 'alt.test'], true));
+
+        $this->assertSame([], $service->store([
+            $this->parsedHeader(502, 2, 'Existing.Batch.Release', 150),
+        ], ['id' => 1, 'name' => 'alt.test'], true));
+
+        $binary = DB::table('binaries')->first();
+
+        $this->assertSame(1, DB::table('collections')->count());
+        $this->assertSame(1, DB::table('binaries')->count());
+        $this->assertSame(2, DB::table('parts')->count());
+        $this->assertSame(2, (int) $binary->currentparts);
+        $this->assertSame(250, (int) $binary->partsize);
+    }
+
     private function rawHeader(int $number, string $subject): array
     {
         return [
