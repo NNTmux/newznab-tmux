@@ -68,6 +68,34 @@ class BinariesStorageInternalsTest extends TestCase
         $this->assertSame(1, DB::table('parts')->count());
     }
 
+    public function test_binary_handler_flushes_cached_article_aggregate_updates(): void
+    {
+        DB::statement('CREATE TABLE binaries (
+            id INTEGER PRIMARY KEY,
+            binaryhash BLOB,
+            name VARCHAR(255),
+            collections_id INT,
+            totalparts INT,
+            currentparts INT,
+            filenumber INT,
+            partsize INT,
+            UNIQUE(binaryhash, collections_id)
+        )');
+
+        $handler = new BinaryHandler;
+        $first = $this->parsedHeader(251, 1, 'Aggregate.Release', 100);
+        $second = $this->parsedHeader(252, 2, 'Aggregate.Release', 50);
+
+        $binaryId = $handler->getOrCreateBinary($first, 1, 1, 0);
+        $this->assertNotNull($binaryId);
+        $this->assertSame($binaryId, $handler->getOrCreateBinary($second, 1, 1, 0));
+        $this->assertTrue($handler->flushUpdates());
+
+        $binary = DB::table('binaries')->where('id', $binaryId)->first();
+        $this->assertSame(2, (int) $binary->currentparts);
+        $this->assertSame(150, (int) $binary->partsize);
+    }
+
     public function test_sqlite_rollback_cleanup_keeps_unrelated_parts_with_same_article_number(): void
     {
         DB::statement('CREATE TABLE collections (id INTEGER PRIMARY KEY, collectionhash VARCHAR(40), noise VARCHAR(64))');
@@ -102,7 +130,10 @@ class BinariesStorageInternalsTest extends TestCase
 
         $collectionHandler = new CollectionHandler(new class extends CollectionsCleaningService
         {
-            public function __construct() {}
+            public function __construct()
+            {
+                parent::__construct();
+            }
 
             public function collectionsCleaner(string $subject, string $groupName = ''): array
             {
@@ -160,13 +191,13 @@ class BinariesStorageInternalsTest extends TestCase
             subject VARCHAR(255),
             fromname VARCHAR(255),
             date DATETIME NULL,
-            xref TEXT DEFAULT "",
+            xref TEXT DEFAULT \'\',
             groups_id INT,
             totalfiles INT,
             collectionhash VARCHAR(40) UNIQUE,
             collection_regexes_id INT,
             dateadded DATETIME NULL,
-            noise VARCHAR(64) DEFAULT ""
+            noise VARCHAR(64) DEFAULT \'\'
         )');
 
         DB::statement('CREATE TABLE binaries (

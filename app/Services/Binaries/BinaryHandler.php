@@ -116,10 +116,15 @@ final class BinaryHandler
         int $fileNumber,
         int $partSize
     ): int {
-        $affected = DB::affectingStatement(
-            'INSERT OR IGNORE INTO binaries (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize) VALUES (?, ?, ?, ?, 1, ?, ?)',
-            [$hash, $name, $collectionId, $totalParts, $fileNumber, $partSize]
-        );
+        $affected = DB::table('binaries')->insertOrIgnore([
+            'binaryhash' => $hash,
+            'name' => $name,
+            'collections_id' => $collectionId,
+            'totalparts' => $totalParts,
+            'currentparts' => 1,
+            'filenumber' => $fileNumber,
+            'partsize' => $partSize,
+        ]);
 
         if ($affected > 0 && ($lastId = (int) DB::connection()->getPdo()->lastInsertId()) > 0) {
             $this->insertedBinaryIds[$lastId] = true;
@@ -214,33 +219,21 @@ final class BinaryHandler
     private function flushUpdatesMysql(array $updates, int $chunkSize): bool
     {
         foreach (array_chunk($updates, $chunkSize) as $chunk) {
-            // Build a CASE statement for batch UPDATE instead of INSERT...ON DUPLICATE KEY
-            // This avoids FK constraint violations when collections have been deleted
-            $ids = [];
-            $partsizeCases = [];
-            $currentpartsCases = [];
+            $selects = [];
             $bindings = [];
 
             foreach ($chunk as $row) {
-                $ids[] = $row['id'];
-                $partsizeCases[] = 'WHEN id = ? THEN partsize + ?';
-                $currentpartsCases[] = 'WHEN id = ? THEN currentparts + ?';
+                $selects[] = 'SELECT ? AS id, ? AS partsize, ? AS currentparts';
                 $bindings[] = $row['id'];
                 $bindings[] = $row['partsize'];
-            }
-
-            foreach ($chunk as $row) {
-                $bindings[] = $row['id'];
                 $bindings[] = $row['currentparts'];
             }
 
-            $idPlaceholders = implode(',', array_fill(0, count($ids), '?'));
-            $bindings = array_merge($bindings, $ids);
-
-            $sql = 'UPDATE binaries SET '
-                .'partsize = CASE '.implode(' ', $partsizeCases).' ELSE partsize END, '
-                .'currentparts = CASE '.implode(' ', $currentpartsCases).' ELSE currentparts END '
-                .'WHERE id IN ('.$idPlaceholders.')';
+            $sql = 'UPDATE binaries b INNER JOIN ('
+                .implode(' UNION ALL ', $selects)
+                .') u ON u.id = b.id '
+                .'SET b.partsize = b.partsize + u.partsize, '
+                .'b.currentparts = b.currentparts + u.currentparts';
 
             DB::statement($sql, $bindings);
         }
