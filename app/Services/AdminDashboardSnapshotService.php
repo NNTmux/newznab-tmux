@@ -100,7 +100,7 @@ class AdminDashboardSnapshotService
         // Approximate counts on huge tables — InnoDB metadata estimates are
         // good enough for the admin overview tiles.
         $releasesCount = ApproximateRowCount::for('releases');
-        $usersCount = ApproximateRowCount::for('users');
+        $usersApproximateCount = ApproximateRowCount::for('users');
         $groupsCount = ApproximateRowCount::for('usenet_groups');
         $failedCount = ApproximateRowCount::for('dnzb_failures');
 
@@ -108,6 +108,7 @@ class AdminDashboardSnapshotService
         $activeGroupsCount = UsenetGroup::where('active', 1)->count();
         $reportedCount = ReleaseReport::where('status', 'pending')->count();
         $softDeletedCount = User::onlyTrashed()->count();
+        $activeUsersCount = max($usersApproximateCount - $softDeletedCount, 0);
 
         // Replaces previous whereJsonContains() count which couldn't use an index.
         $permanentlyDeletedCount = UserActivity::query()
@@ -121,7 +122,7 @@ class AdminDashboardSnapshotService
         return [
             'releases' => $releasesCount,
             'releases_today' => $releasesToday,
-            'users' => $usersCount,
+            'users' => $activeUsersCount,
             'users_today' => $usersToday,
             'groups' => $groupsCount,
             'active_groups' => $activeGroupsCount,
