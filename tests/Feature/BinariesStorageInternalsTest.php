@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Services\Binaries\BinaryHandler;
 use App\Services\Binaries\BinariesConfig;
+use App\Services\Binaries\BinaryHandler;
 use App\Services\Binaries\CollectionHandler;
 use App\Services\Binaries\HeaderParser;
 use App\Services\Binaries\HeaderStorageService;
