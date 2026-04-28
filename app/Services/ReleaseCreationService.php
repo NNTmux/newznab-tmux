@@ -100,7 +100,7 @@ class ReleaseCreationService
 
                 $determinedCategory = $categorize->determineCategory($collection->groups_id, $cleanedName, $fromName);
 
-                    $searchName = ! empty($cleanedName) ? Utf8::clean($cleanedName) : $cleanRelName;
+                $searchName = ! empty($cleanedName) ? Utf8::clean($cleanedName) : $cleanRelName;
 
                 $releaseID = Release::insertRelease([
                     'name' => $cleanRelName,

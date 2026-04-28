@@ -33,4 +33,3 @@ final class Utf8
         return self::$encodings;
     }
 }
-

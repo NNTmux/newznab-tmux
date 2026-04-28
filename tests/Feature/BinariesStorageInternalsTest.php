@@ -125,5 +125,3 @@ class BinariesStorageInternalsTest extends TestCase
         $reflection->setValue($object, $value);
     }
 }
-
-

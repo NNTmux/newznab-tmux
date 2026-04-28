@@ -7,6 +7,7 @@ namespace App\Services\Binaries;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\NNTP\NNTPService;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -40,13 +41,13 @@ class BinariesService
 
     private float $timeInsert = 0;
 
-    private \Carbon\CarbonInterface $startLoop;
+    private CarbonInterface $startLoop;
 
-    private \Carbon\CarbonInterface $startCleaning;
+    private CarbonInterface $startCleaning;
 
-    private \Carbon\CarbonInterface $startPR;
+    private CarbonInterface $startPR;
 
-    private \Carbon\CarbonInterface $startUpdate;
+    private CarbonInterface $startUpdate;
 
     // Scan state
     /**
