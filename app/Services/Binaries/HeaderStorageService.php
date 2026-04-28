@@ -52,12 +52,33 @@ final class HeaderStorageService
             return [];
         }
 
-        // Reset all handlers
+        $this->failedInserts = [];
+
+        $chunkSize = max(1, $this->config->partsChunkSize);
+        foreach (array_chunk($headers, $chunkSize) as $chunk) {
+            $this->storeChunk($chunk, $groupMySQL, $addToPartRepair);
+        }
+
+        return array_values(array_unique($this->failedInserts));
+    }
+
+    /**
+     * Store one bounded header chunk inside its own transaction.
+     *
+     * @param  array<string, mixed>  $headers
+     * @param  array<string, mixed>  $groupMySQL
+     */
+    private function storeChunk(array $headers, array $groupMySQL, bool $addToPartRepair): void
+    {
         $this->collectionHandler->reset();
         $this->binaryHandler->reset();
         $this->partHandler->reset();
         $this->partHandler->setAddToPartRepair($addToPartRepair);
-        $this->failedInserts = [];
+
+        $chunkNumbers = array_values(array_filter(array_map(
+            static fn (array $header): mixed => $header['Number'] ?? null,
+            $headers
+        )));
 
         // Create transaction
         $transaction = new HeaderStorageTransaction(
@@ -93,21 +114,21 @@ final class HeaderStorageService
 
         // Finish transaction
         if (! $transaction->finish()) {
-            // All failed
             if ($addToPartRepair) {
-                return array_unique(array_merge(
+                $this->failedInserts = array_merge(
                     $this->failedInserts,
+                    $chunkNumbers,
                     $this->partHandler->getFailedNumbers()
-                ));
+                );
             }
 
-            return [];
+            return;
         }
 
-        return array_unique(array_merge(
+        $this->failedInserts = array_merge(
             $this->failedInserts,
             $this->partHandler->getFailedNumbers()
-        ));
+        );
     }
 
     /**

@@ -7,7 +7,6 @@ namespace App\Services\Binaries;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\NNTP\NNTPService;
-use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -41,13 +40,13 @@ class BinariesService
 
     private float $timeInsert = 0;
 
-    private CarbonInterface $startLoop;
+    private Carbon $startLoop;
 
-    private CarbonInterface $startCleaning;
+    private Carbon $startCleaning;
 
-    private CarbonInterface $startPR;
+    private Carbon $startPR;
 
-    private CarbonInterface $startUpdate;
+    private Carbon $startUpdate;
 
     // Scan state
     /**
@@ -83,7 +82,7 @@ class BinariesService
             $this->config->partRepairMaxTries
         );
         $this->nntp = $nntp;
-        $this->startUpdate = now();
+        $this->startUpdate = Carbon::now();
     }
 
     /**
@@ -265,7 +264,7 @@ class BinariesService
      */
     public function scan(array $groupMySQL, int $first, int $last, string $type = 'update', ?array $missingParts = null): array
     {
-        $this->startLoop = now();
+        $this->startLoop = Carbon::now();
         $this->groupMySQL = $groupMySQL;
         $this->last = $last;
         $this->first = $first;
@@ -286,7 +285,7 @@ class BinariesService
             return $returnArray;
         }
 
-        $this->startCleaning = now();
+        $this->startCleaning = Carbon::now();
         $this->timeHeaders = $this->startCleaning->diffInSeconds($this->startLoop, true);
 
         $msgCount = \count($headers);
@@ -315,7 +314,7 @@ class BinariesService
         }
 
         // Store headers
-        $this->startUpdate = now();  // Reset before storage begins
+        $this->startUpdate = Carbon::now();  // Reset before storage begins
         $this->timeCleaning = $this->startUpdate->diffInSeconds($this->startCleaning, true);
 
         $headersNotInserted = [];
@@ -327,7 +326,7 @@ class BinariesService
             }
         }
 
-        $this->startPR = now();
+        $this->startPR = Carbon::now();
         $this->timeInsert = $this->startPR->diffInSeconds($this->startUpdate, true);
 
         // Handle repaired parts
