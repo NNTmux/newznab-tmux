@@ -98,10 +98,12 @@ PHPUnit only (no Pest). Create tests: `php artisan make:test --phpunit {name}`
 
 **After every code change, run all of the following before considering a task done:**
 
-### 1. Format changed PHP files
+### 1. Apply style fixes to changed PHP files
 ```bash
 ./vendor/bin/pint --dirty  # Format only changed files
 ```
+
+> If Pint changes files, keep those changes and rerun Pint until it reports clean output.
 
 ### 2. Check for static analysis errors
 ```bash
