@@ -128,19 +128,7 @@ class BinariesStorageInternalsTest extends TestCase
     {
         $this->createHeaderStorageTables('CHECK(size < 500)');
 
-        $collectionHandler = new CollectionHandler(new class extends CollectionsCleaningService
-        {
-            public function __construct()
-            {
-                parent::__construct();
-            }
-
-            public function collectionsCleaner(string $subject, string $groupName = ''): array
-            {
-                return ['id' => 0, 'name' => $subject];
-            }
-        });
-        $service = new HeaderStorageService($collectionHandler, config: new BinariesConfig(partsChunkSize: 2));
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(partsChunkSize: 2));
         $failed = $service->store([
             $this->parsedHeader(301, 1, 'Chunk.One', 100),
             $this->parsedHeader(302, 2, 'Chunk.One', 100),
@@ -155,6 +143,26 @@ class BinariesStorageInternalsTest extends TestCase
         $this->assertSame(1, DB::table('binaries')->count());
         $this->assertSame(2, DB::table('parts')->count());
         $this->assertSame([301, 302], DB::table('parts')->orderBy('number')->pluck('number')->all());
+    }
+
+    public function test_header_storage_batch_reuses_collection_and_binary_for_parts(): void
+    {
+        $this->createHeaderStorageTables();
+
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(partsChunkSize: 10));
+        $failed = $service->store([
+            $this->parsedHeader(401, 1, 'Batch.Release', 150),
+            $this->parsedHeader(402, 2, 'Batch.Release', 175),
+        ], ['id' => 1, 'name' => 'alt.test'], true);
+
+        $binary = DB::table('binaries')->first();
+
+        $this->assertSame([], $failed);
+        $this->assertSame(1, DB::table('collections')->count());
+        $this->assertSame(1, DB::table('binaries')->count());
+        $this->assertSame(2, DB::table('parts')->count());
+        $this->assertSame(2, (int) $binary->currentparts);
+        $this->assertSame(325, (int) $binary->partsize);
     }
 
     private function rawHeader(int $number, string $subject): array
@@ -228,6 +236,22 @@ class BinariesStorageInternalsTest extends TestCase
             status INT DEFAULT 1,
             ordinal INT DEFAULT 0
         )');
+    }
+
+    private function deterministicCollectionHandler(): CollectionHandler
+    {
+        return new CollectionHandler(new class extends CollectionsCleaningService
+        {
+            public function __construct()
+            {
+                parent::__construct();
+            }
+
+            public function collectionsCleaner(string $subject, string $groupName = ''): array
+            {
+                return ['id' => 0, 'name' => $subject];
+            }
+        });
     }
 
     private function setPrivateProperty(object $object, string $property, mixed $value): void

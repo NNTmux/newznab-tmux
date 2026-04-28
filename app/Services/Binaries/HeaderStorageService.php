@@ -89,14 +89,7 @@ final class HeaderStorageService
 
         $transaction->begin();
 
-        // Process each header
-        foreach ($headers as $header) {
-            if (! $this->processHeader($header, $groupMySQL, $transaction)) {
-                if ($addToPartRepair && isset($header['Number'])) {
-                    $this->failedInserts[] = $header['Number'];
-                }
-            }
-        }
+        $this->processHeaderChunk($headers, $groupMySQL, $transaction, $addToPartRepair);
 
         // Flush remaining parts
         if ($this->partHandler->hasPending()) {
@@ -129,6 +122,83 @@ final class HeaderStorageService
             $this->failedInserts,
             $this->partHandler->getFailedNumbers()
         );
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $headers
+     * @param  array<string, mixed>  $groupMySQL
+     */
+    private function processHeaderChunk(array $headers, array $groupMySQL, HeaderStorageTransaction $transaction, bool $addToPartRepair): void
+    {
+        $totalFilesByIndex = [];
+        $fileNumbersByIndex = [];
+
+        foreach ($headers as $index => $header) {
+            [$fileNumber, $totalFiles] = $this->extractFileNumberAndTotal($header);
+            $fileNumbersByIndex[$index] = $fileNumber;
+            $totalFilesByIndex[$index] = $totalFiles;
+        }
+
+        $collectionIds = $this->collectionHandler->getOrCreateCollections(
+            $headers,
+            $groupMySQL['id'],
+            $groupMySQL['name'],
+            $totalFilesByIndex,
+            $transaction->getBatchNoise()
+        );
+
+        $binaryRecords = [];
+        foreach ($headers as $index => $header) {
+            if (! isset($collectionIds[$index])) {
+                $this->markHeaderFailed($header, $transaction, $addToPartRepair);
+
+                continue;
+            }
+
+            $binaryRecords[$index] = [
+                'header' => $header,
+                'collection_id' => $collectionIds[$index],
+                'file_number' => $fileNumbersByIndex[$index],
+            ];
+        }
+
+        $binaryIds = $this->binaryHandler->getOrCreateBinaries($binaryRecords, $groupMySQL['id']);
+
+        foreach ($binaryRecords as $index => $record) {
+            $header = $record['header'];
+            if (! isset($binaryIds[$index])) {
+                $this->markHeaderFailed($header, $transaction, $addToPartRepair);
+
+                continue;
+            }
+
+            if (! $this->partHandler->addPart($binaryIds[$index], $header)) {
+                $this->markHeaderFailed($header, $transaction, $addToPartRepair);
+            }
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $header
+     * @return array{0: int, 1: int}
+     */
+    private function extractFileNumberAndTotal(array $header): array
+    {
+        $fileCount = $this->getFileCount($header['matches'][1]);
+        if ($fileCount[1] === 0 && $fileCount[3] === 0) {
+            $fileCount = $this->getFileCount($header['matches'][0]);
+        }
+
+        return [(int) $fileCount[1], (int) $fileCount[3]];
+    }
+
+    /** @param  array<string, mixed>  $header */
+    private function markHeaderFailed(array $header, HeaderStorageTransaction $transaction, bool $addToPartRepair): void
+    {
+        $transaction->markError();
+        if ($addToPartRepair && isset($header['Number'])) {
+            $this->failedInserts[] = $header['Number'];
+        }
     }
 
     /**

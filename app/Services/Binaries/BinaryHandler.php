@@ -88,6 +88,221 @@ final class BinaryHandler
     }
 
     /**
+     * Resolve binaries for a chunk of headers with one bulk insert and one id lookup.
+     *
+     * @param  array<int, array{header: array<string, mixed>, collection_id: int, file_number: int}>  $records
+     * @return array<int, int> Binary ids keyed by header index
+     */
+    public function getOrCreateBinaries(array $records, int $groupId): array
+    {
+        $resolved = [];
+        $pending = [];
+        $indexesByArticleKey = [];
+        $extraUpdatesByArticleKey = [];
+
+        foreach ($records as $index => $record) {
+            $header = $record['header'];
+            $collectionId = (int) $record['collection_id'];
+            $fileNumber = (int) $record['file_number'];
+            $articleKey = $header['matches'][1];
+
+            if (isset($this->articles[$articleKey])) {
+                $binaryId = $this->articles[$articleKey]['BinaryID'];
+                $this->binariesUpdate[$binaryId]['Size'] += (int) $header['Bytes'];
+                $this->binariesUpdate[$binaryId]['Parts']++;
+                $resolved[$index] = $binaryId;
+
+                continue;
+            }
+
+            $indexesByArticleKey[$articleKey][] = $index;
+            if (isset($pending[$articleKey])) {
+                $extraUpdatesByArticleKey[$articleKey]['Size'] = ($extraUpdatesByArticleKey[$articleKey]['Size'] ?? 0) + (int) $header['Bytes'];
+                $extraUpdatesByArticleKey[$articleKey]['Parts'] = ($extraUpdatesByArticleKey[$articleKey]['Parts'] ?? 0) + 1;
+
+                continue;
+            }
+
+            $hash = md5((string) ($header['matches'][1] ?? '').(string) ($header['From'] ?? '').(string) $groupId);
+            $pending[$articleKey] = [
+                'hash' => $hash,
+                'name' => Utf8::clean($header['matches'][1]),
+                'collections_id' => $collectionId,
+                'totalparts' => (int) $header['matches'][3],
+                'filenumber' => $fileNumber,
+                'partsize' => (int) $header['Bytes'],
+            ];
+        }
+
+        if ($pending === []) {
+            return $resolved;
+        }
+
+        try {
+            $idsByKey = $this->bulkInsertAndResolve($pending);
+            foreach ($pending as $articleKey => $row) {
+                $binaryId = $idsByKey[$this->binaryLookupKey($row['hash'], (int) $row['collections_id'])] ?? 0;
+                if ($binaryId <= 0) {
+                    continue;
+                }
+
+                $this->binariesUpdate[$binaryId] = $this->binariesUpdate[$binaryId] ?? ['Size' => 0, 'Parts' => 0];
+                if (isset($extraUpdatesByArticleKey[$articleKey])) {
+                    $this->binariesUpdate[$binaryId]['Size'] += $extraUpdatesByArticleKey[$articleKey]['Size'];
+                    $this->binariesUpdate[$binaryId]['Parts'] += $extraUpdatesByArticleKey[$articleKey]['Parts'];
+                }
+
+                $this->articles[$articleKey] = [
+                    'CollectionID' => (int) $row['collections_id'],
+                    'BinaryID' => $binaryId,
+                ];
+
+                foreach ($indexesByArticleKey[$articleKey] ?? [] as $index) {
+                    $resolved[$index] = $binaryId;
+                }
+            }
+        } catch (\Throwable $e) {
+            if (config('app.debug') === true) {
+                Log::error('Bulk binary insert failed: '.$e->getMessage());
+            }
+        }
+
+        return $resolved;
+    }
+
+    /**
+     * @param  array<string, array<string, mixed>>  $rowsByArticleKey
+     * @return array<string, int> Binary ids keyed by hash:collectionId
+     */
+    private function bulkInsertAndResolve(array $rowsByArticleKey): array
+    {
+        $lookupRows = array_values($rowsByArticleKey);
+        $existingKeys = $this->existingBinaryKeys($lookupRows);
+
+        if (DB::getDriverName() === 'sqlite') {
+            $this->bulkInsertBinariesSqlite($lookupRows);
+        } else {
+            $this->bulkInsertBinariesMysql($lookupRows);
+        }
+
+        $idsByKey = $this->resolveBinaryIds($lookupRows);
+        foreach ($idsByKey as $key => $id) {
+            if (! isset($existingKeys[$key])) {
+                $this->insertedBinaryIds[$id] = true;
+            }
+        }
+
+        return $idsByKey;
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $rows
+     * @return array<string, true>
+     */
+    private function existingBinaryKeys(array $rows): array
+    {
+        $keys = [];
+        foreach ($this->selectBinaryRows($rows) as $row) {
+            $keys[$this->binaryLookupKey((string) $row->hashvalue, (int) $row->collections_id)] = true;
+        }
+
+        return $keys;
+    }
+
+    /** @param  list<array<string, mixed>>  $rows */
+    private function bulkInsertBinariesSqlite(array $rows): void
+    {
+        $insertRows = [];
+        foreach ($rows as $row) {
+            $insertRows[] = [
+                'binaryhash' => $row['hash'],
+                'name' => $row['name'],
+                'collections_id' => $row['collections_id'],
+                'totalparts' => $row['totalparts'],
+                'currentparts' => 1,
+                'filenumber' => $row['filenumber'],
+                'partsize' => $row['partsize'],
+            ];
+        }
+
+        DB::table('binaries')->insertOrIgnore($insertRows);
+    }
+
+    /** @param  list<array<string, mixed>>  $rows */
+    private function bulkInsertBinariesMysql(array $rows): void
+    {
+        $placeholders = [];
+        $bindings = [];
+        foreach ($rows as $row) {
+            $placeholders[] = '(UNHEX(?), ?, ?, ?, 1, ?, ?)';
+            array_push(
+                $bindings,
+                $row['hash'],
+                $row['name'],
+                $row['collections_id'],
+                $row['totalparts'],
+                $row['filenumber'],
+                $row['partsize']
+            );
+        }
+
+        DB::statement(
+            'INSERT INTO binaries (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize) VALUES '
+            .implode(',', $placeholders)
+            .' ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + VALUES(partsize)',
+            $bindings
+        );
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $rows
+     * @return array<string, int>
+     */
+    private function resolveBinaryIds(array $rows): array
+    {
+        $resolved = [];
+        foreach ($this->selectBinaryRows($rows) as $row) {
+            $resolved[$this->binaryLookupKey((string) $row->hashvalue, (int) $row->collections_id)] = (int) $row->id;
+        }
+
+        return $resolved;
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $rows
+     * @return list<object>
+     */
+    private function selectBinaryRows(array $rows): array
+    {
+        if ($rows === []) {
+            return [];
+        }
+
+        $driver = DB::getDriverName();
+        $clauses = [];
+        $bindings = [];
+        foreach ($rows as $row) {
+            $clauses[] = $driver === 'sqlite'
+                ? '(binaryhash = ? AND collections_id = ?)'
+                : '(binaryhash = UNHEX(?) AND collections_id = ?)';
+            $bindings[] = $row['hash'];
+            $bindings[] = $row['collections_id'];
+        }
+
+        $hashExpression = $driver === 'sqlite' ? 'binaryhash' : 'LOWER(HEX(binaryhash))';
+
+        return DB::select(
+            "SELECT id, {$hashExpression} AS hashvalue, collections_id FROM binaries WHERE ".implode(' OR ', $clauses),
+            $bindings
+        );
+    }
+
+    private function binaryLookupKey(string $hash, int $collectionId): string
+    {
+        return strtolower($hash).':'.$collectionId;
+    }
+
+    /**
      * @param  array<string, mixed>  $header
      */
     private function insertOrGetBinary(
