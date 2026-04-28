@@ -83,27 +83,45 @@ final class PartHandler
             return true;
         }
 
-        $success = $this->insertChunk($this->parts);
+        $insertedCount = $this->insertChunk($this->parts);
 
-        if ($success) {
+        if ($insertedCount === null) {
+            foreach ($this->parts as $part) {
+                $this->failedPartNumbers[] = $part['number'];
+            }
+
+            $this->parts = [];
+
+            return false;
+        }
+
+        if ($insertedCount === \count($this->parts)) {
             foreach ($this->parts as $part) {
                 $this->insertedPartNumbers[] = $part['number'];
             }
-        } else {
-            foreach ($this->parts as $part) {
+
+            $this->parts = [];
+
+            return true;
+        }
+
+        $existingKeys = $this->existingPartKeys($this->parts);
+        foreach ($this->parts as $part) {
+            $key = $this->partKey((int) $part['binaries_id'], (int) $part['number']);
+            if (! isset($existingKeys[$key])) {
                 $this->failedPartNumbers[] = $part['number'];
             }
         }
 
         $this->parts = [];
 
-        return $success;
+        return empty($this->failedPartNumbers);
     }
 
     /**
      * @param  array<string, mixed>  $parts
      */
-    private function insertChunk(array $parts): bool
+    private function insertChunk(array $parts): ?int
     {
         $placeholders = [];
         $bindings = [];
@@ -123,16 +141,50 @@ final class PartHandler
             : 'INSERT IGNORE INTO parts (binaries_id, number, messageid, partnumber, size) VALUES '.implode(',', $placeholders);
 
         try {
-            DB::statement($sql, $bindings);
-
-            return true;
+            return DB::affectingStatement($sql, $bindings);
         } catch (\Throwable $e) {
             if (config('app.debug') === true) {
                 Log::error('Parts chunk insert failed: '.$e->getMessage());
             }
 
-            return false;
+            return null;
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $parts
+     * @return array<string, true>
+     */
+    private function existingPartKeys(array $parts): array
+    {
+        if (empty($parts)) {
+            return [];
+        }
+
+        $clauses = [];
+        $bindings = [];
+        foreach ($parts as $part) {
+            $clauses[] = '(binaries_id = ? AND number = ?)';
+            $bindings[] = $part['binaries_id'];
+            $bindings[] = $part['number'];
+        }
+
+        $rows = DB::select(
+            'SELECT binaries_id, number FROM parts WHERE '.implode(' OR ', $clauses),
+            $bindings
+        );
+
+        $keys = [];
+        foreach ($rows as $row) {
+            $keys[$this->partKey((int) $row->binaries_id, (int) $row->number)] = true;
+        }
+
+        return $keys;
+    }
+
+    private function partKey(int $binaryId, int $number): string
+    {
+        return $binaryId.':'.$number;
     }
 
     /**

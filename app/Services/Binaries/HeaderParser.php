@@ -48,12 +48,15 @@ final class HeaderParser
     ): array {
         $parsed = [];
         $headersRepaired = [];
+        $receivedNumbers = [];
 
         foreach ($headers as $header) {
             // Check if we got the article
             if (! isset($header['Number'])) {
                 continue;
             }
+
+            $receivedNumbers[] = $header['Number'];
 
             // For part repair, only process missing parts
             if ($partRepair && $missingParts !== null) {
@@ -64,7 +67,7 @@ final class HeaderParser
             }
 
             // Parse subject to get base name and part/total like "(12/45)"
-            if (! preg_match('/^\s*(?!"Usenet Index Post)(.+)\s+\((\d+)\/(\d+)\)/', $header['Subject'], $matches)) {
+            if (! preg_match('/^\s*(?!Usenet Index Post)(.+?)\s+\((\d+)\/(\d+)\)/', $header['Subject'], $matches)) {
                 $this->notYEnc++;
 
                 continue;
@@ -98,6 +101,7 @@ final class HeaderParser
         return [
             'headers' => array_column($parsed, 'header'),
             'repaired' => $headersRepaired,
+            'received' => $receivedNumbers,
             'notYEnc' => $this->notYEnc,
             'blacklisted' => $this->blacklisted,
         ];

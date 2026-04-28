@@ -14,6 +14,7 @@ use App\Models\ReleasesGroups;
 use App\Models\UsenetGroup;
 use App\Services\Categorization\CategorizationService;
 use App\Services\Nzb\NzbService;
+use App\Support\Utf8;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -57,8 +58,8 @@ class ReleaseCreationService
         }
 
         foreach ($collections as $collection) {
-            $cleanRelName = mb_convert_encoding(str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection->subject), 'UTF-8', mb_list_encodings());
-            $fromName = mb_convert_encoding(trim($collection->fromname, "'"), 'UTF-8', mb_list_encodings());
+            $cleanRelName = Utf8::clean(str_replace(['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'], '', $collection->subject));
+            $fromName = Utf8::clean(trim($collection->fromname, "'"));
 
             // Deduplicate by name, from, and ~size
             $dupeCheck = Release::query()
@@ -99,7 +100,7 @@ class ReleaseCreationService
 
                 $determinedCategory = $categorize->determineCategory($collection->groups_id, $cleanedName, $fromName);
 
-                $searchName = ! empty($cleanedName) ? mb_convert_encoding($cleanedName, 'UTF-8', mb_list_encodings()) : $cleanRelName;
+                    $searchName = ! empty($cleanedName) ? Utf8::clean($cleanedName) : $cleanRelName;
 
                 $releaseID = Release::insertRelease([
                     'name' => $cleanRelName,

@@ -63,12 +63,21 @@ final class MissedPartHandler
      */
     private function addMissingPartsMysql(array $numbers, int $groupId): void
     {
-        $insertStr = 'INSERT INTO missed_parts (numberid, groups_id) VALUES ';
-        foreach ($numbers as $number) {
-            $insertStr .= '('.$number.','.$groupId.'),';
-        }
+        foreach (array_chunk(array_unique($numbers), 1000) as $chunk) {
+            $placeholders = [];
+            $bindings = [];
 
-        DB::insert(rtrim($insertStr, ',').' ON DUPLICATE KEY UPDATE attempts=attempts+1');
+            foreach ($chunk as $number) {
+                $placeholders[] = '(?, ?)';
+                $bindings[] = $number;
+                $bindings[] = $groupId;
+            }
+
+            DB::insert(
+                'INSERT INTO missed_parts (numberid, groups_id) VALUES '.implode(',', $placeholders).' ON DUPLICATE KEY UPDATE attempts = attempts + 1',
+                $bindings
+            );
+        }
     }
 
     /**
@@ -82,14 +91,12 @@ final class MissedPartHandler
             return;
         }
 
-        $sql = 'DELETE FROM missed_parts WHERE numberid in (';
-        foreach ($numbers as $number) {
-            $sql .= $number.',';
-        }
-
         try {
-            DB::transaction(static function () use ($groupId, $sql) {
-                DB::delete(rtrim($sql, ',').') AND groups_id = '.$groupId);
+            DB::transaction(static function () use ($groupId, $numbers): void {
+                DB::table('missed_parts')
+                    ->where('groups_id', $groupId)
+                    ->whereIn('numberid', $numbers)
+                    ->delete();
             }, 10);
         } catch (\Throwable $e) {
             if (config('app.debug') === true) {
@@ -106,18 +113,16 @@ final class MissedPartHandler
     public function getMissingParts(int $groupId): array
     {
         try {
-            return DB::select(
-                sprintf(
-                    'SELECT * FROM missed_parts WHERE groups_id = %d AND attempts < %d ORDER BY numberid ASC LIMIT %d',
-                    $groupId,
-                    $this->partRepairMaxTries,
-                    $this->partRepairLimit
-                )
-            );
+            return DB::table('missed_parts')
+                ->where('groups_id', $groupId)
+                ->where('attempts', '<', $this->partRepairMaxTries)
+                ->orderBy('numberid')
+                ->limit($this->partRepairLimit)
+                ->get()
+                ->all();
         } catch (\PDOException $e) {
             if ($e->getMessage() === 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') {
                 Log::notice('Deadlock occurred while fetching missed parts');
-                DB::rollBack();
             }
 
             return [];
@@ -129,13 +134,10 @@ final class MissedPartHandler
      */
     public function incrementAttempts(int $groupId, int $maxNumberId): void
     {
-        DB::update(
-            sprintf(
-                'UPDATE missed_parts SET attempts = attempts + 1 WHERE groups_id = %d AND numberid <= %d',
-                $groupId,
-                $maxNumberId
-            )
-        );
+        DB::table('missed_parts')
+            ->where('groups_id', $groupId)
+            ->where('numberid', '<=', $maxNumberId)
+            ->increment('attempts');
     }
 
     /**
@@ -161,15 +163,10 @@ final class MissedPartHandler
      */
     public function getCount(int $groupId, int $maxNumberId): int
     {
-        $result = DB::select(
-            sprintf(
-                'SELECT COUNT(id) AS num FROM missed_parts WHERE groups_id = %d AND numberid <= %d',
-                $groupId,
-                $maxNumberId
-            )
-        );
-
-        return $result[0]->num ?? 0;
+        return DB::table('missed_parts')
+            ->where('groups_id', $groupId)
+            ->where('numberid', '<=', $maxNumberId)
+            ->count('id');
     }
 
     /**
@@ -177,14 +174,11 @@ final class MissedPartHandler
      */
     public function cleanupExhaustedParts(int $groupId): void
     {
-        DB::transaction(function () use ($groupId) {
-            DB::delete(
-                sprintf(
-                    'DELETE FROM missed_parts WHERE attempts >= %d AND groups_id = %d',
-                    $this->partRepairMaxTries,
-                    $groupId
-                )
-            );
+        DB::transaction(function () use ($groupId): void {
+            DB::table('missed_parts')
+                ->where('groups_id', $groupId)
+                ->where('attempts', '>=', $this->partRepairMaxTries)
+                ->delete();
         }, 10);
     }
 }

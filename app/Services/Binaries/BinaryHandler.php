@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Binaries;
 
+use App\Support\Utf8;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -96,7 +97,7 @@ final class BinaryHandler
         int $collectionId,
         int $fileNumber
     ): int {
-        $name = mb_convert_encoding($header['matches'][1], 'UTF-8', mb_list_encodings());
+        $name = Utf8::clean($header['matches'][1]);
         $totalParts = (int) $header['matches'][3];
         $partSize = (int) $header['Bytes'];
 
@@ -115,27 +116,12 @@ final class BinaryHandler
         int $fileNumber,
         int $partSize
     ): int {
-        // Verify collection exists before insert to avoid FK constraint violation
-        $collectionExists = DB::selectOne(
-            'SELECT id FROM collections WHERE id = ? LIMIT 1',
-            [$collectionId]
-        );
-
-        if ($collectionExists === null) {
-            if (config('app.debug') === true) {
-                Log::warning("Binary insert skipped: collection {$collectionId} no longer exists");
-            }
-
-            return 0;
-        }
-
-        DB::statement(
+        $affected = DB::affectingStatement(
             'INSERT OR IGNORE INTO binaries (binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize) VALUES (?, ?, ?, ?, 1, ?, ?)',
             [$hash, $name, $collectionId, $totalParts, $fileNumber, $partSize]
         );
 
-        $lastId = (int) DB::connection()->getPdo()->lastInsertId();
-        if ($lastId > 0) {
+        if ($affected > 0 && ($lastId = (int) DB::connection()->getPdo()->lastInsertId()) > 0) {
             $this->insertedBinaryIds[$lastId] = true;
 
             return $lastId;
@@ -157,19 +143,6 @@ final class BinaryHandler
         int $fileNumber,
         int $partSize
     ): int {
-        // Verify collection exists before insert to avoid FK constraint violation
-        $collectionExists = DB::selectOne(
-            'SELECT id FROM collections WHERE id = ? LIMIT 1',
-            [$collectionId]
-        );
-
-        if ($collectionExists === null) {
-            if (config('app.debug') === true) {
-                Log::warning("Binary insert skipped: collection {$collectionId} no longer exists");
-            }
-
-            return 0;
-        }
 
         $sql = 'INSERT INTO binaries '
             .'(binaryhash, name, collections_id, totalparts, currentparts, filenumber, partsize) '

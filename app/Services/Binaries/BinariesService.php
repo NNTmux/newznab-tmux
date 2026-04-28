@@ -40,13 +40,13 @@ class BinariesService
 
     private float $timeInsert = 0;
 
-    private \DateTime $startLoop;
+    private \Carbon\CarbonInterface $startLoop;
 
-    private \DateTime $startCleaning;
+    private \Carbon\CarbonInterface $startCleaning;
 
-    private \DateTime $startPR;
+    private \Carbon\CarbonInterface $startPR;
 
-    private \DateTime $startUpdate;
+    private \Carbon\CarbonInterface $startUpdate;
 
     // Scan state
     /**
@@ -300,8 +300,7 @@ class BinariesService
         $this->headerParser->reset();
         $parseResult = $this->headerParser->parse($headers, $groupMySQL['name'], $partRepair, $missingParts);
 
-        $this->headersReceived = array_column($headers, 'Number'); // @phpstan-ignore assign.propertyType
-        $this->headersReceived = array_filter($this->headersReceived); // @phpstan-ignore assign.propertyType
+        $this->headersReceived = $parseResult['received'] ?? [];
         $this->notYEnc = $parseResult['notYEnc'];
         $this->headersBlackListed = $parseResult['blacklisted'];
 
@@ -417,13 +416,11 @@ class BinariesService
         do {
             // Try to get the article date locally first
             $local = DB::select(
-                sprintf(
-                    'SELECT c.date AS date FROM collections c
+                'SELECT c.date AS date FROM collections c
                     INNER JOIN binaries b ON(c.id=b.collections_id)
                     INNER JOIN parts p ON(b.id=p.binaries_id)
-                    WHERE p.number = %s',
-                    $currentPost
-                )
+                    WHERE p.number = ?',
+                [$currentPost]
             );
 
             if (! empty($local)) {

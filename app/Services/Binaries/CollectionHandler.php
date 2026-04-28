@@ -7,6 +7,7 @@ namespace App\Services\Binaries;
 use App\Models\Collection;
 use App\Services\CollectionsCleaningService;
 use App\Services\XrefService;
+use App\Support\Utf8;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -28,6 +29,9 @@ final class CollectionHandler
     /** @var array<string, true> Collection hashes touched in this batch */
     private array $batchCollectionHashes = [];
 
+    /** @var array<string, string|null> Cached collection xrefs by collection key */
+    private array $existingXrefs = [];
+
     public function __construct(
         ?CollectionsCleaningService $collectionsCleaning = null,
         ?XrefService $xrefService = null
@@ -44,6 +48,7 @@ final class CollectionHandler
         $this->collectionIds = [];
         $this->insertedCollectionIds = [];
         $this->batchCollectionHashes = [];
+        $this->existingXrefs = [];
     }
 
     /**
@@ -78,13 +83,16 @@ final class CollectionHandler
         $now = now()->timestamp;
         $unixtime = min($headerDate, $now) ?: $now;
 
-        $existingXref = Collection::whereCollectionhash($collectionHash)->value('xref');
+        if (! array_key_exists($collectionKey, $this->existingXrefs)) {
+            $this->existingXrefs[$collectionKey] = Collection::whereCollectionhash($collectionHash)->value('xref');
+        }
+        $existingXref = $this->existingXrefs[$collectionKey];
         $headerTokens = $this->xrefService->extractTokens($header['Xref'] ?? '');
         $newTokens = $this->xrefService->diffNewTokens($existingXref, $header['Xref'] ?? '');
         $finalXrefAppend = implode(' ', $newTokens);
 
-        $subject = substr(mb_convert_encoding($header['matches'][1], 'UTF-8', mb_list_encodings()), 0, 255);
-        $fromName = mb_convert_encoding($header['From'], 'UTF-8', mb_list_encodings());
+        $subject = substr(Utf8::clean($header['matches'][1]), 0, 255);
+        $fromName = Utf8::clean($header['From']);
 
         $driver = DB::getDriverName();
 
@@ -175,8 +183,8 @@ final class CollectionHandler
         int $regexId,
         string $batchNoise
     ): int {
-        DB::statement(
-            'INSERT OR IGNORE INTO collections (subject, fromname, date, xref, groups_id, totalfiles, collectionhash, collection_regexes_id, dateadded, noise) VALUES (?, ?, datetime(?, "unixepoch"), ?, ?, ?, ?, datetime("now"), ?)',
+        $affected = DB::affectingStatement(
+            'INSERT OR IGNORE INTO collections (subject, fromname, date, xref, groups_id, totalfiles, collectionhash, collection_regexes_id, dateadded, noise) VALUES (?, ?, datetime(?, "unixepoch"), ?, ?, ?, ?, ?, datetime("now"), ?)',
             [
                 $subject,
                 $fromName,
@@ -190,8 +198,7 @@ final class CollectionHandler
             ]
         );
 
-        $lastId = (int) DB::connection()->getPdo()->lastInsertId();
-        if ($lastId > 0) {
+        if ($affected > 0 && ($lastId = (int) DB::connection()->getPdo()->lastInsertId()) > 0) {
             $this->insertedCollectionIds[$lastId] = true;
 
             return $lastId;

@@ -6,7 +6,6 @@ use App\Services\Binaries\BinariesConfig;
 use App\Services\Binaries\BinariesService;
 use App\Services\Binaries\HeaderStorageService;
 use App\Services\Binaries\MissedPartHandler;
-use Illuminate\Support\Facades\DB;
 
 class TestBinariesHarness extends BinariesService
 {
@@ -61,7 +60,7 @@ class TestBinariesHarness extends BinariesService
         // Parse headers first to add 'matches'
         $parsedHeaders = [];
         foreach ($headers as $header) {
-            if (preg_match('/^\s*(?!"Usenet Index Post)(.+)\s+\((\d+)\/(\d+)\)/', $header['Subject'], $matches)) {
+            if (preg_match('/^\s*(?!Usenet Index Post)(.+?)\s+\((\d+)\/(\d+)\)/', $header['Subject'], $matches)) {
                 if (stripos($header['Subject'], 'yEnc') === false) {
                     $matches[1] .= ' yEnc';
                 }
@@ -90,7 +89,7 @@ class TestBinariesHarness extends BinariesService
             if (isset($header['Number'])) {
                 $headersReceived[] = $header['Number'];
             }
-            if (preg_match('/^\s*(?!"Usenet Index Post)(.+)\s+\((\d+)\/(\d+)\)/', $header['Subject'], $matches)) {
+            if (preg_match('/^\s*(?!Usenet Index Post)(.+?)\s+\((\d+)\/(\d+)\)/', $header['Subject'], $matches)) {
                 if (stripos($header['Subject'], 'yEnc') === false) {
                     $matches[1] .= ' yEnc';
                 }
@@ -102,14 +101,7 @@ class TestBinariesHarness extends BinariesService
         // If we are simulating a failure, do not perform any inserts; just mark all as missed.
         if ($this->failPartsInsert) {
             if ($enablePartRepair) {
-                foreach (array_unique($headersReceived) as $num) {
-                    $driver = DB::getDriverName();
-                    if ($driver === 'sqlite') {
-                        DB::statement('INSERT INTO missed_parts (numberid, groups_id, attempts) VALUES (?, ?, 1) ON CONFLICT(numberid, groups_id) DO UPDATE SET attempts = attempts + 1', [$num, $group['id']]);
-                    } else {
-                        DB::insert('INSERT INTO missed_parts (numberid, groups_id, attempts) VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE attempts = attempts + 1', [$num, $group['id']]);
-                    }
-                }
+                $this->testMissedPartHandler->addMissingParts(array_unique($headersReceived), $group['id']);
             }
 
             return;

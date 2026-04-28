@@ -16,8 +16,6 @@ final class HeaderStorageTransaction
 
     private BinaryHandler $binaryHandler;
 
-    private PartHandler $partHandler;
-
     private string $batchNoise;
 
     private bool $hadErrors = false;
@@ -29,7 +27,6 @@ final class HeaderStorageTransaction
     ) {
         $this->collectionHandler = $collectionHandler;
         $this->binaryHandler = $binaryHandler;
-        $this->partHandler = $partHandler;
         $this->batchNoise = bin2hex(random_bytes(8));
     }
 
@@ -103,7 +100,11 @@ final class HeaderStorageTransaction
             // Already rolled back
         }
 
-        $this->cleanup();
+        // InnoDB rollback already reverts all rows written by this transaction.
+        // Manual cleanup is retained only for SQLite test/in-memory scenarios.
+        if (DB::getDriverName() === 'sqlite') {
+            $this->cleanup();
+        }
     }
 
     /**
@@ -115,13 +116,6 @@ final class HeaderStorageTransaction
             $this->cleanupParts();
             $this->cleanupBinaries();
             $this->cleanupCollections();
-
-            // Final guard for sqlite
-            if (DB::getDriverName() === 'sqlite') {
-                DB::statement('DELETE FROM parts');
-                DB::statement('DELETE FROM binaries');
-                DB::statement('DELETE FROM collections');
-            }
         } catch (\Throwable $e) {
             if (config('app.debug') === true) {
                 Log::warning('Post-rollback cleanup failed: '.$e->getMessage());
@@ -131,10 +125,10 @@ final class HeaderStorageTransaction
 
     private function cleanupParts(): void
     {
-        $numbers = $this->partHandler->getInsertedNumbers();
-        if (! empty($numbers)) {
-            $placeholders = implode(',', array_fill(0, \count($numbers), '?'));
-            DB::statement("DELETE FROM parts WHERE number IN ({$placeholders})", $numbers);
+        $ids = $this->binaryHandler->getInsertedIds();
+        if (! empty($ids)) {
+            $placeholders = implode(',', array_fill(0, \count($ids), '?'));
+            DB::statement("DELETE FROM parts WHERE binaries_id IN ({$placeholders})", $ids);
         }
     }
 
