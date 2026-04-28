@@ -141,6 +141,7 @@ final class CollectionHandler
         $resolved = [];
         $pending = [];
         $indexByCollectionKey = [];
+        $xrefsToPrefetch = [];
 
         foreach ($headers as $index => $header) {
             $totalFiles = (int) ($totalFilesByIndex[$index] ?? 0);
@@ -164,9 +165,7 @@ final class CollectionHandler
             $collectionHash = sha1($collectionKey);
             $this->batchCollectionHashes[$collectionHash] = true;
 
-            if (! array_key_exists($collectionKey, $this->existingXrefs)) {
-                $this->existingXrefs[$collectionKey] = Collection::whereCollectionhash($collectionHash)->value('xref');
-            }
+            $xrefsToPrefetch[$collectionKey] = $collectionHash;
 
             $headerDate = is_numeric($header['Date']) ? (int) $header['Date'] : strtotime($header['Date']);
             $now = now()->timestamp;
@@ -178,7 +177,7 @@ final class CollectionHandler
                 'fromname' => Utf8::clean($header['From']),
                 'unixtime' => $unixtime,
                 'xref' => implode(' ', $headerTokens),
-                'xref_append' => implode(' ', $this->xrefService->diffNewTokens($this->existingXrefs[$collectionKey], $header['Xref'] ?? '')),
+                'header_xref' => $header['Xref'] ?? '',
                 'groups_id' => $groupId,
                 'totalfiles' => $totalFiles,
                 'collectionhash' => $collectionHash,
@@ -190,6 +189,16 @@ final class CollectionHandler
         if ($pending === []) {
             return $resolved;
         }
+
+        $this->prefetchExistingXrefs($xrefsToPrefetch);
+        foreach ($pending as $collectionKey => &$row) {
+            $row['xref_append'] = implode(' ', $this->xrefService->diffNewTokens(
+                $this->existingXrefs[$collectionKey],
+                $row['header_xref']
+            ));
+            unset($row['header_xref']);
+        }
+        unset($row);
 
         try {
             $idsByHash = $this->bulkInsertAndResolve($pending);
@@ -211,6 +220,31 @@ final class CollectionHandler
         }
 
         return $resolved;
+    }
+
+    /**
+     * @param  array<string, string>  $collectionHashByKey
+     */
+    private function prefetchExistingXrefs(array $collectionHashByKey): void
+    {
+        $missing = array_filter(
+            $collectionHashByKey,
+            fn (string $hash, string $collectionKey): bool => ! array_key_exists($collectionKey, $this->existingXrefs),
+            ARRAY_FILTER_USE_BOTH
+        );
+
+        if ($missing === []) {
+            return;
+        }
+
+        $rows = Collection::query()
+            ->whereIn('collectionhash', array_values($missing))
+            ->pluck('xref', 'collectionhash')
+            ->all();
+
+        foreach ($missing as $collectionKey => $hash) {
+            $this->existingXrefs[$collectionKey] = isset($rows[$hash]) ? (string) $rows[$hash] : null;
+        }
     }
 
     /**
@@ -312,7 +346,8 @@ final class CollectionHandler
 
         foreach ($rowsByCollectionKey as $row) {
             if ($row['xref_append'] !== '' && isset($existingHashes[$row['collectionhash']])) {
-                DB::update('UPDATE collections SET xref = CONCAT(xref, "\n", ?) WHERE collectionhash = ?', [
+                DB::update('UPDATE collections SET xref = CONCAT(xref, ?, ?) WHERE collectionhash = ?', [
+                    "\n",
                     $row['xref_append'],
                     $row['collectionhash'],
                 ]);
@@ -395,20 +430,18 @@ final class CollectionHandler
         int $regexId,
         string $batchNoise
     ): int {
-        $affected = DB::affectingStatement(
-            'INSERT OR IGNORE INTO collections (subject, fromname, date, xref, groups_id, totalfiles, collectionhash, collection_regexes_id, dateadded, noise) VALUES (?, ?, datetime(?, "unixepoch"), ?, ?, ?, ?, ?, datetime("now"), ?)',
-            [
-                $subject,
-                $fromName,
-                $unixtime,
-                implode(' ', $headerTokens),
-                $groupId,
-                $totalFiles,
-                $collectionHash,
-                $regexId,
-                $batchNoise,
-            ]
-        );
+        $affected = DB::table('collections')->insertOrIgnore([
+            'subject' => $subject,
+            'fromname' => $fromName,
+            'date' => date('Y-m-d H:i:s', $unixtime),
+            'xref' => implode(' ', $headerTokens),
+            'groups_id' => $groupId,
+            'totalfiles' => $totalFiles,
+            'collectionhash' => $collectionHash,
+            'collection_regexes_id' => $regexId,
+            'dateadded' => now(),
+            'noise' => $batchNoise,
+        ]);
 
         if ($affected > 0 && ($lastId = (int) DB::connection()->getPdo()->lastInsertId()) > 0) {
             $this->insertedCollectionIds[$lastId] = true;
