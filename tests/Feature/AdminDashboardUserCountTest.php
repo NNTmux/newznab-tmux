@@ -22,6 +22,3 @@ class AdminDashboardUserCountTest extends TestCase
         $this->assertStringContainsString("'users' => \$activeUsersCount", $content);
     }
 }
-
-
-
