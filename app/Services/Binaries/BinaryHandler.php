@@ -46,7 +46,7 @@ final class BinaryHandler
         int $groupId,
         int $fileNumber
     ): ?int {
-        $articleKey = $header['matches'][1];
+        $articleKey = $this->articleKey($collectionId, $header['matches'][1]);
 
         // Return cached if already processed
         if (isset($this->articles[$articleKey])) {
@@ -104,7 +104,7 @@ final class BinaryHandler
             $header = $record['header'];
             $collectionId = (int) $record['collection_id'];
             $fileNumber = (int) $record['file_number'];
-            $articleKey = $header['matches'][1];
+            $articleKey = $this->articleKey($collectionId, $header['matches'][1]);
 
             if (isset($this->articles[$articleKey])) {
                 $binaryId = $this->articles[$articleKey]['BinaryID'];
@@ -470,6 +470,11 @@ final class BinaryHandler
     public function hasArticle(string $articleKey): bool
     {
         return isset($this->articles[$articleKey]);
+    }
+
+    private function articleKey(int $collectionId, string $name): string
+    {
+        return $collectionId.':'.$name;
     }
 
     /**

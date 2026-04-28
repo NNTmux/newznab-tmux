@@ -187,6 +187,26 @@ class BinariesStorageInternalsTest extends TestCase
         $this->assertSame(250, (int) $binary->partsize);
     }
 
+    public function test_header_storage_does_not_merge_same_subject_across_different_collections(): void
+    {
+        $this->createHeaderStorageTables();
+
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(partsChunkSize: 10));
+        $failed = $service->store([
+            $this->parsedHeaderWithTotal(601, 1, 2, 'Same.Subject', 100),
+            $this->parsedHeaderWithTotal(602, 1, 3, 'Same.Subject', 200),
+        ], ['id' => 1, 'name' => 'alt.test'], true);
+
+        $binaries = DB::table('binaries')->orderBy('partsize')->get();
+
+        $this->assertSame([], $failed);
+        $this->assertSame(2, DB::table('collections')->count());
+        $this->assertSame(2, DB::table('binaries')->count());
+        $this->assertSame(2, DB::table('parts')->count());
+        $this->assertSame([100, 200], $binaries->pluck('partsize')->map(static fn ($value): int => (int) $value)->all());
+        $this->assertSame([1, 1], $binaries->pluck('currentparts')->map(static fn ($value): int => (int) $value)->all());
+    }
+
     private function rawHeader(int $number, string $subject): array
     {
         return [
@@ -202,13 +222,18 @@ class BinariesStorageInternalsTest extends TestCase
 
     private function parsedHeader(int $number, int $partNumber, string $subjectBase = 'Example.Release', int $bytes = 100): array
     {
-        $header = $this->rawHeader($number, $subjectBase.' ('.$partNumber.'/2)');
+        return $this->parsedHeaderWithTotal($number, $partNumber, 2, $subjectBase, $bytes);
+    }
+
+    private function parsedHeaderWithTotal(int $number, int $partNumber, int $totalParts, string $subjectBase, int $bytes = 100): array
+    {
+        $header = $this->rawHeader($number, $subjectBase.' ('.$partNumber.'/'.$totalParts.')');
         $header['Bytes'] = $bytes;
         $header['matches'] = [
             0 => $header['Subject'],
             1 => $subjectBase,
             2 => $partNumber,
-            3 => 2,
+            3 => $totalParts,
         ];
 
         return $header;
