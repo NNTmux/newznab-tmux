@@ -94,15 +94,26 @@ PHPUnit only (no Pest). Create tests: `php artisan make:test --phpunit {name}`
 - The ordinal field is intentionally hidden on `resources/views/admin/content/add.blade.php`; the server assigns new items to the bottom of their own group in `AdminContentController::nextBottomOrdinal()`
 - Deleting content does not renumber remaining items; gaps in per-group ordinals are expected
 
-## Code Formatting
+## Code Formatting & Quality
 
-**Always run Pint after completing any PHP code changes:**
+**After every code change, run all of the following before considering a task done:**
 
+### 1. Format changed PHP files
 ```bash
 ./vendor/bin/pint --dirty  # Format only changed files
 ```
 
-This is mandatory — run it before considering any task done. Do not wait for the pre-commit hook to catch formatting issues.
+### 2. Check for static analysis errors
+```bash
+./vendor/bin/phpstan analyse --memory-limit=2G  # Run PHPStan static analysis
+```
+
+### 3. Check for syntax / lint errors
+```bash
+find app -name "*.php" | xargs php -l  # PHP syntax lint on all changed files
+```
+
+> **These steps are mandatory.** Run them before considering any task done. Do not wait for the pre-commit hook to catch formatting or type errors. If PHPStan reports new errors introduced by your changes, fix them before finishing. If you add a PHPStan baseline entry, document why.
 
 ## Pre-commit (CaptainHook)
 
