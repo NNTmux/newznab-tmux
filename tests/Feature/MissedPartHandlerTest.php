@@ -98,4 +98,3 @@ class MissedPartHandlerTest extends TestCase
         $this->assertSame(0, (int) DB::table('missed_parts')->where(['groups_id' => 2, 'numberid' => 12])->value('attempts'));
     }
 }
-
