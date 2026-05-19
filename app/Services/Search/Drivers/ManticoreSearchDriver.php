@@ -717,8 +717,9 @@ class ManticoreSearchDriver implements SearchDriverInterface
             if ($release !== null) {
                 $this->insertRelease($release->toArray());
             } else {
-                Log::warning('ManticoreSearch: Release not found for update', ['id' => $releaseID]);
+                Log::warning('ManticoreSearch: Release not found for update, removing from index', ['id' => $releaseID]);
                 $this->recordReleaseNotFoundForIndex($releaseID);
+                $this->deleteRelease((int) $releaseID);
             }
         } catch (\Throwable $e) {
             Log::error('ManticoreSearch updateRelease error: '.$e->getMessage(), [

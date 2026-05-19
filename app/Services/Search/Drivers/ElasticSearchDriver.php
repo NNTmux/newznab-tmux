@@ -1121,7 +1121,8 @@ class ElasticSearchDriver implements SearchDriverInterface
                 ->first();
 
             if ($release === null) {
-                Log::warning('ElasticSearch: Release not found for update', ['id' => $releaseID]);
+                Log::warning('ElasticSearch: Release not found for update, removing from index', ['id' => $releaseID]);
+                $this->deleteRelease((int) $releaseID);
 
                 return;
             }
