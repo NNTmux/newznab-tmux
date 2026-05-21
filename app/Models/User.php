@@ -31,7 +31,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Spatie\LaravelPasskeys\Models\Concerns\HasPasskeys;
@@ -1431,7 +1430,7 @@ final class User extends Authenticatable implements HasPasskeys, MustVerifyEmail
     public static function updateRssKey(int $uid): int
     {
         static::find($uid)?->update([
-            'api_token' => md5(Password::getRepository()->createNewToken()), // @phpstan-ignore method.notFound
+            'api_token' => md5(Str::random(60)),
         ]);
 
         return SignupError::SUCCESS->value;
