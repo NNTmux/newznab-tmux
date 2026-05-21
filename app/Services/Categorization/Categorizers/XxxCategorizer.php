@@ -16,13 +16,19 @@ class XxxCategorizer extends AbstractCategorizer
     protected int $priority = 10; // High priority - should run early
 
     // Known adult studios/sites - comprehensive list
-    protected const KNOWN_STUDIOS = 'Brazzers|NaughtyAmerica|RealityKings|Bangbros|BangBros18|TeenFidelity|PornPros|SexArt|WowGirls|Vixen|Blacked|Tushy|Deeper|Bellesa|Defloration|MetArt|MetArtX|TheLifeErotic|VivThomas|JoyMii|Nubiles|NubileFilms|Anilos|FamilyStrokes|X-Art|Babes|Twistys|WetAndPuffy|WowPorn|MomsTeachSex|Mofos|BangBus|Passion-HD|EvilAngel|DorcelClub|Private|Hustler|CherryPimps|PureTaboo|LadyLyne|TeamSkeet|GirlsWay|SweetSinner|NewSensations|Digital[._ -]?Playground|Wicked|Penthouse|Playboy|Kink|HardX|ArchAngel|JulesJordan|ManuelFerrara|LesbianX|AllAnal|DarkX|Elegant[._ -]?Angel|ZeroTolerance|Score|PornFidelity|Kelly[._ -]?Madison|DDF[._ -]?Network|21Sextury|21Naturals|Colette|SexMex|Bang|SpankBang|PornWorld|LegalPorno|AnalVids|GonzoXXX|RoccoSiffredi|Fake[._ -]?Hub|FakeAgent|FakeTaxi|FakeHostel|PublicAgent|StrandedTeens|Property[._ -]?Sex|Dane[._ -]?Jones|Lets[._ -]?Doe[._ -]?It|Office[._ -]?Obsession|SexyHub|Massage[._ -]?Rooms|Fitness[._ -]?Rooms|Female[._ -]?Agent|MissaX|All[._ -]?Girl[._ -]?Massage|Fantasy[._ -]?Massage|Nurumassage|Soapymassage|Reality[._ -]?Junkies|Perv[._ -]?Mom|Bad[._ -]?Milfs|Milf[._ -]?Body|Step[._ -]?Siblings|Sis[._ -]?Loves[._ -]?Me|Brother[._ -]??Crush|Dad[._ -]?Crush|Mom[._ -]?Knows[._ -]?Best|Bratty[._ -]?Sis|My[._ -]?Family[._ -]?Pies|Family[._ -]?Therapy|Nubiles[._ -]?Porn|Step[._ -]?Fantasy|Caught[._ -]?Fapping|She[._ -]?Will[._ -]?Cheat|Dirty[._ -]?Wives[._ -]?Club|Big[._ -]?Tits[._ -]?Round[._ -]?Asses|Ass[._ -]?Parade|Monsters[._ -]?Of[._ -]?Cock|Brown[._ -]?Bunnies|Teens[._ -]?Love[._ -]?Huge[._ -]?Cocks|Ass[._ -]?Masterpiece|Bang[._ -]?Casting|Holed|Tiny4K|Lubed|POVD|Exotic4K|CastingCouch[._ -]?X|Casting[._ -]?Couch|Creampie[._ -]?Angels|Digital[._ -]?Desire|Femjoy|Hegre|Joymii|Met[._ -]?Art|MPL[._ -]?Studios|Rylsky[._ -]?Art|Showy[._ -]?Beauty|Stunning18|Photodromm|Watch4Beauty|Wow[._ -]?Girls|Yonitale|Mommys[._ -]?Boy|AllOver30|MyFirst|10musume|Caribbeancom|Heyzo|Pacopacomama|1Pondo|TokyoHot|Mommy[._ -]?Blows[._ -]?Best|Milfs[._ -]?Like[._ -]?It[._ -]?Big|Mommy[._ -]?Got[._ -]?Boobs|My[._ -]?Friends[._ -]?Hot[._ -]?Mom|Seduced[._ -]?By[._ -]?A[._ -]?Cougar|Hot[._ -]?Mom[._ -]?Next[._ -]?Door';
+    protected const KNOWN_STUDIOS = 'Brazzers|NaughtyAmerica|RealityKings|Bangbros|BangBros18|TeenFidelity|PornPros|SexArt|WowGirls|Vixen|Blacked|Tushy|Deeper|Bellesa|Defloration|MetArt|MetArtX|TheLifeErotic|VivThomas|JoyMii|Nubiles|NubileFilms|Anilos|FamilyStrokes|X-Art|Babes|Twistys|WetAndPuffy|WowPorn|MomsTeachSex|Mofos|BangBus|Passion-HD|EvilAngel|DorcelClub|Private|Hustler|CherryPimps|PureTaboo|Lady[._ -]?Lyne|TeamSkeet|GirlsWay|SweetSinner|NewSensations|Digital[._ -]?Playground|Wicked|Penthouse|Playboy|Kink|HardX|ArchAngel|JulesJordan|ManuelFerrara|LesbianX|AllAnal|DarkX|Elegant[._ -]?Angel|ZeroTolerance|Score|PornFidelity|Kelly[._ -]?Madison|DDF[._ -]?Network|21Sextury|21Naturals|Colette|SexMex|Bang|SpankBang|PornWorld|LegalPorno|AnalVids|GonzoXXX|RoccoSiffredi|Fake[._ -]?Hub|FakeAgent|FakeTaxi|FakeHostel|PublicAgent|StrandedTeens|Property[._ -]?Sex|Dane[._ -]?Jones|Lets[._ -]?Doe[._ -]?It|Office[._ -]?Obsession|SexyHub|Massage[._ -]?Rooms|Fitness[._ -]?Rooms|Female[._ -]?Agent|MissaX|All[._ -]?Girl[._ -]?Massage|Fantasy[._ -]?Massage|Nurumassage|Soapymassage|Reality[._ -]?Junkies|Perv[._ -]?Mom|Bad[._ -]?Milfs|Milf[._ -]?Body|Step[._ -]?Siblings|Sis[._ -]?Loves[._ -]?Me|Brother[._ -]??Crush|Dad[._ -]?Crush|Mom[._ -]?Knows[._ -]?Best|Bratty[._ -]?Sis|My[._ -]?Family[._ -]?Pies|Family[._ -]?Therapy|Nubiles[._ -]?Porn|Step[._ -]?Fantasy|Caught[._ -]?Fapping|She[._ -]?Will[._ -]?Cheat|Dirty[._ -]?Wives[._ -]?Club|Big[._ -]?Tits[._ -]?Round[._ -]?Asses|Ass[._ -]?Parade|Monsters[._ -]?Of[._ -]?Cock|Brown[._ -]?Bunnies|Teens[._ -]?Love[._ -]?Huge[._ -]?Cocks|Ass[._ -]?Masterpiece|Bang[._ -]?Casting|Holed|Tiny4K|Lubed|POVD|Exotic4K|CastingCouch[._ -]?X|Casting[._ -]?Couch|Creampie[._ -]?Angels|Digital[._ -]?Desire|Femjoy|Hegre|Joymii|Met[._ -]?Art|MPL[._ -]?Studios|Rylsky[._ -]?Art|Showy[._ -]?Beauty|Stunning18|Photodromm|Watch4Beauty|Wow[._ -]?Girls|Yonitale|Mommys[._ -]?Boy|AllOver30|MyFirst|10musume|Caribbeancom|Heyzo|Pacopacomama|1Pondo|TokyoHot|Mommy[._ -]?Blows[._ -]?Best|Milfs[._ -]?Like[._ -]?It[._ -]?Big|Mommy[._ -]?Got[._ -]?Boobs|My[._ -]?Friends[._ -]?Hot[._ -]?Mom|Seduced[._ -]?By[._ -]?A[._ -]?Cougar|Hot[._ -]?Mom[._ -]?Next[._ -]?Door';
 
     // Adult keywords
     protected const ADULT_KEYWORDS = 'Anal|Ass|BBW|BDSM|Blow|Boob|Bukkake|Casting|Couch|Cock|Compilation|Creampie|Cum|Dick|Dildo|Facial|Fetish|Fuck|Gang|Hardcore|Homemade|Horny|Interracial|Lesbian|MILF|Masturbat|Nympho|Oral|Orgasm|Penetrat|Pornstar|POV|Pussy|Riding|Seduct|Sex|Shaved|Slut|Squirt|Suck|Swallow|Threesome|Tits|Titty|Toy|Virgin|Whore';
 
     // VR sites
-    protected const VR_SITES = 'SexBabesVR|LittleCapriceVR|VRoomed|VRMagic|TonightsGirlfriend|NaughtyAmericaVR|BaDoinkVR|WankzVR|VRBangers|StripzVR|RealJamVR|TmwVRnet|MilfVR|KinkVR|CzechVR(?:Fetish)?|HoloGirlsVR|WetVR|XSinsVR|VRCosplayX|BIBIVR|SLR|SexLikeReal|CutiesVR|18VR|PornCornVR|DarkRoomVR|JackAndJillVR|PasstroughVR|JUVR|KIWVR|KAVR|NKKVR|VRSPy|BadoinkVR|SinsVR|FuckPassVR|CRVR|CatalinaCruzVR';
+    protected const VR_SITES = 'SexBabesVR|LittleCapriceVR|VRoomed|VRMagic|TonightsGirlfriend|NaughtyAmericaVR|BaDoinkVR|WankzVR|VRBangers|StripzVR|RealJamVR|TmwVRnet|MilfVR|KinkVR|CzechVR(?:Fetish)?|HoloGirlsVR|WetVR|XSinsVR|VRCosplayX|BIBIVR|SLR|SexLikeReal|CutiesVR|18VR|PornCornVR|DarkRoomVR|JackAndJillVR|PasstroughVR|JUVR|KIWVR|KAVR|NKKVR|VRSPy|BadoinkVR|SinsVR|FuckPassVR|CRVR|CatalinaCruzVR|StockingsVR|VirtualRealPorn|VRHush|VRConk|SwallowBay';
+
+    // Generic VR adult site pattern (e.g. StockingsVR.com, SomeSiteVR.net)
+    protected const GENERIC_VR_SITE = '\b[A-Z][A-Za-z0-9]{2,}VR(?:\.com|\.net|\.tv)?\b';
+
+    // VR headset / platform tokens
+    protected const VR_DEVICES = 'GearVR|Oculus|Quest[123]?|PSVR|Vive|Index|Pimax';
 
     public function getName(): string
     {
@@ -139,6 +145,17 @@ class XxxCategorizer extends AbstractCategorizer
             return true;
         }
 
+        // Generic VR adult site (e.g. StockingsVR.com)
+        if (preg_match('/'.self::GENERIC_VR_SITE.'/i', $name)) {
+            return true;
+        }
+
+        // VR device combined with HD/UHD video markers
+        if (preg_match('/\b(?:'.self::VR_DEVICES.')\b/i', $name) &&
+            preg_match('/\b(720p|1080p|2160p|4K|VR180|VR360)\b/i', $name)) {
+            return true;
+        }
+
         // Check for adult content indicators combined with video markers
         if (preg_match('/\b('.self::ADULT_KEYWORDS.')\b/i', $name) &&
             preg_match('/\b(720p|1080p|2160p|4k|mp4|mkv|avi|wmv)\b/i', $name)) {
@@ -187,31 +204,52 @@ class XxxCategorizer extends AbstractCategorizer
 
     protected function checkVR(string $name): ?CategorizationResult
     {
-        if (stripos($name, 'vr') === false && stripos($name, 'oculus') === false && stripos($name, 'quest') === false) {
+        $hasKnownVRSite = (bool) preg_match('/\b('.self::VR_SITES.')\b/i', $name);
+        $hasGenericVRSite = (bool) preg_match('/'.self::GENERIC_VR_SITE.'/i', $name);
+        $hasVRSite = $hasKnownVRSite || $hasGenericVRSite;
+        $hasVRDevice = (bool) preg_match('/\b(?:'.self::VR_DEVICES.')\b/i', $name);
+        $hasVR180360 = (bool) preg_match('/\bVR(?:180|360)\b/i', $name);
+
+        if (! $hasVRSite && ! $hasVRDevice && ! $hasVR180360 &&
+            stripos($name, 'vr') === false && stripos($name, 'oculus') === false && stripos($name, 'quest') === false) {
             return null;
         }
-
-        // Check for known VR site
-        $hasVRSite = preg_match('/\b('.self::VR_SITES.')\b/i', $name);
 
         // Require either a VR site token, explicit VR180/VR360, or VR device
-        if (! preg_match('/\bVR(?:180|360)\b/i', $name) &&
-            ! $hasVRSite &&
-            ! preg_match('/\b(?:GearVR|Oculus|Quest[123]?|PSVR|Vive|Index|Pimax)\b/i', $name)) {
+        if (! $hasVR180360 && ! $hasVRSite && ! $hasVRDevice) {
             return null;
         }
 
-        // VR pattern matching - includes VR devices
-        $vrPattern = '/\b('.self::VR_SITES.')\b|\bVR(?:180|360)\b|\b(?:5K|6K|7K|8K)\b.*\bVR\b|\b(?:GearVR|Oculus|Quest[123]?|PSVR|Vive|Index|Pimax)\b/i';
+        // VR pattern matching - includes VR devices and generic VR sites
+        $vrPattern = '/\b('.self::VR_SITES.')\b|'.self::GENERIC_VR_SITE.'|\bVR(?:180|360)\b|\b(?:5K|6K|7K|8K)\b.*\bVR\b|\b(?:'.self::VR_DEVICES.')\b/i';
 
         if (preg_match($vrPattern, $name)) {
-            // VR sites are definitively adult content
-            if ($hasVRSite) {
+            // Known VR sites are definitively adult content
+            if ($hasKnownVRSite) {
                 return $this->matched(Category::XXX_VR, 0.95, 'vr_site');
             }
-            // VR device with adult keywords
-            if (preg_match('/\bXXX\b/i', $name) || preg_match('/\b('.self::ADULT_KEYWORDS.')\b/i', $name)) {
+
+            // Generic VR site pattern (e.g. StockingsVR.com)
+            if ($hasGenericVRSite) {
+                return $this->matched(Category::XXX_VR, 0.9, 'vr_site_generic');
+            }
+
+            // VR device with adult studio, keywords, or XXX marker
+            if ($hasVRDevice && (
+                preg_match('/\bXXX\b/i', $name) ||
+                preg_match('/\b('.self::ADULT_KEYWORDS.')\b/i', $name) ||
+                preg_match('/\b('.self::KNOWN_STUDIOS.')\b/i', $name)
+            )) {
                 return $this->matched(Category::XXX_VR, 0.9, 'vr_device');
+            }
+
+            // VR180/VR360 with adult markers
+            if ($hasVR180360 && (
+                preg_match('/\bXXX\b/i', $name) ||
+                preg_match('/\b('.self::ADULT_KEYWORDS.')\b/i', $name) ||
+                preg_match('/\b('.self::VR_SITES.')\b/i', $name)
+            )) {
+                return $this->matched(Category::XXX_VR, 0.9, 'vr_180_360');
             }
         }
 
