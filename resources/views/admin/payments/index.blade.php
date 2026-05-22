@@ -47,6 +47,16 @@
                             @endforeach
                         </select>
                     </div>
+                    <div>
+                        <label for="filter-start-date" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">From date</label>
+                        <input type="date" name="start_date" id="filter-start-date" value="{{ $filters['start_date'] }}"
+                               class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-400">
+                    </div>
+                    <div>
+                        <label for="filter-end-date" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">To date</label>
+                        <input type="date" name="end_date" id="filter-end-date" value="{{ $filters['end_date'] }}"
+                               class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-blue-400 dark:focus:ring-blue-400">
+                    </div>
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <input type="hidden" name="sort" value="{{ $sort }}">
@@ -60,6 +70,53 @@
                 </div>
             </form>
         </div>
+
+        @if($summary->isNotEmpty())
+            <div class="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+                <h3 class="mb-3 flex items-center text-sm font-semibold text-gray-700 dark:text-gray-200">
+                    <i class="fas fa-chart-pie mr-2 text-blue-600 dark:text-blue-400"></i>
+                    Summary by payment method
+                    @if(!empty($filters['start_date']) || !empty($filters['end_date']))
+                        <span class="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
+                            ({{ $filters['start_date'] ?: '…' }} &rarr; {{ $filters['end_date'] ?: '…' }})
+                        </span>
+                    @endif
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="text-gray-500 dark:text-gray-400">
+                            <tr>
+                                <th class="py-1 pr-4 text-left font-medium">Method</th>
+                                <th class="py-1 pr-4 text-right font-medium">Transactions</th>
+                                <th class="py-1 pr-4 text-right font-medium">Invoice amount total</th>
+                                <th class="py-1 text-right font-medium">Payment value total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($summary as $row)
+                                <tr class="border-t border-gray-100 dark:border-gray-700">
+                                    <td class="py-1 pr-4 font-medium text-gray-900 dark:text-gray-100">{{ $row->method }}</td>
+                                    <td class="py-1 pr-4 text-right text-gray-700 dark:text-gray-300">{{ number_format((int) $row->tx_count) }}</td>
+                                    <td class="py-1 pr-4 text-right text-gray-700 dark:text-gray-300">{{ rtrim(rtrim(number_format((float) $row->invoice_total, 8, '.', ''), '0'), '.') ?: '0' }}</td>
+                                    <td class="py-1 text-right text-gray-700 dark:text-gray-300">{{ rtrim(rtrim(number_format((float) $row->value_total, 8, '.', ''), '0'), '.') ?: '0' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                        <tfoot class="border-t-2 border-gray-300 font-semibold dark:border-gray-600">
+                            <tr>
+                                <td class="py-1 pr-4 text-gray-900 dark:text-gray-100">Total</td>
+                                <td class="py-1 pr-4 text-right text-gray-900 dark:text-gray-100">{{ number_format($summaryTotals['tx_count']) }}</td>
+                                <td class="py-1 pr-4 text-right text-gray-900 dark:text-gray-100">{{ rtrim(rtrim(number_format($summaryTotals['invoice_total'], 8, '.', ''), '0'), '.') ?: '0' }}</td>
+                                <td class="py-1 text-right text-gray-900 dark:text-gray-100">{{ rtrim(rtrim(number_format($summaryTotals['value_total'], 8, '.', ''), '0'), '.') ?: '0' }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    Totals are summed across the currently filtered payments. Currency is implied by the payment method.
+                </p>
+            </div>
+        @endif
 
         @if($payments->count() > 0)
             <x-admin.data-table>

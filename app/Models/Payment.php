@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class Payment extends Model
 {
@@ -24,7 +25,7 @@ class Payment extends Model
 
     /**
      * @param  Builder<Payment>  $query
-     * @param  array{username?: string, email?: string, payment_status?: string, invoice_status?: string}  $filters
+     * @param  array{username?: string, email?: string, payment_status?: string, invoice_status?: string, start_date?: string, end_date?: string}  $filters
      * @return Builder<Payment>
      */
     public function scopeFilter(Builder $query, array $filters): Builder
@@ -49,6 +50,22 @@ class Payment extends Model
                 });
             } else {
                 $query->where('invoice_status', $filters['invoice_status']);
+            }
+        }
+
+        if (! empty($filters['start_date'])) {
+            try {
+                $query->where('created_at', '>=', Carbon::parse($filters['start_date'])->startOfDay());
+            } catch (\Exception) {
+                // ignore invalid date input
+            }
+        }
+
+        if (! empty($filters['end_date'])) {
+            try {
+                $query->where('created_at', '<=', Carbon::parse($filters['end_date'])->endOfDay());
+            } catch (\Exception) {
+                // ignore invalid date input
             }
         }
 
