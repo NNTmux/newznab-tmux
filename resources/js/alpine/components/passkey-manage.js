@@ -7,17 +7,36 @@ Alpine.data('passkeyManage', () => ({
     error: '',
     success: '',
     passkeys: [],
+    optionsUrl: '/passkeys/register-options',
+    storeUrl: '/passkeys',
+    destroyBaseUrl: '/passkeys',
 
     init() {
         this.supported = typeof window.browserSupportsWebAuthn === 'function'
             && window.browserSupportsWebAuthn();
 
-        const rawPasskeys = this.$el.dataset.passkeys;
-        if (rawPasskeys) {
-            try {
-                this.passkeys = JSON.parse(rawPasskeys);
-            } catch (_error) {
-                this.passkeys = [];
+        // Capture URLs from the root element's data attributes once, so we don't
+        // depend on $el inside event handlers (which may resolve to the triggering
+        // element when using the Alpine CSP build).
+        const root = this.$root || this.$el;
+        if (root && root.dataset) {
+            if (root.dataset.optionsUrl) {
+                this.optionsUrl = root.dataset.optionsUrl;
+            }
+            if (root.dataset.storeUrl) {
+                this.storeUrl = root.dataset.storeUrl;
+            }
+            if (root.dataset.destroyBaseUrl) {
+                this.destroyBaseUrl = root.dataset.destroyBaseUrl;
+            }
+
+            const rawPasskeys = root.dataset.passkeys;
+            if (rawPasskeys) {
+                try {
+                    this.passkeys = JSON.parse(rawPasskeys);
+                } catch (_error) {
+                    this.passkeys = [];
+                }
             }
         }
     },
@@ -33,8 +52,8 @@ Alpine.data('passkeyManage', () => ({
         this.success = '';
 
         try {
-            const optionsUrl = this.$el.dataset.optionsUrl || '/passkeys/register-options';
-            const storeUrl = this.$el.dataset.storeUrl || '/passkeys';
+            const optionsUrl = this.optionsUrl;
+            const storeUrl = this.storeUrl;
 
             const optionsResponse = await window.axios.post(optionsUrl, {
                 name: this.name,
@@ -63,7 +82,21 @@ Alpine.data('passkeyManage', () => ({
     },
 
     async deletePasskey(passkeyId) {
-        if (!window.confirm('Delete this passkey? This device will no longer work for passkey login.')) {
+        const passkey = this.passkeys.find((p) => p.id === passkeyId);
+        const passkeyName = passkey?.name ? `"${passkey.name}"` : 'this passkey';
+
+        const confirmed = typeof window.showConfirm === 'function'
+            ? await window.showConfirm({
+                title: 'Delete passkey?',
+                message: `Are you sure you want to delete ${passkeyName}?`,
+                details: 'This device will no longer be able to sign in with a passkey. You can register it again later.',
+                type: 'danger',
+                confirmText: 'Delete passkey',
+                cancelText: 'Cancel',
+            })
+            : window.confirm('Delete this passkey? This device will no longer work for passkey login.');
+
+        if (!confirmed) {
             return;
         }
 
@@ -71,7 +104,7 @@ Alpine.data('passkeyManage', () => ({
         this.success = '';
 
         try {
-            const destroyUrl = `${this.$el.dataset.destroyBaseUrl}/${passkeyId}`;
+            const destroyUrl = `${this.destroyBaseUrl}/${passkeyId}`;
             const response = await window.axios.delete(destroyUrl);
 
             if (!response.data?.ok) {
