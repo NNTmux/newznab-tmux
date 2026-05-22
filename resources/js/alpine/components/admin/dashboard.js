@@ -83,6 +83,7 @@ Alpine.data('adminDashboard', () => ({
                 this._renderUserStats(payload.userStats);
                 this._renderSystemMetrics(payload.systemMetrics);
                 this._renderRecentActivity(payload.recent_activity);
+                this._renderRecentPayments(payload.recent_payments);
                 this._renderSiteStatus(payload.serviceStatuses, payload.activeIncidents);
                 this._renderSystemServices(payload.serviceStatuses);
                 this._lastRefreshAt = Date.now();
@@ -277,6 +278,42 @@ Alpine.data('adminDashboard', () => ({
                         <p class="text-xs text-gray-500 dark:text-gray-400">${escapeHtml(activity.created_at_human ?? '')}</p>
                     </div>
                 </div>`;
+        }).join('');
+    },
+    _renderRecentPayments(payments) {
+        const hasPayments = Array.isArray(payments) && payments.length > 0;
+        const existing = this.$el.querySelector('[data-widget="recent-payments"]');
+        if (!hasPayments) {
+            if (existing) existing.classList.add('hidden');
+            return;
+        }
+        if (existing) existing.classList.remove('hidden');
+        const widget = this._swapWidget('recent-payments');
+        if (!widget) return;
+        const tbody = widget.querySelector('[data-payments-tbody]');
+        if (!tbody) return;
+        const settledClasses = 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200';
+        const pendingClasses = 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200';
+        const otherClasses = 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200';
+        tbody.innerHTML = payments.map(p => {
+            const status = String(p.payment_status ?? '');
+            const isSettled = status.toLowerCase() === 'settled';
+            const isPending = status === '' || status.toLowerCase() === 'pending';
+            const badge = isSettled ? settledClasses : (isPending ? pendingClasses : otherClasses);
+            const statusLabel = status || 'Pending';
+            const dateText = p.created_at_formatted ?? p.created_at_human ?? '';
+            const item = p.item_description ?? '';
+            const itemTrunc = item.length > 40 ? item.slice(0, 40) + '…' : item;
+            return `
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-900 transition">
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">${escapeHtml(dateText)}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">${escapeHtml(p.username ?? '')}</td>
+                    <td class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300" title="${escapeHtml(item)}">${escapeHtml(itemTrunc)}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-right font-semibold text-gray-900 dark:text-gray-100">${escapeHtml(p.invoice_amount ?? '')}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-center">
+                        <span class="px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${badge}">${escapeHtml(statusLabel)}</span>
+                    </td>
+                </tr>`;
         }).join('');
     },
     _renderSiteStatus(services, incidents) {

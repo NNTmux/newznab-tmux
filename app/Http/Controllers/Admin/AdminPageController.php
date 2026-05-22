@@ -56,6 +56,7 @@ class AdminPageController extends BasePageController
             'stats' => $payload['stats'],
             'registrationStatus' => $payload['registrationStatus'],
             'nextRegistrationPeriod' => $payload['nextRegistrationPeriod'],
+            'hasRecentPayments' => ! empty($payload['recent_payments']),
         ]));
     }
 
@@ -133,6 +134,7 @@ class AdminPageController extends BasePageController
             'userStats' => $payload['userStats'],
             'systemMetrics' => $payload['systemMetrics'],
             'recent_activity' => $recentActivity,
+            'recent_payments' => $payload['recent_payments'] ?? [],
             'serviceStatuses' => $serviceStatuses,
             'activeIncidents' => $activeIncidents,
         ]);

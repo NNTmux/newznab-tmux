@@ -474,6 +474,41 @@
         </div>
     </div>
 
+    <!-- Recent Payments Widget (deferred) -->
+    @if(! empty($hasRecentPayments))
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700"
+         data-widget="recent-payments">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center justify-between">
+            <span>
+                <i class="fas fa-credit-card mr-2 text-emerald-600 dark:text-emerald-400"></i>
+                Last 5 Payments
+            </span>
+            <a href="{{ route('admin.payment-list') }}" class="text-xs text-blue-600 dark:text-blue-400 hover:underline font-normal">View all &rarr;</a>
+        </h3>
+        <div data-widget-loading class="space-y-3">
+            @for($i = 0; $i < 5; $i++)
+                <div class="h-12 rounded bg-gray-100 dark:bg-gray-900 animate-pulse"></div>
+            @endfor
+        </div>
+        <div data-widget-content class="hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">User</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Item</th>
+                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Amount</th>
+                            <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700" data-payments-tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Quick Links -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Quick Links</h3>

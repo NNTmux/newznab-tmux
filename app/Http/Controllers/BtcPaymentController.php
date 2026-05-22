@@ -6,8 +6,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Payment;
 use App\Models\User;
+use App\Services\AdminDashboardSnapshotService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class BtcPaymentController extends BasePageController
@@ -48,6 +50,8 @@ class BtcPaymentController extends BasePageController
                     'webhook_id' => $payload['webhookId'],
                     'invoice_id' => $payload['invoiceId'],
                 ]);
+
+                Cache::forget(AdminDashboardSnapshotService::CACHE_KEY);
 
                 return response('OK', 200);
             }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Payment;
 use App\Models\Release;
 use App\Models\ReleaseReport;
 use App\Models\UsenetGroup;
@@ -83,6 +84,7 @@ class AdminDashboardSnapshotService
             'userStats' => $this->buildUserStats(),
             'systemMetrics' => $this->buildSystemMetrics(),
             'recent_activity' => $this->buildRecentActivity(),
+            'recent_payments' => $this->buildRecentPayments(),
             'serviceStatuses' => $this->siteStatusService->getEnabledServices(),
             'activeIncidents' => $this->siteStatusService->getActiveIncidents(),
             'registrationStatus' => $registrationStatus,
@@ -203,5 +205,48 @@ class AdminDashboardSnapshotService
                 'metadata' => $activity->metadata,
             ];
         })->all();
+    }
+
+    /**
+     * Build the "Last 5 payments" widget payload (most recent records by id desc).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function buildRecentPayments(): array
+    {
+        return Payment::query()
+            ->orderByDesc('id')
+            ->limit(5)
+            ->get([
+                'id',
+                'created_at',
+                'username',
+                'email',
+                'item_description',
+                'invoice_amount',
+                'payment_method',
+                'payment_status',
+                'invoice_status',
+                'order_id',
+            ])
+            ->map(static function (Payment $payment): array {
+                $createdAt = $payment->created_at;
+
+                return [
+                    'id' => (int) $payment->id,
+                    'username' => (string) $payment->username,
+                    'email' => (string) $payment->email,
+                    'item_description' => (string) $payment->item_description,
+                    'invoice_amount' => (string) $payment->invoice_amount,
+                    'payment_method' => (string) $payment->payment_method,
+                    'payment_status' => (string) $payment->payment_status,
+                    'invoice_status' => (string) ($payment->invoice_status ?? Payment::INVOICE_STATUS_PENDING),
+                    'order_id' => (string) $payment->order_id,
+                    'created_at' => $createdAt?->toIso8601String(),
+                    'created_at_human' => $createdAt?->diffForHumans(),
+                    'created_at_formatted' => $createdAt?->timezone(config('app.timezone'))->format('Y-m-d H:i'),
+                ];
+            })
+            ->all();
     }
 }
