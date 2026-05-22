@@ -28,10 +28,12 @@ NNTP → NNTPService → BinariesRunner → ReleaseCreationService → ReleasePr
 | **Pipeline** | `*/Pipes/` | `TvProcessingPipeline` (TMDB→TVDB→TVMaze→Trakt), `CategorizationPipeline` (priority-driven; `Music` runs before `Book` for audiobook detection) |
 | **Driver** | `Search/Drivers/` | Manticore/Elasticsearch via `SEARCH_DRIVER` env var |
 | **Runners** | `Runners/` | `BinariesRunner`, `ReleasesRunner`, `BackfillRunner`, `PostProcessRunner` |
-| **DTO** | `*/DTO/`, `app/Support/DTOs/` | `NameFixResult`, `ReleaseProcessingContext`, `ReleaseCreationResult` |
-| **Enum** | `app/Enums/` | `UserRole`, `QueueType`, `FileCompletionStatus` |
+| **DTO** | `*/DTO/`, `app/Support/DTOs/`, `app/Data/` | Internal: `NameFixResult`, `ReleaseProcessingContext`, `ReleaseCreationResult`. API responses use Spatie Laravel Data in `app/Data/Api/` (`ReleaseData`, `CategoryData`, `DetailsData`) |
+| **Enum** | `app/Enums/` | `UserRole`, `QueueType`, `FileCompletionStatus`, `SecondarySearchIndex`, `NzbImportStatus` |
 | **Observer** | `app/Observers/`, `AppServiceProvider` | `ReleaseObserver`, `MovieInfoObserver`, `RolePromotionObserver` |
 | **View Composer** | `app/View/Composers/`, `AppServiceProvider` | `GlobalDataComposer` shared across `layouts.*` and `admin.*` |
+| **Status Probe** | `app/Services/StatusProbes/` | `ServiceProbeRegistry` aggregates `DatabaseProbe`, `DiskProbe`, `NntpProbe`, `QueueProbe`, `RedisProbe`, `SearchProbe` for `StatusPageController` (`/status`) and `DegradeWhenRedisUnreachable` middleware; tune via `config/status-probes.php` |
+| **Passkey** | `app/Actions/Passkeys/`, `app/Http/Controllers/Auth/Passkey*` | Spatie Laravel Passkeys; ceremony actions (`GeneratePasskeyRegisterOptionsAction`, `FindPasskeyToAuthenticateAction`) wire into routes `passkeys.*` in `routes/web.php` |
 
 ## Tmux Processing Engine
 
@@ -85,6 +87,7 @@ PHPUnit only (no Pest). Create tests: `php artisan make:test --phpunit {name}`
 - Never `env()` outside config - use `config('key')`
 - Runtime settings: `Settings::settingValue()`
 - Laravel 13 route/middleware wiring lives in `bootstrap/app.php`; use that file when adding route groups, aliases, or middleware (for example the `/rss` mount)
+- Custom global middleware in `app/Http/Middleware/`: `DegradeWhenRedisUnreachable` (prepended; short-circuits requests when Redis is down via `StatusProbes`), `BlockAbusiveServices` (blocks AIOStreams, Oracle Cloud, UsenetStreamer, Cloudflare WARP), `NoCacheForAuthenticatedUsers` (CDN cache busting), `ContentSecurityPolicy`, `EnforceSessionToken`, `TrustedDevice2FAMiddleware`
 - In Docker/Sail, `Makefile` exports `.env` `SEARCH_DRIVER` as `COMPOSE_PROFILES`, so only the matching Manticore/Elasticsearch service starts
 
 ### Manticore `releases_rt` signed columns
@@ -141,6 +144,7 @@ Auto-runs: PHP lint, Composer lock validation, Pint formatting. Commit limits: 2
 | `app/Services/Search/` | Manticore/ES abstraction |
 | `app/Services/NameFixing/` | Release name correction (see README.md there) |
 | `app/Services/Tmux/` | Tmux orchestration |
+| `app/Services/StatusProbes/` | Service health probes feeding `/status` and degrade middleware |
 | `app/Facades/` | Static service accessors |
 
 ## External APIs
@@ -151,7 +155,7 @@ Requires `.env` keys: TMDB, TVDB, TVMaze, Trakt, OMDB (TV/Movies); IGDB, GiantBo
 
 Blade + TailwindCSS v4 + Vite bundling. Run `npm run build` after changes.
 
-- **Livewire 3**: Used only in the forum package
+- **Livewire 3**: Used by the forum package, the Spatie Pulse dashboard (`resources/views/vendor/pulse/`), and the auth login form (`app/Livewire/Forms/LoginForm.php`, `app/Livewire/Actions/Logout.php`). Most pages remain plain Blade + Alpine.
 - **Alpine.js**: CSP-safe build with component architecture in `resources/js/alpine/`
   - Core components loaded eagerly in `alpine/index.js`
   - Page-specific components lazy-loaded via `alpine/lazy-loader.js`
