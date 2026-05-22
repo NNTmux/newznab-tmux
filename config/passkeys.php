@@ -43,6 +43,50 @@ return [
     ],
 
     /*
+     * Controls the WebAuthn `authenticatorSelection` ceremony parameters that are
+     * sent to the browser when a user is registering a new passkey.
+     *
+     * - `authenticator_attachment` accepts: null (no preference - allows both
+     *   Windows Hello / Touch ID / password managers AND roaming FIDO2 keys),
+     *   "platform" (Windows Hello / Touch ID / Android only) or
+     *   "cross-platform" (only roaming/hardware security keys).
+     *   Leave it `null` so users on Windows domain machines see Windows Hello,
+     *   password managers AND hardware keys in the browser picker.
+     *
+     * - `resident_key` accepts: "preferred" (recommended), "required" or
+     *   "discouraged". Some locked-down Windows domain machines refuse to expose
+     *   the platform authenticator when "required" is requested. Use
+     *   "preferred" for the widest interoperability.
+     *
+     * - `user_verification` accepts: "preferred", "required" or "discouraged".
+     */
+    'authenticator_selection' => [
+        'authenticator_attachment' => env('PASSKEY_AUTHENTICATOR_ATTACHMENT'), // null = no preference
+        'resident_key' => env('PASSKEY_RESIDENT_KEY', 'preferred'),
+        'user_verification' => env('PASSKEY_USER_VERIFICATION', 'preferred'),
+    ],
+
+    /*
+     * WebAuthn Level 3 client hints. Modern Chromium based browsers (including
+     * Edge on Windows) use these to render a richer credential chooser that
+     * lists Windows Hello, mobile (hybrid/QR) and security keys side by side.
+     *
+     * Allowed values: "client-device", "hybrid", "security-key".
+     */
+    'hints' => [
+        'client-device',
+        'hybrid',
+        'security-key',
+    ],
+
+    /*
+     * Whether to request the `credProps` WebAuthn extension. It tells the
+     * server (via the browser response) whether the created credential is a
+     * discoverable / resident key. Safe to leave enabled.
+     */
+    'request_cred_props_extension' => true,
+
+    /*
      * The models used by the package.
      *
      * You can override this by specifying your own models.

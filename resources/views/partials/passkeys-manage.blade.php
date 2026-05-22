@@ -18,10 +18,10 @@
     data-passkeys='@json($passkeyPayload)'
 >
     <p class="text-sm text-gray-600 dark:text-gray-300">
-        Register a passkey from your security key, browser, or password manager.
+        Register a passkey using Windows Hello, Touch ID / Face ID, your phone, a password manager, or a FIDO2 security key.
     </p>
     <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-        On managed/company devices, platform passkeys (Windows Hello/PIN) may be disabled by policy. In that case, use a FIDO2 security key or another allowed passkey provider.
+        On a Windows domain / managed device the browser will show all available options. If Windows Hello is still disabled by group policy, you can fall back to a hardware security key or scan a QR code with your phone.
     </p>
 
     <template x-if="!supported">
