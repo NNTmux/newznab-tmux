@@ -33,7 +33,7 @@ NNTP → NNTPService → BinariesRunner → ReleaseCreationService → ReleasePr
 | **Observer** | `app/Observers/`, `AppServiceProvider` | `ReleaseObserver`, `MovieInfoObserver`, `RolePromotionObserver` |
 | **View Composer** | `app/View/Composers/`, `AppServiceProvider` | `GlobalDataComposer` shared across `layouts.*` and `admin.*` |
 | **Status Probe** | `app/Services/StatusProbes/` | `ServiceProbeRegistry` aggregates `DatabaseProbe`, `DiskProbe`, `NntpProbe`, `QueueProbe`, `RedisProbe`, `SearchProbe` for `StatusPageController` (`/status`) and `DegradeWhenRedisUnreachable` middleware; tune via `config/status-probes.php` |
-| **Passkey** | `app/Actions/Passkeys/`, `app/Http/Controllers/Auth/Passkey*` | Spatie Laravel Passkeys; ceremony actions (`GeneratePasskeyRegisterOptionsAction`, `FindPasskeyToAuthenticateAction`) wire into routes `passkeys.*` in `routes/web.php` |
+| **Passkey** | `app/Actions/Passkeys/`, `app/Http/Controllers/Auth/Passkey*` | Spatie Laravel Passkeys; ceremony actions (`GeneratePasskeyRegisterOptionsAction`, `FindPasskeyToAuthenticateAction`) wire into routes `passkeys.*` in `routes/web.php`. `GeneratePasskeyRegisterOptionsAction` overrides `authenticatorSelection()` (defaults: attachment=null, `residentKey=preferred`, `userVerification=preferred`) and injects WebAuthn L3 `hints` + `credProps` extension so Windows Hello / Touch ID / phone-via-QR / FIDO2 keys all appear in the browser picker on Windows domain machines. Tunable via `PASSKEY_AUTHENTICATOR_ATTACHMENT`, `PASSKEY_RESIDENT_KEY`, `PASSKEY_USER_VERIFICATION`, `PASSKEY_RELYING_PARTY_ID` (see `config/passkeys.php`) |
 
 ## Tmux Processing Engine
 
@@ -85,6 +85,7 @@ PHPUnit only (no Pest). Create tests: `php artisan make:test --phpunit {name}`
 ### Config
 - App configs: `config/nntmux*.php`, `config/tmux.php`, `config/search.php`
 - Never `env()` outside config - use `config('key')`
+- **Whenever you add or rename an `env()` key — in any file, whether under `config/*.php` or anywhere else in the codebase — you MUST also add it (with a sensible default and a short comment) to `.env.example`.** Treat any new env setting without the matching `.env.example` entry as an incomplete task.
 - Runtime settings: `Settings::settingValue()`
 - Laravel 13 route/middleware wiring lives in `bootstrap/app.php`; use that file when adding route groups, aliases, or middleware (for example the `/rss` mount)
 - Custom global middleware in `app/Http/Middleware/`: `DegradeWhenRedisUnreachable` (prepended; short-circuits requests when Redis is down via `StatusProbes`), `BlockAbusiveServices` (blocks AIOStreams, Oracle Cloud, UsenetStreamer, Cloudflare WARP), `NoCacheForAuthenticatedUsers` (CDN cache busting), `ContentSecurityPolicy`, `EnforceSessionToken`, `TrustedDevice2FAMiddleware`
