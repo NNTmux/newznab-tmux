@@ -135,6 +135,9 @@
             <a href="{{ url('/admin/show-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
                 <i class="fas fa-list mr-2 text-blue-400"></i>TV Shows List
             </a>
+            <a href="{{ url('/admin/show-add') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
+                <i class="fas fa-plus-circle mr-2 text-green-400"></i>Add TV Show
+            </a>
         </div>
     </div>
 

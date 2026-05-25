@@ -9,8 +9,14 @@
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
                     <i class="fas fa-tv mr-2"></i>{{ $title }}
                 </h1>
-                <div class="text-sm text-gray-600 dark:text-gray-400">
-                    Total: {{ $tvshowlist->total() }} shows
+                <div class="flex items-center gap-4">
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                        Total: {{ $tvshowlist->total() }} shows
+                    </div>
+                    <a href="{{ route('admin.show-add') }}"
+                       class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm">
+                        <i class="fas fa-plus mr-2"></i>Add TV Show
+                    </a>
                 </div>
             </div>
         </div>

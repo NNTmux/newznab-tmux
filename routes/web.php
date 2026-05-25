@@ -309,6 +309,8 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
 
     Route::get('show-list', [AdminShowsController::class, 'index'])->name('admin.show-list');
     Route::match(['GET', 'POST'], 'show-edit', [AdminShowsController::class, 'edit'])->name('admin.show-edit');
+    Route::match(['GET', 'POST'], 'show-add', [AdminShowsController::class, 'create'])->name('admin.show-add');
+    Route::get('show-add/lookup', [AdminShowsController::class, 'lookup'])->name('admin.show-add.lookup');
     Route::get('show-remove/{id}', [AdminShowsController::class, 'destroy'])->name('admin.show-remove');
     Route::get('comments-list', [AdminCommentsController::class, 'index'])->name('admin.comments-list');
     Route::post('comments-delete/{id}', [AdminCommentsController::class, 'destroy'])->name('admin.comments-delete');
