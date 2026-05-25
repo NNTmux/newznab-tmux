@@ -499,4 +499,3 @@ class TvShowAdder
         return $id;
     }
 }
-
