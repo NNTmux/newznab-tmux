@@ -156,7 +156,7 @@ Requires `.env` keys: TMDB, TVDB, TVMaze, Trakt, OMDB (TV/Movies); IGDB, GiantBo
 
 Blade + TailwindCSS v4 + Vite bundling. Run `npm run build` after changes.
 
-- **Livewire 3**: Used by the forum package, the Spatie Pulse dashboard (`resources/views/vendor/pulse/`), and the auth login form (`app/Livewire/Forms/LoginForm.php`, `app/Livewire/Actions/Logout.php`). Most pages remain plain Blade + Alpine.
+- **Livewire 3**: Used only by the forum package (`resources/forum/livewire-tailwind/`) and the vendored Spatie Pulse dashboard views (`resources/views/vendor/pulse/`). All application pages (auth, profile, admin, browse, etc.) are plain Blade + Alpine.
 - **Alpine.js**: CSP-safe build with component architecture in `resources/js/alpine/`
   - Core components loaded eagerly in `alpine/index.js`
   - Page-specific components lazy-loaded via `alpine/lazy-loader.js`
