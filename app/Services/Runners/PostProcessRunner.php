@@ -6,6 +6,7 @@ namespace App\Services\Runners;
 
 use App\Models\Category;
 use App\Models\Settings;
+use App\Services\AdditionalProcessing\AdditionalCandidateQuery;
 use App\Services\NfoService;
 use Illuminate\Support\Facades\Concurrency;
 use Illuminate\Support\Facades\DB;
@@ -220,22 +221,14 @@ class PostProcessRunner extends BaseRunner
 
     public function processAdditional(): void
     {
-        $bucketExpr = $this->guidBucketExpression('r.leftguid');
-        $ppAddMinSize = Settings::settingValue('minsizetopostprocess') !== '' ? (int) Settings::settingValue('minsizetopostprocess') : 1;
-        $ppAddMinSize = ($ppAddMinSize > 0 ? ('AND r.size > '.($ppAddMinSize * 1048576)) : '');
-        $ppAddMaxSize = (Settings::settingValue('maxsizetopostprocess') !== '') ? (int) Settings::settingValue('maxsizetopostprocess') : 100;
-        $ppAddMaxSize = ($ppAddMaxSize > 0 ? ('AND r.size < '.($ppAddMaxSize * 1073741824)) : '');
+        // Bucket-selection predicates and size filters are owned by
+        // AdditionalCandidateQuery so they cannot drift away from the
+        // per-worker fetch in AdditionalProcessingOrchestrator::fetchReleases().
+        $chars = AdditionalCandidateQuery::bucketChars();
 
-        $sql = '
-            SELECT DISTINCT '.$bucketExpr.' AS id
-            FROM releases r
-            LEFT JOIN categories c ON c.id = r.categories_id
-            WHERE r.passwordstatus = -1
-            AND r.haspreview = -1
-            AND c.disablepreview = 0
-            '.$ppAddMaxSize.' '.$ppAddMinSize.'
-            LIMIT 16';
-        $queue = DB::select($sql);
+        // Normalize to the shape the rest of runPostProcess() expects:
+        // an array of objects with an `id` (first GUID char) property.
+        $queue = array_map(static fn (string $c): object => (object) ['id' => $c], $chars);
 
         $maxProcesses = (int) Settings::settingValue('postthreads');
         $this->runPostProcess($queue, $maxProcesses, 'additional', 'additional postprocessing');

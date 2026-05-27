@@ -49,7 +49,7 @@ class AdditionalProcessingOrchestrator
 
         if ($this->totalReleases > 0) {
             $this->output->echoDescription($this->totalReleases);
-            $this->processReleases();
+            $this->processReleases($guidChar);
         }
     }
 
@@ -72,7 +72,7 @@ class AdditionalProcessingOrchestrator
             $guidChar = $release->leftguid ?? substr($release->guid, 0, 1);
             $groupID = '';
             $this->setupTempPath($guidChar, $groupID);
-            $this->processReleases();
+            $this->processReleases($guidChar);
 
             return true;
         } catch (\Throwable $e) {
@@ -99,11 +99,21 @@ class AdditionalProcessingOrchestrator
 
     /**
      * Fetch releases for processing.
+     *
+     * The selection predicates (passwordstatus, haspreview, nzbstatus,
+     * disablepreview, size bounds) are owned by AdditionalCandidateQuery so
+     * they stay consistent with the bucket-fanout SQL in
+     * PostProcessRunner::processAdditional(). Do NOT inline new predicates
+     * here; add them to AdditionalCandidateQuery instead.
      */
     private function fetchReleases(int|string $groupID, string $guidChar): void
     {
-        $query = Release::query()
-            ->from('releases as r')
+        $query = AdditionalCandidateQuery::baseBuilder(
+            $groupID,
+            $guidChar,
+            $this->config->minSizeMB,
+            $this->config->maxSizeGB,
+        )
             ->select([
                 'r.id',
                 'r.guid',
@@ -118,25 +128,7 @@ class AdditionalProcessingOrchestrator
                 'r.predb_id',
                 'r.pp_timeout_count',
             ])
-            ->selectRaw('r.id as releases_id')
-            ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id')
-            ->where('r.passwordstatus', -1)
-            ->where('r.nzbstatus', 1)
-            ->where('r.haspreview', -1)
-            ->where('c.disablepreview', 0);
-
-        if ($this->config->maxSizeGB > 0) {
-            $query->where('r.size', '<', $this->config->maxSizeGB * 1073741824);
-        }
-        if ($this->config->minSizeMB > 0) {
-            $query->where('r.size', '>', $this->config->minSizeMB * 1048576);
-        }
-        if ($groupID !== '') {
-            $query->where('r.groups_id', $groupID);
-        }
-        if ($guidChar !== '') {
-            $query->where('r.leftguid', $guidChar);
-        }
+            ->selectRaw('r.id as releases_id');
 
         $this->releases = $query
             ->orderBy('r.passwordstatus')
@@ -149,13 +141,44 @@ class AdditionalProcessingOrchestrator
     /**
      * Process all fetched releases.
      *
+     * Each release is processed inside its own try/catch so that a single
+     * poison release cannot stall an entire GUID-character bucket. Without
+     * this, an exception from ReleaseProcessor::process() would abort the
+     * foreach for the whole worker, the same release would be re-selected on
+     * every subsequent cycle, and the "needs additional pp" backlog would
+     * grow indefinitely without any visible failure.
+     *
      * @throws Exception
      */
-    private function processReleases(): void
+    private function processReleases(string $guidChar = ''): void
     {
+        $processed = 0;
+        $failed = 0;
+
         foreach ($this->releases as $release) {
-            $this->processor->process(new ReleaseProcessingContext($release), $this->mainTmpPath);
+            try {
+                $this->processor->process(new ReleaseProcessingContext($release), $this->mainTmpPath);
+                $processed++;
+            } catch (\Throwable $e) {
+                $failed++;
+                Log::error('Additional postprocessing failed for release '.($release->id ?? '?').': '.$e->getMessage(), [
+                    'release_id' => $release->id ?? null,
+                    'guid' => $release->guid ?? null,
+                    'guid_char' => $guidChar,
+                    'exception' => $e,
+                ]);
+                // Don't rethrow: keep draining the bucket. The release will be
+                // re-selected on the next cycle, and the pp_timeout_count /
+                // maxpptimeoutcount machinery will eventually drop it.
+            }
         }
+
+        Log::info('Additional postprocessing run finished', [
+            'guid_char' => $guidChar,
+            'picked' => $this->totalReleases,
+            'processed' => $processed,
+            'failed' => $failed,
+        ]);
 
         $this->output->endOutput();
     }
