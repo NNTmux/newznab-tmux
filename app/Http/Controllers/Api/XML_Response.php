@@ -105,6 +105,41 @@ class XML_Response
         $this->xml->setIndent(false);
     }
 
+    protected function writeXmlElement(string $name, mixed $content): void
+    {
+        $this->xml->writeElement($name, $this->xmlString($content));
+    }
+
+    protected function writeXmlAttribute(string $name, mixed $value): void
+    {
+        $this->xml->writeAttribute($name, $this->xmlString($value));
+    }
+
+    protected function writeXmlText(mixed $content): void
+    {
+        $this->xml->text($this->xmlString($content));
+    }
+
+    protected function writeXmlCdata(mixed $content): void
+    {
+        $this->xml->writeCdata($this->xmlString($content));
+    }
+
+    protected function xmlString(mixed $value): string
+    {
+        if ($value === null) {
+            return '';
+        }
+
+        $string = (string) $value;
+        if ($string === '') {
+            return '';
+        }
+
+        // XML 1.0 allows tab, LF, CR, and the non-control Unicode ranges.
+        return preg_replace('/[^\x{9}\x{A}\x{D}\x{20}-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]/u', '', $string) ?? '';
+    }
+
     public function returnXML(): bool|string
     {
         switch ($this->type) {
@@ -402,9 +437,9 @@ class XML_Response
     {
         $this->xml->startDocument('1.0', 'UTF-8');
         $this->xml->startElement('register');
-        $this->xml->writeAttribute('username', (string) ($this->parameters['username'] ?? ''));
-        $this->xml->writeAttribute('password', (string) ($this->parameters['password'] ?? ''));
-        $this->xml->writeAttribute('apikey', (string) ($this->parameters['token'] ?? ''));
+        $this->writeXmlAttribute('username', $this->parameters['username'] ?? '');
+        $this->writeXmlAttribute('password', $this->parameters['password'] ?? '');
+        $this->writeXmlAttribute('apikey', $this->parameters['token'] ?? '');
         $this->xml->endElement();
         $this->xml->endDocument();
 
@@ -420,7 +455,7 @@ class XML_Response
     {
         $this->xml->startElement($element['name']);
         foreach ($element['data'] as $attr => $val) {
-            $this->xml->writeAttribute($attr, (string) $val);
+            $this->writeXmlAttribute((string) $attr, $val);
         }
         $this->xml->endElement();
     }
@@ -449,17 +484,17 @@ class XML_Response
         $this->xml->startElement('categories');
         foreach ($this->server['categories'] as $this->parameters) {
             $this->xml->startElement('category');
-            $this->xml->writeAttribute('id', (string) $this->parameters['id']);
-            $this->xml->writeAttribute('name', html_entity_decode((string) $this->parameters['title']));
+            $this->writeXmlAttribute('id', $this->parameters['id']);
+            $this->writeXmlAttribute('name', html_entity_decode((string) $this->parameters['title']));
             if (! empty($this->parameters['description'])) {
-                $this->xml->writeAttribute('description', html_entity_decode((string) $this->parameters['description']));
+                $this->writeXmlAttribute('description', html_entity_decode((string) $this->parameters['description']));
             }
             foreach ($this->parameters['categories'] as $c) {
                 $this->xml->startElement('subcat');
-                $this->xml->writeAttribute('id', (string) $c['id']);
-                $this->xml->writeAttribute('name', html_entity_decode((string) $c['title']));
+                $this->writeXmlAttribute('id', $c['id']);
+                $this->writeXmlAttribute('name', html_entity_decode((string) $c['title']));
                 if (! empty($c['description'])) {
-                    $this->xml->writeAttribute('description', html_entity_decode((string) $c['description']));
+                    $this->writeXmlAttribute('description', html_entity_decode((string) $c['description']));
                 }
                 $this->xml->endElement();
             }
@@ -473,10 +508,10 @@ class XML_Response
         $this->xml->startElement('groups');
         foreach (($this->server['groups'] ?? []) as $group) {
             $this->xml->startElement('group');
-            $this->xml->writeAttribute('name', (string) ($group['name'] ?? ''));
-            $this->xml->writeAttribute('description', (string) ($group['description'] ?? ''));
+            $this->writeXmlAttribute('name', $group['name'] ?? '');
+            $this->writeXmlAttribute('description', $group['description'] ?? '');
             if (! empty($group['lastupdate'])) {
-                $this->xml->writeAttribute('lastupdate', (string) $group['lastupdate']);
+                $this->writeXmlAttribute('lastupdate', $group['lastupdate']);
             }
             $this->xml->endElement();
         }
@@ -488,9 +523,9 @@ class XML_Response
         $this->xml->startElement('genres');
         foreach (($this->server['genres'] ?? []) as $genre) {
             $this->xml->startElement('genre');
-            $this->xml->writeAttribute('id', (string) ($genre['id'] ?? ''));
-            $this->xml->writeAttribute('name', (string) ($genre['name'] ?? ''));
-            $this->xml->writeAttribute('categoryid', (string) ($genre['categoryid'] ?? '0'));
+            $this->writeXmlAttribute('id', $genre['id'] ?? '');
+            $this->writeXmlAttribute('name', $genre['name'] ?? '');
+            $this->writeXmlAttribute('categoryid', $genre['categoryid'] ?? '0');
             $this->xml->endElement();
         }
         $this->xml->endElement();
@@ -507,23 +542,23 @@ class XML_Response
         };
 
         $this->xml->startElement('rss');
-        $this->xml->writeAttribute('version', '2.0');
-        $this->xml->writeAttribute('xmlns:atom', 'http://www.w3.org/2005/Atom');
-        $this->xml->writeAttribute("xmlns:{$this->namespace}", $url);
-        $this->xml->writeAttribute('encoding', 'utf-8');
+        $this->writeXmlAttribute('version', '2.0');
+        $this->writeXmlAttribute('xmlns:atom', 'http://www.w3.org/2005/Atom');
+        $this->writeXmlAttribute("xmlns:{$this->namespace}", $url);
+        $this->writeXmlAttribute('encoding', 'utf-8');
     }
 
     protected function includeRssAtomLink(): void
     {
         $this->xml->startElement('atom:link');
         $this->xml->startAttribute('href');
-        $this->xml->text($this->server['server']['url'].($this->namespace === 'newznab' ? '/api/v1/api' : '/rss'));
+        $this->writeXmlText($this->server['server']['url'].($this->namespace === 'newznab' ? '/api/v1/api' : '/rss'));
         $this->xml->endAttribute();
         $this->xml->startAttribute('rel');
-        $this->xml->text('self');
+        $this->writeXmlText('self');
         $this->xml->endAttribute();
         $this->xml->startAttribute('type');
-        $this->xml->text('application/rss+xml');
+        $this->writeXmlText('application/rss+xml');
         $this->xml->endAttribute();
         $this->xml->endElement();
     }
@@ -546,15 +581,15 @@ class XML_Response
                 $tag = 'RSS';
         }
 
-        $this->xml->writeElement('title', $server['title']);
-        $this->xml->writeElement('description', $server['title']." {$tag} Details");
-        $this->xml->writeElement('link', $server['url']);
-        $this->xml->writeElement('language', 'en-gb');
-        $this->xml->writeElement('webMaster', $server['email'].' '.$server['title']);
-        $this->xml->writeElement('category', $server['meta']);
-        $this->xml->writeElement('generator', 'nntmux');
-        $this->xml->writeElement('ttl', '10');
-        $this->xml->writeElement('docs', $this->server['server']['url'].$path);
+        $this->writeXmlElement('title', $server['title']);
+        $this->writeXmlElement('description', $server['title']." {$tag} Details");
+        $this->writeXmlElement('link', $server['url']);
+        $this->writeXmlElement('language', 'en-gb');
+        $this->writeXmlElement('webMaster', $server['email'].' '.$server['title']);
+        $this->writeXmlElement('category', $server['meta']);
+        $this->writeXmlElement('generator', 'nntmux');
+        $this->writeXmlElement('ttl', '10');
+        $this->writeXmlElement('docs', $this->server['server']['url'].$path);
     }
 
     /**
@@ -563,10 +598,10 @@ class XML_Response
     protected function includeImage(): void
     {
         $this->xml->startElement('image');
-        $this->xml->writeAttribute('url', $this->server['server']['url'].'/assets/images/tmux_logo.png');
-        $this->xml->writeAttribute('title', $this->server['server']['title']);
-        $this->xml->writeAttribute('link', $this->server['server']['url']);
-        $this->xml->writeAttribute(
+        $this->writeXmlAttribute('url', $this->server['server']['url'].'/assets/images/tmux_logo.png');
+        $this->writeXmlAttribute('title', $this->server['server']['title']);
+        $this->writeXmlAttribute('link', $this->server['server']['url']);
+        $this->writeXmlAttribute(
             'description',
             'Visit '.$this->server['server']['title'].' - '.$this->server['server']['strapline']
         );
@@ -576,23 +611,23 @@ class XML_Response
     public function includeTotalRows(): void
     {
         $this->xml->startElement($this->namespace.':response');
-        $this->xml->writeAttribute('offset', (string) $this->offset);
-        $this->xml->writeAttribute('total', (string) ($this->releases[0]->_totalrows ?? 0));
+        $this->writeXmlAttribute('offset', $this->offset);
+        $this->writeXmlAttribute('total', $this->releases[0]->_totalrows ?? 0);
         $this->xml->endElement();
     }
 
     public function includeLimits(): void
     {
         $this->xml->startElement($this->namespace.':apilimits');
-        $this->xml->writeAttribute('apicurrent', (string) $this->parameters['requests']);
-        $this->xml->writeAttribute('apimax', (string) $this->parameters['apilimit']);
-        $this->xml->writeAttribute('grabcurrent', (string) $this->parameters['grabs']);
-        $this->xml->writeAttribute('grabmax', (string) $this->parameters['downloadlimit']);
+        $this->writeXmlAttribute('apicurrent', $this->parameters['requests']);
+        $this->writeXmlAttribute('apimax', $this->parameters['apilimit']);
+        $this->writeXmlAttribute('grabcurrent', $this->parameters['grabs']);
+        $this->writeXmlAttribute('grabmax', $this->parameters['downloadlimit']);
         if (! empty($this->parameters['oldestapi'])) {
-            $this->xml->writeAttribute('apioldesttime', (string) $this->parameters['oldestapi']);
+            $this->writeXmlAttribute('apioldesttime', $this->parameters['oldestapi']);
         }
         if (! empty($this->parameters['oldestgrab'])) {
-            $this->xml->writeAttribute('graboldesttime', (string) $this->parameters['oldestgrab']);
+            $this->writeXmlAttribute('graboldesttime', $this->parameters['oldestgrab']);
         }
         $this->xml->endElement();
     }
@@ -625,35 +660,35 @@ class XML_Response
      */
     public function includeReleaseMain(): void
     {
-        $this->xml->writeElement('title', $this->release->searchname);
+        $this->writeXmlElement('title', $this->release->searchname);
         $this->xml->startElement('guid');
-        $this->xml->writeAttribute('isPermaLink', 'true');
-        $this->xml->text("{$this->server['server']['url']}/details/{$this->release->guid}");
+        $this->writeXmlAttribute('isPermaLink', 'true');
+        $this->writeXmlText("{$this->server['server']['url']}/details/{$this->release->guid}");
         $this->xml->endElement();
-        $this->xml->writeElement(
+        $this->writeXmlElement(
             'link',
             "{$this->server['server']['url']}/getnzb?id={$this->release->guid}.nzb".
             "&r={$this->parameters['token']}".
             ((int) $this->parameters['del'] === 1 ? '&del=1' : '')
         );
-        $this->xml->writeElement('comments', "{$this->server['server']['url']}/details/{$this->release->guid}#comments");
-        $this->xml->writeElement('pubDate', date(DATE_RSS, strtotime((string) $this->release->adddate)));
-        $this->xml->writeElement('category', $this->release->category_name);
+        $this->writeXmlElement('comments', "{$this->server['server']['url']}/details/{$this->release->guid}#comments");
+        $this->writeXmlElement('pubDate', date(DATE_RSS, strtotime((string) $this->release->adddate)));
+        $this->writeXmlElement('category', $this->release->category_name);
         if ($this->namespace === 'newznab') {
-            $this->xml->writeElement('description', $this->release->searchname);
+            $this->writeXmlElement('description', $this->release->searchname);
         } else {
             $this->writeRssCdata();
         }
         if (! isset($this->parameters['dl']) || (isset($this->parameters['dl']) && (int) $this->parameters['dl'] === 1)) {
             $this->xml->startElement('enclosure');
-            $this->xml->writeAttribute(
+            $this->writeXmlAttribute(
                 'url',
                 "{$this->server['server']['url']}/getnzb?id={$this->release->guid}.nzb".
                 "&r={$this->parameters['token']}".
                 ((int) $this->parameters['del'] === 1 ? '&del=1' : '')
             );
-            $this->xml->writeAttribute('length', (string) $this->release->size);
-            $this->xml->writeAttribute('type', 'application/x-nzb');
+            $this->writeXmlAttribute('length', $this->release->size);
+            $this->writeXmlAttribute('type', 'application/x-nzb');
             $this->xml->endElement();
         }
     }
@@ -785,8 +820,8 @@ class XML_Response
     protected function writeZedAttr(string $name, mixed $value): void
     {
         $this->xml->startElement($this->namespace.':attr');
-        $this->xml->writeAttribute('name', $name);
-        $this->xml->writeAttribute('value', $value === null ? '' : (string) $value);
+        $this->writeXmlAttribute('name', $name);
+        $this->writeXmlAttribute('value', $value);
         $this->xml->endElement();
     }
 
@@ -855,7 +890,7 @@ class XML_Response
             $this->writeRssConsoleInfo();
         }
         $this->xml->startElement('description');
-        $this->xml->writeCdata($this->cdata."\t</div>");
+        $this->writeXmlCdata($this->cdata."\t</div>");
         $this->xml->endElement();
     }
 
