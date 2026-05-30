@@ -109,6 +109,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read Collection<int, UserRoleHistory> $roleHistory
  * @property-read Collection<int, Passkey> $passkeys
  * @property-read Role|null $role
+ * @property-read Role|null $pendingRole
  * @property-read PasswordSecurity|null $passwordSecurity
  *
  * @method static Builder|User whereUsername(string $value)
@@ -226,6 +227,14 @@ final class User extends Authenticatable implements HasPasskeys, MustVerifyEmail
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class, 'roles_id');
+    }
+
+    /**
+     * @return BelongsTo<Role, $this>
+     */
+    public function pendingRole(): BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'pending_roles_id');
     }
 
     /**
@@ -649,7 +658,7 @@ final class User extends Authenticatable implements HasPasskeys, MustVerifyEmail
             return null;
         }
 
-        return Role::find($this->pending_roles_id);
+        return $this->pendingRole;
     }
 
     /**

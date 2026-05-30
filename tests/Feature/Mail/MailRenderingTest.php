@@ -27,6 +27,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Markdown;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 /**
@@ -120,6 +121,31 @@ class MailRenderingTest extends TestCase
         $html = (string) app(Markdown::class)->render($message->markdown, $message->data());
         $this->assertStringContainsString('>Verify email address<', $html, 'Verify-email CTA label missing from anchor.');
         $this->assertStringContainsStringIgnoringCase('color: #ffffff !important', $html);
+    }
+
+    public function test_account_will_expire_includes_pending_role_details_when_present(): void
+    {
+        $currentRole = new Role;
+        $currentRole->name = 'Silver';
+
+        $pendingRole = new Role;
+        $pendingRole->name = 'Gold';
+
+        $user = new User;
+        $user->username = 'tester';
+        $user->email = 'tester@example.test';
+        $user->pending_roles_id = 2;
+        $user->pending_role_start_date = Carbon::create(2026, 6, 4, 12);
+        $user->setRelation('role', $currentRole);
+        $user->setRelation('pendingRole', $pendingRole);
+
+        $mailable = new AccountWillExpire($user, 5);
+
+        $mailable->assertSeeInHtml('Silver');
+        $mailable->assertSeeInHtml('Gold');
+        $mailable->assertSeeInHtml('Jun 4, 2026');
+        $mailable->assertSeeInHtml('No renewal action is needed');
+        $mailable->assertDontSeeInHtml('please take action before your subscription expires');
     }
 
     public function test_invitation_mail_renders_with_branded_subject_and_brand_palette(): void
