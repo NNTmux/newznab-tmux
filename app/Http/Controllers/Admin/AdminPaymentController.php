@@ -68,8 +68,8 @@ class AdminPaymentController extends BasePageController
 
         $summaryTotals = [
             'tx_count' => (int) $summary->sum('tx_count'),
-            'invoice_total' => (float) $summary->sum(fn ($r) => (float) $r->invoice_total),
-            'value_total' => (float) $summary->sum(fn ($r) => (float) $r->value_total),
+            'invoice_total' => (float) $summary->sum(fn (Payment $payment) => (float) $payment->getAttribute('invoice_total')),
+            'value_total' => (float) $summary->sum(fn (Payment $payment) => (float) $payment->getAttribute('value_total')),
         ];
 
         $paymentStatuses = BtcPaymentController::paymentStatusesForAdminFilter();

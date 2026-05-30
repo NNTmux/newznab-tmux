@@ -119,7 +119,7 @@ class ReleaseBrowseService
                     'groups_id' => $groupId,
                     'password_allow_rar' => $this->passwordAllowRar(),
                     'sort_field' => $indexSort,
-                    'sort_dir' => $orderBy[1] ?? 'desc', // @phpstan-ignore offsetAccess.notFound
+                    'sort_dir' => $orderBy[1] ?? 'desc',
                     'try_fuzzy' => true,
                 ], (int) $num, (int) $start);
                 $searchIndexIds = $filtered['ids'];

@@ -442,13 +442,13 @@ class IGDBService
                 if ($isPublisher === true && $companyId) {
                     $companyData = Company::find($companyId);
                     if ($companyData) {
-                        $publishers[] = $companyData->name; // @phpstan-ignore property.notFound
+                        $publishers[] = $companyData->name;
                     }
                 }
                 if ($isDeveloper === true && $companyId) {
                     $companyData = Company::find($companyId);
                     if ($companyData) {
-                        $developers[] = $companyData->name; // @phpstan-ignore property.notFound
+                        $developers[] = $companyData->name;
                     }
                 }
             }

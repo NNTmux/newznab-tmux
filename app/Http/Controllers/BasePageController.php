@@ -20,7 +20,7 @@ class BasePageController extends Controller
     /**
      * @var Collection<int, mixed>
      */
-    public Collection $settings; // @phpstan-ignore property.phpDocType, class.notFound, missingType.generics
+    public Collection $settings;
 
     public string $title = '';
 

@@ -312,7 +312,7 @@ class SteamService
     /**
      * Populate the steam_apps table with the full app list from Steam.
      *
-     * @return list<array<string, mixed>>
+     * @return array{inserted: int<0, max>, updated: int<0, max>, skipped: int<0, max>, errors: int<0, max>}
      */
     public function populateSteamAppsTable(?callable $progressCallback = null): array
     {
@@ -397,13 +397,13 @@ class SteamService
     /**
      * Get the full list of Steam apps.
      *
-     * @return array{inserted: int<0, max>, updated: 0, skipped: int<0, max>, errors: int<0, max>}
+     * @return list<array<string, mixed>>
      */
     public function getFullAppList(): array
     {
         $cacheKey = 'steam_full_app_list';
         $cached = Cache::get($cacheKey);
-        if ($cached !== null) {
+        if (is_array($cached)) {
             return $cached;
         }
 

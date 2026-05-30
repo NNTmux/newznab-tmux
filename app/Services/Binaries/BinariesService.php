@@ -63,7 +63,7 @@ class BinariesService
     private int $headersBlackListed = 0;
 
     /**
-     * @var array<string, mixed>
+     * @var array<int, int|string>
      */
     private array $headersReceived = [];
 
@@ -257,7 +257,7 @@ class BinariesService
      * @param  int  $first  The oldest wanted header.
      * @param  int  $last  The newest wanted header.
      * @param  string  $type  Is this part repair or update or backfill?
-     * @param  array<string, mixed>|null  $missingParts  If we are running in part repair, the list of missing article numbers.
+     * @param  array<int, mixed>|null  $missingParts  If we are running in part repair, the list of missing article numbers.
      * @return array<string, mixed> Empty on failure.
      *
      * @throws \Exception
@@ -381,7 +381,7 @@ class BinariesService
         }
 
         // Calculate parts repaired
-        $lastPartNumber = $missingParts[$missingCount - 1]->numberid; // @phpstan-ignore offsetAccess.notFound
+        $lastPartNumber = $missingParts[$missingCount - 1]->numberid;
         $remainingCount = $this->missedPartHandler->getCount($groupArr['id'], $lastPartNumber);
         $partsRepaired = $missingCount - $remainingCount;
 
@@ -693,7 +693,7 @@ class BinariesService
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<int, array<string, mixed>>
      */
     private function downloadHeaders(bool $partRepair): ?array
     {
@@ -736,8 +736,8 @@ class BinariesService
     }
 
     /**
-     * @param  array<string, mixed>  $headersNotInserted
-     * @param  array<string, mixed>  $parsedHeaders
+     * @param  array<int, int|string>  $headersNotInserted
+     * @param  array<int, array<string, mixed>>  $parsedHeaders
      */
     private function handlePartRepairTracking(array $headersNotInserted, array $parsedHeaders): void
     {
@@ -750,11 +750,11 @@ class BinariesService
         // Check for missing headers in range
         $expectedCount = $this->last - $this->first - $this->notYEnc - $this->headersBlackListed + 1;
         if ($expectedCount > \count($this->headersReceived)) {
-            $rangeNotReceived = array_diff(range($this->first, $this->last), $this->headersReceived);
+            $rangeNotReceived = array_values(array_diff(range($this->first, $this->last), $this->headersReceived));
             $notReceivedCount = \count($rangeNotReceived);
 
             if ($notReceivedCount > 0) {
-                $this->missedPartHandler->addMissingParts($rangeNotReceived, $this->groupMySQL['id']); // @phpstan-ignore argument.type
+                $this->missedPartHandler->addMissingParts($rangeNotReceived, $this->groupMySQL['id']);
 
                 if ($this->config->echoCli) {
                     cli()->alternate(
@@ -766,14 +766,14 @@ class BinariesService
     }
 
     /**
-     * @param  array<string, mixed>  $missingParts
-     * @return array<string, mixed>
+     * @param  array<int, \stdClass>  $missingParts
+     * @return list<array{partfrom: mixed, partto: mixed, partlist: list<mixed>}>
      */
     private function groupMissingPartsIntoRanges(array $missingParts): array
     {
         $ranges = [];
         $partList = [];
-        $firstPart = $lastNum = $missingParts[0]->numberid; // @phpstan-ignore offsetAccess.notFound
+        $firstPart = $lastNum = $missingParts[0]->numberid;
 
         foreach ($missingParts as $part) {
             if (($part->numberid - $firstPart) > ($this->config->messageBuffer / 4)) {

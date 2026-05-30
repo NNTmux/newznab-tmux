@@ -65,7 +65,7 @@ class GlobalDataComposer
         $viewData['usefulLinks'] = $this->rememberWithCacheFallback('content_useful_links', self::CACHE_TTL, function () {
             return Content::active()
                 ->ofType(Content::TYPE_USEFUL)
-                ->ordered() // @phpstan-ignore method.notFound
+                ->ordered()
                 ->get();
         });
 

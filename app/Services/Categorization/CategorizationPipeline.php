@@ -45,7 +45,6 @@ class CategorizationPipeline
         ?NzbSplitUnwrapper $nzbSplitUnwrapper = null,
         ?ObfuscatedSubjectExtractor $obfuscatedSubjectExtractor = null
     ) {
-        /** @phpstan-ignore argument.templateType */
         $this->pipes = collect($pipes)
             ->sortBy(fn (AbstractCategorizationPipe $p) => $p->getPriority());
 

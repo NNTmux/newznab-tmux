@@ -24,8 +24,7 @@ final class HeaderStorageTransaction
 
     public function __construct(
         CollectionHandler $collectionHandler,
-        BinaryHandler $binaryHandler,
-        PartHandler $partHandler
+        BinaryHandler $binaryHandler
     ) {
         $this->collectionHandler = $collectionHandler;
         $this->binaryHandler = $binaryHandler;

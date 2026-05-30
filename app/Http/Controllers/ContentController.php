@@ -87,9 +87,9 @@ class ContentController extends BasePageController
      *
      * @return Collection<int, mixed>
      */
-    protected function getActiveContent(): Collection // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
+    protected function getActiveContent(): Collection
     {
-        return Content::active()->ordered()->get(); // @phpstan-ignore method.notFound
+        return Content::active()->ordered()->get();
     }
 
     /**
@@ -97,11 +97,11 @@ class ContentController extends BasePageController
      *
      * @return Collection<int, mixed>
      */
-    protected function getAllButFront(): Collection // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
+    protected function getAllButFront(): Collection
     {
         return Content::query()
             ->where('id', '<>', 1)
-            ->ordered() // @phpstan-ignore method.notFound
+            ->ordered()
             ->get();
     }
 
@@ -121,7 +121,7 @@ class ContentController extends BasePageController
      *
      * @return Collection<int, mixed>
      */
-    protected function getFrontPageContent(): Collection // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
+    protected function getFrontPageContent(): Collection
     {
         return Content::frontPage()->get();
     }
@@ -133,7 +133,7 @@ class ContentController extends BasePageController
     {
         return Content::active()
             ->ofType(Content::TYPE_INDEX)
-            ->ordered() // @phpstan-ignore method.notFound
+            ->ordered()
             ->first();
     }
 }

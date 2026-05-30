@@ -78,7 +78,7 @@ class TvMazePipe extends AbstractTvProviderPipe
             $siteId = $tvmaze->getSiteByID('tvmaze', (int) $videoId);
             // If show exists in local DB but doesn't have a TVMaze ID, use the existing video
             // and process episode matching without trying to search TVMaze API
-            if ($siteId === false || $siteId === 0) { // @phpstan-ignore identical.alwaysFalse
+            if ($siteId === false || $siteId === 0) {
                 // Show exists in our DB (likely from another source like TMDB)
                 // Skip TVMaze API search and proceed to episode matching
                 $this->outputFoundInDb($cleanName);

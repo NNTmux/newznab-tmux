@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Http\Controllers\Auth\RegisterController;
 use App\Models\User;
+use App\Rules\ValidEmailDomain;
 use App\Services\RegistrationStatusService;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
 use Illuminate\Database\Schema\Blueprint;
@@ -34,6 +35,13 @@ class RegisterControllerTest extends TestCase
         $this->app->instance(UncompromisedVerifier::class, new class implements UncompromisedVerifier
         {
             public function verify($data): bool
+            {
+                return true;
+            }
+        });
+        $this->app->bind(ValidEmailDomain::class, fn () => new class extends ValidEmailDomain
+        {
+            protected function validateDnsRecords(string $domain): bool
             {
                 return true;
             }

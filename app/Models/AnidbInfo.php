@@ -143,6 +143,18 @@ class AnidbInfo extends Model
     }
 
     /**
+     * Get AniDB URL if anidbid exists.
+     */
+    public function getAnidbUrl(): ?string
+    {
+        if (empty($this->anidbid)) {
+            return null;
+        }
+
+        return 'https://anidb.net/anime/'.$this->anidbid;
+    }
+
+    /**
      * Get AniList URL if anilist_id exists.
      */
     public function getAnilistUrl(): ?string
@@ -164,5 +176,35 @@ class AnidbInfo extends Model
         }
 
         return 'https://myanimelist.net/anime/'.$this->mal_id;
+    }
+
+    /**
+     * Get MyAnimeList URL if mal_id exists.
+     */
+    public function getMyAnimeListUrl(): ?string
+    {
+        return $this->getMalUrl();
+    }
+
+    /**
+     * Get available external links keyed by provider.
+     *
+     * @return array<string, string>
+     */
+    public function getExternalLinks(): array
+    {
+        return array_filter([
+            'anidb' => $this->getAnidbUrl(),
+            'anilist' => $this->getAnilistUrl(),
+            'myanimelist' => $this->getMyAnimeListUrl(),
+        ]);
+    }
+
+    /**
+     * Check whether at least one external link exists.
+     */
+    public function hasExternalLinks(): bool
+    {
+        return $this->getExternalLinks() !== [];
     }
 }

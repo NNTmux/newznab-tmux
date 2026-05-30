@@ -12,7 +12,7 @@ class ValidEmailDomainTest extends TestCase
      */
     public function test_rejects_disposable_email_domains(): void
     {
-        $rule = new ValidEmailDomain;
+        $rule = $this->makeRule();
 
         $disposableEmails = [
             'test@guerrillamail.com',
@@ -38,7 +38,7 @@ class ValidEmailDomainTest extends TestCase
      */
     public function test_accepts_legitimate_email_domains(): void
     {
-        $rule = new ValidEmailDomain;
+        $rule = $this->makeRule();
 
         $legitimateEmails = [
             'test@gmail.com',
@@ -62,7 +62,7 @@ class ValidEmailDomainTest extends TestCase
      */
     public function test_rejects_emails_with_suspicious_patterns(): void
     {
-        $rule = new ValidEmailDomain;
+        $rule = $this->makeRule();
 
         $suspiciousEmails = [
             'test@tempdomainexample.com',
@@ -85,7 +85,7 @@ class ValidEmailDomainTest extends TestCase
      */
     public function test_rejects_emails_with_invalid_domains(): void
     {
-        $rule = new ValidEmailDomain;
+        $rule = $this->makeRule();
 
         $invalidEmails = [
             'test@nonexistentdomain12345xyz.com',
@@ -109,7 +109,7 @@ class ValidEmailDomainTest extends TestCase
      */
     public function test_rejects_malformed_emails(): void
     {
-        $rule = new ValidEmailDomain;
+        $rule = $this->makeRule();
 
         $malformedEmails = [
             'notanemail',
@@ -125,5 +125,21 @@ class ValidEmailDomainTest extends TestCase
 
             $this->assertTrue($failed, "Expected {$email} to be rejected as malformed");
         }
+    }
+
+    private function makeRule(): ValidEmailDomain
+    {
+        return new class extends ValidEmailDomain
+        {
+            protected function validateDnsRecords(string $domain): bool
+            {
+                return in_array($domain, [
+                    'gmail.com',
+                    'yahoo.com',
+                    'outlook.com',
+                    'protonmail.com',
+                ], true);
+            }
+        };
     }
 }

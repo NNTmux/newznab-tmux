@@ -27,14 +27,19 @@ final class ElasticSearchQueryTest extends TestCase
         $driverSource = file_get_contents(__DIR__.'/../../app/Services/Search/Drivers/ElasticSearchDriver.php');
 
         $this->assertIsString($driverSource);
-        $this->assertStringContainsString("'fields' => self::RELEASE_TEXT_FIELDS", $driverSource);
-        $this->assertStringContainsString("'type' => 'cross_fields'", $driverSource);
-        $this->assertStringContainsString("'operator' => 'and'", $driverSource);
+        $methodSource = strstr($driverSource, 'public function searchReleasesFiltered');
+        $this->assertIsString($methodSource);
+        $methodSource = strstr($methodSource, 'private function buildReleaseFieldSpecificMustClauses', true);
+        $this->assertIsString($methodSource);
+
+        $this->assertStringContainsString("'fields' => self::RELEASE_TEXT_FIELDS", $methodSource);
+        $this->assertStringContainsString("'type' => 'cross_fields'", $methodSource);
+        $this->assertStringContainsString("'operator' => 'and'", $methodSource);
         $this->assertStringNotContainsString(
             "'fields' => ['searchname^3', 'name^2', 'filename', 'plainsearchname']",
-            $driverSource
+            $methodSource
         );
-        $this->assertStringNotContainsString("'type' => 'best_fields'", $driverSource);
+        $this->assertStringNotContainsString("'type' => 'best_fields'", $methodSource);
     }
 
     #[Test]

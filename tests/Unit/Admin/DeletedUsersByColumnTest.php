@@ -62,16 +62,16 @@ class DeletedUsersByColumnTest extends TestCase
      */
     public function test_dashboard_activity_log_shows_deleted_by(): void
     {
-        $bladePath = __DIR__.'/../../../resources/views/admin/dashboard.blade.php';
+        $scriptPath = __DIR__.'/../../../resources/js/alpine/components/admin/dashboard.js';
 
-        $this->assertFileExists($bladePath);
+        $this->assertFileExists($scriptPath);
 
-        $content = file_get_contents($bladePath);
+        $content = file_get_contents($scriptPath);
 
         // Check that the dashboard shows deleted_by for deleted activity
-        $this->assertStringContainsString("activity->type === 'deleted'", $content);
-        $this->assertStringContainsString("metadata['deleted_by']", $content);
-        $this->assertStringContainsString("metadata['permanent']", $content);
+        $this->assertStringContainsString("activity.type === 'deleted'", $content);
+        $this->assertStringContainsString('activity.metadata.deleted_by', $content);
+        $this->assertStringContainsString('activity.metadata.permanent', $content);
     }
 
     /**

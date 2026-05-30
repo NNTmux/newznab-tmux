@@ -3,17 +3,15 @@
 namespace Tests\Unit\Models;
 
 use App\Models\AnidbInfo;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class AnidbInfoTest extends TestCase
 {
-    use RefreshDatabase;
-
-    /** @test */
+    #[Test]
     public function it_returns_anidb_url_when_anidbid_exists(): void
     {
-        $animeInfo = AnidbInfo::create([
+        $animeInfo = new AnidbInfo([
             'anidbid' => 12345,
             'type' => 'TV Series',
         ]);
@@ -23,10 +21,10 @@ class AnidbInfoTest extends TestCase
         $this->assertEquals('https://anidb.net/anime/12345', $url);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_anilist_url_when_anilist_id_exists(): void
     {
-        $animeInfo = AnidbInfo::create([
+        $animeInfo = new AnidbInfo([
             'anidbid' => 1,
             'anilist_id' => 9253,
             'type' => 'TV Series',
@@ -37,12 +35,12 @@ class AnidbInfoTest extends TestCase
         $this->assertEquals('https://anilist.co/anime/9253', $url);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_myanimelist_url_when_myanimelist_id_exists(): void
     {
-        $animeInfo = AnidbInfo::create([
+        $animeInfo = new AnidbInfo([
             'anidbid' => 1,
-            'myanimelist_id' => 9253,
+            'mal_id' => 9253,
             'type' => 'TV Series',
         ]);
 
@@ -51,13 +49,13 @@ class AnidbInfoTest extends TestCase
         $this->assertEquals('https://myanimelist.net/anime/9253', $url);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_all_external_links(): void
     {
-        $animeInfo = AnidbInfo::create([
+        $animeInfo = new AnidbInfo([
             'anidbid' => 12345,
             'anilist_id' => 9253,
-            'myanimelist_id' => 9253,
+            'mal_id' => 9253,
             'type' => 'TV Series',
         ]);
 
@@ -69,10 +67,10 @@ class AnidbInfoTest extends TestCase
         $this->assertArrayHasKey('myanimelist', $links);
     }
 
-    /** @test */
+    #[Test]
     public function it_checks_if_external_links_exist(): void
     {
-        $animeInfo = AnidbInfo::create([
+        $animeInfo = new AnidbInfo([
             'anidbid' => 1,
             'anilist_id' => 123,
             'type' => 'TV Series',

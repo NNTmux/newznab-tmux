@@ -7,6 +7,7 @@ namespace App\Services\TvProcessing;
 use App\Models\Video;
 use App\Services\TmdbClient;
 use App\Services\TraktService;
+use App\Services\TvProcessing\Providers\AbstractTvProvider;
 use App\Services\TvProcessing\Providers\TmdbProvider;
 use App\Services\TvProcessing\Providers\TraktProvider;
 use App\Services\TvProcessing\Providers\TvdbProvider;
@@ -139,10 +140,6 @@ class TvShowAdder
             return null;
         }
 
-        if (! is_object($extended)) {
-            return null;
-        }
-
         // TvdbProvider::formatShowInfo() expects fields shaped like SearchResult
         // (tvdb_id, name, overview, first_air_time, aliases). The extended
         // endpoint returns SeriesExtendedRecord (camelCase). Adapt it.
@@ -166,6 +163,9 @@ class TvShowAdder
         ];
     }
 
+    /**
+     * @return array{videoId: int, existed: bool, source: string, externalId: string, title: ?string}
+     */
     private function addViaTvdb(int $tvdbId, int $type): array
     {
         $provider = new TvdbProvider;
@@ -206,6 +206,9 @@ class TvShowAdder
         return is_array($show) ? $show : null;
     }
 
+    /**
+     * @return array{videoId: int, existed: bool, source: string, externalId: string, title: ?string}
+     */
     private function addViaTvMaze(int $tvmazeId, int $type): array
     {
         $provider = new TvMazeProvider;
@@ -251,12 +254,16 @@ class TvShowAdder
         }
         $show['alternative_titles'] = $alternativeTitles;
 
-        $networks = TmdbClient::getArray($show, 'networks');
-        $show['network'] = ! empty($networks[0]['name']) ? (string) $networks[0]['name'] : '';
+        $networks = array_values(TmdbClient::getArray($show, 'networks'));
+        $firstNetwork = $networks[0] ?? null;
+        $show['network'] = is_array($firstNetwork) && ! empty($firstNetwork['name']) ? (string) $firstNetwork['name'] : '';
 
         return $show;
     }
 
+    /**
+     * @return array{videoId: int, existed: bool, source: string, externalId: string, title: ?string}
+     */
     private function addViaTmdb(int $tmdbId, int $type): array
     {
         $provider = new TmdbProvider;
@@ -290,6 +297,9 @@ class TvShowAdder
         return is_array($show) && ! empty($show['ids']) ? $show : null;
     }
 
+    /**
+     * @return array{videoId: int, existed: bool, source: string, externalId: string, title: ?string}
+     */
     private function addViaTrakt(int|string $traktId, int $type): array
     {
         $provider = new TraktProvider;
@@ -338,8 +348,10 @@ class TvShowAdder
             $trakt = app(TraktService::class);
             if ($trakt->isConfigured()) {
                 $results = $trakt->searchById($imdbId, 'imdb', 'show');
-                if (is_array($results) && ! empty($results[0]['show']['ids']['trakt'])) {
-                    $traktId = (int) $results[0]['show']['ids']['trakt'];
+                $resultRows = is_array($results) ? array_values($results) : [];
+                $firstResult = $resultRows[0] ?? null;
+                if (is_array($firstResult) && ! empty($firstResult['show']['ids']['trakt'])) {
+                    $traktId = (int) $firstResult['show']['ids']['trakt'];
                     $provider = new TraktProvider;
                     $show = $this->fetchTrakt($traktId);
                     if ($show !== null) {
@@ -365,6 +377,9 @@ class TvShowAdder
         return null;
     }
 
+    /**
+     * @return array{videoId: int, existed: bool, source: string, externalId: string, title: ?string}
+     */
     private function addViaImdb(string $imdbId, int $type): array
     {
         // TMDB
@@ -388,8 +403,10 @@ class TvShowAdder
             $trakt = app(TraktService::class);
             if ($trakt->isConfigured()) {
                 $results = $trakt->searchById($imdbId, 'imdb', 'show');
-                if (is_array($results) && ! empty($results[0]['show']['ids']['trakt'])) {
-                    return $this->addViaTrakt((int) $results[0]['show']['ids']['trakt'], $type);
+                $resultRows = is_array($results) ? array_values($results) : [];
+                $firstResult = $resultRows[0] ?? null;
+                if (is_array($firstResult) && ! empty($firstResult['show']['ids']['trakt'])) {
+                    return $this->addViaTrakt((int) $firstResult['show']['ids']['trakt'], $type);
                 }
             }
         } catch (\Throwable $e) {
@@ -417,7 +434,7 @@ class TvShowAdder
      * @param  array<string, mixed>  $data
      * @return array{videoId: int, existed: bool, source: string, externalId: string, title: ?string}
      */
-    private function persist(object $provider, array $data, string $source, string $externalId): array
+    private function persist(AbstractTvProvider $provider, array $data, string $source, string $externalId): array
     {
         // Ensure required keys formatShowInfo callers might omit
         $data += [
@@ -442,10 +459,9 @@ class TvShowAdder
             throw new RuntimeException('Provider returned a show without a title.');
         }
 
-        /** @var int $videoId */
-        $videoId = $provider->add($data); // @phpstan-ignore-line - AbstractTvProvider::add()
+        $videoId = $provider->add($data);
 
-        if ($videoId > 0 && method_exists($provider, 'getPoster')) {
+        if ($videoId > 0) {
             try {
                 $provider->getPoster($videoId);
             } catch (\Throwable $e) {

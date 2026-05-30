@@ -51,7 +51,6 @@ class TvProcessingPipeline
      */
     public function __construct(iterable $pipes = [], bool $echoOutput = true)
     {
-        /** @phpstan-ignore argument.templateType */
         $this->pipes = collect($pipes)
             ->sortBy(fn (AbstractTvProviderPipe $p) => $p->getPriority());
 

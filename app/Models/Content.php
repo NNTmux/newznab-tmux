@@ -143,7 +143,7 @@ class Content extends Model
     {
         return $query->active() // @phpstan-ignore method.notFound
             ->ofType(self::TYPE_INDEX)
-            ->ordered(); // @phpstan-ignore method.notFound
+            ->ordered();
     }
 
     /**

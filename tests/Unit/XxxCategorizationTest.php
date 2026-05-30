@@ -116,11 +116,12 @@ class XxxCategorizationTest extends TestCase
     }
 
     #[DataProvider('vrReleasesProvider')]
-    public function test_vr_releases_through_full_pipeline(string $releaseName, int $expectedCategoryId): void
+    public function test_vr_releases_through_full_pipeline(string $releaseName, int $expectedCategoryId, string $expectedMatchedBy): void
     {
         $passable = $this->runPipeline($releaseName);
 
         $this->assertSame($expectedCategoryId, $passable->bestResult->categoryId, "Pipeline wrong category for: {$releaseName}");
+        $this->assertSame($expectedMatchedBy, $passable->bestResult->matchedBy, "Pipeline wrong matched_by for: {$releaseName}");
     }
 
     #[DataProvider('nonVrReleasesProvider')]

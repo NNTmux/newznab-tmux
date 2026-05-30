@@ -757,12 +757,6 @@ parameters:
 			path: app/Services/AdditionalProcessing/ReleaseProcessor.php
 
 		-
-			message: '#^Method App\\Services\\Binaries\\BinariesService\:\:groupMissingPartsIntoRanges\(\) should return array\<string, mixed\> but returns list\<array\<string, mixed\>\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/Binaries/BinariesService.php
-
-		-
 			message: '#^PHPDoc tag @return with type list\<array\<string, mixed\>\> is incompatible with native type int\|null\.$#'
 			identifier: return.phpDocType
 			count: 1
@@ -1197,24 +1191,6 @@ parameters:
 			path: app/Services/SteamService.php
 
 		-
-			message: '#^Method App\\Services\\SteamService\:\:getFullAppList\(\) should return array\{inserted\: int\<0, max\>, updated\: 0, skipped\: int\<0, max\>, errors\: int\<0, max\>\} but returns array\{\}\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/SteamService.php
-
-		-
-			message: '#^Method App\\Services\\SteamService\:\:populateSteamAppsTable\(\) should return list\<array\<string, mixed\>\> but returns array\{inserted\: 0, updated\: 0, skipped\: 0, errors\: 0\}\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/SteamService.php
-
-		-
-			message: '#^Method App\\Services\\SteamService\:\:populateSteamAppsTable\(\) should return list\<array\<string, mixed\>\> but returns array\{inserted\: int\<0, max\>, updated\: 0, skipped\: int\<0, max\>, errors\: int\<0, max\>\}\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/SteamService.php
-
-		-
 			message: '#^Method App\\Services\\SteamService\:\:tokenize\(\) should return array\<string, mixed\> but returns list\<string\>\.$#'
 			identifier: return.type
 			count: 1
@@ -1251,12 +1227,6 @@ parameters:
 			path: app/Services/UserStatsService.php
 
 		-
-			message: '#^Method App\\Services\\UserStatsService\:\:getDownloadsPerDay\(\) should return array\<string, mixed\> but returns list\<array\<string, int\|string\|null\>\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/UserStatsService.php
-
-		-
 			message: '#^Method App\\Services\\UserStatsService\:\:getDownloadsPerHour\(\) should return list\<array\<string, int\|string\|null\>\> but returns array\<string, mixed\>\.$#'
 			identifier: return.type
 			count: 1
@@ -1264,12 +1234,6 @@ parameters:
 
 		-
 			message: '#^Method App\\Services\\UserStatsService\:\:getDownloadsPerMinute\(\) should return array\<string, mixed\> but returns list\<array\<string, int\|string\>\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/UserStatsService.php
-
-		-
-			message: '#^Method App\\Services\\UserStatsService\:\:getSummaryStats\(\) should return list\<array\<string, int\|string\|null\>\> but returns array\{total_users\: int\<0, max\>, downloads_today\: int, downloads_week\: int, api_hits_today\: int, api_hits_week\: int\}\.$#'
 			identifier: return.type
 			count: 1
 			path: app/Services/UserStatsService.php
@@ -1351,12 +1315,6 @@ parameters:
 			identifier: nullsafe.neverNull
 			count: 1
 			path: app/Support/SecondaryIndexDocuments.php
-
-		-
-			message: '#^Method App\\Support\\UpdatePerformanceHelper\:\:checkSystemResources\(\) should return array\<string, mixed\> but returns list\<string\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Support/UpdatePerformanceHelper.php
 
 		-
 			message: '#^Method App\\Support\\UpdatePerformanceHelper\:\:getSystemMemoryInfo\(\) should return list\<string\>\|null but returns array\{total\: int, available\: int, used\: int, usage_percent\: \(float\|int\)\}\.$#'

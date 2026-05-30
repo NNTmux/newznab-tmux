@@ -125,7 +125,7 @@ class NntmuxSearchDiag extends Command
         // ['data' => [...]] shape is retained as a fallback.
         $rows = [];
         foreach ($response as $key => $value) {
-            if (\is_int($key) || (\is_string($key) && ctype_digit($key))) {
+            if (\is_int($key) || ctype_digit($key)) {
                 if (\is_array($value)) {
                     $row = $value;
                     if (! isset($row['id'])) {

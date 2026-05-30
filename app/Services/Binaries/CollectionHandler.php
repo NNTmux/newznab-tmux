@@ -140,6 +140,7 @@ final class CollectionHandler
      * Resolve collections for a chunk of headers with one bulk insert and one id lookup.
      *
      * @param  array<int, array<string, mixed>>  $headers
+     * @param  array<int, int>  $totalFilesByIndex
      * @return array<int, int> Collection ids keyed by header index
      */
     public function getOrCreateCollections(

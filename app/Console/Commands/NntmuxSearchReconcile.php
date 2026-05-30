@@ -172,7 +172,7 @@ class NntmuxSearchReconcile extends Command
         // The old `$response['data']` shape only exists for non-raw mode or pre-4.x clients.
         foreach ($response as $key => $value) {
             // Top-level numeric keys mirror row ids (single-column id projection).
-            if (\is_int($key) || (\is_string($key) && ctype_digit($key))) {
+            if (\is_int($key) || ctype_digit($key)) {
                 $id = (int) $key;
                 if (isset($requested[$id])) {
                     $out[$id] = $id;

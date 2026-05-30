@@ -275,7 +275,7 @@ class TmdbClient
      * Get TV show details by ID
      *
      * @param  int|string  $id  The TMDB TV show ID
-     * @param  array<string, mixed>  $appendToResponse  Additional data to append
+     * @param  list<string>  $appendToResponse  Additional data to append
      * @return array<string, mixed>|null TV show data or null on failure
      */
     public function getTvShow(int|string $id, array $appendToResponse = []): ?array

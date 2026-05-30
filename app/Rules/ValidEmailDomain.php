@@ -182,7 +182,7 @@ class ValidEmailDomain implements ValidationRule
     /**
      * Validate that the domain has proper DNS records
      */
-    private function validateDnsRecords(string $domain): bool
+    protected function validateDnsRecords(string $domain): bool
     {
         // Check for MX records (primary email validation)
         if (@checkdnsrr($domain, 'MX')) {

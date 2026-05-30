@@ -34,10 +34,10 @@ final class HeaderParser
     /**
      * Parse and filter raw headers from NNTP.
      *
-     * @param  array<string, mixed>  $headers  Raw headers from NNTP
+     * @param  array<int, array<string, mixed>>  $headers  Raw headers from NNTP
      * @param  string  $groupName  The newsgroup name
      * @param  bool  $partRepair  Whether this is a part repair scan
-     * @param  array<string, mixed>|null  $missingParts  Missing part numbers if part repair
+     * @param  array<int, mixed>|null  $missingParts  Missing part numbers if part repair
      * @return array<string, mixed> Filtered and parsed headers with article info
      */
     public function parse(
@@ -137,7 +137,7 @@ final class HeaderParser
     /**
      * Extract highest and lowest article info from headers.
      *
-     * @param  array<string, mixed>  $headers
+     * @param  array<int, array<string, mixed>>  $headers
      * @return array<string, mixed>
      */
     public function getArticleRange(array $headers): array

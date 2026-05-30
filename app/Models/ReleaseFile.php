@@ -65,9 +65,9 @@ class ReleaseFile extends Model
      * @param  Builder<self>  $query
      * @return Builder<self>
      */
-    public function scopeNfoFiles(Builder $query): Builder // @phpstan-ignore missingType.generics, return.phpDocType
+    public function scopeNfoFiles(Builder $query): Builder
     {
-        return $query->where(function (Builder $q) { // @phpstan-ignore missingType.generics
+        return $query->where(function (Builder $q) {
             $q->where('name', 'like', '%.nfo')
                 ->orWhere('name', 'like', '%.diz')
                 ->orWhere('name', 'like', '%.inf')
@@ -82,7 +82,7 @@ class ReleaseFile extends Model
      * @param  Builder<self>  $query
      * @return Builder<self>
      */
-    public function scopeNfoFilesWithContent(Builder $query): Builder // @phpstan-ignore missingType.generics, return.phpDocType
+    public function scopeNfoFilesWithContent(Builder $query): Builder
     {
         return $query->nfoFiles()->where('size', '>', 0);
     }

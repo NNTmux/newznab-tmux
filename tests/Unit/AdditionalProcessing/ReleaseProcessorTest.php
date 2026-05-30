@@ -69,6 +69,7 @@ class ReleaseProcessorTest extends TestCase
         ]);
 
         $releaseManager = Mockery::mock(ReleaseFileManager::class);
+        $releaseManager->shouldReceive('processReleaseNameFromNzbContents')->once()->andReturnFalse();
         $releaseManager->shouldReceive('finalizeRelease')->once()->andReturnNull();
 
         $tempWorkspace = Mockery::mock(TempWorkspaceService::class);

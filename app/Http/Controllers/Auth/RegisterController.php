@@ -101,7 +101,7 @@ class RegisterController extends Controller
                 'email',
                 'max:255',
                 Rule::unique('users', 'email')->where(fn ($query) => $query->whereNull('deleted_at')),
-                new ValidEmailDomain,
+                app(ValidEmailDomain::class),
             ],
             'password' => ['required', 'confirmed', Password::min(8)->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
         ], [

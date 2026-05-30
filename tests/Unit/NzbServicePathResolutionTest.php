@@ -137,7 +137,9 @@ final class NzbServicePathResolutionTest extends TestCase
         );
 
         foreach ($iterator as $item) {
-            if ($item->isDir()) {
+            if ($item->isLink()) {
+                unlink($item->getPathname());
+            } elseif ($item->isDir()) {
                 rmdir($item->getPathname());
             } else {
                 unlink($item->getPathname());
