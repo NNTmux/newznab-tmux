@@ -152,18 +152,18 @@ final class AdditionalCandidateQuery
             ? 'substr(r.leftguid, 1, 1)'
             : 'LEFT(r.leftguid, 1)';
         $rows = self::baseBuilder()
-            ->select(DB::raw('DISTINCT '.$bucketExpr.' AS id'))
+            ->select(DB::raw('DISTINCT '.$bucketExpr.' AS guid_bucket'))
             ->limit($effectiveLimit)
             ->get();
         $chars = [];
         foreach ($rows as $row) {
-            $id = (string) ($row->id ?? '');
+            $id = strtolower((string) ($row->guid_bucket ?? ''));
             if ($id !== '') {
                 $chars[] = substr($id, 0, 1);
             }
         }
 
-        return $chars;
+        return array_values(array_unique($chars));
     }
 
     /**
