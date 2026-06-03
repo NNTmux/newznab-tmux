@@ -90,7 +90,7 @@
                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
                           rows="4"
                           required
-                          placeholder="/^(?P<name>.*?)([\. ]S\d{1,3}[\. ]?E\d{1,3})/i">{{ $regex }}</textarea>
+                          placeholder="/^(?P<name>.*?)([\. ]S\d{1,3}[\. ]?E\d{1,3})/i">{{ regex_display_value($regex) }}</textarea>
                 <p class="mt-2 text-sm text-gray-500">
                     Enter the regex pattern to test. Include delimiters and flags.
                 </p>

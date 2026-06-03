@@ -304,6 +304,19 @@ if (! function_exists('escapeString')) {
     }
 }
 
+if (! function_exists('regex_display_value')) {
+    /**
+     * Decode entity-encoded regex text at the presentation boundary.
+     *
+     * Blade should still render the returned value with escaped {{ }} output so regexes that
+     * contain HTML-looking text remain safe while displaying named groups and quotes readably.
+     */
+    function regex_display_value(mixed $value): string
+    {
+        return html_entity_decode((string) ($value ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    }
+}
+
 if (! function_exists('realDuration')) {
 
     function realDuration(mixed $milliseconds): string

@@ -43,7 +43,7 @@
                            id="group_regex"
                            name="group_regex"
                            class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                           value="{{ htmlspecialchars($regex->group_regex ?? '') }}"
+                           value="{{ $regex->group_regex ?? '' }}"
                            required>
                 </div>
                 <p class="mt-2 text-sm text-gray-500">
@@ -66,7 +66,7 @@
                               name="regex"
                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
                               rows="4"
-                              required>{{ htmlspecialchars($regex->regex ?? '') }}</textarea>
+                              required>{{ regex_display_value($regex->regex ?? '') }}</textarea>
                 </div>
                 <p class="mt-2 text-sm text-gray-500">
                     Regex to use when categorizing releases.<br>
@@ -87,7 +87,7 @@
                     <textarea id="description"
                               name="description"
                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                              rows="3">{{ htmlspecialchars($regex->description ?? '') }}</textarea>
+                              rows="3">{{ $regex->description ?? '' }}</textarea>
                 </div>
                 <p class="mt-2 text-sm text-gray-500">
                     Description for this regex. You can include an example usenet subject this regex would match on.

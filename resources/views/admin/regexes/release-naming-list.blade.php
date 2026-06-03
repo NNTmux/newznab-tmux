@@ -93,8 +93,8 @@
                                 </td>
                                 <td class="px-6 py-4 text-sm">
                                     <div class="max-w-[200px] wrap-break-word">
-                                        <code class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-2 py-1 rounded text-xs break-all" title="{{ htmlspecialchars($row->regex) }}">
-                                            {{ htmlspecialchars($row->regex) }}
+                                        <code class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-2 py-1 rounded text-xs break-all" title="{{ regex_display_value($row->regex) }}">
+                                            {{ regex_display_value($row->regex) }}
                                         </code>
                                     </div>
                                 </td>
