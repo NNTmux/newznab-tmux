@@ -649,11 +649,12 @@ class ApiController extends BasePageController
 
     /**
      * @param  array<string, mixed>  $params
+     * @param  array<string, string>  $headers
      * @return Response|void
      *
      * @throws \Exception
      */
-    public function output(mixed $data, array $params, bool $xml, int $offset, string $type = '')
+    public function output(mixed $data, array $params, bool $xml, int $offset, string $type = '', array $headers = [])
     {
         $this->type = $type;
         $options = [
@@ -682,6 +683,10 @@ class ApiController extends BasePageController
         if ($response === false) {
             return showApiError(201);
         } else {
+            foreach ($headers as $name => $value) {
+                header($name.': '.$value);
+            }
+
             header('Content-Length: '.\strlen($response));
             echo $response;
             exit;

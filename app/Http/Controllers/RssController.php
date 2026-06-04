@@ -118,13 +118,31 @@ class RssController extends BasePageController
     {
         $user = $this->userCheck($request);
         if ($user instanceof JsonResponse) {
+            $user->headers->add($this->cartRssNoCacheHeaders());
+
             return $user;
         }
 
         [$userShow, $userAnidb, $userAirDate, $userNum, $userLimit, $outputXML] = $this->parseCommonRssParams($request);
 
         $relData = $this->rss->getRss([-2], $userShow, $userAnidb, $user['user_id'], $userAirDate, $userLimit, $userNum);
-        $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
+        $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss', $this->cartRssNoCacheHeaders());
+    }
+
+    /**
+     * Cart RSS must reflect user cart changes immediately and must not be reused by browsers, proxies, or CDNs.
+     *
+     * @return array<string, string>
+     */
+    private function cartRssNoCacheHeaders(): array
+    {
+        return [
+            'Cache-Control' => 'no-cache, no-store, must-revalidate, private, max-age=0, s-maxage=0',
+            'Pragma' => 'no-cache',
+            'Expires' => 'Thu, 01 Jan 1970 00:00:00 GMT',
+            'CDN-Cache-Control' => 'no-store',
+            'Cloudflare-CDN-Cache-Control' => 'no-store',
+        ];
     }
 
     /**

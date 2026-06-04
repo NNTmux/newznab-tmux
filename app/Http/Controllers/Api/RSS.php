@@ -36,9 +36,11 @@ class RSS extends ApiController
     public function getRss(mixed $cat, mixed $videosId, mixed $aniDbID, int $userID = 0, int $airDate = -1, int $limit = 100, int $offset = 0)
     {
         $catSearch = $cartSearch = '';
+        $isCartFeed = false;
         $catLimit = 'AND r.categories_id BETWEEN '.Category::TV_ROOT.' AND '.Category::TV_OTHER;
         if (\count($cat)) {
             if ((int) $cat[0] === -2) {
+                $isCartFeed = true;
                 $cartSearch = sprintf(
                     'INNER JOIN users_releases ON users_releases.users_id = %d AND users_releases.releases_id = r.id',
                     $userID
@@ -83,6 +85,10 @@ class RSS extends ApiController
                 ($airDate > -1 ? sprintf('AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY)', $airDate) : ''),
                 $limit === -1 ? '' : ' LIMIT '.$limit.' OFFSET '.$offset
             );
+
+        if ($isCartFeed) {
+            return Release::fromQuery($sql);
+        }
 
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_medium'));
 
