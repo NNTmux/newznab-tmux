@@ -166,6 +166,63 @@ class AdminRegexesControllerTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_admin_regex_list_pages_decode_entity_encoded_regexes_without_double_escaping(): void
+    {
+        $admin = $this->createUserWithRole('Admin');
+        $rawRegex = '/^(?P<name>.+?) - "(?P<title>.+?)"$/i';
+        $entityEncodedRegex = '/^(?P&lt;name&gt;.+?) - &quot;(?P&lt;title&gt;.+?)&quot;$/i';
+        $scriptTag = '<'.'script>alert("x")</'.'script>';
+        $htmlLookingRegex = '/^(?P&lt;name&gt;.+?)'.$scriptTag.'$/i';
+
+        foreach (['release_naming_regexes', 'collection_regexes', 'category_regexes'] as $table) {
+            $this->insertRegexFixture($table, $rawRegex, 'Raw regex fixture');
+            $this->insertRegexFixture($table, $entityEncodedRegex, 'Entity encoded regex fixture');
+            $this->insertRegexFixture($table, $htmlLookingRegex, 'HTML-looking regex fixture');
+        }
+
+        foreach ([
+            route('admin.release_naming_regexes-list'),
+            route('admin.collection_regexes-list'),
+            route('admin.category_regexes-list'),
+        ] as $url) {
+            $response = $this->actingAs($admin)->get($url);
+
+            $response->assertOk()
+                ->assertSee(e($rawRegex), false)
+                ->assertSee(e(html_entity_decode($entityEncodedRegex, ENT_QUOTES | ENT_HTML5, 'UTF-8')), false)
+                ->assertSee(e(html_entity_decode($htmlLookingRegex, ENT_QUOTES | ENT_HTML5, 'UTF-8')), false)
+                ->assertDontSee('&amp;quot;', false)
+                ->assertDontSee('&amp;lt;', false)
+                ->assertDontSee('&amp;gt;', false)
+                ->assertDontSee($scriptTag, false);
+        }
+    }
+
+    public function test_admin_regex_edit_pages_decode_entity_encoded_regexes_without_double_escaping(): void
+    {
+        $admin = $this->createUserWithRole('Admin');
+        $entityEncodedRegex = '/^(?P&lt;name&gt;.+?) - &quot;(?P&lt;title&gt;.+?)&quot;$/i';
+        $expectedRenderedRegex = e(html_entity_decode($entityEncodedRegex, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+
+        $releaseNamingRegexId = $this->insertRegexFixture('release_naming_regexes', $entityEncodedRegex, 'Release naming encoded regex');
+        $collectionRegexId = $this->insertRegexFixture('collection_regexes', $entityEncodedRegex, 'Collection encoded regex');
+        $categoryRegexId = $this->insertRegexFixture('category_regexes', $entityEncodedRegex, 'Category encoded regex');
+
+        foreach ([
+            route('admin.release_naming_regexes-edit', ['id' => (string) $releaseNamingRegexId]),
+            route('admin.collection_regexes-edit', ['id' => (string) $collectionRegexId]),
+            route('admin.category_regexes-edit', ['id' => (string) $categoryRegexId]),
+        ] as $url) {
+            $this->actingAs($admin)
+                ->get($url)
+                ->assertOk()
+                ->assertSee($expectedRenderedRegex, false)
+                ->assertDontSee('&amp;quot;', false)
+                ->assertDontSee('&amp;lt;', false)
+                ->assertDontSee('&amp;gt;', false);
+        }
+    }
+
     private function setEnvironmentValue(string $key, ?string $value): void
     {
         if ($value === null) {
@@ -371,6 +428,23 @@ class AdminRegexesControllerTest extends TestCase
         $user->assignRole($role);
 
         return $user->fresh();
+    }
+
+    private function insertRegexFixture(string $table, string $regex, string $description): int
+    {
+        $data = [
+            'group_regex' => 'alt\\.binaries\\.example',
+            'regex' => $regex,
+            'description' => $description,
+            'ordinal' => 10,
+            'status' => 1,
+        ];
+
+        if ($table === 'category_regexes') {
+            $data['categories_id'] = 1;
+        }
+
+        return (int) DB::table($table)->insertGetId($data);
     }
 
     private function resetGlobalComposerState(): void
