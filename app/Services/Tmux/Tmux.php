@@ -356,27 +356,21 @@ class Tmux
                 );
 
             case 2:
-                $ppminString = $ppmaxString = '';
-                if (is_numeric($ppmax) && ! empty($ppmax)) {
-                    $ppmax *= 1073741824;
-                    $ppmaxString = "AND r.size < {$ppmax}";
-                }
-                if (is_numeric($ppmin) && ! empty($ppmin)) {
-                    $ppmin *= 1048576;
-                    $ppminString = "AND r.size > {$ppmin}";
-                }
+                // NOTE: the "Misc In Process" / `work` count was previously computed here
+                // and repeatedly drifted out of sync with the actual additional
+                // post-processor selection in
+                // \App\Services\AdditionalProcessing\AdditionalCandidateQuery::applyPredicates()
+                // (typical drift: a missing `nzbstatus = 1` filter, which leaves
+                // NZB-less releases stuck in the queue forever). It now lives in
+                // \App\Services\Tmux\TmuxMonitorService::collectProcessCounts(), which
+                // calls AdditionalCandidateQuery directly. The $ppmax / $ppmin args
+                // are kept for backward compatibility with the public signature but
+                // are no longer used by this case.
+                unset($ppmax, $ppmin);
 
-                return "SELECT
-					(SELECT COUNT(r.id) FROM releases r
-						LEFT JOIN categories c ON c.id = r.categories_id
-						WHERE r.passwordstatus = -1
-						AND r.haspreview = -1
-						{$ppminString}
-						{$ppmaxString}
-						AND c.disablepreview = 0
-					) AS work,
+                return 'SELECT
 					(SELECT COUNT(id) FROM usenet_groups WHERE active = 1) AS active_groups,
-					(SELECT COUNT(id) FROM usenet_groups WHERE name IS NOT NULL) AS all_groups";
+					(SELECT COUNT(id) FROM usenet_groups WHERE name IS NOT NULL) AS all_groups';
 
             case 4:
                 return sprintf(

@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Release;
 use App\Models\Settings;
+use App\Services\AdditionalProcessing\AdditionalCandidateQuery;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -241,6 +242,14 @@ class TmuxMonitorService
                     $this->runVar['counts']['now'][$key] = $value;
                 }
             }
+
+            // "Misc In Process" / `work` is computed via AdditionalCandidateQuery so
+            // the dashboard counter is guaranteed to match exactly what the
+            // additional post-processor will pick up. Previously this was an
+            // inline SQL fragment inside Tmux::proc_query(2) which kept drifting
+            // (e.g. missing `nzbstatus = 1`) and left releases stuck in the queue
+            // forever. Do NOT re-introduce a separate predicate here.
+            $this->runVar['counts']['now']['work'] = AdditionalCandidateQuery::baseBuilder()->count();
 
             $this->runVar['timers']['query']['proc2_time'] = time() - $timer2;
 
