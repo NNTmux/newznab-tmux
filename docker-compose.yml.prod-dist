@@ -67,7 +67,7 @@ services:
         command: >
             sh -c "while [ true ]; do php artisan schedule:run; sleep 60; done"
     mariadb:
-        image: 'mariadb:11'
+        image: 'mariadb:12.3'
         ports:
             - '${FORWARD_DB_PORT:-3306}:3306'
         environment:
