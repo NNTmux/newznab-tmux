@@ -142,6 +142,12 @@
                                                         <i class="fas fa-flag mr-1"></i> Reported ({{ $result->report_count }})
                                                     </span>
                                                 @endif
+                                                 @if(!empty($result->report_response_count) && $result->report_response_count > 0)
+                                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
+                                                           title="Staff response available on release details">
+                                                         <i class="fas fa-reply mr-1"></i> Response
+                                                     </span>
+                                                 @endif
                                                 @if(!empty($result->failed_count) && $result->failed_count > 0)
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
                                                           title="{{ $result->failed_count }} user(s) reported download failure">
@@ -283,6 +289,20 @@
                                 <a href="{{ url('/details/' . $result->guid) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium wrap-break-word text-base">
                                     {{ $result->searchname }}
                                 </a>
+                                 <div class="flex flex-wrap items-center gap-2 mt-2">
+                                     @if(!empty($result->report_count) && $result->report_count > 0)
+                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200"
+                                               title="Reported: {{ \App\Models\ReleaseReport::reasonKeysToLabels($result->report_reasons ?? '') }}">
+                                             <i class="fas fa-flag mr-1"></i> Reported ({{ $result->report_count }})
+                                         </span>
+                                     @endif
+                                     @if(!empty($result->report_response_count) && $result->report_response_count > 0)
+                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
+                                               title="Staff response available on release details">
+                                             <i class="fas fa-reply mr-1"></i> Response
+                                         </span>
+                                     @endif
+                                 </div>
                                 <div class="flex flex-wrap items-center gap-2 mt-2 text-sm text-gray-600 dark:text-gray-400">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900/50 text-primary-800 dark:text-primary-200">
                                         {{ $result->category_name ?? 'Other' }}

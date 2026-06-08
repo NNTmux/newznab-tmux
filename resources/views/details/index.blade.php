@@ -70,6 +70,26 @@
                             @endauth
                             <x-report-button :release-id="$release->id" variant="button-lg" />
                         </div>
+                        @if(!empty($publicReportResponses) && $publicReportResponses->count() > 0)
+                            <div class="mt-4 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 p-4">
+                                <h3 class="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-3 flex items-center">
+                                    <i class="fas fa-reply mr-2"></i> Staff response
+                                </h3>
+                                <div class="space-y-3">
+                                    @foreach($publicReportResponses as $responseReport)
+                                        <div class="text-sm text-blue-900 dark:text-blue-100">
+                                            <div class="whitespace-pre-wrap break-words">{{ $responseReport->response }}</div>
+                                            <div class="mt-2 text-xs text-blue-700 dark:text-blue-300">
+                                                {{ $responseReport->responded_at ? 'Responded ' . $responseReport->responded_at->format('M d, Y H:i') : 'Staff response' }}
+                                                @if($responseReport->responder)
+                                                    by {{ $responseReport->responder->username }}
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

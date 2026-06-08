@@ -113,6 +113,10 @@ Alpine.data('adminReleaseReports', () => ({
     revertModalOpen: false,
     revertActionUrl: '',
     revertStatus: '',
+    responseModalOpen: false,
+    responseActionUrl: '',
+    responseContent: '',
+    responseIsPublic: true,
     allChecked: false,
     selectedCount: 0,
     rootEl: null,
@@ -142,6 +146,24 @@ Alpine.data('adminReleaseReports', () => ({
     submitRevert() {
         const form = this.$refs.revertForm;
         if (form) { form.action = this.revertActionUrl; form.submit(); }
+    },
+
+    showResponse(actionUrl, response, isPublic) {
+        this.responseActionUrl = actionUrl;
+        this.responseContent = response || '';
+        this.responseIsPublic = isPublic !== false;
+        this.responseModalOpen = true;
+    },
+
+    closeResponse() { this.responseModalOpen = false; },
+
+    responseCharCount() {
+        return (this.responseContent || '').length;
+    },
+
+    submitResponse() {
+        const form = this.$refs.responseForm;
+        if (form) { form.action = this.responseActionUrl; form.submit(); }
     },
 
     componentRoot() {

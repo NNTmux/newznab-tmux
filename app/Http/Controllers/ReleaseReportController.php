@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Release;
 use App\Models\ReleaseReport;
+use App\Services\Releases\ReleaseBrowseService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -51,6 +52,7 @@ class ReleaseReportController extends BasePageController
             'description' => $validated['description'] ?? null,
             'status' => 'pending',
         ]);
+        ReleaseBrowseService::bumpCacheVersion();
 
         return response()->json([
             'success' => true,

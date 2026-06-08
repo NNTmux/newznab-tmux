@@ -26,9 +26,13 @@ class ReleaseReport extends Model
         'users_id',
         'reason',
         'description',
+        'response',
         'status',
         'reviewed_by',
         'reviewed_at',
+        'responded_by',
+        'responded_at',
+        'response_is_public',
     ];
 
     /**
@@ -36,6 +40,8 @@ class ReleaseReport extends Model
      */
     protected $casts = [
         'reviewed_at' => 'datetime',
+        'responded_at' => 'datetime',
+        'response_is_public' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -103,6 +109,16 @@ class ReleaseReport extends Model
     }
 
     /**
+     * Get the admin who responded to the report.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function responder(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'responded_by');
+    }
+
+    /**
      * Get a paginated list of reports with optional filters.
      */
     public static function getReportsRange(// @phpstan-ignore missingType.generics
@@ -110,7 +126,7 @@ class ReleaseReport extends Model
         int $perPage = 50
     ): LengthAwarePaginator {
         $query = self::query()
-            ->with(['release', 'user', 'reviewer'])
+            ->with(['release', 'user', 'reviewer', 'responder'])
             ->orderBy('created_at', 'desc');
 
         if ($status !== null && $status !== 'all') {

@@ -302,6 +302,7 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     // Release Reports Management
     Route::get('release-reports', [AdminReleaseReportController::class, 'index'])->name('admin.release-reports');
     Route::post('release-reports/{id}/status', [AdminReleaseReportController::class, 'updateStatus'])->name('admin.release-reports.update-status');
+    Route::post('release-reports/{id}/response', [AdminReleaseReportController::class, 'updateResponse'])->name('admin.release-reports.update-response');
     Route::post('release-reports/{id}/delete-release', [AdminReleaseReportController::class, 'deleteRelease'])->name('admin.release-reports.delete-release');
     Route::post('release-reports/{id}/dismiss', [AdminReleaseReportController::class, 'dismiss'])->name('admin.release-reports.dismiss');
     Route::post('release-reports/{id}/revert', [AdminReleaseReportController::class, 'revert'])->name('admin.release-reports.revert');

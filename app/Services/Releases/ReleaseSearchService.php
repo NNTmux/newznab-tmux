@@ -1903,6 +1903,8 @@ class ReleaseSearchService
                     df.failed AS failed_count,
                     rr.report_count AS report_count,
                     rr.report_reasons AS report_reasons,
+                    rr.response_count AS report_response_count,
+                    rr.latest_response_at AS latest_report_response_at,
                     g.name AS group_name,
                     rn.releases_id AS nfoid,
                     re.releases_id AS reid,
@@ -1915,7 +1917,7 @@ class ReleaseSearchService
             LEFT JOIN categories c ON c.id = r.categories_id
             LEFT JOIN root_categories cp ON cp.id = c.root_categories_id
             LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-            LEFT OUTER JOIN (SELECT releases_id, COUNT(*) AS report_count, GROUP_CONCAT(DISTINCT reason SEPARATOR ', ') AS report_reasons FROM release_reports WHERE status IN ('pending', 'reviewed', 'resolved') GROUP BY releases_id) rr ON rr.releases_id = r.id
+            LEFT OUTER JOIN (SELECT releases_id, SUM(CASE WHEN status IN ('pending', 'reviewed', 'resolved') THEN 1 ELSE 0 END) AS report_count, GROUP_CONCAT(DISTINCT CASE WHEN status IN ('pending', 'reviewed', 'resolved') THEN reason ELSE NULL END SEPARATOR ', ') AS report_reasons, SUM(CASE WHEN response IS NOT NULL AND response != '' AND response_is_public = 1 THEN 1 ELSE 0 END) AS response_count, MAX(CASE WHEN response IS NOT NULL AND response != '' AND response_is_public = 1 THEN responded_at ELSE NULL END) AS latest_response_at FROM release_reports GROUP BY releases_id) rr ON rr.releases_id = r.id
             %s",
             $whereSql
         );

@@ -189,8 +189,8 @@ class AdminReleaseReportControllerTest extends TestCase
 
         $content = file_get_contents($servicePath);
 
-        // Check that the query includes resolved status
-        $this->assertStringContainsString("WHERE status IN ('pending', 'reviewed', 'resolved')", $content);
+        // Check that the active report count includes resolved status.
+        $this->assertStringContainsString("status IN ('pending', 'reviewed', 'resolved')", $content);
     }
 
     /**
@@ -204,8 +204,8 @@ class AdminReleaseReportControllerTest extends TestCase
 
         $content = file_get_contents($servicePath);
 
-        // Check that the query includes resolved status
-        $this->assertStringContainsString("WHERE status IN ('pending', 'reviewed', 'resolved')", $content);
+        // Check that the active report count includes resolved status.
+        $this->assertStringContainsString("status IN ('pending', 'reviewed', 'resolved')", $content);
     }
 
     /**
@@ -219,8 +219,8 @@ class AdminReleaseReportControllerTest extends TestCase
 
         $content = file_get_contents($servicePath);
 
-        // Check that the query includes resolved status
-        $this->assertStringContainsString("WHERE status IN ('pending', 'reviewed', 'resolved')", $content);
+        // Check that the active report count includes resolved status.
+        $this->assertStringContainsString("status IN ('pending', 'reviewed', 'resolved')", $content);
     }
 
     /**
@@ -236,5 +236,94 @@ class AdminReleaseReportControllerTest extends TestCase
 
         // Check that the query includes resolved status
         $this->assertStringContainsString("whereIn('status', ['pending', 'reviewed', 'resolved'])", $content);
+    }
+
+    /**
+     * Test that release reports support staff response fields.
+     */
+    public function test_release_report_model_supports_response_fields(): void
+    {
+        $modelPath = app_path('Models/ReleaseReport.php');
+
+        $this->assertFileExists($modelPath);
+
+        $content = file_get_contents($modelPath);
+
+        $this->assertStringContainsString("'response'", $content);
+        $this->assertStringContainsString("'responded_by'", $content);
+        $this->assertStringContainsString("'responded_at'", $content);
+        $this->assertStringContainsString("'response_is_public'", $content);
+        $this->assertStringContainsString('public function responder', $content);
+    }
+
+    /**
+     * Test that the response route and controller method are defined.
+     */
+    public function test_response_route_and_controller_method_are_defined(): void
+    {
+        $routesPath = base_path('routes/web.php');
+        $controllerPath = app_path('Http/Controllers/Admin/AdminReleaseReportController.php');
+
+        $this->assertFileExists($routesPath);
+        $this->assertFileExists($controllerPath);
+
+        $routes = file_get_contents($routesPath);
+        $controller = file_get_contents($controllerPath);
+
+        $this->assertStringContainsString('release-reports/{id}/response', $routes);
+        $this->assertStringContainsString('admin.release-reports.update-response', $routes);
+        $this->assertStringContainsString('public function updateResponse', $controller);
+        $this->assertStringContainsString("'response' => 'nullable|string|max:2000'", $controller);
+        $this->assertStringContainsString('ReleaseBrowseService::bumpCacheVersion();', $controller);
+    }
+
+    /**
+     * Test that the admin release reports view includes response UI.
+     */
+    public function test_admin_view_has_response_ui(): void
+    {
+        $viewPath = resource_path('views/admin/release-reports/index.blade.php');
+        $scriptPath = resource_path('js/alpine/components/release-report.js');
+
+        $this->assertFileExists($viewPath);
+        $this->assertFileExists($scriptPath);
+
+        $view = file_get_contents($viewPath);
+        $script = file_get_contents($scriptPath);
+
+        $this->assertStringContainsString('reportResponseModal', $view);
+        $this->assertStringContainsString('reportResponseForm', $view);
+        $this->assertStringContainsString('response-report-btn', $view);
+        $this->assertStringContainsString('admin.release-reports.update-response', $view);
+        $this->assertStringContainsString('showResponse(', $script);
+        $this->assertStringContainsString('submitResponse()', $script);
+    }
+
+    /**
+     * Test that details and browse views expose public report responses.
+     */
+    public function test_details_and_browse_views_show_report_responses(): void
+    {
+        $detailsControllerPath = app_path('Http/Controllers/DetailsController.php');
+        $detailsViewPath = resource_path('views/details/index.blade.php');
+        $browseViewPath = resource_path('views/browse/index.blade.php');
+        $browseServicePath = app_path('Services/Releases/ReleaseBrowseService.php');
+
+        $this->assertFileExists($detailsControllerPath);
+        $this->assertFileExists($detailsViewPath);
+        $this->assertFileExists($browseViewPath);
+        $this->assertFileExists($browseServicePath);
+
+        $detailsController = file_get_contents($detailsControllerPath);
+        $detailsView = file_get_contents($detailsViewPath);
+        $browseView = file_get_contents($browseViewPath);
+        $browseService = file_get_contents($browseServicePath);
+
+        $this->assertStringContainsString('publicReportResponses', $detailsController);
+        $this->assertStringContainsString("where('response_is_public', true)", $detailsController);
+        $this->assertStringContainsString('Staff response', $detailsView);
+        $this->assertStringContainsString('report_response_count', $browseService);
+        $this->assertStringContainsString('response_is_public = 1', $browseService);
+        $this->assertStringContainsString('Staff response available on release details', $browseView);
     }
 }

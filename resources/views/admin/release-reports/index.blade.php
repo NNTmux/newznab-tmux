@@ -111,6 +111,7 @@
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Release</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Reporter</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Reason</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Response</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
@@ -174,6 +175,24 @@
                                                 title="View description">
                                             <i class="fas fa-comment-dots"></i>
                                         </button>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-4">
+                                    @if($report->response)
+                                        <div class="max-w-xs space-y-1">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $report->response_is_public ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200' }}">
+                                                <i class="fas fa-reply mr-1"></i>
+                                                {{ $report->response_is_public ? 'Public response' : 'Private note' }}
+                                            </span>
+                                            <p class="text-xs text-gray-700 dark:text-gray-300 break-words">{{ Str::limit($report->response, 90) }}</p>
+                                            @if($report->responder && $report->responded_at)
+                                                <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                    by {{ $report->responder->username }} at {{ $report->responded_at->format('M d, Y H:i') }}
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">No response</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap">
@@ -280,10 +299,26 @@
                                                     title="Revert to Reviewed for further action">
                                                 <i class="fas fa-undo mr-1"></i> Revert
                                             </button>
-                                            <span class="text-xs text-gray-500 dark:text-gray-400">{{ ucfirst($report->status) }}</span>
+                                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ $statusColors[$report->status] ?? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200' }}">
+                                                 <i class="fas {{ $statusIcons[$report->status] ?? 'fa-question' }} mr-1"></i>
+                                                 {{ ucfirst($report->status) }}
+                                             </span>
                                         @else
-                                            <span class="text-xs text-gray-500 dark:text-gray-400">{{ ucfirst($report->status) }}</span>
+                                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ $statusColors[$report->status] ?? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200' }}">
+                                                 <i class="fas {{ $statusIcons[$report->status] ?? 'fa-question' }} mr-1"></i>
+                                                 {{ ucfirst($report->status) }}
+                                             </span>
                                         @endif
+
+                                        <button type="button"
+                                                class="response-report-btn px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm inline-flex items-center"
+                                                data-action-url="{{ route('admin.release-reports.update-response', $report->id) }}"
+                                                data-response="{{ e($report->response ?? '') }}"
+                                                data-public="{{ $report->response_is_public ? '1' : '0' }}"
+                                                @click="showResponse($event.currentTarget.dataset.actionUrl, $event.currentTarget.dataset.response, $event.currentTarget.dataset.public === '1')"
+                                                title="{{ $report->response ? 'Edit response' : 'Add response' }}">
+                                            <i class="fas fa-reply mr-1"></i> {{ $report->response ? 'Edit Response' : 'Add Response' }}
+                                        </button>
 
                                         @if($report->release)
                                             <a href="{{ url('/details/' . $report->release->guid) }}"
@@ -366,6 +401,75 @@
                     Close
                 </button>
             </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Report Response Modal -->
+<div id="reportResponseModal"
+     x-cloak
+     x-show="responseModalOpen"
+     @keydown.escape.window="closeResponse()"
+     class="fixed inset-0 z-50 overflow-y-auto">
+    <!-- Backdrop -->
+    <div class="response-modal-backdrop fixed inset-0 transition-opacity bg-gray-500/75 dark:bg-gray-900/75"
+         @click="closeResponse()"></div>
+
+    <!-- Modal panel container -->
+    <div class="fixed inset-0 z-10 overflow-y-auto" @click.self="closeResponse()">
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <!-- Modal Content -->
+            <div class="relative w-full max-w-2xl p-6 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-lg">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    <i class="fas fa-reply text-indigo-500 mr-2"></i>Staff Response
+                </h3>
+                <button type="button" class="response-modal-close text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" @click="closeResponse()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="reportResponseForm" x-ref="responseForm" method="POST" action="" @submit.prevent="submitResponse()">
+                @csrf
+                <div class="space-y-4">
+                    <div>
+                        <label for="reportResponseText" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Response</label>
+                        <textarea id="reportResponseText"
+                                  name="response"
+                                  rows="7"
+                                  maxlength="2000"
+                                  x-model="responseContent"
+                                  class="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500"
+                                  placeholder="Write the staff response shown on the release details page..."></textarea>
+                        <div class="mt-1 flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                            <span>Leave blank and save to clear the response.</span>
+                            <span><span x-text="responseCharCount()"></span>/2000</span>
+                        </div>
+                    </div>
+
+                    <label class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                        <input type="hidden" name="response_is_public" value="0">
+                        <input type="checkbox"
+                               name="response_is_public"
+                               value="1"
+                               x-model="responseIsPublic"
+                               class="mt-1 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500 dark:bg-gray-700">
+                        <span>
+                            Show this response publicly on release details pages and enable the response badge on browse/search results.
+                        </span>
+                    </label>
+                </div>
+
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" class="response-modal-close px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition" @click="closeResponse()">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
+                        <i class="fas fa-save mr-1"></i> Save Response
+                    </button>
+                </div>
+            </form>
             </div>
         </div>
     </div>

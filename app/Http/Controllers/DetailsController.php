@@ -72,11 +72,21 @@ class DetailsController extends BasePageController
         $comments = ReleaseComment::getComments($data['id']);
         $similars = $this->releaseSearchService->searchSimilar($data['id'], $data['searchname'], (array) $this->userdata->categoryexclusions);
         $failed = DnzbFailure::getFailedCount($data['id']);
-        $reportData = ReleaseReport::where('releases_id', $data['id'])
+        $reportData = ReleaseReport::query()
+            ->with('responder')
+            ->where('releases_id', $data['id'])
             ->whereIn('status', ['pending', 'reviewed', 'resolved'])
             ->get();
         $reportCount = $reportData->count();
         $reportReasons = ReleaseReport::reasonKeysToLabels($reportData->pluck('reason')->unique()->implode(', '));
+        $publicReportResponses = ReleaseReport::query()
+            ->with('responder')
+            ->where('releases_id', $data['id'])
+            ->where('response_is_public', true)
+            ->whereNotNull('response')
+            ->where('response', '!=', '')
+            ->orderByDesc('responded_at')
+            ->get();
         $downloadedBy = UserDownload::query()->with('user')->where('releases_id', $data['id'])->get(['users_id']);
 
         $showInfo = '';
@@ -175,6 +185,7 @@ class DetailsController extends BasePageController
             'failed' => $failed,
             'reportCount' => $reportCount,
             'reportReasons' => $reportReasons,
+            'publicReportResponses' => $publicReportResponses,
             'regex' => $releaseRegex,
             'downloadedby' => $downloadedBy,
             'meta_title' => 'View NZB',

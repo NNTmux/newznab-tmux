@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BasePageController;
 use App\Models\Release;
 use App\Models\ReleaseReport;
+use App\Services\Releases\ReleaseBrowseService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -51,8 +52,46 @@ class AdminReleaseReportController extends BasePageController
             'reviewed_by' => Auth::id(),
             'reviewed_at' => now(),
         ]);
+        ReleaseBrowseService::bumpCacheVersion();
 
         return redirect()->back()->with('success', 'Report status updated successfully.');
+    }
+
+    /**
+     * Update the staff response for a report.
+     */
+    public function updateResponse(Request $request, int $id): RedirectResponse
+    {
+        $request->validate([
+            'response' => 'nullable|string|max:2000',
+            'response_is_public' => 'nullable|boolean',
+        ]);
+
+        $report = ReleaseReport::findOrFail($id);
+        $response = trim((string) $request->input('response', ''));
+
+        if ($response === '') {
+            $report->update([
+                'response' => null,
+                'responded_by' => null,
+                'responded_at' => null,
+                'response_is_public' => true,
+            ]);
+
+            ReleaseBrowseService::bumpCacheVersion();
+
+            return redirect()->back()->with('success', 'Report response cleared successfully.');
+        }
+
+        $report->update([
+            'response' => $response,
+            'responded_by' => Auth::id(),
+            'responded_at' => now(),
+            'response_is_public' => $request->boolean('response_is_public'),
+        ]);
+        ReleaseBrowseService::bumpCacheVersion();
+
+        return redirect()->back()->with('success', 'Report response saved successfully.');
     }
 
     /**
@@ -78,6 +117,7 @@ class AdminReleaseReportController extends BasePageController
                     'reviewed_by' => Auth::id(),
                     'reviewed_at' => now(),
                 ]);
+            ReleaseBrowseService::bumpCacheVersion();
 
             return redirect()->back()->with('success', "Release '{$releaseName}' deleted and all related reports resolved.");
         }
@@ -96,6 +136,7 @@ class AdminReleaseReportController extends BasePageController
             'reviewed_by' => Auth::id(),
             'reviewed_at' => now(),
         ]);
+        ReleaseBrowseService::bumpCacheVersion();
 
         return redirect()->back()->with('success', 'Report dismissed successfully.');
     }
@@ -116,6 +157,7 @@ class AdminReleaseReportController extends BasePageController
             'reviewed_by' => Auth::id(),
             'reviewed_at' => now(),
         ]);
+        ReleaseBrowseService::bumpCacheVersion();
 
         return redirect()->back()->with('success', 'Report reverted to reviewed status successfully.');
     }
@@ -178,6 +220,10 @@ class AdminReleaseReportController extends BasePageController
             }
 
             $count++;
+        }
+
+        if ($count > 0) {
+            ReleaseBrowseService::bumpCacheVersion();
         }
 
         $actionLabel = match ($action) {
