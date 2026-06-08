@@ -320,10 +320,17 @@ class AdminReleaseReportControllerTest extends TestCase
         $browseService = file_get_contents($browseServicePath);
 
         $this->assertStringContainsString('publicReportResponses', $detailsController);
+        $this->assertStringContainsString('originalReportData', $detailsController);
+        $this->assertStringContainsString('totalReportCount', $detailsController);
         $this->assertStringContainsString("where('response_is_public', true)", $detailsController);
         $this->assertStringContainsString('Staff response', $detailsView);
+        $this->assertStringContainsString('Original report', $detailsView);
+        $this->assertStringContainsString('total_report_count', $browseService);
+        $this->assertStringContainsString('latest_report_description', $browseService);
+        $this->assertStringContainsString('all_report_reasons', $browseService);
         $this->assertStringContainsString('report_response_count', $browseService);
         $this->assertStringContainsString('response_is_public = 1', $browseService);
+        $this->assertStringContainsString('Original report:', $browseView);
         $this->assertStringContainsString('Staff response available on release details', $browseView);
     }
 }

@@ -79,6 +79,12 @@ class DetailsController extends BasePageController
             ->get();
         $reportCount = $reportData->count();
         $reportReasons = ReleaseReport::reasonKeysToLabels($reportData->pluck('reason')->unique()->implode(', '));
+        $originalReportData = ReleaseReport::query()
+            ->where('releases_id', $data['id'])
+            ->orderByDesc('created_at')
+            ->get();
+        $totalReportCount = $originalReportData->count();
+        $allReportReasons = ReleaseReport::reasonKeysToLabels($originalReportData->pluck('reason')->unique()->implode(', '));
         $publicReportResponses = ReleaseReport::query()
             ->with('responder')
             ->where('releases_id', $data['id'])
@@ -185,6 +191,9 @@ class DetailsController extends BasePageController
             'failed' => $failed,
             'reportCount' => $reportCount,
             'reportReasons' => $reportReasons,
+            'originalReportData' => $originalReportData,
+            'totalReportCount' => $totalReportCount,
+            'allReportReasons' => $allReportReasons,
             'publicReportResponses' => $publicReportResponses,
             'regex' => $releaseRegex,
             'downloadedby' => $downloadedBy,

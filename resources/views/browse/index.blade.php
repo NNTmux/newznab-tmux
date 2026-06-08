@@ -136,10 +136,10 @@
                                         <div class="flex-1">
                                             <div class="flex items-center gap-2 flex-wrap">
                                                 <a href="{{ url('/details/' . $result->guid) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium wrap-break-word break-all">{{ $result->searchname }}</a>
-                                                @if(!empty($result->report_count) && $result->report_count > 0)
+                                                @if(!empty($result->total_report_count) && $result->total_report_count > 0)
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200"
-                                                          title="Reported: {{ \App\Models\ReleaseReport::reasonKeysToLabels($result->report_reasons ?? '') }}">
-                                                        <i class="fas fa-flag mr-1"></i> Reported ({{ $result->report_count }})
+                                                          title="Reported: {{ $result->all_report_reasons ?? 'Unknown' }} | Original report: {{ $result->latest_report_reason ?? 'Unknown' }} - {{ $result->latest_report_description ?? 'No additional report details were provided.' }}">
+                                                        <i class="fas fa-flag mr-1"></i> Reported ({{ $result->total_report_count }})
                                                     </span>
                                                 @endif
                                                  @if(!empty($result->report_response_count) && $result->report_response_count > 0)
@@ -261,7 +261,7 @@
                                                 <i class="fa fa-film"></i>
                                             </a>
                                         @endif
-                                        <x-report-button :release-id="$result->id" variant="icon" />
+                                        <x-report-button :release-id="$result->id" :reported-count="$result->total_report_count ?? 0" variant="icon" />
                                     </div>
                                 </td>
                             </tr>
@@ -290,10 +290,10 @@
                                     {{ $result->searchname }}
                                 </a>
                                  <div class="flex flex-wrap items-center gap-2 mt-2">
-                                     @if(!empty($result->report_count) && $result->report_count > 0)
+                                     @if(!empty($result->total_report_count) && $result->total_report_count > 0)
                                          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200"
-                                               title="Reported: {{ \App\Models\ReleaseReport::reasonKeysToLabels($result->report_reasons ?? '') }}">
-                                             <i class="fas fa-flag mr-1"></i> Reported ({{ $result->report_count }})
+                                               title="Reported: {{ $result->all_report_reasons ?? 'Unknown' }} | Original report: {{ $result->latest_report_reason ?? 'Unknown' }} - {{ $result->latest_report_description ?? 'No additional report details were provided.' }}">
+                                             <i class="fas fa-flag mr-1"></i> Reported ({{ $result->total_report_count }})
                                          </span>
                                      @endif
                                      @if(!empty($result->report_response_count) && $result->report_response_count > 0)
@@ -322,7 +322,7 @@
                                     <a href="#" class="add-to-cart px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition text-sm" data-guid="{{ $result->guid }}" title="Add to Cart">
                                         <i class="icon_cart fa fa-shopping-basket"></i>
                                     </a>
-                                    <x-report-button :release-id="$result->id" variant="icon" />
+                                    <x-report-button :release-id="$result->id" :reported-count="$result->total_report_count ?? 0" variant="icon" />
                                 </div>
                             </div>
                         </div>

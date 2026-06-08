@@ -165,8 +165,12 @@ class ReleaseBrowseService
             $outerSelect = "SELECT r.id, r.searchname, r.guid, r.postdate, r.categories_id, r.size, r.totalpart, r.fromname, r.grabs, r.comments, r.adddate, r.videos_id, r.haspreview, r.jpgstatus, r.nfostatus, r.group_name,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				df.failed AS failed_count,
+        rr.total_report_count AS total_report_count,
 				rr.report_count AS report_count,
 				rr.report_reasons AS report_reasons,
+        rr.all_report_reasons AS all_report_reasons,
+        rr.latest_report_reason AS latest_report_reason,
+        rr.latest_report_description AS latest_report_description,
         rr.response_count AS report_response_count,
         rr.latest_response_at AS latest_report_response_at,
 				rn.releases_id AS nfoid,
@@ -178,7 +182,7 @@ class ReleaseBrowseService
 			LEFT OUTER JOIN video_data re ON re.releases_id = r.id
 			LEFT OUTER JOIN release_nfos rn ON rn.releases_id = r.id
       LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
-      LEFT OUTER JOIN (SELECT releases_id, SUM(CASE WHEN status IN ('pending', 'reviewed', 'resolved') THEN 1 ELSE 0 END) AS report_count, GROUP_CONCAT(DISTINCT CASE WHEN status IN ('pending', 'reviewed', 'resolved') THEN reason ELSE NULL END SEPARATOR ', ') AS report_reasons, SUM(CASE WHEN response IS NOT NULL AND response != '' AND response_is_public = 1 THEN 1 ELSE 0 END) AS response_count, MAX(CASE WHEN response IS NOT NULL AND response != '' AND response_is_public = 1 THEN responded_at ELSE NULL END) AS latest_response_at FROM release_reports GROUP BY releases_id) rr ON rr.releases_id = r.id";
+      LEFT OUTER JOIN (SELECT releases_id, COUNT(*) AS total_report_count, SUM(CASE WHEN status IN ('pending', 'reviewed', 'resolved') THEN 1 ELSE 0 END) AS report_count, GROUP_CONCAT(DISTINCT CASE WHEN status IN ('pending', 'reviewed', 'resolved') THEN reason ELSE NULL END SEPARATOR ', ') AS report_reasons, GROUP_CONCAT(DISTINCT reason SEPARATOR ', ') AS all_report_reasons, SUBSTRING_INDEX(GROUP_CONCAT(reason ORDER BY created_at DESC SEPARATOR ','), ',', 1) AS latest_report_reason, SUBSTRING_INDEX(GROUP_CONCAT(COALESCE(NULLIF(description, ''), 'No additional report details were provided.') ORDER BY created_at DESC SEPARATOR ' || '), ' || ', 1) AS latest_report_description, SUM(CASE WHEN response IS NOT NULL AND response != '' AND response_is_public = 1 THEN 1 ELSE 0 END) AS response_count, MAX(CASE WHEN response IS NOT NULL AND response != '' AND response_is_public = 1 THEN responded_at ELSE NULL END) AS latest_response_at FROM release_reports GROUP BY releases_id) rr ON rr.releases_id = r.id";
             $innerSelect = 'SELECT r.id, r.searchname, r.guid, r.postdate, r.groups_id, r.categories_id, r.size, r.totalpart, r.fromname, r.passwordstatus, r.grabs, r.comments, r.adddate, r.videos_id, r.haspreview, r.jpgstatus, r.nfostatus, g.name AS group_name, r.movieinfo_id';
         }
 

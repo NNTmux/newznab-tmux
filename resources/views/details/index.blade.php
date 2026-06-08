@@ -34,11 +34,11 @@
                         <div class="mb-3">
                             <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2 wrap-break-word break-all">{{ $release->searchname }}</h2>
                             <div class="flex flex-wrap gap-2">
-                                @if(!empty($reportCount) && $reportCount > 0)
+                                @if(!empty($totalReportCount) && $totalReportCount > 0)
                                     <div class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 border border-orange-200 dark:border-orange-800"
-                                         title="Reported: {{ $reportReasons ?? 'Unknown' }}">
+                                         title="Reported: {{ $allReportReasons ?? 'Unknown' }}">
                                         <i class="fas fa-flag mr-2"></i>
-                                        <span>{{ $reportCount }} report{{ $reportCount > 1 ? 's' : '' }}: {{ $reportReasons ?? 'Unknown' }}</span>
+                                        <span>Reported ({{ $totalReportCount }}): {{ $allReportReasons ?? 'Unknown' }}</span>
                                     </div>
                                 @endif
                                 @if(!empty($failed) && $failed > 0)
@@ -68,8 +68,32 @@
                                     </a>
                                 @endif
                             @endauth
-                            <x-report-button :release-id="$release->id" variant="button-lg" />
+                            <x-report-button :release-id="$release->id" :reported-count="$totalReportCount ?? 0" variant="button-lg" />
                         </div>
+                        @if(!empty($originalReportData) && $originalReportData->count() > 0)
+                            <div class="mt-4 rounded-lg border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/20 p-4">
+                                <h3 class="text-sm font-semibold text-orange-800 dark:text-orange-200 mb-3 flex items-center">
+                                    <i class="fas fa-flag mr-2"></i> Original report
+                                </h3>
+                                <div class="space-y-3">
+                                    @foreach($originalReportData as $originalReport)
+                                        <div class="text-sm text-orange-900 dark:text-orange-100">
+                                            <div class="flex flex-wrap items-center gap-2 mb-1">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 border border-orange-200 dark:border-orange-800">
+                                                    {{ $originalReport->reason_label }}
+                                                </span>
+                                                <span class="text-xs text-orange-700 dark:text-orange-300">
+                                                    {{ ucfirst($originalReport->status) }} · Reported {{ $originalReport->created_at->format('M d, Y H:i') }}
+                                                </span>
+                                            </div>
+                                            <div class="whitespace-pre-wrap break-words">
+                                                {{ $originalReport->description ?: 'No additional report details were provided.' }}
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                         @if(!empty($publicReportResponses) && $publicReportResponses->count() > 0)
                             <div class="mt-4 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 p-4">
                                 <h3 class="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-3 flex items-center">
