@@ -57,16 +57,16 @@
         },
         {
             "name": "aimeos/laravel-nestedset",
-            "version": "7.3.1",
+            "version": "7.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aimeos/laravel-nestedset.git",
-                "reference": "05f77e28e52c0ce8ba68422ef4a1c9ba765b70a0"
+                "reference": "910df4c973b28d7fef0ad6d979fbf98e059b760c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aimeos/laravel-nestedset/zipball/05f77e28e52c0ce8ba68422ef4a1c9ba765b70a0",
-                "reference": "05f77e28e52c0ce8ba68422ef4a1c9ba765b70a0",
+                "url": "https://api.github.com/repos/aimeos/laravel-nestedset/zipball/910df4c973b28d7fef0ad6d979fbf98e059b760c",
+                "reference": "910df4c973b28d7fef0ad6d979fbf98e059b760c",
                 "shasum": ""
             },
             "require": {
@@ -118,9 +118,9 @@
             ],
             "support": {
                 "issues": "https://github.com/aimeos/laravel-nestedset/issues",
-                "source": "https://github.com/aimeos/laravel-nestedset/tree/7.3.1"
+                "source": "https://github.com/aimeos/laravel-nestedset/tree/7.3.2"
             },
-            "time": "2026-04-10T10:15:52+00:00"
+            "time": "2026-06-10T12:10:06+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
@@ -8576,16 +8576,16 @@
         },
         {
             "name": "symfony/polyfill-deepclone",
-            "version": "v1.38.2",
+            "version": "v1.39.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-deepclone.git",
-                "reference": "c1b95c370cb2ee4ee221f0a317f5ae5dfae9a42e"
+                "reference": "1b034bc050d84cc9c187de373f744912e1e35f1f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-deepclone/zipball/c1b95c370cb2ee4ee221f0a317f5ae5dfae9a42e",
-                "reference": "c1b95c370cb2ee4ee221f0a317f5ae5dfae9a42e",
+                "url": "https://api.github.com/repos/symfony/polyfill-deepclone/zipball/1b034bc050d84cc9c187de373f744912e1e35f1f",
+                "reference": "1b034bc050d84cc9c187de373f744912e1e35f1f",
                 "shasum": ""
             },
             "require": {
@@ -8639,7 +8639,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-deepclone/tree/v1.38.2"
+                "source": "https://github.com/symfony/polyfill-deepclone/tree/v1.39.0"
             },
             "funding": [
                 {
@@ -8659,7 +8659,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-06-08T20:10:26+00:00"
+            "time": "2026-06-10T20:07:50+00:00"
         },
         {
             "name": "symfony/polyfill-intl-grapheme",
