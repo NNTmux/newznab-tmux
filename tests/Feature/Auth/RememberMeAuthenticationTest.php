@@ -258,4 +258,3 @@ class RememberMeAuthenticationTest extends TestCase
         return $user->fresh();
     }
 }
-

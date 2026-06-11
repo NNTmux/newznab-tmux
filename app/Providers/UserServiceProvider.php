@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Models\User;
-use App\Observers\UserApiCacheObserver;
 use App\Observers\UserActivityObserver;
+use App\Observers\UserApiCacheObserver;
 use App\Observers\UserServiceObserver;
 use Illuminate\Support\ServiceProvider;
 

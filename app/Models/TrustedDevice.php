@@ -100,4 +100,3 @@ class TrustedDevice extends Model
         return hash_hmac('sha256', $plainToken, (string) config('app.key'));
     }
 }
-

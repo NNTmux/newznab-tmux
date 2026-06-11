@@ -27,6 +27,7 @@ class RssController extends BasePageController
 
     /**
      * @return JsonResponse|Response
+     *
      * @throws \Throwable
      */
     public function myMoviesRss(Request $request)
@@ -46,6 +47,7 @@ class RssController extends BasePageController
 
     /**
      * @return JsonResponse|Response
+     *
      * @throws \Throwable
      */
     public function myShowsRss(Request $request)
@@ -66,6 +68,7 @@ class RssController extends BasePageController
 
     /**
      * @return JsonResponse|Response
+     *
      * @throws \Throwable
      */
     public function fullFeedRss(Request $request)
@@ -78,6 +81,7 @@ class RssController extends BasePageController
         [$userShow, $userAnidb, $userAirDate, $userNum, $userLimit, $outputXML] = $this->parseCommonRssParams($request);
 
         $relData = $this->rss->getRss([0], $userShow, $userAnidb, $user['user_id'], $userAirDate, $userLimit, $userNum);
+
         return $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
     }
 
@@ -110,6 +114,7 @@ class RssController extends BasePageController
 
     /**
      * @return JsonResponse|Response
+     *
      * @throws \Throwable
      */
     public function cartRss(Request $request)
@@ -146,6 +151,7 @@ class RssController extends BasePageController
 
     /**
      * @return JsonResponse|Response
+     *
      * @throws \Throwable
      */
     public function categoryFeedRss(Request $request)
@@ -169,6 +175,7 @@ class RssController extends BasePageController
 
     /**
      * @return JsonResponse|Response
+     *
      * @throws \Throwable
      */
     public function trendingMoviesRss(Request $request)
@@ -186,6 +193,7 @@ class RssController extends BasePageController
 
     /**
      * @return JsonResponse|Response
+     *
      * @throws \Throwable
      */
     public function trendingShowsRss(Request $request)

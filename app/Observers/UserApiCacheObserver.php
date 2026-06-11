@@ -47,4 +47,3 @@ class UserApiCacheObserver
         Cache::forget('api_user_stats:'.$user->id);
     }
 }
-

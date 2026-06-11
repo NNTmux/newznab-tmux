@@ -225,6 +225,7 @@ class ApiController extends BasePageController
                         $minSize
                     );
                 }
+
                 return $this->output($relData, $params, $outputXML, $offset, 'api');
                 // Search tv releases.
             case 'tv':
@@ -339,6 +340,7 @@ class ApiController extends BasePageController
                         -1,
                         $minSize
                     );
+
                     return $this->output($relData, $params, $outputXML, $offset, 'api');
                 }
 
@@ -417,6 +419,7 @@ class ApiController extends BasePageController
                         $sort
                     );
                 }
+
                 return $this->output($relData, $params, $outputXML, $offset, 'api');
 
             case 'book':
@@ -465,6 +468,7 @@ class ApiController extends BasePageController
                         $sort
                     );
                 }
+
                 return $this->output($relData, $params, $outputXML, $offset, 'api');
 
             case 'anime':
@@ -494,6 +498,7 @@ class ApiController extends BasePageController
                     $anilist,
                     $sort
                 );
+
                 return $this->output($relData, $params, $outputXML, $offset, 'api');
 
                 // Get NZB.
@@ -632,7 +637,6 @@ class ApiController extends BasePageController
                 }
 
                 return showApiError(603, 'Failed to write file to disk');
-
 
                 // Capabilities request.
             case 'c':

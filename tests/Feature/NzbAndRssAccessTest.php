@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Http\Middleware\TrustedDevice2FAMiddleware;
 use App\Http\Controllers\Api\RSS;
+use App\Http\Middleware\TrustedDevice2FAMiddleware;
 use App\Models\TrustedDevice;
 use App\Models\User;
 use App\View\Composers\GlobalDataComposer;
 use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Http\Request;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -452,7 +452,7 @@ class NzbAndRssAccessTest extends TestCase
         ]);
         $request->setLaravelSession(app('session.store'));
 
-        (new TrustedDevice2FAMiddleware())->handle($request, fn () => response('ok'));
+        (new TrustedDevice2FAMiddleware)->handle($request, fn () => response('ok'));
 
         $this->assertFalse((bool) $request->session()->get('google2fa', false));
     }
@@ -484,7 +484,7 @@ class NzbAndRssAccessTest extends TestCase
         ]);
         $request->setLaravelSession(app('session.store'));
 
-        (new TrustedDevice2FAMiddleware())->handle($request, fn () => response('ok'));
+        (new TrustedDevice2FAMiddleware)->handle($request, fn () => response('ok'));
 
         $this->assertTrue((bool) $request->session()->get('google2fa', false));
     }
