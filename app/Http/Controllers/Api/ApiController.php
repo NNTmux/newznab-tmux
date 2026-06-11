@@ -183,7 +183,10 @@ class ApiController extends BasePageController
         switch ($function) {
             // Search releases.
             case 's':
-                $this->verifyEmptyParameter($request, 'q');
+                $emptyParameterError = $this->verifyEmptyParameter($request, 'q');
+                if ($emptyParameterError !== null) {
+                    return $emptyParameterError;
+                }
                 $maxAge = $this->maxAge($request);
                 if (! is_int($maxAge)) {
                     return $maxAge;
@@ -222,20 +225,15 @@ class ApiController extends BasePageController
                         $minSize
                     );
                 }
-                $this->output($relData, $params, $outputXML, $offset, 'api');
-                break;
+                return $this->output($relData, $params, $outputXML, $offset, 'api');
                 // Search tv releases.
             case 'tv':
-                $this->verifyEmptyParameter($request, 'q');
-                $this->verifyEmptyParameter($request, 'vid');
-                $this->verifyEmptyParameter($request, 'tvdbid');
-                $this->verifyEmptyParameter($request, 'traktid');
-                $this->verifyEmptyParameter($request, 'rid');
-                $this->verifyEmptyParameter($request, 'tvmazeid');
-                $this->verifyEmptyParameter($request, 'imdbid');
-                $this->verifyEmptyParameter($request, 'tmdbid');
-                $this->verifyEmptyParameter($request, 'season');
-                $this->verifyEmptyParameter($request, 'ep');
+                foreach (['q', 'vid', 'tvdbid', 'traktid', 'rid', 'tvmazeid', 'imdbid', 'tmdbid', 'season', 'ep'] as $parameter) {
+                    $emptyParameterError = $this->verifyEmptyParameter($request, $parameter);
+                    if ($emptyParameterError !== null) {
+                        return $emptyParameterError;
+                    }
+                }
                 $maxAge = $this->maxAge($request);
                 if (! is_int($maxAge)) {
                     return $maxAge;
@@ -265,8 +263,7 @@ class ApiController extends BasePageController
                         $minSize
                     );
 
-                    $this->output($relData, $params, $outputXML, $offset, 'api');
-                    break;
+                    return $this->output($relData, $params, $outputXML, $offset, 'api');
                 }
 
                 $siteIdArr = [
@@ -304,15 +301,16 @@ class ApiController extends BasePageController
                     $sort
                 );
 
-                $this->output($relData, $params, $outputXML, $offset, 'api');
-                break;
+                return $this->output($relData, $params, $outputXML, $offset, 'api');
 
                 // Search movie releases.
             case 'm':
-                $this->verifyEmptyParameter($request, 'q');
-                $this->verifyEmptyParameter($request, 'imdbid');
-                $this->verifyEmptyParameter($request, 'tmdbid');
-                $this->verifyEmptyParameter($request, 'traktid');
+                foreach (['q', 'imdbid', 'tmdbid', 'traktid'] as $parameter) {
+                    $emptyParameterError = $this->verifyEmptyParameter($request, $parameter);
+                    if ($emptyParameterError !== null) {
+                        return $emptyParameterError;
+                    }
+                }
                 $maxAge = $this->maxAge($request);
                 if (! is_int($maxAge)) {
                     return $maxAge;
@@ -341,8 +339,7 @@ class ApiController extends BasePageController
                         -1,
                         $minSize
                     );
-                    $this->output($relData, $params, $outputXML, $offset, 'api');
-                    break;
+                    return $this->output($relData, $params, $outputXML, $offset, 'api');
                 }
 
                 $imdbId = $request->has('imdbid') && $request->filled('imdbid')
@@ -372,8 +369,7 @@ class ApiController extends BasePageController
                     }
                 );
 
-                $this->output($relData, $params, $outputXML, $offset, 'api');
-                break;
+                return $this->output($relData, $params, $outputXML, $offset, 'api');
 
             case 'music':
                 if ($request->has('q') && ! $request->filled('q')) {
@@ -421,8 +417,7 @@ class ApiController extends BasePageController
                         $sort
                     );
                 }
-                $this->output($relData, $params, $outputXML, $offset, 'api');
-                break;
+                return $this->output($relData, $params, $outputXML, $offset, 'api');
 
             case 'book':
                 if ($request->has('q') && ! $request->filled('q')) {
@@ -470,8 +465,7 @@ class ApiController extends BasePageController
                         $sort
                     );
                 }
-                $this->output($relData, $params, $outputXML, $offset, 'api');
-                break;
+                return $this->output($relData, $params, $outputXML, $offset, 'api');
 
             case 'anime':
                 $q = (string) ($request->input('q') ?? '');
@@ -500,16 +494,18 @@ class ApiController extends BasePageController
                     $anilist,
                     $sort
                 );
-                $this->output($relData, $params, $outputXML, $offset, 'api');
-                break;
+                return $this->output($relData, $params, $outputXML, $offset, 'api');
 
                 // Get NZB.
             case 'g':
-                $this->verifyEmptyParameter($request, 'g');
+                $emptyParameterError = $this->verifyEmptyParameter($request, 'g');
+                if ($emptyParameterError !== null) {
+                    return $emptyParameterError;
+                }
                 UserRequest::addApiRequest($uid, $request->getRequestUri());
                 $relData = Release::checkGuidForApi($request->input('id'));
                 if ($relData) {
-                    return redirect(url('/getnzb?r='.$apiKey.'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : '')));
+                    return redirect(url('/getnzb?r='.rawurlencode((string) $apiKey).'&id='.rawurlencode((string) $request->input('id')).(($request->has('del') && $request->input('del') === '1') ? '&del=1' : '')));
                 }
 
                 return showApiError(300, 'No such item (the guid you provided has no release in our database)');
@@ -523,8 +519,7 @@ class ApiController extends BasePageController
                 UserRequest::addApiRequest($uid, $request->getRequestUri());
                 $data = Release::getByGuidForApi($request->input('id'));
 
-                $this->output($data, $params, $outputXML, $offset, 'api');
-                break;
+                return $this->output($data, $params, $outputXML, $offset, 'api');
 
                 // Get an NFO file for an individual release.
             case 'n':
@@ -638,19 +633,17 @@ class ApiController extends BasePageController
 
                 return showApiError(603, 'Failed to write file to disk');
 
-                break;
 
                 // Capabilities request.
             case 'c':
-                $this->output([], $params, $outputXML, $offset, 'caps');
-                break;
+                return $this->output([], $params, $outputXML, $offset, 'caps');
         }
     }
 
     /**
      * @param  array<string, mixed>  $params
      * @param  array<string, string>  $headers
-     * @return Response|void
+     * @return Response
      *
      * @throws \Exception
      */
@@ -668,29 +661,24 @@ class ApiController extends BasePageController
         $xmlResponse = new XML_Response($options);
 
         if ($xml) {
-            // Generate XML response
             $response = $xmlResponse->returnXML();
-            header('Content-type: text/xml');
+            $contentType = 'text/xml';
         } else {
-            // Build JSON directly from array (avoids expensive XML->xml_to_array->json_encode path)
             $arrayData = $xmlResponse->returnArray();
             if ($arrayData === false) {
                 return showApiError(201);
             }
             $response = json_encode($arrayData, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
-            header('Content-type: application/json');
+            $contentType = 'application/json';
         }
         if ($response === false) {
             return showApiError(201);
-        } else {
-            foreach ($headers as $name => $value) {
-                header($name.': '.$value);
-            }
-
-            header('Content-Length: '.\strlen($response));
-            echo $response;
-            exit;
         }
+
+        return response($response, 200, array_merge([
+            'Content-type' => $contentType,
+            'Content-Length' => (string) \strlen($response),
+        ], $headers));
     }
 
     /**

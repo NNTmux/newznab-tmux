@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\TrustedDevice2FAMiddleware;
+use App\Http\Controllers\Api\RSS;
+use App\Models\TrustedDevice;
 use App\Models\User;
 use App\View\Composers\GlobalDataComposer;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Http\Request;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -269,6 +274,47 @@ class NzbAndRssAccessTest extends TestCase
         $response->assertDontSee('<title>Login', false);
     }
 
+    public function test_authenticated_rss_feed_returns_output_response_body(): void
+    {
+        DB::table('roles')->insert([
+            'id' => 1,
+            'name' => 'User',
+            'guard_name' => 'web',
+            'apirequests' => 100,
+            'downloadrequests' => 10,
+        ]);
+
+        DB::table('users')->insert([
+            'username' => 'valid-rss-user',
+            'email' => 'valid-rss@example.test',
+            'password' => 'secret',
+            'roles_id' => 1,
+            'api_token' => 'valid-rss-token',
+            'rate_limit' => 60,
+            'verified' => 1,
+            'email_verified_at' => now(),
+        ]);
+
+        $this->app->instance(RSS::class, new class extends RSS
+        {
+            public function __construct() {}
+
+            public function getRss(mixed $cat, mixed $videosId, mixed $aniDbID, int $userID = 0, int $airDate = -1, int $limit = 100, int $offset = 0)
+            {
+                return [];
+            }
+
+            public function output(mixed $data, array $params, bool $xml, int $offset, string $type = '', array $headers = [])
+            {
+                return response('<rss>ok</rss>', 200, array_merge(['Content-type' => 'text/xml'], $headers));
+            }
+        });
+
+        $this->get('/rss/full-feed?api_token=valid-rss-token')
+            ->assertOk()
+            ->assertSee('<rss>ok</rss>', false);
+    }
+
     public function test_contact_form_is_publicly_accessible_to_guests(): void
     {
         $response = $this->get('/contact-us');
@@ -348,6 +394,101 @@ class NzbAndRssAccessTest extends TestCase
             ->assertJsonPath('error', 'Request limit reached');
     }
 
+    public function test_api_v2_enforces_daily_role_request_quota(): void
+    {
+        DB::table('roles')->insert([
+            'id' => 10,
+            'name' => 'Limited',
+            'guard_name' => 'web',
+            'apirequests' => 1,
+            'downloadrequests' => 10,
+        ]);
+
+        $userId = DB::table('users')->insertGetId([
+            'username' => 'quota-v2-user',
+            'email' => 'quota-v2@example.test',
+            'password' => 'secret',
+            'roles_id' => 10,
+            'api_token' => 'quota-v2-token',
+            'rate_limit' => 60,
+            'verified' => 1,
+            'email_verified_at' => now(),
+        ]);
+
+        DB::table('user_requests')->insert([
+            ['users_id' => $userId, 'request' => '/api/v2/search?api_token=quota-v2-token&id=one', 'timestamp' => now()->subMinutes(10)],
+            ['users_id' => $userId, 'request' => '/api/v2/search?api_token=quota-v2-token&id=two', 'timestamp' => now()->subMinutes(5)],
+        ]);
+
+        $this->getJson('/api/v2/search?api_token=quota-v2-token&id=test')
+            ->assertStatus(429)
+            ->assertHeader('X-NNTmux', 'API ERROR [500] Request limit reached')
+            ->assertJsonPath('error', 'Request limit reached');
+    }
+
+    public function test_forged_trusted_device_cookie_does_not_pass_2fa_without_stored_token(): void
+    {
+        config(['google2fa.session_var' => 'google2fa']);
+
+        $userId = DB::table('users')->insertGetId([
+            'username' => 'forged-2fa-cookie-user',
+            'email' => 'forged-2fa-cookie@example.test',
+            'password' => 'secret',
+            'api_token' => 'forged-2fa-cookie-token',
+            'verified' => 1,
+            'email_verified_at' => now(),
+        ]);
+        $user = User::query()->findOrFail($userId);
+        Auth::login($user);
+
+        $forgedCookie = json_encode([
+            'user_id' => $user->id,
+            'token' => 'client-forged-token-only',
+            'expires_at' => time() + 3600,
+        ], JSON_THROW_ON_ERROR);
+
+        $request = Request::create('/trusted-device-check', 'GET', [], [
+            '2fa_trusted_device' => $forgedCookie,
+        ]);
+        $request->setLaravelSession(app('session.store'));
+
+        (new TrustedDevice2FAMiddleware())->handle($request, fn () => response('ok'));
+
+        $this->assertFalse((bool) $request->session()->get('google2fa', false));
+    }
+
+    public function test_stored_trusted_device_cookie_passes_2fa(): void
+    {
+        config(['google2fa.session_var' => 'google2fa']);
+
+        $userId = DB::table('users')->insertGetId([
+            'username' => 'stored-2fa-cookie-user',
+            'email' => 'stored-2fa-cookie@example.test',
+            'password' => 'secret',
+            'api_token' => 'stored-2fa-cookie-token',
+            'verified' => 1,
+            'email_verified_at' => now(),
+        ]);
+        $user = User::query()->findOrFail($userId);
+        Auth::login($user);
+
+        $trustedDevice = TrustedDevice::issueForUser($user, '127.0.0.1', 'Feature Test');
+        $cookieValue = json_encode([
+            'user_id' => $user->id,
+            'token' => $trustedDevice['plain'],
+            'expires_at' => $trustedDevice['device']->expires_at->getTimestamp(),
+        ], JSON_THROW_ON_ERROR);
+
+        $request = Request::create('/trusted-device-check', 'GET', [], [
+            '2fa_trusted_device' => $cookieValue,
+        ]);
+        $request->setLaravelSession(app('session.store'));
+
+        (new TrustedDevice2FAMiddleware())->handle($request, fn () => response('ok'));
+
+        $this->assertTrue((bool) $request->session()->get('google2fa', false));
+    }
+
     private function setEnvironmentValue(string $key, ?string $value): void
     {
         if ($value === null) {
@@ -390,9 +531,62 @@ class NzbAndRssAccessTest extends TestCase
                 $table->string('api_token')->nullable()->index();
                 $table->integer('rate_limit')->default(60);
                 $table->boolean('verified')->default(true);
+                $table->timestamp('apiaccess')->nullable();
+                $table->string('host')->nullable();
                 $table->timestamp('email_verified_at')->nullable();
                 $table->timestamps();
                 $table->softDeletes();
+            });
+        }
+
+        if (! Schema::hasTable('roles')) {
+            Schema::create('roles', function (Blueprint $table): void {
+                $table->increments('id');
+                $table->string('name');
+                $table->string('guard_name')->default('web');
+                $table->integer('apirequests')->default(0);
+                $table->integer('downloadrequests')->default(0);
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable('model_has_roles')) {
+            Schema::create('model_has_roles', function (Blueprint $table): void {
+                $table->unsignedInteger('role_id');
+                $table->string('model_type');
+                $table->unsignedInteger('model_id');
+
+                $table->primary(['role_id', 'model_id', 'model_type']);
+            });
+        }
+
+        if (! Schema::hasTable('user_requests')) {
+            Schema::create('user_requests', function (Blueprint $table): void {
+                $table->increments('id');
+                $table->unsignedInteger('users_id');
+                $table->text('request')->nullable();
+                $table->timestamp('timestamp')->nullable();
+            });
+        }
+
+        if (! Schema::hasTable('user_downloads')) {
+            Schema::create('user_downloads', function (Blueprint $table): void {
+                $table->increments('id');
+                $table->unsignedInteger('users_id');
+                $table->timestamp('timestamp')->nullable();
+            });
+        }
+
+        if (! Schema::hasTable('trusted_devices')) {
+            Schema::create('trusted_devices', function (Blueprint $table): void {
+                $table->id();
+                $table->unsignedInteger('user_id');
+                $table->string('token_hash', 64)->unique();
+                $table->timestamp('expires_at');
+                $table->timestamp('last_used_at')->nullable();
+                $table->string('ip_address', 45)->nullable();
+                $table->string('user_agent', 500)->nullable();
+                $table->timestamps();
             });
         }
     }

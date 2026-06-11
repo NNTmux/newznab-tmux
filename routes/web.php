@@ -103,14 +103,16 @@ Route::get('email/verify', [EmailVerificationController::class, 'show'])->middle
 Route::post('email/verification-notification', [EmailVerificationController::class, 'resend'])->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 Route::get('email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
 
-Route::match(['GET', 'POST'], 'forgottenpassword', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('forgottenpassword')->withoutMiddleware(['auth']);
-Route::match(['GET', 'POST'], 'password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request')->withoutMiddleware(['auth']);
+Route::get('forgottenpassword', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('forgottenpassword')->withoutMiddleware(['auth']);
+Route::post('forgottenpassword', [ForgotPasswordController::class, 'showLinkRequestForm'])->middleware('throttle:6,1')->withoutMiddleware(['auth']);
+Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request')->withoutMiddleware(['auth']);
+Route::post('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->middleware('throttle:6,1')->withoutMiddleware(['auth']);
 Route::match(['GET', 'POST'], 'terms-and-conditions', [TermsController::class, 'terms'])->name('terms-and-conditions');
 Route::match(['GET', 'POST'], 'privacy-policy', [PrivacyPolicyController::class, 'privacyPolicy'])->name('privacy-policy');
 
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login'])->name('login.post');
-Route::match(['GET', 'POST'], 'logout', [LoginController::class, 'logout'])->name('logout');
+Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('passkeys/authentication-options', GeneratePasskeyAuthenticationOptionsController::class)
     ->name('passkeys.authentication_options');
 Route::post('passkeys/authenticate', PasskeyLoginController::class)->name('passkeys.login');

@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace Tests\Feature\Auth;
 
 use App\Events\UserLoggedIn;
-use App\Http\Middleware\Google2FAMiddleware;
+use App\Models\PasswordSecurity;
 use App\Models\User;
+use App\Services\PasswordBreachService;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
-use Spatie\LaravelPasskeys\Actions\FindPasskeyToAuthenticateAction;
-use Spatie\LaravelPasskeys\Models\Passkey;
+use PragmaRX\Google2FALaravel\Facade as Google2FA;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
-class PasskeyAuthenticationTest extends TestCase
+class RememberMeAuthenticationTest extends TestCase
 {
     protected function setUp(): void
     {
@@ -29,6 +29,7 @@ class PasskeyAuthenticationTest extends TestCase
             'database.connections.sqlite.database' => ':memory:',
             'app.key' => 'base64:'.base64_encode(random_bytes(32)),
             'session.driver' => 'array',
+            'google2fa.session_var' => 'google2fa',
         ]);
 
         DB::purge();
@@ -37,112 +38,108 @@ class PasskeyAuthenticationTest extends TestCase
         $this->createSchema();
         $this->seedSettings();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
-        $this->withoutMiddleware(Google2FAMiddleware::class);
+        $this->app->instance(PasswordBreachService::class, new class extends PasswordBreachService
+        {
+            public function isPasswordBreached(string $password): bool
+            {
+                return false;
+            }
+        });
     }
 
-    public function test_passkey_authentication_logs_user_in_and_sets_2fa_session_flag(): void
+    public function test_password_login_with_remember_me_queues_recaller_cookie(): void
     {
         Event::fake([UserLoggedIn::class]);
-        $user = $this->createUser('passkey-user@example.test');
+        $user = $this->createUser('remember-password@example.test');
 
-        $passkey = new Passkey;
-        $passkey->setRawAttributes([
-            'id' => 1,
-            'authenticatable_id' => $user->id,
-            'name' => 'Laptop',
-            'credential_id' => 'credential-1',
-            'data' => '{}',
-        ], true);
-        $passkey->setRelation('authenticatable', $user);
-
-        FakeFindPasskeyAction::$passkey = $passkey;
-        config()->set('passkeys.actions.find_passkey', FakeFindPasskeyAction::class);
-
-        $response = $this
-            ->withSession(['passkey-authentication-options' => '{}'])
-            ->post(route('passkeys.login'), [
-                'start_authentication_response' => json_encode(['id' => 'credential-1'], JSON_THROW_ON_ERROR),
-                'remember' => false,
-            ]);
+        $response = $this->post(route('login'), [
+            'username' => $user->email,
+            'password' => 'password',
+            'rememberme' => 'on',
+        ]);
 
         $response->assertRedirect('/');
-        $response->assertCookieMissing(Auth::guard()->getRecallerName());
+        $response->assertCookie($this->recallerCookieName());
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_password_login_without_remember_me_does_not_queue_recaller_cookie(): void
+    {
+        Event::fake([UserLoggedIn::class]);
+        $user = $this->createUser('session-password@example.test');
+
+        $response = $this->post(route('login'), [
+            'username' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect('/');
+        $response->assertCookieMissing($this->recallerCookieName());
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_two_factor_login_preserves_remember_me_until_otp_success(): void
+    {
+        Event::fake([UserLoggedIn::class]);
+        $user = $this->createUser('remember-2fa@example.test');
+        $secret = Google2FA::generateSecretKey();
+        PasswordSecurity::query()->create([
+            'user_id' => $user->id,
+            'google2fa_enable' => 1,
+            'google2fa_secret' => $secret,
+        ]);
+
+        $loginResponse = $this->post(route('login'), [
+            'username' => $user->email,
+            'password' => 'password',
+            'rememberme' => 'on',
+        ]);
+
+        $loginResponse->assertRedirect(route('2fa.verify'));
+        $loginResponse->assertCookieMissing($this->recallerCookieName());
+        $this->assertGuest();
+        $this->assertTrue((bool) session('2fa:remember'));
+        $this->assertSame($user->id, session('2fa:user:id'));
+
+        $verifyResponse = $this->post(route('2fa.post'), [
+            'one_time_password' => Google2FA::getCurrentOtp($secret),
+        ]);
+
+        $verifyResponse->assertRedirect('/');
+        $verifyResponse->assertCookie($this->recallerCookieName());
         $this->assertAuthenticatedAs($user);
         $this->assertTrue((bool) session(config('google2fa.session_var')));
-        Event::assertDispatched(UserLoggedIn::class);
+        $this->assertNull(session('2fa:remember'));
     }
 
-    public function test_passkey_authentication_with_remember_sets_remember_token(): void
+    public function test_two_factor_login_without_remember_me_does_not_queue_recaller_cookie_after_otp_success(): void
     {
         Event::fake([UserLoggedIn::class]);
-        $user = $this->createUser('passkey-remember@example.test');
+        $user = $this->createUser('session-2fa@example.test');
+        $secret = Google2FA::generateSecretKey();
+        PasswordSecurity::query()->create([
+            'user_id' => $user->id,
+            'google2fa_enable' => 1,
+            'google2fa_secret' => $secret,
+        ]);
 
-        $passkey = new Passkey;
-        $passkey->setRawAttributes([
-            'id' => 3,
-            'authenticatable_id' => $user->id,
-            'name' => 'Desktop',
-            'credential_id' => 'credential-3',
-            'data' => '{}',
-        ], true);
-        $passkey->setRelation('authenticatable', $user);
+        $this->post(route('login'), [
+            'username' => $user->email,
+            'password' => 'password',
+        ])->assertRedirect(route('2fa.verify'));
 
-        FakeFindPasskeyAction::$passkey = $passkey;
-        config()->set('passkeys.actions.find_passkey', FakeFindPasskeyAction::class);
+        $verifyResponse = $this->post(route('2fa.post'), [
+            'one_time_password' => Google2FA::getCurrentOtp($secret),
+        ]);
 
-        $response = $this
-            ->withSession(['passkey-authentication-options' => '{}'])
-            ->post(route('passkeys.login'), [
-                'start_authentication_response' => json_encode(['id' => 'credential-3'], JSON_THROW_ON_ERROR),
-                'remember' => true,
-            ]);
-
-        $response->assertRedirect('/');
-        $response->assertCookie(Auth::guard()->getRecallerName());
+        $verifyResponse->assertRedirect('/');
+        $verifyResponse->assertCookieMissing($this->recallerCookieName());
         $this->assertAuthenticatedAs($user);
-        $this->assertNotNull($user->fresh()?->remember_token);
     }
 
-    public function test_unverified_users_cannot_authenticate_with_passkeys(): void
+    private function recallerCookieName(): string
     {
-        $user = $this->createUser('unverified@example.test', false);
-        $passkey = new Passkey;
-        $passkey->setRawAttributes([
-            'id' => 2,
-            'authenticatable_id' => $user->id,
-            'name' => 'Phone',
-            'credential_id' => 'credential-2',
-            'data' => '{}',
-        ], true);
-        $passkey->setRelation('authenticatable', $user);
-
-        FakeFindPasskeyAction::$passkey = $passkey;
-        config()->set('passkeys.actions.find_passkey', FakeFindPasskeyAction::class);
-
-        $response = $this
-            ->from(route('login'))
-            ->withSession(['passkey-authentication-options' => '{}'])
-            ->post(route('passkeys.login'), [
-                'start_authentication_response' => json_encode(['id' => 'credential-2'], JSON_THROW_ON_ERROR),
-            ]);
-
-        $response->assertRedirect(route('login'));
-        $this->assertGuest();
-        $this->assertSame('You have not verified your email address!', session('authenticatePasskey::message'));
-    }
-
-    public function test_passkey_authentication_without_session_options_redirects_with_message(): void
-    {
-        $response = $this
-            ->from(route('login'))
-            ->post(route('passkeys.login'), [
-                'start_authentication_response' => json_encode(['id' => 'credential-x'], JSON_THROW_ON_ERROR),
-            ]);
-
-        $response->assertRedirect(route('login'));
-        $this->assertGuest();
-        $this->assertSame('missing_auth_options', session('authenticatePasskey::reason'));
-        $this->assertStringContainsString('expired', (string) session('authenticatePasskey::message'));
+        return Auth::guard()->getRecallerName();
     }
 
     protected function createSchema(): void
@@ -181,10 +178,19 @@ class PasskeyAuthenticationTest extends TestCase
             $table->boolean('can_post')->default(true);
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('lastlogin')->nullable();
+            $table->string('host')->nullable();
             $table->rememberToken();
             $table->string('session_token', 60)->nullable();
             $table->timestamps();
             $table->softDeletes();
+        });
+
+        Schema::create('password_securities', function (Blueprint $table): void {
+            $table->id();
+            $table->unsignedInteger('user_id');
+            $table->boolean('google2fa_enable')->default(false);
+            $table->string('google2fa_secret')->nullable();
+            $table->timestamps();
         });
 
         Schema::create('model_has_roles', function (Blueprint $table): void {
@@ -216,16 +222,6 @@ class PasskeyAuthenticationTest extends TestCase
             $table->json('metadata')->nullable();
             $table->timestamp('created_at')->nullable();
         });
-
-        Schema::create('passkeys', function (Blueprint $table): void {
-            $table->id();
-            $table->unsignedInteger('authenticatable_id');
-            $table->text('name');
-            $table->text('credential_id');
-            $table->json('data');
-            $table->timestamp('last_used_at')->nullable();
-            $table->timestamps();
-        });
     }
 
     protected function seedSettings(): void
@@ -238,7 +234,7 @@ class PasskeyAuthenticationTest extends TestCase
         ]);
     }
 
-    protected function createUser(string $email, bool $verified = true): User
+    protected function createUser(string $email): User
     {
         $role = Role::query()->firstOrCreate(
             ['name' => 'User', 'guard_name' => 'web'],
@@ -252,8 +248,8 @@ class PasskeyAuthenticationTest extends TestCase
             'roles_id' => $role->id,
             'rate_limit' => 60,
             'api_token' => md5($email),
-            'verified' => $verified,
-            'email_verified_at' => $verified ? now() : null,
+            'verified' => true,
+            'email_verified_at' => now(),
             'lastlogin' => now(),
         ]);
 
@@ -263,12 +259,3 @@ class PasskeyAuthenticationTest extends TestCase
     }
 }
 
-class FakeFindPasskeyAction extends FindPasskeyToAuthenticateAction
-{
-    public static ?Passkey $passkey = null;
-
-    public function execute(string $publicKeyCredentialJson, string $passkeyOptionsJson): ?Passkey
-    {
-        return self::$passkey;
-    }
-}

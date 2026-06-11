@@ -65,6 +65,7 @@ class ApiV2Controller extends BasePageController
         $user = Cache::remember($userCacheKey, 300, function () use ($apiToken) {
             return User::query()
                 ->whereApiToken((string) $apiToken)
+                ->with('role')
                 ->first();
         });
 
@@ -77,6 +78,13 @@ class ApiV2Controller extends BasePageController
         }
 
         $user->loadMissing('role');
+
+        $userStats = $this->api->getCachedUserStats($user->id);
+        $thisRequests = (int) ($userStats->api_count ?? 0);
+        $maxRequests = (int) $user->role->apirequests;
+        if ($thisRequests > $maxRequests) {
+            return apiJsonError(500, 'Request limit reached');
+        }
 
         return $user;
     }
@@ -605,7 +613,7 @@ class ApiV2Controller extends BasePageController
         UserRequest::addApiRequest($user->id, $request->getRequestUri());
         $relData = Release::checkGuidForApi($request->input('id'));
         if ($relData) {
-            return redirect('/getnzb?r='.$request->input('api_token').'&id='.$request->input('id').(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
+            return redirect('/getnzb?r='.rawurlencode((string) $request->input('api_token')).'&id='.rawurlencode((string) $request->input('id')).(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
         }
 
         return response()->json(['data' => 'No such item (the guid you provided has no release in our database)'], 404);

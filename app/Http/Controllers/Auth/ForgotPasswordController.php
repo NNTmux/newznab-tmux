@@ -67,22 +67,17 @@ class ForgotPasswordController extends Controller
             }
         }
 
-        // Check users exists and send an email
+        // Check whether the user exists, but always return the same success message
+        // to avoid account/API-key enumeration.
         $ret = ! empty($rssToken) ? User::findByRssToken($rssToken) : User::findByEmail($email);
         if ($ret === null) {
-            return redirect()
-                ->route('forgottenpassword')
-                ->withErrors(['error' => 'The email or apikey are not recognised.'])
-                ->withInput($request->except(CaptchaHelper::getResponseFieldName()));
+            return redirect()->route('forgottenpassword')->with('success', 'Password reset email has been sent!');
         }
 
         // Check if user is soft deleted
         $user = User::withTrashed()->find($ret['id']);
         if ($user && $user->trashed()) {
-            return redirect()
-                ->route('forgottenpassword')
-                ->withErrors(['error' => 'This account has been deactivated.'])
-                ->withInput($request->except(CaptchaHelper::getResponseFieldName()));
+            return redirect()->route('forgottenpassword')->with('success', 'Password reset email has been sent!');
         }
 
         // Generate a forgottenpassword guid, store it in the user table

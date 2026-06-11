@@ -12,7 +12,7 @@ use App\Models\UserDownload;
 use App\Models\UserRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
+use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 
 class RssController extends BasePageController
@@ -26,8 +26,7 @@ class RssController extends BasePageController
     }
 
     /**
-     * @return JsonResponse|void
-     *
+     * @return JsonResponse|Response
      * @throws \Throwable
      */
     public function myMoviesRss(Request $request)
@@ -41,12 +40,12 @@ class RssController extends BasePageController
         $userNum = $request->has('num') && is_numeric($request->input('num')) ? abs((int) $request->input('num')) : 0;
 
         $relData = $this->rss->getMyMoviesRss($userNum, $user['user_id'], User::getCategoryExclusionById($user['user_id']));
-        $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
+
+        return $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
     }
 
     /**
-     * @return JsonResponse|void
-     *
+     * @return JsonResponse|Response
      * @throws \Throwable
      */
     public function myShowsRss(Request $request)
@@ -61,12 +60,12 @@ class RssController extends BasePageController
         $outputXML = ! ($request->has('o') && $request->input('o') === 'json');
 
         $relData = $this->rss->getShowsRss($userNum, $user['user_id'], User::getCategoryExclusionById($user['user_id']), $userAirDate);
-        $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
+
+        return $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
     }
 
     /**
-     * @return JsonResponse|void
-     *
+     * @return JsonResponse|Response
      * @throws \Throwable
      */
     public function fullFeedRss(Request $request)
@@ -78,8 +77,8 @@ class RssController extends BasePageController
 
         [$userShow, $userAnidb, $userAirDate, $userNum, $userLimit, $outputXML] = $this->parseCommonRssParams($request);
 
-        $relData = $this->rss->getRss(Arr::wrap(0), $userShow, $userAnidb, $user['user_id'], $userAirDate, $userLimit, $userNum);
-        $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
+        $relData = $this->rss->getRss([0], $userShow, $userAnidb, $user['user_id'], $userAirDate, $userLimit, $userNum);
+        return $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
     }
 
     /**
@@ -110,8 +109,7 @@ class RssController extends BasePageController
     }
 
     /**
-     * @return JsonResponse|void
-     *
+     * @return JsonResponse|Response
      * @throws \Throwable
      */
     public function cartRss(Request $request)
@@ -126,7 +124,8 @@ class RssController extends BasePageController
         [$userShow, $userAnidb, $userAirDate, $userNum, $userLimit, $outputXML] = $this->parseCommonRssParams($request);
 
         $relData = $this->rss->getRss([-2], $userShow, $userAnidb, $user['user_id'], $userAirDate, $userLimit, $userNum);
-        $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss', $this->cartRssNoCacheHeaders());
+
+        return $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss', $this->cartRssNoCacheHeaders());
     }
 
     /**
@@ -146,8 +145,7 @@ class RssController extends BasePageController
     }
 
     /**
-     * @return JsonResponse|void
-     *
+     * @return JsonResponse|Response
      * @throws \Throwable
      */
     public function categoryFeedRss(Request $request)
@@ -165,12 +163,12 @@ class RssController extends BasePageController
         [$userShow, $userAnidb, $userAirDate, $userNum, $userLimit, $outputXML] = $this->parseCommonRssParams($request);
 
         $relData = $this->rss->getRss($categoryId, $userShow, $userAnidb, $user['user_id'], $userAirDate, $userLimit, $userNum);
-        $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
+
+        return $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
     }
 
     /**
-     * @return JsonResponse|void
-     *
+     * @return JsonResponse|Response
      * @throws \Throwable
      */
     public function trendingMoviesRss(Request $request)
@@ -182,12 +180,12 @@ class RssController extends BasePageController
 
         $outputXML = ! ($request->has('o') && $request->input('o') === 'json');
         $relData = $this->rss->getTrendingMoviesRss();
-        $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
+
+        return $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
     }
 
     /**
-     * @return JsonResponse|void
-     *
+     * @return JsonResponse|Response
      * @throws \Throwable
      */
     public function trendingShowsRss(Request $request)
@@ -199,7 +197,8 @@ class RssController extends BasePageController
 
         $outputXML = ! ($request->has('o') && $request->input('o') === 'json');
         $relData = $this->rss->getTrendingShowsRss();
-        $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
+
+        return $this->rss->output($relData, $user['params'], $outputXML, 0, 'rss');
     }
 
     /**

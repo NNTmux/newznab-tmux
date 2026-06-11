@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Auth;
 use App\Events\UserLoggedIn;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginLoginRequest;
+use App\Models\TrustedDevice;
 use App\Models\User;
 use App\Services\PasswordBreachService;
 use App\Support\Auth\AuthenticatesUsers;
@@ -45,6 +46,8 @@ class LoginController extends Controller
      * Where to redirect users after login.
      */
     protected string $redirectTo = '/';
+
+    private const string GENERIC_LOGIN_FAILURE = 'Username or email and password combination used does not match our records!';
 
     /**
      * Get the login username to be used (form field name; value may be email or username).
@@ -88,110 +91,70 @@ class LoginController extends Controller
         }
 
         if ($validator->passes()) {
-            $user = User::query()
-                ->where(function ($query) use ($request) {
-                    $query->where('username', $request->input('username'))
-                        ->orWhere('email', $request->input('username'));
-                })
-                ->withTrashed()
-                ->first();
-            if ($user !== null) {
-                // Check if user is soft deleted
-                if ($user->trashed()) {
-                    $request->session()->flash('error', 'This account has been deactivated. Please contact us through contact form to have your account reactivated.');
+            $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';
 
-                    return redirect()->to('login');
-                }
+            if (! Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
+                $this->incrementLoginAttempts($request);
+                Log::channel('failed_login')->error('Failed login attempt by user: '.$request->input('username').' from IP address: '.$request->ip());
+                $request->session()->flash('error', self::GENERIC_LOGIN_FAILURE);
 
-                $rememberMe = $request->has('rememberme') && $request->input('rememberme') === 'on';
+                return redirect()->to('login');
+            }
 
-                if (! $user->hasVerifiedEmail()) {
-                    $request->session()->flash('warning', 'You have not verified your email address!');
+            /** @var User $user */
+            $user = Auth::user();
 
-                    return redirect()->to('login');
-                }
+            if ($user->is_disabled || ! $user->hasVerifiedEmail()) {
+                Auth::logout();
+                $this->incrementLoginAttempts($request);
+                Log::channel('failed_login')->error('Failed login attempt by user: '.$request->input('username').' from IP address: '.$request->ip());
+                $request->session()->flash('error', self::GENERIC_LOGIN_FAILURE);
 
-                if (Auth::attempt($request->only($login_type, 'password'), $rememberMe)) {
-                    // Regenerate session ID to prevent session fixation attacks
-                    // This ensures no session data from a previous user can leak
-                    $request->session()->regenerate();
+                return redirect()->to('login');
+            }
 
-                    $userIp = config('nntmux:settings.store_user_ip') ? ($request->ip() ?? $request->getClientIp()) : '';
-                    event(new UserLoggedIn($user, $userIp));
+            $request->session()->regenerate();
 
-                    // Check if the user has 2FA enabled
-                    if ($user->passwordSecurity && $user->passwordSecurity->google2fa_enable) {
-                        // Check for trusted device cookie before redirecting to 2FA
-                        $trustedCookie = $request->cookie('2fa_trusted_device');
-                        if ($trustedCookie) {
-                            try {
-                                $cookieData = json_decode($trustedCookie, true);
+            $userIp = config('nntmux:settings.store_user_ip') ? ($request->ip() ?? $request->getClientIp()) : '';
+            event(new UserLoggedIn($user, $userIp));
 
-                                // Validate the cookie data
-                                if (json_last_error() === JSON_ERROR_NONE &&
-                                    isset($cookieData['user_id'], $cookieData['token'], $cookieData['expires_at']) &&
-                                    (int) $cookieData['user_id'] === (int) $user->id &&
-                                    time() <= $cookieData['expires_at']) {
+            $passwordBreached = $this->isPasswordBreached((string) $request->input('password'));
 
-                                    // Cookie is valid - mark 2FA as passed
-                                    session([config('google2fa.session_var') => true]);
-                                    session([config('google2fa.session_var').'.auth.passed_at' => time()]);
+            if ($user->passwordSecurity && $user->passwordSecurity->google2fa_enable) {
+                if ($this->trustedDeviceCookieIsValid($request, $user)) {
+                    session([config('google2fa.session_var') => true]);
+                    session([config('google2fa.session_var').'.auth.passed_at' => time()]);
 
-                                    // Skip 2FA - proceed with login
-                                    Auth::logoutOtherDevices($request->input('password'));
-                                    $this->rotateSessionTokenForCurrentSession($request, $user);
-                                    $this->clearLoginAttempts($request);
-
-                                    // Check for password breach
-                                    $redirect = redirect()->intended($this->redirectPath())->with('info', 'You have been logged in');
-
-                                    return $this->checkPasswordBreachAndRedirect($request->input('password'), $redirect);
-                                }
-                            } catch (\Exception $e) {
-                                Log::error('Login - Error processing trusted device cookie', [
-                                    'error' => $e->getMessage(),
-                                ]);
-                            }
-                        }
-
-                        // No valid trusted device cookie, proceed with 2FA verification
-                        // Store intended URL for redirecting after 2FA verification
-                        $request->session()->put('url.intended', $this->redirectPath());
-
-                        // Store rememberme preference in the session for 2FA flow
-                        $request->session()->put('2fa:remember', $rememberMe);
-
-                        // Store password hash for breach check after 2FA (we hash it to avoid storing plain text)
-                        $request->session()->put('2fa:password_check', $request->input('password'));
-
-                        Auth::logout();
-
-                        // Store user ID in the session for 2FA verification
-                        $request->session()->put('2fa:user:id', $user->id);
-
-                        return redirect()->route('2fa.verify');
-                    }
-
-                    Auth::logoutOtherDevices($request->input('password'));
+                    Auth::logoutOtherDevices((string) $request->input('password'));
                     $this->rotateSessionTokenForCurrentSession($request, $user);
                     $this->clearLoginAttempts($request);
 
-                    // Check for password breach
-                    $redirect = redirect()->intended($this->redirectPath())->with('info', 'You have been logged in');
-
-                    return $this->checkPasswordBreachAndRedirect($request->input('password'), $redirect);
+                    return $this->appendPasswordBreachWarning(
+                        redirect()->intended($this->redirectPath())->with('info', 'You have been logged in'),
+                        $passwordBreached
+                    );
                 }
 
-                $this->incrementLoginAttempts($request);
-                Log::channel('failed_login')->error('Failed login attempt by user: '.$request->input('username').' from IP address: '.$request->ip());
-                $request->session()->flash('error', 'Username or email and password combination used does not match our records!');
-            } else {
-                $this->incrementLoginAttempts($request);
-                Log::channel('failed_login')->error('Failed login attempt by user: '.$request->input('username').' from IP address: '.$request->ip());
-                $request->session()->flash('error', 'Username or email used do not match our records!');
+                Auth::logoutOtherDevices((string) $request->input('password'));
+                $request->session()->put('url.intended', $this->redirectPath());
+                $request->session()->put('2fa:remember', $rememberMe);
+                $request->session()->put('2fa:password_breached', $passwordBreached);
+
+                Auth::logout();
+                $request->session()->put('2fa:user:id', $user->id);
+
+                return redirect()->route('2fa.verify');
             }
 
-            return redirect()->to('login');
+            Auth::logoutOtherDevices((string) $request->input('password'));
+            $this->rotateSessionTokenForCurrentSession($request, $user);
+            $this->clearLoginAttempts($request);
+
+            return $this->appendPasswordBreachWarning(
+                redirect()->intended($this->redirectPath())->with('info', 'You have been logged in'),
+                $passwordBreached
+            );
+
         }
 
         $this->incrementLoginAttempts($request);
@@ -217,10 +180,8 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerate();
 
-        // If there was a trusted device cookie, preserve it by re-creating it
         if ($trustedDeviceCookie) {
             try {
-                // Parse the cookie to get the original data including expiration time
                 $cookieData = json_decode($trustedDeviceCookie, true);
 
                 if (isset($cookieData['expires_at'])) {
@@ -237,15 +198,14 @@ class LoginController extends Controller
 
                     // Only preserve the cookie if it hasn't expired yet
                     if ($remainingMinutes > 0) {
-                        // Create a cookie with proper settings for persistence
                         $cookie = cookie(
-                            '2fa_trusted_device',    // name
-                            $trustedDeviceCookie,    // value
-                            $remainingMinutes,       // minutes remaining
-                            '/',                     // path
+                            '2fa_trusted_device',
+                            $trustedDeviceCookie,
+                            $remainingMinutes,
+                            '/',
                             config('session.domain'), // use session domain config
                             config('session.secure'), // use session secure config
-                            false,                   // httpOnly
+                            true,
                             false,                   // raw
                             config('session.same_site', 'lax') // use session same_site config
                         );
@@ -273,11 +233,16 @@ class LoginController extends Controller
      */
     protected function checkPasswordBreachAndRedirect(string $password, RedirectResponse $redirect): RedirectResponse
     {
+        return $this->appendPasswordBreachWarning($redirect, $this->isPasswordBreached($password));
+    }
+
+    protected function isPasswordBreached(string $password): bool
+    {
         try {
             $breachService = app(PasswordBreachService::class);
 
             if ($breachService->isPasswordBreached($password)) {
-                return $redirect->with('warning', 'Security Alert: Your password has been found in a data breach. We strongly recommend changing it immediately in your account settings.');
+                return true;
             }
         } catch (\Exception $e) {
             Log::error('Password breach check failed during login', [
@@ -285,7 +250,40 @@ class LoginController extends Controller
             ]);
         }
 
+        return false;
+    }
+
+    protected function appendPasswordBreachWarning(RedirectResponse $redirect, bool $passwordBreached): RedirectResponse
+    {
+        if ($passwordBreached) {
+            return $redirect->with('warning', 'Security Alert: Your password has been found in a data breach. We strongly recommend changing it immediately in your account settings.');
+        }
+
         return $redirect;
+    }
+
+    private function trustedDeviceCookieIsValid(Request $request, User $user): bool
+    {
+        $trustedCookie = $request->cookie('2fa_trusted_device');
+        if (! is_string($trustedCookie) || $trustedCookie === '') {
+            return false;
+        }
+
+        try {
+            $cookieData = json_decode($trustedCookie, true);
+
+            return json_last_error() === JSON_ERROR_NONE
+                && isset($cookieData['user_id'], $cookieData['token'], $cookieData['expires_at'])
+                && (int) $cookieData['user_id'] === (int) $user->id
+                && time() <= (int) $cookieData['expires_at']
+                && TrustedDevice::findValidForUser((int) $user->id, (string) $cookieData['token']) !== null;
+        } catch (\Exception $e) {
+            Log::error('Login - Error processing trusted device cookie', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
     }
 
     private function rotateSessionTokenForCurrentSession(Request $request, User $user): void

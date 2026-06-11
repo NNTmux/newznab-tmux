@@ -6,8 +6,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Disable2faPasswordSecurityRequest;
 use App\Models\PasswordSecurity;
+use App\Models\TrustedDevice;
 use App\Models\User;
-use App\Services\PasswordBreachService;
 use Illuminate\Auth\Events\OtherDeviceLogout;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -196,12 +196,7 @@ class PasswordSecurityController extends Controller
         // Store the timestamp for determining how long the 2FA session is valid
         session([config('google2fa.session_var').'.auth.passed_at' => time()]);
 
-        // Clean up the temporary session variables
-        $passwordToCheck = $request->session()->get('2fa:password_check');
-
-        if (is_string($passwordToCheck) && $passwordToCheck !== '') {
-            Auth::logoutOtherDevices($passwordToCheck);
-        }
+        $passwordBreached = (bool) $request->session()->get('2fa:password_breached', false);
 
         $newSessionToken = Str::random(60);
         $user->forceFill([
@@ -210,7 +205,7 @@ class PasswordSecurityController extends Controller
         $request->session()->put('session_token_web', $newSessionToken);
         event(new OtherDeviceLogout(Auth::getDefaultDriver(), $user));
 
-        $request->session()->forget(['2fa:user:id', '2fa:remember', '2fa:password_check']);
+        $request->session()->forget(['2fa:user:id', '2fa:remember', '2fa:password_breached']);
 
         // Determine where to redirect after successful verification
         $redirectUrl = $request->session()->pull('url.intended', '/');
@@ -219,56 +214,35 @@ class PasswordSecurityController extends Controller
         $redirect = redirect()->to($redirectUrl)
             ->with('success', 'Two-factor authentication verified successfully.');
 
-        // Check for password breach if we have the password stored
-        if ($passwordToCheck) {
-            try {
-                $breachService = app(PasswordBreachService::class);
-                if ($breachService->isPasswordBreached($passwordToCheck)) {
-                    $redirect = $redirect->with('warning', 'Security Alert: Your password has been found in a data breach. We strongly recommend changing it immediately in your account settings.');
-                }
-            } catch (\Exception $e) {
-                Log::error('Password breach check failed during 2FA verification', [
-                    'error' => $e->getMessage(),
-                ]);
-            }
+        if ($passwordBreached) {
+            $redirect = $redirect->with('warning', 'Security Alert: Your password has been found in a data breach. We strongly recommend changing it immediately in your account settings.');
         }
 
         // If the user has checked "trust this device", create a trust token
         if ($request->has('trust_device') && $request->input('trust_device') == 1) {
+            $trustedDevice = TrustedDevice::issueForUser($user, $request->ip(), $request->userAgent());
+            $expiresAt = $trustedDevice['device']->expires_at->getTimestamp();
 
-            // Generate a unique token for this device
-            $token = hash('sha256', $user->id.uniqid().time());
-
-            // Store the token with an expiry time of 30 days
-            $expiresAt = time() + (60 * 60 * 24 * 30); // 30 days in seconds
-
-            // Create the cookie data
             $cookieData = [
                 'user_id' => $user->id,
-                'token' => $token,
+                'token' => $trustedDevice['plain'],
                 'expires_at' => $expiresAt,
             ];
 
-            $cookieValue = json_encode($cookieData);
-
-            // Use PHP's native setcookie function as the primary method
-            setcookie(
-                '2fa_trusted_device',
-                $cookieValue,
-                [
-                    'expires' => $expiresAt,
-                    'path' => '/',
-                    'domain' => '',
-                    'secure' => request()->secure(),
-                    'httponly' => false,
-                    'samesite' => 'Lax',
-                ]
-            );
-
-            // Also attach the cookie to the Laravel response as a backup approach
-            $redirect->withCookie(
-                cookie('2fa_trusted_device', $cookieValue, 43200, '/', null, null, false)
-            );
+            $cookieValue = json_encode($cookieData, JSON_UNESCAPED_SLASHES);
+            if ($cookieValue !== false) {
+                $redirect->withCookie(cookie(
+                    '2fa_trusted_device',
+                    $cookieValue,
+                    60 * 24 * 30,
+                    '/',
+                    config('session.domain'),
+                    config('session.secure'),
+                    true,
+                    false,
+                    config('session.same_site', 'lax')
+                ));
+            }
         }
 
         return $redirect;
