@@ -51,11 +51,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->validateCsrfTokens(except: [
             'failed',
-            'admin/*',
             'btcpay/webhook',
-            'contact-us',
-            'cart',
-            'cart/*',
         ]);
 
         $middleware->prepend(DegradeWhenRedisUnreachable::class);

@@ -9,8 +9,8 @@ use App\Jobs\SendPasswordForgottenEmail;
 use App\Models\User;
 use App\Support\CaptchaHelper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
 class ForgotPasswordController extends Controller
 {
@@ -45,15 +45,12 @@ class ForgotPasswordController extends Controller
             return view('auth.passwords.email');
         }
 
-        // Handle POST request
-        $sent = '';
-        $email = $request->input('email') ?? '';
-        $rssToken = $request->input('apikey') ?? '';
+        $email = (string) $request->input('email', '');
 
-        if (empty($email) && empty($rssToken)) {
+        if ($email === '') {
             return redirect()
                 ->route('forgottenpassword')
-                ->withErrors(['error' => 'Missing parameter (email and/or apikey) to send password reset'])
+                ->withErrors(['email' => 'Please enter your email address to send a password reset link.'])
                 ->withInput($request->except(CaptchaHelper::getResponseFieldName()));
         }
 
@@ -68,26 +65,35 @@ class ForgotPasswordController extends Controller
         }
 
         // Check whether the user exists, but always return the same success message
-        // to avoid account/API-key enumeration.
-        $ret = ! empty($rssToken) ? User::findByRssToken($rssToken) : User::findByEmail($email);
-        if ($ret === null) {
+        // to avoid account enumeration.
+        $user = User::findByEmail($email);
+        if ($user === null) {
             return redirect()->route('forgottenpassword')->with('success', 'Password reset email has been sent!');
         }
 
         // Check if user is soft deleted
-        $user = User::withTrashed()->find($ret['id']);
-        if ($user && $user->trashed()) {
+        if (User::withTrashed()->find($user->id)?->trashed()) {
             return redirect()->route('forgottenpassword')->with('success', 'Password reset email has been sent!');
         }
 
-        // Generate a forgottenpassword guid, store it in the user table
-        $guid = Str::random(32);
-        User::updatePassResetGuid($ret['id'], $guid);
+        $this->sendResetLink($user);
 
-        // Send the email
-        $resetLink = url('/').'/resetpassword?guid='.$guid;
-        SendPasswordForgottenEmail::dispatch($ret, $resetLink);
+        // Clear any legacy GUID once a broker token has been issued.
+        User::updatePassResetGuid($user->id, null);
 
         return redirect()->route('forgottenpassword')->with('success', 'Password reset email has been sent!');
+    }
+
+    private function sendResetLink(User $user): void
+    {
+        $token = Password::broker()->createToken($user);
+
+        SendPasswordForgottenEmail::dispatch(
+            $user,
+            route('password.reset', [
+                'token' => $token,
+                'email' => $user->email,
+            ]),
+        );
     }
 }

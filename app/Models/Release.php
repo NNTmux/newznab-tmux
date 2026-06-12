@@ -616,7 +616,14 @@ class Release extends Model
                 return false;
             }
 
-            return self::query()->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'releases.id')->whereIn('releases.id', $searchResult)->where('df.release_id', '=', null)->where('releases.categories_id', $rel['categories_id'])->where('id', '<>', $rel['id'])->orderByDesc('releases.postdate')->first(['guid']);
+            return self::query()
+                ->leftJoin('dnzb_failures as df', 'df.release_id', '=', 'releases.id')
+                ->whereIn('releases.id', $searchResult)
+                ->whereNull('df.release_id')
+                ->where('releases.categories_id', $rel['categories_id'])
+                ->where('releases.id', '<>', $rel['id'])
+                ->orderByDesc('releases.postdate')
+                ->first(['releases.guid']);
         }
 
         return false;

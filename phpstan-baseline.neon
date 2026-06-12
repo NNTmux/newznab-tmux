@@ -319,32 +319,8 @@ parameters:
 			path: app/Http/Controllers/Api/ApiController.php
 
 		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: app/Http/Controllers/Api/ApiController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\User\:\:\$is_disabled\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/ApiInformController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\User\:\:\$is_disabled\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/Api/ApiV2Controller.php
-
-		-
 			message: '#^Call to function is_array\(\) with bool\|int\|string will always evaluate to false\.$#'
 			identifier: function.impossibleType
-			count: 1
-			path: app/Http/Controllers/Api/ApiV2Controller.php
-
-		-
-			message: '#^Cannot call method map\(\) on list\<mixed\>\.$#'
-			identifier: method.nonObject
 			count: 1
 			path: app/Http/Controllers/Api/ApiV2Controller.php
 
@@ -445,18 +421,6 @@ parameters:
 			path: app/Http/Controllers/CoverController.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\User\:\:\$is_disabled\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Http/Controllers/GetNzbController.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\User\:\:\$is_disabled\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/RssController.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$roles_id\.$#'
 			identifier: property.notFound
 			count: 1
@@ -473,12 +437,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/Http/Requests/Admin/RegistrationPeriodRequest.php
-
-		-
-			message: '#^Method App\\Models\\Category\:\:getForApi\(\) should return list\<mixed\> but returns Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\RootCategory\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Models/Category.php
 
 		-
 			message: '#^Method App\\Models\\Category\:\:getForMenu\(\) should return array\<string, mixed\> but returns list\<mixed\>\.$#'

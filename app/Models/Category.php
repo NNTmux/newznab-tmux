@@ -553,11 +553,12 @@ class Category extends Model
     }
 
     /**
-     * @return list<mixed>
+     * @return Collection<int, RootCategory>
      */
-    public static function getForApi(): mixed
+    public static function getForApi(): Collection
     {
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
+        /** @var Collection<int, RootCategory>|null $result */
         $result = Cache::get(md5('ForApi'));
         if ($result !== null) {
             return $result;

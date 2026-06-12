@@ -15,28 +15,42 @@ class FailedReleasesController extends BasePageController
 {
     public function failed(Request $request): Application|Response|\Illuminate\Contracts\Foundation\Application|ResponseFactory
     {
-        if ($request->missing('api_token')) {
+         if ($request->missing('guid')) {
             return response('Bad request, please supply all parameters!', 400)->withHeaders(['X-DNZB-RCode' => 400, 'X-DNZB-RText' => 'Bad request, please supply all parameters!']);
         }
 
-        $res = User::findVerifiedByApiToken((string) $request->input('api_token'));
-        if ($res === null) {
+        $user = $this->resolveUser($request);
+        if ($user === null) {
             return response('Unauthorised, wrong rss key!', 401)->withHeaders(['X-DNZB-RCode' => 401, 'X-DNZB-RText' => 'Unauthorised, wrong rss key!']);
         }
 
-        $uid = $res['id'];
-        $rssToken = $res['api_token'];
+        $alt = Release::getAlternate($request->input('guid'), $user->id);
 
-        if (isset($uid, $rssToken) && $request->has('guid')) {
-            $alt = Release::getAlternate($request->input('guid'), $uid);
-
-            if (empty($alt)) {
-                return response('No NZB found for alternate match!', 404)->withHeaders(['X-DNZB-RCode' => 404, 'X-DNZB-RText' => 'No NZB found for alternate match.']);
-            }
-
-            return response('Success')->withHeaders(['Location' => url('/').'/getnzb?id='.$alt['guid'].'&r='.$rssToken]);
+        if (empty($alt)) {
+            return response('No NZB found for alternate match!', 404)->withHeaders(['X-DNZB-RCode' => 404, 'X-DNZB-RText' => 'No NZB found for alternate match.']);
         }
 
-        return response('Bad request, please supply all parameters!', 400)->withHeaders(['X-DNZB-RCode' => 400, 'X-DNZB-RText' => 'Bad request, please supply all parameters!']);
+        $locationParams = ['id' => $alt['guid']];
+        if ($request->filled('api_token')) {
+            $locationParams['r'] = $user->api_token;
+        }
+
+        return response('Success')->withHeaders([
+            'Location' => url('/getnzb').'?'.http_build_query($locationParams, '', '&', PHP_QUERY_RFC3986),
+        ]);
+    }
+
+    private function resolveUser(Request $request): ?User
+    {
+        $sessionUser = $request->user();
+        if ($sessionUser instanceof User) {
+            return $sessionUser;
+        }
+
+        if ($request->filled('api_token')) {
+            return User::findVerifiedByApiToken((string) $request->input('api_token'));
+        }
+
+        return null;
     }
 }

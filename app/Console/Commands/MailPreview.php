@@ -15,7 +15,6 @@ use App\Mail\ForgottenPassword;
 use App\Mail\IncidentDetected;
 use App\Mail\InvitationMail;
 use App\Mail\NewAccountCreatedEmail;
-use App\Mail\PasswordReset;
 use App\Mail\WelcomeEmail;
 use App\Models\Invitation;
 use App\Models\ServiceIncident;
@@ -56,7 +55,6 @@ class MailPreview extends Command
         $mailables = [
             'welcome' => fn (): Mailable => new WelcomeEmail($user),
             'forgotten_password' => fn (): Mailable => new ForgottenPassword('https://example.test/reset/abc123'),
-            'password_reset' => fn (): Mailable => new PasswordReset($user, 'TempPass!2026'),
             'new_account_created' => fn (): Mailable => new NewAccountCreatedEmail($user),
             'account_change' => fn (): Mailable => new AccountChange($user),
             'account_will_expire' => fn (): Mailable => new AccountWillExpire($user, 5),

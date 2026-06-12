@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\UserAccessedApi;
 use App\Http\Controllers\BasePageController;
+use App\Http\Controllers\GetNzbController;
 use App\Models\Category;
 use App\Models\Genre;
 use App\Models\Release;
@@ -510,7 +511,9 @@ class ApiController extends BasePageController
                 UserRequest::addApiRequest($uid, $request->getRequestUri());
                 $relData = Release::checkGuidForApi($request->input('id'));
                 if ($relData) {
-                    return redirect(url('/getnzb?r='.rawurlencode((string) $apiKey).'&id='.rawurlencode((string) $request->input('id')).(($request->has('del') && $request->input('del') === '1') ? '&del=1' : '')));
+                    $request->attributes->set(GetNzbController::REQUEST_USER_ATTRIBUTE, User::findOrFail($uid));
+
+                    return app(GetNzbController::class)->getNzb($request);
                 }
 
                 return showApiError(300, 'No such item (the guid you provided has no release in our database)');

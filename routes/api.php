@@ -52,7 +52,7 @@ Route::get('release/{id}/mediainfo', function ($id) {
         'audio' => $audio ?: null,
         'subs' => $subs ? $subs->subs : null, // @phpstan-ignore property.notFound
     ]);
-});
+})->middleware('throttle:60,1');
 
 Route::fallback(function () {
     return response()->json(['message' => 'Not Found!'], 404);

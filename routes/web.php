@@ -107,6 +107,9 @@ Route::get('forgottenpassword', [ForgotPasswordController::class, 'showLinkReque
 Route::post('forgottenpassword', [ForgotPasswordController::class, 'showLinkRequestForm'])->middleware('throttle:6,1')->withoutMiddleware(['auth']);
 Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request')->withoutMiddleware(['auth']);
 Route::post('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->middleware('throttle:6,1')->withoutMiddleware(['auth']);
+Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset')->withoutMiddleware(['auth']);
+Route::post('password/update', [ResetPasswordController::class, 'reset'])->middleware('throttle:6,1')->name('password.update')->withoutMiddleware(['auth']);
+Route::get('resetpassword', [ResetPasswordController::class, 'showLegacyResetForm'])->middleware('throttle:6,1')->name('resetpassword')->withoutMiddleware(['auth']);
 Route::match(['GET', 'POST'], 'terms-and-conditions', [TermsController::class, 'terms'])->name('terms-and-conditions');
 Route::match(['GET', 'POST'], 'privacy-policy', [PrivacyPolicyController::class, 'privacyPolicy'])->name('privacy-policy');
 
@@ -114,12 +117,13 @@ Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login'])->name('login.post');
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('passkeys/authentication-options', GeneratePasskeyAuthenticationOptionsController::class)
+    ->middleware('throttle:6,1')
     ->name('passkeys.authentication_options');
-Route::post('passkeys/authenticate', PasskeyLoginController::class)->name('passkeys.login');
+Route::post('passkeys/authenticate', PasskeyLoginController::class)->middleware('throttle:6,1')->name('passkeys.login');
 
-Route::get('2fa/verify', [PasswordSecurityController::class, 'getVerify2fa'])->name('2fa.verify');
-Route::post('2fa/verify', [PasswordSecurityController::class, 'verify2fa'])->name('2fa.post');
-Route::post('2faVerify', [PasswordSecurityController::class, 'verify2fa'])->name('2faVerify');
+Route::get('2fa/verify', [PasswordSecurityController::class, 'getVerify2fa'])->middleware('throttle:6,1')->name('2fa.verify');
+Route::post('2fa/verify', [PasswordSecurityController::class, 'verify2fa'])->middleware('throttle:6,1')->name('2fa.post');
+Route::post('2faVerify', [PasswordSecurityController::class, 'verify2fa'])->middleware('throttle:6,1')->name('2faVerify');
 
 // Search autocomplete and suggest API routes (no auth required for better UX)
 Route::get('api/search/autocomplete', [SearchSuggestController::class, 'autocomplete'])->name('api.search.autocomplete');
@@ -139,7 +143,6 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
     Route::delete('passkeys/{passkey}', [PasskeyManagementController::class, 'destroy'])
         ->name('passkeys.destroy');
 
-    Route::match(['GET', 'POST'], 'resetpassword', [ResetPasswordController::class, 'reset'])->name('resetpassword');
     Route::match(['GET', 'POST'], 'profile', [ProfileController::class, 'show'])->name('profile');
 
     Route::prefix('browse')->group(function () {
@@ -164,7 +167,10 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
     Route::match(['GET', 'POST'], 'apiv2help', [ApiHelpController::class, 'apiv2'])->name('apiv2help');
     Route::match(['GET', 'POST'], 'browsegroup', [BrowseGroupController::class, 'show'])->name('browsegroup');
     Route::match(['GET', 'POST'], 'content', [ContentController::class, 'show'])->name('content');
-    Route::match(['GET', 'POST'], 'failed', [FailedReleasesController::class, 'failed'])->name('failed');
+    Route::match(['GET', 'POST'], 'failed', [FailedReleasesController::class, 'failed'])
+        ->middleware('throttle:60,1')
+        ->withoutMiddleware(['auth', 'isVerified'])
+        ->name('failed');
 
     Route::middleware('clearance')->group(function () {
         Route::match(['GET', 'POST'], 'Games', [GamesController::class, 'show'])->name('Games');

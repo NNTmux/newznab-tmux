@@ -15,7 +15,6 @@ use App\Mail\ForgottenPassword;
 use App\Mail\IncidentDetected;
 use App\Mail\InvitationMail;
 use App\Mail\NewAccountCreatedEmail;
-use App\Mail\PasswordReset;
 use App\Mail\WelcomeEmail;
 use App\Models\Invitation;
 use App\Models\ServiceIncident;
@@ -69,7 +68,6 @@ class MailRenderingTest extends TestCase
 
         yield 'WelcomeEmail' => [static fn () => new WelcomeEmail($userFactory())];
         yield 'ForgottenPassword' => [static fn () => new ForgottenPassword('https://example.test/reset/abc123')];
-        yield 'PasswordReset' => [static fn () => new PasswordReset($userFactory(), 'TempPass!2026')];
         yield 'NewAccountCreatedEmail' => [static fn () => new NewAccountCreatedEmail($userFactory())];
         yield 'AccountChange' => [static fn () => new AccountChange($userFactory())];
         yield 'AccountWillExpire' => [static fn () => new AccountWillExpire($userFactory(), 5)];
@@ -205,7 +203,6 @@ class MailRenderingTest extends TestCase
         $cases = [
             [new WelcomeEmail($user), '[NNTmux] Welcome to NNTmux'],
             [new ForgottenPassword('http://example.test/x'), '[NNTmux] Reset your password'],
-            [new PasswordReset($user, 'tmp'), '[NNTmux] Your password has been reset'],
             [new NewAccountCreatedEmail($user), '[NNTmux] New account registered'],
             [new AccountChange($user), '[NNTmux] Account level changed'],
             [new AccountWillExpire($user, 1), '[NNTmux] Your account is about to expire'],

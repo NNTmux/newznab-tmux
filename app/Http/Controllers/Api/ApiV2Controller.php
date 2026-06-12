@@ -9,9 +9,11 @@ use App\Data\Api\DetailsData;
 use App\Data\Api\ReleaseData;
 use App\Events\UserAccessedApi;
 use App\Http\Controllers\BasePageController;
+use App\Http\Controllers\GetNzbController;
 use App\Models\Category;
 use App\Models\Genre;
 use App\Models\Release;
+use App\Models\RootCategory;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Models\User;
@@ -194,7 +196,7 @@ class ApiV2Controller extends BasePageController
                     'book-search' => ['available' => 'yes', 'supportedParams' => 'id,cat,minsize,maxsize,maxage,group,limit,offset,sort'],
                     'anime-search' => ['available' => 'yes', 'supportedParams' => 'id,anidbid,anilistid,cat,minsize,maxsize,maxage,limit,offset,sort'],
                 ],
-                'categories' => $category->map(static fn ($c) => CategoryData::fromCategory($c))->values(),
+                'categories' => $category->map(static fn (RootCategory $rootCategory): CategoryData => CategoryData::fromCategory($rootCategory))->values(),
                 'groups' => Schema::hasTable('usenet_groups')
                     ? UsenetGroup::query()
                         ->where('active', 1)
@@ -613,7 +615,9 @@ class ApiV2Controller extends BasePageController
         UserRequest::addApiRequest($user->id, $request->getRequestUri());
         $relData = Release::checkGuidForApi($request->input('id'));
         if ($relData) {
-            return redirect('/getnzb?r='.rawurlencode((string) $request->input('api_token')).'&id='.rawurlencode((string) $request->input('id')).(($request->has('del') && $request->input('del') === '1') ? '&del=1' : ''));
+            $request->attributes->set(GetNzbController::REQUEST_USER_ATTRIBUTE, $user);
+
+            return app(GetNzbController::class)->getNzb($request);
         }
 
         return response()->json(['data' => 'No such item (the guid you provided has no release in our database)'], 404);

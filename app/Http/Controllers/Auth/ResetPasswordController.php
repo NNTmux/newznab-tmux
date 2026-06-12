@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\SendPasswordResetEmail;
 use App\Models\User;
 use App\Support\Auth\RedirectsUsers;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password as PasswordRule;
 
 class ResetPasswordController extends Controller
 {
@@ -29,16 +33,13 @@ class ResetPasswordController extends Controller
         $this->middleware('guest');
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function reset(Request $request): mixed
+    public function showLegacyResetForm(Request $request): mixed
     {
         if ($request->missing('guid')) {
             return redirect()->route('password.request')->with('error', 'No reset code provided.');
         }
 
-        $user = User::findByResetGuid($request->input('guid'));
+        $user = User::findByResetGuid((string) $request->input('guid'));
         if ($user === null) {
             return redirect()->route('password.request')->with('error', 'Bad reset code provided.');
         }
@@ -48,15 +49,43 @@ class ResetPasswordController extends Controller
             return redirect()->route('password.request')->with('error', 'This account has been deactivated.');
         }
 
-        // Reset the password, inform the user, send out the email
-        User::updatePassResetGuid($user->id, '');
-        $newpass = User::generatePassword();
-        User::updatePassword($user->id, $newpass);
+        $token = Password::broker()->createToken($user);
+        User::updatePassResetGuid($user->id, null);
 
-        SendPasswordResetEmail::dispatch($user, $newpass);
+        return redirect()->route('password.reset', [
+            'token' => $token,
+            'email' => $user->email,
+        ]);
+    }
 
-        return redirect()->route('login')
-            ->with('success', 'Your password has been reset to '.$newpass.' and sent to your e-mail address.');
+    public function reset(Request $request): mixed
+    {
+        $request->validate([
+            'token' => ['required', 'string'],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'confirmed', PasswordRule::defaults()],
+        ]);
+
+        $status = Password::broker()->reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function (User $user, string $password): void {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                    'remember_token' => Str::random(60),
+                    'resetguid' => null,
+                ])->save();
+
+                event(new PasswordReset($user));
+            },
+        );
+
+        if ($status === Password::PASSWORD_RESET) {
+            return redirect()->route('login')->with('success', __($status));
+        }
+
+        return back()
+            ->withInput($request->only('email'))
+            ->withErrors(['email' => __($status)]);
     }
 
     public function showResetForm(Request $request, mixed $token = null): mixed

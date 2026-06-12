@@ -22,6 +22,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class GetNzbController extends BasePageController
 {
+    public const string REQUEST_USER_ATTRIBUTE = 'nntmux.getnzb.user';
+
     private const int BUFFER_SIZE = 1000000;
 
     private const string NZB_SUFFIX = '.nzb';
@@ -82,6 +84,11 @@ class GetNzbController extends BasePageController
      */
     private function authenticateUser(Request $request): array|Response
     {
+        $resolvedUser = $request->attributes->get(self::REQUEST_USER_ATTRIBUTE);
+        if ($resolvedUser instanceof User) {
+            return $this->getUserDataFromResolvedUser($resolvedUser);
+        }
+
         // Try session authentication first
         if ($request->user()) {
             return $this->getUserDataFromSession();
@@ -89,6 +96,31 @@ class GetNzbController extends BasePageController
 
         // Try RSS token authentication
         return $this->getUserDataFromRssToken($request);
+    }
+
+    /**
+     * Get user data from a user resolved by an upstream API controller.
+     *
+     * @return array<string, mixed>|Response
+     */
+    private function getUserDataFromResolvedUser(User $user): array|Response
+    {
+        if (! $user->hasVerifiedEmail()) {
+            return showApiError(100);
+        }
+
+        if ($user->is_disabled || $user->hasRole('Disabled')) {
+            return showApiError(101);
+        }
+
+        $user->loadMissing('role');
+
+        return [
+            'uid' => $user->id,
+            'userName' => $user->username,
+            'maxDownloads' => $user->role->downloadrequests,
+            'rssToken' => $user->api_token,
+        ];
     }
 
     /**
@@ -269,7 +301,7 @@ class GetNzbController extends BasePageController
         $this->updateDownloadStatistics($request, $uid, $releaseId, $releaseData->id);
 
         // Build response headers
-        $headers = $this->buildNzbHeaders($releaseId, $uid, $rssToken, $releaseData);
+        $headers = $this->buildNzbHeaders($request, $releaseId, $uid, $rssToken, $releaseData);
 
         // Stream modified NZB content
         $cleanName = FilenameSanitizer::sanitize($releaseData->searchname, "release-{$releaseId}");
@@ -312,12 +344,21 @@ class GetNzbController extends BasePageController
      *
      * @return array<string, string>
      */
-    private function buildNzbHeaders(string $releaseId, int $uid, string $rssToken, Release $releaseData): array
+    private function buildNzbHeaders(Request $request, string $releaseId, int $uid, string $rssToken, Release $releaseData): array
     {
+        $failureParams = [
+            'guid' => $releaseId,
+            'userid' => $uid,
+        ];
+
+        if (! $request->user() && $rssToken !== '') {
+            $failureParams['api_token'] = $rssToken;
+        }
+
         $headers = [
             'Content-Type' => 'application/x-nzb',
             'Expires' => now()->addYear()->toRfc7231String(),
-            'X-DNZB-Failure' => url('/failed')."?guid={$releaseId}&userid={$uid}&api_token={$rssToken}",
+            'X-DNZB-Failure' => url('/failed').'?'.http_build_query($failureParams, '', '&', PHP_QUERY_RFC3986),
             'X-DNZB-Category' => e($releaseData->category_name),
             'X-DNZB-Details' => url("/details/{$releaseId}"),
         ];

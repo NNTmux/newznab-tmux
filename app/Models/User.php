@@ -13,6 +13,7 @@ use App\Rules\ValidEmailDomain;
 use App\Services\InvitationService;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -93,6 +94,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $role_name Computed from join with roles table
  * @property int|null $num Computed count value
  * @property string|null $mth Computed month value
+ * @property-read bool $is_disabled Computed via Attribute accessor
  * @property bool|null $is_role_expired Computed via Attribute accessor
  * @property int|null $days_until_expiry Computed via Attribute accessor
  * @property int|null $count Computed count from aggregate queries
@@ -122,7 +124,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder|User expiringSoon(int $days = 7)
  * @method static Builder|User expired()
  */
-final class User extends Authenticatable implements HasPasskeys, MustVerifyEmailContract
+final class User extends Authenticatable implements CanResetPasswordContract, HasPasskeys, MustVerifyEmailContract
 {
     use HasFactory; // @phpstan-ignore missingType.generics
     use HasRoles;
@@ -811,7 +813,12 @@ final class User extends Authenticatable implements HasPasskeys, MustVerifyEmail
      */
     public static function findByResetGuid(string $guid): ?static
     {
-        return static::whereResetguid($guid)->first();
+        if (static::whereApiToken($guid)->exists()) {
+            return null;
+        }
+
+        return static::whereResetguid($guid)
+            ->first();
     }
 
     // ===== User Management Methods =====
