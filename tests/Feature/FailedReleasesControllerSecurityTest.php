@@ -1,11 +1,15 @@
 <?php
+
 declare(strict_types=1);
+
 namespace Tests\Feature;
+
 use App\Facades\Search;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
+
 class FailedReleasesControllerSecurityTest extends TestCase
 {
     protected function setUp(): void
@@ -23,6 +27,7 @@ class FailedReleasesControllerSecurityTest extends TestCase
         $this->createSchema();
         $this->seedSettings();
     }
+
     public function test_failed_callback_rejects_userid_without_session_or_api_token(): void
     {
         $this->createUser(1, 'rss-token');
@@ -33,6 +38,7 @@ class FailedReleasesControllerSecurityTest extends TestCase
         ]))->assertStatus(401)
             ->assertHeader('X-DNZB-RCode', 401);
     }
+
     public function test_failed_callback_uses_api_token_user_and_preserves_token_for_alternate_download(): void
     {
         $this->createUser(1, 'rss-token');
@@ -63,6 +69,7 @@ class FailedReleasesControllerSecurityTest extends TestCase
             'users_id' => 999,
         ]);
     }
+
     private function createSchema(): void
     {
         Schema::create('settings', function (Blueprint $table): void {
@@ -96,6 +103,7 @@ class FailedReleasesControllerSecurityTest extends TestCase
             $table->boolean('failed')->default(true);
         });
     }
+
     private function seedSettings(): void
     {
         DB::table('settings')->insert([
@@ -104,6 +112,7 @@ class FailedReleasesControllerSecurityTest extends TestCase
             ['name' => 'catwebdl', 'value' => '0'],
         ]);
     }
+
     private function createUser(int $id, string $apiToken): void
     {
         DB::table('users')->insert([
@@ -119,6 +128,7 @@ class FailedReleasesControllerSecurityTest extends TestCase
             'updated_at' => now(),
         ]);
     }
+
     private function createRelease(int $id, string $guid, string $searchName, int $categoryId, string $postDate): void
     {
         DB::table('releases')->insert([

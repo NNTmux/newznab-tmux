@@ -15,7 +15,7 @@ class FailedReleasesController extends BasePageController
 {
     public function failed(Request $request): Application|Response|\Illuminate\Contracts\Foundation\Application|ResponseFactory
     {
-         if ($request->missing('guid')) {
+        if ($request->missing('guid')) {
             return response('Bad request, please supply all parameters!', 400)->withHeaders(['X-DNZB-RCode' => 400, 'X-DNZB-RText' => 'Bad request, please supply all parameters!']);
         }
 
