@@ -176,7 +176,7 @@ class Settings extends Model
         // Convert numeric strings to actual numbers
         if (is_numeric($value)) {
             // Check if it's an integer or float
-            if (strpos((string) $value, '.') !== false) {
+            if (str_contains((string) $value, '.')) {
                 return (float) $value;
             }
 

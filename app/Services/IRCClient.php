@@ -437,7 +437,7 @@ class IRCClient
             $pong === false
             || (
                 (time() - $this->_lastPing) > ($this->_socket_timeout / 2)
-                && strpos((string) $this->_buffer, 'PONG') !== 0
+                && ! str_starts_with((string) $this->_buffer, 'PONG')
             )
         ) {
             $this->_reconnect();

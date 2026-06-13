@@ -647,7 +647,7 @@ class IGDBService
 
         if (! empty($imageData['url'])) {
             $url = $imageData['url'];
-            if (strpos($url, '//') === 0) {
+            if (str_starts_with($url, '//')) {
                 $url = 'https:'.$url;
             }
 
