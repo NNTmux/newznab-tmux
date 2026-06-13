@@ -170,9 +170,9 @@ class NntmuxCheckIndex extends Command
                 $this->error("HTTP Status: {$statusCode}");
 
                 // Check if it's a table not found error
-                if (strpos($body, 'no such table') !== false ||
-                    strpos($body, 'unknown table') !== false ||
-                    strpos($body, "doesn't exist") !== false) {
+                if (str_contains($body, 'no such table') ||
+                    str_contains($body, 'unknown table') ||
+                    str_contains($body, "doesn't exist")) {
                     $this->error("ManticoreSearch table '{$indexName}' does not exist.");
 
                     return;
