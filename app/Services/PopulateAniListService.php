@@ -6,9 +6,7 @@ namespace App\Services;
 
 use App\Models\AnidbInfo;
 use App\Models\AnidbTitle;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Http;
 
 class PopulateAniListService
 {
@@ -31,11 +29,6 @@ class PopulateAniListService
      * The directory to store anime covers.
      */
     public string $imgSavePath;
-
-    /**
-     * HTTP client for API requests
-     */
-    protected Client $client;
 
     /**
      * Rate limiting: track requests and timestamps
@@ -61,14 +54,6 @@ class PopulateAniListService
 
         // Use storage_path directly to match CoverController expectations
         $this->imgSavePath = storage_path('covers/anime/');
-        $this->client = new Client([
-            'base_uri' => self::API_URL,
-            'timeout' => 30,
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ],
-        ]);
     }
 
     /**
@@ -322,15 +307,18 @@ class PopulateAniListService
         $this->enforceRateLimit();
 
         try {
-            $response = $this->client->post('', [
-                'json' => [
+            $response = Http::timeout(30)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ])
+                ->post(self::API_URL, [
                     'query' => $query,
                     'variables' => $variables,
-                ],
-            ]);
+                ]);
 
-            $statusCode = $response->getStatusCode();
-            $body = json_decode($response->getBody()->getContents(), true);
+            $statusCode = $response->status();
+            $body = $response->json();
 
             // Handle 429 Too Many Requests - pause for 15 minutes
             if ($statusCode === 429) {
@@ -348,8 +336,8 @@ class PopulateAniListService
             }
 
             // Track rate limit from headers
-            $remaining = (int) ($response->getHeader('X-RateLimit-Remaining')[0] ?? self::RATE_LIMIT_PER_MINUTE);
-            $resetAt = (int) ($response->getHeader('X-RateLimit-Reset')[0] ?? time() + 60);
+            $remaining = (int) ($response->header('X-RateLimit-Remaining') ?: self::RATE_LIMIT_PER_MINUTE);
+            $resetAt = (int) ($response->header('X-RateLimit-Reset') ?: time() + 60);
 
             // Record this request
             $this->rateLimitQueue[] = [
@@ -376,11 +364,10 @@ class PopulateAniListService
             }
 
             return false;
-        } catch (ClientException $e) {
-            // Check if this is a 429 error from Guzzle
-            $statusCode = $e->getResponse()->getStatusCode();
-            if ($statusCode === 429) {
-                $pauseUntil = time() + (15 * 60); // 15 minutes from now
+        } catch (\Throwable $e) {
+            // Check if this is a 429 error
+            if (str_contains($e->getMessage(), '429') || str_contains($e->getMessage(), 'Too Many Requests')) {
+                $pauseUntil = time() + (15 * 60);
                 self::$rateLimitPause = [
                     'timestamp' => time(),
                     'paused_until' => $pauseUntil,
@@ -393,12 +380,6 @@ class PopulateAniListService
                 throw new \Exception('AniList API rate limit exceeded (429). Paused until '.date('Y-m-d H:i:s', $pauseUntil));
             }
 
-            if ($this->echooutput) {
-                cli()->error('AniList API Request Failed: '.$e->getMessage());
-            }
-
-            return false;
-        } catch (GuzzleException $e) {
             if ($this->echooutput) {
                 cli()->error('AniList API Request Failed: '.$e->getMessage());
             }
@@ -649,8 +630,8 @@ class PopulateAniListService
                 }
             }
 
-            $response = $this->client->get($imageUrl);
-            $imageData = $response->getBody()->getContents();
+            $response = Http::timeout(30)->get($imageUrl);
+            $imageData = $response->body();
 
             // Write the image file
             $bytesWritten = file_put_contents($coverPath, $imageData);
@@ -665,13 +646,9 @@ class PopulateAniListService
             if ($this->echooutput) {
                 cli()->info("Downloaded cover image for ID {$anidbid} from AniList to {$coverPath}");
             }
-        } catch (GuzzleException $e) {
+        } catch (\Throwable $e) {
             if ($this->echooutput) {
                 cli()->warning("Failed to download cover image for ID {$anidbid}: ".$e->getMessage());
-            }
-        } catch (\Exception $e) {
-            if ($this->echooutput) {
-                cli()->error("Error saving cover image for ID {$anidbid}: ".$e->getMessage());
             }
         }
     }

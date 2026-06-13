@@ -5,34 +5,21 @@ declare(strict_types=1);
 namespace App\Services;
 
 use Carbon\Carbon;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class GoogleBooksService
 {
     protected const API_URL = 'https://www.googleapis.com/books/v1/volumes';
 
-    protected Client $client;
-
     protected ?string $apiKey;
 
     protected int $maxResults = 5;
 
-    public function __construct(?Client $client = null, ?string $apiKey = null)
+    public function __construct(?string $apiKey = null)
     {
         $this->apiKey = trim($apiKey ?? (string) config('nntmux_api.google_books_api_key', '')) ?: null;
-
-        $this->client = $client ?? new Client([
-            'timeout' => 15,
-            'connect_timeout' => 10,
-            'http_errors' => false,
-            'headers' => [
-                'Accept' => 'application/json',
-                'User-Agent' => 'NNTmux/1.0',
-            ],
-        ]);
     }
 
     public function hasApiKey(): bool
@@ -118,17 +105,24 @@ class GoogleBooksService
                 $query['key'] = $this->apiKey;
             }
 
-            $response = $this->client->get(self::API_URL, ['query' => $query]);
-            if ($response->getStatusCode() !== 200) {
-                Log::warning('Google Books API request failed', ['status' => $response->getStatusCode()]);
+            $response = Http::timeout(15)
+                ->connectTimeout(10)
+                ->withHeaders([
+                    'Accept' => 'application/json',
+                    'User-Agent' => 'NNTmux/1.0',
+                ])
+                ->get(self::API_URL, $query);
+
+            if (! $response->successful()) {
+                Log::warning('Google Books API request failed', ['status' => $response->status()]);
 
                 return null;
             }
 
-            $decoded = json_decode($response->getBody()->getContents(), true);
+            $decoded = $response->json();
 
             return is_array($decoded) ? $decoded : null;
-        } catch (GuzzleException $e) {
+        } catch (\Throwable $e) {
             Log::error('Google Books API request error: '.$e->getMessage());
 
             return null;

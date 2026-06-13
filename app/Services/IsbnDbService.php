@@ -5,36 +5,22 @@ declare(strict_types=1);
 namespace App\Services;
 
 use Carbon\Carbon;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Psr\Http\Message\ResponseInterface;
 
 class IsbnDbService
 {
     protected const API_URL = 'https://api2.isbndb.com';
 
-    protected Client $client;
-
     protected string $apiKey;
 
     protected int $pageSize = 5;
 
-    public function __construct(?Client $client = null, ?string $apiKey = null)
+    public function __construct(?string $apiKey = null)
     {
         $this->apiKey = trim($apiKey ?? (string) config('nntmux_api.isbndb_api_key', ''));
-
-        $this->client = $client ?? new Client([
-            'base_uri' => self::API_URL,
-            'timeout' => 15,
-            'connect_timeout' => 10,
-            'http_errors' => false,
-            'headers' => [
-                'Accept' => 'application/json',
-                'User-Agent' => 'NNTmux/1.0',
-            ],
-        ]);
     }
 
     public function isConfigured(): bool
@@ -129,14 +115,16 @@ class IsbnDbService
         }
 
         try {
-            $response = $this->client->get($path, [
-                'headers' => [
+            $response = Http::timeout(15)
+                ->connectTimeout(10)
+                ->withHeaders([
+                    'Accept' => 'application/json',
+                    'User-Agent' => 'NNTmux/1.0',
                     'Authorization' => $this->apiKey,
-                ],
-                'query' => $query,
-            ]);
+                ])
+                ->get(self::API_URL.$path, $query);
 
-            $statusCode = $response->getStatusCode();
+            $statusCode = $response->status();
             $this->logRateLimitHeaders($response);
 
             if ($statusCode === 404) {
@@ -149,16 +137,16 @@ class IsbnDbService
                 return null;
             }
 
-            if ($statusCode !== 200) {
+            if (! $response->successful()) {
                 Log::warning("ISBNdb request returned status {$statusCode}");
 
                 return null;
             }
 
-            $data = json_decode($response->getBody()->getContents(), true);
+            $data = $response->json();
 
             return is_array($data) ? $data : null;
-        } catch (GuzzleException $e) {
+        } catch (\Throwable $e) {
             Log::error('ISBNdb API request error: '.$e->getMessage());
 
             return null;
@@ -225,10 +213,10 @@ class IsbnDbService
         return strtoupper((string) preg_replace('/[^0-9X]/i', '', $isbn));
     }
 
-    private function logRateLimitHeaders(ResponseInterface $response): void
+    private function logRateLimitHeaders(Response $response): void
     {
-        $rateLimit = $response->getHeaderLine('ratelimit');
-        $rateLimitPolicy = $response->getHeaderLine('ratelimit-policy');
+        $rateLimit = $response->header('ratelimit') ?? '';
+        $rateLimitPolicy = $response->header('ratelimit-policy') ?? '';
 
         if ($rateLimit === '' && $rateLimitPolicy === '') {
             return;

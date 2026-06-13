@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use voku\helper\HtmlDomParser;
@@ -20,8 +20,6 @@ class ImdbScraper
 
     protected const string IMDBAPI_DEV_COOLDOWN_CACHE_KEY = 'imdbapi_dev:cooldown';
 
-    protected Client $client;
-
     protected string $imdbApiDevBaseUrl;
 
     protected bool $lastRequestWasBlocked = false;
@@ -32,21 +30,9 @@ class ImdbScraper
 
     protected ?string $lastFallbackFailureReason = null;
 
-    public function __construct(?Client $client = null)
+    public function __construct()
     {
         $this->imdbApiDevBaseUrl = rtrim((string) config('nntmux_api.imdbapi_dev_base_url', 'https://api.imdbapi.dev'), '/');
-        $this->client = $client ?? new Client([
-            'timeout' => 10,
-            'connect_timeout' => 10,
-            'http_errors' => false,
-            'allow_redirects' => true,
-            'headers' => [
-                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
-                'Accept-Language' => 'en-US,en;q=0.9',
-                'Cache-Control' => 'no-cache',
-                'Pragma' => 'no-cache',
-            ],
-        ]);
     }
 
     public function wasBlockedByWaf(): bool
@@ -97,16 +83,21 @@ class ImdbScraper
         $url = 'https://www.imdb.com/title/tt'.$id.'/';
 
         try {
-            $response = $this->client->get($url, [
-                'headers' => [
+            $response = Http::timeout(10)
+                ->connectTimeout(10)
+                ->withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
+                    'Accept-Language' => 'en-US,en;q=0.9',
+                    'Cache-Control' => 'no-cache',
+                    'Pragma' => 'no-cache',
                     'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
                     'Referer' => 'https://www.imdb.com/',
                     'Upgrade-Insecure-Requests' => '1',
-                ],
-            ]);
+                ])
+                ->get($url);
 
-            $statusCode = $response->getStatusCode();
-            $html = (string) $response->getBody();
+            $statusCode = $response->status();
+            $html = $response->body();
 
             if ($this->isWafResponse($statusCode, $html)) {
                 $this->lastRequestWasBlocked = true;
@@ -199,17 +190,22 @@ class ImdbScraper
         $url = 'https://v2.sg.media-imdb.com/suggestion/'.urlencode($prefix).'/'.urlencode($slug).'.json';
 
         try {
-            $res = $this->client->get($url, [
-                'headers' => [
+            $res = Http::timeout(10)
+                ->connectTimeout(10)
+                ->withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
+                    'Accept-Language' => 'en-US,en;q=0.9',
+                    'Cache-Control' => 'no-cache',
+                    'Pragma' => 'no-cache',
                     'Accept' => 'application/json,text/plain,*/*',
                     'Origin' => 'https://www.imdb.com',
                     'Referer' => 'https://www.imdb.com/find/?q='.rawurlencode($query).'&s=tt',
-                ],
-            ]);
-            $body = (string) $res->getBody();
+                ])
+                ->get($url);
+            $body = $res->body();
 
             $results = [];
-            if ($res->getStatusCode() === 200 && ! $this->isWafResponse($res->getStatusCode(), $body)) {
+            if ($res->successful() && ! $this->isWafResponse($res->status(), $body)) {
                 $results = $this->parseSuggestionJson($body);
             }
 
@@ -321,29 +317,36 @@ class ImdbScraper
         try {
             $this->markImdbApiDevAttempt();
 
-            $response = $this->client->get($this->imdbApiDevBaseUrl.'/titles/tt'.$id, [
-                'headers' => [
+            $response = Http::timeout(10)
+                ->connectTimeout(10)
+                ->withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
+                    'Accept-Language' => 'en-US,en;q=0.9',
+                    'Cache-Control' => 'no-cache',
+                    'Pragma' => 'no-cache',
                     'Accept' => 'application/json',
-                ],
-            ]);
+                ])
+                ->get($this->imdbApiDevBaseUrl.'/titles/tt'.$id);
 
-            if ($response->getStatusCode() === 429) {
+            $statusCode = $response->status();
+
+            if ($statusCode === 429) {
                 $this->lastFallbackFailureReason = 'fallback_rate_limited';
                 $this->activateImdbApiDevCooldown();
 
                 return false;
             }
 
-            if ($response->getStatusCode() !== 200) {
+            if (! $response->successful()) {
                 $this->lastFallbackFailureReason = 'fallback_http_failure';
-                if ($response->getStatusCode() >= 500) {
+                if ($statusCode >= 500) {
                     $this->activateImdbApiDevCooldown();
                 }
 
                 return false;
             }
 
-            $payload = json_decode((string) $response->getBody(), true);
+            $payload = $response->json();
             if (! is_array($payload)) {
                 $this->lastFallbackFailureReason = 'fallback_invalid_json';
 
@@ -895,15 +898,20 @@ class ImdbScraper
         $url = 'https://www.imdb.com/find/?q='.rawurlencode($query).'&s=tt';
 
         try {
-            $response = $this->client->get($url, [
-                'headers' => [
+            $response = Http::timeout(10)
+                ->connectTimeout(10)
+                ->withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
+                    'Accept-Language' => 'en-US,en;q=0.9',
+                    'Cache-Control' => 'no-cache',
+                    'Pragma' => 'no-cache',
                     'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
                     'Referer' => 'https://www.imdb.com/',
-                ],
-            ]);
+                ])
+                ->get($url);
 
-            $statusCode = $response->getStatusCode();
-            $html = (string) $response->getBody();
+            $statusCode = $response->status();
+            $html = $response->body();
 
             if ($this->isWafResponse($statusCode, $html)) {
                 $this->lastRequestWasBlocked = true;

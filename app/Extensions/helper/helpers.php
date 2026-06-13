@@ -5,14 +5,11 @@ declare(strict_types=1);
 use App\Models\Country as CountryModel;
 use App\Models\Release;
 use App\Services\Nzb\NzbService;
-use GuzzleHttp\Client;
-use GuzzleHttp\Cookie\CookieJar;
-use GuzzleHttp\Cookie\SetCookie;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use STS\ZipStream\Builder;
@@ -43,25 +40,23 @@ if (! function_exists('getRawHtml')) {
             }
         }
 
-        // Standard method
-        $cookieJar = new CookieJar;
-        $client = new Client(['headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246']]);
-        if ($cookie !== false && $cookie !== null && $cookie !== '') {
-            $cookie = $cookieJar->setCookie(SetCookie::fromString((string) $cookie));
-            $client = new Client(['cookies' => $cookie, 'headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246']]);
+        $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246';
+        $headers = ['User-Agent' => $userAgent];
+
+        if (is_string($cookie) && $cookie !== '') {
+            $headers['Cookie'] = $cookie;
         }
+
         try {
-            $response = $client->get($url)->getBody()->getContents();
-            $jsonResponse = json_decode($response, true);
+            $response = Http::withHeaders($headers)->get($url);
+            $body = $response->body();
+            $jsonResponse = json_decode($body, true);
             if (json_last_error() === JSON_ERROR_NONE) {
                 $response = $jsonResponse;
+            } else {
+                $response = $body;
             }
-        } catch (RequestException $e) {
-            if (function_exists('config') && config('app.debug') === true) {
-                Log::error($e->getMessage());
-            }
-            $response = false;
-        } catch (RuntimeException $e) {
+        } catch (Throwable $e) {
             if (function_exists('config') && config('app.debug') === true) {
                 Log::error($e->getMessage());
             }

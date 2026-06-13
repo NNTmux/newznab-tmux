@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace App\Services;
 
 use Carbon\Carbon;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class OpenLibraryService
@@ -16,22 +15,7 @@ class OpenLibraryService
 
     protected const ISBN_URL = 'https://openlibrary.org/isbn/';
 
-    protected Client $client;
-
     protected int $limit = 5;
-
-    public function __construct(?Client $client = null)
-    {
-        $this->client = $client ?? new Client([
-            'timeout' => 15,
-            'connect_timeout' => 10,
-            'http_errors' => false,
-            'headers' => [
-                'Accept' => 'application/json',
-                'User-Agent' => 'NNTmux/1.0',
-            ],
-        ]);
-    }
 
     /**
      * @return array<string, mixed>|null
@@ -50,12 +34,19 @@ class OpenLibraryService
         }
 
         try {
-            $response = $this->client->get(self::ISBN_URL.rawurlencode($isbn).'.json');
-            if ($response->getStatusCode() !== 200) {
+            $response = Http::timeout(15)
+                ->connectTimeout(10)
+                ->withHeaders([
+                    'Accept' => 'application/json',
+                    'User-Agent' => 'NNTmux/1.0',
+                ])
+                ->get(self::ISBN_URL.rawurlencode($isbn).'.json');
+
+            if (! $response->successful()) {
                 return null;
             }
 
-            $data = json_decode($response->getBody()->getContents(), true);
+            $data = $response->json();
             if (! is_array($data)) {
                 return null;
             }
@@ -64,7 +55,7 @@ class OpenLibraryService
             Cache::put($cacheKey, $book, now()->addHours(24));
 
             return $book;
-        } catch (GuzzleException $e) {
+        } catch (\Throwable $e) {
             Log::error('OpenLibrary ISBN lookup error: '.$e->getMessage());
 
             return null;
@@ -98,17 +89,22 @@ class OpenLibraryService
         }
 
         try {
-            $response = $this->client->get(self::SEARCH_URL, [
-                'query' => [
+            $response = Http::timeout(15)
+                ->connectTimeout(10)
+                ->withHeaders([
+                    'Accept' => 'application/json',
+                    'User-Agent' => 'NNTmux/1.0',
+                ])
+                ->get(self::SEARCH_URL, [
                     'q' => $query,
                     'limit' => $this->limit,
-                ],
-            ]);
-            if ($response->getStatusCode() !== 200) {
+                ]);
+
+            if (! $response->successful()) {
                 return [];
             }
 
-            $data = json_decode($response->getBody()->getContents(), true);
+            $data = $response->json();
             if (! is_array($data['docs'] ?? null)) {
                 return [];
             }
@@ -123,7 +119,7 @@ class OpenLibraryService
             Cache::put($cacheKey, $results, now()->addHours(12));
 
             return $results;
-        } catch (GuzzleException $e) {
+        } catch (\Throwable $e) {
             Log::error('OpenLibrary search error: '.$e->getMessage());
 
             return [];

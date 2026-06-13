@@ -8,9 +8,8 @@ use App\Facades\Elasticsearch;
 use App\Services\Search\Support\ElasticsearchResponseHelper;
 use Elastic\Elasticsearch\Client as ElasticsearchClient;
 use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Http;
 
 class NntmuxCheckIndex extends Command
 {
@@ -146,25 +145,16 @@ class NntmuxCheckIndex extends Command
             // Use HTTP API endpoint
             $baseUrl = "http://{$host}:{$port}";
 
-            // Check if table exists using HTTP API
-            $client = new Client([
-                'base_uri' => $baseUrl,
-                'timeout' => 10,
-                'http_errors' => false, // Don't throw on HTTP errors
-            ]);
-
             // Use raw mode which seems to work
             $query = "SELECT COUNT(*) FROM {$indexName}";
 
-            $response = $client->post('/sql?mode=raw', [
-                'body' => $query,
-                'headers' => [
-                    'Content-Type' => 'text/plain',
-                ],
-            ]);
+            $response = Http::timeout(10)
+                ->baseUrl($baseUrl)
+                ->withBody($query, 'text/plain')
+                ->post('/sql?mode=raw');
 
-            $statusCode = $response->getStatusCode();
-            $body = $response->getBody()->getContents();
+            $statusCode = $response->status();
+            $body = $response->body();
 
             if ($statusCode !== 200) {
                 $this->error("HTTP Status: {$statusCode}");
@@ -198,15 +188,13 @@ class NntmuxCheckIndex extends Command
             if ($docCount > 0) {
                 $sampleQuery = "SELECT * FROM {$indexName} LIMIT 1";
 
-                $sampleResponse = $client->post('/sql?mode=raw', [
-                    'body' => $sampleQuery,
-                    'headers' => [
-                        'Content-Type' => 'text/plain',
-                    ],
-                ]);
+                $sampleResponse = Http::timeout(10)
+                    ->baseUrl($baseUrl)
+                    ->withBody($sampleQuery, 'text/plain')
+                    ->post('/sql?mode=raw');
 
-                if ($sampleResponse->getStatusCode() === 200) {
-                    $sampleBody = $sampleResponse->getBody()->getContents();
+                if ($sampleResponse->successful()) {
+                    $sampleBody = $sampleResponse->body();
                     $sampleJson = json_decode($sampleBody, true);
 
                     if ($sampleJson !== null && isset($sampleJson['data'][0])) {
@@ -230,15 +218,13 @@ class NntmuxCheckIndex extends Command
             // Get table structure
             try {
                 $describeQuery = "DESCRIBE {$indexName}";
-                $describeResponse = $client->post('/sql?mode=raw', [
-                    'body' => $describeQuery,
-                    'headers' => [
-                        'Content-Type' => 'text/plain',
-                    ],
-                ]);
+                $describeResponse = Http::timeout(10)
+                    ->baseUrl($baseUrl)
+                    ->withBody($describeQuery, 'text/plain')
+                    ->post('/sql?mode=raw');
 
-                if ($describeResponse->getStatusCode() === 200) {
-                    $describeBody = $describeResponse->getBody()->getContents();
+                if ($describeResponse->successful()) {
+                    $describeBody = $describeResponse->body();
                     $describeJson = json_decode($describeBody, true);
 
                     if ($describeJson !== null && isset($describeJson['data'])) {
@@ -259,11 +245,8 @@ class NntmuxCheckIndex extends Command
                 // Ignore describe errors
             }
 
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             $this->error("Error checking ManticoreSearch table: {$e->getMessage()}");
-            if ($e instanceof RequestException && $e->hasResponse()) {
-                $this->error('Response body: '.$e->getResponse()->getBody());
-            }
         }
     }
 

@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace App\Services;
 
 use Carbon\Carbon;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -23,24 +22,9 @@ class ItunesService
 
     protected const LOOKUP_URL = 'https://itunes.apple.com/lookup';
 
-    protected Client $client;
-
     protected int $limit = 25;
 
     protected string $country = 'US';
-
-    public function __construct()
-    {
-        $this->client = new Client([
-            'timeout' => 15,
-            'connect_timeout' => 10,
-            'http_errors' => false,
-            'headers' => [
-                'Accept' => 'application/json',
-                'User-Agent' => 'NNTmux/1.0',
-            ],
-        ]);
-    }
 
     /**
      * Set the result limit.
@@ -127,21 +111,24 @@ class ItunesService
         }
 
         try {
-            $response = $this->client->get(self::LOOKUP_URL, [
-                'query' => [
+            $response = Http::timeout(15)
+                ->connectTimeout(10)
+                ->withHeaders([
+                    'Accept' => 'application/json',
+                    'User-Agent' => 'NNTmux/1.0',
+                ])
+                ->get(self::LOOKUP_URL, [
                     'id' => $id,
                     'country' => $this->country,
-                ],
-            ]);
+                ]);
 
-            $statusCode = $response->getStatusCode();
-            if ($statusCode !== 200) {
-                Log::warning("iTunes API lookup returned status {$statusCode}");
+            if (! $response->successful()) {
+                Log::warning("iTunes API lookup returned status {$response->status()}");
 
                 return null;
             }
 
-            $data = json_decode($response->getBody()->getContents(), true);
+            $data = $response->json();
 
             if (! isset($data['results']) || empty($data['results'])) {
                 return null;
@@ -150,7 +137,7 @@ class ItunesService
             Cache::put($cacheKey, $data['results'][0], now()->addDays(7));
 
             return $data['results'][0];
-        } catch (GuzzleException $e) {
+        } catch (\Throwable $e) {
             Log::error('iTunes API lookup error: '.$e->getMessage());
 
             return null;
@@ -253,24 +240,27 @@ class ItunesService
         }
 
         try {
-            $response = $this->client->get(self::API_URL, [
-                'query' => [
+            $response = Http::timeout(15)
+                ->connectTimeout(10)
+                ->withHeaders([
+                    'Accept' => 'application/json',
+                    'User-Agent' => 'NNTmux/1.0',
+                ])
+                ->get(self::API_URL, [
                     'term' => $term,
                     'entity' => $entity,
                     'media' => $media,
                     'country' => $this->country,
                     'limit' => $this->limit,
-                ],
-            ]);
+                ]);
 
-            $statusCode = $response->getStatusCode();
-            if ($statusCode !== 200) {
-                Log::warning("iTunes API search returned status {$statusCode}");
+            if (! $response->successful()) {
+                Log::warning("iTunes API search returned status {$response->status()}");
 
                 return null;
             }
 
-            $data = json_decode($response->getBody()->getContents(), true);
+            $data = $response->json();
 
             if (! isset($data['results'])) {
                 return null;
@@ -280,7 +270,7 @@ class ItunesService
             Cache::put($cacheKey, $results, now()->addHours(6));
 
             return $results;
-        } catch (GuzzleException $e) {
+        } catch (\Throwable $e) {
             Log::error('iTunes API search error: '.$e->getMessage());
 
             return null;
