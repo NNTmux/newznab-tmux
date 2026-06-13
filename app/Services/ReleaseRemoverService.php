@@ -8,6 +8,7 @@ use App\Enums\BlacklistConstants;
 use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Settings;
+use App\Models\UsenetGroup;
 use App\Services\Nzb\NzbService;
 use App\Services\Releases\ReleaseManagementService;
 use Carbon\Carbon;
@@ -597,9 +598,9 @@ class ReleaseRemoverService
             return '';
         }
 
-        $groupIDs = DB::select(
-            'SELECT id FROM usenet_groups WHERE name REGEXP '.escapeString($groupname)
-        );
+        $groupIDs = UsenetGroup::query()
+            ->whereRaw('name REGEXP ?', [$groupname])
+            ->get(['id']);
 
         if (empty($groupIDs)) {
             return null;
@@ -631,18 +632,13 @@ class ReleaseRemoverService
             ? sprintf('AND status = %d', BlacklistConstants::BLACKLIST_ENABLED)
             : '';
 
-        $regexList = DB::select(sprintf(
-            'SELECT regex, id, groupname, msgcol
-            FROM binaryblacklist
-            WHERE optype = %d
-            AND msgcol IN (%d, %d) %s %s
-            ORDER BY id ASC',
-            BlacklistConstants::OPTYPE_BLACKLIST,
-            BlacklistConstants::BLACKLIST_FIELD_SUBJECT,
-            BlacklistConstants::BLACKLIST_FIELD_FROM,
-            $this->blacklistID,
-            $status
-        ));
+        $regexList = BinaryBlacklist::query()
+            ->where('optype', BlacklistConstants::OPTYPE_BLACKLIST)
+            ->whereIn('msgcol', [BlacklistConstants::BLACKLIST_FIELD_SUBJECT, BlacklistConstants::BLACKLIST_FIELD_FROM])
+            ->when($this->blacklistID !== '', fn ($q) => $q->where('id', $this->blacklistID))
+            ->when($status !== '', fn ($q) => $q->where('status', BlacklistConstants::BLACKLIST_ENABLED))
+            ->orderBy('id')
+            ->get(['regex', 'id', 'groupname', 'msgcol']);
 
         if (empty($regexList)) {
             cli()->error("No regular expressions were selected for blacklist removal. Make sure you have activated REGEXPs in Site Edit and you're specifying a valid ID.", true);
@@ -730,17 +726,12 @@ class ReleaseRemoverService
      */
     protected function removeBlacklistFiles(): bool
     {
-        $allRegex = DB::select(sprintf(
-            'SELECT regex, id, groupname
-            FROM binaryblacklist
-            WHERE status = %d
-            AND optype = %d
-            AND msgcol = %d
-            ORDER BY id ASC',
-            BlacklistConstants::BLACKLIST_ENABLED,
-            BlacklistConstants::OPTYPE_BLACKLIST,
-            BlacklistConstants::BLACKLIST_FIELD_SUBJECT
-        ));
+        $allRegex = BinaryBlacklist::query()
+            ->where('status', BlacklistConstants::BLACKLIST_ENABLED)
+            ->where('optype', BlacklistConstants::OPTYPE_BLACKLIST)
+            ->where('msgcol', BlacklistConstants::BLACKLIST_FIELD_SUBJECT)
+            ->orderBy('id')
+            ->get(['regex', 'id', 'groupname']);
 
         if (empty($allRegex)) {
             return true;
@@ -1103,18 +1094,18 @@ class ReleaseRemoverService
     private function buildGroupClause(string $modifier, string $value): bool|string
     {
         if ($modifier === 'equals') {
-            $group = DB::select('SELECT id FROM usenet_groups WHERE name = '.escapeString($value));
-            if (empty($group)) {
+            $group = UsenetGroup::where('name', $value)->first(['id']);
+            if ($group === null) {
                 $this->error = 'This group was not found in your database: '.$value.PHP_EOL;
 
                 return false;
             }
 
-            return ' AND groups_id = '.$group[0]->id;
+            return ' AND groups_id = '.$group->id;
         }
 
         if ($modifier === 'like') {
-            $groups = DB::select('SELECT id FROM usenet_groups WHERE name '.$this->formatLike($value, 'name'));
+            $groups = UsenetGroup::whereRaw($this->formatLike($value, 'name'))->get(['id']);
             if (empty($groups)) {
                 $this->error = 'No groups were found with this pattern in your database: '.$value.PHP_EOL;
 

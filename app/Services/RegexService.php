@@ -10,7 +10,6 @@ use App\Models\CollectionRegex;
 use App\Models\Release;
 use App\Models\ReleaseNamingRegex;
 use App\Models\UsenetGroup;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -58,19 +57,21 @@ class RegexService
      */
     public function addRegex(array $data): bool
     {
-        return (bool) DB::insert(
-            sprintf(
-                'INSERT INTO %s (group_regex, regex, status, description, ordinal%s) VALUES (%s, %s, %d, %s, %d%s)',
-                $this->tableName,
-                ($this->tableName === 'category_regexes' ? ', categories_id' : ''),
-                trim(escapeString($data['group_regex'])),
-                trim(escapeString($data['regex'])),
-                $data['status'],
-                trim(escapeString($data['description'])),
-                $data['ordinal'],
-                ($this->tableName === 'category_regexes' ? (', '.$data['categories_id']) : '')
-            )
-        );
+        $record = [
+            'group_regex' => $data['group_regex'],
+            'regex' => $data['regex'],
+            'status' => $data['status'],
+            'description' => $data['description'],
+            'ordinal' => $data['ordinal'],
+        ];
+
+        if ($this->tableName === 'category_regexes') {
+            $record['categories_id'] = $data['categories_id'];
+        }
+
+        $modelClass = $this->resolveModelClass();
+
+        return (bool) $modelClass::query()->insert($record);
     }
 
     /**
@@ -80,21 +81,21 @@ class RegexService
      */
     public function updateRegex(array $data): bool
     {
-        return (bool) DB::update(
-            sprintf(
-                'UPDATE %s
-                SET group_regex = %s, regex = %s, status = %d, description = %s, ordinal = %d %s
-                WHERE id = %d',
-                $this->tableName,
-                trim(escapeString($data['group_regex'])),
-                trim(escapeString($data['regex'])),
-                $data['status'],
-                trim(escapeString($data['description'])),
-                $data['ordinal'],
-                ($this->tableName === 'category_regexes' ? (', categories_id = '.$data['categories_id']) : ''),
-                $data['id']
-            )
-        );
+        $record = [
+            'group_regex' => $data['group_regex'],
+            'regex' => $data['regex'],
+            'status' => $data['status'],
+            'description' => $data['description'],
+            'ordinal' => $data['ordinal'],
+        ];
+
+        if ($this->tableName === 'category_regexes') {
+            $record['categories_id'] = $data['categories_id'];
+        }
+
+        $modelClass = $this->resolveModelClass();
+
+        return (bool) $modelClass::query()->where('id', $data['id'])->update($record);
     }
 
     /**
@@ -104,7 +105,9 @@ class RegexService
      */
     public function getRegexByID(int $id): array
     {
-        return (array) Arr::first(DB::select(sprintf('SELECT * FROM %s WHERE id = %d LIMIT 1', $this->tableName, $id)));
+        $modelClass = $this->resolveModelClass();
+
+        return (array) $modelClass::query()->where('id', $id)->first();
     }
 
     /**
@@ -156,9 +159,8 @@ class RegexService
      */
     public function deleteRegex(int $id): void
     {
-        DB::transaction(function () use ($id) {
-            DB::delete(sprintf('DELETE FROM %s WHERE id = %d', $this->tableName, $id));
-        }, 3);
+        $modelClass = $this->resolveModelClass();
+        $modelClass::query()->where('id', $id)->delete();
     }
 
     /**
@@ -307,21 +309,28 @@ class RegexService
      */
     protected function _fetchRegex(string $groupName): void
     {
-        // Get all regex from DB which match the current group name. Cache them for 15 minutes. #CACHEDQUERY#
-        $sql = sprintf(
-            'SELECT r.id, r.regex %s FROM %s r WHERE \'%s\' REGEXP r.group_regex AND r.status = 1 ORDER BY r.ordinal ASC, r.group_regex ASC',
-            ($this->tableName === 'category_regexes' ? ', r.categories_id' : ''),
-            $this->tableName,
-            $groupName
-        );
+        $modelClass = $this->resolveModelClass();
+        $select = ['id', 'regex'];
+        if ($this->tableName === 'category_regexes') {
+            $select[] = 'categories_id';
+        }
 
-        $this->_regexCache[$groupName]['regex'] = Cache::get(md5($sql));
+        $cacheKey = md5('regex_'.$this->tableName.'_'.$groupName);
+        $this->_regexCache[$groupName]['regex'] = Cache::get($cacheKey);
         if ($this->_regexCache[$groupName]['regex'] !== null) {
             return;
         }
-        $this->_regexCache[$groupName]['regex'] = DB::select($sql);
+
+        $this->_regexCache[$groupName]['regex'] = $modelClass::query()
+            ->select($select)
+            ->whereRaw('? REGEXP group_regex', [$groupName])
+            ->where('status', 1)
+            ->orderBy('ordinal')
+            ->orderBy('group_regex')
+            ->get();
+
         $expiresAt = now()->addMinutes(config('nntmux.cache_expiry_long'));
-        Cache::put(md5($sql), $this->_regexCache[$groupName]['regex'], $expiresAt);
+        Cache::put($cacheKey, $this->_regexCache[$groupName]['regex'], $expiresAt);
     }
 
     /**
@@ -363,5 +372,14 @@ class RegexService
     protected function _groupQueryString(string $group_regex): string
     {
         return $group_regex ? ('WHERE group_regex LIKE '.escapeString('%'.$group_regex.'%')) : '';
+    }
+
+    private function resolveModelClass(): string
+    {
+        return match ($this->tableName) {
+            'collection_regexes' => CollectionRegex::class,
+            'category_regexes' => CategoryRegex::class,
+            default => ReleaseNamingRegex::class,
+        };
     }
 }
