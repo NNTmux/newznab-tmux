@@ -596,11 +596,11 @@ class ConsoleService
             $result['title'] = trim(preg_replace('/Dis[ck] \d.*$/i', '', $result['title']));
 
             // Needed to add code to handle DLC Properly.
-            if (stripos('dlc', $result['title']) !== false) {
+            if (stripos($result['title'], 'dlc') !== false) {
                 $result['dlc'] = '1';
-                if (stripos('Rock Band Network', $result['title']) !== false) {
+                if (stripos($result['title'], 'Rock Band Network') !== false) {
                     $result['title'] = 'Rock Band';
-                } elseif (strpos('-', $result['title']) !== false) {
+                } elseif (str_contains($result['title'], '-')) {
                     $dlc = explode('-', $result['title']);
                     $result['title'] = $dlc[0];
                 } elseif (preg_match('/(.*? .*?) /i', $result['title'], $dlc)) {
@@ -619,11 +619,11 @@ class ConsoleService
                 $platform = 'NGC';
             }
 
-            if (stripos('PSX2PSP', $platform) === 0) {
+            if (stripos($platform, 'PSX2PSP') === 0) {
                 $platform = 'PSX';
             }
 
-            if (! empty($title) && stripos('XBLA', $platform) === 0 && stripos('dlc', $title) !== false) {
+            if (! empty($title) && stripos($platform, 'XBLA') === 0 && stripos($title, 'dlc') !== false) {
                 $platform = 'XBOX360';
             }
 
