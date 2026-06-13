@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Services\ImdbScraper;
-use GuzzleHttp\Client;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Http;
 
 class ImdbScraperTest extends ImdbScraperTestCase
 {
     public function test_fetch_by_id_parses_title_page_from_fixture(): void
     {
-        $scraper = $this->makeScraperWithResponses([
-            new Response(200, ['Content-Type' => 'text/html; charset=UTF-8'], file_get_contents(base_path('tests/Fixtures/imdb/title_jsonld.html')) ?: ''),
-        ]);
+        Http::fakeSequence()
+            ->push(file_get_contents(base_path('tests/Fixtures/imdb/title_jsonld.html')) ?: '', 200);
+
+        $scraper = new ImdbScraper;
 
         $data = $scraper->fetchById('1234567');
 
@@ -36,10 +34,11 @@ class ImdbScraperTest extends ImdbScraperTestCase
 
     public function test_fetch_by_id_detects_waf_challenge_and_marks_temporary_block(): void
     {
-        $scraper = $this->makeScraperWithResponses([
-            new Response(202, ['Content-Type' => 'text/html; charset=UTF-8'], '<html><script>window.awsWafCookieDomainList=[];window.gokuProps={};</script></html>'),
-            new Response(404, ['Content-Type' => 'application/json; charset=UTF-8'], '{"code":5,"message":"NOT_FOUND"}'),
-        ]);
+        Http::fakeSequence()
+            ->push('<html><script>window.awsWafCookieDomainList=[];window.gokuProps={};</script></html>', 202)
+            ->push('{"code":5,"message":"NOT_FOUND"}', 404);
+
+        $scraper = new ImdbScraper;
 
         $data = $scraper->fetchById('1234567');
 
@@ -52,35 +51,38 @@ class ImdbScraperTest extends ImdbScraperTestCase
 
     public function test_fetch_by_id_falls_back_to_imdbapi_dev_when_title_page_is_blocked(): void
     {
-        $scraper = $this->makeScraperWithResponses([
-            new Response(202, ['Content-Type' => 'text/html; charset=UTF-8'], '<html><script>window.awsWafCookieDomainList=[];window.gokuProps={};</script></html>'),
-            new Response(200, ['Content-Type' => 'application/json; charset=UTF-8'], json_encode([
-                'id' => 'tt1234567',
-                'type' => 'movie',
-                'primaryTitle' => 'API Dev Movie',
-                'startYear' => 2026,
-                'genres' => ['Horror', 'Thriller'],
-                'plot' => 'Fallback plot from imdbapi.dev.',
-                'rating' => [
-                    'aggregateRating' => 7.4,
-                    'voteCount' => 123,
-                ],
-                'primaryImage' => [
-                    'url' => 'https://example.com/api-dev-poster.jpg',
-                ],
-                'directors' => [
-                    ['displayName' => 'API Director'],
-                ],
-                'stars' => [
-                    ['displayName' => 'API Star One'],
-                    ['displayName' => 'API Star Two'],
-                ],
-                'spokenLanguages' => [
-                    ['name' => 'English'],
-                    ['name' => 'Spanish'],
-                ],
-            ], JSON_THROW_ON_ERROR)),
-        ]);
+        $apiDevResponse = json_encode([
+            'id' => 'tt1234567',
+            'type' => 'movie',
+            'primaryTitle' => 'API Dev Movie',
+            'startYear' => 2026,
+            'genres' => ['Horror', 'Thriller'],
+            'plot' => 'Fallback plot from imdbapi.dev.',
+            'rating' => [
+                'aggregateRating' => 7.4,
+                'voteCount' => 123,
+            ],
+            'primaryImage' => [
+                'url' => 'https://example.com/api-dev-poster.jpg',
+            ],
+            'directors' => [
+                ['displayName' => 'API Director'],
+            ],
+            'stars' => [
+                ['displayName' => 'API Star One'],
+                ['displayName' => 'API Star Two'],
+            ],
+            'spokenLanguages' => [
+                ['name' => 'English'],
+                ['name' => 'Spanish'],
+            ],
+        ], JSON_THROW_ON_ERROR);
+
+        Http::fakeSequence()
+            ->push('<html><script>window.awsWafCookieDomainList=[];window.gokuProps={};</script></html>', 202)
+            ->push($apiDevResponse, 200);
+
+        $scraper = new ImdbScraper;
 
         $data = $scraper->fetchById('1234567');
 
@@ -104,13 +106,11 @@ class ImdbScraperTest extends ImdbScraperTestCase
 
     public function test_fetch_by_id_returns_false_when_imdbapi_dev_payload_lacks_title(): void
     {
-        $scraper = $this->makeScraperWithResponses([
-            new Response(202, ['Content-Type' => 'text/html; charset=UTF-8'], '<html><script>window.awsWafCookieDomainList=[];window.gokuProps={};</script></html>'),
-            new Response(200, ['Content-Type' => 'application/json; charset=UTF-8'], json_encode([
-                'id' => 'tt1234567',
-                'startYear' => 2026,
-            ], JSON_THROW_ON_ERROR)),
-        ]);
+        Http::fakeSequence()
+            ->push('<html><script>window.awsWafCookieDomainList=[];window.gokuProps={};</script></html>', 202)
+            ->push(json_encode(['id' => 'tt1234567', 'startYear' => 2026], JSON_THROW_ON_ERROR), 200);
+
+        $scraper = new ImdbScraper;
 
         $this->assertFalse($scraper->fetchById('1234567'));
         $this->assertSame('waf_block', $scraper->getLastFailureReason());
@@ -125,16 +125,17 @@ class ImdbScraperTest extends ImdbScraperTestCase
             'nntmux_api.imdbapi_dev_cooldown_seconds' => 300,
         ]);
 
-        $scraper = $this->makeScraperWithResponses([
-            new Response(202, ['Content-Type' => 'text/html; charset=UTF-8'], '<html><script>window.awsWafCookieDomainList=[];window.gokuProps={};</script></html>'),
-            new Response(200, ['Content-Type' => 'application/json; charset=UTF-8'], json_encode([
+        Http::fakeSequence()
+            ->push('<html><script>window.awsWafCookieDomainList=[];window.gokuProps={};</script></html>', 202)
+            ->push(json_encode([
                 'id' => 'tt1234567',
                 'type' => 'movie',
                 'primaryTitle' => 'First Fallback Movie',
                 'startYear' => 2026,
-            ], JSON_THROW_ON_ERROR)),
-            new Response(202, ['Content-Type' => 'text/html; charset=UTF-8'], '<html><script>window.awsWafCookieDomainList=[];window.gokuProps={};</script></html>'),
-        ]);
+            ], JSON_THROW_ON_ERROR), 200)
+            ->push('<html><script>window.awsWafCookieDomainList=[];window.gokuProps={};</script></html>', 202);
+
+        $scraper = new ImdbScraper;
 
         $first = $scraper->fetchById('1234567');
         $second = $scraper->fetchById('2345678');
@@ -153,11 +154,12 @@ class ImdbScraperTest extends ImdbScraperTestCase
             'nntmux_api.imdbapi_dev_cooldown_seconds' => 300,
         ]);
 
-        $scraper = $this->makeScraperWithResponses([
-            new Response(202, ['Content-Type' => 'text/html; charset=UTF-8'], '<html><script>window.awsWafCookieDomainList=[];window.gokuProps={};</script></html>'),
-            new Response(429, ['Content-Type' => 'application/json; charset=UTF-8'], '{"code":8,"message":"RATE_LIMITED"}'),
-            new Response(202, ['Content-Type' => 'text/html; charset=UTF-8'], '<html><script>window.awsWafCookieDomainList=[];window.gokuProps={};</script></html>'),
-        ]);
+        Http::fakeSequence()
+            ->push('<html><script>window.awsWafCookieDomainList=[];window.gokuProps={};</script></html>', 202)
+            ->push('{"code":8,"message":"RATE_LIMITED"}', 429)
+            ->push('<html><script>window.awsWafCookieDomainList=[];window.gokuProps={};</script></html>', 202);
+
+        $scraper = new ImdbScraper;
 
         $first = $scraper->fetchById('1234567');
         $this->assertFalse($first);
@@ -173,9 +175,10 @@ class ImdbScraperTest extends ImdbScraperTestCase
 
     public function test_search_parses_suggestion_json_results(): void
     {
-        $scraper = $this->makeScraperWithResponses([
-            new Response(200, ['Content-Type' => 'application/json; charset=UTF-8'], file_get_contents(base_path('tests/Fixtures/imdb/search_inception.json')) ?: '{}'),
-        ]);
+        Http::fakeSequence()
+            ->push(file_get_contents(base_path('tests/Fixtures/imdb/search_inception.json')) ?: '{}', 200);
+
+        $scraper = new ImdbScraper;
 
         $results = $scraper->search('Inception');
 
@@ -189,19 +192,5 @@ class ImdbScraperTest extends ImdbScraperTestCase
     {
         $scraper = new ImdbScraper;
         $this->assertSame([], $scraper->search(''));
-    }
-
-    /**
-     * @param  array<int, Response>  $responses
-     */
-    private function makeScraperWithResponses(array $responses): ImdbScraper
-    {
-        $mock = new MockHandler($responses);
-        $client = new Client([
-            'handler' => HandlerStack::create($mock),
-            'http_errors' => false,
-        ]);
-
-        return new ImdbScraper($client);
     }
 }

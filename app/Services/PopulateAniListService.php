@@ -365,21 +365,6 @@ class PopulateAniListService
 
             return false;
         } catch (\Throwable $e) {
-            // Check if this is a 429 error
-            if (str_contains($e->getMessage(), '429') || str_contains($e->getMessage(), 'Too Many Requests')) {
-                $pauseUntil = time() + (15 * 60);
-                self::$rateLimitPause = [
-                    'timestamp' => time(),
-                    'paused_until' => $pauseUntil,
-                ];
-
-                if ($this->echooutput) {
-                    cli()->error('AniList API returned 429 (Too Many Requests). Pausing all API calls for 15 minutes.');
-                }
-
-                throw new \Exception('AniList API rate limit exceeded (429). Paused until '.date('Y-m-d H:i:s', $pauseUntil));
-            }
-
             if ($this->echooutput) {
                 cli()->error('AniList API Request Failed: '.$e->getMessage());
             }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -56,6 +57,23 @@ class ImdbScraper
     }
 
     /**
+     * Build HTTP request with standard IMDb browser headers.
+     *
+     * @param  array<string, string>  $extra  Additional headers to merge
+     */
+    private function imdbRequest(array $extra = []): PendingRequest
+    {
+        return Http::timeout(10)
+            ->connectTimeout(10)
+            ->withHeaders(array_merge([
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
+                'Accept-Language' => 'en-US,en;q=0.9',
+                'Cache-Control' => 'no-cache',
+                'Pragma' => 'no-cache',
+            ], $extra));
+    }
+
+    /**
      * Fetch a movie by IMDB numeric ID.
      *
      * @param  string  $id  Numeric part without 'tt'.
@@ -83,18 +101,11 @@ class ImdbScraper
         $url = 'https://www.imdb.com/title/tt'.$id.'/';
 
         try {
-            $response = Http::timeout(10)
-                ->connectTimeout(10)
-                ->withHeaders([
-                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
-                    'Accept-Language' => 'en-US,en;q=0.9',
-                    'Cache-Control' => 'no-cache',
-                    'Pragma' => 'no-cache',
-                    'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-                    'Referer' => 'https://www.imdb.com/',
-                    'Upgrade-Insecure-Requests' => '1',
-                ])
-                ->get($url);
+            $response = $this->imdbRequest([
+                'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                'Referer' => 'https://www.imdb.com/',
+                'Upgrade-Insecure-Requests' => '1',
+            ])->get($url);
 
             $statusCode = $response->status();
             $html = $response->body();
@@ -190,18 +201,11 @@ class ImdbScraper
         $url = 'https://v2.sg.media-imdb.com/suggestion/'.urlencode($prefix).'/'.urlencode($slug).'.json';
 
         try {
-            $res = Http::timeout(10)
-                ->connectTimeout(10)
-                ->withHeaders([
-                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
-                    'Accept-Language' => 'en-US,en;q=0.9',
-                    'Cache-Control' => 'no-cache',
-                    'Pragma' => 'no-cache',
-                    'Accept' => 'application/json,text/plain,*/*',
-                    'Origin' => 'https://www.imdb.com',
-                    'Referer' => 'https://www.imdb.com/find/?q='.rawurlencode($query).'&s=tt',
-                ])
-                ->get($url);
+            $res = $this->imdbRequest([
+                'Accept' => 'application/json,text/plain,*/*',
+                'Origin' => 'https://www.imdb.com',
+                'Referer' => 'https://www.imdb.com/find/?q='.rawurlencode($query).'&s=tt',
+            ])->get($url);
             $body = $res->body();
 
             $results = [];
@@ -317,16 +321,9 @@ class ImdbScraper
         try {
             $this->markImdbApiDevAttempt();
 
-            $response = Http::timeout(10)
-                ->connectTimeout(10)
-                ->withHeaders([
-                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
-                    'Accept-Language' => 'en-US,en;q=0.9',
-                    'Cache-Control' => 'no-cache',
-                    'Pragma' => 'no-cache',
-                    'Accept' => 'application/json',
-                ])
-                ->get($this->imdbApiDevBaseUrl.'/titles/tt'.$id);
+            $response = $this->imdbRequest([
+                'Accept' => 'application/json',
+            ])->get($this->imdbApiDevBaseUrl.'/titles/tt'.$id);
 
             $statusCode = $response->status();
 
@@ -898,17 +895,10 @@ class ImdbScraper
         $url = 'https://www.imdb.com/find/?q='.rawurlencode($query).'&s=tt';
 
         try {
-            $response = Http::timeout(10)
-                ->connectTimeout(10)
-                ->withHeaders([
-                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
-                    'Accept-Language' => 'en-US,en;q=0.9',
-                    'Cache-Control' => 'no-cache',
-                    'Pragma' => 'no-cache',
-                    'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-                    'Referer' => 'https://www.imdb.com/',
-                ])
-                ->get($url);
+            $response = $this->imdbRequest([
+                'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+                'Referer' => 'https://www.imdb.com/',
+            ])->get($url);
 
             $statusCode = $response->status();
             $html = $response->body();

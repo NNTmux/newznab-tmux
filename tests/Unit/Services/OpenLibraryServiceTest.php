@@ -5,18 +5,15 @@ declare(strict_types=1);
 namespace Tests\Unit\Services;
 
 use App\Services\OpenLibraryService;
-use GuzzleHttp\Client;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class OpenLibraryServiceTest extends TestCase
 {
     public function test_search_books_normalizes_docs_payload(): void
     {
-        $mock = new MockHandler([
-            new Response(200, [], json_encode([
+        Http::fake([
+            'openlibrary.org/search.json*' => Http::response([
                 'docs' => [[
                     'key' => '/works/OL123W',
                     'title' => 'Refactoring',
@@ -26,12 +23,10 @@ class OpenLibraryServiceTest extends TestCase
                     'first_publish_year' => 1999,
                     'cover_i' => 54321,
                 ]],
-            ])),
+            ]),
         ]);
 
-        $service = new OpenLibraryService(
-            new Client(['handler' => HandlerStack::create($mock)])
-        );
+        $service = new OpenLibraryService;
 
         $books = $service->searchBooks('refactoring');
 
@@ -45,25 +40,25 @@ class OpenLibraryServiceTest extends TestCase
 
     public function test_find_by_isbn_normalizes_payload(): void
     {
-        $mock = new MockHandler([
-            new Response(200, [], json_encode([
+        Http::fake([
+            'openlibrary.org/isbn/*' => Http::response([
                 'title' => 'Clean Architecture',
                 'authors' => [['name' => 'Robert C. Martin']],
                 'publish_date' => '2017-09-20',
                 'publishers' => ['Prentice Hall'],
                 'covers' => [12345],
-            ])),
+            ]),
         ]);
 
-        $service = new OpenLibraryService(
-            new Client(['handler' => HandlerStack::create($mock)])
-        );
+        $service = new OpenLibraryService;
 
         $book = $service->findByIsbn('9780134494166');
 
         $this->assertNotNull($book);
         $this->assertSame('Clean Architecture', $book['title']);
         $this->assertSame('Robert C. Martin', $book['author']);
-        $this->assertSame('9780134494166', $book['isbn']);
+        $this->assertSame('2017-09-20', $book['publishdate']);
+        $this->assertSame('Prentice Hall', $book['publisher']);
+        $this->assertSame('https://covers.openlibrary.org/b/id/12345-L.jpg', $book['coverurl']);
     }
 }

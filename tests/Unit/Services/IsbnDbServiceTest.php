@@ -6,28 +6,22 @@ namespace Tests\Unit\Services;
 
 use App\Services\BookService;
 use App\Services\IsbnDbService;
-use GuzzleHttp\Client;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class IsbnDbServiceTest extends TestCase
 {
     public function test_is_configured_returns_false_when_key_is_missing(): void
     {
-        $service = new IsbnDbService(null, '');
+        $service = new IsbnDbService('');
 
         $this->assertFalse($service->isConfigured());
     }
 
     public function test_search_book_maps_response_to_internal_shape(): void
     {
-        $mock = new MockHandler([
-            new Response(200, [
-                'ratelimit' => 'limit=500, remaining=499',
-                'ratelimit-policy' => '500;w=86400',
-            ], json_encode([
+        Http::fake([
+            'api2.isbndb.com/books/*' => Http::response([
                 'total' => 1,
                 'data' => [[
                     'title' => 'Domain-Driven Design',
@@ -41,13 +35,13 @@ class IsbnDbServiceTest extends TestCase
                     'subjects' => ['Software', 'Architecture'],
                     'image' => 'https://example.com/cover.jpg',
                 ]],
-            ])),
+            ], 200, [
+                'ratelimit' => 'limit=500, remaining=499',
+                'ratelimit-policy' => '500;w=86400',
+            ]),
         ]);
 
-        $service = new IsbnDbService(
-            new Client(['handler' => HandlerStack::create($mock), 'base_uri' => 'https://api2.isbndb.com']),
-            'test-key'
-        );
+        $service = new IsbnDbService('test-key');
 
         $book = $service->searchBook('domain driven design');
         $books = $service->searchBooks('domain driven design');
@@ -69,8 +63,8 @@ class IsbnDbServiceTest extends TestCase
 
     public function test_find_by_isbn_reads_book_payload(): void
     {
-        $mock = new MockHandler([
-            new Response(200, [], json_encode([
+        Http::fake([
+            'api2.isbndb.com/book/*' => Http::response([
                 'book' => [
                     'title' => 'Clean Code',
                     'isbn13' => '9780132350884',
@@ -78,13 +72,10 @@ class IsbnDbServiceTest extends TestCase
                     'date_published' => '2008',
                     'subjects' => ['Programming'],
                 ],
-            ])),
+            ]),
         ]);
 
-        $service = new IsbnDbService(
-            new Client(['handler' => HandlerStack::create($mock), 'base_uri' => 'https://api2.isbndb.com']),
-            'test-key'
-        );
+        $service = new IsbnDbService('test-key');
 
         $book = $service->findByIsbn('978-0132350884');
 
