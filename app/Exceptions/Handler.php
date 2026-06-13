@@ -46,19 +46,6 @@ class Handler extends ExceptionHandler
     }
 
     /**
-     * Report or log an exception.
-     *
-     *
-     * @return void
-     *
-     * @throws Throwable
-     */
-    public function report(Throwable $exception)
-    {
-        parent::report($exception);
-    }
-
-    /**
      * @param  Request  $request
      * @return RedirectResponse|Response
      *

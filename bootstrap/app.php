@@ -5,14 +5,13 @@ use App\Http\Middleware\ClearanceMiddleware;
 use App\Http\Middleware\ContentSecurityPolicy;
 use App\Http\Middleware\DegradeWhenRedisUnreachable;
 use App\Http\Middleware\EnforceSessionToken;
-use App\Http\Middleware\EnsureAuthenticatedUsersAreVerified;
 use App\Http\Middleware\ForceJsonOnAPI;
 use App\Http\Middleware\Google2FAMiddleware;
 use App\Http\Middleware\NoCacheForAuthenticatedUsers;
-use App\Http\Middleware\SetUserTimezone;
 use App\Http\Middleware\ThrottleApiRequestsByToken;
 use App\Http\Middleware\TrustedDevice2FAMiddleware;
 use App\Http\Middleware\TrustProxies as AppTrustProxies;
+use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -72,7 +71,6 @@ return Application::configure(basePath: dirname(__DIR__))
             EnforceSessionToken::class,
             TrustedDevice2FAMiddleware::class, // Add our new trusted device middleware
             ContentSecurityPolicy::class, // Add CSP middleware for security
-            SetUserTimezone::class, // Set user timezone
             NoCacheForAuthenticatedUsers::class, // Prevent Cloudflare/CDN caching of authenticated pages
         ]);
 
@@ -83,7 +81,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'bindings' => SubstituteBindings::class,
             'clearance' => ClearanceMiddleware::class,
             'apiRateLimit' => ThrottleApiRequestsByToken::class,
-            'isVerified' => EnsureAuthenticatedUsersAreVerified::class,
+            'isVerified' => EnsureEmailIsVerified::class,
             'permission' => PermissionMiddleware::class,
             'role' => RoleMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,

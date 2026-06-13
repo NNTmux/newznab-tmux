@@ -44,13 +44,8 @@ class MyMoviesController extends BasePageController
                     return redirect()->to('/mymovies');
                 }
                 UserMovie::delMovie($this->userdata->id, $imdbid);
-                if ($request->has('from')) {
-                    header('Location:'.url($request->input('from')));
-                } else {
-                    return redirect()->to('/mymovies');
-                }
 
-                break;
+                return redirect()->to($request->has('from') ? url($request->input('from')) : '/mymovies');
             case 'add':
             case 'doadd':
                 $movie = UserMovie::getMovie($this->userdata->id, $imdbid);
@@ -217,8 +212,5 @@ class MyMoviesController extends BasePageController
 
                 return $this->pagerender();
         }
-
-        // Fallback return in case no case matches
-        return redirect()->to('/mymovies');
     }
 }

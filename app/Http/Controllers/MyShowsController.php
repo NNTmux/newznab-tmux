@@ -40,13 +40,8 @@ class MyShowsController extends BasePageController
                 }
 
                 UserSerie::delShow($this->userdata->id, $videoId);
-                if ($request->has('from')) {
-                    header('Location:'.url($request->input('from')));
-                } else {
-                    return redirect()->to('myshows');
-                }
 
-                break;
+                return redirect()->to($request->has('from') ? url($request->input('from')) : 'myshows');
             case 'add':
             case 'doadd':
                 $show = UserSerie::getShow($this->userdata->id, $videoId);
@@ -164,9 +159,6 @@ class MyShowsController extends BasePageController
 
                 return $this->pagerender();
         }
-
-        // Fallback return in case no case matches
-        return redirect()->to('/myshows');
     }
 
     /**
