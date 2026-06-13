@@ -600,7 +600,7 @@ class ConsoleService
                 $result['dlc'] = '1';
                 if (stripos('Rock Band Network', $result['title']) !== false) {
                     $result['title'] = 'Rock Band';
-                } elseif (strpos('-', $result['title']) !== false) {
+                } elseif (str_contains($result['title'], '-')) {
                     $dlc = explode('-', $result['title']);
                     $result['title'] = $dlc[0];
                 } elseif (preg_match('/(.*? .*?) /i', $result['title'], $dlc)) {
