@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Collection;
 use App\Models\Settings;
+use App\Models\UsenetGroup;
 use App\Services\Runners\BackfillRunner;
 use App\Services\Runners\BinariesRunner;
 use App\Services\Runners\PostProcessRunner;
 use App\Services\Runners\ReleasesRunner;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Process\Process;
 
@@ -278,15 +279,14 @@ class ForkingService
      */
     protected function getReleaseWorkCount(): int
     {
-        $groups = DB::select('SELECT id FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
+        $groups = UsenetGroup::query()
+            ->where(fn ($q) => $q->where('active', 1)->orWhere('backfill', 1))
+            ->get(['id']);
         $count = 0;
 
         foreach ($groups as $group) {
             try {
-                $query = DB::select(
-                    sprintf('SELECT id FROM collections WHERE groups_id = %d LIMIT 1', $group->id)
-                );
-                if (! empty($query)) {
+                if (Collection::where('groups_id', $group->id)->exists()) {
                     $count++;
                 }
             } catch (\PDOException $e) {

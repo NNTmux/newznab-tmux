@@ -5,6 +5,13 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Facades\Search;
+use App\Models\ReleaseComment;
+use App\Models\ReleaseFile;
+use App\Models\ReleaseNfo;
+use App\Models\ReleaseSubtitle;
+use App\Models\UsenetGroup;
+use App\Models\UserDownload;
+use App\Models\UsersRelease;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -137,15 +144,15 @@ class DeleteReleases extends Command
                     $this->line("Deleting: {$releaseName}");
 
                     // Delete related data first (to maintain referential integrity)
-                    DB::delete('DELETE FROM user_downloads WHERE releases_id = ?', [$releaseId]);
-                    DB::delete('DELETE FROM users_releases WHERE releases_id = ?', [$releaseId]);
-                    DB::delete('DELETE FROM release_files WHERE releases_id = ?', [$releaseId]);
-                    DB::delete('DELETE FROM release_comments WHERE releases_id = ?', [$releaseId]);
-                    DB::delete('DELETE FROM release_nfos WHERE releases_id = ?', [$releaseId]);
-                    DB::delete('DELETE FROM release_subtitles WHERE releases_id = ?', [$releaseId]);
+                    UserDownload::where('releases_id', $releaseId)->delete();
+                    UsersRelease::where('releases_id', $releaseId)->delete();
+                    ReleaseFile::where('releases_id', $releaseId)->delete();
+                    ReleaseComment::where('releases_id', $releaseId)->delete();
+                    ReleaseNfo::where('releases_id', $releaseId)->delete();
+                    ReleaseSubtitle::where('releases_id', $releaseId)->delete();
 
                     // Delete the main release record
-                    DB::delete('DELETE FROM releases WHERE id = ?', [$releaseId]);
+                    DB::table('releases')->where('id', $releaseId)->delete();
 
                     // Delete from search indexes
                     Search::deleteRelease($releaseId);
@@ -309,14 +316,14 @@ class DeleteReleases extends Command
             },
             'groupname' => match ($modifier) {
                 'equals' => (static function () use ($value) {
-                    $group = DB::select('SELECT id FROM usenet_groups WHERE name = ?', [$value]);
+                    $group = UsenetGroup::where('name', $value)->first(['id']);
 
-                    return ! empty($group) ? " AND groups_id = {$group[0]->id}" : null;
+                    return $group !== null ? " AND groups_id = {$group->id}" : null;
                 })(),
                 'like' => (static function () use ($value) {
-                    $groups = DB::select('SELECT id FROM usenet_groups WHERE name LIKE ?', ['%'.str_replace(' ', '%', $value).'%']);
+                    $groups = UsenetGroup::where('name', 'like', '%'.str_replace(' ', '%', $value).'%')->pluck('id');
 
-                    return ! empty($groups) ? ' AND groups_id IN ('.implode(',', array_column($groups, 'id')).')' : null;
+                    return $groups->isNotEmpty() ? ' AND groups_id IN ('.$groups->implode(',').')' : null;
                 })(),
                 default => null,
             },

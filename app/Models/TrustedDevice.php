@@ -7,7 +7,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -54,23 +53,16 @@ class TrustedDevice extends Model
         $plainToken = Str::random(64);
         $now = now();
 
-        DB::insert(
-            'insert into trusted_devices (user_id, token_hash, expires_at, ip_address, user_agent, created_at, updated_at) values (?, ?, ?, ?, ?, ?, ?)',
-            [
-                $user->id,
-                self::hashToken($plainToken),
-                $now->copy()->addDays(30)->toDateTimeString(),
-                $ipAddress,
-                $userAgent !== null ? Str::limit($userAgent, 500, '') : null,
-                $now->toDateTimeString(),
-                $now->toDateTimeString(),
-            ]
-        );
-
-        $deviceId = (int) DB::getPdo()->lastInsertId();
-
         /** @var self $device */
-        $device = self::query()->findOrFail($deviceId);
+        $device = self::create([
+            'user_id' => $user->id,
+            'token_hash' => self::hashToken($plainToken),
+            'expires_at' => $now->copy()->addDays(30)->toDateTimeString(),
+            'ip_address' => $ipAddress,
+            'user_agent' => $userAgent !== null ? Str::limit($userAgent, 500, '') : null,
+            'created_at' => $now->toDateTimeString(),
+            'updated_at' => $now->toDateTimeString(),
+        ]);
 
         return ['plain' => $plainToken, 'device' => $device];
     }
