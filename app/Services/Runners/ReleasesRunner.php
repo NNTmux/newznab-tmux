@@ -4,24 +4,28 @@ declare(strict_types=1);
 
 namespace App\Services\Runners;
 
+use App\Models\Collection;
+use App\Models\Predb;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use Illuminate\Support\Facades\Concurrency;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ReleasesRunner extends BaseRunner
 {
     public function releases(): void
     {
-        $groups = DB::select('SELECT id, name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
+        $groups = UsenetGroup::query()
+            ->where(fn ($q) => $q->where('active', 1)->orWhere('backfill', 1))
+            ->select('id', 'name')
+            ->get();
         $maxProcesses = (int) Settings::settingValue('releasethreads');
 
         $uGroups = [];
         foreach ($groups as $group) {
             try {
-                $query = DB::select(sprintf('SELECT id FROM collections WHERE groups_id = %d LIMIT 1', $group->id));
-                if (! empty($query)) {
+                $query = Collection::query()->where('groups_id', $group->id)->first(['id']);
+                if ($query !== null) {
                     $uGroups[] = ['id' => $group->id, 'name' => $group->name];
                 }
             } catch (\PDOException $e) {
@@ -77,7 +81,10 @@ class ReleasesRunner extends BaseRunner
 
     public function updatePerGroup(): void
     {
-        $groups = DB::select('SELECT id , name FROM usenet_groups WHERE (active = 1 OR backfill = 1)');
+        $groups = UsenetGroup::query()
+            ->where(fn ($q) => $q->where('active', 1)->orWhere('backfill', 1))
+            ->select('id', 'name')
+            ->get();
         $maxProcesses = (int) Settings::settingValue('releasethreads');
 
         $count = count($groups);
@@ -132,10 +139,14 @@ class ReleasesRunner extends BaseRunner
         $leftGuids = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
 
         if ($mode === 'predbft') {
-            $preCount = DB::select(
-                "SELECT COUNT(p.id) AS num FROM predb p WHERE LENGTH(p.title) >= 15 AND p.title NOT REGEXP '[\"\<\> ]' AND p.searched = 0 AND p.predate < (NOW() - INTERVAL 1 DAY)"
-            );
-            if (! empty($preCount) && (int) $preCount[0]->num > 0 && $maxPerRun > 0) {
+            $preCount = Predb::query()
+                ->whereRaw('LENGTH(title) >= 15')
+                ->whereRaw("title NOT REGEXP '[\"<> ]'")
+                ->where('searched', 0)
+                ->whereRaw('predate < (NOW() - INTERVAL 1 DAY)')
+                ->selectRaw('COUNT(id) AS num')
+                ->get();
+            if ($preCount->isNotEmpty() && (int) $preCount[0]->num > 0 && $maxPerRun > 0) {
                 $leftGuids = \array_slice($leftGuids, 0, (int) ceil($preCount[0]->num / $maxPerRun));
             } else {
                 $leftGuids = [];

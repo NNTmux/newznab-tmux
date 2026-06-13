@@ -5,18 +5,17 @@ declare(strict_types=1);
 namespace App\Services\Runners;
 
 use App\Models\Settings;
+use App\Models\UsenetGroup;
 use Illuminate\Support\Facades\DB;
 
 class BinariesRunner extends BaseRunner
 {
     public function binaries(int $maxPerGroup): void
     {
-        $work = DB::select(
-            sprintf(
-                'SELECT name, %d AS max FROM usenet_groups WHERE active = 1',
-                $maxPerGroup
-            )
-        );
+        $work = UsenetGroup::query()
+            ->where('active', 1)
+            ->selectRaw('? AS max', [$maxPerGroup])
+            ->get();
 
         $maxProcesses = (int) Settings::settingValue('binarythreads');
 
