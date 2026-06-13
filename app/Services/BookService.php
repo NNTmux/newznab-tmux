@@ -178,13 +178,10 @@ class BookService
         }
 
         // Step 1: Count total distinct books matching filters
-        $countSql = 'SELECT COUNT(DISTINCT boo.id) AS total '
-            .'FROM bookinfo boo '
-            .'INNER JOIN releases r ON boo.id = r.bookinfo_id '
-            .'WHERE '.$baseWhere;
-
-        $totalResult = DB::select($countSql);
-        $totalCount = $totalResult[0]->total ?? 0;
+        $totalCount = DB::table('bookinfo as boo')
+            ->join('releases as r', 'boo.id', '=', 'r.bookinfo_id')
+            ->whereRaw($baseWhere)
+            ->count(DB::raw('DISTINCT boo.id'));
 
         if ($totalCount === 0) {
             return collect();

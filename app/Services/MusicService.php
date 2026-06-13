@@ -183,13 +183,10 @@ class MusicService
         }
 
         // Step 1: Count total distinct music entities matching filters
-        $countSql = 'SELECT COUNT(DISTINCT m.id) AS total '
-            .'FROM musicinfo m '
-            .'INNER JOIN releases r ON r.musicinfo_id = m.id '
-            .'WHERE '.$baseWhere;
-
-        $totalResult = DB::select($countSql);
-        $totalCount = $totalResult[0]->total ?? 0;
+        $totalCount = DB::table('musicinfo as m')
+            ->join('releases as r', 'r.musicinfo_id', '=', 'm.id')
+            ->whereRaw($baseWhere)
+            ->count(DB::raw('DISTINCT m.id'));
 
         if ($totalCount === 0) {
             return collect();
@@ -462,30 +459,26 @@ class MusicService
      */
     public function processMusicReleases(bool $local = false, string $groupID = '', string $guidChar = ''): void
     {
-        $guidFilter = $guidChar !== '' ? 'AND leftguid LIKE '.DB::getPdo()->quote($guidChar.'%') : '';
-        $groupFilter = $groupID !== '' ? 'AND groups_id = '.(int) $groupID : '';
+        $query = Release::query()
+            ->whereNull('musicinfo_id')
+            ->whereIn('categories_id', [Category::MUSIC_MP3, Category::MUSIC_LOSSLESS, Category::MUSIC_OTHER])
+            ->orderByDesc('postdate')
+            ->limit($this->musicqty)
+            ->select(['searchname', 'id']);
 
-        $res = DB::select(
-            sprintf(
-                '
-                SELECT searchname, id
-                FROM releases
-                WHERE musicinfo_id IS NULL
-                %s
-                %s
-                %s
-                AND categories_id IN (%s, %s, %s)
-                ORDER BY postdate DESC
-                LIMIT %d',
-                $this->renamed,
-                $guidFilter,
-                $groupFilter,
-                Category::MUSIC_MP3,
-                Category::MUSIC_LOSSLESS,
-                Category::MUSIC_OTHER,
-                $this->musicqty
-            )
-        );
+        if ($this->renamed !== '') {
+            $query->whereRaw($this->renamed);
+        }
+
+        if ($guidChar !== '') {
+            $query->where('leftguid', 'like', $guidChar.'%');
+        }
+
+        if ($groupID !== '') {
+            $query->where('groups_id', (int) $groupID);
+        }
+
+        $res = $query->get();
 
         if (! empty($res)) {
             foreach ($res as $arr) {

@@ -115,13 +115,10 @@ class MovieBrowseService
         $totalCount = Cache::get($countCacheKey);
 
         if ($totalCount === null) {
-            $countSql = 'SELECT COUNT(DISTINCT m.imdbid) AS total '
-                .'FROM movieinfo m '
-                .'INNER JOIN releases r ON r.imdbid = m.imdbid '
-                .'WHERE '.$baseWhere;
-
-            $totalResult = DB::select($countSql);
-            $totalCount = $totalResult[0]->total ?? 0;
+            $totalCount = DB::table('movieinfo as m')
+                ->join('releases as r', 'r.imdbid', '=', 'm.imdbid')
+                ->whereRaw($baseWhere)
+                ->count(DB::raw('DISTINCT m.imdbid'));
 
             Cache::put($countCacheKey, $totalCount, now()->addMinutes(30));
         }

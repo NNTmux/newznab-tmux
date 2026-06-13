@@ -201,13 +201,10 @@ class ConsoleService
         }
 
         // Step 1: Count total distinct consoles matching filters
-        $countSql = 'SELECT COUNT(DISTINCT con.id) AS total '
-            .'FROM consoleinfo con '
-            .'INNER JOIN releases r ON con.id = r.consoleinfo_id '
-            .'WHERE '.$baseWhere;
-
-        $totalResult = DB::select($countSql);
-        $totalCount = $totalResult[0]->total ?? 0;
+        $totalCount = DB::table('consoleinfo as con')
+            ->join('releases as r', 'con.id', '=', 'r.consoleinfo_id')
+            ->whereRaw($baseWhere)
+            ->count(DB::raw('DISTINCT con.id'));
 
         if ($totalCount === 0) {
             return collect();

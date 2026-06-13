@@ -258,13 +258,10 @@ class GamesService
         }
 
         // Step 1: Count total distinct games matching filters
-        $countSql = 'SELECT COUNT(DISTINCT gi.id) AS total '
-            .'FROM gamesinfo gi '
-            .'INNER JOIN releases r ON gi.id = r.gamesinfo_id '
-            .'WHERE '.$baseWhere;
-
-        $totalResult = DB::select($countSql);
-        $totalCount = $totalResult[0]->total ?? 0;
+        $totalCount = DB::table('gamesinfo as gi')
+            ->join('releases as r', 'gi.id', '=', 'r.gamesinfo_id')
+            ->whereRaw($baseWhere)
+            ->count(DB::raw('DISTINCT gi.id'));
 
         if ($totalCount === 0) {
             return collect();
