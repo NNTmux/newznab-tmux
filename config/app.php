@@ -9,6 +9,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Name, Environment, Debug Mode and URL
+    |--------------------------------------------------------------------------
+    |
+    | These values are used throughout the framework, including by queued mail
+    | notifications that need to generate absolute links without an HTTP request.
+    |
+    */
+
+    'name' => env('APP_NAME', 'NNTmux'),
+
+    'env' => env('APP_ENV', 'production'),
+
+    'debug' => (bool) env('APP_DEBUG', false),
+
+    'url' => env('APP_URL', 'http://localhost'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

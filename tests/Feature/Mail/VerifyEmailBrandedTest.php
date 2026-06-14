@@ -8,8 +8,10 @@ use App\Models\User;
 use App\Notifications\VerifyEmailBranded;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Http\Request;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\URL;
 use stdClass;
 use Tests\TestCase;
 
@@ -70,6 +72,30 @@ class VerifyEmailBrandedTest extends TestCase
         $this->assertNotEmpty($message->viewData['url']);
     }
 
+    public function test_branded_verification_uses_configured_app_url_for_signed_links(): void
+    {
+        config(['app.url' => 'https://example.test']);
+
+        $message = (new VerifyEmailBranded)->toMail($this->verificationNotifiable());
+        $url = (string) $message->viewData['url'];
+
+        $this->assertStringStartsWith('https://example.test/email/verify/', $url);
+        $this->assertStringNotContainsString('localhost', $url);
+        $this->assertTrue(URL::hasValidSignature(Request::create($url)));
+    }
+
+    public function test_branded_verification_normalizes_host_only_app_url_for_signed_links(): void
+    {
+        config(['app.url' => 'example.test']);
+
+        $message = (new VerifyEmailBranded)->toMail($this->verificationNotifiable());
+        $url = (string) $message->viewData['url'];
+
+        $this->assertStringStartsWith('https://example.test/email/verify/', $url);
+        $this->assertStringNotContainsString('localhost', $url);
+        $this->assertTrue(URL::hasValidSignature(Request::create($url)));
+    }
+
     public function test_user_dispatches_branded_verification_when_notifying(): void
     {
         Notification::fake();
@@ -82,5 +108,27 @@ class VerifyEmailBrandedTest extends TestCase
         $user->sendEmailVerificationNotification();
 
         Notification::assertSentTo($user, VerifyEmailBranded::class);
+    }
+
+    private function verificationNotifiable(): object
+    {
+        return new class extends stdClass
+        {
+            public int $id = 7;
+
+            public string $username = 'tester';
+
+            public string $email = 'tester@example.test';
+
+            public function getKey(): int
+            {
+                return $this->id;
+            }
+
+            public function getEmailForVerification(): string
+            {
+                return $this->email;
+            }
+        };
     }
 }
