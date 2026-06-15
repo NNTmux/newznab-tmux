@@ -45,6 +45,7 @@ class AdminUserController extends BasePageController
             'email' => $request->has('email') ? $request->input('email') : '',
             'host' => $request->has('host') ? $request->input('host') : '',
             'role' => $request->has('role') ? $request->input('role') : '',
+            'verified' => in_array($request->input('verified'), ['0', '1'], true) ? $request->input('verified') : '',
             'created_from' => $request->has('created_from') ? $request->input('created_from') : '',
             'created_to' => $request->has('created_to') ? $request->input('created_to') : '',
         ];
@@ -58,10 +59,11 @@ class AdminUserController extends BasePageController
             $variables['host'],
             $variables['role'],
             $variables['created_from'],
-            $variables['created_to']
+            $variables['created_to'],
+            $variables['verified']
         );
 
-        $results = $this->paginate($result, User::getCount($variables['role'], $variables['username'], $variables['host'], $variables['email'], $variables['created_from'], $variables['created_to']), config('nntmux.items_per_page'), $page, $request->url(), $request->query());
+        $results = $this->paginate($result, User::getCount($variables['role'], $variables['username'], $variables['host'], $variables['email'], $variables['created_from'], $variables['created_to'], $variables['verified']), config('nntmux.items_per_page'), $page, $request->url(), $request->query());
 
         // Build order by URLs
         $orderByUrls = [];
@@ -74,6 +76,7 @@ class AdminUserController extends BasePageController
             'email' => $variables['email'],
             'host' => $variables['host'],
             'role' => $variables['role'],
+            'verified' => $variables['verified'],
             'created_from' => $variables['created_from'],
             'created_to' => $variables['created_to'],
             'role_ids' => array_keys($roles),
@@ -309,6 +312,49 @@ class AdminUserController extends BasePageController
         ]);
 
         return view('admin.users.edit', $this->viewData);
+    }
+
+    public function bulkAction(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'action' => ['required', 'string', 'in:delete,verify'],
+            'user_ids' => ['required', 'array', 'min:1'],
+            'user_ids.*' => ['integer', 'exists:users,id'],
+        ]);
+
+        $userIds = array_values(array_unique(array_map('intval', $validated['user_ids'])));
+
+        if ($validated['action'] === 'delete') {
+            $count = User::query()
+                ->whereIn('id', $userIds)
+                ->where('roles_id', '!=', UserRole::ADMIN->value)
+                ->whereDoesntHave('role', fn ($query) => $query->where('name', UserRole::ADMIN->label()))
+                ->whereDoesntHave('roles', fn ($query) => $query->where('name', UserRole::ADMIN->label()))
+                ->delete();
+
+            Cache::forget(AdminDashboardSnapshotService::CACHE_KEY);
+
+            return redirect()->back()->with('success', $count.' user(s) soft-deleted successfully.');
+        }
+
+        $count = 0;
+        User::query()
+            ->whereIn('id', $userIds)
+            ->where('roles_id', '!=', UserRole::ADMIN->value)
+            ->whereDoesntHave('role', fn ($query) => $query->where('name', UserRole::ADMIN->label()))
+            ->whereDoesntHave('roles', fn ($query) => $query->where('name', UserRole::ADMIN->label()))
+            ->where(function ($query): void {
+                $query->where('verified', false)
+                    ->orWhereNull('email_verified_at');
+            })
+            ->get()
+            ->each(function (User $user) use (&$count): void {
+                if ($user->markEmailAsVerified()) {
+                    $count++;
+                }
+            });
+
+        return redirect()->back()->with('success', $count.' user(s) marked as verified successfully.');
     }
 
     public function destroy(Request $request): RedirectResponse

@@ -248,6 +248,7 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::match(['GET', 'POST'], 'category-edit', [AdminCategoryController::class, 'edit'])->name('admin.category-edit');
     Route::get('category-delete', [AdminCategoryController::class, 'destroy'])->name('admin.category-delete');
     Route::get('user-list', [AdminUserController::class, 'index'])->name('admin.user-list');
+    Route::post('user-list/bulk', [AdminUserController::class, 'bulkAction'])->name('admin.user-list.bulk');
     Route::match(['GET', 'POST'], 'user-edit', [AdminUserController::class, 'edit'])->name('admin.user-edit');
     Route::delete('user-passkey/{passkey}', [AdminUserController::class, 'destroyPasskey'])->name('admin.user-passkey.destroy');
     Route::post('user-passkeys/wipe', [AdminUserController::class, 'wipePasskeys'])->name('admin.user-passkeys.wipe');

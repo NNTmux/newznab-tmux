@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-6">
+<div class="space-y-6" x-data="adminUserList">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -60,6 +60,16 @@
                         </select>
                     </div>
                     <div>
+                        <label for="verified" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Verified</label>
+                        <select id="verified"
+                                name="verified"
+                                class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400">
+                            <option value="" {{ ($verified ?? '') === '' ? 'selected' : '' }}>All Users</option>
+                            <option value="1" {{ ($verified ?? '') === '1' ? 'selected' : '' }}>Verified</option>
+                            <option value="0" {{ ($verified ?? '') === '0' ? 'selected' : '' }}>Not Verified</option>
+                        </select>
+                    </div>
+                    <div>
                         <label for="created_from" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Registered From</label>
                         <input type="date"
                                id="created_from"
@@ -113,8 +123,42 @@
             </div>
         @endif
 
+        @if($errors->any())
+            <div class="mx-6 mt-4 p-4 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg">
+                <p class="text-red-800 dark:text-red-200">
+                    <i class="fas fa-exclamation-circle mr-2"></i>{{ $errors->first() }}
+                </p>
+            </div>
+        @endif
+
+        <div id="validationError" class="mx-6 mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg hidden">
+            <p class="text-yellow-800 dark:text-yellow-300">
+                <i class="fas fa-exclamation-triangle mr-2"></i><span id="validationErrorMessage"></span>
+            </p>
+        </div>
+
         <!-- User Table -->
         @if(count($userlist) > 0)
+            <form method="post" action="{{ route('admin.user-list.bulk') }}" id="bulkUserActionForm" class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+                @csrf
+                <div class="flex flex-col md:flex-row md:items-center gap-3">
+                    <label for="bulkUserAction" class="text-sm font-medium text-gray-700 dark:text-gray-300">Bulk Actions:</label>
+                    <select name="action" id="bulkUserAction" class="w-full md:w-auto px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Select Action</option>
+                        <option value="verify">Mark Selected Verified</option>
+                        <option value="delete">Soft Delete Selected</option>
+                    </select>
+                    <button type="submit"
+                            id="bulkUserActionBtn"
+                            class="w-full md:w-auto px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800">
+                        <i class="fas fa-check mr-2"></i>Apply
+                    </button>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                        Select non-admin active users below. Deleted users are managed from the Deleted Users page.
+                    </p>
+                </div>
+            </form>
+
             <!-- Top Scrollbar -->
             <div class="overflow-x-auto border-b border-gray-200 dark:border-gray-700" id="topScroll">
                 <div style="height: 1px;" id="topScrollContent"></div>
@@ -124,6 +168,9 @@
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead class="bg-gray-50 dark:bg-gray-900">
                         <tr>
+                            <th class="px-6 py-3 text-left">
+                                <input type="checkbox" id="selectAllUserList" class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded" title="Select all active users on this page">
+                            </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                 <a href="{{ url('admin/user-list?' . http_build_query(array_merge(request()->except('ob'), ['ob' => request('ob') === 'username_asc' ? 'username_desc' : 'username_asc']))) }}" class="group inline-flex items-center hover:text-gray-700 dark:hover:text-gray-200">
@@ -192,7 +239,21 @@
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                         @foreach($userlist as $user)
+                            @php
+                                $isAdminUser = (int) $user->roles_id === \App\Enums\UserRole::ADMIN->value
+                                    || ($user->rolename ?? null) === \App\Enums\UserRole::ADMIN->label()
+                                    || $user->roles->contains('name', \App\Enums\UserRole::ADMIN->label());
+                            @endphp
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if(!$user->deleted_at && !$isAdminUser)
+                                        <input type="checkbox" name="user_ids[]" value="{{ $user->id }}" form="bulkUserActionForm" class="user-list-checkbox h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
+                                    @elseif($isAdminUser)
+                                        <input type="checkbox" disabled class="h-4 w-4 text-gray-300 dark:text-gray-600 border-gray-300 dark:border-gray-600 rounded cursor-not-allowed" title="Admin users cannot be selected for bulk actions">
+                                    @else
+                                        <input type="checkbox" disabled class="h-4 w-4 text-gray-300 dark:text-gray-600 border-gray-300 dark:border-gray-600 rounded cursor-not-allowed" title="Deleted users cannot be selected here">
+                                    @endif
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $user->id }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $user->username }}</div>
@@ -270,8 +331,9 @@
                                         N/A
                                     @endif
                                 </td>
+                                @php($isVerified = $user->hasVerifiedEmail())
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($user->verified)
+                                    @if($isVerified)
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
                                             <i class="fas fa-check mr-1"></i>Yes
                                         </span>
@@ -319,7 +381,7 @@
                                                title="Role History">
                                                 <i class="fas fa-history"></i>
                                             </a>
-                                            @if(!$user->verified)
+                                            @if(!$isVerified)
                                                 <form method="POST" action="{{ route('admin.verify') }}" class="inline verify-user-form">
                                                     @csrf
                                                     <input type="hidden" name="id" value="{{ $user->id }}">

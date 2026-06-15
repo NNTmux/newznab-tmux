@@ -753,6 +753,7 @@ final class User extends Authenticatable implements CanResetPasswordContract, Ha
         ?string $email = '',
         ?string $createdFrom = '',
         ?string $createdTo = '',
+        ?string $verified = '',
     ): int {
         return self::query()
             ->withTrashed()
@@ -763,6 +764,11 @@ final class User extends Authenticatable implements CanResetPasswordContract, Ha
             ->when($email, fn (Builder $q) => $q->where('email', 'like', "%{$email}%"))
             ->when($createdFrom, fn (Builder $q) => $q->where('created_at', '>=', "{$createdFrom} 00:00:00"))
             ->when($createdTo, fn (Builder $q) => $q->where('created_at', '<=', "{$createdTo} 23:59:59"))
+            ->when($verified === '1', fn (Builder $q) => $q->where(function (Builder $verifiedQuery): void {
+                $verifiedQuery->where('verified', true)
+                    ->orWhereNotNull('email_verified_at');
+            }))
+            ->when($verified === '0', fn (Builder $q) => $q->where('verified', false)->whereNull('email_verified_at'))
             ->count();
     }
 
@@ -1345,6 +1351,7 @@ final class User extends Authenticatable implements CanResetPasswordContract, Ha
         ?string $role = '',
         ?string $createdFrom = '',
         ?string $createdTo = '',
+        ?string $verified = '',
     ): Collection {
         $order = self::getBrowseOrder($orderBy);
 
@@ -1362,6 +1369,11 @@ final class User extends Authenticatable implements CanResetPasswordContract, Ha
             ->when($role, fn (Builder $q) => $q->where('roles_id', $role))
             ->when($createdFrom, fn (Builder $q) => $q->where('created_at', '>=', "{$createdFrom} 00:00:00"))
             ->when($createdTo, fn (Builder $q) => $q->where('created_at', '<=', "{$createdTo} 23:59:59"))
+            ->when($verified === '1', fn (Builder $q) => $q->where(function (Builder $verifiedQuery): void {
+                $verifiedQuery->where('verified', true)
+                    ->orWhereNotNull('email_verified_at');
+            }))
+            ->when($verified === '0', fn (Builder $q) => $q->where('verified', false)->whereNull('email_verified_at'))
             ->withCount([
                 'requests as daily_api_count' => fn (Builder $q) => $q->where('timestamp', '>', now()->subDay()),
                 'downloads as daily_download_count' => fn (Builder $q) => $q->where('timestamp', '>', now()->subDay()),

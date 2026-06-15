@@ -218,18 +218,96 @@ Alpine.data('verifyUser', () => ({
 
 // User List Scroll Sync
 Alpine.data('adminUserList', () => ({
+    allChecked: false,
+
     init() {
         const top = document.getElementById('topScroll');
         const bottom = document.getElementById('bottomScroll');
         const content = document.getElementById('topScrollContent');
         const table = bottom?.querySelector('table');
-        if (!top || !bottom || !content || !table) return;
+        if (top && bottom && content && table) {
+            const sync = () => { content.style.width = table.scrollWidth + 'px'; };
+            sync();
+            window.addEventListener('resize', sync);
+            top.addEventListener('scroll', function() { if (!top._syncing) { bottom._syncing = true; bottom.scrollLeft = top.scrollLeft; bottom._syncing = false; } });
+            bottom.addEventListener('scroll', function() { if (!bottom._syncing) { top._syncing = true; top.scrollLeft = bottom.scrollLeft; bottom._syncing = false; } });
+        }
 
-        const sync = () => { content.style.width = table.scrollWidth + 'px'; };
-        sync();
-        window.addEventListener('resize', sync);
-        top.addEventListener('scroll', function() { if (!top._syncing) { bottom._syncing = true; bottom.scrollLeft = top.scrollLeft; bottom._syncing = false; } });
-        bottom.addEventListener('scroll', function() { if (!bottom._syncing) { top._syncing = true; top.scrollLeft = bottom.scrollLeft; top._syncing = false; } });
+        const selectAll = this.$el.querySelector('#selectAllUserList');
+        const form = this.$el.querySelector('#bulkUserActionForm');
+
+        if (selectAll) {
+            selectAll.addEventListener('change', () => this.toggleAll());
+        }
+
+        this.$el.querySelectorAll('.user-list-checkbox').forEach(cb => {
+            cb.addEventListener('change', () => this.onCheckboxChange());
+        });
+
+        if (form) {
+            form.addEventListener('submit', e => this.submitBulkAction(e));
+        }
+    },
+
+    _checkboxes() {
+        return Array.from(this.$el.querySelectorAll('.user-list-checkbox:not(:disabled)'));
+    },
+
+    _checkedBoxes() {
+        return this._checkboxes().filter(cb => cb.checked);
+    },
+
+    _setValidationError(message) {
+        const errEl = document.getElementById('validationError');
+        const errMsg = document.getElementById('validationErrorMessage');
+        if (errEl && errMsg) {
+            errMsg.textContent = message;
+            errEl.classList.remove('hidden');
+        }
+    },
+
+    _clearValidationError() {
+        const errEl = document.getElementById('validationError');
+        if (errEl) errEl.classList.add('hidden');
+    },
+
+    toggleAll() {
+        const selectAll = this.$el.querySelector('#selectAllUserList');
+        this._checkboxes().forEach(cb => { cb.checked = selectAll?.checked ?? false; });
+        this.onCheckboxChange();
+    },
+
+    onCheckboxChange() {
+        const selectAll = this.$el.querySelector('#selectAllUserList');
+        const boxes = this._checkboxes();
+        const checked = this._checkedBoxes();
+        this.allChecked = boxes.length > 0 && checked.length === boxes.length;
+
+        if (selectAll) {
+            selectAll.checked = this.allChecked;
+            selectAll.indeterminate = checked.length > 0 && checked.length < boxes.length;
+        }
+    },
+
+    submitBulkAction(e) {
+        e.preventDefault();
+        this._clearValidationError();
+
+        const form = this.$el.querySelector('#bulkUserActionForm');
+        const action = this.$el.querySelector('#bulkUserAction')?.value;
+        const checkedCount = this._checkedBoxes().length;
+
+        if (!action) { this._setValidationError('Please select an action.'); return; }
+        if (checkedCount === 0) { this._setValidationError('Please select at least one non-admin active user.'); return; }
+
+        const isDelete = action === 'delete';
+        showConfirm({
+            title: isDelete ? 'Soft Delete Users' : 'Verify Users',
+            message: 'Are you sure you want to ' + (isDelete ? 'soft-delete' : 'mark as verified') + ' ' + checkedCount + ' user(s)?',
+            type: isDelete ? 'danger' : 'success',
+            confirmText: isDelete ? 'Soft Delete' : 'Verify',
+            onConfirm: function() { if (form) form.submit(); }
+        });
     }
 }));
 

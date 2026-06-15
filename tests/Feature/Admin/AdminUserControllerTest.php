@@ -83,6 +83,84 @@ class AdminUserControllerTest extends TestCase
         $this->assertDatabaseMissing('users', ['email' => 'new-user@example.test']);
     }
 
+    public function test_admin_user_list_can_filter_by_verified_status(): void
+    {
+        $admin = $this->createUserWithRole('Admin', false);
+        $verifiedUser = $this->createUserWithRole('User', true);
+        $unverifiedUser = $this->createUserWithRole('User', true);
+        $unverifiedUser->forceFill([
+            'verified' => false,
+            'email_verified_at' => null,
+        ])->save();
+
+        $unverifiedResponse = $this->actingAs($admin)->get(route('admin.user-list', ['verified' => '0']));
+        $unverifiedResponse->assertOk();
+        $unverifiedResponse->assertSee($unverifiedUser->username);
+        $unverifiedResponse->assertDontSee($verifiedUser->username);
+
+        $verifiedResponse = $this->actingAs($admin)->get(route('admin.user-list', ['verified' => '1']));
+        $verifiedResponse->assertOk();
+        $verifiedResponse->assertSee($verifiedUser->username);
+        $verifiedResponse->assertDontSee($unverifiedUser->username);
+    }
+
+    public function test_admin_can_bulk_soft_delete_selected_users(): void
+    {
+        $admin = $this->createUserWithRole('Admin', false);
+        $firstUser = $this->createUserWithRole('User', true);
+        $secondUser = $this->createUserWithRole('User', true);
+
+        $response = $this->actingAs($admin)->post(route('admin.user-list.bulk'), [
+            'action' => 'delete',
+            'user_ids' => [$firstUser->id, $secondUser->id],
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success', '2 user(s) soft-deleted successfully.');
+        $this->assertSoftDeleted('users', ['id' => $firstUser->id]);
+        $this->assertSoftDeleted('users', ['id' => $secondUser->id]);
+    }
+
+    public function test_admin_can_bulk_mark_selected_users_as_verified(): void
+    {
+        $admin = $this->createUserWithRole('Admin', false);
+        $unverifiedUser = $this->createUserWithRole('User', true);
+        $alreadyVerifiedUser = $this->createUserWithRole('User', true);
+        $unverifiedUser->forceFill([
+            'verified' => false,
+            'email_verified_at' => null,
+            'verification_token' => 'pending-token',
+        ])->save();
+
+        $response = $this->actingAs($admin)->post(route('admin.user-list.bulk'), [
+            'action' => 'verify',
+            'user_ids' => [$unverifiedUser->id, $alreadyVerifiedUser->id],
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success', '1 user(s) marked as verified successfully.');
+
+        $unverifiedUser->refresh();
+        $this->assertTrue($unverifiedUser->verified);
+        $this->assertNotNull($unverifiedUser->email_verified_at);
+        $this->assertNull($unverifiedUser->verification_token);
+    }
+
+    public function test_bulk_user_action_rejects_role_updates(): void
+    {
+        $admin = $this->createUserWithRole('Admin', false);
+        $user = $this->createUserWithRole('User', true);
+
+        $response = $this->actingAs($admin)->post(route('admin.user-list.bulk'), [
+            'action' => 'role',
+            'user_ids' => [$user->id],
+            'role' => $admin->roles_id,
+        ]);
+
+        $response->assertSessionHasErrors('action');
+        $this->assertSame($user->roles_id, $user->fresh()->roles_id);
+    }
+
     private function createSchema(): void
     {
         Schema::create('settings', function (Blueprint $table): void {
@@ -122,6 +200,7 @@ class AdminUserControllerTest extends TestCase
             $table->boolean('verified')->default(true);
             $table->boolean('can_post')->default(true);
             $table->timestamp('email_verified_at')->nullable();
+            $table->string('verification_token')->nullable();
             $table->timestamp('lastlogin')->nullable();
             $table->rememberToken();
             $table->timestamps();
@@ -146,6 +225,35 @@ class AdminUserControllerTest extends TestCase
             $table->unsignedInteger('permission_id');
             $table->unsignedInteger('role_id');
             $table->primary(['permission_id', 'role_id']);
+        });
+
+        Schema::create('user_requests', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->unsignedInteger('users_id');
+            $table->string('request')->default('');
+            $table->string('hosthash')->default('');
+            $table->timestamp('timestamp')->nullable();
+        });
+
+        Schema::create('user_downloads', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->unsignedInteger('users_id');
+            $table->unsignedInteger('releases_id')->default(0);
+            $table->string('hosthash')->default('');
+            $table->timestamp('timestamp')->nullable();
+        });
+
+        Schema::create('content', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->string('title')->default('');
+            $table->string('url')->nullable();
+            $table->text('body')->nullable();
+            $table->string('metadescription')->default('');
+            $table->string('metakeywords')->default('');
+            $table->integer('contenttype')->default(1);
+            $table->integer('status')->default(1);
+            $table->integer('ordinal')->nullable();
+            $table->integer('role')->default(0);
         });
 
         Schema::create('user_activities', function (Blueprint $table): void {
