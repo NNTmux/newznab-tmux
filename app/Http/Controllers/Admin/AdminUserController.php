@@ -367,16 +367,17 @@ class AdminUserController extends BasePageController
      */
     private function bulkActionUsersQuery(array $userIds): Builder
     {
+        $adminRoleName = 'Admin';
         $adminRoleIds = Role::query()
-            ->where('name', UserRole::ADMIN->label())
+            ->where('name', $adminRoleName)
             ->pluck('id')
             ->all();
 
         return User::query()
             ->whereIn('id', $userIds)
             ->when($adminRoleIds !== [], fn (Builder $query): Builder => $query->whereNotIn('roles_id', $adminRoleIds))
-            ->whereDoesntHave('role', fn (Builder $query): Builder => $query->where('name', UserRole::ADMIN->label()))
-            ->whereDoesntHave('roles', fn (Builder $query): Builder => $query->where('name', UserRole::ADMIN->label()));
+            ->whereDoesntHave('role', fn (Builder $query): Builder => $query->where('name', $adminRoleName))
+            ->whereDoesntHave('roles', fn (Builder $query): Builder => $query->where('name', $adminRoleName));
     }
 
     public function destroy(Request $request): RedirectResponse

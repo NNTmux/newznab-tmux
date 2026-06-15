@@ -150,8 +150,6 @@ class AdminUserControllerTest extends TestCase
 
     public function test_admin_can_bulk_resend_verification_email_to_not_verified_users(): void
     {
-        Notification::fake();
-
         $admin = $this->createUserWithRole('Admin', false);
         $unverifiedUser = $this->createUserWithRole('User', true);
         $alreadyVerifiedUser = $this->createUserWithRole('User', true);
@@ -160,6 +158,8 @@ class AdminUserControllerTest extends TestCase
             'verified' => false,
             'email_verified_at' => null,
         ])->save();
+
+        Notification::fake();
 
         $response = $this->actingAs($admin)->post(route('admin.user-list.bulk'), [
             'action' => 'resend_verification',
