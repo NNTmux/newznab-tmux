@@ -6,8 +6,10 @@ namespace Tests\Feature\Admin;
 
 use App\Http\Middleware\Google2FAMiddleware;
 use App\Models\User;
+use App\Notifications\VerifyEmailBranded;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
@@ -144,6 +146,31 @@ class AdminUserControllerTest extends TestCase
         $this->assertTrue($unverifiedUser->verified);
         $this->assertNotNull($unverifiedUser->email_verified_at);
         $this->assertNull($unverifiedUser->verification_token);
+    }
+
+    public function test_admin_can_bulk_resend_verification_email_to_not_verified_users(): void
+    {
+        Notification::fake();
+
+        $admin = $this->createUserWithRole('Admin', false);
+        $unverifiedUser = $this->createUserWithRole('User', true);
+        $alreadyVerifiedUser = $this->createUserWithRole('User', true);
+
+        $unverifiedUser->forceFill([
+            'verified' => false,
+            'email_verified_at' => null,
+        ])->save();
+
+        $response = $this->actingAs($admin)->post(route('admin.user-list.bulk'), [
+            'action' => 'resend_verification',
+            'user_ids' => [$unverifiedUser->id, $alreadyVerifiedUser->id],
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success', '1 verification email(s) queued successfully.');
+
+        Notification::assertSentTo($unverifiedUser, VerifyEmailBranded::class);
+        Notification::assertNotSentTo($alreadyVerifiedUser, VerifyEmailBranded::class);
     }
 
     public function test_bulk_user_action_rejects_role_updates(): void

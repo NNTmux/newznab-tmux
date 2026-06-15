@@ -146,6 +146,7 @@
                     <select name="action" id="bulkUserAction" class="w-full md:w-auto px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-blue-500 focus:border-blue-500">
                         <option value="">Select Action</option>
                         <option value="verify">Mark Selected Verified</option>
+                        <option value="resend_verification">Resend Verification Email</option>
                         <option value="delete">Soft Delete Selected</option>
                     </select>
                     <button type="submit"
@@ -243,11 +244,12 @@
                                 $isAdminUser = (int) $user->roles_id === \App\Enums\UserRole::ADMIN->value
                                     || ($user->rolename ?? null) === \App\Enums\UserRole::ADMIN->label()
                                     || $user->roles->contains('name', \App\Enums\UserRole::ADMIN->label());
+                                $isVerified = $user->hasVerifiedEmail();
                             @endphp
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if(!$user->deleted_at && !$isAdminUser)
-                                        <input type="checkbox" name="user_ids[]" value="{{ $user->id }}" form="bulkUserActionForm" class="user-list-checkbox h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
+                                        <input type="checkbox" name="user_ids[]" value="{{ $user->id }}" form="bulkUserActionForm" data-is-verified="{{ $isVerified ? '1' : '0' }}" class="user-list-checkbox h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
                                     @elseif($isAdminUser)
                                         <input type="checkbox" disabled class="h-4 w-4 text-gray-300 dark:text-gray-600 border-gray-300 dark:border-gray-600 rounded cursor-not-allowed" title="Admin users cannot be selected for bulk actions">
                                     @else
@@ -331,7 +333,6 @@
                                         N/A
                                     @endif
                                 </td>
-                                @php($isVerified = $user->hasVerifiedEmail())
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($isVerified)
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
@@ -393,11 +394,16 @@
                                                         <i class="fas fa-check-circle"></i>
                                                     </button>
                                                 </form>
-                                                <a href="{{ url('admin/resendverification?id=' . $user->id) }}"
-                                                   class="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300"
-                                                   title="Resend Verification">
-                                                    <i class="fas fa-envelope"></i>
-                                                </a>
+                                                <form method="POST" action="{{ route('admin.resend-verification') }}" class="inline">
+                                                    @csrf
+                                                    <input type="hidden" name="id" value="{{ $user->id }}">
+                                                    <button type="submit"
+                                                            class="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300 border-0 bg-transparent cursor-pointer p-0"
+                                                            title="Resend Verification"
+                                                            data-confirm="Resend account verification email to '{{ $user->username }}'?">
+                                                        <i class="fas fa-envelope"></i>
+                                                    </button>
+                                                </form>
                                             @endif
                                             <form action="{{ url('admin/user-delete') }}" method="POST" class="inline-form">
                                                 @csrf

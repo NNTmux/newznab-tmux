@@ -13,6 +13,7 @@ use App\Models\UserDownload;
 use App\Models\UserRequest;
 use App\Services\AdminDashboardSnapshotService;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -317,7 +318,7 @@ class AdminUserController extends BasePageController
     public function bulkAction(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'action' => ['required', 'string', 'in:delete,verify'],
+            'action' => ['required', 'string', 'in:delete,verify,resend_verification'],
             'user_ids' => ['required', 'array', 'min:1'],
             'user_ids.*' => ['integer', 'exists:users,id'],
         ]);
@@ -325,36 +326,57 @@ class AdminUserController extends BasePageController
         $userIds = array_values(array_unique(array_map('intval', $validated['user_ids'])));
 
         if ($validated['action'] === 'delete') {
-            $count = User::query()
-                ->whereIn('id', $userIds)
-                ->where('roles_id', '!=', UserRole::ADMIN->value)
-                ->whereDoesntHave('role', fn ($query) => $query->where('name', UserRole::ADMIN->label()))
-                ->whereDoesntHave('roles', fn ($query) => $query->where('name', UserRole::ADMIN->label()))
-                ->delete();
+            $count = $this->bulkActionUsersQuery($userIds)->delete();
 
             Cache::forget(AdminDashboardSnapshotService::CACHE_KEY);
 
             return redirect()->back()->with('success', $count.' user(s) soft-deleted successfully.');
         }
 
+        if ($validated['action'] === 'verify') {
+            $count = 0;
+            $this->bulkActionUsersQuery($userIds)
+                ->where('verified', false)
+                ->whereNull('email_verified_at')
+                ->get()
+                ->each(function (User $user) use (&$count): void {
+                    if ($user->markEmailAsVerified()) {
+                        $count++;
+                    }
+                });
+
+            return redirect()->back()->with('success', $count.' user(s) marked as verified successfully.');
+        }
+
         $count = 0;
-        User::query()
-            ->whereIn('id', $userIds)
-            ->where('roles_id', '!=', UserRole::ADMIN->value)
-            ->whereDoesntHave('role', fn ($query) => $query->where('name', UserRole::ADMIN->label()))
-            ->whereDoesntHave('roles', fn ($query) => $query->where('name', UserRole::ADMIN->label()))
-            ->where(function ($query): void {
-                $query->where('verified', false)
-                    ->orWhereNull('email_verified_at');
-            })
+        $this->bulkActionUsersQuery($userIds)
+            ->where('verified', false)
+            ->whereNull('email_verified_at')
             ->get()
             ->each(function (User $user) use (&$count): void {
-                if ($user->markEmailAsVerified()) {
-                    $count++;
-                }
+                $user->sendEmailVerificationNotification();
+                $count++;
             });
 
-        return redirect()->back()->with('success', $count.' user(s) marked as verified successfully.');
+        return redirect()->back()->with('success', $count.' verification email(s) queued successfully.');
+    }
+
+    /**
+     * @param  list<int>  $userIds
+     * @return Builder<User>
+     */
+    private function bulkActionUsersQuery(array $userIds): Builder
+    {
+        $adminRoleIds = Role::query()
+            ->where('name', UserRole::ADMIN->label())
+            ->pluck('id')
+            ->all();
+
+        return User::query()
+            ->whereIn('id', $userIds)
+            ->when($adminRoleIds !== [], fn (Builder $query): Builder => $query->whereNotIn('roles_id', $adminRoleIds))
+            ->whereDoesntHave('role', fn (Builder $query): Builder => $query->where('name', UserRole::ADMIN->label()))
+            ->whereDoesntHave('roles', fn (Builder $query): Builder => $query->where('name', UserRole::ADMIN->label()));
     }
 
     public function destroy(Request $request): RedirectResponse
