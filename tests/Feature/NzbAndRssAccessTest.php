@@ -241,7 +241,17 @@ class NzbAndRssAccessTest extends TestCase
             ->assertJsonPath('error', 'Incorrect user credentials');
     }
 
-    public function test_rss_feed_without_api_token_returns_403_error_instead_of_login_redirect(): void
+    public function test_rss_health_endpoint_is_public_for_status_monitoring(): void
+    {
+        $this->getJson('/rss/health')
+            ->assertOk()
+            ->assertJson([
+                'status' => 'ok',
+                'service' => 'rss',
+            ]);
+    }
+
+    public function test_rss_feed_without_api_token_returns_api_error_instead_of_login_redirect(): void
     {
         $response = $this->get('/rss/full-feed');
 

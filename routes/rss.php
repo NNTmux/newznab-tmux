@@ -12,6 +12,9 @@
 */
 
 use App\Http\Controllers\RssController;
+use App\Http\Controllers\RssHealthController;
+
+Route::get('health', RssHealthController::class);
 
 Route::middleware('apiRateLimit')->group(function (): void {
     Route::get('mymovies', [RssController::class, 'myMoviesRss']);

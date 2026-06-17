@@ -18,7 +18,7 @@ return new class extends Migration
         $defaults = [
             'api' => '/api/v2/capabilities,/api/v1/api',
             'http' => '/up',
-            'rss' => '/rss/full-feed',
+            'rss' => '/rss/health',
         ];
 
         foreach ($defaults as $slug => $path) {
