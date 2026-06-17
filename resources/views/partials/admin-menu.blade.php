@@ -32,6 +32,9 @@
             <a href="{{ url('/admin/deleted-users') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
                 <i class="fas fa-user-slash mr-2 text-gray-400"></i>Deleted Users
             </a>
+            <a href="{{ route('admin.gdpr-requests.index') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
+                <i class="fas fa-shield-alt mr-2 text-teal-400"></i>GDPR Requests
+            </a>
         </div>
     </div>
 

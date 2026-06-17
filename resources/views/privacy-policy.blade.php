@@ -34,7 +34,9 @@
                         <p class="mb-4">When you use {{ config('app.name') }}, we may collect the following types of information:</p>
                         <ul class="list-disc pl-10 ml-4 mb-4">
                             <li><strong>Account Information:</strong> Username, email address, and password when you register.</li>
-                            <li><strong>Cookies:</strong> We use cookies to maintain your session and preferences.</li>
+                            <li><strong>Usage Information:</strong> API requests, downloads, comments, invitations, security events, and account activity needed to operate and secure the service.</li>
+                            <li><strong>Payment Information:</strong> Payment and invoice records when you make a payment or donation.</li>
+                            <li><strong>Essential Cookies and Storage:</strong> We use only essential cookies/storage to maintain your session, protect forms, support security features such as two-factor trusted devices, and remember display preferences.</li>
                         </ul>
 
                         <h2 class="text-xl font-semibold mb-4 mt-6">2. How We Use Your Information</h2>
@@ -71,27 +73,31 @@
                             <li>Resolve disputes</li>
                         </ul>
                         <p class="mb-4">When you delete your account, we will delete or anonymize your personal information, unless we are required to retain it for legal purposes.</p>
+                        <p class="mb-4">Payment records and security/admin audit records may be retained where needed for accounting, tax, fraud prevention, dispute handling, security, or GDPR accountability. During account erasure, direct account identifiers in retained payment and audit records are anonymized, minimized, or pseudonymized where practical while transaction/accountability details needed for those purposes are preserved.</p>
 
                         <h2 class="text-xl font-semibold mb-4 mt-6">6. Your Rights and Choices</h2>
                         <p class="mb-4">You have the following rights regarding your personal information:</p>
                         <ul class="list-disc pl-10 ml-4 mb-4">
                             <li><strong>Access:</strong> Request access to the personal information we hold about you</li>
+                            <li><strong>Portability:</strong> Request an export of your account data in a machine-readable format</li>
                             <li><strong>Correction:</strong> Request correction of inaccurate or incomplete information</li>
                             <li><strong>Deletion:</strong> Request deletion of your account and associated data</li>
+                            <li><strong>Restriction or Objection:</strong> Ask us to restrict or review certain processing where applicable</li>
                         </ul>
-                        <p class="mb-4">To exercise these rights, please contact us through your account settings or the contact methods provided on our website.</p>
+                        <p class="mb-4">To exercise these rights, use the Privacy Center in your account or contact us through the contact methods provided on our website.</p>
 
                         <h2 class="text-xl font-semibold mb-4 mt-6">7. Cookies and Tracking Technologies</h2>
-                        <p class="mb-4">We use cookies and similar tracking technologies to:</p>
+                        <p class="mb-4">We use essential cookies and similar browser storage only. We do not use marketing or analytics cookies by default. Essential cookies/storage are used to:</p>
                         <ul class="list-disc pl-10 ml-4 mb-4">
                             <li>Maintain your login session</li>
-                            <li>Remember your preferences (such as dark mode settings)</li>
-                            <li>Analyze site usage and performance</li>
+                            <li>Protect forms and authenticated requests from cross-site request forgery</li>
+                            <li>Support security features such as optional two-factor trusted devices</li>
+                            <li>Remember display preferences such as theme and color scheme</li>
                         </ul>
                         <p class="mb-4">You can control cookie settings through your browser preferences. Note that disabling cookies may affect the functionality of our service.</p>
 
                         <h2 class="text-xl font-semibold mb-4 mt-6">8. Third-Party Services</h2>
-                        <p class="mb-4">Our service may contain links to third-party websites or integrate with third-party services. We are not responsible for the privacy practices of these third parties. We encourage you to review their privacy policies before providing any personal information.</p>
+                        <p class="mb-4">Our service may contain links to third-party websites or integrate with third-party services such as captcha providers, Gravatar avatars, payment processors, and error monitoring. We are not responsible for the privacy practices of these third parties. We encourage you to review their privacy policies before providing any personal information.</p>
 
                         <h2 class="text-xl font-semibold mb-4 mt-6">9. Children's Privacy</h2>
                         <p class="mb-4">Our service is not intended for users under the age of 18. We do not knowingly collect personal information from children. If we become aware that we have collected personal information from a child without parental consent, we will take steps to delete that information.</p>

@@ -161,6 +161,7 @@
                                     </a>
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Deleted By</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">GDPR Erasure</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
@@ -212,6 +213,17 @@
                                             </span>
                                         @else
                                             <span class="text-gray-400 dark:text-gray-500">N/A</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @if($user->gdpr_erasure_request_id)
+                                            <a href="{{ route('admin.gdpr-requests.show', $user->gdpr_erasure_request_id) }}" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200 hover:bg-teal-200 dark:hover:bg-teal-800" title="View completed GDPR erasure request #{{ $user->gdpr_erasure_request_id }}">
+                                                <i class="fas fa-shield-alt mr-1"></i>GDPR
+                                            </a>
+                                        @else
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                                <i class="fas fa-minus mr-1"></i>No
+                                            </span>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">

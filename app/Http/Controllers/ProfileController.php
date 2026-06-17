@@ -6,12 +6,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateThemeRequest;
 use App\Jobs\SendAccountDeletedEmail;
+use App\Models\GdprRequest;
 use App\Models\ReleaseComment;
 use App\Models\RootCategory;
 use App\Models\User;
 use App\Models\UserDownload;
 use App\Models\UserRequest;
 use App\Rules\ValidEmailDomain;
+use App\Services\Gdpr\GdprErasureService;
 use App\Support\PermissionSyncHelper;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -248,7 +250,7 @@ class ProfileController extends BasePageController
     /**
      * @throws \Exception
      */
-    public function destroy(Request $request): Application|View|Factory|RedirectResponse|\Illuminate\Contracts\Foundation\Application
+    public function destroy(Request $request, GdprErasureService $erasureService): Application|View|Factory|RedirectResponse|\Illuminate\Contracts\Foundation\Application
     {
         $userId = $request->input('id');
 
@@ -257,12 +259,28 @@ class ProfileController extends BasePageController
             if ($user === null) {
                 return redirect()->to('profile');
             }
+
+            $gdprRequest = GdprRequest::create([
+                'user_id' => $user->id,
+                'requester_username' => $user->username,
+                'requester_email' => $user->email,
+                'type' => GdprRequest::TYPE_ERASURE,
+                'status' => GdprRequest::STATUS_PROCESSING,
+                'request_payload' => [
+                    'requested_by' => 'profile_delete',
+                    'confirmation' => 'legacy_profile_delete_link',
+                ],
+            ]);
+
             SendAccountDeletedEmail::dispatch($user);
+            $erasureService->eraseForAccountDeletion($user, $user, $gdprRequest);
             Auth::logout();
-            $user->delete();
+
+            return redirect()->to('/')->with('success', 'Your account has been deleted. Retained payment and audit records have been anonymized or minimized where practical.');
         }
 
         if ($this->userdata->hasRole('Admin')) {
+
             return redirect()->to('profile');
         }
 

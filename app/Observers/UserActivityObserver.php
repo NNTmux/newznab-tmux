@@ -21,10 +21,10 @@ class UserActivityObserver
             'username' => $user->username,
             'activity_type' => 'registered',
             'description' => "New user registered: {$user->username}",
-            'metadata' => [
+            'metadata' => array_filter([
                 'email' => $user->email,
-                'ip_address' => request()->ip(),
-            ],
+                'ip_address' => config('nntmux_settings.store_user_ip') ? request()->ip() : null,
+            ], static fn ($value): bool => $value !== null),
         ]);
     }
 

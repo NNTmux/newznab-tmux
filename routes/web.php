@@ -44,6 +44,7 @@ use App\Http\Controllers\Admin\AdminTmuxController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminUserRoleHistoryController;
 use App\Http\Controllers\Admin\DeletedUsersController;
+use App\Http\Controllers\Admin\GdprRequestController;
 use App\Http\Controllers\AdultController;
 use App\Http\Controllers\AjaxController;
 use App\Http\Controllers\Api\FileListApiController;
@@ -75,6 +76,7 @@ use App\Http\Controllers\MyMoviesController;
 use App\Http\Controllers\MyShowsController;
 use App\Http\Controllers\NfoController;
 use App\Http\Controllers\PasswordSecurityController;
+use App\Http\Controllers\PrivacyCenterController;
 use App\Http\Controllers\PrivacyPolicyController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfileSecurityController;
@@ -198,6 +200,10 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
     Route::match(['GET', 'POST'], 'profileedit', [ProfileController::class, 'edit'])->name('profileedit');
     Route::match(['GET', 'POST'], 'profile_delete', [ProfileController::class, 'destroy'])->name('profile_delete');
     Route::post('profile/update-theme', [ProfileController::class, 'updateTheme'])->name('profile.update-theme');
+    Route::get('privacy-center', [PrivacyCenterController::class, 'index'])->name('privacy-center.index');
+    Route::post('privacy-center/export', [PrivacyCenterController::class, 'requestExport'])->name('privacy-center.export');
+    Route::post('privacy-center/erasure', [PrivacyCenterController::class, 'requestErasure'])->name('privacy-center.erasure');
+    Route::get('privacy-center/export/{gdprRequest}/download', [PrivacyCenterController::class, 'downloadExport'])->name('privacy-center.export.download');
     Route::match(['GET', 'POST'], 'search', [SearchController::class, 'search'])->name('search');
 
     // Release Report routes
@@ -347,6 +353,13 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::post('deleted-users/bulk', [DeletedUsersController::class, 'bulkAction'])->name('admin.deleted.users.bulk');
     Route::post('deleted-users/restore/{id}', [DeletedUsersController::class, 'restore'])->name('admin.deleted.users.restore');
     Route::post('deleted-users/permanent-delete/{id}', [DeletedUsersController::class, 'permanentDelete'])->name('admin.deleted.users.permanent-delete');
+
+    // GDPR / privacy request management
+    Route::get('gdpr-requests', [GdprRequestController::class, 'index'])->name('admin.gdpr-requests.index');
+    Route::get('gdpr-requests/{gdprRequest}', [GdprRequestController::class, 'show'])->name('admin.gdpr-requests.show');
+    Route::post('gdpr-requests/{gdprRequest}/generate-export', [GdprRequestController::class, 'generateExport'])->name('admin.gdpr-requests.generate-export');
+    Route::post('gdpr-requests/{gdprRequest}/complete-erasure', [GdprRequestController::class, 'completeErasure'])->name('admin.gdpr-requests.complete-erasure');
+    Route::post('gdpr-requests/{gdprRequest}/reject', [GdprRequestController::class, 'reject'])->name('admin.gdpr-requests.reject');
 });
 
 Route::middleware('role_or_permission:Admin|Moderator|edit release')->prefix('admin')->group(function () {

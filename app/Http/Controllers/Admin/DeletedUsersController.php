@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
+use App\Models\GdprRequest;
 use App\Models\User;
 use App\Services\AdminDashboardSnapshotService;
+use App\Services\Gdpr\GdprErasureService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 class DeletedUsersController extends BasePageController
 {
@@ -33,6 +37,18 @@ class DeletedUsersController extends BasePageController
         $deletedUsers = User::onlyTrashed()
             ->leftJoin('roles', 'roles.id', '=', 'users.roles_id')
             ->select('users.*', 'roles.name as rolename')
+            ->when(Schema::hasTable('gdpr_requests'), function ($query): void {
+                $query->selectSub(
+                    GdprRequest::query()
+                        ->select('gdpr_requests.id')
+                        ->whereColumn('gdpr_requests.user_id', 'users.id')
+                        ->where('gdpr_requests.type', GdprRequest::TYPE_ERASURE)
+                        ->where('gdpr_requests.status', GdprRequest::STATUS_COMPLETED)
+                        ->orderByDesc('gdpr_requests.completed_at')
+                        ->limit(1),
+                    'gdpr_erasure_request_id'
+                );
+            })
             // Qualify all columns to avoid ambiguity with joined tables
             ->when($username !== '', fn ($q) => $q->where('users.username', 'like', "%$username%"))
             ->when($email !== '', fn ($q) => $q->where('users.email', 'like', "%$email%"))
@@ -107,7 +123,7 @@ class DeletedUsersController extends BasePageController
     /**
      * Bulk restore or permanent delete.
      */
-    public function bulkAction(Request $request): mixed
+    public function bulkAction(Request $request, GdprErasureService $erasureService): mixed
     {
         $action = $request->input('action');
         $userIds = $request->input('user_ids', []);
@@ -133,10 +149,17 @@ class DeletedUsersController extends BasePageController
             return redirect()->route('admin.deleted.users.index')->with('success', $count.' user(s) restored successfully.');
         }
 
-        $count = User::onlyTrashed()->whereIn('id', $userIds)->forceDelete();
+        $count = 0;
+        $actor = Auth::user();
+        $actor = $actor instanceof User ? $actor : null;
+
+        User::onlyTrashed()->whereIn('id', $userIds)->get()->each(function (User $user) use ($erasureService, $actor, &$count): void {
+            $erasureService->forceDeleteWithErasure($user, $actor);
+            $count++;
+        });
         Cache::forget(AdminDashboardSnapshotService::CACHE_KEY);
 
-        return redirect()->route('admin.deleted.users.index')->with('success', $count.' user(s) permanently deleted.');
+        return redirect()->route('admin.deleted.users.index')->with('success', $count.' user(s) permanently deleted with GDPR cleanup.');
     }
 
     /**
@@ -158,15 +181,15 @@ class DeletedUsersController extends BasePageController
     /**
      * Permanently delete single user.
      */
-    public function permanentDelete(mixed $id): mixed
+    public function permanentDelete(mixed $id, GdprErasureService $erasureService): mixed
     {
         $user = User::onlyTrashed()->find($id);
         if ($user) {
             $username = $user->username;
-            $user->forceDelete();
-            Cache::forget(AdminDashboardSnapshotService::CACHE_KEY);
+            $actor = Auth::user();
+            $erasureService->forceDeleteWithErasure($user, $actor instanceof User ? $actor : null);
 
-            return redirect()->route('admin.deleted.users.index')->with('success', "User '{$username}' has been permanently deleted.");
+            return redirect()->route('admin.deleted.users.index')->with('success', "User '{$username}' has been permanently deleted with GDPR cleanup.");
         }
 
         return redirect()->route('admin.deleted.users.index')->with('error', 'User not found.');
