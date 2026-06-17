@@ -191,7 +191,6 @@ class GdprExportService
             ->map(fn (Payment $payment): array => $this->modelToArray($payment))
             ->all();
     }
-
     /**
      * @param  list<string>  $redactedColumns
      * @return array<int, array<string, mixed>>

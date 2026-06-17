@@ -201,9 +201,9 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
     Route::match(['GET', 'POST'], 'profile_delete', [ProfileController::class, 'destroy'])->name('profile_delete');
     Route::post('profile/update-theme', [ProfileController::class, 'updateTheme'])->name('profile.update-theme');
     Route::get('privacy-center', [PrivacyCenterController::class, 'index'])->name('privacy-center.index');
-    Route::post('privacy-center/export', [PrivacyCenterController::class, 'requestExport'])->name('privacy-center.export');
-    Route::post('privacy-center/erasure', [PrivacyCenterController::class, 'requestErasure'])->name('privacy-center.erasure');
-    Route::get('privacy-center/export/{gdprRequest}/download', [PrivacyCenterController::class, 'downloadExport'])->name('privacy-center.export.download');
+    Route::post('privacy-center/export', [PrivacyCenterController::class, 'requestExport'])->middleware('throttle:3,1')->name('privacy-center.export');
+    Route::post('privacy-center/erasure', [PrivacyCenterController::class, 'requestErasure'])->middleware('throttle:3,1')->name('privacy-center.erasure');
+    Route::get('privacy-center/export/{gdprRequest}/download', [PrivacyCenterController::class, 'downloadExport'])->middleware('throttle:10,1')->name('privacy-center.export.download');
     Route::match(['GET', 'POST'], 'search', [SearchController::class, 'search'])->name('search');
 
     // Release Report routes

@@ -50,6 +50,25 @@ class PrivacyCenterController extends BasePageController
             'notes' => ['nullable', 'string', 'max:2000'],
         ]);
 
+        // Block regeneration while a previously generated export is still downloadable.
+        // This bounds the heavy, synchronous export work and avoids accumulating PII files.
+        $activeExport = GdprRequest::query()
+            ->where('user_id', $user->id)
+            ->where('type', GdprRequest::TYPE_EXPORT)
+            ->where('status', GdprRequest::STATUS_COMPLETED)
+            ->whereNotNull('export_path')
+            ->where(function ($query): void {
+                $query->whereNull('export_expires_at')
+                    ->orWhere('export_expires_at', '>', now());
+            })
+            ->exists();
+
+        if ($activeExport) {
+            return redirect()
+                ->route('privacy-center.index')
+                ->with('error', 'You already have an active data export available for download. Please use or wait for it to expire before requesting a new one.');
+        }
+
         $gdprRequest = GdprRequest::create([
             'user_id' => $user->id,
             'requester_username' => $user->username,
