@@ -38,4 +38,3 @@ class PurgeExpiredGdprExports extends Command
         }
     }
 }
-
