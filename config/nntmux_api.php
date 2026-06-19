@@ -11,4 +11,7 @@ return [
     'imdbapi_dev_cooldown_seconds' => env('IMDBAPI_DEV_COOLDOWN_SECONDS', 300),
     'omdb_api_key' => env('OMDB_APIKEY', ''),
     'trakttv_api_key' => env('TRAKTTV_APIKEY', ''),
+    'trakttv_timeout' => env('TRAKTTV_TIMEOUT', 30),
+    'trakttv_retry_times' => env('TRAKTTV_RETRY_TIMES', 3),
+    'trakttv_retry_delay' => env('TRAKTTV_RETRY_DELAY', 100),
 ];

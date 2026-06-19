@@ -189,25 +189,28 @@ class MovieService
                 $data['trailer']
             );
         }
-        $imdbId = (str_starts_with($data['ids']['imdb'], 'tt')) ? substr($data['ids']['imdb'], 2) : $data['ids']['imdb'];
+        $imdbId = (string) $data['ids']['imdb'];
+        $imdbId = str_starts_with($imdbId, 'tt') ? substr($imdbId, 2) : $imdbId;
+        $genres = $data['genres'] ?? [];
+        $genre = is_array($genres) ? implode(', ', $genres) : (string) $genres;
         $cover = 0;
         if (File::isFile($this->imgSavePath.$imdbId.'-cover.jpg')) {
             $cover = 1;
         }
 
         return $this->update([
-            'genre' => implode(', ', $data['genres']),
+            'genre' => $genre,
             'imdbid' => $this->checkTraktValue($imdbId),
-            'language' => $this->checkTraktValue($data['language']),
-            'plot' => $this->checkTraktValue($data['overview']),
-            'rating' => $this->checkTraktValue($data['rating']),
-            'tagline' => $this->checkTraktValue($data['tagline']),
-            'title' => $this->checkTraktValue($data['title']),
-            'tmdbid' => $this->checkTraktValue($data['ids']['tmdb']),
-            'traktid' => $this->checkTraktValue($data['ids']['trakt']),
-            'trailer' => $this->checkTraktValue($data['trailer']),
+            'language' => $this->checkTraktValue($data['language'] ?? ''),
+            'plot' => $this->checkTraktValue($data['overview'] ?? ''),
+            'rating' => $this->checkTraktValue($data['rating'] ?? ''),
+            'tagline' => $this->checkTraktValue($data['tagline'] ?? ''),
+            'title' => $this->checkTraktValue($data['title'] ?? ''),
+            'tmdbid' => $this->checkTraktValue($data['ids']['tmdb'] ?? 0),
+            'traktid' => $this->checkTraktValue($data['ids']['trakt'] ?? 0),
+            'trailer' => $this->checkTraktValue($data['trailer'] ?? ''),
             'cover' => $cover,
-            'year' => $this->checkTraktValue($data['year']),
+            'year' => $this->checkTraktValue($data['year'] ?? ''),
         ]);
     }
 

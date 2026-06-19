@@ -520,7 +520,7 @@ abstract class AbstractTvProvider extends BaseVideoProvider
         $following = '[^a-z0-9]([(|\[]\w+[)|\]]\s)*?(\d\d-\d\d|\d{1,3}x\d{2,3}|\(?(19|20)\d{2}\)?|(480|720|1080|2160)[ip]|AAC2?|BD-?Rip|Blu-?Ray|D0?\d|DD5|DiVX|DLMux|DTS|DVD(-?Rip)?|E\d{2,3}|[HX][\-_. ]?26[45]|ITA(-ENG)?|HEVC|[HPS]DTV|PROPER|REPACK|Season|Episode|S\d+[^a-z0-9]?((E\d+)[abr]?)*|WEB[\-_. ]?(DL|Rip)|XViD)[^a-z0-9]?';
 
         // Handle fansub/release group prefixes like [SubsPlease], [Erai-raws], [ASW], etc.
-        $cleanRelname = preg_replace('/^\[[^\]]+\][_\s]*/i', '', $relname);
+        $cleanRelname = preg_replace('/^\[[^]]+][_\s]*/i', '', $relname);
 
         if (preg_match('/^([^a-z0-9]{2,}|(sample|proof|repost)-)(?P<name>[\w .\-!&]+?)'.$following.'/i', $cleanRelname, $hits)) {
             $showName = $hits['name'];
@@ -888,10 +888,10 @@ abstract class AbstractTvProvider extends BaseVideoProvider
                 $required = ['name', 'season_number', 'episode_number', 'air_date', 'overview'];
                 break;
             case 'traktS':
-                $required = ['title', 'ids', 'overview', 'first_aired', 'airs', 'country'];
+                $required = ['title', 'ids'];
                 break;
             case 'traktE':
-                $required = ['title', 'season', 'number', 'overview', 'first_aired'];
+                $required = ['title', 'season', 'number'];
                 break;
         }
 

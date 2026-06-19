@@ -18,7 +18,11 @@ use Illuminate\Support\Str;
  * A modern service wrapper for the Trakt.tv API.
  * Provides methods to fetch movie and TV show information.
  *
- * API Documentation: https://trakt.docs.apiary.io/
+ * API Documentation: https://docs.trakt.tv/
+ *
+ * This wrapper intentionally uses public metadata endpoints only. OAuth should
+ * only be added if a future feature needs user-scoped Trakt data such as
+ * watchlists, watched history, private lists, ratings, or sync endpoints.
  */
 class TraktService
 {
@@ -29,6 +33,8 @@ class TraktService
     protected const API_VERSION = 2;
 
     protected const ID_TYPES = ['imdb', 'tmdb', 'trakt', 'tvdb'];
+
+    protected const SEARCH_TYPES = ['movie', 'show', 'episode', 'person', 'list'];
 
     /** Minimum seconds between requests to avoid rate limiting (Trakt/Cloudflare). */
     protected const THROTTLE_SECONDS = 1;
@@ -46,7 +52,7 @@ class TraktService
 
     public function __construct(?string $clientId = null)
     {
-        $this->clientId = $clientId ?? (string) config('nntmux_api.trakttv_api_key', '');
+        $this->clientId = trim($clientId ?? (string) config('nntmux_api.trakttv_api_key', ''));
         $this->timeout = (int) config('nntmux_api.trakttv_timeout', 30);
         $this->retryTimes = (int) config('nntmux_api.trakttv_retry_times', 3);
         $this->retryDelay = (int) config('nntmux_api.trakttv_retry_delay', 100);
@@ -84,8 +90,9 @@ class TraktService
     protected function getHeaders(): array
     {
         return [
+            'Accept' => 'application/json',
             'Content-Type' => 'application/json',
-            'trakt-api-version' => self::API_VERSION,
+            'trakt-api-version' => (string) self::API_VERSION,
             'trakt-api-key' => $this->clientId,
         ];
     }
@@ -232,10 +239,7 @@ class TraktService
             return null;
         }
 
-        $extended = match ($extended) {
-            'aliases', 'full', 'full,aliases' => $extended,
-            default => 'min',
-        };
+        $extended = $this->normalizeExtended($extended, ['min', 'full', 'aliases', 'full,aliases']);
 
         // Format the show ID based on type for cache key and API call
         $formattedId = $this->formatShowIdForApi($showId, $idType);
@@ -243,7 +247,7 @@ class TraktService
             return null;
         }
 
-        $cacheKey = "trakt_episode_{$idType}_{$showId}_{$season}_{$episode}_{$extended}";
+        $cacheKey = "trakt_episode_{$idType}_{$formattedId}_{$season}_{$episode}_{$extended}";
 
         return Cache::remember($cacheKey, now()->addHours(self::CACHE_TTL_HOURS), function () use ($formattedId, $season, $episode, $extended) {
             return $this->get("shows/{$formattedId}/seasons/{$season}/episodes/{$episode}", [
@@ -272,8 +276,9 @@ class TraktService
         $idPriority = ['trakt', 'tmdb', 'tvdb', 'imdb'];
 
         foreach ($idPriority as $idType) {
-            if (! empty($ids[$idType]) && $ids[$idType] > 0) {
-                $result = $this->getEpisodeSummary($ids[$idType], $season, $episode, $extended, $idType);
+            $id = $ids[$idType] ?? null;
+            if ($this->isUsableExternalId($id, $idType)) {
+                $result = $this->getEpisodeSummary($id, $season, $episode, $extended, $idType);
                 if ($result !== null) {
                     return $result;
                 }
@@ -297,10 +302,16 @@ class TraktService
             return null;
         }
 
-        return match ($idType) {
-            'imdb' => is_numeric($id) ? 'tt'.str_pad((string) $id, 8, '0', STR_PAD_LEFT) : (string) $id,
-            'trakt', 'tmdb', 'tvdb' => (string) $id,
-        };
+        $formattedId = trim((string) $id);
+        if ($formattedId === '') {
+            return null;
+        }
+
+        if ($idType === 'imdb') {
+            return $this->formatImdbId($formattedId);
+        }
+
+        return $formattedId;
     }
 
     /**
@@ -387,7 +398,11 @@ class TraktService
     {
         if (empty($startDate)) {
             $startDate = date('Y-m-d');
+        } elseif (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $startDate)) {
+            return null;
         }
+
+        $days = max(1, min($days, 33));
 
         $cacheKey = "trakt_calendar_{$startDate}_{$days}";
 
@@ -409,12 +424,16 @@ class TraktService
             return null;
         }
 
-        $extended = $extended === 'full' ? 'full' : 'min';
-        $slug = Str::slug($movie);
-        $cacheKey = "trakt_movie_{$slug}_{$extended}";
+        $extended = $this->normalizeExtended($extended, ['min', 'full']);
+        $movieId = $this->formatMediaId($movie);
+        if ($movieId === null) {
+            return null;
+        }
 
-        return Cache::remember($cacheKey, now()->addHours(self::CACHE_TTL_HOURS), function () use ($slug, $extended) {
-            return $this->get("movies/{$slug}", ['extended' => $extended]);
+        $cacheKey = 'trakt_movie_'.md5($movieId).'_'.$extended;
+
+        return Cache::remember($cacheKey, now()->addHours(self::CACHE_TTL_HOURS), function () use ($movieId, $extended) {
+            return $this->get("movies/{$movieId}", ['extended' => $extended]);
         });
     }
 
@@ -447,24 +466,35 @@ class TraktService
             return null;
         }
 
-        // Format IMDB ID with 'tt' prefix if needed
-        if ($idType === 'imdb' && is_numeric($id)) {
-            $id = 'tt'.$id;
+        $formattedId = trim((string) $id);
+        if ($formattedId === '') {
+            return null;
+        }
+
+        if ($idType === 'imdb') {
+            $formattedId = $this->formatImdbId($formattedId);
+            if ($formattedId === null) {
+                return null;
+            }
         }
 
         $params = [
             'id_type' => $idType,
-            'id' => $id,
+            'id' => $formattedId,
         ];
 
-        if (! empty($mediaType)) {
+        if ($mediaType !== '' && ! in_array($mediaType, self::SEARCH_TYPES, true)) {
+            return null;
+        }
+
+        if ($mediaType !== '') {
             $params['type'] = $mediaType;
         }
 
-        $cacheKey = 'trakt_search_'.$idType.'_'.preg_replace('/[^a-zA-Z0-9_-]/', '_', (string) $id).'_'.($mediaType ?: 'all');
+        $cacheKey = 'trakt_search_'.$idType.'_'.preg_replace('/[^a-zA-Z0-9_-]/', '_', $formattedId).'_'.($params['type'] ?? 'all');
 
-        return Cache::remember($cacheKey, now()->addHours(self::CACHE_TTL_HOURS), function () use ($id, $idType, $mediaType) {
-            return $this->get('search/'.$idType.'/'.$id, ['type' => $mediaType ?: null]);
+        return Cache::remember($cacheKey, now()->addHours(self::CACHE_TTL_HOURS), function () use ($formattedId, $idType, $params) {
+            return $this->get('search/'.$idType.'/'.$formattedId, array_intersect_key($params, ['type' => true]));
         });
     }
 
@@ -477,7 +507,8 @@ class TraktService
      */
     public function searchShows(string $query, string $type = 'show'): ?array
     {
-        if (empty($query)) {
+        $query = trim($query);
+        if ($query === '' || ! in_array($type, self::SEARCH_TYPES, true)) {
             return null;
         }
 
@@ -504,12 +535,16 @@ class TraktService
             return null;
         }
 
-        $extended = $extended === 'full' ? 'full' : 'min';
-        $slug = Str::slug($showKey);
-        $cacheKey = "trakt_show_{$slug}_{$extended}";
+        $extended = $this->normalizeExtended($extended, ['min', 'full']);
+        $showId = $this->formatMediaId($showKey);
+        if ($showId === null) {
+            return null;
+        }
 
-        return Cache::remember($cacheKey, now()->addHours(self::CACHE_TTL_HOURS), function () use ($slug, $extended) {
-            return $this->get("shows/{$slug}", ['extended' => $extended]);
+        $cacheKey = 'trakt_show_'.md5($showId).'_'.$extended;
+
+        return Cache::remember($cacheKey, now()->addHours(self::CACHE_TTL_HOURS), function () use ($showId, $extended) {
+            return $this->get("shows/{$showId}", ['extended' => $extended]);
         });
     }
 
@@ -522,15 +557,16 @@ class TraktService
      */
     public function getShowSeasons(string $show, string $extended = 'full'): ?array
     {
-        if (empty($show)) {
+        $showId = $this->formatMediaId($show);
+        if ($showId === null) {
             return null;
         }
 
-        $slug = Str::slug($show);
-        $cacheKey = "trakt_seasons_{$slug}_{$extended}";
+        $extended = $this->normalizeExtended($extended, ['min', 'full', 'episodes', 'full,episodes']);
+        $cacheKey = 'trakt_seasons_'.md5($showId).'_'.$extended;
 
-        return Cache::remember($cacheKey, now()->addHours(self::CACHE_TTL_HOURS), function () use ($slug, $extended) {
-            return $this->get("shows/{$slug}/seasons", ['extended' => $extended]);
+        return Cache::remember($cacheKey, now()->addHours(self::CACHE_TTL_HOURS), function () use ($showId, $extended) {
+            return $this->get("shows/{$showId}/seasons", ['extended' => $extended]);
         });
     }
 
@@ -544,15 +580,16 @@ class TraktService
      */
     public function getSeasonEpisodes(string $show, int $season, string $extended = 'full'): ?array
     {
-        if (empty($show)) {
+        $showId = $this->formatMediaId($show);
+        if ($showId === null || $season < 0) {
             return null;
         }
 
-        $slug = Str::slug($show);
-        $cacheKey = "trakt_season_episodes_{$slug}_{$season}_{$extended}";
+        $extended = $this->normalizeExtended($extended, ['min', 'full']);
+        $cacheKey = 'trakt_season_episodes_'.md5($showId)."_{$season}_{$extended}";
 
-        return Cache::remember($cacheKey, now()->addHours(self::CACHE_TTL_HOURS), function () use ($slug, $season, $extended) {
-            return $this->get("shows/{$slug}/seasons/{$season}", ['extended' => $extended]);
+        return Cache::remember($cacheKey, now()->addHours(self::CACHE_TTL_HOURS), function () use ($showId, $season, $extended) {
+            return $this->get("shows/{$showId}/seasons/{$season}", ['extended' => $extended]);
         });
     }
 
@@ -565,6 +602,8 @@ class TraktService
      */
     public function getTrendingShows(int $limit = 10, string $extended = 'full'): ?array
     {
+        $limit = $this->normalizeLimit($limit);
+        $extended = $this->normalizeExtended($extended, ['min', 'full']);
         $cacheKey = "trakt_trending_shows_{$limit}_{$extended}";
 
         return Cache::remember($cacheKey, now()->addHours(1), function () use ($limit, $extended) {
@@ -584,6 +623,8 @@ class TraktService
      */
     public function getTrendingMovies(int $limit = 10, string $extended = 'full'): ?array
     {
+        $limit = $this->normalizeLimit($limit);
+        $extended = $this->normalizeExtended($extended, ['min', 'full']);
         $cacheKey = "trakt_trending_movies_{$limit}_{$extended}";
 
         return Cache::remember($cacheKey, now()->addHours(1), function () use ($limit, $extended) {
@@ -603,6 +644,8 @@ class TraktService
      */
     public function getPopularShows(int $limit = 10, string $extended = 'full'): ?array
     {
+        $limit = $this->normalizeLimit($limit);
+        $extended = $this->normalizeExtended($extended, ['min', 'full']);
         $cacheKey = "trakt_popular_shows_{$limit}_{$extended}";
 
         return Cache::remember($cacheKey, now()->addHours(6), function () use ($limit, $extended) {
@@ -622,6 +665,8 @@ class TraktService
      */
     public function getPopularMovies(int $limit = 10, string $extended = 'full'): ?array
     {
+        $limit = $this->normalizeLimit($limit);
+        $extended = $this->normalizeExtended($extended, ['min', 'full']);
         $cacheKey = "trakt_popular_movies_{$limit}_{$extended}";
 
         return Cache::remember($cacheKey, now()->addHours(6), function () use ($limit, $extended) {
@@ -642,6 +687,16 @@ class TraktService
         Cache::forget("trakt_show_{$slug}_full");
         Cache::forget("trakt_seasons_{$slug}_full");
         Cache::forget("trakt_seasons_{$slug}_min");
+
+        $showId = $this->formatMediaId($show);
+        if ($showId !== null) {
+            Cache::forget('trakt_show_'.md5($showId).'_min');
+            Cache::forget('trakt_show_'.md5($showId).'_full');
+            Cache::forget('trakt_seasons_'.md5($showId).'_min');
+            Cache::forget('trakt_seasons_'.md5($showId).'_full');
+            Cache::forget('trakt_seasons_'.md5($showId).'_episodes');
+            Cache::forget('trakt_seasons_'.md5($showId).'_full,episodes');
+        }
     }
 
     /**
@@ -652,5 +707,62 @@ class TraktService
         $slug = Str::slug($movie);
         Cache::forget("trakt_movie_{$slug}_min");
         Cache::forget("trakt_movie_{$slug}_full");
+
+        $movieId = $this->formatMediaId($movie);
+        if ($movieId !== null) {
+            Cache::forget('trakt_movie_'.md5($movieId).'_min');
+            Cache::forget('trakt_movie_'.md5($movieId).'_full');
+        }
+    }
+
+    /**
+     * Normalize IMDb IDs for Trakt endpoints without padding away meaningful
+     * leading zeroes (for example, tt0137523 must stay tt0137523).
+     */
+    protected function formatImdbId(string $id): ?string
+    {
+        if (preg_match('/^tt\d{6,}$/i', $id) === 1) {
+            return $id;
+        }
+
+        $digits = preg_replace('/\D/', '', $id);
+
+        return $digits !== null && preg_match('/^\d{6,}$/', $digits) === 1 ? 'tt'.$digits : null;
+    }
+
+    protected function formatMediaId(int|string $id): ?string
+    {
+        $id = trim((string) $id);
+        if ($id === '') {
+            return null;
+        }
+
+        return str_starts_with(strtolower($id), 'tt') ? $this->formatImdbId($id) : Str::slug($id);
+    }
+
+    /**
+     * @param  list<string>  $allowed
+     */
+    protected function normalizeExtended(string $extended, array $allowed): string
+    {
+        return in_array($extended, $allowed, true) ? $extended : $allowed[0];
+    }
+
+    protected function normalizeLimit(int $limit): int
+    {
+        return max(1, min($limit, 100));
+    }
+
+    protected function isUsableExternalId(mixed $id, string $idType): bool
+    {
+        if ($id === null || $id === '') {
+            return false;
+        }
+
+        if ($idType === 'imdb') {
+            return $this->formatImdbId((string) $id) !== null;
+        }
+
+        return is_numeric($id) ? (int) $id > 0 : trim((string) $id) !== '';
     }
 }

@@ -13,10 +13,10 @@ use App\Services\TvProcessing\TvProcessingResult;
  */
 class TraktPipe extends AbstractTvProviderPipe
 {
-    // Video type and source constants (matching Videos class protected constants)
+    // Video type and source constants (matching AbstractTvProvider constants)
     private const TYPE_TV = 0;
 
-    private const SOURCE_TRAKT = 5;
+    private const SOURCE_TRAKT = 4;
 
     protected int $priority = 50;
 

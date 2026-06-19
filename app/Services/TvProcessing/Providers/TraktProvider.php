@@ -31,12 +31,12 @@ class TraktProvider extends AbstractTvProvider
     /**
      * The URL to grab the TV fanart.
      */
-    public string $fanartUrl;
+    public string $fanartUrl = '';
 
     /**
      * The localized (network airing) timezone of the show.
      */
-    private string $localizedTZ;
+    private string $localizedTZ = '';
 
     /**
      * @throws \Exception
@@ -278,6 +278,12 @@ class TraktProvider extends AbstractTvProvider
     {
         $return = false;
 
+        if ($videoId > 0 && (int) $series === -1 && (int) $episode === -1) {
+            $this->addEpisodesForShow($siteId, $videoId);
+
+            return false;
+        }
+
         // If we have a video ID, get all available external IDs for fallback
         if ($videoId > 0) {
             $ids = $this->getAllSiteIdsFromVideoID($videoId);
@@ -352,15 +358,20 @@ class TraktProvider extends AbstractTvProvider
         sleep(1);
 
         foreach ($response as $show) {
-            if (! is_bool($show)) {
+            if (is_array($show) && isset($show['show']) && is_array($show['show'])) {
+                $showTitle = (string) ($show['show']['title'] ?? '');
+                if ($showTitle === '') {
+                    continue;
+                }
+
                 // Check for exact title match first and then terminate if found
-                if ($show['show']['title'] === $name) {
+                if (strcasecmp($showTitle, $name) === 0) {
                     $highest = $show;
                     break;
                 }
 
                 // Check each show title for similarity and then find the highest similar value
-                $matchPercent = $this->checkMatch($show['show']['title'], $name, self::MATCH_PROBABILITY);
+                $matchPercent = $this->checkMatch($showTitle, $name, self::MATCH_PROBABILITY);
 
                 // If new match has a higher percentage, set as new matched title
                 if ($matchPercent > $highestMatch) {
@@ -369,7 +380,7 @@ class TraktProvider extends AbstractTvProvider
                 }
             }
         }
-        if ($highest !== null) {
+        if ($highest !== null && ! empty($highest['show']['ids']['trakt'])) {
             $fullShow = $this->client->getShowSummary($highest['show']['ids']['trakt']);
             if ($this->checkRequiredAttr($fullShow, 'traktS')) {
                 $return = $this->formatShowInfo($fullShow);
@@ -387,31 +398,39 @@ class TraktProvider extends AbstractTvProvider
      */
     public function formatShowInfo(mixed $show): array
     {
-        preg_match('/tt(?P<imdbid>\d{6,})$/i', (string) ($show['ids']['imdb'] ?? ''), $imdb);
-        $this->posterUrl = $show['images']['poster']['thumb'] ?? '';
-        $this->fanartUrl = $show['images']['fanart']['thumb'] ?? '';
-        $this->localizedTZ = $show['airs']['timezone'] ?? '';
+        if (! is_array($show)) {
+            return [];
+        }
+
+        $ids = is_array($show['ids'] ?? null) ? $show['ids'] : [];
+        $airs = is_array($show['airs'] ?? null) ? $show['airs'] : [];
+        $images = is_array($show['images'] ?? null) ? $show['images'] : [];
+
+        preg_match('/tt(?P<imdbid>\d{6,})$/i', (string) ($ids['imdb'] ?? ''), $imdb);
+        $this->posterUrl = is_array($images['poster'] ?? null) ? (string) ($images['poster']['thumb'] ?? '') : '';
+        $this->fanartUrl = is_array($images['fanart'] ?? null) ? (string) ($images['fanart']['thumb'] ?? '') : '';
+        $this->localizedTZ = (string) ($airs['timezone'] ?? '');
 
         $imdbId = (string) ($imdb['imdbid'] ?? '');
-        $tvdbId = $show['ids']['tvdb'] ?? 0;
+        $tvdbId = (int) ($ids['tvdb'] ?? 0);
 
         // Look up TVMaze ID using TVDB or IMDB
         $tvmazeId = $this->lookupTvMazeId($tvdbId, $imdbId);
 
         return [
             'type' => parent::TYPE_TV,
-            'title' => $show['title'],
-            'summary' => $show['overview'],
-            'started' => Carbon::parse($show['first_aired'], $this->localizedTZ)->format('Y-m-d'),
-            'publisher' => $show['network'],
-            'country' => $show['country'],
+            'title' => (string) ($show['title'] ?? ''),
+            'summary' => (string) ($show['overview'] ?? ''),
+            'started' => $this->formatTraktDate($show['first_aired'] ?? null),
+            'publisher' => (string) ($show['network'] ?? ''),
+            'country' => (string) ($show['country'] ?? ''),
             'source' => parent::SOURCE_TRAKT,
             'imdb' => $imdbId,
             'tvdb' => $tvdbId,
-            'trakt' => $show['ids']['trakt'],
-            'tvrage' => $show['ids']['tvrage'] ?? 0,
+            'trakt' => (int) ($ids['trakt'] ?? 0),
+            'tvrage' => (int) ($ids['tvrage'] ?? 0),
             'tvmaze' => $tvmazeId,
-            'tmdb' => $show['ids']['tmdb'] ?? 0,
+            'tmdb' => (int) ($ids['tmdb'] ?? 0),
             'aliases' => isset($show['aliases']) && ! empty($show['aliases']) ? $show['aliases'] : '',
             'localzone' => $this->localizedTZ,
         ];
@@ -460,14 +479,63 @@ class TraktProvider extends AbstractTvProvider
      */
     public function formatEpisodeInfo(mixed $episode): array
     {
+        $season = (int) ($episode['season'] ?? 0);
+        $episodeNumber = (int) ($episode['number'] ?? ($episode['episode'] ?? 0));
+
         return [
-            'title' => (string) $episode['title'],
-            'series' => (int) $episode['season'],
+            'title' => (string) ($episode['title'] ?? ''),
+            'series' => $season,
             // Prefer the Trakt 'number' field for episode number, fall back to 'episode' if present
-            'episode' => (int) ($episode['number'] ?? ($episode['episode'] ?? 0)),
-            'se_complete' => 'S'.sprintf('%02d', $episode['season']).'E'.sprintf('%02d', ($episode['number'] ?? ($episode['episode'] ?? 0))),
-            'firstaired' => Carbon::parse($episode['first_aired'], $this->localizedTZ)->format('Y-m-d'),
-            'summary' => (string) $episode['overview'],
+            'episode' => $episodeNumber,
+            'se_complete' => 'S'.sprintf('%02d', $season).'E'.sprintf('%02d', $episodeNumber),
+            'firstaired' => $this->formatTraktDate($episode['first_aired'] ?? null),
+            'summary' => (string) ($episode['overview'] ?? ''),
         ];
+    }
+
+    private function addEpisodesForShow(int|string $siteId, int $videoId): void
+    {
+        $seasons = $this->client->getShowSeasons((string) $siteId, 'episodes');
+        if (! is_array($seasons)) {
+            return;
+        }
+
+        foreach ($seasons as $seasonInfo) {
+            if (! is_array($seasonInfo)) {
+                continue;
+            }
+
+            $seasonNumber = (int) ($seasonInfo['number'] ?? -1);
+            if ($seasonNumber < 0) {
+                continue;
+            }
+
+            $episodes = is_array($seasonInfo['episodes'] ?? null)
+                ? $seasonInfo['episodes']
+                : $this->client->getSeasonEpisodes((string) $siteId, $seasonNumber, 'full');
+
+            if (! is_array($episodes)) {
+                continue;
+            }
+
+            foreach ($episodes as $singleEpisode) {
+                if (is_array($singleEpisode) && $this->checkRequiredAttr($singleEpisode, 'traktE')) {
+                    $this->addEpisode($videoId, $this->formatEpisodeInfo($singleEpisode));
+                }
+            }
+        }
+    }
+
+    private function formatTraktDate(mixed $date): string
+    {
+        if (empty($date)) {
+            return '';
+        }
+
+        try {
+            return Carbon::parse((string) $date, $this->localizedTZ !== '' ? $this->localizedTZ : null)->format('Y-m-d');
+        } catch (\Throwable) {
+            return '';
+        }
     }
 }
