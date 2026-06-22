@@ -53,6 +53,27 @@ Set `COMPOSE_PROFILES` in `.env` to match your `SEARCH_DRIVER`:
 Only the selected search service container will start. The other remains
 dormant and consumes no resources.
 
+### ManticoreSearch Image Updates
+
+Both `docker-compose.yml` and `docker-compose.yml.prod-dist` intentionally use
+the unpinned `manticoresearch/manticore` image. This keeps ManticoreSearch on
+the latest published Docker image whenever images are pulled, but it also means
+production can receive ManticoreSearch changes without a repository diff.
+
+Before pulling and restarting production, validate the new image in staging by
+creating indexes, indexing a small batch, and running representative searches,
+filters, sorting, pagination, deletes, suggestions, fuzzy searches, and any raw
+SQL diagnostics/reconciliation commands.
+
+Manticore Search 27.1.5 is part of the 25.x-27.x release line that introduced
+built-in authentication/authorization, sharded tables, conversational search,
+vector-search improvements, and replication layout changes. The app does not
+enable Manticore auth by default, but if auth is enabled on the server set either
+`MANTICORESEARCH_USERNAME`/`MANTICORESEARCH_PASSWORD` or
+`MANTICORESEARCH_TOKEN` before running the app, index-creation commands, or raw
+HTTP diagnostics. Roll auth out in staging first; anonymous local Docker usage
+continues to work with these variables blank.
+
 ## Make Targets
 
 Run `make` or `make help` to see all targets, grouped by section.

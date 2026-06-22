@@ -27,6 +27,10 @@ return [
             'driver' => 'manticore',
             'host' => env('MANTICORESEARCH_HOST', '127.0.0.1'),
             'port' => env('MANTICORESEARCH_PORT', 9308),
+            'scheme' => env('MANTICORESEARCH_SCHEME', 'http'),
+            'username' => env('MANTICORESEARCH_USERNAME'),
+            'password' => env('MANTICORESEARCH_PASSWORD'),
+            'token' => env('MANTICORESEARCH_TOKEN'),
             'hosts' => env('MANTICORESEARCH_HOSTS', ''),
             'retries' => env('MANTICORESEARCH_RETRIES', 2),
             'indexes' => [

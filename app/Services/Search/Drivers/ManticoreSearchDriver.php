@@ -15,6 +15,7 @@ use App\Models\Release;
 use App\Models\SteamApp;
 use App\Models\Video;
 use App\Services\Search\Contracts\SearchDriverInterface;
+use App\Services\Search\Support\ManticoreClientFactory;
 use App\Support\ReleaseSearchIndexDocument;
 use App\Support\SecondaryIndexDocuments;
 use Illuminate\Support\Facades\Cache;
@@ -55,8 +56,8 @@ class ManticoreSearchDriver implements SearchDriverInterface
     public function __construct(array $config = [])
     {
         $this->config = ! empty($config) ? $config : config('search.drivers.manticore');
-        $this->connection = ['host' => $this->config['host'], 'port' => $this->config['port']];
-        $this->manticoreSearch = new Client($this->connection);
+        $this->connection = ManticoreClientFactory::clientConfig($this->config);
+        $this->manticoreSearch = ManticoreClientFactory::make($this->config);
         $this->search = new Search($this->manticoreSearch);
     }
 
@@ -2336,7 +2337,6 @@ class ManticoreSearchDriver implements SearchDriverInterface
      *
      * @param  array<string, mixed>  $categoryIds  Array of category IDs to filter by
      * @param  int  $limit  Maximum number of results
-     * @return list
      * @return array<string, mixed>
      */
     public function searchReleasesByCategory(array $categoryIds, int $limit = 1000): array
@@ -2397,7 +2397,6 @@ class ManticoreSearchDriver implements SearchDriverInterface
      * @param  string  $searchTerm  Search text
      * @param  array<string, mixed>  $categoryIds  Array of category IDs to filter by (empty for all categories)
      * @param  int  $limit  Maximum number of results
-     * @return list
      * @return array<string, mixed>
      */
     public function searchReleasesWithCategoryFilter(string $searchTerm, array $categoryIds = [], int $limit = 1000): array

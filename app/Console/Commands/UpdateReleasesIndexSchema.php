@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use App\Facades\Search;
 use App\Models\Release;
+use App\Services\Search\Support\ManticoreClientFactory;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -75,14 +76,7 @@ class UpdateReleasesIndexSchema extends Command
         $this->info('Releases index schema update utility');
         $this->newLine();
 
-        // Initialize ManticoreSearch client
-        $host = config('search.drivers.manticore.host', '127.0.0.1');
-        $port = config('search.drivers.manticore.port', 9308);
-
-        $this->client = new Client([
-            'host' => $host,
-            'port' => $port,
-        ]);
+        $this->client = ManticoreClientFactory::make(config('search.drivers.manticore', []));
 
         // Test connection
         try {

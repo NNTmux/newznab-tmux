@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use App\Services\Search\Support\ElasticsearchClientFactory;
 use App\Services\Search\Support\ElasticsearchResponseHelper;
+use App\Services\Search\Support\ManticoreClientFactory;
 use Elastic\Elasticsearch\Client as ElasticsearchClient;
 use Illuminate\Console\Command;
 use Manticoresearch\Client as ManticoreClient;
@@ -53,13 +54,7 @@ class CreateMediaIndexes extends Command
      */
     private function createManticoreIndexes(): int
     {
-        $host = config('search.drivers.manticore.host', '127.0.0.1');
-        $port = config('search.drivers.manticore.port', 9308);
-
-        $client = new ManticoreClient([
-            'host' => $host,
-            'port' => $port,
-        ]);
+        $client = ManticoreClientFactory::make(config('search.drivers.manticore', []));
 
         // Test connection
         try {

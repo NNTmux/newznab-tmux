@@ -111,7 +111,7 @@ services:
             retries: 3
             timeout: 5s
     manticore:
-        image: manticoresearch/manticore:7.4.6
+        image: manticoresearch/manticore
         profiles:
             - manticore
         environment:

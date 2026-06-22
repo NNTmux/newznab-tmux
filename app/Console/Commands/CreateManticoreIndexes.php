@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Enums\SecondarySearchIndex;
+use App\Services\Search\Support\ManticoreClientFactory;
 use Illuminate\Console\Command;
 use Manticoresearch\Client;
 use Manticoresearch\Exceptions\ResponseException;
@@ -37,15 +38,7 @@ class CreateManticoreIndexes extends Command
 
         $dropExisting = $this->option('drop');
 
-        // Get connection details from config
-        $host = config('manticoresearch.host', '127.0.0.1');
-        $port = config('manticoresearch.port', 9308);
-
-        // Create client
-        $this->client = new Client([
-            'host' => $host,
-            'port' => $port,
-        ]);
+        $this->client = ManticoreClientFactory::make(config('search.drivers.manticore', config('manticoresearch', [])));
 
         // We'll skip checking for data_dir this way since it may not be accessible via API
         // but instead provide better error handling during index creation

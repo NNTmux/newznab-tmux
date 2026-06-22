@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use App\Facades\Elasticsearch;
 use App\Services\Search\Support\ElasticsearchResponseHelper;
+use App\Services\Search\Support\ManticoreClientFactory;
 use Elastic\Elasticsearch\Client as ElasticsearchClient;
 use Exception;
 use GuzzleHttp\Client;
@@ -140,18 +141,20 @@ class NntmuxCheckIndex extends Command
                 'anime' => 'anime_rt',
                 default => 'releases_rt',
             };
-            $host = (string) config('search.drivers.manticore.host', '127.0.0.1');
-            $port = (int) config('search.drivers.manticore.port', 9308);
+            $manticoreConfig = config('search.drivers.manticore', []);
+            $host = (string) ($manticoreConfig['host'] ?? '127.0.0.1');
+            $port = (int) ($manticoreConfig['port'] ?? 9308);
+            $scheme = (string) ($manticoreConfig['scheme'] ?? 'http');
 
             // Use HTTP API endpoint
-            $baseUrl = "http://{$host}:{$port}";
+            $baseUrl = "{$scheme}://{$host}:{$port}";
 
             // Check if table exists using HTTP API
-            $client = new Client([
+            $client = new Client(ManticoreClientFactory::guzzleOptions($manticoreConfig, [
                 'base_uri' => $baseUrl,
                 'timeout' => 10,
                 'http_errors' => false, // Don't throw on HTTP errors
-            ]);
+            ]));
 
             // Use raw mode which seems to work
             $query = "SELECT COUNT(*) FROM {$indexName}";
