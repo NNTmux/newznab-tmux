@@ -74,6 +74,12 @@ enable Manticore auth by default, but if auth is enabled on the server set eithe
 HTTP diagnostics. Roll auth out in staging first; anonymous local Docker usage
 continues to work with these variables blank.
 
+Native Ubuntu/Debian package installs are managed by `systemd`, not Docker. If
+the package install fails while starting `manticore.service`, especially with
+`Status: "Replaying binlogs..."` and `accept() failed ... Too many open files`,
+use [`docs/manticore-ubuntu-package.md`](docs/manticore-ubuntu-package.md) to
+raise the service file descriptor limit and finish `dpkg` configuration.
+
 ## Make Targets
 
 Run `make` or `make help` to see all targets, grouped by section.
