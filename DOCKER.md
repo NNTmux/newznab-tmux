@@ -77,8 +77,10 @@ continues to work with these variables blank.
 Native Ubuntu/Debian package installs are managed by `systemd`, not Docker. If
 the package install fails while starting `manticore.service`, especially with
 `Status: "Replaying binlogs..."` and `accept() failed ... Too many open files`,
-use [`docs/manticore-ubuntu-package.md`](docs/manticore-ubuntu-package.md) to
-raise the service file descriptor limit and finish `dpkg` configuration.
+or if `searchd` prints a backtrace during binlog replay, use
+[`docs/manticore-ubuntu-package.md`](docs/manticore-ubuntu-package.md) to raise
+the service file descriptor limit, preserve crash evidence, quarantine bad
+binlogs if needed, and finish `dpkg` configuration.
 
 ## Make Targets
 
