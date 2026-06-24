@@ -40,6 +40,11 @@ class UpdateNNTmux extends Command
     private bool $tmuxWasRunning = false;
 
     /**
+     * @var bool Whether composer dependencies were refreshed during this update
+     */
+    private bool $composerWasRun = false;
+
+    /**
      * @var ProgressBar Progress bar for tracking operations
      */
     private ProgressBar $progressBar;
@@ -192,6 +197,8 @@ class UpdateNNTmux extends Command
             throw new \Exception('Composer update failed');
         }
 
+        $this->composerWasRun = true;
+
         $this->progressBar->advance();
     }
 
@@ -202,13 +209,37 @@ class UpdateNNTmux extends Command
     {
         $this->info('🗄️ Updating database...');
 
-        $dbResult = $this->call('nntmux:db');
+        $dbResult = $this->composerWasRun
+            ? $this->runFreshArtisanCommand(['nntmux:db'])
+            : $this->call('nntmux:db');
 
         if ($dbResult !== 0) {
             throw new \Exception('Database update failed');
         }
 
         $this->progressBar->advance();
+    }
+
+    /**
+     * Run an Artisan command in a new PHP process so updated dependencies are loaded consistently.
+     *
+     * @param  list<string>  $arguments
+     */
+    private function runFreshArtisanCommand(array $arguments): int
+    {
+        $this->line('  ℹ Restarting Artisan for updated dependencies...');
+
+        $result = Process::timeout(3600)
+            ->path(base_path())
+            ->run(array_merge([PHP_BINARY, 'artisan'], $arguments), function (string $type, string $output): void {
+                $this->output->write($output);
+            });
+
+        if (! $result->successful() && $result->errorOutput() !== '') {
+            $this->error($result->errorOutput());
+        }
+
+        return $result->exitCode();
     }
 
     /**
