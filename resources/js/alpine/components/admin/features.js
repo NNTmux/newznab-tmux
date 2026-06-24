@@ -553,23 +553,6 @@ Alpine.data('regexDelete', () => ({
     }
 }));
 
-// Release delete
-Alpine.data('releaseDelete', () => ({
-    deleteRelease(e, id, deleteUrl) {
-        e.preventDefault();
-        const el = e.currentTarget;
-        showConfirm({ title: 'Delete Release', message: 'Are you sure you want to delete this release? This action cannot be undone.', type: 'danger', confirmText: 'Delete', onConfirm: function() {
-            const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-            showToast('Deleting release...', 'info');
-            fetch(deleteUrl, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrf, 'Content-Type': 'application/json', 'Accept': 'application/json' } })
-            .then(r => {
-                if (r.ok) { const row = el.closest('tr'); if (row) { row.style.transition = 'opacity 0.3s'; row.style.opacity = '0'; setTimeout(() => row.remove(), 300); } showToast('Release deleted successfully', 'success'); }
-                else showToast('Error deleting release: ' + r.status, 'error');
-            }).catch(err => showToast('Error deleting release: ' + err.message, 'error'));
-        }});
-    }
-}));
-
 // My Movies confirm
 Alpine.data('myMovies', () => ({
     confirmRemove(e) {
@@ -738,23 +721,6 @@ Alpine.data('myMovies', () => ({
                     else showToast('Error', 'error');
                 }).catch(function() { showToast('Error', 'error'); });
             }
-            return;
-        }
-
-        // Release delete
-        var relDel = e.target.closest('[data-delete-release]');
-        if (relDel) {
-            e.preventDefault();
-            var deleteUrl = relDel.getAttribute('data-delete-url');
-            showConfirm({ title: 'Delete Release', message: 'Are you sure? This cannot be undone.', type: 'danger', confirmText: 'Delete',
-                onConfirm: function() {
-                    var csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-                    showToast('Deleting...', 'info');
-                    fetch(deleteUrl, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrf, 'Content-Type': 'application/json', 'Accept': 'application/json' } })
-                    .then(function(r) { if (r.ok) { var row = relDel.closest('tr'); if (row) { row.style.transition='opacity 0.3s'; row.style.opacity='0'; setTimeout(function() { row.remove(); },300); } showToast('Deleted', 'success'); } else showToast('Error: ' + r.status, 'error'); })
-                    .catch(function(err) { showToast('Error: ' + err.message, 'error'); });
-                }
-            });
             return;
         }
 

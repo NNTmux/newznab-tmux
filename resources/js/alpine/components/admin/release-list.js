@@ -63,6 +63,83 @@ Alpine.data('adminReleaseList', () => ({
         }
     },
 
+    showToast(message, type) {
+        Alpine.store('toast').show(message, type);
+    },
+
+    deleteRelease(e) {
+        e.preventDefault();
+
+        const button = e.currentTarget;
+        const deleteUrl = button.dataset.deleteUrl;
+
+        if (!deleteUrl) {
+            this.showToast('Release delete URL is missing.', 'error');
+
+            return;
+        }
+
+        this.showModal({
+            title: 'Delete Release',
+            message: 'Are you sure you want to delete this release?',
+            details: 'This action cannot be undone.',
+            type: 'danger',
+            confirmText: 'Delete',
+            cancelText: 'Cancel',
+            onConfirm: () => this.submitReleaseDelete(button, deleteUrl),
+        });
+    },
+
+    submitReleaseDelete(button, deleteUrl) {
+        const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+
+        if (!csrf) {
+            this.showToast('Unable to delete release: CSRF token is missing.', 'error');
+
+            return;
+        }
+
+        button.disabled = true;
+        button.setAttribute('aria-busy', 'true');
+        this.showToast('Deleting release...', 'info');
+
+        fetch(deleteUrl, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrf,
+                'Accept': 'application/json',
+            },
+        })
+            .then(response => response.json().catch(() => ({})).then(data => ({ response, data })))
+            .then(({ response, data }) => {
+                if (!response.ok || data.success === false) {
+                    throw new Error(data.message || 'Error deleting release: ' + response.status);
+                }
+
+                const row = button.closest('tr');
+                if (row) {
+                    row.style.transition = 'opacity 0.3s';
+                    row.style.opacity = '0';
+                    setTimeout(() => {
+                        row.remove();
+                        this.syncSelectionState();
+                    }, 300);
+                } else {
+                    this.syncSelectionState();
+                }
+
+                this.showToast(data.message || 'Release deleted successfully', 'success');
+            })
+            .catch(error => {
+                button.disabled = false;
+                this.showToast(error.message || 'Error deleting release.', 'error');
+            })
+            .finally(() => {
+                button.removeAttribute('aria-busy');
+            });
+    },
+
     validateBulkAction(e) {
         e.preventDefault();
 
@@ -99,7 +176,6 @@ Alpine.data('adminReleaseList', () => ({
             return;
         }
 
-        const self = this;
         this.showModal({
             title: 'Change category',
             message: 'Change category for ' + checkedCount + ' release(s)?',

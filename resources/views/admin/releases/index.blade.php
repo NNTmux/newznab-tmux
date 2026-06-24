@@ -158,6 +158,7 @@
                                 </a>
                                 <button type="button"
                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                        @click="deleteRelease($event)"
                                        data-delete-release="{{ $release->guid }}"
                                        data-delete-url="{{ url('admin/release-delete/' . $release->guid) }}"
                                        title="Delete">
