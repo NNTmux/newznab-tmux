@@ -77,6 +77,31 @@ class UsersRelease extends Model
         );
     }
 
+    /**
+     * Add multiple releases to a user's cart in one insert statement.
+     *
+     * @param  list<int>  $releaseIds
+     */
+    public static function addCartForReleases(int $uid, array $releaseIds): int
+    {
+        if ($releaseIds === []) {
+            return 0;
+        }
+
+        $now = now();
+        $rows = array_map(
+            static fn (int $releaseId): array => [
+                'users_id' => $uid,
+                'releases_id' => $releaseId,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            array_values(array_unique($releaseIds))
+        );
+
+        return self::query()->insertOrIgnore($rows);
+    }
+
     public static function getCart(mixed $uid): mixed
     {
         return self::query()
@@ -95,23 +120,27 @@ class UsersRelease extends Model
             return false;
         }
 
-        $del = [];
-        foreach ($guids as $guid) {
-            $rel = Release::query()->where('guid', $guid)->first(['id']);
-            if ($rel !== null) {
-                $del[] = $rel['id'];
-            }
+        $guids = array_values(array_unique(array_filter(array_map(
+            static fn ($guid): string => trim((string) $guid),
+            $guids
+        ))));
+
+        if ($guids === []) {
+            return false;
         }
 
-        return self::query()->whereIn('releases_id', $del)->where('users_id', $userID)->delete() === 1;
+        return self::query()
+            ->where('users_id', $userID)
+            ->whereIn('releases_id', Release::query()->select('id')->whereIn('guid', $guids))
+            ->delete() > 0;
     }
 
     public static function delCartByUserAndRelease(mixed $guid, mixed $uid): void
     {
-        $rel = Release::query()->where('guid', $guid)->first(['id']);
-        if ($rel) {
-            self::query()->where(['users_id' => $uid, 'releases_id' => $rel['id']])->delete();
-        }
+        self::query()
+            ->where('users_id', $uid)
+            ->whereIn('releases_id', Release::query()->select('id')->where('guid', $guid))
+            ->delete();
     }
 
     /**

@@ -36,24 +36,33 @@ class CartController extends BasePageController
      */
     public function store(Request $request): RedirectResponse|JsonResponse
     {
-        $guids = explode(',', $request->input('id'));
+        $guids = collect(explode(',', (string) $request->input('id')))
+            ->map(static fn (string $guid): string => trim($guid))
+            ->filter()
+            ->unique()
+            ->values();
 
-        $data = Release::query()->whereIn('guid', $guids)->select(['id'])->get();
+        $releaseIds = Release::query()
+            ->whereIn('guid', $guids)
+            ->pluck('id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
 
-        if ($data->isEmpty()) {
+        if ($releaseIds === []) {
             return $request->ajax() || $request->wantsJson()
                 ? response()->json(['success' => false, 'message' => 'No releases found'], 404)
                 : redirect()->to('/cart/index');
         }
 
-        $addedCount = 0;
-        foreach ($data as $d) {
-            $check = UsersRelease::whereReleasesId($d['id'])->first();
-            if (empty($check)) {
-                UsersRelease::addCart($this->userdata->id, $d['id']);
-                $addedCount++;
-            }
-        }
+        $existingReleaseIds = UsersRelease::query()
+            ->where('users_id', $this->userdata->id)
+            ->whereIn('releases_id', $releaseIds)
+            ->pluck('releases_id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
+
+        $missingReleaseIds = array_values(array_diff($releaseIds, $existingReleaseIds));
+        $addedCount = UsersRelease::addCartForReleases((int) $this->userdata->id, $missingReleaseIds);
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
