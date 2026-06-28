@@ -139,7 +139,7 @@ class ApiRequestMatrixTest extends TestCase
              */
             public ?array $capturedOutput = null;
 
-            public function output(mixed $data, array $params, bool $xml, int $offset, string $type = '')
+            public function output(mixed $data, array $params, bool $xml, int $offset, string $type = '', array $headers = [])
             {
                 $this->capturedOutput = [
                     'data' => $data,
@@ -178,7 +178,7 @@ class ApiRequestMatrixTest extends TestCase
              */
             public ?array $capturedOutput = null;
 
-            public function output(mixed $data, array $params, bool $xml, int $offset, string $type = '')
+            public function output(mixed $data, array $params, bool $xml, int $offset, string $type = '', array $headers = [])
             {
                 $this->capturedOutput = [
                     'data' => $data,
@@ -231,7 +231,7 @@ class ApiRequestMatrixTest extends TestCase
              */
             public ?array $capturedOutput = null;
 
-            public function output(mixed $data, array $params, bool $xml, int $offset, string $type = '')
+            public function output(mixed $data, array $params, bool $xml, int $offset, string $type = '', array $headers = [])
             {
                 $this->capturedOutput = [
                     'data' => $data,
@@ -284,7 +284,7 @@ class ApiRequestMatrixTest extends TestCase
              */
             public ?array $capturedOutput = null;
 
-            public function output(mixed $data, array $params, bool $xml, int $offset, string $type = '')
+            public function output(mixed $data, array $params, bool $xml, int $offset, string $type = '', array $headers = [])
             {
                 $this->capturedOutput = [
                     'data' => $data,
@@ -336,7 +336,7 @@ class ApiRequestMatrixTest extends TestCase
             {
                 public ?array $capturedOutput = null;
 
-                public function output(mixed $data, array $params, bool $xml, int $offset, string $type = '')
+                public function output(mixed $data, array $params, bool $xml, int $offset, string $type = '', array $headers = [])
                 {
                     $this->capturedOutput = compact('data', 'params', 'xml', 'offset', 'type');
                 }
