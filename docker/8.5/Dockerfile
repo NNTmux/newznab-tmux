@@ -26,9 +26,6 @@ RUN apt-get update \
     && echo "deb [signed-by=/etc/apt/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
     && curl -sS https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | tee /etc/apt/keyrings/pgdg.gpg >/dev/null \
     && echo "deb [signed-by=/etc/apt/keyrings/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt noble-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
-    && curl -fsSL https://extras.getpagespeed.com/deb-archive-keyring.gpg -o /etc/apt/keyrings/getpagespeed.gpg \
-    && echo "deb [signed-by=/etc/apt/keyrings/getpagespeed.gpg] https://extras.getpagespeed.com/ubuntu noble main" > /etc/apt/sources.list.d/getpagespeed.list \
-    && printf 'Package: *\nPin: origin extras.getpagespeed.com\nPin-Priority: 1001\n' > /etc/apt/preferences.d/getpagespeed-nginx.pref \
     && apt-get update
 
 # Install core PHP packages
@@ -53,8 +50,8 @@ RUN apt-get install -y \
     sudo jq htop fonts-powerline nano bash-completion time wget cron \
     jpegoptim webp optipng pngquant libavif-bin
 
-# Install nginx + brotli module from GetPageSpeed (apt-pinned, stable branch)
-RUN apt-get install -y nginx nginx-module-brotli \
+# Install nginx from Ubuntu repositories
+RUN apt-get install -y nginx \
     && rm -f /etc/nginx/conf.d/default.conf \
     && nginx -t
 
