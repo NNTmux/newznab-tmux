@@ -24,6 +24,16 @@ use Symfony\Component\HttpFoundation\Response;
 class BlockAbusiveServices
 {
     /**
+     * @var array<int, string>
+     */
+    private const SENSITIVE_QUERY_PARAMETERS = [
+        'apikey',
+        'api_token',
+        'token',
+        'passkey',
+    ];
+
+    /**
      * User-Agent patterns to block (case-insensitive).
      *
      * @var array<string>
@@ -66,7 +76,7 @@ class BlockAbusiveServices
             Log::warning('Blocked abusive User-Agent', [
                 'ip' => $ip,
                 'user_agent' => $userAgent,
-                'uri' => $request->getRequestUri(),
+                'uri' => $this->safeRequestUri($request),
             ]);
 
             return $this->blockedResponse('Access denied: Streaming services are not allowed.');
@@ -76,7 +86,7 @@ class BlockAbusiveServices
             Log::warning('Blocked proxy indexer app request', [
                 'ip' => $ip,
                 'user_agent' => $userAgent,
-                'uri' => $request->getRequestUri(),
+                'uri' => $this->safeRequestUri($request),
             ]);
 
             return $this->blockedResponse('Access denied: Proxy indexer app access is not allowed.');
@@ -91,7 +101,7 @@ class BlockAbusiveServices
                 'org' => $asnInfo['org'] ?? 'Unknown',
                 'blocked_reason' => $this->blockedAsns[$asnInfo['asn']],
                 'user_agent' => $userAgent,
-                'uri' => $request->getRequestUri(),
+                'uri' => $this->safeRequestUri($request),
             ]);
 
             return $this->blockedResponse(
@@ -188,6 +198,51 @@ class BlockAbusiveServices
         }
 
         return false;
+    }
+
+    /**
+     * Return the request URI with sensitive query parameter values redacted for logs.
+     */
+    protected function safeRequestUri(Request $request): string
+    {
+        $query = $request->query();
+        if ($query === []) {
+            return $request->getPathInfo();
+        }
+
+        $queryString = http_build_query(
+            $this->redactSensitiveQueryParameters($query),
+            '',
+            '&',
+            PHP_QUERY_RFC3986
+        );
+
+        return $queryString === ''
+            ? $request->getPathInfo()
+            : $request->getPathInfo().'?'.$queryString;
+    }
+
+    /**
+     * @param  array<string, mixed>  $parameters
+     * @return array<string, mixed>
+     */
+    protected function redactSensitiveQueryParameters(array $parameters): array
+    {
+        $redacted = [];
+
+        foreach ($parameters as $key => $value) {
+            if (in_array(strtolower((string) $key), self::SENSITIVE_QUERY_PARAMETERS, true)) {
+                $redacted[$key] = '[redacted]';
+
+                continue;
+            }
+
+            $redacted[$key] = is_array($value)
+                ? $this->redactSensitiveQueryParameters($value)
+                : $value;
+        }
+
+        return $redacted;
     }
 
     /**
