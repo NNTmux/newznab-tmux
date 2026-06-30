@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
  * Blocks:
  * - AIOStreams (User-Agent based)
  * - UsenetStreamer (User-Agent based)
+ * - Configured indexer apps on public indexer API/RSS endpoints (User-Agent based, opt-in)
  * - Oracle Cloud (ASN: AS31898)
  * - Cloudflare WARP (ASN: AS13335)
  */
@@ -71,6 +72,16 @@ class BlockAbusiveServices
             return $this->blockedResponse('Access denied: Streaming services are not allowed.');
         }
 
+        if ($this->shouldBlockProxyIndexerApp($request, $userAgent)) {
+            Log::warning('Blocked proxy indexer app request', [
+                'ip' => $ip,
+                'user_agent' => $userAgent,
+                'uri' => $request->getRequestUri(),
+            ]);
+
+            return $this->blockedResponse('Access denied: Proxy indexer app access is not allowed.');
+        }
+
         // Check for blocked ASNs
         $asnInfo = $this->getAsnInfo($ip);
         if ($asnInfo !== null && isset($this->blockedAsns[$asnInfo['asn']])) {
@@ -99,6 +110,78 @@ class BlockAbusiveServices
         $lowerUserAgent = strtolower($userAgent);
 
         foreach ($this->blockedUserAgents as $pattern) {
+            if (str_contains($lowerUserAgent, strtolower($pattern))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check whether an opt-in proxy indexer app block should apply.
+     */
+    protected function shouldBlockProxyIndexerApp(Request $request, string $userAgent): bool
+    {
+        if (! (bool) config('nntmux.block_proxy_indexer_apps', false)) {
+            return false;
+        }
+
+        if (! $this->isPublicIndexerEndpoint($request)) {
+            return false;
+        }
+
+        return $this->matchesAnyUserAgentPattern(
+            $userAgent,
+            $this->configuredProxyIndexerAppUserAgents()
+        );
+    }
+
+    /**
+     * Detect public indexer API/RSS endpoints while leaving unrelated requests alone.
+     */
+    protected function isPublicIndexerEndpoint(Request $request): bool
+    {
+        if ($request->is('api/v1/api') || $request->is('api/v2/*')) {
+            return true;
+        }
+
+        return $request->is('rss/*') && ! $request->is('rss/health');
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function configuredProxyIndexerAppUserAgents(): array
+    {
+        $configured = config('nntmux.block_proxy_indexer_app_user_agents', []);
+
+        if (is_string($configured)) {
+            $configured = preg_split('/[\r\n,]+/', $configured) ?: [];
+        }
+
+        if (! is_array($configured)) {
+            Log::warning('Ignoring invalid proxy indexer app User-Agent configuration.', [
+                'configured_type' => get_debug_type($configured),
+            ]);
+
+            return [];
+        }
+
+        return array_values(array_filter(array_map(
+            static fn (mixed $pattern): string => is_string($pattern) ? trim($pattern) : '',
+            $configured,
+        )));
+    }
+
+    /**
+     * @param  array<int, string>  $patterns
+     */
+    protected function matchesAnyUserAgentPattern(string $userAgent, array $patterns): bool
+    {
+        $lowerUserAgent = strtolower($userAgent);
+
+        foreach ($patterns as $pattern) {
             if (str_contains($lowerUserAgent, strtolower($pattern))) {
                 return true;
             }

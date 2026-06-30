@@ -21,6 +21,8 @@ return [
     'purge_inactive_users' => env('PURGE_INACTIVE_USERS', false),
     'purge_inactive_users_days' => env('PURGE_INACTIVE_USERS_DAYS', 180),
     'mysql_search_fallback' => env('MYSQL_SEARCH_FALLBACK', false), // Disable MySQL LIKE fallback when Manticore/Elasticsearch return no results
+    'block_proxy_indexer_apps' => (bool) env('BLOCK_PROXY_INDEXER_APPS', false),
+    'block_proxy_indexer_app_user_agents' => env('BLOCK_PROXY_INDEXER_APP_USER_AGENTS', 'Prowlarr/,NZBHydra2'),
 
     /*
     |--------------------------------------------------------------------------
