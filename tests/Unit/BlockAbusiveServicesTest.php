@@ -76,40 +76,42 @@ class BlockAbusiveServicesTest extends TestCase
         $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
     }
 
-    public function test_enabled_proxy_indexer_app_block_denies_configured_user_agent_on_newznab_endpoints(): void
+    public function test_enabled_proxy_indexer_app_block_denies_proxied_downloads(): void
     {
         config()->set('nntmux.block_proxy_indexer_apps', true);
         config()->set('nntmux.block_proxy_indexer_app_user_agents', 'Prowlarr/,NZBHydra2');
 
         foreach ([
-            '/api/v1/api?t=caps',
-            '/api/v1/api?t=search&q=linux',
-            '/api/v1/api?t=get&id=release-guid',
-        ] as $uri) {
-            $response = $this->handleRequest($uri, 'Prowlarr/2.0.0');
+            '/api/v1/api?t=get&id=release-guid' => 'Prowlarr/2.0.0',
+            '/api/v1/api?t=g&id=release-guid' => 'Prowlarr/2.0.0',
+            '/api/v2/getnzb?id=release-guid' => 'NZBHydra2 8.3.0',
+        ] as $uri => $userAgent) {
+            $response = $this->handleRequest($uri, $userAgent);
 
             $this->assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode(), $uri);
-            $this->assertStringContainsString('Proxy indexer app access is not allowed', (string) $response->getContent());
+            $this->assertStringContainsString('Proxying NZB downloads through indexer apps is not allowed', (string) $response->getContent());
         }
     }
 
-    public function test_enabled_proxy_indexer_app_block_denies_configured_user_agent_on_v2_endpoints(): void
+    public function test_enabled_proxy_indexer_app_block_allows_proxied_searches(): void
     {
         config()->set('nntmux.block_proxy_indexer_apps', true);
         config()->set('nntmux.block_proxy_indexer_app_user_agents', 'Prowlarr/,NZBHydra2');
 
         foreach ([
-            '/api/v2/capabilities',
-            '/api/v2/search?q=linux',
-            '/api/v2/getnzb?id=release-guid',
-        ] as $uri) {
-            $response = $this->handleRequest($uri, 'NZBHydra2 8.3.0');
+            '/api/v1/api?t=caps' => 'Prowlarr/2.0.0',
+            '/api/v1/api?t=search&q=linux' => 'Prowlarr/2.0.0',
+            '/api/v1/api?t=tvsearch&q=linux' => 'Prowlarr/2.0.0',
+            '/api/v2/capabilities' => 'NZBHydra2 8.3.0',
+            '/api/v2/search?q=linux' => 'NZBHydra2 8.3.0',
+        ] as $uri => $userAgent) {
+            $response = $this->handleRequest($uri, $userAgent);
 
-            $this->assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode(), $uri);
+            $this->assertSame(Response::HTTP_OK, $response->getStatusCode(), $uri);
         }
     }
 
-    public function test_enabled_proxy_indexer_app_block_denies_configured_user_agent_on_rss_feed_endpoints(): void
+    public function test_enabled_proxy_indexer_app_block_allows_proxied_rss_feeds(): void
     {
         config()->set('nntmux.block_proxy_indexer_apps', true);
         config()->set('nntmux.block_proxy_indexer_app_user_agents', 'Prowlarr/,NZBHydra2');
@@ -120,7 +122,7 @@ class BlockAbusiveServicesTest extends TestCase
         ] as $uri) {
             $response = $this->handleRequest($uri, 'Prowlarr/2.0.0');
 
-            $this->assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode(), $uri);
+            $this->assertSame(Response::HTTP_OK, $response->getStatusCode(), $uri);
         }
     }
 
@@ -167,13 +169,13 @@ class BlockAbusiveServicesTest extends TestCase
         config()->set('nntmux.block_proxy_indexer_app_user_agents', 'Prowlarr/,NZBHydra2');
 
         $response = $this->handleRequest(
-            '/api/v1/api?t=search&apikey=secret-api-key&api_token=secret-token&passkey=secret-passkey&q=linux',
+            '/api/v1/api?t=get&id=release-guid&apikey=secret-api-key&api_token=secret-token&passkey=secret-passkey',
             'Prowlarr/2.0.0'
         );
 
         $this->assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode());
         Log::shouldHaveReceived('warning')
-            ->with('Blocked proxy indexer app request', \Mockery::on(function (mixed $context): bool {
+            ->with('Blocked proxied NZB download from indexer app', \Mockery::on(function (mixed $context): bool {
                 if (! is_array($context)) {
                     return false;
                 }
@@ -183,7 +185,7 @@ class BlockAbusiveServicesTest extends TestCase
                 return str_contains($uri, 'apikey=%5Bredacted%5D')
                     && str_contains($uri, 'api_token=%5Bredacted%5D')
                     && str_contains($uri, 'passkey=%5Bredacted%5D')
-                    && str_contains($uri, 'q=linux')
+                    && str_contains($uri, 'id=release-guid')
                     && ! str_contains($uri, 'secret-api-key')
                     && ! str_contains($uri, 'secret-token')
                     && ! str_contains($uri, 'secret-passkey');

@@ -17,7 +17,11 @@ use Symfony\Component\HttpFoundation\Response;
  * Blocks:
  * - AIOStreams (User-Agent based)
  * - UsenetStreamer (User-Agent based)
- * - Configured indexer apps on public indexer API/RSS endpoints (User-Agent based, opt-in)
+ * - Configured indexer apps proxying NZB downloads (User-Agent based, opt-in).
+ *   Only NZB download/grab requests are blocked, so proxied searches and RSS
+ *   feeds keep working. Redirected grabs (Prowlarr/NZBHydra2 "Redirect" setting)
+ *   arrive directly from the download client, whose User-Agent does not match
+ *   the configured proxy patterns, and are therefore allowed.
  * - Oracle Cloud (ASN: AS31898)
  * - Cloudflare WARP (ASN: AS13335)
  */
@@ -83,13 +87,13 @@ class BlockAbusiveServices
         }
 
         if ($this->shouldBlockProxyIndexerApp($request, $userAgent)) {
-            Log::warning('Blocked proxy indexer app request', [
+            Log::warning('Blocked proxied NZB download from indexer app', [
                 'ip' => $ip,
                 'user_agent' => $userAgent,
                 'uri' => $this->safeRequestUri($request),
             ]);
 
-            return $this->blockedResponse('Access denied: Proxy indexer app access is not allowed.');
+            return $this->blockedResponse('Access denied: Proxying NZB downloads through indexer apps is not allowed.');
         }
 
         // Check for blocked ASNs
@@ -137,7 +141,7 @@ class BlockAbusiveServices
             return false;
         }
 
-        if (! $this->isPublicIndexerEndpoint($request)) {
+        if (! $this->isNzbDownloadRequest($request)) {
             return false;
         }
 
@@ -148,15 +152,25 @@ class BlockAbusiveServices
     }
 
     /**
-     * Detect public indexer API/RSS endpoints while leaving unrelated requests alone.
+     * Detect NZB download/grab requests so only proxied downloads are blocked.
+     *
+     * Searches, caps and RSS feeds are intentionally out of scope so proxied
+     * searches keep working. Redirected grabs arrive directly from the download
+     * client, whose User-Agent does not match the configured proxy patterns.
      */
-    protected function isPublicIndexerEndpoint(Request $request): bool
+    protected function isNzbDownloadRequest(Request $request): bool
     {
-        if ($request->is('api/v1/api') || $request->is('api/v2/*')) {
+        if ($request->is('api/v2/getnzb')) {
             return true;
         }
 
-        return $request->is('rss/*') && ! $request->is('rss/health');
+        if (! $request->is('api/v1/api')) {
+            return false;
+        }
+
+        $type = strtolower(trim((string) $request->input('t', '')));
+
+        return in_array($type, ['get', 'g'], true);
     }
 
     /**

@@ -320,4 +320,62 @@ final class BlockAbusiveServicesTest extends TestCase
         $this->assertArrayHasKey('message', $json);
         $this->assertTrue($json['error']);
     }
+
+    /**
+     * Test that a proxied NZB download is blocked when the block is enabled.
+     */
+    public function test_blocks_proxied_download_from_indexer_app(): void
+    {
+        config()->set('nntmux.block_proxy_indexer_apps', true);
+        config()->set('nntmux.block_proxy_indexer_app_user_agents', 'Prowlarr/,NZBHydra2');
+
+        $request = Request::create('/api/v1/api?t=get&id=release-guid', 'GET');
+        $request->headers->set('User-Agent', 'Prowlarr/2.0.0');
+        $request->server->set('REMOTE_ADDR', '127.0.0.1');
+
+        $response = $this->middleware->handle($request, function ($req) {
+            return new Response('OK', 200);
+        });
+
+        $this->assertEquals(403, $response->getStatusCode());
+        $this->assertStringContainsString('Proxying NZB downloads through indexer apps is not allowed', $response->getContent());
+    }
+
+    /**
+     * Test that a proxied search is allowed even when the block is enabled.
+     */
+    public function test_allows_proxied_search_from_indexer_app(): void
+    {
+        config()->set('nntmux.block_proxy_indexer_apps', true);
+        config()->set('nntmux.block_proxy_indexer_app_user_agents', 'Prowlarr/,NZBHydra2');
+
+        $request = Request::create('/api/v1/api?t=search&q=linux', 'GET');
+        $request->headers->set('User-Agent', 'Prowlarr/2.0.0');
+        $request->server->set('REMOTE_ADDR', '127.0.0.1');
+
+        $response = $this->middleware->handle($request, function ($req) {
+            return new Response('OK', 200);
+        });
+
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    /**
+     * Test that a redirected download (download-client UA) is allowed.
+     */
+    public function test_allows_redirected_download_from_download_client(): void
+    {
+        config()->set('nntmux.block_proxy_indexer_apps', true);
+        config()->set('nntmux.block_proxy_indexer_app_user_agents', 'Prowlarr/,NZBHydra2');
+
+        $request = Request::create('/api/v1/api?t=get&id=release-guid', 'GET');
+        $request->headers->set('User-Agent', 'SABnzbd/4.3.3');
+        $request->server->set('REMOTE_ADDR', '127.0.0.1');
+
+        $response = $this->middleware->handle($request, function ($req) {
+            return new Response('OK', 200);
+        });
+
+        $this->assertEquals(200, $response->getStatusCode());
+    }
 }
