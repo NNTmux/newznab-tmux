@@ -12,7 +12,9 @@ use Manticoresearch\Exceptions\ResponseException;
 
 class CreateManticoreIndexes extends Command
 {
-    protected $signature = 'manticore:create-indexes {--drop : Drop existing indexes before creating}';
+    protected $signature = 'manticore:create-indexes
+                            {--drop : Drop selected indexes before creating}
+                            {--index=* : Logical index name(s) to create; defaults to all indexes}';
 
     protected $description = 'Create Manticore Search indexes based on configuration';
 
@@ -33,8 +35,19 @@ class CreateManticoreIndexes extends Command
         }
 
         $configuredNames = config('search.drivers.manticore.indexes', []);
+        $selected = array_values(array_filter(array_map('strval', (array) $this->option('index'))));
+        $definitions = ManticoreIndexRegistry::definitions();
+        if ($selected !== []) {
+            $unknown = array_diff($selected, array_keys($definitions));
+            if ($unknown !== []) {
+                $this->error('Unknown logical index: '.implode(', ', $unknown));
+
+                return self::FAILURE;
+            }
+            $definitions = array_intersect_key($definitions, array_flip($selected));
+        }
         $hasErrors = false;
-        foreach (ManticoreIndexRegistry::definitions() as $logical => $schema) {
+        foreach ($definitions as $logical => $schema) {
             $indexName = (string) ($configuredNames[$logical] ?? $logical.'_rt');
             if (! $this->createIndex($indexName, $schema, (bool) $this->option('drop'))) {
                 $hasErrors = true;

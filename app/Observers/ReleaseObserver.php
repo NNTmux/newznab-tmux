@@ -8,6 +8,7 @@ use App\Facades\Search;
 use App\Models\Release;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -25,7 +26,7 @@ class ReleaseObserver
      */
     public function created(Release $release): void
     {
-        $this->syncToSearchIndex($release);
+        $this->syncAfterCommit($release);
     }
 
     /**
@@ -38,19 +39,25 @@ class ReleaseObserver
     {
         $indexedFields = [
             'name',
+            'guid',
             'searchname',
             'fromname',
             'categories_id',
             'imdbid',
+            'anidbid',
             'movieinfo_id',
             'videos_id',
+            'tv_episodes_id',
             'size',
             'totalpart',
             'grabs',
             'passwordstatus',
             'groups_id',
             'nzbstatus',
+            'nfostatus',
             'haspreview',
+            'jpgstatus',
+            'comments',
             'postdate',
             'adddate',
         ];
@@ -64,7 +71,7 @@ class ReleaseObserver
         }
 
         if ($changed) {
-            $this->syncToSearchIndex($release);
+            $this->syncAfterCommit($release);
         }
     }
 
@@ -106,20 +113,27 @@ class ReleaseObserver
      */
     public function deleted(Release $release): void
     {
-        try {
-            Search::deleteRelease($release->id);
-        } catch (\Throwable $e) {
-            Log::error('ReleaseObserver: Failed to delete release from search index', [
-                'release_id' => $release->id,
-                'error' => $e->getMessage(),
-            ]);
-        }
+        DB::afterCommit(function () use ($release): void {
+            try {
+                Search::deleteRelease($release->id);
+            } catch (\Throwable $e) {
+                Log::error('ReleaseObserver: Failed to delete release from search index', [
+                    'release_id' => $release->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        });
+    }
+
+    private function syncAfterCommit(Release $release): void
+    {
+        DB::afterCommit(fn (): bool => $this->syncToSearchIndex($release));
     }
 
     /**
      * Sync the release to the search index (full document from DB + joins).
      */
-    private function syncToSearchIndex(Release $release): void
+    private function syncToSearchIndex(Release $release): bool
     {
         try {
             Search::updateRelease($release->id);
@@ -129,11 +143,15 @@ class ReleaseObserver
                     'release_id' => $release->id,
                 ]);
             }
+
+            return true;
         } catch (\Throwable $e) {
             Log::error('ReleaseObserver: Failed to sync release to search index', [
                 'release_id' => $release->id,
                 'error' => $e->getMessage(),
             ]);
+
+            return false;
         }
     }
 }

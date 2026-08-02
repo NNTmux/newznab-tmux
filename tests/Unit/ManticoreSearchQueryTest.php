@@ -18,6 +18,7 @@ class ManticoreSearchQueryTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    /** @return array<string, array{string, string}> */
     public static function negationQueriesProvider(): array
     {
         return [
@@ -37,6 +38,7 @@ class ManticoreSearchQueryTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    /** @return array<string, array{string, string}> */
     public static function phraseQueriesProvider(): array
     {
         return [
@@ -55,6 +57,7 @@ class ManticoreSearchQueryTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    /** @return array<string, array{string, string}> */
     public static function orQueriesProvider(): array
     {
         return [
@@ -71,6 +74,7 @@ class ManticoreSearchQueryTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    /** @return array<string, array{string, string}> */
     public static function wildcardQueriesProvider(): array
     {
         return [
@@ -88,6 +92,7 @@ class ManticoreSearchQueryTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    /** @return array<string, array{string, string}> */
     public static function groupingQueriesProvider(): array
     {
         return [
@@ -104,6 +109,7 @@ class ManticoreSearchQueryTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    /** @return array<string, array{string, string}> */
     public static function escapingQueriesProvider(): array
     {
         return [
@@ -143,6 +149,24 @@ class ManticoreSearchQueryTest extends TestCase
         );
     }
 
+    #[Test]
+    public function it_adds_a_normalized_release_name_query_for_punctuation_separators(): void
+    {
+        $reflection = new ReflectionClass(ManticoreSearchDriver::class);
+        $method = $reflection->getMethod('scopeReleaseSearchQuery');
+
+        $query = $method->invoke(
+            null,
+            'Love.Is.A.Dogs.Best.Friend.2025.1080p.WEB-DL.HEVC.x265-BONE',
+            ManticoreSearchDriver::prepareUserSearchQuery('Love.Is.A.Dogs.Best.Friend.2025.1080p.WEB-DL.HEVC.x265-BONE'),
+            '@searchname'
+        );
+
+        $this->assertStringContainsString('@searchname (Love.Is.A.Dogs.Best.Friend.2025.1080p.WEB\\-DL.HEVC.x265\\-BONE)', $query);
+        $this->assertStringContainsString('@searchname (Love Is A Dogs Best Friend 2025 1080p WEB DL HEVC x265 BONE)', $query);
+    }
+
+    /** @return array<string, array{string, string}> */
     public static function edgeCaseQueriesProvider(): array
     {
         return [
@@ -163,6 +187,7 @@ class ManticoreSearchQueryTest extends TestCase
         $this->assertStringContainsString('circus', $result);
     }
 
+    /** @param array<string, string>|string $input */
     #[Test]
     #[DataProvider('negationDetectionProvider')]
     public function it_detects_negation_operators(array|string $input, bool $expected): void
@@ -171,6 +196,7 @@ class ManticoreSearchQueryTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    /** @return array<string, array{array<string, string>|string, bool}> */
     public static function negationDetectionProvider(): array
     {
         return [
@@ -244,7 +270,7 @@ class ManticoreSearchQueryTest extends TestCase
 
         $this->assertIsString($driverSource);
         $this->assertStringContainsString(
-            "\$terms[] = '@@relaxed '.self::scopePreparedQueryToField(\$prepared, '@'.\$key);",
+            "\$terms[] = '@@relaxed '.self::scopeReleaseSearchQuery((string) \$value, \$prepared, '@'.\$key);",
             $driverSource
         );
         $this->assertStringNotContainsString(
@@ -260,7 +286,7 @@ class ManticoreSearchQueryTest extends TestCase
 
         $this->assertIsString($driverSource);
         $this->assertStringContainsString(
-            "\$searchExpr = '@@relaxed '.self::scopePreparedQueryToField(\$preparedSearch, '@searchname');",
+            "\$searchExpr = '@@relaxed '.self::scopeReleaseSearchQuery(\$searchTerm, \$preparedSearch, '@searchname');",
             $driverSource
         );
         $this->assertStringNotContainsString(

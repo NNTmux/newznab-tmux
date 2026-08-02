@@ -50,6 +50,8 @@ return [
                 'anime' => env('MANTICORESEARCH_INDEX_ANIME', 'anime_rt'),
             ],
             'max_matches' => env('MANTICORESEARCH_MAX_MATCHES', 10000),
+            'retry_attempts' => (int) env('MANTICORESEARCH_RETRY_ATTEMPTS', 2),
+            'retry_delay_ms' => (int) env('MANTICORESEARCH_RETRY_DELAY_MS', 100),
             'cache_minutes' => env('MANTICORESEARCH_CACHE_MINUTES', 5),
             'autocomplete' => [
                 'enabled' => env('MANTICORESEARCH_AUTOCOMPLETE_ENABLED', true),

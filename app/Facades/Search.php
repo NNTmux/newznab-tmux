@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static void insertRelease(array $parameters)
  * @method static void updateRelease(int|string $releaseID)
  * @method static void deleteRelease(int $id)
- * @method static void deleteReleases(iterable $ids)
+ * @method static void deleteReleases(iterable<int|string> $ids)
  * @method static void insertPredb(array $parameters)
  * @method static void updatePreDb(array $parameters)
  * @method static void deletePreDb(int $id)

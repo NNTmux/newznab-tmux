@@ -16,6 +16,8 @@ use App\Models\Predb;
 use App\Models\Release;
 use App\Models\SteamApp;
 use App\Models\Video;
+use App\Services\Search\Drivers\ManticoreSearchDriver;
+use App\Services\Search\Support\ReleaseIndexProjection;
 use App\Support\ReleaseSearchIndexDocument;
 use App\Support\SecondaryIndexDocuments;
 use Exception;
@@ -194,7 +196,7 @@ class NntmuxPopulateSearchIndexes extends Command
 
     private function manticoreReleases(): int
     {
-        $indexName = 'releases_rt';
+        $indexName = (string) config('search.drivers.manticore.indexes.releases', 'releases_rt');
 
         Search::truncateIndex([$indexName]);
 
@@ -205,39 +207,14 @@ class NntmuxPopulateSearchIndexes extends Command
             return Command::SUCCESS;
         }
 
-        // Optimized query: avoid GROUP_CONCAT and complex joins for faster population
-        // External media IDs can be populated separately if needed
-        $query = Release::query()
-            ->orderByDesc('releases.id')
-            ->select([
-                'releases.id',
-                'releases.name',
-                'releases.searchname',
-                'releases.fromname',
-                'releases.categories_id',
-                'releases.size',
-                'releases.postdate',
-                'releases.adddate',
-                'releases.totalpart',
-                'releases.grabs',
-                'releases.passwordstatus',
-                'releases.groups_id',
-                'releases.nzbstatus',
-                'releases.haspreview',
-                'releases.videos_id',
-                'releases.movieinfo_id',
-                'releases.imdbid',
-            ]);
+        $query = ReleaseIndexProjection::query()->orderBy('r.id');
 
         return $this->processManticoreData(
             $indexName,
             $total,
             $query,
             function ($item) {
-                return ReleaseSearchIndexDocument::normalize(array_merge(
-                    (array) $item->getAttributes(),
-                    ['filename' => '']
-                ));
+                return ReleaseSearchIndexDocument::normalize((array) $item);
             }
         );
     }
@@ -247,7 +224,7 @@ class NntmuxPopulateSearchIndexes extends Command
      */
     private function manticorePredb(): int
     {
-        $indexName = 'predb_rt';
+        $indexName = (string) config('search.drivers.manticore.indexes.predb', 'predb_rt');
 
         Search::truncateIndex([$indexName]);
 
@@ -282,7 +259,7 @@ class NntmuxPopulateSearchIndexes extends Command
      */
     private function manticoreMovies(): int
     {
-        $indexName = 'movies_rt';
+        $indexName = (string) config('search.drivers.manticore.indexes.movies', 'movies_rt');
 
         Search::truncateIndex([$indexName]);
 
@@ -336,7 +313,7 @@ class NntmuxPopulateSearchIndexes extends Command
      */
     private function manticoreTvshows(): int
     {
-        $indexName = 'tvshows_rt';
+        $indexName = (string) config('search.drivers.manticore.indexes.tvshows', 'tvshows_rt');
 
         Search::truncateIndex([$indexName]);
 
@@ -385,7 +362,7 @@ class NntmuxPopulateSearchIndexes extends Command
 
     private function manticoreMusic(): int
     {
-        $indexName = 'music_rt';
+        $indexName = (string) config('search.drivers.manticore.indexes.music', 'music_rt');
         Search::truncateIndex([$indexName]);
         $total = MusicInfo::count();
         if (! $total) {
@@ -405,7 +382,7 @@ class NntmuxPopulateSearchIndexes extends Command
 
     private function manticoreBooks(): int
     {
-        $indexName = 'books_rt';
+        $indexName = (string) config('search.drivers.manticore.indexes.books', 'books_rt');
         Search::truncateIndex([$indexName]);
         $total = BookInfo::count();
         if (! $total) {
@@ -425,7 +402,7 @@ class NntmuxPopulateSearchIndexes extends Command
 
     private function manticoreGames(): int
     {
-        $indexName = 'games_rt';
+        $indexName = (string) config('search.drivers.manticore.indexes.games', 'games_rt');
         Search::truncateIndex([$indexName]);
         $total = GamesInfo::count();
         if (! $total) {
@@ -445,7 +422,7 @@ class NntmuxPopulateSearchIndexes extends Command
 
     private function manticoreConsole(): int
     {
-        $indexName = 'console_rt';
+        $indexName = (string) config('search.drivers.manticore.indexes.console', 'console_rt');
         Search::truncateIndex([$indexName]);
         $total = ConsoleInfo::count();
         if (! $total) {
@@ -465,7 +442,7 @@ class NntmuxPopulateSearchIndexes extends Command
 
     private function manticoreSteam(): int
     {
-        $indexName = 'steam_rt';
+        $indexName = (string) config('search.drivers.manticore.indexes.steam', 'steam_rt');
         Search::truncateIndex([$indexName]);
         $total = SteamApp::count();
         if (! $total) {
@@ -485,7 +462,7 @@ class NntmuxPopulateSearchIndexes extends Command
 
     private function manticoreAnime(): int
     {
-        $indexName = 'anime_rt';
+        $indexName = (string) config('search.drivers.manticore.indexes.anime', 'anime_rt');
         Search::truncateIndex([$indexName]);
         $total = (int) DB::table('anidb_titles')->count();
         if (! $total) {
@@ -555,7 +532,7 @@ class NntmuxPopulateSearchIndexes extends Command
         $batchData = [];
 
         try {
-            $query->chunk($chunkSize, function ($items) use ($indexName, $transformer, $bar, &$processedCount, &$errorCount, $batchSize, &$batchData) {
+            $processItems = function ($items) use ($indexName, $transformer, $bar, &$processedCount, &$errorCount, $batchSize, &$batchData): void {
                 foreach ($items as $item) {
                     try {
                         $batchData[] = $transformer($item);
@@ -574,7 +551,13 @@ class NntmuxPopulateSearchIndexes extends Command
                     }
                     $bar->advance();
                 }
-            });
+            };
+
+            if ($indexName === (string) config('search.drivers.manticore.indexes.releases', 'releases_rt')) {
+                $query->chunkById($chunkSize, $processItems, 'r.id', 'id');
+            } else {
+                $query->chunk($chunkSize, $processItems);
+            }
 
             // Process remaining items
             if (! empty($batchData)) {
@@ -586,8 +569,20 @@ class NntmuxPopulateSearchIndexes extends Command
 
             if ($errorCount > 0) {
                 $this->warn("Completed with {$errorCount} errors out of {$processedCount} processed items.");
-            } else {
-                $this->info('Search index population completed successfully!');
+
+                return Command::FAILURE;
+            }
+
+            try {
+                $actualCount = app(ManticoreSearchDriver::class)->countIndexDocuments($indexName);
+                if ($actualCount < $total) {
+                    $this->error(sprintf('Manticore verification failed for %s: expected %d, found %d.', $indexName, $total, $actualCount));
+
+                    return Command::FAILURE;
+                }
+                $this->info(sprintf('Search index population completed successfully (%d documents verified).', $actualCount));
+            } catch (Exception $e) {
+                $this->warn('Manticore population completed, but verification failed: '.$e->getMessage());
             }
 
             return Command::SUCCESS;
@@ -1143,24 +1138,28 @@ class NntmuxPopulateSearchIndexes extends Command
         while ($attempt < $retries) {
             try {
                 // Use the correct bulk insert method based on index name
-                if ($indexName === 'releases_rt') {
-                    Search::bulkInsertReleases($data);
-                } elseif ($indexName === 'predb_rt') {
-                    Search::bulkInsertPredb($data);
-                } elseif ($indexName === 'music_rt') {
-                    Search::bulkInsertSecondary(SecondarySearchIndex::Music, $data);
-                } elseif ($indexName === 'books_rt') {
-                    Search::bulkInsertSecondary(SecondarySearchIndex::Books, $data);
-                } elseif ($indexName === 'games_rt') {
-                    Search::bulkInsertSecondary(SecondarySearchIndex::Games, $data);
-                } elseif ($indexName === 'console_rt') {
-                    Search::bulkInsertSecondary(SecondarySearchIndex::Console, $data);
-                } elseif ($indexName === 'steam_rt') {
-                    Search::bulkInsertSecondary(SecondarySearchIndex::Steam, $data);
-                } elseif ($indexName === 'anime_rt') {
-                    Search::bulkInsertSecondary(SecondarySearchIndex::Anime, $data);
+                $result = [];
+                if ($indexName === (string) config('search.drivers.manticore.indexes.releases', 'releases_rt')) {
+                    $result = Search::bulkInsertReleases($data);
+                } elseif ($indexName === (string) config('search.drivers.manticore.indexes.predb', 'predb_rt')) {
+                    $result = Search::bulkInsertPredb($data);
+                } elseif ($indexName === (string) config('search.drivers.manticore.indexes.music', 'music_rt')) {
+                    $result = Search::bulkInsertSecondary(SecondarySearchIndex::Music, $data);
+                } elseif ($indexName === (string) config('search.drivers.manticore.indexes.books', 'books_rt')) {
+                    $result = Search::bulkInsertSecondary(SecondarySearchIndex::Books, $data);
+                } elseif ($indexName === (string) config('search.drivers.manticore.indexes.games', 'games_rt')) {
+                    $result = Search::bulkInsertSecondary(SecondarySearchIndex::Games, $data);
+                } elseif ($indexName === (string) config('search.drivers.manticore.indexes.console', 'console_rt')) {
+                    $result = Search::bulkInsertSecondary(SecondarySearchIndex::Console, $data);
+                } elseif ($indexName === (string) config('search.drivers.manticore.indexes.steam', 'steam_rt')) {
+                    $result = Search::bulkInsertSecondary(SecondarySearchIndex::Steam, $data);
+                } elseif ($indexName === (string) config('search.drivers.manticore.indexes.anime', 'anime_rt')) {
+                    $result = Search::bulkInsertSecondary(SecondarySearchIndex::Anime, $data);
                 } else {
                     throw new Exception("Unknown index: {$indexName}");
+                }
+                if (($result['errors'] ?? 0) > 0) {
+                    throw new Exception('Bulk operation reported '.(int) $result['errors'].' error(s).');
                 }
                 break;
             } catch (Exception $e) {

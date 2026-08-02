@@ -216,7 +216,7 @@ class Release extends Model
                 ]
             );
 
-        Search::updateRelease($parameters['id']);
+        self::syncSearchIndexAfterCommit((int) $parameters['id']);
 
         return $parameters['id'];
     }
@@ -249,7 +249,7 @@ class Release extends Model
             ]
         );
 
-        Search::updateRelease($id);
+        self::syncSearchIndexAfterCommit((int) $id);
     }
 
     /**
@@ -262,7 +262,7 @@ class Release extends Model
             $id = self::whereGuid($guid)->value('id');
             self::whereGuid($guid)->increment('grabs');
             if ($id !== null) {
-                Search::updateRelease((int) $id);
+                self::syncSearchIndexAfterCommit((int) $id);
             }
         }
     }
@@ -284,7 +284,7 @@ class Release extends Model
             $ids = self::query()->whereIn('guid', $guids)->pluck('id');
             self::query()->whereIn('guid', $guids)->increment('grabs');
             foreach ($ids as $id) {
-                Search::updateRelease((int) $id);
+                self::syncSearchIndexAfterCommit((int) $id);
             }
         }
     }
@@ -302,7 +302,7 @@ class Release extends Model
         $ids = self::whereVideosId($videoId)->pluck('id');
         $updated = self::whereVideosId($videoId)->update(['videos_id' => 0, 'tv_episodes_id' => 0]);
         foreach ($ids as $id) {
-            Search::updateRelease((int) $id);
+            self::syncSearchIndexAfterCommit((int) $id);
         }
 
         return $updated;
@@ -311,6 +311,17 @@ class Release extends Model
     public static function removeAnidbIdFromReleases(mixed $anidbID): int
     {
         return self::whereAnidbid($anidbID)->update(['anidbid' => -1]);
+    }
+
+    private static function syncSearchIndexAfterCommit(int $releaseId): void
+    {
+        if ($releaseId <= 0) {
+            return;
+        }
+
+        DB::afterCommit(function () use ($releaseId): void {
+            Search::updateRelease($releaseId);
+        });
     }
 
     public static function getTopDownloads(): mixed

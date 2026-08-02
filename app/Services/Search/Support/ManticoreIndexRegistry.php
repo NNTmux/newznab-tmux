@@ -17,15 +17,27 @@ final class ManticoreIndexRegistry
 
         return [
             'releases' => ['settings' => $settings, 'columns' => [
-                'name' => ['type' => 'text'], 'searchname' => ['type' => 'text'],
+                'guid' => ['type' => 'string'], 'name' => ['type' => 'text'],
+                'searchname' => ['type' => 'text'], 'plainsearchname' => ['type' => 'text'],
                 'fromname' => ['type' => 'text'], 'filename' => ['type' => 'text'],
+                'category_name' => ['type' => 'string'], 'parent_category' => ['type' => 'string'],
+                'sub_category' => ['type' => 'string'], 'group_name' => ['type' => 'string'],
                 'categories_id' => ['type' => 'integer'], 'imdbid' => ['type' => 'string'],
                 'tmdbid' => ['type' => 'integer'], 'traktid' => ['type' => 'integer'],
                 'tvdb' => ['type' => 'integer'], 'tvmaze' => ['type' => 'integer'],
-                'tvrage' => ['type' => 'integer'], 'videos_id' => ['type' => 'integer'],
-                'movieinfo_id' => ['type' => 'integer'], 'size' => ['type' => 'bigint'],
+                'tvrage' => ['type' => 'integer'], 'trakt' => ['type' => 'integer'],
+                'imdb' => ['type' => 'string'], 'tmdb' => ['type' => 'integer'],
+                'videos_id' => ['type' => 'integer'],
+                'tv_episodes_id' => ['type' => 'integer'], 'movieinfo_id' => ['type' => 'integer'],
+                'anidbid' => ['type' => 'integer'], 'parentid' => ['type' => 'integer'],
+                'episode_title' => ['type' => 'text'], 'series' => ['type' => 'integer'],
+                'episode' => ['type' => 'integer'], 'firstaired_ts' => ['type' => 'bigint'],
+                'size' => ['type' => 'bigint'],
                 'postdate_ts' => ['type' => 'bigint'], 'adddate_ts' => ['type' => 'bigint'],
                 'totalpart' => ['type' => 'integer'], 'grabs' => ['type' => 'integer'],
+                'comments' => ['type' => 'integer'], 'nfostatus' => ['type' => 'integer'],
+                'jpgstatus' => ['type' => 'integer'], 'nfoid' => ['type' => 'integer'],
+                'reid' => ['type' => 'integer'],
                 'passwordstatus' => ['type' => 'bigint'], 'groups_id' => ['type' => 'integer'],
                 'nzbstatus' => ['type' => 'integer'], 'haspreview' => ['type' => 'bigint'],
             ]],
@@ -56,7 +68,7 @@ final class ManticoreIndexRegistry
     public static function profile(string $logical): array
     {
         $fields = match ($logical) {
-            'releases' => ['searchname' => 12, 'name' => 8, 'filename' => 5, 'fromname' => 1],
+            'releases' => ['searchname' => 12, 'plainsearchname' => 10, 'name' => 8, 'filename' => 5, 'fromname' => 1],
             'predb' => ['title' => 12, 'filename' => 5],
             'movies' => ['title' => 12, 'director' => 5, 'actors' => 3, 'genre' => 2, 'plot' => 1],
             'tvshows' => ['title' => 12],

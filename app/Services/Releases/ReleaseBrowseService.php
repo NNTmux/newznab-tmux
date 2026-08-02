@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Release;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
+use App\Support\ReleaseSearchIndexDocument;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -375,11 +376,30 @@ class ReleaseBrowseService
             'sort_field' => $indexSortField,
             'sort_dir' => $orderBy[1] ?? 'desc',
             'try_fuzzy' => false,
+            'include_documents' => true,
         ];
 
         $filtered = Search::searchReleasesFiltered($criteria, (int) $num, (int) $start);
         if ($filtered['ids'] === []) {
             return [];
+        }
+
+        if (! empty($filtered['documents'])) {
+            $documents = array_map(static function (array $document): object {
+                $row = ReleaseSearchIndexDocument::toReleaseRow($document);
+                $row['title'] = $row['episode_title'];
+                $row['firstaired'] = $row['firstaired_ts'] > 0
+                    ? date('Y-m-d H:i:s', $row['firstaired_ts'])
+                    : null;
+
+                return (object) $row;
+            }, $filtered['documents']);
+
+            if ($documents !== []) {
+                $documents[0]->_totalcount = $documents[0]->_totalrows = (int) ($filtered['total'] ?? count($documents));
+            }
+
+            return $documents;
         }
 
         $ids = array_map(static fn (int|string $id): int => (int) $id, $filtered['ids']);

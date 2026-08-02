@@ -121,7 +121,7 @@ class NntmuxSearchReconcileFetchIndexedIdsTest extends TestCase
 
             public function __construct() {}
 
-            public function sql(...$params): mixed
+            public function sql(mixed ...$params): mixed
             {
                 $this->capturedSql = $params[0] ?? null;
 
@@ -143,6 +143,9 @@ class NntmuxSearchReconcileFetchIndexedIdsTest extends TestCase
         $this->assertNotNull($client->capturedSql);
         $this->assertStringContainsString('LIMIT 500', $client->capturedSql);
         $this->assertStringContainsString('OPTION max_matches=500', $client->capturedSql);
+        $driverSource = file_get_contents(__DIR__.'/../../app/Services/Search/Drivers/ManticoreSearchDriver.php');
+        self::assertIsString($driverSource);
+        self::assertStringContainsString('ORDER BY id ASC', $driverSource);
     }
 
     /**
@@ -159,7 +162,7 @@ class NntmuxSearchReconcileFetchIndexedIdsTest extends TestCase
                 // Bypass parent ctor: we never hit the network in this test.
             }
 
-            public function sql(...$params): mixed
+            public function sql(mixed ...$params): mixed
             {
                 return $this->stubResponse;
             }

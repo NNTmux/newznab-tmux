@@ -7,7 +7,8 @@ namespace App\Console\Commands;
 use App\Facades\Elasticsearch;
 use App\Facades\Search;
 use App\Models\Predb;
-use App\Models\Release;
+use App\Services\Search\Support\ReleaseIndexProjection;
+use App\Support\ReleaseSearchIndexDocument;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -97,7 +98,7 @@ class NntmuxOffsetWorker extends Command
         if ($engine === 'manticore') {
             $batchData = [];
 
-            $query->chunk($batchSize, function ($items) use ($transformer, &$processed, &$errors, &$batchData, $batchSize, $workerId) {
+            $query->chunk($batchSize, function ($items) use ($transformer, $index, &$processed, &$errors, &$batchData, $batchSize, $workerId) {
                 $this->info("Worker {$workerId}: Processing chunk of {$items->count()} items");
 
                 foreach ($items as $item) {
@@ -106,7 +107,7 @@ class NntmuxOffsetWorker extends Command
                         $processed++;
 
                         if (count($batchData) >= $batchSize) {
-                            $this->processSearchBatch($batchData, $workerId); // @phpstan-ignore argument.type
+                            $this->processSearchBatch($batchData, $index, $workerId); // @phpstan-ignore argument.type
                             $this->info("Worker {$workerId}: Inserted batch of ".count($batchData).' records');
                             $batchData = [];
                         }
@@ -119,7 +120,7 @@ class NntmuxOffsetWorker extends Command
 
             // Process remaining items
             if (! empty($batchData)) {
-                $this->processSearchBatch($batchData, $workerId); // @phpstan-ignore argument.type
+                $this->processSearchBatch($batchData, $index, $workerId); // @phpstan-ignore argument.type
                 $this->info("Worker {$workerId}: Inserted final batch of ".count($batchData).' records');
             }
 
@@ -166,17 +167,8 @@ class NntmuxOffsetWorker extends Command
     private function buildOffsetQuery(string $index, int $offset, int $limit): mixed
     {
         if ($index === 'releases') {
-            return Release::query()
-                ->select([
-                    'releases.id',
-                    'releases.name',
-                    'releases.searchname',
-                    'releases.fromname',
-                    'releases.categories_id',
-                    'releases.postdate',
-                ])
-                ->selectRaw('(SELECT GROUP_CONCAT(rf.name SEPARATOR " ") FROM release_files rf WHERE rf.releases_id = releases.id) AS filename')
-                ->orderBy('releases.id')
+            return ReleaseIndexProjection::query()
+                ->orderBy('r.id')
                 ->offset($offset)
                 ->limit($limit);
         } else {
@@ -194,34 +186,15 @@ class NntmuxOffsetWorker extends Command
     private function getTransformer(string $engine, string $index): callable
     {
         if ($index === 'releases') {
-            if ($engine === 'manticore') {
-                return function ($item) {
-                    return [
-                        'id' => (string) $item->id,
-                        'name' => (string) ($item->name ?: ''),
-                        'searchname' => (string) ($item->searchname ?: ''),
-                        'fromname' => (string) ($item->fromname ?: ''),
-                        'categories_id' => (string) ($item->categories_id ?: '0'),
-                        'filename' => (string) ($item->filename ?: ''),
-                        'dummy' => '1',
-                    ];
-                };
-            } else {
-                return function ($item) {
-                    $searchName = str_replace(['.', '-'], ' ', $item->searchname ?? '');
+            return function ($item) use ($engine): array {
+                $row = (array) $item;
 
-                    return [
-                        'id' => $item->id,
-                        'name' => $item->name,
-                        'searchname' => $item->searchname,
-                        'plainsearchname' => $searchName,
-                        'fromname' => $item->fromname,
-                        'categories_id' => $item->categories_id,
-                        'filename' => $item->filename ?? '',
-                        'postdate' => $item->postdate,
-                    ];
-                };
-            }
+                return $engine === 'manticore'
+                    ? ReleaseSearchIndexDocument::normalize($row)
+                    : array_merge($row, [
+                        'plainsearchname' => str_replace(['.', '-'], ' ', (string) ($item->searchname ?? '')),
+                    ]);
+            };
         } else { // predb
             return function ($item) {
                 return [
@@ -229,7 +202,6 @@ class NntmuxOffsetWorker extends Command
                     'title' => (string) ($item->title ?? ''),
                     'filename' => (string) ($item->filename ?? ''),
                     'source' => (string) ($item->source ?? ''),
-                    'dummy' => 1,
                 ];
             };
         }
@@ -241,7 +213,7 @@ class NntmuxOffsetWorker extends Command
     private function getIndexName(string $engine, string $index): string
     {
         if ($engine === 'manticore') {
-            return $index === 'releases' ? 'releases_rt' : 'predb_rt';
+            return (string) config("search.drivers.manticore.indexes.{$index}", $index.'_rt');
         } else {
             return $index;
         }
@@ -252,14 +224,22 @@ class NntmuxOffsetWorker extends Command
      *
      * @param  array<string, mixed>  $data
      */
-    private function processSearchBatch(array $data, int $workerId): void
+    private function processSearchBatch(array $data, string $index, int $workerId): void
     {
         $retries = 3;
         $attempt = 0;
 
         while ($attempt < $retries) {
             try {
-                Search::bulkInsertReleases($data);
+                $result = [];
+                if ($index === 'releases') {
+                    $result = Search::bulkInsertReleases($data);
+                } else {
+                    $result = Search::bulkInsertPredb($data);
+                }
+                if (($result['errors'] ?? 0) > 0) {
+                    throw new Exception('Bulk operation reported '.(int) $result['errors'].' error(s).');
+                }
                 break;
             } catch (Exception $e) {
                 $attempt++;

@@ -6,6 +6,8 @@ namespace App\Observers;
 
 use App\Facades\Search;
 use App\Models\Video;
+use App\Support\ReleaseSearchIndexSync;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class VideoObserver
@@ -24,6 +26,7 @@ class VideoObserver
     public function updated(Video $video): void
     {
         $this->syncToSearchIndex($video);
+        DB::afterCommit(fn (): bool => $this->syncReleases($video));
     }
 
     /**
@@ -39,6 +42,7 @@ class VideoObserver
                 'error' => $e->getMessage(),
             ]);
         }
+        DB::afterCommit(fn (): bool => $this->syncReleases($video));
     }
 
     /**
@@ -65,5 +69,12 @@ class VideoObserver
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    private function syncReleases(Video $video): bool
+    {
+        ReleaseSearchIndexSync::forVideo((int) $video->id);
+
+        return true;
     }
 }

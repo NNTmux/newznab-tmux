@@ -9,6 +9,7 @@ final readonly class SearchPage
     /**
      * @param  list<int>  $ids
      * @param  list<int|float|string>  $lastSortValues
+     * @param  list<array<string, mixed>>  $documents
      */
     public function __construct(
         public array $ids,
@@ -19,6 +20,7 @@ final readonly class SearchPage
         public float $durationMs = 0.0,
         public array $lastSortValues = [],
         public bool $hasMore = false,
+        public array $documents = [],
     ) {}
 
     /** @return array{ids: list<int>, total: int, fuzzy: bool} */

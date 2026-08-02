@@ -13,6 +13,7 @@ use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\Search\DTO\ReleaseSearchQuery;
 use App\Services\Search\DTO\SearchCursor;
+use App\Support\ReleaseSearchIndexDocument;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
@@ -259,11 +260,31 @@ class ReleaseSearchService
                 'sort_field' => $this->browseOrderToIndexSortField($orderField),
                 'sort_dir' => $orderDir,
                 'try_fuzzy' => true,
+                'include_documents' => true,
             ];
 
             $criteria['track_total'] = $cursor === null;
             $searchPage = Search::searchReleasePage(ReleaseSearchQuery::fromCriteria($criteria, $limit, $offset, $cursor));
             $filtered = $searchPage->legacy();
+
+            if ($searchPage->documents !== []) {
+                $releases = collect(array_map(function (array $document): object {
+                    $row = ReleaseSearchIndexDocument::toReleaseRow($document);
+                    $row['title'] = $row['episode_title'];
+                    $row['firstaired'] = $row['firstaired_ts'] > 0
+                        ? date('Y-m-d H:i:s', $row['firstaired_ts'])
+                        : null;
+
+                    return (object) $row;
+                }, $searchPage->documents));
+                if ($releases->isNotEmpty()) {
+                    $releases[0]->_totalrows = (int) $filtered['total'];
+                    $releases[0]->_search_last_sort = $searchPage->lastSortValues;
+                    $releases[0]->_search_has_more = $searchPage->hasMore;
+                }
+
+                return $releases;
+            }
             if ($cursor !== null && $filtered['total'] === 0) {
                 $filtered['total'] = $cursor->total;
             }

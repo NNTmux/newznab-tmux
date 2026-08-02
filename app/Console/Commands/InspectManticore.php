@@ -56,7 +56,7 @@ final class InspectManticore extends Command
                 $this->line(sprintf('%-20s %s', $table, $status['needs_rebuild'] ? 'REBUILD REQUIRED' : 'compatible'));
             }
             if (! $report['compatible']) {
-                $this->warn('Run manticore:create-indexes --drop during a maintenance window, then repopulate all enabled indexes.');
+                $this->warn('Run manticore:create-indexes --drop --index=releases during a maintenance window for release-only schema changes, then repopulate the affected index.');
             }
         }
 

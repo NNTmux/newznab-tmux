@@ -8,6 +8,7 @@ use App\Facades\Search;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -146,7 +147,9 @@ class ReleaseFile extends Model
             if (\strlen($hash) === 32) {
                 ParHash::insertOrIgnore(['releases_id' => $id, 'hash' => $hash]);
             }
-            Search::updateRelease($id);
+            DB::afterCommit(function () use ($id): void {
+                Search::updateRelease($id);
+            });
         }
 
         return $insert ?? 0;

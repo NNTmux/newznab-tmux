@@ -8,6 +8,7 @@ use App\Facades\Elasticsearch;
 use App\Facades\Search;
 use App\Models\Predb;
 use App\Models\Release;
+use App\Services\Search\Drivers\ManticoreSearchDriver;
 use App\Services\Search\Support\ElasticsearchResponseHelper;
 use Elastic\Elasticsearch\Client as ElasticsearchClient;
 use Exception;
@@ -115,7 +116,9 @@ class NntmuxOffsetPopulate extends Command
         $this->monitorProcesses($processes); // @phpstan-ignore argument.type
 
         // Verify final count
-        $this->verifyIndexPopulation($engine, $index, $total);
+        if (! $this->verifyIndexPopulation($engine, $index, $total)) {
+            return Command::FAILURE;
+        }
 
         $this->info('All parallel processes completed successfully!');
 
@@ -252,7 +255,7 @@ class NntmuxOffsetPopulate extends Command
     /**
      * Verify index population
      */
-    private function verifyIndexPopulation(string $engine, string $index, int $expectedTotal): void
+    private function verifyIndexPopulation(string $engine, string $index, int $expectedTotal): bool
     {
         $this->info('Verifying index population...');
 
@@ -271,12 +274,34 @@ class NntmuxOffsetPopulate extends Command
                     $this->info('✓ Index population successful!');
                 } else {
                     $this->warn('⚠ Index population may be incomplete');
+
+                    return false;
                 }
             } catch (Exception $e) {
                 $this->warn("Could not verify index population: {$e->getMessage()}");
+
+                return false;
             }
+
+            return true;
         } else {
-            $this->info('ManticoreSearch index verification not implemented yet');
+            $indexName = (string) config("search.drivers.manticore.indexes.{$index}", $index.'_rt');
+            try {
+                $actualCount = app(ManticoreSearchDriver::class)->countIndexDocuments($indexName);
+                $this->info('Expected: '.number_format($expectedTotal));
+                $this->info('Actual: '.number_format($actualCount));
+                if ($actualCount < $expectedTotal) {
+                    $this->warn('Manticore index population is incomplete.');
+
+                    return false;
+                }
+            } catch (Exception $e) {
+                $this->warn("Could not verify Manticore population: {$e->getMessage()}");
+
+                return false;
+            }
+
+            return true;
         }
     }
 
@@ -286,7 +311,7 @@ class NntmuxOffsetPopulate extends Command
     private function clearIndex(string $engine, string $index): void
     {
         if ($engine === 'manticore') {
-            $indexName = $index === 'releases' ? 'releases_rt' : 'predb_rt';
+            $indexName = (string) config("search.drivers.manticore.indexes.{$index}", $index.'_rt');
             Search::truncateIndex([$indexName]);
             $this->info("Truncated ManticoreSearch index: {$indexName}");
         } else {

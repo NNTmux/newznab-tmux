@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Services\Search;
 
 use App\Services\Search\Drivers\ManticoreSearchDriver;
+use App\Support\ReleaseSearchIndexDocument;
 use Manticoresearch\Client;
 use Manticoresearch\Exceptions\ResponseException;
 use Manticoresearch\Request;
@@ -129,5 +130,41 @@ final class ManticoreInsertRetryTest extends TestCase
 
         $ok = $refP->invoke($driver, $this->releaseRow(7));
         $this->assertFalse($ok);
+    }
+
+    public function test_replace_release_document_preserves_pre_normalized_timestamps(): void
+    {
+        $config = [
+            'host' => '127.0.0.1',
+            'port' => 9308,
+            'retry_attempts' => 1,
+            'indexes' => ['releases' => 'releases_rt', 'predb' => 'predb_rt'],
+        ];
+        $document = ReleaseSearchIndexDocument::normalize($this->releaseRow(42));
+
+        $table = $this->createMock(Table::class);
+        $table->expects($this->once())
+            ->method('replaceDocument')
+            ->with(
+                $this->callback(static fn (array $indexed): bool =>
+                    $indexed['postdate_ts'] === $document['postdate_ts']
+                    && $indexed['adddate_ts'] === $document['adddate_ts']
+                ),
+                42
+            );
+
+        $client = $this->createMock(Client::class);
+        $client->expects($this->once())
+            ->method('table')
+            ->with('releases_rt')
+            ->willReturn($table);
+
+        $driver = new ManticoreSearchDriver($config);
+        $prop = new \ReflectionProperty(ManticoreSearchDriver::class, 'manticoreSearch');
+        $prop->setValue($driver, $client);
+
+        $method = new ReflectionMethod(ManticoreSearchDriver::class, 'replaceReleaseDocumentWithRetry');
+
+        $this->assertTrue($method->invoke($driver, $document));
     }
 }

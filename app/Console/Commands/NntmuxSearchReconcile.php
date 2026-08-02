@@ -16,8 +16,10 @@ class NntmuxSearchReconcile extends Command
 {
     protected $signature = 'nntmux:search-reconcile
                             {--since=24h : Only releases with adddate after this window (e.g. 24h, 7d)}
+                            {--all : Scan every release row instead of applying --since}
                             {--chunk=1000 : MySQL chunk size when scanning releases}
                             {--in-batch=500 : Max ids per Manticore IN() query}
+                            {--orphans : Also remove indexed ids that no longer exist in MySQL}
                             {--reindex : Call Search::updateRelease for each missing id}
                             {--dry-run : Report only; do not write to the index}';
 
@@ -39,10 +41,12 @@ class NntmuxSearchReconcile extends Command
 
         $since = (string) $this->option('since');
         $cutoff = $this->parseSinceCutoff($since);
+        $scanAll = (bool) $this->option('all');
         $chunk = max(50, min(5000, (int) $this->option('chunk')));
         $inBatch = max(50, min(1000, (int) $this->option('in-batch')));
         $dryRun = (bool) $this->option('dry-run');
         $reindex = (bool) $this->option('reindex');
+        $checkOrphans = (bool) $this->option('orphans');
 
         if ($reindex && $dryRun) {
             $this->warn('--reindex with --dry-run: no writes will be performed.');
@@ -56,8 +60,11 @@ class NntmuxSearchReconcile extends Command
         $bar = $this->output->createProgressBar();
         $bar->start();
 
-        Release::query()
-            ->where('adddate', '>=', $cutoff)
+        $releaseQuery = Release::query();
+        if (! $scanAll) {
+            $releaseQuery->where('adddate', '>=', $cutoff);
+        }
+        $releaseQuery
             ->orderBy('id')
             ->chunkById($chunk, function ($releases) use ($manticore, $index, $inBatch, &$missingAll, &$scanned, $bar): void {
                 $ids = $releases->pluck('id')->map(static fn ($id): int => (int) $id)->all();
@@ -75,7 +82,8 @@ class NntmuxSearchReconcile extends Command
         $this->newLine(2);
 
         $missingTotal = \count($missingAll);
-        $this->info("Scanned {$scanned} release row(s); missing in Manticore index: {$missingTotal} (adddate >= {$cutoff->toDateTimeString()})");
+        $scope = $scanAll ? 'all release rows' : "adddate >= {$cutoff->toDateTimeString()}";
+        $this->info("Scanned {$scanned} release row(s); missing in Manticore index: {$missingTotal} ({$scope})");
         if ($missingTotal > 0) {
             $sample = \array_slice($missingAll, 0, 20);
             $this->line('Sample ids: '.implode(', ', $sample));
@@ -89,12 +97,18 @@ class NntmuxSearchReconcile extends Command
             $this->probeAndWarnAllMissing($manticore, $index, \array_slice($missingAll, 0, 5));
         }
 
-        if ($missingTotal === 0) {
+        $orphans = $checkOrphans ? $this->findOrphanedIds($manticore, $chunk) : [];
+        if ($orphans !== []) {
+            $this->info('Indexed documents with no MySQL release row: '.count($orphans));
+            $this->line('Orphan sample ids: '.implode(', ', array_slice($orphans, 0, 20)));
+        }
+
+        if ($missingTotal === 0 && $orphans === []) {
             return self::SUCCESS;
         }
 
         if (! $reindex) {
-            $this->comment('Run with --reindex to push Search::updateRelease() for each missing id.');
+            $this->comment('Run with --reindex to repair missing documents and remove orphaned ids.');
 
             return self::SUCCESS;
         }
@@ -110,9 +124,42 @@ class NntmuxSearchReconcile extends Command
             }
         }
 
+        if ($orphans !== []) {
+            try {
+                Search::deleteReleases($orphans);
+                $this->info('Removed '.count($orphans).' orphaned document(s).');
+            } catch (Throwable $e) {
+                $this->error('Failed removing orphaned documents: '.$e->getMessage());
+            }
+        }
+
         $this->info("Reindexed {$done} release(s).");
 
         return self::SUCCESS;
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function findOrphanedIds(ManticoreSearchDriver $manticore, int $pageSize): array
+    {
+        $orphans = [];
+        $offset = 0;
+
+        do {
+            $indexed = $manticore->indexedReleaseIds($pageSize, $offset);
+            if ($indexed === []) {
+                break;
+            }
+
+            $existing = Release::query()->whereIn('id', $indexed)->pluck('id')
+                ->map(static fn ($id): int => (int) $id)
+                ->all();
+            $orphans = [...$orphans, ...array_values(array_diff($indexed, $existing))];
+            $offset += count($indexed);
+        } while (count($indexed) === $pageSize);
+
+        return $orphans;
     }
 
     private function parseSinceCutoff(string $since): Carbon

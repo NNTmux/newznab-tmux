@@ -632,7 +632,7 @@ class ConsoleService
         }
 
         $result['release'] = $releaseName;
-        array_map('trim', $result);
+        $result = array_map('trim', $result);
 
         return (isset($result['title'], $result['platform']) && ! empty($result['title'])) ? $result : false;
     }

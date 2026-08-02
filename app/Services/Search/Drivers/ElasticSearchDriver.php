@@ -109,6 +109,7 @@ class ElasticSearchDriver implements SearchDriverInterface
             durationMs: (hrtime(true) - $startedAt) / 1_000_000,
             lastSortValues: $result['last_sort'] ?? [],
             hasMore: (bool) ($result['has_more'] ?? (($query->offset + count($result['ids'])) < (int) $result['total'])),
+            documents: $result['documents'] ?? [],
         );
     }
 

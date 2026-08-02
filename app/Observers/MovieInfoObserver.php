@@ -6,6 +6,8 @@ namespace App\Observers;
 
 use App\Facades\Search;
 use App\Models\MovieInfo;
+use App\Support\ReleaseSearchIndexSync;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class MovieInfoObserver
@@ -24,6 +26,7 @@ class MovieInfoObserver
     public function updated(MovieInfo $movie): void
     {
         $this->syncToSearchIndex($movie);
+        DB::afterCommit(fn (): bool => $this->syncReleases($movie));
     }
 
     /**
@@ -39,6 +42,7 @@ class MovieInfoObserver
                 'error' => $e->getMessage(),
             ]);
         }
+        DB::afterCommit(fn (): bool => $this->syncReleases($movie));
     }
 
     /**
@@ -66,5 +70,12 @@ class MovieInfoObserver
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    private function syncReleases(MovieInfo $movie): bool
+    {
+        ReleaseSearchIndexSync::forMovieInfo((int) $movie->id);
+
+        return true;
     }
 }
