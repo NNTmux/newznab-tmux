@@ -146,8 +146,7 @@ final class ManticoreInsertRetryTest extends TestCase
         $table->expects($this->once())
             ->method('replaceDocument')
             ->with(
-                $this->callback(static fn (array $indexed): bool =>
-                    $indexed['postdate_ts'] === $document['postdate_ts']
+                $this->callback(static fn (array $indexed): bool => $indexed['postdate_ts'] === $document['postdate_ts']
                     && $indexed['adddate_ts'] === $document['adddate_ts']
                 ),
                 42
