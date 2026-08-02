@@ -189,7 +189,7 @@ class ApiRequestMatrixTest extends TestCase
         $releaseSearchService = Mockery::mock(ReleaseSearchService::class);
         $releaseSearchService->shouldReceive('apiSearch')
             ->once()
-            ->with('ubuntu', -1, 0, 100, -1, [5030], [-1], 0, 'posted_desc')
+            ->with('ubuntu', -1, 0, 100, -1, [5030], [-1], 0, 'posted_desc', null)
             ->andReturn(collect());
 
         $releaseBrowseService = Mockery::mock(ReleaseBrowseService::class);
@@ -217,7 +217,7 @@ class ApiRequestMatrixTest extends TestCase
         $releaseSearchService = Mockery::mock(ReleaseSearchService::class);
         $releaseSearchService->shouldReceive('apiSearch')
             ->once()
-            ->with('ubuntu', -1, 0, 100, -1, [5030], [-1], 0, 'posted_desc')
+            ->with('ubuntu', -1, 0, 100, -1, [5030], [-1], 0, 'posted_desc', null)
             ->andReturn(collect([
                 (object) [
                     '_totalrows' => 1,
@@ -247,6 +247,51 @@ class ApiRequestMatrixTest extends TestCase
         $this->assertIsString($content);
         $this->assertSame('Movies > WEBDL', $response->getData(true)['results'][0]['category_name']);
         $this->assertStringContainsString('"category_name":"Movies > WEBDL"', $content);
+        $this->assertStringNotContainsString('\u003E', $content);
+    }
+
+    public function test_v1_search_keeps_category_separator_unescaped_in_json_body(): void
+    {
+        $token = (string) DB::table('users')->value('api_token');
+        $request = Request::create('/api/v1/api', 'GET', [
+            't' => 'search',
+            'o' => 'json',
+            'apikey' => $token,
+            'q' => 'ubuntu',
+        ]);
+
+        $releaseSearchService = Mockery::mock(ReleaseSearchService::class);
+        $releaseSearchService->shouldReceive('apiSearch')
+            ->once()
+            ->with('ubuntu', -1, 0, 100, -1, [5030], [-1], 0, 'posted_desc')
+            ->andReturn(collect([
+                (object) [
+                    '_totalrows' => 1,
+                    'searchname' => 'Ubuntu.Movie.Release',
+                    'guid' => 'movie-release-guid',
+                    'categories_id' => 2040,
+                    'category_name' => 'Movies > WEBDL',
+                    'adddate' => '2026-01-03 00:00:00',
+                    'size' => 123456,
+                    'totalpart' => 10,
+                    'grabs' => 2,
+                    'comments' => 1,
+                    'passwordstatus' => 0,
+                    'postdate' => '2026-01-02 00:00:00',
+                ],
+            ]));
+
+        $releaseBrowseService = Mockery::mock(ReleaseBrowseService::class);
+        $releaseBrowseService->shouldNotReceive('getBrowseRangeForApi');
+
+        $controller = new ApiController($releaseSearchService, $releaseBrowseService);
+        $response = $controller->api($request);
+
+        $this->assertNotNull($response);
+        $content = $response->getContent();
+
+        $this->assertIsString($content);
+        $this->assertStringContainsString('"category":"Movies > WEBDL"', $content);
         $this->assertStringNotContainsString('\u003E', $content);
     }
 

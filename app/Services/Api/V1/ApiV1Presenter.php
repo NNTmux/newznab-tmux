@@ -10,6 +10,9 @@ use Illuminate\Http\Response;
 
 final readonly class ApiV1Presenter
 {
+    // JSON_HEX_TAG would turn category separators such as ">" into "\u003E".
+    private const JSON_ENCODING_OPTIONS = JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
+
     public function __construct(private ApiCapabilitiesService $capabilities) {}
 
     /**
@@ -40,7 +43,7 @@ final readonly class ApiV1Presenter
             if ($array === false) {
                 return showApiError(201);
             }
-            $body = json_encode($array, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+            $body = json_encode($array, self::JSON_ENCODING_OPTIONS);
             $contentType = 'application/json';
         }
 

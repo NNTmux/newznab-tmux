@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 
 final class ApiV2Presenter
 {
+    // JSON_HEX_TAG would turn category separators such as ">" into "\u003E".
     private const JSON_ENCODING_OPTIONS = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
 
     /** @param array<string, mixed> $data */
