@@ -15,10 +15,11 @@ final class ReleaseIndexProjection
 {
     public static function query(): Builder
     {
-        $groupConcat = DB::connection()->getDriverName() === 'sqlite'
-            ? "GROUP_CONCAT(rf.name, ' ')"
-            : "GROUP_CONCAT(rf.name SEPARATOR ' ')";
-        $categoryName = DB::connection()->getDriverName() === 'sqlite'
+        $isSqlite = DB::connection()->getDriverName() === 'sqlite';
+        $filename = $isSqlite
+            ? "COALESCE((SELECT GROUP_CONCAT(rf.name, ' ') FROM release_files rf WHERE rf.releases_id = r.id), '')"
+            : "COALESCE((SELECT GROUP_CONCAT(rf.name SEPARATOR ' ') FROM release_files rf WHERE rf.releases_id = r.id), '')";
+        $categoryName = $isSqlite
             ? "cp.title || ' > ' || c.title"
             : "CONCAT(cp.title, ' > ', c.title)";
 
@@ -38,7 +39,6 @@ final class ReleaseIndexProjection
                 $join->on('tve.id', '=', 'r.tv_episodes_id')
                     ->where('r.tv_episodes_id', '>', 0);
             })
-            ->leftJoin('release_files as rf', 'rf.releases_id', '=', 'r.id')
             ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
             ->leftJoin('video_data as vd', 'vd.releases_id', '=', 'r.id')
             ->select([
@@ -50,7 +50,7 @@ final class ReleaseIndexProjection
                 'c.title as sub_category', 'tve.title as episode_title', 'tve.series',
                 'tve.episode', 'tve.firstaired',
                 'cp.title as parent_category', DB::raw("{$categoryName} AS category_name"),
-                DB::raw("COALESCE({$groupConcat}, '') AS filename"),
+                DB::raw("{$filename} AS filename"),
                 DB::raw('COALESCE(mi.tmdbid, 0) AS tmdbid'),
                 DB::raw('COALESCE(mi.traktid, 0) AS traktid'),
                 DB::raw('COALESCE(v.tvdb, 0) AS tvdb'),
@@ -61,16 +61,6 @@ final class ReleaseIndexProjection
                 DB::raw('COALESCE(v.tmdb, 0) AS tmdb'),
                 DB::raw('COALESCE(rn.releases_id, 0) AS nfoid'),
                 DB::raw('COALESCE(vd.releases_id, 0) AS reid'),
-            ])
-            ->groupBy([
-                'r.id', 'r.guid', 'r.name', 'r.searchname', 'r.fromname', 'r.categories_id',
-                'r.groups_id', 'r.size', 'r.postdate', 'r.adddate', 'r.totalpart', 'r.grabs',
-                'r.comments', 'r.passwordstatus', 'r.nzbstatus', 'r.nfostatus', 'r.haspreview',
-                'r.jpgstatus', 'r.videos_id', 'r.tv_episodes_id', 'r.movieinfo_id', 'r.imdbid',
-                'r.anidbid', 'g.name', 'c.root_categories_id', 'c.title', 'tve.title',
-                'tve.series', 'tve.episode', 'tve.firstaired', 'cp.title', 'mi.tmdbid',
-                'mi.traktid', 'v.tvdb', 'v.tvmaze', 'v.tvrage', 'v.trakt', 'v.imdb', 'v.tmdb',
-                'rn.releases_id', 'vd.releases_id',
             ]);
     }
 

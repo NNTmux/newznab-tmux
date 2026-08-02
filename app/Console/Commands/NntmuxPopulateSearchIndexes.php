@@ -46,7 +46,7 @@ class NntmuxPopulateSearchIndexes extends Command
                                        {--steam : Populates the Steam apps index}
                                        {--anime : Populates the anime titles index}
                                        {--all : Populate all supported indexes for the selected engine}
-                                       {--count=50000 : Sets the chunk size}
+                                       {--count=5000 : Sets the database chunk size}
                                        {--parallel=4 : Number of parallel processes}
                                        {--batch-size=5000 : Batch size for bulk operations}
                                        {--disable-keys : Disable database keys during population}
@@ -68,7 +68,7 @@ class NntmuxPopulateSearchIndexes extends Command
 
     private const GROUP_CONCAT_MAX_LEN = 16384;
 
-    private const DEFAULT_CHUNK_SIZE = 50000;
+    private const DEFAULT_CHUNK_SIZE = 5000;
 
     /** @phpstan-ignore classConstant.unused */
     private const DEFAULT_PARALLEL_PROCESSES = 4;
