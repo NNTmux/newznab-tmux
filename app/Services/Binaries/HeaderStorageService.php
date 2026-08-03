@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\Binaries;
 
+use Illuminate\Database\QueryException;
+
 /**
  * Orchestrates the header storage process.
  *
@@ -12,6 +14,8 @@ namespace App\Services\Binaries;
  */
 final class HeaderStorageService
 {
+    private const int LOCK_RETRY_MAX = 5;
+
     private CollectionHandler $collectionHandler;
 
     private BinaryHandler $binaryHandler;
@@ -23,6 +27,8 @@ final class HeaderStorageService
     /** @var array<int, int|string> Article numbers that failed to insert */
     private array $failedInserts = [];
 
+    private ?\Throwable $lastStorageException = null;
+
     public function __construct(
         ?CollectionHandler $collectionHandler = null,
         ?BinaryHandler $binaryHandler = null,
@@ -30,10 +36,10 @@ final class HeaderStorageService
         ?BinariesConfig $config = null
     ) {
         $this->config = $config ?? BinariesConfig::fromSettings();
-        $this->collectionHandler = $collectionHandler ?? new CollectionHandler;
-        $this->binaryHandler = $binaryHandler ?? new BinaryHandler;
+        $this->collectionHandler = $collectionHandler ?? new CollectionHandler(sqlChunkSize: $this->config->sqlChunkSize);
+        $this->binaryHandler = $binaryHandler ?? new BinaryHandler($this->config->sqlChunkSize);
         $this->partHandler = $partHandler ?? new PartHandler(
-            $this->config->partsChunkSize,
+            $this->config->sqlChunkSize,
             true
         );
     }
@@ -54,17 +60,13 @@ final class HeaderStorageService
 
         $this->failedInserts = [];
 
-        // Use the dedicated header chunk size, NOT partsChunkSize. The latter
-        // controls single-row part flushes and is normally much larger; using
-        // it here forces every collection/binary bulk INSERT and OR-clause
-        // SELECT to scale to thousands of rows per chunk, which exhausts PHP
-        // and MySQL memory.
+        // Header and SQL chunking are configured independently, but both are
+        // clamped by BinariesConfig so generated statements remain bounded.
         $chunkSize = max(1, $this->config->headerChunkSize);
 
         // Walk the array with offset slicing instead of array_chunk() so we
         // don't materialize every chunk simultaneously in memory.
         $total = \count($headers);
-        $headers = array_values($headers);
         for ($offset = 0; $offset < $total; $offset += $chunkSize) {
             $chunk = \array_slice($headers, $offset, $chunkSize);
             $this->storeChunk($chunk, $groupMySQL, $addToPartRepair);
@@ -82,6 +84,30 @@ final class HeaderStorageService
      */
     private function storeChunk(array $headers, array $groupMySQL, bool $addToPartRepair): void
     {
+        $attempt = 0;
+        do {
+            $failedInsertCount = \count($this->failedInserts);
+            if ($this->storeChunkAttempt($headers, $groupMySQL, $addToPartRepair)) {
+                return;
+            }
+
+            $attempt++;
+            if ($attempt >= self::LOCK_RETRY_MAX || ! $this->isTransientLockError($this->lastStorageException)) {
+                return;
+            }
+
+            $this->failedInserts = array_slice($this->failedInserts, 0, $failedInsertCount);
+            usleep((min(500, 20 * $attempt) + random_int(0, 25)) * 1000);
+        } while (true);
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $headers
+     * @param  array<string, mixed>  $groupMySQL
+     */
+    private function storeChunkAttempt(array $headers, array $groupMySQL, bool $addToPartRepair): bool
+    {
+        $this->lastStorageException = null;
         $this->collectionHandler->reset();
         $this->binaryHandler->reset();
         $this->partHandler->reset();
@@ -113,13 +139,26 @@ final class HeaderStorageService
 
         // Flush binary aggregate updates
         if (! $transaction->hasErrors()) {
-            if (! $this->binaryHandler->flushUpdates($this->config->binariesUpdateChunkSize)) {
+            if (! $this->binaryHandler->refreshAggregates(
+                $this->partHandler->getTouchedBinaryIds(),
+                $this->config->sqlChunkSize
+            )) {
+                $transaction->markError();
+            }
+            if (! $transaction->hasErrors() && ! $this->collectionHandler->refreshAggregates(
+                $this->collectionHandler->getAllIds(),
+                $this->config->sqlChunkSize
+            )) {
                 $transaction->markError();
             }
         }
 
         // Finish transaction
         if (! $transaction->finish()) {
+            $this->lastStorageException = $transaction->getLastException()
+                ?? $this->partHandler->getLastException()
+                ?? $this->binaryHandler->getLastException()
+                ?? $this->collectionHandler->getLastException();
             if ($addToPartRepair) {
                 $this->failedInserts = array_merge(
                     $this->failedInserts,
@@ -128,13 +167,32 @@ final class HeaderStorageService
                 );
             }
 
-            return;
+            return false;
         }
 
         $this->failedInserts = array_merge(
             $this->failedInserts,
             $this->partHandler->getFailedNumbers()
         );
+
+        return true;
+    }
+
+    private function isTransientLockError(?\Throwable $exception): bool
+    {
+        if ($exception === null) {
+            return false;
+        }
+        if ($exception instanceof QueryException) {
+            $driverCode = (int) ($exception->errorInfo[1] ?? 0);
+            if ($exception->getCode() === '40001' || \in_array($driverCode, [1205, 1213], true)) {
+                return true;
+            }
+        }
+
+        return str_contains($exception->getMessage(), 'Deadlock found')
+            || str_contains($exception->getMessage(), 'Lock wait timeout exceeded')
+            || str_contains($exception->getMessage(), 'database is locked');
     }
 
     /**
@@ -198,9 +256,6 @@ final class HeaderStorageService
     private function extractFileNumberAndTotal(array $header): array
     {
         $fileCount = $this->getFileCount($header['matches'][1]);
-        if ($fileCount[1] === 0 && $fileCount[3] === 0) {
-            $fileCount = $this->getFileCount($header['matches'][0]);
-        }
 
         return [(int) $fileCount[1], (int) $fileCount[3]];
     }

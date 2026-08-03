@@ -33,8 +33,7 @@ class TestBinariesHarness extends BinariesService
             newGroupDaysToScan: 3,
             partRepairLimit: 15000,
             partRepairMaxTries: 3,
-            partsChunkSize: 5000,
-            binariesUpdateChunkSize: 1000,
+            sqlChunkSize: 500,
             echoCli: false
         );
 

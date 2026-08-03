@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Settings;
+use App\Services\Binaries\BinariesConfig;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class CollectionCleanupService
 {
-    private const MAX_SQL_ROWS_PER_STATEMENT = 500;
-
     /**
      * Maximum number of retries for a lock-related DB error before giving up.
      */
@@ -31,7 +30,14 @@ class CollectionCleanupService
      */
     private const LOCK_DRIVER_CODES = [1213, 1205];
 
-    public function __construct() {}
+    private ?bool $cascadeDeleteReady = null;
+
+    private readonly BinariesConfig $binariesConfig;
+
+    public function __construct(?BinariesConfig $binariesConfig = null)
+    {
+        $this->binariesConfig = $binariesConfig ?? BinariesConfig::fromSettings();
+    }
 
     /**
      * Deletes finished/old collections, cleans orphans, and removes collections missed after NZB creation.
@@ -61,7 +67,7 @@ class CollectionCleanupService
             $ids = DB::table('collections')
                 ->where('dateadded', '<', $cutoff)
                 ->orderBy('id')
-                ->limit(self::MAX_SQL_ROWS_PER_STATEMENT)
+                ->limit($this->sqlChunkSize())
                 ->pluck('id')
                 ->all();
 
@@ -72,7 +78,7 @@ class CollectionCleanupService
             $affected = $this->deleteCollectionsAndDescendants($ids, 'Cleanup', $echoCLI);
 
             $batchDeleted += $affected;
-            if ($affected < self::MAX_SQL_ROWS_PER_STATEMENT) {
+            if ($affected < $this->sqlChunkSize()) {
                 break;
             }
             // Brief pause to reduce pressure on the lock manager in busy systems.
@@ -147,7 +153,7 @@ class CollectionCleanupService
     {
         $deleted = 0;
         $maxBatches = 20; // hard cap per cycle; bounded backlog drain
-        $batchSize = self::MAX_SQL_ROWS_PER_STATEMENT;
+        $batchSize = $this->sqlChunkSize();
 
         for ($i = 0; $i < $maxBatches; $i++) {
             $ids = DB::table('collections as c')
@@ -196,7 +202,7 @@ class CollectionCleanupService
     {
         $deleted = 0;
         $maxBatches = 20;
-        $batchSize = self::MAX_SQL_ROWS_PER_STATEMENT;
+        $batchSize = $this->sqlChunkSize();
 
         for ($i = 0; $i < $maxBatches; $i++) {
             $ids = DB::table('collections as c')
@@ -240,11 +246,18 @@ class CollectionCleanupService
 
         $deletedCollections = 0;
 
-        foreach (array_chunk($collectionIds, self::MAX_SQL_ROWS_PER_STATEMENT) as $chunk) {
+        foreach (array_chunk($collectionIds, $this->sqlChunkSize()) as $chunk) {
             $placeholders = implode(',', array_fill(0, count($chunk), '?'));
             $deletedCollections += $this->retryOnLockError(
                 fn (): int => DB::transaction(
                     function () use ($chunk, $placeholders): int {
+                        if ($this->cascadeDeleteReady()) {
+                            return (int) DB::affectingStatement(
+                                "DELETE FROM collections WHERE id IN ({$placeholders})",
+                                $chunk
+                            );
+                        }
+
                         DB::statement(
                             "DELETE FROM parts WHERE binaries_id IN (SELECT id FROM binaries WHERE collections_id IN ({$placeholders}))",
                             $chunk
@@ -266,6 +279,45 @@ class CollectionCleanupService
         }
 
         return $deletedCollections;
+    }
+
+    private function sqlChunkSize(): int
+    {
+        return $this->binariesConfig->sqlChunkSize;
+    }
+
+    /**
+     * Production deletes can safely target only the parent table when both
+     * descendant foreign keys cascade. SQLite fixtures and incomplete legacy
+     * schemas deliberately retain the explicit descendant-delete fallback.
+     */
+    private function cascadeDeleteReady(): bool
+    {
+        if ($this->cascadeDeleteReady !== null) {
+            return $this->cascadeDeleteReady;
+        }
+        if (DB::getDriverName() === 'sqlite') {
+            return $this->cascadeDeleteReady = false;
+        }
+
+        try {
+            $rows = DB::select(
+                "SELECT TABLE_NAME, DELETE_RULE
+                 FROM information_schema.REFERENTIAL_CONSTRAINTS
+                 WHERE CONSTRAINT_SCHEMA = DATABASE()
+                   AND TABLE_NAME IN ('binaries', 'parts')"
+            );
+            $cascades = [];
+            foreach ($rows as $row) {
+                if (strtoupper((string) $row->DELETE_RULE) === 'CASCADE') {
+                    $cascades[(string) $row->TABLE_NAME] = true;
+                }
+            }
+
+            return $this->cascadeDeleteReady = isset($cascades['binaries'], $cascades['parts']);
+        } catch (\Throwable) {
+            return $this->cascadeDeleteReady = false;
+        }
     }
 
     /**

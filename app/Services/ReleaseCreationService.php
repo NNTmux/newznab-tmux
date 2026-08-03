@@ -10,7 +10,6 @@ use App\Models\Collection;
 use App\Models\Predb;
 use App\Models\Release;
 use App\Models\ReleaseRegex;
-use App\Models\ReleasesGroups;
 use App\Models\UsenetGroup;
 use App\Services\Categorization\CategorizationService;
 use App\Services\Nzb\NzbService;
@@ -18,6 +17,7 @@ use App\Services\Releases\ReleaseDuplicateFinder;
 use App\Support\Utf8;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class ReleaseCreationService
@@ -56,6 +56,7 @@ class ReleaseCreationService
             ->join('usenet_groups', 'usenet_groups.id', '=', 'collections.groups_id')
             ->limit($limit);
         $collections = $collectionsQuery->get();
+        $releaseGroupIds = $this->loadReleaseGroupIds($collections);
 
         if ($echoCLI && $collections->count() > 0) {
             cli()->primary(\count($collections).' Collections ready to be converted to releases.', true);
@@ -137,38 +138,12 @@ class ReleaseCreationService
                         'naming_regex_id' => $namingRegexId,
                     ]);
 
-                    if (preg_match_all('#(\S+):\S+#', $collection->xref, $hits)) {
-                        foreach ($hits[1] as $grp) {
-                            $grpTmp = UsenetGroup::isValidGroup($grp);
-                            if ($grpTmp !== false) {
-                                $xrefGrpID = UsenetGroup::getIDByName($grpTmp);
-                                if ($xrefGrpID === '') {
-                                    $xrefGrpID = UsenetGroup::addGroup([
-                                        'name' => $grpTmp,
-                                        'description' => 'Added by Release processing',
-                                        'backfill_target' => 1,
-                                        'first_record' => 0,
-                                        'last_record' => 0,
-                                        'active' => 0,
-                                        'backfill' => 0,
-                                        'minfilestoformrelease' => '',
-                                        'minsizetoformrelease' => '',
-                                    ]);
-                                }
-
-                                $relGroupsChk = ReleasesGroups::query()->where([
-                                    ['releases_id', '=', $releaseID],
-                                    ['groups_id', '=', $xrefGrpID],
-                                ])->first();
-
-                                if ($relGroupsChk === null) {
-                                    ReleasesGroups::query()->insert([
-                                        'releases_id' => $releaseID,
-                                        'groups_id' => $xrefGrpID,
-                                    ]);
-                                }
-                            }
-                        }
+                    $groupRows = [];
+                    foreach ($releaseGroupIds[(int) $collection->id] ?? [] as $groupId) {
+                        $groupRows[] = ['releases_id' => $releaseID, 'groups_id' => $groupId];
+                    }
+                    if ($groupRows !== []) {
+                        DB::table('releases_groups')->insertOrIgnore($groupRows);
                     }
 
                     $returnCount++;
@@ -214,5 +189,76 @@ class ReleaseCreationService
         }
 
         return ['added' => $returnCount, 'dupes' => $duplicate];
+    }
+
+    /**
+     * Resolve all normalized cross-post groups for the selected collection
+     * batch up front, avoiding release/group membership N+1 queries.
+     *
+     * @param  \Illuminate\Support\Collection<int, Collection>  $collections
+     * @return array<int, list<int>>
+     */
+    private function loadReleaseGroupIds(\Illuminate\Support\Collection $collections): array
+    {
+        $namesByCollection = [];
+        $collectionIds = $collections->pluck('id')->map(static fn ($id): int => (int) $id)->all();
+        if (Schema::hasTable('collection_groups')) {
+            foreach (array_chunk($collectionIds, 500) as $chunk) {
+                foreach (DB::table('collection_groups')->whereIn('collections_id', $chunk)->get() as $row) {
+                    $namesByCollection[(int) $row->collections_id][(string) $row->group_name] = true;
+                }
+            }
+        }
+
+        foreach ($collections as $collection) {
+            $collectionId = (int) $collection->id;
+            if (($namesByCollection[$collectionId] ?? []) === []) {
+                $fallback = (new XrefService)->extractGroupNames((string) $collection->xref);
+                if ($fallback === []) {
+                    $fallback = [(string) $collection->gname];
+                }
+                foreach ($fallback as $name) {
+                    $namesByCollection[$collectionId][$name] = true;
+                }
+            }
+        }
+
+        $allNames = [];
+        foreach ($namesByCollection as $names) {
+            $allNames += $names;
+        }
+        $idsByName = UsenetGroup::query()
+            ->whereIn('name', array_keys($allNames))
+            ->pluck('id', 'name')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
+        foreach (array_keys($allNames) as $name) {
+            $validName = UsenetGroup::isValidGroup($name);
+            if ($validName === false || isset($idsByName[$validName])) {
+                continue;
+            }
+            $idsByName[$validName] = (int) UsenetGroup::addGroup([
+                'name' => $validName,
+                'description' => 'Added by Release processing',
+                'backfill_target' => 1,
+                'first_record' => 0,
+                'last_record' => 0,
+                'active' => 0,
+                'backfill' => 0,
+                'minfilestoformrelease' => '',
+                'minsizetoformrelease' => '',
+            ]);
+        }
+
+        $resolved = [];
+        foreach ($namesByCollection as $collectionId => $names) {
+            foreach (array_keys($names) as $name) {
+                if (isset($idsByName[$name])) {
+                    $resolved[$collectionId][] = $idsByName[$name];
+                }
+            }
+        }
+
+        return $resolved;
     }
 }

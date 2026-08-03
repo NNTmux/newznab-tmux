@@ -45,4 +45,18 @@ class XrefService
 
         return array_values(array_diff($incoming, $existing));
     }
+
+    /** @return list<string> */
+    public function extractGroupNames(?string $xref): array
+    {
+        $groups = [];
+        foreach ($this->extractTokens($xref) as $token) {
+            $group = preg_replace('/:\d+$/', '', (string) $token);
+            if ($group !== null && $group !== '') {
+                $groups[$group] = true;
+            }
+        }
+
+        return array_keys($groups);
+    }
 }

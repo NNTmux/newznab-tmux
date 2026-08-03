@@ -181,7 +181,7 @@ class RegexService
         $rows = DB::select(
             'SELECT
                     b.name, b.totalparts, b.currentparts, HEX(b.binaryhash) AS binaryhash,
-                    c.fromname, c.collectionhash
+                    c.fromname, HEX(c.collectionhash) AS collectionhash
                 FROM binaries b
                 INNER JOIN collections c ON c.id = b.collections_id'
         );

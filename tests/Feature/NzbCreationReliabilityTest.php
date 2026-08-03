@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\Release;
+use App\Services\Binaries\BinariesConfig;
 use App\Services\CollectionCleanupService;
 use App\Services\Nzb\NzbCreationCandidateQuery;
 use App\Services\Nzb\NzbService;
@@ -197,6 +198,30 @@ class NzbCreationReliabilityTest extends TestCase
         $this->assertStringContainsString('move temporary NZB into place', $result->reason);
         $this->assertFileDoesNotExist($nzb->getNzbPath($release->guid));
         $this->assertSame(0, (int) DB::table('releases')->where('id', 1)->value('nzbstatus'));
+    }
+
+    public function test_writer_streams_multiple_keyset_pages_in_segment_order(): void
+    {
+        $this->insertRelease(1, 'h');
+        $this->insertWritableCbp(200, 2000, 1);
+        DB::table('parts')->where('binaries_id', 2000)->delete();
+        DB::table('parts')->insert([
+            ['binaries_id' => 2000, 'messageid' => '<part02@example.test>', 'partnumber' => 2, 'size' => 200],
+            ['binaries_id' => 2000, 'messageid' => '<part01@example.test>', 'partnumber' => 1, 'size' => 100],
+            ['binaries_id' => 2000, 'messageid' => '<part03@example.test>', 'partnumber' => 3, 'size' => 300],
+        ]);
+        $release = Release::query()->findOrFail(1);
+        $release->setRelation('category', (object) ['title' => 'Misc', 'parent' => (object) ['title' => 'Other']]);
+
+        $nzb = new NzbService(app(CollectionCleanupService::class), new BinariesConfig(nzbStreamRows: 2));
+        $result = $nzb->createNzbForRelease($release);
+
+        $this->assertTrue($result->success, $result->reason);
+        $xml = unzipGzipFile((string) $result->path);
+        $this->assertIsString($xml);
+        $this->assertLessThan(strpos($xml, 'part02@example.test'), strpos($xml, 'part01@example.test'));
+        $this->assertLessThan(strpos($xml, 'part03@example.test'), strpos($xml, 'part02@example.test'));
+        $this->assertStringContainsString('<group>alt.test</group>', $xml);
     }
 
     public function test_stale_temporary_nzb_cleanup_deletes_only_old_temp_files(): void

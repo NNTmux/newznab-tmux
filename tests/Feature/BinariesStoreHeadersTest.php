@@ -49,7 +49,16 @@ class BinariesStoreHeadersTest extends TestCase
             collectionhash VARCHAR(40) UNIQUE,
             collection_regexes_id INT,
             dateadded DATETIME NULL,
+            last_seen_at DATETIME NULL,
+            filecheck INT DEFAULT 0,
+            filesize INT DEFAULT 0,
             noise VARCHAR(64) DEFAULT ""
+        )');
+
+        DB::statement('CREATE TABLE collection_groups (
+            collections_id INT,
+            group_name VARCHAR(255),
+            UNIQUE(collections_id, group_name)
         )');
 
         DB::statement('CREATE TABLE binaries (
@@ -61,6 +70,7 @@ class BinariesStoreHeadersTest extends TestCase
             currentparts INT,
             filenumber INT,
             partsize INT,
+            partcheck INT DEFAULT 0,
             UNIQUE(binaryhash, collections_id)
         )');
 
@@ -71,7 +81,7 @@ class BinariesStoreHeadersTest extends TestCase
             messageid VARCHAR(255),
             partnumber INT,
             size INT,
-            UNIQUE(number)
+            UNIQUE(binaries_id, partnumber)
         )');
 
         DB::statement('CREATE TABLE missed_parts (
@@ -159,7 +169,7 @@ class BinariesStoreHeadersTest extends TestCase
         $harness = new TestBinariesHarness;
         $group = ['id' => 2, 'name' => 'alt.rollback'];
 
-        config(['nntmux.parts_chunk_size' => 2]); // force flush earlier
+        config(['nntmux.cbp.sql_chunk_size' => 2]); // force flush earlier
 
         $headers = [
             $this->makeHeader(2001, 1, 3, 111),
@@ -185,7 +195,7 @@ class BinariesStoreHeadersTest extends TestCase
         $group = ['id' => 3, 'name' => 'alt.mixed'];
 
         // Chunk of 2: first flush succeeds, second flush fails
-        config(['nntmux.parts_chunk_size' => 2]);
+        config(['nntmux.cbp.sql_chunk_size' => 2]);
 
         $headers = [
             $this->makeHeader(4001, 1, 5, 101),

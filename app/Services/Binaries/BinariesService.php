@@ -62,9 +62,7 @@ class BinariesService
 
     private int $headersBlackListed = 0;
 
-    /**
-     * @var array<int, int|string>
-     */
+    /** @var array<int, true> */
     private array $headersReceived = [];
 
     public function __construct(
@@ -80,7 +78,7 @@ class BinariesService
         $this->missedPartHandler = $missedPartHandler ?? new MissedPartHandler(
             $this->config->partRepairLimit,
             $this->config->partRepairMaxTries,
-            $this->config->bulkSqlChunkSize
+            $this->config->sqlChunkSize
         );
         $this->nntp = $nntp;
         $this->startUpdate = Carbon::now();
@@ -297,47 +295,68 @@ class BinariesService
         // Extract article range info
         $returnArray = $this->headerParser->getArticleRange($headers);
 
-        // Parse and filter headers
-        $this->headerParser->reset();
-        $parseResult = $this->headerParser->parse($headers, $groupMySQL['name'], $partRepair, $missingParts);
+        // Parse and store one bounded chunk at a time. The previous flow built
+        // a second full-size parsed header array before storage, doubling peak
+        // memory for large XOVER responses.
+        $this->startUpdate = Carbon::now();  // Reset before storage begins
+        $this->timeCleaning = $this->startUpdate->diffInSeconds($this->startCleaning, true);
 
-        $this->headersReceived = $parseResult['received'] ?? [];
-        $this->notYEnc = $parseResult['notYEnc'];
-        $this->headersBlackListed = $parseResult['blacklisted'];
+        $headersNotInserted = [];
+        $repairedNumbers = [];
+        $missingPartSet = $missingParts === null
+            ? null
+            : array_fill_keys(array_map('intval', $missingParts), true);
+        $totalHeaders = \count($headers);
+        for ($offset = 0; $offset < $totalHeaders; $offset += $this->config->headerChunkSize) {
+            $rawChunk = array_slice($headers, $offset, $this->config->headerChunkSize);
+            $this->headerParser->reset();
+            $parseResult = $this->headerParser->parse($rawChunk, $groupMySQL['name'], $partRepair, $missingPartSet);
 
-        // Update blacklist last_activity
-        $this->headerParser->flushBlacklistUpdates();
+            foreach ($parseResult['received'] ?? [] as $number) {
+                $this->headersReceived[(int) $number] = true;
+            }
+            foreach ($parseResult['repaired'] ?? [] as $number) {
+                $repairedNumbers[(int) $number] = true;
+            }
+            $this->notYEnc += (int) $parseResult['notYEnc'];
+            $this->headersBlackListed += (int) $parseResult['blacklisted'];
+            $this->headerParser->flushBlacklistUpdates();
 
+            if ($parseResult['headers'] !== []) {
+                try {
+                    $headersNotInserted = array_merge(
+                        $headersNotInserted,
+                        $this->headerStorage->store($parseResult['headers'], $groupMySQL, $addToPartRepair)
+                    );
+                } catch (\Throwable $e) {
+                    $this->logError('storeHeaders failed: '.$e->getMessage());
+                    foreach ($parseResult['headers'] as $failedHeader) {
+                        if (isset($failedHeader['Number'])) {
+                            $headersNotInserted[] = $failedHeader['Number'];
+                        }
+                    }
+                }
+            }
+
+            unset($rawChunk, $parseResult);
+        }
         unset($headers);
 
         if ($this->config->echoCli && ! $partRepair) {
             $this->outputHeaderInitial();
         }
 
-        // Store headers
-        $this->startUpdate = Carbon::now();  // Reset before storage begins
-        $this->timeCleaning = $this->startUpdate->diffInSeconds($this->startCleaning, true);
-
-        $headersNotInserted = [];
-        if (! empty($parseResult['headers'])) {
-            try {
-                $headersNotInserted = $this->headerStorage->store($parseResult['headers'], $groupMySQL, $addToPartRepair);
-            } catch (\Throwable $e) {
-                $this->logError('storeHeaders failed: '.$e->getMessage());
-            }
-        }
-
         $this->startPR = Carbon::now();
         $this->timeInsert = $this->startPR->diffInSeconds($this->startUpdate, true);
 
         // Handle repaired parts
-        if ($partRepair && ! empty($parseResult['repaired'])) {
-            $this->missedPartHandler->removeRepairedParts($parseResult['repaired'], $groupMySQL['id']);
+        if ($partRepair && $repairedNumbers !== []) {
+            $this->missedPartHandler->removeRepairedParts(array_keys($repairedNumbers), $groupMySQL['id']);
         }
 
         // Handle part repair tracking
         if ($addToPartRepair) {
-            $this->handlePartRepairTracking($headersNotInserted, $parseResult['headers']);
+            $this->handlePartRepairTracking($headersNotInserted);
         }
 
         $this->outputHeaderDuration();
@@ -737,9 +756,8 @@ class BinariesService
 
     /**
      * @param  array<int, int|string>  $headersNotInserted
-     * @param  array<int, array<string, mixed>>  $parsedHeaders
      */
-    private function handlePartRepairTracking(array $headersNotInserted, array $parsedHeaders): void
+    private function handlePartRepairTracking(array $headersNotInserted): void
     {
         $notInsertedCount = \count($headersNotInserted);
         if ($notInsertedCount > 0) {
@@ -747,21 +765,29 @@ class BinariesService
             $this->log($notInsertedCount.' articles failed to insert!', __FUNCTION__, 'warning');
         }
 
-        // Check for missing headers in range
-        $expectedCount = $this->last - $this->first - $this->notYEnc - $this->headersBlackListed + 1;
-        if ($expectedCount > \count($this->headersReceived)) {
-            $rangeNotReceived = array_values(array_diff(range($this->first, $this->last), $this->headersReceived));
-            $notReceivedCount = \count($rangeNotReceived);
-
-            if ($notReceivedCount > 0) {
-                $this->missedPartHandler->addMissingParts($rangeNotReceived, $this->groupMySQL['id']);
-
-                if ($this->config->echoCli) {
-                    cli()->alternate(
-                        'Server did not return '.$notReceivedCount.' articles from '.$this->groupMySQL['name'].'.'
-                    );
-                }
+        // Find missing article numbers without materialising range($first, $last)
+        // and a second array_diff() copy. Flush bounded batches directly.
+        $missing = [];
+        $notReceivedCount = 0;
+        for ($number = $this->first; $number <= $this->last; $number++) {
+            if (isset($this->headersReceived[$number])) {
+                continue;
             }
+            $missing[] = $number;
+            $notReceivedCount++;
+            if (\count($missing) >= $this->config->sqlChunkSize) {
+                $this->missedPartHandler->addMissingParts($missing, $this->groupMySQL['id']);
+                $missing = [];
+            }
+        }
+        if ($missing !== []) {
+            $this->missedPartHandler->addMissingParts($missing, $this->groupMySQL['id']);
+        }
+
+        if ($notReceivedCount > 0 && $this->config->echoCli) {
+            cli()->alternate(
+                'Server did not return '.$notReceivedCount.' articles from '.$this->groupMySQL['name'].'.'
+            );
         }
     }
 

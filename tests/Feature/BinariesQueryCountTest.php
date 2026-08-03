@@ -11,9 +11,8 @@ use Tests\TestCase;
  * Regression tests guarding the SQL fan-out of the CBP write path.
  *
  * The collections/binaries/parts handlers were rewritten to consolidate
- * redundant SELECTs (prefetchExistingXrefs + existingHashes + resolveIdsByHash
- * → 1 query, existingBinaryKeys + resolveBinaryIds → 1 query) and to batch
- * per-row UPDATEs into single JOIN..UNION ALL statements. These tests assert
+ * redundant SELECTs and derives aggregates from stored parts in bounded raw
+ * SQL updates. These tests assert
  * the resulting per-chunk query count stays within a sane ceiling so the old
  * fan-out cannot silently come back.
  */
@@ -58,7 +57,16 @@ class BinariesQueryCountTest extends TestCase
             collectionhash VARCHAR(40) UNIQUE,
             collection_regexes_id INT,
             dateadded DATETIME NULL,
+            last_seen_at DATETIME NULL,
+            filecheck INT DEFAULT 0,
+            filesize INT DEFAULT 0,
             noise VARCHAR(64) DEFAULT ""
+        )');
+
+        DB::statement('CREATE TABLE collection_groups (
+            collections_id INT,
+            group_name VARCHAR(255),
+            UNIQUE(collections_id, group_name)
         )');
 
         DB::statement('CREATE TABLE binaries (
@@ -70,6 +78,7 @@ class BinariesQueryCountTest extends TestCase
             currentparts INT,
             filenumber INT,
             partsize INT,
+            partcheck INT DEFAULT 0,
             UNIQUE(binaryhash, collections_id)
         )');
 
@@ -79,7 +88,7 @@ class BinariesQueryCountTest extends TestCase
             messageid VARCHAR(255),
             partnumber INT,
             size INT,
-            UNIQUE(binaries_id, number)
+            UNIQUE(binaries_id, partnumber)
         )');
 
         DB::statement('CREATE TABLE missed_parts (
@@ -127,8 +136,8 @@ class BinariesQueryCountTest extends TestCase
         });
 
         // Ceiling rationale (per chunk, 5 distinct collections, 5 binaries):
-        //   collections: 1 prefetch + 1 INSERT + 1 resolve-new = 3
-        //   binaries:    1 prefetch + 1 INSERT + 1 resolve-new = 3
+        //   collections: 1 prefetch + 1 INSERT + 1 resolve-new + 1 aggregate = 4
+        //   binaries:    1 prefetch + 1 INSERT + 1 resolve-new + 1 aggregate = 4
         //   parts:       1 INSERT (chunk fits in MAX_SQL_ROWS_PER_STATEMENT)
         // Allow a small headroom so the regression test isn't brittle.
         $this->assertLessThanOrEqual(8, $counts['collections'] ?? 0,
@@ -164,7 +173,7 @@ class BinariesQueryCountTest extends TestCase
 
         // Second pass — exact same headers. The prefetch should hit every row,
         // so no resolve-new SELECT should fire; existing rows skip the xref
-        // append UPDATE because the tokens already match.
+        // append UPDATE; normalized collection_groups inserts are idempotent.
         $counts = $this->countQueriesPerTable(static function () use ($headers): void {
             $freshHarness = new TestBinariesHarness;
             $freshHarness->publicStoreHeaders($headers);
@@ -172,8 +181,8 @@ class BinariesQueryCountTest extends TestCase
 
         // With nothing new to insert, we expect at most:
         //   collections: 1 prefetch + 1 INSERT (no-op via ODKU id=LAST_INSERT_ID(id))
-        //   binaries:    1 prefetch + 1 INSERT (currentparts/partsize incremented by ODKU)
-        //   parts:       1 INSERT IGNORE (no rows actually persist)
+        //   binaries:    1 prefetch + 1 INSERT + 1 authoritative aggregate update
+        //   parts:       1 INSERT IGNORE + 1 identity lookup (no rows actually persist)
         $this->assertLessThanOrEqual(4, $counts['collections'] ?? 0);
         $this->assertLessThanOrEqual(4, $counts['binaries'] ?? 0);
         $this->assertLessThanOrEqual(2, $counts['parts'] ?? 0);

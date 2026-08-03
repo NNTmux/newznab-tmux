@@ -49,6 +49,11 @@ final class HeaderParser
         $parsed = [];
         $headersRepaired = [];
         $receivedNumbers = [];
+        $missingPartSet = $missingParts === null
+            ? null
+            : (array_is_list($missingParts)
+                ? array_fill_keys(array_map('intval', $missingParts), true)
+                : $missingParts);
 
         foreach ($headers as $header) {
             // Check if we got the article
@@ -59,8 +64,8 @@ final class HeaderParser
             $receivedNumbers[] = $header['Number'];
 
             // For part repair, only process missing parts
-            if ($partRepair && $missingParts !== null) {
-                if (! \in_array($header['Number'], $missingParts, true)) {
+            if ($partRepair && $missingPartSet !== null) {
+                if (! isset($missingPartSet[(int) $header['Number']])) {
                     continue;
                 }
                 $headersRepaired[] = $header['Number'];
@@ -92,14 +97,11 @@ final class HeaderParser
                 $header['Bytes'] = $header[':bytes'] ?? 0;
             }
 
-            $parsed[] = [
-                'header' => $header,
-                'repaired' => $partRepair,
-            ];
+            $parsed[] = $header;
         }
 
         return [
-            'headers' => array_column($parsed, 'header'),
+            'headers' => $parsed,
             'repaired' => $headersRepaired,
             'received' => $receivedNumbers,
             'notYEnc' => $this->notYEnc,

@@ -66,7 +66,7 @@ DROP TABLE IF EXISTS `binaries`;
 
 CREATE TABLE `binaries` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `binaryhash` blob NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
+  `binaryhash` binary(16) NOT NULL,
   `name` varchar(1000) NOT NULL DEFAULT '',
   `collections_id` int(10) unsigned NOT NULL DEFAULT 0,
   `filenumber` int(10) unsigned NOT NULL DEFAULT 0,
@@ -75,8 +75,8 @@ CREATE TABLE `binaries` (
   `partcheck` tinyint(1) NOT NULL DEFAULT 0,
   `partsize` bigint(20) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `ux_collection_id_filenumber` (`collections_id`,`filenumber`),
-  KEY `ix_binaries_binaryhash` (`binaryhash`(3072)),
+  UNIQUE KEY `ux_binaries_collection_hash` (`collections_id`,`binaryhash`),
+  KEY `ix_binaries_collection_filenumber` (`collections_id`,`filenumber`),
   KEY `ix_binaries_collection` (`collections_id`),
   KEY `ix_binaries_partcheck` (`partcheck`),
   CONSTRAINT `FK_Collections` FOREIGN KEY (`collections_id`) REFERENCES `collections` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -190,9 +190,10 @@ CREATE TABLE `collections` (
   `xref` varchar(2000) NOT NULL DEFAULT '',
   `totalfiles` int(10) unsigned NOT NULL DEFAULT 0,
   `groups_id` int(10) unsigned NOT NULL DEFAULT 0,
-  `collectionhash` varchar(255) NOT NULL DEFAULT '0',
+  `collectionhash` binary(20) NOT NULL,
   `collection_regexes_id` int(11) NOT NULL DEFAULT 0 COMMENT 'FK to collection_regexes.id',
   `dateadded` datetime DEFAULT NULL,
+  `last_seen_at` datetime DEFAULT NULL,
   `added` timestamp NOT NULL DEFAULT current_timestamp(),
   `filecheck` tinyint(1) NOT NULL DEFAULT 0,
   `filesize` bigint(20) unsigned NOT NULL DEFAULT 0,
@@ -205,7 +206,17 @@ CREATE TABLE `collections` (
   KEY `groups_id` (`groups_id`),
   KEY `ix_collection_dateadded` (`dateadded`),
   KEY `ix_collection_filecheck` (`filecheck`),
-  KEY `ix_collection_releaseid` (`releases_id`)
+  KEY `ix_collection_releaseid` (`releases_id`),
+  KEY `ix_collections_group_filecheck_seen_id` (`groups_id`,`filecheck`,`last_seen_at`,`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+
+DROP TABLE IF EXISTS `collection_groups`;
+
+CREATE TABLE `collection_groups` (
+  `collections_id` int(10) unsigned NOT NULL,
+  `group_name` varchar(255) NOT NULL,
+  PRIMARY KEY (`collections_id`,`group_name`),
+  CONSTRAINT `fk_collection_groups_collection` FOREIGN KEY (`collections_id`) REFERENCES `collections` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 
 DROP TABLE IF EXISTS `consoleinfo`;
@@ -576,11 +587,12 @@ DROP TABLE IF EXISTS `parts`;
 
 CREATE TABLE `parts` (
   `binaries_id` bigint(20) unsigned NOT NULL DEFAULT 0,
-  `messageid` varchar(255) NOT NULL DEFAULT '',
+  `messageid` varchar(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '',
   `number` bigint(20) unsigned NOT NULL DEFAULT 0,
   `partnumber` int(10) unsigned NOT NULL DEFAULT 0,
   `size` int(10) unsigned NOT NULL DEFAULT 0,
-  PRIMARY KEY (`binaries_id`,`number`),
+  PRIMARY KEY (`binaries_id`,`partnumber`),
+  KEY `ix_parts_number` (`number`),
   CONSTRAINT `FK_binaries` FOREIGN KEY (`binaries_id`) REFERENCES `binaries` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 

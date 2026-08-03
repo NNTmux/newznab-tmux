@@ -53,7 +53,7 @@ class BinariesStorageInternalsTest extends TestCase
             messageid VARCHAR(255),
             partnumber INT,
             size INT,
-            UNIQUE(binaries_id, number)
+            UNIQUE(binaries_id, partnumber)
         )');
 
         $handler = new PartHandler(100);
@@ -79,7 +79,16 @@ class BinariesStorageInternalsTest extends TestCase
             currentparts INT,
             filenumber INT,
             partsize INT,
+            partcheck INT DEFAULT 0,
             UNIQUE(binaryhash, collections_id)
+        )');
+        DB::statement('CREATE TABLE parts (
+            binaries_id INT,
+            number INT,
+            messageid VARCHAR(255),
+            partnumber INT,
+            size INT,
+            UNIQUE(binaries_id, partnumber)
         )');
 
         $handler = new BinaryHandler;
@@ -89,7 +98,11 @@ class BinariesStorageInternalsTest extends TestCase
         $binaryId = $handler->getOrCreateBinary($first, 1, 1, 0);
         $this->assertNotNull($binaryId);
         $this->assertSame($binaryId, $handler->getOrCreateBinary($second, 1, 1, 0));
-        $this->assertTrue($handler->flushUpdates());
+        DB::table('parts')->insert([
+            ['binaries_id' => $binaryId, 'number' => 251, 'messageid' => '<251@example>', 'partnumber' => 1, 'size' => 100],
+            ['binaries_id' => $binaryId, 'number' => 252, 'messageid' => '<252@example>', 'partnumber' => 2, 'size' => 50],
+        ]);
+        $this->assertTrue($handler->refreshAggregates([$binaryId]));
 
         $binary = DB::table('binaries')->where('id', $binaryId)->first();
         $this->assertSame(2, (int) $binary->currentparts);
@@ -128,7 +141,7 @@ class BinariesStorageInternalsTest extends TestCase
     {
         $this->createHeaderStorageTables('CHECK(size < 500)');
 
-        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(partsChunkSize: 2, headerChunkSize: 2));
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(sqlChunkSize: 2, headerChunkSize: 2));
         $failed = $service->store([
             $this->parsedHeader(301, 1, 'Chunk.One', 100),
             $this->parsedHeader(302, 2, 'Chunk.One', 100),
@@ -149,7 +162,7 @@ class BinariesStorageInternalsTest extends TestCase
     {
         $this->createHeaderStorageTables();
 
-        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(partsChunkSize: 10));
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(sqlChunkSize: 10));
         $failed = $service->store([
             $this->parsedHeader(401, 1, 'Batch.Release', 150),
             $this->parsedHeader(402, 2, 'Batch.Release', 175),
@@ -169,7 +182,7 @@ class BinariesStorageInternalsTest extends TestCase
     {
         $this->createHeaderStorageTables();
 
-        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(partsChunkSize: 10));
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(sqlChunkSize: 10));
         $this->assertSame([], $service->store([
             $this->parsedHeader(501, 1, 'Existing.Batch.Release', 100),
         ], ['id' => 1, 'name' => 'alt.test'], true));
@@ -187,24 +200,106 @@ class BinariesStorageInternalsTest extends TestCase
         $this->assertSame(250, (int) $binary->partsize);
     }
 
+    public function test_three_identical_ingestions_leave_authoritative_counts_unchanged(): void
+    {
+        $this->createHeaderStorageTables();
+
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(sqlChunkSize: 10));
+        $headers = [
+            $this->parsedHeader(551, 1, 'Idempotent.Release', 125),
+            $this->parsedHeader(552, 2, 'Idempotent.Release', 175),
+        ];
+
+        for ($attempt = 0; $attempt < 3; $attempt++) {
+            $this->assertSame([], $service->store($headers, ['id' => 1, 'name' => 'alt.test'], true));
+        }
+
+        $binary = DB::table('binaries')->first();
+        $collection = DB::table('collections')->first();
+        $this->assertSame(1, DB::table('binaries')->count());
+        $this->assertSame(2, DB::table('parts')->count());
+        $this->assertSame(2, (int) $binary->currentparts);
+        $this->assertSame(300, (int) $binary->partsize);
+        $this->assertSame(300, (int) $collection->filesize);
+    }
+
+    public function test_duplicate_partnumber_prefers_non_empty_message_then_size_then_article_number(): void
+    {
+        DB::statement('CREATE TABLE parts (
+            binaries_id INT,
+            number INT,
+            messageid VARCHAR(255),
+            partnumber INT,
+            size INT,
+            UNIQUE(binaries_id, partnumber)
+        )');
+
+        $handler = new PartHandler(10);
+        $small = $this->parsedHeader(900, 1, 'Preference.Release', 100);
+        $large = $this->parsedHeader(901, 1, 'Preference.Release', 200);
+        $this->assertTrue($handler->addPart(7, $small));
+        $this->assertTrue($handler->addPart(7, $large));
+        $this->assertTrue($handler->flush());
+
+        $part = DB::table('parts')->first();
+        $this->assertSame(901, (int) $part->number);
+        $this->assertSame(200, (int) $part->size);
+    }
+
+    public function test_invalid_message_id_rolls_back_the_header_chunk(): void
+    {
+        $this->createHeaderStorageTables();
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(sqlChunkSize: 10));
+        $header = $this->parsedHeader(910, 1, 'Invalid.Message.Release', 100);
+        $header['Message-ID'] = "<invalid\u{00E9}@example>";
+
+        $this->assertSame([910], $service->store([$header], ['id' => 1, 'name' => 'alt.test'], true));
+        $this->assertSame(0, DB::table('collections')->count());
+        $this->assertSame(0, DB::table('binaries')->count());
+        $this->assertSame(0, DB::table('parts')->count());
+    }
+
+    public function test_zero_file_number_uses_subject_and_poster_identity(): void
+    {
+        $this->createHeaderStorageTables();
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(sqlChunkSize: 10));
+        $first = $this->parsedHeader(920, 1, 'Unknown.File.Release', 100);
+        $second = $this->parsedHeader(921, 1, 'Unknown.File.Release', 100);
+        $second['From'] = 'another-poster@example.com';
+
+        $this->assertSame([], $service->store([$first, $second], ['id' => 1, 'name' => 'alt.test'], true));
+        $this->assertSame(1, DB::table('collections')->count());
+        $this->assertSame(2, DB::table('binaries')->count());
+        $this->assertSame(2, DB::table('parts')->count());
+    }
+
+    public function test_cross_post_groups_are_normalized_and_deduplicated(): void
+    {
+        $this->createHeaderStorageTables();
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(sqlChunkSize: 10));
+        $header = $this->parsedHeader(930, 1, 'Cross.Post.Release', 100);
+        $header['Xref'] = 'news.example alt.binaries.one:930 alt.binaries.two:931 alt.binaries.one:930';
+
+        $this->assertSame([], $service->store([$header], ['id' => 1, 'name' => 'alt.binaries.one'], true));
+        $this->assertSame(
+            ['alt.binaries.one', 'alt.binaries.two'],
+            DB::table('collection_groups')->orderBy('group_name')->pluck('group_name')->all()
+        );
+    }
+
     public function test_header_storage_does_not_merge_same_subject_across_different_collections(): void
     {
         $this->createHeaderStorageTables();
 
-        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(partsChunkSize: 10));
-        $failed = $service->store([
-            $this->parsedHeaderWithTotal(601, 1, 2, 'Same.Subject', 100),
-            $this->parsedHeaderWithTotal(602, 1, 3, 'Same.Subject', 200),
-        ], ['id' => 1, 'name' => 'alt.test'], true);
+        $handler = new BinaryHandler;
+        $header = $this->parsedHeader(601, 1, 'Same.Subject', 100);
+        $firstId = $handler->getOrCreateBinary($header, 10, 1, 0);
+        $secondId = $handler->getOrCreateBinary($header, 20, 1, 0);
 
-        $binaries = DB::table('binaries')->orderBy('partsize')->get();
-
-        $this->assertSame([], $failed);
-        $this->assertSame(2, DB::table('collections')->count());
+        $this->assertNotNull($firstId);
+        $this->assertNotNull($secondId);
+        $this->assertNotSame($firstId, $secondId);
         $this->assertSame(2, DB::table('binaries')->count());
-        $this->assertSame(2, DB::table('parts')->count());
-        $this->assertSame([100, 200], $binaries->pluck('partsize')->map(static fn ($value): int => (int) $value)->all());
-        $this->assertSame([1, 1], $binaries->pluck('currentparts')->map(static fn ($value): int => (int) $value)->all());
     }
 
     private function rawHeader(int $number, string $subject): array
@@ -252,7 +347,16 @@ class BinariesStorageInternalsTest extends TestCase
             collectionhash VARCHAR(40) UNIQUE,
             collection_regexes_id INT,
             dateadded DATETIME NULL,
+            last_seen_at DATETIME NULL,
+            filecheck INT DEFAULT 0,
+            filesize INT DEFAULT 0,
             noise VARCHAR(64) DEFAULT \'\'
+        )');
+
+        DB::statement('CREATE TABLE collection_groups (
+            collections_id INT,
+            group_name VARCHAR(255),
+            UNIQUE(collections_id, group_name)
         )');
 
         DB::statement('CREATE TABLE binaries (
@@ -264,6 +368,7 @@ class BinariesStorageInternalsTest extends TestCase
             currentparts INT,
             filenumber INT,
             partsize INT,
+            partcheck INT DEFAULT 0,
             UNIQUE(binaryhash, collections_id)
         )');
 
@@ -273,7 +378,7 @@ class BinariesStorageInternalsTest extends TestCase
             messageid VARCHAR(255),
             partnumber INT,
             size INT '.$partSizeConstraint.',
-            UNIQUE(binaries_id, number)
+            UNIQUE(binaries_id, partnumber)
         )');
 
         DB::statement('CREATE TABLE collection_regexes (

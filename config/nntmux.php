@@ -18,6 +18,18 @@ return [
     'multiprocessing_max_child_time' => env('NN_MULTIPROCESSING_MAX_CHILD_TIME', 1800),
     'concurrency_timeout' => env('NN_CONCURRENCY_TIMEOUT'),
     'stream_fork_output' => env('STREAM_FORK_OUTPUT', false),
+    'cbp' => [
+        // Bound the amount of header data retained and written in one transaction.
+        'header_chunk_size' => (int) env('CBP_HEADER_CHUNK_SIZE', 500),
+        // Hard limit for rows represented by a generated raw SQL statement.
+        'sql_chunk_size' => (int) env('CBP_SQL_CHUNK_SIZE', 500),
+        // Number of stale collections reconciled by one release-processing batch.
+        'reconcile_batch_size' => (int) env('CBP_RECONCILE_BATCH_SIZE', 500),
+        // Maximum flattened binary/part rows loaded while streaming an NZB.
+        'nzb_stream_rows' => (int) env('CBP_NZB_STREAM_ROWS', 5000),
+        // Explicit maintenance-window approval for the destructive hash/key migration.
+        'storage_migration_execute' => (bool) env('CBP_STORAGE_MIGRATION_EXECUTE', false),
+    ],
     'purge_inactive_users' => env('PURGE_INACTIVE_USERS', false),
     'purge_inactive_users_days' => env('PURGE_INACTIVE_USERS_DAYS', 180),
     'mysql_search_fallback' => env('MYSQL_SEARCH_FALLBACK', false), // Disable MySQL LIKE fallback when Manticore/Elasticsearch return no results

@@ -9,34 +9,33 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Handles part record creation during header storage.
+ *
+ * @phpstan-type PartRow array{binaries_id: int, number: int|string, messageid: string, partnumber: int, size: int|string}
  */
 final class PartHandler
 {
-    /**
-     * Hard upper bound on rows packed into a single SQL statement
-     * (multi-row INSERT, OR-clause SELECT). The public chunkSize controls
-     * when we flush; this constant guarantees the actual SQL we emit is
-     * never large enough to blow up PHP/MySQL memory.
-     */
-    private const MAX_SQL_ROWS_PER_STATEMENT = 500;
-
-    /** @var array<string, mixed> Pending parts to insert */
+    /** @var list<PartRow> Pending parts to insert */
     private array $parts = [];
 
-    /** @var array<string, mixed> Part numbers successfully inserted */
+    /** @var list<int|string> Part numbers successfully inserted */
     private array $insertedPartNumbers = [];
 
-    /** @var array<string, mixed> Part numbers that failed to insert */
+    /** @var list<int|string> Part numbers that failed to insert */
     private array $failedPartNumbers = [];
 
+    /** @var array<int, true> Binary ids whose stored parts must be re-aggregated */
+    private array $touchedBinaryIds = [];
+
     private int $chunkSize;
+
+    private ?\Throwable $lastException = null;
 
     /** @phpstan-ignore property.onlyWritten */
     private bool $addToPartRepair;
 
-    public function __construct(int $chunkSize = 5000, bool $addToPartRepair = true)
+    public function __construct(int $chunkSize = 500, bool $addToPartRepair = true)
     {
-        $this->chunkSize = max(100, $chunkSize);
+        $this->chunkSize = max(1, $chunkSize);
         $this->addToPartRepair = $addToPartRepair;
     }
 
@@ -48,6 +47,8 @@ final class PartHandler
         $this->parts = [];
         $this->insertedPartNumbers = [];
         $this->failedPartNumbers = [];
+        $this->touchedBinaryIds = [];
+        $this->lastException = null;
     }
 
     /**
@@ -66,11 +67,21 @@ final class PartHandler
      */
     public function addPart(int $binaryId, array $header): bool
     {
+        $partNumber = (int) ($header['matches'][2] ?? 0);
+        $messageId = trim((string) ($header['Message-ID'] ?? ''));
+        if ($partNumber <= 0 || $messageId === '' || strlen($messageId) > 255 || preg_match('/^[\x20-\x7E]+$/D', $messageId) !== 1) {
+            if (isset($header['Number'])) {
+                $this->failedPartNumbers[] = $header['Number'];
+            }
+
+            return false;
+        }
+
         $this->parts[] = [
             'binaries_id' => $binaryId,
             'number' => $header['Number'],
-            'messageid' => $header['Message-ID'],
-            'partnumber' => $header['matches'][2],
+            'messageid' => $messageId,
+            'partnumber' => $partNumber,
             'size' => $header['Bytes'],
         ];
 
@@ -91,10 +102,16 @@ final class PartHandler
             return true;
         }
 
-        $insertedCount = $this->insertChunk($this->parts);
+        $pendingParts = $this->parts;
+        $parts = $this->deduplicateParts($pendingParts);
+        foreach ($parts as $part) {
+            $this->touchedBinaryIds[(int) $part['binaries_id']] = true;
+        }
+
+        $insertedCount = $this->insertChunk($parts);
 
         if ($insertedCount === null) {
-            foreach ($this->parts as $part) {
+            foreach ($pendingParts as $part) {
                 $this->failedPartNumbers[] = $part['number'];
             }
 
@@ -103,8 +120,8 @@ final class PartHandler
             return false;
         }
 
-        if ($insertedCount === \count($this->parts)) {
-            foreach ($this->parts as $part) {
+        if ($insertedCount === \count($parts)) {
+            foreach ($parts as $part) {
                 $this->insertedPartNumbers[] = $part['number'];
             }
 
@@ -113,9 +130,9 @@ final class PartHandler
             return true;
         }
 
-        $existingKeys = $this->existingPartKeys($this->parts);
-        foreach ($this->parts as $part) {
-            $key = $this->partKey((int) $part['binaries_id'], (int) $part['number']);
+        $existingKeys = $this->existingPartKeys($parts);
+        foreach ($parts as $part) {
+            $key = $this->partKey((int) $part['binaries_id'], (int) $part['partnumber']);
             if (! isset($existingKeys[$key])) {
                 $this->failedPartNumbers[] = $part['number'];
             }
@@ -127,7 +144,7 @@ final class PartHandler
     }
 
     /**
-     * @param  array<string, mixed>  $parts
+     * @param  list<PartRow>  $parts
      */
     private function insertChunk(array $parts): ?int
     {
@@ -135,7 +152,7 @@ final class PartHandler
         $totalInserted = 0;
 
         try {
-            foreach (array_chunk($parts, self::MAX_SQL_ROWS_PER_STATEMENT) as $chunk) {
+            foreach (array_chunk($parts, $this->chunkSize) as $chunk) {
                 $placeholders = [];
                 $bindings = [];
 
@@ -157,6 +174,7 @@ final class PartHandler
 
             return $totalInserted;
         } catch (\Throwable $e) {
+            $this->lastException = $e;
             if (config('app.debug') === true) {
                 Log::error('Parts chunk insert failed: '.$e->getMessage());
             }
@@ -166,7 +184,7 @@ final class PartHandler
     }
 
     /**
-     * @param  array<string, mixed>  $parts
+     * @param  list<PartRow>  $parts
      * @return array<string, true>
      */
     private function existingPartKeys(array $parts): array
@@ -175,49 +193,95 @@ final class PartHandler
             return [];
         }
 
-        // Deduplicate (binaries_id, number) pairs so we don't bind the same
+        // Deduplicate (binaries_id, partnumber) pairs so we don't bind the same
         // tuple twice when a chunk contains repeats.
         $uniquePairs = [];
         foreach ($parts as $part) {
             $bid = (int) $part['binaries_id'];
-            $num = (int) $part['number'];
-            $uniquePairs[$bid.':'.$num] = [$bid, $num];
+            $partNumber = (int) $part['partnumber'];
+            $uniquePairs[$bid.':'.$partNumber] = [$bid, $partNumber];
         }
 
         $keys = [];
-        // Single tuple-IN per sub-chunk: (binaries_id, number) IN ((?,?),...).
+        // Single tuple-IN per sub-chunk: (binaries_id, partnumber) IN ((?,?),...).
         // Both MySQL and SQLite (3.15+) support this row-constructor form,
         // which lets one SELECT replace the previous "one SELECT per binary".
-        foreach (array_chunk(array_values($uniquePairs), self::MAX_SQL_ROWS_PER_STATEMENT) as $chunk) {
+        foreach (array_chunk(array_values($uniquePairs), $this->chunkSize) as $chunk) {
             $tuples = implode(',', array_fill(0, \count($chunk), '(?,?)'));
             $bindings = [];
-            foreach ($chunk as [$bid, $num]) {
+            foreach ($chunk as [$bid, $partNumber]) {
                 $bindings[] = $bid;
-                $bindings[] = $num;
+                $bindings[] = $partNumber;
             }
 
             $rows = DB::select(
-                "SELECT binaries_id, number FROM parts WHERE (binaries_id, number) IN ({$tuples})",
+                "SELECT binaries_id, partnumber FROM parts WHERE (binaries_id, partnumber) IN ({$tuples})",
                 $bindings
             );
 
             foreach ($rows as $row) {
-                $keys[$this->partKey((int) $row->binaries_id, (int) $row->number)] = true;
+                $keys[$this->partKey((int) $row->binaries_id, (int) $row->partnumber)] = true;
             }
         }
 
         return $keys;
     }
 
-    private function partKey(int $binaryId, int $number): string
+    private function partKey(int $binaryId, int $partNumber): string
     {
-        return $binaryId.':'.$number;
+        return $binaryId.':'.$partNumber;
+    }
+
+    /**
+     * Choose one deterministic segment for each (binary, part number).
+     * Prefer a non-empty message id, then the larger payload, then the lower
+     * article number. This matches the storage migration's duplicate policy.
+     *
+     * @param  list<PartRow>  $parts
+     * @return list<PartRow>
+     */
+    private function deduplicateParts(array $parts): array
+    {
+        $deduplicated = [];
+        foreach ($parts as $part) {
+            $key = $this->partKey((int) $part['binaries_id'], (int) $part['partnumber']);
+            if (! isset($deduplicated[$key]) || $this->shouldPrefer($part, $deduplicated[$key])) {
+                $deduplicated[$key] = $part;
+            }
+        }
+
+        return array_values($deduplicated);
+    }
+
+    /**
+     * @param  PartRow  $candidate
+     * @param  PartRow  $current
+     */
+    private function shouldPrefer(array $candidate, array $current): bool
+    {
+        $candidateHasMessageId = trim((string) $candidate['messageid']) !== '';
+        $currentHasMessageId = trim((string) $current['messageid']) !== '';
+        if ($candidateHasMessageId !== $currentHasMessageId) {
+            return $candidateHasMessageId;
+        }
+
+        if ((int) $candidate['size'] !== (int) $current['size']) {
+            return (int) $candidate['size'] > (int) $current['size'];
+        }
+
+        return (int) $candidate['number'] < (int) $current['number'];
+    }
+
+    /** @return list<int> */
+    public function getTouchedBinaryIds(): array
+    {
+        return array_keys($this->touchedBinaryIds);
     }
 
     /**
      * Get numbers of successfully inserted parts.
      *
-     * @return array<string, mixed>
+     * @return list<int|string>
      */
     public function getInsertedNumbers(): array
     {
@@ -227,11 +291,16 @@ final class PartHandler
     /**
      * Get numbers of failed part inserts.
      *
-     * @return array<string, mixed>
+     * @return list<int|string>
      */
     public function getFailedNumbers(): array
     {
         return $this->failedPartNumbers;
+    }
+
+    public function getLastException(): ?\Throwable
+    {
+        return $this->lastException;
     }
 
     /**

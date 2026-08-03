@@ -22,6 +22,8 @@ final class HeaderStorageTransaction
 
     private bool $hadErrors = false;
 
+    private ?\Throwable $lastException = null;
+
     public function __construct(
         CollectionHandler $collectionHandler,
         BinaryHandler $binaryHandler
@@ -46,6 +48,7 @@ final class HeaderStorageTransaction
     {
         DB::beginTransaction();
         $this->hadErrors = false;
+        $this->lastException = null;
     }
 
     /**
@@ -80,6 +83,7 @@ final class HeaderStorageTransaction
 
             return true;
         } catch (\Throwable $e) {
+            $this->lastException = $e;
             $this->rollbackAndCleanup();
 
             if (config('app.debug') === true) {
@@ -88,6 +92,11 @@ final class HeaderStorageTransaction
 
             return false;
         }
+    }
+
+    public function getLastException(): ?\Throwable
+    {
+        return $this->lastException;
     }
 
     /**

@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $xref
  * @property int $totalfiles
  * @property int $groups_id
- * @property string $collectionhash
+ * @property string $collectionhash Raw 20-byte SHA-1 digest
  * @property int $collection_regexes_id FK to collection_regexes.id
  * @property string|null $dateadded
  * @property string $added

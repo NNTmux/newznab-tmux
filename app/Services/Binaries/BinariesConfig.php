@@ -21,20 +21,17 @@ final readonly class BinariesConfig
         public int $newGroupDaysToScan = 3,
         public int $partRepairLimit = 15000,
         public int $partRepairMaxTries = 3,
-        public int $partsChunkSize = 5000,
-        public int $binariesUpdateChunkSize = 1000,
         public bool $echoCli = false,
         // Number of headers processed (and bulk-inserted) at a time inside
         // HeaderStorageService. This MUST stay small because each chunk
         // produces multi-row INSERTs/SELECTs whose binding count and SQL size
-        // grow linearly with the value. Defaulting it to partsChunkSize
-        // (which used to only control single-row part flushes) caused MySQL
+        // grow linearly with the value. Large unbounded chunks caused MySQL
         // and PHP to allocate hundreds of MB per scan and run out of RAM.
         public int $headerChunkSize = 500,
-        // Hard upper bound applied internally to bulk SELECT/INSERT/UPDATE
-        // operations regardless of caller-provided chunk size, so a
-        // misconfiguration cannot blow up server memory.
-        public int $bulkSqlChunkSize = 500,
+        // One shared hard upper bound for every bulk SELECT/INSERT/UPDATE.
+        public int $sqlChunkSize = 500,
+        public int $reconcileBatchSize = 500,
+        public int $nzbStreamRows = 5000,
     ) {}
 
     /**
@@ -51,11 +48,11 @@ final readonly class BinariesConfig
             newGroupDaysToScan: self::getSettingInt('newgroupdaystoscan', 3),
             partRepairLimit: self::getSettingInt('maxpartrepair', 15000),
             partRepairMaxTries: self::getSettingInt('partrepairmaxtries', 3),
-            partsChunkSize: max(100, (int) config('nntmux.parts_chunk_size', 5000)),
-            binariesUpdateChunkSize: max(100, min(1000, (int) config('nntmux.binaries_update_chunk_size', 1000))),
             echoCli: (bool) config('nntmux.echocli'),
-            headerChunkSize: max(50, min(2000, (int) config('nntmux.header_chunk_size', 500))),
-            bulkSqlChunkSize: max(50, min(1000, (int) config('nntmux.bulk_sql_chunk_size', 500))),
+            headerChunkSize: max(50, min(2000, (int) config('nntmux.cbp.header_chunk_size', 500))),
+            sqlChunkSize: max(50, min(1000, (int) config('nntmux.cbp.sql_chunk_size', 500))),
+            reconcileBatchSize: max(50, min(2000, (int) config('nntmux.cbp.reconcile_batch_size', 500))),
+            nzbStreamRows: max(500, min(20000, (int) config('nntmux.cbp.nzb_stream_rows', 5000))),
         );
     }
 
