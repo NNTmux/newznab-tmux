@@ -9,6 +9,7 @@ use App\Models\Settings;
 use App\Services\Runners\PostProcessRunner;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -385,7 +386,7 @@ final class AdditionalCandidateQuery
         return max(300, $timeout * 2);
     }
 
-    private static function claimStaleBefore(): \Illuminate\Support\Carbon
+    private static function claimStaleBefore(): Carbon
     {
         return now()->subSeconds(self::claimTtlSeconds());
     }
