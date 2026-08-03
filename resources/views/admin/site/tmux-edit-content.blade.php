@@ -225,7 +225,7 @@
                             </x-select>
                         </x-form.group>
 
-                        <x-form.group label="Postprocess Additional Sleep Timer" for="post_timer">
+                        <x-form.group label="Postprocess Additional Sleep Timer" for="post_timer" help="Delay after a bounded worker cycle. Persistent workers drain several batches before this delay, so very low polling intervals are usually unnecessary.">
                             <div class="flex gap-2">
                                 <x-input id="post_timer" name="post_timer" type="number" value="{{ $site['post_timer'] ?? 300 }}" class="flex-1" />
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm">seconds</span>

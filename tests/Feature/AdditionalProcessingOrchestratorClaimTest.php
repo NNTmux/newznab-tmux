@@ -260,8 +260,12 @@ class RecordingTempWorkspaceService extends TempWorkspaceService
 
     public int $clearDirectoryCalls = 0;
 
-    public function ensureMainTempPath(string $basePath, string $guidChar = '', string $groupID = ''): string
-    {
+    public function ensureMainTempPath(
+        string $basePath,
+        string $guidChar = '',
+        string $groupID = '',
+        string $workerToken = ''
+    ): string {
         $this->ensureMainTempPathCalls++;
 
         return '/tmp/additional/';
@@ -275,8 +279,12 @@ class RecordingTempWorkspaceService extends TempWorkspaceService
 
 class FailingTempWorkspaceService extends RecordingTempWorkspaceService
 {
-    public function ensureMainTempPath(string $basePath, string $guidChar = '', string $groupID = ''): string
-    {
+    public function ensureMainTempPath(
+        string $basePath,
+        string $guidChar = '',
+        string $groupID = '',
+        string $workerToken = ''
+    ): string {
         $this->ensureMainTempPathCalls++;
 
         throw new \RuntimeException('Additional post-processing temp path "/root/nope/a/" is not writable');

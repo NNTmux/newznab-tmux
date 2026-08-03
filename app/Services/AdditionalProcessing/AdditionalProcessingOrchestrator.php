@@ -41,21 +41,31 @@ class AdditionalProcessingOrchestrator
     /**
      * Start the additional processing.
      *
+     * @param  list<int>  $excludedReleaseIds
+     * @return array{claimed: int, processed: int, failed: int, claimed_ids: list<int>}
+     *
      * @throws Exception
      */
-    public function start(string $groupID = '', string $guidChar = ''): void
-    {
+    public function start(
+        string $groupID = '',
+        string $guidChar = '',
+        string $workerToken = '',
+        array $excludedReleaseIds = []
+    ): array {
         $this->finish();
-        if (! $this->setupTempPath($guidChar, $groupID)) {
-            return;
+        if (! $this->setupTempPath($guidChar, $groupID, $workerToken)) {
+            return ['claimed' => 0, 'processed' => 0, 'failed' => 0, 'claimed_ids' => []];
         }
 
-        $this->fetchReleases($groupID, $guidChar);
+        $this->fetchReleases($groupID, $guidChar, $excludedReleaseIds);
 
         if ($this->totalReleases > 0) {
             $this->output->echoDescription($this->totalReleases);
-            $this->processReleases($guidChar);
+
+            return $this->processReleases($guidChar);
         }
+
+        return ['claimed' => 0, 'processed' => 0, 'failed' => 0, 'claimed_ids' => []];
     }
 
     /**
@@ -95,13 +105,14 @@ class AdditionalProcessingOrchestrator
     /**
      * Set up the main temp path.
      */
-    private function setupTempPath(string $guidChar, string $groupID): bool
+    private function setupTempPath(string $guidChar, string $groupID, string $workerToken = ''): bool
     {
         try {
             $this->mainTmpPath = $this->tempWorkspace->ensureMainTempPath(
                 $this->config->tmpUnrarPath,
                 $guidChar,
-                $groupID
+                $groupID,
+                $workerToken !== '' ? $workerToken : bin2hex(random_bytes(16)),
             );
             $this->tempWorkspace->clearDirectory($this->mainTmpPath, true);
         } catch (\Throwable $e) {
@@ -129,7 +140,10 @@ class AdditionalProcessingOrchestrator
      * PostProcessRunner::processAdditional(). Do NOT inline new predicates
      * here; add them to AdditionalCandidateQuery instead.
      */
-    private function fetchReleases(int|string $groupID, string $guidChar): void
+    /**
+     * @param  list<int>  $excludedReleaseIds
+     */
+    private function fetchReleases(int|string $groupID, string $guidChar, array $excludedReleaseIds = []): void
     {
         $this->claimToken = bin2hex(random_bytes(16));
         $this->releases = AdditionalCandidateQuery::claimBatch(
@@ -154,6 +168,7 @@ class AdditionalProcessingOrchestrator
                 'pp_timeout_count',
                 AdditionalCandidateQuery::CLAIM_TOKEN_COLUMN,
             ],
+            $excludedReleaseIds,
         );
         $this->totalReleases = $this->releases->count();
     }
@@ -168,10 +183,18 @@ class AdditionalProcessingOrchestrator
      * every subsequent cycle, and the "needs additional pp" backlog would
      * grow indefinitely without any visible failure.
      *
+     * @return array{claimed: int, processed: int, failed: int, claimed_ids: list<int>}
+     *
      * @throws Exception
      */
-    private function processReleases(string $guidChar = ''): void
+    private function processReleases(string $guidChar = ''): array
     {
+        $startedAt = microtime(true);
+        $claimedIds = $this->releases
+            ->pluck('id')
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->values()
+            ->all();
         $processed = 0;
         $failed = 0;
 
@@ -202,15 +225,24 @@ class AdditionalProcessingOrchestrator
             'picked' => $this->totalReleases,
             'processed' => $processed,
             'failed' => $failed,
+            'elapsed_seconds' => round(microtime(true) - $startedAt, 3),
+            'peak_memory_bytes' => memory_get_peak_usage(true),
         ]);
 
         $this->output->endOutput();
+
+        return [
+            'claimed' => $this->totalReleases,
+            'processed' => $processed,
+            'failed' => $failed,
+            'claimed_ids' => $claimedIds,
+        ];
     }
 
     public function finish(): void
     {
         if ($this->mainTmpPath !== '') {
-            $this->tempWorkspace->clearDirectory($this->mainTmpPath, true);
+            $this->tempWorkspace->clearDirectory($this->mainTmpPath, false);
             $this->mainTmpPath = '';
         }
 

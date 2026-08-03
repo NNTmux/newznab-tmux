@@ -771,7 +771,7 @@
                                        class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                                 <span class="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md">seconds</span>
                             </div>
-                            <p class="mt-1 text-sm text-gray-500">Maximum wall-clock seconds to spend processing a single release before skipping it. Set to 0 to disable. Default: 120.</p>
+                            <p class="mt-1 text-sm text-gray-500">Maximum wall-clock seconds to spend processing a single release before skipping it. Keep this below the multiprocessing child timeout. Set to 0 to disable. Default: 120.</p>
                         </div>
 
                         <div>
@@ -789,7 +789,7 @@
                             </label>
                             <input type="text" id="maxaddprocessed" name="maxaddprocessed" value="{{ $site['maxaddprocessed'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                            <p class="mt-1 text-sm text-gray-500">The maximum amount of releases to process for passwords/previews/mediainfo per run. Every release gets processed here. This uses NNTP an connection, 1 per thread. This does not query external metadata providers.</p>
+                            <p class="mt-1 text-sm text-gray-500">Releases claimed per worker batch for passwords, previews, and media info. Larger batches reduce query overhead but increase each worker's memory and runtime. Each thread can hold one NNTP connection.</p>
                         </div>
 
                         <div>
@@ -1046,7 +1046,7 @@
                             </label>
                             <input type="text" id="postthreads" name="postthreads" value="{{ $site['postthreads'] ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                            <p class="mt-1 text-sm text-gray-500">The number of threads for additional postprocessing. This includes deep rar inspection, preview and sample creation and nfo processing.</p>
+                            <p class="mt-1 text-sm text-gray-500">Maximum simultaneous additional-processing workers and NNTP sessions. Workers reuse their process and connection across bounded batches; raise this only within CPU, memory, disk I/O, and provider connection limits.</p>
                         </div>
 
                         <div>
@@ -1100,4 +1100,3 @@
     </div>
 </div>
 @endsection
-

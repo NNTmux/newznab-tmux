@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Log;
 
 class PostProcessRunner extends BaseRunner
 {
+    private const int ADDITIONAL_WORKER_MAX_BATCHES = 4;
+
     private function guidBucketExpression(string $column = 'leftguid'): string
     {
         return DB::getDriverName() === 'sqlite'
@@ -43,7 +45,11 @@ class PostProcessRunner extends BaseRunner
                 // id may already be a single GUID bucket char; if not, take first char defensively
                 $char = isset($release->id) ? substr((string) $release->id, 0, 1) : '';
                 // Use postprocess:guid command which accepts the GUID character
-                $commands[] = PHP_BINARY.' artisan postprocess:guid '.$type.' '.$char;
+                $command = PHP_BINARY.' artisan postprocess:guid '.$type.' '.$char;
+                if ($type === 'additional') {
+                    $command .= ' --worker --max-batches='.self::ADDITIONAL_WORKER_MAX_BATCHES;
+                }
+                $commands[] = $command;
             }
             $this->runStreamingCommands($commands, $maxProcesses, $desc); // @phpstan-ignore argument.type
 
@@ -221,16 +227,18 @@ class PostProcessRunner extends BaseRunner
         // Bucket-selection predicates and size filters are owned by
         // AdditionalCandidateQuery so they cannot drift away from the
         // per-worker fetch in AdditionalProcessingOrchestrator::fetchReleases().
-        $chars = AdditionalCandidateQuery::bucketChars();
+        $bucketCounts = AdditionalCandidateQuery::availableBucketCounts();
+        $chars = array_column($bucketCounts, 'bucket');
 
         $maxProcesses = (int) Settings::settingValue('postthreads');
+        $queryLimit = (int) (Settings::settingValue('maxaddprocessed') ?: 25);
 
         // Normalize to the shape the rest of runPostProcess() expects:
         // an array of objects with an `id` (first GUID char) property. If the
         // backlog is concentrated in fewer buckets than configured threads,
         // repeat buckets so claimBatch() can split one hot bucket across
         // multiple workers.
-        $queue = $this->additionalQueue($chars, $maxProcesses);
+        $queue = $this->additionalQueue($bucketCounts, $maxProcesses, $queryLimit);
         if (! $this->prepareAdditionalTempBuckets($chars)) {
             return;
         }
@@ -245,8 +253,19 @@ class PostProcessRunner extends BaseRunner
             $this->headerStart('postprocess: additional postprocessing', count($queue), 1);
             $orchestrator = app(AdditionalProcessingOrchestrator::class);
             foreach ($chars as $char) {
+                $workerToken = bin2hex(random_bytes(16));
+                $excludedReleaseIds = [];
                 try {
-                    $orchestrator->start('', $char);
+                    for ($batch = 0; $batch < self::ADDITIONAL_WORKER_MAX_BATCHES; $batch++) {
+                        $stats = $orchestrator->start('', $char, $workerToken, $excludedReleaseIds);
+                        if ($stats['claimed'] === 0) {
+                            break;
+                        }
+                        $excludedReleaseIds = array_values(array_unique([
+                            ...$excludedReleaseIds,
+                            ...$stats['claimed_ids'],
+                        ]));
+                    }
                 } finally {
                     $orchestrator->finish();
                 }
@@ -260,20 +279,46 @@ class PostProcessRunner extends BaseRunner
     }
 
     /**
-     * @param  list<string>  $chars
+     * @param  list<array{bucket: string, count: int}>  $bucketCounts
      * @return list<object{id: string}>
      */
-    private function additionalQueue(array $chars, int $maxProcesses): array
+    private function additionalQueue(array $bucketCounts, int $maxProcesses, int $queryLimit): array
     {
-        if ($chars === []) {
+        if ($bucketCounts === []) {
             return [];
         }
 
+        $chars = array_column($bucketCounts, 'bucket');
         $queue = array_map(static fn (string $c): object => (object) ['id' => $c], $chars);
-        $target = max(count($queue), $maxProcesses);
+        $allocations = array_fill(0, count($bucketCounts), 1);
+        $demand = [];
+        foreach ($bucketCounts as $index => $bucketCount) {
+            // Demand is intentionally measured in immediately claimable batches:
+            // postthreads remains the hard connection cap while hot buckets use
+            // available parallelism instead of draining all batches serially.
+            $demand[$index] = max(1, (int) ceil($bucketCount['count'] / max(1, $queryLimit)));
+        }
 
-        for ($index = 0; count($queue) < $target; $index++) {
-            $queue[] = (object) ['id' => $chars[$index % count($chars)]];
+        $target = max(count($queue), min(max(1, $maxProcesses), array_sum($demand)));
+
+        while (count($queue) < $target) {
+            $nextIndex = null;
+            $largestRemainingDemand = 0;
+
+            foreach ($chars as $index => $char) {
+                $remainingDemand = $demand[$index] - $allocations[$index];
+                if ($remainingDemand > $largestRemainingDemand) {
+                    $largestRemainingDemand = $remainingDemand;
+                    $nextIndex = $index;
+                }
+            }
+
+            if ($nextIndex === null) {
+                break;
+            }
+
+            $queue[] = (object) ['id' => $chars[$nextIndex]];
+            $allocations[$nextIndex]++;
         }
 
         return $queue;
@@ -293,7 +338,14 @@ class PostProcessRunner extends BaseRunner
 
         try {
             foreach ($chars as $char) {
-                $tempWorkspace->ensureMainTempPath($basePath, $char);
+                $bucketPath = $tempWorkspace->ensureMainTempPath($basePath, $char);
+                $tempWorkspace->pruneStaleWorkerDirectories(
+                    $bucketPath,
+                    max(
+                        3600,
+                        (int) config('nntmux.multiprocessing_max_child_time', 1800) * 2,
+                    ),
+                );
             }
         } catch (\Throwable $e) {
             cli()->warning('Additional post-processing skipped: '.$e->getMessage());

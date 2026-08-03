@@ -15,8 +15,12 @@ class TempWorkspaceService
      * Ensure the main temp path exists and is namespaced by groupID or guidChar.
      * Returns the resolved main temp path.
      */
-    public function ensureMainTempPath(string $basePath, string $guidChar = '', string $groupID = ''): string
-    {
+    public function ensureMainTempPath(
+        string $basePath,
+        string $guidChar = '',
+        string $groupID = '',
+        string $workerToken = ''
+    ): string {
         // Normalize separator at end
         if (! Str::endsWith($basePath, ['/', '\\'])) {
             $basePath .= '/';
@@ -26,6 +30,10 @@ class TempWorkspaceService
             $basePath .= $groupID.'/';
         } elseif ($guidChar !== '') {
             $basePath .= $guidChar.'/';
+        }
+
+        if ($workerToken !== '') {
+            $basePath .= hash('sha256', $workerToken).'/';
         }
 
         $this->ensureWritableDirectory($basePath, 'Additional post-processing temp path');
@@ -70,6 +78,28 @@ class TempWorkspaceService
         } elseif (File::isFile($path)) {
             File::delete($path);
         }
+    }
+
+    public function pruneStaleWorkerDirectories(string $bucketPath, int $staleAfterSeconds): int
+    {
+        if ($bucketPath === '' || ! File::isDirectory($bucketPath)) {
+            return 0;
+        }
+
+        $removed = 0;
+        $staleBefore = time() - max(1, $staleAfterSeconds);
+
+        foreach (File::directories($bucketPath) as $directory) {
+            if (File::lastModified($directory) >= $staleBefore) {
+                continue;
+            }
+
+            if (File::deleteDirectory($directory)) {
+                $removed++;
+            }
+        }
+
+        return $removed;
     }
 
     /**

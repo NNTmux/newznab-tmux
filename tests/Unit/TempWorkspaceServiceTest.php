@@ -58,6 +58,36 @@ class TempWorkspaceServiceTest extends TestCase
     }
 
     #[WithoutErrorHandler]
+    public function test_worker_workspaces_are_isolated_within_a_guid_bucket(): void
+    {
+        $first = $this->svc->ensureMainTempPath($this->base, 'a', '', 'worker-one');
+        $second = $this->svc->ensureMainTempPath($this->base, 'a', '', 'worker-two');
+        File::put($first.'first.bin', 'first');
+        File::put($second.'second.bin', 'second');
+
+        $this->svc->clearDirectory($first, false);
+
+        $this->assertFalse(File::exists($first));
+        $this->assertTrue(File::isFile($second.'second.bin'));
+        $this->assertNotSame($first, $second);
+    }
+
+    #[WithoutErrorHandler]
+    public function test_prune_stale_worker_directories_keeps_active_siblings(): void
+    {
+        $bucket = $this->svc->ensureMainTempPath($this->base, 'a');
+        $stale = $this->svc->ensureMainTempPath($this->base, 'a', '', 'stale-worker');
+        $active = $this->svc->ensureMainTempPath($this->base, 'a', '', 'active-worker');
+        touch(rtrim($stale, '/\\'), time() - 7200);
+
+        $removed = $this->svc->pruneStaleWorkerDirectories($bucket, 3600);
+
+        $this->assertSame(1, $removed);
+        $this->assertFalse(File::exists($stale));
+        $this->assertTrue(File::isDirectory($active));
+    }
+
+    #[WithoutErrorHandler]
     public function test_ensure_main_temp_path_repairs_existing_unwritable_bucket_directory(): void
     {
         $bucket = $this->base.DIRECTORY_SEPARATOR.'a';

@@ -22,7 +22,9 @@ class PostProcessGuid extends Command
     protected $signature = 'postprocess:guid
                             {type : Type: additional, nfo, movie, tv, anime, books, music, console, or games}
                             {guid : First character of release guid (a-f, 0-9)}
-                            {renamed? : For movie/tv: process renamed only (optional)}';
+                            {renamed? : For movie/tv: process renamed only (optional)}
+                            {--worker : Drain multiple additional-processing batches}
+                            {--max-batches=4 : Maximum claim batches for worker mode}';
 
     /**
      * The console command description.
@@ -55,7 +57,7 @@ class PostProcessGuid extends Command
 
         try {
             match ($type) {
-                'additional' => $this->processAdditional($guid),
+                'additional' => $this->processAdditional($guid, (bool) $this->option('worker')),
                 'nfo' => $this->processNfo($guid),
                 'movie' => $this->postProcessService->processMovies('', $guid, $renamed),
                 'tv' => $this->postProcessService->processTv('', $guid, $renamed),
@@ -81,10 +83,25 @@ class PostProcessGuid extends Command
     /**
      * Process additional data for releases.
      */
-    private function processAdditional(string $guid): void
+    private function processAdditional(string $guid, bool $workerMode): void
     {
+        $maxBatches = $workerMode ? max(1, (int) $this->option('max-batches')) : 1;
+        $workerToken = bin2hex(random_bytes(16));
+        $childTimeout = (int) config('nntmux.multiprocessing_max_child_time', 1800);
+        $deadline = microtime(true) + max(1, $childTimeout - 30);
+        $excludedReleaseIds = [];
+
         try {
-            $this->additionalProcessor->start('', $guid);
+            for ($batch = 0; $batch < $maxBatches && microtime(true) < $deadline; $batch++) {
+                $stats = $this->additionalProcessor->start('', $guid, $workerToken, $excludedReleaseIds);
+                if ($stats['claimed'] === 0) {
+                    break;
+                }
+                $excludedReleaseIds = array_values(array_unique([
+                    ...$excludedReleaseIds,
+                    ...$stats['claimed_ids'],
+                ]));
+            }
         } finally {
             $this->additionalProcessor->finish();
         }

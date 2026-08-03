@@ -161,19 +161,87 @@ final class AdditionalCandidateQuery
         $effectiveLimit = $limit !== null && $limit > 0
             ? min($limit, self::BUCKET_LIMIT)
             : self::BUCKET_LIMIT;
-        $rows = self::baseBuilder()
-            ->select(DB::raw('DISTINCT r.leftguid AS guid_bucket'))
-            ->limit($effectiveLimit)
-            ->get();
-        $chars = [];
-        foreach ($rows as $row) {
-            $id = strtolower((string) ($row->guid_bucket ?? ''));
-            if ($id !== '') {
-                $chars[] = substr($id, 0, 1);
+
+        return array_slice(
+            array_column(self::availableBucketCounts(), 'bucket'),
+            0,
+            $effectiveLimit,
+        );
+    }
+
+    /**
+     * Return available candidate counts keyed by GUID bucket.
+     *
+     * @return list<array{bucket: string, count: int}>
+     */
+    public static function availableBucketCounts(): array
+    {
+        $counts = [];
+
+        foreach (self::bucketBacklog() as $backlog) {
+            if ($backlog['available'] > 0) {
+                $counts[] = [
+                    'bucket' => $backlog['bucket'],
+                    'count' => $backlog['available'],
+                ];
             }
         }
 
-        return array_values(array_unique($chars));
+        return $counts;
+    }
+
+    /**
+     * Return total and currently claimable candidates for every GUID bucket.
+     *
+     * @return list<array{bucket: string, total: int, available: int}>
+     */
+    public static function bucketBacklog(): array
+    {
+        $query = self::baseBuilder(includeClaimed: true)
+            ->select('r.leftguid')
+            ->selectRaw('COUNT(*) AS total_count')
+            ->groupBy('r.leftguid')
+            ->orderBy('r.leftguid');
+
+        if (self::supportsClaims()) {
+            $query->selectRaw(
+                'SUM(CASE WHEN r.'.self::CLAIMED_AT_COLUMN.' IS NULL OR r.'.self::CLAIMED_AT_COLUMN.' < ? THEN 1 ELSE 0 END) AS available_count',
+                [self::claimStaleBefore()],
+            );
+        } else {
+            $query->selectRaw('COUNT(*) AS available_count');
+        }
+
+        $backlog = [];
+        foreach ($query->get() as $row) {
+            $bucket = strtolower(substr((string) ($row->leftguid ?? ''), 0, 1));
+            if ($bucket === '') {
+                continue;
+            }
+
+            $backlog[] = [
+                'bucket' => $bucket,
+                'total' => (int) ($row->total_count ?? 0),
+                'available' => (int) ($row->available_count ?? 0),
+            ];
+        }
+
+        return $backlog;
+    }
+
+    /**
+     * @return array{total: int, available: int}
+     */
+    public static function backlogCounts(): array
+    {
+        $counts = ['total' => 0, 'available' => 0];
+
+        foreach (self::bucketBacklog() as $backlog) {
+            $counts['total'] += $backlog['total'];
+            $counts['available'] += $backlog['available'];
+        }
+
+        return $counts;
     }
 
     /**
@@ -189,6 +257,7 @@ final class AdditionalCandidateQuery
      * Claim a bounded batch of release rows for one worker.
      *
      * @param  list<string>  $columns
+     * @param  list<int>  $excludedReleaseIds
      * @return EloquentCollection<int, Release>
      */
     public static function claimBatch(
@@ -199,16 +268,21 @@ final class AdditionalCandidateQuery
         ?int $minSizeMB = null,
         ?int $maxSizeGB = null,
         array $columns = ['*'],
+        array $excludedReleaseIds = [],
     ): EloquentCollection {
         $effectiveLimit = max(1, $limit);
 
-        return DB::transaction(function () use ($guidChar, $effectiveLimit, $token, $groupID, $minSizeMB, $maxSizeGB, $columns): EloquentCollection {
+        return DB::transaction(function () use ($guidChar, $effectiveLimit, $token, $groupID, $minSizeMB, $maxSizeGB, $columns, $excludedReleaseIds): EloquentCollection {
             $supportsClaims = self::supportsClaims();
             $query = self::baseBuilder($groupID, $guidChar, $minSizeMB, $maxSizeGB)
                 ->select('r.id')
                 ->orderByDesc('r.postdate')
                 ->orderBy('r.id')
                 ->limit($effectiveLimit);
+
+            if ($excludedReleaseIds !== []) {
+                $query->whereNotIn('r.id', $excludedReleaseIds);
+            }
 
             if (DB::getDriverName() !== 'sqlite') {
                 $query->lockForUpdate();
@@ -295,7 +369,7 @@ final class AdditionalCandidateQuery
             return;
         }
 
-        $staleBefore = now()->subSeconds(self::claimTtlSeconds());
+        $staleBefore = self::claimStaleBefore();
 
         $query->where(function (Builder $claimQuery) use ($staleBefore): void {
             $claimQuery
@@ -309,6 +383,11 @@ final class AdditionalCandidateQuery
         $timeout = (int) (Settings::settingValue('releaseprocessingtimeout') ?: 120);
 
         return max(300, $timeout * 2);
+    }
+
+    private static function claimStaleBefore(): \Illuminate\Support\Carbon
+    {
+        return now()->subSeconds(self::claimTtlSeconds());
     }
 
     /**

@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\Runners\PostProcessRunner;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Mockery;
+use Mockery\MockInterface;
 use PDO;
 use Tests\TestCase;
 
@@ -112,14 +116,14 @@ class PostProcessRunnerAdditionalThreadsTest extends TestCase
 
         $this->assertSame(5, $runner->capturedMaxProcesses);
         $this->assertCount(5, $runner->capturedCommands);
-        $this->assertContains(PHP_BINARY.' artisan postprocess:guid additional 0', $runner->capturedCommands);
-        $this->assertContains(PHP_BINARY.' artisan postprocess:guid additional 4', $runner->capturedCommands);
+        $this->assertContains(PHP_BINARY.' artisan postprocess:guid additional 0 --worker --max-batches=4', $runner->capturedCommands);
+        $this->assertContains(PHP_BINARY.' artisan postprocess:guid additional 4 --worker --max-batches=4', $runner->capturedCommands);
     }
 
     public function test_process_additional_repeats_hot_bucket_to_fill_configured_threads(): void
     {
         DB::table('categories')->insert(['id' => 1, 'disablepreview' => 0]);
-        foreach (range(1, 5) as $id) {
+        foreach (range(1, 125) as $id) {
             DB::table('releases')->insert($this->releaseRow($id, 'a'));
         }
 
@@ -144,9 +148,85 @@ class PostProcessRunnerAdditionalThreadsTest extends TestCase
         $this->assertSame(5, $runner->capturedMaxProcesses);
         $this->assertCount(5, $runner->capturedCommands);
         $this->assertSame(
-            array_fill(0, 5, PHP_BINARY.' artisan postprocess:guid additional a'),
+            array_fill(0, 5, PHP_BINARY.' artisan postprocess:guid additional a --worker --max-batches=4'),
             array_values($runner->capturedCommands)
         );
+    }
+
+    public function test_process_additional_does_not_start_idle_workers_for_a_small_hot_bucket(): void
+    {
+        DB::table('categories')->insert(['id' => 1, 'disablepreview' => 0]);
+        foreach (range(1, 5) as $id) {
+            DB::table('releases')->insert($this->releaseRow($id, 'a'));
+        }
+
+        $runner = new class extends PostProcessRunner
+        {
+            /**
+             * @var array<string|int, string>
+             */
+            public array $capturedCommands = [];
+
+            protected function runStreamingCommands(array $commands, int $maxProcesses, string $desc): void
+            {
+                $this->capturedCommands = $commands;
+            }
+        };
+
+        $runner->processAdditional();
+
+        $this->assertSame([
+            PHP_BINARY.' artisan postprocess:guid additional a --worker --max-batches=4',
+        ], array_values($runner->capturedCommands));
+    }
+
+    public function test_direct_guid_command_processes_one_batch(): void
+    {
+        $this->mock(AdditionalProcessingOrchestrator::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('start')
+                ->once()
+                ->with('', 'a', Mockery::type('string'), [])
+                ->andReturn(['claimed' => 1, 'processed' => 1, 'failed' => 0, 'claimed_ids' => [1]]);
+            $mock->shouldReceive('finish')->once();
+        });
+
+        $status = Artisan::call('postprocess:guid', [
+            'type' => 'additional',
+            'guid' => 'a',
+        ]);
+
+        $this->assertSame(0, $status);
+    }
+
+    public function test_worker_guid_command_processes_bounded_distinct_batches(): void
+    {
+        $this->mock(AdditionalProcessingOrchestrator::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('start')
+                ->once()
+                ->ordered()
+                ->with('', 'a', Mockery::type('string'), [])
+                ->andReturn(['claimed' => 1, 'processed' => 1, 'failed' => 0, 'claimed_ids' => [1]]);
+            $mock->shouldReceive('start')
+                ->once()
+                ->ordered()
+                ->with('', 'a', Mockery::type('string'), [1])
+                ->andReturn(['claimed' => 1, 'processed' => 1, 'failed' => 0, 'claimed_ids' => [2]]);
+            $mock->shouldReceive('start')
+                ->once()
+                ->ordered()
+                ->with('', 'a', Mockery::type('string'), [1, 2])
+                ->andReturn(['claimed' => 0, 'processed' => 0, 'failed' => 0, 'claimed_ids' => []]);
+            $mock->shouldReceive('finish')->once();
+        });
+
+        $status = Artisan::call('postprocess:guid', [
+            'type' => 'additional',
+            'guid' => 'a',
+            '--worker' => true,
+            '--max-batches' => 4,
+        ]);
+
+        $this->assertSame(0, $status);
     }
 
     /**

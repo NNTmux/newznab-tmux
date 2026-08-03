@@ -132,6 +132,26 @@ class AdditionalCandidateQueryTest extends TestCase
         $this->assertSame(2, AdditionalCandidateQuery::baseBuilder(includeClaimed: true)->count());
     }
 
+    public function test_backlog_counts_are_aggregated_by_bucket_in_one_shape(): void
+    {
+        DB::table('categories')->insert(['id' => 1, 'disablepreview' => 0]);
+        DB::table('releases')->insert([
+            $this->releaseRow(1, 'a'),
+            $this->releaseRow(2, 'a', claimedAt: now()),
+            $this->releaseRow(3, 'b', claimedAt: now()->subSeconds(301)),
+        ]);
+
+        $this->assertSame([
+            ['bucket' => 'a', 'total' => 2, 'available' => 1],
+            ['bucket' => 'b', 'total' => 1, 'available' => 1],
+        ], AdditionalCandidateQuery::bucketBacklog());
+        $this->assertSame(['total' => 3, 'available' => 2], AdditionalCandidateQuery::backlogCounts());
+        $this->assertSame([
+            ['bucket' => 'a', 'count' => 1],
+            ['bucket' => 'b', 'count' => 1],
+        ], AdditionalCandidateQuery::availableBucketCounts());
+    }
+
     public function test_claim_batch_excludes_active_claims_and_recovers_stale_claims(): void
     {
         DB::table('categories')->insert([
