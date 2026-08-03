@@ -366,16 +366,18 @@ class NzbService
      */
     public function buildNzbPath(string $releaseGuid, int $levelsToSplit, bool $createIfNotExist): string
     {
-        $nzbPath = '';
+        $nzbPath = $this->siteNzbPath;
 
         for ($i = 0; $i < $levelsToSplit && $i < 32; $i++) {
             $nzbPath .= $releaseGuid[$i].'/';
-        }
 
-        $nzbPath = $this->siteNzbPath.$nzbPath;
+            if ($createIfNotExist && ! File::isDirectory($nzbPath)) {
+                if (! File::makeDirectory($nzbPath, 0775) && ! File::isDirectory($nzbPath)) { // @phpstan-ignore booleanNot.alwaysTrue
+                    throw new \RuntimeException(sprintf('Directory "%s" was not created', $nzbPath));
+                }
 
-        if ($createIfNotExist && ! File::isDirectory($nzbPath) && ! File::makeDirectory($nzbPath, 0777, true) && ! File::isDirectory($nzbPath)) { // @phpstan-ignore booleanNot.alwaysTrue
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $nzbPath));
+                File::chmod($nzbPath, 02775);
+            }
         }
 
         return $nzbPath;

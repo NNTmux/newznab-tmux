@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Services\Nzb\NzbService;
-use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use Tests\TestCase;
 
 final class NzbServicePathResolutionTest extends TestCase
 {
@@ -116,6 +116,35 @@ final class NzbServicePathResolutionTest extends TestCase
 
             $this->assertSame($expectedFile, $service->nzbPath($guid));
         } finally {
+            $this->deleteDirectory($tempDir);
+        }
+    }
+
+    public function test_build_nzb_path_creates_group_writable_setgid_directories_despite_umask(): void
+    {
+        $tempDir = sys_get_temp_dir().'/nzb-path-permissions-'.uniqid('', true);
+        $basePath = $tempDir.'/';
+        mkdir($basePath, 0775, true);
+        $previousUmask = umask(0022);
+
+        try {
+            $service = $this->makeServiceWithoutConstructor();
+            \Closure::bind(
+                function (string $path): void {
+                    $this->siteNzbPath = $path;
+                },
+                $service,
+                NzbService::class
+            )($basePath);
+
+            $path = $service->buildNzbPath('4aabfe07-daff-4d28-9d1d-d2a4ab7b6511', 4, true);
+
+            $this->assertSame($basePath.'4/a/a/b/', $path);
+            foreach ([$basePath.'4', $basePath.'4/a', $basePath.'4/a/a', $basePath.'4/a/a/b'] as $directory) {
+                $this->assertSame(02775, fileperms($directory) & 07777);
+            }
+        } finally {
+            umask($previousUmask);
             $this->deleteDirectory($tempDir);
         }
     }

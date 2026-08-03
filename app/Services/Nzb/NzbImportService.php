@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Nzb;
 
 use App\Enums\NzbImportStatus;
+use App\Models\Category;
 use App\Models\Predb;
 use App\Models\Release;
 use App\Models\Settings;
@@ -196,22 +197,38 @@ class NzbImportService
                 $nzbFileName = $useNzbName === true ? $this->deriveReleaseNameFromNzbPath($nzbFilePath) : '';
                 try {
                     $importStatus = $this->scanNZBFile($nzbXML, $nzbFileName, $source);
-                } catch (\Exception $e) {
-                    $this->echoOut('ERROR: Problem inserting: '.$nzbFilePath);
+                } catch (\Throwable $exception) {
+                    Log::error('NZB import failed while scanning or inserting a release.', [
+                        'path' => $nzbFilePath,
+                        'exception' => $exception,
+                    ]);
+
+                    $message = 'ERROR: Problem inserting: '.$nzbFilePath;
+                    if (! $this->browser) {
+                        $message .= ': '.$exception->getMessage();
+                    }
+
+                    $this->echoOut($message);
                     $importStatus = NzbImportStatus::Failed;
                 }
 
                 if ($importStatus === NzbImportStatus::Inserted) {
-                    // Try to copy the NZB to the NZB folder.
-                    $path = $this->nzb->getNzbPath($this->relGuid, 0, true);
+                    $path = null;
+                    try {
+                        $path = $this->nzb->getNzbPath($this->relGuid, 0, true);
+                        $stored = $this->writeCompressedNzb($path, $nzbString);
+                    } catch (\Throwable $exception) {
+                        Log::error('NZB import failed while storing the compressed file.', [
+                            'guid' => $this->relGuid,
+                            'path' => $path,
+                            'exception' => $exception,
+                        ]);
+                        $stored = false;
+                    }
 
-                    // Try to compress the NZB file in the NZB folder.
-                    $fp = gzopen($path, 'w5');
-                    gzwrite($fp, $nzbString);
-                    gzclose($fp);
-
-                    if (! File::isFile($path)) {
-                        $this->echoOut('ERROR: Problem compressing NZB file to: '.$path);
+                    if (! $stored) {
+                        $destination = $path ?? $this->relGuid;
+                        $this->echoOut('ERROR: Problem compressing NZB file to: '.$destination);
 
                         // Remove the release.
                         Release::query()->where('guid', $this->relGuid)->delete();
@@ -301,6 +318,46 @@ class NzbImportService
 
         // Tidy up any trailing dots/whitespace left behind.
         return rtrim($name, ". \t\n\r\0\x0B");
+    }
+
+    protected function writeCompressedNzb(string $path, string $contents): bool
+    {
+        $handle = @gzopen($path, 'w5');
+        if ($handle === false) {
+            Log::error('Unable to open imported NZB destination for writing.', ['path' => $path]);
+
+            return false;
+        }
+
+        $stored = false;
+
+        try {
+            $written = gzwrite($handle, $contents);
+            if ($written !== \strlen($contents) || ! gzclose($handle)) {
+                Log::error('Unable to write the complete imported NZB file.', ['path' => $path]);
+
+                return false;
+            }
+
+            $handle = null;
+            $stored = File::isFile($path);
+
+            return $stored;
+        } catch (\Throwable $exception) {
+            Log::error('Imported NZB compression failed.', [
+                'path' => $path,
+                'exception' => $exception,
+            ]);
+
+            return false;
+        } finally {
+            if (\is_resource($handle)) {
+                @gzclose($handle);
+            }
+            if (! $stored) {
+                File::delete($path);
+            }
+        }
     }
 
     /**
@@ -413,8 +470,60 @@ class NzbImportService
                 'groupName' => $groupName,
                 'totalFiles' => $totalFiles,
                 'totalSize' => $totalSize,
+                'nzbCategoryId' => $this->resolveNzbCategoryId($nzbXML),
             ]
         );
+    }
+
+    protected function resolveNzbCategoryId(mixed $nzbXML): ?int
+    {
+        if (! $nzbXML instanceof \SimpleXMLElement) {
+            return null;
+        }
+
+        $categoryMetadata = [];
+        foreach ($nzbXML->head->meta ?? [] as $meta) {
+            if (mb_strtolower(trim((string) $meta['type'])) !== 'category') {
+                continue;
+            }
+
+            $value = trim((string) $meta);
+            if ($value !== '') {
+                $categoryMetadata[] = $value;
+            }
+        }
+
+        if ($categoryMetadata === []) {
+            return null;
+        }
+
+        $activeCategories = Category::query()
+            ->where('status', Category::STATUS_ACTIVE)
+            ->get(['id', 'title']);
+        $resolvedCategoryIds = [];
+
+        foreach ($categoryMetadata as $value) {
+            if (ctype_digit($value)) {
+                $matchingCategories = $activeCategories->filter(
+                    static fn (Category $category): bool => $category->id === (int) $value
+                );
+            } else {
+                $normalizedValue = mb_strtolower($value);
+                $matchingCategories = $activeCategories->filter(
+                    static fn (Category $category): bool => mb_strtolower($category->title) === $normalizedValue
+                );
+            }
+
+            if ($matchingCategories->count() !== 1) {
+                return null;
+            }
+
+            $resolvedCategoryIds[] = (int) $matchingCategories->first()->id;
+        }
+
+        $resolvedCategoryIds = array_values(array_unique($resolvedCategoryIds));
+
+        return count($resolvedCategoryIds) === 1 ? $resolvedCategoryIds[0] : null;
     }
 
     /**
@@ -498,7 +607,12 @@ class NzbImportService
             return NzbImportStatus::Duplicate;
         }
 
-        $determinedCategory = $this->category->determineCategory($nzbDetails['groups_id'], $cleanName, $escapedFromName);
+        $categoryId = $nzbDetails['nzbCategoryId'];
+        if (! \is_int($categoryId)) {
+            $determinedCategory = $this->category->determineCategory($nzbDetails['groups_id'], $cleanName, $escapedFromName);
+            $categoryId = (int) $determinedCategory['categories_id'];
+        }
+
         $relID = Release::insertRelease(
             [
                 'name' => $escapedSubject,
@@ -509,7 +623,7 @@ class NzbImportService
                 'postdate' => $nzbDetails['postDate'],
                 'fromname' => $escapedFromName,
                 'size' => $nzbDetails['totalSize'],
-                'categories_id' => $determinedCategory['categories_id'],
+                'categories_id' => $categoryId,
                 'isrenamed' => $renamed,
                 'predb_id' => $predbIdInt,
                 'nzbstatus' => NzbService::NZB_ADDED,

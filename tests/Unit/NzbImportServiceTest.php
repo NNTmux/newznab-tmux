@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Enums\NzbImportStatus;
+use App\Models\Category;
 use App\Services\Nzb\NzbImportService;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
@@ -68,6 +71,12 @@ final class NzbImportServiceTest extends TestCase
         DB::purge();
         DB::reconnect();
         Cache::flush();
+
+        Schema::create('categories', function (Blueprint $table): void {
+            $table->integer('id')->primary();
+            $table->string('title');
+            $table->integer('status');
+        });
     }
 
     protected function tearDown(): void
@@ -228,12 +237,102 @@ final class NzbImportServiceTest extends TestCase
         $this->assertSame($expected, $service->deriveForTest($input));
     }
 
+    public function test_nzb_category_metadata_resolves_active_id_and_unique_case_insensitive_title(): void
+    {
+        $this->insertCategory(2040, 'HD', Category::STATUS_ACTIVE);
+        $this->insertCategory(3040, 'Lossless', Category::STATUS_ACTIVE);
+
+        $this->assertSame(2040, $this->resolveNzbCategory('<meta type="category"> 2040 </meta>'));
+        $this->assertSame(3040, $this->resolveNzbCategory('<meta type="CATEGORY"> lossLESS </meta>'));
+        $this->assertSame(2040, $this->resolveNzbCategory(
+            '<meta type="category">2040</meta>',
+            ' xmlns="http://www.newzbin.com/DTD/2003/nzb"'
+        ));
+    }
+
+    public function test_nzb_category_metadata_rejects_unknown_inactive_disabled_and_ambiguous_values(): void
+    {
+        $this->insertCategory(2040, 'HD', Category::STATUS_ACTIVE);
+        $this->insertCategory(3040, 'Lossless', Category::STATUS_INACTIVE);
+        $this->insertCategory(5040, 'HD', Category::STATUS_ACTIVE);
+        $this->insertCategory(6040, 'X264', Category::STATUS_DISABLED);
+
+        $this->assertNull($this->resolveNzbCategory('<meta type="category">9999</meta>'));
+        $this->assertNull($this->resolveNzbCategory('<meta type="category">3040</meta>'));
+        $this->assertNull($this->resolveNzbCategory('<meta type="category">X264</meta>'));
+        $this->assertNull($this->resolveNzbCategory('<meta type="category">HD</meta>'));
+    }
+
+    public function test_nzb_category_metadata_rejects_conflicting_matches(): void
+    {
+        $this->insertCategory(2040, 'Movie HD', Category::STATUS_ACTIVE);
+        $this->insertCategory(5040, 'TV HD', Category::STATUS_ACTIVE);
+
+        $this->assertNull($this->resolveNzbCategory(
+            '<meta type="category">2040</meta><meta type="category">TV HD</meta>'
+        ));
+    }
+
+    public function test_nzb_category_metadata_falls_back_when_category_is_missing_or_blank(): void
+    {
+        $this->assertNull($this->resolveNzbXml('<nzb><file subject="example" /></nzb>'));
+        $this->assertNull($this->resolveNzbCategory(''));
+        $this->assertNull($this->resolveNzbCategory('<meta type="category"> </meta>'));
+        $this->assertNull($this->resolveNzbCategory('<meta type="password">secret</meta>'));
+    }
+
+    public function test_compressed_nzb_write_returns_false_for_an_unwritable_destination(): void
+    {
+        $service = new class(['Browser' => true]) extends NzbImportService
+        {
+            public function writeForTest(string $path, string $contents): bool
+            {
+                return $this->writeCompressedNzb($path, $contents);
+            }
+        };
+
+        $path = sys_get_temp_dir().'/missing-'.bin2hex(random_bytes(5)).'/release.nzb.gz';
+
+        $this->assertFalse($service->writeForTest($path, '<nzb />'));
+        $this->assertFileDoesNotExist($path);
+    }
+
     private function makeNzbFile(string $suffix): string
     {
         $path = sys_get_temp_dir().'/'.$suffix.'-'.bin2hex(random_bytes(5)).'.nzb';
         file_put_contents($path, '<nzb></nzb>');
 
         return $path;
+    }
+
+    private function insertCategory(int $id, string $title, int $status): void
+    {
+        DB::table('categories')->insert([
+            'id' => $id,
+            'title' => $title,
+            'status' => $status,
+        ]);
+    }
+
+    private function resolveNzbCategory(string $headMetadata, string $nzbAttributes = ''): ?int
+    {
+        return $this->resolveNzbXml("<nzb{$nzbAttributes}><head>{$headMetadata}</head></nzb>");
+    }
+
+    private function resolveNzbXml(string $xml): ?int
+    {
+        $service = new class(['Browser' => true]) extends NzbImportService
+        {
+            public function resolveForTest(\SimpleXMLElement $nzb): ?int
+            {
+                return $this->resolveNzbCategoryId($nzb);
+            }
+        };
+
+        $nzb = simplexml_load_string($xml);
+        $this->assertInstanceOf(\SimpleXMLElement::class, $nzb);
+
+        return $service->resolveForTest($nzb);
     }
 
     private function setEnvironmentValue(string $key, ?string $value): void
