@@ -27,6 +27,10 @@ class TmuxMonitorService
 
     protected bool $shouldContinue = true;
 
+    protected float $lastOperationalRefreshAt = 0.0;
+
+    protected float $lastSlowRefreshAt = 0.0;
+
     public function __construct()
     {
         $this->tmux = new Tmux;
@@ -124,46 +128,52 @@ class TmuxMonitorService
      */
     public function collectStatistics(): array
     {
-        // Refresh settings periodically
-        $monitorDelay = (int) ($this->runVar['settings']['monitor'] ?? 60);
-        $timeSinceLastRefresh = time() - ($this->runVar['timers']['timer2'] ?? 0);
+        $now = microtime(true);
+        $monitorDelay = max(1, (int) ($this->runVar['settings']['monitor'] ?? 60));
+        $slowRefreshDelay = max($monitorDelay, (int) config('tmux.monitor.refresh_interval', 60));
+        $statisticsChanged = false;
 
-        if ($this->iterations === 1 || $timeSinceLastRefresh >= $monitorDelay) {
-            $this->refreshStatistics();
-            $this->runVar['timers']['timer2'] = time();
+        if ($this->refreshIsDue($this->lastOperationalRefreshAt, $monitorDelay, $now)) {
+            $this->refreshOperationalStatistics();
+            $this->lastOperationalRefreshAt = $now;
+            $this->runVar['timers']['timer2'] = (int) $now;
+            $statisticsChanged = true;
         }
 
-        // Update connection counts
-        $this->updateConnectionCounts();
+        if ($this->refreshIsDue($this->lastSlowRefreshAt, $slowRefreshDelay, $now)) {
+            $this->refreshSlowStatistics();
+            $this->lastSlowRefreshAt = $now;
+            $statisticsChanged = true;
+        }
 
-        // Set killswitches
+        if ($statisticsChanged) {
+            $this->calculateStatistics();
+        }
+
+        $this->updateConnectionCounts();
         $this->setKillswitches();
 
         return $this->runVar;
     }
 
-    /**
-     * Refresh all statistics from database
-     */
-    protected function refreshStatistics(): void
+    protected function refreshOperationalStatistics(): void
     {
-        $timer = time();
-
-        // Refresh settings
+        $timer = microtime(true);
         $this->runVar['settings'] = $this->tmux->getMonitorSettings();
-        $this->runVar['timers']['query']['tmux_time'] = time() - $timer;
+        $this->runVar['timers']['query']['tmux_time'] = microtime(true) - $timer;
 
-        // Get category counts
-        $this->getCategoryCounts();
-
-        // Get process counts
         $this->getProcessCounts();
+    }
 
-        // Get table counts
+    protected function refreshSlowStatistics(): void
+    {
+        $this->getCategoryCounts();
         $this->getTableCounts();
+    }
 
-        // Calculate diffs and percentages
-        $this->calculateStatistics();
+    protected function refreshIsDue(float $lastRefreshAt, int $interval, float $now): bool
+    {
+        return $lastRefreshAt === 0.0 || ($now - $lastRefreshAt) >= $interval;
     }
 
     /**
@@ -171,41 +181,46 @@ class TmuxMonitorService
      */
     protected function getCategoryCounts(): void
     {
-        $timer = time();
+        $timer = microtime(true);
+        $bindings = [];
+        $aggregates = [];
 
-        $this->runVar['counts']['now']['tv'] = Release::query()
-            ->whereBetween('categories_id', [Category::TV_ROOT, Category::TV_OTHER])
-            ->count('id');
+        foreach ($this->categoryRanges() as $name => [$minimum, $maximum]) {
+            $aggregates[] = "SUM(CASE WHEN categories_id BETWEEN ? AND ? THEN 1 ELSE 0 END) AS {$name}";
+            $bindings[] = $minimum;
+            $bindings[] = $maximum;
+        }
 
-        $this->runVar['counts']['now']['movies'] = Release::query()
-            ->whereBetween('categories_id', [Category::MOVIE_ROOT, Category::MOVIE_OTHER])
-            ->count('id');
+        try {
+            $counts = Release::query()->selectRaw(implode(', ', $aggregates), $bindings)->first();
 
-        $this->runVar['counts']['now']['audio'] = Release::query()
-            ->whereBetween('categories_id', [Category::MUSIC_ROOT, Category::MUSIC_OTHER])
-            ->count('id');
+            if ($counts !== null) {
+                foreach (array_keys($this->categoryRanges()) as $name) {
+                    $this->runVar['counts']['now'][$name] = (int) $counts->getAttribute($name);
+                }
+            }
+        } catch (\Exception $e) {
+            logger()->error('Error collecting category counts: '.$e->getMessage());
+        }
 
-        $this->runVar['counts']['now']['books'] = Release::query()
-            ->whereBetween('categories_id', [Category::BOOKS_ROOT, Category::BOOKS_UNKNOWN])
-            ->count('id');
+        $this->runVar['timers']['query']['init_time'] = microtime(true) - $timer;
+    }
 
-        $this->runVar['counts']['now']['console'] = Release::query()
-            ->whereBetween('categories_id', [Category::GAME_ROOT, Category::GAME_OTHER])
-            ->count('id');
-
-        $this->runVar['counts']['now']['pc'] = Release::query()
-            ->whereBetween('categories_id', [Category::PC_ROOT, Category::PC_PHONE_ANDROID])
-            ->count('id');
-
-        $this->runVar['counts']['now']['xxx'] = Release::query()
-            ->whereBetween('categories_id', [Category::XXX_ROOT, Category::XXX_OTHER])
-            ->count('id');
-
-        $this->runVar['counts']['now']['misc'] = Release::query()
-            ->whereBetween('categories_id', [Category::OTHER_ROOT, Category::OTHER_HASHED])
-            ->count('id');
-
-        $this->runVar['timers']['query']['init_time'] = time() - $timer;
+    /**
+     * @return array<string, array{int, int}>
+     */
+    protected function categoryRanges(): array
+    {
+        return [
+            'tv' => [Category::TV_ROOT, Category::TV_OTHER],
+            'movies' => [Category::MOVIE_ROOT, Category::MOVIE_OTHER],
+            'audio' => [Category::MUSIC_ROOT, Category::MUSIC_OTHER],
+            'books' => [Category::BOOKS_ROOT, Category::BOOKS_UNKNOWN],
+            'console' => [Category::GAME_ROOT, Category::GAME_OTHER],
+            'pc' => [Category::PC_ROOT, Category::PC_PHONE_ANDROID],
+            'xxx' => [Category::XXX_ROOT, Category::XXX_OTHER],
+            'misc' => [Category::OTHER_ROOT, Category::OTHER_HASHED],
+        ];
     }
 
     /**
@@ -213,7 +228,7 @@ class TmuxMonitorService
      */
     protected function getProcessCounts(): void
     {
-        $timer = time();
+        $timer = microtime(true);
         $this->runVar['counts']['now']['work'] = $this->runVar['counts']['now']['work'] ?? 0;
         $this->runVar['counts']['now']['work_available'] = $this->runVar['counts']['now']['work_available'] ?? 0;
 
@@ -229,10 +244,10 @@ class TmuxMonitorService
                 }
             }
 
-            $this->runVar['timers']['query']['proc1_time'] = time() - $timer;
+            $this->runVar['timers']['query']['proc1_time'] = microtime(true) - $timer;
 
             // Process 2
-            $timer2 = time();
+            $timer2 = microtime(true);
             $maxSize = $this->runVar['settings']['maxsize_pp'] ?? '';
             $minSize = $this->runVar['settings']['minsize_pp'] ?? '';
 
@@ -253,7 +268,7 @@ class TmuxMonitorService
             $this->runVar['counts']['now']['work'] = $additionalBacklog['total'];
             $this->runVar['counts']['now']['work_available'] = $additionalBacklog['available'];
 
-            $this->runVar['timers']['query']['proc2_time'] = time() - $timer2;
+            $this->runVar['timers']['query']['proc2_time'] = microtime(true) - $timer2;
 
         } catch (\Exception $e) {
             logger()->error('Error collecting process counts: '.$e->getMessage());
@@ -265,77 +280,65 @@ class TmuxMonitorService
      */
     protected function getTableCounts(): void
     {
-        $timer = time();
+        $timer = microtime(true);
 
         try {
             $this->runVar['counts']['now']['collections_table'] = Collection::query()->count();
+            $this->runVar['counts']['now']['releases'] = Release::query()->count();
 
-            // Get binaries/parts counts from information_schema or use approximation
-            $dbName = config('nntmux.db_name');
-            $tables = $this->tmux->cbpmTableQuery();
-
-            $this->runVar['counts']['now']['binaries_table'] = 0;
-            $this->runVar['counts']['now']['parts_table'] = 0;
-            $this->runVar['counts']['now']['missed_parts_table'] = 0;
-
-            foreach ($tables as $table) {
-                $tableName = $table->name;
-                $count = $this->getTableRowCount($tableName);
-
-                if (str_contains($tableName, 'binaries')) {
-                    $this->runVar['counts']['now']['binaries_table'] += $count;
-                } elseif (str_contains($tableName, 'missed_parts')) {
-                    $this->runVar['counts']['now']['missed_parts_table'] += $count;
-                } elseif (str_contains($tableName, 'parts')) {
-                    $this->runVar['counts']['now']['parts_table'] += $count;
-                }
+            foreach ($this->aggregateTableRowEstimates($this->tmux->cbpmTableQuery()) as $key => $count) {
+                $this->runVar['counts']['now'][$key] = $count;
             }
 
-            $this->runVar['timers']['query']['tpg_time'] = time() - $timer;
+            $this->runVar['timers']['query']['tpg_time'] = microtime(true) - $timer;
 
-            // Get additional table counts (query 4)
-            $timer4 = time();
-            $proc4Query = $this->tmux->proc_query(4, $dbName, '');
-            $proc4Result = DB::selectOne($proc4Query);
+            foreach ([4, 6] as $queryNumber) {
+                $result = DB::selectOne($this->tmux->proc_query($queryNumber, (string) config('nntmux.db_name'), ''));
+                if ($result === null) {
+                    continue;
+                }
 
-            if ($proc4Result) {
-                foreach ((array) $proc4Result as $key => $value) {
-                    $this->runVar['counts']['now'][$key] = $value;
+                $target = $queryNumber === 4 ? 'counts' : 'timers';
+                $section = $queryNumber === 4 ? 'now' : 'newOld';
+                foreach ((array) $result as $key => $value) {
+                    $this->runVar[$target][$section][$key] = $value;
                 }
             }
-
-            // Get newest/oldest data (query 6)
-            $timer6 = time();
-            $proc6Query = $this->tmux->proc_query(6, $dbName, '');
-            $proc6Result = DB::selectOne($proc6Query);
-
-            if ($proc6Result) {
-                foreach ((array) $proc6Result as $key => $value) {
-                    $this->runVar['timers']['newOld'][$key] = $value;
-                }
-            }
-
         } catch (\Exception $e) {
             logger()->error('Error collecting table counts: '.$e->getMessage());
         }
     }
 
     /**
-     * Get row count for a table
+     * @param  array<array-key, mixed>  $tables
+     * @return array{binaries_table: int, parts_table: int, missed_parts_table: int}
      */
-    protected function getTableRowCount(string $tableName): int
+    protected function aggregateTableRowEstimates(array $tables): array
     {
-        try {
-            $result = DB::selectOne(
-                'SELECT TABLE_ROWS AS count FROM information_schema.TABLES
-                 WHERE TABLE_NAME = ? AND TABLE_SCHEMA = DATABASE()',
-                [$tableName]
-            );
+        $counts = [
+            'binaries_table' => 0,
+            'parts_table' => 0,
+            'missed_parts_table' => 0,
+        ];
 
-            return (int) ($result->count ?? 0);
-        } catch (\Exception $e) {
-            return 0;
+        foreach ($tables as $table) {
+            if (! is_object($table)) {
+                continue;
+            }
+
+            $tableName = (string) ($table->name ?? '');
+            $count = (int) ($table->row_count ?? 0);
+
+            if (str_contains($tableName, 'binaries')) {
+                $counts['binaries_table'] += $count;
+            } elseif (str_contains($tableName, 'missed_parts')) {
+                $counts['missed_parts_table'] += $count;
+            } elseif (str_contains($tableName, 'parts')) {
+                $counts['parts_table'] += $count;
+            }
         }
+
+        return $counts;
     }
 
     /**
@@ -485,15 +488,18 @@ class TmuxMonitorService
      */
     protected function updateConnectionCounts(): void
     {
+        $socketSnapshot = $this->tmux->getSocketSnapshot();
         $this->runVar['conncounts'] = $this->tmux->getUSPConnections(
             'primary',
-            $this->runVar['connections']
+            $this->runVar['connections'],
+            $socketSnapshot,
         );
 
         if ((int) ($this->runVar['constants']['alternate_nntp'] ?? 0) === 1) {
             $alternateConns = $this->tmux->getUSPConnections(
                 'alternate',
-                $this->runVar['connections']
+                $this->runVar['connections'],
+                $socketSnapshot,
             );
             $this->runVar['conncounts'] = array_merge($this->runVar['conncounts'], $alternateConns);
         }

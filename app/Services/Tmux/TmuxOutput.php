@@ -20,6 +20,10 @@ class TmuxOutput extends Tmux
 
     private mixed $tmpMasks;
 
+    private ?string $gitVersion = null;
+
+    private ?string $gitBranch = null;
+
     /**
      * TmuxOutput constructor.
      *
@@ -112,8 +116,11 @@ class TmuxOutput extends Tmux
     {
         $buffer = '';
         $state = ((int) $this->runVar['settings']['is_running'] === 1) ? 'Running' : 'Disabled';
-        $version = str_replace(["\n", "\r"], '', Process::run('git describe --tags')->output());
-        $branch = str_replace(["\n", "\r"], '', Process::run('git branch --show-current')->output());
+        $this->gitVersion ??= trim(Process::run('git describe --tags')->output());
+        $this->gitBranch ??= trim(Process::run('git branch --show-current')->output());
+
+        $version = $this->gitVersion;
+        $branch = $this->gitBranch;
 
         $buffer .= sprintf(
             $this->tmpMasks[2],
@@ -395,52 +402,34 @@ class TmuxOutput extends Tmux
 
     protected function _getPaths(): string
     {
-        $buffer = '';
+        $paths = array_values(array_unique(array_filter([
+            $this->runVar['settings']['monitor_path'] ?? null,
+            $this->runVar['settings']['monitor_path_a'] ?? null,
+            $this->runVar['settings']['monitor_path_b'] ?? null,
+        ], static fn (mixed $path): bool => is_string($path) && $path !== '' && file_exists($path))));
 
-        // assign timers from tmux table
-        $monitor_path = $this->runVar['settings']['monitor_path'];
-        $monitor_path_a = $this->runVar['settings']['monitor_path_a'];
-        $monitor_path_b = $this->runVar['settings']['monitor_path_b'];
+        if ($paths === []) {
+            return PHP_EOL;
+        }
 
-        if (($monitor_path !== null && file_exists($monitor_path))
-            || ($monitor_path_a !== null && file_exists($monitor_path_a))
-            || ($monitor_path_b !== null && file_exists($monitor_path_b))) {
-            $buffer .= "\n";
-            $buffer .= sprintf($this->tmpMasks[3], 'File System', 'Used', 'Free');
-            $buffer .= $this->_getSeparator();
+        $buffer = PHP_EOL;
+        $buffer .= sprintf($this->tmpMasks[3], 'File System', 'Used', 'Free');
+        $buffer .= $this->_getSeparator();
 
-            if (! empty($monitor_path) && file_exists($monitor_path)) {
-                $disk_use = $this->decodeSize(disk_total_space($monitor_path) - disk_free_space($monitor_path));
-                $disk_free = $this->decodeSize(disk_free_space($monitor_path));
-                if (basename($monitor_path) === '') {
-                    $show = '/';
-                } else {
-                    $show = basename($monitor_path);
-                }
-                $buffer .= sprintf($this->tmpMasks[4], $show, $disk_use, $disk_free);
+        foreach ($paths as $path) {
+            $total = disk_total_space($path);
+            $free = disk_free_space($path);
+            if ($total === false || $free === false) {
+                continue;
             }
 
-            if (! empty($monitor_path_a) && file_exists($monitor_path_a)) {
-                $disk_use = $this->decodeSize(disk_total_space($monitor_path_a) - disk_free_space($monitor_path_a));
-                $disk_free = $this->decodeSize(disk_free_space($monitor_path_a));
-                if (basename($monitor_path_a) === '') {
-                    $show = '/';
-                } else {
-                    $show = basename($monitor_path_a);
-                }
-                $buffer .= sprintf($this->tmpMasks[4], $show, $disk_use, $disk_free);
-            }
-
-            if (! empty($monitor_path_b) && file_exists($monitor_path_b)) {
-                $disk_use = $this->decodeSize(disk_total_space($monitor_path_b) - disk_free_space($monitor_path_b));
-                $disk_free = $this->decodeSize(disk_free_space($monitor_path_b));
-                if (basename($monitor_path_b) === '') {
-                    $show = '/';
-                } else {
-                    $show = basename($monitor_path_b);
-                }
-                $buffer .= sprintf($this->tmpMasks[4], $show, $disk_use, $disk_free);
-            }
+            $name = basename($path) ?: '/';
+            $buffer .= sprintf(
+                $this->tmpMasks[4],
+                $name,
+                $this->decodeSize($total - $free),
+                $this->decodeSize($free),
+            );
         }
 
         return $buffer.PHP_EOL;
@@ -455,7 +444,7 @@ class TmuxOutput extends Tmux
             $this->tmpMasks[4],
             'Combined',
             sprintf(
-                '%d %d %d %d %d %d %d',
+                '%.3f %.3f %.3f %.3f %.3f %.3f %.3f',
                 $this->runVar['timers']['query']['tmux_time'],
                 $this->runVar['timers']['query']['split_time'],
                 $this->runVar['timers']['query']['init_time'],
@@ -465,7 +454,7 @@ class TmuxOutput extends Tmux
                 $this->runVar['timers']['query']['tpg_time']
             ),
             sprintf(
-                '%d %d %d %d %d %d %d',
+                '%.3f %.3f %.3f %.3f %.3f %.3f %.3f',
                 $this->runVar['timers']['query']['tmux_time'],
                 $this->runVar['timers']['query']['split1_time'],
                 $this->runVar['timers']['query']['init1_time'],

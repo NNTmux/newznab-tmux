@@ -97,7 +97,7 @@ class TmuxMonitor extends Command
 
                 // Increment iteration and sleep
                 $this->monitor->incrementIteration();
-                sleep(10);
+                sleep(max(1, (int) config('tmux.monitor.delay', 10)));
             }
 
             $this->info('🛑 Monitor stopped by exit flag');

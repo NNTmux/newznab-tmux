@@ -235,14 +235,25 @@ final class AdditionalCandidateQuery
      */
     public static function backlogCounts(): array
     {
-        $counts = ['total' => 0, 'available' => 0];
+        $query = self::baseBuilder(includeClaimed: true)
+            ->selectRaw('COUNT(*) AS total_count');
 
-        foreach (self::bucketBacklog() as $backlog) {
-            $counts['total'] += $backlog['total'];
-            $counts['available'] += $backlog['available'];
+        if (self::supportsClaims()) {
+            $query->selectRaw(
+                'SUM(CASE WHEN r.'.self::CLAIMED_AT_COLUMN.' IS NULL OR r.'.self::CLAIMED_AT_COLUMN.' < ? THEN 1 ELSE 0 END) AS available_count',
+                [self::claimStaleBefore()],
+            );
+        } else {
+            $query->selectRaw('COUNT(*) AS available_count');
         }
 
-        return $counts;
+        /** @var object{total_count: int|string|null, available_count: int|string|null}|null $counts */
+        $counts = $query->toBase()->first();
+
+        return [
+            'total' => (int) ($counts->total_count ?? 0),
+            'available' => (int) ($counts->available_count ?? 0),
+        ];
     }
 
     /**

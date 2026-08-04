@@ -49,53 +49,51 @@ class Tmux
         return $runVar['connections'];
     }
 
-    public function getUSPConnections(string $which, mixed $connections): mixed
+    /**
+     * @param  array<string, mixed>  $connections
+     * @return array<string, array{active: int, total: int}>
+     */
+    public function getUSPConnections(string $which, array $connections, ?string $socketSnapshot = null): array
     {
-        switch ($which) {
-            case 'alternate':
-                $ip = 'ip_a';
-                $port = 'port_a';
-                break;
-            case 'primary':
-            default:
-                $ip = 'ip';
-                $port = 'port';
-                break;
+        [$ipKey, $portKey] = $which === 'alternate'
+            ? ['ip_a', 'port_a']
+            : ['ip', 'port'];
+
+        $ip = (string) ($connections[$ipKey] ?? '');
+        $port = (string) ($connections[$portKey] ?? '');
+        $needles = array_values(array_filter([
+            $ip !== '' && $port !== '' ? $ip.':'.$port : null,
+            $ip !== '' ? $ip.':https' : null,
+            $port !== '' ? $port : null,
+            $ip !== '' ? $ip : null,
+        ]));
+        $lines = preg_split('/\R/', $socketSnapshot ?? $this->getSocketSnapshot()) ?: [];
+
+        foreach ($needles as $needle) {
+            $matchingLines = array_filter(
+                $lines,
+                static fn (string $line): bool => str_contains($line, $needle),
+            );
+
+            if ($matchingLines !== []) {
+                return [
+                    $which => [
+                        'active' => count(array_filter(
+                            $matchingLines,
+                            static fn (string $line): bool => str_contains($line, 'ESTAB'),
+                        )),
+                        'total' => count($matchingLines),
+                    ],
+                ];
+            }
         }
 
-        // Initialize result structure
-        $runVar['conncounts'][$which]['active'] = '0';
-        $runVar['conncounts'][$which]['total'] = '0';
+        return [$which => ['active' => 0, 'total' => 0]];
+    }
 
-        // 1) Try exact host:port
-        if (! empty($connections[$ip]) && ! empty($connections[$port])) {
-            $needle = escapeshellarg($connections[$ip].':'.$connections[$port]);
-            $runVar['conncounts'][$which]['active'] = str_replace("\n", '', shell_exec("ss -n 2>/dev/null | grep -- $needle | grep -c -- ESTAB")) ?: '0';
-            $runVar['conncounts'][$which]['total'] = str_replace("\n", '', shell_exec("ss -n 2>/dev/null | grep -c -- $needle")) ?: '0';
-        }
-
-        // 2) Fallback to host:https
-        if ((int) $runVar['conncounts'][$which]['active'] === 0 && (int) $runVar['conncounts'][$which]['total'] === 0 && ! empty($connections[$ip])) {
-            $needleHttps = escapeshellarg($connections[$ip].':https');
-            $runVar['conncounts'][$which]['active'] = str_replace("\n", '', shell_exec("ss -n 2>/dev/null | grep -- $needleHttps | grep -c -- ESTAB")) ?: '0';
-            $runVar['conncounts'][$which]['total'] = str_replace("\n", '', shell_exec("ss -n 2>/dev/null | grep -c -- $needleHttps")) ?: '0';
-        }
-
-        // 3) Fallback to port only
-        if ((int) $runVar['conncounts'][$which]['active'] === 0 && (int) $runVar['conncounts'][$which]['total'] === 0 && ! empty($connections[$port])) {
-            $needlePort = escapeshellarg((string) $connections[$port]);
-            $runVar['conncounts'][$which]['active'] = str_replace("\n", '', shell_exec("ss -n 2>/dev/null | grep -- $needlePort | grep -c -- ESTAB")) ?: '0';
-            $runVar['conncounts'][$which]['total'] = str_replace("\n", '', shell_exec("ss -n 2>/dev/null | grep -c -- $needlePort")) ?: '0';
-        }
-
-        // 4) Fallback to host only
-        if ((int) $runVar['conncounts'][$which]['active'] === 0 && (int) $runVar['conncounts'][$which]['total'] === 0 && ! empty($connections[$ip])) {
-            $needleIp = escapeshellarg($connections[$ip]);
-            $runVar['conncounts'][$which]['active'] = str_replace("\n", '', shell_exec("ss -n 2>/dev/null | grep -- $needleIp | grep -c -- ESTAB")) ?: '0';
-            $runVar['conncounts'][$which]['total'] = str_replace("\n", '', shell_exec("ss -n 2>/dev/null | grep -c -- $needleIp")) ?: '0';
-        }
-
-        return $runVar['conncounts'];
+    public function getSocketSnapshot(): string
+    {
+        return (string) shell_exec('ss -nH 2>/dev/null');
     }
 
     /**
@@ -377,10 +375,6 @@ class Tmux
                     "
 					SELECT
 					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'predb' AND TABLE_SCHEMA = %1\$s) AS predb,
-					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'missed_parts' AND TABLE_SCHEMA = %1\$s) AS missed_parts_table,
-					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'parts' AND TABLE_SCHEMA = %1\$s) AS parts_table,
-					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'binaries' AND TABLE_SCHEMA = %1\$s) AS binaries_table,
-					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'collections' AND TABLE_SCHEMA = %1\$s) AS releases,
 					(SELECT COUNT(id) FROM usenet_groups WHERE first_record IS NOT NULL AND backfill = 1
 						AND (now() - INTERVAL backfill_target DAY) < first_record_postdate
 					) AS backfill_groups_days,
@@ -449,7 +443,7 @@ class Tmux
     {
         return DB::select(
             "
-			SELECT TABLE_NAME AS name
+			SELECT TABLE_NAME AS name, TABLE_ROWS AS row_count
       		FROM information_schema.TABLES
       		WHERE TABLE_SCHEMA = (SELECT DATABASE())
 			AND TABLE_NAME REGEXP {escapeString('^(multigroup_)?(collections|binaries|parts|missed_parts)(_[0-9]+)?$')}
