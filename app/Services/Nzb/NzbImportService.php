@@ -394,7 +394,7 @@ class NzbImportService
             // Get the group names, group_id, check if it's blacklisted.
             $groupArr = [];
             foreach ($file->groups->group as $group) {
-                $group = (string) $group;
+                $group = $this->normalizeGroupName($group);
 
                 // If group_id is -1 try to get a group_id.
                 if ($groupID === -1) {
@@ -639,6 +639,11 @@ class NzbImportService
         $this->relId = (int) $relID;
 
         return NzbImportStatus::Inserted;
+    }
+
+    protected function normalizeGroupName(\SimpleXMLElement|string $group): string
+    {
+        return trim((string) $group);
     }
 
     /**

@@ -237,6 +237,22 @@ final class NzbImportServiceTest extends TestCase
         $this->assertSame($expected, $service->deriveForTest($input));
     }
 
+    public function test_group_names_are_trimmed_before_import(): void
+    {
+        $service = new class(['Browser' => true]) extends NzbImportService
+        {
+            public function groupNameForTest(\SimpleXMLElement $group): string
+            {
+                return $this->normalizeGroupName($group);
+            }
+        };
+
+        $group = simplexml_load_string('<group> alt.binaries.xylo </group>');
+        $this->assertInstanceOf(\SimpleXMLElement::class, $group);
+
+        $this->assertSame('alt.binaries.xylo', $service->groupNameForTest($group));
+    }
+
     public function test_nzb_category_metadata_resolves_active_id_and_unique_case_insensitive_title(): void
     {
         $this->insertCategory(2040, 'HD', Category::STATUS_ACTIVE);
