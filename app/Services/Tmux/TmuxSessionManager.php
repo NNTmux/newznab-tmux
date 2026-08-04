@@ -16,6 +16,8 @@ class TmuxSessionManager
 
     protected string $configFile;
 
+    private ?string $lastError = null;
+
     public function __construct(?string $sessionName = null)
     {
         $this->sessionName = $sessionName ?? $this->getSessionName();
@@ -32,13 +34,18 @@ class TmuxSessionManager
             ?? config('tmux.session.default_name', 'nntmux');
     }
 
+    public function sessionName(): string
+    {
+        return $this->sessionName;
+    }
+
     /**
      * Check if tmux session exists
      */
     public function sessionExists(): bool
     {
         $result = Process::timeout(10)
-            ->run("tmux list-sessions 2>/dev/null | grep -q '^{$this->sessionName}:'");
+            ->run(['tmux', 'has-session', '-t', $this->sessionName]);
 
         return $result->successful();
     }
@@ -46,22 +53,50 @@ class TmuxSessionManager
     /**
      * Create a new tmux session
      */
-    public function createSession(string $windowName = 'Monitor'): bool
+    public function createSession(string $windowName = 'Monitor'): ?string
     {
         if ($this->sessionExists()) {
-            return false;
+            $this->lastError = "Tmux session '{$this->sessionName}' already exists.";
+
+            return null;
         }
 
-        $configOption = file_exists($this->configFile) ? "-f {$this->configFile}" : '';
-
-        // Escape single quotes in the window name for shell
-        $escapedWindowName = str_replace("'", "'\\''", $windowName);
-
-        $result = Process::timeout(30)->run(
-            "tmux {$configOption} new-session -d -s {$this->sessionName} -n '{$escapedWindowName}' 'printf \"\\033]2;{$escapedWindowName}\\033\"'"
+        $arguments = ['tmux'];
+        if (file_exists($this->configFile)) {
+            array_push($arguments, '-f', $this->configFile);
+        }
+        array_push(
+            $arguments,
+            'new-session',
+            '-d',
+            '-P',
+            '-F',
+            '#{pane_id}',
+            '-s',
+            $this->sessionName,
+            '-n',
+            $windowName,
+            'true',
         );
 
-        return $result->successful();
+        $result = Process::timeout(30)->run($arguments);
+
+        if (! $result->successful()) {
+            $this->lastError = trim($result->errorOutput());
+
+            return null;
+        }
+
+        $paneId = trim($result->output());
+        if (! preg_match('/^%[0-9]+$/', $paneId)) {
+            $this->lastError = "Tmux returned an invalid pane ID: '{$paneId}'.";
+
+            return null;
+        }
+
+        $this->lastError = null;
+
+        return $paneId;
     }
 
     /**
@@ -73,7 +108,7 @@ class TmuxSessionManager
             return true;
         }
 
-        $result = Process::timeout(30)->run("tmux kill-session -t {$this->sessionName}");
+        $result = Process::timeout(30)->run(['tmux', 'kill-session', '-t', $this->sessionName]);
 
         return $result->successful();
     }
@@ -87,11 +122,9 @@ class TmuxSessionManager
             return false;
         }
 
-        $result = Process::timeout(5)->run(
-            "tmux select-window -t {$this->sessionName}:0; tmux attach-session -d -t {$this->sessionName}"
-        );
+        passthru('tmux attach-session -t '.escapeshellarg($this->sessionName), $exitCode);
 
-        return $result->successful();
+        return $exitCode === 0;
     }
 
     /**
@@ -106,7 +139,7 @@ class TmuxSessionManager
         }
 
         $result = Process::timeout(10)->run(
-            "tmux list-panes -s -t {$this->sessionName} -F '#{window_index}:#{pane_index} #{pane_title}'"
+            ['tmux', 'list-panes', '-s', '-t', $this->sessionName, '-F', "#{window_index}:#{pane_index}\t#{pane_title}"]
         );
 
         if (! $result->successful()) {
@@ -121,7 +154,7 @@ class TmuxSessionManager
                 continue;
             }
 
-            [$position, $title] = explode(' ', $line, 2);
+            [$position, $title] = array_pad(explode("\t", $line, 2), 2, '');
             $panes[$position] = $title;
         }
 
@@ -134,7 +167,7 @@ class TmuxSessionManager
     public function getPaneStatus(string $window, string $pane): ?string
     {
         $result = Process::timeout(5)->run(
-            "tmux display-message -p -t {$this->sessionName}:{$window}.{$pane} '#{pane_current_command}'"
+            ['tmux', 'display-message', '-p', '-t', "{$this->sessionName}:{$window}.{$pane}", '#{pane_current_command}']
         );
 
         return $result->successful() ? trim($result->output()) : null;
@@ -148,5 +181,10 @@ class TmuxSessionManager
         $status = $this->getPaneStatus($window, $pane);
 
         return $status !== null && $status !== 'bash' && $status !== 'sh';
+    }
+
+    public function lastError(): ?string
+    {
+        return $this->lastError;
     }
 }

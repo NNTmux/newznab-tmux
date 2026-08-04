@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Enums\TmuxPaneRole;
 use App\Models\Settings;
 use App\Services\Tmux\TmuxPaneManager;
 use App\Services\Tmux\TmuxSessionManager;
 use Illuminate\Console\Command;
+use RuntimeException;
 
 class TmuxAttach extends Command
 {
@@ -49,12 +51,20 @@ class TmuxAttach extends Command
 
         // Select monitor pane before attaching so user lands there
         $paneManager = new TmuxPaneManager($sessionName);
-        $paneManager->selectWindow(0);
-        $paneManager->selectPane('0.0');
+        try {
+            $monitorPane = $paneManager->paneForRole(TmuxPaneRole::Monitor, '0.0');
+        } catch (RuntimeException $exception) {
+            $this->error('❌ '.$exception->getMessage());
 
-        // Execute tmux attach
-        passthru("tmux attach -t {$sessionName}");
+            return Command::FAILURE;
+        }
 
-        return Command::SUCCESS;
+        if (! $paneManager->selectWindow(0) || ! $paneManager->selectPane($monitorPane)) {
+            $this->error('❌ Unable to select the tmux monitor pane.');
+
+            return Command::FAILURE;
+        }
+
+        return $sessionManager->attachSession() ? Command::SUCCESS : Command::FAILURE;
     }
 }

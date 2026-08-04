@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Tmux;
 
+use App\Enums\TmuxPaneRole;
 use App\Models\Settings;
 
 /**
@@ -49,14 +50,17 @@ class TmuxTaskRunner
      */
     public function runTask(string $taskName, array $config): bool
     {
-        $pane = $config['pane'] ?? null;
+        $role = $config['role'] ?? null;
         $command = $config['command'] ?? null;
         $enabled = $config['enabled'] ?? true;
         $workAvailable = $config['work_available'] ?? true;
 
-        if (! $pane || ! $command) {
+        if (! $role instanceof TmuxPaneRole || ! $command) {
             return false;
         }
+
+        $legacyPane = $config['legacy_pane'] ?? null;
+        $pane = $this->paneManager->paneForRole($role, is_string($legacyPane) ? $legacyPane : null);
 
         // Check if task is enabled and has work
         if (! $enabled) {
@@ -183,7 +187,7 @@ class TmuxTaskRunner
     public function runIRCScraper(array $config): bool
     {
         $runScraper = (int) ($config['constants']['run_ircscraper'] ?? 0);
-        $pane = '3.0';
+        $pane = $this->paneManager->paneForRole(TmuxPaneRole::IrcScraper, '3.0');
 
         if ($runScraper !== 1) {
             return $this->disablePane($pane, 'IRC Scraper', 'disabled in settings');
@@ -206,7 +210,7 @@ class TmuxTaskRunner
     {
         $enabled = (int) ($config['settings']['binaries_run'] ?? 0);
         $killswitch = $config['killswitch']['pp'] ?? false;
-        $pane = '0.1';
+        $pane = $this->paneManager->paneForRole(TmuxPaneRole::Binaries, '0.1');
 
         if (! $enabled) {
             return $this->disablePane($pane, 'Update Binaries', 'disabled in settings');
@@ -243,7 +247,7 @@ class TmuxTaskRunner
         $enabled = (int) ($config['settings']['backfill'] ?? 0);
         $collKillswitch = $config['killswitch']['coll'] ?? false;
         $ppKillswitch = $config['killswitch']['pp'] ?? false;
-        $pane = '0.2';
+        $pane = $this->paneManager->paneForRole(TmuxPaneRole::Backfill, '0.2');
 
         if (! $enabled) {
             return $this->disablePane($pane, 'Backfill', 'disabled in settings');
@@ -287,7 +291,8 @@ class TmuxTaskRunner
     public function runReleasesUpdate(array $config): bool
     {
         $enabled = (int) ($config['settings']['releases_run'] ?? 0);
-        $pane = $config['pane'] ?? '0.3';
+        $legacyPane = (int) ($config['constants']['sequential'] ?? 0) === 1 ? '0.1' : '0.3';
+        $pane = $this->paneManager->paneForRole(TmuxPaneRole::Releases, $legacyPane);
 
         if (! $enabled) {
             return $this->disablePane($pane, 'Update Releases', 'disabled in settings');
@@ -354,7 +359,7 @@ class TmuxTaskRunner
         // For now, delegate to existing methods
         $this->runBinariesUpdate($runVar);
         $this->runBackfill($runVar);
-        $this->runReleasesUpdate(array_merge($runVar, ['pane' => '0.3']));
+        $this->runReleasesUpdate($runVar);
 
         return true;
     }
@@ -366,7 +371,7 @@ class TmuxTaskRunner
      */
     protected function runMainBasic(array $runVar): bool
     {
-        return $this->runReleasesUpdate(array_merge($runVar, ['pane' => '0.1']));
+        return $this->runReleasesUpdate($runVar);
     }
 
     /**
@@ -377,7 +382,7 @@ class TmuxTaskRunner
     protected function runMainSequential(array $runVar): bool
     {
         // Full sequential mode - runs group:update-all for each group
-        $pane = '0.1';
+        $pane = $this->paneManager->paneForRole(TmuxPaneRole::Sequential, '0.1');
 
         $niceness = $this->getNiceness();
         $artisan = base_path('artisan');
@@ -396,7 +401,7 @@ class TmuxTaskRunner
     {
         $enabled = (int) ($runVar['settings']['fix_names'] ?? 0);
         $work = (int) ($runVar['counts']['now']['processrenames'] ?? 0);
-        $pane = '1.0';
+        $pane = $this->paneManager->paneForRole(TmuxPaneRole::FixNames, '1.0');
 
         if ($enabled !== 1) {
             return $this->disablePane($pane, 'Fix Release Names', 'disabled in settings');
@@ -431,7 +436,7 @@ class TmuxTaskRunner
     protected function runRemoveCrapTask(array $runVar): bool
     {
         $option = $runVar['settings']['fix_crap_opt'] ?? 'Disabled';
-        $pane = '1.1';
+        $pane = $this->paneManager->paneForRole(TmuxPaneRole::RemoveCrap, '1.1');
 
         // Handle disabled state
         if ($option === 'Disabled' || $option === 0 || $option === '0') {
@@ -545,7 +550,7 @@ class TmuxTaskRunner
     protected function runPostProcessAdditional(array $runVar): bool
     {
         $postSetting = (int) ($runVar['settings']['post'] ?? 0);
-        $pane = '2.0';
+        $pane = $this->paneManager->paneForRole(TmuxPaneRole::PostAdditional, '2.0');
 
         // Check if post processing is enabled (1 = additional, 2 = nfo, 3 = both)
         if ($postSetting === 0) {
@@ -610,7 +615,7 @@ class TmuxTaskRunner
     protected function runTvTask(array $runVar): bool
     {
         $enabled = (int) ($runVar['settings']['post_non'] ?? 0);
-        $pane = '2.1';
+        $pane = $this->paneManager->paneForRole(TmuxPaneRole::PostTv, '2.1');
 
         if ($enabled !== 1) {
             return $this->disablePane($pane, 'Post-process TV/Anime', 'disabled in settings');
@@ -670,7 +675,7 @@ class TmuxTaskRunner
     protected function runMoviesTask(array $runVar): bool
     {
         $enabled = (int) ($runVar['settings']['post_non'] ?? 0);
-        $pane = '2.3';
+        $pane = $this->paneManager->paneForRole(TmuxPaneRole::PostMovies, '2.3');
 
         if ($enabled !== 1) {
             return $this->disablePane($pane, 'Post-process Movies', 'disabled in settings');
@@ -720,7 +725,8 @@ class TmuxTaskRunner
     protected function runAmazonTask(array $runVar): bool
     {
         $enabled = (int) ($runVar['settings']['post_amazon'] ?? 0);
-        $pane = '2.2';
+        $legacyPane = (int) ($runVar['constants']['sequential'] ?? 0) === 2 ? '1.1' : '2.2';
+        $pane = $this->paneManager->paneForRole(TmuxPaneRole::PostMetadata, $legacyPane);
 
         if ($enabled !== 1) {
             return $this->disablePane($pane, 'Post-process Metadata', 'disabled in settings');

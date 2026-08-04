@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Enums\TmuxPaneRole;
 use App\Models\Settings;
+use App\Services\Tmux\TmuxPaneManager;
 use App\Services\Tmux\TmuxSessionManager;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -77,7 +79,7 @@ class TmuxHealthCheck extends Command
 
             if ($monitorPaneDead) {
                 if (! $quiet) {
-                    $this->warn('⚠️  Monitor pane (0.0) is dead.');
+                    $this->warn('⚠️  Monitor pane is dead.');
                 }
 
                 if ($autoRestart) {
@@ -92,7 +94,7 @@ class TmuxHealthCheck extends Command
             }
 
             if (! $quiet) {
-                $this->info('✅ Monitor pane (0.0) is alive and running.');
+                $this->info('✅ Monitor pane is alive and running.');
             }
 
             $this->logHealthCheck('info', 'healthy');
@@ -111,12 +113,20 @@ class TmuxHealthCheck extends Command
     }
 
     /**
-     * Check if the monitor pane (0.0) is dead.
+     * Check if the monitor pane is dead.
      */
     private function isMonitorPaneDead(): bool
     {
+        $paneManager = new TmuxPaneManager($this->sessionName);
+
+        try {
+            $monitorPane = $paneManager->paneForRole(TmuxPaneRole::Monitor, '0.0');
+        } catch (\RuntimeException) {
+            return true;
+        }
+
         $result = Process::timeout(10)->run(
-            "tmux display-message -p -t {$this->sessionName}:0.0 '#{pane_dead}'"
+            ['tmux', 'display-message', '-p', '-t', $monitorPane, '#{pane_dead}']
         );
 
         if (! $result->successful()) {
@@ -130,7 +140,7 @@ class TmuxHealthCheck extends Command
         }
 
         $commandResult = Process::timeout(10)->run(
-            "tmux display-message -p -t {$this->sessionName}:0.0 '#{pane_current_command}'"
+            ['tmux', 'display-message', '-p', '-t', $monitorPane, '#{pane_current_command}']
         );
 
         if (! $commandResult->successful()) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Enums\TmuxPaneRole;
 use App\Models\Collection;
 use App\Models\Settings;
 use App\Services\Tmux\TmuxLayoutBuilder;
@@ -35,6 +36,8 @@ class TmuxStart extends Command
     private TmuxSessionManager $sessionManager;
 
     private TmuxLayoutBuilder $layoutBuilder;
+
+    private bool $sessionCreated = false;
 
     /**
      * Execute the console command.
@@ -86,12 +89,13 @@ class TmuxStart extends Command
 
             // Build the tmux layout
             if (! $this->layoutBuilder->buildLayout($sequential)) {
-                $this->error('❌ Failed to build tmux layout');
+                $this->error('❌ Failed to build tmux layout: '.($this->layoutBuilder->lastError() ?? 'unknown error'));
 
                 return Command::FAILURE;
             }
 
             $this->info('✅ Tmux layout created');
+            $this->sessionCreated = true;
 
             // Set running flag
             Settings::query()->where('name', 'running')->update(['value' => 1]);
@@ -101,17 +105,23 @@ class TmuxStart extends Command
             $this->info('🚀 Starting monitor...');
             $this->startMonitor($sessionName);
 
-            // Select monitor pane (0.0) so attach lands there
+            // Select monitor pane so attach lands there
             $paneManager = new TmuxPaneManager($sessionName);
-            $paneManager->selectWindow(0);
-            $paneManager->selectPane('0.0');
+            if (! $paneManager->selectWindow(0)
+                || ! $paneManager->selectPane($paneManager->paneForRole(TmuxPaneRole::Monitor, '0.0'))) {
+                throw new \RuntimeException($paneManager->lastError() ?? 'Unable to select the tmux monitor pane.');
+            }
 
             $this->info("✅ Tmux session '{$sessionName}' started successfully");
 
             // Attach if requested
             if ($this->option('attach')) {
                 $this->info('📎 Attaching to session...');
-                $this->sessionManager->attachSession();
+                if (! $this->sessionManager->attachSession()) {
+                    $this->error('❌ Unable to attach to the tmux session.');
+
+                    return Command::FAILURE;
+                }
             } else {
                 $this->info("💡 To attach to the session, run: tmux attach -t {$sessionName}");
                 $this->info('💡 Or use: php artisan tmux:attach');
@@ -120,6 +130,11 @@ class TmuxStart extends Command
             return Command::SUCCESS;
 
         } catch (\Exception $e) {
+            if ($this->sessionCreated && isset($this->sessionManager)) {
+                $this->sessionManager->killSession();
+                Settings::query()->where('name', 'running')->update(['value' => 0]);
+            }
+
             $this->error('❌ Failed to start tmux: '.$e->getMessage());
             logger()->error('Tmux start error', [
                 'message' => $e->getMessage(),
@@ -192,7 +207,9 @@ class TmuxStart extends Command
             $this->warn('  ⚠ Using artisan command (not recommended for pane)');
         }
 
-        // Spawn monitor in pane 0.0
-        $paneManager->respawnPane('0.0', $command);
+        $monitorPane = $paneManager->paneForRole(TmuxPaneRole::Monitor, '0.0');
+        if (! $paneManager->respawnPane($monitorPane, $command)) {
+            throw new \RuntimeException('Unable to start the tmux monitor pane.');
+        }
     }
 }

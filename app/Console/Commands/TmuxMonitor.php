@@ -193,7 +193,7 @@ class TmuxMonitor extends Command
         $this->taskRunner->runBackfill($runVar);
 
         // Update releases
-        $this->taskRunner->runReleasesUpdate(array_merge($runVar, ['pane' => '0.3']));
+        $this->taskRunner->runReleasesUpdate($runVar);
 
         // Post-processing and cleanup tasks
         $this->runPostProcessingTasks($runVar);
@@ -207,7 +207,7 @@ class TmuxMonitor extends Command
     private function runBasicTasks(array $runVar): void
     {
         // Update releases
-        $this->taskRunner->runReleasesUpdate(array_merge($runVar, ['pane' => '0.1']));
+        $this->taskRunner->runReleasesUpdate($runVar);
 
         // Post-processing and cleanup tasks
         $this->runPostProcessingTasks($runVar);

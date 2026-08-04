@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Console;
 
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Process;
 use PDO;
 use Tests\TestCase;
@@ -88,7 +89,7 @@ class TmuxHealthCheckCommandTest extends TestCase
             ->expectsOutputToContain("Tmux session 'test-session' does not exist.")
             ->assertExitCode(0);
 
-        Process::assertRanTimes("tmux list-sessions 2>/dev/null | grep -q '^test-session:'", 1);
+        Process::assertRanTimes(fn (PendingProcess $process): bool => $this->isTmuxCommand($process, 'has-session'), 1);
         Process::assertNotRan('which tmux 2>/dev/null');
     }
 
@@ -101,7 +102,7 @@ class TmuxHealthCheckCommandTest extends TestCase
             ->expectsOutputToContain("Tmux session 'test-session' does not exist.")
             ->assertExitCode(1);
 
-        Process::assertRanTimes("tmux list-sessions 2>/dev/null | grep -q '^test-session:'", 1);
+        Process::assertRanTimes(fn (PendingProcess $process): bool => $this->isTmuxCommand($process, 'has-session'), 1);
         Process::assertNotRan('which tmux 2>/dev/null');
     }
 
@@ -115,25 +116,50 @@ class TmuxHealthCheckCommandTest extends TestCase
             ->expectsOutputToContain("Tmux session 'test-session' restarted successfully.")
             ->assertExitCode(0);
 
-        Process::assertRanTimes("tmux list-sessions 2>/dev/null | grep -q '^test-session:'", 4);
+        Process::assertRanTimes(fn (PendingProcess $process): bool => $this->isTmuxCommand($process, 'has-session'), 4);
         Process::assertRan('which tmux 2>/dev/null');
-        Process::assertRan(fn ($process): bool => str_contains($process->command, 'new-session -d -s test-session'));
+        Process::assertRan(fn (PendingProcess $process): bool => $this->isTmuxCommand($process, 'new-session'));
     }
 
     private function fakeMissingSession(): void
     {
-        Process::fake([
-            "tmux list-sessions 2>/dev/null | grep -q '^test-session:'" => Process::result('', '', 1),
-        ]);
+        Process::fake(fn () => Process::result('', '', 1));
     }
 
     private function fakeMissingSessionWithSuccessfulStart(): void
     {
-        Process::fake([
-            "tmux list-sessions 2>/dev/null | grep -q '^test-session:'" => Process::result('', '', 1),
-            'which tmux 2>/dev/null' => Process::result('/usr/bin/tmux'.PHP_EOL),
-            '*' => Process::result(),
-        ]);
+        $nextPaneId = 1;
+
+        Process::fake(function (PendingProcess $process) use (&$nextPaneId) {
+            if ($process->command === 'which tmux 2>/dev/null') {
+                return Process::result('/usr/bin/tmux'.PHP_EOL);
+            }
+
+            if (! is_array($process->command)) {
+                return Process::result();
+            }
+
+            if (in_array('has-session', $process->command, true)) {
+                return Process::result('', '', 1);
+            }
+
+            if (in_array('new-session', $process->command, true)
+                || in_array('new-window', $process->command, true)
+                || in_array('split-window', $process->command, true)) {
+                return Process::result('%'.$nextPaneId++."\n");
+            }
+
+            if (in_array('list-panes', $process->command, true)) {
+                return Process::result("%1\tmonitor\n");
+            }
+
+            return Process::result();
+        });
+    }
+
+    private function isTmuxCommand(PendingProcess $process, string $command): bool
+    {
+        return is_array($process->command) && in_array($command, $process->command, true);
     }
 
     private function setSetting(string $name, string $value): void
