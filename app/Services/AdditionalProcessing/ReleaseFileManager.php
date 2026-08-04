@@ -100,6 +100,17 @@ class ReleaseFileManager
             return false;
         }
 
+        $size = $this->normalizeFileSize($file['size'] ?? 0);
+        if ($size === null) {
+            Log::warning('Skipping release file with invalid size metadata.', [
+                'release_id' => $context->release->id,
+                'name' => $file['name'],
+                'size_type' => get_debug_type($file['size'] ?? 0),
+            ]);
+
+            return false;
+        }
+
         // Increment total file info count
         $context->totalFileInfo++;
 
@@ -112,7 +123,7 @@ class ReleaseFileManager
             $context,
             $context->release->id,
             $file['name'],
-            $file['size'] ?? 0,
+            $size,
             $file['date'] ?? now(),
             $file['pass'] ?? 0,
             '',
@@ -724,6 +735,37 @@ class ReleaseFileManager
         }
 
         return Carbon::createFromTimestamp($createdTime, date_default_timezone_get())->format('Y-m-d H:i:s');
+    }
+
+    private function normalizeFileSize(mixed $size): ?int
+    {
+        if (is_int($size)) {
+            return $size >= 0 ? $size : null;
+        }
+
+        if (is_float($size)) {
+            return is_finite($size) && $size >= 0 && $size < PHP_INT_MAX
+                ? (int) $size
+                : null;
+        }
+
+        if (! is_string($size) || preg_match('/^\d+$/D', $size) !== 1) {
+            return null;
+        }
+
+        $normalizedSize = ltrim($size, '0');
+        if ($normalizedSize === '') {
+            return 0;
+        }
+
+        $maximumSize = (string) PHP_INT_MAX;
+        if (strlen($normalizedSize) > strlen($maximumSize)
+            || (strlen($normalizedSize) === strlen($maximumSize) && strcmp($normalizedSize, $maximumSize) > 0)
+        ) {
+            return null;
+        }
+
+        return (int) $normalizedSize;
     }
 
     private function releaseHasNzbSplitWrapper(Release $release): bool

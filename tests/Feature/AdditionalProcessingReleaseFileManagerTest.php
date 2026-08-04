@@ -17,6 +17,7 @@ use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Mockery;
 use PDO;
@@ -153,6 +154,49 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
 
         $this->assertSame(1, DB::table('release_files')->count());
         $this->assertSame(1, DB::table('par_hashes')->count());
+    }
+
+    public function test_float_release_file_size_is_normalized_before_queueing(): void
+    {
+        DB::table('releases')->insert($this->releaseRow());
+
+        Search::shouldReceive('updateRelease')->once()->with(1);
+
+        $manager = $this->makeManager();
+        $context = new ReleaseProcessingContext(Release::query()->findOrFail(1));
+
+        $this->assertTrue($manager->addFileInfo([
+            'name' => 'Example.Movie.2026.mkv',
+            'size' => 1024.0,
+            'date' => 1_788_600_000,
+        ], $context, '\\.(?:par2|sfv|nzb)'));
+
+        $manager->finalizeRelease($context, false);
+
+        $this->assertSame(1024, DB::table('release_files')->value('size'));
+    }
+
+    public function test_invalid_release_file_sizes_are_rejected(): void
+    {
+        DB::table('releases')->insert($this->releaseRow());
+
+        Log::shouldReceive('warning')
+            ->times(4)
+            ->with('Skipping release file with invalid size metadata.', Mockery::type('array'));
+
+        $manager = $this->makeManager();
+        $context = new ReleaseProcessingContext(Release::query()->findOrFail(1));
+        $invalidSizes = [-1, INF, PHP_INT_MAX + 1.0, 'not-numeric'];
+
+        foreach ($invalidSizes as $index => $invalidSize) {
+            $this->assertFalse($manager->addFileInfo([
+                'name' => "Invalid.Size.{$index}.mkv",
+                'size' => $invalidSize,
+            ], $context, '\\.(?:par2|sfv|nzb)'));
+        }
+
+        $this->assertSame(0, $context->totalFileInfo);
+        $this->assertSame(0, $context->addedFileInfo);
     }
 
     public function test_finalize_recognizes_webp_preview_and_sample_without_moving_them(): void
