@@ -222,6 +222,29 @@ class ReleaseNameFixedRecategorizationTest extends TestCase
         $this->assertSame(1, (int) $release->isrenamed);
     }
 
+    public function test_internal_processing_status_updates_do_not_refresh_the_search_index(): void
+    {
+        Search::shouldReceive('updateRelease')->once();
+
+        $group = UsenetGroup::query()->create([
+            'name' => 'alt.binaries.test',
+            'active' => 1,
+            'backfill' => 0,
+        ]);
+        $release = Release::factory()->create([
+            'groups_id' => $group->id,
+            'guid' => str_repeat('d', 40),
+            'leftguid' => 'd',
+            'proc_nfo' => 0,
+        ]);
+
+        app(ReleaseUpdateService::class)->updateSingleColumn('proc_nfo', 1, $release->id);
+        app(ReleaseUpdateService::class)->attachPredbId($release->id, 123);
+
+        $this->assertSame(1, (int) $release->fresh()->proc_nfo);
+        $this->assertSame(123, (int) $release->fresh()->predb_id);
+    }
+
     private function setEnvironmentValue(string $key, ?string $value): void
     {
         if ($value === null) {

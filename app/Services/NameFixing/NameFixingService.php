@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace App\Services\NameFixing;
 
 use App\Facades\Search;
-use App\Models\Category;
-use App\Models\Release;
 use App\Services\NameFixing\Extractors\FileNameExtractor;
 use App\Services\NameFixing\Extractors\NfoNameExtractor;
 use App\Services\NNTP\NNTPService;
 use App\Services\Nzb\NzbContentsService;
+use RuntimeException;
 
 /**
  * Main service for name fixing operations.
@@ -68,17 +67,16 @@ class NameFixingService
 
     protected PredbMatchSelector $predbMatchSelector;
 
+    protected NameFixingQueryService $queries;
+
+    protected DonorMatchSelector $donorMatchSelector;
+
+    /**
+     * @var array<string, array<string, mixed>|null>
+     */
+    protected array $predbMatchCache = [];
+
     protected bool $echoOutput;
-
-    protected string $othercats;
-
-    protected string $timeother;
-
-    protected string $timeall;
-
-    protected string $fullother;
-
-    protected string $fullall;
 
     protected int $_totalReleases = 0;
 
@@ -89,7 +87,9 @@ class NameFixingService
         ?FileNameExtractor $fileExtractor = null,
         ?FileNameCleaner $fileNameCleaner = null,
         ?FilePrioritizer $filePrioritizer = null,
-        ?PredbMatchSelector $predbMatchSelector = null
+        ?PredbMatchSelector $predbMatchSelector = null,
+        ?NameFixingQueryService $queries = null,
+        ?DonorMatchSelector $donorMatchSelector = null
     ) {
         $this->updateService = $updateService ?? new ReleaseUpdateService;
         $this->checkerService = $checkerService ?? new NameCheckerService;
@@ -98,13 +98,9 @@ class NameFixingService
         $this->fileNameCleaner = $fileNameCleaner ?? new FileNameCleaner;
         $this->filePrioritizer = $filePrioritizer ?? new FilePrioritizer;
         $this->predbMatchSelector = $predbMatchSelector ?? new PredbMatchSelector($this->fileNameCleaner);
+        $this->queries = $queries ?? new NameFixingQueryService;
+        $this->donorMatchSelector = $donorMatchSelector ?? new DonorMatchSelector;
         $this->echoOutput = config('nntmux.echocli');
-
-        $this->othercats = implode(',', Category::OTHERS_GROUP);
-        $this->timeother = sprintf(' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) AND rel.categories_id IN (%s) GROUP BY rel.id ORDER BY postdate DESC', $this->othercats);
-        $this->timeall = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) GROUP BY rel.id ORDER BY postdate DESC';
-        $this->fullother = sprintf(' AND rel.categories_id IN (%s) GROUP BY rel.id', $this->othercats);
-        $this->fullall = '';
     }
 
     /**
@@ -114,68 +110,38 @@ class NameFixingService
     {
         $this->echoStartMessage($time, '.nfo files');
         $type = 'NFO, ';
+        $preIdOnly = $cats === 3;
 
-        $preId = false;
-        if ($cats === 3) {
-            $query = sprintf(
-                'SELECT rel.id AS releases_id, rel.fromname
-                FROM releases rel
-                INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
-                WHERE rel.predb_id = 0'
-            );
-            $cats = 2;
-            $preId = true;
-        } else {
-            $query = sprintf(
-                'SELECT rel.id AS releases_id, rel.fromname
-                FROM releases rel
-                INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
-                WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
-                AND rel.predb_id = 0
-                AND rel.proc_nfo = %d',
-                self::IS_RENAMED_NONE,
-                Category::OTHER_MISC,
-                Category::OTHER_HASHED,
-                self::PROC_NFO_NONE
-            );
+        if (! $this->startBatch(NameFixingQueryService::SOURCE_NFO, $time, $cats, ' releases to process.')) {
+            cli()->info('Nothing to fix.');
+
+            return;
         }
 
-        $releases = $this->getReleases($time, $cats, $query);
-        $total = $releases->count();
+        foreach ($this->candidateBatches(NameFixingQueryService::SOURCE_NFO, $time, $cats) as $releases) {
+            $nfos = $this->queries->groupByReleaseId($this->queries->nfoRows($this->releaseIds($releases)));
 
-        if ($total > 0) {
-            $this->_totalReleases = $total;
-            cli()->info(number_format($total).' releases to process.');
-
-            foreach ($releases as $rel) {
-                /** @var Release $rel */
-                $releaseRow = Release::fromQuery(
-                    sprintf(
-                        'SELECT nfo.releases_id AS nfoid, rel.groups_id, rel.fromname, rel.categories_id, rel.name, rel.searchname,
-                            UNCOMPRESS(nfo) AS textstring, rel.id AS releases_id
-                        FROM releases rel
-                        INNER JOIN release_nfos nfo ON (nfo.releases_id = rel.id)
-                        WHERE rel.id = %d LIMIT 1',
-                        $rel->releases_id
-                    )
-                );
-
+            foreach ($releases as $release) {
                 $this->updateService->incrementChecked();
-
-                // Ignore encrypted NFOs
-                if (preg_match('/^=newz\[NZB\]=\w+/', $releaseRow[0]->textstring)) {
-                    $this->updateService->updateSingleColumn('proc_nfo', self::PROC_NFO_DONE, $rel->releases_id);
+                $this->updateService->reset();
+                $nfo = $nfos[(int) $release->releases_id][0] ?? null;
+                if ($nfo === null) {
+                    $this->markProcessed($echo, $nameStatus, 'proc_nfo', (int) $release->releases_id);
 
                     continue;
                 }
 
-                $this->updateService->reset();
+                $release->textstring = (string) ($nfo->textstring ?? '');
+                if (preg_match('/^=newz\[NZB\]=\w+/', $release->textstring)) {
+                    $this->markProcessed($echo, $nameStatus, 'proc_nfo', (int) $release->releases_id);
 
-                // Try NFO extraction
-                $nfoResult = $this->nfoExtractor->extractFromNfo($releaseRow[0]->textstring);
+                    continue;
+                }
+
+                $nfoResult = $this->nfoExtractor->extractFromNfo($release->textstring);
                 if ($nfoResult !== null) {
                     $this->updateService->updateRelease(
-                        $releaseRow[0],
+                        $release,
                         $nfoResult->newName,
                         'nfoCheck: '.$nfoResult->method,
                         $echo,
@@ -185,17 +151,19 @@ class NameFixingService
                     );
                 }
 
-                // If NFO extraction didn't work, try pattern checkers
                 if (! $this->updateService->matched) {
-                    $this->checkWithPatternMatchers($releaseRow[0], $echo, $type, $nameStatus, $show, $preId);
+                    $this->checkWithPatternMatchers($release, $echo, $type, $nameStatus, $show, $preIdOnly);
+                }
+
+                if (! $this->updateService->matched) {
+                    $this->markProcessed($echo, $nameStatus, 'proc_nfo', (int) $release->releases_id);
                 }
 
                 $this->echoRenamed($show);
             }
-            $this->echoFoundCount($echo, ' NFO\'s');
-        } else {
-            cli()->info('Nothing to fix.');
         }
+
+        $this->echoFoundCount($echo, ' NFO\'s');
     }
 
     /**
@@ -206,101 +174,21 @@ class NameFixingService
         $this->echoStartMessage($time, 'file names');
         $type = 'Filenames, ';
 
-        $preId = false;
-        if ($cats === 3) {
-            $query = sprintf(
-                'SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
-                    rf.releases_id AS fileid, rel.id AS releases_id
-                FROM releases rel
-                INNER JOIN release_files rf ON rf.releases_id = rel.id
-                WHERE predb_id = 0'
-            );
-            $cats = 2;
-            $preId = true;
-        } else {
-            $query = sprintf(
-                'SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
-                    rf.releases_id AS fileid, rel.id AS releases_id
-                FROM releases rel
-                INNER JOIN release_files rf ON rf.releases_id = rel.id
-                WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
-                AND rel.predb_id = 0
-                AND proc_files = %d',
-                self::IS_RENAMED_NONE,
-                Category::OTHER_MISC,
-                Category::OTHER_HASHED,
-                self::PROC_FILES_NONE
-            );
-        }
-
-        $releases = $this->getReleases($time, $cats, $query);
-        $total = $releases->count();
-
-        if ($total > 0) {
-            $this->_totalReleases = $total;
-            cli()->info(number_format($total).' file names to process.');
-
-            // Group files by release
-            $releaseFiles = [];
-            foreach ($releases as $release) {
-                /** @var Release $release */
-                $releaseId = $release->releases_id;
-                if (! isset($releaseFiles[$releaseId])) {
-                    $releaseFiles[$releaseId] = [
-                        'release' => $release,
-                        'files' => [],
-                    ];
-                }
-                $releaseFiles[$releaseId]['files'][] = $release->textstring;
-            }
-
-            foreach ($releaseFiles as $releaseId => $data) {
-                $this->updateService->reset();
-                $this->updateService->incrementChecked();
-
-                // Prioritize files for matching
-                $prioritizedFiles = $this->filePrioritizer->prioritizeForMatching($data['files']); // @phpstan-ignore argument.type
-
-                foreach ($prioritizedFiles as $filename) {
-                    /** @var Release $release */
-                    $release = clone $data['release'];
-                    $release->textstring = $filename;
-
-                    // Try file name extraction
-                    $fileResult = $this->fileExtractor->extractFromFile($filename);
-                    if ($fileResult !== null) {
-                        $this->updateService->updateRelease(
-                            $release,
-                            $fileResult->newName,
-                            'fileCheck: '.$fileResult->method,
-                            $echo,
-                            $type,
-                            $nameStatus,
-                            $show
-                        );
-                    }
-
-                    // If not matched, try PreDB search
-                    if (! $this->updateService->matched) {
-                        $this->preDbFileCheck($release, $echo, $type, $nameStatus, $show);
-                    }
-
-                    if (! $this->updateService->matched) {
-                        $this->preDbTitleCheck($release, $echo, $type, $nameStatus, $show);
-                    }
-
-                    if ($this->updateService->matched) {
-                        break;
-                    }
-                }
-
-                $this->echoRenamed($show);
-            }
-
-            $this->echoFoundCount($echo, ' files');
-        } else {
+        if (! $this->startBatch(NameFixingQueryService::SOURCE_FILES, $time, $cats, ' file names to process.')) {
             cli()->info('Nothing to fix.');
+
+            return;
         }
+
+        foreach ($this->candidateBatches(NameFixingQueryService::SOURCE_FILES, $time, $cats) as $releases) {
+            $files = $this->queries->groupByReleaseId($this->queries->fileRows($this->releaseIds($releases)));
+
+            foreach ($releases as $release) {
+                $this->processFileCandidates($release, $files[(int) $release->releases_id] ?? [], $echo, $nameStatus, $show);
+            }
+        }
+
+        $this->echoFoundCount($echo, ' files');
     }
 
     /**
@@ -311,56 +199,38 @@ class NameFixingService
         $this->echoStartMessage($time, 'SRR file names');
         $type = 'SRR, ';
 
-        if ($cats === 3) {
-            $query = sprintf(
-                'SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
-                    rf.releases_id AS fileid, rel.id AS releases_id
-                FROM releases rel
-                INNER JOIN release_files rf ON (rf.releases_id = rel.id)
-                WHERE predb_id = 0
-                AND (rf.name LIKE %s OR rf.name LIKE %s)',
-                escapeString('%.srr'),
-                escapeString('%.srs')
-            );
-            $cats = 2;
-        } else {
-            $query = sprintf(
-                'SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
-                    rf.releases_id AS fileid, rel.id AS releases_id
-                FROM releases rel
-                INNER JOIN release_files rf ON (rf.releases_id = rel.id)
-                WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
-                AND rel.predb_id = 0
-                AND (rf.name LIKE %s OR rf.name LIKE %s)
-                AND rel.proc_srr = %d',
-                self::IS_RENAMED_NONE,
-                Category::OTHER_MISC,
-                Category::OTHER_HASHED,
-                escapeString('%.srr'),
-                escapeString('%.srs'),
-                self::PROC_SRR_NONE
-            );
+        if (! $this->startBatch(NameFixingQueryService::SOURCE_SRR, $time, $cats, ' srr file extensions to process.')) {
+            cli()->info('Nothing to fix.');
+
+            return;
         }
 
-        $releases = $this->getReleases($time, $cats, $query);
-        $total = $releases->count();
-
-        if ($total > 0) {
-            $this->_totalReleases = $total;
-            cli()->info(number_format($total).' srr file extensions to process.');
+        foreach ($this->candidateBatches(NameFixingQueryService::SOURCE_SRR, $time, $cats) as $releases) {
+            $files = $this->queries->groupByReleaseId(
+                $this->queries->fileRows($this->releaseIds($releases), NameFixingQueryService::SOURCE_SRR)
+            );
 
             foreach ($releases as $release) {
                 $this->updateService->reset();
                 $this->updateService->incrementChecked();
 
-                $this->srrNameCheck($release, $echo, $type, $nameStatus, $show);
+                foreach ($files[(int) $release->releases_id] ?? [] as $file) {
+                    $candidate = clone $release;
+                    $candidate->textstring = (string) $file->textstring;
+                    if ($this->srrNameCheck($candidate, $echo, $type, $nameStatus, $show)) {
+                        break;
+                    }
+                }
+
+                if (! $this->updateService->matched) {
+                    $this->markProcessed($echo, $nameStatus, 'proc_srr', (int) $release->releases_id);
+                }
+
                 $this->echoRenamed($show);
             }
-
-            $this->echoFoundCount($echo, ' files');
-        } else {
-            cli()->info('Nothing to fix.');
         }
+
+        $this->echoFoundCount($echo, ' files');
     }
 
     /**
@@ -371,87 +241,47 @@ class NameFixingService
         $this->echoStartMessage($time, 'CRC32');
         $type = 'CRC32, ';
 
-        $preId = false;
-        if ($cats === 3) {
-            $query = sprintf(
-                'SELECT rf.crc32 AS textstring, rf.name AS filename, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize,
-                    rf.releases_id AS fileid, rel.id AS releases_id
-                FROM releases rel
-                INNER JOIN release_files rf ON rf.releases_id = rel.id
-                WHERE predb_id = 0
-                AND rf.crc32 != \'\'
-                AND rf.crc32 IS NOT NULL'
-            );
-            $cats = 2;
-            $preId = true;
-        } else {
-            $query = sprintf(
-                'SELECT rf.crc32 AS textstring, rf.name AS filename, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize,
-                    rf.releases_id AS fileid, rel.id AS releases_id
-                FROM releases rel
-                INNER JOIN release_files rf ON rf.releases_id = rel.id
-                WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
-                AND rel.predb_id = 0
-                AND rel.proc_crc32 = %d
-                AND rf.crc32 != \'\'
-                AND rf.crc32 IS NOT NULL',
-                self::IS_RENAMED_NONE,
-                Category::OTHER_MISC,
-                Category::OTHER_HASHED,
-                self::PROC_CRC_NONE
-            );
+        if (! $this->startBatch(NameFixingQueryService::SOURCE_CRC, $time, $cats, ' CRC32\'s to process.')) {
+            cli()->info('Nothing to fix.');
+
+            return;
         }
 
-        $releases = $this->getReleases($time, $cats, $query);
-        $total = $releases->count();
+        foreach ($this->candidateBatches(NameFixingQueryService::SOURCE_CRC, $time, $cats) as $releases) {
+            $files = $this->queries->groupByReleaseId(
+                $this->queries->fileRows($this->releaseIds($releases), NameFixingQueryService::SOURCE_CRC)
+            );
+            $crcs = $this->distinctValues($files, 'crc32');
+            $donors = $this->queries->crcDonors($crcs);
 
-        if ($total > 0) {
-            $this->_totalReleases = $total;
-            cli()->info(number_format($total).' CRC32\'s to process.');
-
-            // Group by release
-            $releasesCrc = [];
             foreach ($releases as $release) {
-                /** @var Release $release */
-                $releaseId = $release->releases_id;
-                if (! isset($releasesCrc[$releaseId])) {
-                    $releasesCrc[$releaseId] = [
-                        'release' => $release,
-                        'crcs' => [],
-                    ];
-                }
-                if (! empty($release->textstring)) {
-                    $priority = $this->filePrioritizer->getCrcPriority($release->filename ?? '');
-                    $releasesCrc[$releaseId]['crcs'][$priority][] = $release->textstring;
-                }
-            }
-
-            foreach ($releasesCrc as $releaseId => $data) {
                 $this->updateService->reset();
                 $this->updateService->incrementChecked();
+                $prioritized = [];
 
-                ksort($data['crcs']);
-                foreach ($data['crcs'] as $crcs) {
-                    foreach ($crcs as $crc) {
-                        /** @var Release $release */
-                        $release = clone $data['release'];
-                        $release->textstring = $crc;
+                foreach ($files[(int) $release->releases_id] ?? [] as $file) {
+                    $priority = $this->filePrioritizer->getCrcPriority((string) $file->filename);
+                    $prioritized[$priority][(string) $file->crc32] = (string) $file->crc32;
+                }
 
-                        $this->crcCheck($release, $echo, $type, $nameStatus, $show, $preId);
-
-                        if ($this->updateService->matched) {
+                ksort($prioritized);
+                foreach ($prioritized as $values) {
+                    foreach ($values as $crc) {
+                        if ($this->applyDonorMatch($release, $donors[$crc] ?? [], 5, 'crcCheck: CRC32', $type, $echo, $nameStatus, $show)) {
                             break 2;
                         }
                     }
                 }
 
+                if (! $this->updateService->matched) {
+                    $this->markProcessed($echo, $nameStatus, 'proc_crc32', (int) $release->releases_id);
+                }
+
                 $this->echoRenamed($show);
             }
-
-            $this->echoFoundCount($echo, ' crc32\'s');
-        } else {
-            cli()->info('Nothing to fix.');
         }
+
+        $this->echoFoundCount($echo, ' crc32\'s');
     }
 
     /**
@@ -462,53 +292,37 @@ class NameFixingService
         $type = 'UID, ';
         $this->echoStartMessage($time, 'mediainfo Unique_IDs');
 
-        if ($cats === 3) {
-            $query = sprintf(
-                'SELECT rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
-                    rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
-                    ru.unique_id AS uid
-                FROM releases rel
-                LEFT JOIN media_infos ru ON ru.releases_id = rel.id
-                WHERE ru.releases_id IS NOT NULL
-                AND rel.predb_id = 0'
-            );
-            $cats = 2;
-        } else {
-            $query = sprintf(
-                'SELECT rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
-                    rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
-                    ru.unique_id AS uid
-                FROM releases rel
-                LEFT JOIN media_infos ru ON ru.releases_id = rel.id
-                WHERE ru.releases_id IS NOT NULL
-                AND (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
-                AND rel.predb_id = 0
-                AND rel.proc_uid = %d',
-                self::IS_RENAMED_NONE,
-                Category::OTHER_MISC,
-                Category::OTHER_HASHED,
-                self::PROC_UID_NONE
-            );
+        if (! $this->startBatch(NameFixingQueryService::SOURCE_UID, $time, $cats, ' unique ids to process.')) {
+            cli()->info('Nothing to fix.');
+
+            return;
         }
 
-        $releases = $this->getReleases($time, $cats, $query);
-        $total = $releases->count();
+        foreach ($this->candidateBatches(NameFixingQueryService::SOURCE_UID, $time, $cats) as $releases) {
+            $media = $this->queries->groupByReleaseId($this->queries->mediaRows($this->releaseIds($releases)));
+            $uids = $this->distinctValues($media, 'uid');
+            $donors = $this->queries->uidDonors($uids);
 
-        if ($total > 0) {
-            $this->_totalReleases = $total;
-            cli()->info(number_format($total).' unique ids to process.');
-
-            foreach ($releases as $rel) {
+            foreach ($releases as $release) {
                 $this->updateService->reset();
                 $this->updateService->incrementChecked();
-                $this->uidCheck($rel, $echo, $type, $nameStatus, $show);
+
+                foreach ($media[(int) $release->releases_id] ?? [] as $row) {
+                    $uid = (string) ($row->uid ?? '');
+                    if ($uid !== '' && $this->applyDonorMatch($release, $donors[$uid] ?? [], 10, 'uidCheck: Unique_ID', $type, $echo, $nameStatus, $show)) {
+                        break;
+                    }
+                }
+
+                if (! $this->updateService->matched) {
+                    $this->markProcessed($echo, $nameStatus, 'proc_uid', (int) $release->releases_id);
+                }
+
                 $this->echoRenamed($show);
             }
-
-            $this->echoFoundCount($echo, ' UID\'s');
-        } else {
-            cli()->info('Nothing to fix.');
         }
+
+        $this->echoFoundCount($echo, ' UID\'s');
     }
 
     /**
@@ -519,53 +333,37 @@ class NameFixingService
         $type = 'PAR2 hash, ';
         $this->echoStartMessage($time, 'PAR2 hash_16K');
 
-        if ($cats === 3) {
-            $query = sprintf(
-                'SELECT rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
-                    rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
-                    IFNULL(ph.hash, \'\') AS hash
-                FROM releases rel
-                LEFT JOIN par_hashes ph ON ph.releases_id = rel.id
-                WHERE ph.hash != \'\'
-                AND rel.predb_id = 0'
-            );
-            $cats = 2;
-        } else {
-            $query = sprintf(
-                'SELECT rel.id AS releases_id, rel.size AS relsize, rel.groups_id, rel.fromname, rel.categories_id,
-                    rel.name, rel.name AS textstring, rel.predb_id, rel.searchname,
-                    IFNULL(ph.hash, \'\') AS hash
-                FROM releases rel
-                LEFT JOIN par_hashes ph ON ph.releases_id = rel.id
-                WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
-                AND rel.predb_id = 0
-                AND ph.hash != \'\'
-                AND rel.proc_hash16k = %d',
-                self::IS_RENAMED_NONE,
-                Category::OTHER_MISC,
-                Category::OTHER_HASHED,
-                self::PROC_HASH16K_NONE
-            );
+        if (! $this->startBatch(NameFixingQueryService::SOURCE_HASH, $time, $cats, ' hash_16K to process.')) {
+            cli()->info('Nothing to fix.');
+
+            return;
         }
 
-        $releases = $this->getReleases($time, $cats, $query);
-        $total = $releases->count();
+        foreach ($this->candidateBatches(NameFixingQueryService::SOURCE_HASH, $time, $cats) as $releases) {
+            $hashes = $this->queries->groupByReleaseId($this->queries->hashRows($this->releaseIds($releases)));
+            $hashValues = $this->distinctValues($hashes, 'hash');
+            $donors = $this->queries->hashDonors($hashValues);
 
-        if ($total > 0) {
-            $this->_totalReleases = $total;
-            cli()->info(number_format($total).' hash_16K to process.');
-
-            foreach ($releases as $rel) {
+            foreach ($releases as $release) {
                 $this->updateService->reset();
                 $this->updateService->incrementChecked();
-                $this->hashCheck($rel, $echo, $type, $nameStatus, $show);
+
+                foreach ($hashes[(int) $release->releases_id] ?? [] as $row) {
+                    $hash = (string) ($row->hash ?? '');
+                    if ($hash !== '' && $this->applyDonorMatch($release, $donors[$hash] ?? [], 5, 'hashCheck: PAR2 hash_16K', $type, $echo, $nameStatus, $show)) {
+                        break;
+                    }
+                }
+
+                if (! $this->updateService->matched) {
+                    $this->markProcessed($echo, $nameStatus, 'proc_hash16k', (int) $release->releases_id);
+                }
+
                 $this->echoRenamed($show);
             }
-
-            $this->echoFoundCount($echo, ' hashes');
-        } else {
-            cli()->info('Nothing to fix.');
         }
+
+        $this->echoFoundCount($echo, ' hashes');
     }
 
     /**
@@ -638,146 +436,9 @@ class NameFixingService
                     $show
                 );
 
-                return true;
+                return $this->updateService->matched;
             }
         }
-
-        $this->updateService->updateSingleColumn('proc_srr', self::PROC_SRR_DONE, $release->releases_id);
-
-        return false;
-    }
-
-    /**
-     * Check CRC32 for matches.
-     */
-    protected function crcCheck(object $release, bool $echo, string $type, bool $nameStatus, bool $show, bool $preId): bool
-    {
-        if ($release->textstring === '') {
-            $this->updateService->updateSingleColumn('proc_crc32', self::PROC_CRC_DONE, $release->releases_id);
-
-            return false;
-        }
-
-        $result = Release::fromQuery(
-            sprintf(
-                'SELECT rf.crc32, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id, rel.size as relsize, rel.predb_id as predb_id,
-                    rf.releases_id AS fileid, rel.id AS releases_id
-                FROM releases rel
-                LEFT JOIN release_files rf ON rf.releases_id = rel.id
-                WHERE rel.predb_id > 0
-                AND rf.crc32 = %s',
-                escapeString($release->textstring)
-            )
-        );
-
-        foreach ($result as $res) {
-            /** @var Release $res */
-            $floor = round(($res->relsize - $release->relsize) / $res->relsize * 100, 1);
-            if ($floor >= -5 && $floor <= 5) {
-                $this->updateService->updateRelease(
-                    $release,
-                    $res->searchname,
-                    'crcCheck: CRC32',
-                    $echo,
-                    $type,
-                    $nameStatus,
-                    $show,
-                    $res->predb_id
-                );
-
-                return true;
-            }
-        }
-
-        $this->updateService->updateSingleColumn('proc_crc32', self::PROC_CRC_DONE, $release->releases_id);
-
-        return false;
-    }
-
-    /**
-     * Check UID for matches.
-     */
-    protected function uidCheck(object $release, bool $echo, string $type, bool $nameStatus, bool $show): bool
-    {
-        if (empty($release->uid)) {
-            $this->updateService->updateSingleColumn('proc_uid', self::PROC_UID_DONE, $release->releases_id);
-
-            return false;
-        }
-
-        $result = Release::fromQuery(sprintf(
-            'SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
-            FROM releases r
-            LEFT JOIN media_infos ru ON ru.releases_id = r.id
-            WHERE ru.releases_id IS NOT NULL
-            AND ru.unique_id = %s
-            AND ru.releases_id != %d
-            AND (r.predb_id > 0 OR r.anidbid > 0 OR r.fromname = %s)',
-            escapeString($release->uid),
-            $release->releases_id,
-            escapeString('nonscene@Ef.net (EF)')
-        ));
-
-        foreach ($result as $res) {
-            /** @var Release $res */
-            $floor = round(($res->relsize - $release->relsize) / $res->relsize * 100, 1);
-            if ($floor >= -10 && $floor <= 10) {
-                $this->updateService->updateRelease(
-                    $release,
-                    $res->searchname,
-                    'uidCheck: Unique_ID',
-                    $echo,
-                    $type,
-                    $nameStatus,
-                    $show,
-                    $res->predb_id
-                );
-
-                return true;
-            }
-        }
-
-        $this->updateService->updateSingleColumn('proc_uid', self::PROC_UID_DONE, $release->releases_id);
-
-        return false;
-    }
-
-    /**
-     * Check PAR2 hash for matches.
-     */
-    protected function hashCheck(object $release, bool $echo, string $type, bool $nameStatus, bool $show): bool
-    {
-        $result = Release::fromQuery(sprintf(
-            'SELECT r.id AS releases_id, r.size AS relsize, r.name AS textstring, r.searchname, r.fromname, r.predb_id
-            FROM releases r
-            LEFT JOIN par_hashes ph ON ph.releases_id = r.id
-            WHERE ph.hash = %s
-            AND ph.releases_id != %d
-            AND (r.predb_id > 0 OR r.anidbid > 0)',
-            escapeString($release->hash),
-            $release->releases_id
-        ));
-
-        foreach ($result as $res) {
-            /** @var Release $res */
-            $floor = round(($res->relsize - $release->relsize) / $res->relsize * 100, 1);
-            if ($floor >= -5 && $floor <= 5) {
-                $this->updateService->updateRelease(
-                    $release,
-                    $res->searchname,
-                    'hashCheck: PAR2 hash_16K',
-                    $echo,
-                    $type,
-                    $nameStatus,
-                    $show,
-                    $res->predb_id
-                );
-
-                return true;
-            }
-        }
-
-        $this->updateService->updateSingleColumn('proc_hash16k', self::PROC_HASH16K_DONE, $release->releases_id);
 
         return false;
     }
@@ -795,6 +456,15 @@ class NameFixingService
 
         $bestMatch = $this->findBestPredbMatch($fileName);
         if ($bestMatch !== null) {
+            if (strcasecmp((string) ($bestMatch['title'] ?? ''), (string) $release->searchname) === 0) {
+                $this->updateService->attachPredbId(
+                    (int) $release->releases_id,
+                    (int) ($bestMatch['id'] ?? 0)
+                );
+
+                return $this->updateService->matched;
+            }
+
             $this->updateService->updateRelease(
                 $release,
                 $bestMatch['title'] ?? '',
@@ -806,37 +476,7 @@ class NameFixingService
                 $bestMatch['id'] ?? null
             );
 
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Check PreDB for title matches.
-     */
-    protected function preDbTitleCheck(object $release, bool $echo, string $type, bool $nameStatus, bool $show): bool
-    {
-        $fileName = $this->fileNameCleaner->cleanForMatching($release->textstring);
-
-        if (empty($fileName)) {
-            return false;
-        }
-
-        $bestMatch = $this->findBestPredbMatch($fileName);
-        if ($bestMatch !== null) {
-            $this->updateService->updateRelease(
-                $release,
-                $bestMatch['title'] ?? '',
-                'PreDb: Title match',
-                $echo,
-                $type,
-                $nameStatus,
-                $show,
-                $bestMatch['id'] ?? null
-            );
-
-            return true;
+            return $this->updateService->matched;
         }
 
         return false;
@@ -847,35 +487,186 @@ class NameFixingService
      */
     protected function findBestPredbMatch(string $fileName): ?array
     {
+        if (array_key_exists($fileName, $this->predbMatchCache)) {
+            return $this->predbMatchCache[$fileName];
+        }
+
+        if (count($this->predbMatchCache) >= 5000) {
+            $this->predbMatchCache = [];
+        }
+
         $results = Search::searchPredb($fileName);
 
-        return $this->predbMatchSelector->selectBestMatch($fileName, $results);
+        return $this->predbMatchCache[$fileName] = $this->predbMatchSelector->selectBestMatch($fileName, $results);
     }
 
     /**
-     * Get releases based on time and category parameters.
-     *
-     * @return Collection<int, mixed>
+     * @return \Generator<int, list<object>>
      */
-    protected function getReleases(int $time, int $cats, string $query, int $limit = 0): \Illuminate\Database\Eloquent\Collection|bool // @phpstan-ignore class.notFound, missingType.generics, return.phpDocType
+    protected function candidateBatches(string $source, int $time, int $categories): \Generator
     {
-        $releases = false;
-        $queryLimit = ($limit === 0) ? '' : ' LIMIT '.$limit;
+        $afterId = 0;
 
-        if ($time === 1 && $cats === 1) {
-            $releases = Release::fromQuery($query.$this->timeother.$queryLimit);
-        }
-        if ($time === 1 && $cats === 2) {
-            $releases = Release::fromQuery($query.$this->timeall.$queryLimit);
-        }
-        if ($time === 2 && $cats === 1) {
-            $releases = Release::fromQuery($query.$this->fullother.$queryLimit);
-        }
-        if ($time === 2 && $cats === 2) {
-            $releases = Release::fromQuery($query.$this->fullall.$queryLimit);
+        do {
+            $batch = $this->queries->candidateBatch($source, $time, $categories, $afterId);
+            if ($batch === []) {
+                break;
+            }
+
+            yield $batch;
+            $afterId = (int) $batch[array_key_last($batch)]->releases_id;
+        } while (count($batch) === NameFixingQueryService::BATCH_SIZE);
+    }
+
+    protected function startBatch(string $source, int $time, int $categories, string $message): bool
+    {
+        $total = $this->queries->countCandidates($source, $time, $categories);
+        $this->_totalReleases = $total;
+
+        if ($total === 0) {
+            return false;
         }
 
-        return $releases;
+        cli()->info(number_format($total).$message);
+
+        return true;
+    }
+
+    /**
+     * @param  list<object>  $releases
+     * @return list<int>
+     */
+    protected function releaseIds(array $releases): array
+    {
+        return array_values(array_map(
+            static fn (object $release): int => (int) $release->releases_id,
+            $releases
+        ));
+    }
+
+    /**
+     * @param  array<int, list<object>>  $groupedRows
+     * @return list<string>
+     */
+    protected function distinctValues(array $groupedRows, string $column): array
+    {
+        $values = [];
+
+        foreach ($groupedRows as $rows) {
+            foreach ($rows as $row) {
+                $value = (string) ($row->{$column} ?? '');
+                if ($value !== '') {
+                    $values[$value] = $value;
+                }
+            }
+        }
+
+        return array_values($values);
+    }
+
+    /**
+     * @param  list<object>  $donors
+     */
+    protected function applyDonorMatch(
+        object $release,
+        array $donors,
+        int $tolerancePercent,
+        string $method,
+        string $type,
+        bool $echo,
+        bool $nameStatus,
+        bool $show
+    ): bool {
+        $donor = $this->donorMatchSelector->select($donors, (int) $release->relsize, $tolerancePercent);
+        if ($donor === null) {
+            return false;
+        }
+
+        if (strcasecmp((string) $donor->searchname, (string) $release->searchname) === 0) {
+            $this->updateService->attachPredbId(
+                (int) $release->releases_id,
+                (int) $donor->predb_id
+            );
+
+            return $this->updateService->matched;
+        }
+
+        $this->updateService->updateRelease(
+            $release,
+            (string) $donor->searchname,
+            $method,
+            $echo,
+            $type,
+            $nameStatus,
+            $show,
+            (int) $donor->predb_id
+        );
+
+        return $this->updateService->matched;
+    }
+
+    /**
+     * @param  list<object>  $files
+     */
+    protected function processFileCandidates(
+        object $release,
+        array $files,
+        bool $echo,
+        bool $nameStatus,
+        bool $show,
+        bool $incrementChecked = true,
+        bool $showProgress = true
+    ): void {
+        $this->updateService->reset();
+        if ($incrementChecked) {
+            $this->updateService->incrementChecked();
+        }
+        $filenames = array_values(array_unique(array_map(
+            static fn (object $file): string => (string) $file->textstring,
+            $files
+        )));
+        $prioritized = $this->filePrioritizer->prioritizeForMatching($filenames);
+
+        foreach ($prioritized as $filename) {
+            $candidate = clone $release;
+            $candidate->textstring = $filename;
+            $fileResult = $this->fileExtractor->extractFromFile($filename);
+
+            if ($fileResult !== null) {
+                $this->updateService->updateRelease(
+                    $candidate,
+                    $fileResult->newName,
+                    'fileCheck: '.$fileResult->method,
+                    $echo,
+                    'Filenames, ',
+                    $nameStatus,
+                    $show
+                );
+            }
+
+            if (! $this->updateService->matched) {
+                $this->preDbFileCheck($candidate, $echo, 'Filenames, ', $nameStatus, $show);
+            }
+
+            if ($this->updateService->matched) {
+                break;
+            }
+        }
+
+        if (! $this->updateService->matched) {
+            $this->markProcessed($echo, $nameStatus, 'proc_files', (int) $release->releases_id);
+        }
+
+        if ($showProgress) {
+            $this->echoRenamed($show);
+        }
+    }
+
+    protected function markProcessed(bool $echo, bool $nameStatus, string $column, int $releaseId): void
+    {
+        if ($echo && $nameStatus) {
+            $this->updateService->updateSingleColumn($column, 1, $releaseId);
+        }
     }
 
     /**
@@ -953,6 +744,252 @@ class NameFixingService
     }
 
     /**
+     * Process one GUID-partitioned release batch using all standard name sources.
+     *
+     * @param  null|callable(object): bool  $par2Processor
+     * @return array{checked: int, fixed: int}
+     */
+    public function processStandardBatch(
+        string $leftGuid,
+        int $limit,
+        bool $show,
+        ?callable $par2Processor = null
+    ): array {
+        $releases = $this->queries->standardCandidateBatch($leftGuid, $limit);
+        if ($releases === []) {
+            return ['checked' => 0, 'fixed' => 0];
+        }
+
+        $releaseIds = $this->releaseIds($releases);
+        $nfos = $this->queries->groupByReleaseId($this->queries->nfoRows($releaseIds));
+        $files = $this->queries->groupByReleaseId($this->queries->fileRows($releaseIds));
+        $media = $this->queries->groupByReleaseId($this->queries->mediaRows($releaseIds));
+        $hashes = $this->queries->groupByReleaseId($this->queries->hashRows($releaseIds));
+        $uidDonors = $this->queries->uidDonors($this->distinctValues($media, 'uid'));
+        $crcDonors = $this->queries->crcDonors($this->distinctValues($files, 'crc32'));
+        $hashDonors = $this->queries->hashDonors($this->distinctValues($hashes, 'hash'));
+        $fixedBefore = $this->updateService->fixed;
+
+        foreach ($releases as $release) {
+            $this->updateService->incrementChecked();
+            $this->updateService->reset();
+            $releaseId = (int) $release->releases_id;
+            $releaseMedia = $media[$releaseId] ?? [];
+            $releaseFiles = $files[$releaseId] ?? [];
+
+            if ((int) $release->proc_uid === self::PROC_UID_NONE) {
+                $this->updateService->reset();
+                foreach ($releaseMedia as $row) {
+                    $uid = (string) ($row->uid ?? '');
+                    if ($uid !== '' && $this->applyDonorMatch($release, $uidDonors[$uid] ?? [], 10, 'uidCheck: Unique_ID', 'UID, ', true, true, $show)) {
+                        break;
+                    }
+                }
+
+                if (! $this->updateService->matched) {
+                    foreach ($releaseMedia as $row) {
+                        if (empty($row->movie_name)) {
+                            continue;
+                        }
+
+                        $candidate = clone $release;
+                        $candidate->movie_name = $row->movie_name;
+                        $candidate->file_name = $row->file_name;
+                        if ($this->mediaMovieNameCheck($candidate, true, 'Mediainfo, ', true, $show)) {
+                            break;
+                        }
+                    }
+                }
+
+                if (! $this->updateService->matched) {
+                    $this->updateService->updateSingleColumn('proc_uid', self::PROC_UID_DONE, $releaseId);
+                }
+            }
+
+            if ($this->updateService->matched) {
+                continue;
+            }
+
+            if ((int) $release->proc_crc32 === self::PROC_CRC_NONE) {
+                $this->updateService->reset();
+                $prioritizedCrcs = [];
+                foreach ($releaseFiles as $file) {
+                    $crc = (string) ($file->crc32 ?? '');
+                    if ($crc === '') {
+                        continue;
+                    }
+
+                    $priority = $this->filePrioritizer->getCrcPriority((string) $file->filename);
+                    $prioritizedCrcs[$priority][$crc] = $crc;
+                }
+                ksort($prioritizedCrcs);
+
+                foreach ($prioritizedCrcs as $crcs) {
+                    foreach ($crcs as $crc) {
+                        if ($this->applyDonorMatch($release, $crcDonors[$crc] ?? [], 5, 'crcCheck: CRC32', 'CRC32, ', true, true, $show)) {
+                            break 2;
+                        }
+                    }
+                }
+
+                if (! $this->updateService->matched) {
+                    $this->updateService->updateSingleColumn('proc_crc32', self::PROC_CRC_DONE, $releaseId);
+                }
+            }
+
+            if ($this->updateService->matched) {
+                continue;
+            }
+
+            if ((int) $release->proc_srr === self::PROC_SRR_NONE) {
+                $this->updateService->reset();
+                foreach ($releaseFiles as $file) {
+                    $candidate = clone $release;
+                    $candidate->textstring = (string) $file->textstring;
+                    if ($this->srrNameCheck($candidate, true, 'SRR, ', true, $show)) {
+                        break;
+                    }
+                }
+
+                if (! $this->updateService->matched) {
+                    $this->updateService->updateSingleColumn('proc_srr', self::PROC_SRR_DONE, $releaseId);
+                }
+            }
+
+            if ($this->updateService->matched) {
+                continue;
+            }
+
+            if ((int) $release->proc_hash16k === self::PROC_HASH16K_NONE) {
+                $this->updateService->reset();
+                foreach ($hashes[$releaseId] ?? [] as $row) {
+                    $hash = (string) ($row->hash ?? '');
+                    if ($hash !== '' && $this->applyDonorMatch($release, $hashDonors[$hash] ?? [], 5, 'hashCheck: PAR2 hash_16K', 'PAR2 hash, ', true, true, $show)) {
+                        break;
+                    }
+                }
+
+                if (! $this->updateService->matched) {
+                    $this->updateService->updateSingleColumn('proc_hash16k', self::PROC_HASH16K_DONE, $releaseId);
+                }
+            }
+
+            if ($this->updateService->matched) {
+                continue;
+            }
+
+            if ((int) $release->proc_nfo === self::PROC_NFO_NONE) {
+                $this->updateService->reset();
+                $nfo = $nfos[$releaseId][0] ?? null;
+                if ($nfo !== null) {
+                    $release->textstring = (string) ($nfo->textstring ?? '');
+                    if (! preg_match('/^=newz\[NZB\]=\w+/', $release->textstring)) {
+                        $nfoResult = $this->nfoExtractor->extractFromNfo($release->textstring);
+                        if ($nfoResult !== null) {
+                            $this->updateService->updateRelease(
+                                $release,
+                                $nfoResult->newName,
+                                'nfoCheck: '.$nfoResult->method,
+                                true,
+                                'NFO, ',
+                                true,
+                                $show
+                            );
+                        }
+
+                        if (! $this->updateService->matched) {
+                            $this->checkWithPatternMatchers($release, true, 'NFO, ', true, $show, false);
+                        }
+                    }
+                }
+
+                if (! $this->updateService->matched) {
+                    $this->updateService->updateSingleColumn('proc_nfo', self::PROC_NFO_DONE, $releaseId);
+                }
+            }
+
+            if ($this->updateService->matched) {
+                continue;
+            }
+
+            if ((int) $release->proc_files === self::PROC_FILES_NONE) {
+                $this->processFileCandidates($release, $releaseFiles, true, true, $show, false, false);
+            }
+
+            if ($this->updateService->matched) {
+                continue;
+            }
+
+            if ((int) $release->proc_par2 === self::PROC_PAR2_NONE) {
+                $this->updateService->reset();
+                $matched = $par2Processor !== null && $par2Processor($release);
+                if ($matched) {
+                    $this->updateService->fixed++;
+                } else {
+                    $this->updateService->updateSingleColumn('proc_par2', self::PROC_PAR2_DONE, $releaseId);
+                }
+            }
+        }
+
+        return [
+            'checked' => count($releases),
+            'fixed' => $this->updateService->fixed - $fixedBefore,
+        ];
+    }
+
+    /**
+     * Match one PreDB title against indexed release candidates.
+     */
+    public function matchPredbFulltext(object $pre, bool $show = false): int
+    {
+        $title = (string) ($pre->title ?? '');
+        if (strlen($title) < 15 || ! preg_match('/([\w()]+[\s._-]){2,}[\w()]+-\w+/u', $title)) {
+            return 0;
+        }
+
+        if (! Search::isAvailable()) {
+            throw new RuntimeException('The configured search backend is unavailable for PreDB matching.');
+        }
+
+        $searchResults = Search::searchReleases(['name' => $title, 'searchname' => $title], 21);
+        $candidateIds = [];
+        foreach ($searchResults as $key => $value) {
+            $candidateId = is_numeric($value) ? (int) $value : (is_numeric($key) ? (int) $key : 0);
+            if ($candidateId > 0) {
+                $candidateIds[$candidateId] = $candidateId;
+            }
+        }
+
+        $matches = $this->queries->confirmPredbCandidates(array_values($candidateIds), $title);
+        if (count($matches) >= 16) {
+            return -1;
+        }
+
+        $matching = 0;
+        foreach ($matches as $release) {
+            if (strcasecmp($title, (string) $release->searchname) === 0) {
+                $this->updateService->attachPredbId((int) $release->releases_id, (int) $pre->predb_id);
+            } else {
+                $this->updateService->reset();
+                $this->updateService->updateRelease(
+                    $release,
+                    $title,
+                    'Title Match source: '.(string) ($pre->source ?? ''),
+                    true,
+                    'PreDB FT Exact, ',
+                    true,
+                    $show,
+                    (int) $pre->predb_id
+                );
+            }
+
+            $matching++;
+        }
+
+        return $matching;
+    }
+
+    /**
      * Get the update service.
      */
     public function getUpdateService(): ReleaseUpdateService
@@ -975,48 +1012,33 @@ class NameFixingService
     {
         $this->echoStartMessage($time, 'par2 files');
 
-        if ($cats === 3) {
-            $query = sprintf(
-                'SELECT rel.id AS releases_id, rel.guid, rel.groups_id, rel.fromname
-                FROM releases rel
-                WHERE rel.predb_id = 0'
-            );
-            $cats = 2;
-        } else {
-            $query = sprintf(
-                'SELECT rel.id AS releases_id, rel.guid, rel.groups_id, rel.fromname
-                FROM releases rel
-                WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
-                AND rel.predb_id = 0
-                AND rel.proc_par2 = %d',
-                self::IS_RENAMED_NONE,
-                Category::OTHER_MISC,
-                Category::OTHER_HASHED,
-                self::PROC_PAR2_NONE
-            );
+        if (! $this->startBatch(NameFixingQueryService::SOURCE_PAR2, $time, $cats, ' releases to process.')) {
+            cli()->info('Nothing to fix.');
+
+            return;
         }
 
-        $releases = $this->getReleases($time, $cats, $query);
-        $total = $releases ? $releases->count() : 0;
-
-        if ($total > 0) {
-            $this->_totalReleases = $total;
-            cli()->info(number_format($total).' releases to process.');
-            $nzbContentsService = app(NzbContentsService::class);
-
+        $nzbContentsService = app(NzbContentsService::class);
+        foreach ($this->candidateBatches(NameFixingQueryService::SOURCE_PAR2, $time, $cats) as $releases) {
             foreach ($releases as $release) {
-                /** @var Release $release */
-                if ($nzbContentsService->checkPar2($release->guid, $release->releases_id, $release->groups_id, (int) $nameStatus, (int) $show)) {
+                if ($nzbContentsService->checkPar2(
+                    $release->guid,
+                    $release->releases_id,
+                    $release->groups_id,
+                    (int) ($echo && $nameStatus),
+                    (int) $show
+                )) {
                     $this->updateService->fixed++;
+                } else {
+                    $this->markProcessed($echo, $nameStatus, 'proc_par2', (int) $release->releases_id);
                 }
 
                 $this->updateService->incrementChecked();
                 $this->echoRenamed($show);
             }
-            $this->echoFoundCount($echo, ' files');
-        } else {
-            cli()->info('Nothing to fix.');
         }
+
+        $this->echoFoundCount($echo, ' files');
     }
 
     /**
@@ -1027,48 +1049,38 @@ class NameFixingService
         $this->echoStartMessage($time, 'file names');
         $type = 'Filenames, ';
 
-        if ($cats === 3) {
-            $query = sprintf(
-                'SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
-                    rf.releases_id AS fileid, rel.id AS releases_id
-                FROM releases rel
-                INNER JOIN release_files rf ON rf.releases_id = rel.id
-                WHERE predb_id = 0'
-            );
-            $cats = 2;
-        } else {
-            $query = sprintf(
-                'SELECT rf.name AS textstring, rel.categories_id, rel.name, rel.searchname, rel.fromname, rel.groups_id,
-                    rf.releases_id AS fileid, rel.id AS releases_id
-                FROM releases rel
-                INNER JOIN release_files rf ON rf.releases_id = rel.id
-                WHERE (rel.isrenamed = %d OR rel.categories_id IN (%d, %d))
-                AND rel.predb_id = 0
-                AND rf.name LIKE %s',
-                self::IS_RENAMED_NONE,
-                Category::OTHER_MISC,
-                Category::OTHER_HASHED,
-                escapeString('%SDPORN%')
-            );
+        if (! $this->startBatch(NameFixingQueryService::SOURCE_XXX, $time, $cats, ' xxx file names to process.')) {
+            cli()->info('Nothing to fix.');
+
+            return;
         }
 
-        $releases = $this->getReleases($time, $cats, $query);
-        $total = $releases ? $releases->count() : 0;
-
-        if ($total > 0) {
-            $this->_totalReleases = $total;
-            cli()->info(number_format($total).' xxx file names to process.');
+        foreach ($this->candidateBatches(NameFixingQueryService::SOURCE_XXX, $time, $cats) as $releases) {
+            $files = $this->queries->groupByReleaseId(
+                $this->queries->fileRows($this->releaseIds($releases), NameFixingQueryService::SOURCE_XXX)
+            );
 
             foreach ($releases as $release) {
                 $this->updateService->reset();
-                $this->xxxNameCheck($release, $echo, $type, $nameStatus, $show);
                 $this->updateService->incrementChecked();
+
+                foreach ($files[(int) $release->releases_id] ?? [] as $file) {
+                    $candidate = clone $release;
+                    $candidate->textstring = (string) $file->textstring;
+                    if ($this->xxxNameCheck($candidate, $echo, $type, $nameStatus, $show)) {
+                        break;
+                    }
+                }
+
+                if (! $this->updateService->matched) {
+                    $this->markProcessed($echo, $nameStatus, 'proc_files', (int) $release->releases_id);
+                }
+
                 $this->echoRenamed($show);
             }
-            $this->echoFoundCount($echo, ' files');
-        } else {
-            cli()->info('Nothing to fix.');
         }
+
+        $this->echoFoundCount($echo, ' files');
     }
 
     /**
@@ -1079,45 +1091,41 @@ class NameFixingService
         $type = 'Mediainfo, ';
         $this->echoStartMessage($time, 'Mediainfo movie_name');
 
-        if ($cats === 3) {
-            $query = sprintf(
-                'SELECT rel.id AS releases_id, rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.id AS releases_id, rf.movie_name as movie_name
-                FROM releases rel
-                INNER JOIN media_infos rf ON rf.releases_id = rel.id
-                WHERE rel.predb_id = 0'
-            );
-            $cats = 2;
-        } else {
-            $query = sprintf(
-                'SELECT rel.id AS releases_id, rel.name, rel.name AS textstring, rel.predb_id, rel.searchname, rel.fromname, rel.groups_id, rel.categories_id, rel.id AS releases_id, rf.movie_name as movie_name, rf.file_name as file_name
-                FROM releases rel
-                INNER JOIN media_infos rf ON rf.releases_id = rel.id
-                WHERE rel.isrenamed = %d
-                AND rel.predb_id = 0',
-                self::IS_RENAMED_NONE
-            );
-            if ($cats === 2) {
-                $query .= PHP_EOL.'AND rel.categories_id IN ('.Category::OTHER_MISC.','.Category::OTHER_HASHED.')';
-            }
+        if (! $this->startBatch(NameFixingQueryService::SOURCE_MEDIA_MOVIE, $time, $cats, ' mediainfo movie names to process.')) {
+            cli()->info('Nothing to fix.');
+
+            return;
         }
 
-        $releases = $this->getReleases($time, $cats, $query);
-        $total = $releases ? $releases->count() : 0;
+        foreach ($this->candidateBatches(NameFixingQueryService::SOURCE_MEDIA_MOVIE, $time, $cats) as $releases) {
+            $media = $this->queries->groupByReleaseId($this->queries->mediaRows($this->releaseIds($releases)));
 
-        if ($total > 0) {
-            $this->_totalReleases = $total;
-            cli()->info(number_format($total).' mediainfo movie names to process.');
-
-            foreach ($releases as $rel) {
+            foreach ($releases as $release) {
                 $this->updateService->incrementChecked();
                 $this->updateService->reset();
-                $this->mediaMovieNameCheck($rel, $echo, $type, $nameStatus, $show);
+
+                foreach ($media[(int) $release->releases_id] ?? [] as $row) {
+                    if (empty($row->movie_name)) {
+                        continue;
+                    }
+
+                    $candidate = clone $release;
+                    $candidate->movie_name = $row->movie_name;
+                    $candidate->file_name = $row->file_name;
+                    if ($this->mediaMovieNameCheck($candidate, $echo, $type, $nameStatus, $show)) {
+                        break;
+                    }
+                }
+
+                if (! $this->updateService->matched) {
+                    $this->markProcessed($echo, $nameStatus, 'proc_uid', (int) $release->releases_id);
+                }
+
                 $this->echoRenamed($show);
             }
-            $this->echoFoundCount($echo, ' MediaInfo\'s');
-        } else {
-            cli()->info('Nothing to fix.');
         }
+
+        $this->echoFoundCount($echo, ' MediaInfo\'s');
     }
 
     /**
@@ -1128,10 +1136,8 @@ class NameFixingService
         if (preg_match('/^.+?SDPORN/i', $release->textstring, $hit)) {
             $this->updateService->updateRelease($release, $hit[0], 'fileCheck: XXX SDPORN', $echo, $type, $nameStatus, $show);
 
-            return true;
+            return $this->updateService->matched;
         }
-
-        $this->updateService->updateSingleColumn('proc_files', self::PROC_FILES_DONE, $release->releases_id);
 
         return false;
     }
@@ -1156,10 +1162,8 @@ class NameFixingService
         if ($newName !== '') {
             $this->updateService->updateRelease($release, $newName, 'MediaInfo: Movie Name', $echo, $type, $nameStatus, $show, $release->predb_id ?? 0);
 
-            return true;
+            return $this->updateService->matched;
         }
-
-        $this->updateService->updateSingleColumn('proc_uid', self::PROC_UID_DONE, $release->releases_id);
 
         return false;
     }
@@ -1174,9 +1178,15 @@ class NameFixingService
         // Check PreDB first
         $preDbMatch = $this->updateService->checkPreDbMatch($release, $release->textstring);
         if ($preDbMatch !== null) {
-            $this->updateService->updateRelease($release, $preDbMatch['title'], 'preDB: Match', $echo, $type, $nameStatus, $show, $preDbMatch['id']);
+            if (strcasecmp((string) $preDbMatch['title'], (string) $release->searchname) === 0) {
+                if ($echo) {
+                    $this->updateService->attachPredbId((int) $release->releases_id, (int) $preDbMatch['id']);
+                }
+            } else {
+                $this->updateService->updateRelease($release, $preDbMatch['title'], 'preDB: Match', $echo, $type, $nameStatus, $show, $preDbMatch['id']);
+            }
 
-            return true;
+            return $this->updateService->matched;
         }
 
         if ($preId) {
@@ -1211,17 +1221,6 @@ class NameFixingService
                 if (! $this->updateService->matched) {
                     $this->preDbFileCheck($release, $echo, $type, $nameStatus, $show);
                 }
-                // Try PreDB title check
-                if (! $this->updateService->matched) {
-                    $this->preDbTitleCheck($release, $echo, $type, $nameStatus, $show);
-                }
-                // Try file name extraction
-                if (! $this->updateService->matched) {
-                    $result = $this->fileExtractor->extractFromFile($release->textstring);
-                    if ($result !== null) {
-                        $this->updateService->updateRelease($release, $result->newName, 'fileCheck: '.$result->method, $echo, $type, $nameStatus, $show);
-                    }
-                }
                 break;
 
             default:
@@ -1233,7 +1232,7 @@ class NameFixingService
         }
 
         // Update processing flags if not matched
-        if ($nameStatus === true && ! $this->updateService->matched) {
+        if ($echo && $nameStatus && ! $this->updateService->matched) {
             $this->updateProcessingFlags($type, $release->releases_id);
         }
 
@@ -1281,7 +1280,7 @@ class NameFixingService
         $matching = 0;
 
         $files = explode('||', $release->filename ?? '');
-        $prioritizedFiles = $this->filePrioritizer->prioritizeForPreDb($files); // @phpstan-ignore argument.type
+        $prioritizedFiles = $this->filePrioritizer->prioritizeForPreDb($files);
 
         foreach ($prioritizedFiles as $fileName) {
             $cleanedFileName = $this->fileNameCleaner->cleanForMatching($fileName);
@@ -1290,21 +1289,17 @@ class NameFixingService
                 continue;
             }
 
-            $results = Search::searchPredb($cleanedFileName);
+            $bestMatch = $this->findBestPredbMatch($cleanedFileName);
 
-            if (! empty($results)) {
-                $bestMatch = $this->predbMatchSelector->selectBestMatch($cleanedFileName, $results);
-
-                if ($bestMatch !== null) {
-                    if ($bestMatch['title'] !== $release->searchname) {
-                        $this->updateService->updateRelease($release, $bestMatch['title'], 'file matched source: '.($bestMatch['source'] ?? ''), $echo, 'PreDB file match, ', $nameStatus, $show);
-                    } else {
-                        $this->updateService->updateSingleColumn('predb_id', $bestMatch['id'] ?? 0, $release->releases_id);
-                    }
-                    $matching++;
-
-                    return $matching;
+            if ($bestMatch !== null) {
+                if (strcasecmp((string) $bestMatch['title'], (string) $release->searchname) !== 0) {
+                    $this->updateService->updateRelease($release, $bestMatch['title'], 'file matched source: '.($bestMatch['source'] ?? ''), $echo, 'PreDB file match, ', $nameStatus, $show);
+                } elseif ($echo) {
+                    $this->updateService->attachPredbId((int) $release->releases_id, (int) ($bestMatch['id'] ?? 0));
                 }
+                $matching++;
+
+                return $matching;
             }
         }
 
@@ -1333,66 +1328,61 @@ class NameFixingService
     /**
      * Retrieves releases and their file names to attempt PreDB matches.
      *
-     * @param  array<string, mixed>  $args
+     * @param  list<mixed>  $args
      *
      * @throws \Exception
      */
     public function getPreFileNames(array $args = []): void
     {
         $show = isset($args[2]) && $args[2] === 'show';
-
-        if (isset($args[1]) && is_numeric($args[1])) {
-            $limit = 'LIMIT '.$args[1];
-            $orderBy = 'ORDER BY r.id DESC';
-        } else {
-            $orderBy = 'ORDER BY r.id ASC';
-            $limit = 'LIMIT 1000000';
-        }
+        $limited = isset($args[1]) && is_numeric($args[1]);
+        $requestedLimit = $limited ? max(1, (int) $args[1]) : PHP_INT_MAX;
 
         cli()->info(PHP_EOL.'Match PreFiles '.($args[1] ?? 'all').' Started at '.now());
         cli()->info('Matching predb filename to cleaned release_files.name.');
 
         $counter = $counted = 0;
         $timeStart = now();
+        $available = $this->queries->countPrefileCandidates();
+        $total = min($available, $requestedLimit);
+        if ($total === 0) {
+            cli()->info('Nothing to do.');
 
-        $query = Release::fromQuery(
-            sprintf(
-                "SELECT r.id AS releases_id, r.name, r.searchname,
-                    r.fromname, r.groups_id, r.categories_id,
-                    GROUP_CONCAT(rf.name ORDER BY LENGTH(rf.name) DESC SEPARATOR '||') AS filename
-                FROM releases r
-                INNER JOIN release_files rf ON r.id = rf.releases_id
-                WHERE rf.name IS NOT NULL
-                AND r.predb_id = 0
-                AND r.categories_id IN (%s)
-                AND r.isrenamed = 0
-                GROUP BY r.id
-                %s %s",
-                implode(',', Category::OTHERS_GROUP),
-                $orderBy,
-                $limit
-            )
-        );
-
-        if ($query->isNotEmpty()) {
-            $total = $query->count();
-
-            if ($total > 0) {
-                cli()->info(PHP_EOL.number_format($total).' releases to process.');
-
-                foreach ($query as $row) {
-                    $success = $this->matchPreDbFiles($row, true, true, $show);
-                    if ($success === 1) {
-                        $counted++;
-                    }
-                    if ($show === false) {
-                        cli()->info('Renamed Releases: ['.number_format($counted).'] '.cli()->percentString(++$counter, $total));
-                    }
-                }
-                cli()->info(PHP_EOL.'Renamed '.number_format($counted).' releases in '.now()->diffInSeconds($timeStart, true).' seconds.');
-            } else {
-                cli()->info('Nothing to do.');
-            }
+            return;
         }
+
+        cli()->info(PHP_EOL.number_format($total).' releases to process.');
+        $cursor = $limited ? PHP_INT_MAX : 0;
+
+        while ($counter < $total) {
+            $batchLimit = min(NameFixingQueryService::BATCH_SIZE, $total - $counter);
+            $batch = $this->queries->prefileCandidateBatch($cursor, $batchLimit, $limited);
+            if ($batch === []) {
+                break;
+            }
+
+            $files = $this->queries->groupByReleaseId($this->queries->fileRows($this->releaseIds($batch)));
+            foreach ($batch as $row) {
+                $releaseFiles = $files[(int) $row->releases_id] ?? [];
+                usort($releaseFiles, static fn (object $left, object $right): int => strlen((string) $right->textstring) <=> strlen((string) $left->textstring));
+                $row->filename = implode('||', array_map(
+                    static fn (object $file): string => (string) $file->textstring,
+                    $releaseFiles
+                ));
+
+                if ($this->matchPreDbFiles($row, true, true, $show) === 1) {
+                    $counted++;
+                }
+                $counter++;
+
+                if (! $show) {
+                    cli()->info('Renamed Releases: ['.number_format($counted).'] '.cli()->percentString($counter, $total));
+                }
+            }
+
+            $cursor = (int) $batch[array_key_last($batch)]->releases_id;
+        }
+
+        cli()->info(PHP_EOL.'Renamed '.number_format($counted).' releases in '.now()->diffInSeconds($timeStart, true).' seconds.');
     }
 }

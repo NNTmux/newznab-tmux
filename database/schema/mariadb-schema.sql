@@ -580,6 +580,7 @@ CREATE TABLE `par_hashes` (
   `releases_id` int(10) unsigned NOT NULL COMMENT 'FK to releases.id',
   `hash` varchar(32) NOT NULL COMMENT 'hash_16k block of par2',
   PRIMARY KEY (`releases_id`,`hash`),
+  KEY `ix_par_hashes_hash_releases_id` (`hash`,`releases_id`),
   CONSTRAINT `FK_ph_releases` FOREIGN KEY (`releases_id`) REFERENCES `releases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 
@@ -705,6 +706,7 @@ CREATE TABLE `predb` (
   KEY `ix_predb_predate` (`predate`),
   KEY `ix_predb_source` (`source`),
   KEY `ix_predb_searched` (`searched`),
+  KEY `ix_predb_searched_predate_id` (`searched`,`predate`,`id`),
   FULLTEXT KEY `ft_predb_filename` (`filename`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 DROP TABLE IF EXISTS `predb_crcs`;
@@ -829,6 +831,7 @@ CREATE TABLE `release_files` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `passworded` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`releases_id`,`name`),
+  KEY `ix_release_files_crc32_releases_id` (`crc32`,`releases_id`),
   CONSTRAINT `FK_rf_releases` FOREIGN KEY (`releases_id`) REFERENCES `releases` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 DROP TABLE IF EXISTS `release_informs`;

@@ -144,10 +144,11 @@ class ReleasesRunner extends BaseRunner
 
         $queues = [];
         $idx = 0;
+        $workerCount = count($leftGuids);
         foreach ($leftGuids as $leftGuid) {
             if ($maxPerRun > 0) {
                 $idx++;
-                $queues[$idx] = sprintf('%s %s %s %s', $mode, $leftGuid, $maxPerRun, $idx);
+                $queues[$idx] = sprintf('%s %s %s %s %s', $mode, $leftGuid, $maxPerRun, $idx, $workerCount);
             }
         }
 

@@ -7,13 +7,13 @@ namespace App\Services\NameFixing;
 use App\Events\ReleaseNameFixed;
 use App\Facades\Search;
 use App\Models\Category;
-use App\Models\Predb;
 use App\Models\Release;
 use App\Models\UsenetGroup;
 use App\Services\Categorization\CategorizationService;
 use App\Services\ReleaseCleaningService;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 
 /**
  * Service for updating releases with new names.
@@ -23,6 +23,20 @@ use Illuminate\Support\Facades\DB;
  */
 class ReleaseUpdateService
 {
+    /**
+     * @var list<string>
+     */
+    private const SINGLE_UPDATE_COLUMNS = [
+        'predb_id',
+        'proc_nfo',
+        'proc_files',
+        'proc_par2',
+        'proc_uid',
+        'proc_hash16k',
+        'proc_srr',
+        'proc_crc32',
+    ];
+
     /**
      * PreDB regex pattern for scene release names.
      */
@@ -347,10 +361,25 @@ class ReleaseUpdateService
      */
     public function updateSingleColumn(string $column, int $status, int $id): void
     {
-        if ($column !== '' && $id !== 0) {
-            Release::query()->where('id', $id)->update([$column => $status]);
-            Search::updateRelease($id);
+        if (! in_array($column, self::SINGLE_UPDATE_COLUMNS, true)) {
+            throw new InvalidArgumentException("Unsupported release status column [{$column}].");
         }
+
+        if ($id !== 0) {
+            DB::update("UPDATE releases SET {$column} = ? WHERE id = ?", [$status, $id]);
+        }
+    }
+
+    public function attachPredbId(int $releaseId, int $predbId): void
+    {
+        if ($releaseId === 0 || $predbId === 0) {
+            return;
+        }
+
+        $this->updateSingleColumn('predb_id', $predbId, $releaseId);
+        $this->relid = $releaseId;
+        $this->matched = true;
+        $this->done = true;
     }
 
     /**
@@ -360,14 +389,37 @@ class ReleaseUpdateService
      */
     public function checkPreDbMatch(object $release, string $textstring): ?array
     {
-        if (preg_match_all(self::PREDB_REGEX, $textstring, $hits) && ! preg_match('/Source\s:/i', $textstring)) {
-            foreach ($hits as $hit) {
-                foreach ($hit as $val) {
-                    $title = Predb::query()->where('title', trim($val))->select(['title', 'id'])->first();
-                    if ($title !== null) {
-                        return ['title' => $title['title'], 'id' => $title['id']];
-                    }
+        if (! preg_match_all(self::PREDB_REGEX, $textstring, $hits) || preg_match('/Source\s:/i', $textstring)) {
+            return null;
+        }
+
+        $candidates = [];
+        foreach ($hits as $hit) {
+            foreach ($hit as $value) {
+                $title = trim($value);
+                if ($title !== '') {
+                    $candidates[$title] = $title;
                 }
+            }
+        }
+
+        if ($candidates === []) {
+            return null;
+        }
+
+        $candidateValues = array_values($candidates);
+        $rows = DB::select(
+            'SELECT id, title FROM predb WHERE title IN ('.implode(',', array_fill(0, count($candidateValues), '?')).')',
+            $candidateValues
+        );
+        $matches = [];
+        foreach ($rows as $row) {
+            $matches[(string) $row->title] = ['title' => (string) $row->title, 'id' => (int) $row->id];
+        }
+
+        foreach ($candidateValues as $candidate) {
+            if (isset($matches[$candidate])) {
+                return $matches[$candidate];
             }
         }
 

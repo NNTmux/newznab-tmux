@@ -28,10 +28,8 @@ class MatchPrefiles extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
-    public function handle()
+    public function handle(NameFixingService $nameFixingService): int
     {
         $limit = $this->argument('limit');
 
@@ -53,8 +51,7 @@ class MatchPrefiles extends Command
         }
 
         try {
-            $nameFixingService = new NameFixingService;
-            $nameFixingService->getPreFileNames($argv); // @phpstan-ignore argument.type
+            $nameFixingService->getPreFileNames($argv);
 
             return 0;
         } catch (Exception $e) {

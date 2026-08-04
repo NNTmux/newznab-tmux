@@ -15,8 +15,8 @@ if (! isset($argv[1])) {
     exit(1);
 }
 
-// Parse arguments: "type guidChar maxPerRun thread"
-[$type, $guidChar, $maxPerRun, $thread] = explode(' ', $argv[1]);
+// Parse arguments: "type guidChar maxPerRun worker workers"
+[$type, $guidChar, $maxPerRun, $thread, $workers] = array_pad(explode(' ', $argv[1]), 5, '1');
 
 // Build artisan command based on type
 $artisan = dirname(__DIR__, 4).'/artisan';
@@ -37,7 +37,7 @@ switch ($type) {
             exit(1);
         }
 
-        $command = "php {$artisan} releases:fix-names-group predbft --limit={$maxPerRun} --thread={$thread}";
+        $command = "php {$artisan} releases:fix-names-group predbft --limit={$maxPerRun} --thread={$thread} --workers={$workers}";
         break;
 
     default:

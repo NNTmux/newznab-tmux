@@ -58,8 +58,8 @@ class FilePrioritizer
      * 5. NFO files
      * 6. Other files
      *
-     * @param  array<string, mixed>  $files  Array of filenames
-     * @return array<string, mixed> Sorted array of filenames
+     * @param  list<string>  $files  Array of filenames
+     * @return list<string> Sorted array of filenames
      */
     public function prioritizeForMatching(array $files): array
     {
@@ -82,8 +82,8 @@ class FilePrioritizer
      * Similar to prioritizeForMatching but with slightly different priorities
      * optimized for PreDB filename lookups.
      *
-     * @param  array<string, mixed>  $files  Array of filenames
-     * @return array<string, mixed> Sorted array of filenames
+     * @param  list<string>  $files  Array of filenames
+     * @return list<string> Sorted array of filenames
      */
     public function prioritizeForPreDb(array $files): array
     {
@@ -102,8 +102,8 @@ class FilePrioritizer
     /**
      * Categorize files into groups by type.
      *
-     * @param  array<string, mixed>  $files  Array of filenames
-     * @return array<string, mixed> Categorized files
+     * @param  list<string>  $files  Array of filenames
+     * @return array{srr: list<string>, mainRar: list<string>, firstPart: list<string>, video: list<string>, nfo: list<string>, other: list<string>} Categorized files
      */
     protected function categorizeFiles(array $files): array
     {
