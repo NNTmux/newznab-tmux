@@ -57,7 +57,7 @@ final class NameFixingQueryService
         self::SOURCE_FILES => 'EXISTS (SELECT 1 FROM release_files source_file WHERE source_file.releases_id = r.id)',
         self::SOURCE_SRR => "EXISTS (SELECT 1 FROM release_files source_srr WHERE source_srr.releases_id = r.id AND (source_srr.name LIKE '%.srr' OR source_srr.name LIKE '%.srs'))",
         self::SOURCE_CRC => "EXISTS (SELECT 1 FROM release_files source_crc WHERE source_crc.releases_id = r.id AND source_crc.crc32 IS NOT NULL AND source_crc.crc32 != '')",
-        self::SOURCE_UID => "EXISTS (SELECT 1 FROM media_infos source_media WHERE source_media.releases_id = r.id AND source_media.unique_id IS NOT NULL AND source_media.unique_id != '') OR EXISTS (SELECT 1 FROM release_unique source_unique WHERE source_unique.releases_id = r.id AND source_unique.uniqueid != '')",
+        self::SOURCE_UID => "EXISTS (SELECT 1 FROM media_infos source_media WHERE source_media.releases_id = r.id AND source_media.unique_id IS NOT NULL AND source_media.unique_id != '')",
         self::SOURCE_HASH => "EXISTS (SELECT 1 FROM par_hashes source_hash WHERE source_hash.releases_id = r.id AND source_hash.hash != '')",
         self::SOURCE_PAR2 => '1 = 1',
         self::SOURCE_XXX => "EXISTS (SELECT 1 FROM release_files source_xxx WHERE source_xxx.releases_id = r.id AND source_xxx.name LIKE '%SDPORN%')",
@@ -188,13 +188,8 @@ final class NameFixingQueryService
             'SELECT mi.releases_id, mi.unique_id AS uid, mi.movie_name, mi.file_name
              FROM media_infos mi
              WHERE mi.releases_id IN (%s)
-             UNION ALL
-             SELECT ru.releases_id, ru.uniqueid AS uid, NULL AS movie_name, NULL AS file_name
-             FROM release_unique ru
-             WHERE ru.releases_id IN (%s)
-             ORDER BY releases_id',
-            array_merge($releaseIds, $releaseIds),
-            2
+             ORDER BY mi.releases_id',
+            $releaseIds
         );
     }
 
@@ -224,21 +219,14 @@ final class NameFixingQueryService
         }
 
         $placeholders = $this->placeholders(count($uniqueIds));
-        $bindings = array_merge($uniqueIds, ['nonscene@Ef.net (EF)'], $uniqueIds);
+        $bindings = array_merge($uniqueIds, ['nonscene@Ef.net (EF)']);
         $rows = $this->database->select(
             "SELECT mi.unique_id AS match_key, r.id AS releases_id, r.size AS relsize,
                     r.searchname, r.fromname, r.predb_id
              FROM media_infos mi
              INNER JOIN releases r ON r.id = mi.releases_id
              WHERE mi.unique_id IN ({$placeholders})
-             AND (r.predb_id > 0 OR r.anidbid > 0 OR r.fromname = ?)
-             UNION ALL
-             SELECT ru.uniqueid AS match_key, r.id AS releases_id, r.size AS relsize,
-                    r.searchname, r.fromname, r.predb_id
-             FROM release_unique ru
-             INNER JOIN releases r ON r.id = ru.releases_id
-             WHERE ru.uniqueid IN ({$placeholders})
-             AND (r.predb_id > 0 OR r.anidbid > 0 OR r.fromname = 'nonscene@Ef.net (EF)')",
+             AND (r.predb_id > 0 OR r.anidbid > 0 OR r.fromname = ?)",
             $bindings
         );
 

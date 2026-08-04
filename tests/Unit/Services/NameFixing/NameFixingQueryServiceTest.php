@@ -40,6 +40,60 @@ class NameFixingQueryServiceTest extends TestCase
         $service->candidateBatch(NameFixingQueryService::SOURCE_FILES, 2, 2, 0, 100);
     }
 
+    public function test_uid_candidates_only_use_media_infos(): void
+    {
+        $database = $this->createMock(ConnectionInterface::class);
+        $database->expects($this->once())
+            ->method('select')
+            ->with(
+                $this->callback(static fn (string $sql): bool => str_contains($sql, 'FROM media_infos source_media')
+                    && str_contains($sql, 'source_media.unique_id IS NOT NULL')
+                    && ! str_contains($sql, 'release_unique')),
+                [0, 100]
+            )
+            ->willReturn([]);
+
+        $service = new NameFixingQueryService($database);
+        $service->candidateBatch(NameFixingQueryService::SOURCE_UID, 2, 3, 0, 100);
+    }
+
+    public function test_media_rows_only_load_from_media_infos(): void
+    {
+        $database = $this->createMock(ConnectionInterface::class);
+        $database->expects($this->once())
+            ->method('select')
+            ->with(
+                $this->callback(static fn (string $sql): bool => str_contains($sql, 'FROM media_infos mi')
+                    && str_contains($sql, 'mi.releases_id IN (?,?)')
+                    && ! str_contains($sql, 'release_unique')
+                    && ! str_contains($sql, 'UNION ALL')),
+                [11, 22]
+            )
+            ->willReturn([]);
+
+        $service = new NameFixingQueryService($database);
+        $service->mediaRows([11, 22]);
+    }
+
+    public function test_uid_donors_only_load_from_media_infos(): void
+    {
+        $database = $this->createMock(ConnectionInterface::class);
+        $database->expects($this->once())
+            ->method('select')
+            ->with(
+                $this->callback(static fn (string $sql): bool => str_contains($sql, 'FROM media_infos mi')
+                    && str_contains($sql, 'mi.unique_id IN (?,?)')
+                    && ! str_contains($sql, 'release_unique')
+                    && ! str_contains($sql, 'UNION ALL')),
+                ['first-uid', 'second-uid', 'nonscene@Ef.net (EF)']
+            )
+            ->willReturn([]);
+
+        $service = new NameFixingQueryService($database);
+
+        $this->assertSame([], $service->uidDonors(['first-uid', 'second-uid']));
+    }
+
     public function test_predb_workers_use_disjoint_modulo_partitions_without_offsets(): void
     {
         $database = $this->createMock(ConnectionInterface::class);
