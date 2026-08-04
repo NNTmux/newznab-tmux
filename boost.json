@@ -10,5 +10,26 @@
     ],
     "guidelines": true,
     "mcp": true,
-    "sail": true
+    "packages": [
+        "revolution/laravel-boost-phpstorm-copilot",
+        "livewire/blaze",
+        "spatie/laravel-permission"
+    ],
+    "sail": true,
+    "skills": [
+        "infer-conventions",
+        "laravel-best-practices",
+        "configuring-horizon",
+        "pulse-development",
+        "livewire-development",
+        "echo-development",
+        "tailwindcss-development",
+        "blaze-optimize",
+        "laravel-permission-development",
+        "eloquent-best-practices",
+        "laravel-11-12-app-guidelines",
+        "laravel-quality",
+        "laravel-specialist",
+        "laravel-testing"
+    ]
 }
