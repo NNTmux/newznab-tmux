@@ -12,8 +12,10 @@ use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use PDO;
+use Psr\Log\LoggerInterface;
 use Tests\TestCase;
 
 final class NfoImportServiceTest extends TestCase
@@ -127,6 +129,11 @@ final class NfoImportServiceTest extends TestCase
         $this->assertSame(1, DB::table('releases')->where('id', 1)->value('nfostatus'));
         $this->assertSame(NzbUploadManifestService::STATE_NFO_IMPORTED, $manifests->read($manifestPath)['state']);
         $this->assertFileExists($nfoPath);
+    }
+
+    public function test_nfo_import_log_channel_is_available(): void
+    {
+        $this->assertInstanceOf(LoggerInterface::class, Log::channel('nfo_import'));
     }
 
     public function test_it_deletes_a_successfully_imported_nfo_when_requested(): void
