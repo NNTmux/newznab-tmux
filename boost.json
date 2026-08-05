@@ -25,11 +25,6 @@
         "echo-development",
         "tailwindcss-development",
         "blaze-optimize",
-        "laravel-permission-development",
-        "eloquent-best-practices",
-        "laravel-11-12-app-guidelines",
-        "laravel-quality",
-        "laravel-specialist",
-        "laravel-testing"
+        "laravel-permission-development"
     ]
 }
