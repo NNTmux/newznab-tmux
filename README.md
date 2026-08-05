@@ -437,6 +437,33 @@ npm run build
 npm run lint
 ```
 
+### Agent Skills
+
+The repository keeps the shared agent skill baseline in `skills-lock.json`. The
+generated Linux installer installs those skills globally under `~/.agents/skills`
+and bridges them into Codex under `~/.codex/skills`.
+
+Prerequisites: Bash, Node.js/npm (`npx`), and network access to the skill
+repositories.
+
+```bash
+# Regenerate the installer after changing skills-lock.json
+./scripts/generate-global-skills-installer.sh
+
+# Preview global installs and Codex bridge changes
+./scripts/install-global-skills.sh --dry-run
+
+# Install globally and create Codex symlinks
+./scripts/install-global-skills.sh
+
+# Copy skills into Codex instead of creating symlinks
+./scripts/install-global-skills.sh --copy
+```
+
+Set `SKILLS_GLOBAL_DIR` or `CODEX_HOME` when using non-default global
+directories. The installer never removes or overwrites unmanaged existing
+skill paths; resolve reported conflicts manually and rerun it.
+
 ## Troubleshooting
 
 ### Common Issues

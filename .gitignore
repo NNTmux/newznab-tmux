@@ -70,3 +70,8 @@ composer.lock
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+
+# Agent skills are installed globally by scripts/install-global-skills.sh
+/.agents/skills/
+/.claude/skills/
+/.cursor/skills/
