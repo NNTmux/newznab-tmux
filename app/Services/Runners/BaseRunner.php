@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Runners;
 
 use Illuminate\Support\Facades\Log;
+use RuntimeException;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
 
 abstract class BaseRunner
@@ -141,12 +143,20 @@ abstract class BaseRunner
     protected function executeCommand(string $command): string
     {
         $process = Process::fromShellCommandline($command);
-        $process->setTimeout(1800);
-        $process->run(function ($type, $buffer) {
-            if ($type === Process::ERR) {
-                echo $buffer;
-            }
-        });
+        $process->setTimeout($this->concurrencyTimeout());
+
+        try {
+            $process->run(function ($type, $buffer) {
+                if ($type === Process::ERR) {
+                    echo $buffer;
+                }
+            });
+        } catch (ProcessTimedOutException $e) {
+            // Rethrow as RuntimeException: Laravel's Concurrency ProcessDriver cannot
+            // reconstruct ProcessTimedOutException (its constructor requires a Process
+            // object), which would otherwise surface as an unrelated TypeError.
+            throw new RuntimeException($e->getMessage());
+        }
 
         return $process->getOutput();
     }
