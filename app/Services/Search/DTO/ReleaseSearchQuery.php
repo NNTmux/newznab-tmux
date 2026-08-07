@@ -25,6 +25,12 @@ final readonly class ReleaseSearchQuery
         public ?int $groupId = null,
         public bool $passwordAllowRar = false,
         public ?int $passwordStatusMin = null,
+        public ?bool $hasMediaInfo = null,
+        public ?string $mediaUniqueId = null,
+        public int $minVideoWidth = 0,
+        public int $maxVideoWidth = 0,
+        public int $minVideoHeight = 0,
+        public int $maxVideoHeight = 0,
         public string $sortField = 'postdate_ts',
         public string $sortDirection = 'desc',
         public bool $tryFuzzy = true,
@@ -51,6 +57,14 @@ final readonly class ReleaseSearchQuery
             groupId: isset($criteria['groups_id']) ? (int) $criteria['groups_id'] : null,
             passwordAllowRar: (bool) ($criteria['password_allow_rar'] ?? false),
             passwordStatusMin: isset($criteria['password_status_min']) ? (int) $criteria['password_status_min'] : null,
+            hasMediaInfo: array_key_exists('has_media_info', $criteria) && $criteria['has_media_info'] !== null
+                ? (bool) $criteria['has_media_info']
+                : null,
+            mediaUniqueId: self::normalizeMediaUniqueId($criteria['media_unique_id'] ?? null),
+            minVideoWidth: (int) ($criteria['min_video_width'] ?? 0),
+            maxVideoWidth: (int) ($criteria['max_video_width'] ?? 0),
+            minVideoHeight: (int) ($criteria['min_video_height'] ?? 0),
+            maxVideoHeight: (int) ($criteria['max_video_height'] ?? 0),
             sortField: (string) ($criteria['sort_field'] ?? 'postdate_ts'),
             sortDirection: (string) ($criteria['sort_dir'] ?? 'desc'),
             tryFuzzy: (bool) ($criteria['try_fuzzy'] ?? true),
@@ -78,6 +92,12 @@ final readonly class ReleaseSearchQuery
             'groups_id' => $this->groupId,
             'password_allow_rar' => $this->passwordAllowRar,
             'password_status_min' => $this->passwordStatusMin,
+            'has_media_info' => $this->hasMediaInfo,
+            'media_unique_id' => $this->mediaUniqueId,
+            'min_video_width' => max(0, $this->minVideoWidth),
+            'max_video_width' => max(0, $this->maxVideoWidth),
+            'min_video_height' => max(0, $this->minVideoHeight),
+            'max_video_height' => max(0, $this->maxVideoHeight),
             'sort_field' => $this->normalizedSortField(),
             'sort_dir' => $this->normalizedSortDirection(),
             'try_fuzzy' => $this->tryFuzzy,
@@ -97,5 +117,16 @@ final readonly class ReleaseSearchQuery
     public function normalizedSortDirection(): string
     {
         return strtolower($this->sortDirection) === 'asc' ? 'asc' : 'desc';
+    }
+
+    public static function normalizeMediaUniqueId(mixed $value): ?string
+    {
+        if (! is_scalar($value)) {
+            return null;
+        }
+
+        $mediaUniqueId = trim((string) $value);
+
+        return $mediaUniqueId === '' || $mediaUniqueId === '-1' ? null : $mediaUniqueId;
     }
 }

@@ -10,7 +10,6 @@ use App\Models\ConsoleInfo;
 use App\Models\GamesInfo;
 use App\Models\MovieInfo;
 use App\Models\MusicInfo;
-use App\Models\Release;
 use App\Models\SteamApp;
 use App\Models\Video;
 use App\Services\Search\Contracts\SearchDriverInterface;
@@ -18,12 +17,13 @@ use App\Services\Search\DTO\ReleaseSearchQuery;
 use App\Services\Search\DTO\SearchPage;
 use App\Services\Search\Support\ElasticsearchClientFactory;
 use App\Services\Search\Support\ElasticsearchResponseHelper;
+use App\Services\Search\Support\ReleaseIndexProjection;
+use App\Support\ReleaseSearchIndexDocument;
 use App\Support\SecondaryIndexDocuments;
 use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\Exception\ElasticsearchException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
@@ -59,6 +59,19 @@ class ElasticSearchDriver implements SearchDriverInterface
      * @var list<string>
      */
     private const RELEASE_TEXT_FIELDS = ['searchname^3', 'plainsearchname^2'];
+
+    /** @var list<string> */
+    private const RELEASE_MEDIA_INFO_TEXT_FIELDS = [
+        'media_movie_name',
+        'media_file_name',
+        'media_container_format',
+        'media_video_format',
+        'media_video_codec',
+        'media_audio_format',
+        'media_audio_channels',
+        'media_audio_language',
+        'media_subtitle_language',
+    ];
 
     private static ?Client $client = null;
 
@@ -1084,61 +1097,7 @@ class ElasticSearchDriver implements SearchDriverInterface
         }
 
         try {
-            $release = Release::query()
-                ->where('releases.id', $releaseID)
-                ->leftJoin('release_files as rf', 'releases.id', '=', 'rf.releases_id')
-                ->leftJoin('movieinfo as mi', 'releases.movieinfo_id', '=', 'mi.id')
-                ->leftJoin('videos as v', 'releases.videos_id', '=', 'v.id')
-                ->select([
-                    'releases.id',
-                    'releases.name',
-                    'releases.searchname',
-                    'releases.fromname',
-                    'releases.categories_id',
-                    'releases.size',
-                    'releases.postdate',
-                    'releases.adddate',
-                    'releases.totalpart',
-                    'releases.grabs',
-                    'releases.passwordstatus',
-                    'releases.groups_id',
-                    'releases.nzbstatus',
-                    'releases.haspreview',
-                    'releases.imdbid',
-                    'releases.videos_id',
-                    'releases.movieinfo_id',
-                    DB::raw('IFNULL(mi.tmdbid, 0) AS tmdbid'),
-                    DB::raw('IFNULL(mi.traktid, 0) AS traktid'),
-                    DB::raw('IFNULL(v.tvdb, 0) AS tvdb'),
-                    DB::raw('IFNULL(v.tvmaze, 0) AS tvmaze'),
-                    DB::raw('IFNULL(v.tvrage, 0) AS tvrage'),
-                    DB::raw('IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename'),
-                ])
-                ->groupBy([
-                    'releases.id',
-                    'releases.name',
-                    'releases.searchname',
-                    'releases.fromname',
-                    'releases.categories_id',
-                    'releases.size',
-                    'releases.postdate',
-                    'releases.adddate',
-                    'releases.totalpart',
-                    'releases.grabs',
-                    'releases.passwordstatus',
-                    'releases.groups_id',
-                    'releases.nzbstatus',
-                    'releases.haspreview',
-                    'releases.imdbid',
-                    'releases.videos_id',
-                    'releases.movieinfo_id',
-                    'mi.tmdbid',
-                    'mi.traktid',
-                    'v.tvdb',
-                    'v.tvmaze',
-                    'v.tvrage',
-                ])
-                ->first();
+            $release = ReleaseIndexProjection::forId((int) $releaseID);
 
             if ($release === null) {
                 Log::warning('ElasticSearch: Release not found for update, removing from index', ['id' => $releaseID]);
@@ -1147,8 +1106,7 @@ class ElasticSearchDriver implements SearchDriverInterface
                 return;
             }
 
-            $client = $this->getClient();
-            $client->index($this->buildReleaseDocument($release->toArray()));
+            $this->insertRelease($release);
 
         } catch (ElasticsearchException $e) {
             Log::error('ElasticSearch updateRelease error: '.$e->getMessage(), [
@@ -1747,23 +1705,12 @@ class ElasticSearchDriver implements SearchDriverInterface
      */
     private function buildReleaseDocument(array $parameters): array
     {
-        $searchNameDotless = $this->createPlainSearchName($parameters['searchname'] ?? '');
+        $document = ReleaseSearchIndexDocument::normalizeForBulk($parameters);
 
         return [
-            'body' => [
-                'id' => $parameters['id'],
-                'name' => $parameters['name'] ?? '',
-                'searchname' => $parameters['searchname'] ?? '',
-                'plainsearchname' => $searchNameDotless,
-                'fromname' => $parameters['fromname'] ?? '',
-                'categories_id' => $parameters['categories_id'] ?? 0,
-                'imdbid' => (string) ($parameters['imdbid'] ?? ''),
-                'filename' => $parameters['filename'] ?? '',
-                'add_date' => now()->format('Y-m-d H:i:s'),
-                'post_date' => $parameters['postdate'] ?? now()->format('Y-m-d H:i:s'),
-            ],
+            'body' => $document,
             'index' => $this->getReleasesIndex(),
-            'id' => $parameters['id'],
+            'id' => $document['id'],
         ];
     }
 
@@ -2895,7 +2842,7 @@ class ElasticSearchDriver implements SearchDriverInterface
 
         $phrases = $criteria['phrases'] ?? null;
         $hasText = $phrases !== null && $phrases !== '' && $phrases !== -1;
-        $tryFuzzy = (bool) ($criteria['try_fuzzy'] ?? true);
+        $tryFuzzy = (bool) ($criteria['try_fuzzy'] ?? true) && ! self::hasMediaInfoFieldQuery($phrases);
 
         $run = function (bool $useFuzzy) use ($criteria, $limit, $offset, $hasText, $phrases): array {
             $filter = $this->buildElasticsearchReleaseFilters($criteria);
@@ -3036,6 +2983,15 @@ class ElasticSearchDriver implements SearchDriverInterface
             'name' => ['name'],
             'fromname' => ['fromname'],
             'filename' => ['filename'],
+            'media_movie_name' => ['media_movie_name'],
+            'media_file_name' => ['media_file_name'],
+            'media_container_format' => ['media_container_format'],
+            'media_video_format' => ['media_video_format'],
+            'media_video_codec' => ['media_video_codec'],
+            'media_audio_format' => ['media_audio_format'],
+            'media_audio_channels' => ['media_audio_channels'],
+            'media_audio_language' => ['media_audio_language'],
+            'media_subtitle_language' => ['media_subtitle_language'],
         ];
 
         $must = [];
@@ -3077,6 +3033,21 @@ class ElasticSearchDriver implements SearchDriverInterface
         }
 
         return $must;
+    }
+
+    private static function hasMediaInfoFieldQuery(mixed $phrases): bool
+    {
+        if (! is_array($phrases)) {
+            return false;
+        }
+
+        foreach (self::RELEASE_MEDIA_INFO_TEXT_FIELDS as $field) {
+            if (isset($phrases[$field]) && $phrases[$field] !== '' && $phrases[$field] !== -1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -3160,6 +3131,41 @@ class ElasticSearchDriver implements SearchDriverInterface
 
         if (array_key_exists('password_status_min', $criteria) && $criteria['password_status_min'] !== null) {
             $filter[] = ['range' => ['passwordstatus' => ['gte' => (int) $criteria['password_status_min']]]];
+        }
+
+        if (array_key_exists('has_media_info', $criteria) && $criteria['has_media_info'] !== null) {
+            $filter[] = ['term' => ['has_media_info' => (bool) $criteria['has_media_info'] ? 1 : 0]];
+        }
+
+        $mediaUniqueId = ReleaseSearchQuery::normalizeMediaUniqueId($criteria['media_unique_id'] ?? null);
+        if ($mediaUniqueId !== null) {
+            $filter[] = ['term' => ['media_unique_id' => $mediaUniqueId]];
+        }
+
+        $minVideoWidth = (int) ($criteria['min_video_width'] ?? 0);
+        $maxVideoWidth = (int) ($criteria['max_video_width'] ?? 0);
+        if ($minVideoWidth > 0 || $maxVideoWidth > 0) {
+            $range = [];
+            if ($minVideoWidth > 0) {
+                $range['gte'] = $minVideoWidth;
+            }
+            if ($maxVideoWidth > 0) {
+                $range['lte'] = $maxVideoWidth;
+            }
+            $filter[] = ['range' => ['media_video_width' => $range]];
+        }
+
+        $minVideoHeight = (int) ($criteria['min_video_height'] ?? 0);
+        $maxVideoHeight = (int) ($criteria['max_video_height'] ?? 0);
+        if ($minVideoHeight > 0 || $maxVideoHeight > 0) {
+            $range = [];
+            if ($minVideoHeight > 0) {
+                $range['gte'] = $minVideoHeight;
+            }
+            if ($maxVideoHeight > 0) {
+                $range['lte'] = $maxVideoHeight;
+            }
+            $filter[] = ['range' => ['media_video_height' => $range]];
         }
 
         return $filter;

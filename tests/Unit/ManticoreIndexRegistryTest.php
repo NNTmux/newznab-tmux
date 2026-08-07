@@ -29,6 +29,11 @@ final class ManticoreIndexRegistryTest extends TestCase
 
         self::assertSame('bigint', $definitions['releases']['columns']['passwordstatus']['type']);
         self::assertSame('bigint', $definitions['releases']['columns']['haspreview']['type']);
+        self::assertSame('text', $definitions['releases']['columns']['media_movie_name']['type']);
+        self::assertSame('string', $definitions['releases']['columns']['media_unique_id']['type']);
+        self::assertSame('integer', $definitions['releases']['columns']['media_video_width']['type']);
+        self::assertSame('text', $definitions['releases']['columns']['media_audio_language']['type']);
+        self::assertSame('integer', $definitions['releases']['columns']['has_media_info']['type']);
     }
 
     #[Test]

@@ -37,6 +37,37 @@ class ManticoreSearchDriver implements SearchDriverInterface
 {
     private const AVAILABILITY_CHECK_CACHE_TTL = 30;
 
+    /** @var list<string> */
+    private const RELEASE_FIELD_SEARCH_FIELDS = [
+        'searchname',
+        'plainsearchname',
+        'name',
+        'fromname',
+        'filename',
+        'media_movie_name',
+        'media_file_name',
+        'media_container_format',
+        'media_video_format',
+        'media_video_codec',
+        'media_audio_format',
+        'media_audio_channels',
+        'media_audio_language',
+        'media_subtitle_language',
+    ];
+
+    /** @var list<string> */
+    private const RELEASE_MEDIA_INFO_TEXT_FIELDS = [
+        'media_movie_name',
+        'media_file_name',
+        'media_container_format',
+        'media_video_format',
+        'media_video_codec',
+        'media_audio_format',
+        'media_audio_channels',
+        'media_audio_language',
+        'media_subtitle_language',
+    ];
+
     private static ?bool $availabilityCache = null;
 
     private static ?int $availabilityCacheTime = null;
@@ -2591,7 +2622,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
         $phrases = $criteria['phrases'] ?? null;
         $hasText = $phrases !== null && $phrases !== '' && $phrases !== -1;
-        $tryFuzzy = (bool) ($criteria['try_fuzzy'] ?? true);
+        $tryFuzzy = (bool) ($criteria['try_fuzzy'] ?? true) && ! self::hasMediaInfoFieldQuery($phrases);
 
         $execute = function (bool $useFuzzy) use ($criteria, $limit, $offset, $hasText, $phrases): array {
             $query = (new Search($this->manticoreSearch))
@@ -2620,7 +2651,7 @@ class ManticoreSearchDriver implements SearchDriverInterface
                     $searchArray = $this->phrasesToSearchArray($phrases);
                     $terms = [];
                     foreach ($searchArray as $key => $value) {
-                        if ($value === '' || $value === null) {
+                        if (! is_string($key) || ! in_array($key, self::RELEASE_FIELD_SEARCH_FIELDS, true) || $value === '' || $value === null) {
                             continue;
                         }
                         $prepared = self::prepareUserSearchQuery((string) $value);
@@ -2744,6 +2775,21 @@ class ManticoreSearchDriver implements SearchDriverInterface
         return implode(' ', $searchTerms);
     }
 
+    private static function hasMediaInfoFieldQuery(mixed $phrases): bool
+    {
+        if (! is_array($phrases)) {
+            return false;
+        }
+
+        foreach (self::RELEASE_MEDIA_INFO_TEXT_FIELDS as $field) {
+            if (isset($phrases[$field]) && $phrases[$field] !== '' && $phrases[$field] !== -1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * @param  array<string, mixed>  $criteria
      */
@@ -2817,6 +2863,35 @@ class ManticoreSearchDriver implements SearchDriverInterface
 
         if (array_key_exists('password_status_min', $criteria) && $criteria['password_status_min'] !== null) {
             $query->filter('passwordstatus', 'gte', (int) $criteria['password_status_min']);
+        }
+
+        if (array_key_exists('has_media_info', $criteria) && $criteria['has_media_info'] !== null) {
+            $query->filter('has_media_info', '=', (bool) $criteria['has_media_info'] ? 1 : 0);
+        }
+
+        $mediaUniqueId = ReleaseSearchQuery::normalizeMediaUniqueId($criteria['media_unique_id'] ?? null);
+        if ($mediaUniqueId !== null) {
+            $query->filter('media_unique_id', '=', $mediaUniqueId);
+        }
+
+        $minVideoWidth = (int) ($criteria['min_video_width'] ?? 0);
+        if ($minVideoWidth > 0) {
+            $query->filter('media_video_width', 'gte', $minVideoWidth);
+        }
+
+        $maxVideoWidth = (int) ($criteria['max_video_width'] ?? 0);
+        if ($maxVideoWidth > 0) {
+            $query->filter('media_video_width', 'lte', $maxVideoWidth);
+        }
+
+        $minVideoHeight = (int) ($criteria['min_video_height'] ?? 0);
+        if ($minVideoHeight > 0) {
+            $query->filter('media_video_height', 'gte', $minVideoHeight);
+        }
+
+        $maxVideoHeight = (int) ($criteria['max_video_height'] ?? 0);
+        if ($maxVideoHeight > 0) {
+            $query->filter('media_video_height', 'lte', $maxVideoHeight);
         }
     }
 

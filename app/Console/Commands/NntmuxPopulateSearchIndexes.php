@@ -760,45 +760,13 @@ class NntmuxPopulateSearchIndexes extends Command
             return Command::SUCCESS;
         }
 
-        $query = Release::query()
-            ->orderByDesc('releases.id')
-            ->leftJoin('release_files', 'releases.id', '=', 'release_files.releases_id')
-            ->select([
-                'releases.id',
-                'releases.name',
-                'releases.searchname',
-                'releases.fromname',
-                'releases.categories_id',
-                'releases.postdate',
-            ])
-            ->selectRaw('IFNULL(GROUP_CONCAT(release_files.name SEPARATOR " "),"") AS filename')
-            ->groupBy([
-                'releases.id',
-                'releases.name',
-                'releases.searchname',
-                'releases.fromname',
-                'releases.categories_id',
-                'releases.postdate',
-            ]);
+        $query = ReleaseIndexProjection::query()->orderBy('r.id');
 
         return $this->processElasticData(
             'releases',
             $total,
             $query,
-            function ($item) {
-                $searchName = str_replace(['.', '-'], ' ', $item->searchname ?? '');
-
-                return [
-                    'id' => $item->id,
-                    'name' => $item->name,
-                    'searchname' => $item->searchname,
-                    'plainsearchname' => $searchName,
-                    'fromname' => $item->fromname,
-                    'categories_id' => $item->categories_id,
-                    'filename' => $item->filename ?? '',
-                    'postdate' => $item->postdate,
-                ];
-            }
+            fn ($item): array => ReleaseSearchIndexDocument::normalize((array) $item)
         );
     }
 

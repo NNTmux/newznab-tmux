@@ -30,6 +30,11 @@ final class ReleaseSearchIndexDocumentTest extends TestCase
             'tv_episodes_id' => '456',
             'passwordstatus' => '-1',
             'comments' => '3',
+            'media_movie_name' => 'Example Movie',
+            'media_video_width' => '1920',
+            'media_video_height' => '1080',
+            'media_audio_language' => 'English French',
+            'has_media_info' => '1',
             'postdate' => '2026-01-02 03:04:05',
             'adddate' => '2026-01-03 04:05:06',
             'nzb_password' => 'must-not-be-indexed',
@@ -40,6 +45,11 @@ final class ReleaseSearchIndexDocumentTest extends TestCase
         self::assertSame(123, $document['tmdbid']);
         self::assertSame(456, $document['tv_episodes_id']);
         self::assertSame(-1, $document['passwordstatus']);
+        self::assertSame('Example Movie', $document['media_movie_name']);
+        self::assertSame(1920, $document['media_video_width']);
+        self::assertSame(1080, $document['media_video_height']);
+        self::assertSame('English French', $document['media_audio_language']);
+        self::assertSame(1, $document['has_media_info']);
         self::assertGreaterThan(0, $document['postdate_ts']);
         self::assertGreaterThan(0, $document['adddate_ts']);
         self::assertArrayNotHasKey('nzb_password', $document);

@@ -26,6 +26,11 @@ final class ReleaseSearchIndexDocument
             'size', 'postdate_ts', 'adddate_ts', 'totalpart', 'grabs', 'comments',
             'passwordstatus', 'nzbstatus', 'nfostatus', 'haspreview', 'jpgstatus',
             'nfoid', 'reid',
+            'media_movie_name', 'media_file_name', 'media_unique_id',
+            'media_container_format', 'media_video_format', 'media_video_codec',
+            'media_video_width', 'media_video_height', 'media_audio_format',
+            'media_audio_channels', 'media_audio_language', 'media_subtitle_language',
+            'has_media_info',
         ];
     }
 
@@ -103,6 +108,19 @@ final class ReleaseSearchIndexDocument
             'jpgstatus' => (int) ($row['jpgstatus'] ?? 0),
             'nfoid' => (int) ($row['nfoid'] ?? 0),
             'reid' => (int) ($row['reid'] ?? 0),
+            'media_movie_name' => (string) ($row['media_movie_name'] ?? ''),
+            'media_file_name' => (string) ($row['media_file_name'] ?? ''),
+            'media_unique_id' => (string) ($row['media_unique_id'] ?? ''),
+            'media_container_format' => (string) ($row['media_container_format'] ?? ''),
+            'media_video_format' => (string) ($row['media_video_format'] ?? ''),
+            'media_video_codec' => (string) ($row['media_video_codec'] ?? ''),
+            'media_video_width' => (int) ($row['media_video_width'] ?? 0),
+            'media_video_height' => (int) ($row['media_video_height'] ?? 0),
+            'media_audio_format' => (string) ($row['media_audio_format'] ?? ''),
+            'media_audio_channels' => (string) ($row['media_audio_channels'] ?? ''),
+            'media_audio_language' => (string) ($row['media_audio_language'] ?? ''),
+            'media_subtitle_language' => (string) ($row['media_subtitle_language'] ?? ''),
+            'has_media_info' => (int) ($row['has_media_info'] ?? 0),
         ];
     }
 

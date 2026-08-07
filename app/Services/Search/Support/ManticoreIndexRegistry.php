@@ -40,6 +40,13 @@ final class ManticoreIndexRegistry
                 'reid' => ['type' => 'integer'],
                 'passwordstatus' => ['type' => 'bigint'], 'groups_id' => ['type' => 'integer'],
                 'nzbstatus' => ['type' => 'integer'], 'haspreview' => ['type' => 'bigint'],
+                'media_movie_name' => ['type' => 'text'], 'media_file_name' => ['type' => 'text'],
+                'media_unique_id' => ['type' => 'string'], 'media_container_format' => ['type' => 'text'],
+                'media_video_format' => ['type' => 'text'], 'media_video_codec' => ['type' => 'text'],
+                'media_video_width' => ['type' => 'integer'], 'media_video_height' => ['type' => 'integer'],
+                'media_audio_format' => ['type' => 'text'], 'media_audio_channels' => ['type' => 'text'],
+                'media_audio_language' => ['type' => 'text'], 'media_subtitle_language' => ['type' => 'text'],
+                'has_media_info' => ['type' => 'integer'],
             ]],
             'predb' => ['settings' => $settings, 'columns' => [
                 'title' => ['type' => 'text', 'attribute' => true],

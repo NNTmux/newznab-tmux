@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Services\Search\Drivers\ManticoreSearchDriver;
+use App\Services\Search\DTO\ReleaseSearchQuery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -261,6 +262,46 @@ class ManticoreSearchQueryTest extends TestCase
 
         $this->assertIsString($driverSource);
         $this->assertStringContainsString("\$query->sort('id', \$order);", $driverSource);
+    }
+
+    #[Test]
+    public function release_search_query_normalizes_media_info_filters(): void
+    {
+        $criteria = ReleaseSearchQuery::fromCriteria([
+            'has_media_info' => true,
+            'media_unique_id' => ' 0x123ABC ',
+            'min_video_width' => -1,
+            'max_video_width' => 3840,
+            'min_video_height' => 720,
+            'max_video_height' => 2160,
+        ], 25)->criteria();
+
+        $this->assertTrue($criteria['has_media_info']);
+        $this->assertSame('0x123ABC', $criteria['media_unique_id']);
+        $this->assertSame(0, $criteria['min_video_width']);
+        $this->assertSame(3840, $criteria['max_video_width']);
+        $this->assertSame(720, $criteria['min_video_height']);
+        $this->assertSame(2160, $criteria['max_video_height']);
+
+        $invalidCriteria = ReleaseSearchQuery::fromCriteria(['media_unique_id' => '-1'], 25)->criteria();
+        $this->assertNull($invalidCriteria['media_unique_id']);
+    }
+
+    #[Test]
+    public function filtered_release_search_allowlists_media_info_fields_and_filters(): void
+    {
+        $driverSource = file_get_contents(__DIR__.'/../../app/Services/Search/Drivers/ManticoreSearchDriver.php');
+
+        $this->assertIsString($driverSource);
+        $this->assertStringContainsString("'media_video_codec',", $driverSource);
+        $this->assertStringContainsString('in_array($key, self::RELEASE_FIELD_SEARCH_FIELDS, true)', $driverSource);
+        $this->assertStringContainsString("\$query->filter('has_media_info', '='", $driverSource);
+        $this->assertStringContainsString("\$query->filter('media_unique_id', '='", $driverSource);
+        $this->assertStringContainsString("\$query->filter('media_video_width', 'gte'", $driverSource);
+        $this->assertStringContainsString("\$query->filter('media_video_height', 'lte'", $driverSource);
+
+        $reflection = new ReflectionClass(ManticoreSearchDriver::class);
+        $this->assertNotContains('media_unique_id', $reflection->getConstant('RELEASE_FIELD_SEARCH_FIELDS'));
     }
 
     #[Test]

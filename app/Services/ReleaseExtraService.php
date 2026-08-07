@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Models\AudioData;
 use App\Models\ReleaseSubtitle;
 use App\Models\VideoData;
+use App\Support\ReleaseSearchIndexSync;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -250,6 +251,8 @@ class ReleaseExtraService
                 }
             }
         }
+
+        ReleaseSearchIndexSync::forIds([$releaseID]);
     }
 
     /**

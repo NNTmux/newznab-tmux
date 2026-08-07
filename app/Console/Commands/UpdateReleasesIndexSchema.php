@@ -56,6 +56,19 @@ class UpdateReleasesIndexSchema extends Command
         'tvrage' => ['type' => 'int'],
         'videos_id' => ['type' => 'int'],
         'movieinfo_id' => ['type' => 'int'],
+        'media_movie_name' => ['type' => 'text'],
+        'media_file_name' => ['type' => 'text'],
+        'media_unique_id' => ['type' => 'string'],
+        'media_container_format' => ['type' => 'text'],
+        'media_video_format' => ['type' => 'text'],
+        'media_video_codec' => ['type' => 'text'],
+        'media_video_width' => ['type' => 'int'],
+        'media_video_height' => ['type' => 'int'],
+        'media_audio_format' => ['type' => 'text'],
+        'media_audio_channels' => ['type' => 'text'],
+        'media_audio_language' => ['type' => 'text'],
+        'media_subtitle_language' => ['type' => 'text'],
+        'has_media_info' => ['type' => 'int'],
     ];
 
     protected Client $client;

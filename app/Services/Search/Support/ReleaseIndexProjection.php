@@ -16,9 +16,22 @@ final class ReleaseIndexProjection
     public static function query(): Builder
     {
         $isSqlite = DB::connection()->getDriverName() === 'sqlite';
+        $mediaInfo = self::mediaInfoQuery();
         $filename = $isSqlite
             ? "COALESCE((SELECT GROUP_CONCAT(rf.name, ' ') FROM release_files rf WHERE rf.releases_id = r.id), '')"
             : "COALESCE((SELECT GROUP_CONCAT(rf.name SEPARATOR ' ') FROM release_files rf WHERE rf.releases_id = r.id), '')";
+        $audioFormat = $isSqlite
+            ? "COALESCE((SELECT GROUP_CONCAT(ad.audioformat, ' ') FROM audio_data ad WHERE ad.releases_id = r.id), '')"
+            : "COALESCE((SELECT GROUP_CONCAT(ad.audioformat SEPARATOR ' ') FROM audio_data ad WHERE ad.releases_id = r.id), '')";
+        $audioChannels = $isSqlite
+            ? "COALESCE((SELECT GROUP_CONCAT(ad.audiochannels, ' ') FROM audio_data ad WHERE ad.releases_id = r.id), '')"
+            : "COALESCE((SELECT GROUP_CONCAT(ad.audiochannels SEPARATOR ' ') FROM audio_data ad WHERE ad.releases_id = r.id), '')";
+        $audioLanguage = $isSqlite
+            ? "COALESCE((SELECT GROUP_CONCAT(ad.audiolanguage, ' ') FROM audio_data ad WHERE ad.releases_id = r.id), '')"
+            : "COALESCE((SELECT GROUP_CONCAT(ad.audiolanguage SEPARATOR ' ') FROM audio_data ad WHERE ad.releases_id = r.id), '')";
+        $subtitleLanguage = $isSqlite
+            ? "COALESCE((SELECT GROUP_CONCAT(rs.subslanguage, ' ') FROM release_subtitles rs WHERE rs.releases_id = r.id), '')"
+            : "COALESCE((SELECT GROUP_CONCAT(rs.subslanguage SEPARATOR ' ') FROM release_subtitles rs WHERE rs.releases_id = r.id), '')";
         $categoryName = $isSqlite
             ? "cp.title || ' > ' || c.title"
             : "CONCAT(cp.title, ' > ', c.title)";
@@ -41,6 +54,7 @@ final class ReleaseIndexProjection
             })
             ->leftJoin('release_nfos as rn', 'rn.releases_id', '=', 'r.id')
             ->leftJoin('video_data as vd', 'vd.releases_id', '=', 'r.id')
+            ->leftJoinSub($mediaInfo, 'mdi', 'mdi.releases_id', '=', 'r.id')
             ->select([
                 'r.id', 'r.guid', 'r.name', 'r.searchname', 'r.fromname', 'r.categories_id',
                 'r.groups_id', 'r.size', 'r.postdate', 'r.adddate', 'r.totalpart', 'r.grabs',
@@ -61,7 +75,34 @@ final class ReleaseIndexProjection
                 DB::raw('COALESCE(v.tmdb, 0) AS tmdb'),
                 DB::raw('COALESCE(rn.releases_id, 0) AS nfoid'),
                 DB::raw('COALESCE(vd.releases_id, 0) AS reid'),
+                DB::raw("COALESCE(mdi.movie_name, '') AS media_movie_name"),
+                DB::raw("COALESCE(mdi.file_name, '') AS media_file_name"),
+                DB::raw("COALESCE(mdi.unique_id, '') AS media_unique_id"),
+                DB::raw("COALESCE(vd.containerformat, '') AS media_container_format"),
+                DB::raw("COALESCE(vd.videoformat, '') AS media_video_format"),
+                DB::raw("COALESCE(vd.videocodec, '') AS media_video_codec"),
+                DB::raw('COALESCE(vd.videowidth, 0) AS media_video_width'),
+                DB::raw('COALESCE(vd.videoheight, 0) AS media_video_height'),
+                DB::raw("{$audioFormat} AS media_audio_format"),
+                DB::raw("{$audioChannels} AS media_audio_channels"),
+                DB::raw("{$audioLanguage} AS media_audio_language"),
+                DB::raw("{$subtitleLanguage} AS media_subtitle_language"),
+                DB::raw('CASE WHEN mdi.releases_id IS NOT NULL OR vd.releases_id IS NOT NULL OR EXISTS (SELECT 1 FROM audio_data ad WHERE ad.releases_id = r.id) OR EXISTS (SELECT 1 FROM release_subtitles rs WHERE rs.releases_id = r.id) THEN 1 ELSE 0 END AS has_media_info'),
             ]);
+    }
+
+    private static function mediaInfoQuery(): Builder
+    {
+        return DB::table('media_infos as selected_media_info')
+            ->select([
+                'selected_media_info.releases_id',
+                'selected_media_info.movie_name',
+                'selected_media_info.file_name',
+                'selected_media_info.unique_id',
+            ])
+            ->whereRaw(
+                'selected_media_info.id = (SELECT MIN(candidate_media_info.id) FROM media_infos candidate_media_info WHERE candidate_media_info.releases_id = selected_media_info.releases_id)'
+            );
     }
 
     /**
