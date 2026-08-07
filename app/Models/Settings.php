@@ -25,6 +25,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -149,10 +150,31 @@ class Settings extends Model
 
     public static function settingValue(mixed $setting): mixed
     {
-        $value = self::query()->where('name', $setting)->value('value');
+        try {
+            $value = self::query()->where('name', $setting)->value('value');
+        } catch (QueryException $e) {
+            // The settings table does not exist yet on a fresh install. Console
+            // boot eagerly builds commands whose service constructors read
+            // settings, so this must degrade gracefully instead of crashing.
+            if (! self::isMissingTableError($e)) {
+                throw $e;
+            }
+
+            return null;
+        }
 
         // Apply the same conversion logic as the accessor
         return self::convertValue($value);
+    }
+
+    /**
+     * Determine if the exception was caused by a missing table.
+     */
+    private static function isMissingTableError(QueryException $e): bool
+    {
+        // MySQL/MariaDB: 42S02, PostgreSQL: 42P01, SQLite: HY000 with message.
+        return in_array($e->getCode(), ['42S02', '42P01'], true)
+            || ($e->getCode() === 'HY000' && str_contains($e->getMessage(), 'no such table'));
     }
 
     /**
