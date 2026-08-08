@@ -65,6 +65,8 @@ class PostProcessRunnerAdditionalThreadsTest extends TestCase
             'database.connections.sqlite.database' => $this->databasePath,
             'nntmux.echocli' => false,
             'nntmux.tmp_unrar_path' => $this->tmpUnrarPath,
+            'nntmux_settings.check_passworded_rars' => true,
+            'nntmux_settings.unrar_path' => '/usr/bin/unrar',
         ]);
 
         DB::purge();

@@ -136,8 +136,7 @@ final readonly class ProcessingConfiguration
         $this->processJPGSample = (int) Settings::settingValue('processjpg') !== 0;
         $this->processMediaInfo = (bool) $this->mediaInfoPath;
         $this->processAudioInfo = $this->processMediaInfo;
-        $this->processPasswords = config('nntmux_settings.check_passworded_rars') === true
-            && ! empty(config('nntmux_settings.unrar_path'));
+        $this->processPasswords = PasswordInspectionMode::isActive();
         $this->audioSavePath = config('nntmux_settings.covers_path').'/audiosample/';
         $this->tmpUnrarPath = config('nntmux.tmp_unrar_path');
         $this->debugMode = (bool) config('app.debug');

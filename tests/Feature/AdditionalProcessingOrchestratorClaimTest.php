@@ -64,6 +64,8 @@ class AdditionalProcessingOrchestratorClaimTest extends TestCase
         config([
             'database.default' => 'sqlite',
             'database.connections.sqlite.database' => $this->databasePath,
+            'nntmux_settings.check_passworded_rars' => true,
+            'nntmux_settings.unrar_path' => '/usr/bin/unrar',
         ]);
 
         DB::purge();

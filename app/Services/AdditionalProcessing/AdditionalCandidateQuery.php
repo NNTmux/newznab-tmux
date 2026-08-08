@@ -6,6 +6,7 @@ namespace App\Services\AdditionalProcessing;
 
 use App\Models\Release;
 use App\Models\Settings;
+use App\Services\AdditionalProcessing\Config\PasswordInspectionMode;
 use App\Services\Runners\PostProcessRunner;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -25,7 +26,7 @@ use Illuminate\Support\Facades\Schema;
  * History: the two queries were maintained independently, and a mismatch on
  * size filters / nzbstatus caused releases to be advertised by the bucket
  * query but rejected by the orchestrator, accumulating forever in the
- * "passwordstatus=-1, haspreview=-1" backlog.
+ * pending-password-status / haspreview=-1 backlog.
  */
 final class AdditionalCandidateQuery
 {
@@ -104,7 +105,7 @@ final class AdditionalCandidateQuery
         $min = $minSizeMB ?? self::minSizeMB();
         $max = $maxSizeGB ?? self::maxSizeGB();
         $query
-            ->where('r.passwordstatus', -1)
+            ->where('r.passwordstatus', PasswordInspectionMode::pendingReleaseStatus())
             ->where('r.haspreview', -1)
             ->where('r.nzbstatus', 1)
             ->where('c.disablepreview', 0);

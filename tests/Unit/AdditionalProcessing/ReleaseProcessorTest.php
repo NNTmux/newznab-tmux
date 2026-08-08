@@ -5,6 +5,7 @@ namespace Tests\Unit\AdditionalProcessing;
 use App\Models\Release;
 use App\Services\AdditionalProcessing\ArchiveExtractionService;
 use App\Services\AdditionalProcessing\ConsoleOutputService;
+use App\Services\AdditionalProcessing\Enums\DownloadKind;
 use App\Services\AdditionalProcessing\MediaExtractionService;
 use App\Services\AdditionalProcessing\NzbContentParser;
 use App\Services\AdditionalProcessing\ReleaseFileManager;
@@ -15,7 +16,7 @@ use App\Services\AdditionalProcessing\UsenetDownloadService;
 use App\Services\TempWorkspaceService;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class ReleaseProcessorTest extends TestCase
 {
@@ -139,6 +140,85 @@ class ReleaseProcessorTest extends TestCase
         $processor->process($context, '/tmp/main/');
 
         $this->assertTrue(true);
+    }
+
+    #[Test]
+    public function it_processes_media_info_when_password_inspection_is_disabled(): void
+    {
+        $tmpPath = sys_get_temp_dir().'/nntmux-media-info-'.uniqid('', true).'/';
+        mkdir($tmpPath);
+
+        $config = $this->makeConfig([
+            'processPasswords' => false,
+            'processMediaInfo' => true,
+        ]);
+        $nzbParser = Mockery::mock(NzbContentParser::class);
+        $nzbParser->shouldReceive('parseNzb')->once()->andReturn([
+            'error' => null,
+            'contents' => [['title' => 'video.mkv', 'segments' => ['media-message-id']]],
+        ]);
+        $nzbParser->shouldReceive('extractMessageIDs')->once()->andReturn([
+            'hasCompressedFile' => false,
+            'sampleMessageIDs' => [],
+            'jpgMessageIDs' => [],
+            'mediaInfoMessageID' => ['media-message-id'],
+            'audioInfoMessageID' => '',
+            'audioInfoExtension' => '',
+            'bookFileCount' => 0,
+        ]);
+
+        $downloadService = Mockery::mock(UsenetDownloadService::class);
+        $downloadService->shouldReceive('download')
+            ->once()
+            ->with(DownloadKind::MediaInfo, ['media-message-id'], '', 1)
+            ->andReturn([
+                'success' => true,
+                'data' => str_repeat('x', 41),
+                'groupUnavailable' => false,
+                'error' => null,
+            ]);
+        $downloadService->shouldReceive('meetsMinimumSize')->once()->andReturnTrue();
+
+        $mediaService = Mockery::mock(MediaExtractionService::class);
+        $mediaService->shouldReceive('getMediaInfo')->once()->andReturnTrue();
+
+        $releaseManager = Mockery::mock(ReleaseFileManager::class);
+        $releaseManager->shouldReceive('processReleaseNameFromNzbContents')->once()->andReturnFalse();
+        $releaseManager->shouldReceive('finalizeRelease')->once()->with(Mockery::type(ReleaseProcessingContext::class), false);
+
+        $tempWorkspace = Mockery::mock(TempWorkspaceService::class);
+        $tempWorkspace->shouldReceive('createReleaseTempFolder')->once()->andReturn($tmpPath);
+        $tempWorkspace->shouldReceive('clearDirectory')->once()->andReturnNull();
+
+        $output = Mockery::mock(ConsoleOutputService::class);
+        $output->shouldReceive('echoReleaseStart')->once();
+        $output->shouldReceive('setProcessTitle')->once();
+        $output->shouldReceive('echoMediaInfoDownload')->once();
+        $output->shouldReceive('echoMediaInfoAdded')->once();
+
+        $processor = new ReleaseProcessor(
+            $config,
+            $nzbParser,
+            Mockery::mock(ArchiveExtractionService::class),
+            $mediaService,
+            $downloadService,
+            $releaseManager,
+            Mockery::mock(ReleaseFilesArchiveFallback::class),
+            $tempWorkspace,
+            $output,
+        );
+
+        $context = $this->makeContext();
+        $context->release->nfostatus = 1;
+
+        try {
+            $processor->process($context, $tmpPath);
+
+            $this->assertTrue($context->foundMediaInfo);
+        } finally {
+            @unlink($tmpPath.'media.avi');
+            @rmdir($tmpPath);
+        }
     }
 
     private function makeProcessor(

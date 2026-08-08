@@ -5,11 +5,13 @@ use Monolog\Handler\SyslogUdpHandler;
 
 return [
 
+    'default' => env('LOG_CHANNEL', 'stack'),
+
     'channels' => [
         'stack' => [
             'driver' => 'stack',
             'name' => 'NNTmux',
-            'channels' => ['daily', 'flare'],
+            'channels' => explode(',', (string) env('LOG_STACK', 'single')),
             'ignore_exceptions' => false,
         ],
 

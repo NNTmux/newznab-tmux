@@ -56,6 +56,8 @@ class AdditionalCandidateQueryTest extends TestCase
         config([
             'database.default' => 'sqlite',
             'database.connections.sqlite.database' => $this->databasePath,
+            'nntmux_settings.check_passworded_rars' => true,
+            'nntmux_settings.unrar_path' => '/usr/bin/unrar',
         ]);
 
         DB::purge();
@@ -177,6 +179,56 @@ class AdditionalCandidateQueryTest extends TestCase
         $this->assertSame([1], $third->pluck('id')->all());
     }
 
+    public function test_password_inspection_enabled_selects_pending_releases(): void
+    {
+        config([
+            'nntmux_settings.check_passworded_rars' => true,
+            'nntmux_settings.unrar_path' => '/usr/bin/unrar',
+        ]);
+
+        DB::table('categories')->insert(['id' => 1, 'disablepreview' => 0]);
+        DB::table('releases')->insert([
+            $this->releaseRow(1, 'a', passwordStatus: -1),
+            $this->releaseRow(2, 'b', passwordStatus: 0),
+        ]);
+
+        $this->assertSame([1], AdditionalCandidateQuery::baseBuilder()->pluck('r.id')->all());
+    }
+
+    public function test_password_inspection_disabled_selects_unprocessed_no_password_releases(): void
+    {
+        config([
+            'nntmux_settings.check_passworded_rars' => false,
+            'nntmux_settings.unrar_path' => false,
+        ]);
+
+        DB::table('categories')->insert(['id' => 1, 'disablepreview' => 0]);
+        DB::table('releases')->insert([
+            $this->releaseRow(1, 'a', passwordStatus: 0),
+            $this->releaseRow(2, 'b', passwordStatus: -1),
+            $this->releaseRow(3, 'c', passwordStatus: 0, hasPreview: 0),
+        ]);
+
+        $this->assertSame([1], AdditionalCandidateQuery::baseBuilder()->pluck('r.id')->all());
+        $this->assertSame([
+            ['bucket' => 'a', 'total' => 1, 'available' => 1],
+        ], AdditionalCandidateQuery::bucketBacklog());
+        $this->assertSame([1], AdditionalCandidateQuery::claimBatch('a', 25, 'worker', columns: ['id'])->pluck('id')->all());
+    }
+
+    public function test_password_inspection_without_usable_unrar_selects_no_password_state(): void
+    {
+        config([
+            'nntmux_settings.check_passworded_rars' => true,
+            'nntmux_settings.unrar_path' => '',
+        ]);
+
+        DB::table('categories')->insert(['id' => 1, 'disablepreview' => 0]);
+        DB::table('releases')->insert($this->releaseRow(1, 'a', passwordStatus: 0));
+
+        $this->assertSame([1], AdditionalCandidateQuery::baseBuilder()->pluck('r.id')->all());
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -185,14 +237,16 @@ class AdditionalCandidateQueryTest extends TestCase
         string $leftguid,
         int $categoriesId = 1,
         ?\DateTimeInterface $claimedAt = null,
-        string $postdate = '2026-07-12 00:00:00'
+        string $postdate = '2026-07-12 00:00:00',
+        int $passwordStatus = -1,
+        int $hasPreview = -1,
     ): array {
         return [
             'id' => $id,
             'guid' => $leftguid.'-guid-'.$id,
             'leftguid' => $leftguid,
-            'passwordstatus' => -1,
-            'haspreview' => -1,
+            'passwordstatus' => $passwordStatus,
+            'haspreview' => $hasPreview,
             'nzbstatus' => 1,
             'categories_id' => $categoriesId,
             'size' => 2 * 1048576,

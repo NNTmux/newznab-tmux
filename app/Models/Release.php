@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Facades\Search;
+use App\Services\AdditionalProcessing\Config\PasswordInspectionMode;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -190,7 +191,7 @@ class Release extends Model
      */
     public static function insertRelease(array $parameters = [])
     {
-        $passwordStatus = config('nntmux_settings.check_passworded_rars') === true ? -1 : 0;
+        $passwordStatus = PasswordInspectionMode::pendingReleaseStatus();
         $parameters['id'] = self::query()
             ->insertGetId(
                 [
