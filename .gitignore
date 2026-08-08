@@ -64,6 +64,11 @@ phpunit.xml.back
 # IDE helper files (generated locally)
 _ide_helper.php
 
+# Generated local tooling and runtime state
+/.codegraph/
+/resources/js/types/
+/storage/tmux/
+
 # Lock files (generated locally, should not be committed)
 *-lock
 composer.lock
