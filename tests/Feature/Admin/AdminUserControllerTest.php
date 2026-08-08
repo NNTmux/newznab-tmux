@@ -188,6 +188,43 @@ class AdminUserControllerTest extends TestCase
         $this->assertSame($user->roles_id, $user->fresh()->roles_id);
     }
 
+    public function test_admin_user_list_shows_restore_form_only_for_deleted_users(): void
+    {
+        $admin = $this->createUserWithRole('Admin', false);
+        $activeUser = $this->createUserWithRole('User', true);
+        $deletedUser = $this->createUserWithRole('User', true);
+        $deletedUser->delete();
+
+        $response = $this->actingAs($admin)->get(route('admin.user-list'));
+
+        $response->assertOk();
+        $response->assertSee('action="'.route('admin.deleted.users.restore', $deletedUser->id).'"', false);
+        $response->assertDontSee('action="'.route('admin.deleted.users.restore', $activeUser->id).'"', false);
+    }
+
+    public function test_admin_can_restore_soft_deleted_user(): void
+    {
+        $admin = $this->createUserWithRole('Admin', false);
+        $user = $this->createUserWithRole('User', true);
+        $user->delete();
+
+        $response = $this->actingAs($admin)->post(route('admin.deleted.users.restore', $user->id));
+
+        $response->assertRedirect(route('admin.deleted.users.index'));
+        $response->assertSessionHas('success', "User '{$user->username}' has been restored successfully.");
+        $this->assertNull($user->fresh()->deleted_at);
+    }
+
+    public function test_admin_restore_returns_error_for_missing_user(): void
+    {
+        $admin = $this->createUserWithRole('Admin', false);
+
+        $response = $this->actingAs($admin)->post(route('admin.deleted.users.restore', 9999));
+
+        $response->assertRedirect(route('admin.deleted.users.index'));
+        $response->assertSessionHas('error', 'User not found.');
+    }
+
     private function createSchema(): void
     {
         Schema::create('settings', function (Blueprint $table): void {
@@ -230,6 +267,7 @@ class AdminUserControllerTest extends TestCase
             $table->string('verification_token')->nullable();
             $table->timestamp('lastlogin')->nullable();
             $table->rememberToken();
+            $table->string('deleted_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

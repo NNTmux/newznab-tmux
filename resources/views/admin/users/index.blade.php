@@ -329,13 +329,15 @@
                                     <div class="flex gap-2">
                                         @if($user->deleted_at)
                                             <!-- Show restore button for deleted users -->
-                                            <button type="button"
-                                                    class="restore-user-btn text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 bg-transparent border-0 p-0 cursor-pointer"
-                                                    title="Restore User"
-                                                    data-user-id="{{ $user->id }}"
-                                                    data-username="{{ $user->username }}">
-                                                <i class="fas fa-undo"></i>
-                                            </button>
+                                            <form action="{{ route('admin.deleted.users.restore', $user->id) }}" method="POST" class="inline-form">
+                                                @csrf
+                                                <button type="submit"
+                                                        class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 bg-transparent border-0 p-0 cursor-pointer"
+                                                        title="Restore User"
+                                                        data-confirm="Are you sure you want to restore user '{{ $user->username }}'?">
+                                                    <i class="fas fa-undo"></i>
+                                                </button>
+                                            </form>
                                         @else
                                             <!-- Show normal actions for active users -->
                                             <a href="{{ url('admin/user-edit?id=' . $user->id) }}"
@@ -419,7 +421,7 @@
                     <i class="fas fa-check-circle text-green-600 dark:text-green-400 mr-2"></i>
                     Verify User
                 </h3>
-                <button type="button" data-close-verify-modal class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <button type="button" @click="hide()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -431,12 +433,12 @@
         </div>
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
             <button type="button"
-                    data-close-verify-modal
+                    @click="hide()"
                     class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition font-medium">
                 <i class="fas fa-times mr-2"></i>Cancel
             </button>
             <button type="button"
-                    data-submit-verify-form
+                    @click="submit()"
                     class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition font-medium">
                 <i class="fas fa-check mr-2"></i>Verify
             </button>
@@ -444,10 +446,4 @@
     </div>
 </div>
 
-<!-- Hidden form for individual actions (restore deleted users) -->
-<form id="individualActionForm" method="POST" class="hidden">
-    @csrf
-</form>
 @endsection
-
-{{-- Scripts moved to resources/js/csp-safe.js --}}

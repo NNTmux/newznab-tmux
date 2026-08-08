@@ -33,6 +33,19 @@ Alpine.data('adminUserList', () => ({
         if (form) {
             form.addEventListener('submit', e => this.submitBulkAction(e));
         }
+
+        // Verify-user trigger buttons (modal lives in the separate verifyUser component)
+        this.$el.addEventListener('click', e => {
+            const verifyBtn = e.target.closest('[data-show-verify-modal]');
+            if (!verifyBtn) {
+                return;
+            }
+            e.preventDefault();
+            const verifyForm = verifyBtn.closest('form');
+            if (verifyForm && typeof window.showVerifyModal === 'function') {
+                window.showVerifyModal(e, verifyForm);
+            }
+        });
     },
 
     _checkboxes() {
