@@ -1,13 +1,13 @@
 <div class="max-w-4xl mx-auto">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 mb-6">
         <!-- Header -->
-        <div class="bg-linear-to-r from-blue-600 to-blue-700 px-6 py-4">
+        <div class="bg-linear-to-r from-primary-600 to-primary-700 px-6 py-4">
             <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <h3 class="text-xl font-bold text-white flex items-center">
                     <i class="fa fa-film mr-2"></i>{{ ucfirst($type ?? 'add') }} Movie to Watchlist
                 </h3>
                 <nav aria-label="breadcrumb">
-                    <ol class="flex items-center space-x-2 text-sm text-blue-100">
+                    <ol class="flex items-center space-x-2 text-sm text-primary-100">
                         <li><a href="{{ url($site['home_link']) }}" class="hover:text-white transition">Home</a></li>
                         <li><i class="fas fa-chevron-right text-xs"></i></li>
                         <li><a href="{{ url('/mymovies') }}" class="hover:text-white transition">My Movies</a></li>
@@ -34,13 +34,13 @@
                     </div>
                 </div>
 
-                <div class="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4">
+                <div class="bg-primary-50 border-l-4 border-primary-500 rounded-lg p-4">
                     <div class="flex items-start">
-                        <i class="fa fa-info-circle text-blue-600 dark:text-blue-400 mt-0.5 mr-3"></i>
+                        <i class="fa fa-info-circle text-primary-600 dark:text-primary-400 mt-0.5 mr-3"></i>
                         <p class="text-sm text-gray-700">
                             Adding movies to your watchlist will notify you through your
                             <a href="{{ url("/rss/mymovies?dl=1&i={$userdata->id}&api_token={$userdata->api_token}") }}"
-                               class="font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline inline-flex items-center">
+                               class="font-semibold text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 underline inline-flex items-center">
                                 <i class="fa fa-rss mr-1"></i>RSS Feed
                             </a>
                             when they become available.
@@ -60,12 +60,12 @@
                     <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">Choose Categories:</label>
                     <div class="flex flex-wrap gap-3" id="category-container">
                         @foreach($cat_ids ?? [] as $index => $cat_id)
-                            <label class="inline-flex items-center px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:bg-gray-800 transition-all duration-200 has-checked:bg-blue-50 has-checked:border-blue-500 has-checked:text-blue-700">
+                            <label class="inline-flex items-center px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:bg-gray-800 transition-all duration-200 has-checked:bg-primary-50 has-checked:border-primary-500 has-checked:text-primary-700">
                                 <input type="checkbox"
                                        id="category_{{ $cat_id }}"
                                        name="category[]"
                                        value="{{ $cat_id }}"
-                                       class="mr-2 rounded text-blue-600 dark:text-blue-400 focus:ring-blue-500"
+                                       class="mr-2 rounded text-primary-600 dark:text-primary-400 focus:ring-primary-500"
                                        @if(in_array($cat_id, $cat_selected ?? [])) checked @endif>
                                 <span class="text-sm font-medium">{{ $cat_names[$cat_id] ?? '' }}</span>
                             </label>
@@ -74,7 +74,7 @@
                 </div>
 
                 <div class="flex gap-3 pt-4 border-t border-gray-200">
-                    <button class="px-6 py-3 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium"
+                    <button class="px-6 py-3 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium"
                             type="submit" name="{{ $type ?? 'add' }}">
                         <i class="fa {{ ($type ?? 'add') == 'add' ? 'fa-plus' : 'fa-edit' }} mr-2"></i>{{ ucfirst($type ?? 'add') }} Movie
                     </button>
@@ -89,13 +89,13 @@
 </div>
 <div class="max-w-4xl mx-auto">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-        <div class="bg-linear-to-r from-blue-600 to-blue-700 px-6 py-4">
+        <div class="bg-linear-to-r from-primary-600 to-primary-700 px-6 py-4">
             <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                 <h3 class="text-xl font-bold text-white flex items-center">
                     <i class="fa fa-film mr-2"></i>My Movies
                 </h3>
                 <nav aria-label="breadcrumb">
-                    <ol class="flex items-center space-x-2 text-sm text-blue-100">
+                    <ol class="flex items-center space-x-2 text-sm text-primary-100">
                         <li><a href="{{ url($site['home_link']) }}" class="hover:text-white transition">Home</a></li>
                         <li><i class="fas fa-chevron-right text-xs"></i></li>
                         <li class="text-white font-medium">My Movies</li>
@@ -105,16 +105,16 @@
         </div>
 
         <div class="p-6">
-            <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg">
+            <div class="mb-6 p-4 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-700 rounded-lg">
                 <div class="flex items-start">
-                    <i class="fa fa-info-circle text-blue-600 dark:text-blue-400 mt-0.5 mr-3"></i>
-                    <p class="text-sm text-blue-800 dark:text-blue-200">
+                    <i class="fa fa-info-circle text-primary-600 dark:text-primary-400 mt-0.5 mr-3"></i>
+                    <p class="text-sm text-primary-800 dark:text-primary-200">
                         Using 'My Movies' you can search for movies and add them to a wishlist. If the movie becomes available it will be added to an
-                        <a href="{{ url("/rss/mymovies?dl=1&i={$userdata->id}&api_token={$userdata->api_token}") }}" class="font-semibold underline hover:text-blue-600 dark:hover:text-blue-300">
+                        <a href="{{ url("/rss/mymovies?dl=1&i={$userdata->id}&api_token={$userdata->api_token}") }}" class="font-semibold underline hover:text-primary-600 dark:hover:text-primary-300">
                             <i class="fa fa-rss mr-1"></i>RSS Feed
                         </a>
                         you can use to automatically download. You can
-                        <a href="{{ route('mymovies') }}" class="font-semibold underline hover:text-blue-600 dark:hover:text-blue-300">
+                        <a href="{{ route('mymovies') }}" class="font-semibold underline hover:text-primary-600 dark:hover:text-primary-300">
                             <i class="fa fa-list mr-1"></i>Manage Your Movie List
                         </a>
                         to remove old items.
@@ -151,7 +151,7 @@
                                     </td>
                                     <td class="px-4 py-3">
                                         <div class="mb-2">
-                                            <a href="{{ url("/Movies?imdb={$movie['imdbid']}") }}" class="text-gray-900 dark:text-gray-100 font-semibold hover:text-blue-600 dark:hover:text-blue-400 transition" title="View movie details">
+                                            <a href="{{ url("/Movies?imdb={$movie['imdbid']}") }}" class="text-gray-900 dark:text-gray-100 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition" title="View movie details">
                                                 {{ e($movie['title'] ?? '') }} ({{ $movie['year'] ?? '' }})
                                             </a>
                                             @if(!empty($movie['tagline']))
@@ -215,7 +215,7 @@
                                      src="{{ ($movie['cover'] ?? 0) == 1 ? getImageAssetUrl('movies', $movie['imdbid'] . '-cover', url('/covers/movies/no-cover.jpg')) : url('/covers/movies/no-cover.jpg') }}"
                                      alt="{{ e($movie['title'] ?? '') }}"/>
                                 <div class="min-w-0 flex-1">
-                                    <a href="{{ url("/Movies?imdb={$movie['imdbid']}") }}" class="text-gray-900 dark:text-gray-100 font-semibold hover:text-blue-600 dark:hover:text-blue-400 transition text-sm">
+                                    <a href="{{ url("/Movies?imdb={$movie['imdbid']}") }}" class="text-gray-900 dark:text-gray-100 font-semibold hover:text-primary-600 dark:hover:text-primary-400 transition text-sm">
                                         {{ e($movie['title'] ?? '') }} ({{ $movie['year'] ?? '' }})
                                     </a>
                                     @if(!empty($movie['tagline']))
@@ -252,10 +252,10 @@
                     @endforeach
                 </div>
             @else
-                <div class="p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg">
+                <div class="p-4 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-700 rounded-lg">
                     <div class="flex items-center">
-                        <i class="fa fa-info-circle text-blue-600 dark:text-blue-400 mr-3"></i>
-                        <span class="text-blue-800 dark:text-blue-200 text-sm">No movies bookmarked yet. Add movies from movie pages.</span>
+                        <i class="fa fa-info-circle text-primary-600 dark:text-primary-400 mr-3"></i>
+                        <span class="text-primary-800 dark:text-primary-200 text-sm">No movies bookmarked yet. Add movies from movie pages.</span>
                     </div>
                 </div>
             @endif

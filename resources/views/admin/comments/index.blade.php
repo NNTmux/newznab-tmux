@@ -52,7 +52,7 @@
                         @if($comment->guid)
                             <a href="{{ url('details/' . $comment->guid) }}"
                                target="_blank"
-                               class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
+                               class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300">
                                 <i class="fas fa-external-link-alt mr-1"></i>View Release
                             </a>
                         @else
@@ -71,7 +71,7 @@
                                 </span>
                             @endif
                             @if($comment->shared)
-                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
                                     <i class="fas fa-share-alt mr-1"></i>Shared
                                 </span>
                             @endif

@@ -5,7 +5,7 @@
     <x-admin.card>
         <x-admin.page-header :title="$title" icon="fas fa-user-shield">
             <x-slot:actions>
-                <a href="{{ url('admin/role-add') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
+                <a href="{{ url('admin/role-add') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800">
                     <i class="fas fa-plus mr-2"></i>Add New Role
                 </a>
             </x-slot:actions>
@@ -48,7 +48,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div class="flex gap-2">
                                 <a href="{{ url('admin/role-edit?id=' . $role->id) }}"
-                                   class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                   class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
                                    title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>

@@ -25,7 +25,7 @@
                     </a>
                 @endif
                 @if(!($isadmin ?? false) && !$publicview)
-                    <a href="{{ route('privacy-center.index') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white text-sm rounded hover:bg-blue-700 dark:hover:bg-blue-800 transition">
+                    <a href="{{ route('privacy-center.index') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white text-sm rounded hover:bg-primary-700 dark:hover:bg-primary-800 transition">
                         <i class="fa fa-shield-alt mr-1"></i>Privacy Center
                     </a>
                 @endif

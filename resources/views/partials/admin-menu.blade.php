@@ -18,7 +18,7 @@
         </button>
         <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/user-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
-                <i class="fas fa-user-friends mr-2 text-blue-400"></i>User List
+                <i class="fas fa-user-friends mr-2 text-primary-400"></i>User List
             </a>
             <a href="{{ url('/admin/role-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
                 <i class="fas fa-user-tag mr-2 text-purple-400"></i>Roles
@@ -65,7 +65,7 @@
         </button>
         <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/content-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
-                <i class="fas fa-list mr-2 text-blue-400"></i>Content List
+                <i class="fas fa-list mr-2 text-primary-400"></i>Content List
             </a>
             <a href="{{ url('/admin/content-add') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
                 <i class="fas fa-plus-circle mr-2 text-green-400"></i>Add Content
@@ -92,7 +92,7 @@
         </button>
         <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/release-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
-                <i class="fas fa-list-ul mr-2 text-blue-400"></i>Release List
+                <i class="fas fa-list-ul mr-2 text-primary-400"></i>Release List
             </a>
             <a href="{{ url('/admin/release-reports') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
                 <i class="fas fa-flag text-red-500 mr-1"></i> Release Reports
@@ -117,7 +117,7 @@
         </button>
         <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/movie-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
-                <i class="fas fa-video mr-2 text-blue-400"></i>Movie List
+                <i class="fas fa-video mr-2 text-primary-400"></i>Movie List
             </a>
             <a href="{{ url('/admin/movie-add') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
                 <i class="fas fa-plus-circle mr-2 text-green-400"></i>Add Movie
@@ -136,7 +136,7 @@
         </button>
         <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/show-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
-                <i class="fas fa-list mr-2 text-blue-400"></i>TV Shows List
+                <i class="fas fa-list mr-2 text-primary-400"></i>TV Shows List
             </a>
             <a href="{{ url('/admin/show-add') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
                 <i class="fas fa-plus-circle mr-2 text-green-400"></i>Add TV Show
@@ -262,7 +262,7 @@
                 <i class="fas fa-folder mr-2 text-yellow-400"></i>Category Regexes
             </a>
             <a href="{{ url('/admin/collection_regexes-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
-                <i class="fas fa-layer-group mr-2 text-blue-400"></i>Collection Regexes
+                <i class="fas fa-layer-group mr-2 text-primary-400"></i>Collection Regexes
             </a>
             <a href="{{ url('/admin/release_naming_regexes-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
                 <i class="fas fa-tag mr-2 text-green-400"></i>Release Naming Regexes
@@ -281,7 +281,7 @@
         </button>
         <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/group-list') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
-                <i class="fas fa-list mr-2 text-blue-400"></i>All Groups
+                <i class="fas fa-list mr-2 text-primary-400"></i>All Groups
             </a>
             <a href="{{ url('/admin/group-list-active') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
                 <i class="fas fa-check-circle mr-2 text-green-400"></i>Active Groups
@@ -306,7 +306,7 @@
         </button>
         <div x-show="open" x-cloak class="mt-2 ml-6 space-y-1">
             <a href="{{ url('/admin/site-edit') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
-                <i class="fas fa-sliders-h mr-2 text-blue-400"></i>Site Settings
+                <i class="fas fa-sliders-h mr-2 text-primary-400"></i>Site Settings
             </a>
             <a href="{{ route('admin.registrations.index') }}" class="block py-2 px-3 text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-white hover:bg-white/10 dark:hover:bg-white/5 rounded transition">
                 <i class="fas fa-user-plus mr-2 text-emerald-400"></i>Registrations

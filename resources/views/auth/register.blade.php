@@ -41,10 +41,10 @@
                 @endif
 
                 @if(!empty($notice))
-                    <div class="mb-4 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700">
+                    <div class="mb-4 p-4 rounded-lg bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-700">
                         <div class="flex items-start">
                             <i class="fas fa-circle-info text-primary-600 dark:text-primary-400 mr-3 mt-0.5"></i>
-                            <p class="text-sm text-blue-800 dark:text-blue-200">{{ $notice }}</p>
+                            <p class="text-sm text-primary-800 dark:text-primary-200">{{ $notice }}</p>
                         </div>
                     </div>
                 @endif

@@ -6,9 +6,9 @@
     <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <nav aria-label="breadcrumb">
             <ol class="flex items-center space-x-2 text-sm text-gray-600">
-                <li><a href="{{ url($site['home_link'] ?? '/') }}" class="hover:text-blue-600">Home</a></li>
+                <li><a href="{{ url($site['home_link'] ?? '/') }}" class="hover:text-primary-600">Home</a></li>
                 <li><i class="fas fa-chevron-right text-xs mx-2"></i></li>
-                <li><a href="{{ route('series') }}" class="hover:text-blue-600">TV Series</a></li>
+                <li><a href="{{ route('series') }}" class="hover:text-primary-600">TV Series</a></li>
                 <li><i class="fas fa-chevron-right text-xs mx-2"></i></li>
                 <li class="text-gray-500">{{ $seriestitles ?? '' }}</li>
             </ol>
@@ -35,9 +35,9 @@
                     <!-- Series Stats -->
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
                         @if(!empty($show['started']))
-                            <div class="series-stat-card bg-linear-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
-                                <div class="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase mb-1">Series Started</div>
-                                <div class="text-lg font-bold text-blue-900">
+                            <div class="series-stat-card bg-linear-to-br from-primary-50 to-primary-100 rounded-lg p-4 border border-primary-200">
+                                <div class="text-xs font-semibold text-primary-600 dark:text-primary-400 uppercase mb-1">Series Started</div>
+                                <div class="text-lg font-bold text-primary-900">
                                     {{ \Carbon\Carbon::parse($show['started'])->format('M d, Y') }}
                                 </div>
                             </div>
@@ -138,7 +138,7 @@
                                     </a>
 
                                     @if(!empty($show['tvdb']) && $show['tvdb'] > 0)
-                                        <a class="px-4 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 inline-flex items-center text-sm font-medium transition"
+                                        <a class="px-4 py-2 bg-primary-100 text-primary-800 rounded-lg hover:bg-primary-200 inline-flex items-center text-sm font-medium transition"
                                            target="_blank"
                                            href="{{ $site['dereferrer_link'] }}http://thetvdb.com/?tab=series&id={{ $show['tvdb'] }}"
                                            title="View at TheTVDB">
@@ -205,7 +205,7 @@
                     <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                         <div class="flex items-center justify-between">
                             <h5 class="text-lg font-semibold text-gray-800 dark:text-white">
-                                <i class="fa fa-list mr-2 text-blue-600 dark:text-blue-400"></i>
+                                <i class="fa fa-list mr-2 text-primary-600 dark:text-primary-400"></i>
                                 Episodes & Releases
                             </h5>
                             <div class="flex flex-wrap items-center gap-2">
@@ -214,7 +214,7 @@
                                     <button type="button" class="nzb_multi_operations_download px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 transition text-sm" title="Download NZBs">
                                         <i class="fa fa-cloud-download"></i>
                                     </button>
-                                    <button type="button" class="nzb_multi_operations_cart px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800 transition text-sm" title="Send to Download Basket">
+                                    <button type="button" class="nzb_multi_operations_cart px-3 py-1 bg-primary-600 dark:bg-primary-700 text-white rounded hover:bg-primary-700 dark:hover:bg-primary-800 transition text-sm" title="Send to Download Basket">
                                         <i class="fa fa-shopping-basket"></i>
                                     </button>
                                     @if(auth()->check() && auth()->user()->hasRole('Admin'))
@@ -230,18 +230,18 @@
                     <!-- Season Tabs -->
                     <div class="border-b border-gray-200">
                         <div class="flex items-center px-4 py-2 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
-                            <input type="checkbox" class="rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700 mr-2" id="chkSelectAll" x-model="allChecked" @change="toggleAll()">
+                            <input type="checkbox" class="rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400 dark:bg-gray-700 mr-2" id="chkSelectAll" x-model="allChecked" @change="toggleAll()">
                             <label for="chkSelectAll" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">Select All</label>
                         </div>
                         <nav class="flex flex-wrap -mb-px px-4" aria-label="Tabs">
                             @foreach($seasonTabs as $tab)
                                 <a href="{{ $tab['url'] }}"
-                                        class="series-season-tab whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-200 {{ $tab['active'] ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300' }}"
+                                        class="series-season-tab whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors duration-200 {{ $tab['active'] ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300' }}"
                                         data-season="{{ $tab['season'] }}"
                                         data-series-season-link
                                         @if($tab['active']) aria-current="page" @endif>
                                     Season {{ $tab['season'] }}
-                                    <span class="ml-2 px-2 py-0.5 rounded-full text-xs {{ $tab['active'] ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 dark:bg-gray-800 text-gray-600' }}">
+                                    <span class="ml-2 px-2 py-0.5 rounded-full text-xs {{ $tab['active'] ? 'bg-primary-100 text-primary-800' : 'bg-gray-100 dark:bg-gray-800 text-gray-600' }}">
                                         {{ $tab['count'] }}
                                     </span>
                                 </a>
@@ -258,7 +258,7 @@
                 </div>
                 </div>
             @else
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-blue-800">
+                <div class="bg-primary-50 border border-primary-200 rounded-lg p-4 text-primary-800">
                     <i class="fa fa-info-circle mr-2"></i>
                     No episodes/releases found for this series.
                 </div>

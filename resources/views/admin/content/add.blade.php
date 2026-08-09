@@ -32,7 +32,7 @@
                            id="title"
                            name="title"
                            value="{{ old('title', data_get($content, 'title', '')) }}"
-                           class="w-full px-3 py-2 border {{ $errors->has('title') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                           class="w-full px-3 py-2 border {{ $errors->has('title') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                         Leave blank to save content without a page title.
                     </p>
@@ -51,7 +51,7 @@
                            name="url"
                            value="{{ old('url', data_get($content, 'url', '')) }}"
                            placeholder="/page-slug or https://example.com"
-                           class="w-full px-3 py-2 border {{ $errors->has('url') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400">
+                           class="w-full px-3 py-2 border {{ $errors->has('url') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400">
                     <p class="mt-1 text-sm text-gray-500">Internal URL (e.g., /about) or external URL (e.g., https://example.com)</p>
                     @error('url')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -67,7 +67,7 @@
                               name="body"
                               rows="15"
                               data-tinymce-api-key="{{ config('tinymce.api_key', 'no-api-key') }}"
-                              class="w-full px-3 py-2 border {{ $errors->has('body') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">{{ old('body', is_string(data_get($content, 'body')) ? trim((string) data_get($content, 'body'), '\'"') : '') }}</textarea>
+                              class="w-full px-3 py-2 border {{ $errors->has('body') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">{{ old('body', is_string(data_get($content, 'body')) ? trim((string) data_get($content, 'body'), '\'"') : '') }}</textarea>
                     <p class="mt-1 text-sm text-gray-500">Use the rich text editor to format your content</p>
                     @error('body')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -83,7 +83,7 @@
                         <select id="contenttype"
                                 name="contenttype"
                                 required
-                                class="w-full px-3 py-2 border {{ $errors->has('contenttype') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                                class="w-full px-3 py-2 border {{ $errors->has('contenttype') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                             @foreach($contenttypelist as $typeId => $typeName)
                                 <option value="{{ $typeId }}"
                                     {{ (string) old('contenttype', data_get($content, 'contenttype', '')) === (string) $typeId ? 'selected' : '' }}>
@@ -104,7 +104,7 @@
                         <select id="role"
                                 name="role"
                                 required
-                                class="w-full px-3 py-2 border {{ $errors->has('role') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                                class="w-full px-3 py-2 border {{ $errors->has('role') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                             @foreach($rolelist as $roleId => $roleName)
                                 <option value="{{ $roleId }}"
                                     {{ (string) old('role', data_get($content, 'role', '')) === (string) $roleId ? 'selected' : '' }}>
@@ -125,7 +125,7 @@
                         <select id="status"
                                 name="status"
                                 required
-                                class="w-full px-3 py-2 border {{ $errors->has('status') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                                class="w-full px-3 py-2 border {{ $errors->has('status') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                             @foreach($status_ids as $index => $statusId)
                                 <option value="{{ $statusId }}"
                                     {{ (string) old('status', data_get($content, 'status', '')) === (string) $statusId ? 'selected' : '' }}>
@@ -148,7 +148,7 @@
                     <textarea id="metadescription"
                               name="metadescription"
                               rows="3"
-                              class="w-full px-3 py-2 border {{ $errors->has('metadescription') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">{{ old('metadescription', data_get($content, 'metadescription', '')) }}</textarea>
+                              class="w-full px-3 py-2 border {{ $errors->has('metadescription') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">{{ old('metadescription', data_get($content, 'metadescription', '')) }}</textarea>
                     <p class="mt-1 text-sm text-gray-500">SEO meta description</p>
                     @error('metadescription')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -164,7 +164,7 @@
                            id="metakeywords"
                            name="metakeywords"
                            value="{{ old('metakeywords', data_get($content, 'metakeywords', '')) }}"
-                           class="w-full px-3 py-2 border {{ $errors->has('metakeywords') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                           class="w-full px-3 py-2 border {{ $errors->has('metakeywords') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600' }} rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                     <p class="mt-1 text-sm text-gray-500">Comma-separated keywords for SEO</p>
                     @error('metakeywords')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -173,7 +173,7 @@
 
                 <!-- Action Buttons -->
                 <div class="flex gap-3 pt-4 border-t border-gray-200">
-                    <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
+                    <button type="submit" class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
                         <i class="fas fa-save mr-2"></i>{{ $isEditing ? 'Update' : 'Create' }} Content
                     </button>
                     <a href="{{ route('admin.content-list') }}" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">

@@ -9,7 +9,7 @@
     $overallBanner = match ($overallStatus) {
         ServiceStatusEnum::Operational => 'border-green-500/50 bg-green-600 text-white dark:bg-green-900 dark:text-green-200',
         ServiceStatusEnum::Degraded => 'border-yellow-500/50 bg-yellow-500 text-yellow-950 dark:bg-yellow-900 dark:text-yellow-200',
-        ServiceStatusEnum::Maintenance => 'border-blue-500/50 bg-blue-600 text-white dark:bg-blue-900 dark:text-blue-200',
+        ServiceStatusEnum::Maintenance => 'border-primary-500/50 bg-primary-600 text-white dark:bg-primary-900 dark:text-primary-200',
         ServiceStatusEnum::PartialOutage => 'border-orange-500/50 bg-orange-600 text-white dark:bg-orange-900 dark:text-orange-200',
         ServiceStatusEnum::MajorOutage => 'border-red-500/50 bg-red-600 text-white dark:bg-red-900 dark:text-red-200',
     };
@@ -19,7 +19,7 @@
         return $base.' '.match ($s) {
             ServiceStatusEnum::Operational => 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200',
             ServiceStatusEnum::Degraded => 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200',
-            ServiceStatusEnum::Maintenance => 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200',
+            ServiceStatusEnum::Maintenance => 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200',
             ServiceStatusEnum::PartialOutage => 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200',
             ServiceStatusEnum::MajorOutage => 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200',
         };
@@ -39,7 +39,7 @@
         $base = 'px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full';
         return $base.' '.match ($st) {
             IncidentStatusEnum::Investigating => 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200',
-            IncidentStatusEnum::Identified => 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200',
+            IncidentStatusEnum::Identified => 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200',
             IncidentStatusEnum::Monitoring => 'bg-cyan-100 dark:bg-cyan-900 text-cyan-800 dark:text-cyan-200',
             IncidentStatusEnum::Resolved => 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200',
         };

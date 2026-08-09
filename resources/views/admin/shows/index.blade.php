@@ -33,10 +33,10 @@
                            name="showname"
                            value="{{ $showname }}"
                            placeholder="Enter show name..."
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                 </div>
                 <div class="flex items-end space-x-2">
-                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <button type="submit" class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
                         <i class="fas fa-search mr-2"></i>Search
                     </button>
                     @if($showname)
@@ -94,7 +94,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($show->type == 0)
-                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
                                         <i class="fas fa-tv mr-1"></i>TV
                                     </span>
                                 @elseif($show->type == 1)
@@ -149,7 +149,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                 <a href="{{ url('admin/show-edit?id=' . $show->id) }}"
-                                   class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                   class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
                                    title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
@@ -167,7 +167,7 @@
                                     <div class="flex flex-col items-center">
                                         <i class="fas fa-search text-4xl mb-3"></i>
                                         <p class="text-lg">No TV shows found for "{{ $showname }}"</p>
-                                        <a href="{{ url('admin/show-list') }}" class="mt-3 text-blue-600 dark:text-blue-400 hover:underline">
+                                        <a href="{{ url('admin/show-list') }}" class="mt-3 text-primary-600 dark:text-primary-400 hover:underline">
                                             Clear search and view all
                                         </a>
                                     </div>

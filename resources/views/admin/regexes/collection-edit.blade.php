@@ -42,7 +42,7 @@
                     <input type="text"
                            id="group_regex"
                            name="group_regex"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                            value="{{ $regex->group_regex ?? '' }}"
                            required>
                 </div>
@@ -64,13 +64,13 @@
                     </div>
                     <textarea id="regex"
                               name="regex"
-                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono text-sm"
                               rows="4"
                               required>{{ regex_display_value($regex->regex ?? '') }}</textarea>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                     Regex to use when grouping binaries into collections.<br>
-                    The regex delimiters are not added, you MUST add them. See <a href="http://php.net/manual/en/regexp.reference.delimiters" target="_blank" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">this</a> page.<br>
+                    The regex delimiters are not added, you MUST add them. See <a href="http://php.net/manual/en/regexp.reference.delimiters" target="_blank" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">this</a> page.<br>
                     To make the regex case insensitive, add <code class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-2 py-1 rounded">i</code> after the last delimiter.
                 </p>
             </div>
@@ -86,7 +86,7 @@
                     </div>
                     <textarea id="description"
                               name="description"
-                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                               rows="3">{{ $regex->description ?? '' }}</textarea>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -106,7 +106,7 @@
                     <input type="number"
                            id="ordinal"
                            name="ordinal"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                            value="{{ $regex->ordinal ?? 0 }}"
                            min="0"
                            required>
@@ -129,7 +129,7 @@
                                    name="status"
                                    id="status{{ $id }}"
                                    value="{{ $id }}"
-                                   class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
+                                   class="w-4 h-4 text-primary-600 dark:text-primary-400 border-gray-300 dark:border-gray-600 focus:ring-primary-500"
                                    {{ ($regex->status ?? 1) == $id ? 'checked' : '' }}>
                             <label for="status{{ $id }}" class="ml-3 text-sm text-gray-700 dark:text-gray-300">
                                 {{ $status_names[$k] }}

@@ -114,7 +114,7 @@
                                             @endif
 
                                             <div class="text-end">
-                                                <button type="submit" class="bg-blue-500 text-white rounded-md px-3 py-1" @click="submit" :disabled="selectedAction == null">{{ trans('forum::general.proceed') }}</button>
+                                                <button type="submit" class="bg-primary-500 text-white rounded-md px-3 py-1" @click="submit" :disabled="selectedAction == null">{{ trans('forum::general.proceed') }}</button>
                                             </div>
                                         </div>
                                     </div>

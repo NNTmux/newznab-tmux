@@ -35,7 +35,7 @@
                                    name="title"
                                    value="{{ $con['title'] ?? '' }}"
                                    required
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                         </div>
 
                         <!-- Platform -->
@@ -47,7 +47,7 @@
                                    id="platform"
                                    name="platform"
                                    value="{{ $con['platform'] ?? '' }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                         </div>
 
                         <!-- Publisher -->
@@ -59,7 +59,7 @@
                                    id="publisher"
                                    name="publisher"
                                    value="{{ $con['publisher'] ?? '' }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                         </div>
 
                         <!-- Release Date -->
@@ -71,7 +71,7 @@
                                    id="releasedate"
                                    name="releasedate"
                                    value="{{ isset($con['releasedate']) && $con['releasedate'] ? date('Y-m-d', $con['releasedate']) : '' }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                         </div>
 
                         <!-- ASIN -->
@@ -83,7 +83,7 @@
                                    id="asin"
                                    name="asin"
                                    value="{{ $con['asin'] ?? '' }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                         </div>
 
                         <!-- URL -->
@@ -95,9 +95,9 @@
                                    id="url"
                                    name="url"
                                    value="{{ $con['url'] ?? '' }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                             @if(!empty($con['url']))
-                                <a href="{{ $con['url'] }}" target="_blank" class="text-sm text-blue-600 dark:text-blue-400 hover:underline mt-1 inline-block">
+                                <a href="{{ $con['url'] }}" target="_blank" class="text-sm text-primary-600 dark:text-primary-400 hover:underline mt-1 inline-block">
                                     <i class="fas fa-external-link-alt mr-1"></i>View Source
                                 </a>
                             @endif
@@ -110,7 +110,7 @@
                             </label>
                             <select id="esrb"
                                     name="esrb"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                                 <option value="">Select Rating</option>
                                 <option value="E" {{ isset($con['esrb']) && $con['esrb'] == 'E' ? 'selected' : '' }}>E - Everyone</option>
                                 <option value="E10+" {{ isset($con['esrb']) && $con['esrb'] == 'E10+' ? 'selected' : '' }}>E10+ - Everyone 10+</option>
@@ -130,7 +130,7 @@
                                    id="salesrank"
                                    name="salesrank"
                                    value="{{ $con['salesrank'] ?? '' }}"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                         </div>
 
                         <!-- Genre -->
@@ -140,7 +140,7 @@
                             </label>
                             <select id="genre"
                                     name="genre"
-                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                                 <option value="">Select Genre</option>
                                 @foreach($genres as $genre)
                                     <option value="{{ $genre->id }}" {{ isset($con['genre_id']) && $con['genre_id'] == $genre->id ? 'selected' : '' }}>
@@ -191,9 +191,9 @@
                                               file:mr-4 file:py-2 file:px-4
                                               file:rounded-md file:border-0
                                               file:text-sm file:font-semibold
-                                              file:bg-blue-50 file:text-blue-700
-                                              hover:file:bg-blue-100
-                                              dark:file:bg-blue-900 dark:file:text-blue-200">
+                                              file:bg-primary-50 file:text-primary-700
+                                              hover:file:bg-primary-100
+                                              dark:file:bg-primary-900 dark:file:text-primary-200">
                                 <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
                                     PNG, JPG, GIF up to 10MB
                                 </p>
@@ -230,7 +230,7 @@
                     <a href="{{ route('admin.console-list') }}" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
                         <i class="fas fa-times mr-2"></i>Cancel
                     </a>
-                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <button type="submit" class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
                         <i class="fas fa-save mr-2"></i>Save Changes
                     </button>
                 </div>

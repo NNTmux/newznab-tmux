@@ -10,7 +10,7 @@
         x-transition:leave-end="opacity-0 translate-y-4"
         x-cloak
         @click="scrollToTop()"
-        class="fixed z-40 bg-blue-600 dark:bg-blue-700 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors touch-target
+        class="fixed z-40 bg-primary-600 dark:bg-primary-700 text-white p-3 rounded-full shadow-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition-colors touch-target
                bottom-[max(5.5rem,calc(env(safe-area-inset-bottom)+5rem))] right-[max(1rem,env(safe-area-inset-right))]
                md:bottom-[max(1rem,env(safe-area-inset-bottom))] md:right-[max(1rem,env(safe-area-inset-right))]"
         aria-label="Back to top">

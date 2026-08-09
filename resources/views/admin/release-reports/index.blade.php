@@ -37,7 +37,7 @@
                         <i class="fas fa-clock mr-1"></i> Pending ({{ $statusCounts['pending'] }})
                     </a>
                     <a href="{{ route('admin.release-reports', ['status' => 'reviewed']) }}"
-                       class="px-3 py-1.5 rounded-full text-sm font-medium transition {{ $status === 'reviewed' ? 'bg-blue-500 text-white' : 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800' }}">
+                       class="px-3 py-1.5 rounded-full text-sm font-medium transition {{ $status === 'reviewed' ? 'bg-primary-500 text-white' : 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 hover:bg-primary-200 dark:hover:bg-primary-800' }}">
                         <i class="fas fa-eye mr-1"></i> Reviewed ({{ $statusCounts['reviewed'] }})
                     </a>
                     <a href="{{ route('admin.release-reports', ['status' => 'resolved']) }}"
@@ -80,7 +80,7 @@
                     </div>
 
                     <div class="flex flex-wrap items-center gap-3">
-                        <select name="action" class="text-sm border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200">
+                        <select name="action" class="text-sm border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-200">
                             <option value="">Bulk Actions</option>
                             <option value="reviewed">Mark as Reviewed</option>
                             <option value="resolve">Mark as Resolved</option>
@@ -113,7 +113,7 @@
                                            name="report_ids[]"
                                            value="{{ $report->id }}"
                                            @change="onCheckboxChange()"
-                                           class="report-checkbox rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-700">
+                                           class="report-checkbox rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 dark:bg-gray-700">
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200 font-mono">
                                     #{{ $report->id }}
@@ -123,7 +123,7 @@
                                         @if($report->release)
                                             <a href="{{ url('/details/' . $report->release->guid) }}"
                                                target="_blank"
-                                               class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 font-medium text-sm break-all">
+                                               class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300 font-medium text-sm break-all">
                                                 {{ Str::limit($report->release->searchname, 80) }}
                                             </a>
                                             <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -167,7 +167,7 @@
                                 <td class="px-4 py-4">
                                     @if($report->response)
                                         <div class="max-w-xs space-y-1">
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $report->response_is_public ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200' }}">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $report->response_is_public ? 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200' }}">
                                                 <i class="fas fa-reply mr-1"></i>
                                                 {{ $report->response_is_public ? 'Public response' : 'Private note' }}
                                             </span>
@@ -186,7 +186,7 @@
                                     @php
                                         $statusColors = [
                                             'pending' => 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200',
-                                            'reviewed' => 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200',
+                                            'reviewed' => 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200',
                                             'resolved' => 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200',
                                             'dismissed' => 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
                                         ];
@@ -237,7 +237,7 @@
                                                 @csrf
                                                 <input type="hidden" name="status" value="reviewed">
                                                 <button type="submit"
-                                                        class="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm inline-flex items-center"
+                                                        class="px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition text-sm inline-flex items-center"
                                                         title="Mark as Reviewed">
                                                     <i class="fas fa-eye mr-1"></i> Reviewed
                                                 </button>
@@ -310,7 +310,7 @@
                                         @if($report->release)
                                             <a href="{{ url('/details/' . $report->release->guid) }}"
                                                target="_blank"
-                                               class="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm inline-flex items-center"
+                                               class="px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition text-sm inline-flex items-center"
                                                title="View Release">
                                                 <i class="fas fa-external-link-alt"></i>
                                             </a>
@@ -332,7 +332,7 @@
                 <p class="text-gray-500 dark:text-gray-400">
                     @if($status !== 'all')
                         No {{ $status }} reports at this time.
-                        <a href="{{ route('admin.release-reports', ['status' => 'all']) }}" class="text-blue-600 dark:text-blue-400 hover:underline">View all reports</a>
+                        <a href="{{ route('admin.release-reports', ['status' => 'all']) }}" class="text-primary-600 dark:text-primary-400 hover:underline">View all reports</a>
                     @else
                         No release reports have been submitted yet.
                     @endif
@@ -359,7 +359,7 @@
             <div class="relative w-full max-w-lg p-6 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-lg">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    <i class="fas fa-comment-dots text-blue-500 mr-2"></i>Report Details
+                    <i class="fas fa-comment-dots text-primary-500 mr-2"></i>Report Details
                 </h3>
                 <button type="button" class="report-desc-modal-close text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" @click="closeDescription()">
                     <i class="fas fa-times"></i>
@@ -486,7 +486,7 @@
 
             <div class="mb-6">
                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                    Are you sure you want to revert this <span id="revertReportStatus" x-text="revertStatus" class="font-semibold text-orange-600 dark:text-orange-400"></span> report back to <span class="font-semibold text-blue-600 dark:text-blue-400">Reviewed</span> status?
+                    Are you sure you want to revert this <span id="revertReportStatus" x-text="revertStatus" class="font-semibold text-orange-600 dark:text-orange-400"></span> report back to <span class="font-semibold text-primary-600 dark:text-primary-400">Reviewed</span> status?
                 </p>
                 <p class="text-sm text-gray-500 dark:text-gray-500">
                     This will allow further action to be taken on the report if an issue was found with the release.

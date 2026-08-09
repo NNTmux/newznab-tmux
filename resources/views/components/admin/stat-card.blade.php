@@ -9,7 +9,7 @@
 
 @php
     $colorMap = [
-        'blue'   => ['bg' => 'bg-blue-100 dark:bg-blue-900', 'text' => 'text-blue-600 dark:text-blue-400'],
+        'blue'   => ['bg' => 'bg-primary-100 dark:bg-primary-900', 'text' => 'text-primary-600 dark:text-primary-400'],
         'green'  => ['bg' => 'bg-green-100 dark:bg-green-900', 'text' => 'text-green-600 dark:text-green-400'],
         'red'    => ['bg' => 'bg-red-100 dark:bg-red-900', 'text' => 'text-red-600 dark:text-red-400'],
         'purple' => ['bg' => 'bg-purple-100 dark:bg-purple-900', 'text' => 'text-purple-600 dark:text-purple-400'],

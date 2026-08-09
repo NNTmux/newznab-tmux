@@ -49,9 +49,9 @@
                                name="gamesearch"
                                value="{{ $lastSearch ?? '' }}"
                                placeholder="Search by game title..."
-                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
+                    <button type="submit" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
                         Search
                     </button>
                     @if(!empty($lastSearch))
@@ -118,7 +118,7 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="{{ url('admin/game-edit?id=' . $game['id']) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900">
+                                    <a href="{{ url('admin/game-edit?id=' . $game['id']) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-900">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
                                 </td>

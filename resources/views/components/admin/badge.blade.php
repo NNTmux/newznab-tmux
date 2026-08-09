@@ -5,7 +5,7 @@
 
 @php
     $classes = [
-        'blue' => 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200',
+        'blue' => 'bg-primary-100 dark:bg-primary-900/40 text-primary-800 dark:text-primary-200',
         'green' => 'bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200',
         'gray' => 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
         'orange' => 'bg-orange-100 dark:bg-orange-900/40 text-orange-800 dark:text-orange-200',

@@ -16,10 +16,10 @@
         </div>
 
         <!-- Info Alert -->
-        <div class="px-6 py-4 bg-blue-50 border-b border-blue-100">
+        <div class="px-6 py-4 bg-primary-50 border-b border-primary-100">
             <div class="flex">
-                <i class="fas fa-info-circle text-blue-500 text-xl mr-3"></i>
-                <p class="text-sm text-blue-700">
+                <i class="fas fa-info-circle text-primary-500 text-xl mr-3"></i>
+                <p class="text-sm text-primary-700">
                     Test your release naming regex patterns against actual release data from your database.
                 </p>
             </div>
@@ -36,7 +36,7 @@
                     <input type="text"
                            id="group"
                            name="group"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                            value="{{ $group }}"
                            placeholder="alt.binaries.teevee"
                            required>
@@ -53,7 +53,7 @@
                     <input type="number"
                            id="showlimit"
                            name="showlimit"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                            value="{{ $showlimit }}"
                            min="1"
                            max="1000">
@@ -70,7 +70,7 @@
                     <input type="number"
                            id="querylimit"
                            name="querylimit"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                            value="{{ $querylimit }}"
                            min="1"
                            max="500000">
@@ -87,7 +87,7 @@
                 </label>
                 <textarea id="regex"
                           name="regex"
-                          class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                          class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono text-sm"
                           rows="4"
                           required
                           placeholder="/^(?P<name>.*?)([\. ]S\d{1,3}[\. ]?E\d{1,3})/i">{{ regex_display_value($regex) }}</textarea>
@@ -97,7 +97,7 @@
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
+            <button type="submit" class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
                 <i class="fas fa-play mr-2"></i>Test Regex
             </button>
         </form>

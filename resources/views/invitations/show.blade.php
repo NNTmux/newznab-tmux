@@ -5,7 +5,7 @@
     <nav class="flex mb-6" aria-label="breadcrumb">
         <ol class="inline-flex items-center space-x-1 md:space-x-3">
             <li class="inline-flex items-center">
-                <a href="{{ $site['home_link'] }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 dark:text-gray-400 dark:hover:text-white">Home</a>
+                <a href="{{ $site['home_link'] }}" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:text-primary-400 dark:text-gray-400 dark:hover:text-white">Home</a>
             </li>
             <li aria-current="page">
                 <div class="flex items-center">
@@ -24,7 +24,7 @@
         </div>
         <div class="p-6">
             @if($preview)
-                <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 mb-6 dark:bg-blue-900 dark:border-blue-700 dark:text-blue-300">
+                <div class="bg-primary-50 border border-primary-200 text-primary-800 rounded-lg p-4 mb-6 dark:bg-primary-900 dark:border-primary-700 dark:text-primary-300">
                     <div class="flex">
                         <i class="fa fa-user-plus text-4xl mr-4 mt-1"></i>
                         <div>
@@ -91,7 +91,7 @@
                                         <i class="fa fa-user-tag mr-1"></i>Assigned Role:
                                     </div>
                                     <div class="col-span-3 font-medium">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
                                             {{ $preview['role_name'] ?? 'Default' }}
                                         </span>
                                     </div>
@@ -124,7 +124,7 @@
                             <h6 class="font-semibold mb-2">This invitation has already been used</h6>
                             <p class="mb-0">The account has been successfully created using this invitation.</p>
                         </div>
-                        <a href="{{ url('/login') }}" class="inline-flex items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        <a href="{{ url('/login') }}" class="inline-flex items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                             <i class="fas fa-sign-in-alt mr-2"></i> Login to Your Account
                         </a>
                     @elseif($preview['expires_at'] < time())
@@ -143,12 +143,12 @@
                             <p class="mb-0">{{ $registrationStatus['message'] }}</p>
                         </div>
                     @else
-                        <a href="{{ route('register', ['token' => $token]) }}" class="inline-flex items-center px-6 py-3 border border-transparent rounded-md shadow-lg text-base font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                        <a href="{{ route('register', ['token' => $token]) }}" class="inline-flex items-center px-6 py-3 border border-transparent rounded-md shadow-lg text-base font-medium text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                             <i class="fas fa-user-plus mr-2"></i> Accept Invitation & Create Account
                         </a>
                         <div class="mt-3">
                             <small class="text-gray-500 dark:text-gray-400">
-                                Already have an account? <a href="{{ url('/login') }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 dark:text-blue-400 dark:hover:text-blue-300">Login here</a>
+                                Already have an account? <a href="{{ url('/login') }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 dark:text-primary-400 dark:hover:text-primary-300">Login here</a>
                             </small>
                         </div>
                     @endif
@@ -163,7 +163,7 @@
                             <i class="fa fa-envelope mr-1"></i> Contact Support
                         </a>
                         @if($registrationStatus['is_open'])
-                            <a href="{{ url('/register') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                            <a href="{{ url('/register') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                                 <i class="fa fa-user-plus mr-1"></i> Register Without Invitation
                             </a>
                         @endif

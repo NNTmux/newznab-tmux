@@ -52,9 +52,9 @@
                                name="failrelsearch"
                                value="{{ request('failrelsearch') }}"
                                placeholder="Search by name or category..."
-                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
+                    <button type="submit" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
                         Search
                     </button>
                     @if(request('failrelsearch'))
@@ -87,7 +87,7 @@
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td class="px-6 py-4">
                                     <a href="{{ url('/admin/release-edit?id=' . $release->guid) }}"
-                                       class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline truncate block max-w-xs"
+                                       class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline truncate block max-w-xs"
                                        title="{{ $release->searchname }}">
                                         {{ \Illuminate\Support\Str::limit($release->searchname, 50) }}
                                     </a>
@@ -98,7 +98,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right">
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
                                         {{ human_filesize($release->size) }}
                                     </span>
                                 </td>
@@ -132,7 +132,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex justify-end gap-2">
                                         <a href="{{ url('/admin/release-edit?id=' . $release->guid) }}"
-                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                           class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
                                            title="Edit release">
                                             <i class="fas fa-pencil"></i>
                                         </a>

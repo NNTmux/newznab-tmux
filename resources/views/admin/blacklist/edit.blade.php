@@ -42,7 +42,7 @@
                     <input type="text"
                            id="groupname"
                            name="groupname"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                            value="{{ htmlspecialchars($regex->groupname ?? '') }}"
                            required>
                 </div>
@@ -62,7 +62,7 @@
                     </div>
                     <textarea id="regex"
                               name="regex"
-                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono text-sm"
                               rows="4"
                               required>{{ htmlspecialchars($regex->regex ?? '') }}</textarea>
                 </div>
@@ -82,7 +82,7 @@
                     </div>
                     <textarea id="description"
                               name="description"
-                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                               rows="3">{{ htmlspecialchars($regex->description ?? '') }}</textarea>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -102,7 +102,7 @@
                                    name="msgcol"
                                    id="msgcol{{ $id }}"
                                    value="{{ $id }}"
-                                   class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
+                                   class="w-4 h-4 text-primary-600 dark:text-primary-400 border-gray-300 dark:border-gray-600 focus:ring-primary-500"
                                    {{ ($regex->msgcol ?? 1) == $id ? 'checked' : '' }}>
                             <label for="msgcol{{ $id }}" class="ml-3 text-sm text-gray-700 dark:text-gray-300">
                                 {{ $msgcol_names[$i] }}
@@ -127,7 +127,7 @@
                                    name="status"
                                    id="status{{ $id }}"
                                    value="{{ $id }}"
-                                   class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
+                                   class="w-4 h-4 text-primary-600 dark:text-primary-400 border-gray-300 dark:border-gray-600 focus:ring-primary-500"
                                    {{ ($regex->status ?? 1) == $id ? 'checked' : '' }}>
                             <label for="status{{ $id }}" class="ml-3 text-sm text-gray-700 dark:text-gray-300">
                                 {{ $status_names[$i] }}
@@ -152,7 +152,7 @@
                                    name="optype"
                                    id="optype{{ $id }}"
                                    value="{{ $id }}"
-                                   class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
+                                   class="w-4 h-4 text-primary-600 dark:text-primary-400 border-gray-300 dark:border-gray-600 focus:ring-primary-500"
                                    {{ ($regex->optype ?? 1) == $id ? 'checked' : '' }}>
                             <label for="optype{{ $id }}" class="ml-3 text-sm text-gray-700 dark:text-gray-300">
                                 {{ $optype_names[$i] }}

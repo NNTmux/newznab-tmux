@@ -21,7 +21,7 @@
             </a>
             <a href="{{ $nextUrl }}"
                @if($pagination['current_page'] < $pagination['total_pages']) data-series-pagination-link @endif
-               class="px-4 py-2 rounded-lg text-sm font-medium {{ $pagination['current_page'] < $pagination['total_pages'] ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed' }}">
+               class="px-4 py-2 rounded-lg text-sm font-medium {{ $pagination['current_page'] < $pagination['total_pages'] ? 'bg-primary-600 text-white hover:bg-primary-700' : 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed' }}">
                 Next<i class="fas fa-arrow-right ml-2"></i>
             </a>
         </div>

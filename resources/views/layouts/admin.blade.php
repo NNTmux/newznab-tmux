@@ -33,7 +33,7 @@
         <aside id="sidebar" class="hidden md:flex md:flex-col w-64 bg-gray-900 dark:bg-gray-950 text-white shrink-0 h-full overflow-y-auto">
             <div class="flex items-center justify-between p-4 border-b border-white/10 dark:border-white/5">
                 <a href="{{ route('admin.index') }}" class="flex items-center space-x-2">
-                    <i class="fas fa-cog text-2xl text-blue-500 dark:text-blue-400"></i>
+                    <i class="fas fa-cog text-2xl text-primary-500 dark:text-primary-400"></i>
                     <span class="text-xl font-semibold">Admin Panel</span>
                 </a>
             </div>

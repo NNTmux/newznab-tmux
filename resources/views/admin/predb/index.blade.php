@@ -27,10 +27,10 @@
                            name="presearch"
                            value="{{ $lastSearch }}"
                            placeholder="Enter search term..."
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                 </div>
                 <div class="flex items-end space-x-2">
-                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <button type="submit" class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
                         <i class="fas fa-search mr-2"></i>Search
                     </button>
                     @if($lastSearch)
@@ -96,7 +96,7 @@
                                         <i class="fas fa-check-circle mr-1"></i>Not Nuked
                                     </span>
                                 @elseif($pre->nuked == 1)
-                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
                                         <i class="fas fa-undo mr-1"></i>Un-Nuked
                                     </span>
                                 @elseif($pre->nuked == 2)
@@ -118,7 +118,7 @@
                                 @if(isset($pre->guid))
                                     <a href="{{ url('details/' . $pre->guid) }}"
                                        target="_blank"
-                                       class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
+                                       class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300">
                                         <i class="fas fa-external-link-alt mr-1"></i>View
                                     </a>
                                 @else
@@ -133,7 +133,7 @@
                                     <div class="flex flex-col items-center">
                                         <i class="fas fa-search text-4xl mb-3"></i>
                                         <p class="text-lg">No PreDB entries found for "{{ $lastSearch }}"</p>
-                                        <a href="{{ url('admin/predb') }}" class="mt-3 text-blue-600 dark:text-blue-400 hover:underline">
+                                        <a href="{{ url('admin/predb') }}" class="mt-3 text-primary-600 dark:text-primary-400 hover:underline">
                                             Clear search and view all
                                         </a>
                                     </div>
@@ -165,13 +165,13 @@
 
     <!-- Info Box -->
     @if($lastSearch)
-    <div class="mt-6 bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 dark:border-blue-600 p-4 rounded">
+    <div class="mt-6 bg-primary-50 dark:bg-primary-900 border-l-4 border-primary-500 dark:border-primary-600 p-4 rounded">
         <div class="flex">
             <div class="shrink-0">
-                <i class="fas fa-info-circle text-blue-600 dark:text-blue-400"></i>
+                <i class="fas fa-info-circle text-primary-600 dark:text-primary-400"></i>
             </div>
             <div class="ml-3">
-                <p class="text-sm text-blue-800 dark:text-blue-200">
+                <p class="text-sm text-primary-800 dark:text-primary-200">
                     Showing search results for: <strong>{{ $lastSearch }}</strong>
                 </p>
             </div>

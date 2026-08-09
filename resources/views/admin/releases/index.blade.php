@@ -27,10 +27,10 @@
                            name="search"
                            value="{{ request('search') }}"
                            placeholder="Search by release name..."
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                 </div>
                 <select name="category_id"
-                        class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white sm:min-w-[220px]">
+                        class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white sm:min-w-[220px]">
                     @foreach($catlist as $catId => $catTitle)
                         <option value="{{ $catId }}" {{ (int) request('category_id', -1) === (int) $catId ? 'selected' : '' }}>
                             {{ $catTitle }}
@@ -74,7 +74,7 @@
                     </div>
                     <div class="flex flex-wrap items-center gap-3">
                         <select name="categories_id"
-                                class="text-sm border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200 min-w-[200px]">
+                                class="text-sm border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-200 min-w-[200px]">
                             @foreach($catlist as $catId => $catTitle)
                                 @if((int) $catId > 0)
                                     <option value="{{ $catId }}">{{ $catTitle }}</option>
@@ -110,7 +110,7 @@
                                    name="guids[]"
                                    value="{{ $release->guid }}"
                                    @change="onCheckboxChange()"
-                                   class="release-checkbox rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-700">
+                                   class="release-checkbox rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 dark:bg-gray-700">
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $release->id }}</td>
                         <td class="px-6 py-4 text-sm">
@@ -124,7 +124,7 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 dark:bg-primary-900/20 text-primary-800 dark:text-primary-300">
                                 {{ $release->category_name ?? 'N/A' }}
                             </span>
                         </td>
@@ -146,7 +146,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div class="flex gap-2">
                                 <a href="{{ url('/details/' . $release->guid) }}"
-                                   class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                   class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
                                    title="View Details"
                                    target="_blank">
                                     <i class="fas fa-eye"></i>

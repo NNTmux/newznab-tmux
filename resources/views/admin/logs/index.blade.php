@@ -18,7 +18,7 @@
                     <label for="file" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Log File</label>
                     <select id="file"
                             name="file"
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md focus:ring-primary-500 focus:border-primary-500"
                             @disabled(empty($availableLogs))>
                         @forelse($availableLogs as $log)
                             <option value="{{ $log['path'] }}" @selected($selectedFile === $log['path'])>{{ $log['path'] }}</option>
@@ -35,14 +35,14 @@
                            name="search"
                            value="{{ $search }}"
                            placeholder="Search selected log"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md focus:ring-primary-500 focus:border-primary-500">
                 </div>
 
                 <div>
                     <label for="lines" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Display Count</label>
                     <select id="lines"
                             name="lines"
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-md focus:ring-primary-500 focus:border-primary-500">
                         @foreach($lineOptions as $option)
                             <option value="{{ $option }}" @selected($lines === $option)>{{ $option }}</option>
                         @endforeach
@@ -98,7 +98,7 @@
                     <div class="divide-y divide-gray-200 dark:divide-gray-700">
                         @foreach($searchResults as $match)
                             <div class="px-6 py-4">
-                                <div class="text-xs font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400 mb-2">
+                                <div class="text-xs font-semibold uppercase tracking-wide text-primary-600 dark:text-primary-400 mb-2">
                                     Line {{ number_format($match['line_number']) }}
                                 </div>
                                 <pre class="font-mono text-sm whitespace-pre-wrap break-words text-gray-800 dark:text-gray-200">{{ $match['content'] !== '' ? $match['content'] : ' ' }}</pre>

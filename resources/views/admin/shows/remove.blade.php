@@ -48,7 +48,7 @@
                             <span>All episode IDs associated with this video have been removed from releases</span>
                         </li>
                         <li class="flex items-start">
-                            <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 mt-1 mr-2"></i>
+                            <i class="fas fa-info-circle text-primary-600 dark:text-primary-400 mt-1 mr-2"></i>
                             <span>The TV show data itself remains in the database and can be re-linked if needed</span>
                         </li>
                     </ul>
@@ -77,16 +77,16 @@
             @endif
 
             <!-- Info Box -->
-            <div class="mt-6 bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 dark:border-blue-600 p-4 rounded">
+            <div class="mt-6 bg-primary-50 dark:bg-primary-900 border-l-4 border-primary-500 dark:border-primary-600 p-4 rounded">
                 <div class="flex">
                     <div class="shrink-0">
-                        <i class="fas fa-info-circle text-blue-600 dark:text-blue-400"></i>
+                        <i class="fas fa-info-circle text-primary-600 dark:text-primary-400"></i>
                     </div>
                     <div class="ml-3">
-                        <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+                        <h3 class="text-sm font-medium text-primary-800 dark:text-primary-200">
                             About This Operation
                         </h3>
-                        <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                        <div class="mt-2 text-sm text-primary-700 dark:text-primary-300">
                             <p>This operation removes the association between TV show data and releases in your database. It's useful when:</p>
                             <ul class="list-disc list-inside mt-2 space-y-1">
                                 <li>Incorrect TV show data has been linked to releases</li>
@@ -101,7 +101,7 @@
 
             <!-- Action Buttons -->
             <div class="mt-6 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-6">
-                <a href="{{ route('admin.show-list') }}" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <a href="{{ route('admin.show-list') }}" class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
                     <i class="fas fa-list mr-2"></i>Return to TV Shows List
                 </a>
                 @if($videoid)

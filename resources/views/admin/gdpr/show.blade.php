@@ -86,7 +86,7 @@
                     <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Audit Trail</h2>
                     <div class="space-y-3">
                         @forelse($gdprRequest->auditLogs as $auditLog)
-                            <div class="border-l-4 border-blue-500 pl-3">
+                            <div class="border-l-4 border-primary-500 pl-3">
                                 <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $auditLog->event }}</div>
                                 <div class="text-sm text-gray-600 dark:text-gray-400">{{ $auditLog->description }}</div>
                                 <div class="text-xs text-gray-500 dark:text-gray-500">{{ $auditLog->created_at?->format('Y-m-d H:i:s') }}</div>
@@ -105,7 +105,7 @@
                     @if($gdprRequest->type === \App\Models\GdprRequest::TYPE_EXPORT && in_array($gdprRequest->status, [\App\Models\GdprRequest::STATUS_PENDING, \App\Models\GdprRequest::STATUS_PROCESSING], true))
                         <form method="post" action="{{ route('admin.gdpr-requests.generate-export', $gdprRequest) }}" class="mb-3">
                             @csrf
-                            <button type="submit" class="w-full px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700">
+                            <button type="submit" class="w-full px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-md hover:bg-primary-700">
                                 <i class="fas fa-file-export mr-2"></i>Generate Export
                             </button>
                         </form>

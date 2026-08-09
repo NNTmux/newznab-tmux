@@ -19,8 +19,8 @@
 
         <div class="auth-card rounded-xl shadow-xl overflow-hidden">
             <div class="px-8 py-6">
-                <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg">
-                    <p class="text-sm text-blue-800 dark:text-blue-200">
+                <div class="mb-6 p-4 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-700 rounded-lg">
+                    <p class="text-sm text-primary-800 dark:text-primary-200">
                         Two factor authentication protects against phishing, social engineering and password brute force attacks by requiring a second verification step.
                     </p>
                 </div>
@@ -44,7 +44,7 @@
                     <div class="space-y-6">
                         <div>
                             <p class="text-gray-700 dark:text-gray-300 font-medium mb-3">
-                                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 text-primary-600 dark:text-primary-400 text-xs font-bold mr-2">1</span>
+                                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 text-xs font-bold mr-2">1</span>
                                 Scan this barcode with your Google Authenticator App:
                             </p>
                             <div class="flex justify-center p-4 bg-white rounded-lg border border-gray-200 dark:border-gray-600">
@@ -54,7 +54,7 @@
 
                         <div>
                             <p class="text-gray-700 dark:text-gray-300 font-medium mb-3">
-                                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 text-primary-600 dark:text-primary-400 text-xs font-bold mr-2">2</span>
+                                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 text-xs font-bold mr-2">2</span>
                                 Enter the pin code to enable 2FA:
                             </p>
                             <form method="POST" action="{{ route('enable2fa') }}" class="space-y-4">

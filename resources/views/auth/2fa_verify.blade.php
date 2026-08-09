@@ -38,10 +38,10 @@
                 @endif
 
                 <div class="mb-6">
-                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+                    <div class="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-700 rounded-lg p-4">
                         <div class="flex items-start">
                             <i class="fas fa-info-circle text-primary-600 dark:text-primary-400 mr-3 mt-0.5"></i>
-                            <div class="text-sm text-blue-800 dark:text-blue-200">
+                            <div class="text-sm text-primary-800 dark:text-primary-200">
                                 <p class="font-medium mb-1">Security Verification Required</p>
                                 <p>Open your authenticator app and enter the 6-digit verification code to complete your login.</p>
                             </div>

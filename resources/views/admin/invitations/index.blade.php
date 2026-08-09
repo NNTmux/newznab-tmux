@@ -29,7 +29,7 @@
                 </div>
                 <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
                     <div class="text-sm text-gray-500 dark:text-gray-400">Pending</div>
-                    <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ $stats['pending'] }}</div>
+                    <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">{{ $stats['pending'] }}</div>
                 </div>
                 <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
                     <div class="text-sm text-gray-500 dark:text-gray-400">Used</div>
@@ -68,7 +68,7 @@
                                name="email"
                                value="{{ $email }}"
                                placeholder="Filter by email"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                     </div>
                     <div>
                         <label for="invited_by" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Invited By</label>
@@ -77,11 +77,11 @@
                                name="invited_by"
                                value="{{ $invited_by }}"
                                placeholder="Filter by inviter username"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                     </div>
                     <div>
                         <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                        <select name="status" id="status" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <select name="status" id="status" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                             @foreach($statusOptions as $key => $label)
                                 <option value="{{ $key }}" {{ $status === $key ? 'selected' : '' }}>{{ $label }}</option>
                             @endforeach
@@ -89,7 +89,7 @@
                     </div>
                     <div>
                         <label for="ob" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Order By</label>
-                        <select name="ob" id="ob" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <select name="ob" id="ob" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                             <option value="created_at_desc" {{ $orderBy === 'created_at_desc' ? 'selected' : '' }}>Created (Newest)</option>
                             <option value="created_at_asc" {{ $orderBy === 'created_at_asc' ? 'selected' : '' }}>Created (Oldest)</option>
                             <option value="expires_at_desc" {{ $orderBy === 'expires_at_desc' ? 'selected' : '' }}>Expires (Latest)</option>
@@ -100,7 +100,7 @@
                     </div>
                 </div>
                 <div class="mt-4 flex space-x-2">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
                         <i class="fas fa-filter mr-2"></i>Filter
                     </button>
                     <a href="{{ url('admin/invitations') }}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
@@ -154,7 +154,7 @@
                                             <i class="fas fa-clock mr-1"></i>Expired
                                         </span>
                                     @else
-                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
                                             <i class="fas fa-hourglass-half mr-1"></i>Pending
                                         </span>
                                     @endif
@@ -166,7 +166,7 @@
                                     {{ $invitation->expires_at ? $invitation->expires_at->format('Y-m-d H:i') : 'Never' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                    <a href="{{ url('admin/invitations/' . $invitation->id) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
+                                    <a href="{{ url('admin/invitations/' . $invitation->id) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                     @if(!$invitation->used_at)

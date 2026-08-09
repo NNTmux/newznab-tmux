@@ -94,7 +94,7 @@
                                 </a>
                             @endif
                             @if(!empty($movie['tmdbid'] ?? null))
-                                <a href="{{ $site['dereferrer_link'] }}https://www.themoviedb.org/movie/{{ $movie['tmdbid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition">
+                                <a href="{{ $site['dereferrer_link'] }}https://www.themoviedb.org/movie/{{ $movie['tmdbid'] }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-primary-100 text-primary-800 rounded-lg hover:bg-primary-200 transition">
                                     <i class="fas fa-film mr-2"></i> View on TMDb
                                 </a>
                             @endif
@@ -138,7 +138,7 @@
                             <div class="flex flex-wrap gap-2 items-center">
                                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">Resolution:</span>
                                 <button data-resolution="all"
-                                        class="px-4 py-2 rounded-lg text-sm font-medium transition bg-blue-600 text-white hover:bg-blue-700">
+                                        class="px-4 py-2 rounded-lg text-sm font-medium transition bg-primary-600 text-white hover:bg-primary-700">
                                     <i class="fas fa-list mr-1"></i> All
                                 </button>
                                 <button data-resolution="720p"
@@ -183,7 +183,7 @@
                             <div class="movie-release-card release-item bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700" data-release-name="{{ strtolower($release->searchname) }}">
                                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                                     <div class="flex-1 min-w-0">
-                                        <a href="{{ url('/details/' . $release->guid) }}" class="text-base text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:text-blue-400 font-medium block truncate" title="{{ $release->searchname }}">
+                                        <a href="{{ url('/details/' . $release->guid) }}" class="text-base text-gray-800 dark:text-gray-200 hover:text-primary-600 dark:text-primary-400 font-medium block truncate" title="{{ $release->searchname }}">
                                             {{ $release->searchname }}
                                         </a>
                                         <div class="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500">
@@ -203,7 +203,7 @@
                                                 </span>
                                             @endif
                                             @if($release->adddate)
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
                                                     <i class="fas fa-plus-circle mr-1"></i>Added: {{ userDateDiffForHumans($release->adddate) }}
                                                 </span>
                                             @endif

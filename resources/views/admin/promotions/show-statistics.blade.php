@@ -82,7 +82,7 @@
                     <input type="date" name="end_date" value="{{ $endDate->format('Y-m-d') }}" class="form-input rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
                 </div>
                 <div>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
                         <i class="fas fa-filter mr-2"></i>Apply
                     </button>
                 </div>
@@ -94,8 +94,8 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div class="flex items-center">
-                <div class="shrink-0 bg-blue-100 dark:bg-blue-900 rounded-full p-3">
-                    <i class="fas fa-arrow-up text-2xl text-blue-600 dark:text-blue-400"></i>
+                <div class="shrink-0 bg-primary-100 dark:bg-primary-900 rounded-full p-3">
+                    <i class="fas fa-arrow-up text-2xl text-primary-600 dark:text-primary-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Total Upgrades</p>
@@ -163,7 +163,7 @@
                     @foreach($statsByRole as $roleStat)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded font-medium">
+                                <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded font-medium">
                                     {{ $roleStat['role_name'] ?? 'Unknown' }}
                                 </span>
                             </td>
@@ -213,7 +213,7 @@
                                 <td class="text-right font-bold text-gray-800 dark:text-gray-200">{{ $dayStat->count }}</td>
                                 <td class="text-right font-bold text-gray-800 dark:text-gray-200">{{ $dayStat->days }}</td>
                                 <td class="pl-4">
-                                    <div class="bg-blue-200 dark:bg-blue-600 h-4 rounded" style="width: {{ ($dayStat->count / $maxCount) * 100 }}%"></div>
+                                    <div class="bg-primary-200 dark:bg-primary-600 h-4 rounded" style="width: {{ ($dayStat->count / $maxCount) * 100 }}%"></div>
                                 </td>
                             </tr>
                         @endforeach
@@ -257,7 +257,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs font-medium">
+                                <span class="px-2 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded text-xs font-medium">
                                     {{ $application->role->name ?? 'Unknown Role' }}
                                 </span>
                             </td>

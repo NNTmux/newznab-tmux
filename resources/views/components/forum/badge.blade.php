@@ -18,7 +18,7 @@ switch($type) {
         break;
 
     default:
-        $color = 'bg-blue-500';
+        $color = 'bg-primary-500';
         break;
 }
 @endphp

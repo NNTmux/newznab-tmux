@@ -13,7 +13,7 @@
                     <a href="{{ route('admin.promotions.statistics') }}" class="px-4 py-2 bg-purple-600 dark:bg-purple-700 text-white rounded-lg hover:bg-purple-700">
                         <i class="fas fa-chart-bar mr-2"></i>View Statistics
                     </a>
-                    <a href="{{ route('admin.promotions.create') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
+                    <a href="{{ route('admin.promotions.create') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
                         <i class="fas fa-plus mr-2"></i>Add New Promotion
                     </a>
                 </div>
@@ -54,7 +54,7 @@
                                     @else
                                         <div class="flex flex-wrap gap-1">
                                             @foreach($roles as $role)
-                                                <span class="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
+                                                <span class="px-2 py-1 text-xs bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded">
                                                     {{ $role->name }}
                                                 </span>
                                             @endforeach
@@ -108,7 +108,7 @@
                                             <i class="fas fa-{{ $promotion->is_active ? 'pause' : 'play' }}"></i>
                                         </a>
                                         <a href="{{ route('admin.promotions.edit', $promotion->id) }}"
-                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                           class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
                                            title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>

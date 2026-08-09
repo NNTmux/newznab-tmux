@@ -37,7 +37,7 @@
             type="text"
             autocomplete="username webauthn"
             inputmode="email"
-            class="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-3 text-sm text-gray-900 shadow-sm transition focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+            class="mt-2 block w-full rounded-lg border border-gray-300 px-3 py-3 text-sm text-gray-900 shadow-sm transition focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
             placeholder="Choose a saved passkey"
         >
     </div>
@@ -47,7 +47,7 @@
             id="passkey-remember"
             x-model="remember"
             type="checkbox"
-            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:text-blue-400"
+            class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:text-primary-400"
         >
         <label for="passkey-remember" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
             Remember me
@@ -58,7 +58,7 @@
         type="button"
         @click="authenticate()"
         :disabled="busy"
-        class="mt-4 flex w-full items-center justify-center rounded-lg border border-blue-600 px-4 py-3 text-sm font-medium text-blue-700 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-blue-400 dark:text-blue-300 dark:hover:bg-blue-900/30"
+        class="mt-4 flex w-full items-center justify-center rounded-lg border border-primary-600 px-4 py-3 text-sm font-medium text-primary-700 transition hover:bg-primary-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-primary-400 dark:text-primary-300 dark:hover:bg-primary-900/30"
     >
         <i class="fas fa-fingerprint mr-2"></i>
         <span x-text="busy ? 'Waiting for passkey...' : 'Sign in with passkey'"></span>
@@ -69,7 +69,7 @@
     <div
         x-show="showCreateHint"
         x-cloak
-        class="mt-3 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800 dark:border-blue-700 dark:bg-blue-900/20 dark:text-blue-200"
+        class="mt-3 rounded-lg border border-primary-200 bg-primary-50 p-3 text-sm text-primary-800 dark:border-primary-700 dark:bg-primary-900/20 dark:text-primary-200"
     >
         <p>
             No passkey was found for this login on this device/browser.
@@ -82,14 +82,14 @@
             <button
                 type="button"
                 @click="$dispatch('use-password-login')"
-                class="rounded-md border border-blue-300 px-3 py-1.5 text-xs font-medium text-blue-800 hover:bg-blue-100 dark:border-blue-600 dark:text-blue-200 dark:hover:bg-blue-900/40"
+                class="rounded-md border border-primary-300 px-3 py-1.5 text-xs font-medium text-primary-800 hover:bg-primary-100 dark:border-primary-600 dark:text-primary-200 dark:hover:bg-primary-900/40"
             >
                 Use password login
             </button>
             @if(Route::has('register'))
                 <a
                     href="{{ route('register') }}"
-                    class="rounded-md border border-blue-300 px-3 py-1.5 text-xs font-medium text-blue-800 hover:bg-blue-100 dark:border-blue-600 dark:text-blue-200 dark:hover:bg-blue-900/40"
+                    class="rounded-md border border-primary-300 px-3 py-1.5 text-xs font-medium text-primary-800 hover:bg-primary-100 dark:border-primary-600 dark:text-primary-200 dark:hover:bg-primary-900/40"
                 >
                     Create account
                 </a>

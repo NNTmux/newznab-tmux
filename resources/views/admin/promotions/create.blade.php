@@ -20,7 +20,7 @@
                     Promotion Name <span class="text-red-500">*</span>
                 </label>
                 <input type="text" name="name" id="name" value="{{ old('name') }}"
-                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-100"
                        required>
                 @error('name')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -33,7 +33,7 @@
                     Description
                 </label>
                 <textarea name="description" id="description" rows="3"
-                          class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100">{{ old('description') }}</textarea>
+                          class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-100">{{ old('description') }}</textarea>
                 @error('description')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                 @enderror
@@ -45,7 +45,7 @@
                     Applicable Custom Roles
                 </label>
                 <select name="applicable_roles[]" id="applicable_roles" multiple
-                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-100"
                         size="6">
                     @foreach($customRoles as $role)
                         <option value="{{ $role->id }}" {{ is_array(old('applicable_roles')) && in_array($role->id, old('applicable_roles')) ? 'selected' : '' }}>
@@ -68,7 +68,7 @@
                 </label>
                 <input type="number" name="additional_days" id="additional_days" value="{{ old('additional_days', 0) }}"
                        min="0"
-                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-100"
                        required>
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Number of days to add to role expiry date when upgraded</p>
                 @error('additional_days')
@@ -83,7 +83,7 @@
                         Start Date
                     </label>
                     <input type="date" name="start_date" id="start_date" value="{{ old('start_date') }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-100">
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Leave blank for no start restriction</p>
                     @error('start_date')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -95,7 +95,7 @@
                         End Date
                     </label>
                     <input type="date" name="end_date" id="end_date" value="{{ old('end_date') }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-100">
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Leave blank for no end restriction</p>
                     @error('end_date')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -108,7 +108,7 @@
                 <label class="flex items-center">
                     <input type="checkbox" name="is_active" id="is_active" value="1"
                            {{ old('is_active', true) ? 'checked' : '' }}
-                           class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700">
+                           class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700">
                     <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Active</span>
                 </label>
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Uncheck to create as inactive</p>
@@ -121,7 +121,7 @@
                     Cancel
                 </a>
                 <button type="submit"
-                        class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
+                        class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
                     <i class="fas fa-save mr-2"></i>Create Promotion
                 </button>
             </div>

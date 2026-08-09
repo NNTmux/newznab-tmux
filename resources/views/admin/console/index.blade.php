@@ -82,7 +82,7 @@
                                 @if($console->esrb)
                                     <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
                                         @if($console->esrb == 'E') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
-                                        @elseif($console->esrb == 'E10+') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
+                                        @elseif($console->esrb == 'E10+') bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200
                                         @elseif($console->esrb == 'T') bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
                                         @elseif($console->esrb == 'M') bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200
                                         @elseif($console->esrb == 'AO') bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
@@ -96,7 +96,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                 <a href="{{ url('admin/console-edit?id=' . $console->id) }}"
-                                   class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                   class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
                                    title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>

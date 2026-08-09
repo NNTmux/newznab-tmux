@@ -20,7 +20,7 @@
                                name="username"
                                value="{{ $username ?? '' }}"
                                placeholder="Filter by username"
-                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400">
+                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400">
                     </div>
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
@@ -29,7 +29,7 @@
                                name="email"
                                value="{{ $email ?? '' }}"
                                placeholder="Filter by email"
-                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400">
+                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400">
                     </div>
                     <div>
                         <label for="host" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Host/IP</label>
@@ -38,13 +38,13 @@
                                name="host"
                                value="{{ $host ?? '' }}"
                                placeholder="Filter by host"
-                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400">
+                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400">
                     </div>
                     <div>
                         <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
                         <select id="role"
                                 name="role"
-                                class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400">
+                                class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400">
                             <option value="">All Roles</option>
                             @foreach($role_ids ?? [] as $index => $roleId)
                                 <option value="{{ $roleId }}" {{ ($role ?? '') == $roleId ? 'selected' : '' }}>
@@ -57,7 +57,7 @@
                         <label for="verified" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Verified</label>
                         <select id="verified"
                                 name="verified"
-                                class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400">
+                                class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400">
                             <option value="" {{ ($verified ?? '') === '' ? 'selected' : '' }}>All Users</option>
                             <option value="1" {{ ($verified ?? '') === '1' ? 'selected' : '' }}>Verified</option>
                             <option value="0" {{ ($verified ?? '') === '0' ? 'selected' : '' }}>Not Verified</option>
@@ -69,7 +69,7 @@
                                id="created_from"
                                name="created_from"
                                value="{{ $created_from ?? '' }}"
-                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400">
+                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400">
                     </div>
                     <div>
                         <label for="created_to" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Registered To</label>
@@ -77,7 +77,7 @@
                                id="created_to"
                                name="created_to"
                                value="{{ $created_to ?? '' }}"
-                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400">
+                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400">
                     </div>
                 </div>
                 <div class="mt-4 flex gap-2">
@@ -108,7 +108,7 @@
                 @csrf
                 <div class="flex flex-col md:flex-row md:items-center gap-3">
                     <label for="bulkUserAction" class="text-sm font-medium text-gray-700 dark:text-gray-300">Bulk Actions:</label>
-                    <select name="action" id="bulkUserAction" class="w-full md:w-auto px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <select name="action" id="bulkUserAction" class="w-full md:w-auto px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-primary-500 focus:border-primary-500">
                         <option value="">Select Action</option>
                         <option value="verify">Mark Selected Verified</option>
                         <option value="resend_verification">Resend Verification Email</option>
@@ -136,7 +136,7 @@
                     <thead class="bg-gray-50 dark:bg-gray-900">
                         <tr>
                             <th class="px-6 py-3 text-left">
-                                <input type="checkbox" id="selectAllUserList" class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded" title="Select all active users on this page">
+                                <input type="checkbox" id="selectAllUserList" class="h-4 w-4 text-primary-600 dark:text-primary-400 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded" title="Select all active users on this page">
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -215,7 +215,7 @@
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if(!$user->deleted_at && !$isAdminUser)
-                                        <input type="checkbox" name="user_ids[]" value="{{ $user->id }}" form="bulkUserActionForm" data-is-verified="{{ $isVerified ? '1' : '0' }}" class="user-list-checkbox h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded">
+                                        <input type="checkbox" name="user_ids[]" value="{{ $user->id }}" form="bulkUserActionForm" data-is-verified="{{ $isVerified ? '1' : '0' }}" class="user-list-checkbox h-4 w-4 text-primary-600 dark:text-primary-400 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded">
                                     @elseif($isAdminUser)
                                         <input type="checkbox" disabled class="h-4 w-4 text-gray-300 dark:text-gray-600 border-gray-300 dark:border-gray-600 rounded cursor-not-allowed" title="Admin users cannot be selected for bulk actions">
                                     @else
@@ -243,7 +243,7 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
                                         {{ $user->rolename ?? 'N/A' }}
                                     </span>
                                 </td>
@@ -315,7 +315,7 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100" title="API requests in last 24 hours">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                        {{ ($user->daily_api_count ?? 0) > 0 ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300' }}">
+                                        {{ ($user->daily_api_count ?? 0) > 0 ? 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300' }}">
                                         <i class="fas fa-code mr-1"></i>{{ $user->daily_api_count ?? 0 }}
                                     </span>
                                 </td>
@@ -341,7 +341,7 @@
                                         @else
                                             <!-- Show normal actions for active users -->
                                             <a href="{{ url('admin/user-edit?id=' . $user->id) }}"
-                                               class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                               class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
                                                title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>

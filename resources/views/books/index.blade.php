@@ -6,9 +6,9 @@
     <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <nav aria-label="breadcrumb">
             <ol class="flex items-center space-x-2 text-sm text-gray-600">
-                <li><a href="{{ url($site['home_link'] ?? '/') }}" class="hover:text-blue-600">Home</a></li>
+                <li><a href="{{ url($site['home_link'] ?? '/') }}" class="hover:text-primary-600">Home</a></li>
                 <li><i class="fas fa-chevron-right text-xs mx-2"></i></li>
-                <li><a href="{{ url('/browse/Books') }}" class="hover:text-blue-600">Books</a></li>
+                <li><a href="{{ url('/browse/Books') }}" class="hover:text-primary-600">Books</a></li>
                 @if(!empty($categorytitle) && $categorytitle !== 'All')
                     <li><i class="fas fa-chevron-right text-xs mx-2"></i></li>
                     <li class="text-gray-500">{{ $categorytitle }}</li>
@@ -30,7 +30,7 @@
                                name="author"
                                value="{{ $author ?? '' }}"
                                placeholder="Search by author"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">
                     </div>
 
                     <!-- Title Filter -->
@@ -41,7 +41,7 @@
                                name="title"
                                value="{{ $title ?? '' }}"
                                placeholder="Search by title"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">
                     </div>
 
                     <!-- Category Filter -->
@@ -49,7 +49,7 @@
                         <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
                         <select id="category"
                                 name="t"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">
                             <option value="">All Categories</option>
                             @foreach($catlist ?? [] as $cat)
                                 <option value="{{ $cat['id'] }}" {{ ($category ?? '') == $cat['id'] ? 'selected' : '' }}>
@@ -61,7 +61,7 @@
                 </div>
 
                 <div class="mt-4 flex gap-2">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700">
+                    <button type="submit" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-md hover:bg-primary-700">
                         <i class="fa fa-search mr-2"></i>Search
                     </button>
                     <a href="{{ url('/Books/' . ($categorytitle ?: 'All')) }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300">
@@ -134,7 +134,7 @@
                                     <i class="fa fa-download"></i>
                                 </a>
                                 <a href="{{ url('/details/' . $guid) }}"
-                                   class="flex-1 px-2 py-1 bg-blue-600 dark:bg-blue-700 text-white text-xs rounded hover:bg-blue-700 dark:hover:bg-blue-800 text-center"
+                                   class="flex-1 px-2 py-1 bg-primary-600 dark:bg-primary-700 text-white text-xs rounded hover:bg-primary-700 dark:hover:bg-primary-800 text-center"
                                    title="View Details">
                                     <i class="fa fa-info-circle"></i>
                                 </a>
@@ -154,7 +154,7 @@
                 <i class="fa fa-book text-yellow-600 text-5xl mb-4"></i>
                 <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">No books found</h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-4">Try adjusting your search filters or browse all books.</p>
-                <a href="{{ url('/Books/All') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
+                <a href="{{ url('/Books/All') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
                     <i class="fa fa-book mr-2"></i> Browse All Books
                 </a>
             </div>

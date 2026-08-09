@@ -31,7 +31,7 @@
         <div class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-white dark:bg-gray-800">
                 <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">
-                    <i class="fas fa-file-export mr-2 text-blue-600 dark:text-blue-400"></i>Download Your Data
+                    <i class="fas fa-file-export mr-2 text-primary-600 dark:text-primary-400"></i>Download Your Data
                 </h2>
                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                     Generate a JSON export containing your account profile, usage records, comments, requests, GDPR history, and retained payment/audit records that relate to your account.
@@ -40,7 +40,7 @@
                     @csrf
                     <label for="export_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Optional notes</label>
                     <textarea id="export_notes" name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md" placeholder="Anything administrators should know?"></textarea>
-                    <button type="submit" class="mt-4 px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700">
+                    <button type="submit" class="mt-4 px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-md hover:bg-primary-700">
                         <i class="fas fa-download mr-2"></i>Generate Export
                     </button>
                 </form>
@@ -91,7 +91,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
                                 @if($gdprRequest->isDownloadableExport())
-                                    <a href="{{ route('privacy-center.export.download', $gdprRequest) }}" class="text-blue-600 dark:text-blue-400 hover:underline">
+                                    <a href="{{ route('privacy-center.export.download', $gdprRequest) }}" class="text-primary-600 dark:text-primary-400 hover:underline">
                                         <i class="fas fa-download mr-1"></i>Download export
                                     </a>
                                     <span class="block text-xs text-gray-500 dark:text-gray-500">Expires {{ $gdprRequest->export_expires_at?->diffForHumans() }}</span>

@@ -26,7 +26,7 @@
                 <!-- Tmux - How It Works -->
                 <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
                     <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Tmux - How It Works</h2>
-                    <div class="bg-blue-50 dark:bg-gray-700 border border-blue-200 dark:border-gray-600 rounded-lg p-4">
+                    <div class="bg-primary-50 dark:bg-gray-700 border border-primary-200 dark:border-gray-600 rounded-lg p-4">
                         <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">Tmux is a screen multiplexer and at least version 1.6 is required. It is used here to allow multiple windows per session and multiple panes per window.</p>
                         <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">Each script is run in its own shell environment. It is not looped, but allowed to run once and then exit. This notifies tmux that the pane is dead and can then be respawned with another iteration of the script in a new shell environment.</p>
                         <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">This allows for scripts that crash to be restarted without user intervention.</p>
@@ -311,7 +311,7 @@
                                                name="fix_crap_opt"
                                                value="{{ $val }}"
                                                {{ ($site['fix_crap_opt'] ?? 'Disabled') == $val ? 'checked' : '' }}
-                                               class="form-radio h-4 w-4 text-blue-600 dark:bg-gray-700 dark:border-gray-600">
+                                               class="form-radio h-4 w-4 text-primary-600 dark:bg-gray-700 dark:border-gray-600">
                                         <span class="text-sm text-gray-700 dark:text-gray-300">{{ $fix_crap_radio_names[$index] }}</span>
                                     </label>
                                 @endforeach
@@ -320,7 +320,7 @@
 
                         <div id="crap_types_container">
                             <x-form.group label="Select Crap Types" for="fix_crap_types" help="Choose which types of crap releases to remove.">
-                                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-blue-200 dark:border-blue-700">
+                                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-primary-200 dark:border-primary-700">
                                     @php
                                         $selectedTypes = explode(',', $site['fix_crap'] ?? '');
                                     @endphp
@@ -330,7 +330,7 @@
                                                    name="fix_crap[]"
                                                    value="{{ $val }}"
                                                    {{ in_array($val, $selectedTypes) ? 'checked' : '' }}
-                                                   class="form-checkbox h-4 w-4 text-blue-600 rounded dark:bg-gray-700 dark:border-gray-600">
+                                                   class="form-checkbox h-4 w-4 text-primary-600 rounded dark:bg-gray-700 dark:border-gray-600">
                                             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ ucfirst($fix_crap_check_names[$index]) }}</span>
                                         </label>
                                     @endforeach
@@ -367,7 +367,7 @@
                 <!-- Console & Monitoring Tools -->
                 <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
                     <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Console & Monitoring Tools</h2>
-                    <div class="bg-blue-50 dark:bg-gray-700 border border-blue-200 dark:border-gray-600 rounded-lg p-4 mb-4">
+                    <div class="bg-primary-50 dark:bg-gray-700 border border-primary-200 dark:border-gray-600 rounded-lg p-4 mb-4">
                         <p class="text-sm text-gray-700 dark:text-gray-300">
                             <i class="fas fa-info-circle mr-2"></i>
                             Enable monitoring tools to display system metrics in separate tmux windows. Each tool requires the corresponding package to be installed on your system.

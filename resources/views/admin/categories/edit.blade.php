@@ -31,7 +31,7 @@
                                 <i class="fas fa-hashtag text-gray-400"></i>
                             </div>
                             <input type="number" id="id" name="id"
-                                   class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                                   class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                                    placeholder="Leave empty for auto-generated ID"
                                    value="{{ old('id') }}"/>
                         </div>
@@ -48,7 +48,7 @@
                                 <i class="fas fa-tag text-gray-400"></i>
                             </div>
                             <input type="text" id="title" name="title" required
-                                   class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                                   class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                                    placeholder="Enter category title"
                                    value="{{ old('title') }}"/>
                         </div>
@@ -82,7 +82,7 @@
                             <i class="fas fa-folder-open text-gray-400"></i>
                         </div>
                         <select id="root_categories_id" name="root_categories_id"
-                                class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                                class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                             <option value="">-- No Root Category --</option>
                             @foreach($rootCategories ?? [] as $rootCat)
                                 <option value="{{ $rootCat->id }}" {{ ($category->root_categories_id ?? null) == $rootCat->id ? 'selected' : '' }}>
@@ -102,7 +102,7 @@
                             <i class="fas fa-align-left text-gray-400"></i>
                         </div>
                         <input type="text" id="description" name="description"
-                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                                value="{{ $category->description ?? '' }}"
                                placeholder="Brief explanation of what belongs in this category"/>
                     </div>

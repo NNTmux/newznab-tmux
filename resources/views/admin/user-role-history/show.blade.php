@@ -10,7 +10,7 @@
                     <i class="fas fa-history mr-2"></i>{{ $title }}
                 </h1>
                 <div class="flex gap-2">
-                    <a href="{{ url('admin/user-edit?id=' . $user->id) }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
+                    <a href="{{ url('admin/user-edit?id=' . $user->id) }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800">
                         <i class="fas fa-edit mr-2"></i>Edit User
                     </a>
                     <a href="{{ url('admin/user-role-history') }}" class="px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-800">
@@ -35,7 +35,7 @@
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Role</label>
                     <div class="text-lg text-gray-900 dark:text-gray-100">
                         @if($user->role)
-                            <span class="px-3 py-1 text-sm font-medium rounded bg-blue-200 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                            <span class="px-3 py-1 text-sm font-medium rounded bg-primary-200 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
                                 {{ $user->role->name }}
                             </span>
                         @else
@@ -114,7 +114,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                 @if($record->newRole)
-                                    <span class="px-2 py-1 text-xs font-medium rounded bg-blue-200 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                    <span class="px-2 py-1 text-xs font-medium rounded bg-primary-200 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
                                         {{ $record->newRole->name }}
                                     </span>
                                 @else

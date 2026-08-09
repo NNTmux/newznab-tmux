@@ -7,9 +7,9 @@
     <div class="mb-6">
         <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Edit Release</h1>
         <nav class="text-sm text-gray-600 dark:text-gray-400 mt-2">
-            <a href="{{ route('admin.index') }}" class="hover:text-blue-600">Dashboard</a>
+            <a href="{{ route('admin.index') }}" class="hover:text-primary-600">Dashboard</a>
             <i class="fas fa-chevron-right mx-2 text-xs"></i>
-            <a href="{{ route('admin.release-list') }}" class="hover:text-blue-600">Releases</a>
+            <a href="{{ route('admin.release-list') }}" class="hover:text-primary-600">Releases</a>
             <i class="fas fa-chevron-right mx-2 text-xs"></i>
             <span>Edit</span>
         </nav>
@@ -44,7 +44,7 @@
                            id="name"
                            name="name"
                            value="{{ $release->name ?? $release['name'] ?? '' }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
 
                 <!-- Search Name -->
@@ -56,7 +56,7 @@
                            id="searchname"
                            name="searchname"
                            value="{{ $release->searchname ?? $release['searchname'] ?? '' }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
 
                 <!-- From Name -->
@@ -68,7 +68,7 @@
                            id="fromname"
                            name="fromname"
                            value="{{ $release->fromname ?? $release['fromname'] ?? '' }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
 
                 <!-- Category -->
@@ -78,7 +78,7 @@
                     </label>
                     <select id="category"
                             name="category"
-                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                         @foreach($catlist as $catId => $catTitle)
                             <option value="{{ $catId }}" {{ ($release->categories_id ?? $release['categories_id'] ?? '') == $catId ? 'selected' : '' }}>
                                 {{ $catTitle }}
@@ -96,7 +96,7 @@
                            id="totalpart"
                            name="totalpart"
                            value="{{ $release->totalpart ?? $release['totalpart'] ?? 0 }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
 
                 <!-- Grabs -->
@@ -108,7 +108,7 @@
                            id="grabs"
                            name="grabs"
                            value="{{ $release->grabs ?? $release['grabs'] ?? 0 }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
 
                 <!-- Size (in bytes) -->
@@ -120,7 +120,7 @@
                            id="size"
                            name="size"
                            value="{{ $release->size ?? $release['size'] ?? 0 }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         Current: {{ number_format(($release->size ?? $release['size'] ?? 0) / 1073741824, 2) }} GB
                     </p>
@@ -135,7 +135,7 @@
                            id="postdate"
                            name="postdate"
                            value="{{ isset($release->postdate) || isset($release['postdate']) ? date('Y-m-d\TH:i', strtotime($release->postdate ?? $release['postdate'])) : '' }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
 
                 <!-- Add Date -->
@@ -147,7 +147,7 @@
                            id="adddate"
                            name="adddate"
                            value="{{ isset($release->adddate) || isset($release['adddate']) ? date('Y-m-d\TH:i', strtotime($release->adddate ?? $release['adddate'])) : '' }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
 
                 <!-- Video ID -->
@@ -159,7 +159,7 @@
                            id="videos_id"
                            name="videos_id"
                            value="{{ $release->videos_id ?? $release['videos_id'] ?? 0 }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
 
                 <!-- TV Episode ID -->
@@ -171,7 +171,7 @@
                            id="tv_episodes_id"
                            name="tv_episodes_id"
                            value="{{ $release->tv_episodes_id ?? $release['tv_episodes_id'] ?? 0 }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
 
                 <!-- IMDB ID -->
@@ -184,7 +184,7 @@
                            name="imdbid"
                            value="{{ $release->imdbid ?? $release['imdbid'] ?? '' }}"
                            placeholder="e.g., 0133093"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400">
                 </div>
 
                 <!-- AniDB ID -->
@@ -196,13 +196,13 @@
                            id="anidbid"
                            name="anidbid"
                            value="{{ $release->anidbid ?? $release['anidbid'] ?? 0 }}"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                 </div>
             </div>
 
             <!-- Action Buttons -->
             <div class="mt-6 flex gap-3">
-                <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition inline-flex items-center">
+                <button type="submit" class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition inline-flex items-center">
                     <i class="fas fa-save mr-2"></i> Save Changes
                 </button>
                 <a href="{{ route('admin.release-list') }}" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 transition inline-flex items-center">

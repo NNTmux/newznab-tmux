@@ -8,10 +8,10 @@
         <div class="mb-6">
             <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">NFO File</h1>
             <nav class="text-sm text-gray-600 dark:text-gray-400">
-                <a href="{{ url('/') }}" class="hover:text-blue-600">Home</a>
+                <a href="{{ url('/') }}" class="hover:text-primary-600">Home</a>
                 <i class="fas fa-chevron-right mx-2 text-xs"></i>
                 @if(isset($rel))
-                    <a href="{{ url('/details/' . $rel['guid']) }}" class="hover:text-blue-600 wrap-break-word break-all">{{ $rel['searchname'] }}</a>
+                    <a href="{{ url('/details/' . $rel['guid']) }}" class="hover:text-primary-600 wrap-break-word break-all">{{ $rel['searchname'] }}</a>
                     <i class="fas fa-chevron-right mx-2 text-xs"></i>
                 @endif
                 <span>NFO</span>
@@ -24,7 +24,7 @@
 
         @if(isset($rel))
             <div class="mt-4">
-                <a href="{{ url('/details/' . $rel['guid']) }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                <a href="{{ url('/details/' . $rel['guid']) }}" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition">
                     <i class="fas fa-arrow-left mr-2"></i> Back to Release
                 </a>
             </div>

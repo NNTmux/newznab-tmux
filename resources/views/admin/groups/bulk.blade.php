@@ -18,10 +18,10 @@
         <div class="px-6 py-6">
             @if(!empty($groupmsglist))
                 <!-- Success Info -->
-                <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <div class="mb-6 p-4 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 rounded-lg">
                     <div class="flex">
-                        <i class="fas fa-info-circle text-blue-500 dark:text-blue-400 text-xl mr-3"></i>
-                        <p class="text-blue-700 dark:text-blue-300">
+                        <i class="fas fa-info-circle text-primary-500 dark:text-primary-400 text-xl mr-3"></i>
+                        <p class="text-primary-700 dark:text-primary-300">
                             The following groups have been processed. You can now view them in the group list.
                         </p>
                     </div>
@@ -67,10 +67,10 @@
                 </div>
             @else
                 <!-- Info Alert -->
-                <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <div class="mb-6 p-4 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 rounded-lg">
                     <div class="flex">
-                        <i class="fas fa-info-circle text-blue-500 dark:text-blue-400 text-xl mr-3"></i>
-                        <p class="text-blue-700 dark:text-blue-300">
+                        <i class="fas fa-info-circle text-primary-500 dark:text-primary-400 text-xl mr-3"></i>
+                        <p class="text-primary-700 dark:text-primary-300">
                             Enter a regular expression to match multiple groups for bulk addition to the system.
                         </p>
                     </div>
@@ -91,7 +91,7 @@
                             </div>
                             <textarea id="groupfilter"
                                       name="groupfilter"
-                                      class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                                      class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono text-sm"
                                       rows="5"
                                       placeholder="e.g. alt.binaries.cd.image.linux|alt.binaries.warez.linux"></textarea>
                         </div>
@@ -110,7 +110,7 @@
                                        name="active"
                                        id="active_yes"
                                        value="1"
-                                       class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
+                                       class="w-4 h-4 text-primary-600 dark:text-primary-400 border-gray-300 dark:border-gray-600 focus:ring-primary-500"
                                        checked>
                                 <label for="active_yes" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Yes</label>
                             </div>
@@ -119,7 +119,7 @@
                                        name="active"
                                        id="active_no"
                                        value="0"
-                                       class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500">
+                                       class="w-4 h-4 text-primary-600 dark:text-primary-400 border-gray-300 dark:border-gray-600 focus:ring-primary-500">
                                 <label for="active_no" class="ml-2 text-sm text-gray-700 dark:text-gray-300">No</label>
                             </div>
                         </div>
@@ -137,7 +137,7 @@
                                        name="backfill"
                                        id="backfill_yes"
                                        value="1"
-                                       class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500">
+                                       class="w-4 h-4 text-primary-600 dark:text-primary-400 border-gray-300 dark:border-gray-600 focus:ring-primary-500">
                                 <label for="backfill_yes" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Yes</label>
                             </div>
                             <div class="flex items-center">
@@ -145,7 +145,7 @@
                                        name="backfill"
                                        id="backfill_no"
                                        value="0"
-                                       class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500"
+                                       class="w-4 h-4 text-primary-600 dark:text-primary-400 border-gray-300 dark:border-gray-600 focus:ring-primary-500"
                                        checked>
                                 <label for="backfill_no" class="ml-2 text-sm text-gray-700 dark:text-gray-300">No</label>
                             </div>
@@ -169,7 +169,7 @@
                         <i class="fas fa-plus-circle mr-2"></i>Add Groups
                     </button>
                 @else
-                    <a href="{{ url('/admin/group-bulk') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600">
+                    <a href="{{ url('/admin/group-bulk') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600">
                         <i class="fas fa-plus-circle mr-2"></i>Add More Groups
                     </a>
                 @endif

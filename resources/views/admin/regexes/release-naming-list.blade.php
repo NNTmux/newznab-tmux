@@ -9,22 +9,22 @@
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
                     <i class="fas fa-tag mr-2"></i>{{ $title ?? 'Release Naming Regex List' }}
                 </h1>
-                <a href="{{ url('/admin/release_naming_regexes-edit') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
+                <a href="{{ url('/admin/release_naming_regexes-edit') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800">
                     <i class="fas fa-plus mr-2"></i>Add New Regex
                 </a>
             </div>
         </div>
 
         <!-- Info Alert -->
-        <div class="px-6 py-4 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-800">
+        <div class="px-6 py-4 bg-primary-50 dark:bg-primary-900/20 border-b border-primary-100 dark:border-primary-800">
             <div class="flex">
                 <div class="shrink-0">
-                    <i class="fas fa-info-circle text-blue-500 dark:text-blue-400 text-2xl"></i>
+                    <i class="fas fa-info-circle text-primary-500 dark:text-primary-400 text-2xl"></i>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm text-blue-700 dark:text-blue-300">
+                    <p class="text-sm text-primary-700 dark:text-primary-300">
                         This page lists regular expressions used for renaming releases based on their names.<br>
-                        You can test your regex patterns using the <a href="{{ url('/admin/release_naming_regexes-test') }}" class="font-semibold underline hover:text-blue-900 dark:hover:text-blue-100">test feature</a>.
+                        You can test your regex patterns using the <a href="{{ url('/admin/release_naming_regexes-test') }}" class="font-semibold underline hover:text-primary-900 dark:hover:text-primary-100">test feature</a>.
                     </p>
                 </div>
             </div>
@@ -47,10 +47,10 @@
                                type="text"
                                name="group"
                                value="{{ $group }}"
-                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                                placeholder="Search a group...">
                     </div>
-                    <button class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800" type="submit">
+                    <button class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800" type="submit">
                         Search
                     </button>
                 </div>
@@ -113,7 +113,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                     <div class="flex gap-2 justify-center">
                                         <a href="{{ url('/admin/release_naming_regexes-edit?id=' . $row->id) }}"
-                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                           class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
                                            title="Edit this regex">
                                             <i class="fas fa-edit"></i>
                                         </a>
@@ -143,7 +143,7 @@
                 <i class="fas fa-exclamation-triangle text-gray-400 text-5xl mb-4"></i>
                 <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No regex patterns found</h3>
                 <p class="text-gray-500 dark:text-gray-400 mb-4">Try a different search term or add a new regex.</p>
-                <a href="{{ url('/admin/release_naming_regexes-edit') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
+                <a href="{{ url('/admin/release_naming_regexes-edit') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800">
                     <i class="fas fa-plus mr-2"></i>Add New Regex
                 </a>
             </div>
@@ -165,7 +165,7 @@
                     <a href="{{ url('/admin/release_naming_regexes-test') }}" class="px-4 py-2 bg-purple-600 dark:bg-purple-700 text-white rounded-lg hover:bg-purple-700 dark:hover:bg-purple-800 text-sm">
                         <i class="fas fa-flask mr-2"></i>Test Regex
                     </a>
-                    <a href="{{ url('/admin/release_naming_regexes-edit') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 text-sm">
+                    <a href="{{ url('/admin/release_naming_regexes-edit') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 text-sm">
                         <i class="fas fa-plus mr-2"></i>Add New Regex
                     </a>
                 </div>

@@ -5,14 +5,14 @@
     <x-admin.card>
         <x-admin.page-header :title="$title" icon="fas fa-file-alt">
             <x-slot:actions>
-                <a href="{{ url('admin/content-add?action=add') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
+                <a href="{{ url('admin/content-add?action=add') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800">
                     <i class="fas fa-plus mr-2"></i>Add New Content
                 </a>
             </x-slot:actions>
         </x-admin.page-header>
 
         @if(count($contentlist) > 0)
-            <div class="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-800 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-200">
+            <div class="rounded-lg border border-primary-100 bg-primary-50 px-4 py-3 text-sm text-primary-800 dark:border-primary-900/60 dark:bg-primary-950/40 dark:text-primary-200">
                 Drag rows to update the order within each content group. Reordering Homepage items will not affect Useful Links.
             </div>
 
@@ -51,7 +51,7 @@
                                     data-ordinal="{{ $item->ordinal ?? 0 }}">
                                     <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-400 dark:text-gray-500">
                                         <button type="button"
-                                                class="content-drag-handle cursor-grab rounded p-1 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:hover:text-gray-300"
+                                                class="content-drag-handle cursor-grab rounded p-1 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:hover:text-gray-300"
                                                 data-drag-handle
                                                 draggable="true"
                                                 title="Drag to reorder {{ Str::lower($group['label']) }}"
@@ -65,7 +65,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                         @if(!empty($item->url))
-                                            <a href="{{ $item->url }}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                                            <a href="{{ $item->url }}" target="_blank" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
                                                 {{ Str::limit($item->url, 30) }}
                                             </a>
                                         @else
@@ -74,7 +74,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                         @if($item->contenttype == 1)
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
                                                 Useful Link
                                             </span>
                                         @elseif($item->contenttype == 2)
@@ -115,7 +115,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex gap-2">
                                             <a href="{{ url('admin/content-add?id=' . $item->id) }}"
-                                               class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                               class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
                                                title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>

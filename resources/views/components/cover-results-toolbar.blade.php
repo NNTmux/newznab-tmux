@@ -17,7 +17,7 @@
 <div class="mb-4 flex flex-wrap justify-between items-center gap-4">
     <div class="flex items-center gap-4">
         <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-            <i class="{{ $icon }} mr-2 text-blue-600 dark:text-blue-400"></i>
+            <i class="{{ $icon }} mr-2 text-primary-600 dark:text-primary-400"></i>
             {{ $title }}
         </h2>
         <x-view-toggle

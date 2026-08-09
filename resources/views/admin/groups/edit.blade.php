@@ -42,7 +42,7 @@
                     <input type="text"
                            id="name"
                            name="name"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                            value="{{ $group['name'] ?? '' }}"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -61,7 +61,7 @@
                     </div>
                     <textarea id="description"
                               name="description"
-                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                              class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                               rows="3">{{ $group['description'] ?? '' }}</textarea>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -81,7 +81,7 @@
                     <input type="number"
                            id="backfill_target"
                            name="backfill_target"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                            value="{{ $group['backfill_target'] ?? 0 }}"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -101,7 +101,7 @@
                     <input type="number"
                            id="minfilestoformrelease"
                            name="minfilestoformrelease"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                            value="{{ $group['minfilestoformrelease'] ?? 0 }}"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -121,7 +121,7 @@
                     <input type="number"
                            id="minsizetoformrelease"
                            name="minsizetoformrelease"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                            value="{{ $group['minsizetoformrelease'] ?? 0 }}"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -141,7 +141,7 @@
                     <input type="number"
                            id="first_record"
                            name="first_record"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                            value="{{ $group['first_record'] ?? 0 }}"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -161,7 +161,7 @@
                     <input type="number"
                            id="last_record"
                            name="last_record"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
                            value="{{ $group['last_record'] ?? 0 }}"/>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -178,7 +178,7 @@
                                id="active_1"
                                name="active"
                                value="1"
-                               class="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 focus:ring-blue-500 dark:bg-gray-700"
+                               class="w-4 h-4 text-primary-600 border-gray-300 dark:border-gray-600 focus:ring-primary-500 dark:bg-gray-700"
                                {{ (isset($group['active']) && $group['active'] == 1) ? 'checked' : '' }}>
                         <label for="active_1" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Yes</label>
                     </div>
@@ -187,7 +187,7 @@
                                id="active_0"
                                name="active"
                                value="0"
-                               class="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 focus:ring-blue-500 dark:bg-gray-700"
+                               class="w-4 h-4 text-primary-600 border-gray-300 dark:border-gray-600 focus:ring-primary-500 dark:bg-gray-700"
                                {{ (isset($group['active']) && $group['active'] == 0) ? 'checked' : '' }}>
                         <label for="active_0" class="ml-2 text-sm text-gray-700 dark:text-gray-300">No</label>
                     </div>
@@ -206,7 +206,7 @@
                                id="backfill_1"
                                name="backfill"
                                value="1"
-                               class="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 focus:ring-blue-500 dark:bg-gray-700"
+                               class="w-4 h-4 text-primary-600 border-gray-300 dark:border-gray-600 focus:ring-primary-500 dark:bg-gray-700"
                                {{ (isset($group['backfill']) && $group['backfill'] == 1) ? 'checked' : '' }}>
                         <label for="backfill_1" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Yes</label>
                     </div>
@@ -215,7 +215,7 @@
                                id="backfill_0"
                                name="backfill"
                                value="0"
-                               class="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 focus:ring-blue-500 dark:bg-gray-700"
+                               class="w-4 h-4 text-primary-600 border-gray-300 dark:border-gray-600 focus:ring-primary-500 dark:bg-gray-700"
                                {{ (isset($group['backfill']) && $group['backfill'] == 0) ? 'checked' : '' }}>
                         <label for="backfill_0" class="ml-2 text-sm text-gray-700 dark:text-gray-300">No</label>
                     </div>

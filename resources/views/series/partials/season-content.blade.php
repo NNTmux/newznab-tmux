@@ -10,12 +10,12 @@
                         @foreach($releases as $release)
                             <div class="series-episode-card flex items-center gap-3 bg-gray-50 dark:bg-gray-900 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-800">
                                 <div class="shrink-0">
-                                    <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-blue-600 dark:text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700" name="release[]" value="{{ $release->guid }}" @change="onCheckboxChange()">
+                                    <input type="checkbox" class="chkRelease rounded border-gray-300 dark:border-gray-600 text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400 dark:bg-gray-700" name="release[]" value="{{ $release->guid }}" @change="onCheckboxChange()">
                                 </div>
                                 <div class="flex-1">
                                     <div class="flex items-center gap-2 flex-wrap">
                                         <a href="{{ url('/details/' . $release->guid) }}"
-                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium wrap-break-word break-all">
+                                           class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium wrap-break-word break-all">
                                             {{ $release->searchname }}
                                         </a>
                                         @if(($release->failed_count ?? 0) > 0)
@@ -51,7 +51,7 @@
                                         <i class="fa fa-download"></i>
                                     </a>
                                     <a href="{{ url('/details/' . $release->guid) }}"
-                                       class="px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-800 text-sm"
+                                       class="px-3 py-1 bg-primary-600 dark:bg-primary-700 text-white rounded hover:bg-primary-700 dark:hover:bg-primary-800 text-sm"
                                        title="View Details">
                                         <i class="fa fa-info-circle"></i>
                                     </a>
@@ -68,7 +68,7 @@
             @endforeach
         </div>
     @empty
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-blue-800">
+        <div class="bg-primary-50 border border-primary-200 rounded-lg p-4 text-primary-800">
             <i class="fa fa-info-circle mr-2"></i>
             No releases found on this page for the selected season.
         </div>

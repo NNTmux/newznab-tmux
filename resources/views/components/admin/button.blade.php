@@ -10,10 +10,10 @@
         'danger' => 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
         'ghost' => 'bg-transparent text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 focus:ring-gray-400',
         'gray' => 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 focus:ring-gray-400',
-        'primary' => 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
+        'primary' => 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500',
         'success' => 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
         'warning' => 'bg-yellow-600 text-white hover:bg-yellow-700 focus:ring-yellow-500',
-    ][$tone] ?? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500';
+    ][$tone] ?? 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500';
 
     $base = 'inline-flex min-h-9 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900 '.$classes;
 @endphp

@@ -13,10 +13,10 @@
         </x-admin.page-header>
 
         <!-- Info Alert -->
-        <div class="px-6 py-4 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-900">
+        <div class="px-6 py-4 bg-primary-50 dark:bg-primary-900/20 border-b border-primary-100 dark:border-primary-900">
             <div class="flex">
-                <i class="fas fa-info-circle text-blue-500 dark:text-blue-400 text-xl mr-3"></i>
-                <p class="text-sm text-blue-700 dark:text-blue-300">
+                <i class="fas fa-info-circle text-primary-500 dark:text-primary-400 text-xl mr-3"></i>
+                <p class="text-sm text-primary-700 dark:text-primary-300">
                     Below is a list of all usenet groups available to be indexed. Click 'Activate' to start indexing a group.
                     Backfill works independently of active.
                 </p>
@@ -44,7 +44,7 @@
                                            type="text"
                                            name="groupname"
                                            value="{{ $groupname ?? '' }}"
-                                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
+                                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
                                            placeholder="Search for group...">
                                 </div>
                                 <x-admin.button type="submit" icon="fas fa-search">Go</x-admin.button>
@@ -97,7 +97,7 @@
                                        id="select-all-groups"
                                        x-model="allChecked"
                                        @change="toggleAllCheckboxes()"
-                                       class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-700"
+                                       class="form-checkbox h-4 w-4 text-primary-600 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:bg-gray-700"
                                        title="Select all groups on this page">
                             </x-admin.th>
                             <x-admin.th>Group</x-admin.th>
@@ -116,13 +116,13 @@
                             <tr id="grouprow-{{ $group->id }}" class="hover:bg-gray-50 dark:hover:bg-gray-700 group-row">
                                 <td class="px-4 py-4 text-center">
                                     <input type="checkbox"
-                                           class="group-checkbox form-checkbox h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:bg-gray-700"
+                                           class="group-checkbox form-checkbox h-4 w-4 text-primary-600 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:bg-gray-700"
                                            data-group-id="{{ $group->id }}"
                                            data-group-name="{{ $group->name }}"
                                            @change="onGroupCheckboxChange()">
                                 </td>
                                 <td class="px-6 py-4">
-                                    <a href="{{ url('/admin/group-edit?id=' . $group->id) }}" class="font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                                    <a href="{{ url('/admin/group-edit?id=' . $group->id) }}" class="font-semibold text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
                                         {{ str_replace('alt.binaries', 'a.b', $group->name) }}
                                     </a>
                                     @if($group->description)
@@ -158,7 +158,7 @@
                                     @if($group->backfill == 1)
                                         <button type="button"
                                                 @click="handleAction('toggle-backfill', '{{ $group->id }}', '0')"
-                                                class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 hover:bg-blue-200">
+                                                class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-primary-100 text-primary-800 hover:bg-primary-200">
                                             <i class="fas fa-check-circle mr-1"></i>Enabled
                                         </button>
                                     @else
@@ -200,7 +200,7 @@
                                 <td class="px-6 py-4 text-center" id="groupdel-{{ $group->id }}">
                                     <div class="flex gap-1 justify-center">
                                         <a href="{{ url('/admin/group-edit?id=' . $group->id) }}"
-                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                           class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
                                            title="Edit this group">
                                             <i class="fas fa-pencil"></i>
                                         </a>

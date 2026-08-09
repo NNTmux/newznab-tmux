@@ -3,13 +3,13 @@
     <nav aria-label="breadcrumb">
         <ol class="flex items-center space-x-2 text-sm">
             <li>
-                <a href="{{ url($site['home_link']) }}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:text-blue-400 transition-colors">
+                <a href="{{ url($site['home_link']) }}" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:text-primary-400 transition-colors">
                     Home
                 </a>
             </li>
             <li class="text-gray-400">/</li>
             <li>
-                <a href="{{ url('/browse') }}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:text-blue-400 transition-colors">
+                <a href="{{ url('/browse') }}" class="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:text-primary-400 transition-colors">
                     Browse
                 </a>
             </li>
@@ -36,7 +36,7 @@
                             name="search"
                             value="{{ $search ?? '' }}"
                             placeholder="Search group names..."
-                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
                         />
                     </div>
                 </div>
@@ -88,7 +88,7 @@
                                 <a
                                     href="{{ url('/browse/group?g=' . $result->name) }}"
                                     title="Browse releases from {{ str_replace('alt.binaries', 'a.b', $result->name) }}"
-                                    class="font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                                    class="font-semibold text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 transition-colors"
                                 >
                                     {{ str_replace('alt.binaries', 'a.b', $result->name) }}
                                 </a>
@@ -124,13 +124,13 @@
         </div>
     </div>
 @else
-    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+    <div class="bg-primary-50 border-l-4 border-primary-400 p-4 rounded">
         <div class="flex items-start">
-            <i class="fa fa-info-circle text-blue-400 text-xl mr-3 mt-0.5"></i>
-            <div class="text-blue-800">
+            <i class="fa fa-info-circle text-primary-400 text-xl mr-3 mt-0.5"></i>
+            <div class="text-primary-800">
                 @if(!empty($search))
                     No groups found matching "<strong>{{ $search }}</strong>".
-                    <a href="{{ url('/browsegroup') }}" class="font-medium underline hover:text-blue-900">Show all groups</a>
+                    <a href="{{ url('/browsegroup') }}" class="font-medium underline hover:text-primary-900">Show all groups</a>
                 @else
                     No groups found.
                 @endif

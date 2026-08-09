@@ -69,7 +69,7 @@
                             <input type="file"
                                    name="cover"
                                    accept="image/*"
-                                   class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                   class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
                             <p class="mt-2 text-xs text-gray-500">Upload a new cover image (JPG/PNG)</p>
                         </div>
                     </div>
@@ -98,7 +98,7 @@
                             <input type="file"
                                    name="backdrop"
                                    accept="image/*"
-                                   class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                   class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
                             <p class="mt-2 text-xs text-gray-500">Upload a new backdrop image (JPG/PNG)</p>
                         </div>
                     </div>
@@ -135,7 +135,7 @@
                                name="title"
                                value="{{ $movie['title'] ?? $movie->title ?? '' }}"
                                required
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
 
                     <!-- Tagline -->
@@ -147,7 +147,7 @@
                                id="tagline"
                                name="tagline"
                                value="{{ $movie['tagline'] ?? $movie->tagline ?? '' }}"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
 
                     <!-- Year and Rating -->
@@ -162,7 +162,7 @@
                                    value="{{ $movie['year'] ?? $movie->year ?? '' }}"
                                    min="1800"
                                    max="2100"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                         </div>
                         <div>
                             <label for="rating" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -173,7 +173,7 @@
                                    name="rating"
                                    value="{{ $movie['rating'] ?? $movie->rating ?? '' }}"
                                    placeholder="e.g., 8.5"
-                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                         </div>
                     </div>
 
@@ -187,7 +187,7 @@
                                name="genre"
                                value="{{ $movie['genre'] ?? $movie->genre ?? '' }}"
                                placeholder="e.g., Action, Drama, Comedy"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
 
                     <!-- Director -->
@@ -199,7 +199,7 @@
                                id="director"
                                name="director"
                                value="{{ $movie['director'] ?? $movie->director ?? '' }}"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
 
                     <!-- Actors -->
@@ -212,7 +212,7 @@
                                name="actors"
                                value="{{ $movie['actors'] ?? $movie->actors ?? '' }}"
                                placeholder="Comma-separated list of actors"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
 
                     <!-- Language -->
@@ -225,7 +225,7 @@
                                name="language"
                                value="{{ $movie['language'] ?? $movie->language ?? '' }}"
                                placeholder="e.g., English"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
 
                     <!-- Plot -->
@@ -236,12 +236,12 @@
                         <textarea id="plot"
                                   name="plot"
                                   rows="6"
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">{{ $movie['plot'] ?? $movie->plot ?? '' }}</textarea>
+                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">{{ $movie['plot'] ?? $movie->plot ?? '' }}</textarea>
                     </div>
 
                     <!-- Action Buttons -->
                     <div class="flex gap-3 pt-4 border-t border-gray-200">
-                        <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
+                        <button type="submit" class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
                             <i class="fas fa-save mr-2"></i>Save Changes
                         </button>
                         <a href="{{ url('admin/movie-list') }}" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
@@ -270,7 +270,7 @@
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
                     <i class="fas fa-film mr-2"></i>{{ $title }}
                 </h1>
-                <a href="{{ url('admin/movie-add') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
+                <a href="{{ url('admin/movie-add') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
                     <i class="fas fa-plus mr-2"></i>Add Movie
                 </a>
             </div>
@@ -288,9 +288,9 @@
                                name="moviesearch"
                                value="{{ $lastSearch ?? '' }}"
                                placeholder="Search by IMDB ID or movie title..."
-                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
+                    <button type="submit" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
                         Search
                     </button>
                     @if(!empty($lastSearch))
@@ -322,7 +322,7 @@
                         @foreach($movielist as $movie)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                                    <a href="{{ $site['dereferrer_link'] }}https://www.imdb.com/title/tt{{ $movie->imdbid }}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">
+                                    <a href="{{ $site['dereferrer_link'] }}https://www.imdb.com/title/tt{{ $movie->imdbid }}" target="_blank" class="text-primary-600 dark:text-primary-400 hover:underline">
                                         {{ $movie->imdbid }}
                                     </a>
                                 </td>
@@ -361,7 +361,7 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="{{ url('admin/movie-edit?id=' . $movie->imdbid) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 mr-3">
+                                    <a href="{{ url('admin/movie-edit?id=' . $movie->imdbid) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-900 mr-3">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
                                     <a href="{{ url('admin/movie-edit?id=' . $movie->imdbid . '&update=1') }}" class="text-green-600 dark:text-green-400 hover:text-green-900" title="Update from TMDB">
@@ -383,7 +383,7 @@
                         No movies found in the database.
                     @endif
                 </p>
-                <a href="{{ url('admin/movie-add') }}" class="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <a href="{{ url('admin/movie-add') }}" class="mt-4 inline-block px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
                     <i class="fas fa-plus mr-2"></i>Add Your First Movie
                 </a>
             </div>

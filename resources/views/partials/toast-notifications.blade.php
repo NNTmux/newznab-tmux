@@ -24,7 +24,7 @@
                            toast.type === 'success' ? 'text-green-500' : '',
                            toast.type === 'error' ? 'text-red-500' : '',
                            toast.type === 'warning' ? 'text-yellow-500' : '',
-                           toast.type === 'info' ? 'text-blue-500' : ''
+                           toast.type === 'info' ? 'text-primary-500' : ''
                        ]"></i>
                 </div>
                 <div class="flex-1 text-sm text-gray-700 dark:text-gray-300" x-text="toast.message"></div>

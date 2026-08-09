@@ -8,10 +8,10 @@
                     <h1 class="text-3xl font-bold text-white flex items-center">
                         <i class="fa fa-tv mr-3"></i>My TV Shows
                     </h1>
-                    <p class="text-blue-100 mt-2">Manage your favorite TV series and get automatic updates</p>
+                    <p class="text-primary-100 mt-2">Manage your favorite TV series and get automatic updates</p>
                 </div>
                 <nav aria-label="breadcrumb">
-                    <ol class="flex items-center space-x-2 text-sm text-blue-100">
+                    <ol class="flex items-center space-x-2 text-sm text-primary-100">
                         <li><a href="{{ url($site['home_link']) }}" class="hover:text-white transition">Home</a></li>
                         <li><i class="fas fa-chevron-right text-xs"></i></li>
                         <li class="text-white font-medium">My TV Shows</li>
@@ -22,10 +22,10 @@
     </div>
 
     <!-- RSS Feed Info Card -->
-    <div class="info-card-gradient border-l-4 border-blue-500 rounded-lg p-5 mb-6 shadow">
+    <div class="info-card-gradient border-l-4 border-primary-500 rounded-lg p-5 mb-6 shadow">
         <div class="flex items-start">
             <div class="shrink-0">
-                <div class="flex items-center justify-center h-10 w-10 rounded-lg bg-blue-500 text-white">
+                <div class="flex items-center justify-center h-10 w-10 rounded-lg bg-primary-500 text-white">
                     <i class="fa fa-rss text-lg"></i>
                 </div>
             </div>
@@ -34,7 +34,7 @@
                 <p class="text-sm text-gray-700 dark:text-gray-300">
                     Bookmark your favorite series below. New episodes are automatically added to your
                     <a href="{{ url("/rss/myshows?dl=1&i={$userdata->id}&api_token={$userdata->api_token}") }}"
-                       class="font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline inline-flex items-center">
+                       class="font-semibold text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 underline inline-flex items-center">
                         <i class="fa fa-rss mr-1"></i>personal RSS feed
                     </a>
                     for automatic downloading.
@@ -45,7 +45,7 @@
 
     <!-- Action Buttons -->
     <div class="flex flex-wrap gap-3 mb-6">
-        <a class="px-6 py-3 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium"
+        <a class="px-6 py-3 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium"
            href="{{ url('/browse/TV') }}"
            title="View available TV series">
             <i class="fa fa-list mr-2"></i>Browse All Series
@@ -69,8 +69,8 @@
             <div class="table-header-gradient px-6 py-4 border-b-2 border-gray-300 dark:border-gray-600">
                 <div class="flex items-center justify-between">
                     <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center">
-                        <i class="fa fa-bookmark mr-2 text-blue-600"></i>
-                        Your Shows <span class="ml-2 px-3 py-1 bg-blue-600 dark:bg-blue-700 text-white text-sm rounded-full font-bold">{{ count($shows) }}</span>
+                        <i class="fa fa-bookmark mr-2 text-primary-600"></i>
+                        Your Shows <span class="ml-2 px-3 py-1 bg-primary-600 dark:bg-primary-700 text-white text-sm rounded-full font-bold">{{ count($shows) }}</span>
                     </h2>
                 </div>
             </div>
@@ -96,14 +96,14 @@
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800">
                         @foreach($shows as $show)
-                            <tr class="hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors duration-150">
+                            <tr class="hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors duration-150">
                                 <td class="px-8 py-5">
                                     <div class="flex items-center">
                                         <div class="shrink-0 h-12 w-12 show-avatar rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-sm">
                                             {{ strtoupper(substr($show['title'] ?? 'T', 0, 1)) }}
                                         </div>
                                         <div class="ml-4">
-                                            <a class="text-base font-semibold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                            <a class="text-base font-semibold text-gray-900 dark:text-gray-100 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                                                title="View series details"
                                                href="{{ url("/series/{$show['videos_id']}") }}">
                                                 {{ $show['title'] ?? '' }}
@@ -113,7 +113,7 @@
                                 </td>
                                 <td class="px-8 py-5">
                                     @if(!empty($show['categoryNames']))
-                                        <span class="inline-flex items-center px-3 py-1.5 category-badge text-blue-800 text-xs font-semibold rounded-full border border-blue-200">
+                                        <span class="inline-flex items-center px-3 py-1.5 category-badge text-primary-800 text-xs font-semibold rounded-full border border-primary-200">
                                             <i class="fa fa-folder-open mr-1.5"></i>{{ e($show['categoryNames']) }}
                                         </span>
                                     @else
@@ -165,20 +165,20 @@
             <!-- Mobile Card View -->
             <div class="md:hidden">
                 @foreach($shows as $show)
-                    <div class="p-6 border-b border-gray-200 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors duration-150">
+                    <div class="p-6 border-b border-gray-200 dark:border-gray-700 hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors duration-150">
                         <div class="flex items-start justify-between mb-4">
                             <div class="flex items-center flex-1">
                                 <div class="shrink-0 h-12 w-12 show-avatar rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-sm">
                                     {{ strtoupper(substr($show['title'] ?? 'T', 0, 1)) }}
                                 </div>
                                 <div class="ml-3 flex-1">
-                                    <a class="text-base font-semibold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block"
+                                    <a class="text-base font-semibold text-gray-900 dark:text-gray-100 hover:text-primary-600 dark:hover:text-primary-400 block"
                                        href="{{ url("/series/{$show['videos_id']}") }}">
                                         {{ $show['title'] ?? '' }}
                                     </a>
                                     <div class="mt-1.5">
                                         @if(!empty($show['categoryNames']))
-                                            <span class="inline-flex items-center px-2 py-1 category-badge text-blue-800 text-xs font-semibold rounded-full border border-blue-200">
+                                            <span class="inline-flex items-center px-2 py-1 category-badge text-primary-800 text-xs font-semibold rounded-full border border-primary-200">
                                                 <i class="fa fa-folder-open mr-1"></i>{{ e($show['categoryNames']) }}
                                             </span>
                                         @else
@@ -224,14 +224,14 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
             <div class="text-center py-16 px-6">
                 <div class="mx-auto h-24 w-24 empty-state-bg rounded-full flex items-center justify-center mb-6 shadow-sm">
-                    <i class="fa fa-tv text-5xl text-blue-600"></i>
+                    <i class="fa fa-tv text-5xl text-primary-600"></i>
                 </div>
                 <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">No TV Shows Yet</h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
                     You haven't bookmarked any TV series yet. Start building your collection by browsing our series library.
                 </p>
                 <a href="{{ url('/browse/TV') }}"
-                   class="inline-flex items-center px-6 py-3 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 shadow-md hover:shadow-lg transition-all duration-200 font-medium">
+                   class="inline-flex items-center px-6 py-3 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 shadow-md hover:shadow-lg transition-all duration-200 font-medium">
                     <i class="fa fa-search mr-2"></i>Browse Series Library
                 </a>
             </div>

@@ -15,12 +15,12 @@
     <nav class="flex" aria-label="breadcrumb">
         <ol class="inline-flex items-center space-x-1 md:space-x-3">
             <li class="inline-flex items-center">
-                <a href="{{ $site['home_link'] }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 dark:text-gray-400 dark:hover:text-white">Home</a>
+                <a href="{{ $site['home_link'] }}" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:text-primary-400 dark:text-gray-400 dark:hover:text-white">Home</a>
             </li>
             <li>
                 <div class="flex items-center">
                     <svg class="w-3 h-3 text-gray-400 mx-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
-                    <a href="{{ url('/profile') }}" class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:text-blue-400 dark:text-gray-400 dark:hover:text-white">Profile</a>
+                    <a href="{{ url('/profile') }}" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:text-primary-400 dark:text-gray-400 dark:hover:text-white">Profile</a>
                 </div>
             </li>
             <li aria-current="page">
@@ -39,7 +39,7 @@
             <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                 <i class="fa fa-envelope mr-2"></i>My Invitations
             </h5>
-            <a href="{{ url('/invitations/create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <a href="{{ url('/invitations/create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                 <i class="fas fa-plus mr-1"></i> Send New Invitation
             </a>
         </div>
@@ -58,10 +58,10 @@
 
             <!-- Stats Cards -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-blue-600 dark:bg-blue-700 text-white rounded-lg shadow dark:bg-blue-700">
+                <div class="bg-primary-600 dark:bg-primary-700 text-white rounded-lg shadow dark:bg-primary-700">
                     <div class="p-4 text-center">
                         <h4 class="text-3xl font-bold mb-1">{{ $stats['total'] ?? 0 }}</h4>
-                        <small class="text-blue-100">Total Sent</small>
+                        <small class="text-primary-100">Total Sent</small>
                     </div>
                 </div>
                 <div class="bg-green-600 dark:bg-green-700 text-white rounded-lg shadow dark:bg-green-700">
@@ -87,16 +87,16 @@
             <!-- Filter Tabs -->
             <div class="border-b border-gray-200 dark:border-gray-700 mb-4">
                 <nav class="flex flex-wrap -mb-px" aria-label="Tabs">
-                    <a href="{{ url('/invitations') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ empty($status) ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                    <a href="{{ url('/invitations') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ empty($status) ? 'border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
                         <i class="fa fa-list mr-1"></i>All
                     </a>
-                    <a href="{{ url('/invitations?status=pending') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ ($status ?? '') == 'pending' ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                    <a href="{{ url('/invitations?status=pending') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ ($status ?? '') == 'pending' ? 'border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
                         <i class="fa fa-clock-o mr-1"></i>Pending
                     </a>
-                    <a href="{{ url('/invitations?status=used') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ ($status ?? '') == 'used' ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                    <a href="{{ url('/invitations?status=used') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ ($status ?? '') == 'used' ? 'border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
                         <i class="fa fa-check mr-1"></i>Accepted
                     </a>
-                    <a href="{{ url('/invitations?status=expired') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ ($status ?? '') == 'expired' ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                    <a href="{{ url('/invitations?status=expired') }}" class="inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium {{ ($status ?? '') == 'expired' ? 'border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300' }}">
                         <i class="fa fa-times mr-1"></i>Expired
                     </a>
                 </nav>
@@ -161,7 +161,7 @@
                                         <div class="flex items-center space-x-2">
                                             <form method="POST" action="{{ url('/invitations/' . $invitation['id'] . '/resend') }}" class="inline">
                                                 @csrf
-                                                <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-blue-300 rounded text-xs font-medium text-blue-700 bg-white hover:bg-blue-50 dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600 dark:hover:bg-gray-600" title="Resend"><i class="fas fa-paper-plane"></i></button>
+                                                <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-primary-300 rounded text-xs font-medium text-primary-700 bg-white hover:bg-primary-50 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600" title="Resend"><i class="fas fa-paper-plane"></i></button>
                                             </form>
                                             <form method="POST" action="{{ url('/invitations/' . $invitation['id']) }}" class="inline">
                                                 @csrf
@@ -180,11 +180,11 @@
                 </div>
                 @endif
             @empty
-                <div class="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-6 text-center dark:bg-blue-900 dark:border-blue-700 dark:text-blue-300">
+                <div class="bg-primary-50 border border-primary-200 text-primary-800 rounded-lg p-6 text-center dark:bg-primary-900 dark:border-primary-700 dark:text-primary-300">
                     <i class="fa fa-info-circle text-4xl mb-3"></i>
                     <h5 class="text-lg font-semibold mb-2">No Invitations Found</h5>
                     <p class="mb-4">You haven't sent any invitations yet.</p>
-                    <a href="{{ url('/invitations/create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800">
+                    <a href="{{ url('/invitations/create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800">
                         <i class="fas fa-plus mr-1"></i> Send Your First Invitation
                     </a>
                 </div>
@@ -216,7 +216,7 @@
                                 <div class="flex gap-1 shrink-0">
                                     <form method="POST" action="{{ url('/invitations/' . $invitation['id'] . '/resend') }}" class="inline">
                                         @csrf
-                                        <button type="submit" class="px-2 py-1 border border-blue-300 rounded text-xs text-blue-700 bg-white dark:bg-gray-700 dark:text-blue-400 dark:border-blue-600" title="Resend"><i class="fas fa-paper-plane"></i></button>
+                                        <button type="submit" class="px-2 py-1 border border-primary-300 rounded text-xs text-primary-700 bg-white dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600" title="Resend"><i class="fas fa-paper-plane"></i></button>
                                     </form>
                                     <form method="POST" action="{{ url('/invitations/' . $invitation['id']) }}" class="inline">
                                         @csrf

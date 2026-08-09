@@ -133,7 +133,7 @@
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="color_scheme" value="blue" {{ $currentScheme === 'blue' ? 'checked' : '' }}
                             class="sr-only profile-scheme-radio" data-scheme="blue">
-                        <span class="w-10 h-10 rounded-full bg-blue-600 ring-2 ring-offset-2 transition {{ $currentScheme === 'blue' ? 'ring-primary-500 ring-offset-gray-100 dark:ring-offset-gray-800' : 'ring-transparent ring-offset-gray-100 dark:ring-offset-gray-800 hover:ring-gray-300' }}" aria-hidden="true"></span>
+                        <span class="w-10 h-10 rounded-full bg-primary-600 ring-2 ring-offset-2 transition {{ $currentScheme === 'blue' ? 'ring-primary-500 ring-offset-gray-100 dark:ring-offset-gray-800' : 'ring-transparent ring-offset-gray-100 dark:ring-offset-gray-800 hover:ring-gray-300' }}" aria-hidden="true"></span>
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Blue</span>
                     </label>
                     <label class="flex items-center gap-2 cursor-pointer">

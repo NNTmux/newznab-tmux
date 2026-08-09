@@ -43,7 +43,7 @@
                     </select>
                 </div>
                 <div class="flex gap-2">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700">
+                    <button type="submit" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-md hover:bg-primary-700">
                         <i class="fas fa-filter mr-2"></i>Filter
                     </button>
                     <a href="{{ route('admin.gdpr-requests.index') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600">Clear</a>
@@ -79,7 +79,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $gdprRequest->completed_at?->format('Y-m-d H:i') ?? '—' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <a href="{{ route('admin.gdpr-requests.show', $gdprRequest) }}" class="text-blue-600 dark:text-blue-400 hover:underline">
+                                <a href="{{ route('admin.gdpr-requests.show', $gdprRequest) }}" class="text-primary-600 dark:text-primary-400 hover:underline">
                                     <i class="fas fa-eye mr-1"></i>View
                                 </a>
                             </td>

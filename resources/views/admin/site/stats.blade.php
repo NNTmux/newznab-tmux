@@ -5,7 +5,7 @@
     <!-- Header -->
     <div class="mb-8">
         <div class="flex items-center space-x-3">
-            <div class="flex items-center justify-center w-12 h-12 bg-linear-to-br from-blue-400 to-purple-500 rounded-xl shadow-md">
+            <div class="flex items-center justify-center w-12 h-12 bg-linear-to-br from-primary-400 to-purple-500 rounded-xl shadow-md">
                 <i class="fas fa-chart-bar text-white text-xl"></i>
             </div>
             <div>
@@ -19,10 +19,10 @@
         <!-- Top Grabbers -->
         @if(!empty($topgrabs) && count($topgrabs) > 0)
             <div class="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-300 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
-                <div class="bg-linear-to-r from-blue-400 to-blue-500 px-6 py-4">
+                <div class="bg-linear-to-r from-primary-400 to-primary-500 px-6 py-4">
                     <div class="flex items-center space-x-3">
-                        <div class="flex items-center justify-center w-10 h-10 bg-blue-700/40 rounded-lg">
-                            <i class="fas fa-trophy text-blue-100 text-lg"></i>
+                        <div class="flex items-center justify-center w-10 h-10 bg-primary-700/40 rounded-lg">
+                            <i class="fas fa-trophy text-primary-100 text-lg"></i>
                         </div>
                         <h2 class="text-xl font-bold text-white">Top Grabbers</h2>
                     </div>
@@ -40,7 +40,7 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center space-x-2">
-                                    <span class="px-4 py-2 bg-blue-500 text-white rounded-full text-sm font-bold shadow-md">
+                                    <span class="px-4 py-2 bg-primary-500 text-white rounded-full text-sm font-bold shadow-md">
                                         {{ number_format($grab['grabs']) }}
                                     </span>
                                 </div>

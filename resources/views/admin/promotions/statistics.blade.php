@@ -41,7 +41,7 @@
                     <input type="date" name="end_date" value="{{ $endDate->format('Y-m-d') }}" class="form-input rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
                 </div>
                 <div>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
                         <i class="fas fa-filter mr-2"></i>Apply
                     </button>
                 </div>
@@ -53,8 +53,8 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div class="flex items-center">
-                <div class="shrink-0 bg-blue-100 dark:bg-blue-900 rounded-full p-3">
-                    <i class="fas fa-gift text-2xl text-blue-600 dark:text-blue-400"></i>
+                <div class="shrink-0 bg-primary-100 dark:bg-primary-900 rounded-full p-3">
+                    <i class="fas fa-gift text-2xl text-primary-600 dark:text-primary-400"></i>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Total Promotions</p>
@@ -134,7 +134,7 @@
                                         <span><i class="fas fa-calendar mr-1"></i>{{ $promotion->additional_days }} days</span>
                                     </div>
                                 </div>
-                                <a href="{{ route('admin.promotions.show-statistics', $promotion->id) }}" class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                                <a href="{{ route('admin.promotions.show-statistics', $promotion->id) }}" class="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700">
                                     View Details
                                 </a>
                             </div>
@@ -230,7 +230,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{{ route('admin.promotions.show-statistics', $promotion->id) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
+                                <a href="{{ route('admin.promotions.show-statistics', $promotion->id) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300">
                                     View Details <i class="fas fa-arrow-right ml-1"></i>
                                 </a>
                             </td>
@@ -275,7 +275,7 @@
                                 {{ $activity->promotion->name ?? 'Unknown Promotion' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs">
+                                <span class="px-2 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded text-xs">
                                     {{ $activity->role->name ?? 'Unknown Role' }}
                                 </span>
                             </td>

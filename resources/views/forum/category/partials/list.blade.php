@@ -21,7 +21,7 @@
                 @if ($category->accepts_threads)
                     @if ($category->newestThread)
                         <div>
-                            <a href="{{ Forum::route('thread.show', $category->newestThread) }}" class="text-blue-500">{{ $category->newestThread->title }}</a>
+                            <a href="{{ Forum::route('thread.show', $category->newestThread) }}" class="text-primary-500">{{ $category->newestThread->title }}</a>
                             @include ('forum.partials.timestamp', ['carbon' => $category->newestThread->created_at])
                         </div>
                     @endif

@@ -1,4 +1,4 @@
-<div class="bg-white dark:bg-gray-800  {{ $thread->pinned ? 'pinned' : '' }} {{ $thread->locked ? 'locked' : '' }} {{ $thread->trashed() ? 'deleted' : '' }}" :class="{ 'border border-blue-500': selectedThreads.includes({{ $thread->id }}) }">
+<div class="bg-white dark:bg-gray-800  {{ $thread->pinned ? 'pinned' : '' }} {{ $thread->locked ? 'locked' : '' }} {{ $thread->trashed() ? 'deleted' : '' }}" :class="{ 'border border-primary-500': selectedThreads.includes({{ $thread->id }}) }">
     <div class="flex flex-col md:items-start md:flex-row md:justify-between md:gap-4 p-4">
         <div class="md:w-3/6 text-center md:text-left">
             <span class="lead">
@@ -33,7 +33,7 @@
 
         @if ($thread->lastPost)
             <div class="md:w-2/6 text-gray-500 flex justify-center md:flex-col md:items-end">
-                <a href="{{ Forum::route('thread.show', $thread->lastPost) }}" class="text-blue-500">{{ trans('forum::posts.view') }} &raquo;</a>
+                <a href="{{ Forum::route('thread.show', $thread->lastPost) }}" class="text-primary-500">{{ trans('forum::posts.view') }} &raquo;</a>
                 <div>
                     <span>{{ $thread->lastPost->authorName }}</span>
                     <span class="text-gray-500">@include ('forum.partials.timestamp', ['carbon' => $thread->lastPost->created_at])</span>

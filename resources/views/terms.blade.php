@@ -9,7 +9,7 @@
                     <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Terms and Conditions</h1>
                     <nav aria-label="breadcrumb">
                         <ol class="flex text-sm text-gray-600 dark:text-gray-400">
-                            <li><a href="{{ url('/') }}" class="hover:text-blue-600 dark:hover:text-blue-400">Home</a></li>
+                            <li><a href="{{ url('/') }}" class="hover:text-primary-600 dark:hover:text-primary-400">Home</a></li>
                             <li class="mx-2">/</li>
                             <li class="text-gray-500 dark:text-gray-500">Terms and Conditions</li>
                         </ol>
@@ -17,9 +17,9 @@
                 </div>
 
                 <!-- Info Alert -->
-                <div class="mx-6 mt-4 p-4 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg flex items-start">
-                    <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 text-xl mr-3 mt-0.5"></i>
-                    <div class="text-blue-800 dark:text-blue-200">
+                <div class="mx-6 mt-4 p-4 bg-primary-50 dark:bg-primary-900 border border-primary-200 dark:border-primary-700 rounded-lg flex items-start">
+                    <i class="fas fa-info-circle text-primary-600 dark:text-primary-400 text-xl mr-3 mt-0.5"></i>
+                    <div class="text-primary-800 dark:text-primary-200">
                         Please read our terms and conditions carefully. By using our services, you agree to be bound by these terms.
                     </div>
                 </div>

@@ -62,7 +62,7 @@
                                         <i class="fas fa-clock mr-1"></i>Expired
                                     </span>
                                 @else
-                                    <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                    <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
                                         <i class="fas fa-hourglass-half mr-1"></i>Pending
                                     </span>
                                 @endif
@@ -183,7 +183,7 @@
                                     <div class="bg-gray-100 dark:bg-gray-800 p-2 rounded break-all font-mono text-xs">
                                         {{ url('register?invitation=' . $invitation->token) }}
                                     </div>
-                                    <button x-data="copyToClipboard()" @click="copy('invitation-link-{{ $invitation->id }}')" class="mt-2 px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">
+                                    <button x-data="copyToClipboard()" @click="copy('invitation-link-{{ $invitation->id }}')" class="mt-2 px-3 py-1 bg-primary-600 text-white text-xs rounded hover:bg-primary-700">
                                         <i class="fas fa-copy mr-1"></i><span x-text="copied ? 'Copied!' : 'Copy Link'"></span>
                                     </button>
                                     <input type="hidden" id="invitation-link-{{ $invitation->id }}" value="{{ url('register?invitation=' . $invitation->token) }}" />

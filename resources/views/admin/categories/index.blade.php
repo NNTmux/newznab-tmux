@@ -7,7 +7,7 @@
     <x-admin.card>
         <x-admin.page-header :title="$title" icon="fas fa-folder-open">
             <x-slot:actions>
-                <a href="{{ url('/admin/category-add') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition">
+                <a href="{{ url('/admin/category-add') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition">
                     <i class="fas fa-plus mr-2"></i>Add New Category
                 </a>
             </x-slot:actions>
@@ -25,10 +25,10 @@
                         <div class="flex items-center justify-center gap-2">
                             <span>ID</span>
                             <div class="flex flex-col gap-0.5">
-                                <a href="?sort=id&order=asc" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ (request('sort') == 'id' && request('order') == 'asc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Ascending">
+                                <a href="?sort=id&order=asc" class="text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 {{ (request('sort') == 'id' && request('order') == 'asc') ? 'text-primary-600 dark:text-primary-400' : '' }}" title="Sort Ascending">
                                     <i class="fas fa-sort-numeric-down text-xs"></i>
                                 </a>
-                                <a href="?sort=id&order=desc" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ (request('sort') == 'id' && request('order') == 'desc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Descending">
+                                <a href="?sort=id&order=desc" class="text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 {{ (request('sort') == 'id' && request('order') == 'desc') ? 'text-primary-600 dark:text-primary-400' : '' }}" title="Sort Descending">
                                     <i class="fas fa-sort-numeric-down-alt text-xs"></i>
                                 </a>
                             </div>
@@ -38,10 +38,10 @@
                         <div class="flex items-center gap-2">
                             <span>Title</span>
                             <div class="flex flex-col gap-0.5">
-                                <a href="?sort=title&order=asc" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ (request('sort') == 'title' && request('order') == 'asc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Ascending">
+                                <a href="?sort=title&order=asc" class="text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 {{ (request('sort') == 'title' && request('order') == 'asc') ? 'text-primary-600 dark:text-primary-400' : '' }}" title="Sort Ascending">
                                     <i class="fas fa-sort-alpha-down text-xs"></i>
                                 </a>
-                                <a href="?sort=title&order=desc" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 {{ (request('sort') == 'title' && request('order') == 'desc') ? 'text-blue-600 dark:text-blue-400' : '' }}" title="Sort Descending">
+                                <a href="?sort=title&order=desc" class="text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 {{ (request('sort') == 'title' && request('order') == 'desc') ? 'text-primary-600 dark:text-primary-400' : '' }}" title="Sort Descending">
                                     <i class="fas fa-sort-alpha-down-alt text-xs"></i>
                                 </a>
                             </div>
@@ -57,7 +57,7 @@
                     <tr id="row-{{ $category->id }}" class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-semibold text-gray-900 dark:text-gray-100">{{ $category->id }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <a href="{{ url('/admin/category-edit?id=' . $category->id) }}" class="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">
+                            <a href="{{ url('/admin/category-edit?id=' . $category->id) }}" class="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300">
                                 {{ $category->title }}
                             </a>
                         </td>
@@ -95,7 +95,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                             <div class="flex gap-2 justify-center">
                                 <a href="{{ url('/admin/category-edit?id=' . $category->id) }}"
-                                   class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                   class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
                                    title="Edit Category">
                                     <i class="fas fa-edit"></i>
                                 </a>
@@ -127,7 +127,7 @@
                 <span class="text-sm text-gray-600 dark:text-gray-400">
                     Total: {{ count($categorylist) }} categories
                 </span>
-                <a href="{{ url('/admin/category-add') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 text-sm transition">
+                <a href="{{ url('/admin/category-add') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 text-sm transition">
                     <i class="fas fa-plus mr-2"></i>Add New Category
                 </a>
             </div>

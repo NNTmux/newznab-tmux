@@ -5,7 +5,7 @@
     <x-admin.card>
         <x-admin.page-header :title="$title ?? 'Binary Black/White List'" icon="fas fa-ban">
             <x-slot:actions>
-                <a href="{{ url('/admin/binaryblacklist-edit') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
+                <a href="{{ url('/admin/binaryblacklist-edit') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800">
                     <i class="fas fa-plus mr-2"></i>Add New Blacklist
                 </a>
             </x-slot:actions>
@@ -56,7 +56,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             @if($bin->msgcol == 1)
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">Subject</span>
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300">Subject</span>
                             @elseif($bin->msgcol == 2)
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300">Poster</span>
                             @else
@@ -72,7 +72,7 @@
                         </td>
                         <td class="px-6 py-4 text-sm">
                             <div class="max-w-[200px] wrap-break-word">
-                                <a href="{{ url('/admin/binaryblacklist-edit?id=' . $bin->id) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" title="{{ htmlspecialchars($bin->regex) }}">
+                                <a href="{{ url('/admin/binaryblacklist-edit?id=' . $bin->id) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300" title="{{ htmlspecialchars($bin->regex) }}">
                                     <code class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-2 py-1 rounded text-xs break-all">{{ htmlspecialchars($bin->regex) }}</code>
                                 </a>
                             </div>
@@ -89,7 +89,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                             <div class="flex gap-2 justify-center">
                                 <a href="{{ url('/admin/binaryblacklist-edit?id=' . $bin->id) }}"
-                                   class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                   class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
                                    title="Edit this blacklist">
                                     <i class="fas fa-edit"></i>
                                 </a>
@@ -109,7 +109,7 @@
             <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
                 <div class="flex justify-between items-center">
                     <span class="text-sm text-gray-600 dark:text-gray-400">Total entries: {{ count($binlist) }}</span>
-                    <a href="{{ url('/admin/binaryblacklist-edit') }}" class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 text-sm">
+                    <a href="{{ url('/admin/binaryblacklist-edit') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 text-sm">
                         <i class="fas fa-plus mr-2"></i>Add New Blacklist
                     </a>
                 </div>

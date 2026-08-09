@@ -42,8 +42,8 @@
                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Releases</p>
                     <p class="text-3xl font-bold text-gray-800 dark:text-gray-200" data-stat="releases">{{ number_format($stats['releases'] ?? 0) }}</p>
                 </div>
-                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-download text-2xl text-blue-600 dark:text-blue-400"></i>
+                <div class="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-download text-2xl text-primary-600 dark:text-primary-400"></i>
                 </div>
             </div>
             <div class="mt-4">
@@ -65,7 +65,7 @@
                 </div>
             </div>
             <div class="mt-4">
-                <span class="text-sm text-blue-600 dark:text-blue-400">
+                <span class="text-sm text-primary-600 dark:text-primary-400">
                     <i class="fas fa-user-plus"></i> <span data-stat="users-today">{{ $stats['users_today'] ?? 0 }}</span> registered today
                 </span>
             </div>
@@ -101,7 +101,7 @@
                 </div>
             </div>
             <div class="mt-4">
-                <a href="{{ url('/admin/failrel-list') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                <a href="{{ url('/admin/failrel-list') }}" class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
                     View failed releases <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
@@ -119,7 +119,7 @@
                 </div>
             </div>
             <div class="mt-4">
-                <a href="{{ url('/admin/release-reports') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                <a href="{{ url('/admin/release-reports') }}" class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
                     View reports <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
@@ -145,7 +145,7 @@
                 </span>
             </div>
             <div class="mt-2">
-                <a href="{{ route('admin.deleted.users.index') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                <a href="{{ route('admin.deleted.users.index') }}" class="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
                     View deleted users <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
@@ -157,10 +157,10 @@
          data-widget="site-status">
         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center justify-between">
             <span>
-                <i class="fas fa-signal mr-2 text-blue-600 dark:text-blue-400"></i>
+                <i class="fas fa-signal mr-2 text-primary-600 dark:text-primary-400"></i>
                 Site Status
             </span>
-            <a href="{{ route('admin.status.index') }}" class="text-xs text-blue-600 dark:text-blue-400 hover:underline font-normal">Manage &rarr;</a>
+            <a href="{{ route('admin.status.index') }}" class="text-xs text-primary-600 dark:text-primary-400 hover:underline font-normal">Manage &rarr;</a>
         </h3>
         <div data-widget-loading class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
             <div class="h-14 rounded-lg bg-gray-100 dark:bg-gray-900 animate-pulse"></div>
@@ -179,7 +179,7 @@
         <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
                 <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 flex items-center">
-                    <i class="fas fa-user-plus mr-2 text-blue-600 dark:text-blue-400"></i>
+                    <i class="fas fa-user-plus mr-2 text-primary-600 dark:text-primary-400"></i>
                     Site Registration Status
                 </h3>
                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
@@ -187,7 +187,7 @@
                 </p>
             </div>
             <a href="{{ route('admin.registrations.index') }}"
-               class="inline-flex items-center rounded-lg border border-blue-700 bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-blue-300/20 dark:bg-blue-500 dark:text-white dark:hover:bg-blue-400 dark:focus:ring-offset-gray-900">
+               class="inline-flex items-center rounded-lg border border-primary-700 bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:border-primary-300/20 dark:bg-primary-500 dark:text-white dark:hover:bg-primary-400 dark:focus:ring-offset-gray-900">
                 <i class="fas fa-arrow-up-right-from-square mr-2"></i>Manage Registrations
             </a>
         </div>
@@ -202,7 +202,7 @@
                     </span>
                     <span data-registration="scheduled-override"
                           @class([
-                              'inline-flex items-center justify-center rounded-full border border-blue-500/30 bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm dark:border-blue-300/20 dark:bg-blue-500 dark:text-white',
+                              'inline-flex items-center justify-center rounded-full border border-primary-500/30 bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm dark:border-primary-300/20 dark:bg-primary-500 dark:text-white',
                               'hidden' => ! $registrationStatus['scheduled_override_active'],
                           ])>
                         Scheduled Override
@@ -259,7 +259,7 @@
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700"
          data-widget="user-stats">
         <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6 flex items-center">
-            <i class="fas fa-chart-line mr-2 text-blue-600 dark:text-blue-400"></i>
+            <i class="fas fa-chart-line mr-2 text-primary-600 dark:text-primary-400"></i>
             User Statistics
         </h3>
         <div data-widget-loading class="space-y-4">
@@ -405,7 +405,7 @@
             <div class="space-y-6">
                 <div>
                     <h4 class="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
-                        <i class="fas fa-clock mr-2 text-blue-600 dark:text-blue-400"></i>
+                        <i class="fas fa-clock mr-2 text-primary-600 dark:text-primary-400"></i>
                         Last 24 Hours (Hour by Hour)
                     </h4>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -483,7 +483,7 @@
                 <i class="fas fa-credit-card mr-2 text-emerald-600 dark:text-emerald-400"></i>
                 Last 5 Payments
             </span>
-            <a href="{{ route('admin.payment-list') }}" class="text-xs text-blue-600 dark:text-blue-400 hover:underline font-normal">View all &rarr;</a>
+            <a href="{{ route('admin.payment-list') }}" class="text-xs text-primary-600 dark:text-primary-400 hover:underline font-normal">View all &rarr;</a>
         </h3>
         <div data-widget-loading class="space-y-3">
             @for($i = 0; $i < 5; $i++)
@@ -514,7 +514,7 @@
         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Quick Links</h3>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <a href="{{ url('/admin/user-list') }}" class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:bg-gray-800 rounded-lg transition">
-                <i class="fas fa-users text-3xl text-blue-600 dark:text-blue-400 mb-2"></i>
+                <i class="fas fa-users text-3xl text-primary-600 dark:text-primary-400 mb-2"></i>
                 <span class="text-sm font-medium text-gray-700">Manage Users</span>
             </a>
             <a href="{{ url('/admin/release-list') }}" class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:bg-gray-800 rounded-lg transition">

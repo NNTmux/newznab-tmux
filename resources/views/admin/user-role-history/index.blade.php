@@ -23,13 +23,13 @@
                                name="username"
                                value="{{ $filters['username'] }}"
                                placeholder="Filter by username"
-                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400">
+                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400">
                     </div>
                     <div>
                         <label for="role_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
                         <select id="role_id"
                                 name="role_id"
-                                class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400">
+                                class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400">
                             <option value="">All Roles</option>
                             @foreach($roles as $roleId => $roleName)
                                 <option value="{{ $roleId }}" {{ $filters['role_id'] == $roleId ? 'selected' : '' }}>
@@ -45,7 +45,7 @@
                                name="change_reason"
                                value="{{ $filters['change_reason'] }}"
                                placeholder="Filter by reason"
-                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400">
+                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400">
                     </div>
                     <div>
                         <label for="date_from" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date From</label>
@@ -53,7 +53,7 @@
                                id="date_from"
                                name="date_from"
                                value="{{ $filters['date_from'] }}"
-                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400">
+                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400">
                     </div>
                     <div>
                         <label for="date_to" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date To</label>
@@ -61,16 +61,16 @@
                                id="date_to"
                                name="date_to"
                                value="{{ $filters['date_to'] }}"
-                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400">
+                               class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400">
                     </div>
                     <div class="flex items-end">
-                        <button type="submit" class="w-full px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800">
+                        <button type="submit" class="w-full px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-md hover:bg-primary-700 dark:hover:bg-primary-800">
                             <i class="fas fa-search mr-2"></i>Filter
                         </button>
                     </div>
                 </div>
                 <div class="mt-4">
-                    <a href="{{ url('admin/user-role-history') }}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+                    <a href="{{ url('admin/user-role-history') }}" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">
                         Clear Filters
                     </a>
                 </div>
@@ -122,7 +122,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 @if($record->user)
-                                    <a href="{{ url('admin/user-role-history/' . $record->user_id) }}" class="text-blue-600 dark:text-blue-400 hover:underline">
+                                    <a href="{{ url('admin/user-role-history/' . $record->user_id) }}" class="text-primary-600 dark:text-primary-400 hover:underline">
                                         {{ $record->user->username }}
                                     </a>
                                 @else
@@ -140,7 +140,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                 @if($record->newRole)
-                                    <span class="px-2 py-1 text-xs font-medium rounded bg-blue-200 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                    <span class="px-2 py-1 text-xs font-medium rounded bg-primary-200 dark:bg-primary-900 text-primary-800 dark:text-primary-200">
                                         {{ $record->newRole->name }}
                                     </span>
                                 @else
@@ -176,7 +176,7 @@
                                 <div class="flex gap-2">
                                     @if($record->user)
                                         <a href="{{ url('admin/user-edit?id=' . $record->user_id) }}"
-                                           class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                           class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
                                            title="Edit User">
                                             <i class="fas fa-edit"></i>
                                         </a>

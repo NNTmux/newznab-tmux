@@ -281,7 +281,7 @@
                                 <div class="flex items-center justify-center gap-2" id="dropdown-scheme-switcher">
                                     @php $currentScheme = auth()->user()->color_scheme ?? 'blue'; @endphp
                                     <button type="button" data-scheme="blue" title="Blue"
-                                        class="dropdown-scheme-btn w-8 h-8 rounded-full bg-blue-600 transition ring-offset-2 ring-offset-gray-900 {{ $currentScheme === 'blue' ? 'ring-2 ring-primary-500' : '' }}">
+                                        class="dropdown-scheme-btn w-8 h-8 rounded-full bg-primary-600 transition ring-offset-2 ring-offset-gray-900 {{ $currentScheme === 'blue' ? 'ring-2 ring-primary-500' : '' }}">
                                         <span class="sr-only">Blue</span>
                                     </button>
                                     <button type="button" data-scheme="emerald" title="Emerald"
@@ -478,7 +478,7 @@
                         <div class="flex items-center justify-center gap-3" id="mobile-scheme-switcher">
                             @php $mobileScheme = auth()->user()->color_scheme ?? 'blue'; @endphp
                             <button type="button" data-scheme="blue" title="Blue"
-                                class="mobile-scheme-btn w-9 h-9 rounded-full bg-blue-600 transition touch-target ring-offset-2 ring-offset-gray-900 {{ $mobileScheme === 'blue' ? 'ring-2 ring-primary-500' : '' }}">
+                                class="mobile-scheme-btn w-9 h-9 rounded-full bg-primary-600 transition touch-target ring-offset-2 ring-offset-gray-900 {{ $mobileScheme === 'blue' ? 'ring-2 ring-primary-500' : '' }}">
                                 <span class="sr-only">Blue</span>
                             </button>
                             <button type="button" data-scheme="emerald" title="Emerald"

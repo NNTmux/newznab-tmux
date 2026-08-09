@@ -36,15 +36,15 @@
         @endif
 
         <!-- Info Alert -->
-        <div class="px-6 py-4 bg-blue-50 dark:bg-blue-900 border-b border-blue-100">
+        <div class="px-6 py-4 bg-primary-50 dark:bg-primary-900 border-b border-primary-100">
             <div class="flex">
-                <i class="fas fa-info-circle text-blue-500 text-xl mr-3"></i>
-                <div class="text-sm text-blue-700 dark:text-blue-300">
+                <i class="fas fa-info-circle text-primary-500 text-xl mr-3"></i>
+                <div class="text-sm text-primary-700 dark:text-primary-300">
                     <p class="mb-2">
                         Enter an IMDB ID (numeric only, without the 'tt' prefix) to add movie information to the database.
                     </p>
-                    <p class="text-xs text-blue-600 dark:text-blue-400">
-                        Example: For <code class="px-1 bg-blue-100 dark:bg-blue-800 rounded">https://www.imdb.com/title/tt0111161/</code>, enter <code class="px-1 bg-blue-100 dark:bg-blue-800 rounded">0111161</code>
+                    <p class="text-xs text-primary-600 dark:text-primary-400">
+                        Example: For <code class="px-1 bg-primary-100 dark:bg-primary-800 rounded">https://www.imdb.com/title/tt0111161/</code>, enter <code class="px-1 bg-primary-100 dark:bg-primary-800 rounded">0111161</code>
                     </p>
                 </div>
             </div>
@@ -68,10 +68,10 @@
                                    required
                                    pattern="[0-9]+"
                                    placeholder="0111161"
-                                   class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                                   class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
                                    value="">
                         </div>
-                        <button type="submit" class="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 whitespace-nowrap">
+                        <button type="submit" class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 whitespace-nowrap">
                             <i class="fas fa-plus mr-2"></i>Add Movie
                         </button>
                     </div>
