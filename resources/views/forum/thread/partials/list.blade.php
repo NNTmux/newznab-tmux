@@ -42,7 +42,7 @@
         @endif
 
         @if (isset($category) && isset($selectableThreadIds) && in_array($thread->id, $selectableThreadIds))
-            <div class="" style="flex: 0;">
+            <div class="flex-[0]">
                 <input type="checkbox" name="threads[]" :value="{{ $thread->id }}" v-model="selectedThreads">
             </div>
         @endif

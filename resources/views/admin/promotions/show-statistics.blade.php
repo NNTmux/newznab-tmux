@@ -209,7 +209,7 @@
                                 <td class="text-right font-bold text-gray-800 dark:text-gray-200">{{ $dayStat->count }}</td>
                                 <td class="text-right font-bold text-gray-800 dark:text-gray-200">{{ $dayStat->days }}</td>
                                 <td class="pl-4">
-                                    <div class="bg-primary-200 dark:bg-primary-600 h-4 rounded" style="width: {{ ($dayStat->count / $maxCount) * 100 }}%"></div>
+                                    <div class="bg-primary-200 dark:bg-primary-600 h-4 rounded progress-bar" data-width="{{ ($dayStat->count / $maxCount) * 100 }}"></div>
                                 </td>
                             </tr>
                         @endforeach

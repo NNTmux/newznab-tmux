@@ -142,8 +142,7 @@
                                 @if(!empty($show['image']))
                                     <img src="{{ $show['image'] }}"
                                          alt="{{ $show['title'] }}"
-                                         class="max-w-full h-auto mx-auto rounded shadow-lg"
-                                         style="max-height: 400px;"
+                                         class="max-w-full max-h-[400px] h-auto mx-auto rounded shadow-lg"
                                          data-fallback-src="{{ asset('images/no-cover.png') }}">
                                 @else
                                     <div class="flex flex-col items-center justify-center py-12 text-gray-400 dark:text-gray-500">

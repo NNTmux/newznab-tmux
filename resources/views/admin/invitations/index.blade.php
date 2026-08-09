@@ -257,7 +257,7 @@
                                     @endphp
                                     <div class="flex items-center">
                                         <div class="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-2 mr-2">
-                                            <div class="bg-green-600 dark:bg-green-500 h-2 rounded-full" style="width: {{ $rate }}%"></div>
+                                            <div class="bg-green-600 dark:bg-green-500 h-2 rounded-full progress-bar" data-width="{{ $rate }}"></div>
                                         </div>
                                         <span>{{ $rate }}%</span>
                                     </div>

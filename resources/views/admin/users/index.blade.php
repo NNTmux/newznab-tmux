@@ -128,7 +128,7 @@
 
             <!-- Top Scrollbar -->
             <div class="overflow-x-auto border-b border-gray-200 dark:border-gray-700" id="topScroll">
-                <div style="height: 1px;" id="topScrollContent"></div>
+                <div class="h-px" id="topScrollContent"></div>
             </div>
 
             <div class="overflow-x-auto" id="bottomScroll">
