@@ -34,15 +34,15 @@
                         <div class="flex items-center gap-2">
                             <small class="text-gray-600 dark:text-gray-400">With Selected:</small>
                             <div class="flex gap-1">
-                                <button type="button" class="nzb_multi_operations_download px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 transition text-sm" title="Download NZBs">
+                                <x-button variant="success" size="sm" class="nzb_multi_operations_download" title="Download NZBs">
                                     <i class="fa fa-cloud-download"></i>
-                                </button>
-                                <button type="button" class="nzb_multi_operations_cart px-3 py-1 bg-primary-600 dark:bg-primary-700 text-white rounded hover:bg-primary-700 dark:hover:bg-primary-800 transition text-sm" title="Send to Download Basket">
+                                </x-button>
+                                <x-button size="sm" class="nzb_multi_operations_cart" title="Send to Download Basket">
                                     <i class="fa fa-shopping-basket"></i>
-                                </button>
+                                </x-button>
                                 @if(isset($isadmin) && $isadmin)
-                                    <button type="button" class="nzb_multi_operations_edit px-3 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition text-sm">Edit</button>
-                                    <button type="button" class="nzb_multi_operations_delete px-3 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 transition text-sm">Delete</button>
+                                    <x-button variant="warning" size="sm" class="nzb_multi_operations_edit">Edit</x-button>
+                                    <x-button variant="danger" size="sm" class="nzb_multi_operations_delete">Delete</x-button>
                                 @endif
                             </div>
                         </div>
@@ -126,10 +126,10 @@
                                             <!-- External Links -->
                                             @if(!empty($result->url))
                                                 <div class="mt-2">
-                                                    <a target="_blank" href="{{ $site['dereferrer_link'] }}{{ $result->url }}"
-                                                       title="View Game page" class="inline-flex items-center px-2 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700">
-                                                       <i class="fa fa-shopping-cart mr-1"></i>Source
-                                                    </a>
+                                                    <x-button-link target="_blank" href="{{ $site['dereferrer_link'] }}{{ $result->url }}"
+                                                       title="View Game page" variant="secondary" size="sm" icon="fa fa-shopping-cart">
+                                                       Source
+                                                    </x-button-link>
                                                 </div>
                                             @endif
                                         </div>

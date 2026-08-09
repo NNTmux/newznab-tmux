@@ -9,9 +9,9 @@
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
                     <i class="fas fa-plus-square mr-2"></i>{{ $title ?? 'Bulk Add Newsgroups' }}
                 </h1>
-                <a href="{{ url('/admin/group-list') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">
-                    <i class="fas fa-list mr-2"></i>View All Groups
-                </a>
+                <x-button-link href="{{ url('/admin/group-list') }}" variant="muted" icon="fas fa-list">
+                    View All Groups
+                </x-button-link>
             </div>
         </div>
 
@@ -161,17 +161,17 @@
         <!-- Footer -->
         <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
             <div class="flex justify-between">
-                <a href="{{ url('/admin/group-list') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
-                    <i class="fas fa-arrow-left mr-2"></i>Back to Groups
-                </a>
+                <x-button-link href="{{ url('/admin/group-list') }}" variant="muted" icon="fas fa-arrow-left">
+                    Back to Groups
+                </x-button-link>
                 @if(empty($groupmsglist))
-                    <button type="submit" form="groupBulkForm" class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600">
-                        <i class="fas fa-plus-circle mr-2"></i>Add Groups
-                    </button>
+                    <x-button type="submit" form="groupBulkForm" variant="success" icon="fas fa-plus-circle">
+                        Add Groups
+                    </x-button>
                 @else
-                    <a href="{{ url('/admin/group-bulk') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600">
-                        <i class="fas fa-plus-circle mr-2"></i>Add More Groups
-                    </a>
+                    <x-button-link href="{{ url('/admin/group-bulk') }}" icon="fas fa-plus-circle">
+                        Add More Groups
+                    </x-button-link>
                 @endif
             </div>
         </div>

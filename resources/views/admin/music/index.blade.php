@@ -51,13 +51,9 @@
                                placeholder="Search by artist, album title..."
                                class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
-                    <button type="submit" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
-                        Search
-                    </button>
+                    <x-button type="submit">Search</x-button>
                     @if(!empty($lastSearch))
-                        <a href="{{ url('admin/music-list') }}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                            Clear
-                        </a>
+                        <x-button-link href="{{ url('admin/music-list') }}" variant="secondary">Clear</x-button-link>
                     @endif
                 </div>
             </form>

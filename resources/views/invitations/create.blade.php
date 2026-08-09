@@ -35,9 +35,9 @@
             <i class="fa fa-ban mr-2"></i>Invitations Disabled
         </h5>
         <p class="mb-3">User invitations are currently disabled on this site. You cannot send new invitations at this time.</p>
-        <a href="{{ url('/profile') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
-            <i class="fa fa-arrow-left mr-1"></i> Back to Profile
-        </a>
+        <x-button-link href="{{ url('/profile') }}" variant="secondary" icon="fa fa-arrow-left">
+            Back to Profile
+        </x-button-link>
     </div>
 </div>
 @else
@@ -80,9 +80,9 @@
                     <i class="fa fa-envelope mr-1"></i>
                     {{ $user_invites_left }} invites left
                 </div>
-                <a href="{{ url('/invitations') }}" class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500">
-                    <i class="fas fa-arrow-left mr-1"></i> Back to Invitations
-                </a>
+                <x-button-link href="{{ url('/invitations') }}" variant="secondary" icon="fas fa-arrow-left">
+                    Back to Invitations
+                </x-button-link>
             </div>
         </div>
         <div class="p-6">
@@ -111,9 +111,9 @@
                     <h5 class="text-lg font-semibold mb-2">No Invitations Available</h5>
                     <p class="mb-4">You have used all of your available invitations. You cannot send new invitations at this time.</p>
                     <div class="flex gap-2 justify-center">
-                        <a href="{{ url('/invitations') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                            <i class="fa fa-arrow-left mr-1"></i> Back to My Invitations
-                        </a>
+                        <x-button-link href="{{ url('/invitations') }}" icon="fa fa-arrow-left" class="shadow-sm">
+                            Back to My Invitations
+                        </x-button-link>
                         <a href="{{ url('/contact') }}" class="inline-flex items-center px-4 py-2 border border-primary-300 rounded-md text-sm font-medium text-primary-700 bg-white dark:bg-gray-800 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-primary-400 dark:border-primary-600 dark:hover:bg-gray-600">
                             <i class="fa fa-envelope mr-1"></i> Contact Support
                         </a>
@@ -215,12 +215,12 @@
                             </div>
 
                             <div class="flex flex-col sm:flex-row gap-2 justify-end">
-                                <a href="{{ url('/invitations') }}" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500">
-                                    <i class="fa fa-times mr-1"></i>Cancel
-                                </a>
-                                <button type="submit" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                                    <i class="fas fa-paper-plane mr-1"></i> Send Invitation
-                                </button>
+                                <x-button-link href="{{ url('/invitations') }}" variant="secondary" icon="fa fa-times" class="shadow-sm">
+                                    Cancel
+                                </x-button-link>
+                                <x-button type="submit" icon="fas fa-paper-plane" class="shadow-sm">
+                                    Send Invitation
+                                </x-button>
                             </div>
                         </form>
                     @endunless

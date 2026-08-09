@@ -267,16 +267,16 @@
                 This will reset the article pointers for all groups back to their current state.
             </p>
             <div class="flex justify-end gap-3">
-                <button type="button"
-                        @click="handleAction('hide-reset-modal')"
-                        class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
+                <x-button type="button"
+                        variant="muted"
+                        @click="handleAction('hide-reset-modal')">
                     Cancel
-                </button>
-                <button type="button"
-                        @click="handleAction('reset-all')"
-                        class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700">
+                </x-button>
+                <x-button type="button"
+                        variant="warning"
+                        @click="handleAction('reset-all')">
                     Reset All
-                </button>
+                </x-button>
             </div>
         </div>
     </div>
@@ -303,16 +303,16 @@
                 This will delete all releases and binaries for all groups. This action cannot be undone!
             </p>
             <div class="flex justify-end gap-3">
-                <button type="button"
-                        @click="handleAction('hide-purge-modal')"
-                        class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
+                <x-button type="button"
+                        variant="muted"
+                        @click="handleAction('hide-purge-modal')">
                     Cancel
-                </button>
-                <button type="button"
-                        @click="handleAction('purge-all')"
-                        class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700">
+                </x-button>
+                <x-button type="button"
+                        variant="danger"
+                        @click="handleAction('purge-all')">
                     Purge All
-                </button>
+                </x-button>
             </div>
         </div>
     </div>
@@ -344,16 +344,16 @@
                 </template>
             </div>
             <div class="flex justify-end gap-3">
-                <button type="button"
-                        @click="handleAction('hide-reset-selected-modal')"
-                        class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
+                <x-button type="button"
+                        variant="muted"
+                        @click="handleAction('hide-reset-selected-modal')">
                     Cancel
-                </button>
-                <button type="button"
-                        @click="handleAction('reset-selected')"
-                        class="px-4 py-2 bg-orange-600 dark:bg-orange-700 text-white rounded-lg hover:bg-orange-700">
+                </x-button>
+                <x-button type="button"
+                        variant="warning"
+                        @click="handleAction('reset-selected')">
                     Reset Selected
-                </button>
+                </x-button>
             </div>
         </div>
     </div>

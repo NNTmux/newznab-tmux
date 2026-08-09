@@ -460,10 +460,10 @@
                                 <p class="text-sm text-primary-800 dark:text-primary-200">
                                     Registration status, scheduled open periods, and registration activity are now managed from the dedicated registration admin page.
                                 </p>
-                                <a href="{{ route('admin.registrations.index') }}"
-                                   class="mt-3 inline-flex items-center rounded-md border border-primary-600 bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:border-primary-400/40 dark:bg-primary-500/90 dark:hover:bg-primary-400 dark:focus:ring-offset-gray-900">
-                                    <i class="fas fa-arrow-up-right-from-square mr-2"></i>Open Registration Admin
-                                </a>
+                                <x-button-link href="{{ route('admin.registrations.index') }}"
+                                   icon="fas fa-arrow-up-right-from-square" class="mt-3 shadow-sm">
+                                    Open Registration Admin
+                                </x-button-link>
                             </div>
                         </div>
 
@@ -1088,12 +1088,12 @@
 
                 <!-- Action Buttons -->
                 <div class="flex gap-3 pt-4 border-t border-gray-200">
-                    <button type="submit" class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
-                        <i class="fas fa-save mr-2"></i>Save Settings
-                    </button>
-                    <a href="{{ url('admin') }}" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
-                        <i class="fas fa-times mr-2"></i>Cancel
-                    </a>
+                    <x-button type="submit" icon="fas fa-save">
+                        Save Settings
+                    </x-button>
+                    <x-button-link href="{{ url('admin') }}" variant="muted" icon="fas fa-times">
+                        Cancel
+                    </x-button-link>
                 </div>
             </div>
         </form>

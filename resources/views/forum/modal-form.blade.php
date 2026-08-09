@@ -20,7 +20,7 @@
                     {{ $slot }}
                 </div>
                 <div class="border-t py-3 px-4 flex justify-end gap-4">
-                    <x-forum.button-secondary type="button" class="btn btn-secondary" data-close-modal>{{ trans('forum::general.cancel') }}</x-forum.button-secondary>
+                    <x-forum.button-secondary type="button" data-close-modal>{{ trans('forum::general.cancel') }}</x-forum.button-secondary>
                     {{ $actions }}
                 </div>
             </form>

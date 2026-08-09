@@ -37,12 +37,12 @@
                     <div class="flex items-center gap-2">
                         <small class="text-gray-600 dark:text-gray-400">With Selected:</small>
                         <div class="flex gap-1">
-                            <button type="button" class="nzb_multi_operations_download_cart px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 text-sm" title="Download NZBs">
+                            <x-button variant="success" size="sm" class="nzb_multi_operations_download_cart" title="Download NZBs">
                                 <i class="fa fa-cloud-download"></i>
-                            </button>
-                            <button type="button" class="nzb_multi_operations_cartdelete px-3 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 text-sm" title="Delete from cart">
+                            </x-button>
+                            <x-button variant="danger" size="sm" class="nzb_multi_operations_cartdelete" title="Delete from cart">
                                 <i class="fa fa-trash"></i>
-                            </button>
+                            </x-button>
                         </div>
                     </div>
                 </div>
@@ -88,16 +88,17 @@
                                     </td>
                                     <td class="px-4 py-3">
                                         <div class="flex justify-end gap-2">
-                                            <a href="{{ url('/getnzb?id=' . $result->release->guid) }}"
-                                               class="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-sm"
+                                            <x-button-link href="{{ url('/getnzb?id=' . $result->release->guid) }}"
+                                               variant="muted"
+                                               size="sm"
                                                title="Download NZB">
                                                 <i class="fa fa-cloud-download"></i>
-                                            </a>
-                                            <a href="{{ url('/details/' . $result->release->guid) }}"
-                                               class="px-2 py-1 bg-primary-600 dark:bg-primary-700 text-white rounded hover:bg-primary-700 dark:hover:bg-primary-800 text-sm"
+                                            </x-button-link>
+                                            <x-button-link href="{{ url('/details/' . $result->release->guid) }}"
+                                               size="sm"
                                                title="View details">
                                                 <i class="fa fa-info-circle"></i>
-                                            </a>
+                                            </x-button-link>
                                             <button type="button"
                                                class="cart-delete-link px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded hover:bg-red-200 dark:hover:bg-red-900/50 text-sm"
                                                title="Delete from cart"
@@ -134,12 +135,12 @@
                                     <i class="fa fa-clock-o mr-1"></i>{{ \Carbon\Carbon::parse($result->created_at)->diffForHumans() }}
                                 </span>
                                 <div class="flex gap-2">
-                                    <a href="{{ url('/getnzb?id=' . $result->release->guid) }}" class="px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-sm" title="Download NZB">
+                                    <x-button-link href="{{ url('/getnzb?id=' . $result->release->guid) }}" variant="muted" size="sm" title="Download NZB">
                                         <i class="fa fa-cloud-download"></i>
-                                    </a>
-                                    <a href="{{ url('/details/' . $result->release->guid) }}" class="px-2 py-1 bg-primary-600 dark:bg-primary-700 text-white rounded text-sm" title="View details">
+                                    </x-button-link>
+                                    <x-button-link href="{{ url('/details/' . $result->release->guid) }}" size="sm" title="View details">
                                         <i class="fa fa-info-circle"></i>
-                                    </a>
+                                    </x-button-link>
                                     <button type="button" class="cart-delete-link px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded text-sm" title="Delete"
                                             data-delete-url="{{ url('/cart/delete/' . $result->release->guid) }}"
                                             data-release-name="{{ Str::limit($result->release->searchname, 50) }}">
@@ -156,12 +157,12 @@
                     <div class="flex items-center gap-2">
                         <small class="text-gray-600 dark:text-gray-400">With Selected:</small>
                         <div class="flex gap-1">
-                            <button type="button" class="nzb_multi_operations_download_cart px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 text-sm" title="Download NZBs">
+                            <x-button variant="success" size="sm" class="nzb_multi_operations_download_cart" title="Download NZBs">
                                 <i class="fa fa-cloud-download"></i>
-                            </button>
-                            <button type="button" class="nzb_multi_operations_cartdelete px-3 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 text-sm" title="Delete from cart">
+                            </x-button>
+                            <x-button variant="danger" size="sm" class="nzb_multi_operations_cartdelete" title="Delete from cart">
                                 <i class="fa fa-trash"></i>
-                            </button>
+                            </x-button>
                         </div>
                     </div>
                 </div>
@@ -172,9 +173,9 @@
                 <i class="fa fa-shopping-basket text-yellow-600 dark:text-yellow-400 text-5xl mb-4"></i>
                 <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Your basket is empty</h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-4">Add some releases to your download basket to get started.</p>
-                <a href="{{ url('/browse/All') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800">
-                    <i class="fa fa-search mr-2"></i> Browse Releases
-                </a>
+                <x-button-link href="{{ url('/browse/All') }}" icon="fa fa-search">
+                    Browse Releases
+                </x-button-link>
             </div>
         @endif
     </div>

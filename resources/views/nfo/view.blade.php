@@ -24,9 +24,9 @@
 
         @if(isset($rel))
             <div class="mt-4">
-                <a href="{{ url('/details/' . $rel['guid']) }}" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition">
-                    <i class="fas fa-arrow-left mr-2"></i> Back to Release
-                </a>
+                <x-button-link href="{{ url('/details/' . $rel['guid']) }}" icon="fas fa-arrow-left">
+                    Back to Release
+                </x-button-link>
             </div>
         @endif
     </div>

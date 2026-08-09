@@ -312,9 +312,7 @@
                         <a href="{{ route('login') }}" class="px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition">
                             <i class="fa fa-sign-in mr-1"></i><span class="hidden sm:inline">Login</span>
                         </a>
-                        <a href="{{ route('register') }}" class="px-3 py-2 text-sm bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 text-white rounded-lg transition">
-                            <i class="fa fa-user-plus mr-1"></i><span class="hidden sm:inline">Register</span>
-                        </a>
+                        <x-button-link href="{{ route('register') }}" icon="fa fa-user-plus"><span class="hidden sm:inline">Register</span></x-button-link>
                     </div>
                 @endauth
             </div>
@@ -348,9 +346,7 @@
                     <div id="mobile-autocomplete-dropdown" class="hidden absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 text-white px-4 py-3 rounded-lg transition touch-target font-semibold">
-                    <i class="fa fa-search mr-2"></i>Search
-                </button>
+                <x-button type="submit" size="lg" class="w-full touch-target" icon="fa fa-search">Search</x-button>
             </form>
         </div>
     </div>

@@ -5,9 +5,9 @@
     <x-admin.card>
         <x-admin.page-header :title="$title" icon="fas fa-file-alt">
             <x-slot:actions>
-                <a href="{{ url('admin/content-add?action=add') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800">
-                    <i class="fas fa-plus mr-2"></i>Add New Content
-                </a>
+                <x-button-link href="{{ url('admin/content-add?action=add') }}" icon="fas fa-plus">
+                    Add New Content
+                </x-button-link>
             </x-slot:actions>
         </x-admin.page-header>
 

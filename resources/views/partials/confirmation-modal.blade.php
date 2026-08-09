@@ -37,11 +37,12 @@
             </div>
         </div>
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
-            <button type="button"
+            <x-button type="button"
+                    variant="muted"
                     @click="cancel()"
-                    class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition font-medium">
-                <i class="fas fa-times mr-2"></i><span x-text="cancelText">Cancel</span>
-            </button>
+                    icon="fas fa-times">
+                <span x-text="cancelText">Cancel</span>
+            </x-button>
             <button type="button"
                     @click="confirm()"
                     :class="confirmBtnClass()">

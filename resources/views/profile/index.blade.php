@@ -20,21 +20,18 @@
             </h1>
             <div class="flex gap-2">
                 @if(($isadmin ?? false) || !$publicview)
-                    <a href="{{ route('profileedit') }}" class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white text-sm rounded hover:bg-green-700 dark:hover:bg-green-800 transition">
-                        <i class="fa fa-edit mr-1"></i>Edit Profile
-                    </a>
+                    <x-button-link href="{{ route('profileedit') }}" variant="success" icon="fa fa-edit">Edit Profile</x-button-link>
                 @endif
                 @if(!($isadmin ?? false) && !$publicview)
-                    <a href="{{ route('privacy-center.index') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white text-sm rounded hover:bg-primary-700 dark:hover:bg-primary-800 transition">
-                        <i class="fa fa-shield-alt mr-1"></i>Privacy Center
-                    </a>
+                    <x-button-link href="{{ route('privacy-center.index') }}" icon="fa fa-shield-alt">Privacy Center</x-button-link>
                 @endif
                 @if(!($isadmin ?? false) && !$publicview)
-                    <a href="{{ url('profile_delete?id=' . $user->id) }}"
-                       class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded hover:bg-red-700 dark:hover:bg-red-800 transition"
+                    <x-button-link href="{{ url('profile_delete?id=' . $user->id) }}"
+                       variant="danger"
+                       icon="fa fa-trash"
                        data-confirm="Are you sure you want to delete your account? This action cannot be undone.">
-                        <i class="fa fa-trash mr-1"></i>Delete Account
-                    </a>
+                        Delete Account
+                    </x-button-link>
                 @endif
             </div>
         </div>

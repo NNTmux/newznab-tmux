@@ -15,7 +15,7 @@
         <div class="flex justify-between flex-row-reverse">
             @if ($category->accepts_threads)
                 @can ('createThreads', $category)
-                    <x-forum.button-link href="{{ Forum::route('thread.create', $category) }}" class="btn btn-primary float-end">{{ trans('forum::threads.new_thread') }}</x-forum.button-link>
+                    <x-forum.button-link href="{{ Forum::route('thread.create', $category) }}" class="float-end">{{ trans('forum::threads.new_thread') }}</x-forum.button-link>
                 @endcan
             @endif
 
@@ -114,7 +114,7 @@
                                             @endif
 
                                             <div class="text-end">
-                                                <button type="submit" class="bg-primary-500 text-white rounded-md px-3 py-1" @click="submit" :disabled="selectedAction == null">{{ trans('forum::general.proceed') }}</button>
+                                                <x-forum.button type="submit" @click="submit" ::disabled="selectedAction == null">{{ trans('forum::general.proceed') }}</x-forum.button>
                                             </div>
                                         </div>
                                     </div>

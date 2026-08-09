@@ -74,14 +74,12 @@
                 </div>
 
                 <div class="flex gap-3 pt-4 border-t border-gray-200">
-                    <button class="px-6 py-3 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium"
-                            type="submit" name="{{ $type ?? 'add' }}">
-                        <i class="fa {{ ($type ?? 'add') == 'add' ? 'fa-plus' : 'fa-edit' }} mr-2"></i>{{ ucfirst($type ?? 'add') }} Movie
-                    </button>
-                    <a href="{{ url('/mymovies') }}"
-                       class="px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:bg-gray-900 hover:border-gray-400 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium">
-                        <i class="fa fa-arrow-left mr-2"></i>Back to My Movies
-                    </a>
+                    <x-button size="lg" class="shadow-md hover:shadow-lg"
+                              type="submit" name="{{ $type ?? 'add' }}"
+                              icon="fa {{ ($type ?? 'add') == 'add' ? 'fa-plus' : 'fa-edit' }}">{{ ucfirst($type ?? 'add') }} Movie</x-button>
+                    <x-button-link href="{{ url('/mymovies') }}"
+                                   variant="secondary" size="lg" class="shadow-md hover:shadow-lg"
+                                   icon="fa fa-arrow-left">Back to My Movies</x-button-link>
                 </div>
             </form>
         </div>
@@ -123,9 +121,7 @@
             </div>
 
             <div class="flex justify-between items-center mb-4">
-                <a href="{{ url("/rss/mymovies?dl=1&i={$userdata->id}&api_token={$userdata->api_token}") }}" class="btn btn-secondary btn-sm">
-                    <i class="fa fa-rss mr-2"></i>RSS Feed
-                </a>
+                <x-button-link href="{{ url("/rss/mymovies?dl=1&i={$userdata->id}&api_token={$userdata->api_token}") }}" variant="secondary" size="sm" icon="fa fa-rss">RSS Feed</x-button-link>
             </div>
 
             @if(count($movies ?? []) > 0)
@@ -192,12 +188,8 @@
                                     </td>
                                     <td class="px-4 py-3 text-right">
                                         <div class="flex items-center justify-end gap-2">
-                                            <a class="btn btn-warning btn-sm" href="{{ url("/mymovies?id=edit&imdb={$movie['imdbid']}") }}" title="Edit Categories">
-                                                <i class="fa fa-edit"></i>
-                                            </a>
-                                            <a class="btn btn-danger btn-sm" href="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}" title="Remove from My Movies">
-                                                <i class="fa fa-trash"></i>
-                                            </a>
+                                            <x-button-link variant="warning" size="sm" icon="fa fa-edit" href="{{ url("/mymovies?id=edit&imdb={$movie['imdbid']}") }}" title="Edit Categories" aria-label="Edit Categories"></x-button-link>
+                                            <x-button-link variant="danger" size="sm" icon="fa fa-trash" href="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}" title="Remove from My Movies" aria-label="Remove from My Movies"></x-button-link>
                                         </div>
                                     </td>
                                 </tr>
@@ -240,12 +232,8 @@
                                     <i class="fa fa-external-link mr-1"></i>IMDB
                                 </a>
                                 <div class="flex gap-2">
-                                    <a class="btn btn-warning btn-sm" href="{{ url("/mymovies?id=edit&imdb={$movie['imdbid']}") }}" title="Edit">
-                                        <i class="fa fa-edit"></i>
-                                    </a>
-                                    <a class="btn btn-danger btn-sm" href="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}" title="Remove">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
+                                    <x-button-link variant="warning" size="sm" icon="fa fa-edit" href="{{ url("/mymovies?id=edit&imdb={$movie['imdbid']}") }}" title="Edit" aria-label="Edit"></x-button-link>
+                                    <x-button-link variant="danger" size="sm" icon="fa fa-trash" href="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}" title="Remove" aria-label="Remove"></x-button-link>
                                 </div>
                             </div>
                         </div>

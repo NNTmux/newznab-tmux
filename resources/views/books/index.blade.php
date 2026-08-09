@@ -61,12 +61,8 @@
                 </div>
 
                 <div class="mt-4 flex gap-2">
-                    <button type="submit" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-md hover:bg-primary-700">
-                        <i class="fa fa-search mr-2"></i>Search
-                    </button>
-                    <a href="{{ url('/Books/' . ($categorytitle ?: 'All')) }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300">
-                        <i class="fa fa-times mr-2"></i>Clear
-                    </a>
+                    <x-button type="submit" icon="fa fa-search">Search</x-button>
+                    <x-button-link href="{{ url('/Books/' . ($categorytitle ?: 'All')) }}" variant="muted" icon="fa fa-times">Clear</x-button-link>
                 </div>
             </form>
         </div>
@@ -128,16 +124,19 @@
                         </a>
                         @if($guid)
                             <div class="px-3 pb-3 flex gap-1">
-                                <a href="{{ url('/getnzb?id=' . $guid) }}"
-                                   class="flex-1 px-2 py-1 bg-green-600 dark:bg-green-700 text-white text-xs rounded hover:bg-green-700 dark:hover:bg-green-800 text-center"
+                                <x-button-link href="{{ url('/getnzb?id=' . $guid) }}"
+                                   variant="success"
+                                   size="sm"
+                                   class="flex-1"
                                    title="Download NZB">
                                     <i class="fa fa-download"></i>
-                                </a>
-                                <a href="{{ url('/details/' . $guid) }}"
-                                   class="flex-1 px-2 py-1 bg-primary-600 dark:bg-primary-700 text-white text-xs rounded hover:bg-primary-700 dark:hover:bg-primary-800 text-center"
+                                </x-button-link>
+                                <x-button-link href="{{ url('/details/' . $guid) }}"
+                                   size="sm"
+                                   class="flex-1"
                                    title="View Details">
                                     <i class="fa fa-info-circle"></i>
-                                </a>
+                                </x-button-link>
                             </div>
                         @endif
                     </div>
@@ -154,9 +153,7 @@
                 <i class="fa fa-book text-yellow-600 text-5xl mb-4"></i>
                 <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">No books found</h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-4">Try adjusting your search filters or browse all books.</p>
-                <a href="{{ url('/Books/All') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
-                    <i class="fa fa-book mr-2"></i> Browse All Books
-                </a>
+                <x-button-link href="{{ url('/Books/All') }}" icon="fa fa-book">Browse All Books</x-button-link>
             </div>
         @endif
     </div>

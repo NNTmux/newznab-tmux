@@ -223,11 +223,13 @@
                                                   data-confirm-text="Delete"
                                                   @submit.prevent="submit()">
                                                 @csrf
-                                                <button type="submit"
-                                                        class="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm inline-flex items-center"
+                                                <x-button type="submit"
+                                                        variant="danger"
+                                                        size="sm"
+                                                        icon="fas fa-trash"
                                                         title="Delete Release">
-                                                    <i class="fas fa-trash mr-1"></i> Delete
-                                                </button>
+                                                    Delete
+                                                </x-button>
                                             </form>
                                         @endif
 
@@ -236,42 +238,49 @@
                                             <form method="POST" action="{{ route('admin.release-reports.update-status', $report->id) }}" class="inline">
                                                 @csrf
                                                 <input type="hidden" name="status" value="reviewed">
-                                                <button type="submit"
-                                                        class="px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition text-sm inline-flex items-center"
+                                                <x-button type="submit"
+                                                        size="sm"
+                                                        icon="fas fa-eye"
                                                         title="Mark as Reviewed">
-                                                    <i class="fas fa-eye mr-1"></i> Reviewed
-                                                </button>
+                                                    Reviewed
+                                                </x-button>
                                             </form>
 
                                             <!-- Dismiss Button -->
                                             <form method="POST" action="{{ route('admin.release-reports.dismiss', $report->id) }}" class="inline">
                                                 @csrf
-                                                <button type="submit"
-                                                        class="px-3 py-1.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition text-sm inline-flex items-center"
+                                                <x-button type="submit"
+                                                        variant="secondary"
+                                                        size="sm"
+                                                        icon="fas fa-ban"
                                                         title="Dismiss Report">
-                                                    <i class="fas fa-ban mr-1"></i> Dismiss
-                                                </button>
+                                                    Dismiss
+                                                </x-button>
                                             </form>
                                         @elseif($report->status === 'reviewed')
                                             <!-- Mark as Resolved Button -->
                                             <form method="POST" action="{{ route('admin.release-reports.update-status', $report->id) }}" class="inline">
                                                 @csrf
                                                 <input type="hidden" name="status" value="resolved">
-                                                <button type="submit"
-                                                        class="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm inline-flex items-center"
+                                                <x-button type="submit"
+                                                        variant="success"
+                                                        size="sm"
+                                                        icon="fas fa-check"
                                                         title="Mark as Resolved">
-                                                    <i class="fas fa-check mr-1"></i> Resolve
-                                                </button>
+                                                    Resolve
+                                                </x-button>
                                             </form>
 
                                             <!-- Dismiss Button -->
                                             <form method="POST" action="{{ route('admin.release-reports.dismiss', $report->id) }}" class="inline">
                                                 @csrf
-                                                <button type="submit"
-                                                        class="px-3 py-1.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition text-sm inline-flex items-center"
+                                                <x-button type="submit"
+                                                        variant="secondary"
+                                                        size="sm"
+                                                        icon="fas fa-ban"
                                                         title="Dismiss Report">
-                                                    <i class="fas fa-ban mr-1"></i> Dismiss
-                                                </button>
+                                                    Dismiss
+                                                </x-button>
                                             </form>
                                         @elseif(!$report->release)
                                             <span class="text-xs text-gray-500 dark:text-gray-400">Release already deleted</span>
@@ -308,12 +317,12 @@
                                         </button>
 
                                         @if($report->release)
-                                            <a href="{{ url('/details/' . $report->release->guid) }}"
+                                            <x-button-link href="{{ url('/details/' . $report->release->guid) }}"
                                                target="_blank"
-                                               class="px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition text-sm inline-flex items-center"
+                                               size="sm"
+                                               icon="fas fa-external-link-alt"
                                                title="View Release">
-                                                <i class="fas fa-external-link-alt"></i>
-                                            </a>
+                                            </x-button-link>
                                         @endif
                                     </div>
                                 </td>
@@ -382,9 +391,9 @@
             </div>
 
             <div class="mt-6 flex justify-end">
-                <button type="button" class="report-desc-modal-close px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition" @click="closeDescription()">
+                <x-button type="button" variant="muted" class="report-desc-modal-close" @click="closeDescription()">
                     Close
-                </button>
+                </x-button>
             </div>
             </div>
         </div>
@@ -447,9 +456,9 @@
                 </div>
 
                 <div class="mt-6 flex justify-end gap-3">
-                    <button type="button" class="response-modal-close px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition" @click="closeResponse()">
+                    <x-button type="button" variant="muted" class="response-modal-close" @click="closeResponse()">
                         Cancel
-                    </button>
+                    </x-button>
                     <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
                         <i class="fas fa-save mr-1"></i> Save Response
                     </button>
@@ -496,9 +505,9 @@
             <form id="revertConfirmForm" x-ref="revertForm" method="POST" action="" @submit.prevent="submitRevert()">
                 @csrf
                 <div class="flex justify-end gap-3">
-                    <button type="button" class="revert-modal-close px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition" @click="closeRevert()">
+                    <x-button type="button" variant="muted" class="revert-modal-close" @click="closeRevert()">
                         Cancel
-                    </button>
+                    </x-button>
                     <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition">
                         <i class="fas fa-undo mr-1"></i> Revert to Reviewed
                     </button>

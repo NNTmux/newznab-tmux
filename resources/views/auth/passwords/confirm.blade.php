@@ -46,13 +46,10 @@
                     </div>
 
                     <div class="flex items-center justify-between">
-                        <button
+                        <x-button
                             type="submit"
-                            class="flex justify-center items-center py-3 px-6 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition"
-                        >
-                            <i class="fas fa-check mr-2"></i>
-                            {{ __('Confirm Password') }}
-                        </button>
+                            size="lg" icon="fas fa-check" class="shadow-sm"
+                        >{{ __('Confirm Password') }}</x-button>
 
                         @if (Route::has('password.request'))
                             <a class="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 transition" href="{{ route('password.request') }}">

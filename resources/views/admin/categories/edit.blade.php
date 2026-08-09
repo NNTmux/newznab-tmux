@@ -7,9 +7,7 @@
     <x-admin.card>
         <x-admin.page-header :title="$title" :icon="($isCreate ?? false) ? 'fas fa-plus' : 'fas fa-edit'">
             <x-slot:actions>
-                <a href="{{ url('/admin/category-list') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
-                    <i class="fas fa-arrow-left mr-2"></i>Back to Categories
-                </a>
+                <x-button-link href="{{ url('/admin/category-list') }}" variant="muted" icon="fas fa-arrow-left">Back to Categories</x-button-link>
             </x-slot:actions>
         </x-admin.page-header>
 
@@ -110,13 +108,9 @@
 
                 <!-- Form Actions -->
                 <div class="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700">
-                    <a href="{{ url('/admin/category-list') }}"
-                       class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
-                        <i class="fas fa-times mr-2"></i>Cancel
-                    </a>
-                    <button type="submit" class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition">
-                        <i class="fas fa-save mr-2"></i>{{ $isCreate ?? false ? 'Create Category' : 'Save Changes' }}
-                    </button>
+                    <x-button-link href="{{ url('/admin/category-list') }}"
+                       variant="muted" icon="fas fa-times">Cancel</x-button-link>
+                    <x-button type="submit" variant="success" icon="fas fa-save">{{ $isCreate ?? false ? 'Create Category' : 'Save Changes' }}</x-button>
                 </div>
             </form>
         </div>

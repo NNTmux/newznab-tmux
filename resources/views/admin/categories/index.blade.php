@@ -7,9 +7,7 @@
     <x-admin.card>
         <x-admin.page-header :title="$title" icon="fas fa-folder-open">
             <x-slot:actions>
-                <a href="{{ url('/admin/category-add') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition">
-                    <i class="fas fa-plus mr-2"></i>Add New Category
-                </a>
+                <x-button-link href="{{ url('/admin/category-add') }}" icon="fas fa-plus">Add New Category</x-button-link>
             </x-slot:actions>
         </x-admin.page-header>
 
@@ -127,9 +125,7 @@
                 <span class="text-sm text-gray-600 dark:text-gray-400">
                     Total: {{ count($categorylist) }} categories
                 </span>
-                <a href="{{ url('/admin/category-add') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 text-sm transition">
-                    <i class="fas fa-plus mr-2"></i>Add New Category
-                </a>
+                <x-button-link href="{{ url('/admin/category-add') }}" icon="fas fa-plus">Add New Category</x-button-link>
             </div>
         </div>
     </x-admin.card>

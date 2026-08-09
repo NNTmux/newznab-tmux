@@ -46,26 +46,26 @@
                         placeholder="Work laptop, iPhone, etc."
                         class="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                     >
-                    <button
+                    <x-button
                         type="submit"
-                        :disabled="busy || browserPasskeyBlocked()"
-                        class="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-primary-700 dark:hover:bg-primary-800"
+                        ::disabled="busy || browserPasskeyBlocked()"
+                        icon="fas fa-plus"
                     >
-                        <i class="fas fa-plus mr-2"></i>
                         <span x-text="busy ? 'Creating...' : 'Create browser/app passkey'"></span>
-                    </button>
+                    </x-button>
                 </div>
                 <p x-show="browserPasskeyNotice()" x-text="browserPasskeyNotice()" x-cloak class="text-xs text-yellow-700 dark:text-yellow-300">
                 </p>
-                <button
+                <x-button
                     type="button"
+                    variant="secondary"
+                    size="sm"
                     @click="createSecurityKeyPasskey()"
-                    :disabled="busy || !name"
-                    class="inline-flex items-center rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                    ::disabled="busy || !name"
+                    icon="fas fa-key"
                 >
-                    <i class="fas fa-key mr-2"></i>
                     Use USB security key
-                </button>
+                </x-button>
             </form>
 
             <p x-show="error" x-text="error" class="text-sm text-red-600 dark:text-red-400"></p>

@@ -201,12 +201,12 @@
 
             <!-- Action Buttons -->
             <div class="mt-8 flex gap-3 border-t border-gray-200 pt-6">
-                <button type="submit" class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
-                    <i class="fas fa-save mr-2"></i>Save Changes
-                </button>
-                <a href="{{ route('admin.game-list') }}" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                    <i class="fas fa-arrow-left mr-2"></i>Back to Game List
-                </a>
+                <x-button type="submit" icon="fas fa-save">
+                    Save Changes
+                </x-button>
+                <x-button-link href="{{ route('admin.game-list') }}" variant="secondary" icon="fas fa-arrow-left">
+                    Back to Game List
+                </x-button-link>
             </div>
         </form>
     </div>

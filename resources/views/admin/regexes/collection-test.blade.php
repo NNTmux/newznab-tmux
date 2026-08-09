@@ -9,9 +9,7 @@
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
                     <i class="fas fa-flask mr-2"></i>{{ $title ?? 'Collection Regex Test' }}
                 </h1>
-                <a href="{{ url('/admin/collection_regexes-list') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200">
-                    <i class="fas fa-arrow-left mr-2"></i>Back to List
-                </a>
+                <x-button-link href="{{ url('/admin/collection_regexes-list') }}" variant="muted" icon="fas fa-arrow-left">Back to List</x-button-link>
             </div>
         </div>
 
@@ -80,9 +78,7 @@
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
-                <i class="fas fa-play mr-2"></i>Test Regex
-            </button>
+            <x-button type="submit" icon="fas fa-play">Test Regex</x-button>
         </form>
 
         <!-- Results Section -->

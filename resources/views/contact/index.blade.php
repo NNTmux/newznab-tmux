@@ -110,9 +110,7 @@
                 @endif
 
                 <div class="w-full">
-                    <button type="submit" class="w-full bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-800 text-white font-semibold py-3 px-6 rounded-lg transition duration-150 ease-in-out flex items-center justify-center text-lg">
-                        <i class="fas fa-paper-plane mr-2"></i>Send Message
-                    </button>
+                    <x-button type="submit" variant="success" size="lg" icon="fas fa-paper-plane" class="w-full">Send Message</x-button>
                 </div>
             </form>
         </div>

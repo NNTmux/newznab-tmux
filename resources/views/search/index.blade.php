@@ -143,9 +143,7 @@
         <div class="flex flex-col sm:flex-row flex-wrap gap-2">
             <x-button type="submit" size="lg" icon="fas fa-search">Search</x-button>
             <x-button-link href="{{ url('/search?search_type=adv') }}" size="lg" icon="fas fa-sliders-h">Advanced Search</x-button-link>
-            <a href="{{ route('search') }}" class="inline-flex justify-center rounded-lg bg-gray-300 px-6 py-3 text-base font-semibold text-gray-700 transition hover:bg-gray-400 dark:bg-gray-600 dark:text-gray-100 dark:hover:bg-gray-700">
-                Clear
-            </a>
+            <x-button-link href="{{ route('search') }}" variant="muted" size="lg" class="justify-center">Clear</x-button-link>
         </div>
     </form>
 

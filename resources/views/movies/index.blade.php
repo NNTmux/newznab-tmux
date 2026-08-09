@@ -34,13 +34,14 @@
 
             <div class="flex flex-wrap gap-2">
                 {{-- Layout Toggle Button --}}
-                <button type="button"
-                        @click="toggleLayout()"
-                        class="inline-flex items-center px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500"
-                        title="Toggle layout">
-                    <i class="mr-2" :class="layoutIcon"></i>
+                <x-button type="button"
+                          @click="toggleLayout()"
+                          variant="secondary"
+                          class="shadow-md"
+                          title="Toggle layout">
+                    <i :class="layoutIcon"></i>
                     <span x-text="layoutLabel"></span>
-                </button>
+                </x-button>
 
                 {{-- Trending Movies Button --}}
                 <a href="{{ route('trending-movies') }}"
@@ -107,10 +108,9 @@
             </div>
 
             <div class="flex justify-end">
-                <button type="submit"
-                        class="inline-flex items-center px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition shadow-md">
-                    <i class="fas fa-search mr-2"></i> Search
-                </button>
+                <x-button type="submit"
+                          class="shadow-md"
+                          icon="fas fa-search">Search</x-button>
             </div>
         </form>
     </div>

@@ -28,16 +28,16 @@
                 <div class="flex flex-wrap items-center gap-2">
                     <small class="text-gray-600 dark:text-gray-400">With Selected:</small>
                     <div class="flex gap-1">
-                        <button type="button" class="nzb_multi_operations_download px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition text-sm" title="Download NZBs">
+                        <x-button variant="success" size="sm" class="nzb_multi_operations_download" title="Download NZBs">
                             <i class="fa fa-cloud-download"></i>
-                        </button>
-                        <button type="button" class="nzb_multi_operations_cart px-3 py-1 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition text-sm" title="Send to Download Basket">
+                        </x-button>
+                        <x-button size="sm" class="nzb_multi_operations_cart" title="Send to Download Basket">
                             <i class="fa fa-shopping-basket"></i>
-                        </button>
+                        </x-button>
                         @if(auth()->check() && auth()->user()->hasRole('Admin'))
-                            <button type="button" class="nzb_multi_operations_delete px-3 py-1 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition text-sm" title="Delete">
+                            <x-button variant="danger" size="sm" class="nzb_multi_operations_delete" title="Delete">
                                 <i class="fa fa-trash"></i>
-                            </button>
+                            </x-button>
                         @endif
                     </div>
                 </div>

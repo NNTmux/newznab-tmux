@@ -11,9 +11,7 @@
                 </h1>
                 <p class="text-gray-600 dark:text-gray-400 mt-1">Overview of all promotion activities</p>
             </div>
-            <a href="{{ route('admin.promotions.index') }}" class="px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700">
-                <i class="fas fa-arrow-left mr-2"></i>Back to Promotions
-            </a>
+            <x-button-link href="{{ route('admin.promotions.index') }}" variant="secondary" icon="fas fa-arrow-left">Back to Promotions</x-button-link>
         </div>
     </div>
 
@@ -41,9 +39,7 @@
                     <input type="date" name="end_date" value="{{ $endDate->format('Y-m-d') }}" class="form-input rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
                 </div>
                 <div>
-                    <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
-                        <i class="fas fa-filter mr-2"></i>Apply
-                    </button>
+                    <x-button type="submit" icon="fas fa-filter">Apply</x-button>
                 </div>
             </div>
         </form>
@@ -134,9 +130,9 @@
                                         <span><i class="fas fa-calendar mr-1"></i>{{ $promotion->additional_days }} days</span>
                                     </div>
                                 </div>
-                                <a href="{{ route('admin.promotions.show-statistics', $promotion->id) }}" class="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700">
+                                <x-button-link href="{{ route('admin.promotions.show-statistics', $promotion->id) }}" size="sm">
                                     View Details
-                                </a>
+                                </x-button-link>
                             </div>
                         @endforeach
                     </div>

@@ -202,15 +202,9 @@
 
             <!-- Action Buttons -->
             <div class="mt-6 flex gap-3">
-                <button type="submit" class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition inline-flex items-center">
-                    <i class="fas fa-save mr-2"></i> Save Changes
-                </button>
-                <a href="{{ route('admin.release-list') }}" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 transition inline-flex items-center">
-                    <i class="fas fa-times mr-2"></i> Cancel
-                </a>
-                <a href="{{ url('/details/' . ($release->guid ?? $release['guid'] ?? '')) }}" class="px-6 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition inline-flex items-center">
-                    <i class="fas fa-eye mr-2"></i> View Release
-                </a>
+                <x-button type="submit" icon="fas fa-save">Save Changes</x-button>
+                <x-button-link href="{{ route('admin.release-list') }}" variant="muted" icon="fas fa-times">Cancel</x-button-link>
+                <x-button-link href="{{ url('/details/' . ($release->guid ?? $release['guid'] ?? '')) }}" variant="success" icon="fas fa-eye">View Release</x-button-link>
             </div>
         </form>
     </div>

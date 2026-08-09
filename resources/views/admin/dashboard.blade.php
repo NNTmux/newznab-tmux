@@ -186,10 +186,8 @@
                     Live registration availability, manual baseline, and the current schedule summary.
                 </p>
             </div>
-            <a href="{{ route('admin.registrations.index') }}"
-               class="inline-flex items-center rounded-lg border border-primary-700 bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:border-primary-300/20 dark:bg-primary-500 dark:text-white dark:hover:bg-primary-400 dark:focus:ring-offset-gray-900">
-                <i class="fas fa-arrow-up-right-from-square mr-2"></i>Manage Registrations
-            </a>
+            <x-button-link href="{{ route('admin.registrations.index') }}"
+               icon="fas fa-arrow-up-right-from-square" class="shadow-sm">Manage Registrations</x-button-link>
         </div>
 
         <div class="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-3">

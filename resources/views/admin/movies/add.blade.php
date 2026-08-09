@@ -71,9 +71,9 @@
                                    class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
                                    value="">
                         </div>
-                        <button type="submit" class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 whitespace-nowrap">
-                            <i class="fas fa-plus mr-2"></i>Add Movie
-                        </button>
+                        <x-button type="submit" icon="fas fa-plus" class="whitespace-nowrap">
+                            Add Movie
+                        </x-button>
                     </div>
                     <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                         Enter only the numeric part of the IMDB ID (without 'tt' prefix)
@@ -92,9 +92,9 @@
                 </div>
 
                 <div class="mt-6 flex gap-3">
-                    <a href="{{ url('admin/movie-list') }}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                        <i class="fas fa-arrow-left mr-2"></i>Back to Movie List
-                    </a>
+                    <x-button-link href="{{ url('admin/movie-list') }}" variant="secondary" icon="fas fa-arrow-left">
+                        Back to Movie List
+                    </x-button-link>
                 </div>
             </div>
         </form>

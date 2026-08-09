@@ -84,12 +84,8 @@
                 </div>
 
                 <div class="mt-4 flex gap-2">
-                    <button type="submit" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-md hover:bg-primary-700">
-                        <i class="fa fa-search mr-2"></i>Search
-                    </button>
-                    <a href="{{ url('/Games') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300">
-                        <i class="fa fa-times mr-2"></i>Clear
-                    </a>
+                    <x-button type="submit" icon="fa fa-search">Search</x-button>
+                    <x-button-link variant="muted" icon="fa fa-times" href="{{ url('/Games') }}">Clear</x-button-link>
                 </div>
             </form>
         </div>
@@ -193,9 +189,7 @@
                 <i class="fa fa-gamepad text-yellow-600 dark:text-yellow-500 text-5xl mb-4"></i>
                 <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">No games found</h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-4">Try adjusting your search filters or browse all games.</p>
-                <a href="{{ url('/Games') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
-                    <i class="fa fa-gamepad mr-2"></i> Browse All Games
-                </a>
+                <x-button-link href="{{ url('/Games') }}" icon="fa fa-gamepad">Browse All Games</x-button-link>
             </div>
         @endif
     </div>

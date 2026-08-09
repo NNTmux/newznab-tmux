@@ -111,13 +111,14 @@
 
                     <!-- Submit Button -->
                     <div class="pt-2">
-                        <button
+                        <x-button
                             type="submit"
-                            class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-150 ease-in-out"
+                            size="lg"
+                            icon="fas fa-check-circle"
+                            class="w-full shadow-sm"
                         >
-                            <i class="fas fa-check-circle mr-2"></i>
                             Reset Password
-                        </button>
+                        </x-button>
                     </div>
                 </form>
             </div>

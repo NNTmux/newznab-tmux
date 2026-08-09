@@ -13,10 +13,7 @@
                     <div class="text-sm text-gray-600 dark:text-gray-400">
                         Total: {{ $tvshowlist->total() }} shows
                     </div>
-                    <a href="{{ route('admin.show-add') }}"
-                       class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm">
-                        <i class="fas fa-plus mr-2"></i>Add TV Show
-                    </a>
+                    <x-button-link href="{{ route('admin.show-add') }}" variant="success" icon="fas fa-plus">Add TV Show</x-button-link>
                 </div>
             </div>
         </div>
@@ -36,13 +33,9 @@
                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                 </div>
                 <div class="flex items-end space-x-2">
-                    <button type="submit" class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
-                        <i class="fas fa-search mr-2"></i>Search
-                    </button>
+                    <x-button type="submit" icon="fas fa-search">Search</x-button>
                     @if($showname)
-                        <a href="{{ url('admin/show-list') }}" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                            <i class="fas fa-times mr-2"></i>Clear
-                        </a>
+                        <x-button-link href="{{ url('admin/show-list') }}" variant="secondary" icon="fas fa-times">Clear</x-button-link>
                     @endif
                 </div>
             </form>

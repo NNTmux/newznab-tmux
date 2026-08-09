@@ -39,9 +39,7 @@
             <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100 dark:text-white flex items-center">
                 <i class="fa fa-envelope mr-2"></i>My Invitations
             </h5>
-            <a href="{{ url('/invitations/create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                <i class="fas fa-plus mr-1"></i> Send New Invitation
-            </a>
+            <x-button-link href="{{ url('/invitations/create') }}" class="shadow-sm" icon="fas fa-plus">Send New Invitation</x-button-link>
         </div>
         <div class="p-6">
             @if(session('success'))
@@ -184,9 +182,7 @@
                     <i class="fa fa-info-circle text-4xl mb-3"></i>
                     <h5 class="text-lg font-semibold mb-2">No Invitations Found</h5>
                     <p class="mb-4">You haven't sent any invitations yet.</p>
-                    <a href="{{ url('/invitations/create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800">
-                        <i class="fas fa-plus mr-1"></i> Send Your First Invitation
-                    </a>
+                    <x-button-link href="{{ url('/invitations/create') }}" class="shadow-sm" icon="fas fa-plus">Send Your First Invitation</x-button-link>
                 </div>
             @endforelse
 

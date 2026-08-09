@@ -45,16 +45,16 @@
 
     <!-- Action Buttons -->
     <div class="flex flex-wrap gap-3 mb-6">
-        <a class="px-6 py-3 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium"
+        <x-button-link size="lg" icon="fa fa-list" class="shadow-md hover:shadow-lg"
            href="{{ url('/browse/Movies') }}"
            title="Browse all available movies">
-            <i class="fa fa-list mr-2"></i>Browse All Movies
-        </a>
-        <a class="px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium"
+            Browse All Movies
+        </x-button-link>
+        <x-button-link variant="secondary" size="lg" icon="fa fa-rss text-orange-500" class="shadow-md hover:shadow-lg"
            href="{{ url("/rss/mymovies?dl=1&i={$userdata->id}&api_token={$userdata->api_token}") }}"
            title="All movies in your watchlist as an RSS feed">
-            <i class="fa fa-rss mr-2 text-orange-500"></i>RSS Feed
-        </a>
+            RSS Feed
+        </x-button-link>
     </div>
 
     <!-- Movies Table/Cards -->
@@ -101,12 +101,12 @@
                                             @endif
                                         </div>
                                         <div class="flex gap-2 ml-4">
-                                            <a class="inline-flex items-center px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 shadow hover:shadow-md transition-all duration-200 text-sm font-medium"
+                                            <x-button-link variant="warning" icon="fa fa-edit" class="shadow hover:shadow-md"
                                                href="{{ url("/mymovies?id=edit&imdb={$movie['imdbid']}") }}"
                                                title="Edit Categories">
-                                                <i class="fa fa-edit mr-1.5"></i>Edit
-                                            </a>
-                                            <a class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 shadow hover:shadow-md transition-all duration-200 text-sm font-medium"
+                                                Edit
+                                            </x-button-link>
+                                            <x-button-link variant="danger" icon="fa fa-trash" class="shadow hover:shadow-md"
                                                href="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}"
                                                title="Remove from My Movies"
                                                x-data="confirmLink"
@@ -116,8 +116,8 @@
                                                data-confirm-text="Remove"
                                                data-type="danger"
                                                @click.prevent="navigate()">
-                                                <i class="fa fa-trash mr-1.5"></i>Delete
-                                            </a>
+                                                Delete
+                                            </x-button-link>
                                         </div>
                                     </div>
 
@@ -214,23 +214,21 @@
                                 </span>
                             </div>
                             <div class="flex gap-2">
-                                <a class="px-3 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 text-sm font-medium shadow"
+                                <x-button-link variant="warning" size="icon" icon="fa fa-edit" class="shadow"
                                    href="{{ url("/mymovies?id=edit&imdb={$movie['imdbid']}") }}"
-                                   title="Edit">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                <a class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 text-sm font-medium shadow"
+                                   title="Edit"
+                                   aria-label="Edit"></x-button-link>
+                                <x-button-link variant="danger" size="icon" icon="fa fa-trash" class="shadow"
                                    href="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}"
                                    title="Remove"
+                                   aria-label="Remove"
                                    x-data="confirmLink"
                                    data-url="{{ url("/mymovies?id=delete&imdb={$movie['imdbid']}") }}"
                                    data-title="Remove Movie"
                                    data-message="Are you sure you want to remove this movie from your watchlist?"
                                    data-confirm-text="Remove"
                                    data-type="danger"
-                                   @click.prevent="navigate()">
-                                    <i class="fa fa-trash"></i>
-                                </a>
+                                   @click.prevent="navigate()"></x-button-link>
                             </div>
                         </div>
                     </div>
@@ -248,10 +246,10 @@
                 <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
                     You haven't bookmarked any movies yet. Search for movies and add them to your watchlist.
                 </p>
-                <a href="{{ url('/browse/Movies') }}"
-                   class="inline-flex items-center px-6 py-3 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 shadow-md hover:shadow-lg transition-all duration-200 font-medium">
-                    <i class="fa fa-search mr-2"></i>Browse Movies
-                </a>
+                <x-button-link href="{{ url('/browse/Movies') }}"
+                   size="lg" icon="fa fa-search" class="shadow-md hover:shadow-lg">
+                    Browse Movies
+                </x-button-link>
             </div>
         </div>
     @endif

@@ -64,9 +64,9 @@
                                class="w-full px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400">
                     </div>
                     <div class="flex items-end">
-                        <button type="submit" class="w-full px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-md hover:bg-primary-700 dark:hover:bg-primary-800">
-                            <i class="fas fa-search mr-2"></i>Filter
-                        </button>
+                        <x-button type="submit" icon="fas fa-search" class="w-full">
+                            Filter
+                        </x-button>
                     </div>
                 </div>
                 <div class="mt-4">

@@ -9,9 +9,9 @@
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
                     <i class="fas fa-tag mr-2"></i>{{ $title ?? 'Release Naming Regex List' }}
                 </h1>
-                <a href="{{ url('/admin/release_naming_regexes-edit') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800">
-                    <i class="fas fa-plus mr-2"></i>Add New Regex
-                </a>
+                <x-button-link href="{{ url('/admin/release_naming_regexes-edit') }}" icon="fas fa-plus">
+                    Add New Regex
+                </x-button-link>
             </div>
         </div>
 
@@ -50,9 +50,9 @@
                                class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                                placeholder="Search a group...">
                     </div>
-                    <button class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800" type="submit">
+                    <x-button type="submit">
                         Search
-                    </button>
+                    </x-button>
                 </div>
             </form>
         </div>
@@ -143,9 +143,9 @@
                 <i class="fas fa-exclamation-triangle text-gray-400 text-5xl mb-4"></i>
                 <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No regex patterns found</h3>
                 <p class="text-gray-500 dark:text-gray-400 mb-4">Try a different search term or add a new regex.</p>
-                <a href="{{ url('/admin/release_naming_regexes-edit') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800">
-                    <i class="fas fa-plus mr-2"></i>Add New Regex
-                </a>
+                <x-button-link href="{{ url('/admin/release_naming_regexes-edit') }}" icon="fas fa-plus">
+                    Add New Regex
+                </x-button-link>
             </div>
         @endif
 
@@ -165,9 +165,9 @@
                     <a href="{{ url('/admin/release_naming_regexes-test') }}" class="px-4 py-2 bg-purple-600 dark:bg-purple-700 text-white rounded-lg hover:bg-purple-700 dark:hover:bg-purple-800 text-sm">
                         <i class="fas fa-flask mr-2"></i>Test Regex
                     </a>
-                    <a href="{{ url('/admin/release_naming_regexes-edit') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 text-sm">
-                        <i class="fas fa-plus mr-2"></i>Add New Regex
-                    </a>
+                    <x-button-link href="{{ url('/admin/release_naming_regexes-edit') }}" icon="fas fa-plus">
+                        Add New Regex
+                    </x-button-link>
                 </div>
             </div>
         </div>

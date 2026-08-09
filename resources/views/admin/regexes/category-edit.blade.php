@@ -9,9 +9,9 @@
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
                     <i class="fas fa-edit mr-2"></i>{{ $title ?? 'Category Regex Edit' }}
                 </h1>
-                <a href="{{ url('/admin/category_regexes-list') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200">
-                    <i class="fas fa-arrow-left mr-2"></i>Back to List
-                </a>
+                <x-button-link href="{{ url('/admin/category_regexes-list') }}" variant="muted" icon="fas fa-arrow-left">
+                    Back to List
+                </x-button-link>
             </div>
         </div>
 
@@ -171,12 +171,12 @@
         <!-- Footer -->
         <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50">
             <div class="flex justify-between">
-                <a href="{{ url('/admin/category_regexes-list') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300">
-                    <i class="fas fa-times mr-2"></i>Cancel
-                </a>
-                <button type="submit" form="regexForm" class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700">
-                    <i class="fas fa-save mr-2"></i>Save Changes
-                </button>
+                <x-button-link href="{{ url('/admin/category_regexes-list') }}" variant="muted" icon="fas fa-times">
+                    Cancel
+                </x-button-link>
+                <x-button type="submit" form="regexForm" variant="success" icon="fas fa-save">
+                    Save Changes
+                </x-button>
             </div>
         </div>
     </div>

@@ -12,9 +12,7 @@
                 <div class="space-x-2">
                     <form method="POST" action="{{ url('admin/invitations/cleanup') }}" class="inline">
                         @csrf
-                        <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                            <i class="fas fa-trash mr-2"></i>Cleanup Expired
-                        </button>
+                        <x-button type="submit" variant="danger" icon="fas fa-trash">Cleanup Expired</x-button>
                     </form>
                 </div>
             </div>
@@ -100,12 +98,8 @@
                     </div>
                 </div>
                 <div class="mt-4 flex space-x-2">
-                    <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
-                        <i class="fas fa-filter mr-2"></i>Filter
-                    </button>
-                    <a href="{{ url('admin/invitations') }}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                        <i class="fas fa-times mr-2"></i>Clear
-                    </a>
+                    <x-button type="submit" icon="fas fa-filter">Filter</x-button>
+                    <x-button-link href="{{ url('admin/invitations') }}" variant="secondary" icon="fas fa-times">Clear</x-button-link>
                 </div>
             </form>
         </div>
@@ -205,9 +199,7 @@
                                 <option value="cancel">Cancel Selected</option>
                                 <option value="delete">Delete Selected</option>
                             </select>
-                            <button type="submit" class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900" data-confirm="Are you sure you want to perform this bulk action?">
-                                Apply
-                            </button>
+                            <x-button type="submit" variant="secondary" data-confirm="Are you sure you want to perform this bulk action?">Apply</x-button>
                         </div>
                         <div>
                             {{ $invitations->links() }}

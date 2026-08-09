@@ -74,14 +74,14 @@
                 </div>
 
                 <div class="flex gap-3 pt-4 border-t border-gray-200">
-                    <button class="px-6 py-3 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium"
+                    <x-button size="lg" icon="fa {{ ($type ?? 'add') == 'add' ? 'fa-plus' : 'fa-edit' }}" class="shadow-md hover:shadow-lg"
                             type="submit" name="{{ $type ?? 'add' }}">
-                        <i class="fa {{ ($type ?? 'add') == 'add' ? 'fa-plus' : 'fa-edit' }} mr-2"></i>{{ ucfirst($type ?? 'add') }} Show
-                    </button>
-                    <a href="{{ url('/myshows') }}"
-                       class="px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:bg-gray-900 hover:border-gray-400 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium">
-                        <i class="fa fa-arrow-left mr-2"></i>Back to My Shows
-                    </a>
+                        {{ ucfirst($type ?? 'add') }} Show
+                    </x-button>
+                    <x-button-link href="{{ url('/myshows') }}"
+                       variant="secondary" size="lg" icon="fa fa-arrow-left" class="shadow-md hover:shadow-lg">
+                        Back to My Shows
+                    </x-button-link>
                 </div>
             </form>
         </div>

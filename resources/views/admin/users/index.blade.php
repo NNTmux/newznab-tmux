@@ -432,16 +432,18 @@
             </p>
         </div>
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
-            <button type="button"
+            <x-button type="button"
+                    variant="muted"
                     @click="hide()"
-                    class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition font-medium">
-                <i class="fas fa-times mr-2"></i>Cancel
-            </button>
-            <button type="button"
+                    icon="fas fa-times">
+                Cancel
+            </x-button>
+            <x-button type="button"
+                    variant="success"
                     @click="submit()"
-                    class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition font-medium">
-                <i class="fas fa-check mr-2"></i>Verify
-            </button>
+                    icon="fas fa-check">
+                Verify
+            </x-button>
         </div>
     </div>
 </div>

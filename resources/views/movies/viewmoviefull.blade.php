@@ -210,15 +210,15 @@
                                         </div>
                                     </div>
                                     <div class="flex gap-2 shrink-0">
-                                        <a href="{{ url('/getnzb/' . $release->guid) }}" class="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-700 text-white text-sm font-medium rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition">
-                                            <i class="fas fa-download mr-2"></i> Download
-                                        </a>
-                                        <button class="add-to-cart inline-flex items-center px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white text-sm font-medium rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition" data-guid="{{ $release->guid }}">
-                                            <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
-                                        </button>
-                                        <a href="{{ url('/details/' . $release->guid) }}" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition">
-                                            <i class="fas fa-info-circle mr-2"></i> Details
-                                        </a>
+                                        <x-button-link href="{{ url('/getnzb/' . $release->guid) }}" variant="success" icon="fas fa-download">
+                                            Download
+                                        </x-button-link>
+                                        <x-button class="add-to-cart" icon="fas fa-shopping-cart" data-guid="{{ $release->guid }}">
+                                            Add to Cart
+                                        </x-button>
+                                        <x-button-link href="{{ url('/details/' . $release->guid) }}" variant="secondary" icon="fas fa-info-circle">
+                                            Details
+                                        </x-button-link>
                                     </div>
                                 </div>
                             </div>

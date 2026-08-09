@@ -123,12 +123,12 @@
 
                                     <!-- Action Buttons -->
                                     <div class="flex gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                        <a href="{{ route('series', ['id' => $show->id]) }}" class="inline-flex items-center px-6 py-2.5 bg-primary-600 dark:bg-primary-700 text-white font-medium rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition shadow-md">
-                                            <i class="fas fa-eye mr-2"></i> View All Episodes
-                                        </a>
-                                        <a href="{{ route('series') }}?title={{ urlencode($show->title) }}" class="inline-flex items-center px-6 py-2.5 bg-gray-600 text-white font-medium rounded-lg hover:bg-gray-700 transition shadow-md">
-                                            <i class="fas fa-search mr-2"></i> Search Similar
-                                        </a>
+                                        <x-button-link href="{{ route('series', ['id' => $show->id]) }}" size="lg" icon="fas fa-eye" class="shadow-md">
+                                            View All Episodes
+                                        </x-button-link>
+                                        <x-button-link href="{{ route('series') }}?title={{ urlencode($show->title) }}" variant="secondary" size="lg" icon="fas fa-search" class="shadow-md">
+                                            Search Similar
+                                        </x-button-link>
                                     </div>
                                 </div>
                             </div>

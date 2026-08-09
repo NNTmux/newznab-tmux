@@ -61,12 +61,8 @@
                 <div class="flex flex-wrap gap-2">
                     <input type="hidden" name="sort" value="{{ $sort }}">
                     <input type="hidden" name="order" value="{{ $order }}">
-                    <button type="submit" class="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-800">
-                        <i class="fas fa-filter mr-2"></i>Apply filters
-                    </button>
-                    <a href="{{ route('admin.payment-list') }}" class="inline-flex items-center rounded-md bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
-                        Reset
-                    </a>
+                    <x-button type="submit" icon="fas fa-filter">Apply filters</x-button>
+                    <x-button-link variant="muted" href="{{ route('admin.payment-list') }}">Reset</x-button-link>
                 </div>
             </form>
         </div>

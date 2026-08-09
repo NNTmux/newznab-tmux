@@ -30,13 +30,9 @@
                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-primary-500 focus:border-primary-500">
                 </div>
                 <div class="flex items-end space-x-2">
-                    <button type="submit" class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
-                        <i class="fas fa-search mr-2"></i>Search
-                    </button>
+                    <x-button type="submit" icon="fas fa-search">Search</x-button>
                     @if($lastSearch)
-                        <a href="{{ url('admin/predb') }}" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                            <i class="fas fa-times mr-2"></i>Clear
-                        </a>
+                        <x-button-link href="{{ url('admin/predb') }}" variant="secondary" icon="fas fa-times">Clear</x-button-link>
                     @endif
                 </div>
             </form>

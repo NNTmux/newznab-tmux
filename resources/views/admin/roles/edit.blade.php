@@ -232,12 +232,8 @@
 
                     <!-- Action Buttons -->
                     <div class="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <button type="submit" class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800">
-                            <i class="fas fa-save mr-2"></i>Update Role
-                        </button>
-                        <a href="{{ url('admin/role-list') }}" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
-                            <i class="fas fa-times mr-2"></i>Cancel
-                        </a>
+                        <x-button type="submit" icon="fas fa-save">Update Role</x-button>
+                        <x-button-link href="{{ url('admin/role-list') }}" variant="muted" icon="fas fa-times">Cancel</x-button-link>
                     </div>
                 </div>
             </form>
@@ -246,9 +242,9 @@
                 <i class="fas fa-exclamation-circle text-red-400 text-5xl mb-4"></i>
                 <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Role not found</h3>
                 <p class="text-gray-500 mb-4">The requested role could not be found.</p>
-                <a href="{{ url('admin/role-list') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
-                    <i class="fas fa-arrow-left mr-2"></i> Back to Role List
-                </a>
+                <x-button-link href="{{ url('admin/role-list') }}" icon="fas fa-arrow-left">
+                    Back to Role List
+                </x-button-link>
             </div>
         @endif
     </div>

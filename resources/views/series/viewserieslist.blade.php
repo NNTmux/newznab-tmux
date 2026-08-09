@@ -38,12 +38,8 @@
                 <a href="{{ route('trending-tv') }}" class="inline-flex items-center px-4 py-2 bg-linear-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition shadow-md">
                     <i class="fas fa-fire mr-2"></i> View Trending TV Shows
                 </a>
-                <a class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded hover:bg-primary-700 dark:hover:bg-primary-800 inline-flex items-center" href="{{ route('myshows') }}" title="List my watched shows">
-                    <i class="fa fa-list mr-2"></i>My Shows
-                </a>
-                <a class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 inline-flex items-center" href="{{ url('/myshows/browse') }}" title="Browse your shows">
-                    <i class="fa fa-search mr-2"></i>Find My Shows
-                </a>
+                <x-button-link icon="fa fa-list" href="{{ route('myshows') }}" title="List my watched shows">My Shows</x-button-link>
+                <x-button-link variant="success" icon="fa fa-search" href="{{ url('/myshows/browse') }}" title="Browse your shows">Find My Shows</x-button-link>
             </div>
 
             <!-- Search form -->
@@ -53,9 +49,7 @@
                        name="title"
                        value="{{ $showname ?? '' }}"
                        placeholder="Search series">
-                <button class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded hover:bg-primary-700 dark:hover:bg-primary-800" type="submit" title="Search series">
-                    <i class="fa fa-search"></i>
-                </button>
+                <x-button type="submit" icon="fa fa-search" title="Search series" aria-label="Search series"></x-button>
             </form>
         </div>
 
@@ -112,20 +106,14 @@
                                         <td class="px-4 py-3 text-center">
                                             @if(!empty($sData['userseriesid']))
                                                 <div class="flex justify-center gap-1">
-                                                    <a href="{{ url('/myshows?action=edit&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
-                                                       class="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm" title="Edit this show">
-                                                        <i class="fa fa-edit"></i>
-                                                    </a>
-                                                    <a href="{{ url('/myshows?action=delete&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
-                                                       class="px-2 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 text-sm" title="Remove from My Shows">
-                                                        <i class="fa fa-trash"></i>
-                                                    </a>
+                                                    <x-button-link href="{{ url('/myshows?action=edit&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
+                                                       variant="warning" size="sm" icon="fa fa-edit" title="Edit this show" aria-label="Edit this show"></x-button-link>
+                                                    <x-button-link href="{{ url('/myshows?action=delete&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
+                                                       variant="danger" size="sm" icon="fa fa-trash" title="Remove from My Shows" aria-label="Remove from My Shows"></x-button-link>
                                                 </div>
                                             @else
-                                                <a href="{{ url('/myshows?action=add&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
-                                                   class="px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 text-sm inline-flex items-center" title="Add to My Shows">
-                                                    <i class="fa fa-plus mr-1"></i>Add
-                                                </a>
+                                                <x-button-link href="{{ url('/myshows?action=add&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
+                                                   variant="success" size="sm" icon="fa fa-plus" title="Add to My Shows">Add</x-button-link>
                                             @endif
                                         </td>
                                         <td class="px-4 py-3">
@@ -178,16 +166,14 @@
                                     </div>
                                     @if(!empty($sData['userseriesid']))
                                         <div class="flex gap-1 shrink-0">
-                                            <a href="{{ url('/myshows?action=edit&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
-                                               class="px-2 py-1 bg-yellow-500 text-white rounded text-xs" title="Edit"><i class="fa fa-edit"></i></a>
-                                            <a href="{{ url('/myshows?action=delete&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
-                                               class="px-2 py-1 bg-red-600 text-white rounded text-xs" title="Remove"><i class="fa fa-trash"></i></a>
+                                            <x-button-link href="{{ url('/myshows?action=edit&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
+                                               variant="warning" size="sm" icon="fa fa-edit" title="Edit" aria-label="Edit"></x-button-link>
+                                            <x-button-link href="{{ url('/myshows?action=delete&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
+                                               variant="danger" size="sm" icon="fa fa-trash" title="Remove" aria-label="Remove"></x-button-link>
                                         </div>
                                     @else
-                                        <a href="{{ url('/myshows?action=add&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
-                                           class="px-2 py-1 bg-green-600 text-white rounded text-xs shrink-0" title="Add to My Shows">
-                                            <i class="fa fa-plus mr-1"></i>Add
-                                        </a>
+                                        <x-button-link href="{{ url('/myshows?action=add&id=' . $sData['id'] . '&from=' . urlencode(request()->fullUrl())) }}"
+                                           variant="success" size="sm" icon="fa fa-plus" class="shrink-0" title="Add to My Shows">Add</x-button-link>
                                     @endif
                                 </div>
                                 @if(!empty($sData['prevdate']))

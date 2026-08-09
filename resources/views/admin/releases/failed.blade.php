@@ -9,9 +9,7 @@
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
                     <i class="fas fa-exclamation-triangle mr-2"></i>{{ $title }}
                 </h1>
-                <a href="{{ url('/admin/release-list') }}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                    <i class="fas fa-list mr-2"></i>View All Releases
-                </a>
+                <x-button-link href="{{ url('/admin/release-list') }}" variant="secondary" icon="fas fa-list">View All Releases</x-button-link>
             </div>
         </div>
 
@@ -54,13 +52,9 @@
                                placeholder="Search by name or category..."
                                class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
-                    <button type="submit" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
-                        Search
-                    </button>
+                    <x-button type="submit">Search</x-button>
                     @if(request('failrelsearch'))
-                        <a href="{{ url('/admin/failrel-list') }}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                            Clear
-                        </a>
+                        <x-button-link href="{{ url('/admin/failrel-list') }}" variant="secondary">Clear</x-button-link>
                     @endif
                 </div>
             </form>

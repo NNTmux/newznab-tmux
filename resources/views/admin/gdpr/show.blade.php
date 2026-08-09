@@ -8,9 +8,7 @@
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
                     <i class="fas fa-shield-alt mr-2"></i>{{ $title }}
                 </h1>
-                <a href="{{ route('admin.gdpr-requests.index') }}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                    <i class="fas fa-arrow-left mr-2"></i>Back
-                </a>
+                <x-button-link href="{{ route('admin.gdpr-requests.index') }}" variant="secondary" icon="fas fa-arrow-left">Back</x-button-link>
             </div>
         </div>
 
@@ -105,18 +103,14 @@
                     @if($gdprRequest->type === \App\Models\GdprRequest::TYPE_EXPORT && in_array($gdprRequest->status, [\App\Models\GdprRequest::STATUS_PENDING, \App\Models\GdprRequest::STATUS_PROCESSING], true))
                         <form method="post" action="{{ route('admin.gdpr-requests.generate-export', $gdprRequest) }}" class="mb-3">
                             @csrf
-                            <button type="submit" class="w-full px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-md hover:bg-primary-700">
-                                <i class="fas fa-file-export mr-2"></i>Generate Export
-                            </button>
+                            <x-button type="submit" class="w-full" icon="fas fa-file-export">Generate Export</x-button>
                         </form>
                     @endif
 
                     @if($gdprRequest->type === \App\Models\GdprRequest::TYPE_ERASURE && in_array($gdprRequest->status, [\App\Models\GdprRequest::STATUS_PENDING, \App\Models\GdprRequest::STATUS_PROCESSING], true))
                         <form method="post" action="{{ route('admin.gdpr-requests.complete-erasure', $gdprRequest) }}" class="mb-3">
                             @csrf
-                            <button type="submit" class="w-full px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-md hover:bg-red-700" data-confirm="Complete GDPR erasure for this account? Retained payment and audit records will be anonymized or minimized where practical.">
-                                <i class="fas fa-user-slash mr-2"></i>Complete Erasure
-                            </button>
+                            <x-button type="submit" variant="danger" class="w-full" icon="fas fa-user-slash" data-confirm="Complete GDPR erasure for this account? Retained payment and audit records will be anonymized or minimized where practical.">Complete Erasure</x-button>
                         </form>
                     @endif
 
@@ -125,9 +119,7 @@
                             @csrf
                             <label for="admin_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rejection reason</label>
                             <textarea id="admin_notes" name="admin_notes" rows="4" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md" required></textarea>
-                            <button type="submit" class="mt-3 w-full px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800">
-                                <i class="fas fa-ban mr-2"></i>Reject Request
-                            </button>
+                            <x-button type="submit" variant="secondary" class="mt-3 w-full" icon="fas fa-ban">Reject Request</x-button>
                         </form>
                     @else
                         <p class="text-sm text-gray-500 dark:text-gray-400">No actions available for completed, cancelled, or rejected requests.</p>

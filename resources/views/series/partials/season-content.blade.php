@@ -45,21 +45,26 @@
                                     </div>
                                 </div>
                                 <div class="flex gap-2">
-                                    <a href="{{ url('/getnzb?id=' . $release->guid) }}"
-                                       class="download-nzb px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 text-sm"
+                                    <x-button-link href="{{ url('/getnzb?id=' . $release->guid) }}"
+                                       variant="success"
+                                       size="sm"
+                                       icon="fa fa-download"
+                                       class="download-nzb"
                                        title="Download NZB">
-                                        <i class="fa fa-download"></i>
-                                    </a>
-                                    <a href="{{ url('/details/' . $release->guid) }}"
-                                       class="px-3 py-1 bg-primary-600 dark:bg-primary-700 text-white rounded hover:bg-primary-700 dark:hover:bg-primary-800 text-sm"
+                                    </x-button-link>
+                                    <x-button-link href="{{ url('/details/' . $release->guid) }}"
+                                       size="sm"
+                                       icon="fa fa-info-circle"
                                        title="View Details">
-                                        <i class="fa fa-info-circle"></i>
-                                    </a>
-                                    <a href="#" class="add-to-cart px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 text-sm"
+                                    </x-button-link>
+                                    <x-button-link href="#"
+                                       variant="muted"
+                                       size="sm"
+                                       icon="icon_cart fa fa-shopping-basket"
+                                       class="add-to-cart"
                                        data-guid="{{ $release->guid }}"
                                        title="Add to cart">
-                                        <i class="icon_cart fa fa-shopping-basket"></i>
-                                    </a>
+                                    </x-button-link>
                                 </div>
                             </div>
                         @endforeach

@@ -18,22 +18,23 @@
 
             <form method="POST" action="{{ route('verification.send') }}" class="space-y-4">
                 @csrf
-                <button
+                <x-button
                     type="submit"
-                    class="w-full inline-flex justify-center rounded-md bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                    class="w-full"
                 >
                     Resend verification email
-                </button>
+                </x-button>
             </form>
 
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button
+                <x-button
                     type="submit"
-                    class="w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    variant="secondary"
+                    class="w-full"
                 >
                     Sign out
-                </button>
+                </x-button>
             </form>
         </div>
     </div>

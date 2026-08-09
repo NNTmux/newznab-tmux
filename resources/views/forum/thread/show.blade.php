@@ -98,7 +98,7 @@
                             <x-forum.button-link href="{{ Forum::route('post.create', $thread) }}">
                                 {{ trans('forum::general.new_reply') }}
                             </x-forum.button-link>
-                            <x-forum.button-link href="#quick-reply" class="btn btn-primary">
+                            <x-forum.button-link href="#quick-reply">
                                 {{ trans('forum::general.quick_reply') }}
                             </x-forum.button-link>
                         </x-forum.button-group>
@@ -150,7 +150,7 @@
                                 @endif
 
                                 <div class="text-end">
-                                    <button type="submit" class="btn btn-primary" @click="submitPosts">{{ trans('forum::general.proceed') }}</button>
+                                    <x-forum.button type="submit" @click="submitPosts">{{ trans('forum::general.proceed') }}</x-forum.button>
                                 </div>
                             </div>
                         </div>
@@ -191,7 +191,7 @@
             {{ trans('forum::general.generic_confirm') }}
 
             @slot('actions')
-                <button type="submit" class="btn btn-primary">{{ trans('forum::general.proceed') }}</button>
+                <x-forum.button type="submit">{{ trans('forum::general.proceed') }}</x-forum.button>
             @endslot
         @endcomponent
     @endif
@@ -215,7 +215,7 @@
             @endif
 
             @slot('actions')
-                <button type="submit" class="btn btn-danger">{{ trans('forum::general.proceed') }}</button>
+                <x-forum.button type="submit" class="bg-red-500">{{ trans('forum::general.proceed') }}</x-forum.button>
             @endslot
         @endcomponent
 
@@ -231,7 +231,7 @@
                 {{ trans('forum::general.generic_confirm') }}
 
                 @slot('actions')
-                    <button type="submit" class="btn btn-danger">{{ trans('forum::general.proceed') }}</button>
+                    <x-forum.button type="submit" class="bg-red-500">{{ trans('forum::general.proceed') }}</x-forum.button>
                 @endslot
             @endcomponent
         @endif
@@ -249,7 +249,7 @@
                     {{ trans('forum::general.generic_confirm') }}
 
                     @slot('actions')
-                        <button type="submit" class="btn btn-primary">{{ trans('forum::general.proceed') }}</button>
+                        <x-forum.button type="submit">{{ trans('forum::general.proceed') }}</x-forum.button>
                     @endslot
                 @endcomponent
             @else
@@ -262,7 +262,7 @@
                     {{ trans('forum::general.generic_confirm') }}
 
                     @slot('actions')
-                        <button type="submit" class="btn btn-primary">{{ trans('forum::general.proceed') }}</button>
+                        <x-forum.button type="submit">{{ trans('forum::general.proceed') }}</x-forum.button>
                     @endslot
                 @endcomponent
             @endif
@@ -279,7 +279,7 @@
                     {{ trans('forum::general.generic_confirm') }}
 
                     @slot('actions')
-                        <button type="submit" class="btn btn-primary">{{ trans('forum::general.proceed') }}</button>
+                        <x-forum.button type="submit">{{ trans('forum::general.proceed') }}</x-forum.button>
                     @endslot
                 @endcomponent
             @else
@@ -292,7 +292,7 @@
                     {{ trans('forum::general.generic_confirm') }}
 
                     @slot('actions')
-                        <button type="submit" class="btn btn-primary">{{ trans('forum::general.proceed') }}</button>
+                        <x-forum.button type="submit">{{ trans('forum::general.proceed') }}</x-forum.button>
                     @endslot
                 @endcomponent
             @endif
@@ -333,7 +333,7 @@
                 </div>
 
                 @slot('actions')
-                    <button type="submit" class="btn btn-primary">{{ trans('forum::general.proceed') }}</button>
+                    <x-forum.button type="submit">{{ trans('forum::general.proceed') }}</x-forum.button>
                 @endslot
             @endcomponent
         @endcan

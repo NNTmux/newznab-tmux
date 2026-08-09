@@ -13,9 +13,7 @@
                     <a href="{{ route('admin.promotions.statistics') }}" class="px-4 py-2 bg-purple-600 dark:bg-purple-700 text-white rounded-lg hover:bg-purple-700">
                         <i class="fas fa-chart-bar mr-2"></i>View Statistics
                     </a>
-                    <a href="{{ route('admin.promotions.create') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
-                        <i class="fas fa-plus mr-2"></i>Add New Promotion
-                    </a>
+                    <x-button-link href="{{ route('admin.promotions.create') }}" icon="fas fa-plus">Add New Promotion</x-button-link>
                 </div>
             </div>
         </div>

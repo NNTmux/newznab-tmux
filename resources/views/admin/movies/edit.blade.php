@@ -117,11 +117,12 @@
                                    value="{{ $movie['imdbid'] ?? $movie->imdbid ?? '' }}"
                                    readonly
                                    class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-100 dark:bg-gray-700 dark:text-gray-300">
-                            <a href="{{ $site['dereferrer_link'] }}https://www.imdb.com/title/tt{{ $movie['imdbid'] ?? $movie->imdbid ?? '' }}"
+                            <x-button-link href="{{ $site['dereferrer_link'] }}https://www.imdb.com/title/tt{{ $movie['imdbid'] ?? $movie->imdbid ?? '' }}"
                                target="_blank"
-                               class="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600">
-                                <i class="fas fa-external-link"></i> View on IMDB
-                            </a>
+                               variant="warning"
+                               icon="fas fa-external-link">
+                                View on IMDB
+                            </x-button-link>
                         </div>
                     </div>
 
@@ -241,17 +242,15 @@
 
                     <!-- Action Buttons -->
                     <div class="flex gap-3 pt-4 border-t border-gray-200">
-                        <button type="submit" class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
-                            <i class="fas fa-save mr-2"></i>Save Changes
-                        </button>
-                        <a href="{{ url('admin/movie-list') }}" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                            <i class="fas fa-times mr-2"></i>Cancel
-                        </a>
-                        <a href="{{ url('admin/movie-edit?id=' . ($movie['imdbid'] ?? $movie->imdbid ?? '') . '&update=1') }}"
-                           class="ml-auto px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                        <x-button type="submit" icon="fas fa-save">Save Changes</x-button>
+                        <x-button-link href="{{ url('admin/movie-list') }}" variant="secondary" icon="fas fa-times">Cancel</x-button-link>
+                        <x-button-link href="{{ url('admin/movie-edit?id=' . ($movie['imdbid'] ?? $movie->imdbid ?? '') . '&update=1') }}"
+                           variant="success"
+                           class="ml-auto"
+                           icon="fas fa-refresh"
                            data-confirm="This will fetch and update movie data from TMDB. Continue?">
-                            <i class="fas fa-refresh mr-2"></i>Update from TMDB
-                        </a>
+                            Update from TMDB
+                        </x-button-link>
                     </div>
                 </div>
             </div>
@@ -270,9 +269,7 @@
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
                     <i class="fas fa-film mr-2"></i>{{ $title }}
                 </h1>
-                <a href="{{ url('admin/movie-add') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
-                    <i class="fas fa-plus mr-2"></i>Add Movie
-                </a>
+                <x-button-link href="{{ url('admin/movie-add') }}" icon="fas fa-plus">Add Movie</x-button-link>
             </div>
         </div>
 
@@ -290,13 +287,9 @@
                                placeholder="Search by IMDB ID or movie title..."
                                class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white">
                     </div>
-                    <button type="submit" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
-                        Search
-                    </button>
+                    <x-button type="submit">Search</x-button>
                     @if(!empty($lastSearch))
-                        <a href="{{ url('admin/movie-list') }}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                            Clear
-                        </a>
+                        <x-button-link href="{{ url('admin/movie-list') }}" variant="secondary">Clear</x-button-link>
                     @endif
                 </div>
             </form>
@@ -383,9 +376,7 @@
                         No movies found in the database.
                     @endif
                 </p>
-                <a href="{{ url('admin/movie-add') }}" class="mt-4 inline-block px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
-                    <i class="fas fa-plus mr-2"></i>Add Your First Movie
-                </a>
+                <x-button-link href="{{ url('admin/movie-add') }}" class="mt-4" icon="fas fa-plus">Add Your First Movie</x-button-link>
             </div>
         @endif
     </div>

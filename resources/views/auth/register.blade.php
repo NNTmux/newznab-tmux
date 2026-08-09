@@ -208,13 +208,7 @@
 
                     <!-- Submit Button -->
                     <div>
-                        <button
-                            type="submit"
-                            class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-150 ease-in-out"
-                        >
-                            <i class="fas fa-user-plus mr-2"></i>
-                            Create Account
-                        </button>
+                        <x-button type="submit" size="lg" class="w-full shadow-sm" icon="fas fa-user-plus">Create Account</x-button>
                     </div>
                 </form>
                 @endif

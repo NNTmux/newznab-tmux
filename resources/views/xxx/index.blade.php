@@ -90,13 +90,13 @@
                                 </td>
                                 <td class="px-3 py-4 whitespace-nowrap">
                                     <div class="flex items-center gap-1">
-                                        <a href="{{ url('/getnzb/' . $result->guid) }}" class="px-2 py-1 bg-green-600 dark:bg-green-700 text-white rounded text-sm hover:bg-green-700 dark:hover:bg-green-800" title="Download NZB">
+                                        <a href="{{ url('/getnzb/' . $result->guid) }}" class="release-action release-action-download" title="Download NZB">
                                             <i class="fa fa-download"></i>
                                         </a>
-                                        <a href="{{ url('/details/' . $result->guid) }}" class="px-2 py-1 bg-primary-600 dark:bg-primary-700 text-white rounded text-sm hover:bg-primary-700 dark:hover:bg-primary-800" title="Details">
+                                        <a href="{{ url('/details/' . $result->guid) }}" class="release-action release-action-primary" title="Details">
                                             <i class="fa fa-info"></i>
                                         </a>
-                                        <a href="#" class="add-to-cart px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-sm hover:bg-gray-300 dark:hover:bg-gray-600" data-guid="{{ $result->guid }}" title="Add to Cart">
+                                        <a href="#" class="add-to-cart release-action release-action-muted" data-guid="{{ $result->guid }}" title="Add to Cart">
                                             <i class="fa fa-shopping-cart"></i>
                                         </a>
                                     </div>

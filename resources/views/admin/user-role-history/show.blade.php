@@ -10,12 +10,12 @@
                     <i class="fas fa-history mr-2"></i>{{ $title }}
                 </h1>
                 <div class="flex gap-2">
-                    <a href="{{ url('admin/user-edit?id=' . $user->id) }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800">
-                        <i class="fas fa-edit mr-2"></i>Edit User
-                    </a>
-                    <a href="{{ url('admin/user-role-history') }}" class="px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-800">
-                        <i class="fas fa-arrow-left mr-2"></i>Back to All
-                    </a>
+                    <x-button-link href="{{ url('admin/user-edit?id=' . $user->id) }}" icon="fas fa-edit">
+                        Edit User
+                    </x-button-link>
+                    <x-button-link href="{{ url('admin/user-role-history') }}" variant="secondary" icon="fas fa-arrow-left">
+                        Back to All
+                    </x-button-link>
                 </div>
             </div>
         </div>

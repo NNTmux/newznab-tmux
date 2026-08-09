@@ -124,18 +124,18 @@
                             <h6 class="font-semibold mb-2">This invitation has already been used</h6>
                             <p class="mb-0">The account has been successfully created using this invitation.</p>
                         </div>
-                        <a href="{{ url('/login') }}" class="inline-flex items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                            <i class="fas fa-sign-in-alt mr-2"></i> Login to Your Account
-                        </a>
+                        <x-button-link href="{{ url('/login') }}" size="lg" icon="fas fa-sign-in-alt">
+                            Login to Your Account
+                        </x-button-link>
                     @elseif($preview['expires_at'] < time())
                         <div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-6 mb-4 dark:bg-red-900 dark:border-red-700 dark:text-red-300">
                             <i class="fas fa-exclamation-triangle text-4xl mb-2"></i>
                             <h6 class="font-semibold mb-2">This invitation has expired</h6>
                             <p class="mb-0">Please contact the person who invited you for a new invitation.</p>
                         </div>
-                        <a href="{{ url('/contact') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
-                            <i class="fa fa-envelope mr-1"></i> Contact Support
-                        </a>
+                        <x-button-link href="{{ url('/contact') }}" variant="secondary" icon="fa fa-envelope">
+                            Contact Support
+                        </x-button-link>
                     @elseif($registrationStatus['is_closed'])
                         <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-6 mb-4 dark:bg-yellow-900 dark:border-yellow-700 dark:text-yellow-300">
                             <i class="fas fa-door-closed text-4xl mb-2"></i>
@@ -143,9 +143,9 @@
                             <p class="mb-0">{{ $registrationStatus['message'] }}</p>
                         </div>
                     @else
-                        <a href="{{ route('register', ['token' => $token]) }}" class="inline-flex items-center px-6 py-3 border border-transparent rounded-md shadow-lg text-base font-medium text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                            <i class="fas fa-user-plus mr-2"></i> Accept Invitation & Create Account
-                        </a>
+                        <x-button-link href="{{ route('register', ['token' => $token]) }}" size="lg" icon="fas fa-user-plus">
+                            Accept Invitation & Create Account
+                        </x-button-link>
                         <div class="mt-3">
                             <small class="text-gray-500 dark:text-gray-400">
                                 Already have an account? <a href="{{ url('/login') }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 dark:text-primary-400 dark:hover:text-primary-300">Login here</a>
@@ -159,13 +159,13 @@
                     <h5 class="text-xl font-semibold text-red-600 mb-3 dark:text-red-400">Invalid Invitation</h5>
                     <p class="mb-4">This invitation link is not valid, has expired, or has been removed.</p>
                     <div class="flex flex-col sm:flex-row gap-2 justify-center">
-                        <a href="{{ url('/contact') }}" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
-                            <i class="fa fa-envelope mr-1"></i> Contact Support
-                        </a>
+                        <x-button-link href="{{ url('/contact') }}" variant="secondary" icon="fa fa-envelope">
+                            Contact Support
+                        </x-button-link>
                         @if($registrationStatus['is_open'])
-                            <a href="{{ url('/register') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                                <i class="fa fa-user-plus mr-1"></i> Register Without Invitation
-                            </a>
+                            <x-button-link href="{{ url('/register') }}" icon="fa fa-user-plus">
+                                Register Without Invitation
+                            </x-button-link>
                         @endif
                     </div>
                 </div>

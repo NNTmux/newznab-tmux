@@ -19,8 +19,8 @@
             </div>
 
             <div class="text-end">
-                <a href="{{ URL::previous() }}" class="btn btn-link">{{ trans('forum::general.cancel') }}</a>
-                <button type="submit" class="btn btn-primary px-5">{{ trans('forum::general.restore') }}</button>
+                <x-button-link href="{{ URL::previous() }}" variant="ghost">{{ trans('forum::general.cancel') }}</x-button-link>
+                <x-forum.button type="submit" class="px-5">{{ trans('forum::general.restore') }}</x-forum.button>
             </div>
         </form>
     </div>

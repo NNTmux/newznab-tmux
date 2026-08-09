@@ -5,9 +5,7 @@
     <x-admin.card>
         <x-admin.page-header :title="$title" icon="fas fa-film">
             <x-slot:actions>
-                <a href="{{ url('admin/movie-add') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800">
-                    <i class="fas fa-plus mr-2"></i>Add Movie
-                </a>
+                <x-button-link href="{{ url('admin/movie-add') }}" icon="fas fa-plus">Add Movie</x-button-link>
             </x-slot:actions>
         </x-admin.page-header>
 
@@ -25,13 +23,9 @@
                                placeholder="Search by IMDB ID or movie title..."
                                class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100">
                     </div>
-                    <button type="submit" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800">
-                        Search
-                    </button>
+                    <x-button type="submit">Search</x-button>
                     @if(!empty($lastSearch))
-                        <a href="{{ url('admin/movie-list') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
-                            Clear
-                        </a>
+                        <x-button-link href="{{ url('admin/movie-list') }}" variant="muted">Clear</x-button-link>
                     @endif
                 </div>
             </form>

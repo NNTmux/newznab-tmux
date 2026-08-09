@@ -41,13 +41,13 @@
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fa fa-search"></i>Search
-                    </button>
+                    <x-button type="submit" icon="fa fa-search">
+                        Search
+                    </x-button>
                     @if(!empty($search))
-                        <a href="{{ url('/browsegroup') }}" class="btn bg-gray-500 text-white border-gray-500 hover:bg-gray-600">
-                            <i class="fa fa-times"></i>Clear
-                        </a>
+                        <x-button-link href="{{ url('/browsegroup') }}" variant="secondary" icon="fa fa-times">
+                            Clear
+                        </x-button-link>
                     @endif
                 </div>
             </div>

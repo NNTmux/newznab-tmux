@@ -17,7 +17,7 @@
             </div>
         </div>
         <div class="panel-footer clearfix">
-            <button type="submit" class="btn btn-default pull-right">{{ trans('forum::general.proceed') }}</button>
+            <x-forum.button-secondary type="submit" class="pull-right">{{ trans('forum::general.proceed') }}</x-forum.button-secondary>
         </div>
     </div>
 </div>

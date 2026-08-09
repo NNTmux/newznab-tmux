@@ -101,8 +101,8 @@
                 </div>
 
                 <div class="flex flex-wrap gap-3">
-                    <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">Save</button>
-                    <a href="{{ route('admin.status.index') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">Cancel</a>
+                    <x-button type="submit">Save</x-button>
+                    <x-button-link href="{{ route('admin.status.index') }}" variant="muted">Cancel</x-button-link>
                 </div>
             </form>
         </div>

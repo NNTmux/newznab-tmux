@@ -182,21 +182,27 @@
 
                                         {{-- Action Buttons --}}
                                         <div class="release-actions">
-                                            <a href="{{ url('/getnzb/' . $release->guid) }}"
-                                               class="inline-flex items-center px-3 py-1 rounded text-xs font-medium bg-green-600 dark:bg-green-700 text-white hover:bg-green-700 dark:hover:bg-green-800 transition">
-                                                <i class="fas fa-download mr-1"></i> Download
-                                            </a>
+                                            <x-button-link href="{{ url('/getnzb/' . $release->guid) }}"
+                                               variant="success"
+                                               size="sm"
+                                               icon="fas fa-download">
+                                                Download
+                                            </x-button-link>
 
-                                            <button type="button"
-                                                    class="add-to-cart inline-flex items-center px-3 py-1 rounded text-xs font-medium bg-primary-600 dark:bg-primary-700 text-white hover:bg-primary-700 dark:hover:bg-primary-800 transition"
+                                            <x-button type="button"
+                                                    size="sm"
+                                                    icon="fas fa-shopping-cart"
+                                                    class="add-to-cart"
                                                     data-guid="{{ $release->guid }}">
-                                                <i class="fas fa-shopping-cart mr-1"></i> Cart
-                                            </button>
+                                                Cart
+                                            </x-button>
 
-                                            <a href="{{ url('/details/' . $release->guid) }}"
-                                               class="inline-flex items-center px-3 py-1 rounded text-xs font-medium bg-gray-600 dark:bg-gray-700 text-white hover:bg-gray-700 dark:hover:bg-gray-800 transition">
-                                                <i class="fas fa-info-circle mr-1"></i> Details
-                                            </a>
+                                            <x-button-link href="{{ url('/details/' . $release->guid) }}"
+                                               variant="secondary"
+                                               size="sm"
+                                               icon="fas fa-info-circle">
+                                                Details
+                                            </x-button-link>
 
                                             @if($release->id)
                                                 <x-report-button :release-id="(int)$release->id" variant="icon" />

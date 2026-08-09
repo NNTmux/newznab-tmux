@@ -45,21 +45,17 @@
 
     <!-- Action Buttons -->
     <div class="flex flex-wrap gap-3 mb-6">
-        <a class="px-6 py-3 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium"
+        <x-button-link size="lg" icon="fa fa-list" class="shadow-md hover:shadow-lg"
            href="{{ url('/browse/TV') }}"
-           title="View available TV series">
-            <i class="fa fa-list mr-2"></i>Browse All Series
-        </a>
+           title="View available TV series">Browse All Series</x-button-link>
         <a class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium"
            href="{{ url('/myshows/browse') }}"
            title="View a list of all releases in your shows">
             <i class="fa fa-search mr-2"></i>View Releases
         </a>
-        <a class="px-6 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center font-medium"
+        <x-button-link variant="secondary" size="lg" icon="fa fa-rss text-orange-500" class="shadow-md hover:shadow-lg"
            href="{{ url("/rss/myshows?dl=1&i={$userdata->id}&api_token={$userdata->api_token}") }}"
-           title="All releases in your shows as an RSS feed">
-            <i class="fa fa-rss mr-2 text-orange-500"></i>RSS Feed
-        </a>
+           title="All releases in your shows as an RSS feed">RSS Feed</x-button-link>
     </div>
 
     <!-- Shows Table/Cards -->
@@ -135,13 +131,12 @@
                                 </td>
                                 <td class="px-8 py-5">
                                     <div class="flex items-center justify-center gap-2">
-                                        <a class="inline-flex items-center px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 shadow hover:shadow-md transition-all duration-200 text-sm font-medium"
+                                        <x-button-link variant="warning" icon="fa fa-edit" class="shadow hover:shadow-md"
                                            href="{{ url("/myshows?action=edit&id={$show['videos_id']}") }}"
                                            title="Edit Categories">
-                                            <i class="fa fa-edit mr-1.5"></i>
                                             <span class="hidden xl:inline">Edit</span>
-                                        </a>
-                                        <a class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 shadow hover:shadow-md transition-all duration-200 text-sm font-medium"
+                                        </x-button-link>
+                                        <x-button-link variant="danger" icon="fa fa-trash" class="shadow hover:shadow-md"
                                            href="{{ url("/myshows?action=delete&id={$show['videos_id']}") }}"
                                            title="Remove from My Shows"
                                            x-data="confirmLink"
@@ -151,9 +146,8 @@
                                            data-confirm-text="Remove"
                                            data-type="danger"
                                            @click.prevent="navigate()">
-                                            <i class="fa fa-trash mr-1.5"></i>
                                             <span class="hidden xl:inline">Delete</span>
-                                        </a>
+                                        </x-button-link>
                                     </div>
                                 </td>
                             </tr>
@@ -196,23 +190,19 @@
                                 {{ isset($show['created_at']) ? date('M d, Y', strtotime($show['created_at'])) : '' }}
                             </div>
                             <div class="flex gap-2">
-                                <a class="px-3 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 text-sm font-medium shadow"
+                                <x-button-link variant="warning" icon="fa fa-edit" class="shadow"
                                    href="{{ url("/myshows?action=edit&id={$show['videos_id']}") }}"
-                                   title="Edit">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                <a class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 dark:bg-red-700 text-sm font-medium shadow"
+                                   title="Edit" aria-label="Edit"></x-button-link>
+                                <x-button-link variant="danger" icon="fa fa-trash" class="shadow"
                                    href="{{ url("/myshows?action=delete&id={$show['videos_id']}") }}"
-                                   title="Remove"
+                                   title="Remove" aria-label="Remove"
                                    x-data="confirmLink"
                                    data-url="{{ url("/myshows?action=delete&id={$show['videos_id']}") }}"
                                    data-title="Remove Show"
                                    data-message="Are you sure you want to remove this show from your list?"
                                    data-confirm-text="Remove"
                                    data-type="danger"
-                                   @click.prevent="navigate()">
-                                    <i class="fa fa-trash"></i>
-                                </a>
+                                   @click.prevent="navigate()"></x-button-link>
                             </div>
                         </div>
                     </div>
@@ -230,10 +220,8 @@
                 <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
                     You haven't bookmarked any TV series yet. Start building your collection by browsing our series library.
                 </p>
-                <a href="{{ url('/browse/TV') }}"
-                   class="inline-flex items-center px-6 py-3 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 shadow-md hover:shadow-lg transition-all duration-200 font-medium">
-                    <i class="fa fa-search mr-2"></i>Browse Series Library
-                </a>
+                <x-button-link href="{{ url('/browse/TV') }}"
+                   size="lg" icon="fa fa-search" class="shadow-md hover:shadow-lg">Browse Series Library</x-button-link>
             </div>
         </div>
     @endif

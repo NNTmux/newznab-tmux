@@ -40,9 +40,9 @@
                     @csrf
                     <label for="export_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Optional notes</label>
                     <textarea id="export_notes" name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md" placeholder="Anything administrators should know?"></textarea>
-                    <button type="submit" class="mt-4 px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-md hover:bg-primary-700">
-                        <i class="fas fa-download mr-2"></i>Generate Export
-                    </button>
+                    <x-button type="submit" icon="fas fa-download" class="mt-4">
+                        Generate Export
+                    </x-button>
                 </form>
             </div>
 
@@ -59,9 +59,9 @@
                     <textarea id="erasure_notes" name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md" placeholder="Reason or additional details"></textarea>
                     <label for="confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mt-4 mb-1">Type ERASE to confirm</label>
                     <input id="confirmation" name="confirmation" type="text" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md" autocomplete="off">
-                    <button type="submit" class="mt-4 px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-md hover:bg-red-700">
-                        <i class="fas fa-paper-plane mr-2"></i>Submit Erasure Request
-                    </button>
+                    <x-button type="submit" variant="danger" icon="fas fa-paper-plane" class="mt-4">
+                        Submit Erasure Request
+                    </x-button>
                 </form>
             </div>
         </div>

@@ -43,10 +43,10 @@
                     </select>
                 </div>
                 <div class="flex gap-2">
-                    <button type="submit" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-md hover:bg-primary-700">
-                        <i class="fas fa-filter mr-2"></i>Filter
-                    </button>
-                    <a href="{{ route('admin.gdpr-requests.index') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600">Clear</a>
+                    <x-button type="submit" icon="fas fa-filter">
+                        Filter
+                    </x-button>
+                    <x-button-link href="{{ route('admin.gdpr-requests.index') }}" variant="muted">Clear</x-button-link>
                 </div>
             </form>
         </div>

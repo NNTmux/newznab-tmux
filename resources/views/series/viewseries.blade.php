@@ -115,27 +115,27 @@
                         <div class="flex flex-wrap gap-2">
                             <!-- My Shows Controls -->
                             @if(!empty($myshows) && !empty($myshows['id']))
-                                <a class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 inline-flex items-center text-sm font-medium transition"
+                                <x-button-link variant="warning" icon="fa fa-pencil-alt"
                                            href="{{ url('/myshows?action=edit&id=' . $show['id'] . '&from=' . urlencode(request()->fullUrl())) }}">
-                                            <i class="fa fa-pencil-alt mr-2"></i>Edit My Shows
-                                        </a>
-                                        <a class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-800 inline-flex items-center text-sm font-medium transition"
+                                            Edit My Shows
+                                        </x-button-link>
+                                        <x-button-link variant="danger" icon="fa fa-minus"
                                            title="Remove from My Shows"
                                            href="{{ url('/myshows?action=delete&id=' . $show['id'] . '&from=' . urlencode(request()->fullUrl())) }}">
-                                            <i class="fa fa-minus mr-2"></i>Remove from My Shows
-                                        </a>
+                                            Remove from My Shows
+                                        </x-button-link>
                                     @else
-                                        <a class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 inline-flex items-center text-sm font-medium transition"
+                                        <x-button-link variant="success" icon="fa fa-plus"
                                            title="Add to My Shows"
                                            href="{{ url('/myshows?action=add&id=' . $show['id'] . '&from=' . urlencode(request()->fullUrl())) }}">
-                                            <i class="fa fa-plus mr-2"></i>Add to My Shows
-                                        </a>
+                                            Add to My Shows
+                                        </x-button-link>
                                     @endif
 
-                                    <a class="px-4 py-2 bg-linear-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 inline-flex items-center text-sm font-medium shadow-sm transition"
+                                    <x-button-link variant="success" icon="fa fa-rss" class="shadow-sm"
                                        href="{{ url('/rss/full-feed?show=' . $show['id'] . (isset($category) && $category != '' ? '&t=' . $category : '') . '&dl=1&i=' . auth()->id() . '&api_token=' . auth()->user()->api_token) }}">
-                                        <i class="fa fa-rss mr-2"></i> RSS Feed
-                                    </a>
+                                        RSS Feed
+                                    </x-button-link>
 
                                     @if(!empty($show['tvdb']) && $show['tvdb'] > 0)
                                         <a class="px-4 py-2 bg-primary-100 text-primary-800 rounded-lg hover:bg-primary-200 inline-flex items-center text-sm font-medium transition"
@@ -211,16 +211,16 @@
                             <div class="flex flex-wrap items-center gap-2">
                                 <small class="text-gray-600 dark:text-gray-400">With Selected:</small>
                                 <div class="flex gap-1">
-                                    <button type="button" class="nzb_multi_operations_download px-3 py-1 bg-green-600 dark:bg-green-700 text-white rounded hover:bg-green-700 dark:hover:bg-green-800 transition text-sm" title="Download NZBs">
+                                    <x-button variant="success" size="sm" class="nzb_multi_operations_download" title="Download NZBs">
                                         <i class="fa fa-cloud-download"></i>
-                                    </button>
-                                    <button type="button" class="nzb_multi_operations_cart px-3 py-1 bg-primary-600 dark:bg-primary-700 text-white rounded hover:bg-primary-700 dark:hover:bg-primary-800 transition text-sm" title="Send to Download Basket">
+                                    </x-button>
+                                    <x-button size="sm" class="nzb_multi_operations_cart" title="Send to Download Basket">
                                         <i class="fa fa-shopping-basket"></i>
-                                    </button>
+                                    </x-button>
                                     @if(auth()->check() && auth()->user()->hasRole('Admin'))
-                                        <button type="button" class="nzb_multi_operations_delete px-3 py-1 bg-red-600 dark:bg-red-700 text-white rounded hover:bg-red-700 dark:hover:bg-red-800 transition text-sm" title="Delete">
+                                        <x-button variant="danger" size="sm" class="nzb_multi_operations_delete" title="Delete">
                                             <i class="fa fa-trash"></i>
-                                        </button>
+                                        </x-button>
                                     @endif
                                 </div>
                             </div>

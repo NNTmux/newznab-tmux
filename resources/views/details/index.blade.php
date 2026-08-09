@@ -1003,13 +1003,13 @@
                                 ></textarea>
                             </div>
                             <div class="flex justify-end">
-                                <button
+                                <x-button
                                     type="submit"
-                                    class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition inline-flex items-center font-medium shadow-sm"
+                                    class="shadow-sm"
+                                    icon="fas fa-paper-plane"
                                 >
-                                    <i class="fas fa-paper-plane mr-2"></i>
                                     Post Comment
-                                </button>
+                                </x-button>
                             </div>
                         </form>
                     </div>

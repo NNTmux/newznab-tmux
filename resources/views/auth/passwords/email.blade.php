@@ -78,13 +78,13 @@
 
                     <!-- Submit Button -->
                     <div>
-                        <button
+                        <x-button
                             type="submit"
-                            class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition duration-150 ease-in-out"
+                            class="w-full"
+                            icon="fas fa-paper-plane"
                         >
-                            <i class="fas fa-paper-plane mr-2"></i>
                             Send Password Reset Link
-                        </button>
+                        </x-button>
                     </div>
                 </form>
             </div>

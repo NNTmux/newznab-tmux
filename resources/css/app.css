@@ -366,66 +366,11 @@ main tbody tr:hover {
     background-color: var(--surface-hover-dark) !important;
 }
 
-/* Custom styles for proper spacing and button alignment */
-.btn {
-    @apply inline-flex items-center justify-center px-4 py-2 border rounded-lg font-semibold text-sm transition-colors duration-150;
-}
-
-.btn i {
-    @apply mr-2;
-}
-
-.btn-primary {
-    @apply bg-primary-600 text-white border border-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:border-primary-700 dark:hover:bg-primary-800;
-}
-
-.btn-secondary {
-    @apply bg-gray-600 dark:bg-gray-700 text-white border-gray-600 dark:border-gray-700 hover:bg-gray-700 dark:hover:bg-gray-800;
-}
-
-.btn-success {
-    @apply bg-green-600 dark:bg-green-700 text-white border-green-600 dark:border-green-700 hover:bg-green-700 dark:hover:bg-green-800;
-}
-
-.btn-danger {
-    @apply bg-red-600 dark:bg-red-700 text-white border-red-600 dark:border-red-700 hover:bg-red-700 dark:hover:bg-red-800;
-}
-
-.btn-warning {
-    @apply bg-yellow-500 dark:bg-yellow-600 text-white border-yellow-500 dark:border-yellow-600 hover:bg-yellow-600 dark:hover:bg-yellow-700;
-}
-
-.btn-info {
-    @apply bg-cyan-600 dark:bg-cyan-700 text-white border-cyan-600 dark:border-cyan-700 hover:bg-cyan-700 dark:hover:bg-cyan-800;
-}
-
-.btn-sm {
-    @apply px-3 py-1 text-xs;
-}
-
-.btn-lg {
-    @apply px-6 py-3 text-base;
-}
-
-/* Button group spacing */
-.btn-group {
-    @apply inline-flex space-x-2;
-}
-
 /* Icon spacing */
 .fas, .far, .fab, .fa {
     @apply inline-block;
     min-width: 1em;
     text-align: center;
-}
-
-/* Table action buttons */
-.table-actions {
-    @apply flex items-center gap-2;
-}
-
-.table-actions .btn {
-    @apply shrink-0;
 }
 
 /* Mobile Responsive Improvements */
@@ -477,20 +422,6 @@ main tbody tr:hover {
 
     .table-mobile-cards thead {
         display: none;
-    }
-
-    /* Stack buttons vertically on mobile */
-    .btn-group {
-        display: flex;
-        flex-direction: column;
-        row-gap: 0.5rem;
-        column-gap: 0;
-    }
-
-    /* Full width buttons on mobile */
-    .btn-mobile-full {
-        width: 100%;
-        justify-content: center;
     }
 
     /* Mobile search forms */
@@ -652,12 +583,6 @@ main tbody tr:hover {
     body {
         font-size: 0.875rem;
         line-height: 1.25rem;
-    }
-
-    .btn {
-        font-size: 0.75rem;
-        line-height: 1rem;
-        padding: 0.5rem 0.75rem;
     }
 
     /* Stack form fields */

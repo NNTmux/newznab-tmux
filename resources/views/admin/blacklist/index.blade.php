@@ -5,9 +5,9 @@
     <x-admin.card>
         <x-admin.page-header :title="$title ?? 'Binary Black/White List'" icon="fas fa-ban">
             <x-slot:actions>
-                <a href="{{ url('/admin/binaryblacklist-edit') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800">
-                    <i class="fas fa-plus mr-2"></i>Add New Blacklist
-                </a>
+                <x-button-link href="{{ url('/admin/binaryblacklist-edit') }}" icon="fas fa-plus">
+                    Add New Blacklist
+                </x-button-link>
             </x-slot:actions>
         </x-admin.page-header>
 
@@ -109,9 +109,9 @@
             <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
                 <div class="flex justify-between items-center">
                     <span class="text-sm text-gray-600 dark:text-gray-400">Total entries: {{ count($binlist) }}</span>
-                    <a href="{{ url('/admin/binaryblacklist-edit') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 text-sm">
-                        <i class="fas fa-plus mr-2"></i>Add New Blacklist
-                    </a>
+                    <x-button-link href="{{ url('/admin/binaryblacklist-edit') }}" icon="fas fa-plus">
+                        Add New Blacklist
+                    </x-button-link>
                 </div>
             </div>
         @else

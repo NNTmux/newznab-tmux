@@ -9,9 +9,9 @@
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
                     <i class="fas fa-edit mr-2"></i>{{ $title }}
                 </h1>
-                <a href="{{ route('admin.anidb-list') }}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                    <i class="fas fa-arrow-left mr-2"></i>Back to List
-                </a>
+                <x-button-link href="{{ route('admin.anidb-list') }}" variant="secondary" icon="fas fa-arrow-left">
+                    Back to List
+                </x-button-link>
             </div>
         </div>
 
@@ -248,12 +248,12 @@
 
                 <!-- Action Buttons -->
                 <div class="mt-6 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-6">
-                    <a href="{{ route('admin.anidb-list') }}" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
-                        <i class="fas fa-times mr-2"></i>Cancel
-                    </a>
-                    <button type="submit" class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
-                        <i class="fas fa-save mr-2"></i>Save Changes
-                    </button>
+                    <x-button-link href="{{ route('admin.anidb-list') }}" variant="secondary" icon="fas fa-times">
+                        Cancel
+                    </x-button-link>
+                    <x-button type="submit" icon="fas fa-save">
+                        Save Changes
+                    </x-button>
                 </div>
             </form>
         </div>

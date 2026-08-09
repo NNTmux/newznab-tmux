@@ -13,22 +13,22 @@
                     @if(!$invitation->used_at)
                         <form method="POST" action="{{ url('admin/invitations/' . $invitation->id . '/resend') }}" class="inline">
                             @csrf
-                            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                                <i class="fas fa-paper-plane mr-2"></i>Resend
-                            </button>
+                            <x-button type="submit" variant="success" icon="fas fa-paper-plane">
+                                Resend
+                            </x-button>
                         </form>
                         <form method="POST" action="{{ url('admin/invitations/' . $invitation->id . '/cancel') }}" class="inline"
                               x-data="confirmForm"
                               data-message="Are you sure you want to cancel this invitation?">
                             @csrf
-                            <button type="button" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700" @click="submit()">
-                                <i class="fas fa-ban mr-2"></i>Cancel
-                            </button>
+                            <x-button variant="warning" icon="fas fa-ban" @click="submit()">
+                                Cancel
+                            </x-button>
                         </form>
                     @endif
-                    <a href="{{ url('admin/invitations') }}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                        <i class="fas fa-arrow-left mr-2"></i>Back to List
-                    </a>
+                    <x-button-link href="{{ url('admin/invitations') }}" variant="secondary" icon="fas fa-arrow-left">
+                        Back to List
+                    </x-button-link>
                 </div>
             </div>
         </div>
@@ -183,9 +183,7 @@
                                     <div class="bg-gray-100 dark:bg-gray-800 p-2 rounded break-all font-mono text-xs">
                                         {{ url('register?invitation=' . $invitation->token) }}
                                     </div>
-                                    <button x-data="copyToClipboard()" @click="copy('invitation-link-{{ $invitation->id }}')" class="mt-2 px-3 py-1 bg-primary-600 text-white text-xs rounded hover:bg-primary-700">
-                                        <i class="fas fa-copy mr-1"></i><span x-text="copied ? 'Copied!' : 'Copy Link'"></span>
-                                    </button>
+                                    <x-button size="sm" icon="fas fa-copy" x-data="copyToClipboard()" @click="copy('invitation-link-{{ $invitation->id }}')" class="mt-2"><span x-text="copied ? 'Copied!' : 'Copy Link'"></span></x-button>
                                     <input type="hidden" id="invitation-link-{{ $invitation->id }}" value="{{ url('register?invitation=' . $invitation->token) }}" />
                                 @else
                                     <span class="text-gray-500 dark:text-gray-400">Invitation not active</span>

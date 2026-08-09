@@ -34,10 +34,9 @@
                         </ol>
                         <form method="POST" action="{{ route('generate2faSecret') }}">
                             @csrf
-                            <button type="submit" class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 dark:bg-primary-700 hover:bg-primary-700 dark:hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition">
-                                <i class="fas fa-key mr-2"></i>
+                            <x-button type="submit" class="w-full" icon="fas fa-key">
                                 Generate Secret Key to Enable 2FA
-                            </button>
+                            </x-button>
                         </form>
                     </div>
                 @elseif(!$data['user']->passwordSecurity->google2fa_enable)
@@ -75,10 +74,9 @@
                                         <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                     @enderror
                                 </div>
-                                <button type="submit" class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">
-                                    <i class="fas fa-check mr-2"></i>
+                                <x-button type="submit" variant="success" class="w-full" icon="fas fa-check">
                                     Enable 2FA
-                                </button>
+                                </x-button>
                             </form>
                         </div>
                     </div>
@@ -113,10 +111,9 @@
                                     <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
                             </div>
-                            <button type="submit" class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition">
-                                <i class="fas fa-times mr-2"></i>
+                            <x-button type="submit" variant="danger" class="w-full" icon="fas fa-times">
                                 Disable 2FA
-                            </button>
+                            </x-button>
                         </form>
                     </div>
                 @endif

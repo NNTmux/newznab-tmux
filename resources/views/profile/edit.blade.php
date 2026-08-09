@@ -297,18 +297,16 @@
 
             <!-- Actions -->
             <div class="border-t border-gray-200 dark:border-gray-700 pt-6 flex items-center justify-between">
-                <a href="{{ route('profile') }}" class="px-6 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 transition">
+                <x-button-link href="{{ route('profile') }}" variant="muted">
                     Cancel
-                </a>
+                </x-button-link>
                 <div class="flex space-x-2">
                     <a href="{{ route('profileedit', ['action' => 'newapikey']) }}"
                        class="px-6 py-2 text-primary-700 bg-primary-100 rounded-lg hover:bg-primary-200 transition"
                        data-confirm="Are you sure you want to generate a new API key?">
                         <i class="fas fa-key mr-2"></i>New API Key
                     </a>
-                    <button type="submit" class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition">
-                        <i class="fas fa-save mr-2"></i>Save Changes
-                    </button>
+                    <x-button type="submit" icon="fas fa-save">Save Changes</x-button>
                 </div>
             </div>
         </form>
@@ -330,12 +328,11 @@
 
                             <!-- Collapsible Disable Form -->
                             <div class="space-y-3" x-data="profileEdit">
-                                <button x-show="!show2faForm"
-                                        @click="toggle2fa()"
-                                        type="button"
-                                        class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition">
-                                    <i class="fas fa-times-circle mr-2"></i>Disable 2FA
-                                </button>
+                                <x-button x-show="!show2faForm"
+                                          @click="toggle2fa()"
+                                          type="button"
+                                          variant="danger"
+                                          icon="fas fa-times-circle">Disable 2FA</x-button>
 
                                 <div x-show="show2faForm"
                                      x-cloak
@@ -368,15 +365,13 @@
                                             </div>
                                         </div>
                                         <div class="flex gap-2">
-                                            <button type="submit"
-                                                    class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition">
-                                                <i class="fas fa-check mr-2"></i>Confirm Disable
-                                            </button>
-                                            <button @click="cancel2fa()"
-                                                    type="button"
-                                                    class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition">
-                                                <i class="fas fa-times mr-2"></i>Cancel
-                                            </button>
+                                            <x-button type="submit"
+                                                      variant="danger"
+                                                      icon="fas fa-check">Confirm Disable</x-button>
+                                            <x-button @click="cancel2fa()"
+                                                      type="button"
+                                                      variant="muted"
+                                                      icon="fas fa-times">Cancel</x-button>
                                         </div>
                                     </form>
                                 </div>
@@ -424,17 +419,13 @@
                                            class="w-full md:w-64 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-center text-lg tracking-widest bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500">
                                 </div>
                                 <div class="flex gap-2">
-                                    <button type="submit" class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white text-sm rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition">
-                                        <i class="fas fa-check mr-2"></i>Verify and Enable 2FA
-                                    </button>
+                                    <x-button type="submit" variant="success" icon="fas fa-check">Verify and Enable 2FA</x-button>
                                 </div>
                             </form>
 
                             <form method="POST" action="{{ route('profileedit.cancel2fa') }}" class="mt-2">
                                 @csrf
-                                <button type="submit" class="px-4 py-2 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 transition">
-                                    <i class="fas fa-times mr-2"></i>Cancel Setup
-                                </button>
+                                <x-button type="submit" variant="secondary" icon="fas fa-times">Cancel Setup</x-button>
                             </form>
                         </div>
                     </div>
@@ -451,9 +442,7 @@
                             <form method="POST" action="{{ route('generate2faSecret') }}">
                                 @csrf
                                 <input type="hidden" name="from_profile" value="1">
-                                <button type="submit" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white text-sm rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition">
-                                    <i class="fas fa-shield-alt mr-2"></i>Enable Two-Factor Authentication
-                                </button>
+                                <x-button type="submit" icon="fas fa-shield-alt">Enable Two-Factor Authentication</x-button>
                             </form>
                         </div>
                     </div>

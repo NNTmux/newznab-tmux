@@ -9,9 +9,7 @@
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
                     <i class="fas fa-trash-restore mr-2"></i>{{ $title }}
                 </h1>
-                <a href="{{ url('admin/user-list') }}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                    <i class="fas fa-arrow-left mr-2"></i>Back to Active Users
-                </a>
+                <x-button-link href="{{ url('admin/user-list') }}" variant="secondary" icon="fas fa-arrow-left">Back to Active Users</x-button-link>
             </div>
         </div>
 
@@ -80,12 +78,8 @@
                     </div>
                 </div>
                 <div class="mt-4 flex gap-2">
-                    <button type="submit" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-md hover:bg-primary-700">
-                        <i class="fas fa-search mr-2"></i>Filter
-                    </button>
-                    <a href="{{ url('admin/deleted-users') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600">
-                        <i class="fas fa-times mr-2"></i>Clear
-                    </a>
+                    <x-button type="submit" icon="fas fa-search">Filter</x-button>
+                    <x-button-link href="{{ url('admin/deleted-users') }}" variant="muted" icon="fas fa-times">Clear</x-button-link>
                 </div>
             </form>
         </div>
@@ -110,11 +104,11 @@
                             <option value="restore">Restore Selected</option>
                             <option value="delete">Permanently Delete Selected</option>
                         </select>
-                        <button type="submit"
+                        <x-button type="submit"
                                 id="bulkActionBtn"
-                                class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-md hover:bg-primary-700">
-                            <i class="fas fa-check mr-2"></i>Apply
-                        </button>
+                                icon="fas fa-check">
+                            Apply
+                        </x-button>
                     </div>
                 </div>
 

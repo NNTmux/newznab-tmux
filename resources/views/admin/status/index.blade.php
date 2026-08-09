@@ -42,12 +42,12 @@
     <x-admin.card>
         <x-admin.page-header :title="$title" icon="fas fa-signal">
             <x-slot:actions>
-                <a href="{{ route('admin.status.create') }}" class="px-4 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800">
-                    <i class="fas fa-plus mr-2"></i>Create incident
-                </a>
-                <a href="{{ route('status') }}" target="_blank" rel="noopener" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
-                    <i class="fas fa-external-link-alt mr-2"></i>Public page
-                </a>
+                <x-button-link href="{{ route('admin.status.create') }}" icon="fas fa-plus">
+                    Create incident
+                </x-button-link>
+                <x-button-link href="{{ route('status') }}" target="_blank" rel="noopener" variant="muted" icon="fas fa-external-link-alt">
+                    Public page
+                </x-button-link>
             </x-slot:actions>
         </x-admin.page-header>
 
@@ -71,9 +71,9 @@
                                     <option value="{{ $opt->value }}" @selected($svc->status === $opt)>{{ $opt->label() }}</option>
                                 @endforeach
                             </select>
-                            <button type="submit" class="w-full py-2 px-3 text-sm font-medium rounded-lg bg-primary-600 text-white hover:bg-primary-700 dark:hover:bg-primary-600">
+                            <x-button type="submit" class="w-full">
                                 Update
-                            </button>
+                            </x-button>
                         </form>
                     </div>
                 @endforeach

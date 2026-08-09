@@ -125,12 +125,8 @@
 
                                     <!-- Action Buttons -->
                                     <div class="flex gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                        <a href="{{ route('movie.view', ['imdbid' => $movie->imdbid]) }}" class="inline-flex items-center px-6 py-2.5 bg-primary-600 dark:bg-primary-700 text-white font-medium rounded-lg hover:bg-primary-700 dark:hover:bg-primary-800 transition shadow-md">
-                                            <i class="fas fa-eye mr-2"></i> View All Releases
-                                        </a>
-                                        <a href="{{ route('Movies') }}?title={{ urlencode($movie->title) }}" class="inline-flex items-center px-6 py-2.5 bg-gray-600 text-white font-medium rounded-lg hover:bg-gray-700 transition shadow-md">
-                                            <i class="fas fa-search mr-2"></i> Search Similar
-                                        </a>
+                                        <x-button-link href="{{ route('movie.view', ['imdbid' => $movie->imdbid]) }}" size="lg" class="shadow-md" icon="fas fa-eye">View All Releases</x-button-link>
+                                        <x-button-link href="{{ route('Movies') }}?title={{ urlencode($movie->title) }}" variant="secondary" size="lg" class="shadow-md" icon="fas fa-search">Search Similar</x-button-link>
                                     </div>
                                 </div>
                             </div>

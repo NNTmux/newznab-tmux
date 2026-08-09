@@ -88,17 +88,15 @@
 
                     <!-- Action Buttons -->
                     <div class="flex justify-end space-x-3">
-                        <button type="button"
-                                @click="close()"
-                                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition">
+                        <x-button variant="muted"
+                                @click="close()">
                             Cancel
-                        </button>
-                        <button type="submit"
-                                :disabled="!canSubmit()"
-                                class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center">
-                            <i x-show="isSubmitting" class="fas fa-spinner fa-spin mr-2"></i>
+                        </x-button>
+                        <x-button type="submit" variant="danger"
+                                ::disabled="!canSubmit()">
+                            <i x-show="isSubmitting" class="fas fa-spinner fa-spin"></i>
                             <span x-text="submitText()"></span>
-                        </button>
+                        </x-button>
                     </div>
                 </form>
             </div>

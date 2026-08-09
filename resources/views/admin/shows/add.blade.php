@@ -18,10 +18,11 @@
             <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
                 <i class="fas fa-tv mr-2"></i>{{ $title }}
             </h1>
-            <a href="{{ url('admin/show-list') }}"
-               class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm">
-                <i class="fas fa-arrow-left mr-2"></i>Back to TV Shows List
-            </a>
+            <x-button-link href="{{ url('admin/show-list') }}"
+               variant="secondary"
+               icon="fas fa-arrow-left">
+                Back to TV Shows List
+            </x-button-link>
         </div>
 
         <!-- Flash Messages -->
@@ -151,12 +152,8 @@
                  x-text="previewError"></div>
 
             <div class="mt-6 flex gap-3">
-                <button type="submit" class="px-6 py-2 bg-primary-600 dark:bg-primary-700 text-white rounded-lg hover:bg-primary-700">
-                    <i class="fas fa-plus mr-2"></i>Add TV Show
-                </button>
-                <a href="{{ url('admin/show-list') }}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-                    <i class="fas fa-times mr-2"></i>Cancel
-                </a>
+                <x-button type="submit" icon="fas fa-plus">Add TV Show</x-button>
+                <x-button-link href="{{ url('admin/show-list') }}" variant="secondary" icon="fas fa-times">Cancel</x-button-link>
             </div>
         </form>
     </div>
