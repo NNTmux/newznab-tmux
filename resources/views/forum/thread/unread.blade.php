@@ -21,7 +21,7 @@
         @can ('markThreadsAsRead')
             <div class="flex justify-center mt-4">
                 <x-forum.button class="px-5 flex items-center gap-2" data-open-modal="mark-as-read">
-                    <i data-feather="book"></i> {{ trans('forum::general.mark_read') }}
+                    <i class="fas fa-book" aria-hidden="true"></i> {{ trans('forum::general.mark_read') }}
                 </x-forum.button>
             </div>
 

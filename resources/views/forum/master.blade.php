@@ -20,9 +20,6 @@
     <!-- App stylesheet: theme tokens + design-system components -->
     @vite('resources/css/app.css')
 
-    <!-- Feather icons (https://github.com/feathericons/feather) -->
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-
     <!-- Vue (https://github.com/vuejs/vue) -->
     @if (config('app.debug'))
         <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
@@ -191,8 +188,6 @@
         {
             openModal(findModal(hash.replace('modal=','')));
         }
-
-        feather.replace();
 
         const input = document.querySelector('input[name=color]');
 

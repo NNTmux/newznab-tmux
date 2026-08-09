@@ -154,7 +154,7 @@
         @can ('markThreadsAsRead')
             <div class="text-center mt-3">
                 <x-forum.button class="inline-flex px-6 items-center gap-2" data-open-modal="mark-threads-as-read">
-                    <i data-feather="book"></i> {{ trans('forum::general.mark_read') }}
+                    <i class="fas fa-book" aria-hidden="true"></i> {{ trans('forum::general.mark_read') }}
                 </x-forum.button>
             </div>
 

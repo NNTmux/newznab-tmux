@@ -9,17 +9,17 @@
                 @if (Gate::allows('deleteThreads', $thread->category) && Gate::allows('delete', $thread))
                     @if ($thread->trashed())
                         <x-forum.button-link href="#" class="bg-red-500" data-open-modal="perma-delete-thread">
-                            <i data-feather="trash"></i> {{ trans('forum::general.perma_delete') }}
+                            <i class="fas fa-trash" aria-hidden="true"></i> {{ trans('forum::general.perma_delete') }}
                         </x-forum.button-link>
                     @else
                         <x-forum.button-link href="#" class="bg-red-500 inline-flex items-center gap-2" data-open-modal="delete-thread">
-                            <i data-feather="trash" class="w-4"></i> {{ trans('forum::general.delete') }}
+                            <i class="fas fa-trash w-4" aria-hidden="true"></i> {{ trans('forum::general.delete') }}
                         </x-forum.button-link>
                     @endif
                 @endif
                 @if ($thread->trashed() && Gate::allows('restoreThreads', $thread->category) && Gate::allows('restore', $thread))
                     <x-forum.button-link href="#" data-open-modal="restore-thread" class="inline-flex items-center gap-2">
-                        <i data-feather="refresh-cw" class="w-4"></i> {{ trans('forum::general.restore') }}
+                        <i class="fas fa-sync-alt w-4" aria-hidden="true"></i> {{ trans('forum::general.restore') }}
                     </x-forum.button-link>
                 @endif
 
@@ -32,33 +32,33 @@
                             @can ('lockThreads', $category)
                                 @if ($thread->locked)
                                     <x-forum.button-link href="#" data-open-modal="unlock-thread" class="inline-flex items-center gap-2">
-                                        <i data-feather="unlock" class="w-4"></i> {{ trans('forum::threads.unlock') }}
+                                        <i class="fas fa-unlock w-4" aria-hidden="true"></i> {{ trans('forum::threads.unlock') }}
                                     </x-forum.button-link>
                                 @else
                                     <x-forum.button-link href="#" data-open-modal="lock-thread" class="inline-flex items-center gap-2">
-                                        <i data-feather="lock" class="w-4"></i> {{ trans('forum::threads.lock') }}
+                                        <i class="fas fa-lock w-4" aria-hidden="true"></i> {{ trans('forum::threads.lock') }}
                                     </x-forum.button-link>
                                 @endif
                             @endcan
                             @can ('pinThreads', $category)
                                 @if ($thread->pinned)
                                     <x-forum.button-link href="#" data-open-modal="unpin-thread" class="inline-flex items-center gap-2 bg-gray-500">
-                                        <i data-feather="arrow-down"></i> {{ trans('forum::threads.unpin') }}
+                                        <i class="fas fa-arrow-down" aria-hidden="true"></i> {{ trans('forum::threads.unpin') }}
                                     </x-forum.button-link>
                                 @else
                                     <x-forum.button-link href="#" data-open-modal="pin-thread" class="inline-flex items-center gap-2 bg-gray-500">
-                                        <i data-feather="arrow-up" class="w-4"></i> {{ trans('forum::threads.pin') }}
+                                        <i class="fas fa-arrow-up w-4" aria-hidden="true"></i> {{ trans('forum::threads.pin') }}
                                     </x-forum.button-link>
                                 @endif
                             @endcan
                             @can ('rename', $thread)
                                 <x-forum.button-link href="#"  data-open-modal="rename-thread" class="inline-flex items-center gap-2 bg-gray-500">
-                                    <i data-feather="edit-2" class="w-4"></i> {{ trans('forum::general.rename') }}
+                                    <i class="fas fa-edit w-4" aria-hidden="true"></i> {{ trans('forum::general.rename') }}
                                 </x-forum.button-link>
                             @endcan
                             @can ('moveThreadsFrom', $category)
                                 <x-forum.button-link href="#" data-open-modal="move-thread" class="inline-flex items-center gap-2 bg-gray-500">
-                                    <i data-feather="corner-up-right" class="w-4"></i> {{ trans('forum::general.move') }}
+                                    <i class="fas fa-share w-4" aria-hidden="true"></i> {{ trans('forum::general.move') }}
                                 </x-forum.button-link>
                             @endcan
                         @endif
@@ -184,7 +184,7 @@
     @if ($thread->trashed() && Gate::allows('restoreThreads', $thread->category) && Gate::allows('restore', $thread))
         @component('forum.modal-form')
             @slot('key', 'restore-thread')
-            @slot('title', '<i data-feather="refresh-cw" class="text-gray-500"></i>' . trans('forum::general.restore'))
+            @slot('title', '<i class="fas fa-sync-alt text-gray-500" aria-hidden="true"></i>' . trans('forum::general.restore'))
             @slot('route', Forum::route('thread.restore', $thread))
             @slot('method', 'POST')
 
@@ -199,7 +199,7 @@
     @if (Gate::allows('deleteThreads', $thread->category) && Gate::allows('delete', $thread))
         @component('forum.modal-form')
             @slot('key', 'delete-thread')
-            @slot('title', '<i data-feather="trash" class="text-gray-500"></i>' . trans('forum::threads.delete'))
+            @slot('title', '<i class="fas fa-trash text-gray-500" aria-hidden="true"></i>' . trans('forum::threads.delete'))
             @slot('route', Forum::route('thread.delete', $thread))
             @slot('method', 'DELETE')
 
@@ -222,7 +222,7 @@
         @if (config('forum.general.soft_deletes'))
             @component('forum.modal-form')
                 @slot('key', 'perma-delete-thread')
-                @slot('title', '<i data-feather="trash" class="text-gray-500"></i>' . trans_choice('forum::threads.perma_delete', 1))
+                @slot('title', '<i class="fas fa-trash text-gray-500" aria-hidden="true"></i>' . trans_choice('forum::threads.perma_delete', 1))
                 @slot('route', Forum::route('thread.delete', $thread))
                 @slot('method', 'DELETE')
 
@@ -242,7 +242,7 @@
             @if ($thread->locked)
                 @component('forum.modal-form')
                     @slot('key', 'unlock-thread')
-                    @slot('title', '<i data-feather="unlock" class="text-gray-500"></i> ' . trans('forum::threads.unlock'))
+                    @slot('title', '<i class="fas fa-unlock text-gray-500" aria-hidden="true"></i> ' . trans('forum::threads.unlock'))
                     @slot('route', Forum::route('thread.unlock', $thread))
                     @slot('method', 'POST')
 
@@ -255,7 +255,7 @@
             @else
                 @component('forum.modal-form')
                     @slot('key', 'lock-thread')
-                    @slot('title', '<i data-feather="lock" class="text-gray-500"></i> ' . trans('forum::threads.lock'))
+                    @slot('title', '<i class="fas fa-lock text-gray-500" aria-hidden="true"></i> ' . trans('forum::threads.lock'))
                     @slot('route', Forum::route('thread.lock', $thread))
                     @slot('method', 'POST')
 
@@ -272,7 +272,7 @@
             @if ($thread->pinned)
                 @component('forum.modal-form')
                     @slot('key', 'unpin-thread')
-                    @slot('title', '<i data-feather="arrow-down" class="text-gray-500"></i> ' . trans('forum::threads.unpin'))
+                    @slot('title', '<i class="fas fa-arrow-down text-gray-500" aria-hidden="true"></i> ' . trans('forum::threads.unpin'))
                     @slot('route', Forum::route('thread.unpin', $thread))
                     @slot('method', 'POST')
 
@@ -285,7 +285,7 @@
             @else
                 @component('forum.modal-form')
                     @slot('key', 'pin-thread')
-                    @slot('title', '<i data-feather="arrow-up" class="text-gray-500"></i> ' . trans('forum::threads.pin'))
+                    @slot('title', '<i class="fas fa-arrow-up text-gray-500" aria-hidden="true"></i> ' . trans('forum::threads.pin'))
                     @slot('route', Forum::route('thread.pin', $thread))
                     @slot('method', 'POST')
 
@@ -301,7 +301,7 @@
         @can ('rename', $thread)
             @component('forum.modal-form')
                 @slot('key', 'rename-thread')
-                @slot('title', '<i data-feather="edit-2" class="text-gray-500"></i> ' . trans('forum::general.rename'))
+                @slot('title', '<i class="fas fa-edit text-gray-500" aria-hidden="true"></i> ' . trans('forum::general.rename'))
                 @slot('route', Forum::route('thread.rename', $thread))
                 @slot('method', 'POST')
 
@@ -319,7 +319,7 @@
         @can ('moveThreadsFrom', $category)
             @component('forum.modal-form')
                 @slot('key', 'move-thread')
-                @slot('title', '<i data-feather="corner-up-right" class="text-gray-500"></i> ' . trans('forum::general.move'))
+                @slot('title', '<i class="fas fa-share text-gray-500" aria-hidden="true"></i> ' . trans('forum::general.move'))
                 @slot('route', Forum::route('thread.move', $thread))
                 @slot('method', 'POST')
 
