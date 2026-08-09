@@ -18,8 +18,8 @@
     <meta name="description" content="{{ $meta_description ?? '' }}">
 
     <!-- Theme Preference - Set via meta tag for CSP compliance -->
-    <meta name="theme-preference" content="{{ auth()->check() ? (auth()->user()->theme_preference ?? 'light') : 'light' }}">
-    <meta name="color-scheme-preference" content="{{ auth()->check() ? (auth()->user()->color_scheme ?? 'blue') : 'blue' }}">
+    <meta name="theme-preference" content="{{ $userTheme }}">
+    <meta name="color-scheme-preference" content="{{ $userColorScheme }}">
     <!-- CSP Nonce for dynamic script loading -->
     <meta name="csp-nonce" content="{{ csp_nonce() }}">
     @auth
@@ -103,7 +103,7 @@
     @include('partials.back-to-top')
 
     <!-- Theme Toggle -->
-    @php $themePreference = auth()->check() ? (auth()->user()->theme_preference ?? 'light') : 'light'; @endphp
+    @php $themePreference = $userTheme; @endphp
     @guest
         <button id="theme-toggle" class="fixed z-50 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-full shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-200 flex items-center gap-2 touch-target bottom-[max(1rem,env(safe-area-inset-bottom))] right-[max(1rem,env(safe-area-inset-right))]"
                 title="{{ ucfirst($themePreference) }} Mode">
@@ -124,11 +124,11 @@
     @stack('scripts')
 
     <!-- Theme Management Data (moved to csp-safe.js) -->
-    @php $colorScheme = auth()->check() ? (auth()->user()->color_scheme ?? 'blue') : 'blue'; @endphp
+    @php $colorScheme = $userColorScheme; @endphp
     <div id="current-theme-data"
          data-theme="{{ $themePreference }}"
          data-color-scheme="{{ $colorScheme }}"
-         data-authenticated="{{ auth()->check() ? 'true' : 'false' }}"
+         data-authenticated="{{ $loggedin ? 'true' : 'false' }}"
          data-update-url="{{ route('profile.update-theme') }}"
          class="hidden">
     </div>

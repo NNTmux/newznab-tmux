@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <x-admin.card>
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
@@ -42,20 +42,17 @@
         </div>
 
         <!-- TV Shows Table -->
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-900">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Cover</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Type</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Started</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">IDs</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Publisher</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+        <x-admin.data-table>
+            <x-slot:head>
+                <x-admin.th>Cover</x-admin.th>
+                <x-admin.th>Title</x-admin.th>
+                <x-admin.th>Type</x-admin.th>
+                <x-admin.th>Started</x-admin.th>
+                <x-admin.th>IDs</x-admin.th>
+                <x-admin.th>Publisher</x-admin.th>
+                <x-admin.th>Actions</x-admin.th>
+            </x-slot:head>
+
                     @forelse($tvshowlist as $show)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -154,28 +151,22 @@
                             </td>
                         </tr>
                     @empty
+                        @php
+                            $showsEmptyTitle = $showname ? 'No TV shows found for "'.$showname.'"' : 'No TV shows available';
+                        @endphp
                         <tr>
-                            <td colspan="7" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                                @if($showname)
-                                    <div class="flex flex-col items-center">
-                                        <i class="fas fa-search text-4xl mb-3"></i>
-                                        <p class="text-lg">No TV shows found for "{{ $showname }}"</p>
-                                        <a href="{{ url('admin/show-list') }}" class="mt-3 text-primary-600 dark:text-primary-400 hover:underline">
+                            <td colspan="7" class="p-0">
+                                <x-admin.empty-state :icon="$showname ? 'fas fa-search' : 'fas fa-tv'" :title="$showsEmptyTitle">
+                                    @if($showname)
+                                        <a href="{{ url('admin/show-list') }}" class="text-primary-600 dark:text-primary-400 hover:underline">
                                             Clear search and view all
                                         </a>
-                                    </div>
-                                @else
-                                    <div class="flex flex-col items-center">
-                                        <i class="fas fa-tv text-4xl mb-3"></i>
-                                        <p class="text-lg">No TV shows available</p>
-                                    </div>
-                                @endif
+                                    @endif
+                                </x-admin.empty-state>
                             </td>
                         </tr>
                     @endforelse
-                </tbody>
-            </table>
-        </div>
+        </x-admin.data-table>
 
         <!-- Pagination -->
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
@@ -188,7 +179,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </x-admin.card>
 </div>
 
 {{-- Styles moved to resources/css/csp-safe.css --}}

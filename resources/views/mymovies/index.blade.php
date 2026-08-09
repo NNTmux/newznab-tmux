@@ -80,6 +80,7 @@
                                 <div class="shrink-0">
                                     <img class="rounded-lg movie-poster-shadow w-32 h-48 object-cover"
                                          src="{{ ($movie['cover'] ?? 0) == 1 ? getImageAssetUrl('movies', $movie['imdbid'] . '-cover', url('/covers/movies/no-cover.jpg')) : url('/covers/movies/no-cover.jpg') }}"
+                                         loading="lazy"
                                          alt="{{ e($movie['title'] ?? '') }}"/>
                                 </div>
 
@@ -177,6 +178,7 @@
                             <div class="shrink-0">
                                 <img class="rounded-lg movie-poster-shadow w-24 h-36 object-cover"
                                      src="{{ ($movie['cover'] ?? 0) == 1 ? getImageAssetUrl('movies', $movie['imdbid'] . '-cover', url('/covers/movies/no-cover.jpg')) : url('/covers/movies/no-cover.jpg') }}"
+                                     loading="lazy"
                                      alt="{{ e($movie['title'] ?? '') }}"/>
                             </div>
                             <div class="flex-1 min-w-0">

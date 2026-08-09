@@ -129,30 +129,9 @@
             @foreach($usefulLinks as $link)
                 <div class="px-2 py-2">
                     @if($link->url)
-                        @php
-                            $url = $link->url;
-
-                            // Check if URL has protocol
-                            $hasProtocol = str_starts_with($url, 'http://') || str_starts_with($url, 'https://');
-
-                            // Check if URL is a domain pattern (e.g., google.com, chatgpt.ai)
-                            // Pattern: contains at least one dot and doesn't start with /
-                            $isDomain = !str_starts_with($url, '/') && preg_match('/^[a-zA-Z0-9][a-zA-Z0-9-]*\.[a-zA-Z]{2,}/', $url);
-
-                            $isExternal = $hasProtocol || $isDomain;
-
-                            // Use external URLs as-is (add https:// if domain without protocol), prepend site URL for internal paths
-                            if ($hasProtocol) {
-                                $linkUrl = $url;
-                            } elseif ($isDomain) {
-                                $linkUrl = 'https://' . $url;
-                            } else {
-                                $linkUrl = url($url);
-                            }
-                        @endphp
-                        <a href="{{ $linkUrl }}"
+                        <a href="{{ $link->resolved_url }}"
                            class="block text-gray-300 hover:text-white transition"
-                           @if($isExternal) target="_blank" rel="noopener noreferrer" @endif>
+                           @if($link->is_external_url) target="_blank" rel="noopener noreferrer" @endif>
                             <div class="font-medium mb-1">{{ $link->title }}</div>
                             @if($link->body)
                                 <div class="text-sm text-gray-400 useful-link-content">

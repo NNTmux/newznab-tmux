@@ -2,53 +2,48 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <x-admin.card>
         <!-- Header -->
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                    <i class="fas fa-envelope mr-2"></i>{{ $title }}
-                </h1>
-                <div class="space-x-2">
-                    <form method="POST" action="{{ url('admin/invitations/cleanup') }}" class="inline">
-                        @csrf
-                        <x-button type="submit" variant="danger" icon="fas fa-trash">Cleanup Expired</x-button>
-                    </form>
-                </div>
-            </div>
-        </div>
+        <x-admin.page-header :title="$title" icon="fas fa-envelope">
+            <x-slot:actions>
+                <form method="POST" action="{{ url('admin/invitations/cleanup') }}" class="inline">
+                    @csrf
+                    <x-button type="submit" variant="danger" icon="fas fa-trash">Cleanup Expired</x-button>
+                </form>
+            </x-slot:actions>
+        </x-admin.page-header>
 
         <!-- Statistics Cards -->
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                     <div class="text-sm text-gray-500 dark:text-gray-400">Total Invitations</div>
                     <div class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ $stats['total'] }}</div>
                 </div>
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                     <div class="text-sm text-gray-500 dark:text-gray-400">Pending</div>
                     <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">{{ $stats['pending'] }}</div>
                 </div>
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                     <div class="text-sm text-gray-500 dark:text-gray-400">Used</div>
                     <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ $stats['used'] }}</div>
                 </div>
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                     <div class="text-sm text-gray-500 dark:text-gray-400">Expired</div>
                     <div class="text-2xl font-bold text-red-600 dark:text-red-400">{{ $stats['expired'] }}</div>
                 </div>
             </div>
 
             <div class="grid grid-cols-3 gap-4 mt-4">
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                     <div class="text-sm text-gray-500 dark:text-gray-400">Today</div>
                     <div class="text-xl font-semibold text-gray-800 dark:text-gray-200">{{ $stats['today'] }}</div>
                 </div>
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                     <div class="text-sm text-gray-500 dark:text-gray-400">This Week</div>
                     <div class="text-xl font-semibold text-gray-800 dark:text-gray-200">{{ $stats['this_week'] }}</div>
                 </div>
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                     <div class="text-sm text-gray-500 dark:text-gray-400">This Month</div>
                     <div class="text-xl font-semibold text-gray-800 dark:text-gray-200">{{ $stats['this_month'] }}</div>
                 </div>
@@ -108,21 +103,19 @@
         <div class="overflow-x-auto">
             <form method="POST" action="{{ url('admin/invitations/bulk') }}" id="bulkForm">
                 @csrf
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-900">
-                        <tr>
-                            <th class="px-6 py-3 text-left">
-                                <input type="checkbox" id="select_all" class="rounded">
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Invited By</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Created</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Expires</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                <x-admin.data-table>
+                    <x-slot:head>
+                        <x-admin.th>
+                            <input type="checkbox" id="select_all" class="rounded">
+                        </x-admin.th>
+                        <x-admin.th>Email</x-admin.th>
+                        <x-admin.th>Invited By</x-admin.th>
+                        <x-admin.th>Status</x-admin.th>
+                        <x-admin.th>Created</x-admin.th>
+                        <x-admin.th>Expires</x-admin.th>
+                        <x-admin.th>Actions</x-admin.th>
+                    </x-slot:head>
+
                         @forelse($invitations as $invitation)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td class="px-6 py-4 whitespace-nowrap text-center">
@@ -154,10 +147,10 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $invitation->created_at->format('Y-m-d H:i') }}
+                                    {{ formatDateTime($invitation->created_at) }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $invitation->expires_at ? $invitation->expires_at->format('Y-m-d H:i') : 'Never' }}
+                                    {{ $invitation->expires_at ? formatDateTime($invitation->expires_at) : 'Never' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                     <a href="{{ url('admin/invitations/' . $invitation->id) }}" class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300">
@@ -170,9 +163,15 @@
                                                 <i class="fas fa-paper-plane"></i>
                                             </button>
                                         </form>
-                                        <form method="POST" action="{{ url('admin/invitations/' . $invitation->id . '/cancel') }}" class="inline">
+                                        <form method="POST" action="{{ url('admin/invitations/' . $invitation->id . '/cancel') }}" class="inline"
+                                              x-data="confirmForm"
+                                              data-message="Are you sure you want to cancel this invitation?"
+                                              data-title="Cancel Invitation"
+                                              data-type="danger"
+                                              data-confirm-text="Cancel Invitation"
+                                              @submit.prevent="submit()">
                                             @csrf
-                                            <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300" title="Cancel" data-confirm="Are you sure you want to cancel this invitation?">
+                                            <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300" title="Cancel">
                                                 <i class="fas fa-ban"></i>
                                             </button>
                                         </form>
@@ -186,8 +185,7 @@
                                 </td>
                             </tr>
                         @endforelse
-                    </tbody>
-                </table>
+                </x-admin.data-table>
 
                 <!-- Bulk Actions -->
                 <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
@@ -208,30 +206,27 @@
                 </div>
             </form>
         </div>
-    </div>
+    </x-admin.card>
 
     <!-- Top Inviters Section -->
     @if(count($topInviters) > 0)
-    <div class="mt-8 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <x-admin.card class="mt-8">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
                 <i class="fas fa-trophy mr-2"></i>Top Inviters
             </h2>
         </div>
         <div class="p-6">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-900">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Rank</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Username</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Invitations</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Successful</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Success Rate</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <x-admin.data-table>
+                <x-slot:head>
+                    <x-admin.th>Rank</x-admin.th>
+                    <x-admin.th>Username</x-admin.th>
+                    <x-admin.th>Email</x-admin.th>
+                    <x-admin.th>Total Invitations</x-admin.th>
+                    <x-admin.th>Successful</x-admin.th>
+                    <x-admin.th>Success Rate</x-admin.th>
+                </x-slot:head>
+
                         @foreach($topInviters as $index => $user)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">
@@ -264,11 +259,9 @@
                                 </td>
                             </tr>
                         @endforeach
-                    </tbody>
-                </table>
-            </div>
+            </x-admin.data-table>
         </div>
-    </div>
+    </x-admin.card>
     @endif
 </div>
 

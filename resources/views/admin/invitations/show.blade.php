@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <x-admin.card>
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
@@ -131,14 +131,14 @@
                         <div>
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Created At</dt>
                             <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200">
-                                {{ $invitation->created_at->format('Y-m-d H:i:s') }}
+                                {{ formatDateTimeSeconds($invitation->created_at) }}
                                 <span class="text-gray-500 dark:text-gray-400">({{ $invitation->created_at->diffForHumans() }})</span>
                             </dd>
                         </div>
                         <div>
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Updated At</dt>
                             <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200">
-                                {{ $invitation->updated_at->format('Y-m-d H:i:s') }}
+                                {{ formatDateTimeSeconds($invitation->updated_at) }}
                                 <span class="text-gray-500 dark:text-gray-400">({{ $invitation->updated_at->diffForHumans() }})</span>
                             </dd>
                         </div>
@@ -146,7 +146,7 @@
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Expires At</dt>
                             <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200">
                                 @if($invitation->expires_at)
-                                    {{ $invitation->expires_at->format('Y-m-d H:i:s') }}
+                                    {{ formatDateTimeSeconds($invitation->expires_at) }}
                                     <span class="text-gray-500 dark:text-gray-400">({{ $invitation->expires_at->diffForHumans() }})</span>
                                     @if($invitation->expires_at->isPast())
                                         <span class="ml-2 text-red-600 dark:text-red-400"><i class="fas fa-exclamation-triangle"></i> Expired</span>
@@ -160,7 +160,7 @@
                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Used At</dt>
                             <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200">
                                 @if($invitation->used_at)
-                                    {{ $invitation->used_at->format('Y-m-d H:i:s') }}
+                                    {{ formatDateTimeSeconds($invitation->used_at) }}
                                     <span class="text-gray-500 dark:text-gray-400">({{ $invitation->used_at->diffForHumans() }})</span>
                                 @else
                                     <span class="text-gray-500 dark:text-gray-400">Not used yet</span>
@@ -198,7 +198,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </x-admin.card>
 </div>
 
 {{-- Scripts moved to resources/js/csp-safe.js --}}

@@ -101,7 +101,7 @@
                     @forelse($history as $record)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                {{ $record->created_at->format('Y-m-d H:i:s') }}
+                                {{ formatDateTimeSeconds($record->created_at) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                 @if($record->oldRole)
@@ -122,13 +122,13 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                                {{ $record->old_expiry_date ? $record->old_expiry_date->format('Y-m-d H:i') : '-' }}
+                                {{ $record->old_expiry_date ? formatDateTime($record->old_expiry_date) : '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                                {{ $record->new_expiry_date ? $record->new_expiry_date->format('Y-m-d H:i') : '-' }}
+                                {{ $record->new_expiry_date ? formatDateTime($record->new_expiry_date) : '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                                {{ $record->effective_date ? $record->effective_date->format('Y-m-d H:i') : '-' }}
+                                {{ $record->effective_date ? formatDateTime($record->effective_date) : '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
                                 @if($record->is_stacked)

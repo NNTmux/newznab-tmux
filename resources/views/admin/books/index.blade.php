@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <x-admin.card>
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
@@ -16,20 +16,17 @@
         </div>
 
         <!-- Books Table -->
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-900">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Cover</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Author</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Publisher</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Published</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Created</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+        <x-admin.data-table>
+            <x-slot:head>
+                <x-admin.th>Cover</x-admin.th>
+                <x-admin.th>Title</x-admin.th>
+                <x-admin.th>Author</x-admin.th>
+                <x-admin.th>Publisher</x-admin.th>
+                <x-admin.th>Published</x-admin.th>
+                <x-admin.th>Created</x-admin.th>
+                <x-admin.th>Actions</x-admin.th>
+            </x-slot:head>
+
                     @forelse($bookList as $book)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -37,6 +34,7 @@
                                     <img src="{{ asset('storage/covers/book/' . $book->id . (file_exists(storage_path('covers/book/' . $book->id . '.webp')) ? '.webp' : '.jpg')) }}"
                                          alt="{{ $book->title }}"
                                          class="h-16 w-12 object-cover rounded shadow"
+                                         loading="lazy"
                                          data-fallback-src="{{ asset('images/no-cover.png') }}">
                                 @else
                                     <div class="h-16 w-12 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
@@ -68,7 +66,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                {{ $book->created_at ? $book->created_at->format('Y-m-d') : '—' }}
+                                {{ $book->created_at ? formatDate($book->created_at) : '—' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <a href="{{ url('admin/book-edit?id=' . $book->id) }}"
@@ -93,14 +91,12 @@
                             </td>
                         </tr>
                     @endforelse
-                </tbody>
-            </table>
-        </div>
+        </x-admin.data-table>
 
         <!-- Pagination -->
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
             {{ $bookList->links() }}
         </div>
-    </div>
+    </x-admin.card>
 </div>
 @endsection

@@ -423,7 +423,11 @@ class AdminReleaseReportControllerTest extends TestCase
         $this->assertFileExists($browseServicePath);
 
         $detailsController = file_get_contents($detailsControllerPath);
+        // The details view is split into partials under details/partials/; assert against the combined source.
         $detailsView = file_get_contents($detailsViewPath);
+        foreach (glob(resource_path('views/details/partials/*.blade.php')) ?: [] as $detailsPartial) {
+            $detailsView .= file_get_contents($detailsPartial);
+        }
         $releaseResultsComponent = file_get_contents($releaseResultsComponentPath);
         $browseService = file_get_contents($browseServicePath);
 

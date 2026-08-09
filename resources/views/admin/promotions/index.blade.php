@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <x-admin.card>
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
@@ -21,20 +21,17 @@
 
         <!-- Promotions Table -->
         @if(count($promotions) > 0)
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-900">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Applicable Roles</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Additional Days</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Start Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">End Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <x-admin.data-table>
+                <x-slot:head>
+                    <x-admin.th>Name</x-admin.th>
+                    <x-admin.th>Applicable Roles</x-admin.th>
+                    <x-admin.th>Additional Days</x-admin.th>
+                    <x-admin.th>Start Date</x-admin.th>
+                    <x-admin.th>End Date</x-admin.th>
+                    <x-admin.th>Status</x-admin.th>
+                    <x-admin.th>Actions</x-admin.th>
+                </x-slot:head>
+
                         @foreach($promotions as $promotion)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -63,10 +60,10 @@
                                     <span class="font-semibold">{{ $promotion->additional_days }}</span> days
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $promotion->start_date ? $promotion->start_date->format('Y-m-d') : 'No limit' }}
+                                    {{ $promotion->start_date ? formatDate($promotion->start_date) : 'No limit' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $promotion->end_date ? $promotion->end_date->format('Y-m-d') : 'No limit' }}
+                                    {{ $promotion->end_date ? formatDate($promotion->end_date) : 'No limit' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @php
@@ -125,9 +122,7 @@
                                 </td>
                             </tr>
                         @endforeach
-                    </tbody>
-                </table>
-            </div>
+            </x-admin.data-table>
         @else
             <div class="px-6 py-12 text-center">
                 <i class="fas fa-gift text-gray-400 text-5xl mb-4"></i>
@@ -135,7 +130,7 @@
                 <p class="text-gray-500 dark:text-gray-400">Create your first promotion to get started.</p>
             </div>
         @endif
-    </div>
+    </x-admin.card>
 </div>
 @endsection
 

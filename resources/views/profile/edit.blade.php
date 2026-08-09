@@ -303,7 +303,13 @@
                 <div class="flex space-x-2">
                     <a href="{{ route('profileedit', ['action' => 'newapikey']) }}"
                        class="px-6 py-2 text-primary-700 bg-primary-100 rounded-lg hover:bg-primary-200 transition"
-                       data-confirm="Are you sure you want to generate a new API key?">
+                       x-data="confirmLink"
+                       data-url="{{ route('profileedit', ['action' => 'newapikey']) }}"
+                       data-title="New API Key"
+                       data-message="Are you sure you want to generate a new API key?"
+                       data-confirm-text="Generate"
+                       data-type="warning"
+                       @click.prevent="navigate()">
                         <i class="fas fa-key mr-2"></i>New API Key
                     </a>
                     <x-button type="submit" icon="fas fa-save">Save Changes</x-button>

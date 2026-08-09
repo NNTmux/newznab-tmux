@@ -123,6 +123,7 @@
                                             <img src="{{ url('/covers/games/' . $result->cover) }}"
                                                  alt="{{ $result->title ?? $result->searchname }}"
                                                  class="w-32 h-48 object-cover"
+                                                 loading="lazy"
                                                  data-fallback-src="{{ url('/images/no-cover.png') }}">
                                         @else
                                             <div class="w-32 h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
@@ -184,13 +185,14 @@
                 {{ $results->links() }}
             </div>
         @else
-            <!-- No Results -->
-            <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-8 text-center">
-                <i class="fa fa-gamepad text-yellow-600 dark:text-yellow-500 text-5xl mb-4"></i>
-                <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">No games found</h3>
-                <p class="text-gray-600 dark:text-gray-400 mb-4">Try adjusting your search filters or browse all games.</p>
-                <x-button-link href="{{ url('/Games') }}" icon="fa fa-gamepad">Browse All Games</x-button-link>
-            </div>
+            <x-empty-state
+                icon="fa fa-gamepad"
+                title="No games found"
+                message="Try adjusting your search filters or browse all games."
+                :action-url="url('/Games')"
+                action-label="Browse All Games"
+                action-icon="fa fa-gamepad"
+            />
         @endif
     </div>
 </div>

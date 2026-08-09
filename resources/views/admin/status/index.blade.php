@@ -112,7 +112,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             <span class="{{ $incidentStatusBadge($incident->status) }}">{{ $incident->status->label() }}</span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">{{ $incident->started_at->format('Y-m-d H:i') }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">{{ formatDateTime($incident->started_at) }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
                             <a href="{{ route('admin.status.edit', $incident) }}" class="text-primary-600 dark:text-primary-400 hover:underline">Edit</a>
                             @if($incident->status !== IncidentStatusEnum::Resolved)
@@ -121,7 +121,13 @@
                                     <button type="submit" class="text-emerald-600 dark:text-emerald-400 hover:underline">Resolve</button>
                                 </form>
                             @endif
-                            <form action="{{ route('admin.status.destroy', $incident) }}" method="post" class="inline" onsubmit="return confirm('Delete this incident?');">
+                            <form action="{{ route('admin.status.destroy', $incident) }}" method="post" class="inline"
+                                  x-data="confirmForm"
+                                  data-message="Are you sure you want to delete this incident?"
+                                  data-title="Delete Incident"
+                                  data-type="danger"
+                                  data-confirm-text="Delete"
+                                  @submit.prevent="submit()">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-red-600 dark:text-red-400 hover:underline">Delete</button>

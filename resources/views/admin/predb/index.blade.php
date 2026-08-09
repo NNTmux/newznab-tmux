@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <x-admin.card>
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
@@ -39,21 +39,18 @@
         </div>
 
         <!-- PreDB Table -->
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-900">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Category</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Size</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Files</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pre Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Source</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Release</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+        <x-admin.data-table>
+            <x-slot:head>
+                <x-admin.th>Title</x-admin.th>
+                <x-admin.th>Category</x-admin.th>
+                <x-admin.th>Size</x-admin.th>
+                <x-admin.th>Files</x-admin.th>
+                <x-admin.th>Pre Date</x-admin.th>
+                <x-admin.th>Source</x-admin.th>
+                <x-admin.th>Status</x-admin.th>
+                <x-admin.th>Release</x-admin.th>
+            </x-slot:head>
+
                     @forelse($results as $pre)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4">
@@ -123,28 +120,22 @@
                             </td>
                         </tr>
                     @empty
+                        @php
+                            $predbEmptyTitle = $lastSearch ? 'No PreDB entries found for "'.$lastSearch.'"' : 'No PreDB entries available';
+                        @endphp
                         <tr>
-                            <td colspan="8" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                                @if($lastSearch)
-                                    <div class="flex flex-col items-center">
-                                        <i class="fas fa-search text-4xl mb-3"></i>
-                                        <p class="text-lg">No PreDB entries found for "{{ $lastSearch }}"</p>
-                                        <a href="{{ url('admin/predb') }}" class="mt-3 text-primary-600 dark:text-primary-400 hover:underline">
+                            <td colspan="8" class="p-0">
+                                <x-admin.empty-state :icon="$lastSearch ? 'fas fa-search' : 'fas fa-database'" :title="$predbEmptyTitle">
+                                    @if($lastSearch)
+                                        <a href="{{ url('admin/predb') }}" class="text-primary-600 dark:text-primary-400 hover:underline">
                                             Clear search and view all
                                         </a>
-                                    </div>
-                                @else
-                                    <div class="flex flex-col items-center">
-                                        <i class="fas fa-database text-4xl mb-3"></i>
-                                        <p class="text-lg">No PreDB entries available</p>
-                                    </div>
-                                @endif
+                                    @endif
+                                </x-admin.empty-state>
                             </td>
                         </tr>
                     @endforelse
-                </tbody>
-            </table>
-        </div>
+        </x-admin.data-table>
 
         <!-- Pagination -->
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
@@ -157,7 +148,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </x-admin.card>
 
     <!-- Info Box -->
     @if($lastSearch)

@@ -21,7 +21,7 @@
     </div>
 
     <!-- Promotion Info Card -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-6">
+    <x-admin.card class="p-6 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Status</p>
@@ -41,11 +41,11 @@
             </div>
             <div>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Start Date</p>
-                <p class="text-xl font-bold text-gray-800 dark:text-gray-200">{{ $promotion->start_date ? $promotion->start_date->format('Y-m-d') : 'No limit' }}</p>
+                <p class="text-xl font-bold text-gray-800 dark:text-gray-200">{{ $promotion->start_date ? formatDate($promotion->start_date) : 'No limit' }}</p>
             </div>
             <div>
                 <p class="text-sm text-gray-500 dark:text-gray-400">End Date</p>
-                <p class="text-xl font-bold text-gray-800 dark:text-gray-200">{{ $promotion->end_date ? $promotion->end_date->format('Y-m-d') : 'No limit' }}</p>
+                <p class="text-xl font-bold text-gray-800 dark:text-gray-200">{{ $promotion->end_date ? formatDate($promotion->end_date) : 'No limit' }}</p>
             </div>
         </div>
         @if($promotion->description)
@@ -54,10 +54,10 @@
                 <p class="text-gray-800 dark:text-gray-200 mt-1">{{ $promotion->description }}</p>
             </div>
         @endif
-    </div>
+    </x-admin.card>
 
     <!-- Date Range Filter -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-6">
+    <x-admin.card class="p-6 mb-6">
         <form method="GET" action="{{ route('admin.promotions.show-statistics', $promotion->id) }}" class="flex flex-wrap gap-4 items-end" x-data="periodFilter({{ $selectedPeriod === 'custom' ? 'true' : 'false' }})" x-ref="periodForm">
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Time Period</label>
@@ -73,22 +73,22 @@
             <div x-show="showCustom" x-cloak class="flex gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Start Date</label>
-                    <input type="date" name="start_date" value="{{ $startDate ? $startDate->format('Y-m-d') : '' }}" class="form-input rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                    <input type="date" name="start_date" value="{{ $startDate ? formatDate($startDate) : '' }}" class="form-input rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">End Date</label>
-                    <input type="date" name="end_date" value="{{ $endDate->format('Y-m-d') }}" class="form-input rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                    <input type="date" name="end_date" value="{{ formatDate($endDate) }}" class="form-input rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
                 </div>
                 <div>
                     <x-button type="submit" icon="fas fa-filter">Apply</x-button>
                 </div>
             </div>
         </form>
-    </div>
+    </x-admin.card>
 
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <x-admin.card class="p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-primary-100 dark:bg-primary-900 rounded-full p-3">
                     <i class="fas fa-arrow-up text-2xl text-primary-600 dark:text-primary-400"></i>
@@ -98,9 +98,9 @@
                     <p class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ number_format($stats['total_upgrades']) }}</p>
                 </div>
             </div>
-        </div>
+        </x-admin.card>
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <x-admin.card class="p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-green-100 dark:bg-green-900 rounded-full p-3">
                     <i class="fas fa-users text-2xl text-green-600 dark:text-green-400"></i>
@@ -110,9 +110,9 @@
                     <p class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ number_format($stats['unique_users']) }}</p>
                 </div>
             </div>
-        </div>
+        </x-admin.card>
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <x-admin.card class="p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-purple-100 dark:bg-purple-900 rounded-full p-3">
                     <i class="fas fa-calendar-plus text-2xl text-purple-600 dark:text-purple-400"></i>
@@ -122,9 +122,9 @@
                     <p class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ number_format($stats['total_days_added']) }}</p>
                 </div>
             </div>
-        </div>
+        </x-admin.card>
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <x-admin.card class="p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-yellow-100 dark:bg-yellow-900 rounded-full p-3">
                     <i class="fas fa-user-tag text-2xl text-yellow-600 dark:text-yellow-400"></i>
@@ -134,12 +134,12 @@
                     <p class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ number_format($stats['roles_affected']) }}</p>
                 </div>
             </div>
-        </div>
+        </x-admin.card>
     </div>
 
     <!-- Statistics by Role -->
     @if(count($statsByRole) > 0)
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm mb-6">
+    <x-admin.card class="mb-6">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
                 <i class="fas fa-user-tag mr-2"></i>Statistics by Role
@@ -177,12 +177,12 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </x-admin.card>
     @endif
 
     <!-- Daily Activity Chart -->
     @if($dailyStats->isNotEmpty())
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm mb-6">
+    <x-admin.card class="mb-6">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
                 <i class="fas fa-chart-area mr-2"></i>Daily Activity
@@ -217,11 +217,11 @@
                 </table>
             </div>
         </div>
-    </div>
+    </x-admin.card>
     @endif
 
     <!-- Recent Applications -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <x-admin.card>
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
                 <i class="fas fa-list mr-2"></i>Recent Applications
@@ -262,13 +262,13 @@
                                 <span class="text-sm text-gray-500 dark:text-gray-400">days</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                {{ $application->previous_expiry_date ? $application->previous_expiry_date->format('Y-m-d H:i') : 'N/A' }}
+                                {{ $application->previous_expiry_date ? formatDateTime($application->previous_expiry_date) : 'N/A' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                {{ $application->new_expiry_date ? $application->new_expiry_date->format('Y-m-d H:i') : 'N/A' }}
+                                {{ $application->new_expiry_date ? formatDateTime($application->new_expiry_date) : 'N/A' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                <div>{{ $application->applied_at->format('Y-m-d H:i') }}</div>
+                                <div>{{ formatDateTime($application->applied_at) }}</div>
                                 <div class="text-xs">{{ $application->applied_at->diffForHumans() }}</div>
                             </td>
                         </tr>
@@ -287,7 +287,7 @@
                 {{ $applications->appends(request()->query())->links() }}
             </div>
         @endif
-    </div>
+    </x-admin.card>
 </div>
 @endsection
 

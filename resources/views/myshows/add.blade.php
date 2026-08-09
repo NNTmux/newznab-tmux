@@ -24,6 +24,7 @@
                     <img class="rounded-lg shadow-md w-24 h-auto"
                          src="{{ getImageAssetUrl('tvshows', $video . '_thumb', url('/covers/tvshows/no-cover.jpg')) }}"
                          data-fallback-src="{{ url('/covers/tvshows/no-cover.jpg') }}"
+                         loading="lazy"
                          alt="{{ e($show['title'] ?? '') }}" />
 
                     <div>

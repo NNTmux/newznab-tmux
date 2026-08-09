@@ -18,7 +18,7 @@
      data-refresh-interval="{{ 60 * 1000 }}">
     <div class="space-y-6" data-dashboard-content>
     <!-- Welcome Section -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+    <x-admin.card class="p-6">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
                 <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Admin Dashboard</h2>
@@ -31,7 +31,7 @@
                 <p class="mt-1 text-xs text-green-600 dark:text-green-400">Auto-refreshes every minute</p>
             </div>
         </div>
-    </div>
+    </x-admin.card>
 
     <!-- Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
@@ -228,8 +228,8 @@
                     <div class="mt-3">
                         <p class="text-base font-semibold text-gray-900 dark:text-gray-100">{{ $registrationStatus['active_period']->name }}</p>
                         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                            {{ $registrationStatus['active_period']->starts_at->format('Y-m-d H:i') }} to
-                            {{ $registrationStatus['active_period']->ends_at->format('Y-m-d H:i') }}
+                            {{ formatDateTime($registrationStatus['active_period']->starts_at) }} to
+                            {{ formatDateTime($registrationStatus['active_period']->ends_at) }}
                         </p>
                     </div>
                     <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">This window is active on the public registration form right now.</p>
@@ -238,8 +238,8 @@
                     <div class="mt-3">
                         <p class="text-base font-semibold text-gray-900 dark:text-gray-100">{{ $nextRegistrationPeriod->name }}</p>
                         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                            {{ $nextRegistrationPeriod->starts_at->format('Y-m-d H:i') }} to
-                            {{ $nextRegistrationPeriod->ends_at->format('Y-m-d H:i') }}
+                            {{ formatDateTime($nextRegistrationPeriod->starts_at) }} to
+                            {{ formatDateTime($nextRegistrationPeriod->ends_at) }}
                         </p>
                     </div>
                     <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">The next temporary public signup window is already scheduled.</p>
@@ -508,7 +508,7 @@
     @endif
 
     <!-- Quick Links -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+    <x-admin.card class="p-6">
         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Quick Links</h3>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <a href="{{ url('/admin/user-list') }}" class="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:bg-gray-800 rounded-lg transition">
@@ -528,7 +528,7 @@
                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Settings</span>
             </a>
         </div>
-    </div>
+    </x-admin.card>
 </div>
 </div>
 @endsection

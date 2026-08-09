@@ -16,7 +16,7 @@
     </div>
 
     <!-- Date Range Filter -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-6">
+    <x-admin.card class="p-6 mb-6">
         <form method="GET" action="{{ route('admin.promotions.statistics') }}" class="flex flex-wrap gap-4 items-end" x-data="periodFilter({{ $selectedPeriod === 'custom' ? 'true' : 'false' }})" x-ref="periodForm">
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quick Select</label>
@@ -32,22 +32,22 @@
             <div x-show="showCustom" x-cloak class="flex gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Start Date</label>
-                    <input type="date" name="start_date" value="{{ $startDate ? $startDate->format('Y-m-d') : '' }}" class="form-input rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                    <input type="date" name="start_date" value="{{ $startDate ? formatDate($startDate) : '' }}" class="form-input rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">End Date</label>
-                    <input type="date" name="end_date" value="{{ $endDate->format('Y-m-d') }}" class="form-input rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                    <input type="date" name="end_date" value="{{ formatDate($endDate) }}" class="form-input rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
                 </div>
                 <div>
                     <x-button type="submit" icon="fas fa-filter">Apply</x-button>
                 </div>
             </div>
         </form>
-    </div>
+    </x-admin.card>
 
     <!-- Overall Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <x-admin.card class="p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-primary-100 dark:bg-primary-900 rounded-full p-3">
                     <i class="fas fa-gift text-2xl text-primary-600 dark:text-primary-400"></i>
@@ -57,9 +57,9 @@
                     <p class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ $overallStats['total_promotions'] }}</p>
                 </div>
             </div>
-        </div>
+        </x-admin.card>
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <x-admin.card class="p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-green-100 dark:bg-green-900 rounded-full p-3">
                     <i class="fas fa-check-circle text-2xl text-green-600 dark:text-green-400"></i>
@@ -69,9 +69,9 @@
                     <p class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ $overallStats['active_promotions'] }}</p>
                 </div>
             </div>
-        </div>
+        </x-admin.card>
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <x-admin.card class="p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-purple-100 dark:bg-purple-900 rounded-full p-3">
                     <i class="fas fa-arrow-up text-2xl text-purple-600 dark:text-purple-400"></i>
@@ -81,9 +81,9 @@
                     <p class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ number_format($overallStats['total_applications']) }}</p>
                 </div>
             </div>
-        </div>
+        </x-admin.card>
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <x-admin.card class="p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-yellow-100 dark:bg-yellow-900 rounded-full p-3">
                     <i class="fas fa-users text-2xl text-yellow-600 dark:text-yellow-400"></i>
@@ -93,9 +93,9 @@
                     <p class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ number_format($overallStats['unique_users']) }}</p>
                 </div>
             </div>
-        </div>
+        </x-admin.card>
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+        <x-admin.card class="p-6">
             <div class="flex items-center">
                 <div class="shrink-0 bg-red-100 dark:bg-red-900 rounded-full p-3">
                     <i class="fas fa-calendar-plus text-2xl text-red-600 dark:text-red-400"></i>
@@ -105,12 +105,12 @@
                     <p class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ number_format($overallStats['total_days_added']) }}</p>
                 </div>
             </div>
-        </div>
+        </x-admin.card>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!-- Top Promotions -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+        <x-admin.card>
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
                     <i class="fas fa-trophy mr-2 text-yellow-500"></i>Top Promotions by Usage
@@ -138,10 +138,10 @@
                     </div>
                 @endif
             </div>
-        </div>
+        </x-admin.card>
 
         <!-- Statistics by Role -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+        <x-admin.card>
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
                     <i class="fas fa-user-tag mr-2"></i>Statistics by Role
@@ -176,11 +176,11 @@
                     </div>
                 @endif
             </div>
-        </div>
+        </x-admin.card>
     </div>
 
     <!-- All Promotions with Statistics -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <x-admin.card>
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
                 <i class="fas fa-list mr-2"></i>All Promotions Statistics
@@ -241,10 +241,10 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </x-admin.card>
 
     <!-- Recent Activity -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm mt-6">
+    <x-admin.card class="mt-6">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
                 <i class="fas fa-clock mr-2"></i>Recent Promotion Activity
@@ -292,7 +292,7 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </x-admin.card>
 </div>
 @endsection
 

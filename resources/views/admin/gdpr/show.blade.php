@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <x-admin.card>
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
@@ -57,11 +57,11 @@
                         </div>
                         <div>
                             <dt class="text-gray-500 dark:text-gray-400">Created</dt>
-                            <dd class="text-gray-900 dark:text-gray-100 font-medium">{{ $gdprRequest->created_at?->format('Y-m-d H:i') }}</dd>
+                            <dd class="text-gray-900 dark:text-gray-100 font-medium">{{ formatDateTime($gdprRequest->created_at) }}</dd>
                         </div>
                         <div>
                             <dt class="text-gray-500 dark:text-gray-400">Completed</dt>
-                            <dd class="text-gray-900 dark:text-gray-100 font-medium">{{ $gdprRequest->completed_at?->format('Y-m-d H:i') ?? '—' }}</dd>
+                            <dd class="text-gray-900 dark:text-gray-100 font-medium">{{ formatDateTime($gdprRequest->completed_at) ?: '—' }}</dd>
                         </div>
                     </dl>
 
@@ -87,7 +87,7 @@
                             <div class="border-l-4 border-primary-500 pl-3">
                                 <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $auditLog->event }}</div>
                                 <div class="text-sm text-gray-600 dark:text-gray-400">{{ $auditLog->description }}</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-500">{{ $auditLog->created_at?->format('Y-m-d H:i:s') }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-500">{{ formatDateTimeSeconds($auditLog->created_at) }}</div>
                             </div>
                         @empty
                             <p class="text-sm text-gray-500 dark:text-gray-400">No GDPR audit events recorded for this request yet.</p>
@@ -129,12 +129,12 @@
                 @if($gdprRequest->isDownloadableExport())
                     <div class="border border-green-200 dark:border-green-800 rounded-lg p-5 bg-green-50 dark:bg-green-900/10">
                         <h2 class="text-lg font-semibold text-green-800 dark:text-green-200 mb-2">Export Ready</h2>
-                        <p class="text-sm text-green-700 dark:text-green-300">The user can download this export until {{ $gdprRequest->export_expires_at?->format('Y-m-d H:i') }}.</p>
+                        <p class="text-sm text-green-700 dark:text-green-300">The user can download this export until {{ formatDateTime($gdprRequest->export_expires_at) }}.</p>
                     </div>
                 @endif
             </div>
         </div>
-    </div>
+    </x-admin.card>
 </div>
 @endsection
 

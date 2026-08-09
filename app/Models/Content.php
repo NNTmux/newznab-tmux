@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -200,5 +201,57 @@ class Content extends Model
     public function isHomepage(): bool
     {
         return $this->contenttype === self::TYPE_INDEX;
+    }
+
+    /**
+     * Resolve the content URL: external URLs are used as-is (domains without
+     * protocol get https://), internal paths are prefixed with the site URL.
+     *
+     * @return Attribute<string|null, never>
+     */
+    protected function resolvedUrl(): Attribute
+    {
+        return Attribute::make(
+            get: function (): ?string {
+                $url = $this->url;
+
+                if (empty($url)) {
+                    return null;
+                }
+
+                if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+                    return $url;
+                }
+
+                // Domain pattern without protocol (e.g. google.com, chatgpt.ai)
+                if (! str_starts_with($url, '/') && preg_match('/^[a-zA-Z0-9][a-zA-Z0-9-]*\.[a-zA-Z]{2,}/', $url)) {
+                    return 'https://'.$url;
+                }
+
+                return url($url);
+            }
+        );
+    }
+
+    /**
+     * Whether the content URL points to an external site.
+     *
+     * @return Attribute<bool, never>
+     */
+    protected function isExternalUrl(): Attribute
+    {
+        return Attribute::make(
+            get: function (): bool {
+                $url = $this->url;
+
+                if (empty($url)) {
+                    return false;
+                }
+
+                return str_starts_with($url, 'http://')
+                    || str_starts_with($url, 'https://')
+                    || (! str_starts_with($url, '/') && preg_match('/^[a-zA-Z0-9][a-zA-Z0-9-]*\.[a-zA-Z]{2,}/', $url));
+            }
+        );
     }
 }

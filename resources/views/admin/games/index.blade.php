@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <x-admin.card>
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
@@ -61,21 +61,18 @@
 
         <!-- Game List Table -->
         @if(!empty($gamelist) && count($gamelist) > 0)
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-900">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Publisher</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Genre</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ESRB</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Release Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Cover</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <x-admin.data-table>
+                <x-slot:head>
+                    <x-admin.th>ID</x-admin.th>
+                    <x-admin.th>Title</x-admin.th>
+                    <x-admin.th>Publisher</x-admin.th>
+                    <x-admin.th>Genre</x-admin.th>
+                    <x-admin.th>ESRB</x-admin.th>
+                    <x-admin.th>Release Date</x-admin.th>
+                    <x-admin.th>Cover</x-admin.th>
+                    <x-admin.th>Actions</x-admin.th>
+                </x-slot:head>
+
                         @foreach($gamelist as $game)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
@@ -120,22 +117,14 @@
                                 </td>
                             </tr>
                         @endforeach
-                    </tbody>
-                </table>
-            </div>
+            </x-admin.data-table>
         @else
-            <div class="px-6 py-12 text-center">
-                <i class="fas fa-gamepad text-gray-400 text-5xl mb-4"></i>
-                <p class="text-gray-500 dark:text-gray-400 text-lg">
-                    @if(!empty($lastSearch))
-                        No games found matching "{{ $lastSearch }}".
-                    @else
-                        No games found in the database.
-                    @endif
-                </p>
-            </div>
+            @php
+                $gamesEmptyMessage = ! empty($lastSearch) ? 'No games found matching "'.$lastSearch.'".' : 'No games found in the database.';
+            @endphp
+            <x-admin.empty-state icon="fas fa-gamepad" title="No games found" :message="$gamesEmptyMessage" />
         @endif
-    </div>
+    </x-admin.card>
 </div>
 @endsection
 
