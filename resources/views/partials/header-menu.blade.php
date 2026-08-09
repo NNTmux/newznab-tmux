@@ -33,16 +33,7 @@
                                                 <div class="submenu absolute left-full top-0 w-40 bg-gray-900 dark:bg-gray-950 rounded-xl shadow-lg z-50 ml-0.5 hidden">
                                                     <a href="{{ url('/browse/TV/' . $subcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">All Foreign</a>
                                                     <div class="border-t border-white/10 dark:border-white/5"></div>
-                                                    <a href="{{ route('search', ['search' => 'German|Deutsch|DE|GER', 't' => App\Models\Category::TV_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">German</a>
-                                                    <a href="{{ route('search', ['search' => 'French|Francais|FR|FRENCH|VOSTFR|TRUEFRENCH', 't' => App\Models\Category::TV_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">French</a>
-                                                    <a href="{{ route('search', ['search' => 'Spanish|Espanol|ES|ESP|SPANISH|Latino', 't' => App\Models\Category::TV_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">Spanish</a>
-                                                    <a href="{{ route('search', ['search' => 'Italian|Italiano|IT|ITA', 't' => App\Models\Category::TV_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">Italian</a>
-                                                    <a href="{{ route('search', ['search' => 'Dutch|NL|Flemish|Nederlands|DUTCH', 't' => App\Models\Category::TV_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">Dutch</a>
-                                                    <a href="{{ route('search', ['search' => 'Japanese|JP|JPN|JAP', 't' => App\Models\Category::TV_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">Japanese</a>
-                                                    <a href="{{ route('search', ['search' => 'Korean|KR|KOR|K-Drama', 't' => App\Models\Category::TV_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">Korean</a>
-                                                    <a href="{{ route('search', ['search' => 'Chinese|Mandarin|Cantonese|CH|CHN|C-Drama', 't' => App\Models\Category::TV_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">Chinese</a>
-                                                    <a href="{{ route('search', ['search' => 'Russian|RU|RUS', 't' => App\Models\Category::TV_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">Russian</a>
-                                                    <a href="{{ route('search', ['search' => 'Portuguese|PT|POR|Portugues|Brazilian', 't' => App\Models\Category::TV_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">Portuguese</a>
+                                                    @include('partials.foreign-language-links', ['foreignCategory' => App\Models\Category::TV_FOREIGN])
                                                 </div>
                                             </div>
                                         @else
@@ -88,16 +79,7 @@
                                                         <a href="{{ url('/browse/' . $parentcat['title'] . '/' . $subcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">All Foreign</a>
                                                     @endif
                                                     <div class="border-t border-white/10 dark:border-white/5"></div>
-                                                    <a href="{{ route('search', ['search' => 'German|Deutsch|DE|GER', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">German</a>
-                                                    <a href="{{ route('search', ['search' => 'French|Francais|FR|FRENCH|VOSTFR|TRUEFRENCH', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">French</a>
-                                                    <a href="{{ route('search', ['search' => 'Spanish|Espanol|ES|ESP|SPANISH|Latino', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">Spanish</a>
-                                                    <a href="{{ route('search', ['search' => 'Italian|Italiano|IT|ITA', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">Italian</a>
-                                                    <a href="{{ route('search', ['search' => 'Dutch|NL|Flemish|Nederlands|DUTCH', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">Dutch</a>
-                                                    <a href="{{ route('search', ['search' => 'Japanese|JP|JPN|JAP', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">Japanese</a>
-                                                    <a href="{{ route('search', ['search' => 'Korean|KR|KOR|K-Drama', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">Korean</a>
-                                                    <a href="{{ route('search', ['search' => 'Chinese|Mandarin|Cantonese|CH|CHN|C-Drama', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">Chinese</a>
-                                                    <a href="{{ route('search', ['search' => 'Russian|RU|RUS', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">Russian</a>
-                                                    <a href="{{ route('search', ['search' => 'Portuguese|PT|POR|Portugues|Brazilian', 't' => App\Models\Category::MOVIE_FOREIGN]) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">Portuguese</a>
+                                                    @include('partials.foreign-language-links', ['foreignCategory' => App\Models\Category::MOVIE_FOREIGN])
                                                 </div>
                                             </div>
                                         @elseif(auth()->check() && auth()->user()->movieview == "1")
@@ -253,46 +235,12 @@
                             <!-- Theme Switcher -->
                             <div class="px-4 py-2">
                                 <span class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Theme</span>
-                                <div class="flex items-center gap-1" id="dropdown-theme-switcher">
-                                    @php $currentTheme = auth()->user()->theme_preference ?? 'light'; @endphp
-                                    <button type="button" data-theme="light"
-                                        class="dropdown-theme-btn flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs rounded-lg transition {{ $currentTheme === 'light' ? 'bg-primary-600 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}"
-                                        title="Light Mode">
-                                        <i class="fas fa-sun"></i>
-                                        <span>Light</span>
-                                    </button>
-                                    <button type="button" data-theme="dark"
-                                        class="dropdown-theme-btn flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs rounded-lg transition {{ $currentTheme === 'dark' ? 'bg-primary-600 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}"
-                                        title="Dark Mode">
-                                        <i class="fas fa-moon"></i>
-                                        <span>Dark</span>
-                                    </button>
-                                    <button type="button" data-theme="system"
-                                        class="dropdown-theme-btn flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs rounded-lg transition {{ $currentTheme === 'system' ? 'bg-primary-600 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}"
-                                        title="System (Auto)">
-                                        <i class="fas fa-desktop"></i>
-                                        <span>Auto</span>
-                                    </button>
-                                </div>
+                                @include('partials.theme-switcher', ['switcherId' => 'dropdown-theme-switcher', 'btnClass' => 'dropdown-theme-btn', 'mobile' => false])
                             </div>
                             <!-- Color Scheme -->
                             <div class="px-4 py-2">
                                 <span class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Color Scheme</span>
-                                <div class="flex items-center justify-center gap-2" id="dropdown-scheme-switcher">
-                                    @php $currentScheme = auth()->user()->color_scheme ?? 'blue'; @endphp
-                                    <button type="button" data-scheme="blue" title="Blue"
-                                        class="dropdown-scheme-btn w-8 h-8 rounded-full bg-blue-600 transition ring-offset-2 ring-offset-gray-900 {{ $currentScheme === 'blue' ? 'ring-2 ring-primary-500' : '' }}">
-                                        <span class="sr-only">Blue</span>
-                                    </button>
-                                    <button type="button" data-scheme="emerald" title="Emerald"
-                                        class="dropdown-scheme-btn w-8 h-8 rounded-full bg-emerald-600 transition ring-offset-2 ring-offset-gray-900 {{ $currentScheme === 'emerald' ? 'ring-2 ring-primary-500' : '' }}">
-                                        <span class="sr-only">Emerald</span>
-                                    </button>
-                                    <button type="button" data-scheme="violet" title="Violet"
-                                        class="dropdown-scheme-btn w-8 h-8 rounded-full bg-violet-600 transition ring-offset-2 ring-offset-gray-900 {{ $currentScheme === 'violet' ? 'ring-2 ring-primary-500' : '' }}">
-                                        <span class="sr-only">Violet</span>
-                                    </button>
-                                </div>
+                                @include('partials.scheme-switcher', ['switcherId' => 'dropdown-scheme-switcher', 'btnClass' => 'dropdown-scheme-btn', 'mobile' => false])
                             </div>
                             <div class="border-t border-white/10"></div>
                             <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white">
@@ -450,46 +398,12 @@
                     <!-- Mobile Theme Switcher -->
                     <div class="px-4 py-2.5">
                         <span class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Theme</span>
-                        <div class="flex items-center gap-1.5" id="mobile-theme-switcher">
-                            @php $mobileTheme = auth()->user()->theme_preference ?? 'light'; @endphp
-                            <button type="button" data-theme="light"
-                                class="mobile-theme-btn flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg transition touch-target {{ $mobileTheme === 'light' ? 'bg-primary-600 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}"
-                                title="Light Mode">
-                                <i class="fas fa-sun"></i>
-                                <span>Light</span>
-                            </button>
-                            <button type="button" data-theme="dark"
-                                class="mobile-theme-btn flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg transition touch-target {{ $mobileTheme === 'dark' ? 'bg-primary-600 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}"
-                                title="Dark Mode">
-                                <i class="fas fa-moon"></i>
-                                <span>Dark</span>
-                            </button>
-                            <button type="button" data-theme="system"
-                                class="mobile-theme-btn flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg transition touch-target {{ $mobileTheme === 'system' ? 'bg-primary-600 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white' }}"
-                                title="System (Auto)">
-                                <i class="fas fa-desktop"></i>
-                                <span>Auto</span>
-                            </button>
-                        </div>
+                        @include('partials.theme-switcher', ['switcherId' => 'mobile-theme-switcher', 'btnClass' => 'mobile-theme-btn', 'mobile' => true])
                     </div>
                     <!-- Mobile Color Scheme -->
                     <div class="px-4 py-2.5">
                         <span class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Color Scheme</span>
-                        <div class="flex items-center justify-center gap-3" id="mobile-scheme-switcher">
-                            @php $mobileScheme = auth()->user()->color_scheme ?? 'blue'; @endphp
-                            <button type="button" data-scheme="blue" title="Blue"
-                                class="mobile-scheme-btn w-9 h-9 rounded-full bg-blue-600 transition touch-target ring-offset-2 ring-offset-gray-900 {{ $mobileScheme === 'blue' ? 'ring-2 ring-primary-500' : '' }}">
-                                <span class="sr-only">Blue</span>
-                            </button>
-                            <button type="button" data-scheme="emerald" title="Emerald"
-                                class="mobile-scheme-btn w-9 h-9 rounded-full bg-emerald-600 transition touch-target ring-offset-2 ring-offset-gray-900 {{ $mobileScheme === 'emerald' ? 'ring-2 ring-primary-500' : '' }}">
-                                <span class="sr-only">Emerald</span>
-                            </button>
-                            <button type="button" data-scheme="violet" title="Violet"
-                                class="mobile-scheme-btn w-9 h-9 rounded-full bg-violet-600 transition touch-target ring-offset-2 ring-offset-gray-900 {{ $mobileScheme === 'violet' ? 'ring-2 ring-primary-500' : '' }}">
-                                <span class="sr-only">Violet</span>
-                            </button>
-                        </div>
+                        @include('partials.scheme-switcher', ['switcherId' => 'mobile-scheme-switcher', 'btnClass' => 'mobile-scheme-btn', 'mobile' => true])
                     </div>
                 </div>
             @endauth

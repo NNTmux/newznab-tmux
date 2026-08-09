@@ -24,6 +24,7 @@
                     <img class="rounded-lg shadow-md w-24 h-auto"
                          src="{{ getImageAssetUrl('movies', $imdbid . '-cover', url('/covers/movies/no-cover.jpg')) }}"
                          data-fallback-src="{{ url('/covers/movies/no-cover.jpg') }}"
+                         loading="lazy"
                          alt="{{ e($movie['title'] ?? '') }}" />
 
                     <div>
@@ -147,6 +148,7 @@
                                     <td class="px-4 py-3">
                                         <img class="rounded-lg shadow-sm max-w-[120px]"
                                              src="{{ ($movie['cover'] ?? 0) == 1 ? getImageAssetUrl('movies', $movie['imdbid'] . '-cover', url('/covers/movies/no-cover.jpg')) : url('/covers/movies/no-cover.jpg') }}"
+                                             loading="lazy"
                                              alt="{{ e($movie['title'] ?? '') }}"/>
                                     </td>
                                     <td class="px-4 py-3">
@@ -213,6 +215,7 @@
                             <div class="flex gap-3">
                                 <img class="rounded-lg shadow-sm w-20 h-auto shrink-0"
                                      src="{{ ($movie['cover'] ?? 0) == 1 ? getImageAssetUrl('movies', $movie['imdbid'] . '-cover', url('/covers/movies/no-cover.jpg')) : url('/covers/movies/no-cover.jpg') }}"
+                                     loading="lazy"
                                      alt="{{ e($movie['title'] ?? '') }}"/>
                                 <div class="min-w-0 flex-1">
                                     <a href="{{ url("/Movies?imdb={$movie['imdbid']}") }}" class="text-gray-900 dark:text-gray-100 font-semibold hover:text-blue-600 dark:hover:text-blue-400 transition text-sm">

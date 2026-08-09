@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <x-admin.card>
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
@@ -43,20 +43,17 @@
         </div>
 
         <!-- AniDB Table -->
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-900">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Cover</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Type</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Start Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">End Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Rating</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+        <x-admin.data-table>
+            <x-slot:head>
+                <x-admin.th>Cover</x-admin.th>
+                <x-admin.th>Title</x-admin.th>
+                <x-admin.th>Type</x-admin.th>
+                <x-admin.th>Start Date</x-admin.th>
+                <x-admin.th>End Date</x-admin.th>
+                <x-admin.th>Rating</x-admin.th>
+                <x-admin.th>Actions</x-admin.th>
+            </x-slot:head>
+
                     @forelse($anidblist as $anime)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -123,28 +120,22 @@
                             </td>
                         </tr>
                     @empty
+                        @php
+                            $anidbEmptyTitle = $animetitle ? 'No anime found for "'.$animetitle.'"' : 'No anime available';
+                        @endphp
                         <tr>
-                            <td colspan="7" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                                @if($animetitle)
-                                    <div class="flex flex-col items-center">
-                                        <i class="fas fa-search text-4xl mb-3"></i>
-                                        <p class="text-lg">No anime found for "{{ $animetitle }}"</p>
-                                        <a href="{{ url('admin/anidb-list') }}" class="mt-3 text-blue-600 dark:text-blue-400 hover:underline">
+                            <td colspan="7" class="p-0">
+                                <x-admin.empty-state :icon="$animetitle ? 'fas fa-search' : 'fas fa-dragon'" :title="$anidbEmptyTitle">
+                                    @if($animetitle)
+                                        <a href="{{ url('admin/anidb-list') }}" class="text-blue-600 dark:text-blue-400 hover:underline">
                                             Clear search and view all
                                         </a>
-                                    </div>
-                                @else
-                                    <div class="flex flex-col items-center">
-                                        <i class="fas fa-dragon text-4xl mb-3"></i>
-                                        <p class="text-lg">No anime available</p>
-                                    </div>
-                                @endif
+                                    @endif
+                                </x-admin.empty-state>
                             </td>
                         </tr>
                     @endforelse
-                </tbody>
-            </table>
-        </div>
+        </x-admin.data-table>
 
         <!-- Pagination -->
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
@@ -157,7 +148,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </x-admin.card>
 </div>
 
 {{-- Styles moved to resources/css/csp-safe.css --}}

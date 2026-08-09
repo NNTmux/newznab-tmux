@@ -14,7 +14,7 @@
                 <!-- Movie Poster -->
                 <div class="lg:col-span-1">
                     @if(!empty($movie['cover'] ?? null))
-                        <img src="{{ $movie['cover'] }}" alt="{{ $movie['title'] ?? 'Movie' }}" class="movie-detail-poster w-full rounded-lg">
+                        <img src="{{ $movie['cover'] }}" alt="{{ $movie['title'] ?? 'Movie' }}" class="movie-detail-poster w-full rounded-lg" loading="lazy">
                     @else
                         <div class="movie-detail-poster w-full h-96 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
                             <i class="fas fa-film text-gray-400 text-6xl"></i>

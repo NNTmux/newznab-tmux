@@ -83,7 +83,7 @@
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                        <div>{{ $comment->created_at ? $comment->created_at->format('Y-m-d') : '—' }}</div>
+                        <div>{{ $comment->created_at ? formatDate($comment->created_at) : '—' }}</div>
                         <div class="text-xs">{{ $comment->created_at ? $comment->created_at->format('H:i:s') : '' }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">

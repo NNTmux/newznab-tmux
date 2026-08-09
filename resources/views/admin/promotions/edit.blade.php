@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm max-w-3xl mx-auto">
+    <x-admin.card class="max-w-3xl mx-auto">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
@@ -88,7 +88,7 @@
                     <label for="start_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Start Date
                     </label>
-                    <input type="date" name="start_date" id="start_date" value="{{ old('start_date', $promotion->start_date ? $promotion->start_date->format('Y-m-d') : '') }}"
+                    <input type="date" name="start_date" id="start_date" value="{{ old('start_date', $promotion->start_date ? formatDate($promotion->start_date) : '') }}"
                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100">
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Leave blank for no start restriction</p>
                     @error('start_date')
@@ -100,7 +100,7 @@
                     <label for="end_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         End Date
                     </label>
-                    <input type="date" name="end_date" id="end_date" value="{{ old('end_date', $promotion->end_date ? $promotion->end_date->format('Y-m-d') : '') }}"
+                    <input type="date" name="end_date" id="end_date" value="{{ old('end_date', $promotion->end_date ? formatDate($promotion->end_date) : '') }}"
                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100">
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Leave blank for no end restriction</p>
                     @error('end_date')
@@ -132,7 +132,7 @@
                 </button>
             </div>
         </form>
-    </div>
+    </x-admin.card>
 </div>
 @endsection
 

@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <x-admin.card>
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
@@ -51,24 +51,21 @@
             </form>
         </div>
 
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-900">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Requested</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">User</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Type</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Completed</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+        <x-admin.data-table>
+            <x-slot:head>
+                <x-admin.th>ID</x-admin.th>
+                <x-admin.th>Requested</x-admin.th>
+                <x-admin.th>User</x-admin.th>
+                <x-admin.th>Type</x-admin.th>
+                <x-admin.th>Status</x-admin.th>
+                <x-admin.th>Completed</x-admin.th>
+                <x-admin.th>Actions</x-admin.th>
+            </x-slot:head>
+
                     @forelse($requests as $gdprRequest)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">#{{ $gdprRequest->id }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $gdprRequest->created_at?->format('Y-m-d H:i') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ formatDateTime($gdprRequest->created_at) }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                 <div>{{ $gdprRequest->requester_username ?? 'N/A' }}</div>
                                 <div class="text-xs text-gray-500 dark:text-gray-400">{{ $gdprRequest->requester_email ?? 'N/A' }}</div>
@@ -77,7 +74,7 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">{{ ucfirst($gdprRequest->status) }}</span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $gdprRequest->completed_at?->format('Y-m-d H:i') ?? '—' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ formatDateTime($gdprRequest->completed_at) ?: '—' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 <a href="{{ route('admin.gdpr-requests.show', $gdprRequest) }}" class="text-blue-600 dark:text-blue-400 hover:underline">
                                     <i class="fas fa-eye mr-1"></i>View
@@ -89,23 +86,21 @@
                             <td colspan="7" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">No GDPR requests found.</td>
                         </tr>
                     @endforelse
-                </tbody>
-            </table>
-        </div>
+        </x-admin.data-table>
 
         <div class="px-6 py-4">
             {{ $requests->links() }}
         </div>
-    </div>
+    </x-admin.card>
 
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+    <x-admin.card class="p-6">
         <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">Retention Summary</h2>
         <ul class="list-disc pl-6 text-sm text-gray-700 dark:text-gray-300 space-y-1">
             @foreach($retentionPolicy['retained_records'] as $record)
                 <li><strong>{{ $record['table'] }}:</strong> {{ $record['reason'] }} <span class="text-gray-500">({{ str_replace('_', ' ', $record['erasure_action']) }})</span></li>
             @endforeach
         </ul>
-    </div>
+    </x-admin.card>
 </div>
 @endsection
 

@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <x-admin.card>
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
@@ -65,22 +65,19 @@
 
         <!-- Music List Table -->
         @if(!empty($musicList) && count($musicList) > 0)
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-900">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Artist</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Publisher</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Year</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Genre</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tracks</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Cover</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <x-admin.data-table>
+                <x-slot:head>
+                    <x-admin.th>ID</x-admin.th>
+                    <x-admin.th>Title</x-admin.th>
+                    <x-admin.th>Artist</x-admin.th>
+                    <x-admin.th>Publisher</x-admin.th>
+                    <x-admin.th>Year</x-admin.th>
+                    <x-admin.th>Genre</x-admin.th>
+                    <x-admin.th>Tracks</x-admin.th>
+                    <x-admin.th>Cover</x-admin.th>
+                    <x-admin.th>Actions</x-admin.th>
+                </x-slot:head>
+
                         @foreach($musicList as $music)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
@@ -124,9 +121,7 @@
                                 </td>
                             </tr>
                         @endforeach
-                    </tbody>
-                </table>
-            </div>
+            </x-admin.data-table>
         @else
             <div class="px-6 py-12 text-center">
                 <i class="fas fa-music text-gray-400 text-5xl mb-4"></i>
@@ -139,7 +134,7 @@
                 </p>
             </div>
         @endif
-    </div>
+    </x-admin.card>
 </div>
 @endsection
 

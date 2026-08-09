@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <x-admin.card>
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
@@ -130,8 +130,7 @@
                                 @if($hasCover)
                                     <img src="{{ getImageAssetUrl('anime', $anime['anidbid'] . '-cover', url('/covers/anime/no-cover.jpg'), [(string) $anime['anidbid']]) }}"
                                          alt="{{ $anime['title'] }}"
-                                         class="max-w-full h-auto mx-auto rounded shadow-lg"
-                                         style="max-height: 400px;">
+                                         class="max-w-full h-auto mx-auto rounded shadow-lg max-h-[400px]">
                                 @else
                                     <div class="flex flex-col items-center justify-center py-12 text-gray-400 dark:text-gray-500">
                                         <i class="fas fa-dragon text-6xl mb-3"></i>
@@ -257,6 +256,6 @@
                 </div>
             </form>
         </div>
-    </div>
+    </x-admin.card>
 </div>
 @endsection

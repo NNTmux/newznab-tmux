@@ -99,6 +99,7 @@
                                 <img src="{{ getImageAssetUrl('book', (string) $result->id, asset('assets/images/no-cover.png')) }}"
                                      alt="{{ $result->title }}"
                                      class="w-full h-64 object-cover"
+                                     loading="lazy"
                                      data-fallback-src="{{ url('/images/no-cover.png') }}">
                             @else
                                 <div class="w-full h-64 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
@@ -149,15 +150,14 @@
                 {{ $results->links() }}
             </div>
         @else
-            <!-- No Results -->
-            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-8 text-center">
-                <i class="fa fa-book text-yellow-600 text-5xl mb-4"></i>
-                <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">No books found</h3>
-                <p class="text-gray-600 dark:text-gray-400 mb-4">Try adjusting your search filters or browse all books.</p>
-                <a href="{{ url('/Books/All') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700">
-                    <i class="fa fa-book mr-2"></i> Browse All Books
-                </a>
-            </div>
+            <x-empty-state
+                icon="fa fa-book"
+                title="No books found"
+                message="Try adjusting your search filters or browse all books."
+                :action-url="url('/Books/All')"
+                action-label="Browse All Books"
+                action-icon="fa fa-book"
+            />
         @endif
     </div>
 </div>

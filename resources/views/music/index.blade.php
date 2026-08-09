@@ -124,6 +124,7 @@
                                             <img src="{{ url('/covers/music/' . $result->cover) }}"
                                                  alt="{{ $result->artist ?? '' }} - {{ $result->title ?? '' }}"
                                                  class="w-32 h-48 object-cover"
+                                                 loading="lazy"
                                                  data-fallback-src="{{ url('/images/no-cover.png') }}">
                                         @else
                                             <div class="w-32 h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
@@ -181,15 +182,14 @@
                 {{ $results->links() }}
             </div>
         @else
-            <!-- No Results -->
-            <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-8 text-center">
-                <i class="fa fa-music text-yellow-600 dark:text-yellow-500 text-5xl mb-4"></i>
-                <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">No albums found</h3>
-                <p class="text-gray-600 dark:text-gray-400 mb-4">Try adjusting your search filters or browse all music.</p>
-                <a href="{{ url('/browse/Audio/All') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800">
-                    <i class="fa fa-music mr-2"></i> Browse All Audio
-                </a>
-            </div>
+            <x-empty-state
+                icon="fa fa-music"
+                title="No albums found"
+                message="Try adjusting your search filters or browse all music."
+                :action-url="url('/browse/Audio/All')"
+                action-label="Browse All Audio"
+                action-icon="fa fa-music"
+            />
         @endif
     </div>
 </div>

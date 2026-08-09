@@ -38,6 +38,8 @@ class AdminDataComposer
             'loggedin' => $user !== null,
             'isadmin' => $isNntmuxUser && $user->hasRole('Admin'),
             'ismod' => $isNntmuxUser && $user->hasRole('Moderator'),
+            'userTheme' => $isNntmuxUser ? ($user->theme_preference ?? 'light') : 'light',
+            'userColorScheme' => $isNntmuxUser ? ($user->color_scheme ?? 'blue') : 'blue',
         ]);
     }
 

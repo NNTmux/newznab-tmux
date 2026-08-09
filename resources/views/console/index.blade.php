@@ -75,6 +75,7 @@
                                             <img class="w-32 h-48 object-cover"
                                                  src="{{ getReleaseCover($result) }}"
                                                  alt="{{ $result->title }}"
+                                                 loading="lazy"
                                                  data-fallback-src="{{ url('/images/no-cover.png') }}">
                                             @if($totalFailed > 0)
                                                 <div class="absolute top-2 right-2">

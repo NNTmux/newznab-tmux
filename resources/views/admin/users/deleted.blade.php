@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="space-y-6" x-data="adminDeletedUsers">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <x-admin.card>
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
@@ -193,10 +193,10 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                        {{ $user->created_at ? $user->created_at->format('Y-m-d H:i') : 'N/A' }}
+                                        {{ $user->created_at ? formatDateTime($user->created_at) : 'N/A' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                        {{ $user->deleted_at ? $user->deleted_at->format('Y-m-d H:i') : 'N/A' }}
+                                        {{ $user->deleted_at ? formatDateTime($user->deleted_at) : 'N/A' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @if($user->deleted_by === 'Self')
@@ -256,13 +256,9 @@
                 {{ $deletedusers->links() }}
             </div>
         @else
-            <div class="px-6 py-12 text-center">
-                <i class="fas fa-trash-restore text-gray-400 dark:text-gray-600 text-5xl mb-4"></i>
-                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No deleted users found</h3>
-                <p class="text-gray-500 dark:text-gray-400">There are no soft-deleted users matching your filters.</p>
-            </div>
+            <x-admin.empty-state icon="fas fa-trash-restore" title="No deleted users found" message="There are no soft-deleted users matching your filters." />
         @endif
-    </div>
+    </x-admin.card>
 </div>
 
 <!-- Hidden form for individual actions -->

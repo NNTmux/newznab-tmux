@@ -95,7 +95,8 @@ if (! function_exists('makeFieldLinks')) {
             if ($i > 7) {
                 break;
             }
-            $newArr[] = '<a href="'.url('/'.ucfirst($type).'?'.$field.'='.urlencode($ta)).'" title="'.$ta.'">'.$ta.'</a>';
+            $escaped = e($ta);
+            $newArr[] = '<a href="'.url('/'.ucfirst($type).'?'.$field.'='.urlencode($ta)).'" title="'.$escaped.'">'.$escaped.'</a>';
             $i++;
         }
 
@@ -690,6 +691,54 @@ if (! function_exists('formatBytes')) {
         $bytes /= pow(1024, $pow);
 
         return round($bytes, 2).' '.$units[$pow];
+    }
+}
+
+if (! function_exists('formatDate')) {
+    /**
+     * Format a date as Y-m-d (house date style).
+     */
+    function formatDate(Carbon|DateTimeInterface|string|null $date): string
+    {
+        if ($date === null || $date === '') {
+            return '';
+        }
+
+        $date = $date instanceof DateTimeInterface ? $date : Carbon::parse($date);
+
+        return $date->format('Y-m-d');
+    }
+}
+
+if (! function_exists('formatDateTime')) {
+    /**
+     * Format a date as Y-m-d H:i (house datetime style).
+     */
+    function formatDateTime(Carbon|DateTimeInterface|string|null $date): string
+    {
+        if ($date === null || $date === '') {
+            return '';
+        }
+
+        $date = $date instanceof DateTimeInterface ? $date : Carbon::parse($date);
+
+        return $date->format('Y-m-d H:i');
+    }
+}
+
+if (! function_exists('formatDateTimeSeconds')) {
+    /**
+     * Format a date as Y-m-d H:i:s (house datetime style with seconds).
+     */
+    function formatDateTimeSeconds(Carbon|DateTimeInterface|string|null $date): string
+    {
+        if ($date === null || $date === '') {
+            return '';
+        }
+
+        $date = $date instanceof DateTimeInterface ? $date : Carbon::parse($date);
+
+        return $date->format('Y-m-d H:i:s');
     }
 }
 

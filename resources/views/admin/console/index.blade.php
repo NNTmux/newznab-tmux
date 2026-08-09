@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <x-admin.card>
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
@@ -16,20 +16,17 @@
         </div>
 
         <!-- Console Table -->
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-900">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Cover</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Title</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Platform</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Publisher</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Release Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ESRB</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+        <x-admin.data-table>
+            <x-slot:head>
+                <x-admin.th>Cover</x-admin.th>
+                <x-admin.th>Title</x-admin.th>
+                <x-admin.th>Platform</x-admin.th>
+                <x-admin.th>Publisher</x-admin.th>
+                <x-admin.th>Release Date</x-admin.th>
+                <x-admin.th>ESRB</x-admin.th>
+                <x-admin.th>Actions</x-admin.th>
+            </x-slot:head>
+
                     @forelse($consoleList as $console)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -120,14 +117,12 @@
                             </td>
                         </tr>
                     @endforelse
-                </tbody>
-            </table>
-        </div>
+        </x-admin.data-table>
 
         <!-- Pagination -->
         <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
             {{ $consoleList->links() }}
         </div>
-    </div>
+    </x-admin.card>
 </div>
 @endsection

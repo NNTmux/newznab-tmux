@@ -128,7 +128,7 @@
 
             <!-- Top Scrollbar -->
             <div class="overflow-x-auto border-b border-gray-200 dark:border-gray-700" id="topScroll">
-                <div style="height: 1px;" id="topScrollContent"></div>
+                <div class="h-px" id="topScrollContent"></div>
             </div>
 
             <div class="overflow-x-auto" id="bottomScroll">
@@ -311,7 +311,7 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $user->created_at ? $user->created_at->format('Y-m-d') : 'N/A' }}
+                                    {{ $user->created_at ? formatDate($user->created_at) : 'N/A' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100" title="API requests in last 24 hours">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium

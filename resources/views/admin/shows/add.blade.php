@@ -12,7 +12,7 @@
 
 @section('content')
 <div class="space-y-6" x-data="showAddForm" data-config="{{ $configJson }}">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <x-admin.card>
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
             <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
@@ -123,7 +123,7 @@
                  class="mt-6 p-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg">
                 <div class="flex gap-4">
                     <template x-if="hasPoster">
-                        <img x-bind:src="posterUrl" alt="" class="w-32 h-auto rounded shadow" />
+                        <img x-bind:src="posterUrl" x-bind:alt="title ? title + ' poster' : 'Show poster'" class="w-32 h-auto rounded shadow" />
                     </template>
                     <div class="flex-1">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100" x-text="title"></h3>
@@ -159,7 +159,7 @@
                 </a>
             </div>
         </form>
-    </div>
+    </x-admin.card>
 </div>
 @endsection
 

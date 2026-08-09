@@ -2,7 +2,7 @@
 
 @section('content')
 <div x-data="adminReleaseList" class="space-y-6">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+    <x-admin.card>
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
@@ -173,18 +173,12 @@
                 </div>
             </div>
         @else
-            <div class="px-6 py-12 text-center">
-                <i class="fas fa-check-circle text-gray-400 text-5xl mb-4"></i>
-                <p class="text-gray-500 dark:text-gray-400 text-lg">
-                    @if(request('failrelsearch'))
-                        No failed releases found matching "{{ request('failrelsearch') }}".
-                    @else
-                        No failed releases found. Great job!
-                    @endif
-                </p>
-            </div>
+            @php
+                $failedEmptyMessage = request('failrelsearch') ? 'No failed releases found matching "'.request('failrelsearch').'".' : 'No failed releases found. Great job!';
+            @endphp
+            <x-admin.empty-state icon="fas fa-check-circle" title="No failed releases found" :message="$failedEmptyMessage" />
         @endif
-    </div>
+    </x-admin.card>
 </div>
 @endsection
 

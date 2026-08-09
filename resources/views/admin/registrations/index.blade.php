@@ -77,8 +77,8 @@
                     <div class="mt-3">
                         <p class="text-base font-semibold text-gray-900 dark:text-gray-100">{{ $registrationStatus['active_period']->name }}</p>
                         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                            {{ $registrationStatus['active_period']->starts_at->format('Y-m-d H:i') }} to
-                            {{ $registrationStatus['active_period']->ends_at->format('Y-m-d H:i') }}
+                            {{ formatDateTime($registrationStatus['active_period']->starts_at) }} to
+                            {{ formatDateTime($registrationStatus['active_period']->ends_at) }}
                         </p>
                     </div>
                 @else
@@ -207,19 +207,16 @@
                     <p>No current or upcoming open-registration periods are scheduled.</p>
                 </div>
             @else
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-900">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Name</th>
-                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Window</th>
-                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Notes</th>
-                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Updated By</th>
-                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+                <x-admin.data-table>
+                    <x-slot:head>
+                        <x-admin.th>Name</x-admin.th>
+                        <x-admin.th>Status</x-admin.th>
+                        <x-admin.th>Window</x-admin.th>
+                        <x-admin.th>Notes</x-admin.th>
+                        <x-admin.th>Updated By</x-admin.th>
+                        <x-admin.th>Actions</x-admin.th>
+                    </x-slot:head>
+
                             @foreach($currentPeriods as $period)
                                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40">
                                     <td class="px-6 py-4 align-top">
@@ -236,8 +233,8 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 align-top text-sm text-gray-700 dark:text-gray-300">
-                                        <p>{{ $period->starts_at->format('Y-m-d H:i') }}</p>
-                                        <p class="mt-1 text-gray-500 dark:text-gray-400">to {{ $period->ends_at->format('Y-m-d H:i') }}</p>
+                                        <p>{{ formatDateTime($period->starts_at) }}</p>
+                                        <p class="mt-1 text-gray-500 dark:text-gray-400">to {{ formatDateTime($period->ends_at) }}</p>
                                     </td>
                                     <td class="px-6 py-4 align-top text-sm text-gray-700 dark:text-gray-300">
                                         {{ $period->notes ? Str::limit($period->notes, 100) : '—' }}
@@ -288,9 +285,7 @@
                                     </td>
                                 </tr>
                             @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                </x-admin.data-table>
             @endif
         </x-admin.card>
 
@@ -306,19 +301,16 @@
                     <p>No past open-registration periods have been recorded yet.</p>
                 </div>
             @else
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-900">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Name</th>
-                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Window</th>
-                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Notes</th>
-                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Updated By</th>
-                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
+                <x-admin.data-table>
+                    <x-slot:head>
+                        <x-admin.th>Name</x-admin.th>
+                        <x-admin.th>Status</x-admin.th>
+                        <x-admin.th>Window</x-admin.th>
+                        <x-admin.th>Notes</x-admin.th>
+                        <x-admin.th>Updated By</x-admin.th>
+                        <x-admin.th>Actions</x-admin.th>
+                    </x-slot:head>
+
                             @foreach($pastPeriods as $period)
                                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40">
                                     <td class="px-6 py-4 align-top">
@@ -330,8 +322,8 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 align-top text-sm text-gray-700 dark:text-gray-300">
-                                        <p>{{ $period->starts_at->format('Y-m-d H:i') }}</p>
-                                        <p class="mt-1 text-gray-500 dark:text-gray-400">to {{ $period->ends_at->format('Y-m-d H:i') }}</p>
+                                        <p>{{ formatDateTime($period->starts_at) }}</p>
+                                        <p class="mt-1 text-gray-500 dark:text-gray-400">to {{ formatDateTime($period->ends_at) }}</p>
                                     </td>
                                     <td class="px-6 py-4 align-top text-sm text-gray-700 dark:text-gray-300">
                                         {{ $period->notes ? Str::limit($period->notes, 100) : '—' }}
@@ -365,9 +357,7 @@
                                     </td>
                                 </tr>
                             @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                </x-admin.data-table>
             @endif
         </x-admin.card>
     </div>
@@ -458,7 +448,7 @@
                                 @if(!empty($failure['registration_status_label']))
                                     <span>Effective: {{ $failure['registration_status_label'] }}</span>
                                 @endif
-                                <span>{{ $failure['timestamp']->format('Y-m-d H:i:s') }}</span>
+                                <span>{{ formatDateTimeSeconds($failure['timestamp']) }}</span>
                             </div>
                         </div>
                     @empty

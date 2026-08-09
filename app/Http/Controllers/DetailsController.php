@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\Country;
 use App\Models\DnzbFailure;
 use App\Models\Predb;
 use App\Models\Release;
@@ -109,7 +110,7 @@ class DetailsController extends BasePageController
                 if (Settings::settingValue('trailers_display')) {
                     $trailer = empty($mov['trailer']) ? $this->movieService->getTrailer($data['imdbid']) : $mov['trailer'];
                     if ($trailer) {
-                        $mov['trailer'] = sprintf('<iframe width="%d" height="%d" src="%s"></iframe>', Settings::settingValue('trailers_size_x'), Settings::settingValue('trailers_size_y'), $trailer);
+                        $mov['trailer'] = sprintf('<iframe width="%d" height="%d" src="%s"></iframe>', Settings::settingValue('trailers_size_x'), Settings::settingValue('trailers_size_y'), e($trailer));
                     }
                 }
             }
@@ -158,6 +159,20 @@ class DetailsController extends BasePageController
 
         $pre = Predb::getForRelease($data['predb_id']);
 
+        // Resolve AniDB country code to a Country model/name here so the view stays query-free
+        $anidbCountryCode = null;
+        if (is_object($AniDBAPIArray)) {
+            $anidbCountryCode = $AniDBAPIArray->country ?? null;
+        } elseif (is_array($AniDBAPIArray)) {
+            $anidbCountryCode = $AniDBAPIArray['country'] ?? null;
+        }
+        $anidbCountryModel = null;
+        $anidbCountryName = null;
+        if (! empty($anidbCountryCode)) {
+            $anidbCountryModel = Country::query()->find($anidbCountryCode);
+            $anidbCountryName = $anidbCountryModel->name ?? $anidbCountryCode;
+        }
+
         $this->viewData = array_merge($this->viewData, [
             'release' => $data,
             'reVideo' => $reVideo,
@@ -166,6 +181,8 @@ class DetailsController extends BasePageController
             'show' => $showInfo,
             'movie' => $mov,
             'anidb' => $AniDBAPIArray,
+            'anidbCountryModel' => $anidbCountryModel,
+            'anidbCountryName' => $anidbCountryName,
             'music' => $mus,
             'con' => $con,
             'game' => $game,

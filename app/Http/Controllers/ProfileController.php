@@ -181,6 +181,11 @@ class ProfileController extends BasePageController
                         }
                     }
 
+                    // Keep the composer's cached per-user data in sync with theme changes
+                    if ($request->hasAny(['theme_preference', 'color_scheme'])) {
+                        Cache::forget('composer_user_'.$userid);
+                    }
+
                     // Update timezone preference
                     if ($request->has('timezone')) {
                         $timezoneValue = $request->input('timezone');
@@ -304,6 +309,9 @@ class ProfileController extends BasePageController
             $user->color_scheme = $request->input('color_scheme');
         }
         $user->save();
+
+        // Keep the composer's cached per-user data in sync with theme changes
+        Cache::forget('composer_user_'.$user->id);
 
         return response()->json([
             'success' => true,

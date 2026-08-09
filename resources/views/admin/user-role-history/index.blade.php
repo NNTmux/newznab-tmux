@@ -78,47 +78,24 @@
         </div>
 
         <!-- History Table -->
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-900">
-                    <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Date
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            User
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Old Role
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            New Role
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Old Expiry
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            New Expiry
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Stacked
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Reason
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Changed By
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Actions
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+        <x-admin.data-table>
+            <x-slot:head>
+                <x-admin.th scope="col">Date</x-admin.th>
+                <x-admin.th scope="col">User</x-admin.th>
+                <x-admin.th scope="col">Old Role</x-admin.th>
+                <x-admin.th scope="col">New Role</x-admin.th>
+                <x-admin.th scope="col">Old Expiry</x-admin.th>
+                <x-admin.th scope="col">New Expiry</x-admin.th>
+                <x-admin.th scope="col">Stacked</x-admin.th>
+                <x-admin.th scope="col">Reason</x-admin.th>
+                <x-admin.th scope="col">Changed By</x-admin.th>
+                <x-admin.th scope="col">Actions</x-admin.th>
+            </x-slot:head>
+
                     @forelse($history as $record)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                {{ $record->created_at->format('Y-m-d H:i:s') }}
+                                {{ formatDateTimeSeconds($record->created_at) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 @if($record->user)
@@ -148,10 +125,10 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                                {{ $record->old_expiry_date ? $record->old_expiry_date->format('Y-m-d H:i') : '-' }}
+                                {{ $record->old_expiry_date ? formatDateTime($record->old_expiry_date) : '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                                {{ $record->new_expiry_date ? $record->new_expiry_date->format('Y-m-d H:i') : '-' }}
+                                {{ $record->new_expiry_date ? formatDateTime($record->new_expiry_date) : '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
                                 @if($record->is_stacked)
@@ -196,9 +173,7 @@
                             </td>
                         </tr>
                     @endforelse
-                </tbody>
-            </table>
-        </div>
+        </x-admin.data-table>
 
         <!-- Pagination -->
         @if($history->hasPages())

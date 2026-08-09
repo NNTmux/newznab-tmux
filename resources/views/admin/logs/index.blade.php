@@ -80,7 +80,7 @@
                     </div>
                     <div>
                         <p class="text-gray-500 dark:text-gray-400 uppercase tracking-wide text-xs font-semibold">Last Modified</p>
-                        <p class="text-gray-900 dark:text-gray-100 font-medium">{{ $selectedLog['modified_at']->format('Y-m-d H:i:s') }}</p>
+                        <p class="text-gray-900 dark:text-gray-100 font-medium">{{ formatDateTimeSeconds($selectedLog['modified_at']) }}</p>
                     </div>
                 </div>
             </div>

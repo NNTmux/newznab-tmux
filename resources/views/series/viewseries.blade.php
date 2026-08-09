@@ -93,6 +93,7 @@
                                     <div class="lg:col-span-1">
                                         <img class="series-detail-poster w-full h-auto rounded-lg"
                                              alt="{{ $seriestitles ?? '' }} Poster"
+                                             loading="lazy"
                                              src="{{ getImageAssetUrl('tvshows', (string) $show['id'], url('/covers/tvshows/no-cover.jpg')) }}"/>
                                     </div>
                                     <div class="lg:col-span-3">
