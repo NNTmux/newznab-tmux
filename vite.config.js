@@ -9,6 +9,8 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/js/app.js',
+                'resources/forum/blade-tailwind/css/forum.css',
+                'resources/forum/blade-tailwind/js/forum.js',
             ],
             refresh: true,
         }),

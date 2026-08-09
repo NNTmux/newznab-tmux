@@ -306,15 +306,16 @@
                                              </span>
                                         @endif
 
-                                        <button type="button"
-                                                class="response-report-btn px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm inline-flex items-center"
+                                        <x-button type="button" size="sm"
+                                                class="response-report-btn"
                                                 data-action-url="{{ route('admin.release-reports.update-response', $report->id) }}"
                                                 data-response="{{ e($report->response ?? '') }}"
                                                 data-public="{{ $report->response_is_public ? '1' : '0' }}"
                                                 @click="showResponse($event.currentTarget.dataset.actionUrl, $event.currentTarget.dataset.response, $event.currentTarget.dataset.public === '1')"
-                                                title="{{ $report->response ? 'Edit response' : 'Add response' }}">
-                                            <i class="fas fa-reply mr-1"></i> {{ $report->response ? 'Edit Response' : 'Add Response' }}
-                                        </button>
+                                                title="{{ $report->response ? 'Edit response' : 'Add response' }}"
+                                                icon="fas fa-reply">
+                                            {{ $report->response ? 'Edit Response' : 'Add Response' }}
+                                        </x-button>
 
                                         @if($report->release)
                                             <x-button-link href="{{ url('/details/' . $report->release->guid) }}"
@@ -459,9 +460,9 @@
                     <x-button type="button" variant="muted" class="response-modal-close" @click="closeResponse()">
                         Cancel
                     </x-button>
-                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
-                        <i class="fas fa-save mr-1"></i> Save Response
-                    </button>
+                    <x-button type="submit" icon="fas fa-save">
+                        Save Response
+                    </x-button>
                 </div>
             </form>
             </div>
