@@ -33,6 +33,18 @@
                 "action": "vendor/bin/pint",
                 "options": [],
                 "conditions": []
+            },
+            {
+                "action": "scripts/check-design-system.sh",
+                "options": [],
+                "conditions": [
+                    {
+                        "exec": "\\CaptainHook\\App\\Hook\\Condition\\FileChanged\\Any",
+                        "args": [
+                            ["resources/views/*", "resources/css/*", "resources/js/*"]
+                        ]
+                    }
+                ]
             }
         ]
     },

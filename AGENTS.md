@@ -149,7 +149,7 @@ find app -name "*.php" | xargs php -l  # PHP syntax lint on all changed files
 
 ## Pre-commit (CaptainHook)
 
-Auto-runs: PHP lint, Composer lock validation, Pint formatting. Commit limits: 200 char subject, 72 char body.
+Auto-runs: PHP lint, Composer lock validation, Pint formatting, and design-system checks (`scripts/check-design-system.sh`, when frontend files changed). Commit limits: 200 char subject, 72 char body.
 
 When completing a task, stage newly created project files with Git. Do not stage temporary files or planning documents.
 
@@ -182,6 +182,31 @@ Blade + TailwindCSS v4 + Vite bundling. Run `npm run build` after changes.
 - **Vite entry points**: `resources/js/app.js`, `resources/css/app.css`, `resources/forum/blade-tailwind/js/forum.js`, `resources/forum/blade-tailwind/css/forum.css`
 
 This structure ensures Content Security Policy (CSP) compliance by using Alpine.js CSP-safe build and keeping scripts and styles in external files.
+
+### Design system
+
+`resources/css/app.css` defines the styling foundation: three color schemes (`data-color-scheme="blue|emerald|violet"` on `<html>`) providing surface variables (`--surface-body`, `--surface-card`, `--surface-panel-alt`, `--border-default`, `--text-muted`, ...) and a `--color-primary-50…950` accent ramp. Dark mode is class-based (`.dark` on the root). `scripts/check-design-system.sh` enforces the mechanical rules below on pre-commit.
+
+**Color rules**
+
+- Accents (links, primary actions, active states, focus rings, selected tabs) use `primary-*` utilities, **never** `blue-*`/`indigo-*` or another palette color — the emerald and violet schemes only retheme token-driven classes. When unsure, prefer `primary-*`: under the default blue scheme it renders identically.
+- Genuine status colors stay literal: success green, danger red, warning yellow, info cyan.
+- Surfaces/containers use the semantic classes `.card`, `.surface-panel`, `.surface-panel-alt`, `.auth-card` (or the `--surface-*` variables), not hardcoded `bg-white`/`bg-gray-*`.
+- Every color utility carries a `dark:` variant (or is inherited from a token-driven ancestor). There is no global dark-mode rescue CSS — correctness lives at the source.
+
+**Components** (in `resources/views/components/`)
+
+- Buttons: `<x-button>` / `<x-button-link>` — variants `primary|secondary|muted|success|danger|warning|ghost`, sizes `sm|md|lg|icon`, `icon` prop for a leading Font Awesome icon. Extra classes/attributes pass through; escape Alpine/Vue bindings on component tags as `::disabled` etc. so Blade doesn't eval them. Forum app-level views use `<x-forum.button>`/`<x-forum.button-link>`/`<x-forum.button-secondary>`. Compact release-row actions may use the semantic `release-action*` classes.
+- Forms: `<x-input>`, `<x-select>`, `<x-textarea>`, `<x-label>`; other primitives: `<x-badge>`, `<x-panel>`, `<x-page-header>`, `<x-breadcrumb>`, `<x-empty-state>`, `<x-sort-dropdown>`, `<x-view-toggle>`.
+- Legitimately bespoke (don't force into components): nav/dropdown togglers, modal close-X icons, state-conditional toggle chips/tabs, pagination, input-group-attached addons.
+- Icons: Font Awesome only (`fas`/`far`/`fab`); no feather-icons in app views (the out-of-scope forum package theme still bundles it — leave that alone).
+
+**Hard rules**
+
+- No inline `style=` attributes in views: use Tailwind utilities or a class in `csp-safe.css`; dynamic widths use the `progress-bar` class + `data-width` attribute (animated globally by `resources/js/progress-bar.js`). Documented exception: DB-driven forum category colors.
+- No new `!important` in `app.css` — its custom rules are unlayered, so under Tailwind v4 cascade layers they already beat `@layer utilities`. Budget is 1 (the `[x-cloak]` rule).
+- **Trap:** the live forum frontend renders the package preset in `resources/forum/blade-tailwind/` (view namespace `forum::`); `resources/views/forum/` is an orphaned copy nothing renders. Keep the forum bundle in the Vite entry points and `feather-icons` in `package.json` — the preset's `forum.js` imports it.
+- Email views (`resources/views/emails`, `components/mail`, `vendor/mail`) cannot use the app stylesheet — inline styles there are expected.
 
 ===
 
