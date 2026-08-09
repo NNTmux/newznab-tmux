@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    {{-- Apply dark mode BEFORE any CSS loads to prevent white flash --}}
+    @include('partials.theme-init')
+
     <title>
         @if (isset($thread_title))
             {{ $thread_title }} —
@@ -14,8 +17,8 @@
         {{ trans('forum::general.home_title') }}
     </title>
 
-    <!-- Tailwind CSS (https://tailwindcss.com/docs/installation/play-cdn) -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- App stylesheet: theme tokens + design-system components -->
+    @vite('resources/css/app.css')
 
     <!-- Feather icons (https://github.com/feathericons/feather) -->
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
@@ -39,7 +42,7 @@
     <!-- Vue.Draggable (https://github.com/SortableJS/Vue.Draggable) -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.23.2/vuedraggable.umd.min.js"></script>
 </head>
-<body class="bg-gray-100">
+<body class="font-sans antialiased text-gray-900 dark:text-gray-100">
     <nav class="v-navbar bg-white dark:bg-gray-800 shadow py-4">
         <div class="container mx-auto px-4 md:flex md:items-center md:gap-4">
             <div class="flex justify-between items-center">

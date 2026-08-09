@@ -32,7 +32,7 @@
     @stack('meta')
     @stack('styles')
 </head>
-<body class="app-shell font-sans antialiased">
+<body class="app-shell font-sans antialiased text-gray-900 dark:text-gray-100">
     <div class="h-screen flex">
         <!-- Sidebar -->
         @auth

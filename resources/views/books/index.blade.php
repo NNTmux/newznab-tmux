@@ -30,7 +30,7 @@
                                name="author"
                                value="{{ $author ?? '' }}"
                                placeholder="Search by author"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">
+                               class="bg-white text-gray-900 dark:bg-gray-700 dark:text-gray-200 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">
                     </div>
 
                     <!-- Title Filter -->
@@ -41,7 +41,7 @@
                                name="title"
                                value="{{ $title ?? '' }}"
                                placeholder="Search by title"
-                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">
+                               class="bg-white text-gray-900 dark:bg-gray-700 dark:text-gray-200 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">
                     </div>
 
                     <!-- Category Filter -->
@@ -49,7 +49,7 @@
                         <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
                         <select id="category"
                                 name="t"
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">
+                                class="bg-white text-gray-900 dark:bg-gray-700 dark:text-gray-200 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500">
                             <option value="">All Categories</option>
                             @foreach($catlist ?? [] as $cat)
                                 <option value="{{ $cat['id'] }}" {{ ($category ?? '') == $cat['id'] ? 'selected' : '' }}>

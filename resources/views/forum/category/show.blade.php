@@ -76,7 +76,7 @@
                                                 <div class="input-group-prepend">
                                                     <x-forum.label for="bulk-actions">{{ trans_choice('forum::general.actions', 1) }}</x-forum.label>
                                                 </div>
-                                                <select class="form-select" id="bulk-actions" v-model="selectedAction">
+                                                <x-forum.select id="bulk-actions" v-model="selectedAction">
                                                     @can ('deleteThreads', $category)
                                                         <option value="delete">{{ trans('forum::general.delete') }}</option>
                                                     @endcan
@@ -94,7 +94,7 @@
                                                         <option value="pin">{{ trans('forum::threads.pin') }}</option>
                                                         <option value="unpin">{{ trans('forum::threads.unpin') }}</option>
                                                     @endcan
-                                                </select>
+                                                </x-forum.select>
                                             </div>
 
                                             <div class="mb-3" v-if="selectedAction == 'move'">

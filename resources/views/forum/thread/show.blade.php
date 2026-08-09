@@ -134,10 +134,10 @@
                                     <div class="input-group-prepend">
                                         <label class="input-group-text" for="bulk-actions">{{ trans_choice('forum::general.actions', 1) }}</label>
                                     </div>
-                                    <select class="custom-select" id="bulk-actions" v-model="selectedPostAction">
+                                    <x-forum.select id="bulk-actions" v-model="selectedPostAction">
                                         <option value="delete">{{ trans('forum::general.delete') }}</option>
                                         <option value="restore">{{ trans('forum::general.restore') }}</option>
-                                    </select>
+                                    </x-forum.select>
                                 </div>
 
                                 @if (config('forum.general.soft_deletes'))
@@ -327,9 +327,9 @@
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="category-id">{{ trans_choice('forum::categories.category', 1) }}</label>
                     </div>
-                    <select name="category_id" id="category-id" class="form-select">
+                    <x-forum.select name="category_id" id="category-id">
                         @include ('forum.category.partials.options', ['hide' => $thread->category])
-                    </select>
+                    </x-forum.select>
                 </div>
 
                 @slot('actions')

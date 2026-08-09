@@ -6,7 +6,7 @@
             <!-- Header -->
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                 <div class="flex justify-between items-center">
-                    <h1 class="text-2xl font-semibold text-gray-800">
+                    <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
                         <i class="fas fa-edit mr-2"></i>{{ $title ?? 'Release Naming Regex Edit' }}
                     </h1>
                     <a href="{{ url('/admin/release_naming_regexes-list') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200">
@@ -42,7 +42,7 @@
                         <input type="text"
                                id="group_regex"
                                name="group_regex"
-                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                               class="bg-white text-gray-900 dark:bg-gray-700 dark:text-gray-200 pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                                value="{{ $regex->group_regex ?? '' }}"
                                required>
                     </div>
@@ -64,7 +64,7 @@
                         </div>
                         <textarea id="regex"
                                   name="regex"
-                                  class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono text-sm"
+                                  class="bg-white text-gray-900 dark:bg-gray-700 dark:text-gray-200 pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono text-sm"
                                   rows="4"
                                   required>{{ regex_display_value($regex->regex ?? '') }}</textarea>
                     </div>
@@ -86,7 +86,7 @@
                         </div>
                         <textarea id="description"
                                   name="description"
-                                  class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                  class="bg-white text-gray-900 dark:bg-gray-700 dark:text-gray-200 pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                                   rows="3">{{ $regex->description ?? '' }}</textarea>
                     </div>
                     <p class="mt-2 text-sm text-gray-500">
@@ -106,7 +106,7 @@
                         <input type="number"
                                id="ordinal"
                                name="ordinal"
-                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                               class="bg-white text-gray-900 dark:bg-gray-700 dark:text-gray-200 pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                                value="{{ $regex->ordinal ?? 0 }}"
                                min="0"
                                required>
@@ -131,7 +131,7 @@
                                        value="{{ $id }}"
                                        class="w-4 h-4 text-primary-600 dark:text-primary-400 border-gray-300 dark:border-gray-600 focus:ring-primary-500"
                                     {{ ($regex->status ?? 1) == $id ? 'checked' : '' }}>
-                                <label for="status{{ $id }}" class="ml-3 text-sm text-gray-700">
+                                <label for="status{{ $id }}" class="ml-3 text-sm text-gray-700 dark:text-gray-300">
                                     {{ $status_names[$k] }}
                                 </label>
                             </div>

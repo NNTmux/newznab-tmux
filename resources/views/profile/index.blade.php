@@ -15,7 +15,7 @@
 <div class="surface-panel rounded-xl shadow-sm overflow-hidden">
         <!-- Profile Header -->
         <div class="surface-panel-alt border-b px-6 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-semibold text-gray-800">
+            <h1 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
                 <i class="fas fa-user mr-2"></i>User Profile
             </h1>
             <div class="flex gap-2">

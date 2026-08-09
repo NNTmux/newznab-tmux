@@ -35,7 +35,7 @@
                             <span class="text-yellow-500 text-2xl mr-2">
                                 <i class="fas fa-star"></i>
                             </span>
-                            <span class="text-2xl font-semibold text-gray-900">{{ $movie['rating'] }}</span>
+                            <span class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $movie['rating'] }}</span>
                             <span class="text-gray-600 dark:text-gray-400 ml-2">/ 10</span>
                         </div>
                     @endif

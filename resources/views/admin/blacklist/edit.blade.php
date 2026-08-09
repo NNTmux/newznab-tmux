@@ -6,7 +6,7 @@
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-semibold text-gray-800">
+                <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
                     <i class="fas fa-edit mr-2"></i>{{ $title ?? 'Binary Black/Whitelist Edit' }}
                 </h1>
                 <a href="{{ url('/admin/binaryblacklist-list') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200">

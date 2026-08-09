@@ -5,7 +5,7 @@
     <div class="surface-panel rounded-xl shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200">
-            <h1 class="text-2xl font-bold text-gray-800">Edit Profile</h1>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Edit Profile</h1>
             <p class="text-gray-600 dark:text-gray-400 mt-1">Update your account settings and preferences</p>
         </div>
 

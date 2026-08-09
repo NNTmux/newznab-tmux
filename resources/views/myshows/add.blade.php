@@ -37,7 +37,7 @@
                 <div class="bg-primary-50 border-l-4 border-primary-500 rounded-lg p-4">
                     <div class="flex items-start">
                         <i class="fa fa-info-circle text-primary-600 dark:text-primary-400 mt-0.5 mr-3"></i>
-                        <p class="text-sm text-gray-700">
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
                             Adding shows to your watchlist will notify you through your
                             <a href="{{ url("/rss/myshows?dl=1&i={$userdata->id}&api_token={$userdata->api_token}") }}"
                                class="font-semibold text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 underline inline-flex items-center">

@@ -6,7 +6,7 @@
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-semibold text-gray-800">
+                <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
                     <i class="fas fa-flask mr-2"></i>{{ $title ?? 'Collection Regex Test' }}
                 </h1>
                 <a href="{{ url('/admin/collection_regexes-list') }}" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200">
@@ -36,7 +36,7 @@
                     <input type="text"
                            id="group"
                            name="group"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                           class="bg-white text-gray-900 dark:bg-gray-700 dark:text-gray-200 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                            value="{{ $group }}"
                            placeholder="alt.binaries.teevee"
                            required>
@@ -53,7 +53,7 @@
                     <input type="number"
                            id="limit"
                            name="limit"
-                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                           class="bg-white text-gray-900 dark:bg-gray-700 dark:text-gray-200 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                            value="{{ $limit }}"
                            min="1"
                            max="1000">
@@ -70,7 +70,7 @@
                 </label>
                 <textarea id="regex"
                           name="regex"
-                          class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono text-sm"
+                          class="bg-white text-gray-900 dark:bg-gray-700 dark:text-gray-200 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono text-sm"
                           rows="4"
                           required
                           placeholder="/^(?P<name>.*?)([\. ]S\d{1,3}[\. ]?E\d{1,3})/i">{{ regex_display_value($regex) }}</textarea>
@@ -105,7 +105,7 @@
                             <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                 @foreach($data as $row)
                                     <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-gray-100">
                                             {{ $row['binaryID'] ?? $row['id'] ?? 'N/A' }}
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-500">

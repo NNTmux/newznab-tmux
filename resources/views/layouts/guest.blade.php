@@ -33,7 +33,7 @@
         @endif
     @endif
 </head>
-<body class="font-sans antialiased pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]">
+<body class="font-sans antialiased text-gray-900 dark:text-gray-100 pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]">
     @php
         $legacyMessage = session('message');
         $legacyType = session('message_type');

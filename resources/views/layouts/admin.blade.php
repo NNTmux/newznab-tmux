@@ -27,7 +27,7 @@
     @stack('meta')
     @stack('styles')
 </head>
-<body class="app-shell bg-gray-100 dark:bg-gray-900 font-sans antialiased">
+<body class="app-shell bg-gray-100 dark:bg-gray-900 font-sans antialiased text-gray-900 dark:text-gray-100">
     <div class="h-screen flex">
         <!-- Admin Sidebar -->
         <aside id="sidebar" class="hidden md:flex md:flex-col w-64 bg-gray-900 dark:bg-gray-950 text-white shrink-0 h-full overflow-y-auto">

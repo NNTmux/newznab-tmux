@@ -22,7 +22,7 @@
         @if(isset($movie['plot']) && $movie['plot'])
             <div class="mt-4">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Plot</h3>
-                <p class="text-gray-700">{{ $movie['plot'] }}</p>
+                <p class="text-gray-700 dark:text-gray-300">{{ $movie['plot'] }}</p>
             </div>
         @endif
     @endif
