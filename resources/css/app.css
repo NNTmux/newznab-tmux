@@ -167,39 +167,39 @@ body.app-shell {
 
 /* Structural surfaces: color scheme variables applied to main chrome */
 body {
-    background-color: var(--surface-body) !important;
+    background-color: var(--surface-body);
     transition: background-color 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 .dark body {
-    background-color: var(--surface-body-dark) !important;
+    background-color: var(--surface-body-dark);
 }
 #sidebar {
-    background-color: var(--surface-sidebar) !important;
+    background-color: var(--surface-sidebar);
 }
 .dark #sidebar {
-    background-color: var(--surface-sidebar-dark) !important;
+    background-color: var(--surface-sidebar-dark);
 }
-/* Header bar and the nav inside it - .surface-header raises specificity so we beat Tailwind bg utilities */
+/* Header bar and the nav inside it */
 header.surface-header,
 header.surface-header nav {
-    background-color: var(--surface-header) !important;
+    background-color: var(--surface-header);
 }
 .dark header.surface-header,
 .dark header.surface-header nav {
-    background-color: var(--surface-header-dark) !important;
+    background-color: var(--surface-header-dark);
 }
 .dropdown-menu {
-    background-color: var(--surface-dropdown) !important;
+    background-color: var(--surface-dropdown);
 }
 .dark .dropdown-menu {
-    background-color: var(--surface-dropdown-dark) !important;
+    background-color: var(--surface-dropdown-dark);
 }
 footer {
-    background-color: var(--surface-footer) !important;
+    background-color: var(--surface-footer);
     color: white;
 }
 .dark footer {
-    background-color: var(--surface-footer-dark) !important;
+    background-color: var(--surface-footer-dark);
     color: white;
 }
 
@@ -210,20 +210,20 @@ footer {
     }
 }
 
-/* Page-level card container (rounded-xl, shadow) - !important so scheme wins over Tailwind utilities */
+/* Page-level card container (rounded-xl, shadow) */
 .card {
-    background-color: var(--surface-card) !important;
-    border: 1px solid var(--border-default) !important;
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-default);
     @apply rounded-xl shadow-md transition-colors duration-200;
 }
 .dark .card {
-    background-color: var(--surface-card-dark) !important;
-    border-color: var(--border-default-dark) !important;
+    background-color: var(--surface-card-dark);
+    border-color: var(--border-default-dark);
 }
 
 /* Content panels (welcome card, movies wrapper, profile wrapper, etc.) - same surface as cards */
 .surface-panel {
-    background-color: var(--surface-card) !important;
+    background-color: var(--surface-card);
     border-color: var(--border-default);
 }
 .surface-panel.border {
@@ -231,16 +231,16 @@ footer {
     border-style: solid;
 }
 .dark .surface-panel {
-    background-color: var(--surface-card-dark) !important;
+    background-color: var(--surface-card-dark);
     border-color: var(--border-default-dark);
 }
 /* Sub-sections (filter bars, toolbars) - subtle contrast from cards */
 .surface-panel-alt {
-    background-color: var(--surface-panel-alt) !important;
+    background-color: var(--surface-panel-alt);
     border-color: var(--border-default);
 }
 .dark .surface-panel-alt {
-    background-color: var(--surface-panel-alt-dark) !important;
+    background-color: var(--surface-panel-alt-dark);
     border-color: var(--border-default-dark);
 }
 .surface-panel-alt.border-b,
@@ -253,17 +253,17 @@ footer {
 }
 
 .auth-page {
-    background-color: var(--surface-body) !important;
+    background-color: var(--surface-body);
 }
 .dark .auth-page {
-    background-color: var(--surface-body-dark) !important;
+    background-color: var(--surface-body-dark);
 }
 .auth-card {
-    background-color: var(--surface-card) !important;
+    background-color: var(--surface-card);
     border: 1px solid var(--border-default);
 }
 .dark .auth-card {
-    background-color: var(--surface-card-dark) !important;
+    background-color: var(--surface-card-dark);
     border-color: var(--border-default-dark);
 }
 .release-chip {
@@ -331,39 +331,39 @@ footer {
 
 /* Tables in main content - use scheme surfaces so they match sidebar/header/cards */
 main table {
-    background-color: var(--surface-card) !important;
+    background-color: var(--surface-card);
 }
 .dark main table {
-    background-color: var(--surface-card-dark) !important;
+    background-color: var(--surface-card-dark);
 }
 main thead th {
-    background-color: var(--surface-dropdown) !important;
-    border-bottom-color: var(--border-default) !important;
+    background-color: var(--surface-dropdown);
+    border-bottom-color: var(--border-default);
 }
 .dark main thead th {
-    background-color: var(--surface-dropdown-dark) !important;
-    border-bottom-color: var(--border-default-dark) !important;
+    background-color: var(--surface-dropdown-dark);
+    border-bottom-color: var(--border-default-dark);
 }
 /* Table body and every row use scheme surface (override Tailwind bg-white / dark:bg-gray-800) */
 main tbody {
-    background-color: var(--surface-card) !important;
+    background-color: var(--surface-card);
 }
 .dark main tbody {
-    background-color: var(--surface-card-dark) !important;
+    background-color: var(--surface-card-dark);
 }
 main tbody tr {
-    background-color: var(--surface-card) !important;
+    background-color: var(--surface-card);
     border-bottom-color: var(--border-default);
 }
 .dark main tbody tr {
-    background-color: var(--surface-card-dark) !important;
+    background-color: var(--surface-card-dark);
     border-bottom-color: var(--border-default-dark);
 }
 main tbody tr:hover {
-    background-color: var(--surface-hover) !important;
+    background-color: var(--surface-hover);
 }
 .dark main tbody tr:hover {
-    background-color: var(--surface-hover-dark) !important;
+    background-color: var(--surface-hover-dark);
 }
 
 /* Icon spacing */
@@ -376,88 +376,10 @@ main tbody tr:hover {
 /* Mobile Responsive Improvements */
 /* Mobile-friendly tables */
 @media (max-width: 768px) {
-    .table-responsive {
-        overflow-x: auto;
-        margin-left: -1rem;
-        margin-right: -1rem;
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-
-    .table-responsive table {
-        min-width: max-content;
-    }
-
-    /* Card-style table rows for mobile */
-    .table-mobile-cards tbody tr {
-        display: block;
-        border: 1px solid rgb(229 231 235);
-        border-radius: 0.5rem;
-        margin-bottom: 1rem;
-        padding: 1rem;
-    }
-
-    .dark .table-mobile-cards tbody tr {
-        border-color: rgb(55 65 81);
-    }
-
-    .table-mobile-cards tbody td {
-        display: block;
-        text-align: left;
-        padding-left: 50% !important;
-        position: relative;
-    }
-
-    .table-mobile-cards tbody td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 1rem;
-        font-weight: 600;
-        color: rgb(55 65 81);
-    }
-
-    .dark .table-mobile-cards tbody td::before {
-        color: rgb(209 213 219);
-    }
-
-    .table-mobile-cards thead {
-        display: none;
-    }
-
-    /* Mobile search forms */
-    .search-form-mobile {
-        flex-direction: column;
-        row-gap: 0.5rem;
-    }
-
-    .search-form-mobile select,
-    .search-form-mobile input {
-        width: 100%;
-        border-radius: 0.25rem;
-    }
-
     /* Reduce padding on small screens */
     .container {
         padding-left: 0.5rem;
         padding-right: 0.5rem;
-    }
-
-    /* Stack navigation items */
-    .nav-mobile-stack {
-        flex-direction: column;
-        row-gap: 0.5rem;
-        column-gap: 0;
-    }
-
-    /* Hide non-essential columns on mobile */
-    .hide-mobile {
-        display: none;
-    }
-
-    /* Smaller text on mobile */
-    .text-mobile-sm {
-        font-size: 0.75rem;
-        line-height: 1rem;
     }
 
     /* Mobile dropdown menus should be full width */
@@ -467,14 +389,6 @@ main tbody tr:hover {
         width: auto;
         margin-left: 0.5rem;
         margin-right: 0.5rem;
-    }
-
-    /* Mobile modal adjustments */
-    .modal-content {
-        margin-left: 0.5rem;
-        margin-right: 0.5rem;
-        max-height: 90vh;
-        overflow-y: auto;
     }
 
     /* Smaller font sizes for headings on mobile */
@@ -493,11 +407,6 @@ main tbody tr:hover {
         line-height: 1.75rem;
     }
 
-    /* Mobile grid adjustments */
-    .grid-mobile-1 {
-        grid-template-columns: repeat(1, minmax(0, 1fr));
-    }
-
     /* Touch-friendly sizing */
     .touch-target {
         min-height: 44px;
@@ -511,19 +420,6 @@ main tbody tr:hover {
         padding: 0.25rem 0.5rem;
     }
 
-    /* Improve readability of release titles */
-    .release-title {
-        font-size: 0.875rem;
-        line-height: 1.25rem;
-    }
-
-    /* Stack action buttons in cards */
-    .card-actions {
-        flex-direction: column;
-        row-gap: 0.5rem;
-        column-gap: 0;
-    }
-
     /* Make pagination more compact */
     .pagination {
         font-size: 0.875rem;
@@ -535,26 +431,11 @@ main tbody tr:hover {
         min-width: 2rem;
     }
 
-    /* Optimize data tables for mobile */
-    table.dataTable {
-        font-size: 0.875rem;
-    }
-
-    table.dataTable td,
-    table.dataTable th {
-        padding: 0.5rem 0.25rem;
-    }
-
     /* Improve form labels */
     label {
         font-size: 0.875rem;
         line-height: 1.25rem;
         font-weight: 500;
-    }
-
-    /* Better spacing for form groups */
-    .form-group {
-        margin-bottom: 0.75rem;
     }
 
     /* Mobile-friendly alerts */
@@ -570,11 +451,6 @@ main tbody tr:hover {
         line-height: 1rem;
     }
 
-    /* Stack filter options vertically */
-    .filter-options {
-        flex-direction: column;
-        row-gap: 0.5rem;
-    }
 }
 
 /* Small mobile devices */
@@ -585,36 +461,12 @@ main tbody tr:hover {
         line-height: 1.25rem;
     }
 
-    /* Stack form fields */
-    .form-grid {
-        grid-template-columns: repeat(1, minmax(0, 1fr));
-        gap: 0.5rem;
-    }
-
     /* Compact headers */
     .page-header {
         font-size: 1.25rem;
         line-height: 1.75rem;
         padding-top: 0.5rem;
         padding-bottom: 0.5rem;
-    }
-
-    /* Reduce card padding */
-    .card-mobile-compact {
-        padding: 0.75rem;
-    }
-}
-
-/* Tablet improvements */
-@media (min-width: 768px) and (max-width: 1024px) {
-    /* 2-column layout on tablets where appropriate */
-    .tablet-cols-2 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    /* Tablet-optimized navigation */
-    .nav-tablet {
-        column-gap: 0.5rem;
     }
 }
 
@@ -626,11 +478,6 @@ main tbody tr:hover {
         padding-bottom: 0.5rem;
     }
 
-    /* Compact modals in landscape */
-    .modal-content {
-        max-height: 85vh;
-    }
-
     /* Smaller fixed buttons */
     #mobile-sidebar-toggle,
     #theme-toggle {
@@ -640,24 +487,9 @@ main tbody tr:hover {
     }
 }
 
-/* Preview Modal CSP-Safe Styles */
-.preview-modal-hidden,
+/* Modal visibility helper */
 .modal-hidden {
     display: none;
-}
-
-#previewModal,
-.modal-z-index {
-    z-index: 9999;
-}
-
-#previewModal.flex {
-    display: flex;
-}
-
-/* Modal content scroll area */
-.modal-content-scroll {
-    max-height: calc(90vh - 80px);
 }
 
 /* Search highlight styling */

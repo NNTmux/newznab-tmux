@@ -27,10 +27,10 @@
     @stack('meta')
     @stack('styles')
 </head>
-<body class="app-shell bg-gray-100 dark:bg-gray-900 font-sans antialiased text-gray-900 dark:text-gray-100">
+<body class="app-shell font-sans antialiased text-gray-900 dark:text-gray-100">
     <div class="h-screen flex">
         <!-- Admin Sidebar -->
-        <aside id="sidebar" class="hidden md:flex md:flex-col w-64 bg-gray-900 dark:bg-gray-950 text-white shrink-0 h-full overflow-y-auto">
+        <aside id="sidebar" class="hidden md:flex md:flex-col w-64 text-white shrink-0 h-full overflow-y-auto">
             <div class="flex items-center justify-between p-4 border-b border-white/10 dark:border-white/5">
                 <a href="{{ route('admin.index') }}" class="flex items-center space-x-2">
                     <i class="fas fa-cog text-2xl text-primary-500 dark:text-primary-400"></i>
@@ -46,7 +46,7 @@
         <!-- Main Content -->
         <div class="flex-1 flex flex-col h-full overflow-hidden">
             <!-- Top Bar -->
-            <header class="surface-header bg-gray-800 dark:bg-gray-950 text-white shrink-0 z-10">
+            <header class="surface-header text-white shrink-0 z-10">
                 <div class="flex items-center justify-between px-6 py-4">
                     <h1 class="text-lg font-semibold text-gray-200">{{ $page_title ?? 'Admin Dashboard' }}</h1>
                     <div class="flex items-center space-x-4">

@@ -18,7 +18,7 @@
                                     <span>{{ $parentcat['title'] }}</span>
                                     <i class="fas fa-chevron-down ml-1 text-xs"></i>
                                 </button>
-                                <div class="dropdown-menu absolute left-0 top-full w-48 bg-gray-900 dark:bg-gray-950 rounded-xl shadow-lg z-50">
+                                <div class="dropdown-menu absolute left-0 top-full w-48 rounded-xl shadow-lg z-50">
                                     <a href="{{ url('/browse/' . $parentcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">All TV</a>
                                     <div class="border-t border-white/10 dark:border-white/5"></div>
                                     <a href="{{ route('series') }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">TV Series</a>
@@ -58,7 +58,7 @@
                                     <span>{{ $parentcat['title'] }}</span>
                                     <i class="fas fa-chevron-down ml-1 text-xs"></i>
                                 </button>
-                                <div class="dropdown-menu absolute left-0 top-full w-48 bg-gray-900 dark:bg-gray-950 rounded-xl shadow-lg z-50">
+                                <div class="dropdown-menu absolute left-0 top-full w-48 rounded-xl shadow-lg z-50">
                                     @if(auth()->check() && auth()->user()->movieview == "1")
                                         <a href="{{ url('/' . $parentcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">{{ $parentcat['title'] }}</a>
                                     @else
@@ -115,7 +115,7 @@
                                     <span>{{ $parentcat['title'] }}</span>
                                     <i class="fas fa-chevron-down ml-1 text-xs"></i>
                                 </button>
-                                <div class="dropdown-menu absolute left-0 top-full w-48 bg-gray-900 dark:bg-gray-950 rounded-xl shadow-lg z-50">
+                                <div class="dropdown-menu absolute left-0 top-full w-48 rounded-xl shadow-lg z-50">
                                     @if(auth()->check() && auth()->user()->consoleview == "1")
                                         <a href="{{ url('/' . $parentcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">{{ $parentcat['title'] }}</a>
                                     @else
@@ -138,7 +138,7 @@
                                     <span>{{ $parentcat['title'] }}</span>
                                     <i class="fas fa-chevron-down ml-1 text-xs"></i>
                                 </button>
-                                <div class="dropdown-menu absolute left-0 top-full w-48 bg-gray-900 dark:bg-gray-950 rounded-xl shadow-lg z-50">
+                                <div class="dropdown-menu absolute left-0 top-full w-48 rounded-xl shadow-lg z-50">
                                     <a href="{{ url('/browse/' . $parentcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">{{ $parentcat['title'] }}</a>
                                     <div class="border-t border-white/10 dark:border-white/5"></div>
                                     @foreach($parentcat['categories'] as $subcat)
@@ -165,7 +165,7 @@
                                     <span>{{ $parentcat['title'] }}</span>
                                     <i class="fas fa-chevron-down ml-1 text-xs"></i>
                                 </button>
-                                <div class="dropdown-menu absolute left-0 top-full w-48 bg-gray-900 dark:bg-gray-950 rounded-xl shadow-lg z-50">
+                                <div class="dropdown-menu absolute left-0 top-full w-48 rounded-xl shadow-lg z-50">
                                     <a href="{{ url('/browse/' . $parentcat['title']) }}" class="block px-4 py-2 text-sm text-gray-300 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-white/5 hover:text-white dark:hover:text-white">{{ $parentcat['title'] }}</a>
                                     @if(isset($parentcat['categories']) && count($parentcat['categories']) > 0)
                                         <div class="border-t border-white/10 dark:border-white/5"></div>
@@ -227,7 +227,7 @@
                             <span class="hidden lg:block text-sm">{{ auth()->user()->username }}</span>
                             <i class="fas fa-chevron-down text-xs hidden lg:inline"></i>
                         </button>
-                        <div class="dropdown-menu absolute right-0 top-full w-56 bg-gray-900 rounded-xl shadow-lg z-50">
+                        <div class="dropdown-menu absolute right-0 top-full w-56 rounded-xl shadow-lg z-50">
                             <a href="{{ url('/cart/index') }}" class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white">
                                 <i class="fa fa-shopping-basket fa-fw mr-2"></i>My Download Basket
                             </a>
