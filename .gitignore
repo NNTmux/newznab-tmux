@@ -37,10 +37,7 @@ test.php
 # Ignore symlinks in public/storage that point to storage/covers
 /public/storage/covers
 /storage/nzb/*
-/resources/tmp/*
-!/resources/tmp/unrar/
-!/resources/tmp/unzip/
-!/resources/tmp/imdb_cache/
+/resources/tmp/
 !/public/assets/*
 
 # Ignore Vite build output (regenerated locally)

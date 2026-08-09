@@ -187,8 +187,6 @@ class InstallNntmux extends Command
     /**
      * Validate every storage path and report every problem before returning
      * the aggregate result, so one failure does not hide the others.
-     *
-     * @throws \RuntimeException
      */
     private function updatePaths(): bool
     {
@@ -210,19 +208,8 @@ class InstallNntmux extends Command
         if (empty($unrar_path)) {
             $this->warn('Unrar path (nntmux.tmp_unrar_path) is not configured. Please check your .env or config files.');
             $allValid = false;
-        } else {
-            if (! file_exists($unrar_path)) {
-                $this->info('Creating missing '.$unrar_path.' folder');
-                if (! @File::makeDirectory($unrar_path) && ! File::isDirectory($unrar_path)) {
-                    throw new \RuntimeException('Unable to create '.$unrar_path.' folder');
-                }
-                $this->info('Folder '.$unrar_path.' successfully created');
-            }
-
-            if (! is_writable($unrar_path)) {
-                $this->warn($unrar_path.' is not writable. Please fix folder permissions');
-                $allValid = false;
-            }
+        } elseif (! $this->ensureTempDirectory('Unrar path', $unrar_path)) {
+            $allValid = false;
         }
 
         if (empty($covers_path)) {
@@ -236,12 +223,39 @@ class InstallNntmux extends Command
         if (empty($zip_path)) {
             $this->warn('Unzip path (nntmux.tmp_unzip_path) is not configured. Please check your .env or config files.');
             $allValid = false;
-        } elseif (! File::isWritable($zip_path)) {
-            $this->warn($zip_path.' is not writable. Please fix folder permissions');
+        } elseif (! $this->ensureTempDirectory('Unzip path', $zip_path)) {
             $allValid = false;
         }
 
         return $allValid;
+    }
+
+    /**
+     * Ensure a temp scratch directory exists (creating parents as needed)
+     * and is writable. Warns and returns false on failure — never throws,
+     * so one bad path cannot abort the whole path report.
+     */
+    private function ensureTempDirectory(string $label, string $path): bool
+    {
+        if (! File::isDirectory($path)) {
+            $this->info('Creating missing '.$path.' folder');
+            try {
+                File::ensureDirectoryExists($path, 0755);
+            } catch (\Throwable $e) {
+                $this->warn('Unable to create '.$label.' '.$path.': '.$e->getMessage());
+
+                return false;
+            }
+            $this->info('Folder '.$path.' successfully created');
+        }
+
+        if (! is_writable($path)) {
+            $this->warn($path.' is not writable. Please fix folder permissions');
+
+            return false;
+        }
+
+        return true;
     }
 
     private function addAdminUser(): bool
