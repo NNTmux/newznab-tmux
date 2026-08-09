@@ -75,6 +75,8 @@ class InstallNntmux extends Command
         $paths = $this->updatePaths();
         if ($paths !== false) {
             $this->info('Paths checked successfully');
+        } else {
+            $this->warn('One or more storage paths failed validation - see warnings above. Install will continue, but fix these before running the indexer.');
         }
 
         $this->setupManticoreConfig();
@@ -183,76 +185,63 @@ class InstallNntmux extends Command
     }
 
     /**
-     * @return bool
+     * Validate every storage path and report every problem before returning
+     * the aggregate result, so one failure does not hide the others.
      *
-     * @throws \Exception
      * @throws \RuntimeException
      */
-    private function updatePaths()
+    private function updatePaths(): bool
     {
         $covers_path = config('nntmux_settings.covers_path');
         $nzb_path = config('nntmux_settings.path_to_nzbs');
-        $zip_path = config('nntmux_settings.tmp_unzip_path');
+        $zip_path = config('nntmux.tmp_unzip_path');
         $unrar_path = config('nntmux.tmp_unrar_path');
 
-        // Validate that all required paths are configured
+        $allValid = true;
+
         if (empty($nzb_path)) {
             $this->warn('NZB path (nntmux_settings.path_to_nzbs) is not configured. Please check your .env or config files.');
-
-            return false;
+            $allValid = false;
+        } elseif (! File::isWritable($nzb_path)) {
+            $this->warn($nzb_path.' is not writable. Please fix folder permissions');
+            $allValid = false;
         }
 
         if (empty($unrar_path)) {
             $this->warn('Unrar path (nntmux.tmp_unrar_path) is not configured. Please check your .env or config files.');
+            $allValid = false;
+        } else {
+            if (! file_exists($unrar_path)) {
+                $this->info('Creating missing '.$unrar_path.' folder');
+                if (! @File::makeDirectory($unrar_path) && ! File::isDirectory($unrar_path)) {
+                    throw new \RuntimeException('Unable to create '.$unrar_path.' folder');
+                }
+                $this->info('Folder '.$unrar_path.' successfully created');
+            }
 
-            return false;
+            if (! is_writable($unrar_path)) {
+                $this->warn($unrar_path.' is not writable. Please fix folder permissions');
+                $allValid = false;
+            }
         }
 
         if (empty($covers_path)) {
             $this->warn('Covers path (nntmux_settings.covers_path) is not configured. Please check your .env or config files.');
-
-            return false;
+            $allValid = false;
+        } elseif (! File::isWritable($covers_path)) {
+            $this->warn($covers_path.' is not writable. Please fix folder permissions');
+            $allValid = false;
         }
 
         if (empty($zip_path)) {
-            $this->warn('Unzip path (nntmux_settings.tmp_unzip_path) is not configured. Please check your .env or config files.');
-
-            return false;
-        }
-
-        if (! File::isWritable($nzb_path)) {
-            $this->warn($nzb_path.' is not writable. Please fix folder permissions');
-
-            return false;
-        }
-
-        if (! file_exists($unrar_path)) {
-            $this->info('Creating missing '.$unrar_path.' folder');
-            if (! @File::makeDirectory($unrar_path) && ! File::isDirectory($unrar_path)) {
-                throw new \RuntimeException('Unable to create '.$unrar_path.' folder');
-            }
-            $this->info('Folder '.$unrar_path.' successfully created');
-        }
-
-        if (! is_writable($unrar_path)) {
-            $this->warn($unrar_path.' is not writable. Please fix folder permissions');
-
-            return false;
-        }
-
-        if (! File::isWritable($covers_path)) {
-            $this->warn($covers_path.' is not writable. Please fix folder permissions');
-
-            return false;
-        }
-
-        if (! File::isWritable($zip_path)) {
+            $this->warn('Unzip path (nntmux.tmp_unzip_path) is not configured. Please check your .env or config files.');
+            $allValid = false;
+        } elseif (! File::isWritable($zip_path)) {
             $this->warn($zip_path.' is not writable. Please fix folder permissions');
-
-            return false;
+            $allValid = false;
         }
 
-        return true;
+        return $allValid;
     }
 
     private function addAdminUser(): bool
