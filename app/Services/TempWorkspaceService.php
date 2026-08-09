@@ -64,10 +64,8 @@ class TempWorkspaceService
         }
 
         if (File::isDirectory($path)) {
-            // Delete all files recursively
-            foreach (File::allFiles($path) as $file) {
-                File::delete($file->getPathname());
-            }
+            // Delete all files recursively without materializing the tree
+            (new StreamingDirectoryCleaner)->deleteFiles($path);
             // Delete sub-directories
             foreach (File::directories($path) as $dir) {
                 File::deleteDirectory($dir);

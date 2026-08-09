@@ -8,10 +8,10 @@ use App\Facades\Elasticsearch;
 use App\Facades\Search;
 use App\Models\UsenetGroup;
 use App\Services\Search\Support\ElasticsearchResponseHelper;
+use App\Services\StreamingDirectoryCleaner;
 use Elastic\Elasticsearch\Client as ElasticsearchClient;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 
 class NntmuxResetDb extends Command
 {
@@ -42,7 +42,7 @@ class NntmuxResetDb extends Command
     /**
      * @throws \Exception
      */
-    public function handle(): void
+    public function handle(StreamingDirectoryCleaner $cleaner): void
     {
         // Allow database reset only if app environment is local
         if (app()->environment() !== 'local') {
@@ -55,250 +55,269 @@ class NntmuxResetDb extends Command
 
             DB::statement('SET FOREIGN_KEY_CHECKS = 0;');
 
-            UsenetGroup::query()->update([
-                'first_record' => 0,
-                'first_record_postdate' => null,
-                'last_record' => 0,
-                'last_record_postdate' => null,
-                'last_updated' => null,
-            ]);
-            $this->info('Reseting all groups completed.');
-
-            $arr = [
-                'binaries',
-                'collections',
-                'parts',
-                'missed_parts',
-                'videos',
-                'tv_episodes',
-                'tv_info',
-                'release_nfos',
-                'release_comments',
-                'users_releases',
-                'user_movies',
-                'user_series',
-                'movieinfo',
-                'musicinfo',
-                'release_files',
-                'audio_data',
-                'release_subtitles',
-                'video_data',
-                'media_infos',
-                'releases',
-                'anidb_titles',
-                'anidb_info',
-                'releases_groups',
-            ];
-            foreach ($arr as &$value) {
-                DB::statement("TRUNCATE TABLE $value");
-                $this->info('Truncating '.$value.' completed.');
-            }
-            unset($value);
-
-            if (config('search.default') === 'elasticsearch') {
-                /** @var ElasticsearchClient $client */
-                $client = app('elasticsearch');
-
-                if (ElasticsearchResponseHelper::boolResponse($client, fn (ElasticsearchClient $elasticClient) => $elasticClient->indices()->exists(['index' => 'releases']))) {
-                    Elasticsearch::indices()->delete(['index' => 'releases']);
-                }
-                $releases_index = [
-                    'index' => 'releases',
-                    'body' => [
-                        'settings' => [
-                            'number_of_shards' => 2,
-                            'number_of_replicas' => 0,
-                        ],
-                        'mappings' => [
-                            'properties' => [
-                                'id' => [
-                                    'type' => 'long',
-                                    'index' => false,
-                                ],
-                                'name' => ['type' => 'text'],
-                                'searchname' => [
-                                    'type' => 'text',
-                                    'fields' => [
-                                        'sort' => [
-                                            'type' => 'keyword',
-                                        ],
-                                    ],
-                                ],
-                                'plainsearchname' => [
-                                    'type' => 'text',
-                                    'fields' => [
-                                        'sort' => [
-                                            'type' => 'keyword',
-                                        ],
-                                    ],
-                                ],
-                                'fromname' => ['type' => 'text'],
-                                'filename' => ['type' => 'text'],
-                                'add_date' => ['type' => 'date', 'format' => 'yyyy-MM-dd HH:mm:ss'],
-                                'post_date' => ['type' => 'date', 'format' => 'yyyy-MM-dd HH:mm:ss'],
-                                'media_movie_name' => ['type' => 'text'],
-                                'media_file_name' => ['type' => 'text'],
-                                'media_unique_id' => ['type' => 'keyword'],
-                                'media_container_format' => ['type' => 'text'],
-                                'media_video_format' => ['type' => 'text'],
-                                'media_video_codec' => ['type' => 'text'],
-                                'media_video_width' => ['type' => 'integer'],
-                                'media_video_height' => ['type' => 'integer'],
-                                'media_audio_format' => ['type' => 'text'],
-                                'media_audio_channels' => ['type' => 'text'],
-                                'media_audio_language' => ['type' => 'text'],
-                                'media_subtitle_language' => ['type' => 'text'],
-                                'has_media_info' => ['type' => 'integer'],
-                            ],
-                        ],
-                    ],
-                ];
-
-                Elasticsearch::indices()->create($releases_index);
-
-                if (ElasticsearchResponseHelper::boolResponse($client, fn (ElasticsearchClient $elasticClient) => $elasticClient->indices()->exists(['index' => 'predb']))) {
-                    Elasticsearch::indices()->delete(['index' => 'predb']);
-                }
-                $predb_index = [
-                    'index' => 'predb',
-                    'body' => [
-                        'settings' => [
-                            'number_of_shards' => 2,
-                            'number_of_replicas' => 0,
-                        ],
-                        'mappings' => [
-                            'properties' => [
-                                'id' => [
-                                    'type' => 'long',
-                                    'index' => false,
-                                ],
-                                'title' => [
-                                    'type' => 'text',
-                                    'fields' => [
-                                        'sort' => [
-                                            'type' => 'keyword',
-                                        ],
-                                    ],
-                                ],
-                                'filename' => ['type' => 'text'],
-                                'source' => ['type' => 'text'],
-                            ],
-                        ],
-                    ],
-
-                ];
-
-                Elasticsearch::indices()->create($predb_index);
-
-                // Delete and recreate movies index
-                if (ElasticsearchResponseHelper::boolResponse($client, fn (ElasticsearchClient $elasticClient) => $elasticClient->indices()->exists(['index' => 'movies']))) {
-                    Elasticsearch::indices()->delete(['index' => 'movies']);
-                }
-                $movies_index = [
-                    'index' => 'movies',
-                    'body' => [
-                        'settings' => [
-                            'number_of_shards' => 2,
-                            'number_of_replicas' => 0,
-                        ],
-                        'mappings' => [
-                            'properties' => [
-                                'id' => [
-                                    'type' => 'long',
-                                    'index' => false,
-                                ],
-                                'imdbid' => ['type' => 'keyword'],
-                                'tmdbid' => ['type' => 'integer'],
-                                'traktid' => ['type' => 'integer'],
-                                'title' => [
-                                    'type' => 'text',
-                                    'fields' => [
-                                        'sort' => [
-                                            'type' => 'keyword',
-                                        ],
-                                    ],
-                                ],
-                                'year' => ['type' => 'text'],
-                                'genre' => ['type' => 'text'],
-                                'actors' => ['type' => 'text'],
-                                'director' => ['type' => 'text'],
-                                'rating' => ['type' => 'text'],
-                                'plot' => ['type' => 'text'],
-                            ],
-                        ],
-                    ],
-                ];
-
-                Elasticsearch::indices()->create($movies_index);
-
-                // Delete and recreate tvshows index
-                if (ElasticsearchResponseHelper::boolResponse($client, fn (ElasticsearchClient $elasticClient) => $elasticClient->indices()->exists(['index' => 'tvshows']))) {
-                    Elasticsearch::indices()->delete(['index' => 'tvshows']);
-                }
-                $tvshows_index = [
-                    'index' => 'tvshows',
-                    'body' => [
-                        'settings' => [
-                            'number_of_shards' => 2,
-                            'number_of_replicas' => 0,
-                        ],
-                        'mappings' => [
-                            'properties' => [
-                                'id' => [
-                                    'type' => 'long',
-                                    'index' => false,
-                                ],
-                                'title' => [
-                                    'type' => 'text',
-                                    'fields' => [
-                                        'sort' => [
-                                            'type' => 'keyword',
-                                        ],
-                                    ],
-                                ],
-                                'tvdb' => ['type' => 'integer'],
-                                'trakt' => ['type' => 'integer'],
-                                'tvmaze' => ['type' => 'integer'],
-                                'tvrage' => ['type' => 'integer'],
-                                'imdb' => ['type' => 'keyword'],
-                                'tmdb' => ['type' => 'integer'],
-                                'started' => ['type' => 'text'],
-                                'type' => ['type' => 'integer'],
-                            ],
-                        ],
-                    ],
-                ];
-
-                Elasticsearch::indices()->create($tvshows_index);
-
-                $this->info('All done! ElasticSearch indexes are deleted and recreated.');
-            } else {
-                Search::truncateIndex([
-                    'releases_rt', 'predb_rt', 'movies_rt', 'tvshows_rt',
-                    'music_rt', 'books_rt', 'games_rt', 'console_rt', 'steam_rt', 'anime_rt',
+            try {
+                UsenetGroup::query()->update([
+                    'first_record' => 0,
+                    'first_record_postdate' => null,
+                    'last_record' => 0,
+                    'last_record_postdate' => null,
+                    'last_updated' => null,
                 ]);
-            }
+                $this->info('Reseting all groups completed.');
 
-            $this->info('Deleting nzbfiles subfolders.');
-            $files = File::allFiles(config('nntmux_settings.path_to_nzbs'));
-            File::delete($files);
-
-            $this->info('Deleting all images, previews and samples that still remain.');
-
-            $files = File::allFiles(storage_path('covers/'));
-            foreach ($files as $file) {
-                $path = $file->getPathname();
-                if (basename($path) !== '.gitignore' && basename($path) !== 'no-cover.jpg' && basename($path) !== 'no-backdrop.jpg') {
-                    File::delete($path);
+                $arr = [
+                    'binaries',
+                    'collections',
+                    'parts',
+                    'missed_parts',
+                    'videos',
+                    'tv_episodes',
+                    'tv_info',
+                    'release_nfos',
+                    'release_comments',
+                    'users_releases',
+                    'user_movies',
+                    'user_series',
+                    'movieinfo',
+                    'musicinfo',
+                    'release_files',
+                    'audio_data',
+                    'release_subtitles',
+                    'video_data',
+                    'media_infos',
+                    'releases',
+                    'anidb_titles',
+                    'anidb_info',
+                    'releases_groups',
+                ];
+                foreach ($arr as &$value) {
+                    DB::statement("TRUNCATE TABLE $value");
+                    $this->info('Truncating '.$value.' completed.');
                 }
+                unset($value);
+
+                if (config('search.default') === 'elasticsearch') {
+                    /** @var ElasticsearchClient $client */
+                    $client = app('elasticsearch');
+
+                    if (ElasticsearchResponseHelper::boolResponse($client, fn (ElasticsearchClient $elasticClient) => $elasticClient->indices()->exists(['index' => 'releases']))) {
+                        Elasticsearch::indices()->delete(['index' => 'releases']);
+                    }
+                    $releases_index = [
+                        'index' => 'releases',
+                        'body' => [
+                            'settings' => [
+                                'number_of_shards' => 2,
+                                'number_of_replicas' => 0,
+                            ],
+                            'mappings' => [
+                                'properties' => [
+                                    'id' => [
+                                        'type' => 'long',
+                                        'index' => false,
+                                    ],
+                                    'name' => ['type' => 'text'],
+                                    'searchname' => [
+                                        'type' => 'text',
+                                        'fields' => [
+                                            'sort' => [
+                                                'type' => 'keyword',
+                                            ],
+                                        ],
+                                    ],
+                                    'plainsearchname' => [
+                                        'type' => 'text',
+                                        'fields' => [
+                                            'sort' => [
+                                                'type' => 'keyword',
+                                            ],
+                                        ],
+                                    ],
+                                    'fromname' => ['type' => 'text'],
+                                    'filename' => ['type' => 'text'],
+                                    'add_date' => ['type' => 'date', 'format' => 'yyyy-MM-dd HH:mm:ss'],
+                                    'post_date' => ['type' => 'date', 'format' => 'yyyy-MM-dd HH:mm:ss'],
+                                    'media_movie_name' => ['type' => 'text'],
+                                    'media_file_name' => ['type' => 'text'],
+                                    'media_unique_id' => ['type' => 'keyword'],
+                                    'media_container_format' => ['type' => 'text'],
+                                    'media_video_format' => ['type' => 'text'],
+                                    'media_video_codec' => ['type' => 'text'],
+                                    'media_video_width' => ['type' => 'integer'],
+                                    'media_video_height' => ['type' => 'integer'],
+                                    'media_audio_format' => ['type' => 'text'],
+                                    'media_audio_channels' => ['type' => 'text'],
+                                    'media_audio_language' => ['type' => 'text'],
+                                    'media_subtitle_language' => ['type' => 'text'],
+                                    'has_media_info' => ['type' => 'integer'],
+                                ],
+                            ],
+                        ],
+                    ];
+
+                    Elasticsearch::indices()->create($releases_index);
+
+                    if (ElasticsearchResponseHelper::boolResponse($client, fn (ElasticsearchClient $elasticClient) => $elasticClient->indices()->exists(['index' => 'predb']))) {
+                        Elasticsearch::indices()->delete(['index' => 'predb']);
+                    }
+                    $predb_index = [
+                        'index' => 'predb',
+                        'body' => [
+                            'settings' => [
+                                'number_of_shards' => 2,
+                                'number_of_replicas' => 0,
+                            ],
+                            'mappings' => [
+                                'properties' => [
+                                    'id' => [
+                                        'type' => 'long',
+                                        'index' => false,
+                                    ],
+                                    'title' => [
+                                        'type' => 'text',
+                                        'fields' => [
+                                            'sort' => [
+                                                'type' => 'keyword',
+                                            ],
+                                        ],
+                                    ],
+                                    'filename' => ['type' => 'text'],
+                                    'source' => ['type' => 'text'],
+                                ],
+                            ],
+                        ],
+
+                    ];
+
+                    Elasticsearch::indices()->create($predb_index);
+
+                    // Delete and recreate movies index
+                    if (ElasticsearchResponseHelper::boolResponse($client, fn (ElasticsearchClient $elasticClient) => $elasticClient->indices()->exists(['index' => 'movies']))) {
+                        Elasticsearch::indices()->delete(['index' => 'movies']);
+                    }
+                    $movies_index = [
+                        'index' => 'movies',
+                        'body' => [
+                            'settings' => [
+                                'number_of_shards' => 2,
+                                'number_of_replicas' => 0,
+                            ],
+                            'mappings' => [
+                                'properties' => [
+                                    'id' => [
+                                        'type' => 'long',
+                                        'index' => false,
+                                    ],
+                                    'imdbid' => ['type' => 'keyword'],
+                                    'tmdbid' => ['type' => 'integer'],
+                                    'traktid' => ['type' => 'integer'],
+                                    'title' => [
+                                        'type' => 'text',
+                                        'fields' => [
+                                            'sort' => [
+                                                'type' => 'keyword',
+                                            ],
+                                        ],
+                                    ],
+                                    'year' => ['type' => 'text'],
+                                    'genre' => ['type' => 'text'],
+                                    'actors' => ['type' => 'text'],
+                                    'director' => ['type' => 'text'],
+                                    'rating' => ['type' => 'text'],
+                                    'plot' => ['type' => 'text'],
+                                ],
+                            ],
+                        ],
+                    ];
+
+                    Elasticsearch::indices()->create($movies_index);
+
+                    // Delete and recreate tvshows index
+                    if (ElasticsearchResponseHelper::boolResponse($client, fn (ElasticsearchClient $elasticClient) => $elasticClient->indices()->exists(['index' => 'tvshows']))) {
+                        Elasticsearch::indices()->delete(['index' => 'tvshows']);
+                    }
+                    $tvshows_index = [
+                        'index' => 'tvshows',
+                        'body' => [
+                            'settings' => [
+                                'number_of_shards' => 2,
+                                'number_of_replicas' => 0,
+                            ],
+                            'mappings' => [
+                                'properties' => [
+                                    'id' => [
+                                        'type' => 'long',
+                                        'index' => false,
+                                    ],
+                                    'title' => [
+                                        'type' => 'text',
+                                        'fields' => [
+                                            'sort' => [
+                                                'type' => 'keyword',
+                                            ],
+                                        ],
+                                    ],
+                                    'tvdb' => ['type' => 'integer'],
+                                    'trakt' => ['type' => 'integer'],
+                                    'tvmaze' => ['type' => 'integer'],
+                                    'tvrage' => ['type' => 'integer'],
+                                    'imdb' => ['type' => 'keyword'],
+                                    'tmdb' => ['type' => 'integer'],
+                                    'started' => ['type' => 'text'],
+                                    'type' => ['type' => 'integer'],
+                                ],
+                            ],
+                        ],
+                    ];
+
+                    Elasticsearch::indices()->create($tvshows_index);
+
+                    $this->info('All done! ElasticSearch indexes are deleted and recreated.');
+                } else {
+                    Search::truncateIndex([
+                        'releases_rt', 'predb_rt', 'movies_rt', 'tvshows_rt',
+                        'music_rt', 'books_rt', 'games_rt', 'console_rt', 'steam_rt', 'anime_rt',
+                    ]);
+                }
+
+                $this->info('Deleting nzbfiles subfolders.');
+                $this->cleanTree($cleaner, (string) config('nntmux_settings.path_to_nzbs'), [], 'NZB');
+
+                $this->info('Deleting all images, previews and samples that still remain.');
+                $this->cleanTree(
+                    $cleaner,
+                    (string) config('nntmux_settings.covers_path'),
+                    ['.gitignore', 'no-cover.jpg', 'no-backdrop.jpg'],
+                    'cover'
+                );
+
+                $this->call('cache:clear');
+
+                $this->info('Deleted all releases, images, previews and samples. This script finished '.now()->diffForHumans($timestart).' start');
+            } finally {
+                DB::statement('SET FOREIGN_KEY_CHECKS = 1;');
             }
-
-            $this->call('cache:clear');
-
-            $this->info('Deleted all releases, images, previews and samples. This script finished '.now()->diffForHumans($timestart).' start');
-            DB::statement('SET FOREIGN_KEY_CHECKS = 1;');
         } else {
             $this->info('Script execution stopped');
+        }
+    }
+
+    /**
+     * Stream-delete all files in $path (except $preserveBasenames), reporting
+     * progress and any files that could not be removed.
+     *
+     * @param  list<string>  $preserveBasenames
+     */
+    private function cleanTree(StreamingDirectoryCleaner $cleaner, string $path, array $preserveBasenames, string $noun): void
+    {
+        $deleted = $cleaner->deleteFiles(
+            $path,
+            $preserveBasenames,
+            fn (int $count) => $this->info('Deleted '.number_format($count).' '.$noun.' files...')
+        );
+        $this->info('Deleted '.number_format($deleted).' '.$noun.' files.');
+        if ($cleaner->failedDeletions() > 0) {
+            $this->warn('Could not delete '.number_format($cleaner->failedDeletions()).' '.$noun.' files. Check folder permissions.');
         }
     }
 }
