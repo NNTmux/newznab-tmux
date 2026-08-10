@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-if [ ! -z "$WWWUSER" ]; then
-    usermod -u $WWWUSER sail
+if [ -n "${WWWUSER:-}" ]; then
+    usermod -u "$WWWUSER" -o -g www-data sail
 fi
 
 if [ ! -d /.composer ]; then
@@ -31,7 +31,7 @@ EOF
 ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 if [ $# -gt 0 ]; then
-    exec gosu $WWWUSER "$@"
+    exec gosu "$WWWUSER" "$@"
 else
     exec /usr/bin/supervisord --nodaemon -c /etc/supervisor/supervisord.conf
 fi

@@ -3,8 +3,8 @@ name: nntmux-ci
 services:
   laravel.test:
     build:
-      context: ..
-      dockerfile: docker/8.5/Dockerfile
+      context: ../docker/8.5
+      dockerfile: Dockerfile
       args:
         WWWGROUP: '${WWWGROUP}'
     image: nntmux-ci/php85

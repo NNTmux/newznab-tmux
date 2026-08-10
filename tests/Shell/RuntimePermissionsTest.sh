@@ -17,6 +17,12 @@ fail() {
     exit 1
 }
 
+if [[ -f /.dockerenv && "${APP_ENV:-}" == testing ]]; then
+    [[ "$(id -u)" == "$(stat -c '%u' "$repository_root")" ]] || \
+        fail "Sail user UID $(id -u) does not match checkout UID $(stat -c '%u' "$repository_root")"
+    [[ "$(id -gn)" == www-data ]] || fail "Sail user primary group is $(id -gn), expected www-data"
+fi
+
 assert_mode() {
     local expected="$1"
     local path="$2"
@@ -37,10 +43,11 @@ snapshot_tree() {
     done < <(find -P "$root" -mindepth 1 -print0 | sort -z)
 }
 
-mkdir -p "$fixture_root"/{app,nested,public/build/assets,vendor/bin,storage/framework/views,storage/logs,bootstrap/cache,resources,routes,config,scripts}
+mkdir -p "$fixture_root"/{app,nested,public/build/assets,vendor/bin,storage/framework/views,storage/logs,bootstrap/cache,resources,routes,config,scripts,tests/Shell}
 git -C "$fixture_root" init -q
 
 cp "$repository_root/scripts/runtime-permissions.sh" "$fixture_root/scripts/runtime-permissions.sh"
+printf '#!/usr/bin/env sh\nexit 0\n' > "$fixture_root/tests/Shell/FixtureTest.sh"
 
 printf '<?php\n' > "$fixture_root/app/OwnerOnly.php"
 printf '#!/usr/bin/env sh\nexit 0\n' > "$fixture_root/artisan"
@@ -56,12 +63,13 @@ printf 'outside\n' > "$outside_target"
 ln -s "$outside_target" "$fixture_root/app/external-link"
 
 chmod 0700 "$fixture_root/artisan" "$fixture_root/vendor/bin/tool" "$fixture_root/storage/tracked-tool"
-git -C "$fixture_root" add app artisan resources routes config bootstrap storage/tracked-tool
-git -C "$fixture_root" update-index --chmod=+x artisan storage/tracked-tool
+git -C "$fixture_root" add app artisan resources routes config scripts tests bootstrap storage/tracked-tool
+git -C "$fixture_root" update-index --chmod=+x artisan scripts/runtime-permissions.sh tests/Shell/FixtureTest.sh storage/tracked-tool
 
 find "$fixture_root/app" "$fixture_root/public/build" "$fixture_root/vendor" "$fixture_root/storage" "$fixture_root/bootstrap/cache" -type d -exec chmod 0700 {} +
 find "$fixture_root/app" "$fixture_root/public/build" "$fixture_root/vendor" "$fixture_root/storage" "$fixture_root/bootstrap/cache" -type f -exec chmod 0600 {} +
 chmod 0700 "$fixture_root/vendor/bin/tool"
+chmod 0700 "$fixture_root/scripts" "$fixture_root/scripts/runtime-permissions.sh" "$fixture_root/tests" "$fixture_root/tests/Shell" "$fixture_root/tests/Shell/FixtureTest.sh"
 chmod 0600 "$fixture_root/.env"
 chmod 0600 "$outside_target"
 
@@ -97,6 +105,11 @@ assert_mode 644 "$fixture_root/public/build/manifest.json"
 assert_mode 644 "$fixture_root/public/build/assets/app.js"
 assert_mode 644 "$fixture_root/vendor/autoload.php"
 assert_mode 755 "$fixture_root/vendor/bin/tool"
+assert_mode 755 "$fixture_root/scripts"
+assert_mode 755 "$fixture_root/scripts/runtime-permissions.sh"
+assert_mode 755 "$fixture_root/tests"
+assert_mode 755 "$fixture_root/tests/Shell"
+assert_mode 755 "$fixture_root/tests/Shell/FixtureTest.sh"
 assert_mode 2775 "$fixture_root/storage/framework/views"
 assert_mode 664 "$fixture_root/storage/framework/views/compiled.php"
 assert_mode 2775 "$fixture_root/storage/logs"

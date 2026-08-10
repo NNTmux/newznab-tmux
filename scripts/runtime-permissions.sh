@@ -28,7 +28,8 @@ home_root="$(realpath -m -- "${HOME:-/nonexistent-home}")"
 [[ "$repository_root" != / ]] || fatal 'refusing filesystem root'
 [[ "$repository_root" != "$home_root" ]] || fatal 'refusing home directory'
 
-git_root="$(git -C "$repository_root" rev-parse --show-toplevel 2>/dev/null)" || fatal "not a Git repository: $repository_root"
+git_command=(git -c "safe.directory=$repository_root" -C "$repository_root")
+git_root="$("${git_command[@]}" rev-parse --show-toplevel 2>/dev/null)" || fatal "not a Git repository: $repository_root"
 git_root="$(realpath -e -- "$git_root")" || fatal 'cannot resolve Git repository root'
 [[ "$repository_root" == "$git_root" ]] || fatal "target is not the Git repository root: $repository_root"
 
@@ -195,7 +196,7 @@ require_tree_access() {
     fi
 }
 
-source_roots=(app bootstrap config resources routes)
+source_roots=(app bootstrap config resources routes scripts tests)
 entry_points=(artisan public/index.php server.php)
 declare -A tracked_runtime_modes=()
 
@@ -207,7 +208,7 @@ while IFS= read -r -d '' index_record; do
     else
         tracked_runtime_modes["$repository_root/$relative_path"]=0644
     fi
-done < <(git -C "$repository_root" ls-files -z --stage -- storage bootstrap/cache)
+done < <("${git_command[@]}" ls-files -z --stage -- storage bootstrap/cache)
 
 normalize_tree() {
     local root="$1"
@@ -283,7 +284,7 @@ elif [[ "$action" == normalize ]]; then
         else
             set_mode 0644 "$path"
         fi
-    done < <(git -C "$repository_root" ls-files -z --stage -- "${source_roots[@]}" "${entry_points[@]}" ':(exclude)bootstrap/cache/**')
+    done < <("${git_command[@]}" ls-files -z --stage -- "${source_roots[@]}" "${entry_points[@]}" ':(exclude)bootstrap/cache/**')
 
     normalize_tree "$repository_root/vendor"
 
@@ -322,7 +323,7 @@ else
         if [[ "$index_mode" == 100755 ]]; then expected_mode=0755; else expected_mode=0644; fi
         tracked_expected_modes["$path"]="${expected_mode#0}"
         tracked_paths+=("$path")
-    done < <(git -C "$repository_root" ls-files -z --stage -- "${source_roots[@]}" "${entry_points[@]}" ':(exclude)bootstrap/cache/**')
+    done < <("${git_command[@]}" ls-files -z --stage -- "${source_roots[@]}" "${entry_points[@]}" ':(exclude)bootstrap/cache/**')
 
     if [[ "${#tracked_paths[@]}" -gt 0 ]]; then
         while IFS= read -r -d '' stat_record; do
