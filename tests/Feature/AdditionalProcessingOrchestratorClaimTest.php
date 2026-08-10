@@ -115,7 +115,7 @@ class AdditionalProcessingOrchestratorClaimTest extends TestCase
         $output = new RecordingConsoleOutputService;
 
         $orchestrator = new AdditionalProcessingOrchestrator(
-            $this->makeConfig(['queryLimit' => 25, 'minSizeMB' => 0, 'maxSizeGB' => 100]),
+            $this->makeConfig(['queryLimit' => 25, 'minSizeBytes' => 0, 'maxSizeBytes' => 107374182400]),
             $processor,
             $tempWorkspace,
             $output
@@ -162,7 +162,7 @@ class AdditionalProcessingOrchestratorClaimTest extends TestCase
         $output = new RecordingConsoleOutputService;
 
         $orchestrator = new AdditionalProcessingOrchestrator(
-            $this->makeConfig(['queryLimit' => 25, 'minSizeMB' => 0, 'maxSizeGB' => 100]),
+            $this->makeConfig(['queryLimit' => 25, 'minSizeBytes' => 0, 'maxSizeBytes' => 107374182400]),
             $processor,
             $tempWorkspace,
             $output

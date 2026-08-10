@@ -151,8 +151,8 @@ class AdditionalProcessingOrchestrator
             $this->config->queryLimit > 0 ? $this->config->queryLimit : 25,
             $this->claimToken,
             $groupID,
-            $this->config->minSizeMB,
-            $this->config->maxSizeGB,
+            $this->config->minSizeBytes,
+            $this->config->maxSizeBytes,
             [
                 'id',
                 'guid',

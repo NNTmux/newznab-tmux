@@ -10,6 +10,7 @@ use App\Models\ReleaseStat;
 use App\Models\RoleStat;
 use App\Models\Settings;
 use App\Models\SignupStat;
+use App\Support\SizeUnit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -32,7 +33,14 @@ class AdminSiteController extends BasePageController
 
         switch ($action) {
             case 'submit':
-                Settings::settingsUpdate($request->all());
+                $data = $request->all();
+
+                foreach (SizeUnit::SITE_SIZE_SETTINGS as $sizeKey) {
+                    $data[$sizeKey] = SizeUnit::toBytes($data[$sizeKey] ?? null, $data[$sizeKey.'_unit'] ?? 'MB');
+                    unset($data[$sizeKey.'_unit']);
+                }
+
+                Settings::settingsUpdate($data);
 
                 return redirect()->to('admin/site-edit')->with('success', 'Settings updated successfully');
 
@@ -43,8 +51,15 @@ class AdminSiteController extends BasePageController
 
         $compress_headers_warning = ! str_contains(config('settings.nntp_server'), 'astra') ? 'compress_headers_warning' : '';
 
+        $sizeFields = [];
+        foreach (SizeUnit::SITE_SIZE_SETTINGS as $sizeKey) {
+            $sizeFields[$sizeKey] = SizeUnit::fromBytes($this->viewData['site'][$sizeKey] ?? 0);
+        }
+
         $this->viewData = array_merge($this->viewData, [
             'error' => $error,
+            'sizeFields' => $sizeFields,
+            'sizeUnits' => SizeUnit::UNITS,
             'yesno' => [
                 'ids' => [1, 0],
                 'names' => ['Yes', 'No'],

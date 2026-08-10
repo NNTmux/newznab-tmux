@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BasePageController;
 use App\Http\Requests\Admin\AdminGroupListRequest;
 use App\Models\UsenetGroup;
+use App\Support\SizeUnit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -75,6 +76,16 @@ class AdminGroupController extends BasePageController
 
         switch ($action) {
             case 'submit':
+                // Convert the size + unit pair to bytes; a blank input stays blank
+                // so the model stores null and the site-wide setting applies.
+                $minSizeInput = $request->input('minsizetoformrelease');
+                if ($minSizeInput !== null && $minSizeInput !== '') {
+                    $request->merge([
+                        'minsizetoformrelease' => SizeUnit::toBytes($minSizeInput, $request->input('minsizetoformrelease_unit', 'MB')),
+                    ]);
+                }
+                $request->request->remove('minsizetoformrelease_unit');
+
                 if (empty($request->input('id'))) {
                     // Add a new group.
                     $request->merge(['name' => UsenetGroup::isValidGroup($request->input('name'))]);
@@ -101,7 +112,9 @@ class AdminGroupController extends BasePageController
                 break;
         }
 
-        return view('admin.groups.edit', compact('title', 'group'));
+        $groupMinSize = SizeUnit::fromBytes($group['minsizetoformrelease'] ?? 0);
+
+        return view('admin.groups.edit', compact('title', 'group', 'groupMinSize') + ['sizeUnits' => SizeUnit::UNITS]);
     }
 
     /**

@@ -109,6 +109,92 @@ class AdminGroupControllerTest extends TestCase
         $this->assertSame('No group list provided.', $response->getData()['groupmsglist']);
     }
 
+    public function test_edit_submit_converts_min_size_unit_to_bytes(): void
+    {
+        $this->createUsenetGroupsTable();
+        $groupId = DB::table('usenet_groups')->insertGetId([
+            'name' => 'alt.binaries.test',
+            'description' => 'Test group',
+            'active' => 1,
+            'backfill' => 1,
+            'minsizetoformrelease' => null,
+            'minfilestoformrelease' => null,
+        ]);
+
+        $request = Request::create('/admin/group-edit', 'POST', [
+            'action' => 'submit',
+            'id' => (string) $groupId,
+            'name' => 'alt.binaries.test',
+            'description' => 'Test group',
+            'backfill_target' => '1',
+            'first_record' => '0',
+            'last_record' => '0',
+            'active' => '1',
+            'backfill' => '1',
+            'minsizetoformrelease' => '2',
+            'minsizetoformrelease_unit' => 'GB',
+            'minfilestoformrelease' => '1',
+        ]);
+
+        $response = app(AdminGroupController::class)->edit($request);
+
+        $this->assertTrue($response->isRedirect());
+        $this->assertSame(2147483648, (int) DB::table('usenet_groups')->where('id', $groupId)->value('minsizetoformrelease'));
+    }
+
+    public function test_edit_submit_keeps_blank_min_size_as_null(): void
+    {
+        $this->createUsenetGroupsTable();
+        $groupId = DB::table('usenet_groups')->insertGetId([
+            'name' => 'alt.binaries.test',
+            'description' => 'Test group',
+            'active' => 1,
+            'backfill' => 1,
+            'minsizetoformrelease' => 1048576,
+            'minfilestoformrelease' => null,
+        ]);
+
+        $request = Request::create('/admin/group-edit', 'POST', [
+            'action' => 'submit',
+            'id' => (string) $groupId,
+            'name' => 'alt.binaries.test',
+            'description' => 'Test group',
+            'backfill_target' => '1',
+            'first_record' => '0',
+            'last_record' => '0',
+            'active' => '1',
+            'backfill' => '1',
+            'minsizetoformrelease' => '',
+            'minsizetoformrelease_unit' => 'MB',
+            'minfilestoformrelease' => '1',
+        ]);
+
+        app(AdminGroupController::class)->edit($request);
+
+        $this->assertNull(DB::table('usenet_groups')->where('id', $groupId)->value('minsizetoformrelease'));
+    }
+
+    public function test_edit_view_exposes_group_min_size_split_into_value_and_unit(): void
+    {
+        $this->createUsenetGroupsTable();
+        $groupId = DB::table('usenet_groups')->insertGetId([
+            'name' => 'alt.binaries.test',
+            'description' => 'Test group',
+            'active' => 1,
+            'backfill' => 1,
+            'minsizetoformrelease' => 2147483648,
+            'minfilestoformrelease' => null,
+        ]);
+
+        $request = Request::create('/admin/group-edit', 'GET', ['id' => (string) $groupId]);
+
+        $response = app(AdminGroupController::class)->edit($request);
+
+        $this->assertInstanceOf(View::class, $response);
+        $this->assertSame(['value' => 2, 'unit' => 'GB'], $response->getData()['groupMinSize']);
+        $this->assertSame(['MB', 'GB'], $response->getData()['sizeUnits']);
+    }
+
     private function setEnvironmentValue(string $key, ?string $value): void
     {
         if ($value === null) {
@@ -146,6 +232,27 @@ class AdminGroupControllerTest extends TestCase
                 $table->integer('role')->default(Content::ROLE_EVERYONE);
             });
         }
+    }
+
+    private function createUsenetGroupsTable(): void
+    {
+        if (Schema::hasTable('usenet_groups')) {
+            return;
+        }
+
+        Schema::create('usenet_groups', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->string('name')->default('');
+            $table->string('description')->default('');
+            $table->unsignedBigInteger('first_record')->default(0);
+            $table->unsignedBigInteger('last_record')->default(0);
+            $table->dateTime('last_updated')->nullable();
+            $table->boolean('active')->default(false);
+            $table->boolean('backfill')->default(false);
+            $table->unsignedBigInteger('minsizetoformrelease')->nullable();
+            $table->unsignedBigInteger('minfilestoformrelease')->nullable();
+            $table->integer('backfill_target')->default(1);
+        });
     }
 
     private function seedSettings(): void

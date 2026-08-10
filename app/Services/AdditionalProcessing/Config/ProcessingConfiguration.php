@@ -39,9 +39,9 @@ final readonly class ProcessingConfiguration
 
     public int $maximumRarPasswordChecks;
 
-    public int $maxSizeGB;
+    public int $maxSizeBytes;
 
-    public int $minSizeMB;
+    public int $minSizeBytes;
 
     public bool $alternateNNTP;
 
@@ -117,8 +117,8 @@ final readonly class ProcessingConfiguration
         // (explicit '0' means disabled, empty/null means default) are owned
         // in one place and shared between the bucket query and the per-worker
         // fetch.
-        $this->maxSizeGB = AdditionalCandidateQuery::maxSizeGB();
-        $this->minSizeMB = AdditionalCandidateQuery::minSizeMB();
+        $this->maxSizeBytes = AdditionalCandidateQuery::maxSizeBytes();
+        $this->minSizeBytes = AdditionalCandidateQuery::minSizeBytes();
         $this->alternateNNTP = (bool) config('nntmux_nntp.use_alternate_nntp_server');
         $this->ffmpegDuration = (int) (Settings::settingValue('ffmpeg_duration') ?: 5);
         $this->addPAR2Files = (bool) config('nntmux_settings.add_par2');
