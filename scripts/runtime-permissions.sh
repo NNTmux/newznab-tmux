@@ -32,8 +32,6 @@ git_root="$(git -C "$repository_root" rev-parse --show-toplevel 2>/dev/null)" ||
 git_root="$(realpath -e -- "$git_root")" || fatal 'cannot resolve Git repository root'
 [[ "$repository_root" == "$git_root" ]] || fatal "target is not the Git repository root: $repository_root"
 
-deployment_owner="${DEPLOYMENT_OWNER:-$(stat -c '%u' "$repository_root")}"
-
 resolve_fpm_identity() {
     local field="$1"
     local value=''
@@ -51,16 +49,32 @@ resolve_fpm_identity() {
     done | tail -n 1
 }
 
-detected_application_user=''
-detected_application_group=''
-if [[ "$(id -u)" == 0 ]]; then
-    detected_application_user="$(resolve_fpm_identity user)"
-    detected_application_group="$(resolve_fpm_identity group)"
+script_repository_root="$(realpath -e -- "$script_root/..")" || fatal 'cannot resolve script repository root'
+
+if [[ "$repository_root" == "$script_repository_root" ]]; then
+    if [[ -v DEPLOYMENT_OWNER || -v APPLICATION_USER || -v APPLICATION_GROUP ]]; then
+        fatal 'identity overrides are forbidden for the live checkout'
+    fi
+
+    repository_owner_uid="$(stat -c '%u' "$repository_root")"
+    deployment_owner="$(getent passwd "$repository_owner_uid" | cut -d: -f1)"
+    [[ -n "$deployment_owner" ]] || fatal "repository owner does not resolve to a local user: $repository_owner_uid"
+    application_user="$deployment_owner"
+    application_group='www-data'
+else
+    deployment_owner="${DEPLOYMENT_OWNER:-$(stat -c '%u' "$repository_root")}"
+
+    detected_application_user=''
+    detected_application_group=''
+    if [[ "$(id -u)" == 0 ]]; then
+        detected_application_user="$(resolve_fpm_identity user)"
+        detected_application_group="$(resolve_fpm_identity group)"
+    fi
+    application_user="${APPLICATION_USER:-$detected_application_user}"
+    application_user="${application_user:-$(id -un)}"
+    application_group="${APPLICATION_GROUP:-$detected_application_group}"
+    application_group="${application_group:-$(id -gn "$application_user" 2>/dev/null || true)}"
 fi
-application_user="${APPLICATION_USER:-$detected_application_user}"
-application_user="${application_user:-$(id -un)}"
-application_group="${APPLICATION_GROUP:-$detected_application_group}"
-application_group="${application_group:-$(id -gn "$application_user" 2>/dev/null || true)}"
 
 getent passwd "$deployment_owner" >/dev/null 2>&1 || fatal "deployment owner does not exist: $deployment_owner"
 getent passwd "$application_user" >/dev/null 2>&1 || fatal "application user does not exist: $application_user"

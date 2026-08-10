@@ -26,8 +26,21 @@ assert_mode() {
     [[ "$actual" == "$expected" ]] || fail "$path mode is $actual, expected $expected"
 }
 
-mkdir -p "$fixture_root"/{app,nested,public/build/assets,vendor/bin,storage/framework/views,storage/logs,bootstrap/cache,resources,routes,config}
+snapshot_tree() {
+    local root="$1"
+
+    while IFS= read -r -d '' path; do
+        stat -c '%n\t%F\t%a\t%u\t%g\t%s\t%y' "$path"
+        if [[ -f "$path" && ! -L "$path" ]]; then
+            sha256sum "$path"
+        fi
+    done < <(find -P "$root" -mindepth 1 -print0 | sort -z)
+}
+
+mkdir -p "$fixture_root"/{app,nested,public/build/assets,vendor/bin,storage/framework/views,storage/logs,bootstrap/cache,resources,routes,config,scripts}
 git -C "$fixture_root" init -q
+
+cp "$repository_root/scripts/runtime-permissions.sh" "$fixture_root/scripts/runtime-permissions.sh"
 
 printf '<?php\n' > "$fixture_root/app/OwnerOnly.php"
 printf '#!/usr/bin/env sh\nexit 0\n' > "$fixture_root/artisan"
@@ -54,6 +67,19 @@ chmod 0600 "$outside_target"
 
 identity_user="$(id -un)"
 identity_group="$(id -gn)"
+
+conflicting_group="$(getent group | awk -F: '$1 != "www-data" { print $1; exit }')"
+[[ -n "$conflicting_group" ]] || fail 'could not find a group that conflicts with the live application group'
+
+live_snapshot_before="$(snapshot_tree "$fixture_root")"
+if override_output="$(DEPLOYMENT_OWNER="$identity_user" APPLICATION_USER="$identity_user" APPLICATION_GROUP="$conflicting_group" \
+    "$fixture_root/scripts/runtime-permissions.sh" normalize "$fixture_root" 2>&1)"; then
+    fail 'live normalization accepted identity overrides'
+fi
+[[ "$override_output" == *'identity overrides are forbidden for the live checkout'* ]] || \
+    fail "live normalization returned the wrong override error: $override_output"
+live_snapshot_after="$(snapshot_tree "$fixture_root")"
+[[ "$live_snapshot_after" == "$live_snapshot_before" ]] || fail 'rejected live identity overrides changed fixture metadata or content'
 
 if DEPLOYMENT_OWNER="$identity_user" APPLICATION_USER="$identity_user" APPLICATION_GROUP="$identity_group" \
     "$repository_root/scripts/runtime-permissions.sh" check "$fixture_root" >/dev/null 2>&1; then

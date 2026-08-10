@@ -198,7 +198,7 @@ rector-fix: ## Apply Rector refactorings
 .PHONY: npm-build
 npm-build: ## Run npm install and build inside the container
 	@$(SAIL) exec -u sail $(APP_SERVICE) bash -c 'set -e; umask 0022; npm install; npm run build'
-	@$(DOCKER_COMPOSE) exec -u root -e DEPLOYMENT_OWNER=$(HOST_UID) $(APP_SERVICE) scripts/runtime-permissions.sh normalize-build /var/www/html
+	@$(DOCKER_COMPOSE) exec -u root $(APP_SERVICE) scripts/runtime-permissions.sh normalize-build /var/www/html
 .PHONY: npm-dev
 npm-dev: ## Start Vite dev server inside the container
 	@$(SAIL) npm run dev
@@ -237,7 +237,7 @@ fix-permissions: ## Repair ownership and deterministic runtime modes without fol
 	@$(DOCKER_COMPOSE) exec -u root $(APP_SERVICE) usermod -u $(HOST_UID) -o sail >/dev/null 2>&1 || true
 	@$(DOCKER_COMPOSE) exec -u root $(APP_SERVICE) groupmod -g $(HOST_GID) -o sail >/dev/null 2>&1 || true
 	@$(DOCKER_COMPOSE) exec -u root $(APP_SERVICE) chown -R $(HOST_UID):$(HOST_GID) /var/www/html
-	@$(DOCKER_COMPOSE) exec -u root -e DEPLOYMENT_OWNER=$(HOST_UID) $(APP_SERVICE) scripts/runtime-permissions.sh normalize /var/www/html
+	@$(DOCKER_COMPOSE) exec -u root $(APP_SERVICE) scripts/runtime-permissions.sh normalize /var/www/html
 	@$(DOCKER_COMPOSE) exec -u root $(APP_SERVICE) git config --system --add safe.directory /var/www/html
 	@echo "$(GREEN)✔ Permissions fixed.$(RESET)"
 	@if [ "$(WWWUSER)" != "$(HOST_UID)" ] || [ -z "$(WWWUSER)" ]; then 		echo "$(YELLOW)⚠  WWWUSER ($(WWWUSER)) ≠ host UID ($(HOST_UID)). Set WWWUSER=$(HOST_UID) and WWWGROUP=$(HOST_GID) in .env, then run 'make rebuild' to align the container's sail user.$(RESET)"; 	fi
@@ -246,7 +246,7 @@ fix-perms: fix-permissions ## Alias for 'fix-permissions'
 
 .PHONY: check-permissions
 check-permissions: ## Read-only verification of runtime permissions and isolated test caches
-	@$(DOCKER_COMPOSE) exec -u root -e DEPLOYMENT_OWNER=$(HOST_UID) $(APP_SERVICE) scripts/runtime-permissions.sh check /var/www/html
+	@$(DOCKER_COMPOSE) exec -u root $(APP_SERVICE) scripts/runtime-permissions.sh check /var/www/html
 
 .PHONY: git-safe-directory
 git-safe-directory: ## Register /var/www/html as a git safe.directory inside the container
