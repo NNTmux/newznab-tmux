@@ -53,8 +53,6 @@
 
                 @include('admin.site.sections.developer-settings')
 
-                @include('admin.site.sections.threaded-settings')
-
                 <!-- Note about full settings -->
                 <div class="bg-primary-50 border border-primary-200 rounded-lg p-4">
                     <p class="text-primary-800 text-sm">

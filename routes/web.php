@@ -309,7 +309,8 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::get('collection_regexes-list', [AdminCollectionRegexesController::class, 'index'])->name('admin.collection_regexes-list');
     Route::match(['GET', 'POST'], 'collection_regexes-edit', [AdminCollectionRegexesController::class, 'edit'])->name('admin.collection_regexes-edit');
     Route::post('ajax', [AdminAjaxController::class, 'ajaxAction'])->name('admin.ajax');
-    Route::match(['GET', 'POST'], 'tmux-edit', [AdminTmuxController::class, 'edit'])->name('admin.tmux-edit');
+    Route::get('tmux-edit', [AdminTmuxController::class, 'edit'])->name('admin.tmux-edit');
+    Route::post('tmux-edit', [AdminTmuxController::class, 'update'])->name('admin.tmux-update');
     Route::get('release-list', [AdminReleasesController::class, 'index'])->name('admin.release-list');
     Route::post('release-bulk-category', [AdminReleasesController::class, 'bulkCategory'])->name('admin.release-bulk-category');
     Route::post('release-delete/{id}', [AdminReleasesController::class, 'destroy'])->name('admin.release-delete');

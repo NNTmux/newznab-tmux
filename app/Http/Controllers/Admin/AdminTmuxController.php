@@ -5,41 +5,19 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
+use App\Http\Requests\Admin\UpdateTmuxSettingsRequest;
 use App\Models\Settings;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class AdminTmuxController extends BasePageController
 {
     /**
      * @throws \Exception
      */
-    public function edit(Request $request): mixed
+    public function edit(): View
     {
         $this->setAdminPrefs();
-
-        // Set the current action.
-        $action = $request->input('action') ?? 'view';
-
-        switch ($action) {
-            case 'submit':
-                $data = $request->all();
-
-                // Handle fix_crap checkbox array - convert to comma-separated string
-                if (isset($data['fix_crap']) && is_array($data['fix_crap'])) {
-                    $data['fix_crap'] = implode(',', $data['fix_crap']);
-                } elseif (! isset($data['fix_crap'])) {
-                    // If no checkboxes selected, save empty string
-                    $data['fix_crap'] = '';
-                }
-
-                Settings::settingsUpdate($data);
-
-                return redirect()->to('admin/tmux-edit')->with('success', 'Tmux settings updated successfully');
-
-            case 'view':
-            default:
-                break;
-        }
 
         $meta_title = $title = 'Tmux Settings Edit';
 
@@ -76,5 +54,20 @@ class AdminTmuxController extends BasePageController
         ]);
 
         return view('admin.site.tmux-edit', $this->viewData);
+    }
+
+    public function update(UpdateTmuxSettingsRequest $request): RedirectResponse
+    {
+        $data = $request->all();
+
+        if (isset($data['fix_crap']) && is_array($data['fix_crap'])) {
+            $data['fix_crap'] = implode(',', $data['fix_crap']);
+        } elseif (! isset($data['fix_crap'])) {
+            $data['fix_crap'] = '';
+        }
+
+        Settings::settingsUpdate($data);
+
+        return redirect()->route('admin.tmux-edit')->with('success', 'Tmux settings updated successfully');
     }
 }

@@ -17,10 +17,17 @@
         @endif
 
         <!-- Tmux Settings Form -->
-        <form method="post" action="{{ url('admin/tmux-edit') }}" class="p-6" id="tmuxForm">
+        <form method="post" action="{{ route('admin.tmux-update') }}" class="p-6" id="tmuxForm">
             @csrf
-            <input type="hidden" name="action" value="submit">
 
+            @if($errors->any())
+                <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg" role="alert">
+                    <p class="font-medium text-red-800 dark:text-red-200">
+                        <i class="fas fa-exclamation-circle mr-2"></i>Unable to save tmux settings
+                    </p>
+                    <p class="mt-1 text-sm text-red-700 dark:text-red-300">Correct the highlighted thread settings and try again.</p>
+                </div>
+            @endif
 
             <div class="space-y-8">
                 <!-- Tmux - How It Works -->
@@ -30,10 +37,6 @@
                         <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">Tmux is a screen multiplexer and at least version 1.6 is required. It is used here to allow multiple windows per session and multiple panes per window.</p>
                         <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">Each script is run in its own shell environment. It is not looped, but allowed to run once and then exit. This notifies tmux that the pane is dead and can then be respawned with another iteration of the script in a new shell environment.</p>
                         <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">This allows for scripts that crash to be restarted without user intervention.</p>
-                        <div class="bg-yellow-50 dark:bg-gray-800 border border-yellow-300 dark:border-gray-600 rounded p-3 mt-3">
-                            <p class="text-sm font-medium text-yellow-800 dark:text-gray-300"><i class="fas fa-exclamation-triangle mr-2"></i>NOTICE:</p>
-                            <p class="text-sm text-yellow-700 dark:text-gray-400">If "Save Tmux Settings" is the last thing you did on this page, refreshing will save the current form values again, not reload from database.</p>
-                        </div>
                     </div>
                 </div>
 
@@ -109,6 +112,13 @@
                             </x-select>
                         </x-form.group>
 
+                        <x-form.group label="Update Binaries Threads" for="binarythreads" help="The number of threads for update_binaries. If you notice that you are getting a lot of parts into the missed_parts table, it is possible that your USP is not keeping up with the requests. Try to reduce the threads, at least until the cause can be determined.">
+                            <x-input id="binarythreads" name="binarythreads" type="number" min="1" max="99" value="{{ old('binarythreads', $site['binarythreads'] ?? 1) }}" class="w-full" required />
+                            @error('binarythreads')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+                        </x-form.group>
+
                         <x-form.group label="Update Binaries Sleep Timer" for="bins_timer">
                             <div class="flex gap-2">
                                 <x-input id="bins_timer" name="bins_timer" type="number" value="{{ $site['bins_timer'] ?? 10 }}" class="flex-1" />
@@ -161,6 +171,13 @@
                             </x-form.group>
                         </div>
 
+                        <x-form.group label="Backfill Threads" for="backfillthreads" help="The number of threads for backfill.">
+                            <x-input id="backfillthreads" name="backfillthreads" type="number" min="1" max="99" value="{{ old('backfillthreads', $site['backfillthreads'] ?? 1) }}" class="w-full" required />
+                            @error('backfillthreads')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+                        </x-form.group>
+
                         <x-form.group label="Backfill Quantity" for="backfill_qty" help="Number of headers per group per thread to download.">
                             <x-input id="backfill_qty" name="backfill_qty" type="number" value="{{ $site['backfill_qty'] ?? 20000 }}" class="w-full" />
                         </x-form.group>
@@ -202,6 +219,13 @@
                             </x-select>
                         </x-form.group>
 
+                        <x-form.group label="Update Releases Threads" for="releasethreads" help="The number of threads for releases update scripts.">
+                            <x-input id="releasethreads" name="releasethreads" type="number" min="1" max="99" value="{{ old('releasethreads', $site['releasethreads'] ?? 1) }}" class="w-full" required />
+                            @error('releasethreads')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+                        </x-form.group>
+
                         <x-form.group label="Update Releases Sleep Timer" for="rel_timer">
                             <div class="flex gap-2">
                                 <x-input id="rel_timer" name="rel_timer" type="number" value="{{ $site['rel_timer'] ?? 15 }}" class="flex-1" />
@@ -223,6 +247,20 @@
                                     </option>
                                 @endforeach
                             </x-select>
+                        </x-form.group>
+
+                        <x-form.group label="Postprocessing Additional Threads" for="postthreads" help="Maximum simultaneous additional-processing threads and NNTP sessions. Threads reuse their connection across bounded batches; raise this only within CPU, memory, disk I/O, and provider connection limits.">
+                            <x-input id="postthreads" name="postthreads" type="number" min="1" max="99" value="{{ old('postthreads', $site['postthreads'] ?? 1) }}" class="w-full" required />
+                            @error('postthreads')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+                        </x-form.group>
+
+                        <x-form.group label="NFO Threads" for="nfothreads" help="The number of threads for NFO postprocessing. The limit is 16 threads.">
+                            <x-input id="nfothreads" name="nfothreads" type="number" min="1" max="16" value="{{ old('nfothreads', $site['nfothreads'] ?? 1) }}" class="w-full" required />
+                            @error('nfothreads')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
                         </x-form.group>
 
                         <x-form.group label="Postprocess Additional Sleep Timer" for="post_timer" help="Delay after a bounded worker cycle. Persistent workers drain several batches before this delay, so very low polling intervals are usually unnecessary.">
@@ -249,6 +287,13 @@
                             </x-select>
                         </x-form.group>
 
+                        <x-form.group label="Amazon Postprocessing Threads" for="postthreadsamazon" help="The number of threads for Amazon postprocessing metadata lookups covering books, music, console and PC games.">
+                            <x-input id="postthreadsamazon" name="postthreadsamazon" type="number" min="1" max="99" value="{{ old('postthreadsamazon', $site['postthreadsamazon'] ?? 1) }}" class="w-full" required />
+                            @error('postthreadsamazon')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+                        </x-form.group>
+
                         <x-form.group label="Postprocess Metadata Sleep Timer" for="post_timer_amazon">
                             <div class="flex gap-2">
                                 <x-input id="post_timer_amazon" name="post_timer_amazon" type="number" value="{{ $site['post_timer_amazon'] ?? 300 }}" class="flex-1" />
@@ -264,6 +309,13 @@
                                     </option>
                                 @endforeach
                             </x-select>
+                        </x-form.group>
+
+                        <x-form.group label="Postprocessing Video Metadata Threads" for="postthreadsnon" help="The number of threads for video metadata postprocessing. This includes movies, anime and TV lookups.">
+                            <x-input id="postthreadsnon" name="postthreadsnon" type="number" min="1" max="99" value="{{ old('postthreadsnon', $site['postthreadsnon'] ?? 1) }}" class="w-full" required />
+                            @error('postthreadsnon')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
                         </x-form.group>
 
                         <x-form.group label="Postprocess Video Metadata Sleep Timer" for="post_timer_non">
@@ -287,6 +339,13 @@
                                     </option>
                                 @endforeach
                             </x-select>
+                        </x-form.group>
+
+                        <x-form.group label="Fix Release Names Threads" for="fixnamethreads" help="The number of threads for fixReleaseNames. This includes MD5, NFOs, PAR2 and filenames.">
+                            <x-input id="fixnamethreads" name="fixnamethreads" type="number" min="1" max="16" value="{{ old('fixnamethreads', $site['fixnamethreads'] ?? 1) }}" class="w-full" required />
+                            @error('fixnamethreads')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
                         </x-form.group>
 
                         <x-form.group label="Fix Release Names Sleep Timer" for="fix_timer">
