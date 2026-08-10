@@ -3,6 +3,8 @@
  */
 import Alpine from '@alpinejs/csp';
 
+import { summarizeSelection } from './group-selection.js';
+
 function escapeHtml(text) {
     const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
     return String(text).replace(/[&<>"']/g, m => map[m]);
@@ -12,13 +14,19 @@ Alpine.data('adminGroups', () => ({
     resetAllOpen: false,
     purgeAllOpen: false,
     resetSelectedOpen: false,
+    maintenanceOpen: false,
     selectedGroupNames: [],
-    allChecked: false,
+    selectedCount: 0,
+    hasSelection: false,
 
     init() {
         const container = this.$el.querySelector('[data-ajax-url]') || this.$el;
         this._ajaxUrl = container.dataset.ajaxUrl || '/admin/ajax';
         this._csrf = container.dataset.csrfToken || document.querySelector('meta[name="csrf-token"]')?.content;
+
+        // Selection is per page: never inherit checkboxes a browser restored
+        // across a reload or a back navigation.
+        this._applySelectAll(false);
 
         // Backward compat
         const self = this;
@@ -36,9 +44,9 @@ Alpine.data('adminGroups', () => ({
         window.hidePurgeAllModal = function() { self.purgeAllOpen = false; };
         window.showResetSelectedModal = function() { self._showResetSelected(); };
         window.hideResetSelectedModal = function() { self.resetSelectedOpen = false; };
-        window.toggleSelectAllGroups = function(cb) { self._toggleSelectAll(cb); };
+        window.toggleSelectAllGroups = function(cb) { self._applySelectAll(cb?.checked); };
         window.getSelectedGroups = function() { return self._getSelected(); };
-        window.updateSelectionUI = function() { self._updateSelectionUI(); };
+        window.updateSelectionUI = function() { self._syncSelection(); };
     },
 
     handleAction(action, groupId, status) {
@@ -51,24 +59,41 @@ Alpine.data('adminGroups', () => ({
             case 'reset-all': this._resetAll(); break;
             case 'purge-all': this._purgeAll(); break;
             case 'reset-selected': this._resetSelected(); break;
-            case 'show-reset-modal': this.resetAllOpen = true; break;
+            case 'show-reset-modal': this.closeMaintenance(); this.resetAllOpen = true; break;
             case 'hide-reset-modal': this.resetAllOpen = false; break;
-            case 'show-purge-modal': this.purgeAllOpen = true; break;
+            case 'show-purge-modal': this.closeMaintenance(); this.purgeAllOpen = true; break;
             case 'hide-purge-modal': this.purgeAllOpen = false; break;
             case 'show-reset-selected-modal': this._showResetSelected(); break;
             case 'hide-reset-selected-modal': this.resetSelectedOpen = false; break;
-            case 'select-all-groups': break; // handled via x-model
         }
     },
 
+    toggleMaintenance() {
+        this.maintenanceOpen = ! this.maintenanceOpen;
+    },
+
+    closeMaintenance() {
+        this.maintenanceOpen = false;
+    },
+
+    /**
+     * Escape closes the menu and hands focus back to the control that opened it.
+     */
+    dismissMaintenance() {
+        if (! this.maintenanceOpen) { return; }
+        this.maintenanceOpen = false;
+        this.$el.querySelector('#group-maintenance-toggle')?.focus();
+    },
+
+    /**
+     * Header checkbox: apply its *new* checked value to every row on this page.
+     */
     toggleAllCheckboxes() {
-        const boxes = this.$el.querySelectorAll('.group-checkbox');
-        boxes.forEach(cb => { cb.checked = this.allChecked; });
-        this._updateSelectionUI();
+        this._applySelectAll(this._selectAllCheckbox()?.checked);
     },
 
     onGroupCheckboxChange() {
-        this._updateSelectionUI();
+        this._syncSelection();
     },
 
     _post(body) {
@@ -118,7 +143,7 @@ Alpine.data('adminGroups', () => ({
     _deleteGroup(id) {
         showConfirm({ title: 'Delete Group', message: 'Are you sure you want to delete this group?', details: 'This action cannot be undone.', type: 'danger', confirmText: 'Delete', cancelText: 'Cancel', onConfirm: () => {
             this._post({ action: 'delete_group', group_id: id }).then(d => {
-                if (d.success) { const row = document.getElementById('grouprow-' + id); if (row) { row.style.transition = 'opacity 0.3s'; row.style.opacity = '0'; setTimeout(() => row.remove(), 300); } }
+                if (d.success) { const row = document.getElementById('grouprow-' + id); if (row) { row.style.transition = 'opacity 0.3s'; row.style.opacity = '0'; setTimeout(() => { row.remove(); this._syncSelection(); }, 300); } }
                 showToast(d.message || (d.success ? 'Deleted' : 'Error'), d.success ? 'success' : 'error');
             }).catch(() => showToast('Error', 'error'));
         }});
@@ -133,41 +158,68 @@ Alpine.data('adminGroups', () => ({
     _resetAll() { this.resetAllOpen = false; this._post({ action: 'reset_all_groups' }).then(d => showToast(d.message || 'Done', d.success ? 'success' : 'error')).catch(() => showToast('Error', 'error')); },
     _purgeAll() { this.purgeAllOpen = false; this._post({ action: 'purge_all_groups' }).then(d => showToast(d.message || 'Done', d.success ? 'success' : 'error')).catch(() => showToast('Error', 'error')); },
 
+    _rowCheckboxes() {
+        return Array.from(this.$el.querySelectorAll('.group-checkbox'));
+    },
+
+    _selectAllCheckbox() {
+        return this.$el.querySelector('#select-all-groups');
+    },
+
+    /**
+     * Snapshot the row checkboxes, which are the authoritative selection state.
+     */
+    _readRows() {
+        return this._rowCheckboxes().map(cb => ({
+            id: cb.dataset.groupId,
+            name: cb.dataset.groupName,
+            checked: cb.checked,
+        }));
+    },
+
     _getSelected() {
-        return Array.from(this.$el.querySelectorAll('.group-checkbox:checked')).map(cb => ({ id: cb.dataset.groupId, name: cb.dataset.groupName }));
+        return this._readRows().filter(row => row.checked).map(({ id, name }) => ({ id, name }));
+    },
+
+    _applySelectAll(checked) {
+        const value = Boolean(checked);
+        this._rowCheckboxes().forEach(cb => { cb.checked = value; });
+
+        return this._syncSelection();
+    },
+
+    /**
+     * Derive every piece of selection UI — counter, contextual action, header
+     * checked/indeterminate — from the rows that are actually checked.
+     */
+    _syncSelection() {
+        const summary = summarizeSelection(this._readRows());
+
+        this.selectedCount = summary.count;
+        this.hasSelection = summary.hasSelection;
+        this.selectedGroupNames = summary.names;
+
+        const selectAll = this._selectAllCheckbox();
+        if (selectAll) {
+            selectAll.checked = summary.allChecked;
+            selectAll.indeterminate = summary.indeterminate;
+        }
+
+        return summary;
     },
 
     _showResetSelected() {
-        const selected = this._getSelected();
-        if (selected.length === 0) { showToast('No groups selected', 'warning'); return; }
-        this.selectedGroupNames = selected.map(g => g.name);
+        if (! this._syncSelection().hasSelection) { showToast('No groups selected', 'warning'); return; }
         this.resetSelectedOpen = true;
     },
 
     _resetSelected() {
         this.resetSelectedOpen = false;
-        const selected = this._getSelected();
-        if (selected.length === 0) { showToast('No groups selected', 'warning'); return; }
-        this._post({ action: 'reset_selected_groups', group_ids: JSON.stringify(selected.map(g => g.id)) }).then(d => {
-            if (d.success) { this.$el.querySelectorAll('.group-checkbox:checked').forEach(cb => { cb.checked = false; }); this.allChecked = false; this._updateSelectionUI(); }
+        const summary = this._syncSelection();
+        if (! summary.hasSelection) { showToast('No groups selected', 'warning'); return; }
+        this._post({ action: 'reset_selected_groups', group_ids: JSON.stringify(summary.ids) }).then(d => {
+            if (d.success) { this._applySelectAll(false); }
             showToast(d.message || 'Done', d.success ? 'success' : 'error');
         }).catch(() => showToast('Error', 'error'));
-    },
-
-    _toggleSelectAll(cb) { this.allChecked = cb.checked; this.toggleAllCheckboxes(); },
-
-    _updateSelectionUI() {
-        const selected = this._getSelected();
-        const counter = document.getElementById('selection-counter');
-        const countSpan = document.getElementById('selected-count');
-        const resetBtn = document.getElementById('reset-selected-btn');
-        if (counter && countSpan) { if (selected.length > 0) { counter.classList.remove('hidden'); countSpan.textContent = selected.length; } else counter.classList.add('hidden'); }
-        if (resetBtn) { if (selected.length > 0) resetBtn.classList.remove('hidden'); else resetBtn.classList.add('hidden'); }
-        const all = this.$el.querySelectorAll('.group-checkbox');
-        const allC = Array.from(all).every(cb => cb.checked);
-        const someC = Array.from(all).some(cb => cb.checked);
-        this.allChecked = allC;
-        const selAll = document.getElementById('select-all-groups');
-        if (selAll) { selAll.checked = allC; selAll.indeterminate = someC && !allC; }
     }
 }));

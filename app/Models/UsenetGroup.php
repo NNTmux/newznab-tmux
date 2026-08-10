@@ -241,7 +241,7 @@ class UsenetGroup extends Model
             $groups->where('active', '=', 0);
         }
 
-        return $groups->paginate(config('nntmux.items_per_page'));
+        return $groups->paginate(config('nntmux.items_per_page'))->withQueryString();
     }
 
     /**

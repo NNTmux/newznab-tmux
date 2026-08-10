@@ -39,3 +39,11 @@ jobs:
 
       - name: Run tests
         run: vendor/bin/phpunit
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run JS tests
+        run: npm run test:js

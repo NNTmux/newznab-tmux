@@ -29,75 +29,107 @@
             </div>
         @endif
 
-        @if($grouplist && $grouplist->count() > 0)
+        @php
+            $searchTerm = $groupname ?? '';
+            $hasRows = $grouplist->count() > 0;
+        @endphp
+
+        @if($hasRows || $searchTerm !== '')
             <x-admin.action-bar>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <!-- Search Form -->
-                    <div>
-                        <form name="groupsearch" method="GET">
-                            <div class="flex gap-2">
-                                <div class="relative flex-1">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fas fa-search text-gray-400"></i>
-                                    </div>
-                                    <input id="groupname"
-                                           type="text"
-                                           name="groupname"
-                                           value="{{ $groupname ?? '' }}"
-                                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
-                                           placeholder="Search for group...">
-                                </div>
-                                <x-admin.button type="submit" icon="fas fa-search">Go</x-admin.button>
-                            </div>
-                        </form>
-                    </div>
+                <div class="flex w-full flex-col gap-3 lg:flex-row lg:flex-nowrap lg:items-end lg:gap-3">
+                    <!-- Search: capped at a quarter of the bar so selection never resizes it -->
+                    <form name="groupsearch" method="GET" class="w-full lg:w-auto lg:shrink-0 lg:grow-0 lg:basis-1/4">
+                        <x-label for="groupname">Search groups</x-label>
+                        <div class="flex items-center gap-2">
+                            <x-input id="groupname"
+                                     name="groupname"
+                                     :value="$searchTerm"
+                                     class="min-w-0 flex-1"
+                                     placeholder="Search for group..." />
+                            <x-admin.button type="submit"
+                                            icon="fas fa-search"
+                                            class="shrink-0"
+                                            title="Search groups"
+                                            aria-label="Search groups" />
+                        </div>
+                    </form>
 
-                    <!-- Pagination -->
-                    <div class="flex justify-center items-center">
-                        {{ $grouplist->onEachSide(5)->links() }}
-                    </div>
-
-                    <!-- Bulk Actions -->
-                    <div class="flex justify-end items-center">
-                        <div class="flex gap-2 items-center">
-                            <!-- Selection Counter -->
-                            <span id="selection-counter" class="hidden text-sm text-gray-600 dark:text-gray-400 mr-2">
-                                <span id="selected-count">0</span> selected
-                            </span>
-                            <x-admin.button type="button"
-                                    id="reset-selected-btn"
+                    <!-- Selection-scoped action: only present while rows are selected -->
+                    <x-admin.button type="button"
+                                    x-show="hasSelection"
+                                    x-cloak
                                     @click="handleAction('show-reset-selected-modal')"
                                     tone="warning"
                                     icon="fas fa-refresh"
-                                    class="hidden">
-                                Reset Selected
-                            </x-admin.button>
+                                    class="self-start lg:self-auto lg:shrink-0">
+                        Reset <span x-text="selectedCount">0</span> selected
+                    </x-admin.button>
+
+                    <div class="flex flex-wrap items-center gap-3 lg:ml-auto lg:flex-nowrap lg:justify-end">
+                        <p class="whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                            <span class="font-medium text-gray-900 dark:text-gray-100">{{ number_format($grouplist->total()) }}</span> groups
+                            @if($hasRows)
+                                <span aria-hidden="true">&middot;</span> Page {{ $grouplist->currentPage() }}/{{ max($grouplist->lastPage(), 1) }}
+                            @endif
+                        </p>
+
+                        <!-- All-record maintenance actions, kept out of the routine flow -->
+                        <div class="relative"
+                             @click.outside="closeMaintenance()"
+                             @keydown.escape.window="dismissMaintenance()">
                             <x-admin.button type="button"
-                                    @click="handleAction('show-reset-modal')"
-                                    tone="warning"
-                                    icon="fas fa-refresh">
-                                Reset All
+                                            id="group-maintenance-toggle"
+                                            tone="gray"
+                                            icon="fas fa-screwdriver-wrench"
+                                            @click="toggleMaintenance()"
+                                            aria-haspopup="true"
+                                            aria-controls="group-maintenance-menu"
+                                            x-bind:aria-expanded="maintenanceOpen">
+                                Maintenance
+                                <i class="fas fa-chevron-down text-xs" aria-hidden="true"></i>
                             </x-admin.button>
-                            <x-admin.button type="button"
-                                    @click="handleAction('show-purge-modal')"
-                                    tone="danger"
-                                    icon="fas fa-trash">
-                                Purge All
-                            </x-admin.button>
+                            <div id="group-maintenance-menu"
+                                 x-show="maintenanceOpen"
+                                 x-cloak
+                                 role="group"
+                                 aria-label="Maintenance actions for all indexed groups"
+                                 class="surface-panel absolute right-0 z-20 mt-2 w-72 rounded-lg border p-3 shadow-lg">
+                                <p class="mb-3 text-xs text-gray-500 dark:text-gray-400">
+                                    These actions apply to <strong class="font-semibold text-gray-700 dark:text-gray-300">every indexed group</strong> &mdash; not your selection, and not just this page.
+                                </p>
+                                <div class="flex flex-col gap-2">
+                                    <x-admin.button type="button"
+                                                    @click="handleAction('show-reset-modal')"
+                                                    tone="warning"
+                                                    icon="fas fa-refresh"
+                                                    class="w-full">
+                                        Reset All
+                                    </x-admin.button>
+                                    <x-admin.button type="button"
+                                                    @click="handleAction('show-purge-modal')"
+                                                    tone="danger"
+                                                    icon="fas fa-trash"
+                                                    class="w-full">
+                                        Purge All
+                                    </x-admin.button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </x-admin.action-bar>
+        @endif
 
+        @if($hasRows)
             <!-- Groups Table -->
             <x-admin.data-table sticky>
                 <x-slot:head>
                             <x-admin.th align="center" class="w-12">
                                 <input type="checkbox"
                                        id="select-all-groups"
-                                       x-model="allChecked"
                                        @change="toggleAllCheckboxes()"
                                        class="form-checkbox h-4 w-4 text-primary-600 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:bg-gray-700"
+                                       aria-label="Select all groups on this page"
                                        title="Select all groups on this page">
                             </x-admin.th>
                             <x-admin.th>Group</x-admin.th>
@@ -228,20 +260,17 @@
                         @endforeach
             </x-admin.data-table>
 
-            <!-- Footer -->
-            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-                <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600 dark:text-gray-400">
-                        Showing {{ $grouplist->count() }} of {{ $grouplist->total() }} groups
-                    </span>
-                    <div>
-                        {{ $grouplist->onEachSide(5)->links() }}
-                    </div>
-                </div>
-            </div>
+            <!-- Footer: the only numbered paginator on the page -->
+            <x-admin.pagination :paginator="$grouplist" :on-each-side="2" />
+        @elseif($searchTerm !== '')
+            <x-admin.empty-state icon="fas fa-magnifying-glass"
+                                 title="No matching groups"
+                                 :message="'No groups match “'.$searchTerm.'”. Edit the search above, or clear it to see every group.'">
+                <x-admin.button :href="request()->url()" tone="gray" icon="fas fa-xmark">Clear search</x-admin.button>
+            </x-admin.empty-state>
         @else
             <x-admin.empty-state icon="fas fa-exclamation-triangle" title="No groups available" message="No groups have been added yet.">
-                <x-admin.button :href="url('/admin/group-bulk')" tone="success" icon="fas fa-plus-circle" class="mt-4">Add Groups</x-admin.button>
+                <x-admin.button :href="url('/admin/group-bulk')" tone="success" icon="fas fa-plus-circle">Add Groups</x-admin.button>
             </x-admin.empty-state>
         @endif
     </x-admin.card>
@@ -333,7 +362,7 @@
         <div class="mt-3">
             <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Confirm Reset Selected Groups</h3>
             <p class="text-sm text-orange-600 dark:text-orange-400 mb-2">
-                <i class="fas fa-exclamation-triangle mr-2"></i>Are you sure you want to reset <span x-text="selectedGroupNames.length">0</span> selected group(s)?
+                <i class="fas fa-exclamation-triangle mr-2"></i>Are you sure you want to reset <span x-text="selectedCount">0</span> selected group(s)?
             </p>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 This will reset the article pointers for the selected groups back to their current state.

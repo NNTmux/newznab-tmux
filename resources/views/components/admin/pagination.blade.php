@@ -2,6 +2,7 @@
 @props([
     'paginator',
     'position' => 'bottom',
+    'onEachSide' => 5,
 ])
 
 @if($paginator->hasPages())
@@ -11,7 +12,7 @@
             : 'border-t border-gray-200 dark:border-gray-700';
     @endphp
     <div class="px-6 py-4 {{ $borderClass }} bg-gray-50 dark:bg-gray-900">
-        {{ $paginator->onEachSide(5)->links() }}
+        {{ $paginator->onEachSide((int) $onEachSide)->links() }}
     </div>
 @endif
 
