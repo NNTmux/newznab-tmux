@@ -9,16 +9,32 @@
  */
 
 import { summarizeSelection } from './group-selection.js';
+import { formatGroupFileSize, parseGroupFileSize } from './group-file-size.js';
 
 export function adminGroups() {
     return {
         resetAllOpen: false,
         purgeAllOpen: false,
         resetSelectedOpen: false,
+        editSelectedOpen: false,
+        editSelectedEditing: true,
+        editSelectedConfirming: false,
         maintenanceOpen: false,
         selectedGroupNames: [],
         selectedCount: 0,
         hasSelection: false,
+        editBackfillTarget: '',
+        editMinFiles: '',
+        editMinSize: '',
+        editActive: '',
+        editBackfill: '',
+        editBackfillTargetError: '',
+        editMinFilesError: '',
+        editMinSizeError: '',
+        editMinSizeReadout: '',
+        editSaveDisabled: true,
+        editConfirmationChanges: [],
+        editConfirmationGroupNames: [],
 
         init() {
             // `init()` evaluates against the x-data element, but resolve upwards
@@ -49,6 +65,8 @@ export function adminGroups() {
             window.hidePurgeAllModal = function() { self.purgeAllOpen = false; };
             window.showResetSelectedModal = function() { self._showResetSelected(); };
             window.hideResetSelectedModal = function() { self.resetSelectedOpen = false; };
+            window.showEditSelectedModal = function() { self.openEditSelected(); };
+            window.hideEditSelectedModal = function() { self.closeEditSelected(); };
             window.toggleSelectAllGroups = function(cb) { self._applySelectAll(cb?.checked); };
             window.getSelectedGroups = function() { return self._getSelected(); };
             window.updateSelectionUI = function() { self._syncSelection(); };
@@ -70,6 +88,11 @@ export function adminGroups() {
                 case 'hide-purge-modal': this.purgeAllOpen = false; break;
                 case 'show-reset-selected-modal': this._showResetSelected(); break;
                 case 'hide-reset-selected-modal': this.resetSelectedOpen = false; break;
+                case 'show-edit-selected-modal': this.openEditSelected(); break;
+                case 'hide-edit-selected-modal': this.closeEditSelected(); break;
+                case 'confirm-edit-selected': this.confirmEditSelected(); break;
+                case 'back-to-edit-selected': this.backToEditSelected(); break;
+                case 'save-edit-selected': this.saveEditSelected(); break;
             }
         },
 
@@ -112,13 +135,7 @@ export function adminGroups() {
         _toggleStatus(id, status) {
             this._post({ action: 'toggle_group_active_status', group_id: id, group_status: status }).then(data => {
                 if (data.success) {
-                    const cell = document.getElementById('group-' + id);
-                    if (cell && data.newStatus !== undefined) {
-                        const active = data.newStatus == 1;
-                        cell.innerHTML = active
-                            ? '<button type="button" data-action="toggle-group-status" data-group-id="' + id + '" data-status="0" class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 hover:bg-green-200"><i class="fa fa-check-circle mr-1"></i>Active</button>'
-                            : '<button type="button" data-action="toggle-group-status" data-group-id="' + id + '" data-status="1" class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200"><i class="fa fa-times-circle mr-1"></i>Inactive</button>';
-                    }
+                    if (data.row) { this._replaceReturnedRows({ [id]: data.row }, false); }
                     showToast(data.message || 'Group status updated', 'success');
                 } else showToast(data.message || 'Error', 'error');
             }).catch(() => showToast('Error updating group status', 'error'));
@@ -127,13 +144,7 @@ export function adminGroups() {
         _toggleBackfill(id, status) {
             this._post({ action: 'toggle_group_backfill', group_id: id, backfill: status }).then(data => {
                 if (data.success) {
-                    const cell = document.getElementById('backfill-' + id);
-                    if (cell && data.newStatus !== undefined) {
-                        const en = data.newStatus == 1;
-                        cell.innerHTML = en
-                            ? '<button type="button" data-action="toggle-backfill" data-group-id="' + id + '" data-status="0" class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 hover:bg-blue-200"><i class="fa fa-check-circle mr-1"></i>Enabled</button>'
-                            : '<button type="button" data-action="toggle-backfill" data-group-id="' + id + '" data-status="1" class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200"><i class="fa fa-times-circle mr-1"></i>Disabled</button>';
-                    }
+                    if (data.row) { this._replaceReturnedRows({ [id]: data.row }, false); }
                     showToast(data.message || 'Backfill status updated', 'success');
                 } else showToast(data.message || 'Error', 'error');
             }).catch(() => showToast('Error updating backfill status', 'error'));
@@ -179,6 +190,11 @@ export function adminGroups() {
                 id: cb.dataset.groupId,
                 name: cb.dataset.groupName,
                 checked: cb.checked,
+                backfillTarget: cb.dataset.backfillTarget,
+                minFiles: cb.dataset.minFiles,
+                minSize: cb.dataset.minSize,
+                active: cb.dataset.active,
+                backfill: cb.dataset.backfill,
             }));
         },
 
@@ -226,6 +242,189 @@ export function adminGroups() {
                 if (d.success) { this._applySelectAll(false); }
                 showToast(d.message || 'Done', d.success ? 'success' : 'error');
             }).catch(() => showToast('Error', 'error'));
+        },
+
+        openEditSelected() {
+            const selectedRows = this._readRows().filter(row => row.checked);
+            if (selectedRows.length === 0) { showToast('No groups selected', 'warning'); return; }
+
+            this._editSelectedTrigger = document.activeElement;
+            this.editBackfillTarget = this._uniformValue(selectedRows, 'backfillTarget');
+            this.editMinFiles = this._uniformValue(selectedRows, 'minFiles');
+            const uniformSize = this._uniformValue(selectedRows, 'minSize');
+            this.editMinSize = uniformSize === '' ? '' : formatGroupFileSize(uniformSize);
+            this.editActive = this._uniformValue(selectedRows, 'active');
+            this.editBackfill = this._uniformValue(selectedRows, 'backfill');
+            this._editSelectedOriginal = this._editSelectedValues();
+            this._editSelectedOriginalNormalized = this._normalizedEditSelectedValues(this._editSelectedOriginal);
+            this.editSelectedEditing = true;
+            this.editSelectedConfirming = false;
+            this.editSelectedOpen = true;
+            this.validateEditSelected();
+            setTimeout(() => this._root.querySelector('#edit-selected-backfill-target')?.focus(), 0);
+        },
+
+        closeEditSelected() {
+            if (! this.editSelectedOpen) { return; }
+            this.editSelectedOpen = false;
+            this.editSelectedEditing = true;
+            this.editSelectedConfirming = false;
+            this._editSelectedTrigger?.focus?.();
+        },
+
+        validateEditSelected() {
+            this.editBackfillTargetError = this._integerError(this.editBackfillTarget, 1, 7300, 'Backfill Days must be a whole number between 1 and 7300.');
+            this.editMinFilesError = this._integerError(this.editMinFiles, 0, 2147483647, 'Minimum Files must be a whole number between 0 and 2,147,483,647.');
+
+            if (this.editMinSize === '') {
+                this.editMinSizeError = '';
+                this.editMinSizeReadout = '';
+            } else {
+                const parsed = parseGroupFileSize(this.editMinSize);
+                this.editMinSizeError = parsed.error;
+                this.editMinSizeReadout = parsed.error ? '' : `${parsed.bytes.toLocaleString()} bytes`;
+            }
+
+            this.editSaveDisabled = ! this.canSaveEditSelected();
+        },
+
+        canSaveEditSelected() {
+            return ! this.editBackfillTargetError
+                && ! this.editMinFilesError
+                && ! this.editMinSizeError
+                && Object.keys(this.editSelectedChanges()).length > 0;
+        },
+
+        editSelectedChanges() {
+            const current = this._editSelectedValues();
+            const original = this._editSelectedOriginal ?? current;
+            const currentNormalized = this._normalizedEditSelectedValues(current);
+            const originalNormalized = this._editSelectedOriginalNormalized ?? this._normalizedEditSelectedValues(original);
+            const changes = {};
+
+            if (currentNormalized.backfillTarget !== originalNormalized.backfillTarget && current.backfillTarget !== '') {
+                changes.backfill_target = Number(current.backfillTarget);
+            }
+            if (currentNormalized.minFiles !== originalNormalized.minFiles && current.minFiles !== '') {
+                changes.minfilestoformrelease = Number(current.minFiles);
+            }
+            if (currentNormalized.minSize !== originalNormalized.minSize && current.minSize !== '') {
+                changes.minsizetoformrelease = current.minSize;
+            }
+            if (currentNormalized.active !== originalNormalized.active && current.active !== '') {
+                changes.active = Number(current.active);
+            }
+            if (currentNormalized.backfill !== originalNormalized.backfill && current.backfill !== '') {
+                changes.backfill = Number(current.backfill);
+            }
+
+            return changes;
+        },
+
+        confirmEditSelected() {
+            this.validateEditSelected();
+            if (this.editSaveDisabled) { return; }
+
+            const changes = this.editSelectedChanges();
+            const labels = {
+                backfill_target: 'Backfill Days',
+                minfilestoformrelease: 'Minimum Files to Form Release',
+                minsizetoformrelease: 'Minimum File Size',
+                active: 'Active',
+                backfill: 'Backfill',
+            };
+
+            this.editConfirmationChanges = Object.entries(changes).map(([key, value]) => {
+                let display = value;
+                if (key === 'active' || key === 'backfill') { display = value === 1 ? 'Enabled' : 'Disabled'; }
+                if (key === 'minsizetoformrelease') {
+                    const parsed = parseGroupFileSize(value);
+                    display = `${value} (${parsed.bytes.toLocaleString()} bytes)`;
+                }
+                return { key, label: labels[key], value: display };
+            });
+            this.editConfirmationGroupNames = this.selectedGroupNames.slice(0, 5);
+            this.editSelectedEditing = false;
+            this.editSelectedConfirming = true;
+        },
+
+        backToEditSelected() {
+            this.editSelectedEditing = true;
+            this.editSelectedConfirming = false;
+        },
+
+        saveEditSelected() {
+            const summary = this._syncSelection();
+            if (! summary.hasSelection) { this.closeEditSelected(); showToast('No groups selected', 'warning'); return; }
+
+            this._post({
+                action: 'edit_selected_groups',
+                group_ids: JSON.stringify(summary.ids),
+                changes: JSON.stringify(this.editSelectedChanges()),
+            }).then(data => {
+                if (! data.success) { showToast(data.message || 'Error updating selected groups', 'error'); return; }
+
+                this._replaceReturnedRows(data.rows ?? {}, true);
+                this.closeEditSelected();
+                showToast(data.message || 'Selected groups updated', 'success');
+            }).catch(() => showToast('Error updating selected groups', 'error'));
+        },
+
+        _uniformValue(rows, key) {
+            const first = rows[0][key] ?? '';
+            return rows.every(row => (row[key] ?? '') === first) ? first : '';
+        },
+
+        _editSelectedValues() {
+            return {
+                backfillTarget: String(this.editBackfillTarget).trim(),
+                minFiles: String(this.editMinFiles).trim(),
+                minSize: String(this.editMinSize).trim(),
+                active: String(this.editActive),
+                backfill: String(this.editBackfill),
+            };
+        },
+
+        _normalizedEditSelectedValues(values) {
+            const parsedSize = values.minSize === '' ? null : parseGroupFileSize(values.minSize);
+
+            return {
+                backfillTarget: values.backfillTarget === '' ? '' : String(Number(values.backfillTarget)),
+                minFiles: values.minFiles === '' ? '' : String(Number(values.minFiles)),
+                minSize: values.minSize === '' || parsedSize.error ? values.minSize : String(parsedSize.bytes),
+                active: values.active,
+                backfill: values.backfill,
+            };
+        },
+
+        _integerError(value, minimum, maximum, message) {
+            const input = String(value).trim();
+            if (input === '') { return ''; }
+            if (! /^\d+$/.test(input)) { return message; }
+            const parsed = Number(input);
+            return Number.isSafeInteger(parsed) && parsed >= minimum && parsed <= maximum ? '' : message;
+        },
+
+        _replaceReturnedRows(rows, keepSelected) {
+            for (const [id, html] of Object.entries(rows)) {
+                const currentRow = this._root.querySelector(`#grouprow-${id}`);
+                if (! currentRow || ! document.createElement) { continue; }
+                const wasSelected = Boolean(currentRow.querySelector?.('.group-checkbox')?.checked);
+
+                const template = document.createElement('template');
+                template.innerHTML = String(html).trim();
+                const replacement = template.content.firstElementChild;
+                if (! replacement) { continue; }
+
+                currentRow.replaceWith(replacement);
+                window.Alpine?.initTree?.(replacement);
+                const checkbox = replacement.querySelector('.group-checkbox');
+                if (checkbox) { checkbox.checked = Boolean(keepSelected || wasSelected); }
+                replacement.classList.add('group-row-updated');
+                setTimeout(() => replacement.classList.remove('group-row-updated'), 1600);
+            }
+
+            this._syncSelection();
         }
     };
 }

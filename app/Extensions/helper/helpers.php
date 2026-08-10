@@ -180,6 +180,40 @@ if (! function_exists('human_filesize')) {
     }
 }
 
+if (! function_exists('parse_group_file_size')) {
+    /**
+     * Parse the byte-count grammar used by the group edit forms.
+     *
+     * @throws InvalidArgumentException
+     */
+    function parse_group_file_size(string|int $value): int
+    {
+        $input = trim((string) $value);
+        $message = 'Enter a whole byte count or a number followed by M, MB, G, or GB.';
+
+        if (preg_match('/^\d+$/', $input) === 1) {
+            if ((float) $input > PHP_INT_MAX) {
+                throw new InvalidArgumentException($message);
+            }
+
+            return (int) $input;
+        }
+
+        if (preg_match('/^(\d+(?:\.\d+)?)\s*([MG])B?$/i', $input, $matches) !== 1) {
+            throw new InvalidArgumentException($message);
+        }
+
+        $multiplier = strtoupper($matches[2]) === 'G' ? 1024 ** 3 : 1024 ** 2;
+        $bytes = (float) $matches[1] * $multiplier;
+
+        if (! is_finite($bytes) || $bytes > PHP_INT_MAX) {
+            throw new InvalidArgumentException($message);
+        }
+
+        return (int) round($bytes);
+    }
+}
+
 if (! function_exists('bcdechex')) {
     function bcdechex(string $dec): string
     {

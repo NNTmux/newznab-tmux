@@ -259,10 +259,19 @@ class UsenetGroup extends Model
                 'last_updated' => now(),
                 'active' => $group['active'],
                 'backfill' => $group['backfill'],
-                'minsizetoformrelease' => $group['minsizetoformrelease'] === '' ? null : $group['minsizetoformrelease'],
-                'minfilestoformrelease' => $group['minfilestoformrelease'] === '' ? null : $group['minfilestoformrelease'],
+                'minsizetoformrelease' => empty($group['minsizetoformrelease']) ? null : $group['minsizetoformrelease'],
+                'minfilestoformrelease' => empty($group['minfilestoformrelease']) ? null : $group['minfilestoformrelease'],
             ]
         );
+    }
+
+    /**
+     * @param  list<int>  $groupIds
+     * @param  array<string, int|null>  $changes
+     */
+    public static function updateSelected(array $groupIds, array $changes): int
+    {
+        return self::query()->whereIn('id', $groupIds)->update($changes);
     }
 
     /**

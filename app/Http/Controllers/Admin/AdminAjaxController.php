@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BasePageController;
+use App\Http\Requests\Admin\EditSelectedGroupsRequest;
 use App\Models\UsenetGroup;
 use App\Services\BlacklistService;
 use App\Services\RegexService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class AdminAjaxController extends BasePageController
 {
@@ -90,6 +92,9 @@ class AdminAjaxController extends BasePageController
                         'message' => "$count group(s) reset successfully",
                     ]);
 
+                case 'edit_selected_groups':
+                    return $this->editSelectedGroups($request);
+
                 case 'group_edit_delete_single':
                 case 'delete_group':
                     $id = (int) $request->input('group_id');
@@ -107,6 +112,7 @@ class AdminAjaxController extends BasePageController
                         'success' => true,
                         'message' => $message,
                         'newStatus' => $status,
+                        'row' => $this->renderGroupRow($groupId),
                     ]);
 
                 case 'toggle_group_backfill_status':
@@ -121,15 +127,54 @@ class AdminAjaxController extends BasePageController
                         'success' => true,
                         'message' => $message,
                         'newStatus' => $status,
+                        'row' => $this->renderGroupRow($groupId),
                     ]);
 
                 default:
                     return response()->json(['success' => false, 'message' => 'Unknown action'], 400);
             }
+        } catch (ValidationException $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => 'The submitted group settings are invalid.',
+                'errors' => $exception->errors(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
 
         return null;
+    }
+
+    private function editSelectedGroups(Request $request): mixed
+    {
+        $validatedRequest = EditSelectedGroupsRequest::createFrom($request);
+        $validatedRequest->setContainer(app());
+        $validatedRequest->setRedirector(app('redirect'));
+        $validatedRequest->validateResolved();
+
+        $groupIds = $validatedRequest->groupIds();
+        UsenetGroup::updateSelected($groupIds, $validatedRequest->changes());
+        $updated = count($groupIds);
+        $groups = UsenetGroup::query()->whereIn('id', $groupIds)->get();
+        $rows = [];
+
+        foreach ($groups as $group) {
+            $rows[(string) $group->id] = view('admin.groups._row', compact('group'))->render();
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $updated.' group(s) updated successfully',
+            'updated' => $updated,
+            'rows' => $rows,
+        ]);
+    }
+
+    private function renderGroupRow(int $groupId): string
+    {
+        $group = UsenetGroup::query()->findOrFail($groupId);
+
+        return view('admin.groups._row', compact('group'))->render();
     }
 }

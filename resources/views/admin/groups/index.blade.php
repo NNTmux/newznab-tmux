@@ -56,6 +56,16 @@
 
                     <!-- Selection-scoped action: only present while rows are selected -->
                     <x-admin.button type="button"
+                                    id="edit-selected-groups"
+                                    x-show="hasSelection"
+                                    x-cloak
+                                    @click="handleAction('show-edit-selected-modal')"
+                                    icon="fas fa-pen-to-square"
+                                    class="self-start lg:self-auto lg:shrink-0">
+                        Edit <span x-text="selectedCount">0</span> selected
+                    </x-admin.button>
+
+                    <x-admin.button type="button"
                                     x-show="hasSelection"
                                     x-cloak
                                     @click="handleAction('show-reset-selected-modal')"
@@ -145,118 +155,7 @@
                             <x-admin.th align="center" class="w-40">Actions</x-admin.th>
                 </x-slot:head>
                         @foreach($grouplist as $group)
-                            <tr id="grouprow-{{ $group->id }}" class="hover:bg-gray-50 dark:hover:bg-gray-700 group-row">
-                                <td class="px-4 py-4 text-center">
-                                    <input type="checkbox"
-                                           class="group-checkbox form-checkbox h-4 w-4 text-primary-600 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500 dark:bg-gray-700"
-                                           data-group-id="{{ $group->id }}"
-                                           data-group-name="{{ $group->name }}"
-                                           @change="onGroupCheckboxChange()">
-                                </td>
-                                <td class="px-6 py-4">
-                                    <a href="{{ url('/admin/group-edit?id=' . $group->id) }}" class="font-semibold text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
-                                        {{ str_replace('alt.binaries', 'a.b', $group->name) }}
-                                    </a>
-                                    @if($group->description)
-                                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ $group->description }}</div>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 text-sm">
-                                    <div class="flex flex-col">
-                                        <span class="text-gray-900 dark:text-gray-100">{{ $group->first_record_postdate }}</span>
-                                        <small class="text-gray-500 dark:text-gray-400">{{ \Carbon\Carbon::parse($group->first_record_postdate)->diffForHumans() }}</small>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{{ $group->last_record_postdate }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400" title="{{ $group->last_updated }}">
-                                    {{ \Carbon\Carbon::parse($group->last_updated)->diffForHumans() }}
-                                </td>
-                                <td class="px-6 py-4 text-center" id="group-{{ $group->id }}">
-                                    @if($group->active == 1)
-                                        <button type="button"
-                                                @click="handleAction('toggle-group-status', '{{ $group->id }}', '0')"
-                                                class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 hover:bg-green-200">
-                                            <i class="fas fa-check-circle mr-1"></i>Active
-                                        </button>
-                                    @else
-                                        <button type="button"
-                                                @click="handleAction('toggle-group-status', '{{ $group->id }}', '1')"
-                                                class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200">
-                                            <i class="fas fa-times-circle mr-1"></i>Inactive
-                                        </button>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 text-center" id="backfill-{{ $group->id }}">
-                                    @if($group->backfill == 1)
-                                        <button type="button"
-                                                @click="handleAction('toggle-backfill', '{{ $group->id }}', '0')"
-                                                class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-primary-100 text-primary-800 hover:bg-primary-200">
-                                            <i class="fas fa-check-circle mr-1"></i>Enabled
-                                        </button>
-                                    @else
-                                        <button type="button"
-                                                @click="handleAction('toggle-backfill', '{{ $group->id }}', '1')"
-                                                class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200">
-                                            <i class="fas fa-times-circle mr-1"></i>Disabled
-                                        </button>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                        {{ $group->num_releases ?? 0 }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    @if(empty($group->minfilestoformrelease))
-                                        <span class="text-gray-400 dark:text-gray-500">n/a</span>
-                                    @else
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                            {{ $group->minfilestoformrelease }}
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    @if(empty($group->minsizetoformrelease))
-                                        <span class="text-gray-400 dark:text-gray-500">n/a</span>
-                                    @else
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                            {{ human_filesize($group->minsizetoformrelease) }}
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                                        {{ $group->backfill_target }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 text-center" id="groupdel-{{ $group->id }}">
-                                    <div class="flex gap-1 justify-center">
-                                        <a href="{{ url('/admin/group-edit?id=' . $group->id) }}"
-                                           class="text-primary-600 dark:text-primary-400 hover:text-primary-900 dark:hover:text-primary-300"
-                                           title="Edit this group">
-                                            <i class="fas fa-pencil"></i>
-                                        </a>
-                                        <button type="button"
-                                                @click="handleAction('reset-group', '{{ $group->id }}')"
-                                                class="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300"
-                                                title="Reset this group">
-                                            <i class="fas fa-refresh"></i>
-                                        </button>
-                                        <button type="button"
-                                                @click="handleAction('delete-group', '{{ $group->id }}')"
-                                                class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                                title="Delete this group">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                        <button type="button"
-                                                @click="handleAction('purge-group', '{{ $group->id }}')"
-                                                class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                                title="Purge this group">
-                                            <i class="fas fa-eraser"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                            @include('admin.groups._row', ['group' => $group])
                         @endforeach
             </x-admin.data-table>
 
@@ -274,6 +173,121 @@
             </x-admin.empty-state>
         @endif
     </x-admin.card>
+
+    <!-- Edit Selected Modal -->
+    <div x-show="editSelectedOpen"
+         x-cloak
+         @keydown.escape.window="handleAction('hide-edit-selected-modal')"
+         class="fixed inset-0 z-50 h-full w-full overflow-y-auto bg-gray-600/50">
+        <div class="surface-panel relative top-8 mx-auto w-full max-w-2xl rounded-lg border p-6 shadow-lg"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="edit-selected-title"
+             @click.outside="handleAction('hide-edit-selected-modal')">
+            <div class="mb-5 flex items-start justify-between gap-4">
+                <div>
+                    <h3 id="edit-selected-title" class="text-lg font-semibold text-gray-900 dark:text-gray-100">Edit Selected Groups</h3>
+                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                        Change settings for <span x-text="selectedCount">0</span> selected groups. Empty fields are left unchanged.
+                    </p>
+                </div>
+                <button type="button"
+                        class="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100"
+                        aria-label="Close Edit Selected dialog"
+                        @click="handleAction('hide-edit-selected-modal')">
+                    <i class="fas fa-xmark" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <div x-show="editSelectedEditing" class="space-y-4">
+                <div>
+                    <x-label for="edit-selected-backfill-target">Backfill Days</x-label>
+                    <x-input id="edit-selected-backfill-target"
+                             type="text"
+                             inputmode="numeric"
+                             placeholder="Mixed — leave unchanged"
+                             x-model="editBackfillTarget"
+                             @input="validateEditSelected()" />
+                    <p x-show="editBackfillTargetError" x-text="editBackfillTargetError" class="mt-1 text-sm text-red-600 dark:text-red-400"></p>
+                </div>
+
+                <div>
+                    <x-label for="edit-selected-min-files">Minimum Files to Form Release</x-label>
+                    <x-input id="edit-selected-min-files"
+                             type="text"
+                             inputmode="numeric"
+                             placeholder="Mixed — leave unchanged"
+                             x-model="editMinFiles"
+                             @input="validateEditSelected()" />
+                    <p x-show="editMinFilesError" x-text="editMinFilesError" class="mt-1 text-sm text-red-600 dark:text-red-400"></p>
+                </div>
+
+                <div>
+                    <x-label for="edit-selected-min-size">Minimum File Size</x-label>
+                    <x-input id="edit-selected-min-size"
+                             type="text"
+                             placeholder="100M, 2.5G, or bytes"
+                             x-model="editMinSize"
+                             @input="validateEditSelected()" />
+                    <p x-show="editMinSizeReadout" x-text="editMinSizeReadout" class="mt-1 text-sm text-gray-600 dark:text-gray-400"></p>
+                    <p x-show="editMinSizeError" x-text="editMinSizeError" class="mt-1 text-sm text-red-600 dark:text-red-400"></p>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <x-label for="edit-selected-active">Active</x-label>
+                        <x-select id="edit-selected-active" x-model="editActive" @change="validateEditSelected()">
+                            <option value="">No change</option>
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </x-select>
+                    </div>
+                    <div>
+                        <x-label for="edit-selected-backfill">Backfill</x-label>
+                        <x-select id="edit-selected-backfill" x-model="editBackfill" @change="validateEditSelected()">
+                            <option value="">No change</option>
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </x-select>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-3">
+                    <x-button type="button" variant="muted" @click="handleAction('hide-edit-selected-modal')">Cancel</x-button>
+                    <x-button type="button"
+                              variant="primary"
+                              x-bind:disabled="editSaveDisabled"
+                              @click="handleAction('confirm-edit-selected')">
+                        Save
+                    </x-button>
+                </div>
+            </div>
+
+            <div x-show="editSelectedConfirming" class="space-y-4">
+                <p class="text-sm text-gray-700 dark:text-gray-300">
+                    Apply these changes to <strong x-text="selectedCount">0</strong> selected groups?
+                </p>
+                <dl class="surface-panel-alt space-y-2 rounded-lg border p-4">
+                    <template x-for="change in editConfirmationChanges" :key="change.key">
+                        <div class="flex justify-between gap-4 text-sm">
+                            <dt x-text="change.label" class="text-gray-600 dark:text-gray-400"></dt>
+                            <dd x-text="change.value" class="font-medium text-gray-900 dark:text-gray-100"></dd>
+                        </div>
+                    </template>
+                </dl>
+                <div>
+                    <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Affected groups include</p>
+                    <template x-for="name in editConfirmationGroupNames" :key="name">
+                        <div x-text="name" class="text-sm text-gray-700 dark:text-gray-300"></div>
+                    </template>
+                </div>
+                <div class="flex justify-end gap-3 pt-3">
+                    <x-button type="button" variant="muted" @click="handleAction('back-to-edit-selected')">Back</x-button>
+                    <x-button type="button" variant="primary" @click="handleAction('save-edit-selected')">Apply Changes</x-button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Reset All Modal -->
     <div x-show="resetAllOpen"

@@ -15,6 +15,7 @@ class FakeElement {
         this.checked = false;
         this.indeterminate = false;
         this.focused = false;
+        this.classList = { add() {}, remove() {} };
     }
 
     matches(selector) {
@@ -63,7 +64,15 @@ function mountPage(rowCount = 3) {
     const header = new FakeElement({ id: 'select-all-groups' });
     const rows = Array.from({ length: rowCount }, (unused, index) => new FakeElement({
         classes: ['group-checkbox'],
-        dataset: { groupId: String(index + 1), groupName: 'alt.binaries.group' + (index + 1) },
+        dataset: {
+            groupId: String(index + 1),
+            groupName: 'alt.binaries.group' + (index + 1),
+            backfillTarget: index === 2 ? '30' : '7',
+            minFiles: index === 2 ? '' : '4',
+            minSize: index === 2 ? '1073741824' : '104857600',
+            active: index === 2 ? '0' : '1',
+            backfill: '0',
+        },
     }));
     const maintenanceToggle = new FakeElement({ id: 'group-maintenance-toggle' });
     const root = new FakeRoot([header, ...rows, maintenanceToggle]);
@@ -219,4 +228,102 @@ test('escape returns focus to the maintenance trigger only when the menu is open
 
     assert.equal(page.component.maintenanceOpen, false);
     assert.equal(page.maintenanceToggle.focused, true);
+});
+
+test('edit selected prefills uniform values and leaves mixed values empty', () => {
+    const page = mountPage();
+    page.rows.forEach(row => { row.checked = true; });
+    page.component._syncSelection();
+
+    page.component.openEditSelected();
+
+    assert.equal(page.component.editBackfillTarget, '');
+    assert.equal(page.component.editMinFiles, '');
+    assert.equal(page.component.editMinSize, '');
+    assert.equal(page.component.editActive, '');
+    assert.equal(page.component.editBackfill, '0');
+});
+
+test('edit selected sends only values changed since the dialog opened', () => {
+    const page = mountPage(2);
+    page.rows.forEach(row => { row.checked = true; });
+    page.component._syncSelection();
+    page.component.openEditSelected();
+
+    assert.deepEqual(page.component.editSelectedChanges(), {});
+
+    page.component.editBackfillTarget = '30';
+    page.component.editMinSize = '2.5G';
+    page.component.editActive = '0';
+    page.component.validateEditSelected();
+
+    assert.deepEqual(page.component.editSelectedChanges(), {
+        backfill_target: 30,
+        minsizetoformrelease: '2.5G',
+        active: 0,
+    });
+    assert.equal(page.component.canSaveEditSelected(), true);
+});
+
+test('edit selected save stays disabled for invalid values or no changes', () => {
+    const page = mountPage(2);
+    page.rows.forEach(row => { row.checked = true; });
+    page.component._syncSelection();
+    page.component.openEditSelected();
+
+    assert.equal(page.component.canSaveEditSelected(), false);
+
+    page.component.editBackfillTarget = '07';
+    page.component.editMinSize = '100M';
+    page.component.validateEditSelected();
+    assert.deepEqual(page.component.editSelectedChanges(), {});
+    assert.equal(page.component.canSaveEditSelected(), false, 'Equivalent numeric and size spellings are not changes.');
+
+    page.component.editMinFiles = '3000000000';
+    page.component.validateEditSelected();
+    assert.match(page.component.editMinFilesError, /2,147,483,647/);
+    assert.equal(page.component.canSaveEditSelected(), false);
+
+    page.component.editBackfillTarget = '0';
+    page.component.validateEditSelected();
+    assert.match(page.component.editBackfillTargetError, /between 1 and 7300/);
+    assert.equal(page.component.canSaveEditSelected(), false);
+
+    page.component.editBackfillTarget = '30';
+    page.component.editMinSize = '10K';
+    page.component.validateEditSelected();
+    assert.match(page.component.editMinSizeError, /M, MB, G, or GB/);
+    assert.equal(page.component.canSaveEditSelected(), false);
+});
+
+test('returned rows replace the originals and remain selected', () => {
+    const page = mountPage(1);
+    page.rows[0].checked = true;
+    page.component._syncSelection();
+
+    const replacementCheckbox = new FakeElement({
+        classes: ['group-checkbox'],
+        dataset: page.rows[0].dataset,
+    });
+    const replacementRow = {
+        classList: { add() {}, remove() {} },
+        querySelector: () => replacementCheckbox,
+    };
+    const currentRow = {
+        querySelector: () => page.rows[0],
+        replaceWith() {
+            page.root.descendants = page.root.descendants.map(node => node === page.rows[0] ? replacementCheckbox : node);
+        },
+    };
+    const originalQuerySelector = page.root.querySelector.bind(page.root);
+    page.root.querySelector = selector => selector === '#grouprow-1' ? currentRow : originalQuerySelector(selector);
+    globalThis.document.createElement = () => ({
+        content: { firstElementChild: replacementRow },
+        set innerHTML(value) { this.html = value; },
+    });
+
+    page.component._replaceReturnedRows({ 1: '<tr id="grouprow-1"></tr>' }, true);
+
+    assert.equal(replacementCheckbox.checked, true);
+    assert.equal(page.component.selectedCount, 1);
 });

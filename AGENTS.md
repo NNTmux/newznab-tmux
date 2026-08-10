@@ -320,6 +320,8 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 # Laravel Sail
 
+- On this host, invoke every Sail command with the `sudo vendor/bin/sail` prefix; this applies to every Sail example below.
+- In agent workspaces without a root `docker-compose.yml`, run Sail with `SAIL_FILES=.github/docker-compose.ci.yml APP_SERVICE=laravel.test`.
 - This project runs inside Laravel Sail's Docker containers. You MUST execute all commands through Sail.
 - Start services using `vendor/bin/sail up -d` and stop them with `vendor/bin/sail stop`.
 - Open the application in the browser by running `vendor/bin/sail open`.

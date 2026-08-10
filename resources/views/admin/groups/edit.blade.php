@@ -109,21 +109,19 @@
 
             <!-- Minimum Size -->
             <div class="mb-6">
-                <label for="minsizetoformrelease" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Minimum File Size (bytes):
-                </label>
+                <x-label for="minsizetoformrelease">Minimum File Size:</x-label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-download text-gray-400"></i>
                     </div>
-                    <input type="number"
-                           id="minsizetoformrelease"
-                           name="minsizetoformrelease"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-gray-100"
-                           value="{{ $group['minsizetoformrelease'] ?? 0 }}"/>
+                    <x-input type="text"
+                             id="minsizetoformrelease"
+                             name="minsizetoformrelease"
+                             class="pl-10"
+                             :value="$group['minsizetoformrelease'] ?? 0" />
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    The minimum total size in bytes to make a release. If left blank, will use the site wide setting.
+                    Enter bytes, or use M/MB/G/GB (for example 100M or 2.5G). If left blank, the site-wide setting is used.
                 </p>
             </div>
 
@@ -253,4 +251,3 @@
 </div>
 
 @endsection
-

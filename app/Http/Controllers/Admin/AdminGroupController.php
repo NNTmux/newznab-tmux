@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\AdminGroupListRequest;
 use App\Models\UsenetGroup;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class AdminGroupController extends BasePageController
@@ -75,6 +76,17 @@ class AdminGroupController extends BasePageController
 
         switch ($action) {
             case 'submit':
+                $minimumSize = $request->input('minsizetoformrelease');
+                if ($minimumSize !== null && trim((string) $minimumSize) !== '') {
+                    try {
+                        $request->merge(['minsizetoformrelease' => parse_group_file_size($minimumSize)]);
+                    } catch (\InvalidArgumentException $exception) {
+                        throw ValidationException::withMessages([
+                            'minsizetoformrelease' => $exception->getMessage(),
+                        ]);
+                    }
+                }
+
                 if (empty($request->input('id'))) {
                     // Add a new group.
                     $request->merge(['name' => UsenetGroup::isValidGroup($request->input('name'))]);

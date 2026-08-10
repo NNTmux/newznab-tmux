@@ -714,6 +714,18 @@ code.api-token::-webkit-scrollbar-thumb:hover {
     background-color: rgba(59, 130, 246, 0.1); /* blue-500/10 */
 }
 
+.group-row {
+    transition: background-color 0.35s ease-in-out;
+}
+
+.group-row.group-row-updated {
+    background-color: color-mix(in srgb, var(--color-primary-200) 55%, transparent);
+}
+
+.dark .group-row.group-row-updated {
+    background-color: color-mix(in srgb, var(--color-primary-800) 55%, transparent);
+}
+
 .dark .group-row.selected {
     background-color: rgba(59, 130, 246, 0.15); /* blue-500/15 */
 }
@@ -979,4 +991,3 @@ code.api-token::-webkit-scrollbar-thumb:hover {
 .series-detail-page .series-detail-poster {
     @apply rounded-xl shadow-xl transition-shadow duration-300;
 }
-

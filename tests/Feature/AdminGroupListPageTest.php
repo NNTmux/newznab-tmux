@@ -244,6 +244,148 @@ class AdminGroupListPageTest extends TestCase
         $response->assertForbidden();
     }
 
+    public function test_group_list_exposes_edit_selected_values_and_modal(): void
+    {
+        $this->createGroups(1);
+
+        $response = $this->actingAs($this->admin())->get(route('admin.group-list'));
+
+        $response->assertOk();
+        $response->assertSee('Edit <span x-text="selectedCount">0</span> selected', false);
+        $response->assertSee('data-backfill-target="1"', false);
+        $response->assertSee('data-min-files=""', false);
+        $response->assertSee('data-min-size=""', false);
+        $response->assertSee('data-active="1"', false);
+        $response->assertSee('data-backfill="0"', false);
+        $response->assertSee('Edit Selected Groups');
+        $response->assertSee('Minimum File Size');
+    }
+
+    public function test_edit_selected_updates_only_submitted_settings_and_returns_rows(): void
+    {
+        $this->createGroups(2);
+        $ids = DB::table('usenet_groups')->orderBy('id')->pluck('id')->all();
+        $lastUpdated = DB::table('usenet_groups')->where('id', $ids[0])->value('last_updated');
+
+        $response = $this->actingAs($this->admin())->post(route('admin.ajax'), [
+            'action' => 'edit_selected_groups',
+            'group_ids' => json_encode($ids),
+            'changes' => json_encode([
+                'backfill_target' => 30,
+                'minsizetoformrelease' => '100M',
+                'active' => 0,
+            ]),
+        ]);
+
+        $response->assertOk()->assertJson([
+            'success' => true,
+            'updated' => 2,
+        ]);
+        $response->assertJsonPath('rows.'.$ids[0], fn (string $row): bool => str_contains($row, 'id="grouprow-'.$ids[0].'"'));
+        $response->assertJsonPath('rows.'.$ids[1], fn (string $row): bool => str_contains($row, 'id="grouprow-'.$ids[1].'"'));
+
+        foreach ($ids as $id) {
+            $group = DB::table('usenet_groups')->where('id', $id)->first();
+            $this->assertSame(30, $group->backfill_target);
+            $this->assertSame(104857600, $group->minsizetoformrelease);
+            $this->assertSame(0, $group->active);
+            $this->assertSame(0, $group->backfill, 'An omitted setting must remain untouched.');
+            $this->assertNull($group->minfilestoformrelease, 'An omitted release floor must remain untouched.');
+        }
+
+        $this->assertSame($lastUpdated, DB::table('usenet_groups')->where('id', $ids[0])->value('last_updated'));
+    }
+
+    public function test_edit_selected_normalizes_zero_release_floors_to_null(): void
+    {
+        $this->createGroups(1);
+        $id = DB::table('usenet_groups')->value('id');
+        DB::table('usenet_groups')->where('id', $id)->update([
+            'minfilestoformrelease' => 5,
+            'minsizetoformrelease' => 1024,
+        ]);
+
+        $response = $this->actingAs($this->admin())->post(route('admin.ajax'), [
+            'action' => 'edit_selected_groups',
+            'group_ids' => json_encode([$id]),
+            'changes' => json_encode([
+                'minfilestoformrelease' => 0,
+                'minsizetoformrelease' => '0',
+            ]),
+        ]);
+
+        $response->assertOk();
+        $this->assertNull(DB::table('usenet_groups')->where('id', $id)->value('minfilestoformrelease'));
+        $this->assertNull(DB::table('usenet_groups')->where('id', $id)->value('minsizetoformrelease'));
+    }
+
+    public function test_edit_selected_rejects_invalid_or_nonsensical_requests(): void
+    {
+        $this->createGroups(1);
+        $id = DB::table('usenet_groups')->value('id');
+        $admin = $this->admin();
+
+        foreach ([
+            ['group_ids' => [$id], 'changes' => []],
+            ['group_ids' => [$id], 'changes' => ['backfill_target' => 0]],
+            ['group_ids' => [$id], 'changes' => ['backfill_target' => 7301]],
+            ['group_ids' => [$id], 'changes' => ['minfilestoformrelease' => 3000000000]],
+            ['group_ids' => [$id], 'changes' => ['minsizetoformrelease' => '10K']],
+            ['group_ids' => [999999], 'changes' => ['active' => 1]],
+            ['group_ids' => [$id], 'changes' => ['description' => 'tampered']],
+        ] as $payload) {
+            $response = $this->actingAs($admin)
+                ->withHeaders([
+                    'Accept' => 'application/json',
+                    'X-Requested-With' => 'XMLHttpRequest',
+                ])->post(route('admin.ajax'), [
+                    'action' => 'edit_selected_groups',
+                    'group_ids' => json_encode($payload['group_ids']),
+                    'changes' => json_encode($payload['changes']),
+                ]);
+
+            $response->assertUnprocessable();
+        }
+    }
+
+    public function test_edit_selected_is_closed_to_non_admins(): void
+    {
+        $user = $this->createUserWithRole('User');
+        /** @var Authenticatable $authenticatedUser */
+        $authenticatedUser = $user;
+
+        $response = $this->actingAs($authenticatedUser)->post(route('admin.ajax'), [
+            'action' => 'edit_selected_groups',
+            'group_ids' => '[1]',
+            'changes' => '{"active":1}',
+        ]);
+
+        $response->assertForbidden();
+    }
+
+    public function test_single_group_edit_accepts_the_same_file_size_grammar(): void
+    {
+        $this->createGroups(1);
+        $group = DB::table('usenet_groups')->first();
+
+        $response = $this->actingAs($this->admin())->post('/admin/group-edit?action=submit', [
+            'id' => $group->id,
+            'name' => $group->name,
+            'description' => $group->description,
+            'backfill_target' => 1,
+            'first_record' => 0,
+            'last_record' => 0,
+            'active' => 1,
+            'backfill' => 0,
+            'minfilestoformrelease' => 0,
+            'minsizetoformrelease' => '2.5G',
+        ]);
+
+        $response->assertRedirect('admin/group-list');
+        $this->assertSame(2684354560, DB::table('usenet_groups')->where('id', $group->id)->value('minsizetoformrelease'));
+        $this->assertNull(DB::table('usenet_groups')->where('id', $group->id)->value('minfilestoformrelease'));
+    }
+
     private function admin(): Authenticatable
     {
         /** @var Authenticatable $admin */
@@ -391,6 +533,8 @@ class AdminGroupListPageTest extends TestCase
             $table->string('first_record_postdate')->nullable();
             $table->string('last_record_postdate')->nullable();
             $table->string('last_updated')->nullable();
+            $table->unsignedBigInteger('first_record')->default(0);
+            $table->unsignedBigInteger('last_record')->default(0);
             $table->boolean('active')->default(false);
             $table->boolean('backfill')->default(false);
             $table->unsignedInteger('minfilestoformrelease')->nullable();
