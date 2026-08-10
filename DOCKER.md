@@ -1,6 +1,6 @@
 # Docker Development Environment
 
-> Docker / Sail setup for NNTmux — a Laravel 12 Usenet indexer.
+> Docker / Sail setup for NNTmux — a Laravel 13 Usenet indexer.
 
 ## Prerequisites
 
@@ -26,6 +26,75 @@ make artisan cmd="nntmux:install"
 # 4. Build frontend assets
 make npm-build
 ```
+
+## Runtime permission contract
+
+NNTmux supports callers with a restrictive `umask`, including `0077`. The
+global shell, agent, and Docker daemon umasks should remain restrictive. The
+Sail Composer and production Vite commands publish runtime files under a
+command-scoped `umask 0022`, then the build workflow verifies exact modes.
+
+This contract exists because two separate production failures made the Web UI
+unusable: Vite emitted an owner-only manifest and assets, and a focused test run
+compiled owner-only Blade views into the checkout's live framework cache. Git
+cannot reveal either problem because it does not record group/other read bits
+and both generated paths are ignored.
+
+| Path | Owner/group and mode contract |
+|------|-------------------------------|
+| Tracked runtime source | Deployment owner; directories `0755`, files `0644`, Git executables `0755` |
+| `vendor` | Runtime-readable/traversable; existing package executables stay executable |
+| `public/build` | Directories exactly `0755`, regular files exactly `0644` |
+| `.env` | Deployment owner and PHP-FPM application group, exactly `0640` |
+| `storage/framework/views` | Deployment owner/application group; directories `2775`, compiled files `0664` |
+| Other `storage` and `bootstrap/cache` | Deployment owner/application group; writable setgid directories, private group-writable files |
+
+`make fix-permissions` is the idempotent repair command. It validates the Git
+root before changing anything, skips symlinks during mode normalization, and
+derives the application identity from PHP-FPM configuration. `make
+check-permissions` is read-only and performs decisive access checks as that
+application user. Its errors name the failing path and the repair command.
+
+Tests launched with `./sail test`, `./sail phpunit`, or `./sail artisan test`
+receive unique temporary compiled-view, config, route, event, package, service,
+and PHPUnit cache paths before Artisan starts. The runner removes that tree on
+exit and never writes to live `storage/framework/views` or `bootstrap/cache`.
+
+Do not substitute a plain recursive `chown` or `chmod`: ownership alone does
+not repair modes, a blanket mode exposes secrets and destroys executable bits,
+and neither approach protects test caches. Running tests as root only hides the
+fault while allowing root-owned artifacts. In a served checkout, build frontend
+assets with `make npm-build`; do not run host-side `npm run build`.
+
+### Repairing an existing deployment
+
+The following rollout does not rebuild the database, remove application data,
+or restart background processing:
+
+1. Run `make fix-permissions`. This normalizes tracked source (including
+   `UpdateTmuxSettingsRequest.php`), `public/build`, `.env`, dependencies, live
+   compiled views, storage, and bootstrap caches. Run it a second time if you
+   want to confirm the idempotent `corrected 0 path(s)` result.
+2. Run `make check-permissions`. This verifies `.env` remains owner/application-
+   group `0640`, live views are group-writable/setgid, and PHP-FPM can read the
+   source, Composer autoloader, manifest, assets, and compiled views.
+3. Using the deployed base URL and an authenticated administrator cookie, verify
+   `curl -f "$APP_URL/login"`, `curl -f "$APP_URL/status"`, and
+   `curl -f -b admin.cookies "$APP_URL/admin/tmux-edit"` all return HTTP 200.
+4. Inspect `public/build/manifest.json` and run `curl -f "$APP_URL/<asset>"`
+   for every referenced JavaScript and CSS `file`/`css` entry.
+5. Snapshot metadata and hashes beneath `storage/framework/views` and
+   `bootstrap/cache`, then run `PERMISSION_TEST_BASE_URL="$APP_URL"
+   PERMISSION_TEST_ADMIN_COOKIE_FILE=admin.cookies make
+   test-focused-isolation`. It runs the issue #19 tests through Sail, compares
+   content and nanosecond-resolution metadata, and repeats the authenticated
+   served `/admin/tmux-edit` request after the tests. The snapshots must match
+   and the request must return HTTP 200.
+
+If a compiled Blade file cannot be repaired, it is safe to clear only compiled
+views with `make artisan cmd="view:clear"`, immediately rerun `make
+fix-permissions`, and warm/verify the view as the application user. Do not remove
+other storage content.
 
 ## Environment Configuration
 
@@ -98,7 +167,7 @@ Run `make` or `make help` to see all targets, grouped by section.
 | `make rebuild`    | Pull fresh base images + `--no-cache` build + force-recreate    |
 | `make pull`       | Pull latest enabled-profile base images (skips buildable ones)  |
 | `make update`     | Infra-only: pull + `--pull` build + restart                     |
-| `make upgrade`    | App upgrade: `update` + composer + npm + migrate + caches       |
+| `make upgrade`    | App upgrade ending in permission normalization and verification  |
 | `make fresh`      | **Destroy volumes**, pull, rebuild, recreate (DATA LOSS)        |
 
 ### Development
@@ -121,14 +190,17 @@ Run `make` or `make help` to see all targets, grouped by section.
 | `make tmux-stop`    | Stop the tmux processing engine                       |
 | `make tmux-attach`  | Attach to the running tmux session                    |
 | `make horizon`      | Show Horizon queue status                             |
-| `make fix-permissions` | Chown project to host UID + register git `safe.directory` |
-| `make fix-permissions` | Chown project to `sail` + register git safe.directory |
+| `make fix-permissions` | Repair runtime ownership/modes and register Git `safe.directory` |
+| `make check-permissions` | Read-only application-user permission/isolation diagnostic |
 
 ### Testing & Quality
 
 | Target           | Description                                          |
 |------------------|------------------------------------------------------|
 | `make test`      | PHPUnit tests (`filter=Name` optional)               |
+| `make test-permissions` | Permission and isolated-cache regression tests    |
+| `make test-focused-isolation` | Issue #19 Sail tests plus live-cache snapshot comparison |
+| `make test-focused-cache-isolation` | CI cache snapshot check (no deployed HTTP endpoint) |
 | `make pint`      | Pint formatter on dirty files                        |
 | `make pint-all`  | Pint formatter on all files                          |
 | `make phpstan`   | PHPStan static analysis (2G memory limit)            |
@@ -139,7 +211,7 @@ Run `make` or `make help` to see all targets, grouped by section.
 
 | Target                | Description                          |
 |-----------------------|--------------------------------------|
-| `make npm-build`      | `npm install` + `npm run build`      |
+| `make npm-build`      | Safe production build plus exact asset-mode normalization |
 | `make npm-dev`        | Start Vite dev server                |
 | `make ts-types`       | Regenerate TypeScript types          |
 | `make ts-types-check` | CI: fail if generated types drift    |
@@ -267,7 +339,7 @@ docker compose up -d
 
 | Problem                         | Solution                                                              |
 |---------------------------------|-----------------------------------------------------------------------|
-| Permission errors on storage/   | `make fix-permissions` (chowns project to your host UID)              |
+| Permission errors on source/build/cache | `make fix-permissions`, then `make check-permissions`         |
 | `composer install` permission denied | `make fix-permissions`, then re-run `make composer-install`      |
 | `npm`/`ncu` EACCES on host (`package.json`) | `make fix-permissions` chowns to host UID, not container `sail` |
 | `fatal: detected dubious ownership` (git) | `make fix-permissions` registers `safe.directory` in the container |
@@ -298,4 +370,3 @@ To revert to stock Ubuntu nginx, remove the GetPageSpeed apt key, list, and
 preferences entries from `docker/8.5/Dockerfile`, drop `nginx-module-brotli`
 from the install line, re-comment the brotli block in `docker/8.5/nginx.conf`,
 and run `make rebuild`.
-

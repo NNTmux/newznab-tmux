@@ -45,6 +45,11 @@
                         ]
                     }
                 ]
+            },
+            {
+                "action": "scripts/runtime-permissions.sh check-source",
+                "options": [],
+                "conditions": []
             }
         ]
     },

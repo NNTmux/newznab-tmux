@@ -19,7 +19,8 @@
 -include .env
 export COMPOSE_PROFILES ?= $(SEARCH_DRIVER)
 SAIL           := ./sail
-DOCKER_COMPOSE := docker compose
+DOCKER_COMPOSE := docker compose $(foreach file,$(subst :, ,$(SAIL_FILES)),-f $(file))
+APP_SERVICE    ?= laravel.test
 # Optional parameters with safe defaults
 SERVICE     ?=
 CMD         ?=
@@ -82,12 +83,14 @@ update: check-env pull ## Infra-only: pull base images, rebuild with --pull, res
 	@$(SAIL) up -d --remove-orphans
 	@echo "$(GREEN)✔ Infra updated.$(RESET)"
 .PHONY: upgrade
-upgrade: update fix-permissions composer-install npm-build ## Full app upgrade: update + perms + composer + npm + migrate + caches
+upgrade: update composer-install npm-build ## Full app upgrade: update + composer + npm + migrate + caches + final permission verification
 	@if [ "$(MAINTENANCE)" = "1" ]; then $(SAIL) artisan down; fi
 	@$(SAIL) artisan migrate --force
 	@if [ "$(MAINTENANCE)" = "1" ]; then $(SAIL) artisan up; fi
 	@$(MAKE) data-cache
 	@$(MAKE) optimize
+	@$(MAKE) fix-permissions
+	@$(MAKE) check-permissions
 	@echo "$(GREEN)✔ Upgrade complete.$(RESET)"
 .PHONY: fresh
 fresh: check-env ## Destroy ALL volumes, rebuild, and start clean (DATA LOSS!)
@@ -164,6 +167,18 @@ horizon: ## Show Horizon status
 .PHONY: test
 test: ## Run the PHPUnit test suite (usage: make test filter=TestName)
 	@$(SAIL) test $(if $(filter),--filter=$(filter),)
+	@$(SAIL) exec -u sail $(APP_SERVICE) tests/Shell/TestIsolationTest.sh
+.PHONY: test-permissions
+test-permissions: ## Run permission, Sail-wrapper, and test-isolation regressions
+	@$(SAIL) exec -u sail $(APP_SERVICE) tests/Shell/RuntimePermissionsTest.sh
+	@$(SAIL) exec -u sail $(APP_SERVICE) tests/Shell/SailWorkflowTest.sh
+	@$(SAIL) exec -u sail $(APP_SERVICE) tests/Shell/TestIsolationTest.sh
+.PHONY: test-focused-isolation
+test-focused-isolation: ## Deployment: verify focused-test cache isolation and served admin HTTP 200
+	@tests/Shell/FocusedSailIsolationTest.sh
+.PHONY: test-focused-cache-isolation
+test-focused-cache-isolation: ## CI: prove issue #19 tests leave live caches unchanged
+	@PERMISSION_TEST_SKIP_HTTP=1 tests/Shell/FocusedSailIsolationTest.sh
 .PHONY: pint
 pint: ## Run Laravel Pint code formatter on dirty files
 	@$(SAIL) pint --dirty
@@ -182,8 +197,8 @@ rector-fix: ## Apply Rector refactorings
 # ── Frontend ─────────────────────────────────────────────────
 .PHONY: npm-build
 npm-build: ## Run npm install and build inside the container
-	@$(SAIL) npm install
-	@$(SAIL) npm run build
+	@$(SAIL) exec -u sail $(APP_SERVICE) bash -c 'set -e; umask 0022; npm install; npm run build'
+	@$(DOCKER_COMPOSE) exec -u root -e DEPLOYMENT_OWNER=$(HOST_UID) $(APP_SERVICE) scripts/runtime-permissions.sh normalize-build /var/www/html
 .PHONY: npm-dev
 npm-dev: ## Start Vite dev server inside the container
 	@$(SAIL) npm run dev
@@ -201,10 +216,10 @@ data-cache: ## Cache spatie/laravel-data structures (run on deploy)
 # ── Dependencies ─────────────────────────────────────────────
 .PHONY: composer-install
 composer-install: ## Run composer install inside the container
-	@$(SAIL) composer install
+	@$(SAIL) exec -u sail $(APP_SERVICE) bash -c 'umask 0022; exec composer install'
 .PHONY: composer-update
 composer-update: ## Run composer update inside the container
-	@$(SAIL) composer update
+	@$(SAIL) exec -u sail $(APP_SERVICE) bash -c 'umask 0022; exec composer update'
 # ── Database / Services ──────────────────────────────────────
 .PHONY: db
 db: ## Open a MariaDB CLI session
@@ -217,16 +232,21 @@ redis-cli: ## Open a Redis CLI session
 HOST_UID ?= $(shell id -u)
 HOST_GID ?= $(shell id -g)
 .PHONY: fix-permissions
-fix-permissions: ## Align UIDs: remap sail to host UID, chown project, register git safe.directory
+fix-permissions: ## Repair ownership and deterministic runtime modes without following symlinks
 	@echo "$(YELLOW)→ Remapping container 'sail' user to UID $(HOST_UID) and chowning /var/www/html…$(RESET)"
-	@$(DOCKER_COMPOSE) exec -u root laravel.test usermod -u $(HOST_UID) -o sail >/dev/null 2>&1 || true
-	@$(DOCKER_COMPOSE) exec -u root laravel.test groupmod -g $(HOST_GID) -o sail >/dev/null 2>&1 || true
-	@$(DOCKER_COMPOSE) exec -u root laravel.test chown -R $(HOST_UID):$(HOST_GID) /var/www/html
-	@$(DOCKER_COMPOSE) exec -u root laravel.test git config --system --add safe.directory /var/www/html
+	@$(DOCKER_COMPOSE) exec -u root $(APP_SERVICE) usermod -u $(HOST_UID) -o sail >/dev/null 2>&1 || true
+	@$(DOCKER_COMPOSE) exec -u root $(APP_SERVICE) groupmod -g $(HOST_GID) -o sail >/dev/null 2>&1 || true
+	@$(DOCKER_COMPOSE) exec -u root $(APP_SERVICE) chown -R $(HOST_UID):$(HOST_GID) /var/www/html
+	@$(DOCKER_COMPOSE) exec -u root -e DEPLOYMENT_OWNER=$(HOST_UID) $(APP_SERVICE) scripts/runtime-permissions.sh normalize /var/www/html
+	@$(DOCKER_COMPOSE) exec -u root $(APP_SERVICE) git config --system --add safe.directory /var/www/html
 	@echo "$(GREEN)✔ Permissions fixed.$(RESET)"
 	@if [ "$(WWWUSER)" != "$(HOST_UID)" ] || [ -z "$(WWWUSER)" ]; then 		echo "$(YELLOW)⚠  WWWUSER ($(WWWUSER)) ≠ host UID ($(HOST_UID)). Set WWWUSER=$(HOST_UID) and WWWGROUP=$(HOST_GID) in .env, then run 'make rebuild' to align the container's sail user.$(RESET)"; 	fi
 .PHONY: fix-perms
 fix-perms: fix-permissions ## Alias for 'fix-permissions'
+
+.PHONY: check-permissions
+check-permissions: ## Read-only verification of runtime permissions and isolated test caches
+	@$(DOCKER_COMPOSE) exec -u root -e DEPLOYMENT_OWNER=$(HOST_UID) $(APP_SERVICE) scripts/runtime-permissions.sh check /var/www/html
 
 .PHONY: git-safe-directory
 git-safe-directory: ## Register /var/www/html as a git safe.directory inside the container

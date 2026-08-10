@@ -5,45 +5,51 @@ on: [push]
 jobs:
   tests:
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: true
-      matrix:
-        php: [ 8.5 ]
-
-    name: PHP ${{ matrix.php }}
+    name: PHP 8.5 via Sail
+    env:
+      SAIL_FILES: .github/docker-compose.ci.yml
+      COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GITHUB_TOKEN }}"}}'
 
     steps:
       - uses: actions/checkout@v5
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
-          coverage: none
-
       - name: Copy env file
-        run:
-          cp .env.test .env
+        run: cp .env.test .env
+
+      - name: Configure Sail identity
+        run: |
+          echo "WWWUSER=$(id -u)" >> "$GITHUB_ENV"
+          echo "WWWGROUP=$(id -g)" >> "$GITHUB_ENV"
+
+      - name: Start Sail
+        run: ./sail up -d --build
 
       - name: Run composer install
-        run: composer install --prefer-dist --no-interaction --no-progress --no-scripts
-        env:
-          COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GITHUB_TOKEN }}"}}'
+        run: make composer-install
 
       - name: Generate app key
         run: |
-          APP_KEY=$(php -r "echo 'base64:' . base64_encode(random_bytes(32));")
-          sed -i "s|APP_KEY=.*|APP_KEY=$APP_KEY|" .env
+          ./sail artisan key:generate --force
 
       - name: Run tests
-        run: vendor/bin/phpunit
+        run: ./sail test --compact
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+      - name: Run permission and test-isolation regressions
+        run: make test-permissions
 
-      - name: Run JS tests
-        run: npm run test:js
+      - name: Prove focused tests leave live caches unchanged
+        run: make test-focused-cache-isolation
+
+      - name: Build frontend and run JS tests
+        run: |
+          make npm-build
+          ./sail npm run test:js
+
+      - name: Verify production permissions
+        run: |
+          make fix-permissions
+          make check-permissions
+
+      - name: Stop Sail
+        if: always()
+        run: ./sail down

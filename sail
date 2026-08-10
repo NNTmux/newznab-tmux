@@ -202,7 +202,11 @@ if [ "$1" == "php" ]; then
     if [ "$EXEC" == "yes" ]; then
         ARGS+=(exec -u sail)
         [ ! -t 0 ] && ARGS+=(-T)
-        ARGS+=("$APP_SERVICE" "php" "$@")
+        if [ "${1:-}" == "artisan" ] && [ "${2:-}" == "test" ]; then
+            ARGS+=("$APP_SERVICE" scripts/run-tests-isolated.sh --phpunit-cache php "$@")
+        else
+            ARGS+=("$APP_SERVICE" "php" "$@")
+        fi
     else
         sail_is_not_running
     fi
@@ -250,7 +254,11 @@ elif [ "$1" == "artisan" ] || [ "$1" == "art" ]; then
     if [ "$EXEC" == "yes" ]; then
         ARGS+=(exec -u sail)
         [ ! -t 0 ] && ARGS+=(-T)
-        ARGS+=("$APP_SERVICE" php artisan "$@")
+        if [ "${1:-}" == "test" ]; then
+            ARGS+=("$APP_SERVICE" scripts/run-tests-isolated.sh --phpunit-cache php artisan "$@")
+        else
+            ARGS+=("$APP_SERVICE" php artisan "$@")
+        fi
     else
         sail_is_not_running
     fi
@@ -274,7 +282,7 @@ elif [ "$1" == "test" ]; then
     if [ "$EXEC" == "yes" ]; then
         ARGS+=(exec -u sail)
         [ ! -t 0 ] && ARGS+=(-T)
-        ARGS+=("$APP_SERVICE" php artisan test "$@")
+        ARGS+=("$APP_SERVICE" scripts/run-tests-isolated.sh --phpunit-cache php artisan test "$@")
     else
         sail_is_not_running
     fi
@@ -286,7 +294,7 @@ elif [ "$1" == "phpunit" ]; then
     if [ "$EXEC" == "yes" ]; then
         ARGS+=(exec -u sail)
         [ ! -t 0 ] && ARGS+=(-T)
-        ARGS+=("$APP_SERVICE" php vendor/bin/phpunit "$@")
+        ARGS+=("$APP_SERVICE" scripts/run-tests-isolated.sh --phpunit-cache php vendor/bin/phpunit "$@")
     else
         sail_is_not_running
     fi
