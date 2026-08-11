@@ -23,7 +23,7 @@ class AdminCategoryRegexesController extends BasePageController
 
         $meta_title = $title = 'Category Regex List';
 
-        $group = $request->has('group') && ! empty($request->input('group')) ? $request->input('group') : '';
+        $group = $this->scalarInput($request, 'group');
         $regex = $regexes->getRegex($group);
 
         $this->viewData = array_merge($this->viewData, [

@@ -24,42 +24,51 @@ class AdminUserRoleHistoryController extends BasePageController
         // Get all roles for filter
         $roles = Role::all()->pluck('name', 'id')->toArray();
 
+        $filters = [
+            'user_id' => $this->scalarInput($request, 'user_id'),
+            'username' => $this->scalarInput($request, 'username'),
+            'role_id' => $this->scalarInput($request, 'role_id'),
+            'change_reason' => $this->scalarInput($request, 'change_reason'),
+            'date_from' => $this->scalarInput($request, 'date_from'),
+            'date_to' => $this->scalarInput($request, 'date_to'),
+        ];
+
         // Build query
         $query = UserRoleHistory::with(['user', 'oldRole', 'newRole', 'changedByUser'])
             ->orderBy('created_at', 'desc');
 
         // Apply filters
-        if ($request->has('user_id') && ! empty($request->input('user_id'))) {
-            $query->where('user_id', $request->input('user_id'));
+        if ($filters['user_id'] !== '') {
+            $query->where('user_id', $filters['user_id']);
         }
 
-        if ($request->has('username') && ! empty($request->input('username'))) {
-            $query->whereHas('user', function ($q) use ($request) {
-                $q->where('username', 'like', '%'.$request->input('username').'%');
+        if ($filters['username'] !== '') {
+            $query->whereHas('user', function ($q) use ($filters) {
+                $q->where('username', 'like', '%'.$filters['username'].'%');
             });
         }
 
-        if ($request->has('role_id') && ! empty($request->input('role_id'))) {
-            $query->where(function ($q) use ($request) {
-                $q->where('old_role_id', $request->input('role_id'))
-                    ->orWhere('new_role_id', $request->input('role_id'));
+        if ($filters['role_id'] !== '') {
+            $query->where(function ($q) use ($filters) {
+                $q->where('old_role_id', $filters['role_id'])
+                    ->orWhere('new_role_id', $filters['role_id']);
             });
         }
 
-        if ($request->has('change_reason') && ! empty($request->input('change_reason'))) {
-            $query->where('change_reason', 'like', '%'.$request->input('change_reason').'%');
+        if ($filters['change_reason'] !== '') {
+            $query->where('change_reason', 'like', '%'.$filters['change_reason'].'%');
         }
 
-        if ($request->has('date_from') && ! empty($request->input('date_from'))) {
-            $query->where('created_at', '>=', $request->input('date_from').' 00:00:00');
+        if ($filters['date_from'] !== '') {
+            $query->where('created_at', '>=', $filters['date_from'].' 00:00:00');
         }
 
-        if ($request->has('date_to') && ! empty($request->input('date_to'))) {
-            $query->where('created_at', '<=', $request->input('date_to').' 23:59:59');
+        if ($filters['date_to'] !== '') {
+            $query->where('created_at', '<=', $filters['date_to'].' 23:59:59');
         }
 
         // Pagination
-        $page = $request->has('page') && is_numeric($request->input('page')) ? $request->input('page') : 1;
+        $page = $this->resolvePage($request);
         $perPage = config('nntmux.items_per_page', 50);
 
         $results = $query->paginate($perPage, ['*'], 'page', $page);
@@ -69,14 +78,7 @@ class AdminUserRoleHistoryController extends BasePageController
             'meta_title' => $meta_title,
             'history' => $results,
             'roles' => $roles,
-            'filters' => [
-                'user_id' => $request->input('user_id', ''),
-                'username' => $request->input('username', ''),
-                'role_id' => $request->input('role_id', ''),
-                'change_reason' => $request->input('change_reason', ''),
-                'date_from' => $request->input('date_from', ''),
-                'date_to' => $request->input('date_to', ''),
-            ],
+            'filters' => $filters,
         ]);
 
         return view('admin.user-role-history.index', $this->viewData);

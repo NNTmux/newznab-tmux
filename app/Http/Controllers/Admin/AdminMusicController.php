@@ -21,7 +21,7 @@ class AdminMusicController extends BasePageController
         $meta_title = $title = 'Music List';
 
         // Get search parameter
-        $search = $request->input('musicsearch', '');
+        $search = $this->scalarInput($request, 'musicsearch');
 
         if (! empty($search)) {
             $musicList = getRange('musicinfo');

@@ -23,7 +23,7 @@ class AdminAnidbController extends BasePageController
         $anidbService = new AnidbService;
         $title = $meta_title = 'AniDB List';
 
-        $animetitle = $request->input('animetitle', '');
+        $animetitle = $this->scalarInput($request, 'animetitle');
         $anidblist = $anidbService->getAnimeRange($animetitle);
 
         return view('admin.anidb.index', compact('anidblist', 'animetitle', 'title', 'meta_title'));

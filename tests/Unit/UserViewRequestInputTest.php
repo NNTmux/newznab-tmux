@@ -4,9 +4,11 @@ namespace Tests\Unit;
 
 use App\Http\Controllers\BasePageController;
 use App\Http\Controllers\SearchController;
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use Symfony\Component\HttpFoundation\Response;
 
 class UserViewRequestInputTest extends TestCase
 {
@@ -44,6 +46,20 @@ class UserViewRequestInputTest extends TestCase
         $this->assertSame(80, $controller->offset(5, 20));
     }
 
+    public function test_scalar_input_normalizes_an_explicitly_empty_query_after_http_middleware(): void
+    {
+        $request = Request::create('/admin/anidb-list', 'GET', ['animetitle' => '']);
+
+        (new ConvertEmptyStringsToNull)->handle(
+            $request,
+            static fn (Request $request): Response => new Response,
+        );
+
+        $this->assertNull($request->input('animetitle'));
+        $this->assertSame('', $this->controller()->scalar($request, 'animetitle'));
+        $this->assertSame('all', $this->controller()->scalar($request, 'animetitle', 'all'));
+    }
+
     public function test_search_category_resolution_rejects_malformed_category_values(): void
     {
         $reflection = new ReflectionClass(SearchController::class);
@@ -74,9 +90,9 @@ class UserViewRequestInputTest extends TestCase
                 return $this->resolveOrderBy($request, $ordering);
             }
 
-            public function scalar(Request $request, string $key): string
+            public function scalar(Request $request, string $key, string $default = ''): string
             {
-                return $this->scalarInput($request, $key);
+                return $this->scalarInput($request, $key, $default);
             }
 
             public function integer(Request $request, string $key, int $default): int

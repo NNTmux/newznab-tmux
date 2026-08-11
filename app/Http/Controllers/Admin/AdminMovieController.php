@@ -33,10 +33,10 @@ class AdminMovieController extends BasePageController
      */
     public function index(Request $request): mixed
     {
-        $lastSearch = $request->input('moviesearch', '');
+        $lastSearch = $this->scalarInput($request, 'moviesearch');
 
         if ($request->has('moviesearch')) {
-            $movielist = MovieInfo::getAll($request->input('moviesearch'));
+            $movielist = MovieInfo::getAll($lastSearch);
         } else {
             $movielist = MovieInfo::getAll();
         }

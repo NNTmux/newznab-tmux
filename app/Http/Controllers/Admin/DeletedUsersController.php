@@ -25,14 +25,14 @@ class DeletedUsersController extends BasePageController
         $this->setAdminPrefs();
 
         // Filters
-        $username = $request->input('username', '');
-        $email = $request->input('email', '');
-        $host = $request->input('host', '');
-        $orderBy = $request->filled('ob') ? $request->input('ob') : 'deleted_at_desc';
-        $createdFrom = $request->input('created_from', '');
-        $createdTo = $request->input('created_to', '');
-        $deletedFrom = $request->input('deleted_from', '');
-        $deletedTo = $request->input('deleted_to', '');
+        $username = $this->scalarInput($request, 'username');
+        $email = $this->scalarInput($request, 'email');
+        $host = $this->scalarInput($request, 'host');
+        $orderBy = $this->scalarInput($request, 'ob', 'deleted_at_desc');
+        $createdFrom = $this->scalarInput($request, 'created_from');
+        $createdTo = $this->scalarInput($request, 'created_to');
+        $deletedFrom = $this->scalarInput($request, 'deleted_from');
+        $deletedTo = $this->scalarInput($request, 'deleted_to');
 
         $deletedUsers = User::onlyTrashed()
             ->leftJoin('roles', 'roles.id', '=', 'users.roles_id')

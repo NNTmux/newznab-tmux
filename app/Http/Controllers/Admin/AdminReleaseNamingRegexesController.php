@@ -23,10 +23,7 @@ class AdminReleaseNamingRegexesController extends BasePageController
 
         $meta_title = $title = 'Release Naming Regex List';
 
-        $group = '';
-        if ($request->has('group') && ! empty($request->input('group'))) {
-            $group = $request->input('group');
-        }
+        $group = $this->scalarInput($request, 'group');
         $regex = $regexes->getRegex($group);
 
         $this->viewData = array_merge($this->viewData, [

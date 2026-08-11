@@ -24,7 +24,7 @@ class AdminShowsController extends BasePageController
 
         $meta_title = $title = 'TV Shows List';
 
-        $showname = $request->input('showname', '');
+        $showname = $this->scalarInput($request, 'showname');
         $tvshowlist = Video::getRange($showname);
 
         return view('admin.shows.index', compact('tvshowlist', 'showname', 'title', 'meta_title'));

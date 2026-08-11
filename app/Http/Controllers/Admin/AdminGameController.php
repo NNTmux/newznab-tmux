@@ -23,7 +23,7 @@ class AdminGameController extends BasePageController
         $meta_title = $title = 'Game List';
 
         // Get search parameter
-        $search = $request->input('gamesearch', '');
+        $search = $this->scalarInput($request, 'gamesearch');
 
         if (! empty($search)) {
             $gamelist = $game->getRange($search);

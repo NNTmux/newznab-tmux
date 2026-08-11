@@ -18,7 +18,7 @@ class AdminPredbController extends BasePageController
     {
         $this->setAdminPrefs();
 
-        $lastSearch = $request->input('presearch', '');
+        $lastSearch = $this->scalarInput($request, 'presearch');
 
         if ($lastSearch) {
             $results = Predb::getAll($lastSearch);

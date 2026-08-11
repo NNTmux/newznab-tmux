@@ -33,10 +33,10 @@ class AdminInvitationController extends BasePageController
         $meta_title = $title = 'Invitation Management';
 
         // Get filter parameters
-        $status = $request->get('status', '');
-        $invited_by = $request->get('invited_by', '');
-        $email = $request->get('email', '');
-        $orderBy = $request->get('ob', 'created_at_desc');
+        $status = $this->scalarInput($request, 'status');
+        $invited_by = $this->scalarInput($request, 'invited_by');
+        $email = $this->scalarInput($request, 'email');
+        $orderBy = $this->scalarInput($request, 'ob', 'created_at_desc');
 
         // Build query
         $query = Invitation::with(['invitedBy', 'usedBy']);
