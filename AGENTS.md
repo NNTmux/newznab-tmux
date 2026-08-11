@@ -292,14 +292,6 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
     - Execute PHP scripts: `vendor/bin/sail php [script]`
 - View all available Sail commands by running `vendor/bin/sail` without arguments.
 
-### WSL2 + Windows Docker Desktop
-
-Local development is often done in WSL2 while Docker itself runs via **Windows Docker Desktop** (WSL integration), not a native Linux Docker install inside the distro.
-
-- If `docker` / `docker compose` cannot be found, or Sail fails with "Docker is not running" / cannot connect to the daemon, do **not** assume Docker must be installed inside WSL. Check that Docker Desktop is running on Windows and that WSL integration is enabled for this distro.
-- Prefer diagnosing through Docker Desktop (engine status, WSL integration settings) before suggesting `apt install docker` or similar host installs.
-- Once Desktop is up and integrated, `vendor/bin/sail` and `make …` targets should work from the WSL project tree as usual.
-
 === tests rules ===
 
 # Test Enforcement
