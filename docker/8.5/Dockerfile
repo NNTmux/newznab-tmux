@@ -86,9 +86,11 @@ RUN groupadd --force -g $WWWGROUP sail
 RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
 RUN echo "alias artisan=\"php artisan\"" >> /home/sail/.bashrc
 
+# /etc/cron.d entries carry their own user field; installing the same file as
+# a user crontab (which has no user field) would misparse the user as the
+# command, so cron.d alone is correct here.
 COPY scheduler /etc/cron.d/scheduler
-RUN chmod 0644 /etc/cron.d/scheduler \
-    && crontab /etc/cron.d/scheduler
+RUN chmod 0644 /etc/cron.d/scheduler
 
 COPY start-container /usr/local/bin/start-container
 COPY nginx.conf /etc/nginx/sites-available/default

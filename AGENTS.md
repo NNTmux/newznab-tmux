@@ -2,6 +2,10 @@
 
 > AI coding agent guidelines for NNTmux - a Laravel 13 Usenet indexer.
 
+## Development workflow
+
+Master only moves by pull request (server-enforced — direct pushes are rejected, even for docs-only changes). Every change: branch in a worktree → PR with auto-merge armed → monitor until merged → clean up and sync local master. See `docs/agents/development-workflow.md` before committing anything.
+
 ## Agent skills
 
 ### Issue tracker

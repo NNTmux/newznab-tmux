@@ -46,10 +46,7 @@ final class TvSearchApiTest extends TestCase
             return;
         }
 
-        $pdo = DB::connection()->getPdo();
-        if ($pdo instanceof \PDO && method_exists($pdo, 'sqliteCreateFunction')) {
-            $pdo->sqliteCreateFunction('CONCAT', static fn (...$parts): string => implode('', $parts));
-        }
+        $this->registerSqliteFunction('CONCAT', static fn (...$parts): string => implode('', $parts));
     }
 
     protected function tearDown(): void

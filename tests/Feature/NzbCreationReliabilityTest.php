@@ -69,11 +69,12 @@ class NzbCreationReliabilityTest extends TestCase
         parent::setUp();
 
         $this->tempNzbPath = sys_get_temp_dir().'/nntmux-nzb-reliability-'.uniqid('', true);
+        mkdir($this->tempNzbPath, 0775, true);
         config(['database.default' => 'sqlite', 'database.connections.sqlite.database' => $this->databasePath]);
         config(['nntmux_settings.path_to_nzbs' => $this->tempNzbPath]);
         DB::purge();
         DB::reconnect();
-        DB::connection()->getPdo()->sqliteCreateFunction('UNIX_TIMESTAMP', static fn (?string $value): int => strtotime((string) $value));
+        $this->registerSqliteFunction('UNIX_TIMESTAMP', static fn (?string $value): int => strtotime((string) $value));
 
         $this->createSchema();
         $this->seedSettings();
