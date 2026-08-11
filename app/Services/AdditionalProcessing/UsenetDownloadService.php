@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\AdditionalProcessing;
 
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
+use App\Services\AdditionalProcessing\DTO\DownloadMetrics;
 use App\Services\AdditionalProcessing\Enums\DownloadKind;
 use App\Services\NNTP\NNTPService;
 use Exception;
@@ -16,7 +17,32 @@ use Illuminate\Support\Facades\Log;
  */
 class UsenetDownloadService
 {
+    private const int MAX_CACHE_ENTRIES = 4;
+
+    private const int MAX_CACHE_ENTRY_BYTES = 8_388_608;
+
+    private const int MAX_CACHE_BYTES = 16_777_216;
+
     private NNTPService $nntp;
+
+    private bool $releaseScopeActive = false;
+
+    /**
+     * @var array<string, array{success: bool, data: string|null, groupUnavailable: bool, error: string|null}>
+     */
+    private array $releaseCache = [];
+
+    private int $cachedBytes = 0;
+
+    private int $logicalRequests = 0;
+
+    private int $networkRequests = 0;
+
+    private int $cacheHits = 0;
+
+    private int $bytesDownloaded = 0;
+
+    private int $bytesReused = 0;
 
     public function __construct(
         private readonly ProcessingConfiguration $config,
@@ -25,10 +51,31 @@ class UsenetDownloadService
         $this->nntp = $nntp ?? new NNTPService;
     }
 
+    public function beginReleaseScope(): void
+    {
+        $this->clearReleaseScope();
+        $this->releaseScopeActive = true;
+    }
+
+    public function finishReleaseScope(): DownloadMetrics
+    {
+        $metrics = new DownloadMetrics(
+            logicalRequests: $this->logicalRequests,
+            networkRequests: $this->networkRequests,
+            cacheHits: $this->cacheHits,
+            bytesDownloaded: $this->bytesDownloaded,
+            bytesReused: $this->bytesReused,
+        );
+
+        $this->clearReleaseScope();
+
+        return $metrics;
+    }
+
     /**
      * Download binary content from usenet using message IDs.
      *
-     * @param  array<string, mixed>|string  $messageIDs  Single or array of message IDs
+     * @param  array<int|string, mixed>|string  $messageIDs  Single or array of message IDs
      * @param  string  $groupName  Group name for logging
      * @param  int|null  $releaseId  Release ID for logging
      * @return array{success: bool, data: string|null, groupUnavailable: bool, error: string|null}
@@ -61,7 +108,8 @@ class UsenetDownloadService
         if ($this->config->debugMode) {
             Log::debug('Attempting NNTP fetch', [
                 'release_id' => $releaseId,
-                'message_ids' => $messageIDs,
+                'message_id_count' => count($messageIDs),
+                'request_fingerprint' => $this->downloadFingerprint($messageIDs, $groupName),
                 'group' => $groupName,
             ]);
         }
@@ -89,7 +137,8 @@ class UsenetDownloadService
             if ($this->config->debugMode) {
                 Log::debug('NNTP fetch failed', [
                     'release_id' => $releaseId,
-                    'message_ids' => $messageIDs,
+                    'message_id_count' => count($messageIDs),
+                    'request_fingerprint' => $this->downloadFingerprint($messageIDs, $groupName),
                     'group' => $groupName,
                     'error_object' => is_object($binary) ? get_class($binary) : null,
                     'error_message' => $errorMessage,
@@ -112,7 +161,7 @@ class UsenetDownloadService
     /**
      * Download content for a specific processing step.
      *
-     * @param  array<string, mixed>|string  $messageIDs
+     * @param  array<int|string, mixed>|string  $messageIDs
      * @return array{success: bool, data: string|null, groupUnavailable: bool, error: string|null}
      */
     public function download(
@@ -122,30 +171,97 @@ class UsenetDownloadService
         ?int $releaseId = null,
         ?string $fileTitle = null
     ): array {
+        $messageIdList = is_array($messageIDs) ? array_values($messageIDs) : [$messageIDs];
+        $cacheKey = $this->downloadFingerprint($messageIdList, $groupName);
+
+        if ($this->releaseScopeActive) {
+            $this->logicalRequests++;
+
+            if (isset($this->releaseCache[$cacheKey])) {
+                $cached = $this->releaseCache[$cacheKey];
+                $this->cacheHits++;
+                $this->bytesReused += is_string($cached['data']) ? strlen($cached['data']) : 0;
+
+                return $cached;
+            }
+        }
+
         if ($this->config->debugMode) {
             Log::debug('Attempting download', [
                 'kind' => $kind->value,
                 'release_id' => $releaseId,
                 'file_title' => $fileTitle,
-                'message_ids' => $messageIDs,
+                'message_id_count' => count($messageIdList),
+                'request_fingerprint' => $cacheKey,
                 'group' => $groupName,
             ]);
         }
 
+        if ($this->releaseScopeActive && $messageIdList !== [] && $messageIdList !== ['']) {
+            $this->networkRequests++;
+        }
+
         $result = $this->downloadByMessageIDs($messageIDs, $groupName, $releaseId);
+
+        if ($this->releaseScopeActive && $result['success'] && is_string($result['data'])) {
+            $byteSize = strlen($result['data']);
+            $this->bytesDownloaded += $byteSize;
+            $this->rememberSuccessfulDownload($cacheKey, $result, $byteSize);
+        }
 
         if (! $result['success'] && $this->config->debugMode) {
             Log::debug('Download failed', [
                 'kind' => $kind->value,
                 'release_id' => $releaseId,
                 'file_title' => $fileTitle,
-                'message_ids' => $messageIDs,
+                'message_id_count' => count($messageIdList),
+                'request_fingerprint' => $cacheKey,
                 'group' => $groupName,
                 'error' => $result['error'],
             ]);
         }
 
         return $result;
+    }
+
+    /**
+     * @param  list<mixed>  $messageIds
+     */
+    private function downloadFingerprint(array $messageIds, string $groupName): string
+    {
+        return hash('sha256', serialize([
+            'message_ids' => array_map(static fn (mixed $messageId): string => (string) $messageId, $messageIds),
+            'group' => $groupName,
+            'alternate' => $this->config->alternateNNTP,
+        ]));
+    }
+
+    /**
+     * @param  array{success: bool, data: string|null, groupUnavailable: bool, error: string|null}  $result
+     */
+    private function rememberSuccessfulDownload(string $cacheKey, array $result, int $byteSize): void
+    {
+        if ($byteSize > self::MAX_CACHE_ENTRY_BYTES
+            || count($this->releaseCache) >= self::MAX_CACHE_ENTRIES
+            || ($this->cachedBytes + $byteSize) > self::MAX_CACHE_BYTES
+        ) {
+            return;
+        }
+
+        $this->releaseCache[$cacheKey] = $result;
+        $this->cachedBytes += $byteSize;
+    }
+
+    private function clearReleaseScope(): void
+    {
+        $this->releaseScopeActive = false;
+        $this->releaseCache = [];
+        $this->cachedBytes = 0;
+        $this->logicalRequests = 0;
+        $this->networkRequests = 0;
+        $this->cacheHits = 0;
+        $this->bytesDownloaded = 0;
+        $this->bytesReused = 0;
     }
 
     /**

@@ -154,6 +154,25 @@ class AdditionalProcessingNzbSplitRenameTest extends TestCase
         $this->assertSame('MLB.2026.Cincinnati.Reds.vs.Tampa.Bay.Rays.20.04.720pEN60fps', $result);
     }
 
+    public function test_additional_nfo_detection_accepts_alternative_and_scene_names(): void
+    {
+        $manager = $this->makeReleaseFileManager();
+
+        foreach (['file_id.diz', 'readme.txt', 'info.txt', '00-scene.nfo', 'group-release.nfo'] as $filename) {
+            $this->assertTrue($manager->isNfoFilename($filename), $filename.' should be treated as NFO data');
+        }
+    }
+
+    public function test_additional_nfo_normalization_converts_utf16_and_removes_utf8_bom(): void
+    {
+        $manager = $this->makeReleaseFileManager();
+        $normalize = new \ReflectionMethod($manager, 'normalizeNfoEncoding');
+        $utf16 = "\xFF\xFE".mb_convert_encoding('Scene NFO', 'UTF-16LE', 'UTF-8');
+
+        $this->assertSame('Scene NFO', $normalize->invoke($manager, $utf16));
+        $this->assertSame('Scene NFO', $normalize->invoke($manager, "\xEF\xBB\xBFScene NFO"));
+    }
+
     private function makeReleaseFileManager(?ReleaseUpdateService $updateService = null): ReleaseFileManager
     {
         $updateService ??= $this->createMock(ReleaseUpdateService::class);

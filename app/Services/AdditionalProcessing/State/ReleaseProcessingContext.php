@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services\AdditionalProcessing\State;
 
 use App\Models\Release;
+use App\Services\AdditionalProcessing\DTO\AdditionalWorkPlan;
+use App\Services\AdditionalProcessing\DTO\DownloadedArchive;
 
 /**
  * Mutable context object that holds the processing state for a single release.
@@ -17,6 +19,10 @@ use App\Models\Release;
  */
 class ReleaseProcessingContext
 {
+    private const int MAX_RETAINED_ARCHIVES = 2;
+
+    private const int MAX_RETAINED_ARCHIVE_BYTES = 16_777_216;
+
     // The release being processed
     public Release $release;
 
@@ -55,6 +61,15 @@ class ReleaseProcessingContext
      * @var list<array<string, mixed>>
      */
     public array $nzbContents = [];
+
+    public ?AdditionalWorkPlan $workPlan = null;
+
+    /**
+     * @var list<DownloadedArchive>
+     */
+    public array $downloadedArchives = [];
+
+    private int $retainedArchiveBytes = 0;
 
     // Message IDs for downloading
     /**
@@ -177,8 +192,51 @@ class ReleaseProcessingContext
         $this->releaseHasPassword = false;
         $this->nzbHasCompressedFile = false;
         $this->groupUnavailable = false;
+        $this->workPlan = null;
+        $this->releaseDownloadedArchives();
         $this->resetMessageIDs();
         $this->resetCounters();
+    }
+
+    /**
+     * Retain only small, immediately reusable archive payloads for this release.
+     *
+     * @param  array<int, array<string, mixed>>  $files
+     */
+    public function rememberDownloadedArchive(string $title, string $data, array $files): bool
+    {
+        $byteSize = strlen($data);
+        if ($byteSize === 0
+            || count($this->downloadedArchives) >= self::MAX_RETAINED_ARCHIVES
+            || ($this->retainedArchiveBytes + $byteSize) > self::MAX_RETAINED_ARCHIVE_BYTES
+        ) {
+            return false;
+        }
+
+        $archive = new DownloadedArchive($title, $data, $files);
+        $this->downloadedArchives[] = $archive;
+        $this->retainedArchiveBytes += $archive->byteSize();
+
+        return true;
+    }
+
+    public function releaseDownloadedArchives(): void
+    {
+        $this->downloadedArchives = [];
+        $this->retainedArchiveBytes = 0;
+    }
+
+    public function duplicateMessageIdCount(): int
+    {
+        return $this->workPlan === null ? 0 : $this->workPlan->duplicateMessageIdCount;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function unsupportedReasons(): array
+    {
+        return $this->workPlan === null ? [] : $this->workPlan->unsupportedReasons;
     }
 
     /**

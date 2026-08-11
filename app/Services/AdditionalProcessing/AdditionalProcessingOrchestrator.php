@@ -6,6 +6,9 @@ namespace App\Services\AdditionalProcessing;
 
 use App\Models\Release;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
+use App\Services\AdditionalProcessing\DTO\AdditionalBatchResult;
+use App\Services\AdditionalProcessing\DTO\ReleaseProcessingResult;
+use App\Services\AdditionalProcessing\Enums\ProcessingOutcome;
 use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use App\Services\TempWorkspaceService;
 use Exception;
@@ -31,6 +34,8 @@ class AdditionalProcessingOrchestrator
 
     private string $claimToken = '';
 
+    private string $lastSetupError = '';
+
     public function __construct(
         private readonly ProcessingConfiguration $config,
         private readonly ReleaseProcessor $processor,
@@ -42,7 +47,6 @@ class AdditionalProcessingOrchestrator
      * Start the additional processing.
      *
      * @param  list<int>  $excludedReleaseIds
-     * @return array{claimed: int, processed: int, failed: int, claimed_ids: list<int>}
      *
      * @throws Exception
      */
@@ -51,10 +55,10 @@ class AdditionalProcessingOrchestrator
         string $guidChar = '',
         string $workerToken = '',
         array $excludedReleaseIds = []
-    ): array {
+    ): AdditionalBatchResult {
         $this->finish();
         if (! $this->setupTempPath($guidChar, $groupID, $workerToken)) {
-            return ['claimed' => 0, 'processed' => 0, 'failed' => 0, 'claimed_ids' => []];
+            return AdditionalBatchResult::setupFailed($this->lastSetupError);
         }
 
         $this->fetchReleases($groupID, $guidChar, $excludedReleaseIds);
@@ -65,40 +69,59 @@ class AdditionalProcessingOrchestrator
             return $this->processReleases($guidChar);
         }
 
-        return ['claimed' => 0, 'processed' => 0, 'failed' => 0, 'claimed_ids' => []];
+        return AdditionalBatchResult::empty();
     }
 
     /**
      * Process a single release by GUID.
      */
-    public function processSingleGuid(string $guid): bool
+    public function processSingleGuid(string $guid): ReleaseProcessingResult
     {
+        $releaseId = 0;
+
         try {
             $this->finish();
             $release = Release::where('guid', $guid)->first();
             if ($release === null) {
                 $this->output->warning('Release not found for GUID: '.$guid);
 
-                return false;
+                return new ReleaseProcessingResult(0, $guid, ProcessingOutcome::NotFound, reason: 'Release not found.');
             }
+
+            $releaseId = (int) $release->id;
 
             $this->releases = collect([$release]);
             $this->totalReleases = 1;
             $guidChar = $release->leftguid ?? substr($release->guid, 0, 1);
             $groupID = '';
             if (! $this->setupTempPath($guidChar, $groupID)) {
-                return false;
+                return new ReleaseProcessingResult(
+                    $releaseId,
+                    $guid,
+                    ProcessingOutcome::TemporaryWorkspaceUnavailable,
+                    reason: $this->lastSetupError,
+                );
             }
 
-            $this->processReleases($guidChar);
+            $result = $this->processReleases($guidChar)->firstResult();
 
-            return true;
+            return $result ?? new ReleaseProcessingResult(
+                $releaseId,
+                $guid,
+                ProcessingOutcome::Failed,
+                reason: 'No processing result was produced.',
+            );
         } catch (\Throwable $e) {
             if ($this->config->debugMode) {
                 Log::error('processSingleGuid failed: '.$e->getMessage());
             }
 
-            return false;
+            return new ReleaseProcessingResult(
+                $releaseId,
+                $guid,
+                ProcessingOutcome::Failed,
+                reason: $e->getMessage(),
+            );
         }
     }
 
@@ -107,6 +130,8 @@ class AdditionalProcessingOrchestrator
      */
     private function setupTempPath(string $guidChar, string $groupID, string $workerToken = ''): bool
     {
+        $this->lastSetupError = '';
+
         try {
             $this->mainTmpPath = $this->tempWorkspace->ensureMainTempPath(
                 $this->config->tmpUnrarPath,
@@ -116,6 +141,7 @@ class AdditionalProcessingOrchestrator
             );
             $this->tempWorkspace->clearDirectory($this->mainTmpPath, true);
         } catch (\Throwable $e) {
+            $this->lastSetupError = $e->getMessage();
             $this->output->warning('Additional post-processing skipped: '.$e->getMessage());
             Log::error('Additional post-processing temp path is unavailable', [
                 'tmp_unrar_path' => $this->config->tmpUnrarPath,
@@ -183,27 +209,31 @@ class AdditionalProcessingOrchestrator
      * every subsequent cycle, and the "needs additional pp" backlog would
      * grow indefinitely without any visible failure.
      *
-     * @return array{claimed: int, processed: int, failed: int, claimed_ids: list<int>}
-     *
      * @throws Exception
      */
-    private function processReleases(string $guidChar = ''): array
+    private function processReleases(string $guidChar = ''): AdditionalBatchResult
     {
-        $startedAt = microtime(true);
+        $startedAt = hrtime(true);
         $claimedIds = $this->releases
             ->pluck('id')
             ->map(static fn (mixed $id): int => (int) $id)
             ->values()
             ->all();
-        $processed = 0;
-        $failed = 0;
+        $results = [];
 
         foreach ($this->releases as $release) {
+            $releaseStartedAt = hrtime(true);
+
             try {
-                $this->processor->process(new ReleaseProcessingContext($release), $this->mainTmpPath);
-                $processed++;
+                $results[] = $this->processor->process(new ReleaseProcessingContext($release), $this->mainTmpPath);
             } catch (\Throwable $e) {
-                $failed++;
+                $results[] = new ReleaseProcessingResult(
+                    releaseId: (int) ($release->id ?? 0),
+                    guid: (string) ($release->guid ?? ''),
+                    outcome: ProcessingOutcome::Failed,
+                    reason: $e->getMessage(),
+                    elapsedSeconds: $this->elapsedSecondsSince($releaseStartedAt),
+                );
                 Log::error('Additional postprocessing failed for release '.($release->id ?? '?').': '.$e->getMessage(), [
                     'release_id' => $release->id ?? null,
                     'guid' => $release->guid ?? null,
@@ -220,23 +250,63 @@ class AdditionalProcessingOrchestrator
             }
         }
 
+        $batchResult = new AdditionalBatchResult(
+            claimedIds: $claimedIds,
+            results: $results,
+            elapsedSeconds: $this->elapsedSecondsSince($startedAt),
+            peakMemoryBytes: memory_get_peak_usage(true),
+        );
+        $downloadMetrics = $batchResult->downloadMetrics();
+        $persistenceMetrics = $batchResult->persistenceMetrics();
+
         Log::info('Additional postprocessing run finished', [
+            'pipeline' => 'v2',
             'guid_char' => $guidChar,
             'picked' => $this->totalReleases,
-            'processed' => $processed,
-            'failed' => $failed,
-            'elapsed_seconds' => round(microtime(true) - $startedAt, 3),
-            'peak_memory_bytes' => memory_get_peak_usage(true),
+            'processed' => $batchResult->successfulCount(),
+            'failed' => $batchResult->unsuccessfulCount(),
+            'outcomes' => $batchResult->outcomeCounts(),
+            'artifacts_created' => $batchResult->artifactsCreatedCount(),
+            'artifact_yield_percent' => round($batchResult->artifactYieldPercent(), 2),
+            'release_files_added' => $batchResult->releaseFilesAdded(),
+            'download_requests' => $downloadMetrics->logicalRequests,
+            'nntp_requests' => $downloadMetrics->networkRequests,
+            'download_cache_hits' => $downloadMetrics->cacheHits,
+            'nntp_bytes' => $downloadMetrics->bytesDownloaded,
+            'reused_bytes' => $downloadMetrics->bytesReused,
+            'database_statements' => $persistenceMetrics->databaseStatements,
+            'database_milliseconds' => round($persistenceMetrics->databaseMilliseconds, 3),
+            'search_sync_requests' => $persistenceMetrics->searchSyncRequests,
+            'search_sync_executions' => $persistenceMetrics->searchSyncExecutions,
+            'duplicate_message_ids' => $batchResult->duplicateMessageIdCount(),
+            'unsupported_reasons' => $batchResult->unsupportedReasonCounts(),
+            'elapsed_seconds' => round($batchResult->elapsedSeconds, 6),
+            'releases_per_second' => round($batchResult->releasesPerSecond(), 4),
+            'average_release_seconds' => round($batchResult->averageReleaseSeconds(), 6),
+            'stage_seconds' => $this->roundedStageDurations($batchResult->stageDurationTotals()),
+            'peak_memory_bytes' => $batchResult->peakMemoryBytes,
         ]);
 
         $this->output->endOutput();
 
-        return [
-            'claimed' => $this->totalReleases,
-            'processed' => $processed,
-            'failed' => $failed,
-            'claimed_ids' => $claimedIds,
-        ];
+        return $batchResult;
+    }
+
+    private function elapsedSecondsSince(int $startedAtNanoseconds): float
+    {
+        return (hrtime(true) - $startedAtNanoseconds) / 1_000_000_000;
+    }
+
+    /**
+     * @param  array<string, float>  $durations
+     * @return array<string, float>
+     */
+    private function roundedStageDurations(array $durations): array
+    {
+        return array_map(
+            static fn (float $duration): float => round($duration, 6),
+            $durations,
+        );
     }
 
     public function finish(): void
@@ -249,5 +319,6 @@ class AdditionalProcessingOrchestrator
         $this->releases = collect();
         $this->totalReleases = 0;
         $this->claimToken = '';
+        $this->lastSetupError = '';
     }
 }

@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Services\NameFixing;
 
 use App\Events\ReleaseNameFixed;
-use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
 use App\Models\UsenetGroup;
+use App\Services\AdditionalProcessing\ReleaseSearchSyncCoordinator;
+use App\Services\AdditionalProcessing\State\PersistenceMetricsCollector;
 use App\Services\Categorization\CategorizationService;
 use App\Services\ReleaseCleaningService;
 use Illuminate\Support\Arr;
@@ -82,6 +83,8 @@ class ReleaseUpdateService
 
     protected bool $echoOutput;
 
+    private readonly ReleaseSearchSyncCoordinator $searchSyncCoordinator;
+
     /**
      * The release ID we are trying to rename.
      */
@@ -109,10 +112,13 @@ class ReleaseUpdateService
 
     public function __construct(
         ?CategorizationService $category = null,
-        ?FileNameCleaner $fileNameCleaner = null
+        ?FileNameCleaner $fileNameCleaner = null,
+        ?ReleaseSearchSyncCoordinator $searchSyncCoordinator = null,
     ) {
         $this->category = $category ?? new CategorizationService;
         $this->fileNameCleaner = $fileNameCleaner ?? new FileNameCleaner;
+        $this->searchSyncCoordinator = $searchSyncCoordinator
+            ?? new ReleaseSearchSyncCoordinator(new PersistenceMetricsCollector);
         $this->echoOutput = config('nntmux.echocli');
     }
 
@@ -331,8 +337,7 @@ class ReleaseUpdateService
             ));
         });
 
-        // Update search index
-        Search::updateRelease($release->releases_id);
+        $this->searchSyncCoordinator->request((int) $release->releases_id);
     }
 
     /**

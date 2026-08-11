@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Services\AdditionalProcessing;
 
 use App\Enums\ImageAssetProfile;
-use App\Facades\Search;
 use App\Models\Category;
 use App\Models\Release;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
+use App\Services\AdditionalProcessing\State\PersistenceMetricsCollector;
 use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use App\Services\Categorization\CategorizationService;
 use App\Services\NameFixing\ReleaseUpdateService;
@@ -38,12 +38,20 @@ class MediaExtractionService
 
     private ?MediaInfo $mediaInfo = null;
 
+    private readonly ReleaseSearchSyncCoordinator $searchSyncCoordinator;
+
     public function __construct(
         private readonly ProcessingConfiguration $config,
         private readonly ReleaseImageService $releaseImage,
         private readonly ReleaseExtraService $releaseExtra,
-        private readonly CategorizationService $categorize
-    ) {}
+        private readonly CategorizationService $categorize,
+        ?ReleaseSearchSyncCoordinator $searchSyncCoordinator = null,
+    ) {
+        $this->searchSyncCoordinator = $searchSyncCoordinator
+            ?? new ReleaseSearchSyncCoordinator(
+                new PersistenceMetricsCollector,
+            );
+    }
 
     /**
      * Get video time code for sample extraction.
@@ -329,7 +337,7 @@ class MediaExtractionService
                                 'proc_pp' => 1,
                             ]);
 
-                            Search::updateRelease($context->release->id);
+                            $this->searchSyncCoordinator->request((int) $context->release->id);
 
                             if ($this->config->echoCLI) {
                                 $releaseInfo = (object) [

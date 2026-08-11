@@ -6,7 +6,12 @@ namespace App\Services\AdditionalProcessing;
 
 use App\Models\UsenetGroup;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
+use App\Services\AdditionalProcessing\DTO\ReleaseProcessingResult;
 use App\Services\AdditionalProcessing\Enums\DownloadKind;
+use App\Services\AdditionalProcessing\Enums\ProcessingOutcome;
+use App\Services\AdditionalProcessing\Enums\ProcessingStage;
+use App\Services\AdditionalProcessing\State\PersistenceMetricsCollector;
+use App\Services\AdditionalProcessing\State\ProcessingMetrics;
 use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use App\Services\Releases\ReleaseBrowseService;
 use App\Services\TempWorkspaceService;
@@ -25,99 +30,203 @@ class ReleaseProcessor
     public function __construct(
         private readonly ProcessingConfiguration $config,
         private readonly NzbContentParser $nzbParser,
+        private readonly AdditionalWorkPlanner $workPlanner,
         private readonly ArchiveExtractionService $archiveService,
         private readonly MediaExtractionService $mediaService,
         private readonly UsenetDownloadService $downloadService,
         private readonly ReleaseFileManager $releaseManager,
         private readonly ReleaseFilesArchiveFallback $archiveFallback,
         private readonly TempWorkspaceService $tempWorkspace,
-        private readonly ConsoleOutputService $output
+        private readonly ConsoleOutputService $output,
+        private readonly ?ReleaseSearchSyncCoordinator $searchSyncCoordinator = null,
+        private readonly ?PersistenceMetricsCollector $persistenceMetricsCollector = null,
     ) {}
 
-    public function process(ReleaseProcessingContext $context, string $mainTmpPath): void
+    public function process(ReleaseProcessingContext $context, string $mainTmpPath): ReleaseProcessingResult
     {
+        $metrics = new ProcessingMetrics;
+        $releaseId = (int) $context->release->id;
+        $persistenceMetricsCollector = $this->persistenceMetricsCollector ?? new PersistenceMetricsCollector;
+        $searchSyncCoordinator = $this->searchSyncCoordinator
+            ?? new ReleaseSearchSyncCoordinator(
+                $persistenceMetricsCollector,
+            );
+
+        $persistenceMetricsCollector->beginReleaseScope($releaseId);
+        $searchSyncCoordinator->beginReleaseScope($releaseId);
+        $this->downloadService->beginReleaseScope();
+
+        try {
+            $result = $this->processRelease($context, $mainTmpPath, $metrics);
+        } finally {
+            $context->releaseDownloadedArchives();
+            try {
+                $searchSyncCoordinator->finishReleaseScope();
+            } finally {
+                $persistenceMetrics = $persistenceMetricsCollector->finishReleaseScope();
+                $downloadMetrics = $this->downloadService->finishReleaseScope();
+            }
+        }
+
+        return $result->withPerformance(
+            $metrics->elapsedSeconds(),
+            $metrics->stageDurations(),
+            $downloadMetrics,
+            $persistenceMetrics,
+        );
+    }
+
+    private function processRelease(
+        ReleaseProcessingContext $context,
+        string $mainTmpPath,
+        ProcessingMetrics $metrics,
+    ): ReleaseProcessingResult {
         $release = $context->release;
 
         $this->output->echoReleaseStart($release->id, $release->size);
         $this->output->setProcessTitle((int) $release->id);
 
         try {
-            $context->tmpPath = $this->tempWorkspace->createReleaseTempFolder($mainTmpPath, $release->guid);
+            $context->tmpPath = $metrics->measure(
+                ProcessingStage::WorkspacePreparation,
+                fn (): string => $this->tempWorkspace->createReleaseTempFolder($mainTmpPath, $release->guid),
+            );
         } catch (\Throwable $e) {
             $this->output->warning('Unable to prepare release temp directory: '.$e->getMessage());
 
-            return;
+            return $this->result(
+                $context,
+                ProcessingOutcome::TemporaryWorkspaceUnavailable,
+                reason: $e->getMessage(),
+            );
         }
 
         try {
-            $nzbResult = $this->nzbParser->parseNzb($release->guid);
+            $releaseNameChanged = false;
+            $releaseNeededNfo = false;
+            $nzbResult = $metrics->measure(
+                ProcessingStage::NzbParsing,
+                fn (): array => $this->nzbParser->parseNzb($release->guid),
+            );
             if ($nzbResult['error'] !== null) {
                 $this->output->warning($nzbResult['error']);
                 $this->releaseManager->deleteRelease($release);
 
-                return;
+                return $this->result(
+                    $context,
+                    ProcessingOutcome::DeletedBrokenNzb,
+                    reason: $nzbResult['error'],
+                );
             }
 
             $context->nzbContents = array_values($nzbResult['contents']);
-            if ($this->checkReleaseTimeout($context)) {
-                return;
+            if (($timeoutResult = $this->processingTimeoutResult($context, $metrics)) !== null) {
+                return $timeoutResult;
             }
 
-            $this->initializeContext($context);
-            $this->releaseManager->processReleaseNameFromNzbContents($context->nzbContents, $context);
-            $messageIds = $this->nzbParser->extractMessageIDs($context->nzbContents, $context->releaseGroupName, $this->config);
+            $releaseNameChanged = $metrics->measure(
+                ProcessingStage::ReleaseInitialization,
+                function () use ($context): bool {
+                    $this->initializeContext($context);
 
-            $context->nzbHasCompressedFile = $messageIds['hasCompressedFile'];
-            $context->sampleMessageIDs = $messageIds['sampleMessageIDs'];
-            $context->jpgMessageIDs = $messageIds['jpgMessageIDs'];
-            $context->mediaInfoMessageIDs = $messageIds['mediaInfoMessageID'];
-            $context->audioInfoMessageIDs = $messageIds['audioInfoMessageID'];
-            $context->audioInfoExtension = $messageIds['audioInfoExtension'];
-
-            $bookFlood = $messageIds['bookFileCount'] > 80
-                && ($messageIds['bookFileCount'] * 2) >= count($context->nzbContents);
+                    return $this->releaseManager->processReleaseNameFromNzbContents($context->nzbContents, $context);
+                },
+            );
+            $releaseNeededNfo = $context->releaseHasNoNFO;
+            $bookFlood = $metrics->measure(
+                ProcessingStage::MessageIdSelection,
+                fn (): bool => $this->prepareMessageIds($context),
+            );
 
             if ($this->shouldProcessDownloads()) {
-                $this->processMessageIdDownloads($context);
-                if ($this->checkReleaseTimeout($context)) {
-                    return;
+                $metrics->measure(
+                    ProcessingStage::DirectDownloads,
+                    fn () => $this->processMessageIdDownloads($context),
+                );
+                if (($timeoutResult = $this->processingTimeoutResult($context, $metrics)) !== null) {
+                    return $timeoutResult;
                 }
 
                 if (! $bookFlood && $context->nzbHasCompressedFile) {
                     $triedCompressedMids = [];
-                    $this->processNzbCompressedFiles($context, false, $triedCompressedMids);
-                    if ($this->checkReleaseTimeout($context)) {
-                        return;
+                    $metrics->measure(
+                        ProcessingStage::ArchiveDownloads,
+                        function () use ($context, &$triedCompressedMids): void {
+                            $this->processNzbCompressedFiles($context, false, $triedCompressedMids);
+                        },
+                    );
+                    if (($timeoutResult = $this->processingTimeoutResult($context, $metrics)) !== null) {
+                        return $timeoutResult;
                     }
 
                     if ($this->config->fetchLastFiles) {
-                        $this->processNzbCompressedFiles($context, true, $triedCompressedMids);
-                        if ($this->checkReleaseTimeout($context)) {
-                            return;
+                        $metrics->measure(
+                            ProcessingStage::ArchiveDownloads,
+                            function () use ($context, &$triedCompressedMids): void {
+                                $this->processNzbCompressedFiles($context, true, $triedCompressedMids);
+                            },
+                        );
+                        if (($timeoutResult = $this->processingTimeoutResult($context, $metrics)) !== null) {
+                            return $timeoutResult;
                         }
                     }
 
                     if (! $context->releaseHasPassword) {
-                        $this->processExtractedFiles($context);
-                        if ($this->checkReleaseTimeout($context)) {
-                            return;
+                        $metrics->measure(
+                            ProcessingStage::ExtractedFiles,
+                            fn () => $this->processExtractedFiles($context),
+                        );
+                        if (($timeoutResult = $this->processingTimeoutResult($context, $metrics)) !== null) {
+                            return $timeoutResult;
                         }
                     }
                 }
 
-                if (! $context->foundJPGSample && $this->config->processJPGSample) {
-                    $this->archiveFallback->processJpgFromReleaseFiles($context);
-                }
+                $metrics->measure(ProcessingStage::ArchiveFallbacks, function () use ($context): void {
+                    if (! $context->foundJPGSample && $this->config->processJPGSample) {
+                        $this->archiveFallback->processJpgFromReleaseFiles($context);
+                    }
 
-                if ($context->releaseHasNoNFO) {
-                    $this->archiveFallback->processNfoFromReleaseFiles($context);
-                }
+                    if ($context->releaseHasNoNFO) {
+                        $this->archiveFallback->processNfoFromDownloadedArchives($context);
+                    }
+
+                    if ($context->releaseHasNoNFO) {
+                        $this->archiveFallback->processNfoFromReleaseFiles($context);
+                    }
+                });
             }
 
-            $this->releaseManager->finalizeRelease($context, $this->config->processPasswords);
+            $metrics->measure(
+                ProcessingStage::Finalization,
+                fn () => $this->releaseManager->finalizeRelease($context, $this->config->processPasswords),
+            );
+
+            $artifactsCreated = $releaseNameChanged || $this->createdArtifacts($context, $releaseNeededNfo);
+            $outcome = match (true) {
+                $context->releaseHasPassword => ProcessingOutcome::Passworded,
+                $context->groupUnavailable => ProcessingOutcome::GroupUnavailable,
+                ! $artifactsCreated => ProcessingOutcome::NoUsefulArtifacts,
+                default => ProcessingOutcome::Completed,
+            };
+
+            return $this->result(
+                $context,
+                $outcome,
+                $artifactsCreated,
+                reason: match ($outcome) {
+                    ProcessingOutcome::Passworded => 'Password protection was detected.',
+                    ProcessingOutcome::GroupUnavailable => 'The release group was unavailable during processing.',
+                    ProcessingOutcome::NoUsefulArtifacts => 'Processing completed without creating useful artifacts.',
+                    default => '',
+                },
+            );
         } finally {
             if ($context->tmpPath !== '') {
-                $this->tempWorkspace->clearDirectory($context->tmpPath, false);
+                $metrics->measure(
+                    ProcessingStage::WorkspaceCleanup,
+                    fn () => $this->tempWorkspace->clearDirectory($context->tmpPath, false),
+                );
             }
         }
     }
@@ -130,6 +239,23 @@ class ReleaseProcessor
             || $this->config->processAudioInfo
             || $this->config->processVideo
             || $this->config->processJPGSample;
+    }
+
+    private function prepareMessageIds(ReleaseProcessingContext $context): bool
+    {
+        $workPlan = $this->workPlanner->plan(
+            $context->nzbContents,
+            $context->releaseGroupName,
+        );
+        $context->workPlan = $workPlan;
+        $context->nzbHasCompressedFile = $workPlan->hasCompressedFile();
+        $context->sampleMessageIDs = $workPlan->sampleMessageIds;
+        $context->jpgMessageIDs = $workPlan->jpgMessageIds;
+        $context->mediaInfoMessageIDs = $workPlan->mediaInfoMessageId;
+        $context->audioInfoMessageIDs = $workPlan->audioInfoMessageId;
+        $context->audioInfoExtension = $workPlan->audioInfoExtension;
+
+        return $workPlan->bookFlood;
     }
 
     private function initializeContext(ReleaseProcessingContext $context): void
@@ -159,15 +285,20 @@ class ReleaseProcessor
         $context->resetCounters();
     }
 
-    private function checkReleaseTimeout(ReleaseProcessingContext $context): bool
-    {
+    private function processingTimeoutResult(
+        ReleaseProcessingContext $context,
+        ProcessingMetrics $metrics,
+    ): ?ReleaseProcessingResult {
         if (! $context->isTimedOut($this->config->releaseProcessingTimeout)) {
-            return false;
+            return null;
         }
 
-        $deleted = $this->releaseManager->handleReleaseTimeout(
-            $context->release,
-            $this->config->maxPpTimeoutCount
+        $deleted = $metrics->measure(
+            ProcessingStage::TimeoutHandling,
+            fn (): bool => $this->releaseManager->handleReleaseTimeout(
+                $context->release,
+                $this->config->maxPpTimeoutCount,
+            ),
         );
 
         if ($deleted) {
@@ -183,7 +314,44 @@ class ReleaseProcessor
             $this->tempWorkspace->clearDirectory($context->tmpPath, false);
         }
 
-        return true;
+        return $this->result(
+            $context,
+            $deleted ? ProcessingOutcome::DeletedAfterTimeout : ProcessingOutcome::TimedOut,
+            reason: $deleted
+                ? 'The release was deleted after reaching the post-processing timeout limit.'
+                : 'The release exceeded the post-processing timeout.',
+        );
+    }
+
+    private function createdArtifacts(ReleaseProcessingContext $context, bool $releaseNeededNfo): bool
+    {
+        return $context->releaseFilesChanged
+            || $context->foundPAR2Info
+            || ($releaseNeededNfo && ! $context->releaseHasNoNFO)
+            || ($this->config->processVideo && $context->foundVideo)
+            || ($this->config->processThumbnails && $context->foundSample)
+            || ($this->config->processJPGSample && $context->foundJPGSample)
+            || ($this->config->processMediaInfo && $context->foundMediaInfo)
+            || ($this->config->processAudioInfo && $context->foundAudioInfo)
+            || ($this->config->processAudioSample && $context->foundAudioSample);
+    }
+
+    private function result(
+        ReleaseProcessingContext $context,
+        ProcessingOutcome $outcome,
+        bool $artifactsCreated = false,
+        string $reason = '',
+    ): ReleaseProcessingResult {
+        return new ReleaseProcessingResult(
+            releaseId: (int) $context->release->id,
+            guid: (string) $context->release->guid,
+            outcome: $outcome,
+            artifactsCreated: $artifactsCreated,
+            releaseFilesAdded: $context->addedFileInfo,
+            reason: $reason,
+            duplicateMessageIdCount: $context->duplicateMessageIdCount(),
+            unsupportedReasons: $context->unsupportedReasons(),
+        );
     }
 
     private function processMessageIdDownloads(ReleaseProcessingContext $context): void
@@ -318,61 +486,39 @@ class ReleaseProcessor
             return;
         }
 
-        $nzbContents = $context->nzbContents;
-        if ($reverse) {
-            krsort($nzbContents);
-        } else {
+        $archiveCandidates = match (true) {
+            $context->workPlan === null => [],
+            $reverse => $context->workPlan->orderedArchiveCandidates(true),
+            default => $context->workPlan->prioritizedArchiveCandidates(),
+        };
+        if (! $reverse) {
             $triedCompressedMids = [];
         }
 
         $failed = $downloaded = 0;
 
-        foreach ($nzbContents as $nzbFile) {
+        foreach ($archiveCandidates as $archiveCandidate) {
             if ($downloaded >= $this->config->maximumRarSegments
                 || $failed >= $this->config->maximumRarPasswordChecks
                 || $context->releaseHasPassword
-                || $context->groupUnavailable
             ) {
                 break;
             }
 
-            $title = (string) ($nzbFile['title'] ?? '');
-            if (preg_match(
-                '/(\.(part\d+|[rz]\d+|rar|0+|0*10?|zipr\d{2,3}|zipx?)(\s*\.rar)*($|[ ")]|-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$)/i',
-                $title
-            ) !== 1) {
+            if ($reverse && array_intersect($archiveCandidate->messageIds, $triedCompressedMids) !== []) {
                 continue;
             }
 
-            $segments = $nzbFile['segments'] ?? [];
-            $messageIDs = [];
-            $segmentCount = count($segments) - 1;
-
-            foreach (range(0, $this->config->maximumRarSegments - 1) as $index) {
-                if ($index > $segmentCount) {
-                    break;
-                }
-
-                $segment = (string) $segments[$index];
-                if (! $reverse) {
-                    $triedCompressedMids[] = $segment;
-                } elseif (in_array($segment, $triedCompressedMids, false)) {
-                    continue 2;
-                }
-
-                $messageIDs[] = $segment;
-            }
-
-            if ($messageIDs === []) {
-                continue;
+            if (! $reverse) {
+                $triedCompressedMids = [...$triedCompressedMids, ...$archiveCandidate->messageIds];
             }
 
             $result = $this->downloadService->download(
                 DownloadKind::Compressed,
-                $messageIDs,
+                $archiveCandidate->messageIds,
                 $context->releaseGroupName,
                 $context->release->id,
-                $title
+                $archiveCandidate->title,
             );
 
             if ($result['groupUnavailable']) {
@@ -385,8 +531,13 @@ class ReleaseProcessor
                 $this->output->echoCompressedDownload();
                 $downloaded++;
 
-                $processed = $this->processCompressedData($result['data'], $context, $reverse);
-                if ($processed || $context->releaseHasPassword) {
+                $processed = $this->processCompressedData(
+                    $result['data'],
+                    $context,
+                    $reverse,
+                    $archiveCandidate->title,
+                );
+                if ($processed) {
                     break;
                 }
             } else {
@@ -399,7 +550,8 @@ class ReleaseProcessor
     private function processCompressedData(
         string $compressedData,
         ReleaseProcessingContext $context,
-        bool $reverse
+        bool $reverse,
+        string $archiveTitle = '',
     ): bool {
         $result = $this->archiveService->processCompressedData(
             $compressedData,
@@ -411,7 +563,7 @@ class ReleaseProcessor
             $context->releaseHasPassword = true;
             $context->passwordStatus = $result['passwordStatus'];
 
-            return false;
+            return true;
         }
 
         if (isset($result['standaloneVideoType'])) {
@@ -457,11 +609,32 @@ class ReleaseProcessor
             }
         }
 
+        if ($context->releaseHasNoNFO
+            && is_array($result['files'])
+            && $this->containsNfoCandidate($result['files'])
+        ) {
+            $context->rememberDownloadedArchive($archiveTitle, $compressedData, $result['files']);
+        }
+
         if (! $context->foundJPGSample && $this->config->processJPGSample) {
             $this->archiveFallback->processJpgFromArchiveFileList($compressedData, $result['files'], $context);
         }
 
         return $context->totalFileInfo > 0;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $files
+     */
+    private function containsNfoCandidate(array $files): bool
+    {
+        foreach ($files as $file) {
+            if ($this->archiveService->isNfoFile((string) ($file['name'] ?? ''))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function processExtractedFiles(ReleaseProcessingContext $context): void
@@ -490,7 +663,7 @@ class ReleaseProcessor
 
                 $rarData = @File::get($filePath);
                 if (! empty($rarData)) {
-                    $this->processCompressedData($rarData, $context, false);
+                    $this->processCompressedData($rarData, $context, false, basename($filePath));
                     $foundCompressed = true;
                 }
                 File::delete($filePath);
@@ -565,7 +738,7 @@ class ReleaseProcessor
                 continue;
             }
 
-            if (! $context->foundJPGSample && preg_match('/\.(jpe?g|png)$/i', $filePath) === 1) {
+            if (! $context->foundJPGSample && preg_match('/\.(jpe?g|png|webp)$/i', $filePath) === 1) {
                 if ($this->mediaService->getJPGSample($filePath, $context->release->guid)) {
                     $context->markFound('jpgSample');
                     $this->output->echoJpgSaved();
@@ -588,7 +761,7 @@ class ReleaseProcessor
                 continue;
             }
 
-            if (! $context->foundJPGSample && preg_match('/^JPE?G|^PNG/i', $output) === 1) {
+            if (! $context->foundJPGSample && preg_match('/^JPE?G|^PNG|^WebP/i', $output) === 1) {
                 if ($this->mediaService->getJPGSample($filePath, $context->release->guid)) {
                     $context->markFound('jpgSample');
                     $this->output->echoJpgSaved();

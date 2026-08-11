@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Log;
 
 class PostProcessRunner extends BaseRunner
 {
-    private const int ADDITIONAL_WORKER_MAX_BATCHES = 4;
+    public const int ADDITIONAL_WORKER_MAX_BATCHES = 4;
 
     private function guidBucketExpression(string $column = 'leftguid'): string
     {
@@ -257,13 +257,13 @@ class PostProcessRunner extends BaseRunner
                 $excludedReleaseIds = [];
                 try {
                     for ($batch = 0; $batch < self::ADDITIONAL_WORKER_MAX_BATCHES; $batch++) {
-                        $stats = $orchestrator->start('', $char, $workerToken, $excludedReleaseIds);
-                        if ($stats['claimed'] === 0) {
+                        $result = $orchestrator->start('', $char, $workerToken, $excludedReleaseIds);
+                        if ($result->claimedCount() === 0) {
                             break;
                         }
                         $excludedReleaseIds = array_values(array_unique([
                             ...$excludedReleaseIds,
-                            ...$stats['claimed_ids'],
+                            ...$result->claimedIds,
                         ]));
                     }
                 } finally {

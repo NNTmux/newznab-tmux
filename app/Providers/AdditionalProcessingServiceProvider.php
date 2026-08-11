@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
+use App\Services\AdditionalProcessing\AdditionalWorkPlanner;
 use App\Services\AdditionalProcessing\ArchiveExtractionService;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
 use App\Services\AdditionalProcessing\ConsoleOutputService;
@@ -13,15 +14,20 @@ use App\Services\AdditionalProcessing\NzbContentParser;
 use App\Services\AdditionalProcessing\ReleaseFileManager;
 use App\Services\AdditionalProcessing\ReleaseFilesArchiveFallback;
 use App\Services\AdditionalProcessing\ReleaseProcessor;
+use App\Services\AdditionalProcessing\ReleaseSearchSyncCoordinator;
+use App\Services\AdditionalProcessing\State\PersistenceMetricsCollector;
 use App\Services\AdditionalProcessing\UsenetDownloadService;
 use App\Services\Categorization\CategorizationService;
 use App\Services\NameFixing\NameFixingService;
+use App\Services\NameFixing\ReleaseUpdateService;
 use App\Services\NfoService;
 use App\Services\Nzb\NzbParserService;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseExtraService;
 use App\Services\ReleaseImageService;
 use App\Services\TempWorkspaceService;
+use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -38,6 +44,18 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
         // Configuration is a singleton since it loads settings once
         $this->app->singleton(ProcessingConfiguration::class, function () {
             return new ProcessingConfiguration;
+        });
+
+        $this->app->singleton(PersistenceMetricsCollector::class);
+        $this->app->singleton(ReleaseSearchSyncCoordinator::class, function ($app) {
+            return new ReleaseSearchSyncCoordinator(
+                $app->make(PersistenceMetricsCollector::class),
+            );
+        });
+        $this->app->bind(ReleaseUpdateService::class, function ($app) {
+            return new ReleaseUpdateService(
+                searchSyncCoordinator: $app->make(ReleaseSearchSyncCoordinator::class),
+            );
         });
 
         // Release extra service for video/audio/subtitle data
@@ -64,6 +82,10 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
             );
         });
 
+        $this->app->singleton(AdditionalWorkPlanner::class, function ($app) {
+            return new AdditionalWorkPlanner($app->make(ProcessingConfiguration::class));
+        });
+
         // Archive extraction service
         $this->app->singleton(ArchiveExtractionService::class, function ($app) {
             return new ArchiveExtractionService(
@@ -85,7 +107,9 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
                 $app->make(ReleaseImageService::class),
                 new NfoService,
                 $app->make(NzbService::class),
-                new NameFixingService
+                new NameFixingService($app->make(ReleaseUpdateService::class)),
+                $app->make(ReleaseUpdateService::class),
+                searchSyncCoordinator: $app->make(ReleaseSearchSyncCoordinator::class),
             );
         });
 
@@ -95,18 +119,18 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
                 $app->make(ProcessingConfiguration::class),
                 $app->make(ReleaseImageService::class),
                 $app->make(ReleaseExtraService::class),
-                new CategorizationService
+                new CategorizationService,
+                $app->make(ReleaseSearchSyncCoordinator::class),
             );
         });
 
         $this->app->singleton(ReleaseFilesArchiveFallback::class, function ($app) {
             return new ReleaseFilesArchiveFallback(
-                $app->make(ProcessingConfiguration::class),
                 $app->make(ArchiveExtractionService::class),
                 $app->make(MediaExtractionService::class),
                 $app->make(UsenetDownloadService::class),
                 $app->make(ReleaseFileManager::class),
-                $app->make(ConsoleOutputService::class)
+                $app->make(ConsoleOutputService::class),
             );
         });
 
@@ -114,13 +138,16 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
             return new ReleaseProcessor(
                 $app->make(ProcessingConfiguration::class),
                 $app->make(NzbContentParser::class),
+                $app->make(AdditionalWorkPlanner::class),
                 $app->make(ArchiveExtractionService::class),
                 $app->make(MediaExtractionService::class),
                 $app->make(UsenetDownloadService::class),
                 $app->make(ReleaseFileManager::class),
                 $app->make(ReleaseFilesArchiveFallback::class),
                 $app->make(TempWorkspaceService::class),
-                $app->make(ConsoleOutputService::class)
+                $app->make(ConsoleOutputService::class),
+                $app->make(ReleaseSearchSyncCoordinator::class),
+                $app->make(PersistenceMetricsCollector::class),
             );
         });
 
@@ -143,8 +170,12 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
     /**
      * Bootstrap services.
      */
-    public function boot(): void
+    public function boot(PersistenceMetricsCollector $persistenceMetrics): void
     {
+        DB::listen(static function (QueryExecuted $query) use ($persistenceMetrics): void {
+            $persistenceMetrics->recordDatabaseStatement($query->time);
+        });
+
         $this->app->terminating(function (): void {
             if ($this->app->bound(AdditionalProcessingOrchestrator::class)) {
                 $this->app->make(AdditionalProcessingOrchestrator::class)->finish();

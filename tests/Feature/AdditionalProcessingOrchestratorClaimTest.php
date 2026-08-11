@@ -7,13 +7,17 @@ namespace Tests\Feature;
 use App\Models\Release;
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
 use App\Services\AdditionalProcessing\ConsoleOutputService;
+use App\Services\AdditionalProcessing\DTO\ReleaseProcessingResult;
+use App\Services\AdditionalProcessing\Enums\ProcessingOutcome;
 use App\Services\AdditionalProcessing\ReleaseProcessor;
 use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use App\Services\TempWorkspaceService;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
+use Mockery;
 use PDO;
 use Tests\TestCase;
 use Tests\Unit\AdditionalProcessing\CreatesProcessingConfiguration;
@@ -87,6 +91,8 @@ class AdditionalProcessingOrchestratorClaimTest extends TestCase
 
     public function test_handled_release_exception_clears_claim(): void
     {
+        Log::spy();
+
         DB::table('categories')->insert(['id' => 1, 'disablepreview' => 0]);
         DB::table('releases')->insert([
             'id' => 1,
@@ -121,15 +127,49 @@ class AdditionalProcessingOrchestratorClaimTest extends TestCase
             $output
         );
 
-        $orchestrator->start('', 'a');
+        $result = $orchestrator->start('', 'a');
 
         $this->assertSame(1, $processor->processCalls);
+        $this->assertSame([1], $result->claimedIds);
+        $this->assertSame(0, $result->successfulCount());
+        $this->assertSame(1, $result->unsuccessfulCount());
+        $this->assertTrue($result->hasOutcome(ProcessingOutcome::Failed));
+        $this->assertGreaterThan(0.0, $result->elapsedSeconds);
+        $this->assertGreaterThan(0.0, $result->averageReleaseSeconds());
+        $this->assertGreaterThan(0.0, $result->releasesPerSecond());
+        $this->assertGreaterThan(0, $result->peakMemoryBytes);
         $this->assertSame(1, $tempWorkspace->ensureMainTempPathCalls);
         $this->assertSame(1, $tempWorkspace->clearDirectoryCalls);
         $this->assertSame(1, $output->echoDescriptionCalls);
         $this->assertSame(1, $output->endOutputCalls);
         $this->assertNull(Release::query()->where('id', 1)->value('additional_pp_claimed_at'));
         $this->assertNull(Release::query()->where('id', 1)->value('additional_pp_claim_token'));
+
+        Log::shouldHaveReceived('info')
+            ->once()
+            ->with(
+                'Additional postprocessing run finished',
+                Mockery::on(static fn (array $context): bool => $context['picked'] === 1
+                    && $context['processed'] === 0
+                    && $context['failed'] === 1
+                    && $context['outcomes'] === ['failed' => 1]
+                    && array_key_exists('artifacts_created', $context)
+                    && array_key_exists('artifact_yield_percent', $context)
+                    && array_key_exists('release_files_added', $context)
+                    && array_key_exists('download_requests', $context)
+                    && array_key_exists('nntp_requests', $context)
+                    && array_key_exists('download_cache_hits', $context)
+                    && array_key_exists('database_statements', $context)
+                    && array_key_exists('database_milliseconds', $context)
+                    && array_key_exists('search_sync_requests', $context)
+                    && array_key_exists('search_sync_executions', $context)
+                    && array_key_exists('duplicate_message_ids', $context)
+                    && array_key_exists('unsupported_reasons', $context)
+                    && array_key_exists('releases_per_second', $context)
+                    && array_key_exists('average_release_seconds', $context)
+                    && array_key_exists('stage_seconds', $context)
+                    && array_key_exists('peak_memory_bytes', $context)),
+            );
     }
 
     public function test_temp_setup_failure_does_not_claim_releases(): void
@@ -168,9 +208,11 @@ class AdditionalProcessingOrchestratorClaimTest extends TestCase
             $output
         );
 
-        $orchestrator->start('', 'a');
+        $result = $orchestrator->start('', 'a');
 
         $this->assertSame(0, $processor->processCalls);
+        $this->assertSame(0, $result->claimedCount());
+        $this->assertStringContainsString('not writable', $result->setupFailure);
         $this->assertSame(1, $tempWorkspace->ensureMainTempPathCalls);
         $this->assertSame(0, $output->echoDescriptionCalls);
         $this->assertSame(0, $output->endOutputCalls);
@@ -246,7 +288,7 @@ class FailingAdditionalReleaseProcessor extends ReleaseProcessor
 
     public function __construct() {}
 
-    public function process(ReleaseProcessingContext $context, string $mainTmpPath): void
+    public function process(ReleaseProcessingContext $context, string $mainTmpPath): ReleaseProcessingResult
     {
         $this->processCalls++;
 

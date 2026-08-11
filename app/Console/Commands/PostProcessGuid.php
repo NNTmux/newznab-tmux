@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use App\Models\Settings;
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
+use App\Services\AdditionalProcessing\DTO\AdditionalBatchResult;
 use App\Services\NfoService;
 use App\Services\NNTP\NNTPService;
 use App\Services\PostProcessService;
@@ -24,7 +25,8 @@ class PostProcessGuid extends Command
                             {guid : First character of release guid (a-f, 0-9)}
                             {renamed? : For movie/tv: process renamed only (optional)}
                             {--worker : Drain multiple additional-processing batches}
-                            {--max-batches=4 : Maximum claim batches for worker mode}';
+                            {--max-batches=4 : Maximum claim batches for worker mode}
+                            {--profile : Emit one machine-readable performance record per additional batch}';
 
     /**
      * The console command description.
@@ -93,18 +95,54 @@ class PostProcessGuid extends Command
 
         try {
             for ($batch = 0; $batch < $maxBatches && microtime(true) < $deadline; $batch++) {
-                $stats = $this->additionalProcessor->start('', $guid, $workerToken, $excludedReleaseIds);
-                if ($stats['claimed'] === 0) {
+                $result = $this->additionalProcessor->start('', $guid, $workerToken, $excludedReleaseIds);
+                if ((bool) $this->option('profile')) {
+                    $this->writeAdditionalProfile($guid, $batch + 1, $result);
+                }
+                if ($result->claimedCount() === 0) {
                     break;
                 }
                 $excludedReleaseIds = array_values(array_unique([
                     ...$excludedReleaseIds,
-                    ...$stats['claimed_ids'],
+                    ...$result->claimedIds,
                 ]));
             }
         } finally {
             $this->additionalProcessor->finish();
         }
+    }
+
+    private function writeAdditionalProfile(string $guid, int $batch, AdditionalBatchResult $result): void
+    {
+        $downloadMetrics = $result->downloadMetrics();
+        $persistenceMetrics = $result->persistenceMetrics();
+
+        $this->line(json_encode([
+            'event' => 'additional-postprocessing-profile',
+            'pipeline' => 'v2',
+            'guid_char' => $guid,
+            'batch' => $batch,
+            'claimed' => $result->claimedCount(),
+            'attempted' => $result->attemptedCount(),
+            'successful' => $result->successfulCount(),
+            'failed' => $result->unsuccessfulCount(),
+            'outcomes' => $result->outcomeCounts(),
+            'artifacts_created' => $result->artifactsCreatedCount(),
+            'artifact_yield_percent' => round($result->artifactYieldPercent(), 2),
+            'release_files_added' => $result->releaseFilesAdded(),
+            'nntp_requests' => $downloadMetrics->networkRequests,
+            'nntp_bytes' => $downloadMetrics->bytesDownloaded,
+            'database_statements' => $persistenceMetrics->databaseStatements,
+            'database_milliseconds' => round($persistenceMetrics->databaseMilliseconds, 3),
+            'search_sync_requests' => $persistenceMetrics->searchSyncRequests,
+            'search_sync_executions' => $persistenceMetrics->searchSyncExecutions,
+            'duplicate_message_ids' => $result->duplicateMessageIdCount(),
+            'elapsed_seconds' => round($result->elapsedSeconds, 6),
+            'releases_per_hour' => round($result->releasesPerSecond() * 3600, 2),
+            'average_release_seconds' => round($result->averageReleaseSeconds(), 6),
+            'stage_seconds' => $result->stageDurationTotals(),
+            'peak_memory_bytes' => $result->peakMemoryBytes,
+        ], JSON_THROW_ON_ERROR));
     }
 
     /**

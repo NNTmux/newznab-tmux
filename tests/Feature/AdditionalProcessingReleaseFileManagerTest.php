@@ -7,6 +7,7 @@ namespace Tests\Feature;
 use App\Facades\Search;
 use App\Models\Release;
 use App\Services\AdditionalProcessing\ReleaseFileManager;
+use App\Services\AdditionalProcessing\State\PersistenceMetricsCollector;
 use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use App\Services\CollectionCleanupService;
 use App\Services\NameFixing\NameFixingService;
@@ -14,6 +15,7 @@ use App\Services\NfoService;
 use App\Services\Nzb\NzbService;
 use App\Services\ReleaseImageService;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -129,6 +131,40 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
         $this->assertNull(DB::table('releases')->where('id', 1)->value('additional_pp_claim_token'));
     }
 
+    public function test_finalization_flushes_rows_and_synchronizes_search_immediately(): void
+    {
+        DB::table('releases')->insert($this->releaseRow());
+
+        Search::shouldReceive('updateRelease')->once()->with(1);
+
+        $manager = $this->makeManagerWithImageService(new ReleaseImageService);
+        $context = new ReleaseProcessingContext(Release::query()->findOrFail(1));
+        $this->assertTrue($manager->addFileInfo([
+            'name' => 'Example.Movie.2026.mkv',
+            'size' => 2048,
+            'date' => 1_788_600_000,
+        ], $context, '\\.(?:par2|sfv|nzb)'));
+
+        $manager->finalizeRelease($context, false);
+
+        $this->assertSame(1, DB::table('release_files')->count());
+        $this->assertSame(1, DB::table('releases')->where('id', 1)->value('rarinnerfilecount'));
+        $this->assertSame([], $context->pendingReleaseFiles);
+    }
+
+    public function test_database_statements_are_measured_inside_an_active_release_scope(): void
+    {
+        DB::table('releases')->insert($this->releaseRow());
+        $collector = app(PersistenceMetricsCollector::class);
+
+        $collector->beginReleaseScope(1);
+        DB::table('releases')->where('id', 1)->value('guid');
+        $metrics = $collector->finishReleaseScope();
+
+        $this->assertSame(1, $metrics->databaseStatements);
+        $this->assertGreaterThanOrEqual(0.0, $metrics->databaseMilliseconds);
+    }
+
     public function test_queued_par_hashes_flush_with_release_files(): void
     {
         DB::table('releases')->insert($this->releaseRow());
@@ -154,6 +190,35 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
 
         $this->assertSame(1, DB::table('release_files')->count());
         $this->assertSame(1, DB::table('par_hashes')->count());
+    }
+
+    public function test_failed_finalization_rolls_back_buffered_rows_and_keeps_them_for_retry(): void
+    {
+        DB::table('releases')->insert($this->releaseRow());
+
+        Search::shouldReceive('updateRelease')->never();
+
+        $manager = $this->makeManager();
+        $context = new ReleaseProcessingContext(Release::query()->findOrFail(1));
+        $this->assertTrue($manager->addFileInfo([
+            'name' => 'Example.Movie.2026.mkv',
+            'size' => 1024,
+            'date' => 1_788_600_000,
+        ], $context, '\\.(?:par2|sfv|nzb)'));
+
+        DB::unprepared("CREATE TRIGGER fail_release_finalize BEFORE UPDATE ON releases BEGIN SELECT RAISE(ABORT, 'forced finalization failure'); END");
+
+        try {
+            $manager->finalizeRelease($context, false);
+            $this->fail('Finalization should have failed.');
+        } catch (QueryException $exception) {
+            $this->assertStringContainsString('forced finalization failure', $exception->getMessage());
+        } finally {
+            DB::unprepared('DROP TRIGGER IF EXISTS fail_release_finalize');
+        }
+
+        $this->assertSame(0, DB::table('release_files')->count());
+        $this->assertArrayHasKey('Example.Movie.2026.mkv', $context->pendingReleaseFiles);
     }
 
     public function test_float_release_file_size_is_normalized_before_queueing(): void
@@ -230,12 +295,16 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
         return $this->makeManagerWithImageService(new ReleaseImageService, $nameFixing);
     }
 
+    /**
+     * @param  array<string, mixed>  $configOverrides
+     */
     private function makeManagerWithImageService(
         ReleaseImageService $imageService,
         ?NameFixingService $nameFixing = null,
+        array $configOverrides = [],
     ): ReleaseFileManager {
         return new ReleaseFileManager(
-            $this->makeConfig(),
+            $this->makeConfig($configOverrides),
             $imageService,
             new NfoService,
             new TestNzbService,

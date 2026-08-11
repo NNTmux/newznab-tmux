@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\AdditionalProcessing;
 
 use App\Models\ReleaseFile;
-use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
+use App\Services\AdditionalProcessing\DTO\ArchiveCandidate;
 use App\Services\AdditionalProcessing\Enums\DownloadKind;
 use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\File;
 class ReleaseFilesArchiveFallback
 {
     public function __construct(
-        private readonly ProcessingConfiguration $config,
         private readonly ArchiveExtractionService $archiveService,
         private readonly MediaExtractionService $mediaService,
         private readonly UsenetDownloadService $downloadService,
@@ -26,7 +25,7 @@ class ReleaseFilesArchiveFallback
     ) {}
 
     /**
-     * Try JPG/PNG files listed inside an already-downloaded archive summary.
+     * Try JPG/PNG/WebP files listed inside an already-downloaded archive summary.
      *
      * @param  array<int, array<string, mixed>>  $files
      */
@@ -37,7 +36,7 @@ class ReleaseFilesArchiveFallback
     ): void {
         $imageFiles = array_values(array_filter(
             $files,
-            static fn (array $file): bool => preg_match('/\.(jpe?g|png)$/i', (string) ($file['name'] ?? '')) === 1
+            static fn (array $file): bool => preg_match('/\.(jpe?g|png|webp)$/i', (string) ($file['name'] ?? '')) === 1
         ));
 
         if ($imageFiles === []) {
@@ -69,7 +68,7 @@ class ReleaseFilesArchiveFallback
     }
 
     /**
-     * Re-download archives and extract stored JPG/PNG candidates.
+     * Re-download archives and extract stored JPG/PNG/WebP candidates.
      */
     public function processJpgFromReleaseFiles(ReleaseProcessingContext $context): void
     {
@@ -78,7 +77,8 @@ class ReleaseFilesArchiveFallback
             ->where(function ($query) {
                 $query->where('name', 'like', '%.jpg')
                     ->orWhere('name', 'like', '%.jpeg')
-                    ->orWhere('name', 'like', '%.png');
+                    ->orWhere('name', 'like', '%.png')
+                    ->orWhere('name', 'like', '%.webp');
             })
             ->orderByDesc('size')
             ->limit(3)
@@ -145,6 +145,45 @@ class ReleaseFilesArchiveFallback
     }
 
     /**
+     * Extract NFO candidates from archives already downloaded for this release.
+     */
+    public function processNfoFromDownloadedArchives(ReleaseProcessingContext $context): void
+    {
+        if ($context->downloadedArchives === [] || ! $context->releaseHasNoNFO) {
+            return;
+        }
+
+        $nntp = $this->downloadService->getNNTP();
+
+        foreach ($context->downloadedArchives as $archive) {
+            $nfoFiles = array_values(array_filter(
+                $this->archiveService->sortFilesWithNfoPriority($archive->files),
+                fn (array $file): bool => $this->archiveService->isNfoFile((string) ($file['name'] ?? '')),
+            ));
+
+            $this->processExtractedCandidatesFromData(
+                $archive->data,
+                array_slice($nfoFiles, 0, 3),
+                $context,
+                'downloaded_nfo_',
+                function (string $tempPath, ReleaseProcessingContext $context) use ($nntp): bool {
+                    if (! $this->releaseManager->processNfoFile($tempPath, $context, $nntp)) {
+                        return false;
+                    }
+
+                    $this->output->echoNfoFound();
+
+                    return true;
+                },
+            );
+
+            if (! $context->releaseHasNoNFO) {
+                return;
+            }
+        }
+    }
+
+    /**
      * @param  EloquentCollection<int, ReleaseFile>  $candidates
      * @param  callable(ReleaseProcessingContext): bool  $shouldStop
      * @param  callable(string, ReleaseProcessingContext): bool  $handler
@@ -156,34 +195,22 @@ class ReleaseFilesArchiveFallback
         callable $shouldStop,
         callable $handler
     ): void {
-        if ($candidates->isEmpty() || $context->nzbContents === []) {
+        $archiveCandidates = $this->archiveCandidates($context);
+        if ($candidates->isEmpty() || $archiveCandidates === []) {
             return;
         }
 
-        foreach ($context->nzbContents as $nzbFile) {
+        foreach ($archiveCandidates as $archiveCandidate) {
             if ($shouldStop($context)) {
                 break;
             }
 
-            $title = (string) ($nzbFile['title'] ?? '');
-            if (preg_match(
-                '/(\.(part0*1|rar|zip))(\s*\.rar)*($|[ ")]|-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$/i',
-                $title
-            ) !== 1) {
-                continue;
-            }
-
-            $messageIDs = $this->extractInitialSegments($nzbFile['segments'] ?? []);
-            if ($messageIDs === []) {
-                continue;
-            }
-
             $result = $this->downloadService->download(
                 DownloadKind::Compressed,
-                $messageIDs,
+                $archiveCandidate->messageIds,
                 $context->releaseGroupName,
                 $context->release->id,
-                $title
+                $archiveCandidate->title,
             );
 
             if ($result['groupUnavailable']) {
@@ -197,12 +224,19 @@ class ReleaseFilesArchiveFallback
                 continue;
             }
 
+            $filenames = $candidates
+                ->pluck('name')
+                ->filter(static fn (mixed $filename): bool => is_string($filename) && $filename !== '')
+                ->values()
+                ->all();
+            $extractedFiles = $this->extractCandidateFiles(
+                $result['data'],
+                $filenames,
+                $context->tmpPath,
+            );
+
             foreach ($candidates as $candidate) {
-                $fileData = $this->archiveService->extractSpecificFile(
-                    $result['data'],
-                    $candidate->name,
-                    $context->tmpPath
-                );
+                $fileData = $extractedFiles[$candidate->name] ?? null;
 
                 if ($fileData === null || $fileData === '') {
                     continue;
@@ -226,13 +260,23 @@ class ReleaseFilesArchiveFallback
         string $tempPrefix,
         callable $handler
     ): void {
+        $filenames = array_values(array_filter(array_map(
+            static fn (array $candidate): string => (string) ($candidate['name'] ?? ''),
+            $candidates,
+        )));
+        $extractedFiles = $this->extractCandidateFiles(
+            $compressedData,
+            $filenames,
+            $context->tmpPath,
+        );
+
         foreach ($candidates as $candidate) {
             $filename = (string) ($candidate['name'] ?? '');
             if ($filename === '') {
                 continue;
             }
 
-            $fileData = $this->archiveService->extractSpecificFile($compressedData, $filename, $context->tmpPath);
+            $fileData = $extractedFiles[$filename] ?? null;
             if ($fileData === null || $fileData === '') {
                 continue;
             }
@@ -241,6 +285,30 @@ class ReleaseFilesArchiveFallback
                 return;
             }
         }
+    }
+
+    /**
+     * @return list<ArchiveCandidate>
+     */
+    private function archiveCandidates(ReleaseProcessingContext $context): array
+    {
+        if ($context->workPlan === null) {
+            return [];
+        }
+
+        return array_values(array_filter(
+            $context->workPlan->archiveCandidates,
+            static fn (ArchiveCandidate $candidate): bool => $candidate->likelyFirstVolume,
+        ));
+    }
+
+    /**
+     * @param  list<string>  $filenames
+     * @return array<string, string>
+     */
+    private function extractCandidateFiles(string $archiveData, array $filenames, string $tmpPath): array
+    {
+        return $this->archiveService->extractSpecificFiles($archiveData, $filenames, $tmpPath);
     }
 
     /**
@@ -263,21 +331,5 @@ class ReleaseFilesArchiveFallback
         } finally {
             File::delete($tempPath);
         }
-    }
-
-    /**
-     * @param  array<int, mixed>  $segments
-     * @return list<string>
-     */
-    private function extractInitialSegments(array $segments): array
-    {
-        $messageIDs = [];
-        $segmentCount = min(count($segments), $this->config->maximumRarSegments);
-
-        for ($index = 0; $index < $segmentCount; $index++) {
-            $messageIDs[] = (string) $segments[$index];
-        }
-
-        return $messageIDs;
     }
 }

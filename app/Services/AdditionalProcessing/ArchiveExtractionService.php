@@ -167,8 +167,8 @@ class ArchiveExtractionService
     /**
      * Sort files to prioritize NFO files for processing.
      *
-     * @param  array<string, mixed>  $files  Array of file info arrays.
-     * @return array<string, mixed> Sorted array with NFO files first.
+     * @param  list<array<string, mixed>>  $files  Array of file info arrays.
+     * @return list<array<string, mixed>> Sorted array with NFO files first.
      */
     public function sortFilesWithNfoPriority(array $files): array
     {
@@ -325,23 +325,55 @@ class ArchiveExtractionService
      */
     public function extractSpecificFile(string $compressedData, string $filename, string $tmpPath): ?string
     {
-        // Try using ArchiveInfo's built-in extraction
+        return $this->extractSpecificFiles($compressedData, [$filename], $tmpPath)[$filename] ?? null;
+    }
+
+    /**
+     * Inspect one archive and extract several exact filenames from it.
+     *
+     * @param  list<string>  $filenames
+     * @return array<string, string>
+     */
+    public function extractSpecificFiles(string $compressedData, array $filenames, string $tmpPath): array
+    {
+        $filenames = array_values(array_unique(array_filter(
+            $filenames,
+            static fn (string $filename): bool => $filename !== '',
+        )));
+        $extractedFiles = [];
+        $remaining = $filenames;
+
         if ($this->archiveInfo->setData($compressedData, true)) {
-            try {
-                $extracted = $this->archiveInfo->getFileData($filename);
-                if ($extracted !== false && ! empty($extracted)) {
-                    return $extracted;
-                }
-            } catch (\Throwable $e) {
-                if ($this->config->debugMode) {
-                    Log::debug('ArchiveInfo getFileData failed: '.$e->getMessage());
+            foreach ($filenames as $filename) {
+                try {
+                    $extracted = $this->archiveInfo->getFileData($filename);
+                    if ($extracted !== false && $extracted !== '') {
+                        $extractedFiles[$filename] = $extracted;
+                        $remaining = array_values(array_diff($remaining, [$filename]));
+                    }
+                } catch (\Throwable $e) {
+                    if ($this->config->debugMode) {
+                        Log::debug('ArchiveInfo getFileData failed: '.$e->getMessage());
+                    }
                 }
             }
         }
 
-        // Fallback: use external tools to extract to temp directory
+        foreach ($remaining as $filename) {
+            $extracted = $this->extractSpecificFileWithExternalTools($compressedData, $filename, $tmpPath);
+            if ($extracted !== null) {
+                $extractedFiles[$filename] = $extracted;
+            }
+        }
 
-        // Try using unrar for RAR files
+        return $extractedFiles;
+    }
+
+    private function extractSpecificFileWithExternalTools(
+        string $compressedData,
+        string $filename,
+        string $tmpPath,
+    ): ?string {
         if ($this->config->unrarPath) {
             $extracted = $this->extractFileViaExternalTool(
                 $compressedData,
@@ -356,7 +388,6 @@ class ArchiveExtractionService
             }
         }
 
-        // Try using unzip for ZIP files
         if ($this->config->unzipPath) {
             $extracted = $this->extractFileViaExternalTool(
                 $compressedData,

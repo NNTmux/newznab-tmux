@@ -147,16 +147,16 @@ class NzbContentParser
     /**
      * Process NZB contents to extract message IDs for different file types.
      *
-     * @param  array<string, mixed>  $nzbContents
-     * @return array<string, mixed>
-     *                              hasCompressedFile: bool,
-     *                              sampleMessageIDs: array,
-     *                              jpgMessageIDs: array,
-     *                              mediaInfoMessageID: string,
-     *                              audioInfoMessageID: string,
-     *                              audioInfoExtension: string,
-     *                              bookFileCount: int
-     *                              }
+     * @param  list<array<string, mixed>>  $nzbContents
+     * @return array{
+     *     hasCompressedFile: bool,
+     *     sampleMessageIDs: list<string>,
+     *     jpgMessageIDs: list<string>,
+     *     mediaInfoMessageID: string,
+     *     audioInfoMessageID: string,
+     *     audioInfoExtension: string,
+     *     bookFileCount: int
+     * }
      */
     public function extractMessageIDs(
         array $nzbContents,
@@ -194,7 +194,7 @@ class NzbContentParser
                 // Look for a video sample (not an image)
                 if ($config->processThumbnails && empty($result['sampleMessageIDs']) && ! empty($segments)
                     && stripos($title, 'sample') !== false
-                    && ! preg_match('/\.jpe?g$/i', $title)
+                    && ! preg_match('/\.(?:jpe?g|png|webp)$/i', $title)
                 ) {
                     $result['sampleMessageIDs'] = $this->extractSegments($segments, $config->segmentsToDownload);
                 }
@@ -202,7 +202,7 @@ class NzbContentParser
                 // Look for a JPG picture (not a CD cover)
                 if ($config->processJPGSample && empty($result['jpgMessageIDs']) && ! empty($segments)
                     && ! preg_match('/flac|lossless|mp3|music|inner-sanctum|sound/i', $groupName)
-                    && preg_match('/\.jpe?g[. ")\]]/i', $title)
+                    && preg_match('/\.(?:jpe?g|png|webp)[. ")\]]/i', $title)
                 ) {
                     $result['jpgMessageIDs'] = $this->extractSegments($segments, $config->segmentsToDownload);
                 }
@@ -238,18 +238,14 @@ class NzbContentParser
     /**
      * Extract segment message IDs up to a limit.
      *
-     * @param  array<string, mixed>  $segments
-     * @return array<string, mixed>
+     * @param  array<int|string, mixed>  $segments
+     * @return list<string>
      */
     private function extractSegments(array $segments, int $limit): array
     {
         $ids = [];
-        $segCount = count($segments) - 1;
-        for ($i = 0; $i < $limit; $i++) {
-            if ($i > $segCount) {
-                break;
-            }
-            $ids[] = (string) $segments[$i]; // @phpstan-ignore offsetAccess.notFound
+        foreach (array_slice(array_values($segments), 0, max(0, $limit)) as $segment) {
+            $ids[] = (string) $segment;
         }
 
         return $ids;

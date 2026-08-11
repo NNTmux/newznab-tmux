@@ -390,14 +390,14 @@ final class AdditionalCandidateQuery
         });
     }
 
-    private static function claimTtlSeconds(): int
+    public static function claimTtlSeconds(): int
     {
         $timeout = (int) (Settings::settingValue('releaseprocessingtimeout') ?: 120);
 
         return max(300, $timeout * 2);
     }
 
-    private static function claimStaleBefore(): Carbon
+    public static function claimStaleBefore(): Carbon
     {
         return now()->subSeconds(self::claimTtlSeconds());
     }

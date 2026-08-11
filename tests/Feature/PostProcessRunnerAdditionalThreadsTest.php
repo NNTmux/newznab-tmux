@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Services\AdditionalProcessing\AdditionalProcessingOrchestrator;
+use App\Services\AdditionalProcessing\DTO\AdditionalBatchResult;
+use App\Services\AdditionalProcessing\DTO\DownloadMetrics;
+use App\Services\AdditionalProcessing\DTO\PersistenceMetrics;
+use App\Services\AdditionalProcessing\DTO\ReleaseProcessingResult;
+use App\Services\AdditionalProcessing\Enums\ProcessingOutcome;
 use App\Services\Runners\PostProcessRunner;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Schema\Blueprint;
@@ -186,7 +191,7 @@ class PostProcessRunnerAdditionalThreadsTest extends TestCase
             $mock->shouldReceive('start')
                 ->once()
                 ->with('', 'a', Mockery::type('string'), [])
-                ->andReturn(['claimed' => 1, 'processed' => 1, 'failed' => 0, 'claimed_ids' => [1]]);
+                ->andReturn($this->successfulBatch(1));
             $mock->shouldReceive('finish')->once();
         });
 
@@ -205,17 +210,17 @@ class PostProcessRunnerAdditionalThreadsTest extends TestCase
                 ->once()
                 ->ordered()
                 ->with('', 'a', Mockery::type('string'), [])
-                ->andReturn(['claimed' => 1, 'processed' => 1, 'failed' => 0, 'claimed_ids' => [1]]);
+                ->andReturn($this->successfulBatch(1));
             $mock->shouldReceive('start')
                 ->once()
                 ->ordered()
                 ->with('', 'a', Mockery::type('string'), [1])
-                ->andReturn(['claimed' => 1, 'processed' => 1, 'failed' => 0, 'claimed_ids' => [2]]);
+                ->andReturn($this->successfulBatch(2));
             $mock->shouldReceive('start')
                 ->once()
                 ->ordered()
                 ->with('', 'a', Mockery::type('string'), [1, 2])
-                ->andReturn(['claimed' => 0, 'processed' => 0, 'failed' => 0, 'claimed_ids' => []]);
+                ->andReturn(AdditionalBatchResult::empty());
             $mock->shouldReceive('finish')->once();
         });
 
@@ -227,6 +232,154 @@ class PostProcessRunnerAdditionalThreadsTest extends TestCase
         ]);
 
         $this->assertSame(0, $status);
+    }
+
+    public function test_worker_guid_command_emits_machine_readable_batch_profiles(): void
+    {
+        $batchResult = $this->successfulBatch(1)->withPerformance(2.0, 1024);
+        $this->mock(AdditionalProcessingOrchestrator::class, function (MockInterface $mock) use ($batchResult): void {
+            $mock->shouldReceive('start')->once()->andReturn($batchResult);
+            $mock->shouldReceive('finish')->once();
+        });
+
+        $status = Artisan::call('postprocess:guid', [
+            'type' => 'additional',
+            'guid' => 'a',
+            '--profile' => true,
+        ]);
+        $profile = json_decode(trim(Artisan::output()), true, flags: JSON_THROW_ON_ERROR);
+
+        $this->assertSame(0, $status);
+        $this->assertSame('additional-postprocessing-profile', $profile['event']);
+        $this->assertSame('v2', $profile['pipeline']);
+        $this->assertSame(1, $profile['attempted']);
+        $this->assertSame(1800, $profile['releases_per_hour']);
+        $this->assertSame(1024, $profile['peak_memory_bytes']);
+    }
+
+    public function test_targeted_additional_command_reports_a_successful_typed_outcome(): void
+    {
+        DB::table('categories')->insert(['id' => 1, 'disablepreview' => 0]);
+        DB::table('releases')->insert($this->releaseRow(1, 'a'));
+
+        $this->mock(AdditionalProcessingOrchestrator::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('processSingleGuid')
+                ->once()
+                ->with('a-guid-1')
+                ->andReturn(new ReleaseProcessingResult(
+                    1,
+                    'a-guid-1',
+                    ProcessingOutcome::Completed,
+                    artifactsCreated: true,
+                    releaseFilesAdded: 2,
+                    elapsedSeconds: 1.2345,
+                    stageDurations: ['nzb-parsing' => 0.5],
+                    downloadMetrics: new DownloadMetrics(2, 1, 1, 100, 100),
+                    persistenceMetrics: new PersistenceMetrics(4, 3.5, 2, 1),
+                ));
+            $mock->shouldReceive('finish')->once();
+        });
+
+        $status = Artisan::call('releases:additional', ['--id' => 1, '--profile' => true]);
+        $output = Artisan::output();
+
+        $this->assertSame(0, $status);
+        $this->assertStringContainsString('outcome completed', $output);
+        $this->assertStringContainsString('Artifacts created', $output);
+        $this->assertStringContainsString('Release files added', $output);
+        $this->assertStringContainsString('Stage profile', $output);
+        $this->assertStringContainsString('Download profile', $output);
+        $this->assertStringContainsString('Persistence profile', $output);
+    }
+
+    public function test_targeted_additional_command_fails_for_an_unsuccessful_typed_outcome(): void
+    {
+        DB::table('categories')->insert(['id' => 1, 'disablepreview' => 0]);
+        DB::table('releases')->insert($this->releaseRow(1, 'a'));
+
+        $this->mock(AdditionalProcessingOrchestrator::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('processSingleGuid')
+                ->once()
+                ->with('a-guid-1')
+                ->andReturn(new ReleaseProcessingResult(
+                    1,
+                    'a-guid-1',
+                    ProcessingOutcome::TimedOut,
+                    reason: 'The release exceeded the post-processing timeout.',
+                    elapsedSeconds: 2.3456,
+                ));
+            $mock->shouldReceive('finish')->once();
+        });
+
+        $status = Artisan::call('releases:additional', ['--id' => 1]);
+        $output = Artisan::output();
+
+        $this->assertSame(3, $status);
+        $this->assertStringContainsString('outcome timed-out', $output);
+        $this->assertStringContainsString('Reason', $output);
+        $this->assertStringContainsString('The release exceeded the post-processing timeout.', $output);
+    }
+
+    public function test_additional_diagnostics_reports_stale_claims_and_preflight_warnings_as_json(): void
+    {
+        config(['nntmux.tmp_unrar_path' => '']);
+        DB::table('settings')->upsert([
+            ['name' => 'postthreads', 'value' => '33'],
+            ['name' => 'maxaddprocessed', 'value' => '25'],
+            ['name' => 'maxpptimeoutcount', 'value' => '3'],
+        ], ['name'], ['value']);
+        DB::table('categories')->insert(['id' => 1, 'disablepreview' => 0]);
+        DB::table('releases')->insert([
+            ...$this->releaseRow(1, 'a'),
+            'additional_pp_claimed_at' => now()->subHour(),
+            'additional_pp_claim_token' => 'stale-claim',
+        ]);
+
+        $status = Artisan::call('nntmux:additional-diagnose', ['--json' => true]);
+        $report = json_decode(Artisan::output(), true, flags: JSON_THROW_ON_ERROR);
+        $warningCodes = array_column($report['warnings'], 'code');
+
+        $this->assertSame(0, $status);
+        $this->assertSame(1, $report['backlog']['total']);
+        $this->assertSame(1, $report['backlog']['available']);
+        $this->assertSame(1, $report['backlog']['stale_claims']);
+        $this->assertSame(825, $report['capacity']['max_in_flight']);
+        $this->assertSame('v2', $report['settings']['pipeline']);
+        $this->assertContains('stale-claims', $warningCodes);
+        $this->assertContains('claim-ttl', $warningCodes);
+        $this->assertContains('missing-index', $warningCodes);
+        $this->assertContains('unwritable-temp-path', $warningCodes);
+        $this->assertContains('oversized-capacity', $warningCodes);
+    }
+
+    public function test_additional_diagnostics_recognizes_the_covering_claim_index(): void
+    {
+        Schema::table('releases', function (Blueprint $table): void {
+            $table->index([
+                'passwordstatus',
+                'haspreview',
+                'nzbstatus',
+                'leftguid',
+                'additional_pp_claimed_at',
+                'postdate',
+            ], 'ix_releases_add_pp_claim_queue');
+        });
+
+        $status = Artisan::call('nntmux:additional-diagnose', ['--json' => true]);
+        $report = json_decode(Artisan::output(), true, flags: JSON_THROW_ON_ERROR);
+
+        $this->assertSame(0, $status);
+        $this->assertFalse($report['indexes']['missing']);
+        $this->assertSame('ix_releases_add_pp_claim_queue', $report['indexes']['covering_index']);
+        $this->assertNotContains('missing-index', array_column($report['warnings'], 'code'));
+    }
+
+    private function successfulBatch(int $releaseId): AdditionalBatchResult
+    {
+        return new AdditionalBatchResult(
+            [$releaseId],
+            [new ReleaseProcessingResult($releaseId, 'a-guid-'.$releaseId, ProcessingOutcome::Completed)],
+        );
     }
 
     /**

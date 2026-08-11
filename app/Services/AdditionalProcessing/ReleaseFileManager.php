@@ -12,6 +12,7 @@ use App\Models\Predb;
 use App\Models\Release;
 use App\Models\ReleaseFile;
 use App\Services\AdditionalProcessing\Config\ProcessingConfiguration;
+use App\Services\AdditionalProcessing\State\PersistenceMetricsCollector;
 use App\Services\AdditionalProcessing\State\ReleaseProcessingContext;
 use App\Services\NameFixing\FileNameCleaner;
 use App\Services\NameFixing\NameFixingService;
@@ -24,6 +25,7 @@ use App\Services\Releases\ReleaseBrowseService;
 use dariusiii\rarinfo\Par2Info;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
@@ -37,6 +39,8 @@ class ReleaseFileManager
 
     private readonly FileNameCleaner $fileNameCleaner;
 
+    private readonly ReleaseSearchSyncCoordinator $searchSyncCoordinator;
+
     public function __construct(
         private readonly ProcessingConfiguration $config,
         private readonly ReleaseImageService $releaseImage,
@@ -44,9 +48,15 @@ class ReleaseFileManager
         private readonly NzbService $nzb,
         private readonly NameFixingService $nameFixingService,
         ?ReleaseUpdateService $releaseUpdateService = null,
-        ?FileNameCleaner $fileNameCleaner = null
+        ?FileNameCleaner $fileNameCleaner = null,
+        ?ReleaseSearchSyncCoordinator $searchSyncCoordinator = null,
     ) {
-        $this->releaseUpdateService = $releaseUpdateService ?? new ReleaseUpdateService;
+        $this->searchSyncCoordinator = $searchSyncCoordinator
+            ?? new ReleaseSearchSyncCoordinator(
+                new PersistenceMetricsCollector,
+            );
+        $this->releaseUpdateService = $releaseUpdateService
+            ?? new ReleaseUpdateService(searchSyncCoordinator: $this->searchSyncCoordinator);
         $this->fileNameCleaner = $fileNameCleaner ?? new FileNameCleaner;
     }
 
@@ -156,7 +166,7 @@ class ReleaseFileManager
      */
     public function updateSearchIndex(int $releaseId): void
     {
-        Search::updateRelease($releaseId);
+        $this->searchSyncCoordinator->request($releaseId);
     }
 
     /**
@@ -213,8 +223,6 @@ class ReleaseFileManager
      */
     public function finalizeRelease(ReleaseProcessingContext $context, bool $processPasswords): void
     {
-        $this->flushQueuedReleaseFiles($context);
-
         $updateRows = ['haspreview' => 0];
 
         // Check for existing samples
@@ -230,9 +238,6 @@ class ReleaseFileManager
             $updateRows['jpgstatus'] = 1;
         }
 
-        // Get file count
-        $releaseFilesCount = ReleaseFile::whereReleasesId($context->release->id)->count('releases_id') ?? 0;
-
         $passwordStatus = $context->passwordStatus;
 
         // Set to no password if processing is off
@@ -242,16 +247,43 @@ class ReleaseFileManager
 
         $updateRows = array_merge($updateRows, AdditionalCandidateQuery::claimResetValues());
 
-        // Update based on conditions
-        if (! $context->releaseHasPassword && $context->nzbHasCompressedFile && $releaseFilesCount === 0) {
-            Release::query()->where('id', $context->release->id)->update($updateRows);
-        } else {
-            $updateRows['passwordstatus'] = $processPasswords ? $passwordStatus : ReleaseBrowseService::PASSWD_NONE;
-            $updateRows['rarinnerfilecount'] = $releaseFilesCount;
-            Release::query()->where('id', $context->release->id)->update($updateRows);
-        }
+        $pendingReleaseFiles = array_values($context->pendingReleaseFiles);
+        $pendingParHashes = array_values($context->pendingParHashes);
 
-        Search::updateRelease((int) $context->release->id);
+        $insertedReleaseFiles = DB::transaction(function () use (
+            $context,
+            $pendingReleaseFiles,
+            $pendingParHashes,
+            $updateRows,
+            $processPasswords,
+            $passwordStatus,
+        ): int {
+            $inserted = $pendingReleaseFiles === []
+                ? 0
+                : ReleaseFile::query()->insertOrIgnore($pendingReleaseFiles);
+
+            if ($pendingParHashes !== []) {
+                ParHash::query()->insertOrIgnore($pendingParHashes);
+            }
+
+            $releaseFilesCount = ReleaseFile::whereReleasesId($context->release->id)->count('releases_id') ?? 0;
+
+            if (! $context->releaseHasPassword && $context->nzbHasCompressedFile && $releaseFilesCount === 0) {
+                Release::query()->where('id', $context->release->id)->update($updateRows);
+            } else {
+                $updateRows['passwordstatus'] = $processPasswords ? $passwordStatus : ReleaseBrowseService::PASSWD_NONE;
+                $updateRows['rarinnerfilecount'] = $releaseFilesCount;
+                Release::query()->where('id', $context->release->id)->update($updateRows);
+            }
+
+            return $inserted;
+        }, 3);
+
+        $context->pendingReleaseFiles = [];
+        $context->pendingParHashes = [];
+        $context->releaseFilesChanged = $context->releaseFilesChanged || $insertedReleaseFiles > 0;
+
+        $this->searchSyncCoordinator->request((int) $context->release->id);
     }
 
     /**
@@ -283,7 +315,7 @@ class ReleaseFileManager
             'passwordstatus' => ReleaseBrowseService::PASSWD_NONE,
         ], AdditionalCandidateQuery::claimResetValues()));
 
-        Search::updateRelease((int) $release->id);
+        $this->searchSyncCoordinator->request((int) $release->id);
 
         Log::warning('Release '.$release->id.' skipped after post-processing timeout ('.$newCount.'/'.$maxTimeoutCount.')');
 
@@ -302,6 +334,7 @@ class ReleaseFileManager
 
             $id = (int) $release->id;
             $guid = $release->guid ?? '';
+            $this->searchSyncCoordinator->discard($id);
 
             // Delete NZB file
             try {
@@ -352,7 +385,7 @@ class ReleaseFileManager
                 Release::where('id', $id)->delete();
             } catch (\Throwable) {
             }
-        } catch (\Throwable) { // @phpstan-ignore catch.neverThrown
+        } catch (\Throwable) {
             // Last resort: swallow any exception
         }
     }
@@ -691,20 +724,6 @@ class ReleaseFileManager
         }
 
         return true;
-    }
-
-    private function flushQueuedReleaseFiles(ReleaseProcessingContext $context): void
-    {
-        if ($context->pendingReleaseFiles !== []) {
-            $inserted = ReleaseFile::query()->insertOrIgnore(array_values($context->pendingReleaseFiles));
-            $context->releaseFilesChanged = $context->releaseFilesChanged || $inserted > 0;
-            $context->pendingReleaseFiles = [];
-        }
-
-        if ($context->pendingParHashes !== []) {
-            ParHash::query()->insertOrIgnore(array_values($context->pendingParHashes));
-            $context->pendingParHashes = [];
-        }
     }
 
     private function loadExistingReleaseFileNames(ReleaseProcessingContext $context): void
