@@ -124,12 +124,24 @@ class AnidbService
      */
     public function getAnimeRange(string $animeTitle = ''): LengthAwarePaginator // @phpstan-ignore missingType.generics
     {
+        $titleAggregate = DB::connection()->getDriverName() === 'sqlite'
+            ? "GROUP_CONCAT(at.title, ', ') AS title"
+            : "GROUP_CONCAT(at.title SEPARATOR ', ') AS title";
+
         $query = AnidbTitle::query()
             ->where('at.lang', '=', 'en');
         if ($animeTitle !== '') {
             $query->where('at.title', 'like', '%'.$animeTitle.'%');
         }
-        $query->select(['at.anidbid', DB::raw("GROUP_CONCAT(at.title SEPARATOR ', ') AS title"), 'ai.description'])
+        $query->select([
+            'at.anidbid',
+            DB::raw($titleAggregate),
+            'ai.description',
+            'ai.type',
+            'ai.startdate',
+            'ai.enddate',
+            'ai.rating',
+        ])
             ->from('anidb_titles as at')
             ->leftJoin('anidb_info as ai', 'ai.anidbid', '=', 'at.anidbid')
             ->groupBy('at.anidbid')
