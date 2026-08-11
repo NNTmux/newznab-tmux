@@ -17,10 +17,10 @@
 
         <!-- Edit Form -->
         <div class="p-6">
-            <form method="POST" action="{{ url('admin/anidb-edit/' . $anime['anidbid']) }}">
+            <form method="POST" action="{{ url('admin/anidb-edit/' . $anime->anidbid) }}">
                 @csrf
                 <input type="hidden" name="action" value="submit">
-                <input type="hidden" name="anidbid" value="{{ $anime['anidbid'] }}">
+                <input type="hidden" name="anidbid" value="{{ $anime->anidbid }}">
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Left Column -->
@@ -33,7 +33,7 @@
                             <input type="text"
                                    id="title"
                                    name="title"
-                                   value="{{ $anime['title'] ?? '' }}"
+                                   value="{{ $anime->title ?? '' }}"
                                    required
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
                         </div>
@@ -46,7 +46,7 @@
                             <input type="text"
                                    id="type"
                                    name="type"
-                                   value="{{ $anime['type'] ?? '' }}"
+                                   value="{{ $anime->type ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
                         </div>
 
@@ -58,7 +58,7 @@
                             <input type="text"
                                    id="startdate"
                                    name="startdate"
-                                   value="{{ $anime['startdate'] ?? '' }}"
+                                   value="{{ $anime->startdate ?? '' }}"
                                    placeholder="YYYY-MM-DD"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
                         </div>
@@ -71,7 +71,7 @@
                             <input type="text"
                                    id="enddate"
                                    name="enddate"
-                                   value="{{ $anime['enddate'] ?? '' }}"
+                                   value="{{ $anime->enddate ?? '' }}"
                                    placeholder="YYYY-MM-DD"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
                         </div>
@@ -84,11 +84,11 @@
                             <input type="text"
                                    id="rating"
                                    name="rating"
-                                   value="{{ $anime['rating'] ?? '' }}"
+                                   value="{{ $anime->rating ?? '' }}"
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                            @if(!empty($anime['rating']))
+                            @if(!empty($anime->rating))
                                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                    Display: {{ number_format($anime['rating'] / 100, 1) }} / 10
+                                    Display: {{ number_format($anime->rating / 100, 1) }} / 10
                                 </p>
                             @endif
                         </div>
@@ -101,7 +101,7 @@
                             <textarea id="related"
                                       name="related"
                                       rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime['related'] ?? '' }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime->related ?? '' }}</textarea>
                         </div>
 
                         <!-- Similar -->
@@ -112,7 +112,7 @@
                             <textarea id="similar"
                                       name="similar"
                                       rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime['similar'] ?? '' }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime->similar ?? '' }}</textarea>
                         </div>
                     </div>
 
@@ -125,11 +125,11 @@
                             </label>
                             <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
                                 @php
-                                    $hasCover = $anime['anidbid'] > 0 && (file_exists(storage_path('covers/anime/' . $anime['anidbid'] . '-cover.webp')) || file_exists(storage_path('covers/anime/' . $anime['anidbid'] . '-cover.jpg')));
+                                    $hasCover = $anime->anidbid > 0 && (file_exists(storage_path('covers/anime/' . $anime->anidbid . '-cover.webp')) || file_exists(storage_path('covers/anime/' . $anime->anidbid . '-cover.jpg')));
                                 @endphp
                                 @if($hasCover)
-                                    <img src="{{ getImageAssetUrl('anime', $anime['anidbid'] . '-cover', url('/covers/anime/no-cover.jpg'), [(string) $anime['anidbid']]) }}"
-                                         alt="{{ $anime['title'] }}"
+                                    <img src="{{ getImageAssetUrl('anime', $anime->anidbid . '-cover', url('/covers/anime/no-cover.jpg'), [(string) $anime->anidbid]) }}"
+                                         alt="{{ $anime->title }}"
                                          class="max-w-full h-auto mx-auto rounded shadow-lg max-h-[400px]">
                                 @else
                                     <div class="flex flex-col items-center justify-center py-12 text-gray-400 dark:text-gray-500">
@@ -143,8 +143,8 @@
                         
                         <!-- External Links -->
                         @php
-                            $anilistId = $anime['anilist_id'] ?? null;
-                            $malId = $anime['mal_id'] ?? null;
+                            $anilistId = $anime->anilist_id ?? null;
+                            $malId = $anime->mal_id ?? null;
                         @endphp
                         @if(!empty($anilistId) || !empty($malId))
                             <div class="mt-4">
@@ -174,7 +174,7 @@
                             <textarea id="description"
                                       name="description"
                                       rows="8"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime['description'] ?? '' }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime->description ?? '' }}</textarea>
                         </div>
 
                         <!-- Creators -->
@@ -185,7 +185,7 @@
                             <textarea id="creators"
                                       name="creators"
                                       rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime['creators'] ?? '' }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime->creators ?? '' }}</textarea>
                         </div>
 
                         <!-- Categories -->
@@ -196,7 +196,7 @@
                             <textarea id="categories"
                                       name="categories"
                                       rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime['categories'] ?? '' }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime->categories ?? '' }}</textarea>
                         </div>
 
                         <!-- Characters -->
@@ -207,7 +207,7 @@
                             <textarea id="characters"
                                       name="characters"
                                       rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime['characters'] ?? '' }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime->characters ?? '' }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -221,7 +221,7 @@
                         <textarea id="epnos"
                                   name="epnos"
                                   rows="4"
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime['epnos'] ?? '' }}</textarea>
+                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime->epnos ?? '' }}</textarea>
                     </div>
 
                     <div>
@@ -231,7 +231,7 @@
                         <textarea id="airdates"
                                   name="airdates"
                                   rows="4"
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime['airdates'] ?? '' }}</textarea>
+                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime->airdates ?? '' }}</textarea>
                     </div>
 
                     <div>
@@ -241,7 +241,7 @@
                         <textarea id="episodetitles"
                                   name="episodetitles"
                                   rows="4"
-                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime['episodetitles'] ?? '' }}</textarea>
+                                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">{{ $anime->episodetitles ?? '' }}</textarea>
                     </div>
                 </div>
 
