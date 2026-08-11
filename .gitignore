@@ -77,3 +77,7 @@ pnpm-lock.yaml
 /.agents/skills/
 /.claude/skills/
 /.cursor/skills/
+
+# Local operational runbooks — specific to this deployment's machines and
+# workflow, intentionally kept out of the public repo.
+/docs/runbooks/
