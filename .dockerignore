@@ -16,6 +16,7 @@ public/build/
 
 .env
 .env.*
+!.env.dist
 *.log
 phpstan*
 .phpunit*

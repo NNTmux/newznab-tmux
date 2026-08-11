@@ -3,7 +3,9 @@ set -e
 # Create .env file if it doesn't exist
 if [ ! -f .env ]; then
     echo "Creating .env file from environment variables..."
-    envsubst < .env.dist > .env
+    # Drop variables that substituted to an empty string so Laravel's
+    # config defaults apply instead of being overridden by ''
+    envsubst < .env.dist | sed '/^[A-Za-z_][A-Za-z0-9_]*=$/d' > .env
 fi
 if [ "$1" != 'php' ] && [ "$1" != 'sh' ]; then
     # Install dependencies if not already installed
