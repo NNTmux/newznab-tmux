@@ -2,6 +2,16 @@
 
 > AI coding agent guidelines for NNTmux - a Laravel 13 Usenet indexer.
 
+## Command execution precedence (overrules Boost Sail)
+
+**This section and `.ai/guidelines/sail/core.blade.php` overrule Laravel Boost's built-in Sail rules** (including any text below that says you MUST run all commands through Sail).
+
+1. **Default:** run Artisan, Composer, npm, Pint, PHPStan, and tests on the **WSL host** using the Quick Reference below.
+2. **Sail / `make`:** only for Compose lifecycle (`make up` / `make down`) or when the user explicitly asks for containerized commands.
+3. **Docker missing in WSL:** usually means Windows Docker Desktop is stopped or WSL integration is off — do not apt-install Docker inside WSL by default. Host tooling still works when Docker is down.
+
+Canonical Boost override: `.ai/guidelines/sail/core.blade.php`. Host binaries for generated guidelines: `config/boost.php` → `executable_paths`. Copilot mirror: `.github/instructions/nntmux-command-execution.instructions.md`.
+
 ## Quick Reference
 
 ```bash
@@ -99,8 +109,8 @@ PHPUnit only (no Pest). Create tests: `php artisan make:test --phpunit {name}`
 ### Commands
 - 80+ auto-registered in `app/Console/Commands/`
 - Create with `php artisan make:` + `--no-interaction`
-- Docker/Sail convenience targets live in `Makefile`; prefer `make artisan cmd="..."`, `make test filter=TestName`, `make pint`, and `make npm-build` when working inside containers
-- On WSL2, Docker may come from **Windows Docker Desktop** (not a Linux Docker package in the distro). If `docker` is missing or the daemon is unreachable, start Desktop / enable WSL integration before installing Docker inside WSL — see Sail rules below
+- Prefer host `php artisan …` / `./vendor/bin/…` (see Command execution precedence). Use `Makefile` / Sail only for Compose lifecycle or when the user asks for containerized runs (`make artisan cmd="..."`, `make test filter=TestName`, etc.)
+- On WSL2, Docker may come from **Windows Docker Desktop** (not a Linux Docker package in the distro). If `docker` is missing or the daemon is unreachable, start Desktop / enable WSL integration before installing Docker inside WSL
 - This workspace may have cached routes under `bootstrap/cache/routes-*.php`; after adding/changing routes, refresh with `php artisan route:cache` if a route appears missing
 
 ### Admin Content
@@ -187,10 +197,6 @@ Before relying on a package's API, confirm its installed version:
 - PHP packages: run `composer show --direct` to list direct dependencies with versions, or `composer show <vendor/package>` for a single package.
 - JS packages: check `package.json` for the installed versions.
 
-## Skills Activation
-
-This project has domain-specific skills available in `**/skills/**`. You MUST activate the relevant skill whenever you work in that domain—don't wait until you're stuck.
-
 ## Conventions
 
 - You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, and naming.
@@ -208,7 +214,7 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 ## Frontend Bundling
 
-- If the user doesn't see a frontend change reflected in the UI, it could mean they need to run `vendor/bin/sail npm run build`, `vendor/bin/sail npm run dev`, or `vendor/bin/sail composer run dev`. Ask them.
+- If the user doesn't see a frontend change reflected in the UI, it could mean they need to run `npm run build`, `npm run dev`, or `composer run dev`. Ask them.
 
 ## Documentation Files
 
@@ -251,15 +257,15 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 ## Artisan
 
-- Run Artisan commands directly via the command line (e.g., `vendor/bin/sail artisan route:list`). Use `vendor/bin/sail artisan list` to discover available commands and `vendor/bin/sail artisan [command] --help` to check parameters.
-- Inspect routes with `vendor/bin/sail artisan route:list`. Filter with: `--method=GET`, `--name=users`, `--path=api`, `--except-vendor`, `--only-vendor`.
-- Read configuration values using dot notation: `vendor/bin/sail artisan config:show app.name`, `vendor/bin/sail artisan config:show database.default`. Or read config files directly from the `config/` directory.
+- Run Artisan commands directly via the command line (e.g., `php artisan route:list`). Use `php artisan list` to discover available commands and `php artisan [command] --help` to check parameters.
+- Inspect routes with `php artisan route:list`. Filter with: `--method=GET`, `--name=users`, `--path=api`, `--except-vendor`, `--only-vendor`.
+- Read configuration values using dot notation: `php artisan config:show app.name`, `php artisan config:show database.default`. Or read config files directly from the `config/` directory.
 
 ## Tinker
 
 - Execute PHP in app context for debugging and testing code. Do not create models without user approval, prefer tests with factories instead. Prefer existing Artisan commands over custom tinker code.
-- Always use single quotes to prevent shell expansion: `vendor/bin/sail artisan tinker --execute 'Your::code();'`
-  - Double quotes for PHP strings inside: `vendor/bin/sail artisan tinker --execute 'User::where("active", true)->count();'`
+- Always use single quotes to prevent shell expansion: `php artisan tinker --execute 'Your::code();'`
+  - Double quotes for PHP strings inside: `php artisan tinker --execute 'User::where("active", true)->count();'`
 
 === php rules ===
 
@@ -280,36 +286,55 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 === sail rules ===
 
-# Laravel Sail
+# Laravel Sail (project override)
 
-- This project runs inside Laravel Sail's Docker containers. You MUST execute all commands through Sail.
-- Start services using `vendor/bin/sail up -d` and stop them with `vendor/bin/sail stop`.
-- Open the application in the browser by running `vendor/bin/sail open`.
-- Always prefix PHP, Artisan, Composer, and Node commands with `vendor/bin/sail`. Examples:
-    - Run Artisan Commands: `vendor/bin/sail artisan migrate`
-    - Install Composer packages: `vendor/bin/sail composer install`
-    - Execute Node commands: `vendor/bin/sail npm run dev`
-    - Execute PHP scripts: `vendor/bin/sail php [script]`
-- View all available Sail commands by running `vendor/bin/sail` without arguments.
+> **This guideline OVERRULES Boost's built-in Sail rules.** Do not require `vendor/bin/sail` for day-to-day PHP, Artisan, Composer, Node, Pint, PHPStan, or tests.
+
+## Default: run on the WSL host
+
+Prefer host commands (as in the Quick Reference at the top of `AGENTS.md`):
+
+- Artisan: `php artisan [command]` (e.g. `php artisan test --compact --filter=TestName`)
+- Composer: `composer install`
+- Node/npm: `npm run build`
+- Vendor bins: `vendor/bin/pint --dirty`, `vendor/bin/phpstan analyse --memory-limit=2G`
+
+Do **not** prefix every command with Sail. Ignore any conflicting Boost text that says you MUST execute all commands through Sail.
+
+## When Sail / Docker is appropriate
+
+Use Sail or `Makefile` targets only when:
+
+- Starting/stopping the stack (`make up` / `vendor/bin/sail up -d`, `make down` / `vendor/bin/sail stop`)
+- The user explicitly asks for containerized commands
+- A task needs services only available inside Compose (e.g. aligning container UIDs via `make fix-permissions`)
+
+## WSL2 + Windows Docker Desktop
+
+Local development is often done in WSL2 while Docker runs via **Windows Docker Desktop** (WSL integration), not a native Linux Docker install inside the distro.
+
+- If `docker` / `docker compose` cannot be found, or Sail fails with "Docker is not running" / cannot connect to the daemon, do **not** assume Docker must be installed inside WSL. Check that Docker Desktop is running on Windows and that WSL integration is enabled for this distro.
+- Prefer diagnosing through Docker Desktop (engine status, WSL integration settings) before suggesting `apt install docker` or similar host installs.
+- Host PHP/Artisan/tests remain valid even when the Docker engine is down.
 
 === tests rules ===
 
 # Test Enforcement
 
 - Every change must be programmatically tested. Write a new test or update an existing test, then run the affected tests to make sure they pass.
-- Run the minimum number of tests needed to ensure code quality and speed. Use `vendor/bin/sail artisan test --compact` with a specific filename or filter.
+- Run the minimum number of tests needed to ensure code quality and speed. Use `php artisan test --compact` with a specific filename or filter.
 
 === laravel/core rules ===
 
 # Do Things the Laravel Way
 
-- Use `vendor/bin/sail artisan make:` commands to create new files (i.e. migrations, controllers, models, etc.). You can list available Artisan commands using `vendor/bin/sail artisan list` and check their parameters with `vendor/bin/sail artisan [command] --help`.
-- If you're creating a generic PHP class, use `vendor/bin/sail artisan make:class`.
+- Use `php artisan make:` commands to create new files (i.e. migrations, controllers, models, etc.). You can list available Artisan commands using `php artisan list` and check their parameters with `php artisan [command] --help`.
+- If you're creating a generic PHP class, use `php artisan make:class`.
 - Pass `--no-interaction` to all Artisan commands to ensure they work without user input. You should also pass the correct `--options` to ensure correct behavior.
 
 ### Model Creation
 
-- When creating new models, create useful factories and seeders for them too. Ask the user if they need any other things, using `vendor/bin/sail artisan make:model --help` to check the available options.
+- When creating new models, create useful factories and seeders for them too. Ask the user if they need any other things, using `php artisan make:model --help` to check the available options.
 
 ## APIs & Eloquent Resources
 
@@ -323,11 +348,11 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 - When creating models for tests, use the factories for the models. Check if the factory has custom states that can be used before manually setting up the model.
 - Faker: Use methods such as `$this->faker->word()` or `fake()->randomDigit()`. Follow existing conventions whether to use `$this->faker` or `fake()`.
-- When creating tests, make use of `vendor/bin/sail artisan make:test [options] {name}` to create a feature test, and pass `--unit` to create a unit test. Most tests should be feature tests.
+- When creating tests, make use of `php artisan make:test [options] {name}` to create a feature test, and pass `--unit` to create a unit test. Most tests should be feature tests.
 
 ## Vite Error
 
-- If you receive an "Illuminate\Foundation\ViteException: Unable to locate file in Vite manifest" error, you can run `vendor/bin/sail npm run build` or ask the user to run `vendor/bin/sail npm run dev` or `vendor/bin/sail composer run dev`.
+- If you receive an "Illuminate\Foundation\ViteException: Unable to locate file in Vite manifest" error, you can run `npm run build` or ask the user to run `npm run dev` or `composer run dev`.
 
 === livewire/core rules ===
 
@@ -341,14 +366,14 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 # Laravel Pint Code Formatter
 
-- If you have modified any PHP files, you must run `vendor/bin/sail bin pint --dirty --format agent` before finalizing changes to ensure your code matches the project's expected style.
-- Do not run `vendor/bin/sail bin pint --test --format agent`, simply run `vendor/bin/sail bin pint --format agent` to fix any formatting issues.
+- If you have modified any PHP files, you must run `vendor/bin/pint --dirty --format agent` before finalizing changes to ensure your code matches the project's expected style.
+- Do not run `vendor/bin/pint --test --format agent`, simply run `vendor/bin/pint --format agent` to fix any formatting issues.
 
 === phpunit/core rules ===
 
 # PHPUnit
 
-- This application uses PHPUnit for testing. All tests must be written as PHPUnit classes. Use `vendor/bin/sail artisan make:test --phpunit {name}` to create a new test.
+- This application uses PHPUnit for testing. All tests must be written as PHPUnit classes. Use `php artisan make:test --phpunit {name}` to create a new test.
 - If you see a test using "Pest", convert it to PHPUnit.
 - Every time a test has been updated, run that singular test.
 - When the tests relating to your feature are passing, ask the user if they would like to also run the entire test suite to make sure everything is still passing.
@@ -358,9 +383,9 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 ## Running Tests
 
 - Run the minimal number of tests, using an appropriate filter, before finalizing.
-- To run all tests: `vendor/bin/sail artisan test --compact`.
-- To run all tests in a file: `vendor/bin/sail artisan test --compact tests/Feature/ExampleTest.php`.
-- To filter on a particular test name: `vendor/bin/sail artisan test --compact --filter=testName` (recommended after making a change to a related file).
+- To run all tests: `php artisan test --compact`.
+- To run all tests in a file: `php artisan test --compact tests/Feature/ExampleTest.php`.
+- To filter on a particular test name: `php artisan test --compact --filter=testName` (recommended after making a change to a related file).
 
 === revolution/laravel-boost-phpstorm-copilot/core rules ===
 
