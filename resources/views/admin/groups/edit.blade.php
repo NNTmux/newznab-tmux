@@ -112,20 +112,31 @@
             <!-- Minimum Size -->
             <div class="mb-6">
                 <label for="minsizetoformrelease" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Minimum File Size (bytes):
+                    Minimum File Size:
                 </label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-download text-gray-400"></i>
+                <div class="flex gap-2">
+                    <div class="relative flex-1">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-download text-gray-400"></i>
+                        </div>
+                        <input type="number"
+                               step="any"
+                               min="0"
+                               id="minsizetoformrelease"
+                               name="minsizetoformrelease"
+                               class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                               value="{{ $groupMinSize['value'] ?? 0 }}"/>
                     </div>
-                    <input type="number"
-                           id="minsizetoformrelease"
-                           name="minsizetoformrelease"
-                           class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100"
-                           value="{{ $group['minsizetoformrelease'] ?? 0 }}"/>
+                    <select id="minsizetoformrelease_unit"
+                            name="minsizetoformrelease_unit"
+                            class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-100">
+                        @foreach($sizeUnits as $unit)
+                            <option value="{{ $unit }}" {{ ($groupMinSize['unit'] ?? 'MB') === $unit ? 'selected' : '' }}>{{ $unit }}</option>
+                        @endforeach
+                    </select>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    The minimum total size in bytes to make a release. If left blank, will use the site wide setting.
+                    The minimum total size to make a release, stored as bytes. If left blank or set to 0, will use the site wide setting.
                 </p>
             </div>
 

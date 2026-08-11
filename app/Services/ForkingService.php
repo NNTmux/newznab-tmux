@@ -29,16 +29,10 @@ class ForkingService
 
     protected PostProcessRunner $postProcessRunner;
 
-    protected int $maxSize;
-
-    protected int $minSize;
-
     protected int $maxRetries;
 
     public function __construct()
     {
-        $this->maxSize = (int) Settings::settingValue('maxsizetoprocessnfo');
-        $this->minSize = (int) Settings::settingValue('minsizetoprocessnfo');
         $this->maxRetries = (int) Settings::settingValue('maxnforetries') >= 0
             ? -((int) Settings::settingValue('maxnforetries') + 1)
             : NfoService::NFO_UNPROC;

@@ -29,11 +29,11 @@ use Illuminate\Support\Facades\Schema;
  */
 final class AdditionalCandidateQuery
 {
-    /** Default size lower bound when the setting is empty/unset (megabytes). */
-    public const int DEFAULT_MIN_SIZE_MB = 1;
+    /** Default size lower bound when the setting is empty/unset (bytes, 1 MB). */
+    public const int DEFAULT_MIN_SIZE_BYTES = 1048576;
 
-    /** Default size upper bound when the setting is empty/unset (gigabytes). */
-    public const int DEFAULT_MAX_SIZE_GB = 100;
+    /** Default size upper bound when the setting is empty/unset (bytes, 100 GB). */
+    public const int DEFAULT_MAX_SIZE_BYTES = 107374182400;
 
     /**
      * Hard cap on the bucket fan-out. `leftguid` is the first character of a
@@ -52,32 +52,32 @@ final class AdditionalCandidateQuery
     private static ?bool $supportsClaims = null;
 
     /**
-     * Resolve the minimum-size filter (megabytes). Returns 0 when disabled.
+     * Resolve the minimum-size filter (bytes). Returns 0 when disabled.
      *
      * An explicit '0' setting means "no minimum size filter". An empty/null
-     * setting falls back to {@see self::DEFAULT_MIN_SIZE_MB}.
+     * setting falls back to {@see self::DEFAULT_MIN_SIZE_BYTES}.
      */
-    public static function minSizeMB(): int
+    public static function minSizeBytes(): int
     {
         $value = Settings::settingValue('minsizetopostprocess');
         if ($value === '' || $value === null) {
-            return self::DEFAULT_MIN_SIZE_MB;
+            return self::DEFAULT_MIN_SIZE_BYTES;
         }
 
         return max(0, (int) $value);
     }
 
     /**
-     * Resolve the maximum-size filter (gigabytes). Returns 0 when disabled.
+     * Resolve the maximum-size filter (bytes). Returns 0 when disabled.
      *
      * An explicit '0' setting means "no maximum size filter". An empty/null
-     * setting falls back to {@see self::DEFAULT_MAX_SIZE_GB}.
+     * setting falls back to {@see self::DEFAULT_MAX_SIZE_BYTES}.
      */
-    public static function maxSizeGB(): int
+    public static function maxSizeBytes(): int
     {
         $value = Settings::settingValue('maxsizetopostprocess');
         if ($value === '' || $value === null) {
-            return self::DEFAULT_MAX_SIZE_GB;
+            return self::DEFAULT_MAX_SIZE_BYTES;
         }
 
         return max(0, (int) $value);
@@ -97,22 +97,22 @@ final class AdditionalCandidateQuery
         Builder $query,
         int|string $groupID = '',
         string $guidChar = '',
-        ?int $minSizeMB = null,
-        ?int $maxSizeGB = null,
+        ?int $minSizeBytes = null,
+        ?int $maxSizeBytes = null,
         bool $includeClaimed = false,
     ): Builder {
-        $min = $minSizeMB ?? self::minSizeMB();
-        $max = $maxSizeGB ?? self::maxSizeGB();
+        $min = $minSizeBytes ?? self::minSizeBytes();
+        $max = $maxSizeBytes ?? self::maxSizeBytes();
         $query
             ->where('r.passwordstatus', -1)
             ->where('r.haspreview', -1)
             ->where('r.nzbstatus', 1)
             ->where('c.disablepreview', 0);
         if ($min > 0) {
-            $query->where('r.size', '>', $min * 1048576);
+            $query->where('r.size', '>', $min);
         }
         if ($max > 0) {
-            $query->where('r.size', '<', $max * 1073741824);
+            $query->where('r.size', '<', $max);
         }
         if ($groupID !== '' && $groupID !== 0 && $groupID !== '0') {
             $query->where('r.groups_id', $groupID);
@@ -136,15 +136,15 @@ final class AdditionalCandidateQuery
     public static function baseBuilder(
         int|string $groupID = '',
         string $guidChar = '',
-        ?int $minSizeMB = null,
-        ?int $maxSizeGB = null,
+        ?int $minSizeBytes = null,
+        ?int $maxSizeBytes = null,
         bool $includeClaimed = false,
     ): Builder {
         $query = Release::query()
             ->from('releases as r')
             ->leftJoin('categories as c', 'c.id', '=', 'r.categories_id');
 
-        return self::applyPredicates($query, $groupID, $guidChar, $minSizeMB, $maxSizeGB, $includeClaimed);
+        return self::applyPredicates($query, $groupID, $guidChar, $minSizeBytes, $maxSizeBytes, $includeClaimed);
     }
 
     /**
@@ -277,16 +277,16 @@ final class AdditionalCandidateQuery
         int $limit,
         string $token,
         int|string $groupID = '',
-        ?int $minSizeMB = null,
-        ?int $maxSizeGB = null,
+        ?int $minSizeBytes = null,
+        ?int $maxSizeBytes = null,
         array $columns = ['*'],
         array $excludedReleaseIds = [],
     ): EloquentCollection {
         $effectiveLimit = max(1, $limit);
 
-        return DB::transaction(function () use ($guidChar, $effectiveLimit, $token, $groupID, $minSizeMB, $maxSizeGB, $columns, $excludedReleaseIds): EloquentCollection {
+        return DB::transaction(function () use ($guidChar, $effectiveLimit, $token, $groupID, $minSizeBytes, $maxSizeBytes, $columns, $excludedReleaseIds): EloquentCollection {
             $supportsClaims = self::supportsClaims();
-            $query = self::baseBuilder($groupID, $guidChar, $minSizeMB, $maxSizeGB)
+            $query = self::baseBuilder($groupID, $guidChar, $minSizeBytes, $maxSizeBytes)
                 ->select('r.id')
                 ->orderByDesc('r.postdate')
                 ->orderBy('r.id')

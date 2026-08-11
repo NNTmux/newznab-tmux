@@ -177,11 +177,11 @@ class SettingsTableSeeder extends Seeder
             ],
             49 => [
                 'name' => 'maxsizetopostprocess',
-                'value' => '100',
+                'value' => '107374182400',
             ],
             50 => [
                 'name' => 'maxsizetoprocessnfo',
-                'value' => '100',
+                'value' => '107374182400',
             ],
             51 => [
                 'name' => 'maxxxxprocessed',
@@ -189,11 +189,11 @@ class SettingsTableSeeder extends Seeder
             ],
             52 => [
                 'name' => 'minsizetopostprocess',
-                'value' => '1',
+                'value' => '1048576',
             ],
             53 => [
                 'name' => 'minsizetoprocessnfo',
-                'value' => '1',
+                'value' => '1048576',
             ],
             54 => [
                 'name' => 'mischashedretentionhours',

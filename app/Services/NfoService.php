@@ -830,11 +830,11 @@ class NfoService
         }
 
         if ($this->getMaxSize() > 0) {
-            $query->where('size', '<', $this->getMaxSize() * 1073741824);
+            $query->where('size', '<', $this->getMaxSize());
         }
 
         if ($this->getMinSize() > 0) {
-            $query->where('size', '>', $this->getMinSize() * 1048576);
+            $query->where('size', '>', $this->getMinSize());
         }
 
         return $query;
@@ -985,8 +985,8 @@ class NfoService
             'AND r.nfostatus BETWEEN %d AND %d %s %s',
             ($maxRetries < -8 ? -8 : $maxRetries),
             self::NFO_UNPROC,
-            ($maxSize > 0 ? ('AND r.size < '.($maxSize * 1073741824)) : ''),
-            ($minSize > 0 ? ('AND r.size > '.($minSize * 1048576)) : '')
+            ($maxSize > 0 ? ('AND r.size < '.$maxSize) : ''),
+            ($minSize > 0 ? ('AND r.size > '.$minSize) : '')
         );
     }
 
