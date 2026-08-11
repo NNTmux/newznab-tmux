@@ -46,7 +46,7 @@ class TvCategorizer extends AbstractCategorizer
             return $result;
         }
 
-        if (! $this->looksLikeTV($name)) {
+        if (! $this->looksLikeTV($context)) {
             return $this->noMatch();
         }
 
@@ -77,15 +77,22 @@ class TvCategorizer extends AbstractCategorizer
         if ($result = $this->checkSD($name)) {
             return $result;
         }
-        if ($result = $this->checkOther($name)) {
+        if ($result = $this->checkOther($context)) {
             return $result;
         }
 
         return $this->noMatch();
     }
 
-    protected function looksLikeTV(string $name): bool
+    protected function looksLikeTV(ReleaseContext $context): bool
     {
+        $name = $context->releaseName;
+
+        // Standalone season token: S01, S02, etc. Quality markers may appear later.
+        if ($context->hasStandaloneSeasonToken()) {
+            return true;
+        }
+
         // Season + Episode pattern: S01E01, S01.E01, S1D1, etc.
         if (preg_match('/[._ -]s\d{1,3}[._ -]?(e|d(isc)?)\d{1,3}([._ -]|$)/i', $name)) {
             return true;
@@ -284,14 +291,16 @@ class TvCategorizer extends AbstractCategorizer
         return null;
     }
 
-    protected function checkOther(string $name): ?CategorizationResult
+    protected function checkOther(ReleaseContext $context): ?CategorizationResult
     {
+        $name = $context->releaseName;
+
         // Season + episode pattern
         if (preg_match('/[._ -]s\d{1,3}[._ -]?(e|d(isc)?)\d{1,3}([._ -]|$)/i', $name)) {
             return $this->matched(Category::TV_OTHER, 0.6, 'tv_other');
         }
-        // Season pack pattern (S01, S02, etc.) with any quality marker
-        if (preg_match('/[._ -]S\d{1,3}[._ -]/i', $name)) {
+        // Standalone season pack pattern (S01, S02, etc.)
+        if ($context->hasStandaloneSeasonToken()) {
             return $this->matched(Category::TV_OTHER, 0.6, 'tv_season_pack');
         }
 

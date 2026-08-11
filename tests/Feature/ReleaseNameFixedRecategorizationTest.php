@@ -130,6 +130,53 @@ class ReleaseNameFixedRecategorizationTest extends TestCase
         $this->assertSame(1, (int) $release->isrenamed);
     }
 
+    public function test_renaming_tv_episode_to_full_season_keeps_it_out_of_movies(): void
+    {
+        Search::shouldReceive('updateRelease')->twice();
+
+        $group = UsenetGroup::query()->create([
+            'name' => 'alt.binaries.warcraft',
+            'active' => 1,
+            'backfill' => 0,
+        ]);
+
+        $oldName = 'Tale.of.the.Nine.Tailed.S02E10.2023.1080p.AMZN.WEB-DL.x264.DDP2.0-ADWeb';
+        $newName = 'Tale.of.the.Nine.Tailed.S02.2023.1080p.AMZN.WEB-DL.x264.DDP2.0-ADWeb';
+
+        $release = Release::factory()->create([
+            'name' => '[1/8] - "'.$oldName.'.par2" yEnc',
+            'searchname' => $oldName,
+            'fromname' => 'poster@example.com',
+            'groups_id' => $group->id,
+            'categories_id' => Category::TV_WEBDL,
+            'iscategorized' => 1,
+            'isrenamed' => 0,
+            'guid' => str_repeat('e', 40),
+            'leftguid' => 'e',
+            'size' => 1,
+            'postdate' => now(),
+            'adddate' => now(),
+        ]);
+
+        app(ReleaseUpdateService::class)->updateRelease(
+            $release->fresh(),
+            $newName,
+            'Raw file: Flat scene release',
+            true,
+            'Filenames, ',
+            true,
+            false,
+        );
+
+        $release->refresh();
+
+        $this->assertSame($newName, $release->searchname);
+        $this->assertSame(Category::TV_WEBDL, $release->categories_id);
+        $this->assertNotSame(Category::MOVIE_WEBDL, $release->categories_id);
+        $this->assertSame(1, (int) $release->iscategorized);
+        $this->assertSame(1, (int) $release->isrenamed);
+    }
+
     public function test_renaming_olympic_webdl_release_recategorizes_it_from_movie_webdl_to_tv_sport(): void
     {
         Search::shouldReceive('updateRelease')->twice();

@@ -9,6 +9,8 @@ namespace App\Services\Categorization;
  */
 class ReleaseContext
 {
+    private const string STANDALONE_SEASON_TOKEN_REGEX = '/(?:^|[._ -])S\d{1,3}(?=$|[._ -])/i';
+
     public function __construct(
         public readonly string $releaseName,
         public readonly int|string $groupId,
@@ -48,6 +50,14 @@ class ReleaseContext
     public function groupMatchesPattern(string $pattern): bool
     {
         return (bool) preg_match($pattern, $this->groupName);
+    }
+
+    /**
+     * Check whether the release name contains a delimiter-bounded season-pack token.
+     */
+    public function hasStandaloneSeasonToken(): bool
+    {
+        return preg_match(self::STANDALONE_SEASON_TOKEN_REGEX, $this->releaseName) === 1;
     }
 
     /**
