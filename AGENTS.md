@@ -100,6 +100,7 @@ PHPUnit only (no Pest). Create tests: `php artisan make:test --phpunit {name}`
 - 80+ auto-registered in `app/Console/Commands/`
 - Create with `php artisan make:` + `--no-interaction`
 - Docker/Sail convenience targets live in `Makefile`; prefer `make artisan cmd="..."`, `make test filter=TestName`, `make pint`, and `make npm-build` when working inside containers
+- On WSL2, Docker may come from **Windows Docker Desktop** (not a Linux Docker package in the distro). If `docker` is missing or the daemon is unreachable, start Desktop / enable WSL integration before installing Docker inside WSL — see Sail rules below
 - This workspace may have cached routes under `bootstrap/cache/routes-*.php`; after adding/changing routes, refresh with `php artisan route:cache` if a route appears missing
 
 ### Admin Content
@@ -290,6 +291,14 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
     - Execute Node commands: `vendor/bin/sail npm run dev`
     - Execute PHP scripts: `vendor/bin/sail php [script]`
 - View all available Sail commands by running `vendor/bin/sail` without arguments.
+
+### WSL2 + Windows Docker Desktop
+
+Local development is often done in WSL2 while Docker itself runs via **Windows Docker Desktop** (WSL integration), not a native Linux Docker install inside the distro.
+
+- If `docker` / `docker compose` cannot be found, or Sail fails with "Docker is not running" / cannot connect to the daemon, do **not** assume Docker must be installed inside WSL. Check that Docker Desktop is running on Windows and that WSL integration is enabled for this distro.
+- Prefer diagnosing through Docker Desktop (engine status, WSL integration settings) before suggesting `apt install docker` or similar host installs.
+- Once Desktop is up and integrated, `vendor/bin/sail` and `make …` targets should work from the WSL project tree as usual.
 
 === tests rules ===
 
