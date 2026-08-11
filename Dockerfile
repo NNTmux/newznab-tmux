@@ -1,6 +1,6 @@
 
 FROM composer:latest AS composer-base
-FROM dunglas/frankenphp:1-php8.4
+FROM dunglas/frankenphp:1-php8.5
 LABEL maintainer="PyRowMan"
 ENV SERVER_NAME=:${APP_PORT:-80}
 ARG MYSQL_CLIENT="mariadb-client"
@@ -18,8 +18,8 @@ RUN apt update \
      gnupg libpng-dev dnsutils jq htop iputils-ping net-tools ffmpeg \
      jpegoptim webp optipng pngquant libavif-bin watch iproute2 nmon \
      libonig-dev libxml2-dev libicu-dev libjpeg-dev libfreetype6-dev libxslt-dev $MYSQL_CLIENT libcurl4-openssl-dev \
- && wget https://mediaarea.net/repo/deb/repo-mediaarea_1.0-24_all.deb \
- && dpkg -i repo-mediaarea_1.0-24_all.deb \
+ && wget https://mediaarea.net/repo/deb/repo-mediaarea_1.0-25_all.deb \
+ && dpkg -i repo-mediaarea_1.0-25_all.deb \
  && apt update \
  && apt install -y libmediainfo0v5 mediainfo libzen0v5
 RUN install-php-extensions imagick/imagick@master
@@ -45,7 +45,7 @@ COPY . /app
 
 RUN rm -Rf tests/
 
-RUN composer install
+RUN CAPTAINHOOK_DISABLE=true composer install --no-scripts
 
 RUN chmod -R 755 /app/vendor/
 RUN chmod -R 777 /app/storage/

@@ -3,6 +3,7 @@ node_modules/
 .git/
 tests/
 docker/
+!docker/8.5/php.ini
 __pycache__/
 .idea/
 .vscode/
