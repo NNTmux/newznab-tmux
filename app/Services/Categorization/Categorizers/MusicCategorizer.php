@@ -151,8 +151,8 @@ class MusicCategorizer extends AbstractCategorizer
     protected function checkLossless(string $name, bool $categorizeForeign): ?CategorizationResult
     {
         // Lossless format indicators
-        if (preg_match('/(?:^|[^a-zA-Z0-9])(?:FLAC|APE|WAV|ALAC|DSD|DSF|AIFF|PCM|Lossless)|\b(?:FLAC|APE|WAV|ALAC|DSD|DSF|AIFF|PCM)\b/i', $name)) {
-            if (preg_match('/\b(?:24[Bb]it|96kHz|192kHz|Hi[- ]?Res|HD[- ]?Tracks|Vinyl[- ]?Rip|CD[- ]?Rip|WEB[- ]?Rip|HDtracks|Qobuz|Tidal|MQA|SACD)\b/i', $name) ||
+        if (preg_match('/(?<![a-zA-Z0-9])(?:FLAC|APE|WAV|ALAC|DSD|DSF|AIFF|PCM|Lossless)(?![a-zA-Z0-9])/i', $name)) {
+            if (preg_match('/\b(?:24[Bb]it|96kHz|192kHz|Hi[- ]?Res|HD[- ]?Tracks|Vinyl[- ]?Rip|CD[- ]?Rip|HDtracks|Qobuz|Tidal|MQA|SACD)\b/i', $name) ||
                 preg_match('/\.(flac|ape|wav|aiff|dsf|dff|m4a|tak)$/i', $name)) {
 
                 if ($categorizeForeign && $this->checkForeign($name)) {
@@ -175,7 +175,7 @@ class MusicCategorizer extends AbstractCategorizer
         }
 
         // Other lossless formats
-        if (preg_match('/\b(?:APE|Monkey\'s[._ -]Audio|WavPack|WV|TAK|TTA|ALAC|Apple[._ -]Lossless)\b|\.(ape|wv|tak|tta)$/i', $name)) {
+        if (preg_match('/\b(?:Monkey\'s[._ -]Audio|WavPack|WV|TAK|TTA|ALAC|Apple[._ -]Lossless)\b|\.(ape|wv|tak|tta)$/i', $name)) {
             if ($categorizeForeign && $this->checkForeign($name)) {
                 return $this->matched(Category::MUSIC_FOREIGN, 0.85, 'lossless_format_foreign');
             }
@@ -189,7 +189,7 @@ class MusicCategorizer extends AbstractCategorizer
     protected function checkMP3(string $name, bool $categorizeForeign): ?CategorizationResult
     {
         // MP3 indicators
-        if (preg_match('/(?:^|[^a-zA-Z0-9])(?:MP3|320kbps|256kbps|192kbps|128kbps|CBR|VBR)|\b(?:MP3)\b|[\._-](?:MP3)[\._-]|\.mp3$/i', $name)) {
+        if (preg_match('/(?<![a-zA-Z0-9])(?:MP3|320kbps|256kbps|192kbps|128kbps|CBR|VBR)(?![a-zA-Z0-9])|\b(?:MP3)\b|[\._-](?:MP3)[\._-]|\.mp3$/i', $name)) {
             if (preg_match('/\b(?:320|256|192|128)[._-]?kbps|\b(?:320|256|192|128)[._-]?K|\((?:320|256|192|128)\)|\[(?:320|256|192|128)\]|V0|V2|VBR/i', $name) ||
                 preg_match('/\b(?:CD[._-]?Rip|Web[._-]?Rip|WEB|iTunes|AmazonRip|Spotify[._-]?Rip|MP3\s*\-\s*\d{3}kbps)\b/i', $name) ||
                 preg_match('/\.(m3u|mp3)"|rip(?:192|256|320)|[._-]FM[._-].+MP3/i', $name)) {
@@ -226,7 +226,7 @@ class MusicCategorizer extends AbstractCategorizer
     protected function checkOther(string $name, bool $categorizeForeign): ?CategorizationResult
     {
         // Compilation and VA indicators
-        if (preg_match('/(?:^|[^a-zA-Z0-9])(?:Compilation|Various[._ -]Artists|OST|Soundtrack|B-Sides|Greatest[._ -]Hits|Anthology)|\b(?:VA|V\.A|Bonus[._ -]Track|Discography|Box[._ -]Set)\b/i', $name)) {
+        if (preg_match('/(?<![a-zA-Z0-9])(?:Compilation|Various[._ -]Artists|OST|Soundtrack|B-Sides|Greatest[._ -]Hits|Anthology)(?![a-zA-Z0-9])|\b(?:VA|V\.A|Bonus[._ -]Track|Discography|Box[._ -]Set)\b/i', $name)) {
             if ($categorizeForeign && $this->checkForeign($name)) {
                 return $this->matched(Category::MUSIC_FOREIGN, 0.8, 'music_other_foreign');
             }
