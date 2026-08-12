@@ -40,7 +40,7 @@ class PasskeyAuthenticationTest extends TestCase
         $this->withoutMiddleware(Google2FAMiddleware::class);
     }
 
-    public function test_passkey_authentication_logs_user_in_and_sets_2fa_session_flag(): void
+    public function test_passkey_authentication_is_always_remembered_and_sets_2fa_session_flag(): void
     {
         Event::fake([UserLoggedIn::class]);
         $user = $this->createUser('passkey-user@example.test');
@@ -66,13 +66,13 @@ class PasskeyAuthenticationTest extends TestCase
             ]);
 
         $response->assertRedirect('/');
-        $response->assertCookieMissing(Auth::guard()->getRecallerName());
+        $response->assertCookie(Auth::guard()->getRecallerName());
         $this->assertAuthenticatedAs($user);
         $this->assertTrue((bool) session(config('google2fa.session_var')));
         Event::assertDispatched(UserLoggedIn::class);
     }
 
-    public function test_passkey_authentication_with_remember_sets_remember_token(): void
+    public function test_passkey_authentication_does_not_consult_a_remember_field(): void
     {
         Event::fake([UserLoggedIn::class]);
         $user = $this->createUser('passkey-remember@example.test');
@@ -94,7 +94,6 @@ class PasskeyAuthenticationTest extends TestCase
             ->withSession(['passkey-authentication-options' => '{}'])
             ->post(route('passkeys.login'), [
                 'start_authentication_response' => json_encode(['id' => 'credential-3'], JSON_THROW_ON_ERROR),
-                'remember' => true,
             ]);
 
         $response->assertRedirect('/');

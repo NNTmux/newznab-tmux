@@ -36,6 +36,7 @@
 
                 @include('admin.site.sections.registration-settings')
 
+                @include('admin.site.sections.login-session-settings')
 
                 @include('admin.site.sections.password-settings')
 

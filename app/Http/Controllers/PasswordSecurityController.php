@@ -8,17 +8,14 @@ use App\Http\Requests\Disable2faPasswordSecurityRequest;
 use App\Models\PasswordSecurity;
 use App\Models\TrustedDevice;
 use App\Models\User;
-use Illuminate\Auth\Events\OtherDeviceLogout;
+use App\Services\Auth\WebLoginSessionPolicy;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use PragmaRX\Google2FA\Exceptions\IncompatibleWithGoogleAuthenticatorException;
 use PragmaRX\Google2FA\Exceptions\InvalidCharactersException;
 use PragmaRX\Google2FA\Exceptions\SecretKeyTooShortException;
@@ -26,6 +23,8 @@ use PragmaRX\Google2FALaravel\Facade as Google2FA;
 
 class PasswordSecurityController extends Controller
 {
+    public function __construct(private readonly WebLoginSessionPolicy $webLoginSessionPolicy) {}
+
     public function show2faForm(Request $request): Application|View|Factory|\Illuminate\Contracts\Foundation\Application|RedirectResponse
     {
         $user = $request->user();
@@ -187,8 +186,7 @@ class PasswordSecurityController extends Controller
         // Get the remember me preference from session (defaults to false if not set)
         $rememberMe = $request->session()->get('2fa:remember', false);
 
-        // Log the user back in with the remember me preference
-        Auth::login($user, $rememberMe);
+        $this->webLoginSessionPolicy->loginWithoutPassword($request, $user, (bool) $rememberMe);
 
         // Mark the user as having passed 2FA
         session([config('google2fa.session_var') => true]);
@@ -197,13 +195,6 @@ class PasswordSecurityController extends Controller
         session([config('google2fa.session_var').'.auth.passed_at' => time()]);
 
         $passwordBreached = (bool) $request->session()->get('2fa:password_breached', false);
-
-        $newSessionToken = Str::random(60);
-        $user->forceFill([
-            'session_token' => $newSessionToken,
-        ])->save();
-        $request->session()->put('session_token_web', $newSessionToken);
-        event(new OtherDeviceLogout(Auth::getDefaultDriver(), $user));
 
         $request->session()->forget(['2fa:user:id', '2fa:remember', '2fa:password_breached']);
 

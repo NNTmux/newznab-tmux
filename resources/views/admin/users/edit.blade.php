@@ -164,9 +164,19 @@
                 <div class="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <x-button type="submit" form="admin-user-edit-form" icon="fas fa-save">Save User</x-button>
                     <x-button-link href="{{ url('admin/user-list') }}" variant="muted" icon="fas fa-times">Cancel</x-button-link>
+                    @if(!is_array($user) && $user->exists)
+                        <x-button
+                            type="submit"
+                            form="admin-user-edit-form"
+                            variant="danger"
+                            icon="fas fa-right-from-bracket"
+                            formaction="{{ route('admin.login-sessions.expire-user', $user) }}"
+                            formmethod="POST"
+                            data-confirm="Expire every web login and trusted device for '{{ $user->username }}'?"
+                        >Expire All Logins</x-button>
+                    @endif
                 </div>
         </div>
     </div>
 </x-admin.card>
 @endsection
-

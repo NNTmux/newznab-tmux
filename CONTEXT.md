@@ -28,3 +28,22 @@ _Avoid_: calling a group floor an override of the site setting — it can only r
 
 **Backfill Days**:
 A group's `backfill_target`: how many days back the backfill runner aims for on that group. Always at least 1; a group never lacks a target.
+
+**Web Login Session**:
+An authenticated browsing session on the web frontend, expiring after 12 hours of inactivity. Applies only to browser logins by users and admins — API keys and RSS tokens are a separate concept and are never affected by session policy.
+_Avoid_: plain "session" when the distinction from API/RSS access matters.
+
+**Remembered Login**:
+The long-lived "keep me signed in" state: a rolling 7-day window, reset by each new activity, with no absolute ceiling — a browser used at least weekly stays signed in indefinitely until revoked. Transparently re-authenticates a returning browser without a password. Explicitly opt-in for password logins (checkbox, unchecked by default); always granted on passkey logins, since possessing the authenticator already proves the device.
+_Avoid_: "remember me cookie" in UI copy — name the behavior, not the mechanism.
+
+**Single Active Session**:
+A site-owner option (default off): each account may hold only one Web Login Session at a time — a new login anywhere ends the account's other sessions and their Remembered Logins. Enforced from the next login onward when enabled; existing concurrent sessions are not reaped. When off, concurrent logins from any number of devices are allowed.
+_Avoid_: describing this as a security feature — it is an anti-account-sharing policy.
+
+**Trusted Device**:
+A browser the user chose to skip 2FA challenges on, for 30 days. Independent of Remembered Login: one answers "who are you", the other "should this device be re-challenged". The windows are deliberately not aligned.
+
+**Expire All Logins**:
+An admin breach-response action ending every Web Login Session, Remembered Login, and Trusted Device — site-wide or for a single user. Spares only the acting admin's current session; their other logins expire like everyone else's.
+_Avoid_: "logout all users" — it also revokes remembered state and trusted devices, not just live sessions.

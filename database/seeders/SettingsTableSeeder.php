@@ -657,6 +657,10 @@ class SettingsTableSeeder extends Seeder
                 'name' => 'maxpptimeoutcount',
                 'value' => '3',
             ],
+            241 => [
+                'name' => 'single_active_session',
+                'value' => '0',
+            ],
         ]);
     }
 }

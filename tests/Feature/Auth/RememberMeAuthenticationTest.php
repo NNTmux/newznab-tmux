@@ -120,7 +120,66 @@ class RememberMeAuthenticationTest extends TestCase
 
         $response->assertRedirect('/');
         $response->assertCookie($this->recallerCookieName());
+        $recallerCookie = $response->getCookie($this->recallerCookieName(), decrypt: false);
+        $this->assertNotNull($recallerCookie);
+        $this->assertEqualsWithDelta(now()->addDays(7)->getTimestamp(), $recallerCookie->getExpiresTime(), 2);
         $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_web_login_session_idle_lifetime_defaults_to_twelve_hours(): void
+    {
+        $this->assertSame(720, config('session.lifetime'));
+    }
+
+    public function test_remember_me_checkbox_is_unchecked_by_default_and_passkeys_have_no_checkbox(): void
+    {
+        $content = $this->get(route('login'))->assertOk()->getContent();
+
+        $this->assertIsString($content);
+        $this->assertMatchesRegularExpression('/<input(?=[^>]*name="rememberme")[^>]*>/', $content);
+        $this->assertDoesNotMatchRegularExpression('/<input(?=[^>]*name="rememberme")(?=[^>]*checked)[^>]*>/', $content);
+        $this->assertStringNotContainsString('passkey-remember', $content);
+    }
+
+    public function test_remembered_login_window_rolls_on_each_authenticated_visit_without_a_ceiling(): void
+    {
+        Event::fake([UserLoggedIn::class]);
+        $user = $this->createUser('remember-rolling@example.test');
+
+        $loginResponse = $this->post(route('login'), [
+            'username' => $user->email,
+            'password' => 'password',
+            'rememberme' => 'on',
+        ]);
+
+        $firstCookie = $loginResponse->getCookie($this->recallerCookieName(), decrypt: false);
+        $this->assertNotNull($firstCookie);
+
+        $this->travel(6)->days();
+        $this->flushSession();
+        Auth::forgetGuards();
+
+        $firstVisit = $this
+            ->withUnencryptedCookie($this->recallerCookieName(), $firstCookie->getValue())
+            ->get('/__remember_me_probe')
+            ->assertOk();
+
+        $secondCookie = $firstVisit->getCookie($this->recallerCookieName(), decrypt: false);
+        $this->assertNotNull($secondCookie);
+        $this->assertGreaterThan($firstCookie->getExpiresTime(), $secondCookie->getExpiresTime());
+
+        $this->travel(6)->days();
+        $this->flushSession();
+        Auth::forgetGuards();
+
+        $secondVisit = $this
+            ->withUnencryptedCookie($this->recallerCookieName(), $secondCookie->getValue())
+            ->get('/__remember_me_probe')
+            ->assertOk();
+
+        $thirdCookie = $secondVisit->getCookie($this->recallerCookieName(), decrypt: false);
+        $this->assertNotNull($thirdCookie);
+        $this->assertGreaterThan($secondCookie->getExpiresTime(), $thirdCookie->getExpiresTime());
     }
 
     public function test_password_login_with_boolean_remember_me_value_queues_recaller_cookie(): void
@@ -182,6 +241,54 @@ class RememberMeAuthenticationTest extends TestCase
         $response->assertRedirect('/');
         $response->assertCookieMissing($this->recallerCookieName());
         $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_password_login_preserves_other_devices_when_single_active_session_is_off(): void
+    {
+        Event::fake([UserLoggedIn::class]);
+        $user = $this->createUser('concurrent-password@example.test');
+        $user->forceFill([
+            'remember_token' => 'existing-remember-token',
+            'session_token' => 'existing-session-token',
+        ])->save();
+        $passwordHash = $user->password;
+
+        $this->post(route('login'), [
+            'username' => $user->email,
+            'password' => 'password',
+            'rememberme' => 'on',
+        ])->assertRedirect('/');
+
+        $user->refresh();
+        $this->assertSame('existing-remember-token', $user->remember_token);
+        $this->assertSame('existing-session-token', $user->session_token);
+        $this->assertSame($passwordHash, $user->password);
+    }
+
+    public function test_password_login_invalidates_other_devices_when_single_active_session_is_on(): void
+    {
+        DB::table('settings')->insert([
+            'name' => 'single_active_session',
+            'value' => '1',
+        ]);
+        Event::fake([UserLoggedIn::class]);
+        $user = $this->createUser('single-password@example.test');
+        $user->forceFill([
+            'remember_token' => 'existing-remember-token',
+            'session_token' => 'existing-session-token',
+        ])->save();
+        $passwordHash = $user->password;
+
+        $this->post(route('login'), [
+            'username' => $user->email,
+            'password' => 'password',
+            'rememberme' => 'on',
+        ])->assertRedirect('/');
+
+        $user->refresh();
+        $this->assertStringStartsWith('s.', (string) $user->session_token);
+        $this->assertNotSame($passwordHash, $user->password);
+        $this->assertSame($user->session_token, session('session_token_web'));
     }
 
     public function test_two_factor_login_preserves_remember_me_until_otp_success(): void
@@ -275,6 +382,19 @@ class RememberMeAuthenticationTest extends TestCase
         $this->assertNull(session('2fa:user:id'));
     }
 
+    public function test_trusted_device_window_remains_thirty_days(): void
+    {
+        $user = $this->createUser('trusted-window@example.test');
+
+        $trustedDevice = TrustedDevice::issueForUser($user);
+
+        $this->assertEqualsWithDelta(
+            now()->addDays(30)->getTimestamp(),
+            $trustedDevice['device']->expires_at->getTimestamp(),
+            2,
+        );
+    }
+
     public function test_two_factor_login_with_forged_trusted_device_cookie_still_requires_otp(): void
     {
         Event::fake([UserLoggedIn::class]);
@@ -311,6 +431,7 @@ class RememberMeAuthenticationTest extends TestCase
     protected function createSchema(): void
     {
         foreach ([
+            'content',
             'user_activities',
             'trusted_devices',
             'role_has_permissions',
@@ -328,6 +449,15 @@ class RememberMeAuthenticationTest extends TestCase
         Schema::create('settings', function (Blueprint $table): void {
             $table->string('name')->primary();
             $table->text('value')->nullable();
+        });
+
+        Schema::create('content', function (Blueprint $table): void {
+            $table->id();
+            $table->unsignedInteger('contenttype');
+            $table->unsignedInteger('status')->default(1);
+            $table->unsignedInteger('ordinal')->nullable();
+            $table->text('title')->nullable();
+            $table->text('body')->nullable();
         });
 
         Schema::create('roles', function (Blueprint $table): void {

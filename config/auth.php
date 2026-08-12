@@ -35,6 +35,7 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
+            'remember' => 60 * 24 * 7,
         ],
     ],
 

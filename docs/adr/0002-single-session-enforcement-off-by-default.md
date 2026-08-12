@@ -1,0 +1,7 @@
+# Single-session enforcement is an off-by-default site option
+
+NNTmux historically enforced one active login per account through two stacked mechanisms: `Auth::logoutOtherDevices()` on every password login, and a per-user `session_token` that `EnforceSessionToken` middleware compares against the session, killing any session holding a stale token. Combined with Laravel's default 120-minute idle lifetime and opt-in remember-me, this made users re-login constantly — logging in on a second device silently killed the first, including its remember cookie.
+
+We decided single-session enforcement is an anti-account-sharing *policy*, not a security baseline, so it became a site-owner setting ("Single Active Session") in the `settings` table, **default off**. When off, both mechanisms go dormant and concurrent logins coexist; when on, a new login ends the account's other sessions and their Remembered Logins, enforced forward-only from the moment the setting is enabled. The security scenarios the old behavior incidentally covered are handled explicitly instead: an admin "Expire All Logins" action (site-wide or per-user) that sweeps sessions, remember tokens, and 2FA trusted devices, sparing only the acting admin's current session.
+
+A future reader will find security-looking logout code gated behind a disabled-by-default setting — that is deliberate, not an oversight. Do not "fix" it by re-enabling unconditional `logoutOtherDevices`. See `CONTEXT.md` for the Web Login Session / Remembered Login / Single Active Session / Expire All Logins vocabulary.

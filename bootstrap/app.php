@@ -10,10 +10,12 @@ use App\Http\Middleware\ForceJsonOnAPI;
 use App\Http\Middleware\Google2FAMiddleware;
 use App\Http\Middleware\MeasureApiPerformance;
 use App\Http\Middleware\NoCacheForAuthenticatedUsers;
+use App\Http\Middleware\RefreshRememberedLogin;
 use App\Http\Middleware\SetUserTimezone;
 use App\Http\Middleware\ThrottleApiRequestsByToken;
 use App\Http\Middleware\TrustedDevice2FAMiddleware;
 use App\Http\Middleware\TrustProxies as AppTrustProxies;
+use Illuminate\Contracts\Session\Middleware\AuthenticatesSessions;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -70,13 +72,19 @@ return Application::configure(basePath: dirname(__DIR__))
         );
 
         $middleware->web([
-            AuthenticateSession::class,
             EnforceSessionToken::class,
+            AuthenticateSession::class,
+            RefreshRememberedLogin::class,
             TrustedDevice2FAMiddleware::class, // Add our new trusted device middleware
             ContentSecurityPolicy::class, // Add CSP middleware for security
             SetUserTimezone::class, // Set user timezone
             NoCacheForAuthenticatedUsers::class, // Prevent Cloudflare/CDN caching of authenticated pages
         ]);
+
+        $middleware->prependToPriorityList(
+            AuthenticatesSessions::class,
+            EnforceSessionToken::class,
+        );
 
         $middleware->throttleApi('60,1');
 

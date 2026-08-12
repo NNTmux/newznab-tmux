@@ -3,6 +3,7 @@
  * Global singleton - one per page, invoked via window.showConfirm() or $dispatch.
  */
 import Alpine from '@alpinejs/csp';
+import { submitConfirmedElement } from './confirm-submit.js';
 
 Alpine.data('confirmModal', () => ({
     open: false,
@@ -116,15 +117,12 @@ Alpine.data('confirmModal', () => ({
                 e.preventDefault();
                 e.stopPropagation();
                 var message = confirmEl.getAttribute('data-confirm');
-                var isAnchor = confirmEl.tagName === 'A';
-                var form = isAnchor ? null : confirmEl.closest('form');
                 self.show({
                     message: message,
                     type: 'danger',
                     confirmText: 'Confirm',
                     onConfirm: function() {
-                        if (isAnchor && confirmEl.href) window.location.href = confirmEl.href;
-                        else if (form) form.submit();
+                        submitConfirmedElement(confirmEl);
                     }
                 });
                 return;

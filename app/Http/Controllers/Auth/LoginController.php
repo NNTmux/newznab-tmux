@@ -9,10 +9,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginLoginRequest;
 use App\Models\TrustedDevice;
 use App\Models\User;
+use App\Services\Auth\WebLoginSessionPolicy;
 use App\Services\PasswordBreachService;
 use App\Support\Auth\AuthenticatesUsers;
 use Illuminate\Auth\AuthenticationException;
-use Illuminate\Auth\Events\OtherDeviceLogout;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,7 +21,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
 class LoginController extends Controller
 {
@@ -62,7 +61,7 @@ class LoginController extends Controller
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(private readonly WebLoginSessionPolicy $webLoginSessionPolicy)
     {
         $this->middleware('guest')->except('logout');
     }
@@ -125,8 +124,12 @@ class LoginController extends Controller
                     session([config('google2fa.session_var') => true]);
                     session([config('google2fa.session_var').'.auth.passed_at' => time()]);
 
-                    Auth::logoutOtherDevices((string) $request->input('password'));
-                    $this->rotateSessionTokenForCurrentSession($request, $user);
+                    $this->webLoginSessionPolicy->completePasswordLogin(
+                        $request,
+                        $user,
+                        $rememberMe,
+                        (string) $request->input('password'),
+                    );
                     $this->clearLoginAttempts($request);
 
                     return $this->appendPasswordBreachWarning(
@@ -140,8 +143,12 @@ class LoginController extends Controller
                 return redirect()->route('2fa.verify');
             }
 
-            Auth::logoutOtherDevices((string) $request->input('password'));
-            $this->rotateSessionTokenForCurrentSession($request, $user);
+            $this->webLoginSessionPolicy->completePasswordLogin(
+                $request,
+                $user,
+                $rememberMe,
+                (string) $request->input('password'),
+            );
             $this->clearLoginAttempts($request);
 
             return $this->appendPasswordBreachWarning(
@@ -278,7 +285,7 @@ class LoginController extends Controller
         $request->session()->put('2fa:remember', $rememberMe);
         $request->session()->put('2fa:password_breached', $passwordBreached);
 
-        Auth::logout();
+        Auth::logoutCurrentDevice();
         $request->session()->put('2fa:user:id', $user->id);
     }
 
@@ -304,17 +311,5 @@ class LoginController extends Controller
 
             return false;
         }
-    }
-
-    private function rotateSessionTokenForCurrentSession(Request $request, User $user): void
-    {
-        $newSessionToken = Str::random(60);
-
-        $user->forceFill([
-            'session_token' => $newSessionToken,
-        ])->save();
-
-        $request->session()->put('session_token_web', $newSessionToken);
-        event(new OtherDeviceLogout(Auth::getDefaultDriver(), $user));
     }
 }

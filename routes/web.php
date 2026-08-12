@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\AdminFailedReleasesController;
 use App\Http\Controllers\Admin\AdminGameController;
 use App\Http\Controllers\Admin\AdminGroupController;
 use App\Http\Controllers\Admin\AdminInvitationController;
+use App\Http\Controllers\Admin\AdminLoginSessionController;
 use App\Http\Controllers\Admin\AdminLogViewerController;
 use App\Http\Controllers\Admin\AdminMovieController;
 use App\Http\Controllers\Admin\AdminMusicController;
@@ -258,6 +259,7 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::match(['GET', 'POST'], 'user-edit', [AdminUserController::class, 'edit'])->name('admin.user-edit');
     Route::delete('user-passkey/{passkey}', [AdminUserController::class, 'destroyPasskey'])->name('admin.user-passkey.destroy');
     Route::post('user-passkeys/wipe', [AdminUserController::class, 'wipePasskeys'])->name('admin.user-passkeys.wipe');
+    Route::post('user/{user}/expire-logins', [AdminLoginSessionController::class, 'expireUser'])->name('admin.login-sessions.expire-user');
     Route::post('user-delete', [AdminUserController::class, 'destroy'])->name('admin.user-delete');
     Route::post('verify', [AdminUserController::class, 'verify'])->name('admin.verify');
     Route::post('resendverification', [AdminUserController::class, 'resendVerification'])->name('admin.resend-verification');
@@ -270,6 +272,7 @@ Route::middleware(['role:Admin', '2fa'])->prefix('admin')->group(function () {
     Route::post('registrations/periods/{period}/toggle', [AdminRegistrationController::class, 'togglePeriod'])->name('admin.registrations.periods.toggle');
     Route::delete('registrations/periods/{period}', [AdminRegistrationController::class, 'destroyPeriod'])->name('admin.registrations.periods.destroy');
     Route::match(['GET', 'POST'], 'site-edit', [AdminSiteController::class, 'edit'])->name('admin.site-edit');
+    Route::post('site/expire-logins', [AdminLoginSessionController::class, 'expireAll'])->name('admin.login-sessions.expire-all');
     Route::get('status/create', [AdminStatusController::class, 'create'])->name('admin.status.create');
     Route::post('status', [AdminStatusController::class, 'store'])->name('admin.status.store');
     Route::get('status', [AdminStatusController::class, 'index'])->name('admin.status.index');
