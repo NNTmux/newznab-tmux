@@ -6,12 +6,12 @@ namespace App\Services\Search;
 
 use App\Services\Search\DTO\SearchCursor;
 use Illuminate\Contracts\Encryption\DecryptException;
-use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Contracts\Encryption\StringEncrypter;
 use InvalidArgumentException;
 
 final readonly class SearchCursorCodec
 {
-    public function __construct(private Encrypter $encrypter) {}
+    public function __construct(private StringEncrypter $encrypter) {}
 
     public function encode(SearchCursor $cursor): string
     {

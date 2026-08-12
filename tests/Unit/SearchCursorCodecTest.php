@@ -6,13 +6,38 @@ namespace Tests\Unit;
 
 use App\Services\Search\DTO\SearchCursor;
 use App\Services\Search\SearchCursorCodec;
+use Illuminate\Contracts\Encryption\StringEncrypter;
 use Illuminate\Encryption\Encrypter;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use SensitiveParameter;
 
 final class SearchCursorCodecTest extends TestCase
 {
+    #[Test]
+    public function it_accepts_an_implementation_of_the_string_encrypter_contract(): void
+    {
+        $codec = new SearchCursorCodec(new class implements StringEncrypter
+        {
+            public function encryptString(#[SensitiveParameter] mixed $value): string
+            {
+                return strrev((string) $value);
+            }
+
+            public function decryptString(mixed $payload): string
+            {
+                return strrev((string) $payload);
+            }
+        });
+        $cursor = new SearchCursor([1710000000, 42], 250, 'query-hash', 'elasticsearch', '7', time() + 60);
+
+        $decoded = $codec->decode($codec->encode($cursor));
+
+        $this->assertSame($cursor->sortValues, $decoded->sortValues);
+        $this->assertSame($cursor->queryHash, $decoded->queryHash);
+    }
+
     #[Test]
     public function it_round_trips_an_opaque_signed_cursor(): void
     {
