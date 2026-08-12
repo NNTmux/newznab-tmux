@@ -493,12 +493,6 @@ parameters:
 			path: app/Services/AdditionalProcessing/ArchiveExtractionService.php
 
 		-
-			message: '#^Method App\\Services\\AdditionalProcessing\\NzbContentParser\:\:extractSegments\(\) should return array\<string, mixed\> but returns list\<string\>\.$#'
-			identifier: return.type
-			count: 1
-			path: app/Services/AdditionalProcessing/NzbContentParser.php
-
-		-
 			message: '#^Using nullsafe property access "\?\-\>id" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
 			identifier: nullsafe.neverNull
 			count: 2
@@ -509,24 +503,6 @@ parameters:
 			identifier: nullsafe.neverNull
 			count: 2
 			path: app/Services/AdditionalProcessing/ReleaseFileManager.php
-
-		-
-			message: '#^Parameter \#2 \$messageIDs of method App\\Services\\AdditionalProcessing\\UsenetDownloadService\:\:download\(\) expects array\<string, mixed\>\|string, list\<string\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Services/AdditionalProcessing/ReleaseFilesArchiveFallback.php
-
-		-
-			message: '#^Parameter \#1 \$nzbContents of method App\\Services\\AdditionalProcessing\\NzbContentParser\:\:extractMessageIDs\(\) expects array\<string, mixed\>, list\<array\<string, mixed\>\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Services/AdditionalProcessing/ReleaseProcessor.php
-
-		-
-			message: '#^Parameter \#2 \$messageIDs of method App\\Services\\AdditionalProcessing\\UsenetDownloadService\:\:download\(\) expects array\<string, mixed\>\|string, list\<string\> given\.$#'
-			identifier: argument.type
-			count: 3
-			path: app/Services/AdditionalProcessing/ReleaseProcessor.php
 
 		-
 			message: '#^Right side of \|\| is always false\.$#'

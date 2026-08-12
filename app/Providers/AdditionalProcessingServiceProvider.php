@@ -14,6 +14,7 @@ use App\Services\AdditionalProcessing\ReleaseFileManager;
 use App\Services\AdditionalProcessing\ReleaseFilesArchiveFallback;
 use App\Services\AdditionalProcessing\ReleaseProcessor;
 use App\Services\AdditionalProcessing\UsenetDownloadService;
+use App\Services\AdditionalProcessing\VideoFrameExtractor;
 use App\Services\Categorization\CategorizationService;
 use App\Services\NameFixing\NameFixingService;
 use App\Services\NfoService;
@@ -95,7 +96,8 @@ class AdditionalProcessingServiceProvider extends ServiceProvider
                 $app->make(ProcessingConfiguration::class),
                 $app->make(ReleaseImageService::class),
                 $app->make(ReleaseExtraService::class),
-                new CategorizationService
+                new CategorizationService,
+                new VideoFrameExtractor($app->make(ProcessingConfiguration::class)),
             );
         });
 

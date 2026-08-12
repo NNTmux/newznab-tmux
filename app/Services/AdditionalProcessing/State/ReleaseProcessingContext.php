@@ -68,9 +68,9 @@ class ReleaseProcessingContext
     public array $jpgMessageIDs = [];
 
     /**
-     * @var list<string>|string
+     * @var list<string>
      */
-    public string|array $mediaInfoMessageIDs = [];
+    public array $mediaInfoMessageIDs = [];
 
     /**
      * @var list<string>|string

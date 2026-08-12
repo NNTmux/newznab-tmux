@@ -147,16 +147,16 @@ class NzbContentParser
     /**
      * Process NZB contents to extract message IDs for different file types.
      *
-     * @param  array<string, mixed>  $nzbContents
-     * @return array<string, mixed>
-     *                              hasCompressedFile: bool,
-     *                              sampleMessageIDs: array,
-     *                              jpgMessageIDs: array,
-     *                              mediaInfoMessageID: string,
-     *                              audioInfoMessageID: string,
-     *                              audioInfoExtension: string,
-     *                              bookFileCount: int
-     *                              }
+     * @param  list<array<string, mixed>>  $nzbContents
+     * @return array{
+     *     hasCompressedFile: bool,
+     *     sampleMessageIDs: list<string>,
+     *     jpgMessageIDs: list<string>,
+     *     mediaInfoMessageIDs: list<string>,
+     *     audioInfoMessageID: string,
+     *     audioInfoExtension: string,
+     *     bookFileCount: int
+     * }
      */
     public function extractMessageIDs(
         array $nzbContents,
@@ -167,7 +167,7 @@ class NzbContentParser
             'hasCompressedFile' => false,
             'sampleMessageIDs' => [],
             'jpgMessageIDs' => [],
-            'mediaInfoMessageID' => '',
+            'mediaInfoMessageIDs' => [],
             'audioInfoMessageID' => '',
             'audioInfoExtension' => '',
             'bookFileCount' => 0,
@@ -193,8 +193,7 @@ class NzbContentParser
 
                 // Look for a video sample (not an image)
                 if ($config->processThumbnails && empty($result['sampleMessageIDs']) && ! empty($segments)
-                    && stripos($title, 'sample') !== false
-                    && ! preg_match('/\.jpe?g$/i', $title)
+                    && $this->isExplicitVideoSample($title, $config)
                 ) {
                     $result['sampleMessageIDs'] = $this->extractSegments($segments, $config->segmentsToDownload);
                 }
@@ -207,12 +206,12 @@ class NzbContentParser
                     $result['jpgMessageIDs'] = $this->extractSegments($segments, $config->segmentsToDownload);
                 }
 
-                // Look for a video file for MediaInfo (sample video)
-                if ($config->processMediaInfo && empty($result['mediaInfoMessageID']) && ! empty($segments[0])
-                    && stripos($title, 'sample') !== false
+                // Look for the main video file for MediaInfo and preview extraction.
+                if ($config->processMediaInfo && empty($result['mediaInfoMessageIDs']) && ! empty($segments)
+                    && ! $this->isExplicitVideoSample($title, $config)
                     && preg_match('/'.$config->videoFileRegex.'[. ")\]]/i', $title)
                 ) {
-                    $result['mediaInfoMessageID'] = (string) $segments[0];
+                    $result['mediaInfoMessageIDs'] = $this->extractSegments($segments, $config->segmentsToDownload);
                 }
 
                 // Look for an audio file
@@ -235,11 +234,19 @@ class NzbContentParser
         return $result;
     }
 
+    private function isExplicitVideoSample(string $title, ProcessingConfiguration $config): bool
+    {
+        return preg_match(
+            '/(?:^|[._\-\s])sample'.$config->videoFileRegex.'[. ")\]]/i',
+            $title,
+        ) === 1;
+    }
+
     /**
      * Extract segment message IDs up to a limit.
      *
-     * @param  array<string, mixed>  $segments
-     * @return array<string, mixed>
+     * @param  array<array-key, mixed>  $segments
+     * @return list<string>
      */
     private function extractSegments(array $segments, int $limit): array
     {
@@ -249,7 +256,7 @@ class NzbContentParser
             if ($i > $segCount) {
                 break;
             }
-            $ids[] = (string) $segments[$i]; // @phpstan-ignore offsetAccess.notFound
+            $ids[] = (string) $segments[$i];
         }
 
         return $ids;

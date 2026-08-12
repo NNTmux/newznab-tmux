@@ -28,7 +28,7 @@ class UsenetDownloadService
     /**
      * Download binary content from usenet using message IDs.
      *
-     * @param  array<string, mixed>|string  $messageIDs  Single or array of message IDs
+     * @param  list<string>|string  $messageIDs  Single or array of message IDs
      * @param  string  $groupName  Group name for logging
      * @param  int|null  $releaseId  Release ID for logging
      * @return array{success: bool, data: string|null, groupUnavailable: bool, error: string|null}
@@ -112,7 +112,7 @@ class UsenetDownloadService
     /**
      * Download content for a specific processing step.
      *
-     * @param  array<string, mixed>|string  $messageIDs
+     * @param  list<string>|string  $messageIDs
      * @return array{success: bool, data: string|null, groupUnavailable: bool, error: string|null}
      */
     public function download(

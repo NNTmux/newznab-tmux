@@ -42,7 +42,8 @@ class MediaExtractionService
         private readonly ProcessingConfiguration $config,
         private readonly ReleaseImageService $releaseImage,
         private readonly ReleaseExtraService $releaseExtra,
-        private readonly CategorizationService $categorize
+        private readonly CategorizationService $categorize,
+        private readonly VideoFrameExtractor $videoFrameExtractor,
     ) {}
 
     /**
@@ -51,10 +52,10 @@ class MediaExtractionService
     public function getVideoTime(string $videoLocation): string
     {
         try {
-            if (! $this->ffprobe()->isValid($videoLocation)) {
+            $duration = $this->videoFrameExtractor->probeDecodableDuration($videoLocation);
+            if ($duration === null) {
                 return '';
             }
-            $time = $this->ffprobe()->format($videoLocation)->get('duration');
         } catch (\Throwable $e) {
             if ($this->config->debugMode) {
                 Log::debug($e->getMessage());
@@ -63,18 +64,12 @@ class MediaExtractionService
             return '';
         }
 
-        if (empty($time) || ! preg_match('/time=(\d{1,2}:\d{1,2}:)?(\d{1,2})\.(\d{1,2})\s*bitrate=/i', $time, $numbers)) {
-            return '';
-        }
+        $timestamp = $this->videoFrameExtractor->representativeTimestamp($duration);
+        $hours = (int) floor($timestamp / 3600);
+        $minutes = (int) floor(fmod($timestamp, 3600) / 60);
+        $seconds = fmod($timestamp, 60);
 
-        if ($numbers[3] > 0) {
-            $numbers[3]--;
-        } elseif ($numbers[1] > 0) {
-            $numbers[2]--;
-            $numbers[3] = '99';
-        }
-
-        return '00:00:'.str_pad($numbers[2], 2, '0', STR_PAD_LEFT).'.'.str_pad($numbers[3], 2, '0', STR_PAD_LEFT);
+        return sprintf('%02d:%02d:%06.3f', $hours, $minutes, $seconds);
     }
 
     /**
@@ -87,16 +82,9 @@ class MediaExtractionService
         }
 
         $fileName = $tmpPath.'zzzz'.random_int(5, 12).random_int(5, 12).'.jpg';
-        $time = $this->getVideoTime($fileLocation);
 
         try {
-            if ($this->ffprobe()->isValid($fileLocation)) {
-                /** @var Video $video */
-                $video = $this->ffmpeg()->open($fileLocation);
-                $video->frame(TimeCode::fromString($time === '' ? '00:00:03:00' : $time))
-                    ->save($fileName);
-            }
-            if (! File::isFile($fileName)) {
+            if (! $this->videoFrameExtractor->extractRepresentativeFrame($fileLocation, $fileName)) {
                 return false;
             }
 

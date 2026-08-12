@@ -70,7 +70,7 @@ class ReleaseProcessor
             $context->nzbHasCompressedFile = $messageIds['hasCompressedFile'];
             $context->sampleMessageIDs = $messageIds['sampleMessageIDs'];
             $context->jpgMessageIDs = $messageIds['jpgMessageIDs'];
-            $context->mediaInfoMessageIDs = $messageIds['mediaInfoMessageID'];
+            $context->mediaInfoMessageIDs = $messageIds['mediaInfoMessageIDs'];
             $context->audioInfoMessageIDs = $messageIds['audioInfoMessageID'];
             $context->audioInfoExtension = $messageIds['audioInfoExtension'];
 
