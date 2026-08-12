@@ -21,6 +21,7 @@
     <env name="QUEUE_CONNECTION" value="sync"/>
     <env name="API_ASYNC_AUDIT" value="false"/>
     <env name="MAIL_MAILER" value="array"/>
+    <env name="LOG_CHANNEL" value="stderr" force="true"/>
   </php>
   <logging/>
   <source>

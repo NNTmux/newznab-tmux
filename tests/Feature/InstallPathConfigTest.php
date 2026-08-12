@@ -72,13 +72,14 @@ class InstallPathConfigTest extends TestCase
 
     public function test_update_paths_creates_both_missing_temp_dirs_recursively(): void
     {
-        $base = sys_get_temp_dir().'/nntmux-install-test-'.uniqid();
+        $base = $this->makeTempPath('nntmux-install-test');
+        $tmpRoot = $base.'/tmp';
         $writable = sys_get_temp_dir();
         config([
             'nntmux_settings.path_to_nzbs' => $writable,
             'nntmux_settings.covers_path' => $writable,
-            'nntmux.tmp_unrar_path' => $base.'/tmp/unrar/',
-            'nntmux.tmp_unzip_path' => $base.'/tmp/unzip/',
+            'nntmux.tmp_unrar_path' => $tmpRoot.'/unrar/',
+            'nntmux.tmp_unzip_path' => $tmpRoot.'/unzip/',
         ]);
 
         try {
@@ -87,8 +88,8 @@ class InstallPathConfigTest extends TestCase
             $result = (new \ReflectionMethod($command, 'updatePaths'))->invoke($command);
 
             $this->assertTrue($result);
-            $this->assertDirectoryExists($base.'/tmp/unrar/');
-            $this->assertDirectoryExists($base.'/tmp/unzip/');
+            $this->assertDirectoryExists($tmpRoot.'/unrar/');
+            $this->assertDirectoryExists($tmpRoot.'/unzip/');
         } finally {
             File::deleteDirectory($base);
         }
@@ -96,8 +97,9 @@ class InstallPathConfigTest extends TestCase
 
     public function test_ensure_temp_directory_creates_nested_missing_path(): void
     {
-        $base = sys_get_temp_dir().'/nntmux-install-test-'.uniqid();
-        $path = $base.'/tmp/unrar/';
+        $base = $this->makeTempPath('nntmux-install-test');
+        $tmpRoot = $base.'/tmp';
+        $path = $tmpRoot.'/unrar/';
 
         try {
             [$command] = $this->makeCommandWithBufferedOutput();
@@ -113,8 +115,7 @@ class InstallPathConfigTest extends TestCase
 
     public function test_ensure_temp_directory_warns_and_returns_false_when_path_is_uncreatable(): void
     {
-        $base = sys_get_temp_dir().'/nntmux-install-test-'.uniqid();
-        File::makeDirectory($base);
+        $base = $this->makeTempDirectory('nntmux-install-test');
         File::put($base.'/blocker', 'not a directory');
         $path = $base.'/blocker/unrar/';
 

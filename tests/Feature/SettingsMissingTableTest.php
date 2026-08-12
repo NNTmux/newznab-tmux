@@ -27,7 +27,7 @@ final class SettingsMissingTableTest extends TestCase
 
     public function createApplication()
     {
-        $this->databasePath = sys_get_temp_dir().'/nntmux-settings-missing-table-test.sqlite';
+        $this->databasePath = $this->makeTempPath('nntmux-settings-missing-table-test', '.sqlite');
 
         $this->originalEnvironment = [
             'APP_ENV' => getenv('APP_ENV'),

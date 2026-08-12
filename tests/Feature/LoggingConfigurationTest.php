@@ -49,7 +49,11 @@ class LoggingConfigurationTest extends TestCase
         $this->assertSame('stack', config('logging.default'));
         $this->assertSame(['single'], config('logging.channels.stack.channels'));
 
-        $logPath = sys_get_temp_dir().'/nntmux-production-safe-logging.log';
+        // Deliberately a real file: this test guards that the production stack
+        // channel can actually write, which a Log fake would not exercise. The
+        // path is unique and outside storage/logs so no permission bit or
+        // concurrent run can affect it.
+        $logPath = $this->makeTempPath('nntmux-production-safe-logging', '.log');
         $message = 'Production-safe logging configuration test';
         config(['logging.channels.single.path' => $logPath]);
 

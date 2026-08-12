@@ -38,7 +38,7 @@ class AdditionalProcessingReleaseFileManagerTest extends TestCase
 
     public function createApplication()
     {
-        $this->databasePath = sys_get_temp_dir().'/nntmux-release-file-manager-test.sqlite';
+        $this->databasePath = $this->makeTempPath('nntmux-release-file-manager-test', '.sqlite');
 
         $this->originalEnvironment = [
             'APP_ENV' => getenv('APP_ENV'),

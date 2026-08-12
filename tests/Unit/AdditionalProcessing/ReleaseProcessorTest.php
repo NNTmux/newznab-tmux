@@ -22,6 +22,20 @@ class ReleaseProcessorTest extends TestCase
 {
     use CreatesProcessingConfiguration;
 
+    private string $releaseTempPath;
+
+    private string $mainTempPath;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Unique per test: these only ever reach mocked collaborators, but a shared
+        // literal would still make two concurrent runs indistinguishable in failures.
+        $this->releaseTempPath = $this->makeTempPath('nntmux-ap-release').'/';
+        $this->mainTempPath = $this->makeTempPath('nntmux-ap-main').'/';
+    }
+
     protected function tearDown(): void
     {
         Mockery::close();
@@ -37,15 +51,15 @@ class ReleaseProcessorTest extends TestCase
             releaseManager: Mockery::mock(ReleaseFileManager::class)
                 ->shouldReceive('deleteRelease')->once()->andReturnNull()->getMock(),
             tempWorkspace: Mockery::mock(TempWorkspaceService::class)
-                ->shouldReceive('createReleaseTempFolder')->once()->andReturn('/tmp/ap-release/')
-                ->shouldReceive('clearDirectory')->once()->with('/tmp/ap-release/', false)->andReturnNull()->getMock(),
+                ->shouldReceive('createReleaseTempFolder')->once()->andReturn($this->releaseTempPath)
+                ->shouldReceive('clearDirectory')->once()->with($this->releaseTempPath, false)->andReturnNull()->getMock(),
             output: Mockery::mock(ConsoleOutputService::class)
                 ->shouldReceive('echoReleaseStart')->once()->andReturnNull()
                 ->shouldReceive('setProcessTitle')->once()->andReturnNull()
                 ->shouldReceive('warning')->once()->with('broken nzb')->andReturnNull()->getMock()
         );
 
-        $processor->process($this->makeContext(), '/tmp/main/');
+        $processor->process($this->makeContext(), $this->mainTempPath);
 
         $this->assertTrue(true);
     }
@@ -74,8 +88,8 @@ class ReleaseProcessorTest extends TestCase
         $releaseManager->shouldReceive('finalizeRelease')->once()->andReturnNull();
 
         $tempWorkspace = Mockery::mock(TempWorkspaceService::class);
-        $tempWorkspace->shouldReceive('createReleaseTempFolder')->once()->andReturn('/tmp/ap-release/');
-        $tempWorkspace->shouldReceive('clearDirectory')->once()->with('/tmp/ap-release/', false)->andReturnNull();
+        $tempWorkspace->shouldReceive('createReleaseTempFolder')->once()->andReturn($this->releaseTempPath);
+        $tempWorkspace->shouldReceive('clearDirectory')->once()->with($this->releaseTempPath, false)->andReturnNull();
 
         $output = Mockery::mock(ConsoleOutputService::class);
         $output->shouldReceive('echoReleaseStart')->once()->andReturnNull();
@@ -93,7 +107,7 @@ class ReleaseProcessorTest extends TestCase
             $output
         );
 
-        $processor->process($this->makeContext(), '/tmp/main/');
+        $processor->process($this->makeContext(), $this->mainTempPath);
 
         $this->assertTrue(true);
     }
@@ -114,8 +128,8 @@ class ReleaseProcessorTest extends TestCase
         $releaseManager->shouldNotReceive('finalizeRelease');
 
         $tempWorkspace = Mockery::mock(TempWorkspaceService::class);
-        $tempWorkspace->shouldReceive('createReleaseTempFolder')->once()->andReturn('/tmp/ap-release/');
-        $tempWorkspace->shouldReceive('clearDirectory')->twice()->with('/tmp/ap-release/', false)->andReturnNull();
+        $tempWorkspace->shouldReceive('createReleaseTempFolder')->once()->andReturn($this->releaseTempPath);
+        $tempWorkspace->shouldReceive('clearDirectory')->twice()->with($this->releaseTempPath, false)->andReturnNull();
 
         $output = Mockery::mock(ConsoleOutputService::class);
         $output->shouldReceive('echoReleaseStart')->once()->andReturnNull();
@@ -137,7 +151,7 @@ class ReleaseProcessorTest extends TestCase
         $context = $this->makeContext();
         $context->startTime = hrtime(true) - 2_000_000_000;
 
-        $processor->process($context, '/tmp/main/');
+        $processor->process($context, $this->mainTempPath);
 
         $this->assertTrue(true);
     }
@@ -145,8 +159,7 @@ class ReleaseProcessorTest extends TestCase
     #[Test]
     public function it_processes_media_info_when_password_inspection_is_disabled(): void
     {
-        $tmpPath = sys_get_temp_dir().'/nntmux-media-info-'.uniqid('', true).'/';
-        mkdir($tmpPath);
+        $tmpPath = $this->makeTempDirectory('nntmux-media-info').'/';
 
         $config = $this->makeConfig([
             'processPasswords' => false,

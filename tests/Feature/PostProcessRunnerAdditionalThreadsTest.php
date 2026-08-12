@@ -29,7 +29,7 @@ class PostProcessRunnerAdditionalThreadsTest extends TestCase
 
     public function createApplication()
     {
-        $this->databasePath = sys_get_temp_dir().'/nntmux-postprocess-additional-threads.sqlite';
+        $this->databasePath = $this->makeTempPath('nntmux-postprocess-additional-threads', '.sqlite');
         $this->tmpUnrarPath = sys_get_temp_dir().'/nntmux-additional-threads-'.uniqid('', true);
 
         $this->originalEnvironment = [

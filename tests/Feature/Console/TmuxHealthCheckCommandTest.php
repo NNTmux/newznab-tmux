@@ -21,7 +21,7 @@ class TmuxHealthCheckCommandTest extends TestCase
 
     public function createApplication()
     {
-        $this->databasePath = sys_get_temp_dir().'/nntmux-tmux-health-check-test.sqlite';
+        $this->databasePath = $this->makeTempPath('nntmux-tmux-health-check-test', '.sqlite');
 
         $this->originalEnvironment = [
             'APP_ENV' => getenv('APP_ENV'),

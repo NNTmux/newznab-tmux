@@ -21,7 +21,7 @@ abstract class ImdbScraperTestCase extends TestCase
 
     public function createApplication()
     {
-        $this->databasePath = sys_get_temp_dir().'/nntmux-imdb-scraper-test.sqlite';
+        $this->databasePath = $this->makeTempPath('nntmux-imdb-scraper-test', '.sqlite');
 
         $this->originalEnvironment = [
             'APP_ENV' => getenv('APP_ENV'),

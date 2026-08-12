@@ -27,7 +27,7 @@ final class NzbImportServiceTest extends TestCase
 
     public function createApplication()
     {
-        $this->databasePath = sys_get_temp_dir().'/nntmux-nzb-import-test.sqlite';
+        $this->databasePath = $this->makeTempPath('nntmux-nzb-import-test', '.sqlite');
 
         $this->originalEnvironment = [
             'APP_ENV' => getenv('APP_ENV'),
@@ -216,7 +216,7 @@ final class NzbImportServiceTest extends TestCase
             ],
             'non-media inner ext stays' => ['release.name.nzb.gz', 'release.name'],
             'no trailing media ext' => ['something.nzb', 'something'],
-            'full path input' => ['/tmp/nested/path/Show - 01.mp4.nzb.gz', 'Show - 01'],
+            'full path input' => [sys_get_temp_dir().'/nested/path/Show - 01.mp4.nzb.gz', 'Show - 01'],
         ];
     }
 

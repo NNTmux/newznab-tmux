@@ -73,6 +73,6 @@ class ArchiveProcessingServiceTest extends TestCase
 
         $this->assertSame([['name' => 'file.txt']], $svc->getFileList());
         $this->assertSame('DATA', $svc->getFileData('name', 'source'));
-        $this->assertTrue($svc->extractFile('name', '/tmp/path'));
+        $this->assertTrue($svc->extractFile('name', sys_get_temp_dir().'/extract-target'));
     }
 }

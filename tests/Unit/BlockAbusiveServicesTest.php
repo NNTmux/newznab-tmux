@@ -26,7 +26,7 @@ class BlockAbusiveServicesTest extends TestCase
 
     public function createApplication()
     {
-        $this->databasePath = sys_get_temp_dir().'/nntmux-block-abusive-services-test.sqlite';
+        $this->databasePath = $this->makeTempPath('nntmux-block-abusive-services-test', '.sqlite');
 
         $this->originalEnvironment = [
             'APP_ENV' => getenv('APP_ENV'),

@@ -86,6 +86,9 @@ PHPUnit only (no Pest). Create tests: `php artisan make:test --phpunit {name}`
 - Use model factories; check for custom states first
 - Mocks in `tests/Fixtures/`, `tests/mock_data/`
 - Test harnesses in `tests/Support/` (e.g., `DatabaseTestCase`, `TestBinariesHarness`)
+- Never hardcode a temp path. In a `Tests\TestCase` subclass use `makeTempPath()` / `makeTempDirectory()`, which return a unique path and remove it recursively in `tearDown()`; where `$this` is unavailable (static data providers, plain `PHPUnit\Framework\TestCase`) build the path from `sys_get_temp_dir()` and clean it up yourself
+- A test class that rewires `DB_CONNECTION`/`DB_DATABASE` must restore them in `tearDown()`; `Tests\TestCase` fails the next test naming the offender otherwise (opt out with `protected bool $allowsConnectionSwap = true`)
+- `phpunit.xml` forces `LOG_CHANNEL=stderr`, so tests never depend on `storage/logs` permissions
 - PHPUnit 12 — use `#[Test]` attributes or `test` prefix naming
 
 ## Project Conventions

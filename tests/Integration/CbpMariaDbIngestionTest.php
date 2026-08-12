@@ -15,6 +15,11 @@ use Tests\TestCase;
 
 final class CbpMariaDbIngestionTest extends TestCase
 {
+    /**
+     * @var array<string, string|false>
+     */
+    private array $originalEnvironment = [];
+
     public function createApplication()
     {
         $database = getenv('CBP_INTEGRATION_DB_DATABASE');
@@ -22,16 +27,15 @@ final class CbpMariaDbIngestionTest extends TestCase
             return parent::createApplication();
         }
 
-        putenv('DB_CONNECTION=mariadb');
-        putenv('DB_DATABASE='.$database);
-        putenv('DB_HOST=mariadb');
-        putenv('DB_USERNAME='.(string) getenv('CBP_INTEGRATION_DB_USERNAME'));
-        putenv('DB_PASSWORD='.(string) getenv('CBP_INTEGRATION_DB_PASSWORD'));
-        $_ENV['DB_CONNECTION'] = $_SERVER['DB_CONNECTION'] = 'mariadb';
-        $_ENV['DB_DATABASE'] = $_SERVER['DB_DATABASE'] = $database;
-        $_ENV['DB_HOST'] = $_SERVER['DB_HOST'] = 'mariadb';
-        $_ENV['DB_USERNAME'] = $_SERVER['DB_USERNAME'] = (string) getenv('CBP_INTEGRATION_DB_USERNAME');
-        $_ENV['DB_PASSWORD'] = $_SERVER['DB_PASSWORD'] = (string) getenv('CBP_INTEGRATION_DB_PASSWORD');
+        foreach (['DB_CONNECTION', 'DB_DATABASE', 'DB_HOST', 'DB_USERNAME', 'DB_PASSWORD'] as $key) {
+            $this->originalEnvironment[$key] = getenv($key);
+        }
+
+        $this->setEnvironmentValue('DB_CONNECTION', 'mariadb');
+        $this->setEnvironmentValue('DB_DATABASE', $database);
+        $this->setEnvironmentValue('DB_HOST', 'mariadb');
+        $this->setEnvironmentValue('DB_USERNAME', (string) getenv('CBP_INTEGRATION_DB_USERNAME'));
+        $this->setEnvironmentValue('DB_PASSWORD', (string) getenv('CBP_INTEGRATION_DB_PASSWORD'));
 
         $app = require __DIR__.'/../../bootstrap/app.php';
         $app->make(Kernel::class)->bootstrap();
@@ -97,6 +101,25 @@ final class CbpMariaDbIngestionTest extends TestCase
             DB::statement('SET FOREIGN_KEY_CHECKS=1');
         }
         parent::tearDown();
+
+        foreach ($this->originalEnvironment as $key => $value) {
+            $this->setEnvironmentValue($key, $value === false ? null : $value);
+        }
+        $this->originalEnvironment = [];
+    }
+
+    private function setEnvironmentValue(string $key, ?string $value): void
+    {
+        if ($value === null) {
+            putenv($key);
+            unset($_ENV[$key], $_SERVER[$key]);
+
+            return;
+        }
+
+        putenv($key.'='.$value);
+        $_ENV[$key] = $value;
+        $_SERVER[$key] = $value;
     }
 
     public function test_reingestion_is_idempotent_and_hot_lookups_use_indexes(): void

@@ -29,7 +29,7 @@ final class NfoImportServiceTest extends TestCase
 
     public function createApplication()
     {
-        $this->databasePath = sys_get_temp_dir().'/nntmux-nfo-import-test.sqlite';
+        $this->databasePath = $this->makeTempPath('nntmux-nfo-import-test', '.sqlite');
         $this->originalEnvironment = [
             'APP_ENV' => getenv('APP_ENV'),
             'DB_CONNECTION' => getenv('DB_CONNECTION'),

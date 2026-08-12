@@ -21,7 +21,7 @@ class AuthRedirectMiddlewareTest extends TestCase
 
     public function createApplication()
     {
-        $this->databasePath = sys_get_temp_dir().'/nntmux-auth-redirect-test.sqlite';
+        $this->databasePath = $this->makeTempPath('nntmux-auth-redirect-test', '.sqlite');
 
         $this->originalEnvironment = [
             'APP_ENV' => getenv('APP_ENV'),
