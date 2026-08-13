@@ -4,22 +4,27 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Exceptions\BookProviderException;
+use App\Support\BookIsbn;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use JsonException;
 use Psr\Http\Message\ResponseInterface;
 
 class IsbnDbService
 {
+    public const COOLDOWN_CACHE_KEY = 'isbndb_provider_cooldown';
+
     protected const API_URL = 'https://api2.isbndb.com';
 
     protected Client $client;
 
     protected string $apiKey;
 
-    protected int $pageSize = 5;
+    protected int $pageSize = 10;
 
     public function __construct(?Client $client = null, ?string $apiKey = null)
     {
@@ -45,9 +50,9 @@ class IsbnDbService
     /**
      * @return array<string, mixed>|null
      */
-    public function searchBook(string $query): ?array
+    public function searchBook(string $query, ?string $author = null, bool $shouldMatchAll = true): ?array
     {
-        $books = $this->searchBooks($query);
+        $books = $this->searchBooks($query, $author, $shouldMatchAll);
 
         return $books[0] ?? null;
     }
@@ -55,26 +60,46 @@ class IsbnDbService
     /**
      * @return array<int, array<string, mixed>>
      */
-    public function searchBooks(string $query): array
+    public function searchBooks(string $query, ?string $author = null, bool $shouldMatchAll = true): array
     {
         $query = trim($query);
+        $author = $author !== null ? trim($author) : null;
         if ($query === '' || ! $this->isConfigured()) {
             return [];
         }
 
-        $cacheKey = 'isbndb_search_'.md5($query.'_'.$this->pageSize);
+        if (Cache::has(self::COOLDOWN_CACHE_KEY)) {
+            throw new BookProviderException('isbndb', 'ISBNdb is temporarily cooling down after a failed request.');
+        }
+
+        $cacheKey = 'isbndb_search_'.md5(implode('|', [
+            mb_strtolower((string) preg_replace('/\s+/', ' ', $query)),
+            mb_strtolower((string) preg_replace('/\s+/', ' ', (string) $author)),
+            $shouldMatchAll ? 'all' : 'any',
+            (string) $this->pageSize,
+        ]));
         $cached = Cache::get($cacheKey);
         if (is_array($cached)) {
             return $cached;
         }
 
-        $response = $this->request('/books/'.rawurlencode($query), [
-            'shouldMatchAll' => true,
+        $requestQuery = [
+            'shouldMatchAll' => $shouldMatchAll ? 'true' : 'false',
             'pageSize' => $this->pageSize,
-        ]);
+            'column' => 'title',
+        ];
+
+        $response = $this->request('/books/'.rawurlencode($query), $requestQuery);
 
         $books = $response['data'] ?? null;
-        if (! is_array($books) || $books === []) {
+        if (! is_array($books)) {
+            Cache::put(self::COOLDOWN_CACHE_KEY, true, now()->addMinutes(5));
+
+            throw new BookProviderException('isbndb', 'ISBNdb search response did not contain a data array.', 200, 300);
+        }
+        if ($books === []) {
+            Cache::put($cacheKey, [], now()->addHours(6));
+
             return [];
         }
 
@@ -95,9 +120,13 @@ class IsbnDbService
      */
     public function findByIsbn(string $isbn): ?array
     {
-        $isbn = $this->normalizeIsbn($isbn);
-        if ($isbn === '' || ! $this->isConfigured()) {
+        $isbn = BookIsbn::normalize($isbn);
+        if ($isbn === null || ! $this->isConfigured()) {
             return null;
+        }
+
+        if (Cache::has(self::COOLDOWN_CACHE_KEY)) {
+            throw new BookProviderException('isbndb', 'ISBNdb is temporarily cooling down after a failed request.');
         }
 
         $cacheKey = 'isbndb_isbn_'.$isbn;
@@ -109,7 +138,9 @@ class IsbnDbService
         $response = $this->request('/book/'.rawurlencode($isbn));
         $bookRaw = $response['book'] ?? null;
         if (! is_array($bookRaw) || $bookRaw === []) {
-            return null;
+            Cache::put(self::COOLDOWN_CACHE_KEY, true, now()->addMinutes(5));
+
+            throw new BookProviderException('isbndb', 'ISBNdb ISBN response did not contain a book object.', 200, 300);
         }
 
         $book = $this->normalizeBookResult($bookRaw);
@@ -130,6 +161,7 @@ class IsbnDbService
 
         try {
             $response = $this->client->get($path, [
+                'http_errors' => false,
                 'headers' => [
                     'Authorization' => $this->apiKey,
                 ],
@@ -143,25 +175,50 @@ class IsbnDbService
                 return null;
             }
 
-            if ($statusCode === 401 || $statusCode === 429) {
-                Log::warning("ISBNdb request failed with status {$statusCode}");
-
-                return null;
-            }
-
             if ($statusCode !== 200) {
-                Log::warning("ISBNdb request returned status {$statusCode}");
+                $retryAfter = $this->retryAfterSeconds($response);
+                if ($statusCode === 429 || $statusCode >= 500) {
+                    $retryAfter ??= 300;
+                    Cache::put(self::COOLDOWN_CACHE_KEY, true, now()->addSeconds($retryAfter));
+                }
 
-                return null;
+                throw new BookProviderException(
+                    'isbndb',
+                    "ISBNdb request returned status {$statusCode}.",
+                    $statusCode,
+                    $retryAfter,
+                );
             }
 
-            $data = json_decode($response->getBody()->getContents(), true);
+            $data = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
 
-            return is_array($data) ? $data : null;
+            if (! is_array($data)) {
+                throw new BookProviderException('isbndb', 'ISBNdb returned an invalid response payload.', $statusCode);
+            }
+
+            return $data;
+        } catch (BookProviderException $exception) {
+            throw $exception;
+        } catch (JsonException $exception) {
+            Cache::put(self::COOLDOWN_CACHE_KEY, true, now()->addMinutes(5));
+
+            throw new BookProviderException(
+                'isbndb',
+                'ISBNdb returned malformed JSON.',
+                200,
+                300,
+                $exception,
+            );
         } catch (GuzzleException $e) {
-            Log::error('ISBNdb API request error: '.$e->getMessage());
+            Cache::put(self::COOLDOWN_CACHE_KEY, true, now()->addMinutes(5));
 
-            return null;
+            throw new BookProviderException(
+                'isbndb',
+                'ISBNdb API request error: '.$e->getMessage(),
+                null,
+                300,
+                $e,
+            );
         }
     }
 
@@ -171,12 +228,18 @@ class IsbnDbService
      */
     private function normalizeBookResult(array $book): array
     {
-        $isbn13 = isset($book['isbn13']) ? $this->normalizeIsbn((string) $book['isbn13']) : '';
-        if ($isbn13 === '' && isset($book['isbn'])) {
-            $isbn13 = $this->normalizeIsbn((string) $book['isbn']);
+        $isbn13 = isset($book['isbn13']) ? BookIsbn::normalize((string) $book['isbn13']) : null;
+        if ($isbn13 === null && isset($book['isbn'])) {
+            $isbn13 = BookIsbn::normalize((string) $book['isbn']);
+        }
+        if ($isbn13 !== null && strlen($isbn13) === 10) {
+            $isbn13 = BookIsbn::toIsbn13($isbn13);
         }
 
-        $isbn10 = isset($book['isbn10']) ? $this->normalizeIsbn((string) $book['isbn10']) : '';
+        $isbn10 = isset($book['isbn10']) ? BookIsbn::normalize((string) $book['isbn10']) : null;
+        if ($isbn10 !== null && strlen($isbn10) === 13) {
+            $isbn10 = BookIsbn::toIsbn10($isbn10);
+        }
 
         $authors = is_array($book['authors'] ?? null)
             ? array_values(array_filter(array_map('strval', $book['authors'])))
@@ -185,7 +248,7 @@ class IsbnDbService
             ? array_values(array_filter(array_map('strval', $book['subjects'])))
             : [];
 
-        $identifier = $isbn13 !== '' ? $isbn13 : ($isbn10 !== '' ? $isbn10 : md5((string) json_encode($book)));
+        $identifier = $isbn13 ?? $isbn10 ?? md5((string) json_encode($book));
         $coverUrl = (string) ($book['image'] ?? $book['image_original'] ?? '');
         $overview = trim((string) ($book['synopsis'] ?? $book['overview'] ?? $book['excerpt'] ?? ''));
 
@@ -193,8 +256,8 @@ class IsbnDbService
             'title' => (string) ($book['title'] ?? ''),
             'author' => implode(', ', $authors),
             'asin' => 'isbndb:'.$identifier,
-            'isbn' => $isbn13 !== '' ? $isbn13 : null,
-            'ean' => $isbn10 !== '' ? $isbn10 : null,
+            'isbn' => $isbn13,
+            'ean' => $isbn10,
             'url' => '',
             'salesrank' => '',
             'publisher' => (string) ($book['publisher'] ?? ''),
@@ -218,11 +281,6 @@ class IsbnDbService
         } catch (\Exception) {
             return null;
         }
-    }
-
-    private function normalizeIsbn(string $isbn): string
-    {
-        return strtoupper((string) preg_replace('/[^0-9X]/i', '', $isbn));
     }
 
     private function logRateLimitHeaders(ResponseInterface $response): void
@@ -250,5 +308,20 @@ class IsbnDbService
             'ratelimit' => $rateLimit,
             'ratelimit_policy' => $rateLimitPolicy,
         ]);
+    }
+
+    private function retryAfterSeconds(ResponseInterface $response): ?int
+    {
+        $retryAfter = trim($response->getHeaderLine('Retry-After'));
+        if ($retryAfter === '') {
+            return null;
+        }
+        if (ctype_digit($retryAfter)) {
+            return max(1, (int) $retryAfter);
+        }
+
+        $retryAt = strtotime($retryAfter);
+
+        return $retryAt === false ? null : max(1, $retryAt - time());
     }
 }

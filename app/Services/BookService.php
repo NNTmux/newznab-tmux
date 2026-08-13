@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Enums\ImageAssetProfile;
 use App\Enums\SecondarySearchIndex;
+use App\Exceptions\BookProviderException;
 use App\Facades\Search;
 use App\Models\BookInfo;
 use App\Models\Category;
@@ -13,6 +14,7 @@ use App\Models\Release;
 use App\Models\Settings;
 use App\Services\NameFixing\Extractors\ObfuscatedSubjectExtractor;
 use App\Services\Releases\ReleaseBrowseService;
+use App\Support\BookIsbn;
 use App\Support\BookMatchScorer;
 use App\Support\Data\BookParseResult;
 use App\Support\MetadataSearchLookup;
@@ -26,6 +28,8 @@ use Illuminate\Support\Facades\Log;
  */
 class BookService
 {
+    private const FAILURE_CACHE_VERSION = 2;
+
     public bool $echooutput;
 
     public int $bookqty;
@@ -42,11 +46,29 @@ class BookService
 
     private ObfuscatedSubjectExtractor $obfuscatedSubjectExtractor;
 
+    private IsbnDbService $isbnDb;
+
+    private GoogleBooksService $googleBooks;
+
+    private OpenLibraryService $openLibrary;
+
+    private ItunesService $itunes;
+
+    private BookMatchScorer $scorer;
+
+    private ReleaseImageService $releaseImageService;
+
     /**
      * @throws \Exception
      */
-    public function __construct()
-    {
+    public function __construct(
+        ?IsbnDbService $isbnDb = null,
+        ?GoogleBooksService $googleBooks = null,
+        ?OpenLibraryService $openLibrary = null,
+        ?ItunesService $itunes = null,
+        ?BookMatchScorer $scorer = null,
+        ?ReleaseImageService $releaseImageService = null,
+    ) {
         $this->echooutput = config('nntmux.echocli');
 
         $this->bookqty = Settings::settingValue('maxbooksprocessed') !== '' ? (int) Settings::settingValue('maxbooksprocessed') : 300;
@@ -58,6 +80,12 @@ class BookService
         $this->parsedIsbn = null;
         $this->parsedBookResult = null;
         $this->obfuscatedSubjectExtractor = new ObfuscatedSubjectExtractor;
+        $this->isbnDb = $isbnDb ?? new IsbnDbService;
+        $this->googleBooks = $googleBooks ?? new GoogleBooksService;
+        $this->openLibrary = $openLibrary ?? new OpenLibraryService;
+        $this->itunes = $itunes ?? new ItunesService;
+        $this->scorer = $scorer ?? new BookMatchScorer;
+        $this->releaseImageService = $releaseImageService ?? new ReleaseImageService;
     }
 
     /**
@@ -116,6 +144,21 @@ class BookService
             ->get();
 
         return $this->pickBestExistingBook($results->all(), $parsed);
+    }
+
+    public function getBookInfoByIsbn(?string $isbn): ?BookInfo
+    {
+        $identifiers = BookIsbn::equivalents($isbn);
+        if ($identifiers === []) {
+            return null;
+        }
+
+        return BookInfo::query()
+            ->where(static function ($query) use ($identifiers): void {
+                $query->whereIn('isbn', $identifiers)
+                    ->orWhereIn('ean', $identifiers);
+            })
+            ->first();
     }
 
     /**
@@ -386,6 +429,10 @@ class BookService
             $query->where('groups_id', $groupID);
         }
 
+        if ($this->renamed !== '') {
+            $query->where('isrenamed', 1);
+        }
+
         $this->processBookReleasesHelper(
             $query->get(['searchname', 'id', 'categories_id']),
             sprintf(
@@ -406,8 +453,10 @@ class BookService
                     ->orWhere('categories_id', Category::MUSIC_AUDIOBOOK);
             })
             ->where(function ($builder): void {
-                $builder->where('isrenamed', 0)
-                    ->orWhere('searchname', 'like', 'N:/NZB%')
+                if ($this->renamed === '') {
+                    $builder->where('isrenamed', 0);
+                }
+                $builder->orWhere('searchname', 'like', 'N:/NZB%')
                     ->orWhere('searchname', 'like', 'N_NZB_%')
                     ->orWhere('name', 'like', 'N:/NZB%')
                     ->orWhere('name', 'like', 'N_NZB_%');
@@ -453,8 +502,8 @@ class BookService
                 cli()->header('Processing '.$res->count().' book release(s) for categories id '.$categoryID);
             }
 
-            $bookId = -2;
             foreach ($res as $arr) {
+                $bookId = -2;
                 $startTime = now()->timestamp;
                 $usedExternalApi = false;
                 // audiobooks are also books and should be handled in an identical manor, even though it falls under a music category
@@ -471,9 +520,10 @@ class BookService
                         cli()->info('Looking up: '.$bookInfo);
                     }
 
-                    // Do a local lookup first
-                    $bookCheck = $this->getBookInfoByName($bookInfo, $this->parsedBookResult);
-                    $failCacheKey = 'book_lookup_fail_'.md5(strtolower($bookInfo));
+                    // Prefer an exact local identifier before any fuzzy title match.
+                    $bookCheck = $this->getBookInfoByIsbn($this->parsedIsbn)
+                        ?? $this->getBookInfoByName($bookInfo, $this->parsedBookResult);
+                    $failCacheKey = $this->failureCacheKey($this->parsedBookResult, $bookInfo);
 
                     if ($bookCheck === null && Cache::has($failCacheKey)) {
                         // Lookup recently failed, no point trying again
@@ -485,8 +535,8 @@ class BookService
                         $bookId = $this->updateBookInfo($bookInfo, $this->parsedIsbn);
                         $usedExternalApi = true;
                         if ($bookId === -2) {
-                            Cache::put($failCacheKey, true, now()->addDays(7));
-                        } else {
+                            Cache::put($failCacheKey, true, now()->addDay());
+                        } elseif ($bookId !== null) {
                             Cache::forget($failCacheKey);
                         }
                     } else {
@@ -554,9 +604,12 @@ class BookService
 
                 return false;
             }
-            if (! empty($releasename) && ! preg_match('/^[a-z0-9]+$|^([0-9]+ ){1,}$|Part \d+/i', $releasename)) {
+            if (! empty($releasename)
+                && (! preg_match('/^[a-z0-9]+$|^([0-9]+ ){1,}$|Part \d+/i', $releasename)
+                    || $parsed->hasAuthor()
+                    || $parsed->isbn !== null)) {
                 $wordCount = count(preg_split('/\s+/', trim($releasename)) ?: []);
-                if ($wordCount >= 2) {
+                if ($wordCount >= 2 || $parsed->hasAuthor() || $parsed->isbn !== null) {
                     return $parsed->searchQuery();
                 }
             }
@@ -568,9 +621,12 @@ class BookService
                 return false;
             }
 
-            if (! empty($releasename) && ! preg_match('/^[a-z0-9]+$|^([0-9]+ ){1,}$|Part \d+/i', $releasename)) {
+            if (! empty($releasename)
+                && (! preg_match('/^[a-z0-9]+$|^([0-9]+ ){1,}$|Part \d+/i', $releasename)
+                    || $parsed->hasAuthor()
+                    || $parsed->isbn !== null)) {
                 $wordCount = count(preg_split('/\s+/', trim($releasename)) ?: []);
-                if ($wordCount >= 2) {
+                if ($wordCount >= 2 || $parsed->hasAuthor() || $parsed->isbn !== null) {
                     return $parsed->searchQuery();
                 }
             }
@@ -589,6 +645,10 @@ class BookService
             $releaseName = $quotedMatch[1];
         }
         $isbn = $this->extractIsbn($releaseName);
+        $year = null;
+        if (preg_match('/\b(19|20)\d{2}\b/', $releaseName, $yearMatch) === 1) {
+            $year = (int) $yearMatch[0];
+        }
         $a = preg_replace('/\d{1,2} \d{1,2} \d{2,4}|(19|20)\d\d|anybody got .+?[a-z]\? |[ ._-](Novel|TIA)([ ._-]|$)|([ \.])HQ([-\. ])|[\(\)\.\-_ ](AVI|AZW3?|DOC|EPUB|LIT|MOBI|NFO|RETAIL|(si)?PDF|RTF|TXT)[\)\]\.\-_ ](?![a-z0-9])|compleet|DAGSTiDNiNGEN|DiRFiX|\+ extra|r?e ?Books?([\.\-_ ]English|ers)?|azw3?|ePu([bp])s?|html|mobi|^NEW[\.\-_ ]|PDF([\.\-_ ]English)?|Please post more|Post description|Proper|Repack(fix)?|[\.\-_ ](Chinese|English|French|German|Italian|Retail|Scan|Swedish|Multilingual)|^R4 |Repost|Skytwohigh|TIA!+|TruePDF|V413HAV|(would someone )?please (re)?post.+? "|with the authors name right/i', '', $releaseName);
         $b = preg_replace('/^(As Req |conversion |eq |Das neue Abenteuer \d+|Fixed version( ignore previous post)?|Full |Per Req As Found|(\s+)?R4 |REQ |revised |version |\d+(\s+)?$)|(COMPLETE|INTERNAL|RELOADED| (AZW3|eB|docx|ENG?|exe|FR|Fix|gnv64|MU|NIV|R\d\s+\d{1,2} \d{1,2}|R\d|Req|TTL|UC|v(\s+)?\d))(\s+)?$/i', '', (string) $a);
         $c = preg_replace('/ - \[.+\]|\[.+\]/', '', (string) $b);
@@ -599,7 +659,6 @@ class BookService
         $normalized = (string) preg_replace('/\b(S\d{1,3}E\d{1,3}|Season\s*\d+|Temporada\s*\d+|Saison\s*\d+|Staffel\s*\d+|Episode\s*\d+|HDTV|WEB[\s-]?DL|WEBRip|BluRay|BDRip|DVDRip|BRRip|XviD|[xh][\s.]?26[45]|HEVC|10bit|1080[pi]|720p|2160p|4K|UHD|HDR|REMUX|AAC5?\s*\d|DDP?5\s*\d|ATMOS|PAR2?|vol\d+\+\d+|NTb|FLUX|PSA|RARBG|YTS|YIFY|AMZN|DSNP|NF|ATVP|HMAX)\b/i', '', $normalized);
         $normalized = trim((string) preg_replace('/\s+/', ' ', $normalized));
 
-        $year = null;
         $specialMagazineTitle = null;
         if (preg_match('/^MCN[._ -](?<month>[A-Za-z]+)[._ -](?<day>\d{1,2})[._ -](?<year>(?:19|20)\d{2})/i', $rawReleaseName, $mcnMatch) === 1) {
             $month = ucfirst(strtolower($mcnMatch['month']));
@@ -627,22 +686,15 @@ class BookService
                 $author = $candidateAuthor;
                 $title = $candidateTitle;
             }
-        } elseif (preg_match('/^(?<author>[A-Za-z0-9&\'\.\-\s]{3,80})\s+by\s+(?<title>.+)$/i', $normalized, $matches) === 1) {
-            $author = trim($matches['author']);
-            $title = trim($matches['title']);
         } elseif (preg_match('/^(?<title>.+?)\s+by\s+(?<author>[A-Za-z0-9&\'\.\-\s]{3,80})$/i', $normalized, $matches) === 1) {
             $author = trim($matches['author']);
             $title = trim($matches['title']);
         }
 
-        $title = trim((string) preg_replace('/\s+/', ' ', (string) preg_replace('/\((Book|Series)\s*\d+\)/i', '', $title)));
+        $title = trim((string) preg_replace('/\s+/', ' ', $title));
         if ($author === null && preg_match('/^(?<title>.+?)[\s._-]+(?<year>(19|20)\d{2})[\s._-]+(?<format>EPUB|MOBI|AZW3?|PDF|FB2|DJVU|LIT)$/i', $normalized, $matches) === 1) {
             $title = trim(str_replace(['.', '_'], ' ', $matches['title']));
         }
-        if ($author === null && preg_match('/^(?<title>.+?)\s+Vol\.?\s*\d{1,3}$/i', $title, $matches) === 1) {
-            $title = trim($matches['title']);
-        }
-
         $isJunk = false;
         $junkPattern = '/^([a-z0-9] )+$|ArtofUsenet|ekiosk|(ebook|mobi).+collection|erotica|Full Video|ImwithJamie|linkoff org|Mega.+pack|^[a-z0-9]+ (?!((January|February|March|April|May|June|July|August|September|O([ck])tober|November|De([cz])ember)))[a-z]+( (ebooks?|The))?$|NY Times|(Book|Massive) Dump|Sexual/i';
         if (preg_match($junkPattern, $normalized) === 1) {
@@ -694,16 +746,15 @@ class BookService
     {
         if (preg_match('/\b(97[89](?:[-\s]?\d){10})\b/', $releaseName, $matches) === 1) {
             $isbn = preg_replace('/[^0-9]/', '', $matches[1]);
-            if (is_string($isbn) && strlen($isbn) === 13) {
-                return $isbn;
+            if (is_string($isbn)) {
+                return BookIsbn::normalize($isbn);
             }
         }
 
         if (preg_match('/\b(\d(?:[-\s]?\d){8}[-\s]?[\dXx])\b/', $releaseName, $matches) === 1) {
             $isbn = strtoupper((string) preg_replace('/[^0-9X]/i', '', $matches[1]));
-            if (strlen($isbn) === 10) {
-                return $isbn;
-            }
+
+            return BookIsbn::normalize($isbn);
         }
 
         return null;
@@ -745,184 +796,159 @@ class BookService
     /**
      * Update book info from external sources.
      *
-     * @return false|int|string
-     *
      * @throws \Exception
      */
-    public function updateBookInfo(string $bookInfo = '', ?string $isbn = null)
+    public function updateBookInfo(string $bookInfo = '', ?string $isbn = null): ?int
     {
-        $ri = new ReleaseImageService;
-        $isbnDb = new IsbnDbService;
-        $googleBooks = new GoogleBooksService;
-        $openLibrary = new OpenLibraryService;
-        $itunes = new ItunesService;
-        $scorer = new BookMatchScorer;
-
-        $bookId = -2;
-        $book = null;
-        if ($bookInfo !== '') {
-            $wordCount = count(array_filter(preg_split('/\s+/', trim($bookInfo)) ?: []));
-            if ($wordCount < 3) {
-                return -2;
-            }
-
-            $parsed = $this->parsedBookResult ?? $this->parseReleaseName($bookInfo);
-            $candidates = [];
-            $resolvedSource = null;
-            if ($isbnDb->isConfigured()) {
-                if ($isbn !== null && $isbn !== '') {
-                    cli()->info('Fetching data from ISBNdb by ISBN '.$isbn);
-                    $candidate = $isbnDb->findByIsbn($isbn);
-                    if (is_array($candidate)) {
-                        $candidates[] = $candidate;
-                        $resolvedSource = 'isbndb_isbn';
-                    }
-                }
-                if ($candidates === []) {
-                    cli()->info('Fetching data from ISBNdb for '.$bookInfo);
-                    $candidates = array_merge($candidates, $isbnDb->searchBooks($bookInfo));
-                    if ($candidates !== []) {
-                        $resolvedSource = 'isbndb_search';
-                    }
-                }
-            }
-
-            if ($candidates === []) {
-                if ($isbn !== null && $isbn !== '') {
-                    cli()->info('Fetching data from Google Books by ISBN '.$isbn);
-                    $candidate = $googleBooks->findByIsbn($isbn);
-                    if (is_array($candidate)) {
-                        $candidates[] = $candidate;
-                        $resolvedSource = 'google_books_isbn';
-                    }
-                }
-            }
-
-            if ($candidates === []) {
-                cli()->info('Fetching data from Google Books for '.$bookInfo);
-                $candidates = array_merge(
-                    $candidates,
-                    $googleBooks->searchBooks(
-                        $bookInfo,
-                        $parsed->title,
-                        $parsed->author,
-                        $isbn
-                    )
-                );
-                if ($candidates !== []) {
-                    $resolvedSource = 'google_books_search';
-                }
-            }
-
-            if ($candidates === []) {
-                cli()->info('Fetching data from iTunes for '.$bookInfo);
-                $candidates = array_merge($candidates, $this->fetchItunesBookProperties($bookInfo, $itunes));
-                if ($candidates !== []) {
-                    $resolvedSource = 'itunes_search';
-                }
-            }
-
-            if ($candidates === []) {
-                cli()->info('Fetching data from Open Library for '.$bookInfo);
-                if ($isbn !== null && $isbn !== '') {
-                    $candidate = $openLibrary->findByIsbn($isbn);
-                    if (is_array($candidate)) {
-                        $candidates[] = $candidate;
-                        $resolvedSource = 'open_library_isbn';
-                    }
-                }
-
-                if ($candidates === []) {
-                    $candidates = array_merge($candidates, $openLibrary->searchBooks($bookInfo));
-                    if ($candidates !== []) {
-                        $resolvedSource = 'open_library_search';
-                    }
-                }
-            }
-
-            $book = $this->pickBestCandidate($candidates, $parsed, $scorer);
-            if (is_array($book)) {
-                Log::debug('Book metadata source resolved', [
-                    'book_info' => $bookInfo,
-                    'source' => $resolvedSource,
-                    'isbn' => $isbn,
-                ]);
-            }
-        }
-
-        if (empty($book)) {
+        $bookInfo = trim($bookInfo);
+        if ($bookInfo === '') {
             return -2;
         }
 
-        $check = BookInfo::query()->where('asin', $book['asin'])->first();
-        if ($check === null && ! empty($book['isbn'])) {
-            $check = BookInfo::query()->where('isbn', $book['isbn'])->first();
-        }
-        if ($check === null) {
-            $bookId = BookInfo::query()->insertGetId(
-                [
-                    'title' => $book['title'],
-                    'author' => $book['author'],
-                    'asin' => $book['asin'],
-                    'isbn' => $book['isbn'],
-                    'ean' => $book['ean'],
-                    'url' => $book['url'],
-                    'salesrank' => $book['salesrank'],
-                    'publisher' => $book['publisher'],
-                    'publishdate' => $book['publishdate'],
-                    'pages' => $book['pages'],
-                    'overview' => $book['overview'],
-                    'genre' => $book['genre'],
-                    'cover' => $book['cover'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]
-            );
-        } else {
-            $bookId = $check['id'];
-            BookInfo::query()->where('id', $bookId)->update(
-                [
-                    'title' => $book['title'],
-                    'author' => $book['author'],
-                    'asin' => $book['asin'],
-                    'isbn' => $book['isbn'],
-                    'ean' => $book['ean'],
-                    'url' => $book['url'],
-                    'salesrank' => $book['salesrank'],
-                    'publisher' => $book['publisher'],
-                    'publishdate' => $book['publishdate'],
-                    'pages' => $book['pages'],
-                    'overview' => $book['overview'],
-                    'genre' => $book['genre'],
-                    'cover' => $book['cover'],
-                ]
-            );
+        $parsed = $this->parsedBookResult ?? $this->parseReleaseName($bookInfo);
+        $isbn = BookIsbn::normalize($isbn ?? $parsed->isbn);
+        if ($isbn === null && ! $parsed->hasAuthor() && $this->scorer->meaningfulTitleTokenCount($parsed->title) < 2) {
+            return -2;
         }
 
-        if ($bookId && $bookId !== -2) {
-            if ($this->echooutput) {
-                cli()->header('Added/updated book: ');
-                if ($book['author'] !== '') {
-                    cli()->alternateOver('   Author: ').cli()->primary($book['author']);
+        $candidates = [];
+        $book = null;
+        $hadProviderFailure = false;
+
+        if ($this->isbnDb->isConfigured()) {
+            try {
+                if ($isbn !== null) {
+                    cli()->info('Fetching data from ISBNdb by ISBN '.$isbn);
+                    $candidate = $this->isbnDb->findByIsbn($isbn);
+                    if (is_array($candidate)) {
+                        $this->appendCandidates($candidates, [$candidate], 'isbndb_isbn');
+                        $book = $this->pickBestCandidate($candidates, $parsed, $this->scorer);
+                    }
                 }
-                cli()->alternateOver('   Title: ').cli()->primary(' '.$book['title']);
-                if ($book['genre'] !== '') {
-                    cli()->alternateOver('   Genre: ').cli()->primary(' '.$book['genre']);
+
+                if ($book === null) {
+                    cli()->info('Fetching data from ISBNdb for '.$parsed->title);
+                    $this->appendCandidates(
+                        $candidates,
+                        $this->isbnDb->searchBooks($parsed->title, $parsed->author, true),
+                        'isbndb_search',
+                    );
+                    $book = $this->pickBestCandidate($candidates, $parsed, $this->scorer);
                 }
+
+                $titleOnlyHypothesis = $this->titleOnlyHypothesis($parsed);
+                if ($book === null && $titleOnlyHypothesis !== null) {
+                    cli()->info('Retrying ISBNdb with title-only hypothesis '.$titleOnlyHypothesis->title);
+                    $this->appendCandidates(
+                        $candidates,
+                        $this->isbnDb->searchBooks($titleOnlyHypothesis->title, null, true),
+                        'isbndb_title_fallback',
+                    );
+                    $book = $this->pickBestCandidate($candidates, $parsed, $this->scorer);
+                }
+            } catch (BookProviderException $exception) {
+                $hadProviderFailure = true;
+                $this->logProviderFailure($exception, $bookInfo);
             }
-
-            $book['cover'] = (int) $ri->saveRemoteImage(
-                (string) $bookId,
-                $book['coverurl'],
-                $this->imgSavePath,
-                ImageAssetProfile::MetadataCover,
-            )->success;
-        } elseif ($this->echooutput) {
-            cli()->header('Nothing to update: ').
-            cli()->header($book['author'].
-                ' - '.
-                $book['title']);
         }
+
+        if ($book === null) {
+            try {
+                if ($isbn !== null) {
+                    cli()->info('Fetching data from Google Books by ISBN '.$isbn);
+                    $candidate = $this->googleBooks->findByIsbn($isbn);
+                    if (is_array($candidate)) {
+                        $this->appendCandidates($candidates, [$candidate], 'google_books_isbn');
+                        $book = $this->pickBestCandidate($candidates, $parsed, $this->scorer);
+                    }
+                }
+                if ($book === null) {
+                    cli()->info('Fetching data from Google Books for '.$parsed->title);
+                    $this->appendCandidates(
+                        $candidates,
+                        $this->googleBooks->searchBooks($parsed->searchQuery(), $parsed->title, $parsed->author),
+                        'google_books_search',
+                    );
+                    $book = $this->pickBestCandidate($candidates, $parsed, $this->scorer);
+                }
+                $titleOnlyHypothesis = $this->titleOnlyHypothesis($parsed);
+                if ($book === null && $titleOnlyHypothesis !== null) {
+                    $this->appendCandidates(
+                        $candidates,
+                        $this->googleBooks->searchBooks(
+                            $titleOnlyHypothesis->title,
+                            $titleOnlyHypothesis->title,
+                            null,
+                        ),
+                        'google_books_title_fallback',
+                    );
+                    $book = $this->pickBestCandidate($candidates, $parsed, $this->scorer);
+                }
+            } catch (BookProviderException $exception) {
+                $hadProviderFailure = true;
+                $this->logProviderFailure($exception, $bookInfo);
+            }
+        }
+
+        if ($book === null) {
+            try {
+                cli()->info('Fetching data from Open Library for '.$parsed->title);
+                if ($isbn !== null) {
+                    $candidate = $this->openLibrary->findByIsbn($isbn);
+                    if (is_array($candidate)) {
+                        $this->appendCandidates($candidates, [$candidate], 'open_library_isbn');
+                        $book = $this->pickBestCandidate($candidates, $parsed, $this->scorer);
+                    }
+                }
+                if ($book === null) {
+                    $this->appendCandidates(
+                        $candidates,
+                        $this->openLibrary->searchBooks($parsed->searchQuery()),
+                        'open_library_search',
+                    );
+                    $book = $this->pickBestCandidate($candidates, $parsed, $this->scorer);
+                }
+                $titleOnlyHypothesis = $this->titleOnlyHypothesis($parsed);
+                if ($book === null && $titleOnlyHypothesis !== null) {
+                    $this->appendCandidates(
+                        $candidates,
+                        $this->openLibrary->searchBooks($titleOnlyHypothesis->title),
+                        'open_library_title_fallback',
+                    );
+                    $book = $this->pickBestCandidate($candidates, $parsed, $this->scorer);
+                }
+            } catch (BookProviderException $exception) {
+                $hadProviderFailure = true;
+                $this->logProviderFailure($exception, $bookInfo);
+            }
+        }
+
+        if ($book === null) {
+            cli()->info('Fetching data from iTunes for '.$parsed->title);
+            $itunesCandidates = $this->fetchItunesBookProperties($parsed->searchQuery(), $this->itunes);
+            $this->appendCandidates(
+                $candidates,
+                $itunesCandidates,
+                'itunes_search',
+            );
+            $book = $this->pickBestCandidate($candidates, $parsed, $this->scorer);
+            if ($itunesCandidates === [] && $this->itunes->lastRequestFailed()) {
+                $hadProviderFailure = true;
+            }
+        }
+
+        if ($book === null) {
+            return $hadProviderFailure ? null : -2;
+        }
+
+        Log::debug('Book metadata source resolved', [
+            'book_info' => $bookInfo,
+            'source' => $book['_source'] ?? null,
+            'isbn' => $isbn,
+        ]);
+
+        $bookId = $this->persistBookCandidate($book);
+        $this->outputBookMatch($book);
 
         return $bookId;
     }
@@ -980,18 +1006,28 @@ class BookService
             return $books[0];
         }
 
-        $scorer = new BookMatchScorer;
-        $best = null;
-        $bestScore = 0.0;
+        $candidates = [];
         foreach ($books as $book) {
-            $score = $scorer->scoreBookInfo($book, $parsed);
-            if ($score > $bestScore) {
-                $best = $book;
-                $bestScore = $score;
-            }
+            $candidates[] = [
+                '_book_id' => $book->id,
+                'title' => $book->title,
+                'author' => $book->author,
+                'isbn' => $book->isbn,
+                'ean' => $book->ean,
+                'publishdate' => $book->publishdate,
+                'publisher' => $book->publisher,
+                'cover' => $book->cover ? 1 : 0,
+            ];
         }
 
-        return $bestScore >= $this->minimumMatchScore($parsed) ? $best : null;
+        $best = $this->pickBestCandidate($candidates, $parsed, $this->scorer);
+        if ($best === null) {
+            return null;
+        }
+
+        $bookId = (int) ($best['_book_id'] ?? 0);
+
+        return $bookId > 0 ? BookInfo::query()->find($bookId) : null;
     }
 
     /**
@@ -1004,30 +1040,302 @@ class BookService
             return null;
         }
 
-        $best = null;
-        $bestScore = 0.0;
-        foreach ($candidates as $candidate) {
-            $score = $scorer->score($candidate, $parsed);
-            if ($score > $bestScore) {
-                $bestScore = $score;
-                $best = $candidate;
+        foreach ($this->matchingHypotheses($parsed) as $hypothesis) {
+            $best = $this->pickBestCandidateForParse($candidates, $hypothesis, $scorer);
+            if ($best !== null) {
+                return $best;
             }
         }
 
-        if ($best === null || $bestScore < $this->minimumMatchScore($parsed)) {
+        return null;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $candidates
+     * @return array<string, mixed>|null
+     */
+    private function pickBestCandidateForParse(
+        array $candidates,
+        BookParseResult $parsed,
+        BookMatchScorer $scorer,
+    ): ?array {
+
+        /** @var array<string, array{candidate: array<string, mixed>, score: float, year_tie: int, completeness: int}> $byWork */
+        $byWork = [];
+        foreach ($candidates as $candidate) {
+            $score = $scorer->score($candidate, $parsed);
+            $key = $scorer->workKey($candidate);
+            if ($key === '|') {
+                $key = (string) ($candidate['asin'] ?? md5((string) json_encode($candidate)));
+            }
+            $completeness = $this->candidateCompleteness($candidate);
+            $yearTie = $this->candidateYearTie($candidate, $parsed);
+            $existing = $byWork[$key] ?? null;
+            if ($existing === null
+                || $score > $existing['score']
+                || ($score === $existing['score'] && $yearTie > $existing['year_tie'])
+                || ($score === $existing['score']
+                    && $yearTie === $existing['year_tie']
+                    && $completeness > $existing['completeness'])) {
+                $byWork[$key] = [
+                    'candidate' => $candidate,
+                    'score' => $score,
+                    'year_tie' => $yearTie,
+                    'completeness' => $completeness,
+                ];
+            }
+        }
+
+        $ranked = array_values($byWork);
+        usort($ranked, static function (array $left, array $right): int {
+            $scoreComparison = $right['score'] <=> $left['score'];
+
+            return $scoreComparison !== 0
+                ? $scoreComparison
+                : (($right['year_tie'] <=> $left['year_tie'])
+                    ?: ($right['completeness'] <=> $left['completeness']));
+        });
+
+        $best = $ranked[0] ?? null;
+        if ($best === null || ! $this->candidatePassesIdentityRules(
+            $best['candidate'],
+            $best['score'],
+            $ranked[1]['score'] ?? null,
+            $parsed,
+            $scorer,
+        )) {
             return null;
         }
 
-        return $best;
+        return $best['candidate'];
     }
 
-    private function minimumMatchScore(?BookParseResult $parsed): float
+    /**
+     * @return list<BookParseResult>
+     */
+    private function matchingHypotheses(BookParseResult $parsed): array
     {
-        if ($parsed === null) {
-            return 0.55;
+        $hypotheses = [$parsed];
+        $titleOnly = $this->titleOnlyHypothesis($parsed);
+        if ($titleOnly !== null) {
+            $hypotheses[] = $titleOnly;
         }
 
-        // No-author parses are more ambiguous and need a stricter cutoff.
-        return $parsed->hasAuthor() ? 0.55 : 0.68;
+        return $hypotheses;
+    }
+
+    private function titleOnlyHypothesis(BookParseResult $parsed): ?BookParseResult
+    {
+        if (! $parsed->hasAuthor() || ! str_contains($parsed->rawName, ' - ')) {
+            return null;
+        }
+
+        return new BookParseResult(
+            rawName: $parsed->rawName,
+            title: trim($parsed->author.' - '.$parsed->title),
+            author: null,
+            isbn: $parsed->isbn,
+            year: $parsed->year,
+            format: $parsed->format,
+            isJunk: $parsed->isJunk,
+            isMagazine: $parsed->isMagazine,
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $candidate
+     */
+    private function candidatePassesIdentityRules(
+        array $candidate,
+        float $score,
+        ?float $runnerUpScore,
+        BookParseResult $parsed,
+        BookMatchScorer $scorer,
+    ): bool {
+        if ($score === 1.0 && $parsed->isbn !== null) {
+            return true;
+        }
+
+        $titleScore = $scorer->titleScore($parsed->title, (string) ($candidate['title'] ?? ''));
+        if ($parsed->hasAuthor()) {
+            $authorScore = $scorer->authorScore((string) $parsed->author, (string) ($candidate['author'] ?? ''));
+            if ($titleScore < 0.78 || $authorScore < 0.75 || $score < 0.82) {
+                return false;
+            }
+
+            return $runnerUpScore === null || ($score - $runnerUpScore) >= 0.08;
+        }
+
+        if ($scorer->meaningfulTitleTokenCount($parsed->title) < 3 || $titleScore < 0.92) {
+            return false;
+        }
+
+        return $runnerUpScore === null || ($score - $runnerUpScore) >= 0.12;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $target
+     * @param  array<int, array<string, mixed>>  $incoming
+     */
+    private function appendCandidates(array &$target, array $incoming, string $source): void
+    {
+        foreach ($incoming as $candidate) {
+            $candidate['_source'] = $source;
+            $target[] = $candidate;
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $candidate
+     */
+    private function candidateCompleteness(array $candidate): int
+    {
+        $score = 0;
+        foreach (['isbn', 'ean', 'publisher', 'publishdate', 'pages', 'overview', 'genre', 'coverurl'] as $field) {
+            if (isset($candidate[$field]) && $candidate[$field] !== '') {
+                $score++;
+            }
+        }
+
+        return $score;
+    }
+
+    /**
+     * @param  array<string, mixed>  $candidate
+     */
+    private function candidateYearTie(array $candidate, BookParseResult $parsed): int
+    {
+        if ($parsed->year === null || empty($candidate['publishdate'])) {
+            return 0;
+        }
+
+        if (preg_match('/\b(19|20)\d{2}\b/', (string) $candidate['publishdate'], $match) !== 1) {
+            return 0;
+        }
+
+        return max(0, 100 - abs($parsed->year - (int) $match[0]));
+    }
+
+    /**
+     * @param  array<string, mixed>  $book
+     */
+    private function persistBookCandidate(array $book): int
+    {
+        $check = null;
+        $asin = trim((string) ($book['asin'] ?? ''));
+        if ($asin !== '') {
+            $check = BookInfo::query()->where('asin', $asin)->first();
+        }
+
+        foreach (['isbn', 'ean'] as $identifierField) {
+            if ($check !== null) {
+                break;
+            }
+            $identifiers = BookIsbn::equivalents(isset($book[$identifierField]) ? (string) $book[$identifierField] : null);
+            if ($identifiers !== []) {
+                $check = BookInfo::query()
+                    ->where(static function ($query) use ($identifiers): void {
+                        $query->whereIn('isbn', $identifiers)->orWhereIn('ean', $identifiers);
+                    })
+                    ->first();
+            }
+        }
+
+        $attributes = [
+            'title' => (string) ($book['title'] ?? ''),
+            'author' => (string) ($book['author'] ?? ''),
+            'asin' => $asin !== '' ? $asin : null,
+            'isbn' => BookIsbn::normalize(isset($book['isbn']) ? (string) $book['isbn'] : null),
+            'ean' => BookIsbn::normalize(isset($book['ean']) ? (string) $book['ean'] : null),
+            'url' => $book['url'] ?? null,
+            'salesrank' => $book['salesrank'] ?? null,
+            'publisher' => $book['publisher'] ?? null,
+            'publishdate' => $book['publishdate'] ?? null,
+            'pages' => $book['pages'] ?? null,
+            'overview' => $book['overview'] ?? null,
+            'genre' => (string) ($book['genre'] ?? ''),
+        ];
+
+        if ($check === null) {
+            $bookId = BookInfo::query()->insertGetId(array_merge($attributes, [
+                'cover' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]));
+        } else {
+            $bookId = (int) $check->id;
+            $updates = [];
+            foreach ($attributes as $field => $value) {
+                if ($value === null || $value === '') {
+                    continue;
+                }
+                if ($field === 'asin' && ! empty($check->asin)) {
+                    continue;
+                }
+                $updates[$field] = $value;
+            }
+            if ($updates !== []) {
+                $updates['updated_at'] = now();
+                BookInfo::query()->where('id', $bookId)->update($updates);
+            }
+        }
+
+        $coverUrl = trim((string) ($book['coverurl'] ?? ''));
+        if ($coverUrl !== '') {
+            $coverSaved = $this->releaseImageService->saveRemoteImage(
+                (string) $bookId,
+                $coverUrl,
+                $this->imgSavePath,
+                ImageAssetProfile::MetadataCover,
+            )->success;
+            if ($coverSaved) {
+                BookInfo::query()->where('id', $bookId)->update(['cover' => 1]);
+            }
+        }
+
+        return $bookId;
+    }
+
+    /**
+     * @param  array<string, mixed>  $book
+     */
+    private function outputBookMatch(array $book): void
+    {
+        if (! $this->echooutput) {
+            return;
+        }
+
+        cli()->header('Added/updated book: ');
+        if (! empty($book['author'])) {
+            cli()->alternateOver('   Author: ').cli()->primary((string) $book['author']);
+        }
+        cli()->alternateOver('   Title: ').cli()->primary(' '.(string) $book['title']);
+        if (! empty($book['genre'])) {
+            cli()->alternateOver('   Genre: ').cli()->primary(' '.(string) $book['genre']);
+        }
+    }
+
+    private function failureCacheKey(?BookParseResult $parsed, string $bookInfo): string
+    {
+        $identity = [
+            (string) self::FAILURE_CACHE_VERSION,
+            mb_strtolower(trim($parsed === null ? $bookInfo : $parsed->title)),
+            mb_strtolower(trim((string) ($parsed === null ? '' : $parsed->author))),
+            (string) ($parsed === null ? '' : $parsed->year),
+            (string) ($parsed === null ? '' : $parsed->isbn),
+        ];
+
+        return 'book_lookup_fail_v'.self::FAILURE_CACHE_VERSION.'_'.md5(implode('|', $identity));
+    }
+
+    private function logProviderFailure(BookProviderException $exception, string $bookInfo): void
+    {
+        Log::warning('Book metadata provider unavailable', [
+            'provider' => $exception->provider,
+            'status' => $exception->statusCode,
+            'retry_after_seconds' => $exception->retryAfterSeconds,
+            'book_info' => $bookInfo,
+            'message' => $exception->getMessage(),
+        ]);
     }
 }

@@ -32,6 +32,39 @@ class BookServiceTest extends TestCase
         $this->assertSame('9780321125217', $parsed->isbn);
     }
 
+    public function test_parse_release_name_parses_title_by_author_in_conventional_order(): void
+    {
+        $parsed = $this->makeService()->parseReleaseName('Clean Code by Robert C. Martin 2008 EPUB');
+
+        $this->assertSame('Clean Code', $parsed->title);
+        $this->assertSame('Robert C Martin', $parsed->author);
+        $this->assertSame(2008, $parsed->year);
+    }
+
+    public function test_parse_release_name_captures_year_before_removing_release_noise(): void
+    {
+        $parsed = $this->makeService()->parseReleaseName('The Pragmatic Programmer 1999 EPUB');
+
+        $this->assertSame('The Pragmatic Programmer', $parsed->title);
+        $this->assertSame(1999, $parsed->year);
+    }
+
+    public function test_parse_release_name_preserves_series_and_volume_evidence(): void
+    {
+        $parsed = $this->makeService()->parseReleaseName('Frank Herbert - Dune (Book 2) EPUB');
+
+        $this->assertSame('Dune (Book 2)', $parsed->title);
+        $this->assertSame('Frank Herbert', $parsed->author);
+    }
+
+    public function test_extract_isbn_ignores_invalid_check_digits(): void
+    {
+        $service = $this->makeService();
+
+        $this->assertNull($service->extractIsbn('Fake Book 978-0-13-235088-5 EPUB'));
+        $this->assertNull($service->extractIsbn('Fake Book 0132350883 EPUB'));
+    }
+
     public function test_parse_release_name_flags_software_as_junk(): void
     {
         $service = $this->makeService();

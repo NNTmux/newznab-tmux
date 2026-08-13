@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
+use App\Exceptions\BookProviderException;
 use App\Services\GoogleBooksService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
@@ -60,5 +61,20 @@ class GoogleBooksServiceTest extends TestCase
 
         $this->assertTrue($service->isConfigured());
         $this->assertFalse($service->hasApiKey());
+    }
+
+    public function test_server_error_is_reported_as_provider_unavailability(): void
+    {
+        $service = new GoogleBooksService(
+            new Client([
+                'handler' => HandlerStack::create(new MockHandler([new Response(503)])),
+                'http_errors' => false,
+            ]),
+            null
+        );
+
+        $this->expectException(BookProviderException::class);
+
+        $service->searchBooks('unavailable query');
     }
 }

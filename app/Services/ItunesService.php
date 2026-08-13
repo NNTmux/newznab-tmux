@@ -29,6 +29,8 @@ class ItunesService
 
     protected string $country = 'US';
 
+    private bool $lastRequestFailed = false;
+
     public function __construct()
     {
         $this->client = new Client([
@@ -60,6 +62,11 @@ class ItunesService
         $this->country = strtoupper($country);
 
         return $this;
+    }
+
+    public function lastRequestFailed(): bool
+    {
+        return $this->lastRequestFailed;
     }
 
     /**
@@ -240,6 +247,7 @@ class ItunesService
      */
     protected function search(string $term, string $entity, string $media): ?array
     {
+        $this->lastRequestFailed = false;
         $term = trim($term);
         if (empty($term)) {
             return null;
@@ -265,6 +273,7 @@ class ItunesService
 
             $statusCode = $response->getStatusCode();
             if ($statusCode !== 200) {
+                $this->lastRequestFailed = true;
                 Log::warning("iTunes API search returned status {$statusCode}");
 
                 return null;
@@ -273,6 +282,8 @@ class ItunesService
             $data = json_decode($response->getBody()->getContents(), true);
 
             if (! isset($data['results'])) {
+                $this->lastRequestFailed = true;
+
                 return null;
             }
 
@@ -281,6 +292,7 @@ class ItunesService
 
             return $results;
         } catch (GuzzleException $e) {
+            $this->lastRequestFailed = true;
             Log::error('iTunes API search error: '.$e->getMessage());
 
             return null;
