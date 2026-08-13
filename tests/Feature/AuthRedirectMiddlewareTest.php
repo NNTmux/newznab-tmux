@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use Illuminate\Auth\GenericUser;
+use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Cache;
 use PDO;
 use Tests\TestCase;
@@ -99,6 +101,13 @@ class AuthRedirectMiddlewareTest extends TestCase
         ]))
             ->get(route('login'))
             ->assertRedirect('/');
+    }
+
+    public function test_is_verified_alias_uses_laravels_email_verification_middleware(): void
+    {
+        $middlewareAliases = app(Router::class)->getMiddleware();
+
+        $this->assertSame(EnsureEmailIsVerified::class, $middlewareAliases['isVerified'] ?? null);
     }
 
     private function setEnvironmentValue(string $key, ?string $value): void

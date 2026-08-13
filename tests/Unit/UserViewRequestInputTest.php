@@ -4,8 +4,12 @@ namespace Tests\Unit;
 
 use App\Http\Controllers\BasePageController;
 use App\Http\Controllers\SearchController;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
 use Illuminate\Http\Request;
+use Illuminate\Routing\RouteCollection;
+use Illuminate\Routing\UrlGenerator;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\HttpFoundation\Response;
@@ -71,6 +75,46 @@ class UserViewRequestInputTest extends TestCase
         $this->assertSame([-1], $method->invoke($controller, Request::create('/search', 'GET', ['searchadvcat' => ''])));
     }
 
+    public function test_local_return_url_accepts_local_targets_and_rejects_external_urls(): void
+    {
+        $originalContainer = Container::getInstance();
+        $container = new Container;
+        $container->instance(
+            UrlGeneratorContract::class,
+            new UrlGenerator(new RouteCollection, Request::create('https://nntmux.test')),
+        );
+        Container::setInstance($container);
+
+        try {
+            $controller = $this->controller();
+
+            $this->assertSame(
+                'https://nntmux.test/mymovies',
+                $controller->returnUrl(Request::create('https://nntmux.test/mymovies'), '/mymovies'),
+            );
+            $this->assertSame(
+                'https://nntmux.test/browse',
+                $controller->returnUrl(Request::create('https://nntmux.test/mymovies', 'GET', ['from' => '/browse']), '/mymovies'),
+            );
+            $this->assertSame(
+                'https://nntmux.test/browse?view=covers',
+                $controller->returnUrl(
+                    Request::create('https://nntmux.test/mymovies', 'GET', ['from' => 'https://nntmux.test/browse?view=covers']),
+                    '/mymovies',
+                ),
+            );
+            $this->assertSame(
+                'https://nntmux.test/mymovies',
+                $controller->returnUrl(
+                    Request::create('https://nntmux.test/mymovies', 'GET', ['from' => 'https://external.example/browse']),
+                    '/mymovies',
+                ),
+            );
+        } finally {
+            Container::setInstance($originalContainer);
+        }
+    }
+
     private function controller(): object
     {
         return new class extends BasePageController
@@ -111,6 +155,11 @@ class UserViewRequestInputTest extends TestCase
             public function offset(int $page, int $perPage): int
             {
                 return $this->paginationOffset($page, $perPage);
+            }
+
+            public function returnUrl(Request $request, string $fallback): string
+            {
+                return $this->localReturnUrl($request, $fallback);
             }
         };
     }
