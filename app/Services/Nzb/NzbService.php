@@ -368,6 +368,14 @@ class NzbService
     {
         $nzbPath = $this->siteNzbPath;
 
+        if ($createIfNotExist && ! File::isDirectory($nzbPath)) {
+            if (! File::makeDirectory($nzbPath, 0775, true) && ! File::isDirectory($nzbPath)) { // @phpstan-ignore booleanNot.alwaysTrue
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $nzbPath));
+            }
+
+            File::chmod($nzbPath, 02775);
+        }
+
         for ($i = 0; $i < $levelsToSplit && $i < 32; $i++) {
             $nzbPath .= $releaseGuid[$i].'/';
 
