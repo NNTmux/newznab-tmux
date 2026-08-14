@@ -128,20 +128,32 @@ final class ReleaseSchemaOptimizationMigrationTest extends TestCase
     public function test_preflight_blocks_bad_identifiers_and_the_opt_out_bypasses_it(): void
     {
         DB::table('releases')->insert([
-            ['id' => 1, 'guid' => 'not-a-uuid', 'leftguid' => 'z', 'comments' => 0],
+            ['id' => 1, 'guid' => str_repeat('a', 41), 'leftguid' => 'a', 'comments' => 0],
         ]);
 
         try {
             $this->invoke('assertReleaseIdentifiersAreSafe');
-            $this->fail('The migration accepted an invalid guid.');
+            $this->fail('The migration accepted a guid that does not fit the narrowed column.');
         } catch (RuntimeException $e) {
-            $this->assertStringContainsString('invalid release GUIDs', $e->getMessage());
+            $this->assertStringContainsString('release GUIDs that do not fit CHAR(40) ascii', $e->getMessage());
             $this->assertStringContainsString('releases:normalize-guids', $e->getMessage());
         }
 
         config(['nntmux.releases_optimize.skip_preflight' => true]);
         $this->invoke('assertReleaseIdentifiersAreSafe');
         $this->assertSame(1, DB::table('releases')->count());
+    }
+
+    public function test_preflight_accepts_legacy_sha1_guids(): void
+    {
+        DB::table('releases')->insert([
+            ['id' => 1, 'guid' => '0c5c002220e26542a4c9dae845a58a38b3e7e63a', 'leftguid' => '0', 'comments' => 0],
+            ['id' => 2, 'guid' => '01234567-89ab-cdef-0123-456789abcdef', 'leftguid' => '0', 'comments' => 0],
+        ]);
+
+        $this->invoke('assertReleaseIdentifiersAreSafe');
+
+        $this->assertSame(2, DB::table('releases')->count());
     }
 
     private function invoke(string $method): void

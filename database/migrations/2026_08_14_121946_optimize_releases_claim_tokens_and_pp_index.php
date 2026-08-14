@@ -23,6 +23,11 @@ use Illuminate\Support\Facades\Schema;
  * 2. Both claim tokens narrowed to `CHAR(32) ascii`. They only ever hold
  *    `bin2hex(random_bytes(16))`, so `VARCHAR(64)` utf8mb4 reserved four bytes
  *    per character for hex digits.
+ * 3. `guid` widened from `CHAR(36)` to `CHAR(40) ascii`. The original rebuild
+ *    assumed every guid was a UUID, but legacy nZEDb installs still hold 40
+ *    character SHA1 guids that `CHAR(36)` would silently truncate. Note that this
+ *    only restores the column shape: an install that already ran the `CHAR(36)`
+ *    version has lost those four characters and must restore them from a backup.
  *
  * Both now happen inside the normalization rebuild's single `ALTER`, because the
  * claim token type change is `ALGORITHM=COPY` only and would otherwise force a
@@ -52,8 +57,9 @@ return new class extends Migration
 
         $indexNeedsSize = ! $this->ppClaimIndexCoversSize();
         $columnsToNarrow = $this->claimTokenColumnsToNarrow();
+        $guidNeedsWidening = $this->guidNeedsWidening();
 
-        if (! $indexNeedsSize && $columnsToNarrow === []) {
+        if (! $indexNeedsSize && $columnsToNarrow === [] && ! $guidNeedsWidening) {
             return;
         }
 
@@ -68,6 +74,9 @@ return new class extends Migration
             }
             foreach ($columnsToNarrow as $column) {
                 $specifications[] = 'MODIFY `'.$column.'` CHAR(32) CHARACTER SET ascii COLLATE ascii_general_ci NULL';
+            }
+            if ($guidNeedsWidening) {
+                $specifications[] = 'MODIFY `guid` CHAR(40) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL';
             }
 
             DB::statement('ALTER TABLE '.$this->table('releases').' '.implode(', ', $specifications));
@@ -128,6 +137,25 @@ return new class extends Migration
         }
 
         return $pending;
+    }
+
+    /**
+     * True only for an install left on the `CHAR(36)` guid shape, which would
+     * truncate the legacy 40 character SHA1 guids that predate UUID generation.
+     */
+    private function guidNeedsWidening(): bool
+    {
+        if (! $this->isMariaDbOrMySql()) {
+            return false;
+        }
+
+        foreach (Schema::getColumns('releases') as $column) {
+            if ($column['name'] === 'guid') {
+                return str_starts_with(strtolower((string) ($column['type'] ?? '')), 'char(36)');
+            }
+        }
+
+        return false;
     }
 
     private function indexExists(string $name): bool

@@ -46,7 +46,7 @@ final class ReleasesNormalizeGuidsMariaDbTest extends TestCase
         DB::statement(
             'CREATE TABLE `'.$this->table('releases').'` (
                 `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-                `guid` VARCHAR(40) NOT NULL,
+                `guid` VARCHAR(64) NOT NULL,
                 `leftguid` CHAR(1) NOT NULL DEFAULT "",
                 `name` VARCHAR(255) NOT NULL DEFAULT "",
                 PRIMARY KEY (`id`),
@@ -77,19 +77,33 @@ final class ReleasesNormalizeGuidsMariaDbTest extends TestCase
     }
 
     #[Test]
-    public function legacy_md5_guids_are_detected_by_the_regexp_check(): void
+    public function legacy_sha1_guids_fit_the_narrowed_column_and_do_not_block(): void
     {
         $this->insert(1, '01234567-89ab-cdef-0123-456789abcdef', '0');
-        $this->insert(2, 'd41d8cd98f00b204e9800998ecf8427e', 'd', 'Legacy nZEDb release');
-        $this->insert(3, 'not-a-uuid-at-all-------------------x', 'n');
+        $this->insert(2, '0c5c002220e26542a4c9dae845a58a38b3e7e63a', '0', 'Legacy nZEDb release');
+
+        $status = Artisan::call('releases:normalize-guids');
+        $output = Artisan::output();
+
+        $this->assertSame(0, $status);
+        $this->assertStringContainsString('Release guids are consistent.', $output);
+        $this->assertStringContainsString('1 releases still carry a legacy non-UUID guid', $output);
+        $this->assertSame('0c5c002220e26542a4c9dae845a58a38b3e7e63a', DB::table('releases')->where('id', 2)->value('guid'));
+    }
+
+    #[Test]
+    public function oversized_guids_are_detected_by_the_regexp_check(): void
+    {
+        $this->insert(1, '01234567-89ab-cdef-0123-456789abcdef', '0');
+        $this->insert(2, str_repeat('a', 41), 'a', 'Oversized guid release');
 
         $status = Artisan::call('releases:normalize-guids');
         $output = Artisan::output();
 
         $this->assertSame(1, $status);
-        $this->assertStringContainsString('2 releases have a guid that blocks', $output);
-        $this->assertStringContainsString('Legacy nZEDb release', $output);
-        $this->assertSame('d41d8cd98f00b204e9800998ecf8427e', DB::table('releases')->where('id', 2)->value('guid'));
+        $this->assertStringContainsString('1 releases have a guid that blocks', $output);
+        $this->assertStringContainsString('Oversized guid release', $output);
+        $this->assertSame(str_repeat('a', 41), DB::table('releases')->where('id', 2)->value('guid'));
     }
 
     #[Test]

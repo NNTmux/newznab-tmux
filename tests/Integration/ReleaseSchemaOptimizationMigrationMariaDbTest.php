@@ -69,7 +69,7 @@ final class ReleaseSchemaOptimizationMigrationMariaDbTest extends TestCase
         $this->assertSame('temporary', DB::table('release_nzb_creation_failures')->where('releases_id', 1)->value('last_error'));
         $this->assertSame(['id'], $this->primaryKeyColumns());
         $this->assertSame('ascii_general_ci', $this->columnCollation('guid'));
-        $this->assertSame('char(36)', strtolower($this->columnType('guid')));
+        $this->assertSame('char(40)', strtolower($this->columnType('guid')));
         $this->assertSame('ascii_general_ci', $this->columnCollation('leftguid'));
         $this->assertSame(1, (int) DB::table('releases')->where('id', 1)->value('comments'));
         $this->assertFalse(Schema::hasColumn('releases', 'nzb_password'));
@@ -111,6 +111,23 @@ final class ReleaseSchemaOptimizationMigrationMariaDbTest extends TestCase
         $this->assertFalse(Schema::hasTable('release_nzb_passwords'));
         $this->assertFalse(Schema::hasTable('release_nzb_creation_failures'));
         $this->assertDatabaseHas('release_files', ['releases_id' => 1, 'name' => 'kept.nzb']);
+    }
+
+    #[Test]
+    public function rebuild_keeps_legacy_sha1_guids_intact(): void
+    {
+        $sha1 = '0c5c002220e26542a4c9dae845a58a38b3e7e63a';
+        DB::table('releases')->insert([
+            'id' => 9001,
+            'guid' => $sha1,
+            'leftguid' => '0',
+            'name' => 'Legacy nZEDb release',
+        ]);
+
+        $this->migration()->up();
+
+        $this->assertSame('char(40)', strtolower($this->columnType('guid')));
+        $this->assertSame($sha1, DB::table('releases')->where('id', 9001)->value('guid'));
     }
 
     #[Test]

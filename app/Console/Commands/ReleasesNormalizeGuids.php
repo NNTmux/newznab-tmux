@@ -17,9 +17,14 @@ use Illuminate\Support\Str;
  * repairs the one class of problem that can be fixed without side effects.
  *
  * `leftguid` is derived data that nothing outside the database depends on, so it is
- * rewritten in place. Invalid and duplicated `guid` values are only reported: a guid
+ * rewritten in place. Oversized and duplicated `guid` values are only reported: a guid
  * determines the on-disk NZB path and is published in download links, so replacing one
  * is a migration of file and link state rather than a database repair.
+ *
+ * The migration narrows `guid` to `CHAR(40) ascii`, so legacy 40 character nZEDb SHA1
+ * guids are still valid and are reported as informational only. Only values longer than
+ * 40 characters, values containing non-printable-ASCII bytes, and case-insensitive
+ * duplicates actually block the rebuild.
  *
  * Every scan here is either a single aggregate or a keyset (`id > ?`) walk. Never use
  * `chunk()`: its `LIMIT/OFFSET` paging degrades quadratically, and on a multi-million
@@ -31,6 +36,11 @@ use Illuminate\Support\Str;
 #[Description('Report release guid problems and resync leftguid so the releases normalization migration can run')]
 class ReleasesNormalizeGuids extends Command
 {
+    /** Values that survive the narrowing to `CHAR(40) ascii`. */
+    private const string SUPPORTED_PATTERN = '/^[\x20-\x7E]{1,40}$/D';
+
+    private const string SUPPORTED_REGEXP = '^[ -~]{1,40}$';
+
     private const string UUID_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iD';
 
     private const string UUID_REGEXP = '^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$';
@@ -53,24 +63,34 @@ class ReleasesNormalizeGuids extends Command
         }
 
         $leftGuids = $this->syncLeftGuids();
-        $invalid = $this->countInvalidGuids();
+        $unsupported = $this->countUnsupportedGuids();
         $duplicates = $this->countDuplicateGuids();
+        $legacy = $this->countLegacyGuids();
 
-        $this->table(['Issue', 'Releases'], [
-            ['leftguid out of sync with guid', (string) $leftGuids],
-            ['guid is not a UUID', (string) $invalid],
-            ['guid duplicated case-insensitively', (string) $duplicates],
+        $this->table(['Issue', 'Releases', 'Blocks migration'], [
+            ['leftguid out of sync with guid', (string) $leftGuids, 'no (repaired)'],
+            ['guid longer than 40 chars or not ASCII', (string) $unsupported, 'yes'],
+            ['guid duplicated case-insensitively', (string) $duplicates, 'yes'],
+            ['guid is a legacy non-UUID', (string) $legacy, 'no'],
         ]);
 
-        if ($invalid + $duplicates === 0) {
+        if ($unsupported + $duplicates === 0) {
+            if ($legacy > 0) {
+                $this->line(
+                    $legacy.' releases still carry a legacy non-UUID guid. These fit CHAR(40) ascii and are kept '
+                    .'as-is so their NZB paths and published download links keep working. Only newly created '
+                    .'releases get a UUID, so this count decays on its own.'
+                );
+            }
+
             $this->info($this->dryRun
-                ? 'No guid problems found. Re-run without --dry-run to apply the leftguid sync.'
+                ? 'No blocking guid problems found. Re-run without --dry-run to apply the leftguid sync.'
                 : 'Release guids are consistent.');
 
             return self::SUCCESS;
         }
 
-        $this->reportBlockingReleases($invalid + $duplicates);
+        $this->reportBlockingReleases($unsupported + $duplicates);
 
         return self::FAILURE;
     }
@@ -116,15 +136,39 @@ class ReleasesNormalizeGuids extends Command
      * On MySQL this is a single aggregate. Elsewhere it is a keyset walk that
      * applies the pattern in PHP, keeping memory flat regardless of table size.
      */
-    private function countInvalidGuids(): int
+    private function countUnsupportedGuids(): int
     {
         if ($this->isMySql()) {
-            return $this->invalidGuidQuery()->count();
+            return $this->unsupportedGuidQuery()->count();
         }
 
         $count = 0;
         $this->walkByKey(function (object $row) use (&$count): bool {
-            if ($this->isInvalidGuid($row->guid)) {
+            if ($this->isUnsupportedGuid($row->guid)) {
+                $count++;
+            }
+
+            return true;
+        });
+
+        return $count;
+    }
+
+    /**
+     * Legacy guids fit the narrowed column, so this is reported for visibility only.
+     * It is the count of releases whose download links predate UUID generation.
+     */
+    private function countLegacyGuids(): int
+    {
+        if ($this->isMySql()) {
+            return DB::table('releases')
+                ->whereRaw("`guid` NOT REGEXP '".self::UUID_REGEXP."'")
+                ->count();
+        }
+
+        $count = 0;
+        $this->walkByKey(function (object $row) use (&$count): bool {
+            if (! is_string($row->guid) || preg_match(self::UUID_PATTERN, $row->guid) !== 1) {
                 $count++;
             }
 
@@ -160,7 +204,6 @@ class ReleasesNormalizeGuids extends Command
             .'row that references the old value. Resolve them deliberately: delete the affected releases, or assign '
             .'new guids and relocate the matching NZB files yourself.'
         );
-
         $sample = $this->sampleBlockingReleases();
         if ($sample === []) {
             return;
@@ -181,23 +224,23 @@ class ReleasesNormalizeGuids extends Command
     private function sampleBlockingReleases(): array
     {
         if ($this->isMySql()) {
-            $invalid = $this->invalidGuidQuery()
+            $unsupported = $this->unsupportedGuidQuery()
                 ->select(['id', 'guid', 'name'])
                 ->orderBy('id')
                 ->limit(self::SAMPLE_SIZE)
                 ->get()
                 ->all();
 
-            if (count($invalid) >= self::SAMPLE_SIZE) {
-                return $invalid;
+            if (count($unsupported) >= self::SAMPLE_SIZE) {
+                return $unsupported;
             }
 
-            return [...$invalid, ...$this->sampleDuplicateGuids(self::SAMPLE_SIZE - count($invalid), $invalid)];
+            return [...$unsupported, ...$this->sampleDuplicateGuids(self::SAMPLE_SIZE - count($unsupported), $unsupported)];
         }
 
         $sample = [];
         $this->walkByKey(function (object $row) use (&$sample): bool {
-            if ($this->isInvalidGuid($row->guid)) {
+            if ($this->isUnsupportedGuid($row->guid)) {
                 $sample[] = $row;
             }
 
@@ -259,17 +302,17 @@ class ReleasesNormalizeGuids extends Command
         } while ($rows->count() === $chunk);
     }
 
-    private function invalidGuidQuery(): Builder
+    private function unsupportedGuidQuery(): Builder
     {
         return DB::table('releases')->where(function ($query): void {
             $query->whereNull('guid')
-                ->orWhereRaw("`guid` NOT REGEXP '".self::UUID_REGEXP."'");
+                ->orWhereRaw("`guid` NOT REGEXP '".self::SUPPORTED_REGEXP."'");
         });
     }
 
-    private function isInvalidGuid(mixed $guid): bool
+    private function isUnsupportedGuid(mixed $guid): bool
     {
-        return ! is_string($guid) || preg_match(self::UUID_PATTERN, $guid) !== 1;
+        return ! is_string($guid) || preg_match(self::SUPPORTED_PATTERN, $guid) !== 1;
     }
 
     private function isMySql(): bool

@@ -70,7 +70,7 @@ final class ReleasesNormalizeGuidsTest extends TestCase
     public function test_dry_run_reports_without_writing(): void
     {
         $this->insertRelease(1, '01234567-89ab-cdef-0123-456789abcdef', 'f');
-        $this->insertRelease(2, 'd41d8cd98f00b204e9800998ecf8427e', 'd');
+        $this->insertRelease(2, str_repeat('a', 41), 'x');
 
         $status = Artisan::call('releases:normalize-guids', ['--dry-run' => true]);
         $output = Artisan::output();
@@ -78,21 +78,47 @@ final class ReleasesNormalizeGuidsTest extends TestCase
         $this->assertSame(1, $status);
         $this->assertStringContainsString('Dry run: no rows are modified.', $output);
         $this->assertSame('f', DB::table('releases')->where('id', 1)->value('leftguid'));
-        $this->assertSame('d41d8cd98f00b204e9800998ecf8427e', DB::table('releases')->where('id', 2)->value('guid'));
+        $this->assertSame(str_repeat('a', 41), DB::table('releases')->where('id', 2)->value('guid'));
     }
 
-    public function test_invalid_guid_is_reported_and_never_rewritten(): void
+    public function test_legacy_sha1_guid_fits_the_narrowed_column_and_does_not_block(): void
     {
-        $this->insertRelease(1, 'd41d8cd98f00b204e9800998ecf8427e', 'd', ['name' => 'Legacy nZEDb release']);
+        $sha1 = '0c5c002220e26542a4c9dae845a58a38b3e7e63a';
+        $this->insertRelease(1, $sha1, '0');
+
+        $status = Artisan::call('releases:normalize-guids');
+        $output = Artisan::output();
+
+        $this->assertSame(0, $status);
+        $this->assertStringContainsString('Release guids are consistent.', $output);
+        $this->assertStringContainsString('1 releases still carry a legacy non-UUID guid', $output);
+        $this->assertSame($sha1, DB::table('releases')->where('id', 1)->value('guid'));
+    }
+
+    public function test_oversized_guid_is_reported_and_never_rewritten(): void
+    {
+        $tooLong = str_repeat('b', 41);
+        $this->insertRelease(1, $tooLong, 'b', ['name' => 'Oversized guid release']);
 
         $status = Artisan::call('releases:normalize-guids');
         $output = Artisan::output();
 
         $this->assertSame(1, $status);
         $this->assertStringContainsString('1 releases have a guid that blocks the normalization migration.', $output);
-        $this->assertStringContainsString('d41d8cd98f00b204e9800998ecf8427e', $output);
-        $this->assertStringContainsString('Legacy nZEDb release', $output);
-        $this->assertSame('d41d8cd98f00b204e9800998ecf8427e', DB::table('releases')->where('id', 1)->value('guid'));
+        $this->assertStringContainsString('Oversized guid release', $output);
+        $this->assertSame($tooLong, DB::table('releases')->where('id', 1)->value('guid'));
+    }
+
+    public function test_non_ascii_guid_blocks_the_migration(): void
+    {
+        $this->insertRelease(1, 'd41d8cd98f00b204e9800998ecf842ü', 'd', ['name' => 'Non ASCII guid']);
+
+        $status = Artisan::call('releases:normalize-guids');
+        $output = Artisan::output();
+
+        $this->assertSame(1, $status);
+        $this->assertStringContainsString('1 releases have a guid that blocks', $output);
+        $this->assertStringContainsString('Non ASCII guid', $output);
     }
 
     public function test_case_insensitive_duplicates_report_every_id_but_the_lowest(): void

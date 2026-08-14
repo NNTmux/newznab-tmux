@@ -1299,7 +1299,7 @@ CREATE TABLE `releases` (
   `size` bigint(20) unsigned NOT NULL DEFAULT 0,
   `postdate` datetime DEFAULT NULL,
   `adddate` datetime DEFAULT NULL,
-  `guid` char(36) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL,
+  `guid` char(40) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL,
   `leftguid` char(1) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL COMMENT 'The first letter of the release guid',
   `fromname` varchar(255) DEFAULT NULL,
   `completion` double NOT NULL DEFAULT 0,

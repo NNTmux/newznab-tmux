@@ -63,6 +63,16 @@ return new class extends Migration
         'additional_pp_claim_token',
     ];
 
+    /**
+     * `guid` is narrowed to `CHAR(40) ascii`, so the only values that cannot survive
+     * the rebuild are ones longer than 40 characters or containing bytes outside
+     * printable ASCII. Legacy 40 character nZEDb SHA1 guids are explicitly still
+     * valid; only newly generated guids are UUIDs.
+     */
+    private const string GUID_REGEXP = '^[ -~]{1,40}$';
+
+    private const string GUID_PATTERN = '/^[\x20-\x7E]{1,40}$/D';
+
     public function up(): void
     {
         if (! Schema::hasTable('releases')) {
@@ -286,7 +296,7 @@ return new class extends Migration
             }
         }
 
-        $specifications[] = 'MODIFY `guid` CHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL';
+        $specifications[] = 'MODIFY `guid` CHAR(40) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL';
         $specifications[] = "MODIFY `leftguid` CHAR(1) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL COMMENT 'The first letter of the release guid'";
         foreach (self::CLAIM_TOKEN_COLUMNS as $column) {
             if (Schema::hasColumn('releases', $column)) {
@@ -560,12 +570,12 @@ return new class extends Migration
         if ($this->isMariaDbOrMySql()) {
             $invalidGuids = DB::table('releases')
                 ->whereNull('guid')
-                ->orWhereRaw("guid NOT REGEXP '^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$'")
+                ->orWhereRaw("`guid` NOT REGEXP '".self::GUID_REGEXP."'")
                 ->count();
         } else {
             $invalidGuids = DB::table('releases')->pluck('guid')->filter(
                 static fn (mixed $guid): bool => ! is_string($guid)
-                    || preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iD', $guid) !== 1,
+                    || preg_match(self::GUID_PATTERN, $guid) !== 1,
             )->count();
         }
 
@@ -579,7 +589,7 @@ return new class extends Migration
 
         $blockers = array_filter([
             'duplicate release IDs' => $duplicateIds,
-            'invalid release GUIDs' => $invalidGuids,
+            'release GUIDs that do not fit CHAR(40) ascii' => $invalidGuids,
             'case-insensitive duplicate release GUIDs' => $duplicateGuids,
             'mismatched release leftguid values' => $leftGuidMismatches,
         ]);
