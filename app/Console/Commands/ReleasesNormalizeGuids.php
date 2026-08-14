@@ -7,6 +7,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -19,6 +20,10 @@ use Illuminate\Support\Str;
  * rewritten in place. Invalid and duplicated `guid` values are only reported: a guid
  * determines the on-disk NZB path and is published in download links, so replacing one
  * is a migration of file and link state rather than a database repair.
+ *
+ * Every scan here is either a single aggregate or a keyset (`id > ?`) walk. Never use
+ * `chunk()`: its `LIMIT/OFFSET` paging degrades quadratically, and on a multi-million
+ * row `releases` table the later batches re-read millions of rows each.
  */
 #[Signature('releases:normalize-guids
     {--dry-run : Report the required changes without writing anything}
@@ -27,6 +32,10 @@ use Illuminate\Support\Str;
 class ReleasesNormalizeGuids extends Command
 {
     private const string UUID_PATTERN = '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iD';
+
+    private const string UUID_REGEXP = '^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$';
+
+    private const int SAMPLE_SIZE = 20;
 
     private bool $dryRun = false;
 
@@ -44,17 +53,16 @@ class ReleasesNormalizeGuids extends Command
         }
 
         $leftGuids = $this->syncLeftGuids();
-        $invalid = $this->collectInvalidGuidIds();
-        $duplicates = $this->collectDuplicateGuidIds();
+        $invalid = $this->countInvalidGuids();
+        $duplicates = $this->countDuplicateGuids();
 
         $this->table(['Issue', 'Releases'], [
             ['leftguid out of sync with guid', (string) $leftGuids],
-            ['guid is not a UUID', (string) count($invalid)],
-            ['guid duplicated case-insensitively', (string) count($duplicates)],
+            ['guid is not a UUID', (string) $invalid],
+            ['guid duplicated case-insensitively', (string) $duplicates],
         ]);
 
-        $blocking = array_values(array_unique([...$invalid, ...$duplicates]));
-        if ($blocking === []) {
+        if ($invalid + $duplicates === 0) {
             $this->info($this->dryRun
                 ? 'No guid problems found. Re-run without --dry-run to apply the leftguid sync.'
                 : 'Release guids are consistent.');
@@ -62,42 +70,9 @@ class ReleasesNormalizeGuids extends Command
             return self::SUCCESS;
         }
 
-        $this->reportBlockingReleases($blocking);
+        $this->reportBlockingReleases($invalid + $duplicates);
 
         return self::FAILURE;
-    }
-
-    /**
-     * Print the releases that must be resolved by hand before the migration can run.
-     *
-     * @param  list<int>  $ids
-     */
-    private function reportBlockingReleases(array $ids): void
-    {
-        $this->error(count($ids).' releases have a guid that blocks the normalization migration.');
-        $this->warn(
-            'These are not repaired automatically. A guid determines the release NZB path and is published in '
-            .'download links, so a new guid orphans the existing NZB file and breaks every link and download_stats '
-            .'row that references the old value. Resolve them deliberately: delete the affected releases, or assign '
-            .'new guids and relocate the matching NZB files yourself.'
-        );
-
-        $sample = array_slice($ids, 0, 20);
-        $rows = DB::table('releases')
-            ->select(['id', 'guid', 'name'])
-            ->whereIn('id', $sample)
-            ->orderBy('id')
-            ->get();
-
-        $this->table(['Release ID', 'Guid', 'Name'], $rows->map(static fn ($row): array => [
-            (string) $row->id,
-            (string) $row->guid,
-            Str::limit((string) $row->name, 60),
-        ])->all());
-
-        if (count($ids) > count($sample)) {
-            $this->line('… and '.(count($ids) - count($sample)).' more.');
-        }
     }
 
     /**
@@ -137,58 +112,174 @@ class ReleasesNormalizeGuids extends Command
         return $total;
     }
 
-    /** @return list<int> */
-    private function collectInvalidGuidIds(): array
+    /**
+     * On MySQL this is a single aggregate. Elsewhere it is a keyset walk that
+     * applies the pattern in PHP, keeping memory flat regardless of table size.
+     */
+    private function countInvalidGuids(): int
     {
-        $ids = [];
-        DB::table('releases')->select(['id', 'guid'])->orderBy('id')->chunk($this->chunkSize(), function ($rows) use (&$ids): void {
-            foreach ($rows as $row) {
-                if (! is_string($row->guid) || preg_match(self::UUID_PATTERN, $row->guid) !== 1) {
-                    $ids[] = (int) $row->id;
-                }
+        if ($this->isMySql()) {
+            return $this->invalidGuidQuery()->count();
+        }
+
+        $count = 0;
+        $this->walkByKey(function (object $row) use (&$count): bool {
+            if ($this->isInvalidGuid($row->guid)) {
+                $count++;
             }
+
+            return true;
         });
 
-        return $ids;
+        return $count;
     }
 
     /**
-     * Every release that shares a case-insensitive guid with a lower-id release.
-     * The lowest id is treated as the owner of the guid and is not reported.
-     *
-     * @return list<int>
+     * The number of rows that share a guid with a lower-id row, which is exactly
+     * the total row count minus the number of distinct guids.
      */
-    private function collectDuplicateGuidIds(): array
+    private function countDuplicateGuids(): int
     {
-        $duplicated = DB::table('releases')
-            ->selectRaw('LOWER(guid) AS normalized_guid')
-            ->groupByRaw('LOWER(guid)')
-            ->havingRaw('COUNT(*) > 1')
-            ->pluck('normalized_guid');
+        $row = DB::selectOne(
+            'SELECT COUNT(*) AS total, COUNT(DISTINCT LOWER(`guid`)) AS distinct_guids FROM '.$this->prefixedTable('releases')
+        );
 
-        $ids = [];
-        foreach ($duplicated->chunk(500) as $batch) {
-            $rows = DB::table('releases')
-                ->select(['id', 'guid'])
-                ->whereIn(DB::raw('LOWER(guid)'), $batch->all())
-                ->orderBy('id')
-                ->get();
+        return max(0, (int) ($row->total ?? 0) - (int) ($row->distinct_guids ?? 0));
+    }
 
-            $seen = [];
-            foreach ($rows as $row) {
-                $key = strtolower((string) $row->guid);
-                if (isset($seen[$key])) {
-                    $ids[] = (int) $row->id;
+    /**
+     * Print a bounded sample of the releases that must be resolved by hand before
+     * the migration can run.
+     */
+    private function reportBlockingReleases(int $total): void
+    {
+        $this->error($total.' releases have a guid that blocks the normalization migration.');
+        $this->warn(
+            'These are not repaired automatically. A guid determines the release NZB path and is published in '
+            .'download links, so a new guid orphans the existing NZB file and breaks every link and download_stats '
+            .'row that references the old value. Resolve them deliberately: delete the affected releases, or assign '
+            .'new guids and relocate the matching NZB files yourself.'
+        );
 
-                    continue;
-                }
-                $seen[$key] = true;
-            }
+        $sample = $this->sampleBlockingReleases();
+        if ($sample === []) {
+            return;
         }
 
-        sort($ids);
+        $this->table(['Release ID', 'Guid', 'Name'], array_map(static fn (object $row): array => [
+            (string) $row->id,
+            (string) $row->guid,
+            Str::limit((string) ($row->name ?? ''), 60),
+        ], $sample));
 
-        return $ids;
+        if ($total > count($sample)) {
+            $this->line('… and '.($total - count($sample)).' more.');
+        }
+    }
+
+    /** @return list<object> */
+    private function sampleBlockingReleases(): array
+    {
+        if ($this->isMySql()) {
+            $invalid = $this->invalidGuidQuery()
+                ->select(['id', 'guid', 'name'])
+                ->orderBy('id')
+                ->limit(self::SAMPLE_SIZE)
+                ->get()
+                ->all();
+
+            if (count($invalid) >= self::SAMPLE_SIZE) {
+                return $invalid;
+            }
+
+            return [...$invalid, ...$this->sampleDuplicateGuids(self::SAMPLE_SIZE - count($invalid), $invalid)];
+        }
+
+        $sample = [];
+        $this->walkByKey(function (object $row) use (&$sample): bool {
+            if ($this->isInvalidGuid($row->guid)) {
+                $sample[] = $row;
+            }
+
+            return count($sample) < self::SAMPLE_SIZE;
+        }, ['id', 'guid', 'name']);
+
+        return $sample;
+    }
+
+    /**
+     * @param  list<object>  $exclude
+     * @return list<object>
+     */
+    private function sampleDuplicateGuids(int $limit, array $exclude): array
+    {
+        if ($limit <= 0) {
+            return [];
+        }
+
+        $excludedIds = array_map(static fn (object $row): int => (int) $row->id, $exclude);
+        $releases = $this->prefixedTable('releases');
+
+        return DB::select(
+            "SELECT r.`id` AS id, r.`guid` AS guid, r.`name` AS name
+             FROM {$releases} r
+             JOIN (SELECT LOWER(`guid`) AS normalized_guid, MIN(`id`) AS keep_id
+                   FROM {$releases} GROUP BY LOWER(`guid`) HAVING COUNT(*) > 1) d
+               ON LOWER(r.`guid`) = d.normalized_guid AND r.`id` > d.keep_id
+             ".($excludedIds === [] ? '' : 'WHERE r.`id` NOT IN ('.implode(', ', $excludedIds).')')."
+             ORDER BY r.`id` LIMIT {$limit}"
+        );
+    }
+
+    /**
+     * Walk `releases` in primary key order. The callback returns false to stop.
+     *
+     * @param  callable(object): bool  $callback
+     * @param  list<string>  $columns
+     */
+    private function walkByKey(callable $callback, array $columns = ['id', 'guid']): void
+    {
+        $chunk = $this->chunkSize();
+        $lastId = 0;
+
+        do {
+            $rows = DB::table('releases')
+                ->select($columns)
+                ->where('id', '>', $lastId)
+                ->orderBy('id')
+                ->limit($chunk)
+                ->get();
+
+            foreach ($rows as $row) {
+                $lastId = max($lastId, (int) $row->id);
+                if (! $callback($row)) {
+                    return;
+                }
+            }
+        } while ($rows->count() === $chunk);
+    }
+
+    private function invalidGuidQuery(): Builder
+    {
+        return DB::table('releases')->where(function ($query): void {
+            $query->whereNull('guid')
+                ->orWhereRaw("`guid` NOT REGEXP '".self::UUID_REGEXP."'");
+        });
+    }
+
+    private function isInvalidGuid(mixed $guid): bool
+    {
+        return ! is_string($guid) || preg_match(self::UUID_PATTERN, $guid) !== 1;
+    }
+
+    private function isMySql(): bool
+    {
+        return in_array(DB::getDriverName(), ['mariadb', 'mysql'], true);
+    }
+
+    private function prefixedTable(string $name): string
+    {
+        return '`'.DB::getTablePrefix().$name.'`';
     }
 
     private function chunkSize(): int

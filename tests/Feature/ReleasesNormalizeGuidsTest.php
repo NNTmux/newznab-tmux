@@ -120,6 +120,29 @@ final class ReleasesNormalizeGuidsTest extends TestCase
         $this->assertStringContainsString('Release guids are consistent.', Artisan::output());
     }
 
+    public function test_portable_scans_never_use_offset_paging(): void
+    {
+        for ($id = 1; $id <= 250; $id++) {
+            $this->insertRelease($id, sprintf('%08x-89ab-cdef-0123-456789abcdef', $id), 'x');
+        }
+
+        $queries = [];
+        DB::listen(static function ($query) use (&$queries): void {
+            $queries[] = $query->sql;
+        });
+
+        Artisan::call('releases:normalize-guids', ['--chunk' => 100]);
+
+        $this->assertNotEmpty($queries);
+        foreach ($queries as $sql) {
+            $this->assertStringNotContainsStringIgnoringCase(
+                'offset',
+                $sql,
+                'releases:normalize-guids must page by primary key, never with LIMIT/OFFSET.',
+            );
+        }
+    }
+
     /** @param array<string, mixed> $overrides */
     private function insertRelease(int $id, string $guid, string $leftguid, array $overrides = []): void
     {
