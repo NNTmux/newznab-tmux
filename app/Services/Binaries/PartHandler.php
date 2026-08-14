@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\Binaries;
 
+use App\Support\SqlError;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Handles part record creation during header storage.
@@ -176,7 +176,7 @@ final class PartHandler
         } catch (\Throwable $e) {
             $this->lastException = $e;
             if (config('app.debug') === true) {
-                Log::error('Parts chunk insert failed: '.$e->getMessage());
+                SqlError::logFailure('Parts chunk insert failed', $e);
             }
 
             return null;

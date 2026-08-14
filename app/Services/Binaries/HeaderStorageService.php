@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Binaries;
 
-use Illuminate\Database\QueryException;
+use App\Support\SqlError;
 
 /**
  * Orchestrates the header storage process.
@@ -180,19 +180,7 @@ final class HeaderStorageService
 
     private function isTransientLockError(?\Throwable $exception): bool
     {
-        if ($exception === null) {
-            return false;
-        }
-        if ($exception instanceof QueryException) {
-            $driverCode = (int) ($exception->errorInfo[1] ?? 0);
-            if ($exception->getCode() === '40001' || \in_array($driverCode, [1205, 1213], true)) {
-                return true;
-            }
-        }
-
-        return str_contains($exception->getMessage(), 'Deadlock found')
-            || str_contains($exception->getMessage(), 'Lock wait timeout exceeded')
-            || str_contains($exception->getMessage(), 'database is locked');
+        return $exception !== null && SqlError::isTransientLock($exception);
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Binaries;
 
+use App\Support\SqlError;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -87,7 +88,7 @@ final class HeaderStorageTransaction
             $this->rollbackAndCleanup();
 
             if (config('app.debug') === true) {
-                Log::error('HeaderStorageTransaction commit failed: '.$e->getMessage());
+                SqlError::logFailure('HeaderStorageTransaction commit failed', $e);
             }
 
             return false;

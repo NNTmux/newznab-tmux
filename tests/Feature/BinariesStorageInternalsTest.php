@@ -11,6 +11,7 @@ use App\Services\Binaries\HeaderStorageTransaction;
 use App\Services\Binaries\PartHandler;
 use App\Services\BlacklistService;
 use App\Services\CollectionsCleaningService;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
@@ -388,6 +389,25 @@ class BinariesStorageInternalsTest extends TestCase
             status INT DEFAULT 1,
             ordinal INT DEFAULT 0
         )');
+    }
+
+    public function test_record_changed_since_last_read_is_treated_as_transient(): void
+    {
+        $service = new HeaderStorageService($this->deterministicCollectionHandler(), config: new BinariesConfig(sqlChunkSize: 10));
+        $method = new \ReflectionMethod($service, 'isTransientLockError');
+
+        $pdo1020 = new \PDOException("SQLSTATE[HY000]: General error: 1020 Record has changed since last read in table 'collections'; try restarting transaction");
+        $pdo1020->errorInfo = ['HY000', 1020, "Record has changed since last read in table 'collections'"];
+        $checkRead = new QueryException('mariadb', 'INSERT INTO collections ...', [], $pdo1020);
+
+        $this->assertTrue($method->invoke($service, $checkRead));
+
+        $pdo1062 = new \PDOException('SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry');
+        $pdo1062->errorInfo = ['23000', 1062, 'Duplicate entry'];
+        $duplicateKey = new QueryException('mariadb', 'INSERT INTO collections ...', [], $pdo1062);
+
+        $this->assertFalse($method->invoke($service, $duplicateKey));
+        $this->assertFalse($method->invoke($service, null));
     }
 
     private function deterministicCollectionHandler(): CollectionHandler

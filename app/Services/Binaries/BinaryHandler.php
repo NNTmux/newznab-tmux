@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services\Binaries;
 
+use App\Support\SqlError;
 use App\Support\Utf8;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Handles binary record creation and updates during header storage.
@@ -86,7 +86,7 @@ final class BinaryHandler
         } catch (\Throwable $e) {
             $this->lastException = $e;
             if (config('app.debug') === true) {
-                Log::error('Binary insert failed: '.$e->getMessage());
+                SqlError::logFailure('Binary insert failed', $e);
             }
         }
 
@@ -158,7 +158,7 @@ final class BinaryHandler
         } catch (\Throwable $e) {
             $this->lastException = $e;
             if (config('app.debug') === true) {
-                Log::error('Bulk binary insert failed: '.$e->getMessage());
+                SqlError::logFailure('Bulk binary insert failed', $e);
             }
         }
 
@@ -458,7 +458,7 @@ final class BinaryHandler
         } catch (\Throwable $e) {
             $this->lastException = $e;
             if (config('app.debug') === true) {
-                Log::error('Binaries aggregate update failed: '.$e->getMessage());
+                SqlError::logFailure('Binaries aggregate update failed', $e);
             }
 
             return false;

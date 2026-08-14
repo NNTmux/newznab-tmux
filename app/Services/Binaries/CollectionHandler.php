@@ -8,9 +8,9 @@ use App\Enums\CollectionFileCheckStatus;
 use App\Models\Collection;
 use App\Services\CollectionsCleaningService;
 use App\Services\XrefService;
+use App\Support\SqlError;
 use App\Support\Utf8;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Handles collection record creation and retrieval during header storage.
@@ -131,7 +131,7 @@ final class CollectionHandler
         } catch (\Throwable $e) {
             $this->lastException = $e;
             if (config('app.debug') === true) {
-                Log::error('Collection insert failed: '.$e->getMessage());
+                SqlError::logFailure('Collection insert failed', $e);
             }
         }
 
@@ -233,7 +233,7 @@ final class CollectionHandler
         } catch (\Throwable $e) {
             $this->lastException = $e;
             if (config('app.debug') === true) {
-                Log::error('Bulk collection insert failed: '.$e->getMessage());
+                SqlError::logFailure('Bulk collection insert failed', $e);
             }
         }
 
@@ -676,7 +676,7 @@ final class CollectionHandler
         } catch (\Throwable $e) {
             $this->lastException = $e;
             if (config('app.debug') === true) {
-                Log::error('Collection aggregate refresh failed: '.$e->getMessage());
+                SqlError::logFailure('Collection aggregate refresh failed', $e);
             }
 
             return false;
