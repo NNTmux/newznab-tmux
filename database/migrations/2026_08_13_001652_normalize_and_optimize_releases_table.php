@@ -50,6 +50,19 @@ return new class extends Migration
         'ix_releases_nzb_creation_queue',
     ];
 
+    /**
+     * Narrowed to `CHAR(32) ascii` as part of this rebuild rather than in a
+     * follow-up migration: the `guid` charset change already forces
+     * `ALGORITHM=COPY`, so folding these in costs nothing, whereas a separate
+     * migration would force a second full table rebuild.
+     *
+     * @var list<string>
+     */
+    private const array CLAIM_TOKEN_COLUMNS = [
+        'nzb_creation_claim_token',
+        'additional_pp_claim_token',
+    ];
+
     public function up(): void
     {
         if (! Schema::hasTable('releases')) {
@@ -275,6 +288,11 @@ return new class extends Migration
 
         $specifications[] = 'MODIFY `guid` CHAR(36) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL';
         $specifications[] = "MODIFY `leftguid` CHAR(1) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL COMMENT 'The first letter of the release guid'";
+        foreach (self::CLAIM_TOKEN_COLUMNS as $column) {
+            if (Schema::hasColumn('releases', $column)) {
+                $specifications[] = 'MODIFY `'.$column.'` CHAR(32) CHARACTER SET ascii COLLATE ascii_general_ci NULL';
+            }
+        }
         foreach (self::REMOVED_RELEASE_COLUMNS as $column) {
             if (Schema::hasColumn('releases', $column)) {
                 $specifications[] = 'DROP COLUMN `'.$column.'`';
@@ -286,7 +304,7 @@ return new class extends Migration
             'ADD UNIQUE INDEX `ux_releases_guid` (`guid`)',
             'ADD INDEX `ix_releases_predb_id` (`predb_id`)',
             'ADD INDEX `ix_releases_size` (`size`)',
-            'ADD INDEX `ix_releases_add_pp_claim_queue` (`passwordstatus`, `haspreview`, `nzbstatus`, `leftguid`, `postdate` DESC, `id`, `additional_pp_claimed_at`)',
+            'ADD INDEX `ix_releases_add_pp_claim_queue` (`passwordstatus`, `haspreview`, `nzbstatus`, `leftguid`, `postdate` DESC, `id`, `additional_pp_claimed_at`, `size`)',
             'ADD INDEX `ix_releases_nzb_creation_group_queue` (`nzbstatus`, `groups_id`, `postdate` DESC, `id`, `nzb_creation_claimed_at`)',
             'ADD INDEX `ix_releases_nzb_creation_global_queue` (`nzbstatus`, `postdate` DESC, `id`, `nzb_creation_claimed_at`)',
         ];
@@ -311,7 +329,7 @@ return new class extends Migration
             $table->index('predb_id', 'ix_releases_predb_id');
             $table->index('size', 'ix_releases_size');
             $table->index(
-                ['passwordstatus', 'haspreview', 'nzbstatus', 'leftguid', 'postdate', 'id', 'additional_pp_claimed_at'],
+                ['passwordstatus', 'haspreview', 'nzbstatus', 'leftguid', 'postdate', 'id', 'additional_pp_claimed_at', 'size'],
                 'ix_releases_add_pp_claim_queue',
             );
             $table->index(
@@ -345,6 +363,8 @@ return new class extends Migration
             ...$specifications,
             'MODIFY `guid` VARCHAR(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL',
             "MODIFY `leftguid` CHAR(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'The first letter of the release guid'",
+            'MODIFY `nzb_creation_claim_token` VARCHAR(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL',
+            'MODIFY `additional_pp_claim_token` VARCHAR(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL',
             'ADD COLUMN `updatetime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `adddate`',
             'ADD COLUMN `gid` VARCHAR(32) NULL AFTER `updatetime`',
             'ADD COLUMN `source` SMALLINT UNSIGNED NULL',

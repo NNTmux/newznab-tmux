@@ -76,7 +76,7 @@ final class ReleaseSchemaOptimizationMigrationMariaDbTest extends TestCase
         $this->assertFalse(Schema::hasColumn('releases', 'proc_sorter'));
         $this->assertFalse(Schema::hasColumn('release_comments', 'gid'));
         $this->assertSame(
-            ['passwordstatus', 'haspreview', 'nzbstatus', 'leftguid', 'postdate', 'id', 'additional_pp_claimed_at'],
+            ['passwordstatus', 'haspreview', 'nzbstatus', 'leftguid', 'postdate', 'id', 'additional_pp_claimed_at', 'size'],
             $this->indexColumns('ix_releases_add_pp_claim_queue'),
         );
         $this->assertSame(
@@ -114,13 +114,11 @@ final class ReleaseSchemaOptimizationMigrationMariaDbTest extends TestCase
     }
 
     #[Test]
-    public function claim_token_and_pp_index_follow_up_narrows_columns_and_adds_size(): void
+    public function rebuild_narrows_claim_tokens_and_covers_size_in_one_pass(): void
     {
         $this->seedLegacyData();
-        $this->migration()->up();
-        $followUp = $this->followUpMigration();
 
-        $followUp->up();
+        $this->migration()->up();
 
         $this->assertSame(
             ['passwordstatus', 'haspreview', 'nzbstatus', 'leftguid', 'postdate', 'id', 'additional_pp_claimed_at', 'size'],
@@ -135,13 +133,55 @@ final class ReleaseSchemaOptimizationMigrationMariaDbTest extends TestCase
         DB::table('releases')->where('id', 1)->update(['additional_pp_claim_token' => $token]);
         $this->assertSame($token, DB::table('releases')->where('id', 1)->value('additional_pp_claim_token'));
 
-        $followUp->down();
+        $this->migration()->down();
+
+        $this->assertSame('varchar(64)', strtolower($this->columnType('additional_pp_claim_token')));
+        $this->assertSame('varchar(64)', strtolower($this->columnType('nzb_creation_claim_token')));
+    }
+
+    #[Test]
+    public function follow_up_migration_is_a_no_op_once_the_rebuild_covers_it(): void
+    {
+        $this->seedLegacyData();
+        $this->migration()->up();
+
+        $before = $this->releasesCreateStatement();
+        $this->followUpMigration()->up();
+
+        $this->assertSame($before, $this->releasesCreateStatement());
+    }
+
+    #[Test]
+    public function follow_up_migration_upgrades_an_install_left_on_the_old_shape(): void
+    {
+        $this->seedLegacyData();
+        $this->migration()->up();
+
+        DB::statement(
+            'ALTER TABLE `'.$this->table('releases').'` '
+            .'DROP INDEX `ix_releases_add_pp_claim_queue`, '
+            .'ADD INDEX `ix_releases_add_pp_claim_queue` (`passwordstatus`, `haspreview`, `nzbstatus`, `leftguid`,'
+            .' `postdate` DESC, `id`, `additional_pp_claimed_at`), '
+            .'MODIFY `nzb_creation_claim_token` VARCHAR(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL, '
+            .'MODIFY `additional_pp_claim_token` VARCHAR(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL'
+        );
+
+        $this->followUpMigration()->up();
 
         $this->assertSame(
-            ['passwordstatus', 'haspreview', 'nzbstatus', 'leftguid', 'postdate', 'id', 'additional_pp_claimed_at'],
+            ['passwordstatus', 'haspreview', 'nzbstatus', 'leftguid', 'postdate', 'id', 'additional_pp_claimed_at', 'size'],
             $this->indexColumns('ix_releases_add_pp_claim_queue'),
         );
-        $this->assertSame('varchar(64)', strtolower($this->columnType('additional_pp_claim_token')));
+        foreach (['nzb_creation_claim_token', 'additional_pp_claim_token'] as $column) {
+            $this->assertSame('char(32)', strtolower($this->columnType($column)));
+        }
+    }
+
+    private function releasesCreateStatement(): string
+    {
+        $row = DB::selectOne('SHOW CREATE TABLE `'.$this->table('releases').'`');
+
+        return (string) ($row->{'Create Table'} ?? '');
     }
 
     private function createSchema(): void

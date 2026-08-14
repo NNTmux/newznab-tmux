@@ -1324,7 +1324,7 @@ CREATE TABLE `releases` (
   `videostatus` tinyint(1) NOT NULL DEFAULT 0,
   `nzbstatus` tinyint(1) NOT NULL DEFAULT 0,
   `nzb_creation_claimed_at` timestamp NULL DEFAULT NULL,
-  `nzb_creation_claim_token` varchar(64) DEFAULT NULL,
+  `nzb_creation_claim_token` char(32) CHARACTER SET ascii COLLATE ascii_general_ci DEFAULT NULL,
   `iscategorized` tinyint(1) NOT NULL DEFAULT 0,
   `isrenamed` tinyint(1) NOT NULL DEFAULT 0,
   `proc_pp` tinyint(1) NOT NULL DEFAULT 0,
@@ -1337,7 +1337,7 @@ CREATE TABLE `releases` (
   `proc_crc32` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Has the release been crc32 processed',
   `pp_timeout_count` tinyint(4) NOT NULL DEFAULT 0 COMMENT 'Number of times this release timed out during additional post-processing',
   `additional_pp_claimed_at` timestamp NULL DEFAULT NULL,
-  `additional_pp_claim_token` varchar(64) DEFAULT NULL,
+  `additional_pp_claim_token` char(32) CHARACTER SET ascii COLLATE ascii_general_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `ux_releases_guid` (`guid`),
   KEY `ix_releases_groupsid` (`groups_id`,`passwordstatus`),
@@ -1362,7 +1362,7 @@ CREATE TABLE `releases` (
   KEY `ix_releases_adddate_id` (`adddate`,`id`),
   KEY `ix_releases_predb_id` (`predb_id`),
   KEY `ix_releases_size` (`size`),
-  KEY `ix_releases_add_pp_claim_queue` (`passwordstatus`,`haspreview`,`nzbstatus`,`leftguid`,`postdate` DESC,`id`,`additional_pp_claimed_at`),
+  KEY `ix_releases_add_pp_claim_queue` (`passwordstatus`,`haspreview`,`nzbstatus`,`leftguid`,`postdate` DESC,`id`,`additional_pp_claimed_at`,`size`),
   KEY `ix_releases_nzb_creation_group_queue` (`nzbstatus`,`groups_id`,`postdate` DESC,`id`,`nzb_creation_claimed_at`),
   KEY `ix_releases_nzb_creation_global_queue` (`nzbstatus`,`postdate` DESC,`id`,`nzb_creation_claimed_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
