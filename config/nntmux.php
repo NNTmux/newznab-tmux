@@ -81,4 +81,21 @@ return [
     'categorization' => [
         'log' => (bool) env('NNTMUX_CATEGORIZATION_LOG', false),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Releases table normalization migration
+    |--------------------------------------------------------------------------
+    |
+    | Knobs for the one-off releases rebuild. Skip the in-migration preflight
+    | only after `php artisan releases:optimize-preflight` has passed, since the
+    | checks are four full scans of the largest table. The free-space guard
+    | aborts before a COPY-algorithm ALTER that would fill the data volume.
+    |
+    */
+    'releases_optimize' => [
+        'skip_preflight' => (bool) env('RELEASES_OPTIMIZE_SKIP_PREFLIGHT', false),
+        'skip_free_space_check' => (bool) env('RELEASES_OPTIMIZE_SKIP_FREE_SPACE_CHECK', false),
+        'chunk_size' => (int) env('RELEASES_OPTIMIZE_CHUNK_SIZE', 5000),
+    ],
 ];

@@ -70,16 +70,6 @@
                                     <i class="fas fa-eye-slash mr-1"></i>Hidden
                                 </span>
                             @endif
-                            @if($comment->shared)
-                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                                    <i class="fas fa-share-alt mr-1"></i>Shared
-                                </span>
-                            @endif
-                            @if($comment->issynced)
-                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200">
-                                    <i class="fas fa-sync mr-1"></i>Synced
-                                </span>
-                            @endif
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">

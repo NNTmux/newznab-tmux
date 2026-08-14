@@ -206,17 +206,22 @@ class ReleasesOptimizePreflight extends Command
             return 0;
         }
 
-        return DB::query()->fromSub(
-            DB::table('releases as r')
-                ->leftJoin('release_comments as rc', function ($join): void {
-                    $join->on('rc.releases_id', '=', 'r.id')->where('rc.isvisible', 1);
-                })
-                ->select('r.id', 'r.comments')
-                ->selectRaw('COUNT(rc.id) AS visible_comments')
-                ->groupBy('r.id', 'r.comments')
-                ->havingRaw('r.comments <> COUNT(rc.id)'),
-            'comment_counter_mismatches',
-        )->count();
+        // Raw SQL with explicit prefixed names: Laravel prefixes query aliases
+        // too, so `releases as r` would not match a raw `r.comments` reference.
+        $releases = $this->prefixedTable('releases');
+        $comments = $this->prefixedTable('release_comments');
+
+        return count(DB::select(
+            "SELECT r.`id` FROM {$releases} r LEFT JOIN {$comments} c
+               ON c.`releases_id` = r.`id` AND c.`isvisible` = 1
+             GROUP BY r.`id`, r.`comments`
+             HAVING r.`comments` <> COUNT(c.`id`)"
+        ));
+    }
+
+    private function prefixedTable(string $name): string
+    {
+        return '`'.DB::getTablePrefix().$name.'`';
     }
 
     private function countNonEmpty(string $table, string $column): int
@@ -278,10 +283,103 @@ class ReleasesOptimizePreflight extends Command
             array_values($report['migration_data']),
         ));
 
+        $this->renderStorageSection($report);
+        $this->renderDiscardedDataSection($report);
+        $this->renderIndexSection($report);
+
         if ($report['ok']) {
             $this->info('Releases optimization preflight passed.');
         } else {
             $this->error('Releases optimization preflight failed. Resolve every blocker before migration.');
         }
+    }
+
+    /**
+     * Print the on-disk footprint and the free space the rebuild needs.
+     *
+     * @param  array<string, mixed>  $report
+     */
+    private function renderStorageSection(array $report): void
+    {
+        $storage = $report['storage'] ?? [];
+        if (! is_array($storage) || ($storage['total_bytes'] ?? null) === null) {
+            $this->line('Storage: not reported for the '.$report['database_driver'].' driver.');
+
+            return;
+        }
+
+        $this->table(['Storage', 'Size'], [
+            ['Data', self::formatBytes((int) $storage['data_bytes'])],
+            ['Indexes', self::formatBytes((int) $storage['index_bytes'])],
+            ['Total', self::formatBytes((int) $storage['total_bytes'])],
+            ['Free space required', self::formatBytes((int) $storage['required_free_bytes'])],
+        ]);
+        $this->warn(
+            'The rebuild copies the table, so at least '.self::formatBytes((int) $storage['required_free_bytes'])
+            .' must be free on the MySQL data volume before you migrate.'
+        );
+    }
+
+    /**
+     * Print how many values each dropped column is about to lose.
+     *
+     * @param  array<string, mixed>  $report
+     */
+    private function renderDiscardedDataSection(array $report): void
+    {
+        $discarded = $report['discarded_data'] ?? [];
+        if (! is_array($discarded) || $discarded === []) {
+            return;
+        }
+
+        $rows = [];
+        foreach ($discarded as $column => $count) {
+            $rows[] = [$column, $count === null ? 'already dropped' : (string) $count];
+        }
+
+        $this->table(['Dropped column', 'Values destroyed'], $rows);
+
+        $destroyed = array_sum(array_map(static fn (?int $count): int => $count ?? 0, $discarded));
+        if ($destroyed > 0) {
+            $this->warn('These '.$destroyed.' values are permanently destroyed by the migration. Back up first.');
+        }
+    }
+
+    /**
+     * Print the index changes the migration will make.
+     *
+     * @param  array<string, mixed>  $report
+     */
+    private function renderIndexSection(array $report): void
+    {
+        $indexes = $report['indexes'] ?? [];
+        if (! is_array($indexes)) {
+            return;
+        }
+
+        $removal = $indexes['scheduled_for_removal'] ?? [];
+        $existing = $indexes['already_present_replacements'] ?? [];
+        $missing = array_values(array_diff(self::NEW_INDEXES, $existing));
+
+        $this->table(['Index change', 'Names'], [
+            ['Dropped', $removal === [] ? 'none' : implode(', ', $removal)],
+            ['Created', $missing === [] ? 'none' : implode(', ', $missing)],
+            ['Already present', $existing === [] ? 'none' : implode(', ', $existing)],
+        ]);
+    }
+
+    private static function formatBytes(int $bytes): string
+    {
+        $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
+        $value = (float) $bytes;
+        $unit = 0;
+        while ($value >= 1024.0 && $unit < count($units) - 1) {
+            $value /= 1024.0;
+            $unit++;
+        }
+
+        return $unit === 0
+            ? $bytes.' B'
+            : sprintf('%.2f %s', $value, $units[$unit]);
     }
 }

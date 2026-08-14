@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -56,6 +57,7 @@ return new class extends Migration
         }
 
         $this->assertReleaseIdentifiersAreSafe();
+        $this->assertEnoughFreeSpaceForRebuild();
         $this->createSparseTables();
         $this->backfillSparseTables();
         $this->recountVisibleComments();
@@ -226,13 +228,40 @@ return new class extends Migration
             return;
         }
 
-        DB::statement(
-            'UPDATE '.$this->table('releases').' SET `comments` = (SELECT COUNT(*) FROM '
-            .$this->table('release_comments').' WHERE '
-            .$this->table('release_comments').'.`releases_id` = '
-            .$this->table('releases').'.`id` AND '
-            .$this->table('release_comments').'.`isvisible` = 1)'
-        );
+        $chunkSize = $this->chunkSize();
+        $releases = $this->table('releases');
+        $comments = $this->table('release_comments');
+        $lastId = 0;
+
+        do {
+            // Raw SQL with explicit prefixed names: Laravel also prefixes query
+            // aliases, so `releases as r` would not match a raw `r.comments`.
+            $mismatches = DB::select(
+                "SELECT r.`id` AS id, COUNT(c.`id`) AS visible_comments
+                 FROM {$releases} r LEFT JOIN {$comments} c
+                   ON c.`releases_id` = r.`id` AND c.`isvisible` = 1
+                 WHERE r.`id` > ?
+                 GROUP BY r.`id`, r.`comments`
+                 HAVING r.`comments` <> COUNT(c.`id`)
+                 ORDER BY r.`id`
+                 LIMIT {$chunkSize}",
+                [$lastId],
+            );
+
+            if ($mismatches === []) {
+                return;
+            }
+
+            $idsByCount = [];
+            foreach ($mismatches as $mismatch) {
+                $idsByCount[(int) $mismatch->visible_comments][] = (int) $mismatch->id;
+                $lastId = max($lastId, (int) $mismatch->id);
+            }
+
+            foreach ($idsByCount as $count => $ids) {
+                DB::table('releases')->whereIn('id', $ids)->update(['comments' => $count]);
+            }
+        } while (count($mismatches) === $chunkSize);
     }
 
     private function rebuildReleasesForMariaDb(): void
@@ -367,33 +396,142 @@ return new class extends Migration
             $table->boolean('proc_sorter')->default(false);
             $table->boolean('audiostatus')->default(false);
             $table->index('guid', 'ix_releases_guid');
+            $table->index('adddate', 'ix_releases_adddate_only');
+            $table->index('videos_id', 'ix_releases_videos_id');
+            $table->index('movieinfo_id', 'ix_releases_movieinfo_id');
+            $table->index('imdbid', 'ix_releases_imdbid');
+            $table->index(
+                ['passwordstatus', 'categories_id', 'postdate', 'videos_id', 'tv_episodes_id', 'groups_id'],
+                'ix_releases_tv_search_covering',
+            );
+            $table->index('passwordstatus', 'ix_releases_passwordstatus');
+            $table->index(['haspreview', 'passwordstatus'], 'ix_releases_haspreview_passwordstatus');
+            $table->index(['postdate', 'searchname'], 'ix_releases_postdate_searchname');
+            $table->index(['predb_id', 'searchname'], 'ix_releases_predb_id_searchname');
+            $table->index(['size', 'categories_id', 'passwordstatus'], 'ix_releases_size_cat');
+            $table->index(
+                ['passwordstatus', 'haspreview', 'nzbstatus', 'leftguid', 'additional_pp_claimed_at', 'postdate'],
+                'ix_releases_add_pp_claim_queue',
+            );
+            $table->index(
+                ['nzbstatus', 'groups_id', 'leftguid', 'nzb_creation_claimed_at', 'postdate'],
+                'ix_releases_nzb_creation_queue',
+            );
         });
     }
 
     private function restoreSparseDataToReleases(): void
     {
+        $chunkSize = $this->chunkSize();
+
         if (Schema::hasTable('release_nzb_passwords')) {
-            DB::table('release_nzb_passwords')->orderBy('releases_id')->chunkById(1000, function ($rows): void {
-                foreach ($rows as $row) {
-                    DB::table('releases')->where('id', $row->releases_id)->update(['nzb_password' => $row->password]);
-                }
-            }, 'releases_id');
+            DB::table('release_nzb_passwords')->orderBy('releases_id')->chunkById(
+                $chunkSize,
+                fn ($rows) => $this->batchUpdateReleases($rows, ['nzb_password' => 'password']),
+                'releases_id',
+            );
         }
 
         if (Schema::hasTable('release_nzb_creation_failures')) {
-            DB::table('release_nzb_creation_failures')->orderBy('releases_id')->chunkById(1000, function ($rows): void {
-                foreach ($rows as $row) {
-                    DB::table('releases')->where('id', $row->releases_id)->update([
-                        'nzb_creation_attempts' => $row->attempts,
-                        'nzb_creation_last_error' => $row->last_error,
-                    ]);
-                }
-            }, 'releases_id');
+            DB::table('release_nzb_creation_failures')->orderBy('releases_id')->chunkById(
+                $chunkSize,
+                fn ($rows) => $this->batchUpdateReleases($rows, [
+                    'nzb_creation_attempts' => 'attempts',
+                    'nzb_creation_last_error' => 'last_error',
+                ]),
+                'releases_id',
+            );
         }
+    }
+
+    /**
+     * Push one chunk of sparse rows back into `releases` with a single
+     * `CASE`-driven statement instead of one `UPDATE` per row.
+     *
+     * @param  Collection<int, object>  $rows
+     * @param  array<string, string>  $columnMap  Target `releases` column => source column
+     */
+    private function batchUpdateReleases($rows, array $columnMap): void
+    {
+        if ($rows->isEmpty()) {
+            return;
+        }
+
+        $setClauses = [];
+        $bindings = [];
+        foreach ($columnMap as $target => $source) {
+            $clause = '`'.$target.'` = CASE `id`';
+            foreach ($rows as $row) {
+                $clause .= ' WHEN ? THEN ?';
+                $bindings[] = (int) $row->releases_id;
+                $bindings[] = $row->{$source};
+            }
+            $setClauses[] = $clause.' ELSE `'.$target.'` END';
+        }
+
+        $ids = [];
+        foreach ($rows as $row) {
+            $ids[] = (int) $row->releases_id;
+        }
+
+        DB::update(
+            'UPDATE '.$this->table('releases').' SET '.implode(', ', $setClauses)
+            .' WHERE `id` IN ('.implode(', ', array_fill(0, count($ids), '?')).')',
+            [...$bindings, ...$ids],
+        );
+    }
+
+    /**
+     * Abort before the COPY-algorithm rebuild when the data volume cannot hold
+     * a second copy of the table. Silently skipped when the server's datadir is
+     * not visible to PHP (remote or containerised MySQL).
+     */
+    private function assertEnoughFreeSpaceForRebuild(): void
+    {
+        if (! $this->isMariaDbOrMySql() || (bool) config('nntmux.releases_optimize.skip_free_space_check', false)) {
+            return;
+        }
+
+        $sizes = DB::selectOne(
+            'SELECT DATA_LENGTH + INDEX_LENGTH AS total_bytes FROM information_schema.TABLES
+             WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?',
+            [DB::getTablePrefix().'releases'],
+        );
+        $required = (int) ($sizes->total_bytes ?? 0) * 2;
+        if ($required <= 0) {
+            return;
+        }
+
+        $dataDir = (string) (DB::selectOne('SELECT @@datadir AS dir')->dir ?? '');
+        if ($dataDir === '' || ! is_dir($dataDir) || ! is_readable($dataDir)) {
+            return;
+        }
+
+        $free = @disk_free_space($dataDir);
+        if ($free === false || $free >= $required) {
+            return;
+        }
+
+        throw new RuntimeException(sprintf(
+            'Releases rebuild needs about %d bytes free in %s but only %d are available. '
+            .'Free up space, use gh-ost/pt-online-schema-change, or set RELEASES_OPTIMIZE_SKIP_FREE_SPACE_CHECK=true to override.',
+            $required,
+            $dataDir,
+            (int) $free,
+        ));
+    }
+
+    private function chunkSize(): int
+    {
+        return max(100, min(10000, (int) config('nntmux.releases_optimize.chunk_size', 5000)));
     }
 
     private function assertReleaseIdentifiersAreSafe(): void
     {
+        if ((bool) config('nntmux.releases_optimize.skip_preflight', false)) {
+            return;
+        }
+
         $duplicateIds = DB::query()->fromSub(
             DB::table('releases')->select('id')->groupBy('id')->havingRaw('COUNT(*) > 1'),
             'duplicate_release_ids',
@@ -427,7 +565,10 @@ return new class extends Migration
         ]);
 
         if ($blockers !== []) {
-            throw new RuntimeException('Releases optimization preflight failed: '.json_encode($blockers, JSON_THROW_ON_ERROR));
+            throw new RuntimeException(
+                'Releases optimization preflight failed: '.json_encode($blockers, JSON_THROW_ON_ERROR)
+                .'. Run `php artisan releases:normalize-guids --dry-run` to see how to resolve them.'
+            );
         }
     }
 

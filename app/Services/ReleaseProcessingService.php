@@ -754,6 +754,10 @@ final class ReleaseProcessingService
 
     private function nextNzbCreationAttempt(Release $release): int
     {
+        if (! $release->relationLoaded('nzbCreationFailure') && NzbCreationCandidateQuery::supportsFailureState()) {
+            $release->loadMissing('nzbCreationFailure');
+        }
+
         $failureState = $release->relationLoaded('nzbCreationFailure')
             ? $release->getRelation('nzbCreationFailure')
             : null;
@@ -764,16 +768,13 @@ final class ReleaseProcessingService
     private function recordNzbCreationRetry(Release $release, NzbCreationResult $result): void
     {
         $nextAttempt = $this->nextNzbCreationAttempt($release);
-        ReleaseNzbCreationFailure::query()->upsert(
-            [[
-                'releases_id' => (int) $release->id,
+        $failure = ReleaseNzbCreationFailure::query()->updateOrCreate(
+            ['releases_id' => (int) $release->id],
+            [
                 'attempts' => $nextAttempt,
                 'last_error' => mb_substr($result->reason, 0, 1000),
-            ]],
-            ['releases_id'],
-            ['attempts', 'last_error'],
+            ],
         );
-        $failure = ReleaseNzbCreationFailure::query()->findOrFail((int) $release->id);
         $release->setRelation('nzbCreationFailure', $failure);
 
         Log::channel('nzb_creation')->warning('NZB creation failed; release will be retried', [

@@ -106,6 +106,22 @@ final class ReleasesOptimizePreflightTest extends TestCase
         }
     }
 
+    public function test_human_report_includes_storage_discarded_data_and_index_sections(): void
+    {
+        $this->insertRelease(1, '01234567-89ab-cdef-0123-456789abcdef', '0', ['source' => 2]);
+
+        $status = Artisan::call('releases:optimize-preflight');
+        $output = Artisan::output();
+
+        $this->assertSame(0, $status);
+        $this->assertStringContainsString('Storage: not reported for the sqlite driver.', $output);
+        $this->assertStringContainsString('Dropped column', $output);
+        $this->assertStringContainsString('releases.source', $output);
+        $this->assertStringContainsString('permanently destroyed', $output);
+        $this->assertStringContainsString('Index change', $output);
+        $this->assertStringContainsString('ux_releases_guid', $output);
+    }
+
     /** @param array<string, mixed> $overrides */
     private function insertRelease(int $id, string $guid, string $leftguid, array $overrides = []): void
     {

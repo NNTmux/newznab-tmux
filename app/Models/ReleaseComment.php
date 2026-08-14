@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\DB;
  * @property int $releases_id FK to releases.id
  * @property string $text
  * @property bool $isvisible
- * @property string $text_hash
  * @property string $username
  * @property int $users_id
  * @property Carbon|null $created_at
@@ -32,7 +31,6 @@ use Illuminate\Support\Facades\DB;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereIsvisible($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereReleasesId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereText($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereTextHash($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereUsername($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereUsersId($value)

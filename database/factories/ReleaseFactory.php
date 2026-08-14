@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class ReleaseFactory extends Factory
 {
@@ -17,7 +18,8 @@ class ReleaseFactory extends Factory
             'fromname' => $this->faker->unique()->safeEmail(),
             'postdate' => $this->faker->date(),
             'adddate' => $this->faker->date(),
-            'guid' => $this->faker->sha1(),
+            'guid' => Str::uuid()->toString(),
+            'leftguid' => fn (array $attributes): string => $attributes['guid'][0],
             'categories_id' => '2080',
             'nzbstatus' => 1,
             'passwordstatus' => 0,

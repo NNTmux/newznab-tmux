@@ -113,6 +113,37 @@ final class ReleaseSchemaOptimizationMigrationMariaDbTest extends TestCase
         $this->assertDatabaseHas('release_files', ['releases_id' => 1, 'name' => 'kept.nzb']);
     }
 
+    #[Test]
+    public function claim_token_and_pp_index_follow_up_narrows_columns_and_adds_size(): void
+    {
+        $this->seedLegacyData();
+        $this->migration()->up();
+        $followUp = $this->followUpMigration();
+
+        $followUp->up();
+
+        $this->assertSame(
+            ['passwordstatus', 'haspreview', 'nzbstatus', 'leftguid', 'postdate', 'id', 'additional_pp_claimed_at', 'size'],
+            $this->indexColumns('ix_releases_add_pp_claim_queue'),
+        );
+        foreach (['nzb_creation_claim_token', 'additional_pp_claim_token'] as $column) {
+            $this->assertSame('char(32)', strtolower($this->columnType($column)));
+            $this->assertSame('ascii_general_ci', $this->columnCollation($column));
+        }
+
+        $token = bin2hex(random_bytes(16));
+        DB::table('releases')->where('id', 1)->update(['additional_pp_claim_token' => $token]);
+        $this->assertSame($token, DB::table('releases')->where('id', 1)->value('additional_pp_claim_token'));
+
+        $followUp->down();
+
+        $this->assertSame(
+            ['passwordstatus', 'haspreview', 'nzbstatus', 'leftguid', 'postdate', 'id', 'additional_pp_claimed_at'],
+            $this->indexColumns('ix_releases_add_pp_claim_queue'),
+        );
+        $this->assertSame('varchar(64)', strtolower($this->columnType('additional_pp_claim_token')));
+    }
+
     private function createSchema(): void
     {
         $releases = $this->table('releases');
@@ -256,6 +287,14 @@ final class ReleaseSchemaOptimizationMigrationMariaDbTest extends TestCase
     {
         /** @var Migration $migration */
         $migration = require database_path('migrations/2026_08_13_001652_normalize_and_optimize_releases_table.php');
+
+        return $migration;
+    }
+
+    private function followUpMigration(): Migration
+    {
+        /** @var Migration $migration */
+        $migration = require database_path('migrations/2026_08_14_121946_optimize_releases_claim_tokens_and_pp_index.php');
 
         return $migration;
     }
