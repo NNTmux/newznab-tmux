@@ -154,6 +154,8 @@ CREATE TABLE `bookinfo` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `ix_bookinfo_asin` (`asin`),
+  KEY `ix_bookinfo_isbn` (`isbn`),
+  KEY `ix_bookinfo_ean` (`ean`),
   FULLTEXT KEY `ix_bookinfo_author_title_ft` (`author`,`title`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

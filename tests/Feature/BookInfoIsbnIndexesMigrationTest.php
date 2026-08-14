@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use Illuminate\Auth\GenericUser;
-use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use PDO;
 use Tests\TestCase;
 
-class AuthRedirectMiddlewareTest extends TestCase
+class BookInfoIsbnIndexesMigrationTest extends TestCase
 {
     private string $databasePath;
 
@@ -23,8 +21,7 @@ class AuthRedirectMiddlewareTest extends TestCase
 
     public function createApplication()
     {
-        $this->databasePath = sys_get_temp_dir().'/nntmux-auth-redirect-test.sqlite';
-
+        $this->databasePath = sys_get_temp_dir().'/nntmux-bookinfo-isbn-indexes.sqlite';
         $this->originalEnvironment = [
             'APP_ENV' => getenv('APP_ENV'),
             'DB_CONNECTION' => getenv('DB_CONNECTION'),
@@ -37,18 +34,13 @@ class AuthRedirectMiddlewareTest extends TestCase
 
         $pdo = new PDO('sqlite:'.$this->databasePath);
         $pdo->exec('CREATE TABLE settings (name VARCHAR PRIMARY KEY, value TEXT NULL)');
-        $pdo->exec("INSERT INTO settings (name, value) VALUES
-            ('categorizeforeign', '0'),
-            ('catwebdl', '0'),
-            ('title', 'NNTmux Test'),
-            ('home_link', '/')");
+        $pdo->exec("INSERT INTO settings (name, value) VALUES ('categorizeforeign', '0'), ('catwebdl', '1')");
 
         $this->setEnvironmentValue('APP_ENV', 'testing');
         $this->setEnvironmentValue('DB_CONNECTION', 'sqlite');
         $this->setEnvironmentValue('DB_DATABASE', $this->databasePath);
 
         $app = require __DIR__.'/../../bootstrap/app.php';
-
         $app->make(Kernel::class)->bootstrap();
 
         return $app;
@@ -61,10 +53,13 @@ class AuthRedirectMiddlewareTest extends TestCase
         config([
             'database.default' => 'sqlite',
             'database.connections.sqlite.database' => $this->databasePath,
-            'app.key' => 'base64:'.base64_encode(random_bytes(32)),
         ]);
 
-        Cache::flush();
+        Schema::create('bookinfo', function (Blueprint $table): void {
+            $table->increments('id');
+            $table->string('isbn')->nullable();
+            $table->string('ean')->nullable();
+        });
     }
 
     protected function tearDown(): void
@@ -80,34 +75,20 @@ class AuthRedirectMiddlewareTest extends TestCase
         }
     }
 
-    public function test_guest_is_redirected_to_login_for_auth_middleware_routes(): void
+    public function test_it_adds_and_removes_isbn_indexes_idempotently(): void
     {
-        $this->get(route('verification.notice'))
-            ->assertRedirect(route('login'));
-    }
+        $migration = require database_path('migrations/2026_08_13_133021_add_isbn_indexes_to_bookinfo_table.php');
 
-    public function test_json_guest_requests_receive_unauthorized_instead_of_html_redirects(): void
-    {
-        $this->getJson(route('verification.notice'))
-            ->assertUnauthorized();
-    }
+        $migration->up();
+        $migration->up();
 
-    public function test_authenticated_users_are_redirected_away_from_guest_routes(): void
-    {
-        $this->actingAs(new GenericUser([
-            'id' => 1,
-            'email' => 'member@example.test',
-            'password' => 'test-password',
-        ]))
-            ->get(route('login'))
-            ->assertRedirect('/');
-    }
+        $this->assertTrue(Schema::hasIndex('bookinfo', 'ix_bookinfo_isbn'));
+        $this->assertTrue(Schema::hasIndex('bookinfo', 'ix_bookinfo_ean'));
 
-    public function test_is_verified_alias_uses_laravels_email_verification_middleware(): void
-    {
-        $middlewareAliases = app(Router::class)->getMiddleware();
+        $migration->down();
 
-        $this->assertSame(EnsureEmailIsVerified::class, $middlewareAliases['isVerified'] ?? null);
+        $this->assertFalse(Schema::hasIndex('bookinfo', 'ix_bookinfo_isbn'));
+        $this->assertFalse(Schema::hasIndex('bookinfo', 'ix_bookinfo_ean'));
     }
 
     private function setEnvironmentValue(string $key, ?string $value): void

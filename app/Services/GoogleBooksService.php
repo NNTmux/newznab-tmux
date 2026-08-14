@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Exceptions\BookProviderException;
+use App\Support\BookIsbn;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
+use JsonException;
 
 class GoogleBooksService
 {
@@ -73,7 +75,7 @@ class GoogleBooksService
         $query = trim($query);
         $title = $title !== null ? trim($title) : null;
         $author = $author !== null ? trim($author) : null;
-        $isbn = $isbn !== null ? strtoupper((string) preg_replace('/[^0-9X]/i', '', $isbn)) : null;
+        $isbn = BookIsbn::normalize($isbn);
 
         $searchQuery = $this->buildSearchQuery($query, $title, $author, $isbn);
         if ($searchQuery === '') {
@@ -118,20 +120,42 @@ class GoogleBooksService
                 $query['key'] = $this->apiKey;
             }
 
-            $response = $this->client->get(self::API_URL, ['query' => $query]);
+            $response = $this->client->get(self::API_URL, [
+                'http_errors' => false,
+                'query' => $query,
+            ]);
             if ($response->getStatusCode() !== 200) {
-                Log::warning('Google Books API request failed', ['status' => $response->getStatusCode()]);
-
-                return null;
+                throw new BookProviderException(
+                    'google_books',
+                    'Google Books API request failed.',
+                    $response->getStatusCode(),
+                );
             }
 
-            $decoded = json_decode($response->getBody()->getContents(), true);
+            $decoded = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+            if (! is_array($decoded)) {
+                throw new BookProviderException('google_books', 'Google Books returned an invalid response payload.', 200);
+            }
 
-            return is_array($decoded) ? $decoded : null;
+            return $decoded;
+        } catch (BookProviderException $exception) {
+            throw $exception;
+        } catch (JsonException $exception) {
+            throw new BookProviderException(
+                'google_books',
+                'Google Books returned malformed JSON.',
+                200,
+                null,
+                $exception,
+            );
         } catch (GuzzleException $e) {
-            Log::error('Google Books API request error: '.$e->getMessage());
-
-            return null;
+            throw new BookProviderException(
+                'google_books',
+                'Google Books API request error: '.$e->getMessage(),
+                null,
+                null,
+                $e,
+            );
         }
     }
 
@@ -172,11 +196,11 @@ class GoogleBooksService
                 continue;
             }
             $type = (string) ($identifier['type'] ?? '');
-            $value = strtoupper((string) preg_replace('/[^0-9X]/i', '', (string) ($identifier['identifier'] ?? '')));
-            if ($type === 'ISBN_13' && $value !== '') {
+            $value = BookIsbn::normalize((string) ($identifier['identifier'] ?? ''));
+            if ($type === 'ISBN_13' && $value !== null && strlen($value) === 13) {
                 $isbn13 = $value;
             }
-            if ($type === 'ISBN_10' && $value !== '') {
+            if ($type === 'ISBN_10' && $value !== null && strlen($value) === 10) {
                 $isbn10 = $value;
             }
         }

@@ -155,6 +155,7 @@ class PostProcessRunner extends BaseRunner
     private function getBooksBuckets(): array
     {
         $bucketExpr = $this->guidBucketExpression();
+        $pendingCondition = $this->bookPendingCondition();
 
         return DB::select('
             SELECT DISTINCT '.$bucketExpr.' AS id
@@ -164,7 +165,7 @@ class PostProcessRunner extends BaseRunner
                 OR categories_id = '.Category::MUSIC_AUDIOBOOK.'
             )
             AND (
-                bookinfo_id IS NULL
+                '.$pendingCondition.'
                 OR searchname LIKE "N:/NZB%"
                 OR searchname LIKE "N_NZB_%"
                 OR name LIKE "N:/NZB%"
@@ -600,6 +601,8 @@ class PostProcessRunner extends BaseRunner
             return;
         }
 
+        $pendingCondition = $this->bookPendingCondition();
+
         $checkSql = '
             SELECT id
             FROM releases
@@ -608,7 +611,7 @@ class PostProcessRunner extends BaseRunner
                 OR categories_id = 3030
             )
             AND (
-                bookinfo_id IS NULL
+                '.$pendingCondition.'
                 OR searchname LIKE "N:/NZB%"
                 OR searchname LIKE "N_NZB_%"
                 OR name LIKE "N:/NZB%"
@@ -630,7 +633,7 @@ class PostProcessRunner extends BaseRunner
                 OR categories_id = 3030
             )
             AND (
-                bookinfo_id IS NULL
+                '.$pendingCondition.'
                 OR searchname LIKE "N:/NZB%"
                 OR searchname LIKE "N_NZB_%"
                 OR name LIKE "N:/NZB%"
@@ -641,6 +644,13 @@ class PostProcessRunner extends BaseRunner
 
         $maxProcesses = (int) Settings::settingValue('postthreadsamazon');
         $this->runPostProcess($queue, $maxProcesses, 'books', 'books postprocessing');
+    }
+
+    private function bookPendingCondition(): string
+    {
+        return (int) Settings::settingValue('lookupbooks') === 2
+            ? '(bookinfo_id IS NULL AND isrenamed = 1)'
+            : 'bookinfo_id IS NULL';
     }
 
     public function processMusic(): void

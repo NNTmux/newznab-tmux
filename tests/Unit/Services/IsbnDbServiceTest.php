@@ -4,16 +4,28 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
+use App\Exceptions\BookProviderException;
 use App\Services\BookService;
 use App\Services\IsbnDbService;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 class IsbnDbServiceTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Cache::flush();
+    }
+
     public function test_is_configured_returns_false_when_key_is_missing(): void
     {
         $service = new IsbnDbService(null, '');
@@ -65,6 +77,163 @@ class IsbnDbServiceTest extends TestCase
         $this->assertSame('Software, Architecture', $book['genre']);
         $this->assertSame('https://example.com/cover.jpg', $book['coverurl']);
         $this->assertSame('isbndb:9780321125217', $book['asin']);
+    }
+
+    public function test_search_books_uses_the_documented_title_and_match_parameters(): void
+    {
+        $mock = new MockHandler([
+            new Response(200, [], json_encode(['data' => []])),
+        ]);
+        $history = [];
+        $handler = HandlerStack::create($mock);
+        $handler->push(Middleware::history($history));
+        $service = new IsbnDbService(
+            new Client(['handler' => $handler, 'base_uri' => 'https://api2.isbndb.com']),
+            'test-key'
+        );
+
+        $this->assertSame([], $service->searchBooks('Clean Code', 'Robert C Martin', true));
+        $this->assertCount(1, $history);
+
+        parse_str($history[0]['request']->getUri()->getQuery(), $query);
+        $this->assertArrayNotHasKey('author', $query);
+        $this->assertSame('title', $query['column']);
+        $this->assertSame('true', $query['shouldMatchAll']);
+        $this->assertSame('10', $query['pageSize']);
+    }
+
+    public function test_successful_empty_search_is_cached(): void
+    {
+        $mock = new MockHandler([
+            new Response(200, [], json_encode(['data' => []])),
+        ]);
+        $history = [];
+        $handler = HandlerStack::create($mock);
+        $handler->push(Middleware::history($history));
+        $service = new IsbnDbService(
+            new Client(['handler' => $handler, 'base_uri' => 'https://api2.isbndb.com']),
+            'test-key'
+        );
+
+        $this->assertSame([], $service->searchBooks('Unique Empty Book Query'));
+        $this->assertSame([], $service->searchBooks('Unique Empty Book Query'));
+        $this->assertCount(1, $history);
+    }
+
+    public function test_rate_limit_response_throws_provider_exception_and_sets_cooldown(): void
+    {
+        $mock = new MockHandler([
+            new Response(429, ['Retry-After' => '120']),
+        ]);
+        $service = new IsbnDbService(
+            new Client(['handler' => HandlerStack::create($mock), 'base_uri' => 'https://api2.isbndb.com']),
+            'test-key'
+        );
+
+        try {
+            $service->searchBooks('Rate Limited Query');
+            $this->fail('Expected the ISBNdb request to report provider unavailability.');
+        } catch (BookProviderException $exception) {
+            $this->assertSame('isbndb', $exception->provider);
+            $this->assertSame(429, $exception->statusCode);
+            $this->assertSame(120, $exception->retryAfterSeconds);
+        }
+
+        $this->assertTrue(Cache::has(IsbnDbService::COOLDOWN_CACHE_KEY));
+    }
+
+    public function test_malformed_success_response_throws_provider_exception(): void
+    {
+        $mock = new MockHandler([
+            new Response(200, [], '{not-json'),
+        ]);
+        $service = new IsbnDbService(
+            new Client(['handler' => HandlerStack::create($mock), 'base_uri' => 'https://api2.isbndb.com']),
+            'test-key'
+        );
+
+        $this->expectException(BookProviderException::class);
+
+        $service->searchBooks('Malformed Response Query');
+    }
+
+    public function test_success_response_without_documented_data_envelope_is_retryable(): void
+    {
+        $mock = new MockHandler([
+            new Response(200, [], json_encode(['books' => []])),
+        ]);
+        $service = new IsbnDbService(
+            new Client(['handler' => HandlerStack::create($mock), 'base_uri' => 'https://api2.isbndb.com']),
+            'test-key'
+        );
+
+        $this->expectException(BookProviderException::class);
+
+        $service->searchBooks('Missing Data Envelope Query');
+    }
+
+    public function test_authentication_failure_is_distinguished_without_transient_cooldown(): void
+    {
+        $mock = new MockHandler([
+            new Response(401),
+        ]);
+        $service = new IsbnDbService(
+            new Client(['handler' => HandlerStack::create($mock), 'base_uri' => 'https://api2.isbndb.com']),
+            'test-key'
+        );
+
+        try {
+            $service->searchBooks('Authentication Failure Query');
+            $this->fail('Expected an authentication provider exception.');
+        } catch (BookProviderException $exception) {
+            $this->assertSame(401, $exception->statusCode);
+            $this->assertNull($exception->retryAfterSeconds);
+        }
+
+        $this->assertFalse(Cache::has(IsbnDbService::COOLDOWN_CACHE_KEY));
+    }
+
+    public function test_server_failure_applies_default_cooldown(): void
+    {
+        $mock = new MockHandler([
+            new Response(503),
+        ]);
+        $service = new IsbnDbService(
+            new Client(['handler' => HandlerStack::create($mock), 'base_uri' => 'https://api2.isbndb.com']),
+            'test-key'
+        );
+
+        try {
+            $service->searchBooks('Server Failure Query');
+            $this->fail('Expected a transient provider exception.');
+        } catch (BookProviderException $exception) {
+            $this->assertSame(503, $exception->statusCode);
+            $this->assertSame(300, $exception->retryAfterSeconds);
+        }
+
+        $this->assertTrue(Cache::has(IsbnDbService::COOLDOWN_CACHE_KEY));
+    }
+
+    public function test_network_failure_applies_default_cooldown(): void
+    {
+        $request = new Request('GET', 'https://api2.isbndb.com/books/Network');
+        $mock = new MockHandler([
+            new ConnectException('Connection failed', $request),
+        ]);
+        $service = new IsbnDbService(
+            new Client(['handler' => HandlerStack::create($mock), 'base_uri' => 'https://api2.isbndb.com']),
+            'test-key'
+        );
+
+        try {
+            $service->searchBooks('Network Failure Query');
+            $this->fail('Expected a network provider exception.');
+        } catch (BookProviderException $exception) {
+            $this->assertNull($exception->statusCode);
+            $this->assertSame(300, $exception->retryAfterSeconds);
+        }
+
+        $this->assertTrue(Cache::has(IsbnDbService::COOLDOWN_CACHE_KEY));
     }
 
     public function test_find_by_isbn_reads_book_payload(): void

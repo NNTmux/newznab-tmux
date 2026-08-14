@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
+use App\Exceptions\BookProviderException;
 use App\Services\OpenLibraryService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
@@ -65,5 +66,18 @@ class OpenLibraryServiceTest extends TestCase
         $this->assertSame('Clean Architecture', $book['title']);
         $this->assertSame('Robert C. Martin', $book['author']);
         $this->assertSame('9780134494166', $book['isbn']);
+    }
+
+    public function test_malformed_search_response_is_reported_as_provider_unavailability(): void
+    {
+        $service = new OpenLibraryService(
+            new Client(['handler' => HandlerStack::create(new MockHandler([
+                new Response(200, [], '{invalid-json'),
+            ]))])
+        );
+
+        $this->expectException(BookProviderException::class);
+
+        $service->searchBooks('malformed query');
     }
 }

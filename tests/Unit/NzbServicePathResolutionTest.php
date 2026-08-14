@@ -124,7 +124,6 @@ final class NzbServicePathResolutionTest extends TestCase
     {
         $tempDir = sys_get_temp_dir().'/nzb-path-permissions-'.uniqid('', true);
         $basePath = $tempDir.'/';
-        mkdir($basePath, 0775, true);
         $previousUmask = umask(0022);
 
         try {
@@ -140,7 +139,7 @@ final class NzbServicePathResolutionTest extends TestCase
             $path = $service->buildNzbPath('4aabfe07-daff-4d28-9d1d-d2a4ab7b6511', 4, true);
 
             $this->assertSame($basePath.'4/a/a/b/', $path);
-            foreach ([$basePath.'4', $basePath.'4/a', $basePath.'4/a/a', $basePath.'4/a/a/b'] as $directory) {
+            foreach ([rtrim($basePath, '/'), $basePath.'4', $basePath.'4/a', $basePath.'4/a/a', $basePath.'4/a/a/b'] as $directory) {
                 $this->assertSame(02775, fileperms($directory) & 07777);
             }
         } finally {

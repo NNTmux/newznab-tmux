@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Exceptions\BookProviderException;
+use App\Support\BookIsbn;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
+use JsonException;
 
 class OpenLibraryService
 {
@@ -38,8 +40,8 @@ class OpenLibraryService
      */
     public function findByIsbn(string $isbn): ?array
     {
-        $isbn = strtoupper((string) preg_replace('/[^0-9X]/i', '', $isbn));
-        if ($isbn === '') {
+        $isbn = BookIsbn::normalize($isbn);
+        if ($isbn === null) {
             return null;
         }
 
@@ -50,24 +52,33 @@ class OpenLibraryService
         }
 
         try {
-            $response = $this->client->get(self::ISBN_URL.rawurlencode($isbn).'.json');
-            if ($response->getStatusCode() !== 200) {
+            $response = $this->client->get(self::ISBN_URL.rawurlencode($isbn).'.json', ['http_errors' => false]);
+            if ($response->getStatusCode() === 404) {
                 return null;
             }
+            if ($response->getStatusCode() !== 200) {
+                throw new BookProviderException(
+                    'open_library',
+                    'Open Library ISBN request failed.',
+                    $response->getStatusCode(),
+                );
+            }
 
-            $data = json_decode($response->getBody()->getContents(), true);
+            $data = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
             if (! is_array($data)) {
-                return null;
+                throw new BookProviderException('open_library', 'Open Library returned an invalid ISBN payload.', 200);
             }
 
             $book = $this->normalizeIsbnResult($data, $isbn);
             Cache::put($cacheKey, $book, now()->addHours(24));
 
             return $book;
+        } catch (BookProviderException $exception) {
+            throw $exception;
+        } catch (JsonException $exception) {
+            throw new BookProviderException('open_library', 'Open Library returned malformed JSON.', 200, null, $exception);
         } catch (GuzzleException $e) {
-            Log::error('OpenLibrary ISBN lookup error: '.$e->getMessage());
-
-            return null;
+            throw new BookProviderException('open_library', 'Open Library ISBN lookup error: '.$e->getMessage(), null, null, $e);
         }
     }
 
@@ -99,18 +110,26 @@ class OpenLibraryService
 
         try {
             $response = $this->client->get(self::SEARCH_URL, [
+                'http_errors' => false,
                 'query' => [
                     'q' => $query,
                     'limit' => $this->limit,
                 ],
             ]);
-            if ($response->getStatusCode() !== 200) {
+            if ($response->getStatusCode() === 404) {
                 return [];
             }
+            if ($response->getStatusCode() !== 200) {
+                throw new BookProviderException(
+                    'open_library',
+                    'Open Library search request failed.',
+                    $response->getStatusCode(),
+                );
+            }
 
-            $data = json_decode($response->getBody()->getContents(), true);
+            $data = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
             if (! is_array($data['docs'] ?? null)) {
-                return [];
+                throw new BookProviderException('open_library', 'Open Library returned an invalid search payload.', 200);
             }
 
             $results = [];
@@ -123,10 +142,12 @@ class OpenLibraryService
             Cache::put($cacheKey, $results, now()->addHours(12));
 
             return $results;
+        } catch (BookProviderException $exception) {
+            throw $exception;
+        } catch (JsonException $exception) {
+            throw new BookProviderException('open_library', 'Open Library returned malformed JSON.', 200, null, $exception);
         } catch (GuzzleException $e) {
-            Log::error('OpenLibrary search error: '.$e->getMessage());
-
-            return [];
+            throw new BookProviderException('open_library', 'Open Library search error: '.$e->getMessage(), null, null, $e);
         }
     }
 
@@ -180,8 +201,8 @@ class OpenLibraryService
         $isbn10 = null;
         if (is_array($doc['isbn'] ?? null)) {
             foreach ($doc['isbn'] as $isbn) {
-                $normalized = strtoupper((string) preg_replace('/[^0-9X]/i', '', (string) $isbn));
-                if ($normalized === '') {
+                $normalized = BookIsbn::normalize((string) $isbn);
+                if ($normalized === null) {
                     continue;
                 }
                 if (strlen($normalized) === 13 && $isbn13 === null) {
