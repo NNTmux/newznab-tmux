@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 
 /**
  * App\Models\ReleaseComment.
@@ -16,34 +17,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $releases_id FK to releases.id
  * @property string $text
  * @property bool $isvisible
- * @property bool $issynced
- * @property string|null $gid
- * @property string|null $cid
  * @property string $text_hash
  * @property string $username
  * @property int $users_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property string|null $host
- * @property bool $shared
- * @property string $shareid
- * @property string $siteid
- * @property int|null $sourceid
  * @property-read Release $release
  * @property-read User $user
  *
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereCid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereGid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereHost($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereIssynced($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereIsvisible($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereReleasesId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereShared($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereShareid($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereSiteid($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereSourceid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereText($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereTextHash($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ReleaseComment whereUpdatedAt($value)
@@ -108,13 +95,18 @@ class ReleaseComment extends Model
     /**
      * Delete single comment on the site.
      */
-    public static function deleteComment(mixed $id): void
+    public static function deleteComment(int $id): void
     {
-        $res = self::getCommentById($id);
-        if ($res) {
-            self::query()->where('id', $id)->delete();
-            self::updateReleaseCommentCount($res['gid']);
-        }
+        DB::transaction(function () use ($id): void {
+            $comment = self::query()->find($id, ['id', 'releases_id']);
+            if ($comment === null) {
+                return;
+            }
+
+            $releaseId = (int) $comment->releases_id;
+            $comment->delete();
+            self::updateReleaseCommentCount($releaseId);
+        });
     }
 
     /**
@@ -124,31 +116,31 @@ class ReleaseComment extends Model
      *
      * @throws \Exception
      */
-    public static function addComment(mixed $id, mixed $gid, mixed $text, mixed $userid, mixed $host): int
+    public static function addComment(int $releaseId, string $text, int $userId, ?string $host): int
     {
         if (config('nntmux:settings.store_user_ip') === false) {
             $host = '';
         }
 
-        $username = User::query()->where('id', $userid)->first(['username']);
+        $username = User::query()->where('id', $userId)->first(['username']);
         $username = ($username === null ? 'ANON' : $username['username']);
 
-        $comid = self::query()
-            ->insertGetId(
+        return DB::transaction(function () use ($releaseId, $text, $userId, $host, $username): int {
+            $commentId = self::query()->insertGetId(
                 [
-                    'releases_id' => $id,
-                    'gid' => $gid,
+                    'releases_id' => $releaseId,
                     'text' => $text,
-                    'users_id' => $userid,
+                    'users_id' => $userId,
                     'created_at' => now(),
                     'updated_at' => now(),
                     'host' => $host,
                     'username' => $username,
                 ]
             );
-        self::updateReleaseCommentCount($id);
+            self::updateReleaseCommentCount($releaseId);
 
-        return $comid;
+            return $commentId;
+        });
     }
 
     /**
@@ -167,10 +159,13 @@ class ReleaseComment extends Model
     /**
      * Update the denormalised count of comments for a release.
      */
-    public static function updateReleaseCommentCount(mixed $gid): void
+    public static function updateReleaseCommentCount(int $releaseId): void
     {
-        $commentCount = self::query()->where('gid', '=', 'releases.gid')->where('isvisible', '=', 1)->count('id');
-        Release::query()->where('gid', $gid)->update(['comments' => $commentCount]);
+        $commentCount = self::query()
+            ->where('releases_id', $releaseId)
+            ->where('isvisible', 1)
+            ->count('id');
+        Release::query()->whereKey($releaseId)->update(['comments' => $commentCount]);
     }
 
     /**

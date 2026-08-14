@@ -6,6 +6,7 @@ namespace App\Services\Nzb;
 
 use App\Models\Collection;
 use App\Models\Release;
+use App\Models\ReleaseNzbCreationFailure;
 use App\Models\Settings;
 use App\Services\Binaries\BinariesConfig;
 use App\Services\CollectionCleanupService;
@@ -262,8 +263,16 @@ class NzbService
                 return NzbCreationResult::transient("Final NZB file is missing or unreadable: {$path}", $collectionIds, $path);
             }
 
-            // Mark release as having NZB.
-            $release->update($this->successfulReleaseUpdateValues());
+            DB::transaction(function () use ($release): void {
+                $release->update($this->successfulReleaseUpdateValues());
+
+                if (NzbCreationCandidateQuery::supportsFailureState()) {
+                    ReleaseNzbCreationFailure::query()
+                        ->where('releases_id', $release->id)
+                        ->delete();
+                    $release->unsetRelation('nzbCreationFailure');
+                }
+            });
         } catch (Throwable $e) {
             return NzbCreationResult::transient('Failed to write NZB file: '.$e->getMessage(), $collectionIds, $path);
         } finally {
@@ -729,8 +738,6 @@ class NzbService
 
         if (NzbCreationCandidateQuery::supportsClaims()) {
             $values += [
-                NzbCreationCandidateQuery::ATTEMPTS_COLUMN => 0,
-                NzbCreationCandidateQuery::LAST_ERROR_COLUMN => null,
                 NzbCreationCandidateQuery::CLAIMED_AT_COLUMN => null,
                 NzbCreationCandidateQuery::CLAIM_TOKEN_COLUMN => null,
             ];

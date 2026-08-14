@@ -352,7 +352,7 @@ class ReleaseUpdateService
             'PAR2, ' => ['isrenamed' => 1, 'iscategorized' => 1, 'proc_par2' => 1],
             'Filenames, ', 'file matched source: ' => ['isrenamed' => 1, 'iscategorized' => 1, 'proc_files' => 1],
             'PreDB FT Exact, ' => ['isrenamed' => 1, 'iscategorized' => 1],
-            'sorter, ' => ['isrenamed' => 1, 'iscategorized' => 1, 'proc_sorter' => 1],
+            'sorter, ' => ['isrenamed' => 1, 'iscategorized' => 1],
             'UID, ', 'Mediainfo, ' => ['isrenamed' => 1, 'iscategorized' => 1, 'proc_uid' => 1],
             'PAR2 hash, ' => ['isrenamed' => 1, 'iscategorized' => 1, 'proc_hash16k' => 1],
             'SRR, ' => ['isrenamed' => 1, 'iscategorized' => 1, 'proc_srr' => 1],

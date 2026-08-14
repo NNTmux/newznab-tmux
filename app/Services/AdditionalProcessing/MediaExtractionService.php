@@ -390,7 +390,6 @@ class MediaExtractionService
                 }
 
                 @chmod($this->config->audioSavePath.$audioFileName, 0764);
-                Release::query()->where('id', $context->release->id)->update(['audiostatus' => 1]);
                 $result['audioSample'] = true;
                 $context->foundAudioSample = true;
             }

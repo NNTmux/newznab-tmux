@@ -23,8 +23,9 @@ final class AdditionalProcessingDiagnostics
         'haspreview',
         'nzbstatus',
         'leftguid',
-        'additional_pp_claimed_at',
         'postdate',
+        'id',
+        'additional_pp_claimed_at',
     ];
 
     /**
@@ -150,12 +151,12 @@ final class AdditionalProcessingDiagnostics
 
     /**
      * @param  list<array{code: string, message: string}>  $warnings
-     * @return array{required_columns: list<string>, present: list<string>, covering_index: string|null, missing: bool}
+     * @return array{required_columns: list<string>, present: list<string>, claim_queue_index: string|null, missing: bool}
      */
     private function indexes(array &$warnings): array
     {
         $present = [];
-        $coveringIndex = null;
+        $claimQueueIndex = null;
 
         if (Schema::hasTable('releases')) {
             foreach (Schema::getIndexes('releases') as $index) {
@@ -169,13 +170,13 @@ final class AdditionalProcessingDiagnostics
                     $present[] = $name;
                 }
                 if ($columns === self::REQUIRED_CLAIM_INDEX_COLUMNS) {
-                    $coveringIndex = $name;
+                    $claimQueueIndex = $name;
                 }
             }
         }
 
         sort($present);
-        $missing = $coveringIndex === null;
+        $missing = $claimQueueIndex === null;
         if ($missing) {
             $warnings[] = $this->warning(
                 'missing-index',
@@ -186,7 +187,7 @@ final class AdditionalProcessingDiagnostics
         return [
             'required_columns' => self::REQUIRED_CLAIM_INDEX_COLUMNS,
             'present' => $present,
-            'covering_index' => $coveringIndex,
+            'claim_queue_index' => $claimQueueIndex,
             'missing' => $missing,
         ];
     }

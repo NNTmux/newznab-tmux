@@ -75,7 +75,6 @@ class ProcessAdditionalGuid extends Command
                 'haspreview' => -1,
                 'jpgstatus' => 0,
                 'videostatus' => 0,
-                'audiostatus' => 0,
                 'nfostatus' => -1,
             ]);
             Search::updateRelease((int) $release->id);

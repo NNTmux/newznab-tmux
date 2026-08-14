@@ -45,7 +45,7 @@ class AdditionalProcessingDiagnose extends Command
         ]);
         $this->table(['Preflight', 'Value'], [
             ['Database driver', (string) $report['database_driver']],
-            ['Covering claim index', (string) ($report['indexes']['covering_index'] ?? 'missing')],
+            ['Claim queue index', (string) ($report['indexes']['claim_queue_index'] ?? 'missing')],
             ['Temp path', (string) $report['temp_path']['path']],
             ['Temp path writable', $report['temp_path']['writable'] ? 'yes' : 'no'],
         ]);

@@ -132,6 +132,18 @@ class Release extends Model
         return $this->hasOne(ReleaseNfo::class, 'releases_id');
     }
 
+    /** @return HasOne<ReleaseNzbPassword, $this> */
+    public function nzbPassword(): HasOne
+    {
+        return $this->hasOne(ReleaseNzbPassword::class, 'releases_id');
+    }
+
+    /** @return HasOne<ReleaseNzbCreationFailure, $this> */
+    public function nzbCreationFailure(): HasOne
+    {
+        return $this->hasOne(ReleaseNzbCreationFailure::class, 'releases_id');
+    }
+
     /**
      * @return HasMany<ReleaseComment, $this>
      */
@@ -212,7 +224,6 @@ class Release extends Model
                     'isrenamed' => $parameters['isrenamed'],
                     'iscategorized' => 1,
                     'predb_id' => $parameters['predb_id'],
-                    'source' => $parameters['source'] ?? null,
                 ]
             );
 

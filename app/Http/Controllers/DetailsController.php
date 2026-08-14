@@ -56,7 +56,7 @@ class DetailsController extends BasePageController
         }
 
         if ($this->isPostBack($request)) {
-            ReleaseComment::addComment($data['id'], $data['gid'], $request->input('txtAddComment'), $this->userdata->id, $request->ip());
+            ReleaseComment::addComment((int) $data['id'], (string) $request->input('txtAddComment'), (int) $this->userdata->id, $request->ip());
 
             return redirect()->route('details', ['guid' => $guid])->with('success', 'Comment posted successfully!');
         }

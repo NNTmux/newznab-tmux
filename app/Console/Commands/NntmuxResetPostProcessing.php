@@ -86,7 +86,6 @@ class NntmuxResetPostProcessing extends Command
                             'haspreview' => -1,
                             'jpgstatus' => 0,
                             'videostatus' => 0,
-                            'audiostatus' => 0,
                             'nfostatus' => -1,
                         ]
                     );
@@ -366,7 +365,6 @@ class NntmuxResetPostProcessing extends Command
                         'haspreview' => -1,
                         'jpgstatus' => 0,
                         'videostatus' => 0,
-                        'audiostatus' => 0,
                         'nfostatus' => -1,
                     ]);
                 Search::updateRelease((int) $releases->id);

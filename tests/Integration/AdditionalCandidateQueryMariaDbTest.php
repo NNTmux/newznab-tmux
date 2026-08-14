@@ -276,7 +276,7 @@ final class AdditionalCandidateQueryMariaDbTest extends TestCase
                 additional_pp_claimed_at TIMESTAMP NULL,
                 additional_pp_claim_token VARCHAR(64) NULL,
                 KEY ix_releases_haspreview_passwordstatus (haspreview, passwordstatus),
-                KEY ix_releases_add_pp_claim_queue (passwordstatus, haspreview, nzbstatus, leftguid, additional_pp_claimed_at, postdate DESC)
+                KEY ix_releases_add_pp_claim_queue (passwordstatus, haspreview, nzbstatus, leftguid, postdate DESC, id, additional_pp_claimed_at)
             ) ENGINE=InnoDB
             SQL);
         DB::table('settings')->insert([

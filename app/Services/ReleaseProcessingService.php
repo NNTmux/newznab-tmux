@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Collection;
 use App\Models\MusicInfo;
 use App\Models\Release;
+use App\Models\ReleaseNzbCreationFailure;
 use App\Models\Settings;
 use App\Models\UsenetGroup;
 use App\Services\Binaries\BinariesConfig;
@@ -690,7 +691,6 @@ final class ReleaseProcessingService
                 'groups_id',
                 'postdate',
                 'nzbstatus',
-                NzbCreationCandidateQuery::ATTEMPTS_COLUMN,
                 NzbCreationCandidateQuery::CLAIM_TOKEN_COLUMN,
             ];
 
@@ -754,24 +754,34 @@ final class ReleaseProcessingService
 
     private function nextNzbCreationAttempt(Release $release): int
     {
-        return ((int) ($release->{NzbCreationCandidateQuery::ATTEMPTS_COLUMN} ?? 0)) + 1;
+        $failureState = $release->relationLoaded('nzbCreationFailure')
+            ? $release->getRelation('nzbCreationFailure')
+            : null;
+
+        return ($failureState instanceof ReleaseNzbCreationFailure ? $failureState->attempts : 0) + 1;
     }
 
     private function recordNzbCreationRetry(Release $release, NzbCreationResult $result): void
     {
-        $values = NzbCreationCandidateQuery::failureUpdateValues($result->reason, true);
-        if ($values !== []) {
-            Release::query()
-                ->where('id', $release->id)
-                ->update($values);
-        }
+        $nextAttempt = $this->nextNzbCreationAttempt($release);
+        ReleaseNzbCreationFailure::query()->upsert(
+            [[
+                'releases_id' => (int) $release->id,
+                'attempts' => $nextAttempt,
+                'last_error' => mb_substr($result->reason, 0, 1000),
+            ]],
+            ['releases_id'],
+            ['attempts', 'last_error'],
+        );
+        $failure = ReleaseNzbCreationFailure::query()->findOrFail((int) $release->id);
+        $release->setRelation('nzbCreationFailure', $failure);
 
         Log::channel('nzb_creation')->warning('NZB creation failed; release will be retried', [
             'release_id' => $release->id,
             'guid' => $release->guid,
             'failure_type' => $result->failureType,
             'reason' => $result->reason,
-            'next_attempt' => $this->nextNzbCreationAttempt($release),
+            'next_attempt' => $nextAttempt,
             'max_attempts' => self::NZB_CREATION_MAX_ATTEMPTS,
         ]);
     }
