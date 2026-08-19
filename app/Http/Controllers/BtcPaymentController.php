@@ -99,6 +99,15 @@ class BtcPaymentController extends BasePageController
 
                 return response('Not Found', 404);
             }
+
+            $existingPayment = Payment::query()->where('invoice_id', '=', $payload['invoiceId'])->first();
+            if ($existingPayment === null) {
+                Log::channel('btc_payment')->error('InvoiceSettled webhook received but no payment recorded for invoice: '.$payload['invoiceId'].' (webhook: '.($payload['webhookId'] ?? 'unknown').', buyer: '.($payload['metadata']['buyerEmail'] ?? 'unknown').')');
+
+                return response('Not Found', 404);
+            }
+
+            Log::channel('btc_payment')->info('Duplicate InvoiceSettled webhook for already settled invoice: '.$payload['invoiceId']);
         }
 
         return response('OK', 200);
