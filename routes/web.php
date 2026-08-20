@@ -368,7 +368,7 @@ Route::middleware('role_or_permission:Admin|Moderator|edit release')->prefix('ad
 
 // Redirect btcpay route to btc payment server
 Route::get('btcpay', function () {
-    return redirect()->to('https://simplegate.space/apps/3MjgKvosMZtc2sSxiRBwadDCn1zA/pos');
+    return redirect()->to('https://example.com');
 })->name('btcpay');
 // Invitation management routes
 Route::prefix('invitations')->name('invitations.')->group(function () {

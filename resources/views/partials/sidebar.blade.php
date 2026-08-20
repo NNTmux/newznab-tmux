@@ -162,12 +162,12 @@
         @endphp
         @if($userRole !== 'Admin')
             @if($userRole === 'User')
-                <a href="https://simplegate.space/apps/3MjgKvosMZtc2sSxiRBwadDCn1zA/pos" target="_blank" class="flex items-center px-4 py-3 text-white hover:bg-white/10 rounded transition mt-4">
+                <a href="https://example.com" target="_blank" class="flex items-center px-4 py-3 text-white hover:bg-white/10 rounded transition mt-4">
                     <i class="fa fa-arrow-up fa-fw mr-3"></i>
                     <span>Upgrade Your Account</span>
                 </a>
             @else
-                <a href="https://simplegate.space/apps/3MjgKvosMZtc2sSxiRBwadDCn1zA/pos" target="_blank" class="flex items-center px-4 py-3 text-white hover:bg-white/10 rounded transition mt-4">
+                <a href="https://example.com" target="_blank" class="flex items-center px-4 py-3 text-white hover:bg-white/10 rounded transition mt-4">
                     <i class="fa fa-clock fa-fw mr-3"></i>
                     <span>Extend Your Account</span>
                 </a>
@@ -186,4 +186,3 @@
         </form>
     @endauth
 </nav>
-
